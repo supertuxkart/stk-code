@@ -35,7 +35,8 @@ namespace GUIEngine
  * \brief Dialog that shows information about a specific grand prix
  * \ingroup states_screens
  */
-class BaseGPInfoScreen : public GUIEngine::Screen
+class GPInfoScreen : public GUIEngine::Screen,
+                     public GUIEngine::ScreenSingleton<GPInfoScreen>
 {
 private:
     /** Spinner for the different track groups. */
@@ -53,7 +54,7 @@ private:
     /** The currently selected group name. */
     std::string m_group_name;
 
-protected: // Necessary for RandomBaseGPInfoScreen
+protected: // Necessary for RandomGPInfoScreen
     GUIEngine::IconButtonWidget* m_screenshot_widget;
     float m_curr_time;
 
@@ -70,10 +71,10 @@ protected: // Necessary for RandomBaseGPInfoScreen
     GrandPrixData::GPReverseType getReverse() const;
 
 public:
-    BaseGPInfoScreen(const std::string &name);
+    GPInfoScreen();
     /** Places the focus back on the selected GP, in the case that the dialog
      * was cancelled and we're returning to the track selection screen */
-    virtual ~BaseGPInfoScreen();
+    virtual ~GPInfoScreen();
 
     void onEnterPressedInternal();
     virtual void eventCallback(GUIEngine::Widget *, const std::string &name,
@@ -84,28 +85,6 @@ public:
     virtual void onUpdate(float dt);
 
     void setGP(const std::string &gp_ident);
-};   // BaseGPInfoScreen
-
-// ============================================================================
-class GPInfoScreen: public BaseGPInfoScreen,
-                    public GUIEngine::ScreenSingleton<GPInfoScreen>
-{
-private:
-    GPInfoScreen() : BaseGPInfoScreen("gp_info.stkgui")
-    {};
-public:
-    friend class GUIEngine::ScreenSingleton<GPInfoScreen>;
-};   // class GPInfoScreen
-
-// ============================================================================
-class RandomGPInfoScreen: public BaseGPInfoScreen,
-                          public GUIEngine::ScreenSingleton<RandomGPInfoScreen>
-{
-private:
-    RandomGPInfoScreen() : BaseGPInfoScreen("random_gp_info.stkgui")
-    {};
-public:
-    friend class GUIEngine::ScreenSingleton<RandomGPInfoScreen>;
-};   // class RandomGPInfoScreen
+};   // GPInfoScreen
 
 #endif

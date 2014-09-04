@@ -25,7 +25,6 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -52,23 +51,22 @@ using GUIEngine::PROP_ID;
 using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( GPInfoScreen );
-DEFINE_SCREEN_SINGLETON( RandomGPInfoScreen );
 
-BaseGPInfoScreen::BaseGPInfoScreen(const std::string &name) : Screen(name.c_str())
+GPInfoScreen::GPInfoScreen() : Screen("gp_info.stkgui")
 {
     m_curr_time = 0.0f;
     // Necessary to test if loadedFroMFile() was executed (in setGP)
     m_reverse_spinner = NULL;
-}   // BaseGPInfoScreen
+}   // GPInfoScreen
 
 // ----------------------------------------------------------------------------
 
-BaseGPInfoScreen::~BaseGPInfoScreen()
+GPInfoScreen::~GPInfoScreen()
 {
-}   // ~BaseGPInfoScreen
+}   // ~GPInfoScreen
 
 // ----------------------------------------------------------------------------
-void BaseGPInfoScreen::loadedFromFile()
+void GPInfoScreen::loadedFromFile()
 {
     // The group spinner is filled in init every time the screen is shown
     // (since the groups can change if addons are added/deleted).
@@ -91,7 +89,7 @@ void BaseGPInfoScreen::loadedFromFile()
 /** Sets the GP to be displayed. If the identifier is 'random', no gp info
  *  will be loaded.
  */
-void BaseGPInfoScreen::setGP(const std::string &gp_ident)
+void GPInfoScreen::setGP(const std::string &gp_ident)
 {
     if(gp_ident!="random")
         m_gp = *grand_prix_manager->getGrandPrix(gp_ident);
@@ -106,7 +104,7 @@ void BaseGPInfoScreen::setGP(const std::string &gp_ident)
 }   // setGP
 
 // ----------------------------------------------------------------------------
-GrandPrixData::GPReverseType BaseGPInfoScreen::getReverse() const
+GrandPrixData::GPReverseType GPInfoScreen::getReverse() const
 {
     switch (m_reverse_spinner->getValue())
     {
@@ -120,7 +118,7 @@ GrandPrixData::GPReverseType BaseGPInfoScreen::getReverse() const
 }   // getReverse
 
 // ----------------------------------------------------------------------------
-void BaseGPInfoScreen::init()
+void GPInfoScreen::init()
 {
     Screen::init();
     m_curr_time = 0.0f;
@@ -206,7 +204,7 @@ void BaseGPInfoScreen::init()
 // ----------------------------------------------------------------------------
 /** Updates the list of tracks shown.
  */
-void BaseGPInfoScreen::addTracks()
+void GPInfoScreen::addTracks()
 {
     const std::vector<std::string> tracks = m_gp.getTrackNames();
 
@@ -223,7 +221,7 @@ void BaseGPInfoScreen::addTracks()
 // ----------------------------------------------------------------------------
 /** Creates a screenshot widget in the placeholder of the GUI.
  */
-void BaseGPInfoScreen::addScreenshot()
+void GPInfoScreen::addScreenshot()
 {
     Widget* screenshot_div = getWidget("screenshot_div");
 
@@ -254,7 +252,7 @@ void BaseGPInfoScreen::addScreenshot()
 
 // ----------------------------------------------------------------------------
 
-void BaseGPInfoScreen::onEnterPressedInternal()
+void GPInfoScreen::onEnterPressedInternal()
 {
     // Save the GP id because dismiss() will destroy this instance
     GrandPrixData gp_data = m_gp;
@@ -264,7 +262,7 @@ void BaseGPInfoScreen::onEnterPressedInternal()
 }
 
 // ----------------------------------------------------------------------------
-void BaseGPInfoScreen::updateRandomGP()
+void GPInfoScreen::updateRandomGP()
 {
     // First get the right track group to use
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
@@ -287,7 +285,7 @@ void BaseGPInfoScreen::updateRandomGP()
 // ----------------------------------------------------------------------------
 /** Handle user input.
  */
-void BaseGPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &name,
+void GPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &name,
                                  const int player_id)
 {
     if(name=="buttons")
@@ -356,7 +354,7 @@ void BaseGPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &nam
 /** Called every update. Used to cycle the screenshots.
  *  \param dt Time step size.
  */
-void BaseGPInfoScreen::onUpdate(float dt)
+void GPInfoScreen::onUpdate(float dt)
 {
     if (dt == 0)
         return; // if nothing changed, return right now
