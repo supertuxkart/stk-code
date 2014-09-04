@@ -350,7 +350,7 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
         if (!(*I)->isVisible())
             continue;
         (*I)->updateAbsolutePosition();
-        (*I)->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
+
         scene::ICameraSceneNode* cam = irr_driver->getSceneManager()->getActiveCamera();
         bool IsCulledForSolid = irr_driver->getSceneManager()->isCulled(*I);
         bool IsCulledForShadow[4];
