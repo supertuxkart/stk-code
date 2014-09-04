@@ -33,6 +33,7 @@ static const char* GPU_Phase[Q_LAST] =
 {
     "Solid Pass 1",
     "Shadows",
+    "RSM",
     "RH",
     "GI",
     "Env Map",
@@ -352,26 +353,27 @@ void Profiler::draw()
         }
     }
 
+    // GPU profiler
     QueryPerf hovered_gpu_marker = Q_LAST;
     long hovered_gpu_marker_elapsed = 0;
+    int gpu_y = int(y_offset + nb_thread_infos*line_height + line_height/2);
+    float total = 0;
+    for (unsigned i = 0; i < Q_LAST; i++)
+    {
+        total += irr_driver->getGPUTimer(i).elapsedTimeus();
+    }
+
+    static video::SColor colors[] = {
+        video::SColor(255, 255, 0, 0),
+        video::SColor(255, 0, 255, 0),
+        video::SColor(255, 0, 0, 255),
+        video::SColor(255, 255, 255, 0),
+        video::SColor(255, 255, 0, 255),
+        video::SColor(255, 0, 255, 255)
+    };
+
     if (hovered_markers.size() == 0)
     {
-        int gpu_y = int(y_offset + nb_thread_infos*line_height + line_height/2);
-        float total = 0;
-        for (unsigned i = 0; i < Q_LAST; i++)
-        {
-            total += irr_driver->getGPUTimer(i).elapsedTimeus();
-        }
-
-        static video::SColor colors[] = {
-            video::SColor(255, 255, 0, 0),
-            video::SColor(255, 0, 255, 0),
-            video::SColor(255, 0, 0, 255),
-            video::SColor(255, 255, 255, 0),
-            video::SColor(255, 255, 0, 255),
-            video::SColor(255, 0, 255, 255)
-        };
-
         float curr_val = 0;
         for (unsigned i = 0; i < Q_LAST; i++)
         {
@@ -421,7 +423,7 @@ void Profiler::draw()
 
     // Draw the hovered markers' names
     gui::ScalableFont* font = GUIEngine::getFont();
-    if(font)
+    if (font)
     {
         core::stringw text;
         while(!hovered_markers.empty())

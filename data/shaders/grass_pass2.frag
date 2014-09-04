@@ -33,7 +33,9 @@ void main(void)
 
     vec4 color = texture(Albedo, uv);
 #ifdef GL_ARB_bindless_texture
+#ifdef SRGBBindlessFix
     color.xyz = pow(color.xyz, vec3(2.2));
+#endif
 #endif
     if (color.a < 0.5) discard;
     vec3 LightFactor = (scattering * 0.3) + getLightFactor(1.);

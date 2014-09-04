@@ -54,6 +54,7 @@ PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex;
 PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced;
 PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC glDrawElementsInstancedBaseVertex;
 PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC glDrawElementsInstancedBaseVertexBaseInstance;
+PFNGLDRAWELEMENTSINDIRECTPROC glDrawElementsIndirect;
 PFNGLMULTIDRAWELEMENTSINDIRECTPROC glMultiDrawElementsIndirect;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
@@ -121,9 +122,11 @@ CALLBACK
 debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
               const GLchar* msg, const void *userparam)
 {
+#ifdef GL_DEBUG_SEVERITY_NOTIFICATION
     // ignore minor notifications sent by some drivers (notably the nvidia one)
     if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
         return;
+#endif
 
     switch(source)
     {
@@ -245,6 +248,7 @@ void initGL()
     glDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsInstanced");
     glDrawElementsInstancedBaseVertex = (PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsInstancedBaseVertex");
     glDrawElementsInstancedBaseVertexBaseInstance = (PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsInstancedBaseVertexBaseInstance");
+    glDrawElementsIndirect = (PFNGLDRAWELEMENTSINDIRECTPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsIndirect");
     glMultiDrawElementsIndirect = (PFNGLMULTIDRAWELEMENTSINDIRECTPROC)IRR_OGL_LOAD_EXTENSION("glMultiDrawElementsIndirect");
     glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteBuffers");
     glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)IRR_OGL_LOAD_EXTENSION("glGenVertexArrays");
@@ -320,7 +324,7 @@ GLuint LoadShader(const char * file, unsigned type)
     char versionString[20];
     sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
     std::string Code = versionString;
-    if (UserConfigParams::m_bindless_textures)
+    if (UserConfigParams::m_azdo)
         Code += "#extension GL_ARB_bindless_texture : enable\n";
     else
     {
@@ -333,6 +337,8 @@ GLuint LoadShader(const char * file, unsigned type)
         Code += "#define UBO_DISABLED\n";
     if (irr_driver->hasVSLayerExtension())
         Code += "#define VSLayer\n";
+    if (irr_driver->needsRGBBindlessWorkaround())
+        Code += "#define SRGBBindlessFix\n";
     Code += LoadHeader();
     if (Stream.is_open())
     {
@@ -595,9 +601,22 @@ VAOManager::VAOManager()
     idx_mirror[0] = idx_mirror[1] = idx_mirror[2] = NULL;
     instance_count[0] = 0;
 
-    glGenBuffers(1, &instance_vbo[0]);
-    glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[0]);
-    glBufferData(GL_ARRAY_BUFFER, 10000 * sizeof(float)* 9, 0, GL_STATIC_DRAW);
+    for (unsigned i = 0; i < InstanceTypeCount; i++)
+    {
+        glGenBuffers(1, &instance_vbo[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[i]);
+#ifdef Buffer_Storage
+        if (irr_driver->hasBufferStorageExtension())
+        {
+            glBufferStorage(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceData), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+            Ptr[i] = glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceData), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        }
+        else
+#endif
+        {
+            glBufferData(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceData), 0, GL_STREAM_DRAW);
+        }
+    }
 }
 
 static void cleanVAOMap(std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint> Map)
@@ -612,9 +631,7 @@ static void cleanVAOMap(std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, 
 void VAOManager::cleanInstanceVAOs()
 {
     cleanVAOMap(InstanceVAO);
-    cleanVAOMap(ShadowInstanceVAO);
     InstanceVAO.clear();
-    ShadowInstanceVAO.clear();
 }
 
 VAOManager::~VAOManager()
@@ -633,7 +650,11 @@ VAOManager::~VAOManager()
         if (vao[i])
             glDeleteVertexArrays(1, &vao[i]);
     }
-    glDeleteBuffers(1, &instance_vbo[0]);
+    for (unsigned i = 0; i < InstanceTypeCount; i++)
+    {
+        glDeleteBuffers(1, &instance_vbo[i]);
+    }
+
 }
 
 void VAOManager::regenerateBuffer(enum VTXTYPE tp)
@@ -643,7 +664,16 @@ void VAOManager::regenerateBuffer(enum VTXTYPE tp)
         glDeleteBuffers(1, &vbo[tp]);
     glGenBuffers(1, &vbo[tp]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
-    glBufferData(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_DYNAMIC_DRAW);
+#ifdef Buffer_Storage
+    if (irr_driver->hasBufferStorageExtension())
+    {
+        glBufferStorage(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        VBOPtr[tp] = glMapBufferRange(GL_ARRAY_BUFFER, 0, vtx_cnt[tp] * getVertexPitch(tp), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+    }
+    else
+#endif
+        glBufferData(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_DYNAMIC_DRAW);
+
 
     if (ibo[tp])
         glDeleteBuffers(1, &ibo[tp]);
@@ -728,13 +758,11 @@ void VAOManager::regenerateInstancedVAO()
     enum video::E_VERTEX_TYPE IrrVT[] = { video::EVT_STANDARD, video::EVT_2TCOORDS, video::EVT_TANGENTS };
     for (unsigned i = 0; i < VTXTYPE_COUNT; i++)
     {
-        for (unsigned j = 0; j < InstanceTypeCount; j++)
-        {
             video::E_VERTEX_TYPE tp = IrrVT[i];
             if (!vbo[tp] || !ibo[tp])
                 continue;
             GLuint vao = createVAO(vbo[tp], ibo[tp], tp);
-            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[j]);
+            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeDefault]);
 
             glEnableVertexAttribArray(7);
             glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
@@ -751,29 +779,65 @@ void VAOManager::regenerateInstancedVAO()
             glEnableVertexAttribArray(11);
             glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float) + 2 * sizeof(unsigned)));
             glVertexAttribDivisor(11, 1);
-            InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, (InstanceType) j)] = vao;
+            InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeDefault)] = vao;
 
-            GLuint shadow_vao = createVAO(vbo[tp], ibo[tp], tp);
-            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[j]);
+            vao = createVAO(vbo[tp], ibo[tp], tp);
+            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeShadow]);
 
             glEnableVertexAttribArray(7);
             glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
-            glVertexAttribDivisor(7, 4);
+            glVertexAttribDivisor(7, 1);
             glEnableVertexAttribArray(8);
             glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
-            glVertexAttribDivisor(8, 4);
+            glVertexAttribDivisor(8, 1);
             glEnableVertexAttribArray(9);
             glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
-            glVertexAttribDivisor(9, 4);
+            glVertexAttribDivisor(9, 1);
             glEnableVertexAttribArray(10);
             glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)));
-            glVertexAttribDivisor(10, 4);
+            glVertexAttribDivisor(10, 1);
             glEnableVertexAttribArray(11);
-            glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)+2 * sizeof(unsigned)));
+            glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float) + 2 * sizeof(unsigned)));
             glVertexAttribDivisor(11, 1);
-            ShadowInstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, (InstanceType)j)] = shadow_vao;
+            InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeShadow)] = vao;
+
+            vao = createVAO(vbo[tp], ibo[tp], tp);
+            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeRSM]);
+
+            glEnableVertexAttribArray(7);
+            glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
+            glVertexAttribDivisor(7, 1);
+            glEnableVertexAttribArray(8);
+            glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
+            glVertexAttribDivisor(8, 1);
+            glEnableVertexAttribArray(9);
+            glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
+            glVertexAttribDivisor(9, 1);
+            glEnableVertexAttribArray(10);
+            glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)));
+            glVertexAttribDivisor(10, 1);
+            glEnableVertexAttribArray(11);
+            glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float) + 2 * sizeof(unsigned)));
+            glVertexAttribDivisor(11, 1);
+            InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeRSM)] = vao;
+
+            vao = createVAO(vbo[tp], ibo[tp], tp);
+            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeGlow]);
+
+            glEnableVertexAttribArray(7);
+            glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(GlowInstanceData), 0);
+            glVertexAttribDivisor(7, 1);
+            glEnableVertexAttribArray(8);
+            glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(GlowInstanceData), (GLvoid*)(3 * sizeof(float)));
+            glVertexAttribDivisor(8, 1);
+            glEnableVertexAttribArray(9);
+            glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(GlowInstanceData), (GLvoid*)(6 * sizeof(float)));
+            glVertexAttribDivisor(9, 1);
+            glEnableVertexAttribArray(12);
+            glVertexAttribPointer(12, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(GlowInstanceData), (GLvoid*)(9 * sizeof(float)));
+            glVertexAttribDivisor(12, 1);
+            InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeGlow)] = vao;
             glBindVertexArray(0);
-        }
     }
 
 

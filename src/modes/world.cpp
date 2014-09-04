@@ -121,6 +121,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_self_destruct      = false;
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
+    m_weather            = NULL;
 
     m_stop_music_when_dialog_open = true;
 
@@ -195,6 +196,12 @@ void World::init()
         ReplayPlay::get()->Load();
 
     powerup_manager->updateWeightsForRace(num_karts);
+    
+    if (UserConfigParams::m_weather_effects)
+    {
+        m_weather = new Weather(m_track->getWeatherLightning(), 
+                          m_track->getWeatherSound());
+    }
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -262,7 +269,6 @@ void World::reset()
 
     //Reset the Rubber Ball Collect Time to some negative value.
     powerup_manager->setBallCollectTime(-100);
-
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -376,6 +382,9 @@ World::~World()
         // gui and this must be deleted.
         delete m_race_gui;
     }
+    
+    if (m_weather != NULL)
+        delete m_weather;
 
     for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
         delete m_karts[i];
@@ -924,6 +933,11 @@ void World::update(float dt)
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
         Camera::getCamera(i)->update(dt);
+    }
+    
+    if (UserConfigParams::m_graphical_effects && m_weather)
+    {
+        m_weather->update(dt);
     }
 
     projectile_manager->update(dt);

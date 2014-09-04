@@ -37,7 +37,6 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stkinstancedscenenode.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -132,7 +131,10 @@ Track::Track(const std::string &filename)
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
     m_sky_dy                = 0.0f;
-    m_weather_type          = WEATHER_NONE;
+    m_godrays_opacity       = 1.0f;
+    m_godrays_color         = video::SColor(255, 255, 255, 255);
+    m_weather_lightning      = false;
+    m_weather_sound         = "";
     m_cache_track           = UserConfigParams::m_cache_overworld &&
                               m_ident=="overworld";
     m_minimap_x_scale       = 1.0f;
@@ -439,6 +441,9 @@ void Track::loadTrackInfo()
     m_fog_height_end        = 100.0f;
     m_gravity               = 9.80665f;
     m_smooth_normals        = false;
+    m_godrays               = false;
+    m_godrays_opacity       = 1.0f;
+    m_godrays_color         = video::SColor(255, 255, 255, 255);
                               /* ARGB */
     m_fog_color             = video::SColor(255, 77, 179, 230);
     m_default_ambient_color = video::SColor(255, 120, 120, 120);
@@ -481,7 +486,6 @@ void Track::loadTrackInfo()
     root->get("bloom-threshold",       &m_bloom_threshold);
     root->get("lens-flare",            &m_lensflare);
     root->get("shadows",               &m_shadows);
-    root->get("god-rays",              &m_godrays);
     root->get("displacement-speed",    &m_displacement_speed);
     root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);
@@ -737,23 +741,9 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     node->updateAbsolutePosition();
 
     std::vector<core::matrix4> matrices;
-
-    STKInstancedSceneNode* instancing_node = dynamic_cast<STKInstancedSceneNode*>(node);
-    if (instancing_node != NULL)
-    {
-        int count = instancing_node->getInstanceCount();
-        for (int i = 0; i < count; i++)
-        {
-            matrices.push_back(instancing_node->getInstanceTransform(i));
-        }
-    }
-    else
-    {
-        matrices.push_back(node->getAbsoluteTransformation());
-    }
+    matrices.push_back(node->getAbsoluteTransformation());
 
     const core::vector3df &pos   = node->getAbsolutePosition();
-
 
     scene::IMesh *mesh;
     // In case of readonly materials we have to get the material from
@@ -1051,20 +1041,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
         {
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
-            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
-            {
-                lodLoader.addModelDefinition(lod_group_xml->getNode(j));
-            }
-        }
-    }
-
-    // Load instancing models (for the moment they are loaded the same way as LOD to simplify implementation)
-    const XMLNode *instancing_xml_node = root.getNode("instancing");
-    if (instancing_xml_node != NULL)
-    {
-        for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
-        {
-            const XMLNode* lod_group_xml = instancing_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
                 lodLoader.addModelDefinition(lod_group_xml->getNode(j));
@@ -1724,6 +1700,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         node->get("fog-end-height",   &m_fog_height_end);
     }
 
+    if (const XMLNode *node = root->getNode("lightshaft"))
+    {
+        m_godrays = true;
+        node->get("opacity", &m_godrays_opacity);
+        node->get("color", &m_godrays_color);
+        node->get("xyz", &m_godrays_position);
+    }
+
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
 
@@ -1736,20 +1720,6 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
         {
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
-            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
-            {
-                model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
-            }
-        }
-    }
-
-    // Load instancing models (for the moment they are loaded the same way as LOD to simplify implementation)
-    const XMLNode *instancing_xml_node = root->getNode("instancing");
-    if (instancing_xml_node != NULL)
-    {
-        for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
-        {
-            const XMLNode* lod_group_xml = instancing_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
                 model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
@@ -1997,20 +1967,6 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
                         }
                     }
                 }
-
-                // Load instancing definitions
-                const XMLNode *instancing_xml_node = libroot->getNode("instancing");
-                if (instancing_xml_node != NULL)
-                {
-                    for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
-                    {
-                        const XMLNode* instancing_group_xml = instancing_xml_node->getNode(i);
-                        for (unsigned int j = 0; j < instancing_group_xml->getNumNodes(); j++)
-                        {
-                            model_def_loader.addModelDefinition(instancing_group_xml->getNode(j));
-                        }
-                    }
-                }
             }
             else
             {
@@ -2089,26 +2045,15 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         else if (name == "weather")
         {
             std::string weather_particles;
-            std::string weather_type;
+
             node->get("particles", &weather_particles);
-            node->get("type", &weather_type);
+            node->get("lightning", &m_weather_lightning);
+            node->get("sound", &m_weather_sound);
 
             if (weather_particles.size() > 0)
             {
                 m_sky_particles =
                     ParticleKindManager::get()->getParticles(weather_particles);
-            }
-            else if (weather_type.size() > 0)
-            {
-                if (weather_type == "rain")
-                {
-                    m_weather_type = WEATHER_RAIN;
-                }
-                else
-                {
-                    Log::error("track", "Unknown weather type : '%s'",
-                               weather_type.c_str());
-                }
             }
             else
             {
@@ -2126,7 +2071,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "instancing")
         {
-            // handled above
+            // TODO: eventually remove, this is now automatic
         }
         else if (name == "subtitles")
         {

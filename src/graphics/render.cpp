@@ -34,7 +34,6 @@
 #include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stkmeshscenenode.hpp"
-#include "graphics/stkinstancedscenenode.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
@@ -47,6 +46,7 @@
 #include "utils/helpers.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
+#include "stkscenemanager.hpp"
 
 #include <algorithm>
 #include <limits>
@@ -272,22 +272,30 @@ void IrrDriver::renderGLSL(float dt)
 void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
+    m_scene_manager->setActiveCamera(camnode);
 
+    PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
+    PrepareDrawCalls(camnode);
+    PROFILER_POP_CPU_MARKER();
     // Shadows
     {
-        PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
-        ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
         // To avoid wrong culling, use the largest view possible
         m_scene_manager->setActiveCamera(m_suncam);
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights &&
             UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround() && hasShadow)
         {
+            PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
             renderShadows();
+            PROFILER_POP_CPU_MARKER();
             if (UserConfigParams::m_gi)
+            {
+                PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
                 renderRSM();
+                PROFILER_POP_CPU_MARKER();
+            }
         }
         m_scene_manager->setActiveCamera(camnode);
-        PROFILER_POP_CPU_MARKER();
+
     }
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
@@ -322,6 +330,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         m_rtts->getFBO(FBO_COLORS).Bind();
     renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
+
+    m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
     if (getNormals())
     {
@@ -514,7 +524,9 @@ void IrrDriver::renderParticles()
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
-    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
+    for (unsigned i = 0; i < ParticlesList::getInstance()->size(); ++i)
+        ParticlesList::getInstance()->at(i)->render();
+//    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 }
 
 /** Given a matrix transform and a set of points returns an orthogonal projection matrix that maps coordinates of
@@ -593,6 +605,11 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(), 16 * sizeof(float));
 
     const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
+    for (unsigned i = 0; i < 4; i++)
+    {
+        if (!m_shadow_camnodes[i])
+            m_shadow_camnodes[i] = (scene::ICameraSceneNode *) m_suncam->clone();
+    }
     sun_ortho_matrix.clear();
 
     if (World::getWorld() && World::getWorld()->getTrack())
@@ -670,8 +687,8 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             const float units_per_w = w / 1024;
             const float units_per_h = h / 1024;*/
 
-            m_suncam->setProjectionMatrix(getTighestFitOrthoProj(SunCamViewMatrix, vectors) , true);
-            m_suncam->render();
+            m_shadow_camnodes[i]->setProjectionMatrix(getTighestFitOrthoProj(SunCamViewMatrix, vectors) , true);
+            m_shadow_camnodes[i]->render();
 
             sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
         }
@@ -703,6 +720,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         assert(sun_ortho_matrix.size() == 4);
         camnode->setNearValue(oldnear);
         camnode->setFarValue(oldfar);
+        camnode->render();
 
         size_t size = irr_driver->getShadowViewProj().size();
         for (unsigned i = 0; i < size; i++)
@@ -768,20 +786,40 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glDepthMask(GL_FALSE);
     glDisable(GL_BLEND);
 
-    glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_STANDARD));
+    if (irr_driver->hasARB_base_instance())
+        glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_STANDARD));
     for (u32 i = 0; i < glowcount; i++)
     {
         const GlowData &dat = glows[i];
-        scene::ISceneNode * const cur = dat.node;
+        scene::ISceneNode * cur = dat.node;
 
-        //TODO : implement culling on gpu
-        // Quick box-based culling
-//        const core::aabbox3df nodebox = cur->getTransformedBoundingBox();
-//        if (!nodebox.intersectsWithBox(cambox))
-//            continue;
+        STKMeshSceneNode *node = static_cast<STKMeshSceneNode *>(cur);
+        node->setGlowColors(SColor(0, dat.b * 255.f, dat.g * 255.f, dat.r * 255.f));
+        if (!irr_driver->hasARB_draw_indirect())
+            node->render();
+    }
 
-        cb->setColor(dat.r, dat.g, dat.b);
-        cur->render();
+    if (irr_driver->hasARB_draw_indirect())
+    {
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
+        glUseProgram(MeshShader::InstancedColorizeShader::getInstance()->Program);
+
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeGlow));
+        if (UserConfigParams::m_azdo)
+        {
+            if (GlowPassCmd::getInstance()->Size)
+            {
+                glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
+                    (const void*)(GlowPassCmd::getInstance()->Offset * sizeof(DrawElementsIndirectCommand)),
+                    GlowPassCmd::getInstance()->Size,
+                    sizeof(DrawElementsIndirectCommand));
+            }
+        }
+        else
+        {
+            for (unsigned i = 0; i < ListInstancedGlow::getInstance()->size(); i++)
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((GlowPassCmd::getInstance()->Offset + i) * sizeof(DrawElementsIndirectCommand)));
+        }
     }
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);

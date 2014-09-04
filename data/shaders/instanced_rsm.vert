@@ -1,9 +1,10 @@
-uniform int layer;
+uniform mat4 RSMMatrix;
 
-#if __VERSION__ >= 330
 layout(location = 0) in vec3 Position;
+layout(location = 1) in vec3 Normal;
+layout(location = 2) in vec4 Color;
 layout(location = 3) in vec2 Texcoord;
-
+layout(location = 4) in vec2 SecondTexcoord;
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
@@ -11,27 +12,14 @@ layout(location = 9) in vec3 Scale;
 layout(location = 10) in uvec2 Handle;
 #endif
 
-#else
-in vec3 Position;
-in vec2 Texcoord;
-
-in vec3 Origin;
-in vec3 Orientation;
-in vec3 Scale;
-#endif
-
-#ifdef VSLayer
+out vec3 nor;
 out vec2 uv;
+out vec2 uv_bis;
+out vec4 color;
 #ifdef GL_ARB_bindless_texture
 flat out uvec2 handle;
 #endif
-#else
-out vec2 tc;
-out int layerId;
-#ifdef GL_ARB_bindless_texture
-flat out uvec2 hdle;
-#endif
-#endif
+
 
 mat4 getWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
 mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
@@ -39,19 +27,13 @@ mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
 void main(void)
 {
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
-#ifdef VSLayer
-    gl_Layer = layer;
-    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position, 1.);
+    mat4 ModelViewProjectionMatrix = RSMMatrix * ModelMatrix;
+    mat4 TransposeInverseModel = transpose(inverse(ModelMatrix));
+    gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
+    nor = (TransposeInverseModel * vec4(Normal, 0.)).xyz;
     uv = Texcoord;
+    color = Color.zyxw;
 #ifdef GL_ARB_bindless_texture
     handle = Handle;
-#endif
-#else
-    layerId = layer;
-    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position, 1.);
-    tc = Texcoord;
-#ifdef GL_ARB_bindless_texture
-    hdle = Handle;
-#endif
 #endif
 }

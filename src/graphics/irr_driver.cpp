@@ -166,6 +166,11 @@ void IrrDriver::IncreaseObjectCount()
     object_count[m_phase]++;
 }
 
+void IrrDriver::IncreasePolyCount(unsigned Polys)
+{
+    poly_count[m_phase] += Polys;
+}
+
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
 {
   return m_mrt;
@@ -470,6 +475,7 @@ void IrrDriver::initDevice()
 
         m_need_ubo_workaround = false;
         m_need_rh_workaround = false;
+        m_need_srgb_workaround = false;
 #ifdef WIN32
         // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
         if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL && (GLMajorVersion == 3 && GLMinorVersion == 1))
@@ -478,12 +484,18 @@ void IrrDriver::initDevice()
         // Fix for Nvidia and instanced RH
         if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
             m_need_rh_workaround = true;
+
+        // Fix for AMD and bindless sRGB textures
+        if (strstr((const char *)glGetString(GL_VENDOR), "ATI") != NULL)
+            m_need_srgb_workaround = true;
     }
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
 
     // Parse extensions
     hasVSLayer = false;
     hasBaseInstance = false;
+    hasBuffserStorage = false;
+    hasDrawIndirect = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
     if (!ProfileWorld::isNoGraphics())
     {
@@ -491,10 +503,22 @@ void IrrDriver::initDevice()
             hasVSLayer = true;
             Log::info("GLDriver", "AMD Vertex Shader Layer enabled");
         }
+#ifdef Buffer_Storage
+        if (hasGLExtension("GL_ARB_buffer_storage")) {
+            hasBuffserStorage = true;
+            Log::info("GLDriver", "ARB Buffer Storage enabled");
+        }
+#endif
 #ifdef Base_Instance_Support
         if (hasGLExtension("GL_ARB_base_instance")) {
             hasBaseInstance = true;
             Log::info("GLDriver", "ARB Instance enabled");
+        }
+#endif
+#ifdef Draw_Indirect
+        if (hasGLExtension("GL_ARB_draw_indirect")) {
+            hasDrawIndirect = true;
+            Log::info("GLDriver", "ARB Draw Indirect enabled");
         }
 #endif
     }
@@ -1612,6 +1636,7 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
 // ----------------------------------------------------------------------------
 void IrrDriver::setRTT(RTT* rtt)
 {
+    memset(m_shadow_camnodes, 0, 4 * sizeof(void*));
     m_rtts = rtt;
 }
 // ----------------------------------------------------------------------------
@@ -1714,13 +1739,14 @@ void IrrDriver::displayFPS()
     if (UserConfigParams::m_artist_debug_mode)
     {
         sprintf(
-            buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) - LightDst : ~%d",
+            buffer, "FPS: %i/%i/%i - PolyCount (Solid:%d Shadows:%d) - LightDst : ~%d",
             min, fps, max,
-            object_count[SOLID_NORMAL_AND_DEPTH_PASS],
-            object_count[SOLID_NORMAL_AND_DEPTH_PASS],
-            object_count[TRANSPARENT_PASS],
+            poly_count[SOLID_NORMAL_AND_DEPTH_PASS],
+            poly_count[SHADOW_PASS],
             m_last_light_bucket_distance
         );
+        poly_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+        poly_count[SHADOW_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         object_count[TRANSPARENT_PASS] = 0;
@@ -2425,8 +2451,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
 
         if (sun)
         {
-            m_sun_interposer->setPosition(pos);
-            m_sun_interposer->updateAbsolutePosition();
+            //m_sun_interposer->setPosition(pos);
+            //m_sun_interposer->updateAbsolutePosition();
 
             m_lensflare->setPosition(pos);
             m_lensflare->updateAbsolutePosition();

@@ -81,6 +81,7 @@ public:
     const float* getColorTo() const { return m_color_to; }
     void setHeightmap(const std::vector<std::vector<float> >&, float, float, float, float);
     void setFlip();
+    bool update();
 };
 
 #endif // GPUPARTICLES_H

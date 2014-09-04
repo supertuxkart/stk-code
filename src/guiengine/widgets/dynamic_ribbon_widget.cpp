@@ -491,6 +491,7 @@ void DynamicRibbonWidget::clearItems()
 {
     m_items.clear();
     m_animated_contents = false;
+    m_scroll_offset = 0;
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::elementRemoved()

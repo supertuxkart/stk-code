@@ -21,6 +21,10 @@ add_library(enet STATIC
 	win32.c
 )
 
+if(MINGW)
+  target_link_libraries(enet wsock32 ws2_32 Winmm)
+endif()
+
 #if(WIN32)
 #  find_library(WS2_LIBRARY NAMES "ws2_32" PATHS "C:/Windows/System32")
 #  target_link_libraries(enet ${WS2_LIBRARY})

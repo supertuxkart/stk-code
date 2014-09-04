@@ -150,7 +150,7 @@ FileManager::FileManager()
     if(exe_path.size()==0 || exe_path[exe_path.size()-1]!='/')
         exe_path += "/";
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
-        root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/" ;
+        root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/data/" ;
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
@@ -174,7 +174,7 @@ FileManager::FileManager()
     else
     {
 #ifdef SUPERTUXKART_DATADIR
-        root_dir = SUPERTUXKART_DATADIR;
+        root_dir = SUPERTUXKART_DATADIR"/data/";
         if(root_dir.size()==0 || root_dir[root_dir.size()-1]!='/')
             root_dir+='/';
 
@@ -186,6 +186,8 @@ FileManager::FileManager()
     addRootDirs(root_dir);
     if( fileExists(root_dir+"../../stk-assets"))
         addRootDirs(root_dir+"../../stk-assets");
+    if( fileExists(root_dir+"../../supertuxkart-assets"))
+        addRootDirs(root_dir+"../../supertuxkart-assets");
     if ( getenv ( "SUPERTUXKART_ROOT_PATH" ) != NULL )
         addRootDirs(getenv("SUPERTUXKART_ROOT_PATH"));
 
@@ -736,10 +738,10 @@ void FileManager::checkAndCreateConfigDir()
 
         // Try to use the APPDATA directory to store config files and highscore
         // lists. If not defined, used the current directory.
-        if(getenv("APPDATA")!=NULL)
+        if (getenv("APPDATA") != NULL)
         {
             m_user_config_dir  = getenv("APPDATA");
-            if(!checkAndCreateDirectory(m_user_config_dir))
+            if (!checkAndCreateDirectory(m_user_config_dir))
             {
                 Log::error("[FileManager]", "Can't create config dir '%s"
                             ", falling back to '.'.", m_user_config_dir.c_str());
@@ -753,7 +755,7 @@ void FileManager::checkAndCreateConfigDir()
 
 #elif defined(__APPLE__)
 
-        if (getenv("HOME")!=NULL)
+        if (getenv("HOME") != NULL)
         {
             m_user_config_dir = getenv("HOME");
         }
@@ -773,8 +775,10 @@ void FileManager::checkAndCreateConfigDir()
 
         // Remaining unix variants. Use the new standards for config directory
         // i.e. either XDG_CONFIG_HOME or $HOME/.config
-        if (getenv("XDG_CONFIG_HOME")!=NULL){
+        if (getenv("XDG_CONFIG_HOME") !=NULL)
+        {
             m_user_config_dir = getenv("XDG_CONFIG_HOME");
+            checkAndCreateDirectory(m_user_config_dir);
         }
         else if (!getenv("HOME"))
         {
@@ -786,6 +790,8 @@ void FileManager::checkAndCreateConfigDir()
         else
         {
             m_user_config_dir  = getenv("HOME");
+            checkAndCreateDirectory(m_user_config_dir);
+            
             m_user_config_dir += "/.config";
             if(!checkAndCreateDirectory(m_user_config_dir))
             {

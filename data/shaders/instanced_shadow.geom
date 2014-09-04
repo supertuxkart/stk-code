@@ -2,14 +2,14 @@ layout(triangles) in;
 layout(triangle_strip, max_vertices=3) out;
 
 #ifdef GL_ARB_bindless_texture
-flat in sampler2D hdle[3];
+flat in uvec2 hdle[3];
 #endif
 in vec2 tc[3];
 in int layerId[3];
 
 out vec2 uv;
 #ifdef GL_ARB_bindless_texture
-out flat sampler2D handle;
+out flat uvec2 handle;
 #endif
 
 void main(void)

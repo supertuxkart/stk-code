@@ -16,38 +16,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RAIN_HPP
-#define HEADER_RAIN_HPP
-
-class Camera;
-class PerCameraNode;
-
-#include <vector3d.h>
-namespace irr
-{
-    namespace video { class SMaterial; class ITexture; }
-    namespace scene { class ICameraSceneNode; class ISceneNode; }
-}
-using namespace irr;
+#ifndef HEADER_WEATHER_HPP
+#define HEADER_WEATHER_HPP
 
 class SFXBase;
 
-class Rain
+class Weather
 {
-    PerCameraNode* m_node;
-
-    float m_next_lightning;
     bool m_lightning;
+    float m_next_lightning;
+
     SFXBase* m_thunder_sound;
+    SFXBase* m_weather_sound;
 
 public:
-    Rain(Camera* camera, irr::scene::ISceneNode* parent);
-    virtual ~Rain();
+    Weather(bool lightning, std::string sound);
+    virtual ~Weather();
 
     void update(float dt);
-    void setPosition(const irr::core::vector3df& position);
-
-    void setCamera(scene::ICameraSceneNode* camera);
+    void playSound();
 };
 
 #endif
