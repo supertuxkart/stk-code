@@ -14,6 +14,7 @@
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "lod_node.hpp"
+#include <unordered_map>
 
 static void
 FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > InstanceList, InstanceData * InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer,
@@ -92,7 +93,7 @@ size_t &InstanceBufferOffset, size_t &CommandBufferOffset)
 
 
 static
-void FillInstances(const std::map<scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
+void FillInstances(const std::unordered_map<scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
     InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &Polycount)
 {
     auto It = GatheredGLMesh.begin(), E = GatheredGLMesh.end();
@@ -105,7 +106,7 @@ void FillInstances(const std::map<scene::IMeshBuffer *, std::vector<std::pair<GL
 }
 
 static
-void FillInstancesGrass(const std::map<scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
+void FillInstancesGrass(const std::unordered_map<scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
     InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, const core::vector3df &dir, size_t &PolyCount)
 {
     auto It = GatheredGLMesh.begin(), E = GatheredGLMesh.end();
@@ -118,10 +119,10 @@ void FillInstancesGrass(const std::map<scene::IMeshBuffer *, std::vector<std::pa
     }
 }
 
-static std::map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForSolidPass[MAT_COUNT];
-static std::map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForShadowPass[4][MAT_COUNT];
-static std::map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForRSMPass[MAT_COUNT];
-static std::map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, STKMeshCommon *> > > MeshForGlowPass;
+static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForSolidPass[MAT_COUNT];
+static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForShadowPass[4][MAT_COUNT];
+static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForRSMPass[MAT_COUNT];
+static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, STKMeshCommon *> > > MeshForGlowPass;
 
 static core::vector3df windDir;
 
