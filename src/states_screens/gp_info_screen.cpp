@@ -46,8 +46,6 @@
 #include <algorithm>
 
 using irr::gui::IGUIStaticText;
-using GUIEngine::PROP_ID;
-
 using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( GPInfoScreen );
@@ -232,9 +230,9 @@ void GPInfoScreen::addScreenshot()
 {
     Widget* screenshot_div = getWidget("screenshot_div");
 
-    m_screenshot_widget = new GUIEngine::IconButtonWidget(
-        GUIEngine::IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
-        false, false, GUIEngine::IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    m_screenshot_widget = new IconButtonWidget(
+        IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
+        false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     // images are saved squared, but must be stretched to 4:3
     m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
     m_screenshot_widget->m_x = screenshot_div->m_x;
@@ -260,12 +258,12 @@ void GPInfoScreen::addScreenshot()
 // ----------------------------------------------------------------------------
 /** Handle user input.
  */
-void GPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &name,
+void GPInfoScreen::eventCallback(Widget *, const std::string &name,
                                  const int player_id)
 {
     if(name=="buttons")
     {
-        const std::string &button = getWidget<GUIEngine::RibbonWidget>("buttons")
+        const std::string &button = getWidget<RibbonWidget>("buttons")
                                   ->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         // The continue button becomes a 'reload' button in random GP:
@@ -347,5 +345,5 @@ void GPInfoScreen::onUpdate(float dt)
     Track* track = track_manager->getTrack(tracks[frame_after]);
     std::string file = track->getScreenshotFile();
     m_screenshot_widget->setImage(file, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    m_screenshot_widget->m_properties[GUIEngine::PROP_ICON] = file;
+    m_screenshot_widget->m_properties[PROP_ICON] = file;
 }   // onUpdate
