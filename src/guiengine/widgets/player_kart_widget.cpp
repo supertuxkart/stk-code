@@ -289,6 +289,18 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
     {
         m_player_ident_spinner->setID(m_player_id);
     }
+
+    m_model_view->unsetBadge(ZIPPER_BADGE);
+    m_model_view->unsetBadge(ANCHOR_BADGE);
+    // Add badge for per player difficulty if necessary
+    if (!m_parent_screen->m_from_overworld && (m_parent_screen->m_multiplayer || !m_parent_screen->profile_to_use->isSingleplayerDifficulty()))
+    {
+        PerPlayerDifficulty difficulty = m_parent_screen->profile_to_use->getDifficulty();
+        if (difficulty < PLAYER_DIFFICULTY_NORMAL)
+            m_model_view->setBadge(ZIPPER_BADGE);
+        else if (difficulty > PLAYER_DIFFICULTY_NORMAL)
+            m_model_view->setBadge(ANCHOR_BADGE);
+    }
 }   // setPlayerID
 
 // ------------------------------------------------------------------------
