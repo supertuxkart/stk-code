@@ -661,6 +661,58 @@ namespace core
 		const T *m1 = other_a.M;
 		const T *m2 = other_b.M;
 
+#if defined(WIN32) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
+        // From http://drrobsjournal.blogspot.fr/2012/10/fast-simd-4x4-matrix-multiplication.html
+        // Use unaligned load/store
+
+        const float *matA = other_a.pointer();
+
+        const __m128 a = _mm_loadu_ps(matA); // First row
+        const __m128 b = _mm_loadu_ps(&matA[4]); // Second row
+        const __m128 c = _mm_loadu_ps(&matA[8]); // Third row
+        const __m128 d = _mm_loadu_ps(&matA[12]); // Fourth row
+
+         __m128 t1 = _mm_set1_ps(m2[0]);
+         __m128 t2 = _mm_mul_ps(a, t1);
+        t1 = _mm_set1_ps(m2[1]);
+        t2 = _mm_add_ps(_mm_mul_ps(b, t1), t2);
+        t1 = _mm_set1_ps(m2[2]);
+        t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
+        t1 = _mm_set1_ps(m2[3]);
+        t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
+        _mm_storeu_ps(&M[0], t2);
+
+        t1 = _mm_set1_ps(m2[4]);
+        t2 = _mm_mul_ps(a, t1);
+        t1 = _mm_set1_ps(m2[5]);
+        t2 = _mm_add_ps(_mm_mul_ps(b, t1), t2);
+        t1 = _mm_set1_ps(m2[6]);
+        t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
+        t1 = _mm_set1_ps(m2[7]);
+        t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
+        _mm_storeu_ps(&M[4], t2);
+
+        t1 = _mm_set1_ps(m2[8]);
+        t2 = _mm_mul_ps(a, t1);
+        t1 = _mm_set1_ps(m2[9]);
+        t2 = _mm_add_ps(_mm_mul_ps(b, t1), t2);
+        t1 = _mm_set1_ps(m2[10]);
+        t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
+        t1 = _mm_set1_ps(m2[11]);
+        t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
+        _mm_storeu_ps(&M[8], t2);
+
+        t1 = _mm_set1_ps(m2[12]);
+        t2 = _mm_mul_ps(a, t1);
+        t1 = _mm_set1_ps(m2[13]);
+        t2 = _mm_add_ps(_mm_mul_ps(b, t1), t2);
+        t1 = _mm_set1_ps(m2[14]);
+        t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
+        t1 = _mm_set1_ps(m2[15]);
+        t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
+        _mm_storeu_ps(&M[12], t2);
+#else
+
 		M[0] = m1[0]*m2[0] + m1[4]*m2[1] + m1[8]*m2[2] + m1[12]*m2[3];
 		M[1] = m1[1]*m2[0] + m1[5]*m2[1] + m1[9]*m2[2] + m1[13]*m2[3];
 		M[2] = m1[2]*m2[0] + m1[6]*m2[1] + m1[10]*m2[2] + m1[14]*m2[3];
@@ -682,6 +734,7 @@ namespace core
 		M[15] = m1[3]*m2[12] + m1[7]*m2[13] + m1[11]*m2[14] + m1[15]*m2[15];
 #if defined ( USE_MATRIX_TEST )
 		definitelyIdentityMatrix=false;
+#endif
 #endif
 		return *this;
 	}
