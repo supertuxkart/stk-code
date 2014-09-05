@@ -92,6 +92,8 @@ class GPUTimer;
 
 class ScopedGPUTimer
 {
+protected:
+    GPUTimer &timer;
 public:
     ScopedGPUTimer(GPUTimer &);
     ~ScopedGPUTimer();
@@ -102,6 +104,8 @@ class GPUTimer
     friend class ScopedGPUTimer;
     GLuint query;
     bool initialised;
+    unsigned lastResult;
+    bool canSubmitQuery;
 public:
     GPUTimer();
     unsigned elapsedTimeus();

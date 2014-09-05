@@ -924,11 +924,11 @@ size_t VAOManager::appendInstance(enum InstanceType, const std::vector<InstanceD
     return result;
 }
 
-ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
+ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 {
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
-
+    if (!timer.canSubmitQuery) return;
 #ifdef GL_TIME_ELAPSED
     irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
     if (!timer.initialised)
@@ -943,14 +943,15 @@ ScopedGPUTimer::~ScopedGPUTimer()
 {
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
-    
+    if (!timer.canSubmitQuery) return;
 #ifdef GL_TIME_ELAPSED
     irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
     gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
+    timer.canSubmitQuery = false;
 #endif
 }
 
-GPUTimer::GPUTimer() : initialised(false)
+GPUTimer::GPUTimer() : initialised(false), lastResult(0), canSubmitQuery(true)
 {
 }
 
@@ -960,7 +961,12 @@ unsigned GPUTimer::elapsedTimeus()
         return 0;
     GLuint result;
     irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
+    gl_driver->extGlGetQueryObjectuiv(query, GL_QUERY_RESULT_AVAILABLE, &result);
+    if (result == GL_FALSE)
+        return lastResult;
     gl_driver->extGlGetQueryObjectuiv(query, GL_QUERY_RESULT, &result);
+    lastResult = result / 1000;
+    canSubmitQuery = true;
     return result / 1000;
 }
 
