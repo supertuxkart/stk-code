@@ -150,24 +150,25 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 for_in(mesh, node->MeshSolidMaterial[Mat])
                 {
                     if (node->glow())
-                        MeshForGlowPass[mesh->mb].push_back(std::make_pair(mesh, node));
-                    core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
-                    ModelMatrix.getInverse(InvModelMatrix);
+                        MeshForGlowPass[mesh->mb].emplace_back(mesh, node);
+
 
                     if (mesh->TextureMatrix.isIdentity())
-                        MeshForSolidPass[Mat][mesh->mb].push_back(std::make_pair(mesh, Node));
+                        MeshForSolidPass[Mat][mesh->mb].emplace_back(mesh, Node);
                     else
                     {
+                        core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
+                        ModelMatrix.getInverse(InvModelMatrix);
                         switch (Mat)
                         {
                         case MAT_DEFAULT:
-                            ListMatDefault::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                            ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
                         case MAT_ALPHA_REF:
-                            ListMatAlphaRef::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                            ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
                         case MAT_UNLIT:
-                            ListMatUnlit::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                            ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
                         }
                     }
@@ -183,28 +184,28 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                     switch (Mat)
                     {
                     case MAT_DEFAULT:
-                        ListMatDefault::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_ALPHA_REF:
-                        ListMatAlphaRef::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_DETAIL:
-                        ListMatDetails::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatDetails::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_UNLIT:
-                        ListMatUnlit::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_SPHEREMAP:
-                        ListMatSphereMap::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatSphereMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_SPLATTING:
-                        ListMatSplatting::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix));
+                        ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case MAT_GRASS:
-                        ListMatGrass::getInstance()->SolidPass.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, windDir));
+                        ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, windDir);
                         break;
                     }
                 }
@@ -219,7 +220,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 if (irr_driver->hasARB_draw_indirect())
                 {
                     for_in(mesh, node->MeshSolidMaterial[Mat])
-                        MeshForShadowPass[cascade][Mat][mesh->mb].push_back(std::make_pair(mesh, Node));
+                        MeshForShadowPass[cascade][Mat][mesh->mb].emplace_back(mesh, Node);
                 }
                 else
                 {
@@ -231,28 +232,28 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                         switch (Mat)
                         {
                         case MAT_DEFAULT:
-                            ListMatDefault::getInstance()->Shadows[cascade].push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                            ListMatDefault::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
                         case MAT_ALPHA_REF:
-                            ListMatAlphaRef::getInstance()->Shadows[cascade].push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                            ListMatAlphaRef::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
                         case MAT_NORMAL_MAP:
-                            ListMatNormalMap::getInstance()->Shadows[cascade].push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                            ListMatNormalMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
                         case MAT_DETAIL:
-                            ListMatDetails::getInstance()->Shadows[cascade].push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                            ListMatDetails::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
                         case MAT_UNLIT:
-                            ListMatUnlit::getInstance()->Shadows[cascade].push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                            ListMatUnlit::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
                         case MAT_SPHEREMAP:
-                            ListMatSphereMap::getInstance()->Shadows[cascade].push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                            ListMatSphereMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
                         case MAT_SPLATTING:
-                            ListMatSplatting::getInstance()->Shadows[cascade].push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix));
+                            ListMatSplatting::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix);
                             break;
                         case MAT_GRASS:
-                            ListMatGrass::getInstance()->Shadows[cascade].push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, windDir));
+                            ListMatGrass::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, windDir);
                         }
                     }
                 }
@@ -265,7 +266,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             if (irr_driver->hasARB_draw_indirect())
             {
                 for_in(mesh, node->MeshSolidMaterial[Mat])
-                    MeshForRSMPass[Mat][mesh->mb].push_back(std::make_pair(mesh, Node));
+                    MeshForRSMPass[Mat][mesh->mb].emplace_back(mesh, Node);
             }
             else
             {
@@ -277,28 +278,28 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                     switch (Mat)
                     {
                     case MAT_DEFAULT:
-                        ListMatDefault::getInstance()->RSM.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_ALPHA_REF:
-                        ListMatAlphaRef::getInstance()->RSM.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->RSM.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatNormalMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_DETAIL:
-                        ListMatDetails::getInstance()->RSM.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatDetails::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_UNLIT:
-                        ListMatUnlit::getInstance()->RSM.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatUnlit::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_SPHEREMAP:
-                        ListMatSphereMap::getInstance()->RSM.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix));
+                        ListMatSphereMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case MAT_SPLATTING:
-                        ListMatSplatting::getInstance()->RSM.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix));
+                        ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case MAT_GRASS:
-                        ListMatGrass::getInstance()->RSM.push_back(STK::make_tuple(mesh, ModelMatrix, InvModelMatrix, windDir));
+                        ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, windDir);
                         break;
                     }
                 }
