@@ -597,11 +597,12 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     };
 
 
-    float tmp[16 * 8 + 2];
+    float tmp[16 * 9 + 2];
     memcpy(tmp, irr_driver->getViewMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[32], irr_driver->getInvViewMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(), 16 * sizeof(float));
+    memcpy(&tmp[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
 
     const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
     for (unsigned i = 0; i < 4; i++)
@@ -723,13 +724,13 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
         size_t size = irr_driver->getShadowViewProj().size();
         for (unsigned i = 0; i < size; i++)
-            memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
+            memcpy(&tmp[16 * i + 80], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
     }
 
-    tmp[128] = float(width);
-    tmp[129] = float(height);
+    tmp[144] = float(width);
+    tmp[145] = float(height);
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 8 + 2) * sizeof(float), tmp);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float), tmp);
 }
 
 
