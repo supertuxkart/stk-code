@@ -147,7 +147,7 @@ void LODNode::updateVisibility(bool* shown)
     {
         m_nodes[i]->setVisible(i == level);
         if (i == level && shown != NULL)
-            *shown = level;
+            *shown = (i > 0);
     }
 }
 
