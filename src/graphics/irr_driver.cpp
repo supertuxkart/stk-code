@@ -498,6 +498,7 @@ void IrrDriver::initDevice()
     hasBuffserStorage = false;
     hasDrawIndirect = false;
     hasComputeShaders = false;
+    hasTextureStorage = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
     if (!ProfileWorld::isNoGraphics())
     {
@@ -520,6 +521,10 @@ void IrrDriver::initDevice()
         if (GLEW_ARB_compute_shader) {
             hasComputeShaders = true;
             Log::info("GLDriver", "ARB Compute Shader enabled");
+        }
+        if (GLEW_ARB_texture_storage) {
+            hasTextureStorage = true;
+            Log::info("GLDriver", "ARB Texture Storage enabled");
         }
     }
 
