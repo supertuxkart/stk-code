@@ -1329,9 +1329,9 @@ namespace core
         float *dst = (float*)out.pointer();
         // from http://www.intel.com/design/pentiumiii/sml/245043.htm
         {
-            __m128 minor0, minor1, minor2, minor3;
-            __m128 row0, row1, row2, row3;
-            __m128 det, tmp1;
+            __m128 minor0 = {}, minor1 = {}, minor2 = {}, minor3 = {};
+            __m128 row0 = {}, row1 = {}, row2 = {}, row3 = {};
+            __m128 det = {}, tmp1 = {};
             tmp1 = _mm_loadh_pi(_mm_loadl_pi(tmp1, (__m64*)(src)), (__m64*)(src + 4));
             row1 = _mm_loadh_pi(_mm_loadl_pi(row1, (__m64*)(src + 8)), (__m64*)(src + 12));
             row0 = _mm_shuffle_ps(tmp1, row1, 0x88);
