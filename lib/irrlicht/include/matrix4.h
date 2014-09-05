@@ -12,7 +12,7 @@
 #include "aabbox3d.h"
 #include "rect.h"
 #include "irrString.h"
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86)
+#if defined(WIN32) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
 #include <intrin.h>
 #endif
 
@@ -1324,7 +1324,7 @@ namespace core
         }
 #endif
         const CMatrix4<T> &m = *this;
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86)
+#if defined(WIN32) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
         float *src = (float*)m.pointer();
         float *dst = (float*)out.pointer();
         // from http://www.intel.com/design/pentiumiii/sml/245043.htm
