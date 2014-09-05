@@ -149,6 +149,10 @@ endif()
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
+# Glew
+find_package(GLEW REQUIRED)
+include_directories(${GLEW_INCLUDE_DIR})
+
 if(UNIX AND NOT APPLE)
     if(USE_XRANDR)
         find_package(Xrandr REQUIRED)
@@ -269,7 +273,8 @@ target_link_libraries(supertuxkart
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
-    ${OPENGL_LIBRARIES})
+    ${OPENGL_LIBRARIES}
+    ${GLEW_LIBRARIES})
 
 if(UNIX AND NOT APPLE)
     if(USE_XRANDR)

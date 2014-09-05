@@ -7,10 +7,6 @@
 #include "irr_driver.hpp"
 #include "utils/log.hpp"
 
-// already includes glext.h, which defines useful GL constants.
-// COpenGLDriver has already loaded the extension GL functions we use (e.g glBeginQuery)
-#include "../../lib/irrlicht/source/Irrlicht/COpenGLDriver.h"
-
 
 void initGL();
 GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
