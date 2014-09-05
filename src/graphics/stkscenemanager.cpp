@@ -444,7 +444,9 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     // Add a 20 ms timeout
     if (!m_sync)
         m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+    PROFILER_PUSH_CPU_MARKER("- Sync Stall", 0xFF, 0x0, 0x0);
     GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000000);
+    PROFILER_POP_CPU_MARKER();
     /*    switch (reason)
     {
     case GL_ALREADY_SIGNALED:
