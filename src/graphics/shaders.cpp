@@ -1727,8 +1727,8 @@ namespace FullScreenShader
 
     ComputeGaussian17TapHShader::ComputeGaussian17TapHShader()
     {
-#if WIN32
-        if (irr_driver->getGLSLVersion() < 420)
+
+        if (irr_driver->hasARBComputeShaders())
             return;
         Program = LoadProgram(
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralH.comp").c_str());
@@ -1737,7 +1737,6 @@ namespace FullScreenShader
         TU_dest = 2;
         AssignUniforms();
         AssignTextureUnit(Program, TexUnit(TU_source, "source"), TexUnit(TU_depth, "depth"), TexUnit(TU_dest, "dest"));
-#endif
     }
 
     Gaussian6HBlurShader::Gaussian6HBlurShader()
@@ -1772,8 +1771,7 @@ namespace FullScreenShader
 
     ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
     {
-#if WIN32
-        if (irr_driver->getGLSLVersion() < 420)
+        if (irr_driver->hasARBComputeShaders())
             return;
         Program = LoadProgram(
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralV.comp").c_str());
@@ -1781,7 +1779,6 @@ namespace FullScreenShader
         TU_depth = 1;
         TU_dest = 2;
         AssignTextureUnit(Program, TexUnit(TU_source, "source"), TexUnit(TU_depth, "depth"), TexUnit(TU_dest, "dest"));
-#endif
     }
 
     Gaussian6VBlurShader::Gaussian6VBlurShader()

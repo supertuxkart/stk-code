@@ -337,15 +337,12 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
     assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
     {
-#if WIN32
-        if (irr_driver->getGLSLVersion() < 430)
-#endif
+        if (irr_driver->hasARBComputeShaders())
         {
             auxiliary.Bind();
             FullScreenShader::Gaussian17TapHShader::getInstance()->SetTextureUnits(createVector<GLuint>(in_fbo.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]));
             DrawFullScreenEffect<FullScreenShader::Gaussian17TapHShader>(core::vector2df(inv_width, inv_height));
         }
-#if WIN32
         else
         {
 
@@ -356,19 +353,15 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             FullScreenShader::ComputeGaussian17TapHShader::getInstance()->setUniforms();
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
         }
-#endif
     }
     {
-#if WIN32
-        if (irr_driver->getGLSLVersion() < 430)
-#endif
+        if (irr_driver->hasARBComputeShaders())
         {
             in_fbo.Bind();
 
             FullScreenShader::Gaussian17TapVShader::getInstance()->SetTextureUnits(createVector<GLuint>(auxiliary.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]));
             DrawFullScreenEffect<FullScreenShader::Gaussian17TapVShader>(core::vector2df(inv_width, inv_height));
         }
-#if WIN32
         else
         {
             glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->Program);
@@ -378,7 +371,6 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             FullScreenShader::ComputeGaussian17TapVShader::getInstance()->setUniforms();
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
         }
-#endif
     }
 }
 

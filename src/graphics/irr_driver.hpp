@@ -203,6 +203,7 @@ private:
     bool hasBaseInstance;
     bool hasDrawIndirect;
     bool hasBuffserStorage;
+    bool hasComputeShaders;
     bool m_need_ubo_workaround;
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
@@ -322,6 +323,11 @@ public:
     bool hasBufferStorageExtension() const
     {
         return hasBuffserStorage;
+    }
+
+    bool hasARBComputeShaders() const
+    {
+        return hasComputeShaders;
     }
 
     video::SColorf getAmbientLight() const;
