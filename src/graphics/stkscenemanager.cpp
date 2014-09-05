@@ -14,6 +14,7 @@
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "lod_node.hpp"
+#include "utils/profiler.hpp"
 #include <unordered_map>
 
 static void
@@ -493,6 +494,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 
     size_t SolidPoly = 0, ShadowPoly = 0, MiscPoly = 0;
 
+    PROFILER_PUSH_CPU_MARKER("- Draw Command upload", 0xFF, 0x0, 0xFF);
 #pragma omp parallel sections
     {
 #pragma omp section
@@ -650,6 +652,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
             }
         }
     }
+    PROFILER_POP_CPU_MARKER();
     poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += SolidPoly;
     poly_count[SHADOW_PASS] += ShadowPoly;
 
