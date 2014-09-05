@@ -798,7 +798,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
         scene::ISceneNode * cur = dat.node;
 
         STKMeshSceneNode *node = static_cast<STKMeshSceneNode *>(cur);
-        node->setGlowColors(SColor(0, (unsigned)dat.b * 255.f, (unsigned)dat.g * 255.f, (unsigned)dat.r * 255.f));
+        node->setGlowColors(SColor(0, (unsigned) (dat.b * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.r * 255.f)));
         if (!irr_driver->hasARB_draw_indirect())
             node->render();
     }
