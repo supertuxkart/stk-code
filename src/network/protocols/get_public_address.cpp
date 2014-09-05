@@ -28,6 +28,11 @@
 #include "utils/random_generator.hpp"
 
 #include <assert.h>
+
+#ifdef __MINGW32__
+#  define _WIN32_WINNT 0x501
+#endif
+
 #ifdef WIN32
 #  include <winsock2.h>
 #  include <ws2tcpip.h>
@@ -35,6 +40,7 @@
 #  include <netdb.h>
 #endif
 #include <sys/types.h>
+
 
 int stunRand()
 {

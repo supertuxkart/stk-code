@@ -28,9 +28,8 @@
 #include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/dialogs/gp_info_dialog.hpp"
-#include "states_screens/dialogs/random_gp_dialog.hpp"
-#include "states_screens/dialogs/track_info_dialog.hpp"
+#include "states_screens/track_info_screen.hpp"
+#include "states_screens/gp_info_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -81,14 +80,8 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
 
             if (clicked_track)
             {
-                ITexture* screenshot =
-                    irr_driver->getTexture(clicked_track->getScreenshotFile(),
-                                   "While loading screenshot for track '%s':",
-                                   clicked_track->getFilename()               );
-
-                new TrackInfoDialog(selection, clicked_track->getIdent(),
-                              translations->fribidize(clicked_track->getName()),
-                              screenshot, 0.8f, 0.7f);
+                TrackInfoScreen::getInstance()->setTrack(clicked_track);
+                StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
             }   // if clicked_track
 
         }   // selection=="random_track"
@@ -104,14 +97,8 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             Track* clicked_track = track_manager->getTrack(selection);
             if (clicked_track)
             {
-                ITexture* screenshot =
-                    irr_driver->getTexture(clicked_track->getScreenshotFile(),
-                                    "While loading screenshot for track '%s'",
-                                    clicked_track->getFilename());
-
-                new TrackInfoDialog(selection, clicked_track->getIdent(),
-                             translations->fribidize(clicked_track->getName()),
-                             screenshot, 0.8f, 0.7f);
+                TrackInfoScreen::getInstance()->setTrack(clicked_track);
+                StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
             }
         }
     }   // name=="tracks"
@@ -127,10 +114,10 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else
         {
-            if (selection == "Random Grand Prix")
-                new RandomGPInfoDialog();
-            else
-                new GPInfoDialog(selection);
+            GPInfoScreen *gpis = GPInfoScreen::getInstance();
+            gpis->setGP( selection == "Random Grand Prix" ? "random" 
+                                                          : selection);
+            StateManager::get()->pushScreen(gpis);
         }
     }
     else if (name == "trackgroups")

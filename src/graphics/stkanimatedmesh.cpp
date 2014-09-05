@@ -165,7 +165,7 @@ void STKAnimatedMesh::render()
 
     update();
 
-    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
+/*    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
         core::matrix4 invmodel;
@@ -185,7 +185,7 @@ void STKAnimatedMesh::render()
             pushVector(ListMatUnlit::getInstance(), mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
 
         return;
-    }
+    }*/
 
     if (irr_driver->getPhase() == TRANSPARENT_PASS)
     {

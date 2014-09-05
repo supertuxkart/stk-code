@@ -136,6 +136,9 @@ public:
     const std::string& getId()       const { return m_id;                 }
 
     // ------------------------------------------------------------------------
+    /** Returns true if this GP is a random GP. */
+    bool isRandomGP() const { return m_id=="random"; }
+    // ------------------------------------------------------------------------
     /** Returns the filename of the grand prix xml file. */
     const std::string& getFilename() const { return m_filename;           }
 };   // GrandPrixData

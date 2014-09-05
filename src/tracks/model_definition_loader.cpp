@@ -22,7 +22,6 @@ using namespace irr;
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "graphics/stkinstancedscenenode.hpp"
 #include "io/xml_node.hpp"
 #include "tracks/track.hpp"
 
@@ -107,35 +106,6 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
         Log::warn("ModelDefinitionLoader", "LOD group '%s' is empty", groupname.c_str());
         return NULL;
     }
-}
-
-// ----------------------------------------------------------------------------
-
-STKInstancedSceneNode* ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
-                                const irr::core::vector3df& rotation,
-                                const irr::core::vector3df scale,
-                                const std::string& name)
-{
-    if (m_instancing_nodes.find(name) == m_instancing_nodes.end())
-    {
-        if (m_lod_groups.find(name) == m_lod_groups.end())
-        {
-            Log::warn("Instancing", "Cannot find instancing model <%s>", name.c_str());
-            return NULL;
-        }
-
-        scene::IMesh* mesh = irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
-        mesh = MeshTools::createMeshWithTangents(mesh, &MeshTools::isNormalMap);
-        irr_driver->setAllMaterialFlags(mesh);
-
-        m_instancing_nodes[name] = new STKInstancedSceneNode(mesh,
-            irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager(), -1);
-        m_track->addNode(m_instancing_nodes[name]);
-    }
-
-    m_instancing_nodes[name]->addInstance(position, rotation, scale);
-    m_instancing_nodes[name]->instanceGrab();
-    return m_instancing_nodes[name];
 }
 
 // ----------------------------------------------------------------------------

@@ -185,12 +185,13 @@ public:
             case MINOR_MODE_SOCCER:         return _("Soccer");
             default: assert(false); return NULL;
         }
-    }
+    }   // getNameOf
 
     // ------------------------------------------------------------------------
-    static bool hasAI(const MinorRaceModeType mode)
+    /** Returns if the currently set minor game mode can be used by the AI. */
+    bool hasAI()
     {
-        switch (mode)
+        switch (m_minor_mode)
         {
             case MINOR_MODE_NORMAL_RACE:    return true;
             case MINOR_MODE_TIME_TRIAL:     return true;
@@ -200,7 +201,7 @@ public:
             case MINOR_MODE_SOCCER:         return false;
             default: assert(false);         return false;
         }
-    }
+    }   // hasAI
 
 
     // ------------------------------------------------------------------------
@@ -417,9 +418,9 @@ public:
     void setDifficulty(Difficulty diff);
 
     // ------------------------------------------------------------------------
-    void setGrandPrix(const GrandPrixData *gp)
+    void setGrandPrix(const GrandPrixData &gp)
     {
-        m_grand_prix = *gp;
+        m_grand_prix = gp;
         m_coin_target = 0;
     }
     // ------------------------------------------------------------------------
@@ -694,7 +695,7 @@ public:
       * \brief Higher-level method to start a GP without having to care about
       *  the exact startup sequence
       */
-    void  startGP(const GrandPrixData* gp, bool from_overworld,
+    void  startGP(const GrandPrixData &gp, bool from_overworld,
                   bool continue_saved_gp);
 
     /**

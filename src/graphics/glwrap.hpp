@@ -7,10 +7,6 @@
 #include "irr_driver.hpp"
 #include "utils/log.hpp"
 
-// already includes glext.h, which defines useful GL constants.
-// COpenGLDriver has already loaded the extension GL functions we use (e.g glBeginQuery)
-#include "../../lib/irrlicht/source/Irrlicht/COpenGLDriver.h"
-
 
 void initGL();
 GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
@@ -92,6 +88,8 @@ class GPUTimer;
 
 class ScopedGPUTimer
 {
+protected:
+    GPUTimer &timer;
 public:
     ScopedGPUTimer(GPUTimer &);
     ~ScopedGPUTimer();
@@ -102,6 +100,8 @@ class GPUTimer
     friend class ScopedGPUTimer;
     GLuint query;
     bool initialised;
+    unsigned lastResult;
+    bool canSubmitQuery;
 public:
     GPUTimer();
     unsigned elapsedTimeus();
@@ -142,6 +142,9 @@ void saveCompressedTexture(const std::string& compressed_tex);
 enum InstanceType
 {
     InstanceTypeDefault,
+    InstanceTypeShadow,
+    InstanceTypeRSM,
+    InstanceTypeGlow,
     InstanceTypeCount,
 };
 
@@ -172,23 +175,53 @@ struct InstanceData
     uint64_t SecondTexture;
 #ifdef WIN32
 };
-#pragma pack(pop)
 #else
 } __attribute__((packed));
+#endif
+
+struct GlowInstanceData
+{
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Origin;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Orientation;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Scale;
+    unsigned Color;
+#ifdef WIN32
+};
+#else
+} __attribute__((packed));
+#endif
+#ifdef WIN32
+#pragma pack(pop)
 #endif
 
 class VAOManager : public Singleton<VAOManager>
 {
     enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
     GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
-    GLuint instance_vbo[1];
-    size_t instance_count[1];
+    GLuint instance_vbo[InstanceTypeCount];
+    size_t instance_count[InstanceTypeCount];
+    void *Ptr[InstanceTypeCount];
     void *VBOPtr[VTXTYPE_COUNT];
     std::vector<scene::IMeshBuffer *> storedCPUBuffer[VTXTYPE_COUNT];
     void *vtx_mirror[VTXTYPE_COUNT], *idx_mirror[VTXTYPE_COUNT];
     size_t vtx_cnt[VTXTYPE_COUNT], idx_cnt[VTXTYPE_COUNT];
     std::map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
-    std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO, ShadowInstanceVAO;
+    std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO;
 
     void cleanInstanceVAOs();
     void regenerateBuffer(enum VTXTYPE);
@@ -201,11 +234,12 @@ public:
     VAOManager();
     std::pair<unsigned, unsigned> getBase(scene::IMeshBuffer *);
     size_t appendInstance(enum InstanceType, const std::vector<InstanceData> &instance_data);
+    GLuint getInstanceBuffer(InstanceType it) { return instance_vbo[it]; }
+    void *getInstanceBufferPtr(InstanceType it) { return Ptr[it]; }
     unsigned getVBO(video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
     void *getVBOPtr(video::E_VERTEX_TYPE type) { return VBOPtr[getVTXTYPE(type)]; }
     unsigned getVAO(video::E_VERTEX_TYPE type) { return vao[getVTXTYPE(type)]; }
     unsigned getInstanceVAO(video::E_VERTEX_TYPE vt, enum InstanceType it) { return InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(vt, it)]; }
-    unsigned getShadowInstanceVAO(video::E_VERTEX_TYPE vt, enum InstanceType it) { return ShadowInstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(vt, it)]; }
     ~VAOManager();
 };
 

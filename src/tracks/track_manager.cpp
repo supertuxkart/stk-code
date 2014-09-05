@@ -58,6 +58,19 @@ void TrackManager::addTrackSearchDir(const std::string &dir)
 }   // addTrackDir
 
 //-----------------------------------------------------------------------------
+/** Returns the number of racing tracks. Those are tracks that are not 
+ *  internal (like cut scenes), arenas, or soccer fields.
+ */
+int TrackManager::getNumberOfRaceTracks() const
+{
+    int n=0;
+    for(unsigned int i=0; i<m_tracks.size(); i++)
+        if(m_tracks[i]->isRaceTrack())
+            n++;
+    return n;
+}   // getNumberOfRaceTracks
+
+//-----------------------------------------------------------------------------
 /** Get TrackData by the track identifier.
  *  \param ident Identifier = basename of the directory the track is in.
  *  \return      The corresponding track object, or NULL if not found

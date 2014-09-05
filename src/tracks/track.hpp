@@ -401,6 +401,7 @@ private:
     /** The number of laps the track will be raced in a random GP.
      * m_actual_number_of_laps is initialised with this value.*/
     int m_default_number_of_laps;
+
     /** The number of laps that is predefined in a track info dialog. */
     int m_actual_number_of_laps;
 
@@ -419,7 +420,7 @@ private:
 
 public:
 
-    bool reverseAvailable() { return m_reverse_available; }
+    bool reverseAvailable() const { return m_reverse_available; }
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
 
     static const float NOHIT;
@@ -463,8 +464,16 @@ public:
     /** Returns true if this track has an arena mode. */
     bool isArena() const { return m_is_arena; }
     // ------------------------------------------------------------------------
+    /** Returns true if this track is a racing track. This means it is not an
+     *  internal track (like cut scenes), arena, or soccer field. */
+    bool isRaceTrack() const 
+    {
+        return !m_internal && !m_is_arena && !m_is_soccer;
+    }   // isRaceTrack
+    // ------------------------------------------------------------------------
     /** Returns true if this track has easter eggs. */
     bool hasEasterEggs() const { return m_has_easter_eggs; }
+    // ------------------------------------------------------------------------
     bool               isSoccer             () const { return m_is_soccer; }
     // ------------------------------------------------------------------------
     void               loadTrackModel  (World* parent,

@@ -408,7 +408,6 @@ void Shaders::loadShaders()
     initShadowVPMUBO();
     initParticleQuadVBO();
     MeshShader::BubbleShader::init();
-    MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
     UtilShader::ColoredLine::init();
 }
@@ -711,6 +710,20 @@ void BindTextureTrilinearAnisotropic(GLuint TU, GLuint tex)
     int aniso = UserConfigParams::m_anisotropic;
     if (aniso == 0) aniso = 1;
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
+}
+
+void BindCubemapTrilinear(unsigned TU, unsigned tex)
+{
+    glActiveTexture(GL_TEXTURE0 + TU);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    int aniso = UserConfigParams::m_anisotropic;
+    if (aniso == 0) aniso = 1;
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
 }
 
 GLuint createShadowSampler()
@@ -1137,6 +1150,18 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
+    InstancedColorizeShader::InstancedColorizeShader()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/glow_object.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/glow_object.frag").c_str());
+        AssignUniforms();
+
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
     ShadowShader::ShadowShader()
     {
         // Geometry shader needed
@@ -1167,6 +1192,20 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
 
         AssignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
+        AssignSamplerNames(Program, 0, "tex");
+
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
+    InstancedRSMShader::InstancedRSMShader()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_rsm.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_rsm.frag").c_str());
+
+        AssignUniforms("RSMMatrix");
         AssignSamplerNames(Program, 0, "tex");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1343,20 +1382,13 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    GLuint SkyboxShader::Program;
-    GLuint SkyboxShader::attrib_position;
-    GLuint SkyboxShader::uniform_MM;
-    GLuint SkyboxShader::uniform_tex;
-    GLuint SkyboxShader::cubevao;
-
-    void SkyboxShader::init()
+    SkyboxShader::SkyboxShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sky.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_tex = glGetUniformLocation(Program, "tex");
+        AssignUniforms("ModelMatrix");
+        AssignSamplerNames(Program, 0, "tex");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1364,18 +1396,10 @@ namespace MeshShader
         glGenVertexArrays(1, &cubevao);
         glBindVertexArray(cubevao);
         glBindBuffer(GL_ARRAY_BUFFER, SharedObject::cubevbo);
-        glEnableVertexAttribArray(attrib_position);
-        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::cubeindexes);
         glBindVertexArray(0);
-    }
-
-    void SkyboxShader::setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &screen, unsigned TU_tex)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniform1i(uniform_tex, TU_tex);
     }
 
     NormalVisualizer::NormalVisualizer()
@@ -1703,8 +1727,8 @@ namespace FullScreenShader
 
     ComputeGaussian17TapHShader::ComputeGaussian17TapHShader()
     {
-#if WIN32
-        if (irr_driver->getGLSLVersion() < 420)
+
+        if (irr_driver->hasARBComputeShaders())
             return;
         Program = LoadProgram(
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralH.comp").c_str());
@@ -1713,7 +1737,6 @@ namespace FullScreenShader
         TU_dest = 2;
         AssignUniforms();
         AssignTextureUnit(Program, TexUnit(TU_source, "source"), TexUnit(TU_depth, "depth"), TexUnit(TU_dest, "dest"));
-#endif
     }
 
     Gaussian6HBlurShader::Gaussian6HBlurShader()
@@ -1748,8 +1771,7 @@ namespace FullScreenShader
 
     ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
     {
-#if WIN32
-        if (irr_driver->getGLSLVersion() < 420)
+        if (irr_driver->hasARBComputeShaders())
             return;
         Program = LoadProgram(
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralV.comp").c_str());
@@ -1757,7 +1779,6 @@ namespace FullScreenShader
         TU_depth = 1;
         TU_dest = 2;
         AssignTextureUnit(Program, TexUnit(TU_source, "source"), TexUnit(TU_depth, "depth"), TexUnit(TU_dest, "dest"));
-#endif
     }
 
     Gaussian6VBlurShader::Gaussian6VBlurShader()

@@ -37,7 +37,6 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stkinstancedscenenode.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -742,23 +741,9 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     node->updateAbsolutePosition();
 
     std::vector<core::matrix4> matrices;
-
-    STKInstancedSceneNode* instancing_node = dynamic_cast<STKInstancedSceneNode*>(node);
-    if (instancing_node != NULL)
-    {
-        int count = instancing_node->getInstanceCount();
-        for (int i = 0; i < count; i++)
-        {
-            matrices.push_back(instancing_node->getInstanceTransform(i));
-        }
-    }
-    else
-    {
-        matrices.push_back(node->getAbsoluteTransformation());
-    }
+    matrices.push_back(node->getAbsoluteTransformation());
 
     const core::vector3df &pos   = node->getAbsolutePosition();
-
 
     scene::IMesh *mesh;
     // In case of readonly materials we have to get the material from
@@ -1056,20 +1041,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
         {
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
-            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
-            {
-                lodLoader.addModelDefinition(lod_group_xml->getNode(j));
-            }
-        }
-    }
-
-    // Load instancing models (for the moment they are loaded the same way as LOD to simplify implementation)
-    const XMLNode *instancing_xml_node = root.getNode("instancing");
-    if (instancing_xml_node != NULL)
-    {
-        for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
-        {
-            const XMLNode* lod_group_xml = instancing_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
                 lodLoader.addModelDefinition(lod_group_xml->getNode(j));
@@ -1756,20 +1727,6 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
     }
 
-    // Load instancing models (for the moment they are loaded the same way as LOD to simplify implementation)
-    const XMLNode *instancing_xml_node = root->getNode("instancing");
-    if (instancing_xml_node != NULL)
-    {
-        for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
-        {
-            const XMLNode* lod_group_xml = instancing_xml_node->getNode(i);
-            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
-            {
-                model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
-            }
-        }
-    }
-
     std::map<std::string, XMLNode*> library_nodes;
     loadObjects(root, path, model_def_loader, true, NULL, library_nodes);
 
@@ -2010,20 +1967,6 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
                         }
                     }
                 }
-
-                // Load instancing definitions
-                const XMLNode *instancing_xml_node = libroot->getNode("instancing");
-                if (instancing_xml_node != NULL)
-                {
-                    for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
-                    {
-                        const XMLNode* instancing_group_xml = instancing_xml_node->getNode(i);
-                        for (unsigned int j = 0; j < instancing_group_xml->getNumNodes(); j++)
-                        {
-                            model_def_loader.addModelDefinition(instancing_group_xml->getNode(j));
-                        }
-                    }
-                }
             }
             else
             {
@@ -2128,7 +2071,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "instancing")
         {
-            // handled above
+            // TODO: eventually remove, this is now automatic
         }
         else if (name == "subtitles")
         {
