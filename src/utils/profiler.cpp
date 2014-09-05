@@ -256,6 +256,7 @@ void Profiler::synchronizeFrame()
 /// Draw the markers
 void Profiler::draw()
 {
+    PROFILER_PUSH_CPU_MARKER("ProfilerDraw", 0xFF, 0xFF, 0x00);
     video::IVideoDriver*    driver = irr_driver->getVideoDriver();
     std::stack<Marker>      hovered_markers;
 
@@ -294,7 +295,7 @@ void Profiler::draw()
             else end = std::max(end, m.end);
         }
     }
-
+    
     const double duration = end - start;
     const double factor = profiler_width / duration;
 
@@ -352,17 +353,19 @@ void Profiler::draw()
             m_first_capture_sweep = false;
         }
     }
-
+    
     // GPU profiler
     QueryPerf hovered_gpu_marker = Q_LAST;
     long hovered_gpu_marker_elapsed = 0;
     int gpu_y = int(y_offset + nb_thread_infos*line_height + line_height/2);
     float total = 0;
+    unsigned int gpu_timers[Q_LAST];
     for (unsigned i = 0; i < Q_LAST; i++)
     {
-        total += irr_driver->getGPUTimer(i).elapsedTimeus();
+        gpu_timers[i] = irr_driver->getGPUTimer(i).elapsedTimeus();
+        total += gpu_timers[i];
     }
-
+    
     static video::SColor colors[] = {
         video::SColor(255, 255, 0, 0),
         video::SColor(255, 0, 255, 0),
@@ -379,7 +382,7 @@ void Profiler::draw()
         {
             //Log::info("GPU Perf", "Phase %d : %d us\n", i, irr_driver->getGPUTimer(i).elapsedTimeus());
 
-            float elapsed = float(irr_driver->getGPUTimer(i).elapsedTimeus());
+            float elapsed = float(gpu_timers[i]);
             core::rect<s32> pos((s32)(x_offset + (curr_val / total)*profiler_width),
                 (s32)(y_offset + gpu_y),
                 (s32)(x_offset + ((curr_val + elapsed) / total)*profiler_width),
@@ -391,7 +394,7 @@ void Profiler::draw()
             if (pos.isPointInside(mouse_pos))
             {
                 hovered_gpu_marker = (QueryPerf)i;
-                hovered_gpu_marker_elapsed = irr_driver->getGPUTimer(i).elapsedTimeus();
+                hovered_gpu_marker_elapsed = gpu_timers[i];
             }
 
             if (m_capture_report)
@@ -451,6 +454,8 @@ void Profiler::draw()
     {
         font->draw("Capturing profiler report...", MARKERS_NAMES_POS, video::SColor(0xFF, 0x00, 0x90, 0x00));
     }
+
+    PROFILER_POP_CPU_MARKER();
 }
 
 //-----------------------------------------------------------------------------
