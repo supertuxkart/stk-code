@@ -47,8 +47,6 @@ namespace core
 	template <class T>
 	class CMatrix4
 	{
-    private:
-        float M_raw[24];
 		public:
 
 			//! Constructor Flags
@@ -408,7 +406,7 @@ namespace core
 
 		private:
 			//! Matrix data, stored in row-major order
-            T* M = (T*)((uintptr_t)&M_raw[4] & ~0xF);
+			T M[16];
 #if defined ( USE_MATRIX_TEST )
 			//! Flag is this matrix is identity matrix
 			mutable u32 definitelyIdentityMatrix;
@@ -669,10 +667,10 @@ namespace core
 
         const float *matA = other_a.pointer();
 
-        const __m128 a = _mm_load_ps(matA); // First row
-        const __m128 b = _mm_load_ps(&matA[4]); // Second row
-        const __m128 c = _mm_load_ps(&matA[8]); // Third row
-        const __m128 d = _mm_load_ps(&matA[12]); // Fourth row
+        const __m128 a = _mm_loadu_ps(matA); // First row
+        const __m128 b = _mm_loadu_ps(&matA[4]); // Second row
+        const __m128 c = _mm_loadu_ps(&matA[8]); // Third row
+        const __m128 d = _mm_loadu_ps(&matA[12]); // Fourth row
 
          __m128 t1 = _mm_set1_ps(m2[0]);
          __m128 t2 = _mm_mul_ps(a, t1);
@@ -682,7 +680,7 @@ namespace core
         t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
         t1 = _mm_set1_ps(m2[3]);
         t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
-        _mm_store_ps(&M[0], t2);
+        _mm_storeu_ps(&M[0], t2);
 
         t1 = _mm_set1_ps(m2[4]);
         t2 = _mm_mul_ps(a, t1);
@@ -692,7 +690,7 @@ namespace core
         t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
         t1 = _mm_set1_ps(m2[7]);
         t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
-        _mm_store_ps(&M[4], t2);
+        _mm_storeu_ps(&M[4], t2);
 
         t1 = _mm_set1_ps(m2[8]);
         t2 = _mm_mul_ps(a, t1);
@@ -702,7 +700,7 @@ namespace core
         t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
         t1 = _mm_set1_ps(m2[11]);
         t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
-        _mm_store_ps(&M[8], t2);
+        _mm_storeu_ps(&M[8], t2);
 
         t1 = _mm_set1_ps(m2[12]);
         t2 = _mm_mul_ps(a, t1);
@@ -712,7 +710,7 @@ namespace core
         t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
         t1 = _mm_set1_ps(m2[15]);
         t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
-        _mm_store_ps(&M[12], t2);
+        _mm_storeu_ps(&M[12], t2);
 #else
 
 		M[0] = m1[0]*m2[0] + m1[4]*m2[1] + m1[8]*m2[2] + m1[12]*m2[3];
