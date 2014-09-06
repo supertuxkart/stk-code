@@ -197,7 +197,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                         MeshForGlowPass[mesh->mb].emplace_back(mesh, node);
 
 
-                    if (mesh->TextureMatrix.isIdentity())
+                    if (Mat != MAT_SPLATTING && mesh->TextureMatrix.isIdentity())
                         MeshForSolidPass[Mat][mesh->mb].emplace_back(mesh, Node);
                     else
                     {
@@ -213,6 +213,9 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                             break;
                         case MAT_UNLIT:
                             ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                            break;
+                        case MAT_SPLATTING:
+                            ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                             break;
                         }
                     }
@@ -310,7 +313,16 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             if (irr_driver->hasARB_draw_indirect())
             {
                 for_in(mesh, node->MeshSolidMaterial[Mat])
-                    MeshForRSMPass[Mat][mesh->mb].emplace_back(mesh, Node);
+                {
+                    if (Mat != MAT_SPLATTING)
+                        MeshForRSMPass[Mat][mesh->mb].emplace_back(mesh, Node);
+                    else
+                    {
+                        core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
+                        ModelMatrix.getInverse(InvModelMatrix);
+                        ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
+                    }
+                }
             }
             else
             {
