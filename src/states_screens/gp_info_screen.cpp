@@ -121,9 +121,26 @@ GrandPrixData::GPReverseType GPInfoScreen::getReverse() const
 void GPInfoScreen::beforeAddingWidget()
 {
     bool random = m_gp.isRandomGP();
-    RibbonWidget* ribbonButtons = getWidget<RibbonWidget>("buttons");
-    int id_continue_button = ribbonButtons->findItemNamed("continue");
-    ribbonButtons->setItemVisible(id_continue_button, random);
+    if (!random)
+    {
+        // Check if there is a saved GP:
+        SavedGrandPrix* saved_gp = SavedGrandPrix::getSavedGP(
+            StateManager::get()->getActivePlayerProfile(0)->getUniqueID(),
+            m_gp.getId(),
+            race_manager->getDifficulty(),
+            race_manager->getNumberOfKarts(),
+            race_manager->getNumLocalPlayers());
+
+        RibbonWidget* ribbonButtons = getWidget<RibbonWidget>("buttons");
+        int id_continue_button = ribbonButtons->findItemNamed("continue");
+        ribbonButtons->setItemVisible(id_continue_button, saved_gp != NULL);
+    }
+    else
+    {
+        RibbonWidget* ribbonButtons = getWidget<RibbonWidget>("buttons");
+        int id_continue_button = ribbonButtons->findItemNamed("continue");
+        ribbonButtons->setItemVisible(id_continue_button, true);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -193,15 +210,6 @@ void GPInfoScreen::init()
     {
         getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
         m_gp.checkConsistency();
-
-        // Check if there is a saved GP:
-        SavedGrandPrix* saved_gp =
-            SavedGrandPrix::getSavedGP(StateManager::get()
-                                       ->getActivePlayerProfile(0)->getUniqueID(),
-                                       m_gp.getId(),
-                                       race_manager->getDifficulty(),
-                                       race_manager->getNumberOfKarts(),
-                                       race_manager->getNumLocalPlayers());
     }
 
     addTracks();
