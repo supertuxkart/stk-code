@@ -98,8 +98,9 @@ void initGL()
     if (is_gl_init)
         return;
     is_gl_init = true;
-    if (GLEW_OK != glewInit())
-        Log::fatal("GLEW", "Glew initialisation failed, can't continue.");
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
+        Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
 #ifdef ARB_DEBUG_OUTPUT
     if (glDebugMessageCallbackARB)
         glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
