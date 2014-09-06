@@ -70,7 +70,6 @@ void GPInfoScreen::loadedFromFile()
     // The group spinner is filled in init every time the screen is shown
     // (since the groups can change if addons are added/deleted).
     m_group_spinner      = getWidget<SpinnerWidget>("group-spinner");
-    m_continue_button    = getWidget<IconButtonWidget>("continue");
     m_reverse_spinner    = getWidget<SpinnerWidget>("reverse-spinner");
     m_reverse_spinner->addLabel(_("No"));
     m_reverse_spinner->addLabel(_("Yes"));
@@ -118,6 +117,14 @@ GrandPrixData::GPReverseType GPInfoScreen::getReverse() const
     // Avoid compiler warning
     return GrandPrixData::GP_NO_REVERSE;
 }   // getReverse
+// ----------------------------------------------------------------------------
+void GPInfoScreen::beforeAddingWidget()
+{
+    bool random = m_gp.isRandomGP();
+    RibbonWidget* ribbonButtons = getWidget<RibbonWidget>("buttons");
+    int id_continue_button = ribbonButtons->findItemNamed("continue");
+    ribbonButtons->setItemVisible(id_continue_button, random);
+}
 
 // ----------------------------------------------------------------------------
 /** Called before the screen is shown. It adds the screenshot icon, and
@@ -144,8 +151,6 @@ void GPInfoScreen::init()
         rb->setLabel(1,_(L"Reload") );
         getWidget<LabelWidget>("name")->setText(_("Random Grand Prix"), false);
         std::string restart = file_manager->getAsset(FileManager::GUI, "restart.png");
-        m_continue_button->setImage(restart, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-        m_continue_button->setVisible(true);
 
         // We have to recreate the group spinner, but a new group might have
         // been added or deleted since the last time this screen was shown.
@@ -197,10 +202,6 @@ void GPInfoScreen::init()
                                        race_manager->getDifficulty(),
                                        race_manager->getNumberOfKarts(),
                                        race_manager->getNumLocalPlayers());
-
-        //I18N: Continue a previously saved Grand Prix.
-        m_continue_button->setText(_(L"Continue saved GP"));
-        m_continue_button->setVisible(saved_gp != NULL);
     }
 
     addTracks();

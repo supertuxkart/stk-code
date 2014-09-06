@@ -152,6 +152,8 @@ namespace GUIEngine
           */
         void setLabel(const unsigned int id, irr::core::stringw new_name);
         
+        void setItemVisible(const unsigned int id, bool visible);
+
         /** Returns the ID of the item, or -1 if not found */
         int findItemNamed(const char* internalName);
         

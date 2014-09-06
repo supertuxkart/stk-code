@@ -734,6 +734,18 @@ void RibbonWidget::setLabel(const unsigned int id, irr::core::stringw new_name)
 }   // setLabel
 
 // ----------------------------------------------------------------------------
+
+void RibbonWidget::setItemVisible(const unsigned int id, bool visible)
+{
+    m_children[id].setVisible(visible);
+
+    // ignore this call for ribbons without labels
+    if (m_labels.size() == 0) return;
+
+    m_labels[id].setVisible(visible);
+} // RibbonWidget
+
+// ----------------------------------------------------------------------------
 int RibbonWidget::findItemNamed(const char* internalName)
 {
     const int size = m_children.size();
