@@ -135,8 +135,8 @@ bool isBoxInFrontOfPlane(const core::plane3df &plane, const core::vector3df edge
 {
     for (u32 j = 0; j<8; ++j)
         if (plane.classifyPointRelation(edges[j]) != core::ISREL3D_FRONT)
-            return true;
-    return false;
+            return false;
+    return true;
 }
 
 static
