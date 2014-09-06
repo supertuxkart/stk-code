@@ -48,7 +48,9 @@ namespace core
 	class CMatrix4
 	{
     private:
+#if defined(WIN32) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
         float M_raw[24];
+#endif
 		public:
 
 			//! Constructor Flags
@@ -407,8 +409,12 @@ namespace core
 			bool equals(const core::CMatrix4<T>& other, const T tolerance=(T)ROUNDING_ERROR_f64) const;
 
 		private:
+#if defined(WIN32) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
 			//! Matrix data, stored in row-major order
             T* M = (T*)((uintptr_t)&M_raw[4] & ~0xF);
+#else
+            T M[16];
+#endif
 #if defined ( USE_MATRIX_TEST )
 			//! Flag is this matrix is identity matrix
 			mutable u32 definitelyIdentityMatrix;
