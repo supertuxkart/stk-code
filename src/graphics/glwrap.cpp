@@ -98,6 +98,7 @@ void initGL()
     if (is_gl_init)
         return;
     is_gl_init = true;
+    glewExperimental = GL_TRUE;
     GLenum err = glewInit();
     if (GLEW_OK != err)
         Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
