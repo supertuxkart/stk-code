@@ -16,6 +16,7 @@
 #include "lod_node.hpp"
 #include "utils/profiler.hpp"
 #include <unordered_map>
+#include <SViewFrustum.h>
 
 static void
 FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > InstanceList, InstanceData * InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer,
@@ -127,6 +128,48 @@ static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *,
 static std::vector <STKMeshCommon *> DeferredUpdate;
 
 static core::vector3df windDir;
+
+// From irrlicht code
+static
+bool isBoxInFrontOfPlane(const core::plane3df &plane, const core::vector3df edges[8])
+{
+    for (u32 j = 0; j<8; ++j)
+        if (plane.classifyPointRelation(edges[j]) != core::ISREL3D_FRONT)
+            return true;
+    return false;
+}
+
+static
+bool isCulled(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
+{
+    // can be seen by a bounding box ?
+    if (node->getAutomaticCulling() & scene::EAC_BOX)
+    {
+        core::aabbox3d<f32> tbox = node->getBoundingBox();
+        node->getAbsoluteTransformation().transformBoxEx(tbox);
+        return !(tbox.intersectsWithBox(cam->getViewFrustum()->getBoundingBox()));
+    }
+
+    // can be seen by cam pyramid planes ?
+    if (node->getAutomaticCulling() & scene::EAC_FRUSTUM_BOX)
+    {
+        scene::SViewFrustum frust = *cam->getViewFrustum();
+
+        //transform the frustum to the node's current absolute transformation
+        core::matrix4 invTrans(node->getAbsoluteTransformation(), core::matrix4::EM4CONST_INVERSE);
+        //invTrans.makeInverse();
+        frust.transform(invTrans);
+
+        core::vector3df edges[8];
+        node->getBoundingBox().getEdges(edges);
+
+        for (s32 i = 0; i < scene::SViewFrustum::VF_PLANE_COUNT; ++i)
+            if (isBoxInFrontOfPlane(frust.planes[i], edges))
+                return true;
+        return false;
+    }
+    return false;
+}
 
 static void
 handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *ImmediateDraw, bool IsCulledForSolid, bool IsCulledForShadow[4], bool IsCulledForRSM)
@@ -359,16 +402,13 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
             continue;
         (*I)->updateAbsolutePosition();
 
-        core::aabbox3d<f32> tbox = (*I)->getBoundingBox();
-        (*I)->getAbsoluteTransformation().transformBoxEx(tbox);
-
-        bool IsCulledForSolid = !(tbox.intersectsWithBox(cam->getViewFrustum()->getBoundingBox()));
+        bool IsCulledForSolid = isCulled(cam, *I);
 
         bool IsCulledForShadow[4];
         for (unsigned i = 0; i < 4; ++i)
-            IsCulledForShadow[i] = !(tbox.intersectsWithBox(shadowCams[i]->getViewFrustum()->getBoundingBox()));
+            IsCulledForShadow[i] = isCulled(shadowCams[i], *I);
 
-        bool IsCulledForRSM = !(tbox.intersectsWithBox(RSM_cam->getViewFrustum()->getBoundingBox()));
+        bool IsCulledForRSM = isCulled(RSM_cam, *I);
 
         if (!IsCulledForSolid)
         {
