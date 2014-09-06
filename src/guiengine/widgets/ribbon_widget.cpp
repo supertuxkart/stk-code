@@ -722,15 +722,21 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w,
 // ----------------------------------------------------------------------------
 void RibbonWidget::setLabel(const unsigned int id, irr::core::stringw new_name)
 {
-    // This method should only be called AFTER a widget is added
-    assert(m_element != NULL);
+    if (m_element == NULL)
+    {
+        // before adding
+        m_children[id].setText(new_name);
+    }
+    else
+    {
+        // after adding
+        // ignore this call for ribbons without labels
+        if (m_labels.size() == 0) return;
 
-    // ignore this call for ribbons without labels
-    if (m_labels.size() == 0) return;
-
-    assert(id < m_labels.size());
-    m_labels[id].setText( new_name.c_str() );
-    m_text = new_name;
+        assert(id < m_labels.size());
+        m_labels[id].setText(new_name.c_str());
+        //m_text = new_name;
+    }
 }   // setLabel
 
 // ----------------------------------------------------------------------------

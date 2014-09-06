@@ -134,12 +134,14 @@ void GPInfoScreen::beforeAddingWidget()
         RibbonWidget* ribbonButtons = getWidget<RibbonWidget>("buttons");
         int id_continue_button = ribbonButtons->findItemNamed("continue");
         ribbonButtons->setItemVisible(id_continue_button, saved_gp != NULL);
+        ribbonButtons->setLabel(id_continue_button, _("Continue saved GP"));
     }
     else
     {
         RibbonWidget* ribbonButtons = getWidget<RibbonWidget>("buttons");
         int id_continue_button = ribbonButtons->findItemNamed("continue");
         ribbonButtons->setItemVisible(id_continue_button, true);
+        ribbonButtons->setLabel(id_continue_button, _("Reload"));
     }
 }
 
