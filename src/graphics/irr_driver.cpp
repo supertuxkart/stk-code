@@ -112,6 +112,10 @@ IrrDriver::IrrDriver()
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
         m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
     SkyboxCubeMap = m_last_light_bucket_distance = 0;
+    m_shadow_camnodes[0] = NULL;
+    m_shadow_camnodes[1] = NULL;
+    m_shadow_camnodes[2] = NULL;
+    m_shadow_camnodes[3] = NULL;
     memset(object_count, 0, sizeof(object_count));
 }   // IrrDriver
 
