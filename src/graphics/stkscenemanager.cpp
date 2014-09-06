@@ -124,6 +124,7 @@ static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *,
 static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForShadowPass[4][MAT_COUNT];
 static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForRSMPass[MAT_COUNT];
 static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, STKMeshCommon *> > > MeshForGlowPass;
+static std::vector <STKMeshCommon *> DeferredUpdate;
 
 static core::vector3df windDir;
 
@@ -133,7 +134,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     STKMeshCommon *node = dynamic_cast<STKMeshCommon*>(Node);
     if (!node)
         return;
-    node->update();
+    DeferredUpdate.push_back(node);
 
     if (node->isImmediateDraw())
     {
@@ -437,11 +438,11 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
             MeshForShadowPass[cascade][Mat].clear();
     }
     MeshForGlowPass.clear();
+    DeferredUpdate.clear();
     core::list<scene::ISceneNode*> List = m_scene_manager->getRootSceneNode()->getChildren();
 
-    bool isCulled[4] = {};
-
-    // Add a 20 ms timeout
+    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam);
+    // Add a 1 s timeout
     if (!m_sync)
         m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     PROFILER_PUSH_CPU_MARKER("- Sync Stall", 0xFF, 0x0, 0x0);
@@ -462,7 +463,9 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     printf("Wait Failed\n");
     break;
     }*/
-    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam);
+    for (unsigned i = 0; i < DeferredUpdate.size(); i++)
+        DeferredUpdate[i]->update();
+
     if (!irr_driver->hasARB_draw_indirect())
         return;
 
