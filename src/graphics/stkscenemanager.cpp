@@ -503,8 +503,10 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     printf("Wait Failed\n");
     break;
     }*/
+    PROFILER_PUSH_CPU_MARKER("- Animations/Buffer upload", 0x0, 0x0, 0x0);
     for (unsigned i = 0; i < DeferredUpdate.size(); i++)
         DeferredUpdate[i]->updateGL();
+    PROFILER_POP_CPU_MARKER();
 
     if (!irr_driver->hasARB_draw_indirect())
         return;
