@@ -419,7 +419,7 @@ private:
     void renderRSM();
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
-    void renderLights(unsigned pointlightCount);
+    void renderLights(unsigned pointlightCount, bool hasShadow);
     void renderShadowsDebug();
     void doScreenShot();
     void PrepareDrawCalls(scene::ICameraSceneNode *camnode);
