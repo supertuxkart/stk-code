@@ -10,12 +10,14 @@
 class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode, public STKMeshCommon
 {
 protected:
-    bool firstTime;
+    bool isMaterialInitialized;
+    bool isGLInitialized;
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;
     void cleanGLMeshes();
 public:
-    virtual void update();
+    virtual void updateNoGL();
+    virtual void updateGL();
   STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::ISceneNode* parent,
      irr::scene::ISceneManager* mgr, irr::s32 id,
      const irr::core::vector3df& position = irr::core::vector3df(0,0,0),

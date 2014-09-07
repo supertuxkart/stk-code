@@ -506,27 +506,27 @@ void IrrDriver::initDevice()
     // Default false value for hasVSLayer if --no-graphics argument is used
     if (!ProfileWorld::isNoGraphics())
     {
-        if (GLEW_AMD_vertex_shader_layer) {
+        if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
             hasVSLayer = true;
             Log::info("GLDriver", "AMD Vertex Shader Layer enabled");
         }
-        if (GLEW_ARB_buffer_storage) {
+        if (hasGLExtension("GL_ARB_buffer_storage")) {
             hasBuffserStorage = true;
             Log::info("GLDriver", "ARB Buffer Storage enabled");
         }
-        if (GLEW_ARB_base_instance) {
+        if (hasGLExtension("GL_ARB_base_instance")) {
             hasBaseInstance = true;
             Log::info("GLDriver", "ARB Base Instance enabled");
         }
-        if (GLEW_ARB_draw_indirect) {
+        if (hasGLExtension("GL_ARB_draw_indirect")) {
             hasDrawIndirect = true;
             Log::info("GLDriver", "ARB Draw Indirect enabled");
         }
-        if (GLEW_ARB_compute_shader) {
+        if (hasGLExtension("GL_ARB_compute_shader")) {
             hasComputeShaders = true;
             Log::info("GLDriver", "ARB Compute Shader enabled");
         }
-        if (GLEW_ARB_texture_storage) {
+        if (hasGLExtension("GL_ARB_texture_storage")) {
             hasTextureStorage = true;
             Log::info("GLDriver", "ARB Texture Storage enabled");
         }
@@ -1742,17 +1742,23 @@ void IrrDriver::displayFPS()
     if (low > kilotris) low = kilotris;
     if (high < kilotris) high = kilotris;
 
-    static char buffer[128];
+    core::stringw fpsString;
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(
-            buffer, "FPS: %i/%i/%i - PolyCount (Solid:%d Shadows:%d) - LightDst : ~%d",
-            min, fps, max,
-            poly_count[SOLID_NORMAL_AND_DEPTH_PASS],
-            poly_count[SHADOW_PASS],
-            m_last_light_bucket_distance
-        );
+        fpsString += _("FPS: ");
+        fpsString += core::stringw(min);
+        fpsString += _("/");
+        fpsString += core::stringw(fps);
+        fpsString += _("/");
+        fpsString += core::stringw(max);
+        fpsString += _(" PolyCount: ");
+        fpsString += _(" (Solid) ");
+        fpsString += core::stringw(poly_count[SOLID_NORMAL_AND_DEPTH_PASS]);
+        fpsString += _(" (Shadows) ");
+        fpsString += core::stringw(poly_count[SHADOW_PASS]);
+        fpsString += _(" LightDist: ");
+        fpsString += core::stringw(m_last_light_bucket_distance);
         poly_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         poly_count[SHADOW_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
@@ -1761,11 +1767,16 @@ void IrrDriver::displayFPS()
     }
     else
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %i KTris", min, fps, max,
-                (int)roundf(kilotris));
+        fpsString += _("FPS: ");
+        fpsString += core::stringw(min);
+        fpsString += _("/");
+        fpsString += core::stringw(fps);
+        fpsString += _("/");
+        fpsString += core::stringw(max);
+        fpsString += _(" - ");
+        fpsString += core::stringw((int)roundf(kilotris));
+        fpsString += _("KTris");
     }
-
-    core::stringw fpsString = buffer;
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
 

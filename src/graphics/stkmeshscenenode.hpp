@@ -19,13 +19,15 @@ protected:
     void setFirstTimeMaterial();
     void updatevbo();
     bool isMaterialInitialized;
+    bool isGLInitialized;
     bool immediate_draw;
     bool update_each_frame;
     bool isDisplacement;
     bool isGlow;
     video::SColor glowcolor;
 public:
-    virtual void update();
+    virtual void updateNoGL();
+    virtual void updateGL();
     void setReloadEachFrame(bool);
     STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
         const irr::core::vector3df& position = irr::core::vector3df(0, 0, 0),
