@@ -1,6 +1,7 @@
 #include "stkmeshscenenode.hpp"
 #include "stkmesh.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/glwrap.hpp"
 #include "tracks/track.hpp"
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>

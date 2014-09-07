@@ -1,8 +1,7 @@
-#include "stkscenemanager.hpp"
-#include "stkmesh.hpp"
-#include "irr_driver.hpp"
-#include <ISceneManager.h>
-#include <ISceneNode.h>
+#include "graphics/glwrap.hpp"
+#include "graphics/stkscenemanager.hpp"
+#include "graphics/stkmesh.hpp"
+#include "graphics/irr_driver.hpp"
 #include "stkanimatedmesh.hpp"
 #include "stkmeshscenenode.hpp"
 #include "utils/ptr_vector.hpp"
@@ -15,6 +14,10 @@
 #include "tracks/track.hpp"
 #include "lod_node.hpp"
 #include "utils/profiler.hpp"
+
+#include <ISceneManager.h>
+#include <ISceneNode.h>
+
 #include <unordered_map>
 #include <SViewFrustum.h>
 #include <functional>

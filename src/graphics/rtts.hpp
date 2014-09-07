@@ -17,15 +17,19 @@
 #ifndef HEADER_RTTS_HPP
 #define HEADER_RTTS_HPP
 
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/leak_check.hpp"
+
+class FrameBuffer;
 
 namespace irr {
     namespace video {
         class ITexture;
     };
+    namespace scene {
+        class ICameraSceneNode;
+    }
 };
 
 using irr::video::ITexture;
@@ -46,7 +50,7 @@ public:
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
     FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
 
-    FrameBuffer* render(scene::ICameraSceneNode* camera, float dt);
+    FrameBuffer* render(irr::scene::ICameraSceneNode* camera, float dt);
 
 private:
     unsigned RenderTargetTextures[RTT_COUNT];

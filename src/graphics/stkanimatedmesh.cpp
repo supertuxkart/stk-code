@@ -1,3 +1,4 @@
+#include "graphics/glwrap.hpp"
 #include "graphics/stkanimatedmesh.hpp"
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
