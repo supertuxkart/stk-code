@@ -74,6 +74,14 @@ public:
     virtual void loadedFromFile();
     virtual void eventCallback(GUIEngine::Widget *,const std::string &name ,
                                const int player_id);
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual GUIEngine::EventPropagation filterActions( PlayerAction action,
+                                                       int deviceID,
+                                                       const unsigned int value,
+                                                       Input::InputType type,
+                                                       int playerId) OVERRIDE;
+
     void onEnterPressedInternal();
     void setTrack(Track *track);
 };
