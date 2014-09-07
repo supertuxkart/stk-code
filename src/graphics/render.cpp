@@ -34,7 +34,6 @@
 #include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stkmeshscenenode.hpp"
-#include "graphics/stkinstancedscenenode.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
@@ -47,6 +46,7 @@
 #include "utils/helpers.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
+#include "stkscenemanager.hpp"
 
 #include <algorithm>
 #include <limits>
@@ -148,8 +148,12 @@ void IrrDriver::renderGLSL(float dt)
         // TODO: put this outside of the rendering loop
         generateDiffuseCoefficients();
 
+        PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
         unsigned plc = UpdateLightsInfo(camnode, dt);
+        PROFILER_POP_CPU_MARKER();
+        PROFILER_PUSH_CPU_MARKER("Compute camera matrix", 0x0, 0xFF, 0x0);
         computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
+        PROFILER_POP_CPU_MARKER();
         renderScene(camnode, plc, glows, dt, track->hasShadows(), false);
 
         // Debug physic
@@ -272,22 +276,30 @@ void IrrDriver::renderGLSL(float dt)
 void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
+    m_scene_manager->setActiveCamera(camnode);
 
+    PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
+    PrepareDrawCalls(camnode);
+    PROFILER_POP_CPU_MARKER();
     // Shadows
     {
-        PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
-        ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
         // To avoid wrong culling, use the largest view possible
         m_scene_manager->setActiveCamera(m_suncam);
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights &&
             UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround() && hasShadow)
         {
+            PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
             renderShadows();
+            PROFILER_POP_CPU_MARKER();
             if (UserConfigParams::m_gi)
+            {
+                PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
                 renderRSM();
+                PROFILER_POP_CPU_MARKER();
+            }
         }
         m_scene_manager->setActiveCamera(camnode);
-        PROFILER_POP_CPU_MARKER();
+
     }
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
@@ -322,6 +334,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         m_rtts->getFBO(FBO_COLORS).Bind();
     renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
+
+    m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
     if (getNormals())
     {
@@ -480,28 +494,24 @@ void IrrDriver::computeSunVisibility()
         hasgodrays = World::getWorld()->getTrack()->hasGodRays();
     }
 
-    irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
-    if (UserConfigParams::m_light_shaft && hasgodrays)//hasflare || hasgodrays)
+    if (UserConfigParams::m_light_shaft && hasgodrays)
     {
         GLuint res = 0;
         if (m_query_issued)
-            gl_driver->extGlGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
+            glGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
         m_post_processing->setSunPixels(res);
 
         // Prepare the query for the next frame.
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        gl_driver->extGlBeginQuery(GL_SAMPLES_PASSED_ARB, m_lensflare_query);
+        glBeginQuery(GL_SAMPLES_PASSED_ARB, m_lensflare_query);
         m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
         m_scene_manager->drawAll(scene::ESNRP_CAMERA);
         irr_driver->setPhase(GLOW_PASS);
         m_sun_interposer->render();
-        gl_driver->extGlEndQuery(GL_SAMPLES_PASSED_ARB);
+        glEndQuery(GL_SAMPLES_PASSED_ARB);
         m_query_issued = true;
 
         m_lensflare->setStrength(res / 4000.0f);
-
-        if (hasflare)
-            m_lensflare->OnRegisterSceneNode();
 
         // Make sure the color mask is reset
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -514,7 +524,9 @@ void IrrDriver::renderParticles()
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
-    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
+    for (unsigned i = 0; i < ParticlesList::getInstance()->size(); ++i)
+        ParticlesList::getInstance()->at(i)->render();
+//    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 }
 
 /** Given a matrix transform and a set of points returns an orthogonal projection matrix that maps coordinates of
@@ -584,14 +596,20 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         50.,
     };
 
-    float *tmp = new float[18 * 8];
 
+    float tmp[16 * 9 + 2];
     memcpy(tmp, irr_driver->getViewMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[32], irr_driver->getInvViewMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(), 16 * sizeof(float));
+    memcpy(&tmp[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
 
     const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
+    for (unsigned i = 0; i < 4; i++)
+    {
+        if (!m_shadow_camnodes[i])
+            m_shadow_camnodes[i] = (scene::ICameraSceneNode *) m_suncam->clone();
+    }
     sun_ortho_matrix.clear();
 
     if (World::getWorld() && World::getWorld()->getTrack())
@@ -669,8 +687,8 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             const float units_per_w = w / 1024;
             const float units_per_h = h / 1024;*/
 
-            m_suncam->setProjectionMatrix(getTighestFitOrthoProj(SunCamViewMatrix, vectors) , true);
-            m_suncam->render();
+            m_shadow_camnodes[i]->setProjectionMatrix(getTighestFitOrthoProj(SunCamViewMatrix, vectors) , true);
+            m_shadow_camnodes[i]->render();
 
             sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
         }
@@ -702,18 +720,17 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         assert(sun_ortho_matrix.size() == 4);
         camnode->setNearValue(oldnear);
         camnode->setFarValue(oldfar);
+        camnode->render();
 
         size_t size = irr_driver->getShadowViewProj().size();
         for (unsigned i = 0; i < size; i++)
-            memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
+            memcpy(&tmp[16 * i + 80], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
     }
 
-    tmp[128] = float(width);
-    tmp[129] = float(height);
-
+    tmp[144] = float(width);
+    tmp[145] = float(height);
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 8 + 2) * sizeof(float), tmp);
-    delete []tmp;
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float), tmp);
 }
 
 
@@ -770,20 +787,40 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glDepthMask(GL_FALSE);
     glDisable(GL_BLEND);
 
-    glBindVertexArray(getVAO(EVT_STANDARD));
+    if (irr_driver->hasARB_base_instance())
+        glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_STANDARD));
     for (u32 i = 0; i < glowcount; i++)
     {
         const GlowData &dat = glows[i];
-        scene::ISceneNode * const cur = dat.node;
+        scene::ISceneNode * cur = dat.node;
 
-        //TODO : implement culling on gpu
-        // Quick box-based culling
-//        const core::aabbox3df nodebox = cur->getTransformedBoundingBox();
-//        if (!nodebox.intersectsWithBox(cambox))
-//            continue;
+        STKMeshSceneNode *node = static_cast<STKMeshSceneNode *>(cur);
+        node->setGlowColors(SColor(0, (unsigned) (dat.b * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.r * 255.f)));
+        if (!irr_driver->hasARB_draw_indirect())
+            node->render();
+    }
 
-        cb->setColor(dat.r, dat.g, dat.b);
-        cur->render();
+    if (irr_driver->hasARB_draw_indirect())
+    {
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
+        glUseProgram(MeshShader::InstancedColorizeShader::getInstance()->Program);
+
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeGlow));
+        if (UserConfigParams::m_azdo)
+        {
+            if (GlowPassCmd::getInstance()->Size)
+            {
+                glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
+                    (const void*)(GlowPassCmd::getInstance()->Offset * sizeof(DrawElementsIndirectCommand)),
+                    GlowPassCmd::getInstance()->Size,
+                    sizeof(DrawElementsIndirectCommand));
+            }
+        }
+        else
+        {
+            for (unsigned i = 0; i < ListInstancedGlow::getInstance()->size(); i++)
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((GlowPassCmd::getInstance()->Offset + i) * sizeof(DrawElementsIndirectCommand)));
+        }
     }
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);

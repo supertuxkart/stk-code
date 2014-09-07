@@ -1,6 +1,12 @@
+#ifdef GL_ARB_bindless_texture
+layout(bindless_sampler) uniform sampler2D Albedo;
+layout(bindless_sampler) uniform sampler2D dtex;
+#else
 uniform sampler2D Albedo;
-uniform vec3 SunDir;
 uniform sampler2D dtex;
+#endif
+
+uniform vec3 SunDir;
 
 in vec3 nor;
 in vec2 uv;
@@ -26,6 +32,11 @@ void main(void)
     float scattering = mix(fPowEdotL, fLdotNBack, .5);
 
     vec4 color = texture(Albedo, uv);
+#ifdef GL_ARB_bindless_texture
+#ifdef SRGBBindlessFix
+    color.xyz = pow(color.xyz, vec3(2.2));
+#endif
+#endif
     if (color.a < 0.5) discard;
     vec3 LightFactor = (scattering * 0.3) + getLightFactor(1.);
     FragColor = vec4(color.xyz * LightFactor, 1.);

@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -25,6 +25,11 @@ subject to the following restrictions:
 #  define isnan _isnan
 #endif
 #include <math.h>
+
+#if defined(__MINGW32__) && __cplusplus >= 201103
+	#include <cmath>
+	using std::isnan;
+#endif
 
 class btCollisionShape;
 class btMotionState;
@@ -51,7 +56,7 @@ enum	btRigidBodyFlags
 
 ///The btRigidBody is the main class for rigid body objects. It is derived from btCollisionObject, so it keeps a pointer to a btCollisionShape.
 ///It is recommended for performance and memory use to share btCollisionShape objects whenever possible.
-///There are 3 types of rigid bodies: 
+///There are 3 types of rigid bodies:
 ///- A) Dynamic rigid bodies, with positive mass. Motion is controlled by rigid body dynamics.
 ///- B) Fixed objects with zero mass. They are not moving (basically collision objects)
 ///- C) Kinematic objects, which are objects without mass, but the user can move them. There is on-way interaction, and Bullet calculates a velocity based on the timestep and previous and current world transform.
@@ -66,12 +71,12 @@ class btRigidBody  : public btCollisionObject
 	btScalar		m_inverseMass;
 	btVector3		m_linearFactor;
 
-	btVector3		m_gravity;	
+	btVector3		m_gravity;
 	btVector3		m_gravity_acceleration;
 	btVector3		m_invInertiaLocal;
 	btVector3		m_totalForce;
 	btVector3		m_totalTorque;
-	
+
 	btScalar		m_linearDamping;
 	btScalar		m_angularDamping;
 
@@ -92,9 +97,9 @@ class btRigidBody  : public btCollisionObject
 	btAlignedObjectArray<btTypedConstraint*> m_constraintRefs;
 
 	int				m_rigidbodyFlags;
-	
+
 	int				m_debugBodyId;
-	
+
 
 protected:
 
@@ -111,7 +116,7 @@ public:
 
 	///The btRigidBodyConstructionInfo structure provides information to create a rigid body. Setting mass to zero creates a fixed (non-dynamic) rigid body.
 	///For dynamic objects, you can use the collision shape to approximate the local inertia tensor, otherwise use the zero vector (default argument)
-	///You can use the motion state to synchronize the world transform between physics and graphics objects. 
+	///You can use the motion state to synchronize the world transform between physics and graphics objects.
 	///And if the motion state is provided, the rigid body will initialize its initial world transform from the motion state,
 	///m_startWorldTransform is only used when you don't provide a motion state.
 	struct	btRigidBodyConstructionInfo
@@ -168,16 +173,16 @@ public:
 	///btRigidBody constructor using construction info
 	btRigidBody(	const btRigidBodyConstructionInfo& constructionInfo);
 
-	///btRigidBody constructor for backwards compatibility. 
+	///btRigidBody constructor for backwards compatibility.
 	///To specify friction (etc) during rigid body construction, please use the other constructor (using btRigidBodyConstructionInfo)
 	btRigidBody(	btScalar mass, btMotionState* motionState, btCollisionShape* collisionShape, const btVector3& localInertia=btVector3(0,0,0));
 
 
 	virtual ~btRigidBody()
-        { 
+        {
                 //No constraints should point to this rigidbody
-		//Remove constraints from the dynamics world before you delete the related rigidbodies. 
-                btAssert(m_constraintRefs.size()==0); 
+		//Remove constraints from the dynamics world before you delete the related rigidbodies.
+                btAssert(m_constraintRefs.size()==0);
         }
 
 protected:
@@ -187,8 +192,8 @@ protected:
 
 public:
 
-	void			proceedToTransform(const btTransform& newTrans); 
-	
+	void			proceedToTransform(const btTransform& newTrans);
+
 	///to keep collision detection and dynamics separate we don't store a rigidbody pointer
 	///but a rigidbody is derived from btCollisionObject, so we can safely perform an upcast
 	static const btRigidBody*	upcast(const btCollisionObject* colObj)
@@ -203,15 +208,15 @@ public:
 			return (btRigidBody*)colObj;
 		return 0;
 	}
-	
+
 	/// continuous collision detection needs prediction
 	void			predictIntegratedTransform(btScalar step, btTransform& predictedTransform) ;
-	
+
 	void			saveKinematicState(btScalar step);
-	
+
 	void			applyGravity();
-	
-	void			setGravity(const btVector3& acceleration);  
+
+	void			setGravity(const btVector3& acceleration);
 
 	const btVector3&	getGravity() const
 	{
@@ -249,9 +254,9 @@ public:
 	SIMD_FORCE_INLINE btCollisionShape*	getCollisionShape() {
 			return m_collisionShape;
 	}
-	
+
 	void			setMassProps(btScalar mass, const btVector3& inertia);
-	
+
 	const btVector3& getLinearFactor() const
 	{
 		return m_linearFactor;
@@ -265,10 +270,10 @@ public:
 		m_invMass = m_linearFactor*m_inverseMass;
 	}
 	btScalar		getInvMass() const { return m_inverseMass; }
-	const btMatrix3x3& getInvInertiaTensorWorld() const { 
-		return m_invInertiaTensorWorld; 
+	const btMatrix3x3& getInvInertiaTensorWorld() const {
+		return m_invInertiaTensorWorld;
 	}
-		
+
 	void			integrateVelocities(btScalar step);
 
 	void			setCenterOfMassTransform(const btTransform& xform);
@@ -290,7 +295,7 @@ public:
 	{
 		return m_totalTorque;
 	};
-    
+
 	const btVector3& getInvInertiaDiagLocal() const
 	{
 		return m_invInertiaLocal;
@@ -314,8 +319,8 @@ public:
         btAssert(!isnan(torque.getZ()));
 		m_totalTorque += torque*m_angularFactor;
 	}
-	
-	void	applyForce(const btVector3& force, const btVector3& rel_pos) 
+
+	void	applyForce(const btVector3& force, const btVector3& rel_pos)
 	{
         btAssert(!isnan(force.getX()));
         btAssert(!isnan(force.getY()));
@@ -326,7 +331,7 @@ public:
 		applyCentralForce(force);
 		applyTorque(rel_pos.cross(force*m_linearFactor));
 	}
-	
+
 	void applyCentralImpulse(const btVector3& impulse)
 	{
         btAssert(!isnan(impulse.getX()));
@@ -334,7 +339,7 @@ public:
         btAssert(!isnan(impulse.getZ()));
 		m_linearVelocity += impulse *m_linearFactor * m_inverseMass;
 	}
-	
+
   	void applyTorqueImpulse(const btVector3& torque)
 	{
             btAssert(!isnan(torque.getX()));
@@ -342,8 +347,8 @@ public:
             btAssert(!isnan(torque.getZ()));
 			m_angularVelocity += m_invInertiaTensorWorld * torque * m_angularFactor;
 	}
-	
-	void applyImpulse(const btVector3& impulse, const btVector3& rel_pos) 
+
+	void applyImpulse(const btVector3& impulse, const btVector3& rel_pos)
 	{
         btAssert(!isnan(impulse.getX()));
         btAssert(!isnan(impulse.getY()));
@@ -361,44 +366,44 @@ public:
 		}
 	}
 
-	void clearForces() 
+	void clearForces()
 	{
 		m_totalForce.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 		m_totalTorque.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 	}
-	
-	void updateInertiaTensor();    
-	
-	const btVector3&     getCenterOfMassPosition() const { 
-		return m_worldTransform.getOrigin(); 
+
+	void updateInertiaTensor();
+
+	const btVector3&     getCenterOfMassPosition() const {
+		return m_worldTransform.getOrigin();
 	}
 	btQuaternion getOrientation() const;
-	
-	const btTransform&  getCenterOfMassTransform() const { 
-		return m_worldTransform; 
+
+	const btTransform&  getCenterOfMassTransform() const {
+		return m_worldTransform;
 	}
-	const btVector3&   getLinearVelocity() const { 
-		return m_linearVelocity; 
+	const btVector3&   getLinearVelocity() const {
+		return m_linearVelocity;
 	}
-	const btVector3&    getAngularVelocity() const { 
-		return m_angularVelocity; 
+	const btVector3&    getAngularVelocity() const {
+		return m_angularVelocity;
 	}
-	
+
 
 	inline void setLinearVelocity(const btVector3& lin_vel)
-	{ 
+	{
         btAssert(!isnan(lin_vel.getX()));
         btAssert(!isnan(lin_vel.getY()));
         btAssert(!isnan(lin_vel.getZ()));
-		m_linearVelocity = lin_vel; 
+		m_linearVelocity = lin_vel;
 	}
 
-	inline void setAngularVelocity(const btVector3& ang_vel) 
-	{ 
+	inline void setAngularVelocity(const btVector3& ang_vel)
+	{
         btAssert(!isnan(ang_vel.getX()));
         btAssert(!isnan(ang_vel.getY()));
         btAssert(!isnan(ang_vel.getZ()));
-		m_angularVelocity = ang_vel; 
+		m_angularVelocity = ang_vel;
 	}
 
 	btVector3 getVelocityInLocalPoint(const btVector3& rel_pos) const
@@ -410,18 +415,18 @@ public:
 		//		return 	(m_worldTransform(rel_pos) - m_interpolationWorldTransform(rel_pos)) / m_kinematicTimeStep;
 	}
 
-	void translate(const btVector3& v) 
+	void translate(const btVector3& v)
 	{
-		m_worldTransform.getOrigin() += v; 
+		m_worldTransform.getOrigin() += v;
 	}
 
-	
+
 	void	getAabb(btVector3& aabbMin,btVector3& aabbMax) const;
 
 
 
 
-	
+
 	SIMD_FORCE_INLINE btScalar computeImpulseDenominator(const btVector3& pos, const btVector3& normal) const
 	{
 		btVector3 r0 = pos - getCenterOfMassPosition();
@@ -478,12 +483,12 @@ public:
 	}
 
 
-	
+
 	const btBroadphaseProxy*	getBroadphaseProxy() const
 	{
 		return m_broadphaseHandle;
 	}
-	btBroadphaseProxy*	getBroadphaseProxy() 
+	btBroadphaseProxy*	getBroadphaseProxy()
 	{
 		return m_broadphaseHandle;
 	}
@@ -567,12 +572,12 @@ public:
 		return m_deltaAngularVelocity;
 	}
 
-	const btVector3& getPushVelocity() const 
+	const btVector3& getPushVelocity() const
 	{
 		return m_pushVelocity;
 	}
 
-	const btVector3& getTurnVelocity() const 
+	const btVector3& getTurnVelocity() const
 	{
 		return m_turnVelocity;
 	}
@@ -580,7 +585,7 @@ public:
 
 	////////////////////////////////////////////////
 	///some internal methods, don't use them
-		
+
 	btVector3& internalGetDeltaLinearVelocity()
 	{
 		return m_deltaLinearVelocity;
@@ -600,7 +605,7 @@ public:
 	{
 		return m_invMass;
 	}
-	
+
 	btVector3& internalGetPushVelocity()
 	{
 		return m_pushVelocity;
@@ -640,7 +645,7 @@ public:
 			m_turnVelocity += angularComponent*(impulseMagnitude*m_angularFactor);
 		}
 	}
-	
+
 	void	internalWritebackVelocity()
 	{
 		if (m_inverseMass)
@@ -656,7 +661,7 @@ public:
 
 	void	internalWritebackVelocity(btScalar timeStep);
 
-	
+
 
 	///////////////////////////////////////////////
 
@@ -679,7 +684,7 @@ struct	btRigidBodyFloatData
 	btVector3FloatData		m_angularVelocity;
 	btVector3FloatData		m_angularFactor;
 	btVector3FloatData		m_linearFactor;
-	btVector3FloatData		m_gravity;	
+	btVector3FloatData		m_gravity;
 	btVector3FloatData		m_gravity_acceleration;
 	btVector3FloatData		m_invInertiaLocal;
 	btVector3FloatData		m_totalForce;
@@ -705,7 +710,7 @@ struct	btRigidBodyDoubleData
 	btVector3DoubleData		m_angularVelocity;
 	btVector3DoubleData		m_angularFactor;
 	btVector3DoubleData		m_linearFactor;
-	btVector3DoubleData		m_gravity;	
+	btVector3DoubleData		m_gravity;
 	btVector3DoubleData		m_gravity_acceleration;
 	btVector3DoubleData		m_invInertiaLocal;
 	btVector3DoubleData		m_totalForce;

@@ -171,20 +171,6 @@ public:
     virtual ~TrackObjectPresentationLOD();
 };
 
-class TrackObjectPresentationInstancing : public TrackObjectPresentationSceneNode
-{
-    STKInstancedSceneNode* m_instancing_group;
-    scene::IMeshSceneNode* m_fallback_scene_node;
-public:
-
-    TrackObjectPresentationInstancing(const XMLNode& xml_node,
-        scene::ISceneNode* parent,
-        ModelDefinitionLoader& model_def_loader);
-    virtual ~TrackObjectPresentationInstancing();
-
-    STKInstancedSceneNode* getInstancingGroup() { return m_instancing_group;  }
-};
-
 /**
  * \ingroup tracks
  * A track object representation that consists of a mesh scene node.

@@ -160,8 +160,6 @@ void MainLoop::run()
             PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
             Online::RequestManager::get()->update(dt);
             PROFILER_POP_CPU_MARKER();
-
-            PROFILER_SYNC_FRAME();
         }
         else if (!m_abort && ProfileWorld::isNoGraphics())
         {
@@ -174,8 +172,8 @@ void MainLoop::run()
             PROFILER_POP_CPU_MARKER();
         }
 
-        PROFILER_SYNC_FRAME();
         PROFILER_POP_CPU_MARKER();
+        PROFILER_SYNC_FRAME();
     }  // while !m_abort
 
 }   // run

@@ -18,8 +18,8 @@
 #ifndef HEADER_GRAND_PRIX_EDITOR_SCREEN_HPP
 #define HEADER_GRAND_PRIX_EDITOR_SCREEN_HPP
 
-#include "dialogs/enter_gp_name_dialog.hpp"
 #include "guiengine/screen.hpp"
+#include "states_screens/dialogs/enter_gp_name_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 
 

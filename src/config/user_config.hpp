@@ -464,6 +464,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_gi
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_gi",
         &m_video_group, "Enable Global Illumination"));
+    PARAM_PREFIX BoolUserConfigParam        m_azdo
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_azdo",
+        &m_video_group, "Enable 'Approaching Zero Driver Overhead' mode (very experimental !)"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */

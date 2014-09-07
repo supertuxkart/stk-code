@@ -24,7 +24,6 @@
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/rain.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
@@ -52,7 +51,6 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
 {
     m_mode          = CM_NORMAL;
     m_index         = camera_index;
-    m_rain          = NULL;
     m_original_kart = kart;
     m_camera        = irr_driver->addCameraSceneNode();
 
@@ -92,7 +90,6 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
  */
 Camera::~Camera()
 {
-    if(m_rain) delete m_rain;
     irr_driver->removeCameraSceneNode(m_camera);
 
     if (s_active_camera == this)
@@ -222,13 +219,6 @@ void Camera::setupCamera()
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
     m_camera->setFarValue(World::getWorld()->getTrack()->getCameraFar());
-
-    if (UserConfigParams::m_weather_effects &&
-        World::getWorld()->getTrack()->getWeatherType() == WEATHER_RAIN)
-    {
-        m_rain = new Rain(this, NULL);
-    }
-
 }   // setupCamera
 
 // ----------------------------------------------------------------------------
@@ -530,12 +520,6 @@ void Camera::update(float dt)
         getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing);
         positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
     }
-
-    if (UserConfigParams::m_graphical_effects && m_rain)
-    {
-        m_rain->setPosition( getCameraSceneNode()->getPosition() );
-        m_rain->update(dt);
-    }  // UserConfigParams::m_graphical_effects
 }   // update
 
 // ----------------------------------------------------------------------------

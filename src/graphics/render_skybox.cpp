@@ -16,7 +16,6 @@
 #include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stkmeshscenenode.hpp"
-#include "graphics/stkinstancedscenenode.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
@@ -440,6 +439,7 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
                     swapPixels(tmp, rgba[i], size, x, y, (size - y - 1), x);
                 }
             }
+            free(tmp);
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, result);
@@ -448,6 +448,7 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
         else
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, size, size, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     for (unsigned i = 0; i < 6; i++)
         delete[] rgba[i];
     return result;
@@ -552,7 +553,7 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
         return;
     if (!SkyboxCubeMap)
         generateSkyboxCubemap();
-    glBindVertexArray(MeshShader::SkyboxShader::cubevao);
+    glBindVertexArray(MeshShader::SkyboxShader::getInstance()->cubevao);
     glDisable(GL_CULL_FACE);
     assert(SkyboxTextures.size() == 6);
 
@@ -567,15 +568,10 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
     core::matrix4 invtransform;
     transform.getInverse(invtransform);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glUseProgram(MeshShader::SkyboxShader::Program);
-    MeshShader::SkyboxShader::setUniforms(transform,
-        core::vector2df(float(UserConfigParams::m_width),
-        float(UserConfigParams::m_height)),
-        0);
+    glUseProgram(MeshShader::SkyboxShader::getInstance()->Program);
+    MeshShader::SkyboxShader::getInstance()->setUniforms(transform);
+    MeshShader::SkyboxShader::getInstance()->SetTextureUnits(createVector<GLuint>(SkyboxCubeMap));
+
     glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

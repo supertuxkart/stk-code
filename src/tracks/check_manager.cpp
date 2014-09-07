@@ -150,6 +150,7 @@ unsigned int CheckManager::getLapLineIndex() const
     }
 
     Log::fatal("CheckManager", "Error, no kind of lap line for track found, aborting.");
+    return -1;
 }   // getLapLineIndex
 
 // ----------------------------------------------------------------------------

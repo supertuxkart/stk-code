@@ -112,6 +112,10 @@ IrrDriver::IrrDriver()
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
         m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
     SkyboxCubeMap = m_last_light_bucket_distance = 0;
+    m_shadow_camnodes[0] = NULL;
+    m_shadow_camnodes[1] = NULL;
+    m_shadow_camnodes[2] = NULL;
+    m_shadow_camnodes[3] = NULL;
     memset(object_count, 0, sizeof(object_count));
 }   // IrrDriver
 
@@ -164,6 +168,11 @@ STKRenderingPass IrrDriver::getPhase() const
 void IrrDriver::IncreaseObjectCount()
 {
     object_count[m_phase]++;
+}
+
+void IrrDriver::IncreasePolyCount(unsigned Polys)
+{
+    poly_count[m_phase] += Polys;
 }
 
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
@@ -328,8 +337,8 @@ void IrrDriver::initDevice()
 
         } // end if firstTime
 
-        const core::dimension2d<u32> ssize = m_device->getVideoModeList()
-                                                     ->getDesktopResolution();
+        video::IVideoModeList* modes = m_device->getVideoModeList();
+        const core::dimension2d<u32> ssize = modes->getDesktopResolution();
         if (UserConfigParams::m_width > (int)ssize.Width ||
             UserConfigParams::m_height > (int)ssize.Height)
         {
@@ -339,11 +348,14 @@ void IrrDriver::initDevice()
             UserConfigParams::m_height = (int)ssize.Height;
         }
 
-        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, UserConfigParams::m_height);
-        res = m_device->getVideoModeList()->getVideoModeResolution(res, res);
-
-        if (res.Width > 0 && res.Height > 0)
+        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, 
+                                                    UserConfigParams::m_height);
+        
+        
+        if (modes->getVideoModeCount() > 0)
         {
+            res = modes->getVideoModeResolution(res, res);
+
             UserConfigParams::m_width = res.Width;
             UserConfigParams::m_height = res.Height;
         }
@@ -467,25 +479,57 @@ void IrrDriver::initDevice()
 
         m_need_ubo_workaround = false;
         m_need_rh_workaround = false;
+        m_need_srgb_workaround = false;
 #ifdef WIN32
         // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
-        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != nullptr && (GLMajorVersion == 3 && GLMinorVersion == 1))
+        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL && (GLMajorVersion == 3 && GLMinorVersion == 1))
             m_need_ubo_workaround = true;
 #endif
         // Fix for Nvidia and instanced RH
-        if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != nullptr)
+        if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
             m_need_rh_workaround = true;
+
+        // Fix for AMD and bindless sRGB textures
+        if (strstr((const char *)glGetString(GL_VENDOR), "ATI") != NULL)
+            m_need_srgb_workaround = true;
     }
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
+    initGL();
 
     // Parse extensions
     hasVSLayer = false;
+    hasBaseInstance = false;
+    hasBuffserStorage = false;
+    hasDrawIndirect = false;
+    hasComputeShaders = false;
+    hasTextureStorage = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
     if (!ProfileWorld::isNoGraphics())
     {
-        const GLubyte *extensions = glGetString(GL_EXTENSIONS);
-        if (extensions && strstr((const char*)extensions, "GL_AMD_vertex_shader_layer") != NULL)
-        hasVSLayer = true;
+        if (GLEW_AMD_vertex_shader_layer) {
+            hasVSLayer = true;
+            Log::info("GLDriver", "AMD Vertex Shader Layer enabled");
+        }
+        if (GLEW_ARB_buffer_storage) {
+            hasBuffserStorage = true;
+            Log::info("GLDriver", "ARB Buffer Storage enabled");
+        }
+        if (GLEW_ARB_base_instance) {
+            hasBaseInstance = true;
+            Log::info("GLDriver", "ARB Base Instance enabled");
+        }
+        if (GLEW_ARB_draw_indirect) {
+            hasDrawIndirect = true;
+            Log::info("GLDriver", "ARB Draw Indirect enabled");
+        }
+        if (GLEW_ARB_compute_shader) {
+            hasComputeShaders = true;
+            Log::info("GLDriver", "ARB Compute Shader enabled");
+        }
+        if (GLEW_ARB_texture_storage) {
+            hasTextureStorage = true;
+            Log::info("GLDriver", "ARB Texture Storage enabled");
+        }
     }
 
 
@@ -513,8 +557,7 @@ void IrrDriver::initDevice()
         m_mrt.clear();
         m_mrt.reallocate(2);
 
-        irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
-        gl_driver->extGlGenQueries(1, &m_lensflare_query);
+        glGenQueries(1, &m_lensflare_query);
         m_query_issued = false;
 
         scene::IMesh * const sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
@@ -733,7 +776,7 @@ void IrrDriver::applyResolutionSettings()
     // FIXME: this load sequence is (mostly) duplicated from main.cpp!!
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
-
+    m_shaders->killShaders();
     // initDevice will drop the current device.
     initDevice();
 
@@ -1601,6 +1644,7 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
 // ----------------------------------------------------------------------------
 void IrrDriver::setRTT(RTT* rtt)
 {
+    memset(m_shadow_camnodes, 0, 4 * sizeof(void*));
     m_rtts = rtt;
 }
 // ----------------------------------------------------------------------------
@@ -1703,13 +1747,14 @@ void IrrDriver::displayFPS()
     if (UserConfigParams::m_artist_debug_mode)
     {
         sprintf(
-            buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) - LightDst : ~%d",
+            buffer, "FPS: %i/%i/%i - PolyCount (Solid:%d Shadows:%d) - LightDst : ~%d",
             min, fps, max,
-            object_count[SOLID_NORMAL_AND_DEPTH_PASS],
-            object_count[SOLID_NORMAL_AND_DEPTH_PASS],
-            object_count[TRANSPARENT_PASS],
+            poly_count[SOLID_NORMAL_AND_DEPTH_PASS],
+            poly_count[SHADOW_PASS],
             m_last_light_bucket_distance
         );
+        poly_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+        poly_count[SHADOW_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         object_count[TRANSPARENT_PASS] = 0;
@@ -2414,8 +2459,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
 
         if (sun)
         {
-            m_sun_interposer->setPosition(pos);
-            m_sun_interposer->updateAbsolutePosition();
+            //m_sun_interposer->setPosition(pos);
+            //m_sun_interposer->updateAbsolutePosition();
 
             m_lensflare->setPosition(pos);
             m_lensflare->updateAbsolutePosition();

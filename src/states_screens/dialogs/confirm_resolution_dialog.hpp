@@ -20,6 +20,7 @@
 #define HEADER_CONFIRM_RES_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "utils/cpp2011.hpp"
 
 /**
  * \brief Dialog shown after a resolution switch sot he user may confirm if
@@ -28,6 +29,7 @@
  */
 class ConfirmResolutionDialog : public GUIEngine::ModalDialog
 {
+private:
     /** number of seconds left before resolution is considered unplayable */
     float m_remaining_time;
         
@@ -40,6 +42,7 @@ public:
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     
     virtual void onUpdate(float dt);
+    virtual bool onEscapePressed() OVERRIDE;
 };
   
 

@@ -113,8 +113,8 @@ KartModel::KartModel(bool is_master)
 
         // default value for kart suspensions. move to config file later
         // if we find each kart needs custom values
-        m_min_suspension[i] = -0.59f;
-        m_max_suspension[i] = 0.59f;
+        m_min_suspension[i] = -0.07f;
+        m_max_suspension[i] = 0.20f;
         m_dampen_suspension_amplitude[i] = 2.5f;
     }
     m_wheel_filename[0] = "";
@@ -541,6 +541,14 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         }
     }
 
+    float y_off = kart_properties.getGraphicalYOffset();
+    if(y_off!=0)
+    {
+        for (unsigned int i = 0; i < 4; i++)
+            m_wheel_graphics_position[i].setY(
+                                  m_wheel_graphics_position[i].getY() - y_off);
+    }
+
     // Load the wheel models. This can't be done early, since the default
     // values for the graphical position must be defined, which in turn
     // depend on the size of the model.
@@ -634,9 +642,7 @@ void KartModel::loadWheelInfo(const XMLNode &node,
  */
 void KartModel::reset()
 {
-    // Reset the wheels
-    const float suspension[4]={0,0,0,0};
-    update(0.0f, 0.0f, 0.0f, suspension, 0.0f);
+    update(0.0f, 0.0f, 0.0f, 0.0f);
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
@@ -742,36 +748,51 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
 }   // OnAnimationEnd
 
 // ----------------------------------------------------------------------------
+void KartModel::setDefaultSuspension()
+{
+    for(int i=0; i<m_kart->getVehicle()->getNumWheels(); i++)
+    {
+        const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+        m_default_physics_suspension[i] = wi.m_raycastInfo.m_suspensionLength;
+    }
+}   // setDefaultSuspension
+
+// ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension
     + updates the speed-weighted objects' animations.
  *  \param dt time since last frame
  *  \param rotation_dt How far the wheels have rotated since last time.
  *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
- *  \param speed The speed of the kart in meters/sec, used for the speed-weighted objects' animations
+ *  \param speed The speed of the kart in meters/sec, used for the 
+ *         speed-weighted objects' animations
  */
-void KartModel::update(float dt, float rotation_dt, float steer,
-                       const float height_above_terrain[4], float speed)
+void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
 {
    core::vector3df wheel_steer(0, steer*30.0f, 0);
 
     for(unsigned int i=0; i<4; i++)
     {
         if(!m_wheel_node[i]) continue;
+        const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
 #ifdef DEBUG
         if(UserConfigParams::m_physics_debug && m_kart)
         {
             // Make wheels that are not touching the ground invisible
-            bool wheel_has_contact =
-                m_kart->getVehicle()->getWheelInfo(i).m_raycastInfo
-                                                     .m_isInContact;
-            m_wheel_node[i]->setVisible(wheel_has_contact);
+            m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
         }
 #endif
+        float rel_suspension = wi.m_raycastInfo.m_suspensionLength
+                             - m_default_physics_suspension[i];
+        // If the suspension is too compressed
+        if(rel_suspension< m_min_suspension[i])
+            rel_suspension = m_min_suspension[i];
+        else if(rel_suspension > m_max_suspension[i])
+            rel_suspension = m_max_suspension[i];
+
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        // 
-        pos.Y = -  height_above_terrain[i] + m_kart_lowest_point
-              + m_wheel_graphics_radius[i];
+        pos.Y -= rel_suspension;
+
         m_wheel_node[i]->setPosition(pos);
 
         // Now calculate the new rotation: (old + change) mod 360

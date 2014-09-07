@@ -46,6 +46,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
+#include "states_screens/grand_prix_cutscene.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
 #include "states_screens/kart_selection.hpp"
@@ -678,16 +679,17 @@ void RaceManager::exitRace(bool delete_world)
             }
         }
 
+        if (delete_world) World::deleteWorld();
+        delete_world = false;
+
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts(0);
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLocalPlayers(0);
+
         if (someHumanPlayerWon)
         {
-            if (delete_world) World::deleteWorld();
-            delete_world = false;
-
-            StateManager::get()->enterGameState();
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-            race_manager->setNumKarts(0);
-            race_manager->setNumPlayers(0);
-            race_manager->setNumLocalPlayers(0);
             race_manager->startSingleRace("gpwin", 999, false);
             GrandPrixWin* scene = GrandPrixWin::getInstance();
             StateManager::get()->pushScreen(scene);
@@ -695,14 +697,6 @@ void RaceManager::exitRace(bool delete_world)
         }
         else
         {
-            if (delete_world) World::deleteWorld();
-            delete_world = false;
-
-            StateManager::get()->enterGameState();
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-            race_manager->setNumKarts(0);
-            race_manager->setNumPlayers(0);
-            race_manager->setNumLocalPlayers(0);
             race_manager->startSingleRace("gplose", 999, false);
             GrandPrixLose* scene = GrandPrixLose::getInstance();
             StateManager::get()->pushScreen(scene);
@@ -713,7 +707,8 @@ void RaceManager::exitRace(bool delete_world)
             }
             else
             {
-                std::cerr << "RaceManager::exitRace() : what's going on?? no winners and no losers??\n";
+                Log::error("RaceManager", "There are no winners and no losers."
+                           "This should have never happend\n");
                 std::vector<std::string> karts;
                 karts.push_back(UserConfigParams::m_default_kart);
                 scene->setKarts(karts);
@@ -767,12 +762,9 @@ void RaceManager::rerunRace()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld,
+void RaceManager::startGP(const GrandPrixData &gp, bool from_overworld,
                           bool continue_saved_gp)
 {
-    assert(gp != NULL);
-    //std::cout << gp->getId();
-
     StateManager::get()->enterGameState();
     setGrandPrix(gp);
     setCoinTarget( 0 ); // Might still be set from a previous challenge

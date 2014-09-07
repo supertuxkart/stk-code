@@ -66,13 +66,13 @@ class Kart : public AbstractKart
     friend class Skidding;
 private:
     /** Handles speed increase and capping due to powerup, terrain, ... */
-    MaxSpeed           *m_max_speed;
+    MaxSpeed *m_max_speed;
 
     /** Stores information about the terrain the kart is on. */
-    TerrainInfo        *m_terrain_info;
+    TerrainInfo *m_terrain_info;
 
     /** Handles the powerup of a kart. */
-    Powerup     *m_powerup;
+    Powerup *m_powerup;
 
     /** True if kart is flying (for debug purposes only). */
     bool m_flying;
@@ -105,6 +105,9 @@ private:
     /** The coordinates of the front of the kart, used to determine when a
      *  new lap is triggered. */
     Vec3 m_xyz_front;
+
+    /** Offset of the graphical kart chassis from the physical chassis. */
+    float m_graphical_y_offset;
 
     /** True if the kart is eliminated. */
     bool m_eliminated;
@@ -234,6 +237,7 @@ public:
                         int position, const btTransform& init_transform);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
+    virtual void   kartIsInRestNow();
     virtual void   updateGraphics(float dt, const Vec3& off_xyz,
                                   const btQuaternion& off_rotation);
     virtual void   createPhysics    ();

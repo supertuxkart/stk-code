@@ -45,6 +45,6 @@ mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation, vec3 scale)
 {
     mat4 result = transpose(getMatrixFromRotation(rotation));
     // FIXME: it's wrong but the fourth column is not used
-    result[3].xyz -= translation;
+    // result[3].xyz -= translation;
     return getScaleMatrix(1. / scale) * result;
 }

@@ -6,6 +6,7 @@
 #include <IParticleSystemSceneNode.h>
 #include "guiengine/engine.hpp"
 #include "graphics/particle_emitter.hpp"
+#include "../../lib/irrlicht/source/Irrlicht/os.h"
 #define COMPONENTCOUNT 8
 
 scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
@@ -88,7 +89,7 @@ void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &h
     has_height_map = true;
     glGenBuffers(1, &heighmapbuffer);
     glBindBuffer(GL_TEXTURE_BUFFER, heighmapbuffer);
-    glBufferData(GL_TEXTURE_BUFFER, width * height * sizeof(float), hm_array, GL_STATIC_DRAW);
+    glBufferData(GL_TEXTURE_BUFFER, width * height * sizeof(float), hm_array, GL_STREAM_COPY);
     glGenTextures(1, &heightmaptexture);
     glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
     glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, heighmapbuffer);
@@ -348,9 +349,7 @@ void ParticleSystemProxy::drawFlip()
     glBlendFunc(GL_ONE, GL_ONE);
     glUseProgram(ParticleShader::FlipParticleRender::getInstance()->Program);
 
-    setTexture(ParticleShader::FlipParticleRender::getInstance()->TU_tex, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-    setTexture(ParticleShader::FlipParticleRender::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-
+    ParticleShader::FlipParticleRender::getInstance()->SetTextureUnits(std::vector<GLuint>{ texture, irr_driver->getDepthStencilTexture() });
     ParticleShader::FlipParticleRender::getInstance()->setUniforms();
 
     glBindVertexArray(current_rendering_vao);
@@ -365,8 +364,7 @@ void ParticleSystemProxy::drawNotFlip()
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glUseProgram(ParticleShader::SimpleParticleRender::getInstance()->Program);
 
-    setTexture(ParticleShader::SimpleParticleRender::getInstance()->TU_tex, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-    setTexture(ParticleShader::SimpleParticleRender::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    ParticleShader::SimpleParticleRender::getInstance()->SetTextureUnits(std::vector<GLuint>{ texture, irr_driver->getDepthStencilTexture() });
     video::SColorf ColorFrom = video::SColorf(getColorFrom()[0], getColorFrom()[1], getColorFrom()[2]);
     video::SColorf ColorTo = video::SColorf(getColorTo()[0], getColorTo()[1], getColorTo()[2]);
 
@@ -389,12 +387,12 @@ void ParticleSystemProxy::generateVAOs()
     glBindVertexArray(0);
     glGenBuffers(1, &initial_values_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), ParticleParams, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), ParticleParams, GL_STREAM_COPY);
     glGenBuffers(2, tfb_buffers);
     glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), InitialValues, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), InitialValues, GL_STREAM_COPY);
     glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_COPY);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGenVertexArrays(1, &current_rendering_vao);
@@ -423,7 +421,7 @@ void ParticleSystemProxy::generateVAOs()
         }
         glGenBuffers(1, &quaternionsbuffer);
         glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
-        glBufferData(GL_ARRAY_BUFFER, 4 * count * sizeof(float), quaternions, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 4 * count * sizeof(float), quaternions, GL_STREAM_COPY);
         delete[] quaternions;
     }
 
@@ -450,6 +448,12 @@ void ParticleSystemProxy::render() {
     m_first_execution = false;
     simulate();
     draw();
+}
+
+bool ParticleSystemProxy::update()
+{
+    doParticleSystem(os::Timer::getTime());
+    return (IsVisible && (Particles.size() != 0));
 }
 
 void ParticleSystemProxy::OnRegisterSceneNode()

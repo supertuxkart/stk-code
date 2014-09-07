@@ -84,17 +84,13 @@ void EnterGPNameDialog::onEnterPressedInternal()
     if (name.size() > 0 && name != "Random Grand Prix")
     {
         // check for duplicate names
-        for (unsigned int i = 0; i < grand_prix_manager->getNumberOfGrandPrix(); i++)
+        if (grand_prix_manager->existsName(name))
         {
-            const GrandPrixData* gp = grand_prix_manager->getGrandPrix(i);
-            if (gp->getName() == name)
-            {
-                LabelWidget* label = getWidget<LabelWidget>("title");
-                assert(label != NULL);
-                label->setText(_("Another grand prix with this name already exists."), false);
-                sfx_manager->quickSound("anvil");
-                return;
-            }
+            LabelWidget* label = getWidget<LabelWidget>("title");
+            assert(label != NULL);
+            label->setText(_("Another grand prix with this name already exists."), false);
+            sfx_manager->quickSound("anvil");
+            return;
         }
 
         // It's unsafe to delete from inside the event handler so we do it

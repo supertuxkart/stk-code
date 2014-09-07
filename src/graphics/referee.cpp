@@ -19,6 +19,7 @@
 #include "graphics/referee.hpp"
 
 #include "graphics/irr_driver.hpp"
+#include "graphics/light.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "karts/abstract_kart.hpp"
 #include "io/file_manager.hpp"
@@ -36,7 +37,6 @@ Vec3                  Referee::m_st_start_offset       = Vec3(-2, 2, 2);
 Vec3                  Referee::m_st_start_rotation     = Vec3(0, 180, 0);
 Vec3                  Referee::m_st_scale              = Vec3(1, 1, 1);
 scene::IAnimatedMesh *Referee::m_st_referee_mesh       = NULL;
-video::ITexture      *Referee::m_st_traffic_lights[3]  = {NULL, NULL, NULL};
 
 // ----------------------------------------------------------------------------
 /** Loads the static mesh.
@@ -93,23 +93,6 @@ void Referee::init()
                         * RAD_TO_DEGREE;
     m_st_start_rotation.setY(m_st_start_rotation.getY()+angle_to_kart);
 
-    std::vector<std::string> colors;
-    node->get("colors", &colors);
-
-    if(colors.size()>3)
-        Log::warn("referee", "Too many colors for referee defined, "
-                             "only first three will be used.");
-    if(colors.size()<3)
-    {
-        Log::fatal("referee",
-                   "Not enough colors for referee defined, aborting.");
-    }
-    for(unsigned int i=0; i<3; i++)
-    {
-        m_st_traffic_lights[i] = irr_driver->getTexture(FileManager::MODEL, colors[i]);
-    }
-
-
     for(unsigned int i=0; i<m_st_referee_mesh->getMeshBufferCount(); i++)
     {
         scene::IMeshBuffer *mb = m_st_referee_mesh->getMeshBuffer(i);
@@ -119,7 +102,7 @@ void Referee::init()
 
         std::string name=StringUtils::getBasename(t->getName()
                                                   .getInternalName().c_str());
-        if(name==colors[0] || name==colors[1] ||name==colors[2] )
+        if (name == "traffic_light.png")
         {
             m_st_traffic_buffer = i;
             break;
@@ -166,6 +149,16 @@ Referee::Referee()
                                m_st_last_start_frame);
 
     irr_driver->applyObjectPassShader(m_scene_node);
+
+    if (irr_driver->isGLSL() && UserConfigParams::m_dynamic_lights)
+    {
+        m_light = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.6f), 0.7f, 2.0f,
+            0.7f /* r */, 0.0 /* g */, 0.0f /* b */, false /* sun */, m_scene_node);
+    }
+    else
+    {
+        m_light = NULL;
+    }
 }   // Referee
 
 // ----------------------------------------------------------------------------
@@ -212,6 +205,9 @@ void Referee::attachToSceneNode()
     if(!m_scene_node->getParent())
         m_scene_node->setParent(irr_driver->getSceneManager()
                                           ->getRootSceneNode());
+
+    if (m_light != NULL)
+        m_light->setVisible(true);
 }   // attachToSceneNode
 
 // ----------------------------------------------------------------------------
@@ -223,6 +219,8 @@ void Referee::removeFromSceneGraph()
 {
     if(isAttached())
         irr_driver->removeNode(m_scene_node);
+    if (m_light != NULL)
+        m_light->setVisible(false);
 }   // removeFromSceneGraph
 
 // ----------------------------------------------------------------------------
@@ -232,9 +230,31 @@ void Referee::removeFromSceneGraph()
  */
 void Referee::selectReadySetGo(int rsg)
 {
-    if(m_st_traffic_buffer<0) return;
-    video::SMaterial &m = m_scene_node->getMesh()->getMeshBuffer(m_st_traffic_buffer)->getMaterial();
-    m.setTexture(0, m_st_traffic_lights[rsg]);
+    if (m_st_traffic_buffer < 0)
+        return;
+    video::SMaterial &m = m_scene_node->getMaterial(m_st_traffic_buffer); // m_scene_node->getMesh()->getMeshBuffer(m_st_traffic_buffer)->getMaterial();
+
+    //if (irr_driver->isGLSL() && UserConfigParams::m_dynamic_lights)
+    //    m.MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+
+    core::matrix4* matrix = &m.getTextureMatrix(0);
+    matrix->setTextureTranslate(0.0f, rsg*0.333f);
+
+    if (m_light != NULL)
+    {
+        if (rsg == 0)
+        {
+            ((LightNode*)m_light)->setColor(0.6f, 0.0f, 0.0f);
+        }
+        else if (rsg == 1)
+        {
+            ((LightNode*)m_light)->setColor(0.7f, 0.23f, 0.0f);
+        }
+        else if (rsg == 2)
+        {
+            ((LightNode*)m_light)->setColor(0.0f, 0.6f, 0.0f);
+        }
+    }
 
     // disable lighting, we need to see the traffic light even if facing away
     // from the sun

@@ -112,7 +112,7 @@ private:
                                        *   for this kart.*/
     float m_shadow_x_offset;          /**< X offset of the shadow plane
                                        *   for this kart.*/
-    float m_shadow_y_offset;          /**< Y offset of the shadow plane
+    float m_shadow_z_offset;          /**< Z offset of the shadow plane
                                        *   for this kart.*/
     video::ITexture *m_shadow_texture;/**< The texture with the shadow. */
     video::SColor m_color;            /**< Color the represents the kart in the
@@ -152,7 +152,11 @@ private:
 
     /** The position of the physical wheel is a weighted average of the
      *  two ends of the beveled shape. This determines the weight: 0 = 
-     *  a the widest end, 1 = at the narrowest front end. */
+     *  a the widest end, 1 = at the narrowest front end. If the value is 
+     *  < 0, the old physics settings are used which places the raycast
+     *  wheels outside of the chassis - but result in a more stable
+     *  physics behaviour (which is therefore atm still the default).
+     */
     float m_physical_wheel_position;
 
     /** Time a kart is moved upwards after when it is rescued. */
@@ -200,6 +204,10 @@ private:
     std::string m_wheel_filename[4];
     /**  Radius of the graphical wheels.  */
     float       m_wheel_graphics_radius[4];
+    /** An additional Y offset added to the y position of the graphical
+     *  chassis. Useful for karts that don't have enough space for suspension
+     *  compression. */
+    float       m_graphical_y_offset;
     /** If the kart is supposed to have random wheel rotation at start. */
     bool        m_has_rand_wheels;
     /** Max. length of plunger rubber band. */
@@ -565,6 +573,11 @@ public:
     float getWheelRadius            () const {return m_wheel_radius;          }
 
     // ------------------------------------------------------------------------
+    /** Return the additional Y offset added to the y position of the graphical
+     *  chassis. Useful for karts that don't have enough space for suspension
+     *  compression. */
+    float getGraphicalYOffset() const {return m_graphical_y_offset; }
+    // ------------------------------------------------------------------------
     /** Returns parameters for the speed-weighted objects */
     const SpeedWeightedObject::Properties& getSpeedWeightedObjectProperties() const
     {
@@ -827,7 +840,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the scale factor by which the shadow plane
      *  had to be set. */
-    float getShadowYOffset          () const {return m_shadow_y_offset;       }
+    float getShadowZOffset          () const {return m_shadow_z_offset;       }
 
     // ------------------------------------------------------------------------
     /** Returns a pointer to the skidding properties. */
@@ -916,7 +929,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns position of the physical wheel is a weighted average of the
      *  two ends of the beveled shape. This determines the weight: 0 = 
-     *  a the widest end, 1 = at the narrowest, front end. */
+     *  a the widest end, 1 = at the narrowest, front end. If the value is <0,
+     *  the old physics position is picked, which placed the raycast wheels
+     *  outside of the chassis, but gives more stable physics. */
     const float getPhysicalWheelPosition() const 
     {
         return m_physical_wheel_position; 

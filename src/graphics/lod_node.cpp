@@ -137,19 +137,24 @@ void LODNode::OnAnimate(u32 timeMs)
     }
 }
 
-void LODNode::OnRegisterSceneNode()
+void LODNode::updateVisibility(bool* shown)
 {
     if (!isVisible()) return;
     if (m_nodes.size() == 0) return;
 
-    bool shown = false;
     int level = getLevel();
-    if (level>=0)
+    for (size_t i = 0; i < m_nodes.size(); i++)
     {
-        m_nodes[level]->updateAbsolutePosition();
-        m_nodes[level]->OnRegisterSceneNode();
-        shown = true;
+        m_nodes[i]->setVisible(i == level);
+        if (i == level && shown != NULL)
+            *shown = (i > 0);
     }
+}
+
+void LODNode::OnRegisterSceneNode()
+{
+    bool shown;
+    updateVisibility(&shown);
 
     const u32 now = irr_driver->getDevice()->getTimer()->getTime();
 
@@ -158,6 +163,7 @@ void LODNode::OnRegisterSceneNode()
                                 m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH) &&
         now > m_last_tick)
     {
+        int level = getLevel();
         if (m_previous_visibility == WAS_HIDDEN && shown)
         {
             scene::IMesh* mesh;
@@ -254,20 +260,7 @@ void LODNode::OnRegisterSceneNode()
     m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN);
     m_last_tick = now;
 
-    // If this node has children other than the LOD nodes, draw them
-    core::list<ISceneNode*>::Iterator it;
-
-    for (it = Children.begin(); it != Children.end(); it++)
-    {
-        if (m_nodes_set.find(*it) == m_nodes_set.end())
-        {
-            assert(*it != NULL);
-            if ((*it)->isVisible())
-            {
-                (*it)->OnRegisterSceneNode();
-            }
-        }
-    }
+    scene::ISceneNode::OnRegisterSceneNode();
 }
 
 void LODNode::add(int level, scene::ISceneNode* node, bool reparent)

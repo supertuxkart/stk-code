@@ -154,6 +154,12 @@ public:
     /** Returns the highest point of the kart (coordinate on up axis) */
     float getHighestPoint() const { return m_kart_highest_point;  }
     // ------------------------------------------------------------------------
+    /** Called after the kart comes to rest. It can be used to e.g. compute
+     *  differences between graphical and physical chassis. Note that 
+     *  overwriting this function is possible, but this implementation must
+     *  be called. */
+    virtual void kartIsInRestNow();
+    // ------------------------------------------------------------------------
     /** Returns true if this kart has no wheels. */
     bool isWheeless() const;
     // ------------------------------------------------------------------------

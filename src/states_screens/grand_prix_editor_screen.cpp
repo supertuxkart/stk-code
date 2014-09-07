@@ -29,7 +29,6 @@
 #include "states_screens/edit_gp_screen.hpp"
 #include "states_screens/dialogs/enter_gp_name_dialog.hpp"
 #include "states_screens/dialogs/gp_info_dialog.hpp"
-#include "states_screens/dialogs/track_info_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -205,6 +204,9 @@ void GrandPrixEditorScreen::loadGPList()
     // Reset GP list everytime (accounts for locking changes, etc.)
     gplist_widget->clearItems();
 
+    // ensures that no GP and no track is NULL
+    grand_prix_manager->checkConsistency();
+
     // Build GP list
     for (unsigned int i = 0; i < grand_prix_manager->getNumberOfGrandPrix(); i++)
     {
@@ -215,23 +217,7 @@ void GrandPrixEditorScreen::loadGPList()
         for (unsigned int t=0; t<tracks.size(); t++)
         {
             Track* track = track_manager->getTrack(tracks[t]);
-            if (track == NULL)
-            {
-                Log::warn("GrandPrixEditor",
-                    "Grand Prix '%s' refers to track '%s', which does not exist\n",
-                    gp->getId().c_str(), tracks[t].c_str());
-            }
-            else
-            {
-                sshot_files.push_back(track->getScreenshotFile());
-            }
-        }
-        if (sshot_files.size() == 0)
-        {
-            Log::warn("GrandPrixEditor",
-                "Grand Prix '%s' does not contain any valid track\n",
-                gp->getId().c_str());
-            sshot_files.push_back("gui/main_help.png");
+            sshot_files.push_back(track->getScreenshotFile());
         }
 
         gplist_widget->addAnimatedItem(translations->fribidize(gp->getName()), gp->getId(),

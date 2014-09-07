@@ -224,7 +224,7 @@ void RegisterScreen::doRegister()
     }
     else if (username.size() < 3 || username.size() > 30)
     {
-        m_info_widget->setText(_("Username has to be between 4 and 30 characters long!"), false);
+        m_info_widget->setText(_("Online username has to be between 3 and 30 characters long!"), false);
     }
     else if (password.size() < 8 || password.size() > 30)
     {

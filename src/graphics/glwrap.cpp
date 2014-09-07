@@ -3,92 +3,16 @@
 #include <string>
 #include "config/user_config.hpp"
 #include "utils/profiler.hpp"
+#include "utils/cpp2011.hpp"
+#include "graphics/stkmesh.hpp"
 
-#ifdef _IRR_WINDOWS_API_
-#define IRR_OGL_LOAD_EXTENSION(X) wglGetProcAddress(reinterpret_cast<const char*>(X))
-PFNGLGENTRANSFORMFEEDBACKSPROC glGenTransformFeedbacks;
-PFNGLBINDTRANSFORMFEEDBACKPROC glBindTransformFeedback;
-PFNGLDRAWTRANSFORMFEEDBACKPROC glDrawTransformFeedback;
-PFNGLBEGINTRANSFORMFEEDBACKPROC glBeginTransformFeedback;
-PFNGLENDTRANSFORMFEEDBACKPROC glEndTransformFeedback;
-PFNGLTRANSFORMFEEDBACKVARYINGSPROC glTransformFeedbackVaryings;
-PFNGLBINDBUFFERBASEPROC glBindBufferBase;
-PFNGLGENBUFFERSPROC glGenBuffers;
-PFNGLBINDBUFFERPROC glBindBuffer;
-PFNGLBUFFERDATAPROC glBufferData;
-PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
-PFNGLCREATESHADERPROC glCreateShader;
-PFNGLCOMPILESHADERPROC glCompileShader;
-PFNGLSHADERSOURCEPROC glShaderSource;
-PFNGLCREATEPROGRAMPROC glCreateProgram;
-PFNGLATTACHSHADERPROC glAttachShader;
-PFNGLLINKPROGRAMPROC glLinkProgram;
-PFNGLUSEPROGRAMPROC glUseProgram;
-PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
-PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
-PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
-PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
-PFNGLUNIFORM1FPROC glUniform1f;
-PFNGLUNIFORM3FPROC glUniform3f;
-PFNGLDELETESHADERPROC glDeleteShader;
-PFNGLGETSHADERIVPROC glGetShaderiv;
-PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
-PFNGLACTIVETEXTUREPROC glActiveTexture;
-PFNGLUNIFORM2FPROC glUniform2f;
-PFNGLUNIFORM1IPROC glUniform1i;
-PFNGLUNIFORM3IPROC glUniform3i;
-PFNGLUNIFORM4IPROC glUniform4i;
-PFNGLUNIFORM1FVPROC glUniform1fv;
-PFNGLUNIFORM4FVPROC glUniform4fv;
-PFNGLGETPROGRAMIVPROC glGetProgramiv;
-PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
-PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
-PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
-PFNGLBLENDEQUATIONPROC glBlendEquation;
-PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
-PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
-PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex;
-PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced;
-PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC glDrawElementsInstancedBaseVertex;
-PFNGLDELETEBUFFERSPROC glDeleteBuffers;
-PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
-PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
-PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
-PFNGLTEXBUFFERPROC glTexBuffer;
-PFNGLBUFFERSUBDATAPROC glBufferSubData;
-PFNGLMAPBUFFERPROC glMapBuffer;
-PFNGLMAPBUFFERRANGEPROC glMapBufferRange;
-PFNGLUNMAPBUFFERPROC glUnmapBuffer;
-PFNGLFENCESYNCPROC glFenceSync;
-PFNGLCLIENTWAITSYNCPROC glClientWaitSync;
-PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
-PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
-PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
-PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
-PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
-PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
-PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
-PFNGLTEXIMAGE3DPROC glTexImage3D;
-PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
-PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
-PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
-PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
-PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
-PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
-PFNGLBLENDCOLORPROC glBlendColor;
-PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D;
-PFNGLGETCOMPRESSEDTEXIMAGEPROC glGetCompressedTexImage;
-PFNGLTEXSTORAGE1DPROC glTexStorage1D;
-PFNGLTEXSTORAGE2DPROC glTexStorage2D;
-PFNGLTEXSTORAGE3DPROC glTexStorage3D;
-PFNGLBINDIMAGETEXTUREPROC glBindImageTexture;
-PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
-#endif
+
+#include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
 
 static bool is_gl_init = false;
 
 #ifdef DEBUG
-#ifdef WIN32
+#if !defined(__APPLE__)
 #define ARB_DEBUG_OUTPUT
 #endif
 #endif
@@ -101,9 +25,11 @@ CALLBACK
 debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
               const GLchar* msg, const void *userparam)
 {
+#ifdef GL_DEBUG_SEVERITY_NOTIFICATION
     // ignore minor notifications sent by some drivers (notably the nvidia one)
     if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
         return;
+#endif
 
     switch(source)
     {
@@ -172,87 +98,10 @@ void initGL()
     if (is_gl_init)
         return;
     is_gl_init = true;
-#ifdef _IRR_WINDOWS_API_
-    glGenTransformFeedbacks = (PFNGLGENTRANSFORMFEEDBACKSPROC)IRR_OGL_LOAD_EXTENSION("glGenTransformFeedbacks");
-    glBindTransformFeedback = (PFNGLBINDTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glBindTransformFeedback");
-    glDrawTransformFeedback = (PFNGLDRAWTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glDrawTransformFeedback");
-    glBeginTransformFeedback = (PFNGLBEGINTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glBeginTransformFeedback");
-    glEndTransformFeedback = (PFNGLENDTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glEndTransformFeedback");
-    glBindBufferBase = (PFNGLBINDBUFFERBASEPROC)IRR_OGL_LOAD_EXTENSION("glBindBufferBase");
-    glGenBuffers = (PFNGLGENBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glGenBuffers");
-    glBindBuffer = (PFNGLBINDBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBindBuffer");
-    glBufferData = (PFNGLBUFFERDATAPROC)IRR_OGL_LOAD_EXTENSION("glBufferData");
-    glMapBuffer = (PFNGLMAPBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glMapBuffer");
-    glMapBufferRange = (PFNGLMAPBUFFERRANGEPROC)IRR_OGL_LOAD_EXTENSION("glMapBufferRange");
-    glUnmapBuffer = (PFNGLUNMAPBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glUnmapBuffer");
-    glFenceSync = (PFNGLFENCESYNCPROC)IRR_OGL_LOAD_EXTENSION("glFenceSync");
-    glClientWaitSync = (PFNGLCLIENTWAITSYNCPROC)IRR_OGL_LOAD_EXTENSION("glClientWaitSync");
-    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribPointer");
-    glCreateShader = (PFNGLCREATESHADERPROC)IRR_OGL_LOAD_EXTENSION("glCreateShader");
-    glCompileShader = (PFNGLCOMPILESHADERPROC)IRR_OGL_LOAD_EXTENSION("glCompileShader");
-    glShaderSource = (PFNGLSHADERSOURCEPROC)IRR_OGL_LOAD_EXTENSION("glShaderSource");
-    glCreateProgram = (PFNGLCREATEPROGRAMPROC)IRR_OGL_LOAD_EXTENSION("glCreateProgram");
-    glAttachShader = (PFNGLATTACHSHADERPROC)IRR_OGL_LOAD_EXTENSION("glAttachShader");
-    glLinkProgram = (PFNGLLINKPROGRAMPROC)IRR_OGL_LOAD_EXTENSION("glLinkProgram");
-    glUseProgram = (PFNGLUSEPROGRAMPROC)IRR_OGL_LOAD_EXTENSION("glUseProgram");
-    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)IRR_OGL_LOAD_EXTENSION("glEnableVertexAttribArray");
-    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetUniformLocation");
-    glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)IRR_OGL_LOAD_EXTENSION("glUniformMatrix4fv");
-    glUniform1f = (PFNGLUNIFORM1FPROC)IRR_OGL_LOAD_EXTENSION("glUniform1f");
-    glUniform3f = (PFNGLUNIFORM3FPROC)IRR_OGL_LOAD_EXTENSION("glUniform3f");
-    glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)IRR_OGL_LOAD_EXTENSION("glDisableVertexAttribArray");
-    glDeleteShader = (PFNGLDELETESHADERPROC)IRR_OGL_LOAD_EXTENSION("glDeleteShader");
-    glGetShaderiv = (PFNGLGETSHADERIVPROC)IRR_OGL_LOAD_EXTENSION("glGetShaderiv");
-    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetShaderInfoLog");
-    glActiveTexture = (PFNGLACTIVETEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glActiveTexture");
-    glUniform2f = (PFNGLUNIFORM2FPROC)IRR_OGL_LOAD_EXTENSION("glUniform2f");
-    glUniform4i = (PFNGLUNIFORM4IPROC)IRR_OGL_LOAD_EXTENSION("glUniform4i");
-    glUniform3i = (PFNGLUNIFORM3IPROC)IRR_OGL_LOAD_EXTENSION("glUniform3i");
-    glUniform1i = (PFNGLUNIFORM1IPROC)IRR_OGL_LOAD_EXTENSION("glUniform1i");
-    glGetProgramiv = (PFNGLGETPROGRAMIVPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramiv");
-    glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramInfoLog");
-    glTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC)IRR_OGL_LOAD_EXTENSION("glTransformFeedbackVaryings");
-    glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetAttribLocation");
-    glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glBindAttribLocation");
-    glBlendEquation = (PFNGLBLENDEQUATIONPROC)IRR_OGL_LOAD_EXTENSION("glBlendEquation");
-    glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribDivisor");
-    glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawArraysInstanced");
-    glDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsBaseVertex");
-    glDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsInstanced");
-    glDrawElementsInstancedBaseVertex = (PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsInstancedBaseVertex");
-    glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteBuffers");
-    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)IRR_OGL_LOAD_EXTENSION("glGenVertexArrays");
-    glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)IRR_OGL_LOAD_EXTENSION("glBindVertexArray");
-    glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteVertexArrays");
-    glTexBuffer = (PFNGLTEXBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glTexBuffer");
-    glUniform1fv = (PFNGLUNIFORM1FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform1fv");
-    glUniform4fv = (PFNGLUNIFORM4FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform4fv");
-    glBufferSubData = (PFNGLBUFFERSUBDATAPROC)IRR_OGL_LOAD_EXTENSION("glBufferSubData");
-    glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribIPointer");
-    glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glGenFramebuffers");
-    glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteFramebuffers");
-    glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBindFramebuffer");
-    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture2D");
-    glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture");
-    glTexImage3D = (PFNGLTEXIMAGE3DPROC)IRR_OGL_LOAD_EXTENSION("glTexImage3D");
-    glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)IRR_OGL_LOAD_EXTENSION("glGenerateMipmap");
-    glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)IRR_OGL_LOAD_EXTENSION("glCheckFramebufferStatus");
-    glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)IRR_OGL_LOAD_EXTENSION("glTexImage2DMultisample");
-    glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBlitFramebuffer");
-    glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)IRR_OGL_LOAD_EXTENSION("glGetUniformBlockIndex");
-    glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)IRR_OGL_LOAD_EXTENSION("glUniformBlockBinding");
-    glBlendColor = (PFNGLBLENDCOLORPROC)IRR_OGL_LOAD_EXTENSION("glBlendColor");
-    glCompressedTexImage2D = (PFNGLCOMPRESSEDTEXIMAGE2DPROC)IRR_OGL_LOAD_EXTENSION("glCompressedTexImage2D");
-    glGetCompressedTexImage = (PFNGLGETCOMPRESSEDTEXIMAGEPROC)IRR_OGL_LOAD_EXTENSION("glGetCompressedTexImage");
-    glTexStorage1D = (PFNGLTEXSTORAGE1DPROC)IRR_OGL_LOAD_EXTENSION("glTexStorage1D");
-    glTexStorage2D = (PFNGLTEXSTORAGE2DPROC)IRR_OGL_LOAD_EXTENSION("glTexStorage2D");
-    glTexStorage3D = (PFNGLTEXSTORAGE3DPROC)IRR_OGL_LOAD_EXTENSION("glTexStorage3D");
-    glBindImageTexture = (PFNGLBINDIMAGETEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glBindImageTexture");
-    glDispatchCompute = (PFNGLDISPATCHCOMPUTEPROC)IRR_OGL_LOAD_EXTENSION("glDispatchCompute");
-#ifdef DEBUG
-    glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
-#endif
-#endif
+    glewExperimental = GL_TRUE;
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
+        Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
 #ifdef ARB_DEBUG_OUTPUT
     if (glDebugMessageCallbackARB)
         glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
@@ -282,12 +131,21 @@ GLuint LoadShader(const char * file, unsigned type)
     char versionString[20];
     sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
     std::string Code = versionString;
+    if (UserConfigParams::m_azdo)
+        Code += "#extension GL_ARB_bindless_texture : enable\n";
+    else
+    {
+        Code += "#extension GL_ARB_bindless_texture : disable\n";
+        Code += "#undef GL_ARB_bindless_texture\n";
+    }
     std::ifstream Stream(file, std::ios::in);
     Code += "//" + std::string(file) + "\n";
     if (irr_driver->needUBOWorkaround())
         Code += "#define UBO_DISABLED\n";
     if (irr_driver->hasVSLayerExtension())
         Code += "#define VSLayer\n";
+    if (irr_driver->needsRGBBindlessWorkaround())
+        Code += "#define SRGBBindlessFix\n";
     Code += LoadHeader();
     if (Stream.is_open())
     {
@@ -539,40 +397,7 @@ void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum
     glGetError();
 }
 
-class VBOGatherer
-{
-    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
-    GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
-    std::vector<scene::IMeshBuffer *> storedCPUBuffer[VTXTYPE_COUNT];
-    void *vtx_mirror[VTXTYPE_COUNT], *idx_mirror[VTXTYPE_COUNT];
-    size_t vtx_cnt[VTXTYPE_COUNT], idx_cnt[VTXTYPE_COUNT];
-    std::map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
-
-    void regenerateBuffer(enum VTXTYPE);
-    void regenerateVAO(enum VTXTYPE);
-    size_t getVertexPitch(enum VTXTYPE) const;
-    VTXTYPE getVTXTYPE(video::E_VERTEX_TYPE type);
-    void append(scene::IMeshBuffer *, VBOGatherer::VTXTYPE tp);
-public:
-    VBOGatherer();
-    std::pair<unsigned, unsigned> getBase(scene::IMeshBuffer *);
-    unsigned getVBO(video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
-    unsigned getVAO(video::E_VERTEX_TYPE type) { return vao[getVTXTYPE(type)]; }
-    ~VBOGatherer()
-    {
-        for (unsigned i = 0; i < VTXTYPE_COUNT; i++)
-        {
-            if (vbo[i])
-                glDeleteBuffers(1, &vbo[i]);
-            if (ibo[i])
-                glDeleteBuffers(1, &ibo[i]);
-            if (vao[i])
-                glDeleteVertexArrays(1, &vao[i]);
-        }
-    }
-};
-
-VBOGatherer::VBOGatherer()
+VAOManager::VAOManager()
 {
     vao[0] = vao[1] = vao[2] = 0;
     vbo[0] = vbo[1] = vbo[2] = 0;
@@ -581,16 +406,81 @@ VBOGatherer::VBOGatherer()
     idx_cnt[0] = idx_cnt[1] = idx_cnt[2] = 0;
     vtx_mirror[0] = vtx_mirror[1] = vtx_mirror[2] = NULL;
     idx_mirror[0] = idx_mirror[1] = idx_mirror[2] = NULL;
+    instance_count[0] = 0;
+
+    for (unsigned i = 0; i < InstanceTypeCount; i++)
+    {
+        glGenBuffers(1, &instance_vbo[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[i]);
+#ifdef Buffer_Storage
+        if (irr_driver->hasBufferStorageExtension())
+        {
+            glBufferStorage(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceData), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+            Ptr[i] = glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceData), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        }
+        else
+#endif
+        {
+            glBufferData(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceData), 0, GL_STREAM_DRAW);
+        }
+    }
 }
 
-void VBOGatherer::regenerateBuffer(enum VTXTYPE tp)
+static void cleanVAOMap(std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint> Map)
+{
+    std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint>::iterator It = Map.begin(), E = Map.end();
+    for (; It != E; It++)
+    {
+        glDeleteVertexArrays(1, &(It->second));
+    }
+}
+
+void VAOManager::cleanInstanceVAOs()
+{
+    cleanVAOMap(InstanceVAO);
+    InstanceVAO.clear();
+}
+
+VAOManager::~VAOManager()
+{
+    cleanInstanceVAOs();
+    for (unsigned i = 0; i < 3; i++)
+    {
+        if (vtx_mirror[i])
+            free(vtx_mirror[i]);
+        if (idx_mirror[i])
+            free(idx_mirror[i]);
+        if (vbo[i])
+            glDeleteBuffers(1, &vbo[i]);
+        if (ibo[i])
+            glDeleteBuffers(1, &ibo[i]);
+        if (vao[i])
+            glDeleteVertexArrays(1, &vao[i]);
+    }
+    for (unsigned i = 0; i < InstanceTypeCount; i++)
+    {
+        glDeleteBuffers(1, &instance_vbo[i]);
+    }
+
+}
+
+void VAOManager::regenerateBuffer(enum VTXTYPE tp)
 {
     glBindVertexArray(0);
     if (vbo[tp])
         glDeleteBuffers(1, &vbo[tp]);
     glGenBuffers(1, &vbo[tp]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
-    glBufferData(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_DYNAMIC_DRAW);
+#ifdef Buffer_Storage
+    if (irr_driver->hasBufferStorageExtension())
+    {
+        glBufferStorage(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        VBOPtr[tp] = glMapBufferRange(GL_ARRAY_BUFFER, 0, vtx_cnt[tp] * getVertexPitch(tp), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+    }
+    else
+#endif
+        glBufferData(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_DYNAMIC_DRAW);
+
 
     if (ibo[tp])
         glDeleteBuffers(1, &ibo[tp]);
@@ -602,7 +492,7 @@ void VBOGatherer::regenerateBuffer(enum VTXTYPE tp)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void VBOGatherer::regenerateVAO(enum VTXTYPE tp)
+void VAOManager::regenerateVAO(enum VTXTYPE tp)
 {
     if (vao[tp])
         glDeleteVertexArrays(1, &vao[tp]);
@@ -668,7 +558,100 @@ void VBOGatherer::regenerateVAO(enum VTXTYPE tp)
     glBindVertexArray(0);
 }
 
-size_t VBOGatherer::getVertexPitch(enum VTXTYPE tp) const
+void VAOManager::regenerateInstancedVAO()
+{
+    cleanInstanceVAOs();
+
+    enum video::E_VERTEX_TYPE IrrVT[] = { video::EVT_STANDARD, video::EVT_2TCOORDS, video::EVT_TANGENTS };
+    for (unsigned i = 0; i < VTXTYPE_COUNT; i++)
+    {
+            video::E_VERTEX_TYPE tp = IrrVT[i];
+            if (!vbo[tp] || !ibo[tp])
+                continue;
+            GLuint vao = createVAO(vbo[tp], ibo[tp], tp);
+            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeDefault]);
+
+            glEnableVertexAttribArray(7);
+            glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
+            glVertexAttribDivisor(7, 1);
+            glEnableVertexAttribArray(8);
+            glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
+            glVertexAttribDivisor(8, 1);
+            glEnableVertexAttribArray(9);
+            glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
+            glVertexAttribDivisor(9, 1);
+            glEnableVertexAttribArray(10);
+            glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)));
+            glVertexAttribDivisor(10, 1);
+            glEnableVertexAttribArray(11);
+            glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float) + 2 * sizeof(unsigned)));
+            glVertexAttribDivisor(11, 1);
+            InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeDefault)] = vao;
+
+            vao = createVAO(vbo[tp], ibo[tp], tp);
+            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeShadow]);
+
+            glEnableVertexAttribArray(7);
+            glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
+            glVertexAttribDivisor(7, 1);
+            glEnableVertexAttribArray(8);
+            glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
+            glVertexAttribDivisor(8, 1);
+            glEnableVertexAttribArray(9);
+            glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
+            glVertexAttribDivisor(9, 1);
+            glEnableVertexAttribArray(10);
+            glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)));
+            glVertexAttribDivisor(10, 1);
+            glEnableVertexAttribArray(11);
+            glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float) + 2 * sizeof(unsigned)));
+            glVertexAttribDivisor(11, 1);
+            InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeShadow)] = vao;
+
+            vao = createVAO(vbo[tp], ibo[tp], tp);
+            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeRSM]);
+
+            glEnableVertexAttribArray(7);
+            glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
+            glVertexAttribDivisor(7, 1);
+            glEnableVertexAttribArray(8);
+            glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
+            glVertexAttribDivisor(8, 1);
+            glEnableVertexAttribArray(9);
+            glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
+            glVertexAttribDivisor(9, 1);
+            glEnableVertexAttribArray(10);
+            glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)));
+            glVertexAttribDivisor(10, 1);
+            glEnableVertexAttribArray(11);
+            glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float) + 2 * sizeof(unsigned)));
+            glVertexAttribDivisor(11, 1);
+            InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeRSM)] = vao;
+
+            vao = createVAO(vbo[tp], ibo[tp], tp);
+            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeGlow]);
+
+            glEnableVertexAttribArray(7);
+            glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(GlowInstanceData), 0);
+            glVertexAttribDivisor(7, 1);
+            glEnableVertexAttribArray(8);
+            glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(GlowInstanceData), (GLvoid*)(3 * sizeof(float)));
+            glVertexAttribDivisor(8, 1);
+            glEnableVertexAttribArray(9);
+            glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(GlowInstanceData), (GLvoid*)(6 * sizeof(float)));
+            glVertexAttribDivisor(9, 1);
+            glEnableVertexAttribArray(12);
+            glVertexAttribPointer(12, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(GlowInstanceData), (GLvoid*)(9 * sizeof(float)));
+            glVertexAttribDivisor(12, 1);
+            InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeGlow)] = vao;
+            glBindVertexArray(0);
+    }
+
+
+
+}
+
+size_t VAOManager::getVertexPitch(enum VTXTYPE tp) const
 {
     switch (tp)
     {
@@ -684,22 +667,22 @@ size_t VBOGatherer::getVertexPitch(enum VTXTYPE tp) const
     }
 }
 
-VBOGatherer::VTXTYPE VBOGatherer::getVTXTYPE(video::E_VERTEX_TYPE type)
+VAOManager::VTXTYPE VAOManager::getVTXTYPE(video::E_VERTEX_TYPE type)
 {
     switch (type)
     {
+    default:
+        assert(0 && "Wrong vtxtype");
     case video::EVT_STANDARD:
         return VTXTYPE_STANDARD;
     case video::EVT_2TCOORDS:
         return VTXTYPE_TCOORD;
     case video::EVT_TANGENTS:
         return VTXTYPE_TANGENT;
-    default:
-        assert(0 && "Wrong vtxtype");
     }
 };
 
-void VBOGatherer::append(scene::IMeshBuffer *mb, VBOGatherer::VTXTYPE tp)
+void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
 {
     size_t old_vtx_cnt = vtx_cnt[tp];
     vtx_cnt[tp] += mb->getVertexCount();
@@ -717,7 +700,7 @@ void VBOGatherer::append(scene::IMeshBuffer *mb, VBOGatherer::VTXTYPE tp)
     mappedBaseIndex[tp][mb] = old_idx_cnt * sizeof(u16);
 }
 
-std::pair<unsigned, unsigned> VBOGatherer::getBase(scene::IMeshBuffer *mb)
+std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb)
 {
     VTXTYPE tp = getVTXTYPE(mb->getVertexType());
     if (mappedBaseVertex[tp].find(mb) == mappedBaseVertex[tp].end())
@@ -727,6 +710,7 @@ std::pair<unsigned, unsigned> VBOGatherer::getBase(scene::IMeshBuffer *mb)
         append(mb, tp);
         regenerateBuffer(tp);
         regenerateVAO(tp);
+        regenerateInstancedVAO();
     }
 
     std::map<scene::IMeshBuffer*, unsigned>::iterator It;
@@ -738,63 +722,41 @@ std::pair<unsigned, unsigned> VBOGatherer::getBase(scene::IMeshBuffer *mb)
     return std::pair<unsigned, unsigned>(vtx, It->second);
 }
 
-static VBOGatherer *gatherersingleton = 0;
-
-std::pair<unsigned, unsigned> getVAOOffsetAndBase(scene::IMeshBuffer *mb)
+size_t VAOManager::appendInstance(enum InstanceType, const std::vector<InstanceData> &instance_data)
 {
-    if (!gatherersingleton)
-        gatherersingleton = new VBOGatherer();
-    return gatherersingleton->getBase(mb);
+    glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[0]);
+    glBufferSubData(GL_ARRAY_BUFFER, instance_count[0] * sizeof(InstanceData), instance_data.size() * sizeof(InstanceData), instance_data.data());
+    size_t result = instance_count[0];
+    instance_count[0] += instance_data.size();
+    return result;
 }
 
-unsigned getVBO(video::E_VERTEX_TYPE type)
-{
-    if (gatherersingleton)
-        return gatherersingleton->getVBO(type);
-    return 0;
-}
-
-unsigned getVAO(video::E_VERTEX_TYPE type)
-{
-    if (gatherersingleton)
-        return gatherersingleton->getVAO(type);
-    return 0;
-}
-
-void resetVAO()
-{
-    if (gatherersingleton)
-        delete gatherersingleton;
-    gatherersingleton = 0;
-}
-
-ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
+ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 {
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
-
+    if (!timer.canSubmitQuery) return;
 #ifdef GL_TIME_ELAPSED
-    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
     if (!timer.initialised)
     {
-        gl_driver->extGlGenQueries(1, &timer.query);
+        glGenQueries(1, &timer.query);
         timer.initialised = true;
     }
-    gl_driver->extGlBeginQuery(GL_TIME_ELAPSED, timer.query);
+    glBeginQuery(GL_TIME_ELAPSED, timer.query);
 #endif
 }
 ScopedGPUTimer::~ScopedGPUTimer()
 {
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
-    
+    if (!timer.canSubmitQuery) return;
 #ifdef GL_TIME_ELAPSED
-    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
-    gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
+    glEndQuery(GL_TIME_ELAPSED);
+    timer.canSubmitQuery = false;
 #endif
 }
 
-GPUTimer::GPUTimer() : initialised(false)
+GPUTimer::GPUTimer() : initialised(false), lastResult(0), canSubmitQuery(true)
 {
 }
 
@@ -803,8 +765,12 @@ unsigned GPUTimer::elapsedTimeus()
     if (!initialised)
         return 0;
     GLuint result;
-    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
-    gl_driver->extGlGetQueryObjectuiv(query, GL_QUERY_RESULT, &result);
+    glGetQueryObjectuiv(query, GL_QUERY_RESULT_AVAILABLE, &result);
+    if (result == GL_FALSE)
+        return lastResult;
+    glGetQueryObjectuiv(query, GL_QUERY_RESULT, &result);
+    lastResult = result / 1000;
+    canSubmitQuery = true;
     return result / 1000;
 }
 
@@ -861,7 +827,7 @@ void FrameBuffer::Bind()
     glViewport(0, 0, width, height);
     irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver*)irr_driver->getDevice()->getVideoDriver();
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    gl_driver->extGlDrawBuffers(RenderTargets.size(), bufs);
+    glDrawBuffers(RenderTargets.size(), bufs);
 }
 
 void FrameBuffer::Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask, GLenum filter)
@@ -924,7 +890,7 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
     glUseProgram(UIShader::ColoredTextureRectShader::getInstance()->Program);
     glBindVertexArray(UIShader::ColoredTextureRectShader::getInstance()->vao);
 
-    setTexture(UIShader::ColoredTextureRectShader::getInstance()->TU_tex, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
+    UIShader::ColoredTextureRectShader::getInstance()->SetTextureUnits(createVector<GLuint>(static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName()));
     UIShader::ColoredTextureRectShader::getInstance()->setUniforms(
         core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height),
         core::vector2df(tex_center_pos_x, tex_center_pos_y), core::vector2df(tex_width, tex_height));
@@ -944,7 +910,7 @@ void drawTexQuad(GLuint texture, float width, float height,
     glUseProgram(UIShader::TextureRectShader::getInstance()->Program);
     glBindVertexArray(SharedObject::UIVAO);
 
-    setTexture(UIShader::TextureRectShader::getInstance()->TU_tex, texture, GL_LINEAR, GL_LINEAR);
+    UIShader::TextureRectShader::getInstance()->SetTextureUnits(createVector<GLuint>(texture));
     UIShader::TextureRectShader::getInstance()->setUniforms(
         core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height),
         core::vector2df(tex_center_pos_x, tex_center_pos_y),
@@ -1047,7 +1013,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
     glUseProgram(UIShader::UniformColoredTextureRectShader::getInstance()->Program);
     glBindVertexArray(SharedObject::UIVAO);
 
-    setTexture(UIShader::UniformColoredTextureRectShader::getInstance()->TU_tex, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
+    UIShader::UniformColoredTextureRectShader::getInstance()->SetTextureUnits(createVector<GLuint>(static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName()));
     UIShader::UniformColoredTextureRectShader::getInstance()->setUniforms(
         core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height), core::vector2df(tex_center_pos_x, tex_center_pos_y), core::vector2df(tex_width, tex_height), colors);
 
@@ -1083,7 +1049,7 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
     glUseProgram(UIShader::UniformColoredTextureRectShader::getInstance()->Program);
     glBindVertexArray(SharedObject::UIVAO);
 
-    setTexture(UIShader::UniformColoredTextureRectShader::getInstance()->TU_tex, texture, GL_LINEAR, GL_LINEAR);
+    UIShader::UniformColoredTextureRectShader::getInstance()->SetTextureUnits(createVector<GLuint>(texture));
     UIShader::UniformColoredTextureRectShader::getInstance()->setUniforms(
         core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height),
         core::vector2df(tex_center_pos_x, tex_center_pos_y), core::vector2df(tex_width, tex_height),
@@ -1203,4 +1169,31 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
     glUseProgram(0);
 
     glGetError();
+}
+
+bool hasGLExtension(const char* extension) 
+{
+    if (glGetStringi != NULL)
+    {
+        GLint numExtensions = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+        for (GLint i = 0; i < numExtensions; i++)
+        {
+            const char* foundExtension =
+                (const char*) glGetStringi(GL_EXTENSIONS, i);
+            if (foundExtension && strcmp(foundExtension, extension) == 0)
+            {
+                return true;
+            }
+        }
+    }
+    else
+    {
+        const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
+        if (extensions && strstr(extensions, extension) != NULL)
+        {
+            return true;
+        }
+    }
+    return false;
 }

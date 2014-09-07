@@ -105,9 +105,6 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     bool lod_instance = false;
     xml_node.get("lod_instance", &lod_instance);
 
-    bool instancing = false;
-    xml_node.get("instancing", &instancing);
-
     m_soccer_ball = false;
     xml_node.get("soccer_ball", &m_soccer_ball);
     
@@ -163,14 +160,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     {
         scene::ISceneNode *glownode = NULL;
 
-        if (instancing)
-        {
-            m_type = "lod";
-            TrackObjectPresentationInstancing* instancing_node =
-                new TrackObjectPresentationInstancing(xml_node, parent, model_def_loader);
-            m_presentation = instancing_node;
-        }
-        else if (lod_instance)
+        if (lod_instance)
         {
             m_type = "lod";
             TrackObjectPresentationLOD* lod_node =

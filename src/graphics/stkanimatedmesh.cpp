@@ -33,6 +33,15 @@ void STKAnimatedMesh::cleanGLMeshes()
             glDeleteVertexArrays(1, &(mesh.vao));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
+        if (mesh.instance_buffer)
+            glDeleteBuffers(1, &(mesh.instance_buffer));
+#ifdef Bindless_Texture_Support
+        for (unsigned j = 0; j < 6; j++)
+        {
+            if (mesh.TextureHandles[j] && glIsTextureHandleResidentARB(mesh.TextureHandles[j]))
+                glMakeTextureHandleNonResidentARB(mesh.TextureHandles[j]);
+        }
+#endif
     }
 }
 
@@ -45,21 +54,13 @@ void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
     CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
-void STKAnimatedMesh::render()
+void STKAnimatedMesh::update()
 {
     video::IVideoDriver* driver = SceneManager->getVideoDriver();
-
-    bool isTransparentPass =
-        SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
-
-    ++PassCount;
-
     scene::IMesh* m = getMeshForCurrentFrame();
 
     if (m)
-    {
         Box = m->getBoundingBox();
-    }
     else
     {
         Log::error("animated mesh", "Animated Mesh returned no mesh to render.");
@@ -99,11 +100,21 @@ void STKAnimatedMesh::render()
             {
                 MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
                 MeshSolidMaterial[MatType].push_back(&mesh);
+                InitTextures(mesh, MatType);
             }
-            std::pair<unsigned, unsigned> p = getVAOOffsetAndBase(mb);
-            mesh.vaoBaseVertex = p.first;
-            mesh.vaoOffset = p.second;
-            mesh.VAOType = mb->getVertexType();
+
+            if (irr_driver->hasARB_base_instance())
+            {
+                std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
+                mesh.vaoBaseVertex = p.first;
+                mesh.vaoOffset = p.second;
+            }
+            else
+            {
+                fillLocalBuffer(mesh, mb);
+                mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
+                glBindVertexArray(0);
+            }
         }
     }
     firstTime = false;
@@ -114,31 +125,47 @@ void STKAnimatedMesh::render()
         const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
         if (isObject(material.MaterialType))
         {
-            if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == TRANSPARENT_PASS)
+
+            size_t size = mb->getVertexCount() * GLmeshes[i].Stride, offset = GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride;
+            void *buf;
+            if (irr_driver->hasBufferStorageExtension())
+            {
+                buf = VAOManager::getInstance()->getVBOPtr(mb->getVertexType());
+                buf = (char *)buf + offset;
+            }
+            else
             {
                 glBindVertexArray(0);
-                size_t size = mb->getVertexCount() * GLmeshes[i].Stride;
-                glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
+                if (irr_driver->hasARB_base_instance())
+                    glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getVBO(mb->getVertexType()));
+                else
+                    glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
                 GLbitfield bitfield = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
-                void * buf = glMapBufferRange(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, size, bitfield);
-                memcpy(buf, mb->getVertices(), size);
+                buf = glMapBufferRange(GL_ARRAY_BUFFER, offset, size, bitfield);
+            }
+            memcpy(buf, mb->getVertices(), size);
+            if (!irr_driver->hasBufferStorageExtension())
+            {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
             }
         }
         if (mb)
             GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
-
-        video::IMaterialRenderer* rnd = driver->getMaterialRenderer(Materials[i].MaterialType);
-        bool transparent = (rnd && rnd->isTransparent());
-
-       // only render transparent buffer if this is the transparent render pass
-       // and solid only in solid pass
-       if (transparent != isTransparentPass)
-          continue;
     }
 
-    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
+}
+
+void STKAnimatedMesh::render()
+{
+    bool isTransparentPass =
+        SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
+
+    ++PassCount;
+
+    update();
+
+/*    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
         core::matrix4 invmodel;
@@ -158,7 +185,7 @@ void STKAnimatedMesh::render()
             pushVector(ListMatUnlit::getInstance(), mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
 
         return;
-    }
+    }*/
 
     if (irr_driver->getPhase() == TRANSPARENT_PASS)
     {

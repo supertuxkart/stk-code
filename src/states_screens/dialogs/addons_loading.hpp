@@ -23,6 +23,7 @@
 #include "addons/addons_manager.hpp"
 #include "guiengine/widgets.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
 namespace Online { class HTTPRequest; }
@@ -32,7 +33,6 @@ namespace Online { class HTTPRequest; }
   */
 class AddonsLoading : public GUIEngine::ModalDialog
 {
-  virtual void escapePressed();
 private:
     GUIEngine::LabelWidget       *m_state;
     GUIEngine::ProgressBarWidget *m_progress;
@@ -70,6 +70,7 @@ public:
      * */
     void onUpdate(float delta);
     void voteClicked();
+    virtual bool onEscapePressed() OVERRIDE;
     
 };   // AddonsLoading
 

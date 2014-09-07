@@ -103,7 +103,7 @@ void RacePausedDialog::onEnterPressedInternal()
 GUIEngine::EventPropagation
            RacePausedDialog::processEvent(const std::string& eventSource)
 {
-    GUIEngine::RibbonWidget* chocie_ribbon =
+    GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
 
     if (eventSource == "backbtn")
@@ -115,7 +115,7 @@ GUIEngine::EventPropagation
     else if (eventSource == "choiceribbon")
     {
         const std::string& selection =
-            chocie_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+            choice_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection == "exit")
         {

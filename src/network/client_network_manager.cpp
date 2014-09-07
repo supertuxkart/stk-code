@@ -117,7 +117,10 @@ ClientNetworkManager::ClientNetworkManager()
 
 ClientNetworkManager::~ClientNetworkManager()
 {
-    pthread_cancel(*m_thread_keyboard);
+    // On windows in release mode there is no console, and the
+    // thread is not created.
+    if(m_thread_keyboard)
+        pthread_cancel(*m_thread_keyboard);
 }
 
 void ClientNetworkManager::run()
@@ -133,10 +136,17 @@ void ClientNetworkManager::run()
 
     Log::info("ClientNetworkManager", "Host initialized.");
 
+    // On windows in release mode the console is suppressed, so nothing can
+    // be read from std::cin. Since getline(std::cin,...) then returns
+    // an empty string, the waitInput thread is running all the time, consuming
+    // CPU. Therefore don't start the console thread in this case.
+#if defined(WIN32) && defined(_MSC_VER) && !defined(DEBUG)
+    m_thread_keyboard = NULL;
+#else
     // listen keyboard console input
     m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
     pthread_create(m_thread_keyboard, NULL, waitInput, NULL);
-
+#endif
     NetworkManager::run();
 
     Log::info("ClientNetworkManager", "Ready !");

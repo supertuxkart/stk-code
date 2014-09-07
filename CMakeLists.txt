@@ -15,17 +15,21 @@ option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 
-if(UNIX)
+if(UNIX OR MINGW)
     option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
 endif()
-if(MSVC)
+if(MSVC OR MINGW)
     # Normally hide the option to build wiiuse on VS, since it depends
-    # on the installation of the Windows DDK (Driver Developer Kit), 
+    # on the installation of the Windows DDK (Driver Developer Kit),
     # which also needs an absolute path :(
     option(WIIUSE_BUILD "Build wiiuse lib (only for developers)" OFF)
     mark_as_advanced(WIIUSE_BUILD)
 else()
     set(WIIUSE_BUILD ON)
+endif()
+
+if(MINGW)
+    set(USE_WIIUSE OFF)
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -69,6 +73,7 @@ endif()
 # Build the angelscript library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
 include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
 
@@ -78,6 +83,11 @@ if(MSVC)
     set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
     set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
     add_definitions(/D_IRR_STATIC_LIB_)
+endif()
+
+if(MINGW)
+    set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
+    add_definitions(-D_IRR_STATIC_LIB_)
 endif()
 
 if(APPLE)
@@ -124,8 +134,15 @@ if(USE_FRIBIDI)
     endif()
 endif()
 
+# OpenMP
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
 
-if(UNIX)
+
+if(UNIX OR MINGW)
 #    if(USE_CPP2011)
         add_definitions("-std=gnu++0x")
 #    endif()
@@ -134,6 +151,10 @@ endif()
 # OpenGL
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
+
+# Glew
+find_package(GLEW REQUIRED)
+include_directories(${GLEW_INCLUDE_DIR})
 
 if(UNIX AND NOT APPLE)
     if(USE_XRANDR)
@@ -147,7 +168,7 @@ if(UNIX AND NOT APPLE)
     endif()
 endif()
 
-    
+
 # Set some compiler options
 if(UNIX)
     add_definitions(-Wall)
@@ -175,6 +196,9 @@ endif()
 # TODO: remove this switch
 add_definitions(-DHAVE_OGGVORBIS)
 
+if(WIN32 AND NOT MINGW)
+    configure_file("${STK_SOURCE_DIR}/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
+endif()
 
 # Provides list of source and header files (STK_SOURCES and STK_HEADERS)
 include(sources.cmake)
@@ -230,7 +254,7 @@ else()
     endif()
 
     # Build the final executable
-    add_executable(supertuxkart ${STK_SOURCES} ${STK_HEADERS})
+    add_executable(supertuxkart ${STK_SOURCES} ${STK_RESOURCES} ${STK_HEADERS})
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
@@ -253,8 +277,9 @@ target_link_libraries(supertuxkart
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
-    ${OPENGL_LIBRARIES})
-    
+    ${OPENGL_LIBRARIES}
+    ${GLEW_LIBRARIES})
+
 if(UNIX AND NOT APPLE)
     if(USE_XRANDR)
         target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
@@ -288,8 +313,12 @@ if(USE_WIIUSE)
     if(APPLE)
         find_library(BLUETOOTH_LIBRARY NAMES IOBluetooth PATHS /Developer/Library/Frameworks/IOBluetooth.framework)
         target_link_libraries(supertuxkart wiiuse ${BLUETOOTH_LIBRARY})
-    elseif(MSVC)
-        add_definitions("/DWIIUSE_STATIC")
+    elseif(WIN32)
+        if(MSVC)
+            add_definitions("/DWIIUSE_STATIC")
+        else()
+            add_definitions("-DWIIUSE_STATIC")
+        endif()
         if(WIIUSE_BUILD)
             target_link_libraries(supertuxkart wiiuse)
         else()
@@ -302,12 +331,12 @@ if(USE_WIIUSE)
 
 endif()
 
-if(MSVC)
+if(MSVC OR MINGW)
   target_link_libraries(supertuxkart iphlpapi.lib)
   add_custom_command(TARGET supertuxkart POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/dependencies/dll"
-        $<TARGET_FILE_DIR:supertuxkart>) 
+        $<TARGET_FILE_DIR:supertuxkart>)
   add_custom_target(stkshaders SOURCES ${STK_SHADERS})
 endif()
 
@@ -316,7 +345,7 @@ add_subdirectory(tools/font_tool)
 
 
 # ==== Make dist target ====
-if(MSVC)
+if(MSVC OR MINGW)
   # Don't create a dist target for VS
 else()
   add_custom_target(dist
@@ -340,9 +369,9 @@ endif()
 
 # ==== Checking if stk-assets folder exists ====
 if(CHECK_ASSETS)
-  if((IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/karts) AND 
-       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/library) AND 
-       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/music) AND 
+  if((IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/karts) AND
+       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/library) AND
+       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/music) AND
        (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/sfx) AND
        (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/textures) AND
        (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/tracks))
@@ -368,11 +397,8 @@ install(DIRECTORY ${STK_DATA_DIR} DESTINATION ${STK_INSTALL_DATA_DIR} PATTERN ".
 if(STK_ASSETS_DIR AND CHECK_ASSETS)
   install(DIRECTORY ${STK_ASSETS_DIR} DESTINATION ${STK_INSTALL_DATA_DIR}/data PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
 endif()
-install(FILES ${PROJECT_BINARY_DIR}/supertuxkart.desktop DESTINATION share/applications)
+install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/applications)
+install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32 RENAME supertuxkart.png)
+install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128 RENAME supertuxkart.png)
 install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
 install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
-
-
-set(PREFIX ${CMAKE_INSTALL_PREFIX})
-configure_file(data/supertuxkart_desktop.template supertuxkart.desktop)
-add_dependencies(supertuxkart supertuxkart.desktop)

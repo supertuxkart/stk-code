@@ -60,9 +60,14 @@ namespace Online
     void Request::execute()
     {
         assert(isBusy());
+        // Abort as early as possible if abort is requested
+        if(RequestManager::get()->getAbort()) return;
         prepareOperation();
+        if(RequestManager::get()->getAbort()) return;
         operation();
+        if(RequestManager::get()->getAbort()) return;
         setExecuted();
+        if(RequestManager::get()->getAbort()) return;
         afterOperation();
     }   // execute
 

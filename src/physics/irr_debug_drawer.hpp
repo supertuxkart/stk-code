@@ -20,8 +20,8 @@
 #define HEADER_IRR_DEBUG_DRAWER_HPP
 
 #include "btBulletDynamicsCommon.h"
-#include "graphics/glwrap.hpp"
 
+#include <SColor.h>
 #include "utils/vec3.hpp"
 #include <map>
 #include <vector>
