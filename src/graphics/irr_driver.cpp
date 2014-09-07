@@ -1742,17 +1742,23 @@ void IrrDriver::displayFPS()
     if (low > kilotris) low = kilotris;
     if (high < kilotris) high = kilotris;
 
-    static char buffer[128];
+    core::stringw fpsString;
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(
-            buffer, "FPS: %i/%i/%i - PolyCount (Solid:%d Shadows:%d) - LightDst : ~%d",
-            min, fps, max,
-            poly_count[SOLID_NORMAL_AND_DEPTH_PASS],
-            poly_count[SHADOW_PASS],
-            m_last_light_bucket_distance
-        );
+        fpsString += _("FPS: ");
+        fpsString += core::stringw(min);
+        fpsString += _("/");
+        fpsString += core::stringw(fps);
+        fpsString += _("/");
+        fpsString += core::stringw(max);
+        fpsString += _(" PolyCount: ");
+        fpsString += _(" (Solid) ");
+        fpsString += core::stringw(poly_count[SOLID_NORMAL_AND_DEPTH_PASS]);
+        fpsString += _(" (Shadows) ");
+        fpsString += core::stringw(poly_count[SHADOW_PASS]);
+        fpsString += _(" LightDist: ");
+        fpsString += core::stringw(m_last_light_bucket_distance);
         poly_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         poly_count[SHADOW_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
@@ -1761,11 +1767,16 @@ void IrrDriver::displayFPS()
     }
     else
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %i KTris", min, fps, max,
-                (int)roundf(kilotris));
+        fpsString += _("FPS: ");
+        fpsString += core::stringw(min);
+        fpsString += _("/");
+        fpsString += core::stringw(fps);
+        fpsString += _("/");
+        fpsString += core::stringw(max);
+        fpsString += _(" - ");
+        fpsString += core::stringw((int)roundf(kilotris));
+        fpsString += _("KTris");
     }
-
-    core::stringw fpsString = buffer;
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
 
