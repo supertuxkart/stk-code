@@ -34,8 +34,6 @@ void STKAnimatedMesh::cleanGLMeshes()
             glDeleteVertexArrays(1, &(mesh.vao));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
-        if (mesh.instance_buffer)
-            glDeleteBuffers(1, &(mesh.instance_buffer));
 #ifdef Bindless_Texture_Support
         for (unsigned j = 0; j < 6; j++)
         {
@@ -193,48 +191,4 @@ void STKAnimatedMesh::render()
 
     updateNoGL();
     updateGL();
-
-    if (irr_driver->getPhase() == TRANSPARENT_PASS)
-    {
-        ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-
-        if (!TransparentMesh[TM_BUBBLE].empty())
-            glUseProgram(MeshShader::BubbleShader::Program);
-
-        GLMesh* mesh;
-        if (World::getWorld() && World::getWorld()->isFogEnabled())
-        {
-            const Track * const track = World::getWorld()->getTrack();
-
-            // Todo : put everything in a ubo
-            const float fogmax = track->getFogMax();
-            const float startH = track->getFogStartHeight();
-            const float endH = track->getFogEndHeight();
-            const float start = track->getFogStart();
-            const float end = track->getFogEnd();
-            const video::SColor tmpcol = track->getFogColor();
-
-            video::SColorf col(tmpcol.getRed() / 255.0f,
-                tmpcol.getGreen() / 255.0f,
-                tmpcol.getBlue() / 255.0f);
-
-            for_in(mesh, TransparentMesh[TM_DEFAULT])
-                ListBlendTransparentFog::getInstance()->push_back(
-                    STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
-                                    fogmax, startH, endH, start, end, col));
-            for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                ListAdditiveTransparentFog::getInstance()->push_back(
-                STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
-                                    fogmax, startH, endH, start, end, col));
-        }
-        else
-        {
-            for_in(mesh, TransparentMesh[TM_DEFAULT])
-                pushVector(ListBlendTransparent::getInstance(), mesh, AbsoluteTransformation, mesh->TextureMatrix);
-
-            for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                pushVector(ListAdditiveTransparent::getInstance(), mesh, AbsoluteTransformation, mesh->TextureMatrix);
-        }
-        return;
-    }
 }

@@ -722,15 +722,6 @@ std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb)
     return std::pair<unsigned, unsigned>(vtx, It->second);
 }
 
-size_t VAOManager::appendInstance(enum InstanceType, const std::vector<InstanceData> &instance_data)
-{
-    glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[0]);
-    glBufferSubData(GL_ARRAY_BUFFER, instance_count[0] * sizeof(InstanceData), instance_data.size() * sizeof(InstanceData), instance_data.data());
-    size_t result = instance_count[0];
-    instance_count[0] += instance_data.size();
-    return result;
-}
-
 ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 {
     if (!UserConfigParams::m_profiler_enabled) return;

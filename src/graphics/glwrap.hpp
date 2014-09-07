@@ -233,7 +233,6 @@ class VAOManager : public Singleton<VAOManager>
 public:
     VAOManager();
     std::pair<unsigned, unsigned> getBase(scene::IMeshBuffer *);
-    size_t appendInstance(enum InstanceType, const std::vector<InstanceData> &instance_data);
     GLuint getInstanceBuffer(InstanceType it) { return instance_vbo[it]; }
     void *getInstanceBufferPtr(InstanceType it) { return Ptr[it]; }
     unsigned getVBO(video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
