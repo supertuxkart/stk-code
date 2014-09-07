@@ -44,7 +44,7 @@ void main(void)
 {
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
     mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * InverseViewMatrix);
-    gl_Position = ProjectionMatrix * ViewMatrix *  ModelMatrix * vec4(Position, 1.);
+    gl_Position = ProjectionViewMatrix *  ModelMatrix * vec4(Position, 1.);
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     tangent = (TransposeInverseModelView * vec4(Tangent, 1.)).xyz;
     bitangent = (TransposeInverseModelView * vec4(Bitangent, 1.)).xyz;

@@ -37,7 +37,7 @@ void main()
 {
     mat4 ModelMatrix = getWorldMatrix(Origin + windDir * Color.r, Orientation, Scale);
     mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin + windDir * Color.r, Orientation, Scale) * InverseViewMatrix);
-    gl_Position = ProjectionMatrix * ViewMatrix *  ModelMatrix * vec4(Position, 1.);
+    gl_Position = ProjectionViewMatrix *  ModelMatrix * vec4(Position, 1.);
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     uv = Texcoord;
 #ifdef GL_ARB_bindless_texture

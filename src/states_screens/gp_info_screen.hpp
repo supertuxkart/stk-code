@@ -48,9 +48,6 @@ private:
     /** Spinner for number of tracks (in case of random GP). */
     GUIEngine::SpinnerWidget *m_num_tracks_spinner;
 
-    /** The continue/reload (in case of random GP) icon. */
-    GUIEngine::IconButtonWidget *m_continue_button;
-
     /** The currently selected group name. */
     std::string m_group_name;
 
@@ -79,8 +76,9 @@ public:
     void onEnterPressedInternal();
     virtual void eventCallback(GUIEngine::Widget *, const std::string &name,
                                const int player_id);
-    virtual void loadedFromFile();
-    virtual void init();
+    virtual void loadedFromFile() OVERRIDE;
+    virtual void init() OVERRIDE;
+    virtual void beforeAddingWidget() OVERRIDE;
 
     virtual void onUpdate(float dt);
 

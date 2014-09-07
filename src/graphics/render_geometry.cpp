@@ -423,7 +423,7 @@ void IrrDriver::renderSolidSecondPass()
             TexUnit(2, true),
             TexUnit(3, true),
             TexUnit(4, true),
-            TexUnit(5, true)
+            TexUnit(0, true)
             ), ListMatSplatting::getInstance()->SolidPass, createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD, 2, 1>(TexUnits(
             TexUnit(0, true)
