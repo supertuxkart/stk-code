@@ -10,7 +10,6 @@
 #include <SViewFrustum.h>
 #include "callbacks.hpp"
 #include "utils/cpp2011.hpp"
-#include <omp.h>
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "lod_node.hpp"
