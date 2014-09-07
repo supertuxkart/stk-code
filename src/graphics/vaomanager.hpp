@@ -6,6 +6,7 @@
 #include "irr_driver.hpp"
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 enum InstanceType
 {
@@ -88,7 +89,7 @@ class VAOManager : public Singleton<VAOManager>
     std::vector<scene::IMeshBuffer *> storedCPUBuffer[VTXTYPE_COUNT];
     void *vtx_mirror[VTXTYPE_COUNT], *idx_mirror[VTXTYPE_COUNT];
     size_t vtx_cnt[VTXTYPE_COUNT], idx_cnt[VTXTYPE_COUNT];
-    std::map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
+    std::unordered_map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
     std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO;
 
     void cleanInstanceVAOs();

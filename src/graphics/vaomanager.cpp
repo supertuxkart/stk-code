@@ -310,7 +310,7 @@ std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb)
         regenerateInstancedVAO();
     }
 
-    std::map<scene::IMeshBuffer*, unsigned>::iterator It;
+    std::unordered_map<scene::IMeshBuffer*, unsigned>::iterator It;
     It = mappedBaseVertex[tp].find(mb);
     assert(It != mappedBaseVertex[tp].end());
     unsigned vtx = It->second;
