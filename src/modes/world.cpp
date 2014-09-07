@@ -912,7 +912,7 @@ void World::update(float dt)
     }
 #endif
 
-    PROFILER_PUSH_CPU_MARKER("World::update part 1", 0x20, 0x7F, 0x00);
+    PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
     history->update(dt);
     if(ReplayRecorder::get()) ReplayRecorder::get()->update(dt);
     if(ReplayPlay::get()) ReplayPlay::get()->update(dt);
@@ -925,7 +925,7 @@ void World::update(float dt)
         m_physics->update(dt);
     }
 
-    PROFILER_PUSH_CPU_MARKER("World::update part 2", 0x40, 0x7F, 0x00);
+    PROFILER_PUSH_CPU_MARKER("World::update (AI)", 0x40, 0x7F, 0x00);
     const int kart_amount = m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {
@@ -934,21 +934,21 @@ void World::update(float dt)
     }
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("World::update part 3", 0x60, 0x7F, 0x00);
+    PROFILER_PUSH_CPU_MARKER("World::update (camera)", 0x60, 0x7F, 0x00);
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
         Camera::getCamera(i)->update(dt);
     }
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("World::update part 4", 0x80, 0x7F, 0x00);
+    PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
     if (UserConfigParams::m_graphical_effects && m_weather)
     {
         m_weather->update(dt);
     }
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("World::update part 5", 0xa0, 0x7F, 0x00);
+    PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
     projectile_manager->update(dt);
     PROFILER_POP_CPU_MARKER();
 
