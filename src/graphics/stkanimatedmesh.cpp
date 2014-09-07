@@ -19,7 +19,8 @@ const core::vector3df& rotation,
 const core::vector3df& scale) :
     CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
-    firstTime = true;
+    isGLInitialized = false;
+    isMaterialInitialized = false;
 }
 
 void STKAnimatedMesh::cleanGLMeshes()
@@ -47,16 +48,16 @@ void STKAnimatedMesh::cleanGLMeshes()
 
 void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
 {
-    firstTime = true;
+    isGLInitialized = false;
+    isMaterialInitialized = false;
     GLmeshes.clear();
     for (unsigned i = 0; i < MAT_COUNT; i++)
         MeshSolidMaterial[i].clearWithoutDeleting();
     CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
-void STKAnimatedMesh::update()
+void STKAnimatedMesh::updateNoGL()
 {
-    video::IVideoDriver* driver = SceneManager->getVideoDriver();
     scene::IMesh* m = getMeshForCurrentFrame();
 
     if (m)
@@ -67,8 +68,9 @@ void STKAnimatedMesh::update()
         return;
     }
 
-    if (firstTime)
+    if (!isMaterialInitialized)
     {
+        video::IVideoDriver* driver = SceneManager->getVideoDriver();
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
@@ -100,6 +102,32 @@ void STKAnimatedMesh::update()
             {
                 MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
                 MeshSolidMaterial[MatType].push_back(&mesh);
+            }
+        }
+        isMaterialInitialized = true;
+    }
+}
+
+void STKAnimatedMesh::updateGL()
+{
+
+    scene::IMesh* m = getMeshForCurrentFrame();
+
+    if (!isGLInitialized)
+    {
+        for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
+        {
+            scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+            if (!mb)
+                continue;
+            video::IVideoDriver* driver = SceneManager->getVideoDriver();
+            video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
+            video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
+            GLMesh &mesh = GLmeshes[i];
+
+            if (!rnd->isTransparent())
+            {
+                MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
                 InitTextures(mesh, MatType);
             }
 
@@ -116,8 +144,8 @@ void STKAnimatedMesh::update()
                 glBindVertexArray(0);
             }
         }
+        isGLInitialized = true;
     }
-    firstTime = false;
 
     for (u32 i = 0; i<m->getMeshBufferCount(); ++i)
     {
@@ -163,29 +191,8 @@ void STKAnimatedMesh::render()
 
     ++PassCount;
 
-    update();
-
-/*    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
-    {
-        ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-        core::matrix4 invmodel;
-        AbsoluteTransformation.getInverse(invmodel);
-
-        GLMesh* mesh;
-        for_in(mesh, MeshSolidMaterial[MAT_DEFAULT])
-            pushVector(ListMatDefault::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
-
-        for_in(mesh, MeshSolidMaterial[MAT_ALPHA_REF])
-            pushVector(ListMatAlphaRef::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
-
-        for_in(mesh, MeshSolidMaterial[MAT_DETAIL])
-            pushVector(ListMatDetails::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
-
-        for_in(mesh, MeshSolidMaterial[MAT_UNLIT])
-            pushVector(ListMatUnlit::getInstance(), mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
-
-        return;
-    }*/
+    updateNoGL();
+    updateGL();
 
     if (irr_driver->getPhase() == TRANSPARENT_PASS)
     {

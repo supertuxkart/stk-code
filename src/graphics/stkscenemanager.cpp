@@ -176,6 +176,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     STKMeshCommon *node = dynamic_cast<STKMeshCommon*>(Node);
     if (!node)
         return;
+    node->updateNoGL();
     DeferredUpdate.push_back(node);
 
     if (node->isImmediateDraw())
@@ -504,7 +505,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     break;
     }*/
     for (unsigned i = 0; i < DeferredUpdate.size(); i++)
-        DeferredUpdate[i]->update();
+        DeferredUpdate[i]->updateGL();
 
     if (!irr_driver->hasARB_draw_indirect())
         return;

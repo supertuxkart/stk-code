@@ -70,7 +70,8 @@ protected:
 public:
     PtrVector<GLMesh, REF> MeshSolidMaterial[MAT_COUNT];
     PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
-    virtual void update() = 0;
+    virtual void updateNoGL() = 0;
+    virtual void updateGL() = 0;
     virtual bool glow() const = 0;
     virtual bool isImmediateDraw() const { return false; }
     bool isCulledForPlayerCam() const { return m_culledForPlayerCam; }
