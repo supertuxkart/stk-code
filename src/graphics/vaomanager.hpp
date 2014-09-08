@@ -85,6 +85,7 @@ class VAOManager : public Singleton<VAOManager>
     GLuint instance_vbo[InstanceTypeCount];
     void *Ptr[InstanceTypeCount];
     void *VBOPtr[VTXTYPE_COUNT], *IBOPtr[VTXTYPE_COUNT];
+    size_t RealVBOSize[VTXTYPE_COUNT], RealIBOSize[VTXTYPE_COUNT];
     size_t last_vertex[VTXTYPE_COUNT], last_index[VTXTYPE_COUNT];
     std::unordered_map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
     std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO;

@@ -8,6 +8,8 @@ VAOManager::VAOManager()
     ibo[0] = ibo[1] = ibo[2] = 0;
     last_vertex[0] = last_vertex[1] = last_vertex[2] = 0;
     last_index[0] = last_index[1] = last_index[2] = 0;
+    RealVBOSize[0] = RealVBOSize[1] = RealVBOSize[2] = 0;
+    RealIBOSize[0] = RealIBOSize[1] = RealIBOSize[2] = 0;
 
     for (unsigned i = 0; i < InstanceTypeCount; i++)
     {
@@ -58,48 +60,58 @@ void VAOManager::regenerateBuffer(enum VTXTYPE tp, size_t newlastvertex, size_t 
 {
     glBindVertexArray(0);
 
-    GLuint newVBO;
-    glGenBuffers(1, &newVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, newVBO);
-    if (irr_driver->hasBufferStorageExtension())
+    if (newlastindex >= RealVBOSize[tp])
     {
-        glBufferStorage(GL_ARRAY_BUFFER, newlastvertex * getVertexPitch(tp), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-        VBOPtr[tp] = glMapBufferRange(GL_ARRAY_BUFFER, 0, newlastvertex * getVertexPitch(tp), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-    }
-    else
-        glBufferData(GL_ARRAY_BUFFER, newlastvertex * getVertexPitch(tp), 0, GL_DYNAMIC_DRAW);
+        while (newlastindex >= RealVBOSize[tp])
+            RealVBOSize[tp] = 2 * RealVBOSize[tp] + 1;
+        GLuint newVBO;
+        glGenBuffers(1, &newVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, newVBO);
+        if (irr_driver->hasBufferStorageExtension())
+        {
+            glBufferStorage(GL_ARRAY_BUFFER, RealVBOSize[tp] * getVertexPitch(tp), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+            VBOPtr[tp] = glMapBufferRange(GL_ARRAY_BUFFER, 0, RealVBOSize[tp] * getVertexPitch(tp), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        }
+        else
+            glBufferData(GL_ARRAY_BUFFER, RealVBOSize[tp] * getVertexPitch(tp), 0, GL_DYNAMIC_DRAW);
 
-    if (vbo[tp])
-    {
-        GLuint oldVBO = vbo[tp];
-        glBindBuffer(GL_COPY_WRITE_BUFFER, newVBO);
-        glBindBuffer(GL_COPY_READ_BUFFER, oldVBO);
-        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, last_vertex[tp] * getVertexPitch(tp));
-        glDeleteBuffers(1, &oldVBO);
+        if (vbo[tp])
+        {
+            GLuint oldVBO = vbo[tp];
+            glBindBuffer(GL_COPY_WRITE_BUFFER, newVBO);
+            glBindBuffer(GL_COPY_READ_BUFFER, oldVBO);
+            glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, last_vertex[tp] * getVertexPitch(tp));
+            glDeleteBuffers(1, &oldVBO);
+        }
+        vbo[tp] = newVBO;
     }
-    vbo[tp] = newVBO;
     last_vertex[tp] = newlastvertex;
 
-    GLuint newIBO;
-    glGenBuffers(1, &newIBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIBO);
-    if (irr_driver->hasBufferStorageExtension())
+    if (newlastindex >= RealIBOSize[tp])
     {
-        glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, newlastindex * sizeof(u16), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-        IBOPtr[tp] = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, newlastindex * sizeof(u16), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-    }
-    else
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, newlastindex * sizeof(u16), 0, GL_STATIC_DRAW);
+        while (newlastindex >= RealIBOSize[tp])
+            RealIBOSize[tp] = 2 * RealIBOSize[tp] + 1;
+        GLuint newIBO;
+        glGenBuffers(1, &newIBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIBO);
+        if (irr_driver->hasBufferStorageExtension())
+        {
+            glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, RealIBOSize[tp] * sizeof(u16), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+            IBOPtr[tp] = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, RealIBOSize[tp] * sizeof(u16), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        }
+        else
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, RealIBOSize[tp] * sizeof(u16), 0, GL_STATIC_DRAW);
 
-    if (ibo[tp])
-    {
-        GLuint oldIBO = ibo[tp];
-        glBindBuffer(GL_COPY_WRITE_BUFFER, newIBO);
-        glBindBuffer(GL_COPY_READ_BUFFER, oldIBO);
-        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, last_index[tp] * sizeof(u16));
-        glDeleteBuffers(1, &oldIBO);
+        if (ibo[tp])
+        {
+            GLuint oldIBO = ibo[tp];
+            glBindBuffer(GL_COPY_WRITE_BUFFER, newIBO);
+            glBindBuffer(GL_COPY_READ_BUFFER, oldIBO);
+            glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, last_index[tp] * sizeof(u16));
+            glDeleteBuffers(1, &oldIBO);
+        }
+        ibo[tp] = newIBO;
     }
-    ibo[tp] = newIBO;
     last_index[tp] = newlastindex;
 }
 
