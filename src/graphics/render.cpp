@@ -47,6 +47,8 @@
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "stkscenemanager.hpp"
+#include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
+#include "../../lib/irrlicht/source/Irrlicht/os.h"
 
 #include <algorithm>
 #include <limits>
@@ -572,7 +574,8 @@ core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform, const std::
 
 void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
-    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
+    static_cast<scene::CSceneManager *>(m_scene_manager)->OnAnimate(os::Timer::getTime());
+    camnode->render();
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
     irr_driver->genProjViewMatrix();
