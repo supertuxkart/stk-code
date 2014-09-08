@@ -115,9 +115,11 @@ private:
     /** Last time the bouncing ball was collected */
     float         m_rubber_ball_collect_time;
 
+public:
     /** The mesh for each model (if the powerup has a model), e.g. a switch
         has none. */
     irr::scene::IMesh *m_all_meshes[POWERUP_MAX];
+private:
 
     /** Size of the corresponding mesh. */
     btVector3     m_all_extends[POWERUP_MAX];

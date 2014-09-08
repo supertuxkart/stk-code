@@ -47,6 +47,7 @@
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "stkscenemanager.hpp"
+#include "items/powerup_manager.hpp"
 #include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
 
@@ -61,6 +62,27 @@ void IrrDriver::renderGLSL(float dt)
     World *world = World::getWorld(); // Never NULL.
 
     Track *track = world->getTrack();
+
+    for (unsigned i = 0; i < PowerupManager::POWERUP_MAX; i++)
+    {
+        scene::IMesh *mesh = powerup_manager->m_all_meshes[i];
+        if (!mesh)
+            continue;
+        for (unsigned j = 0; j < mesh->getMeshBufferCount(); j++)
+        {
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(j);
+            if (!mb)
+                continue;
+            for (unsigned k = 0; k < 4; k++)
+            {
+                video::ITexture *tex = mb->getMaterial().getTexture(k);
+                if (!tex)
+                    continue;
+                compressTexture(tex, true);
+            }
+        }
+    }
+
 
     // Overrides
     video::SOverrideMaterial &overridemat = m_video_driver->getOverrideMaterial();
