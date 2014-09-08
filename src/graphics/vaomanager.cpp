@@ -61,14 +61,12 @@ void VAOManager::regenerateBuffer(enum VTXTYPE tp, size_t newlastvertex, size_t 
     GLuint newVBO;
     glGenBuffers(1, &newVBO);
     glBindBuffer(GL_ARRAY_BUFFER, newVBO);
-#ifdef Buffer_Storage
     if (irr_driver->hasBufferStorageExtension())
     {
         glBufferStorage(GL_ARRAY_BUFFER, newlastvertex * getVertexPitch(tp), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
         VBOPtr[tp] = glMapBufferRange(GL_ARRAY_BUFFER, 0, newlastvertex * getVertexPitch(tp), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
     }
     else
-#endif
         glBufferData(GL_ARRAY_BUFFER, newlastvertex * getVertexPitch(tp), 0, GL_DYNAMIC_DRAW);
 
     if (vbo[tp])
@@ -85,7 +83,13 @@ void VAOManager::regenerateBuffer(enum VTXTYPE tp, size_t newlastvertex, size_t 
     GLuint newIBO;
     glGenBuffers(1, &newIBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, newlastindex * sizeof(u16), 0, GL_STATIC_DRAW);
+    if (irr_driver->hasBufferStorageExtension())
+    {
+        glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, newlastindex * sizeof(u16), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        IBOPtr[tp] = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, newlastindex * sizeof(u16), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+    }
+    else
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, newlastindex * sizeof(u16), 0, GL_STATIC_DRAW);
 
     if (ibo[tp])
     {
@@ -305,8 +309,16 @@ void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
         glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
         glBufferSubData(GL_ARRAY_BUFFER, old_vtx_cnt * getVertexPitch(tp), mb->getVertexCount() * getVertexPitch(tp), mb->getVertices());
     }
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[tp]);
-    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, old_idx_cnt * sizeof(u16), mb->getIndexCount() * sizeof(u16), mb->getIndices());
+    if (irr_driver->hasBufferStorageExtension())
+    {
+        void *tmp = (char*)IBOPtr[tp] + old_idx_cnt * sizeof(u16);
+        memcpy(tmp, mb->getIndices(), mb->getIndexCount() * sizeof(u16));
+    }
+    else
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[tp]);
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, old_idx_cnt * sizeof(u16), mb->getIndexCount() * sizeof(u16), mb->getIndices());
+    }
 
     mappedBaseVertex[tp][mb] = old_vtx_cnt;
     mappedBaseIndex[tp][mb] = old_idx_cnt * sizeof(u16);
