@@ -289,8 +289,11 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 }
             }
         }
-        if (!UserConfigParams::m_shadows)
-            return;
+    }
+    if (!UserConfigParams::m_shadows)
+        return;
+    for (unsigned Mat = 0; Mat < MAT_COUNT; ++Mat)
+    {
         for (unsigned cascade = 0; cascade < 4; ++cascade)
         {
             if (irr_driver->hasARB_draw_indirect())
@@ -334,8 +337,11 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 }
             }
         }
-        if (!UserConfigParams::m_gi)
-            return;
+    }
+    if (!UserConfigParams::m_gi)
+        return;
+    for (unsigned Mat = 0; Mat < MAT_COUNT; ++Mat)
+    {
         if (irr_driver->hasARB_draw_indirect())
         {
             for_in(mesh, node->MeshSolidMaterial[Mat])
