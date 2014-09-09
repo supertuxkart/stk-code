@@ -337,7 +337,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
     assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
     {
-        if (irr_driver->hasARBComputeShaders())
+        if (!irr_driver->hasARBComputeShaders())
         {
             auxiliary.Bind();
             FullScreenShader::Gaussian17TapHShader::getInstance()->SetTextureUnits(createVector<GLuint>(in_fbo.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]));
@@ -355,7 +355,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         }
     }
     {
-        if (irr_driver->hasARBComputeShaders())
+        if (!irr_driver->hasARBComputeShaders())
         {
             in_fbo.Bind();
 
