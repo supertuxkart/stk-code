@@ -32,6 +32,51 @@
 
 #include <algorithm>
 
+/**
+\page render_geometry Geometry Rendering Overview
+
+/**
+\section adding_material Adding a solid material
+
+You need to consider twice before adding a new material : in the worst case a material requires 8 shaders :
+one for each solid pass, one for shadow pass, one for RSM pass, and you need to double that for instanced version.
+
+You need to declare a new enum in MeshMaterial and to write the corresponding dispatch code in MaterialTypeToMeshMaterial
+and to create 2 new List* structures (one for standard and one for instanced version).
+
+Then you need to write the code in stkscenemanager.cpp that will add any mesh with the new material to their corresponding
+lists : in handleSTKCommon for the standard version and in the body of PrepareDrawCalls for instanced version.
+
+\section vertex_layout Available Vertex Layout
+
+There are 3 different layout that comes from Irrlicht loading routines :
+EVT_STANDARD, EVT_2TCOORDS, EVT_TANGENT.
+
+Below are the attributes for each vertex layout and their predefined location.
+
+\subsection EVT_STANDARD
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec3 Normal;
+layout(location = 2) in vec4 Color;
+layout(location = 3) in vec2 Texcoord;
+
+\subsection EVT_2TCOORDS
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec3 Normal;
+layout(location = 2) in vec4 Color;
+layout(location = 3) in vec2 Texcoord;
+layout(location = 4) in vec2 SecondTexcoord;
+
+\subsection EVT_TANGENT
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec3 Normal;
+layout(location = 2) in vec4 Color;
+layout(location = 3) in vec2 Texcoord;
+layout(location = 5) in vec3 Tangent;
+layout(location = 6) in vec3 Bitangent;
+
+*/
+
 namespace RenderGeometry
 {
     struct TexUnit
