@@ -256,13 +256,11 @@ void STKMeshSceneNode::render()
             compressTexture(mesh.textures[0], true);
             if (UserConfigParams::m_azdo)
             {
-#ifdef Bindless_Texture_Support
                 if (!mesh.TextureHandles[0])
                     mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                 MeshShader::ObjectPass1Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(mesh.TextureHandles[0]));
-#endif
             }
             else
                 MeshShader::ObjectPass1Shader::getInstance()->SetTextureUnits(std::vector < GLuint > { getTextureGLuint(mesh.textures[0]) });
@@ -304,7 +302,6 @@ void STKMeshSceneNode::render()
 
                 if (UserConfigParams::m_azdo)
                 {
-#ifdef Bindless_Texture_Support
                     GLuint64 DiffuseHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
                     if (!glIsTextureHandleResidentARB(DiffuseHandle))
                         glMakeTextureHandleResidentARB(DiffuseHandle);
@@ -322,7 +319,6 @@ void STKMeshSceneNode::render()
                     if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                         glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                     MeshShader::ObjectPass2Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, mesh.TextureHandles[0]));
-#endif
                 }
                 else
                     MeshShader::ObjectPass2Shader::getInstance()->SetTextureUnits(createVector<GLuint>(
@@ -409,13 +405,11 @@ void STKMeshSceneNode::render()
                     compressTexture(mesh.textures[0], true);
                     if (UserConfigParams::m_azdo)
                     {
-#ifdef Bindless_Texture_Support
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
                         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                         MeshShader::TransparentFogShader::getInstance()->SetTextureHandles(createVector<uint64_t>(mesh.TextureHandles[0]));
-#endif
                     }
                     else
                         MeshShader::TransparentFogShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(mesh.textures[0]) });
@@ -442,13 +436,11 @@ void STKMeshSceneNode::render()
                     compressTexture(mesh.textures[0], true);
                     if (UserConfigParams::m_azdo)
                     {
-#ifdef Bindless_Texture_Support
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentShader::getInstance()->SamplersId[0]);
                         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                         MeshShader::TransparentShader::getInstance()->SetTextureHandles(createVector<uint64_t>(mesh.TextureHandles[0]));
-#endif
                     }
                     else
                         MeshShader::TransparentShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(mesh.textures[0]) });

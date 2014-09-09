@@ -35,12 +35,6 @@ extern "C" {
 #    include <GL/glext.h>
 #endif
 
-#define Bindless_Texture_Support
-#define Base_Instance_Support
-#define Buffer_Storage
-#define Multi_Draw_Indirect
-#define Draw_Indirect
-
 struct DrawElementsIndirectCommand{
     GLuint count;
     GLuint instanceCount;

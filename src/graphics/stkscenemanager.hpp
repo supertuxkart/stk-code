@@ -19,14 +19,12 @@ public:
     {
         glGenBuffers(1, &drawindirectcmd);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
-#ifdef Buffer_Storage
         if (irr_driver->hasBufferStorageExtension())
         {
             glBufferStorage(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
             Ptr = (DrawElementsIndirectCommand *)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
         }
         else
-#endif
         {
             glBufferData(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_STREAM_DRAW);
         }
