@@ -117,6 +117,12 @@ void TrackInfoScreen::init()
     ITexture* screenshot = irr_driver->getTexture(m_track->getScreenshotFile(),
                                     "While loading screenshot for track '%s':",
                                            m_track->getFilename()            );
+    if(!screenshot)
+    {
+        screenshot = irr_driver->getTexture("main_help.png",
+                                    "While loading screenshot for track '%s':",
+                                    m_track->getFilename());
+    }
     if (screenshot != NULL)
         m_screenshot->setImage(screenshot);
 
