@@ -479,10 +479,6 @@ namespace UtilShader
         glEnableVertexAttribArray(attrib_position);
         glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
         uniform_color = glGetUniformLocation(Program, "color");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
     }
 
     void ColoredLine::setUniforms(const irr::video::SColor &col)
@@ -779,10 +775,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
         AssignUniforms("ModelMatrix", "InverseModelMatrix");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "tex");
     }
 
@@ -793,10 +785,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         AssignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "tex");
     }
 
@@ -807,7 +795,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         AssignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
-
         AssignSamplerNames(Program, 0, "tex");
     }
 
@@ -818,10 +805,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/normalmap.frag").c_str());
         AssignUniforms("ModelMatrix", "InverseModelMatrix");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 1, "normalMap", 0, "DiffuseForAlpha");
     }
 
@@ -835,9 +818,6 @@ namespace MeshShader
 
         AssignUniforms();
         AssignSamplerNames(Program, 0, "tex");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     InstancedObjectRefPass1Shader::InstancedObjectRefPass1Shader()
@@ -850,9 +830,6 @@ namespace MeshShader
 
         AssignUniforms();
         AssignSamplerNames(Program, 0, "tex");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     InstancedGrassPass1Shader::InstancedGrassPass1Shader()
@@ -863,11 +840,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass1.frag").c_str());
         AssignUniforms("windDir");
-
         AssignSamplerNames(Program, 0, "tex");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     InstancedNormalMapShader::InstancedNormalMapShader()
@@ -878,10 +851,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_normalmap.frag").c_str());
         AssignUniforms();
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "normalMap", 1, "DiffuseForAlpha");
     }
 
@@ -893,10 +862,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "TextureMatrix");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
     }
 
@@ -908,12 +873,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_pass2.frag").c_str());
         AssignUniforms();
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
     }
 
     InstancedObjectRefPass2Shader::InstancedObjectRefPass2Shader()
@@ -924,11 +884,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass2.frag").c_str());
         AssignUniforms();
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     DetailledObjectPass2Shader::DetailledObjectPass2Shader()
@@ -938,9 +894,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/detailledobject_pass2.frag").c_str());
         AssignUniforms("ModelMatrix");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail");
     }
 
@@ -952,11 +905,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_detailledobject_pass2.frag").c_str());
         AssignUniforms();
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     ObjectUnlitShader::ObjectUnlitShader()
@@ -965,10 +914,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         AssignUniforms("ModelMatrix", "TextureMatrix");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
@@ -979,10 +924,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_unlit.frag").c_str());
         AssignUniforms();
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
@@ -993,10 +934,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "TextureMatrix");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
     }
 
@@ -1007,7 +944,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "windDir");
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
     }
 
@@ -1019,11 +955,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_grass_pass2.frag").c_str());
         AssignUniforms("windDir", "SunDir");
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     SphereMapShader::SphereMapShader()
@@ -1034,10 +966,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
         AssignUniforms("ModelMatrix", "InverseModelMatrix");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
@@ -1050,10 +978,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectpass_spheremap.frag").c_str());
         AssignUniforms();
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
@@ -1106,10 +1030,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparent.frag").c_str());
         AssignUniforms("ModelMatrix", "TextureMatrix");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "tex");
     }
 
@@ -1119,10 +1039,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparentfog.frag").c_str());
         AssignUniforms("ModelMatrix", "TextureMatrix", "fogmax", "startH", "endH", "start", "end", "col");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "tex");
     }
 
@@ -1132,10 +1048,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/billboard.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/billboard.frag").c_str());
 
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         AssignUniforms("ModelViewMatrix", "ProjectionMatrix", "Position", "Size");
-
         AssignSamplerNames(Program, 0, "tex");
     }
 
@@ -1145,9 +1058,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colorize.frag").c_str());
         AssignUniforms("ModelMatrix", "col");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     InstancedColorizeShader::InstancedColorizeShader()
@@ -1157,9 +1067,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/glow_object.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/glow_object.frag").c_str());
         AssignUniforms();
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     ShadowShader::ShadowShader()
@@ -1181,8 +1088,6 @@ namespace MeshShader
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         }
         AssignUniforms("layer", "ModelMatrix");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     RSMShader::RSMShader()
@@ -1193,9 +1098,6 @@ namespace MeshShader
 
         AssignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
         AssignSamplerNames(Program, 0, "tex");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     InstancedRSMShader::InstancedRSMShader()
@@ -1207,9 +1109,6 @@ namespace MeshShader
 
         AssignUniforms("RSMMatrix");
         AssignSamplerNames(Program, 0, "tex");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     SplattingRSMShader::SplattingRSMShader()
@@ -1220,9 +1119,6 @@ namespace MeshShader
 
         AssignUniforms("RSMMatrix", "ModelMatrix");
         AssignSamplerNames(Program, 0, "tex_layout", 1, "tex_detail0", 2, "tex_detail1", 3, "tex_detail2", 4, "tex_detail3");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     InstancedShadowShader::InstancedShadowShader()
@@ -1246,8 +1142,6 @@ namespace MeshShader
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         }
         AssignUniforms("layer");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     RefShadowShader::RefShadowShader()
@@ -1269,9 +1163,6 @@ namespace MeshShader
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
         AssignUniforms("layer", "ModelMatrix");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "tex");
     }
 
@@ -1297,8 +1188,6 @@ namespace MeshShader
         }
         AssignUniforms("layer");
         AssignSamplerNames(Program, 0, "tex");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     GrassShadowShader::GrassShadowShader()
@@ -1320,9 +1209,6 @@ namespace MeshShader
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
         AssignUniforms("layer", "ModelMatrix", "windDir");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-
         AssignSamplerNames(Program, 0, "tex");
     }
 
@@ -1348,10 +1234,7 @@ namespace MeshShader
         }
 
         AssignSamplerNames(Program, 0, "tex");
-
         AssignUniforms("layer", "windDir");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     DisplaceMaskShader::DisplaceMaskShader()
@@ -1360,9 +1243,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         AssignUniforms("ModelMatrix");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
 
@@ -1378,8 +1258,6 @@ namespace MeshShader
             1, "color_tex",
             2, "mask_tex",
             3, "tex");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     SkyboxShader::SkyboxShader()
@@ -1389,9 +1267,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sky.frag").c_str());
         AssignUniforms("ModelMatrix");
         AssignSamplerNames(Program, 0, "tex");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
         glGenVertexArrays(1, &cubevao);
         glBindVertexArray(cubevao);
@@ -1409,9 +1284,6 @@ namespace MeshShader
             GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/normal_visualizer.geom").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
         AssignUniforms("ModelMatrix", "InverseModelMatrix", "color");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     GLuint ViewFrustrumShader::Program;
@@ -1426,9 +1298,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/frustrum.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
         uniform_color = glGetUniformLocation(Program, "color");
         uniform_idx = glGetUniformLocation(Program, "idx");
@@ -1602,9 +1471,6 @@ namespace FullScreenShader
 
         AssignUniforms();
         AssignSamplerNames(Program, 0, "tex", 1, "dtex");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     SunLightShader::SunLightShader()
@@ -1618,9 +1484,6 @@ namespace FullScreenShader
 
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex");
         AssignUniforms("direction", "col");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     DiffuseEnvMapShader::DiffuseEnvMapShader()
@@ -1645,9 +1508,6 @@ namespace FullScreenShader
         // Use 8 to circumvent a catalyst bug when binding sampler
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
         AssignUniforms("direction", "col");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     RadianceHintsConstructionShader::RadianceHintsConstructionShader()
@@ -1696,8 +1556,6 @@ namespace FullScreenShader
         TU_SHG = 1;
         TU_SHB = 2;
         AssignTextureUnit(Program, TexUnit(TU_SHR, "SHR"), TexUnit(TU_SHG, "SHG"), TexUnit(TU_SHB, "SHB"));
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     GlobalIlluminationReconstructionShader::GlobalIlluminationReconstructionShader()
@@ -1709,10 +1567,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gi.frag").c_str());
 
         AssignUniforms("RHMatrix", "InvRHMatrix", "extents");
-
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "SHR", 3, "SHG", 4, "SHB");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     Gaussian17TapHShader::Gaussian17TapHShader()
@@ -1721,7 +1576,6 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralH.frag").c_str());
         AssignUniforms("pixel");
-
         AssignSamplerNames(Program, 0, "tex", 1, "depth");
     }
 
@@ -1854,9 +1708,6 @@ namespace FullScreenShader
 
         AssignSamplerNames(Program, 0, "dtex");
         AssignUniforms("radius", "k", "sigma");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     FogShader::FogShader()
@@ -1868,9 +1719,6 @@ namespace FullScreenShader
 
         AssignUniforms("fogmax", "startH", "endH", "start", "end", "col");
         AssignSamplerNames(Program, 0, "tex");
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     MotionBlurShader::MotionBlurShader()
@@ -1880,7 +1728,6 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/motion_blur.frag").c_str());
         AssignUniforms("previous_viewproj", "center", "boost_amount", "mask_radius");
-
         AssignSamplerNames(Program, 0, "color_buffer", 1, "dtex");
     }
 
