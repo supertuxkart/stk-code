@@ -719,5 +719,6 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += SolidPoly;
     poly_count[SHADOW_PASS] += ShadowPoly;
 
-    glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
+    if (irr_driver->hasBufferStorageExtension())
+        glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 }
