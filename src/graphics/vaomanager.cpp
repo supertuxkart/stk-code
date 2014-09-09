@@ -6,11 +6,10 @@ VAOManager::VAOManager()
     vao[0] = vao[1] = vao[2] = 0;
     vbo[0] = vbo[1] = vbo[2] = 0;
     ibo[0] = ibo[1] = ibo[2] = 0;
-    vtx_cnt[0] = vtx_cnt[1] = vtx_cnt[2] = 0;
-    idx_cnt[0] = idx_cnt[1] = idx_cnt[2] = 0;
-    vtx_mirror[0] = vtx_mirror[1] = vtx_mirror[2] = NULL;
-    idx_mirror[0] = idx_mirror[1] = idx_mirror[2] = NULL;
-    instance_count[0] = 0;
+    last_vertex[0] = last_vertex[1] = last_vertex[2] = 0;
+    last_index[0] = last_index[1] = last_index[2] = 0;
+    RealVBOSize[0] = RealVBOSize[1] = RealVBOSize[2] = 0;
+    RealIBOSize[0] = RealIBOSize[1] = RealIBOSize[2] = 0;
 
     for (unsigned i = 0; i < InstanceTypeCount; i++)
     {
@@ -43,10 +42,6 @@ VAOManager::~VAOManager()
     cleanInstanceVAOs();
     for (unsigned i = 0; i < 3; i++)
     {
-        if (vtx_mirror[i])
-            free(vtx_mirror[i]);
-        if (idx_mirror[i])
-            free(idx_mirror[i]);
         if (vbo[i])
             glDeleteBuffers(1, &vbo[i]);
         if (ibo[i])
@@ -61,32 +56,63 @@ VAOManager::~VAOManager()
 
 }
 
-void VAOManager::regenerateBuffer(enum VTXTYPE tp)
+void VAOManager::regenerateBuffer(enum VTXTYPE tp, size_t newlastvertex, size_t newlastindex)
 {
     glBindVertexArray(0);
-    if (vbo[tp])
-        glDeleteBuffers(1, &vbo[tp]);
-    glGenBuffers(1, &vbo[tp]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
-#ifdef Buffer_Storage
-    if (irr_driver->hasBufferStorageExtension())
+
+    if (newlastindex >= RealVBOSize[tp])
     {
-        glBufferStorage(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-        VBOPtr[tp] = glMapBufferRange(GL_ARRAY_BUFFER, 0, vtx_cnt[tp] * getVertexPitch(tp), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        while (newlastindex >= RealVBOSize[tp])
+            RealVBOSize[tp] = 2 * RealVBOSize[tp] + 1;
+        GLuint newVBO;
+        glGenBuffers(1, &newVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, newVBO);
+        if (irr_driver->hasBufferStorageExtension())
+        {
+            glBufferStorage(GL_ARRAY_BUFFER, RealVBOSize[tp] * getVertexPitch(tp), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+            VBOPtr[tp] = glMapBufferRange(GL_ARRAY_BUFFER, 0, RealVBOSize[tp] * getVertexPitch(tp), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        }
+        else
+            glBufferData(GL_ARRAY_BUFFER, RealVBOSize[tp] * getVertexPitch(tp), 0, GL_DYNAMIC_DRAW);
+
+        if (vbo[tp])
+        {
+            GLuint oldVBO = vbo[tp];
+            glBindBuffer(GL_COPY_WRITE_BUFFER, newVBO);
+            glBindBuffer(GL_COPY_READ_BUFFER, oldVBO);
+            glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, last_vertex[tp] * getVertexPitch(tp));
+            glDeleteBuffers(1, &oldVBO);
+        }
+        vbo[tp] = newVBO;
     }
-    else
-#endif
-        glBufferData(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_DYNAMIC_DRAW);
+    last_vertex[tp] = newlastvertex;
 
+    if (newlastindex >= RealIBOSize[tp])
+    {
+        while (newlastindex >= RealIBOSize[tp])
+            RealIBOSize[tp] = 2 * RealIBOSize[tp] + 1;
+        GLuint newIBO;
+        glGenBuffers(1, &newIBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIBO);
+        if (irr_driver->hasBufferStorageExtension())
+        {
+            glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, RealIBOSize[tp] * sizeof(u16), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+            IBOPtr[tp] = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, RealIBOSize[tp] * sizeof(u16), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        }
+        else
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, RealIBOSize[tp] * sizeof(u16), 0, GL_STATIC_DRAW);
 
-    if (ibo[tp])
-        glDeleteBuffers(1, &ibo[tp]);
-    glGenBuffers(1, &ibo[tp]);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[tp]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u16)* idx_cnt[tp], idx_mirror[tp], GL_DYNAMIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        if (ibo[tp])
+        {
+            GLuint oldIBO = ibo[tp];
+            glBindBuffer(GL_COPY_WRITE_BUFFER, newIBO);
+            glBindBuffer(GL_COPY_READ_BUFFER, oldIBO);
+            glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, last_index[tp] * sizeof(u16));
+            glDeleteBuffers(1, &oldIBO);
+        }
+        ibo[tp] = newIBO;
+    }
+    last_index[tp] = newlastindex;
 }
 
 void VAOManager::regenerateVAO(enum VTXTYPE tp)
@@ -281,19 +307,32 @@ VAOManager::VTXTYPE VAOManager::getVTXTYPE(video::E_VERTEX_TYPE type)
 
 void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
 {
-    size_t old_vtx_cnt = vtx_cnt[tp];
-    vtx_cnt[tp] += mb->getVertexCount();
-    vtx_mirror[tp] = realloc(vtx_mirror[tp], vtx_cnt[tp] * getVertexPitch(tp));
-    intptr_t dstptr = (intptr_t)vtx_mirror[tp] + (old_vtx_cnt * getVertexPitch(tp));
-    memcpy((void *)dstptr, mb->getVertices(), mb->getVertexCount() * getVertexPitch(tp));
+    size_t old_vtx_cnt = last_vertex[tp];
+    size_t old_idx_cnt = last_index[tp];
+
+    regenerateBuffer(tp, old_vtx_cnt + mb->getVertexCount(), old_idx_cnt + mb->getIndexCount());
+    if (irr_driver->hasBufferStorageExtension())
+    {
+        void *tmp = (char*)VBOPtr[tp] + old_vtx_cnt * getVertexPitch(tp);
+        memcpy(tmp, mb->getVertices(), mb->getVertexCount() * getVertexPitch(tp));
+    }
+    else
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
+        glBufferSubData(GL_ARRAY_BUFFER, old_vtx_cnt * getVertexPitch(tp), mb->getVertexCount() * getVertexPitch(tp), mb->getVertices());
+    }
+    if (irr_driver->hasBufferStorageExtension())
+    {
+        void *tmp = (char*)IBOPtr[tp] + old_idx_cnt * sizeof(u16);
+        memcpy(tmp, mb->getIndices(), mb->getIndexCount() * sizeof(u16));
+    }
+    else
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[tp]);
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, old_idx_cnt * sizeof(u16), mb->getIndexCount() * sizeof(u16), mb->getIndices());
+    }
+
     mappedBaseVertex[tp][mb] = old_vtx_cnt;
-
-    size_t old_idx_cnt = idx_cnt[tp];
-    idx_cnt[tp] += mb->getIndexCount();
-    idx_mirror[tp] = realloc(idx_mirror[tp], idx_cnt[tp] * sizeof(u16));
-
-    dstptr = (intptr_t)idx_mirror[tp] + (old_idx_cnt * sizeof(u16));
-    memcpy((void *)dstptr, mb->getIndices(), mb->getIndexCount() * sizeof(u16));
     mappedBaseIndex[tp][mb] = old_idx_cnt * sizeof(u16);
 }
 
@@ -303,9 +342,7 @@ std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb)
     if (mappedBaseVertex[tp].find(mb) == mappedBaseVertex[tp].end())
     {
         assert(mappedBaseIndex[tp].find(mb) == mappedBaseIndex[tp].end());
-        storedCPUBuffer[tp].push_back(mb);
         append(mb, tp);
-        regenerateBuffer(tp);
         regenerateVAO(tp);
         regenerateInstancedVAO();
     }

@@ -59,13 +59,6 @@ void STKMeshSceneNode::cleanGLMeshes()
             glDeleteBuffers(1, &(mesh.vertex_buffer));
         if (mesh.index_buffer)
             glDeleteBuffers(1, &(mesh.index_buffer));
-#ifdef Bindless_Texture_Support
-        for (unsigned j = 0; j < 6; j++)
-        {
-            if (mesh.TextureHandles[j] && glIsTextureHandleResidentARB(mesh.TextureHandles[j]))
-                glMakeTextureHandleNonResidentARB(mesh.TextureHandles[j]);
-        }
-#endif
     }
     GLmeshes.clear();
     for (unsigned i = 0; i < MAT_COUNT; i++)
