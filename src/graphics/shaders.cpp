@@ -1512,8 +1512,6 @@ namespace FullScreenShader
 
     RadianceHintsConstructionShader::RadianceHintsConstructionShader()
     {
-        if (irr_driver->getGLSLVersion() < 150)
-            return;
         if (irr_driver->hasVSLayerExtension())
         {
             Program = LoadProgram(OBJECT,
@@ -1534,8 +1532,6 @@ namespace FullScreenShader
 
     NVWorkaroundRadianceHintsConstructionShader::NVWorkaroundRadianceHintsConstructionShader()
     {
-        if (irr_driver->getGLSLVersion() < 150)
-            return;
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/slicedscreenquad_nvworkaround.vert").c_str(),
             GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/rhpassthrough.geom").c_str(),
@@ -1581,9 +1577,6 @@ namespace FullScreenShader
 
     ComputeGaussian17TapHShader::ComputeGaussian17TapHShader()
     {
-
-        if (irr_driver->hasARBComputeShaders())
-            return;
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralH.comp").c_str());
         TU_source = 0;
@@ -1625,8 +1618,6 @@ namespace FullScreenShader
 
     ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
     {
-        if (irr_driver->hasARBComputeShaders())
-            return;
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralV.comp").c_str());
         TU_source = 0;
