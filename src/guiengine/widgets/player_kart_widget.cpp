@@ -231,9 +231,6 @@ PlayerKartWidget::~PlayerKartWidget()
         GUIEngine::focusNothingForPlayer(m_player_id);
     }
 
-    //if (m_player_ID_label->getIrrlichtElement() != NULL)
-    //    m_player_ID_label->getIrrlichtElement()->remove();
-
     if (m_player_ident_spinner != NULL)
     {
         m_player_ident_spinner->setListener(NULL);
@@ -289,18 +286,6 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
     {
         m_player_ident_spinner->setID(m_player_id);
     }
-
-    m_model_view->unsetBadge(ZIPPER_BADGE);
-    m_model_view->unsetBadge(ANCHOR_BADGE);
-    // Add badge for per player difficulty if necessary
-    if (!m_parent_screen->m_from_overworld && (m_parent_screen->m_multiplayer || !m_parent_screen->profile_to_use->isSingleplayerDifficulty()))
-    {
-        PerPlayerDifficulty difficulty = m_parent_screen->profile_to_use->getDifficulty();
-        if (difficulty < PLAYER_DIFFICULTY_NORMAL)
-            m_model_view->setBadge(ZIPPER_BADGE);
-        else if (difficulty > PLAYER_DIFFICULTY_NORMAL)
-            m_model_view->setBadge(ANCHOR_BADGE);
-    }
 }   // setPlayerID
 
 // ------------------------------------------------------------------------
@@ -334,8 +319,6 @@ void PlayerKartWidget::add()
         }
         assert(mineInList);
     }
-
-    //m_player_ID_label->add();
 
     // the first player will have an ID of its own to allow for keyboard
     // navigation despite this widget being added last
@@ -441,7 +424,6 @@ void PlayerKartWidget::markAsReady()
 
     m_model_view->setRotateTo(30.0f, 1.0f);
 
-    player_id_w *= 2;
     player_name_w = 0;
 
     m_model_view->setBadge(OK_BADGE);
@@ -600,9 +582,21 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
 
         if (m_parent_screen->m_multiplayer)
         {
-            m_associated_player->setPlayerProfile(
-                PlayerManager::get()->getPlayer(m_player_ident_spinner
-                                                    ->getValue()) );
+            PlayerProfile* profile = PlayerManager::get()->getPlayer(
+                m_player_ident_spinner->getValue());
+            m_associated_player->setPlayerProfile(profile);
+
+            // Add badge for per player difficulty if necessary
+            m_model_view->unsetBadge(ZIPPER_BADGE);
+            m_model_view->unsetBadge(ANCHOR_BADGE);
+            if (!m_parent_screen->m_from_overworld && (m_parent_screen->m_multiplayer || !profile->isSingleplayerDifficulty()))
+            {
+                PerPlayerDifficulty difficulty = profile->getDifficulty();
+                if (difficulty < PLAYER_DIFFICULTY_NORMAL)
+                    m_model_view->setBadge(ZIPPER_BADGE);
+                else if (difficulty > PLAYER_DIFFICULTY_NORMAL)
+                    m_model_view->setBadge(ANCHOR_BADGE);
+            }
         }
     }
 
@@ -621,9 +615,6 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     m_h = h;
 
     // -- sizes
-    player_id_w = w;
-    player_id_h = GUIEngine::getFontHeight();
-
     player_name_h = 40;
     player_name_w = std::min(400, w);
 
@@ -636,24 +627,19 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
         const float factor = h / 175.0f;
         kart_name_h   = (int)(kart_name_h*factor);
         player_name_h = (int)(player_name_h*factor);
-        player_id_h   = (int)(player_id_h*factor);
     }
 
     // --- layout
-    player_id_x = x;
-    player_id_y = y;
-
     player_name_x = x + w/2 - player_name_w/2;
-    player_name_y = y + player_id_h;
+    player_name_y = y;
 
     if (m_parent_screen->m_multiplayer)
     {
-        const int modelMaxHeight = (h - kart_name_h - player_name_h
-                                   - player_id_h)/2;
+        const int modelMaxHeight = (h - kart_name_h - player_name_h)/2;
         const int modelMaxWidth =  w;
         const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
         model_x = x + w/2 - (int)(bestSize/2);
-        model_y =  y + player_name_h + player_id_h;
+        model_y =  y + player_name_h;
         model_w = bestSize;
         model_h = bestSize;
 
@@ -664,14 +650,13 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     }
     else
     {
-        const int modelMaxHeight = h - kart_name_h - player_name_h
-                                   - player_id_h;
+        const int modelMaxHeight = h - kart_name_h - player_name_h;
         const int modelMaxWidth =  w;
         const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
-        const int modelY = y + player_name_h + player_id_h;
+        const int modelY = y + player_name_h;
         model_x = x + w/4 - (int)(bestSize/2);
         model_y = modelY + modelMaxHeight/2 - bestSize/2;
-        model_w = (int)(bestSize);
+        model_w = bestSize;
         model_h = bestSize;
 
         m_kart_stats_w = w/2;

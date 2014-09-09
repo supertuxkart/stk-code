@@ -48,7 +48,6 @@ namespace GUIEngine
         bool m_ready;
 
         /** widget coordinates */
-        int player_id_x, player_id_y, player_id_w, player_id_h;
         int player_name_x, player_name_y, player_name_w, player_name_h;
         int model_x, model_y, model_w, model_h;
         int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
@@ -92,7 +91,6 @@ namespace GUIEngine
 
         irr::gui::IGUIStaticText* m_ready_text;
 
-        //LabelWidget *getPlayerIDLabel() {return m_player_ID_label;}
         core::stringw deviceName;
         std::string m_kartInternalName;
 
