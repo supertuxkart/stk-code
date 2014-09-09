@@ -504,6 +504,7 @@ void IrrDriver::initDevice()
     hasComputeShaders = false;
     hasTextureStorage = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
+#if !defined(__APPLE__)
     if (!ProfileWorld::isNoGraphics())
     {
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
@@ -531,7 +532,7 @@ void IrrDriver::initDevice()
             Log::info("GLDriver", "ARB Texture Storage enabled");
         }
     }
-
+#endif
 
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
