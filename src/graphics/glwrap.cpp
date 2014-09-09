@@ -11,6 +11,12 @@
 
 static bool is_gl_init = false;
 
+#if DEBUG
+bool GLContextDebugBit = true;
+#else
+bool GLContextDebugBit = false;
+#endif
+
 #ifdef DEBUG
 #if !defined(__APPLE__)
 #define ARB_DEBUG_OUTPUT

@@ -2,6 +2,9 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
+
+extern bool GLContextDebugBit;
+
 #include "COpenGLDriver.h"
 // needed here also because of the create methods' parameters
 #include "CNullDriver.h"
@@ -89,7 +92,7 @@ static PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs_ARB;
 static HGLRC getMeAGLContext(HDC HDc)
 {
     HGLRC hrc = 0;
-    int ctx44[] =
+    int ctx44debug[] =
     {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
@@ -98,11 +101,19 @@ static HGLRC getMeAGLContext(HDC HDc)
         0
     };
 
-    hrc = wglCreateContextAttribs_ARB(HDc, 0, ctx44);
+    int ctx44[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        0
+    };
+
+    hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx44debug : ctx44);
     if (hrc)
         return hrc;
 
-    int ctx40[] =
+    int ctx40debug[] =
     {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
         WGL_CONTEXT_MINOR_VERSION_ARB, 0,
@@ -111,11 +122,19 @@ static HGLRC getMeAGLContext(HDC HDc)
         0
     };
 
-    hrc = wglCreateContextAttribs_ARB(HDc, 0, ctx40);
+    int ctx40[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        0
+    };
+
+    hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx40debug : ctx40);
     if (hrc)
         return hrc;
 
-    int ctx33[] =
+    int ctx33debug[] =
     {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
@@ -124,11 +143,19 @@ static HGLRC getMeAGLContext(HDC HDc)
         0
     };
 
-    hrc = wglCreateContextAttribs_ARB(HDc, 0, ctx33);
+    int ctx33[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        0
+    };
+
+    hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx33debug : ctx33);
     if (hrc)
         return hrc;
 
-    int ctx31[] =
+    int ctx31debug[] =
     {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
         WGL_CONTEXT_MINOR_VERSION_ARB, 1,
@@ -136,7 +163,15 @@ static HGLRC getMeAGLContext(HDC HDc)
         WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
         0
     };
-    hrc = wglCreateContextAttribs_ARB(HDc, 0, ctx31);
+
+    int ctx31[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        0
+    };
+    hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ?  ctx31debug : ctx31);
     if (hrc)
         return hrc;
 
