@@ -250,88 +250,27 @@ namespace StringUtils
     }   // insertValues(s, v1)
 
     // ------------------------------------------------------------------------
+    /** Intermediate struct to fill a vector using variadic templates */
+    struct __FillStringwVector
+    {
+        template<typename T, typename...Args>
+        static void __Fill(std::vector<irr::core::stringw> &all_vals, T&& v, Args &&...args)
+        {
+            all_vals.push_back(irr::core::stringw(std::forward<T>(v)));
+            __Fill(all_vals, std::forward<Args>(args)...);
+        }
+
+        static void __Fill(std::vector<irr::core::stringw>&) {}
+    };
+
     /** Like the other ones above but for wide strings */
-    template <class T1, class T2, class T3, class T4, class T5, class T6>
-    irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1,
-                                    const T2 &v2, const T3 &v3, const T4 &v4,
-                                    const T5 &v5, const T6 &v6)
+    template <typename...Args>
+    irr::core::stringw insertValues(const irr::core::stringw &s, Args ...args)
     {
         std::vector<irr::core::stringw> all_vals;
-        all_vals.push_back( irr::core::stringw(v1) );
-        all_vals.push_back( irr::core::stringw(v2) );
-        all_vals.push_back( irr::core::stringw(v3) );
-        all_vals.push_back( irr::core::stringw(v4) );
-        all_vals.push_back( irr::core::stringw(v5) );
-        all_vals.push_back( irr::core::stringw(v6) );
+        __FillStringwVector::__Fill(all_vals, std::forward<Args>(args)...);
         return insertValues(s, all_vals);
-    }   // insertValues(s, v1, ..., v6)
-
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for wide strings */
-    template <class T1, class T2, class T3, class T4, class T5>
-    irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1,
-                                    const T2 &v2, const T3 &v3, const T4 &v4,
-                                    const T5 &v5)
-    {
-        std::vector<irr::core::stringw> all_vals;
-        all_vals.push_back( irr::core::stringw(v1) );
-        all_vals.push_back( irr::core::stringw(v2) );
-        all_vals.push_back( irr::core::stringw(v3) );
-        all_vals.push_back( irr::core::stringw(v4) );
-        all_vals.push_back( irr::core::stringw(v5) );
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1, ..., v5)
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for wide strings */
-    template <class T1, class T2, class T3, class T4>
-    irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1,
-                                    const T2 &v2, const T3 &v3, const T4 &v4)
-    {
-        std::vector<irr::core::stringw> all_vals;
-        all_vals.push_back( irr::core::stringw(v1) );
-        all_vals.push_back( irr::core::stringw(v2) );
-        all_vals.push_back( irr::core::stringw(v3) );
-        all_vals.push_back( irr::core::stringw(v4) );
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1, ..., v4)
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for wide strings */
-    template <class T1, class T2, class T3>
-    irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1,
-                                    const T2 &v2, const T3 &v3)
-    {
-        std::vector<irr::core::stringw> all_vals;
-        irr::core::stringw dummy;
-        all_vals.push_back( irr::core::stringw(v1) );
-        all_vals.push_back( irr::core::stringw(v2) );
-        all_vals.push_back( irr::core::stringw(v3) );
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1, ..., v3)
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for wide strings */
-    template <class T1, class T2>
-    irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1,
-                             const T2 &v2)
-    {
-        std::vector<irr::core::stringw> all_vals;
-        all_vals.push_back( irr::core::stringw(v1) );
-        all_vals.push_back( irr::core::stringw(v2) );
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1, v2)
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for wide strings */
-    template <class T1>
-    irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1)
-    {
-        std::vector<irr::core::stringw> all_vals;
-        all_vals.push_back( irr::core::stringw(v1) );
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1)
+    }
 
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */

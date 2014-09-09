@@ -1,7 +1,6 @@
 #ifndef STKMESH_H
 #define STKMESH_H
 
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/tuple.hpp"
 

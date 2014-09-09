@@ -22,7 +22,8 @@
 #include "S3DVertex.h"
 #include "SMaterial.h"
 #include "graphics/camera.hpp"
-#include "graphics/glwrap.hpp"
+
+class FrameBuffer;
 
 #include <vector>
 

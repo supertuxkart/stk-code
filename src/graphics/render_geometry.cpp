@@ -208,6 +208,9 @@ void IrrDriver::renderSolidFirstPass()
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
 
+    if (irr_driver->hasARB_draw_indirect())
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
+
     if (!UserConfigParams::m_dynamic_lights)
         return;
 
@@ -230,9 +233,6 @@ void IrrDriver::renderSolidFirstPass()
             ), ListMatNormalMap::getInstance()->SolidPass);
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatSphereMap::getInstance()->SolidPass);
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, ListMatDetails::getInstance()->SolidPass);
-
-        if (irr_driver->hasARB_draw_indirect())
-            glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
 
         if (UserConfigParams::m_azdo)
         {

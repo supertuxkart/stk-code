@@ -47,6 +47,9 @@
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "stkscenemanager.hpp"
+#include "items/powerup_manager.hpp"
+#include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
+#include "../../lib/irrlicht/source/Irrlicht/os.h"
 
 #include <algorithm>
 #include <limits>
@@ -59,6 +62,27 @@ void IrrDriver::renderGLSL(float dt)
     World *world = World::getWorld(); // Never NULL.
 
     Track *track = world->getTrack();
+
+    for (unsigned i = 0; i < PowerupManager::POWERUP_MAX; i++)
+    {
+        scene::IMesh *mesh = powerup_manager->m_all_meshes[i];
+        if (!mesh)
+            continue;
+        for (unsigned j = 0; j < mesh->getMeshBufferCount(); j++)
+        {
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(j);
+            if (!mb)
+                continue;
+            for (unsigned k = 0; k < 4; k++)
+            {
+                video::ITexture *tex = mb->getMaterial().getTexture(k);
+                if (!tex)
+                    continue;
+                compressTexture(tex, true);
+            }
+        }
+    }
+
 
     // Overrides
     video::SOverrideMaterial &overridemat = m_video_driver->getOverrideMaterial();
@@ -572,7 +596,8 @@ core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform, const std::
 
 void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
-    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
+    static_cast<scene::CSceneManager *>(m_scene_manager)->OnAnimate(os::Timer::getTime());
+    camnode->render();
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
     irr_driver->genProjViewMatrix();
