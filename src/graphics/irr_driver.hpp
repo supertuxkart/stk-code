@@ -283,6 +283,7 @@ public:
 
     unsigned getGLSLVersion() const
     {
+        return 140;
         if (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion == 3))
             return GLMajorVersion * 100 + GLMinorVersion * 10;
         else if (GLMajorVersion == 3)
