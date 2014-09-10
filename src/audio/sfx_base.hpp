@@ -49,6 +49,7 @@ public:
 
     virtual void       position(const Vec3 &position) = 0;
     virtual void       setLoop(bool status)      = 0;
+    virtual bool       isLoop()                  = 0;
     virtual void       play()                    = 0;
     virtual void       stop()                    = 0;
     virtual void       pause()                   = 0;

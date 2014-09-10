@@ -140,15 +140,17 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 
     m_kart_model->setKart(this);
 
-    std::string names[] = {m_kart_properties->getEngineSfxType(), "horn", "crash",
-                     "boing", "goo", "skid"};
+    std::string names[] = {"horn", "crash", "boing", "goo", "skid"};
+    SFXBase* tmp;
+    for (unsigned int i = 0; i < 5; i++) {
+        // TODO: use map::emplace when C++11 is ready
+        tmp = sfx_manager->createSoundSource(names[i]);
+        m_custom_sounds.insert(std::pair<std::string, SFXBase*>(names[i], tmp));
+    }
+    // There are two sound for the engine
+    tmp = sfx_manager->createSoundSource(m_kart_properties->getEngineSfxType());
+    m_custom_sounds.insert(std::pair<std::string, SFXBase*>("engine", tmp));
 
-    m_engine_sound  = sfx_manager->createSoundSource(m_kart_properties->getEngineSfxType());
-    m_beep_sound    = sfx_manager->createSoundSource( "horn"  );
-    m_crash_sound   = sfx_manager->createSoundSource( "crash" );
-    m_boing_sound   = sfx_manager->createSoundSource( "boing" );
-    m_goo_sound     = sfx_manager->createSoundSource( "goo"   );
-    m_skid_sound    = sfx_manager->createSoundSource( "skid"  );
     m_terrain_sound          = NULL;
     m_previous_terrain_sound = NULL;
 }   // Kart
@@ -163,30 +165,21 @@ void Kart::init(RaceManager::KartType type)
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
     {
+        float factor;
         if (type == RaceManager::KT_PLAYER)
-        {
             // players have louder sounds than AIs
-            const float factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
-            m_goo_sound->volume( 1.0f / factor );
-            m_skid_sound->volume( 1.0f / factor );
-            m_crash_sound->volume( 1.0f / factor );
-            m_boing_sound->volume( 1.0f / factor );
-            m_beep_sound->volume( 1.0f / factor );
-        }
+            factor = 1.0f / std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
         else
-        {
-            m_goo_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_skid_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_crash_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_beep_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_boing_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-        }
+            factor = 1.0f / race_manager->getNumberOfKarts();
+
+        std::map<std::string, SFXBase*>::iterator i;
+        for (i = m_custom_sounds.begin(); i != m_custom_sounds.end(); i++)
+                i->second->volume(factor);
     }
 
-    if(!m_engine_sound)
-    {
-        Log::error("Kart","Could not allocate a sfx object for the kart. Further errors may ensue!");
-    }
+    if(m_custom_sounds.find("engine") == m_custom_sounds.end() ||
+       m_custom_sounds["engine"] == NULL)
+        Log::error("Kart", "Kart does not have an engine sound!");
 
 
     bool animations = true;
@@ -224,12 +217,10 @@ Kart::~Kart()
 {
     // [TODO] Delete all custom sounds
 
-    sfx_manager->deleteSFX(m_engine_sound );
-    sfx_manager->deleteSFX(m_crash_sound  );
-    sfx_manager->deleteSFX(m_skid_sound   );
-    sfx_manager->deleteSFX(m_goo_sound    );
-    sfx_manager->deleteSFX(m_beep_sound   );
-    sfx_manager->deleteSFX(m_boing_sound  );
+    std::map<std::string, SFXBase*>::iterator i;
+    for (i = m_custom_sounds.begin(); i != m_custom_sounds.end(); i++)
+        sfx_manager->deleteSFX(i->second);
+
     delete m_kart_gfx;
     if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
@@ -240,7 +231,6 @@ Kart::~Kart()
     delete m_sky_particles_emitter;
     delete m_attachment;
     delete m_stars_effect;
-
     delete m_shadow;
 
     if(m_skidmarks) delete m_skidmarks ;
@@ -353,8 +343,8 @@ void Kart::reset()
     m_terrain_sound = NULL;
     m_previous_terrain_sound = NULL;
 
-    if(m_engine_sound)
-        m_engine_sound->stop();
+    if(m_custom_sounds["engine"])
+        m_custom_sounds["engine"]->stop();
 
     m_controls.reset();
     m_slipstream->reset();
@@ -722,7 +712,7 @@ void Kart::flyDown()
  */
 void Kart::startEngineSFX()
 {
-    if(!m_engine_sound)
+    if(!m_custom_sounds["engine"])
         return;
 
     // In multiplayer mode, sounds are NOT positional (because we have
@@ -737,14 +727,14 @@ void Kart::startEngineSFX()
         const float players_volume = (np * 2.0f) / (np*2.0f + np);
 
         if (m_controller->isPlayerController())
-            m_engine_sound->volume( players_volume / np );
+            m_custom_sounds["engine"]->volume( players_volume / np );
         else
-            m_engine_sound->volume( (1.0f - players_volume) / nai );
+            m_custom_sounds["engine"]->volume( (1.0f - players_volume) / nai );
     }
 
-    m_engine_sound->speed(0.6f);
-    m_engine_sound->setLoop(true);
-    m_engine_sound->play();
+    m_custom_sounds["engine"]->speed(0.6f);
+    m_custom_sounds["engine"]->setLoop(true);
+    m_custom_sounds["engine"]->play();
 }   // startEngineSFX
 
 //-----------------------------------------------------------------------------
@@ -909,8 +899,8 @@ void Kart::collectedItem(Item *item, int add_info)
                                  m_kart_properties->getBubblegumSpeedFraction(),
                                  m_kart_properties->getBubblegumFadeInTime(),
                                  m_bubblegum_time);
-        m_goo_sound->position(getXYZ());
-        m_goo_sound->play();
+        m_custom_sounds["goo"]->position(getXYZ());
+        m_custom_sounds["goo"]->play();
         // Play appropriate custom character sound
         playCustomSFX("goo");
         break;
@@ -1156,18 +1146,11 @@ void Kart::update(float dt)
         m_fire_clicked = 1;
     }
 
-    /* (TODO: add back when properly done)
-    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
-    {
-        if (m_custom_sounds[n] != NULL) m_custom_sounds[n]->position   ( getXYZ() );
-    }
-     */
+    // Set the sound source to the kart position
+    std::map<std::string, SFXBase*>::iterator i;
+    for (i = m_custom_sounds.begin(); i != m_custom_sounds.end(); i++)
+        i->second->position(getXYZ());
 
-    m_beep_sound->position   ( getXYZ() );
-    m_engine_sound->position ( getXYZ() );
-    m_crash_sound->position  ( getXYZ() );
-    m_skid_sound->position   ( getXYZ() );
-    m_boing_sound->position  ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much -->
     // automatic rescue
@@ -1868,18 +1851,10 @@ void Kart::crashed(const Material* m, AbstractKart *k)
     {
         if (m_body->getLinearVelocity().length()> 0.555f)
         {
-            // In case that the sfx is longer than 0.5 seconds, only play it if
-            // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
-            {
-                if (m_boing_sound->getStatus() != SFXManager::SFX_PLAYING)
-                    m_boing_sound->play();
-            }
+                playCustomSFX("boing");
             else
-            {
-                if(m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
-                    m_crash_sound->play();
-            }
+                playCustomSFX("crash");
         }
 
         m_bounce_back_time = 0.1f;
@@ -1889,6 +1864,9 @@ void Kart::crashed(const Material* m, AbstractKart *k)
 // -----------------------------------------------------------------------------
 /** Plays a sound effect for a kart. There are some effects predefined for every
  * kart, but they can be overwritten by defining custom sounds in kart.xml
+ * If a sound sound is already playing and it's not a background sound (=looping),
+ * then the function returns without doing anything because overlapping voices
+ * are really bad
  * \param name the name of the sound effect, e.g. "beep"
  */
 void Kart::playCustomSFX(std::string name)
@@ -1898,7 +1876,8 @@ void Kart::playCustomSFX(std::string name)
     // If another sound is already playing, discard to avoid overlapping sounds
     for (i = m_custom_sounds.begin(); i != m_custom_sounds.end(); i++)
     {
-        if (i->second->getStatus() == SFXManager::SFX_PLAYING)
+        if (i->second->getStatus() == SFXManager::SFX_PLAYING &&
+            !i->second->isLoop())
             return;
     }
 
@@ -1947,12 +1926,12 @@ void Kart::updatePhysics(float dt)
          m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
         m_skidding->getGraphicalJumpOffset()==0)
     {
-        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING &&!isWheeless())
-            m_skid_sound->play();
+        if(!isWheeless())
+            playCustomSFX("skid");
     }
-    else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
+    else if(m_custom_sounds["skid"]->getStatus() == SFXManager::SFX_PLAYING)
     {
-        m_skid_sound->stop();
+        m_custom_sounds["skid"]->stop();
     }
 
     float steering = getMaxSteerAngle() * m_skidding->getSteeringFraction();
@@ -2036,7 +2015,7 @@ void Kart::updatePhysics(float dt)
 void Kart::updateEngineSFX()
 {
     // when going faster, use higher pitch for engine
-    if(!m_engine_sound || !sfx_manager->sfxAllowed())
+    if(!m_custom_sounds["engine"] || !sfx_manager->sfxAllowed())
         return;
 
     if(isOnGround())
@@ -2053,15 +2032,15 @@ void Kart::updateEngineSFX()
         if (f>1.0f) f=1.0f;
 
         float gears = 3.0f * fmod(f, 0.333334f);
-        m_engine_sound->speed(0.6f + (f +gears)* 0.35f);
+        m_custom_sounds["engine"]->speed(0.6f + (f +gears)* 0.35f);
     }
     else
     {
         // When flying, fixed value but not too high pitch
         // This gives some variation (vs previous "on wheels" one)
-        m_engine_sound->speed(0.9f);
+        m_custom_sounds["engine"]->speed(0.9f);
     }
-    m_engine_sound->position(getXYZ());
+    m_custom_sounds["engine"]->position(getXYZ());
 }   // updateEngineSFX
 
 //-----------------------------------------------------------------------------
