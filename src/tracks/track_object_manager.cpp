@@ -84,6 +84,16 @@ void TrackObjectManager::reset()
     for_in (curr, m_all_objects)
     {
         curr->reset();
+        if (!curr->isEnabled())
+        {
+            //PhysicalObjects may need to be added
+            if (curr->getType() == "mesh")
+            {
+                if (curr->getPhysicalObject() != NULL)
+                    curr->getPhysicalObject()->addBody();
+            }
+        }
+        curr->setEnable(true);
     }
 }   // reset
 
