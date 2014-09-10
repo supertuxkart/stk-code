@@ -42,24 +42,22 @@ void printFileList(GLint ShaderType, const char *filepath, Types ... args)
     printFileList(args...);
 }
 
+enum AttributeType
+{
+    OBJECT,
+    PARTICLES_SIM,
+    PARTICLES_RENDERING,
+};
+
+void setAttribute(AttributeType Tp, GLuint ProgramID);
+
 template<typename ... Types>
-GLint LoadProgram(Types ... args)
+GLint LoadProgram(AttributeType Tp, Types ... args)
 {
     GLint ProgramID = glCreateProgram();
     loadAndAttach(ProgramID, args...);
     if (irr_driver->getGLSLVersion() < 330)
-    {
-        glBindAttribLocation(ProgramID, 0, "Position");
-        glBindAttribLocation(ProgramID, 1, "Normal");
-        glBindAttribLocation(ProgramID, 2, "Color");
-        glBindAttribLocation(ProgramID, 3, "Texcoord");
-        glBindAttribLocation(ProgramID, 4, "SecondTexcoord");
-        glBindAttribLocation(ProgramID, 5, "Tangent");
-        glBindAttribLocation(ProgramID, 6, "Bitangent");
-        glBindAttribLocation(ProgramID, 7, "Origin");
-        glBindAttribLocation(ProgramID, 8, "Orientation");
-        glBindAttribLocation(ProgramID, 9, "Scale");
-    }
+        setAttribute(Tp, ProgramID);
     glLinkProgram(ProgramID);
 
     GLint Result = GL_FALSE;
