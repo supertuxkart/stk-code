@@ -405,9 +405,9 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
     {
         if (LODNode *node = dynamic_cast<LODNode *>(*I))
             node->updateVisibility();
+        (*I)->updateAbsolutePosition();
         if (!(*I)->isVisible())
             continue;
-        (*I)->updateAbsolutePosition();
 
         if (ParticleSystemProxy *node = dynamic_cast<ParticleSystemProxy *>(*I))
         {
