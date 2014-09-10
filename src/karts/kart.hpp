@@ -145,7 +145,7 @@ private:
 
     /** The torque to apply after hitting a bubble gum. */
     float        m_bubblegum_torque;
-    
+
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
 
@@ -165,10 +165,10 @@ private:
     // -----------------
     /** Time a kart is jumping. */
     float            m_jump_time;
-    
+
     /** Is time flying activated */
     bool             m_is_jumping;
-    
+
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 
@@ -204,7 +204,7 @@ private:
     float         m_view_blocked_by_plunger;
     float         m_speed;
 
-    std::vector<SFXBase*> m_custom_sounds;
+    std::map<std::string, SFXBase*> m_custom_sounds;
     SFXBase      *m_beep_sound;
     SFXBase      *m_engine_sound;
     SFXBase      *m_crash_sound;
@@ -216,7 +216,7 @@ private:
     SFXBase      *m_goo_sound;
     SFXBase      *m_boing_sound;
     float         m_time_last_crash;
-    
+
     /** To prevent using nitro in too short bursts */
     float         m_min_nitro_time;
 
@@ -273,11 +273,10 @@ public:
     virtual void   update           (float dt);
     virtual void   finishedRace(float time);
     virtual void   setPosition(int p);
-    virtual void   beep             ();
     virtual void   showZipperFire   ();
     virtual float  getCurrentMaxSpeed() const;
 
-    virtual bool   playCustomSFX    (unsigned int type);
+    virtual void   playCustomSFX    (std::string type);
     virtual void   setController(Controller *controller);
 
     // ========================================================================

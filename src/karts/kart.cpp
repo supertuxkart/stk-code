@@ -128,12 +128,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_is_jumping           = false;
     m_min_nitro_time       = 0.0f;
     m_fire_clicked         = 0;
-    
+
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
-
-    // Initialize custom sound vector (TODO: add back when properly done)
-    // m_custom_sounds.resize(SFXManager::NUM_CUSTOMS);
 
     // Set position and heading:
     m_reset_transform         = init_transform;
@@ -143,18 +140,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 
     m_kart_model->setKart(this);
 
-    // Create SFXBase for each custom sound (TODO: add back when properly done)
-    /*
-    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
-    {
-        int id = m_kart_properties->getCustomSfxId((SFXManager::CustomSFX)n);
-
-        // If id == -1 the custom sound was not defined in the .irrkart config file
-        if (id != -1)
-        {
-            m_custom_sounds[n] = sfx_manager->newSFX(id);
-        }
-    }*/
+    std::string names[] = {m_kart_properties->getEngineSfxType(), "horn", "crash",
+                     "boing", "goo", "skid"};
 
     m_engine_sound  = sfx_manager->createSoundSource(m_kart_properties->getEngineSfxType());
     m_beep_sound    = sfx_manager->createSoundSource( "horn"  );
@@ -164,7 +151,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_skid_sound    = sfx_manager->createSoundSource( "skid"  );
     m_terrain_sound          = NULL;
     m_previous_terrain_sound = NULL;
-
 }   // Kart
 
 // -----------------------------------------------------------------------------
@@ -236,13 +222,7 @@ void Kart::init(RaceManager::KartType type)
  */
 Kart::~Kart()
 {
-    // Delete all custom sounds (TODO: add back when properly done)
-    /*
-    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
-    {
-        if (m_custom_sounds[n] != NULL)
-            sfx_manager->deleteSFX(m_custom_sounds[n]);
-    }*/
+    // [TODO] Delete all custom sounds
 
     sfx_manager->deleteSFX(m_engine_sound );
     sfx_manager->deleteSFX(m_crash_sound  );
@@ -253,11 +233,13 @@ Kart::~Kart()
     delete m_kart_gfx;
     if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
-    if(m_collision_particles)    delete m_collision_particles;
-    if(m_slipstream)             delete m_slipstream;
-    if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
-    if(m_attachment)             delete m_attachment;
-    if(m_stars_effect)          delete m_stars_effect;
+
+    // delete checks for NULL
+    delete m_collision_particles;
+    delete m_slipstream;
+    delete m_sky_particles_emitter;
+    delete m_attachment;
+    delete m_stars_effect;
 
     delete m_shadow;
 
@@ -585,7 +567,7 @@ void Kart::createPhysics()
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
     Vec3 wheel_pos[4];
     assert(bevel.getX() || bevel.getY() || bevel.getZ());
-    
+
     Vec3 orig_factor(1, 1, 1 - bevel.getZ());
     Vec3 bevel_factor(1.0f - bevel.getX(), 1.0f - bevel.getY(), 1.0f);
     btConvexHullShape *hull = new btConvexHullShape();
@@ -607,7 +589,7 @@ void Kart::createPhysics()
                 {
                     int index = (x + 1) / 2 + 1 - z;  // get index of wheel
                     float f = getKartProperties()->getPhysicalWheelPosition();
-                    // f < 0 indicates to use the old physics position, i.e. 
+                    // f < 0 indicates to use the old physics position, i.e.
                     // to place the wheels outside of the chassis
                     if(f<0)
                     {
@@ -930,7 +912,7 @@ void Kart::collectedItem(Item *item, int add_info)
         m_goo_sound->position(getXYZ());
         m_goo_sound->play();
         // Play appropriate custom character sound
-        playCustomSFX(SFXManager::CUSTOM_GOO);
+        playCustomSFX("goo");
         break;
     default        : break;
     }   // switch TYPE
@@ -1162,7 +1144,7 @@ void Kart::update(float dt)
     if (m_collision_particles) m_collision_particles->update(dt);
 
     updatePhysics(dt);
-    
+
     if(!m_controls.m_fire) m_fire_clicked = 0;
 
     if(m_controls.m_fire && !m_fire_clicked && !m_kart_animation)
@@ -1466,7 +1448,7 @@ void Kart::handleMaterialSFX(const Material *material)
         sfx_manager->deleteSFX(m_previous_terrain_sound);
         m_previous_terrain_sound = NULL;
     }
-    
+
     bool m_schedule_pause = m_flying ||
                         dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
                         dynamic_cast<ExplosionAnimation*>(getKartAnimation());
@@ -1657,7 +1639,7 @@ void Kart::handleZipper(const Material *material, bool play_sound)
                                      max_speed_increase, speed_gain,
                                      engine_force, duration, fade_out_time);
     // Play custom character sound (weee!)
-    playCustomSFX(SFXManager::CUSTOM_ZIPPER);
+    playCustomSFX("zipper");
     m_controller->handleZipper(play_sound);
 }   // handleZipper
 
@@ -1674,13 +1656,13 @@ void Kart::updateNitro(float dt)
     if (m_min_nitro_time > 0.0f)
     {
         m_min_nitro_time -= dt;
-        
+
         // when pressing the key, don't allow the min time to go under zero.
         // If it went under zero, it would be reset
         if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
             m_min_nitro_time = 0.1f;
     }
-    
+
     bool increase_speed = (m_controls.m_nitro && isOnGround());
     if (!increase_speed && m_min_nitro_time <= 0.0f)
     {
@@ -1692,7 +1674,7 @@ void Kart::updateNitro(float dt)
         m_collected_energy = 0;
         return;
     }
-    
+
     if (increase_speed)
     {
         m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
@@ -1905,46 +1887,9 @@ void Kart::crashed(const Material* m, AbstractKart *k)
 }   // crashed
 
 // -----------------------------------------------------------------------------
-/** Plays a beep sfx.
- */
-void Kart::beep()
-{
-    // If the custom horn can't play (isn't defined) then play the default one
-    if (!playCustomSFX(SFXManager::CUSTOM_HORN))
-        m_beep_sound->play();
-
-} // beep
-
-// -----------------------------------------------------------------------------
-/*
-    playCustomSFX()
-
-    This function will play a particular character voice for this kart.  It
-    returns whether or not a character voice sample exists for the particular
-    event.  If there is no voice sample, a default can be played instead.
-
-    Use entries from the CustomSFX enumeration as a parameter (see
-    sfx_manager.hpp).  eg. playCustomSFX(SFXManager::CUSTOM_CRASH)
-
-    Obviously we don't want a certain character voicing multiple phrases
-    simultaneously.  It just sounds bad.  There are two ways of avoiding this:
-
-    1.  If there is already a voice sample playing for the character
-        don't play another until it is finished.
-
-    2.  If there is already a voice sample playing for the character
-        stop the sample, and play the new one.
-
-    Currently we're doing #2.
-
-    rforder
-
-*/
-
-bool Kart::playCustomSFX(unsigned int type)
+void Kart::playCustomSFX(std::string type)
 {
     // (TODO: add back when properly done)
-    return false;
 
     /*
     bool ret = false;
@@ -1959,25 +1904,16 @@ bool Kart::playCustomSFX(unsigned int type)
             // don't stop it, we'll just let it finish.
             if (type != n) m_custom_sounds[n]->stop();
         }
-    }
+    }*/
 
-    if (type < SFXManager::NUM_CUSTOMS)
-    {
-        if (m_custom_sounds[type] != NULL)
-        {
-            ret = true;
-            //printf("Kart SFX: playing %s for %s.\n",
-            //    sfx_manager->getCustomTagName(type),
-            //    m_kart_properties->getIdent().c_str());
-            // If it's already playing, let it finish
-            if (m_custom_sounds[type]->getStatus() != SFXManager::SFX_PLAYING)
-            {
-                m_custom_sounds[type]->play();
-            }
-        }
+    // [TODO]
+    std::map<std::string, SFXBase*>::iterator i = m_custom_sounds.find(type);
+    if (i != m_custom_sounds.end()) {
+        Log::debug("Kart SFX", "Sound '%s' was found");
+        m_custom_sounds[type]->play();
+    } else {
+        Log::warn("Kart SFX", "Sound '%s' was not found");
     }
-    return ret;
-     */
 }
 // ----------------------------------------------------------------------------
 /** Updates the physics for this kart: computing the driving force, set
@@ -2071,13 +2007,13 @@ void Kart::updatePhysics(float dt)
     //at low velocity, forces on kart push it back and forth so we ignore this
     if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
          m_speed = 0;
-         
+
     if (dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
         dynamic_cast<ExplosionAnimation*>(getKartAnimation()))
     {
         m_speed = 0;
     }
-    
+
     updateEngineSFX();
 #ifdef XX
     Log::info("Kart","forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f"
@@ -2430,7 +2366,7 @@ void Kart::kartIsInRestNow()
         f +=  wi.m_chassisConnectionPointCS.getY()
             - wi.m_raycastInfo.m_suspensionLength - wi.m_wheelsRadius;
     }
-    m_graphical_y_offset = f/m_vehicle->getNumWheels() 
+    m_graphical_y_offset = f/m_vehicle->getNumWheels()
                          + getKartProperties()->getGraphicalYOffset();
 
     m_kart_model->setDefaultSuspension();
@@ -2471,7 +2407,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO2, 0);
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
-        
+
     }
     m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO1, getSpeed(), dt);
     m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO2, getSpeed(), dt);
@@ -2543,7 +2479,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
 
     float heading = m_skidding->getVisualSkidRotation();
-    Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset() 
+    Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset()
                               + lean_height +m_graphical_y_offset, 0);
     center_shift = getTrans().getBasis() * center_shift;
 

@@ -406,7 +406,7 @@ void PlayerController::setPosition(int p)
             AbstractKart *kart = world->getKart(i);
             if(kart->getPosition() == p + 1)
             {
-                kart->beep();
+                kart->playCustomSFX("beep");
                 break;
             }
         }

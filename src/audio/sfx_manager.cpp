@@ -251,7 +251,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     }
 
     std::string sfx_name = StringUtils::removeExtension(filename);
-    
+
     if(m_all_sfx_types.find(sfx_name)!=m_all_sfx_types.end())
     {
         Log::error("SFXManager",
@@ -294,11 +294,6 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     {
         positional = buffer->isPositional();
     }
-
-    //printf("CREATING %s (%x), positional = %i (race_manager->getNumLocalPlayers() = %i, buffer->isPositional() = %i)\n",
-    //       buffer->getFileName().c_str(), (unsigned int)buffer,
-    //       positional,
-    //       race_manager->getNumLocalPlayers(), buffer->isPositional());
 
 #if HAVE_OGGVORBIS
     //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
@@ -532,8 +527,8 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
     }
     else
     {
-        (*sound).second->play();
-        return (*sound).second;
+        sound->second->play();
+        return sound->second;
     }
 
     //     m_locked_sound = sfx_manager->newSFX(SFXManager::SOUND_LOCKED);
