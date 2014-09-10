@@ -6,7 +6,7 @@
 #include <vector>
 #include "irr_driver.hpp"
 #include "utils/log.hpp"
-
+#include "vaomanager.hpp"
 
 void initGL();
 GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
@@ -42,24 +42,22 @@ void printFileList(GLint ShaderType, const char *filepath, Types ... args)
     printFileList(args...);
 }
 
+enum AttributeType
+{
+    OBJECT,
+    PARTICLES_SIM,
+    PARTICLES_RENDERING,
+};
+
+void setAttribute(AttributeType Tp, GLuint ProgramID);
+
 template<typename ... Types>
-GLint LoadProgram(Types ... args)
+GLint LoadProgram(AttributeType Tp, Types ... args)
 {
     GLint ProgramID = glCreateProgram();
     loadAndAttach(ProgramID, args...);
     if (irr_driver->getGLSLVersion() < 330)
-    {
-        glBindAttribLocation(ProgramID, 0, "Position");
-        glBindAttribLocation(ProgramID, 1, "Normal");
-        glBindAttribLocation(ProgramID, 2, "Color");
-        glBindAttribLocation(ProgramID, 3, "Texcoord");
-        glBindAttribLocation(ProgramID, 4, "SecondTexcoord");
-        glBindAttribLocation(ProgramID, 5, "Tangent");
-        glBindAttribLocation(ProgramID, 6, "Bitangent");
-        glBindAttribLocation(ProgramID, 7, "Origin");
-        glBindAttribLocation(ProgramID, 8, "Orientation");
-        glBindAttribLocation(ProgramID, 9, "Scale");
-    }
+        setAttribute(Tp, ProgramID);
     glLinkProgram(ProgramID);
 
     GLint Result = GL_FALSE;
@@ -138,110 +136,6 @@ void resetTextureTable();
 void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = false);
 bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);
-
-enum InstanceType
-{
-    InstanceTypeDefault,
-    InstanceTypeShadow,
-    InstanceTypeRSM,
-    InstanceTypeGlow,
-    InstanceTypeCount,
-};
-
-#ifdef WIN32
-#pragma pack(push, 1)
-#endif
-struct InstanceData
-{
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Origin;
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Orientation;
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Scale;
-    uint64_t Texture;
-    uint64_t SecondTexture;
-#ifdef WIN32
-};
-#else
-} __attribute__((packed));
-#endif
-
-struct GlowInstanceData
-{
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Origin;
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Orientation;
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Scale;
-    unsigned Color;
-#ifdef WIN32
-};
-#else
-} __attribute__((packed));
-#endif
-#ifdef WIN32
-#pragma pack(pop)
-#endif
-
-class VAOManager : public Singleton<VAOManager>
-{
-    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
-    GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
-    GLuint instance_vbo[InstanceTypeCount];
-    size_t instance_count[InstanceTypeCount];
-    void *Ptr[InstanceTypeCount];
-    void *VBOPtr[VTXTYPE_COUNT];
-    std::vector<scene::IMeshBuffer *> storedCPUBuffer[VTXTYPE_COUNT];
-    void *vtx_mirror[VTXTYPE_COUNT], *idx_mirror[VTXTYPE_COUNT];
-    size_t vtx_cnt[VTXTYPE_COUNT], idx_cnt[VTXTYPE_COUNT];
-    std::map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
-    std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO;
-
-    void cleanInstanceVAOs();
-    void regenerateBuffer(enum VTXTYPE);
-    void regenerateVAO(enum VTXTYPE);
-    void regenerateInstancedVAO();
-    size_t getVertexPitch(enum VTXTYPE) const;
-    VTXTYPE getVTXTYPE(video::E_VERTEX_TYPE type);
-    void append(scene::IMeshBuffer *, VTXTYPE tp);
-public:
-    VAOManager();
-    std::pair<unsigned, unsigned> getBase(scene::IMeshBuffer *);
-    size_t appendInstance(enum InstanceType, const std::vector<InstanceData> &instance_data);
-    GLuint getInstanceBuffer(InstanceType it) { return instance_vbo[it]; }
-    void *getInstanceBufferPtr(InstanceType it) { return Ptr[it]; }
-    unsigned getVBO(video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
-    void *getVBOPtr(video::E_VERTEX_TYPE type) { return VBOPtr[getVTXTYPE(type)]; }
-    unsigned getVAO(video::E_VERTEX_TYPE type) { return vao[getVTXTYPE(type)]; }
-    unsigned getInstanceVAO(video::E_VERTEX_TYPE vt, enum InstanceType it) { return InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(vt, it)]; }
-    ~VAOManager();
-};
 
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);

@@ -423,7 +423,7 @@ XMLNode *FileManager::createXMLTreeFromString(const std::string & content)
     {
         char *b = new char[content.size()];
         memcpy(b, content.c_str(), content.size());
-        io::IReadFile * ireadfile = m_file_system->createMemoryReadFile(b, strlen(b), "tempfile", true);
+        io::IReadFile * ireadfile = m_file_system->createMemoryReadFile(b, content.size(), "tempfile", true);
         io::IXMLReader * reader = m_file_system->createXMLReader(ireadfile);
         XMLNode* node = new XMLNode(reader);
         reader->drop();
@@ -792,7 +792,7 @@ void FileManager::checkAndCreateConfigDir()
         {
             m_user_config_dir  = getenv("HOME");
             checkAndCreateDirectory(m_user_config_dir);
-            
+
             m_user_config_dir += "/.config";
             if(!checkAndCreateDirectory(m_user_config_dir))
             {

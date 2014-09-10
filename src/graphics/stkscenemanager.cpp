@@ -1,8 +1,7 @@
-#include "stkscenemanager.hpp"
-#include "stkmesh.hpp"
-#include "irr_driver.hpp"
-#include <ISceneManager.h>
-#include <ISceneNode.h>
+#include "graphics/glwrap.hpp"
+#include "graphics/stkscenemanager.hpp"
+#include "graphics/stkmesh.hpp"
+#include "graphics/irr_driver.hpp"
 #include "stkanimatedmesh.hpp"
 #include "stkmeshscenenode.hpp"
 #include "utils/ptr_vector.hpp"
@@ -10,11 +9,14 @@
 #include <SViewFrustum.h>
 #include "callbacks.hpp"
 #include "utils/cpp2011.hpp"
-#include <omp.h>
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "lod_node.hpp"
 #include "utils/profiler.hpp"
+
+#include <ISceneManager.h>
+#include <ISceneNode.h>
+
 #include <unordered_map>
 #include <SViewFrustum.h>
 #include <functional>
@@ -176,6 +178,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     STKMeshCommon *node = dynamic_cast<STKMeshCommon*>(Node);
     if (!node)
         return;
+    node->updateNoGL();
     DeferredUpdate.push_back(node);
 
     if (node->isImmediateDraw())
@@ -183,9 +186,45 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         ImmediateDraw->push_back(Node);
         return;
     }
+
+
+    // Transparent
+    GLMesh *mesh;
+    if (World::getWorld() && World::getWorld()->isFogEnabled())
+    {
+        const Track * const track = World::getWorld()->getTrack();
+
+        // Todo : put everything in a ubo
+        const float fogmax = track->getFogMax();
+        const float startH = track->getFogStartHeight();
+        const float endH = track->getFogEndHeight();
+        const float start = track->getFogStart();
+        const float end = track->getFogEnd();
+        const video::SColor tmpcol = track->getFogColor();
+
+        video::SColorf col(tmpcol.getRed() / 255.0f,
+            tmpcol.getGreen() / 255.0f,
+            tmpcol.getBlue() / 255.0f);
+
+        for_in(mesh, node->TransparentMesh[TM_DEFAULT])
+            pushVector(ListBlendTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
+            fogmax, startH, endH, start, end, col);
+        for_in(mesh, node->TransparentMesh[TM_ADDITIVE])
+            pushVector(ListAdditiveTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
+            fogmax, startH, endH, start, end, col);
+    }
+    else
+    {
+        for_in(mesh, node->TransparentMesh[TM_DEFAULT])
+            pushVector(ListBlendTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
+        for_in(mesh, node->TransparentMesh[TM_ADDITIVE])
+            pushVector(ListAdditiveTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
+    }
+    for_in(mesh, node->TransparentMesh[TM_DISPLACEMENT])
+        pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
+
     for (unsigned Mat = 0; Mat < MAT_COUNT; ++Mat)
     {
-        GLMesh *mesh;
         if (irr_driver->hasARB_draw_indirect())
         {
             for_in(mesh, node->MeshSolidMaterial[Mat])
@@ -253,8 +292,11 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 }
             }
         }
-        if (!UserConfigParams::m_shadows)
-            return;
+    }
+    if (!UserConfigParams::m_shadows)
+        return;
+    for (unsigned Mat = 0; Mat < MAT_COUNT; ++Mat)
+    {
         for (unsigned cascade = 0; cascade < 4; ++cascade)
         {
             if (irr_driver->hasARB_draw_indirect())
@@ -298,8 +340,11 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 }
             }
         }
-        if (!UserConfigParams::m_gi)
-            return;
+    }
+    if (!UserConfigParams::m_gi)
+        return;
+    for (unsigned Mat = 0; Mat < MAT_COUNT; ++Mat)
+    {
         if (irr_driver->hasARB_draw_indirect())
         {
             for_in(mesh, node->MeshSolidMaterial[Mat])
@@ -349,40 +394,6 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             }
         }
     }
-    // Transparent
-    GLMesh *mesh;
-    if (World::getWorld() && World::getWorld()->isFogEnabled())
-    {
-        const Track * const track = World::getWorld()->getTrack();
-
-        // Todo : put everything in a ubo
-        const float fogmax = track->getFogMax();
-        const float startH = track->getFogStartHeight();
-        const float endH = track->getFogEndHeight();
-        const float start = track->getFogStart();
-        const float end = track->getFogEnd();
-        const video::SColor tmpcol = track->getFogColor();
-
-        video::SColorf col(tmpcol.getRed() / 255.0f,
-            tmpcol.getGreen() / 255.0f,
-            tmpcol.getBlue() / 255.0f);
-
-        for_in(mesh, node->TransparentMesh[TM_DEFAULT])
-            pushVector(ListBlendTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
-            fogmax, startH, endH, start, end, col);
-        for_in(mesh, node->TransparentMesh[TM_ADDITIVE])
-            pushVector(ListAdditiveTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
-            fogmax, startH, endH, start, end, col);
-    }
-    else
-    {
-        for_in(mesh, node->TransparentMesh[TM_DEFAULT])
-            pushVector(ListBlendTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
-        for_in(mesh, node->TransparentMesh[TM_ADDITIVE])
-            pushVector(ListAdditiveTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
-    }
-    for_in(mesh, node->TransparentMesh[TM_DISPLACEMENT])
-        pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
 }
 
 static void
@@ -503,8 +514,10 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     printf("Wait Failed\n");
     break;
     }*/
+    PROFILER_PUSH_CPU_MARKER("- Animations/Buffer upload", 0x0, 0x0, 0x0);
     for (unsigned i = 0; i < DeferredUpdate.size(); i++)
-        DeferredUpdate[i]->update();
+        DeferredUpdate[i]->updateGL();
+    PROFILER_POP_CPU_MARKER();
 
     if (!irr_driver->hasARB_draw_indirect())
         return;
@@ -706,5 +719,6 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += SolidPoly;
     poly_count[SHADOW_PASS] += ShadowPoly;
 
-    glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
+    if (irr_driver->hasBufferStorageExtension())
+        glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 }

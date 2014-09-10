@@ -19,7 +19,7 @@
                         I18N="Difficulty"  text="SuperTux"/>
             </ribbon>
         </box>
-        <spacer height="5%"" width="25"/>
+        <spacer height="5%" width="25"/>
 
         <box width="95%" height="40%" padding="10" layout="vertical-row">
             <bright width="100%" text="Select a game mode" align="center" text_align="left" />

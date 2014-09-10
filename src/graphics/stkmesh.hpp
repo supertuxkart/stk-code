@@ -1,7 +1,6 @@
 #ifndef STKMESH_H
 #define STKMESH_H
 
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/tuple.hpp"
 
@@ -37,7 +36,6 @@ struct GLMesh {
     GLuint vao;
     GLuint vertex_buffer;
     GLuint index_buffer;
-    GLuint instance_buffer;
     video::ITexture *textures[6];
     GLenum PrimitiveType;
     GLenum IndexType;
@@ -70,7 +68,8 @@ protected:
 public:
     PtrVector<GLMesh, REF> MeshSolidMaterial[MAT_COUNT];
     PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
-    virtual void update() = 0;
+    virtual void updateNoGL() = 0;
+    virtual void updateGL() = 0;
     virtual bool glow() const = 0;
     virtual bool isImmediateDraw() const { return false; }
     bool isCulledForPlayerCam() const { return m_culledForPlayerCam; }

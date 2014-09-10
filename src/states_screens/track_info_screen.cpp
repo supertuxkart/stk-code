@@ -117,6 +117,12 @@ void TrackInfoScreen::init()
     ITexture* screenshot = irr_driver->getTexture(m_track->getScreenshotFile(),
                                     "While loading screenshot for track '%s':",
                                            m_track->getFilename()            );
+    if(!screenshot)
+    {
+        screenshot = irr_driver->getTexture("main_help.png",
+                                    "While loading screenshot for track '%s':",
+                                    m_track->getFilename());
+    }
     if (screenshot != NULL)
         m_screenshot->setImage(screenshot);
 
@@ -193,6 +199,9 @@ void TrackInfoScreen::init()
         getWidget<LabelWidget>("highscore2")->setVisible(false);
         getWidget<LabelWidget>("highscore3")->setVisible(false);
     }
+    
+    RibbonWidget* bt_start = getWidget<GUIEngine::RibbonWidget>("buttons");
+    bt_start->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
 }   // init
 
@@ -325,3 +334,37 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+GUIEngine::EventPropagation TrackInfoScreen::filterActions(PlayerAction action,
+                                                           int deviceID,
+                                                           const unsigned int value,
+                                                           Input::InputType type,
+                                                           int playerId)
+{
+    GUIEngine::EventPropagation result = EVENT_LET;
+    RibbonWidget* bt_start = getWidget<GUIEngine::RibbonWidget>("buttons");
+
+    switch (action)
+    {
+    case PA_MENU_LEFT:
+    case PA_MENU_RIGHT:
+    {
+        if (bt_start->isFocusedForPlayer(playerId))
+        {
+            result = EVENT_BLOCK;
+        }
+
+        break;
+    }
+    case PA_MENU_UP:
+    case PA_MENU_DOWN:
+    case PA_MENU_SELECT:
+    case PA_MENU_CANCEL:
+        break;
+    default:
+        break;
+    }
+
+    return result;
+}   // filterActions
+
+// -----------------------------------------------------------------------------

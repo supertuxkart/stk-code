@@ -1,6 +1,7 @@
 #include "stkmeshscenenode.hpp"
 #include "stkmesh.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/glwrap.hpp"
 #include "tracks/track.hpp"
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
@@ -42,63 +43,7 @@ void STKMeshSceneNode::createGLMeshes()
         GLmeshes.push_back(allocateMeshBuffer(mb));
     }
     isMaterialInitialized = false;
-}
-
-void STKMeshSceneNode::setFirstTimeMaterial()
-{
-  if (isMaterialInitialized)
-      return;
-  irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
-  for (u32 i = 0; i<Mesh->getMeshBufferCount(); ++i)
-  {
-      scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-      if (!mb)
-        continue;
-
-      video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
-      f32 MaterialTypeParam = mb->getMaterial().MaterialTypeParam;
-      video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
-      if (!isObject(type))
-      {
-#ifdef DEBUG
-          Log::warn("material", "Unhandled (static) material type : %d", type);
-#endif
-          continue;
-      }
-
-
-      GLMesh &mesh = GLmeshes[i];
-      if (rnd->isTransparent())
-      {
-          TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
-          if (!immediate_draw)
-              TransparentMesh[TranspMat].push_back(&mesh);
-      }
-      else
-      {
-          assert(!isDisplacement);
-          MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
-          if (!immediate_draw)
-          {
-              InitTextures(mesh, MatType);
-              MeshSolidMaterial[MatType].push_back(&mesh);
-          }
-      }
-
-      if (!immediate_draw && irr_driver->hasARB_base_instance())
-      {
-          std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
-          mesh.vaoBaseVertex = p.first;
-          mesh.vaoOffset = p.second;
-      }
-      else
-      {
-          fillLocalBuffer(mesh, mb);
-          mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
-          glBindVertexArray(0);
-      }
-  }
-  isMaterialInitialized = true;
+    isGLInitialized = false;
 }
 
 void STKMeshSceneNode::cleanGLMeshes()
@@ -114,15 +59,6 @@ void STKMeshSceneNode::cleanGLMeshes()
             glDeleteBuffers(1, &(mesh.vertex_buffer));
         if (mesh.index_buffer)
             glDeleteBuffers(1, &(mesh.index_buffer));
-        if (mesh.instance_buffer)
-            glDeleteBuffers(1, &(mesh.instance_buffer));
-#ifdef Bindless_Texture_Support
-        for (unsigned j = 0; j < 6; j++)
-        {
-            if (mesh.TextureHandles[j] && glIsTextureHandleResidentARB(mesh.TextureHandles[j]))
-                glMakeTextureHandleNonResidentARB(mesh.TextureHandles[j]);
-        }
-#endif
     }
     GLmeshes.clear();
     for (unsigned i = 0; i < MAT_COUNT; i++)
@@ -169,11 +105,47 @@ void STKMeshSceneNode::updatevbo()
     }
 }
 
-void STKMeshSceneNode::update()
+void STKMeshSceneNode::updateNoGL()
 {
     Box = Mesh->getBoundingBox();
 
-    setFirstTimeMaterial();
+    if (!isMaterialInitialized)
+    {
+        irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
+        for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
+        {
+            scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+            if (!mb)
+                continue;
+
+            video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
+            f32 MaterialTypeParam = mb->getMaterial().MaterialTypeParam;
+            video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
+            if (!isObject(type))
+            {
+#ifdef DEBUG
+                Log::warn("material", "Unhandled (static) material type : %d", type);
+#endif
+                continue;
+            }
+
+            GLMesh &mesh = GLmeshes[i];
+            if (rnd->isTransparent())
+            {
+                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
+                if (!immediate_draw)
+                    TransparentMesh[TranspMat].push_back(&mesh);
+            }
+            else
+            {
+                assert(!isDisplacement);
+                MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
+                if (!immediate_draw)
+                    MeshSolidMaterial[MatType].push_back(&mesh);
+            }
+        }
+        isMaterialInitialized = true;
+    }
 
     for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
     {
@@ -184,6 +156,45 @@ void STKMeshSceneNode::update()
     }
 }
 
+void STKMeshSceneNode::updateGL()
+{
+    if (isGLInitialized)
+        return;
+    for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
+    {
+        scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+        if (!mb)
+            continue;
+        GLMesh &mesh = GLmeshes[i];
+
+        irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
+        video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
+        f32 MaterialTypeParam = mb->getMaterial().MaterialTypeParam;
+        video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
+
+
+        if (!rnd->isTransparent())
+        {
+            MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType()); 
+            if (!immediate_draw)
+                InitTextures(mesh, MatType);
+        }
+
+        if (!immediate_draw && irr_driver->hasARB_base_instance())
+        {
+            std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
+            mesh.vaoBaseVertex = p.first;
+            mesh.vaoOffset = p.second;
+        }
+        else
+        {
+            fillLocalBuffer(mesh, mb);
+            mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
+            glBindVertexArray(0);
+        }
+    }
+    isGLInitialized = true;
+}
 
 void STKMeshSceneNode::OnRegisterSceneNode()
 {
@@ -204,7 +215,8 @@ void STKMeshSceneNode::render()
 
     ++PassCount;
 
-    update();
+    updateNoGL();
+    updateGL();
 
     bool isTransparent;
 
@@ -244,13 +256,11 @@ void STKMeshSceneNode::render()
             compressTexture(mesh.textures[0], true);
             if (UserConfigParams::m_azdo)
             {
-#ifdef Bindless_Texture_Support
                 if (!mesh.TextureHandles[0])
                     mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                 MeshShader::ObjectPass1Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(mesh.TextureHandles[0]));
-#endif
             }
             else
                 MeshShader::ObjectPass1Shader::getInstance()->SetTextureUnits(std::vector < GLuint > { getTextureGLuint(mesh.textures[0]) });
@@ -292,7 +302,6 @@ void STKMeshSceneNode::render()
 
                 if (UserConfigParams::m_azdo)
                 {
-#ifdef Bindless_Texture_Support
                     GLuint64 DiffuseHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
                     if (!glIsTextureHandleResidentARB(DiffuseHandle))
                         glMakeTextureHandleResidentARB(DiffuseHandle);
@@ -310,7 +319,6 @@ void STKMeshSceneNode::render()
                     if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                         glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                     MeshShader::ObjectPass2Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, mesh.TextureHandles[0]));
-#endif
                 }
                 else
                     MeshShader::ObjectPass2Shader::getInstance()->SetTextureUnits(createVector<GLuint>(
@@ -397,13 +405,11 @@ void STKMeshSceneNode::render()
                     compressTexture(mesh.textures[0], true);
                     if (UserConfigParams::m_azdo)
                     {
-#ifdef Bindless_Texture_Support
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
                         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                         MeshShader::TransparentFogShader::getInstance()->SetTextureHandles(createVector<uint64_t>(mesh.TextureHandles[0]));
-#endif
                     }
                     else
                         MeshShader::TransparentFogShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(mesh.textures[0]) });
@@ -430,13 +436,11 @@ void STKMeshSceneNode::render()
                     compressTexture(mesh.textures[0], true);
                     if (UserConfigParams::m_azdo)
                     {
-#ifdef Bindless_Texture_Support
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentShader::getInstance()->SamplersId[0]);
                         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                         MeshShader::TransparentShader::getInstance()->SetTextureHandles(createVector<uint64_t>(mesh.TextureHandles[0]));
-#endif
                     }
                     else
                         MeshShader::TransparentShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(mesh.textures[0]) });

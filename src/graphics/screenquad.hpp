@@ -17,8 +17,6 @@
 #ifndef HEADER_SCREENQUAD_H
 #define HEADER_SCREENQUAD_H
 
-#include "graphics/glwrap.hpp"
-
 #include <SMaterial.h>
 #include <IVideoDriver.h>
 

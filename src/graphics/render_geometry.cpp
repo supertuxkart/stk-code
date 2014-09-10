@@ -32,6 +32,51 @@
 
 #include <algorithm>
 
+/**
+\page render_geometry Geometry Rendering Overview
+
+/**
+\section adding_material Adding a solid material
+
+You need to consider twice before adding a new material : in the worst case a material requires 8 shaders :
+one for each solid pass, one for shadow pass, one for RSM pass, and you need to double that for instanced version.
+
+You need to declare a new enum in MeshMaterial and to write the corresponding dispatch code in MaterialTypeToMeshMaterial
+and to create 2 new List* structures (one for standard and one for instanced version).
+
+Then you need to write the code in stkscenemanager.cpp that will add any mesh with the new material to their corresponding
+lists : in handleSTKCommon for the standard version and in the body of PrepareDrawCalls for instanced version.
+
+\section vertex_layout Available Vertex Layout
+
+There are 3 different layout that comes from Irrlicht loading routines :
+EVT_STANDARD, EVT_2TCOORDS, EVT_TANGENT.
+
+Below are the attributes for each vertex layout and their predefined location.
+
+\subsection EVT_STANDARD
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec3 Normal;
+layout(location = 2) in vec4 Color;
+layout(location = 3) in vec2 Texcoord;
+
+\subsection EVT_2TCOORDS
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec3 Normal;
+layout(location = 2) in vec4 Color;
+layout(location = 3) in vec2 Texcoord;
+layout(location = 4) in vec2 SecondTexcoord;
+
+\subsection EVT_TANGENT
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec3 Normal;
+layout(location = 2) in vec4 Color;
+layout(location = 3) in vec2 Texcoord;
+layout(location = 5) in vec3 Tangent;
+layout(location = 6) in vec3 Bitangent;
+
+*/
+
 namespace RenderGeometry
 {
     struct TexUnit
@@ -151,7 +196,6 @@ void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
     }
 }
 
-#ifdef Draw_Indirect
 template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
 void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<GLMesh *> &meshes, Args...args)
 {
@@ -173,9 +217,7 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((SolidPassCmd::getInstance()->Offset[Mat] + i) * sizeof(DrawElementsIndirectCommand)));
     }
 }
-#endif
 
-#ifdef Multi_Draw_Indirect
 template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
 void multidraw1stPass(Args...args)
 {
@@ -190,7 +232,6 @@ void multidraw1stPass(Args...args)
             sizeof(DrawElementsIndirectCommand));
     }
 }
-#endif
 
 static core::vector3df windDir;
 
@@ -207,6 +248,9 @@ void IrrDriver::renderSolidFirstPass()
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
+
+    if (irr_driver->hasARB_draw_indirect())
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
 
     if (!UserConfigParams::m_dynamic_lights)
         return;
@@ -231,12 +275,8 @@ void IrrDriver::renderSolidFirstPass()
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatSphereMap::getInstance()->SolidPass);
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, ListMatDetails::getInstance()->SolidPass);
 
-        if (irr_driver->hasARB_draw_indirect())
-            glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
-
         if (UserConfigParams::m_azdo)
         {
-#ifdef Multi_Draw_Indirect
             multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DEFAULT, video::EVT_STANDARD>();
             multidraw1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_ALPHA_REF, video::EVT_STANDARD>();
             multidraw1stPass<MeshShader::InstancedNormalMapShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>();
@@ -244,9 +284,7 @@ void IrrDriver::renderSolidFirstPass()
             multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DETAIL, video::EVT_2TCOORDS>();
             multidraw1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_UNLIT, video::EVT_STANDARD>();
             multidraw1stPass<MeshShader::InstancedGrassPass1Shader, MAT_GRASS, video::EVT_STANDARD>(windDir);
-#endif
         }
-#ifdef Draw_Indirect
         else if (irr_driver->hasARB_draw_indirect())
         {
             // Default
@@ -273,7 +311,6 @@ void IrrDriver::renderSolidFirstPass()
             renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(
                 TexUnits(TexUnit(1, false), TexUnit(0, true)), ListInstancedMatNormalMap::getInstance()->SolidPass);
         }
-#endif
     }
 }
 
@@ -315,7 +352,6 @@ void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
     }
 }
 
-#ifdef Draw_Indirect
 template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
 void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, const std::vector<GLuint> &Prefilled_tex, std::vector<GLMesh *> &meshes, Args...args)
 {
@@ -332,9 +368,7 @@ void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, const st
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((SolidPassCmd::getInstance()->Offset[Mat] + i) * sizeof(DrawElementsIndirectCommand)));
     }
 }
-#endif
 
-#ifdef Multi_Draw_Indirect
 template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
 void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
 {
@@ -350,7 +384,6 @@ void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
             sizeof(DrawElementsIndirectCommand));
     }
 }
-#endif
 
 void IrrDriver::renderSolidSecondPass()
 {
@@ -379,7 +412,6 @@ void IrrDriver::renderSolidSecondPass()
 
     if (UserConfigParams::m_azdo)
     {
-#ifdef Bindless_Texture_Support
         DiffuseHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
         if (!glIsTextureHandleResidentARB(DiffuseHandle))
             glMakeTextureHandleResidentARB(DiffuseHandle);
@@ -395,7 +427,6 @@ void IrrDriver::renderSolidSecondPass()
         DepthHandle = glGetTextureSamplerHandleARB(getDepthStencilTexture(), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[3]);
         if (!glIsTextureHandleResidentARB(DepthHandle))
             glMakeTextureHandleResidentARB(DepthHandle);
-#endif
     }
 
     {
@@ -441,7 +472,6 @@ void IrrDriver::renderSolidSecondPass()
 
         if (UserConfigParams::m_azdo)
         {
-#ifdef Multi_Draw_Indirect
             multidraw2ndPass<MeshShader::InstancedObjectPass2Shader, MAT_DEFAULT, video::EVT_STANDARD>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
             multidraw2ndPass<MeshShader::InstancedObjectPass2Shader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
             multidraw2ndPass<MeshShader::InstancedObjectRefPass2Shader, MAT_ALPHA_REF, video::EVT_STANDARD>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
@@ -450,9 +480,7 @@ void IrrDriver::renderSolidSecondPass()
             multidraw2ndPass<MeshShader::InstancedObjectUnlitShader, MAT_UNLIT, video::EVT_STANDARD>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
             SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
             multidraw2ndPass<MeshShader::InstancedGrassPass2Shader, MAT_GRASS, video::EVT_STANDARD>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, DepthHandle, 0), windDir, cb->getPosition());
-#endif
         }
-#ifdef Draw_Indirect
         else if (irr_driver->hasARB_draw_indirect())
         {
             // Default
@@ -481,7 +509,6 @@ void IrrDriver::renderSolidSecondPass()
             renderInstancedMeshes2ndPass<MeshShader::InstancedGrassPass2Shader, MAT_GRASS, video::EVT_STANDARD>(
                 TexUnits(TexUnit(0, true)), DiffSpecSSAOTex, ListInstancedMatGrass::getInstance()->SolidPass, windDir, cb->getPosition());
         }
-#endif
     }
 }
 
@@ -537,12 +564,10 @@ void renderTransparenPass(const std::vector<TexUnit> &TexUnits, std::vector<STK:
             compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
             if (UserConfigParams::m_azdo)
             {
-#ifdef Bindless_Texture_Support
                 if (!mesh.TextureHandles[TexUnits[j].m_id])
                     mesh.TextureHandles[TexUnits[j].m_id] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[TexUnits[j].m_id]), Shader::getInstance()->SamplersId[Handles.size()]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[TexUnits[j].m_id]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[TexUnits[j].m_id]);
-#endif
                 Handles.push_back(mesh.TextureHandles[TexUnits[j].m_id]);
             }
             else
@@ -752,7 +777,6 @@ void renderShadow(const std::vector<GLuint> TextureUnits, unsigned cascade, cons
     }
 }
 
-#ifdef Draw_Indirect
 template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
 void renderInstancedShadow(const std::vector<GLuint> TextureUnits, unsigned cascade, const std::vector<GLMesh *> &t, Args ...args)
 {
@@ -773,9 +797,7 @@ void renderInstancedShadow(const std::vector<GLuint> TextureUnits, unsigned casc
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((tmp) * sizeof(DrawElementsIndirectCommand)));
     }
 }
-#endif
 
-#ifdef Multi_Draw_Indirect
 template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
 static void multidrawShadow(unsigned i, Args ...args)
 {
@@ -787,7 +809,6 @@ static void multidrawShadow(unsigned i, Args ...args)
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)(ShadowPassCmd::getInstance()->Offset[i][Mat] * sizeof(DrawElementsIndirectCommand)), ShadowPassCmd::getInstance()->Size[i][Mat], sizeof(DrawElementsIndirectCommand));
     }
 }
-#endif
 
 void IrrDriver::renderShadows()
 {
@@ -824,16 +845,13 @@ void IrrDriver::renderShadows()
 
         if (UserConfigParams::m_azdo)
         {
-#ifdef Multi_Draw_Indirect
             multidrawShadow<MeshShader::InstancedShadowShader, MAT_DEFAULT, video::EVT_STANDARD>(cascade);
             multidrawShadow<MeshShader::InstancedShadowShader, MAT_DETAIL, video::EVT_2TCOORDS>(cascade);
             multidrawShadow<MeshShader::InstancedShadowShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(cascade);
             multidrawShadow<MeshShader::InstancedRefShadowShader, MAT_ALPHA_REF, video::EVT_STANDARD>(cascade);
             multidrawShadow<MeshShader::InstancedRefShadowShader, MAT_UNLIT, video::EVT_STANDARD>(cascade);
             multidrawShadow<MeshShader::InstancedGrassShadowShader, MAT_GRASS, video::EVT_STANDARD>(cascade, windDir);
-#endif
         }
-#ifdef Draw_Indirect
         else if (irr_driver->hasARB_draw_indirect())
         {
             renderInstancedShadow<MeshShader::InstancedShadowShader, MAT_DEFAULT, video::EVT_STANDARD>(noTexUnits, cascade, ListInstancedMatDefault::getInstance()->Shadows[cascade]);
@@ -843,7 +861,6 @@ void IrrDriver::renderShadows()
             renderInstancedShadow<MeshShader::InstancedGrassShadowShader, MAT_GRASS, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, cascade, ListInstancedMatGrass::getInstance()->Shadows[cascade], windDir);
             renderInstancedShadow<MeshShader::InstancedShadowShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(noTexUnits, cascade, ListInstancedMatNormalMap::getInstance()->Shadows[cascade]);
         }
-#endif
     }
 
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -893,7 +910,6 @@ void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> &Textur
     }
 }
 
-#ifdef Draw_Indirect
 template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
 void renderRSMShadow(const std::vector<GLuint> TextureUnits, const std::vector<GLMesh *> &t, Args ...args)
 {
@@ -913,9 +929,7 @@ void renderRSMShadow(const std::vector<GLuint> TextureUnits, const std::vector<G
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((RSMPassCmd::getInstance()->Offset[Mat] + i)* sizeof(DrawElementsIndirectCommand)));
     }
 }
-#endif
 
-#ifdef Multi_Draw_Indirect
 template<typename Shader, MeshMaterial Mat, enum E_VERTEX_TYPE VertexType, typename... Args>
 void multidrawRSM(Args...args)
 {
@@ -927,7 +941,6 @@ void multidrawRSM(Args...args)
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)(RSMPassCmd::getInstance()->Offset[Mat] * sizeof(DrawElementsIndirectCommand)), RSMPassCmd::getInstance()->Size[Mat], sizeof(DrawElementsIndirectCommand));
     }
 }
-#endif
 
 void IrrDriver::renderRSM()
 {
@@ -947,15 +960,12 @@ void IrrDriver::renderRSM()
 
     if (UserConfigParams::m_azdo)
     {
-#ifdef Multi_Draw_Indirect
         multidrawRSM<MeshShader::InstancedRSMShader, MAT_DEFAULT, video::EVT_STANDARD>(rsm_matrix);
         multidrawRSM<MeshShader::InstancedRSMShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(rsm_matrix);
         multidrawRSM<MeshShader::InstancedRSMShader, MAT_ALPHA_REF, video::EVT_STANDARD>(rsm_matrix);
         multidrawRSM<MeshShader::InstancedRSMShader, MAT_UNLIT, video::EVT_STANDARD>(rsm_matrix);
         multidrawRSM<MeshShader::InstancedRSMShader, MAT_DETAIL, video::EVT_2TCOORDS>(rsm_matrix);
-#endif
     }
-#ifdef Draw_Indirect
     else if (irr_driver->hasARB_draw_indirect())
     {
         renderRSMShadow<MeshShader::InstancedRSMShader, MAT_DEFAULT, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, ListInstancedMatDefault::getInstance()->RSM, rsm_matrix);
@@ -964,5 +974,4 @@ void IrrDriver::renderRSM()
         renderRSMShadow<MeshShader::InstancedRSMShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(std::vector < GLuint > { 0 }, ListInstancedMatNormalMap::getInstance()->RSM, rsm_matrix);
         renderRSMShadow<MeshShader::InstancedRSMShader, MAT_DETAIL, video::EVT_2TCOORDS>(std::vector < GLuint > { 0 }, ListInstancedMatDetails::getInstance()->RSM, rsm_matrix);
     }
-#endif
 }
