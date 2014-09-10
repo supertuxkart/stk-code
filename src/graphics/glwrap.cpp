@@ -217,8 +217,6 @@ void setAttribute(AttributeType Tp, GLuint ProgramID)
         glBindAttribLocation(ProgramID, 1, "lifetime");
         glBindAttribLocation(ProgramID, 2, "size");
         glBindAttribLocation(ProgramID, 4, "quadcorner");
-        glBindAttribLocation(ProgramID, 5, "rotationvec");
-        glBindAttribLocation(ProgramID, 6, "anglespeed");
         break;
     }
 }
