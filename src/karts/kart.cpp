@@ -1887,32 +1887,28 @@ void Kart::crashed(const Material* m, AbstractKart *k)
 }   // crashed
 
 // -----------------------------------------------------------------------------
-void Kart::playCustomSFX(std::string type)
+/** Plays a sound effect for a kart. There are some effects predefined for every
+ * kart, but they can be overwritten by defining custom sounds in kart.xml
+ * \param name the name of the sound effect, e.g. "beep"
+ */
+void Kart::playCustomSFX(std::string name)
 {
-    // (TODO: add back when properly done)
+    std::map<std::string, SFXBase*>::iterator i;
 
-    /*
-    bool ret = false;
-
-    // Stop all other character voices for this kart before playing a new one
-    // we don't want overlapping phrases coming from the same kart
-    for (unsigned int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
+    // If another sound is already playing, discard to avoid overlapping sounds
+    for (i = m_custom_sounds.begin(); i != m_custom_sounds.end(); i++)
     {
-        if (m_custom_sounds[n] != NULL)
-        {
-            // If the sound we're trying to play is already playing
-            // don't stop it, we'll just let it finish.
-            if (type != n) m_custom_sounds[n]->stop();
-        }
-    }*/
+        if (i->second->getStatus() == SFXManager::SFX_PLAYING)
+            return;
+    }
 
-    // [TODO]
-    std::map<std::string, SFXBase*>::iterator i = m_custom_sounds.find(type);
+    // If a sound exists, play it
+    i = m_custom_sounds.find(name);
     if (i != m_custom_sounds.end()) {
         Log::debug("Kart SFX", "Sound '%s' was found");
-        m_custom_sounds[type]->play();
+        i->second->play();
     } else {
-        Log::warn("Kart SFX", "Sound '%s' was not found");
+        Log::warn ("Kart SFX", "Sound '%s' was not found");
     }
 }
 // ----------------------------------------------------------------------------
