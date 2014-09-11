@@ -463,6 +463,8 @@ InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t
         ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
 }
 
+int enableOpenMP;
+
 void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 {
     windDir = getWindDir();
@@ -558,7 +560,10 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
         ShadowCmdBuffer = ShadowPassCmd::getInstance()->Ptr;
         GlowCmdBuffer = GlowPassCmd::getInstance()->Ptr;
         RSMCmdBuffer = RSMPassCmd::getInstance()->Ptr;
+        enableOpenMP = 1;
     }
+    else
+        enableOpenMP = 0;
 
     ListInstancedMatDefault::getInstance()->clear();
     ListInstancedMatAlphaRef::getInstance()->clear();
@@ -573,7 +578,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     PROFILER_PUSH_CPU_MARKER("- Draw Command upload", 0xFF, 0x0, 0xFF);
 
     auto playercamculling = [](const scene::ISceneNode *nd) {return dynamic_cast<const STKMeshCommon*>(nd)->isCulledForPlayerCam(); };
-#pragma omp parallel sections
+#pragma omp parallel sections if(enableOpenMP)
     {
 #pragma omp section
         {
