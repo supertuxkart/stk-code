@@ -531,13 +531,9 @@ bool PhysicalObject::castRay(const btVector3 &from, const btVector3 &to,
         Log::warn("PhysicalObject", "Can only raycast against 'exact' meshes.");
         return false;
     }
-    Vec3 dxyz(m_init_xyz);
-    //bool result = m_triangle_mesh->castRay(from-dxyz, to-dxyz, hit_point, 
     bool result = m_triangle_mesh->castRay(from, to, hit_point, 
                                            material, normal, 
                                            interpolate_normal);
-//    if(result)
-//        *hit_point += (btVector3)dxyz;
     return result;
 }   // castRay
 

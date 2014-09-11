@@ -63,9 +63,16 @@ public:
     btVector3 getInterpolatedNormal(unsigned int index,
                                     const btVector3 &position) const;
     // ------------------------------------------------------------------------
+    /** In case of physical objects of shape 'exact', the physical body is
+     *  created outside of the mesh. Since raycasts need the body's world
+     *  transform, the body can be set using this function. This will also
+     *  cause the body not to be freed (since it will be freed as part of
+     *  the physical object). */
     void setBody(btRigidBody *body)
     {
         assert(!m_body);
+        // Mark that the body should not be deleted when this object is 
+        // deleted, since the body is managed elsewhere.
         m_free_body = false;
         m_body = body;
     }

@@ -125,6 +125,25 @@ void TrackObjectManager::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
+/** Does a raycast against all driveable objects. This way part of the track
+ *  can be a physical object, and can e.g. be animated. A separate list of all
+ *  driveable objects is maintained (in one case there were over 2000 bodies,
+ *  but only one is driveable). The result of the raycast against the track
+ *  mesh are the input parameter. It is then tested if the raycast against 
+ *  a track object gives a 'closer' result. If so, the parameters hit_point,
+ *  normal, and material will be updated.
+ *  \param from/to The from and to position for the raycast.
+ *  \param xyz The position in world where the ray hit.
+ *  \param material The material of the mesh that was hit.
+ *  \param normal The intrapolated normal at that position.
+ *  \param interpolate_normal If true, the returned normal is the interpolated
+ *         based on the three normals of the triangle and the location of the
+ *         hit point (which is more compute intensive, but results in much
+ *         smoother results).
+ *  \return True if a triangle was hit, false otherwise (and no output
+ *          variable will be set.
+ 
+ */
 void TrackObjectManager::castRay(const btVector3 &from, 
                                  const btVector3 &to, btVector3 *hit_point, 
                                  const Material **material,
@@ -147,6 +166,8 @@ void TrackObjectManager::castRay(const btVector3 &from,
                       interpolate_normal))
         {
             float new_distance = new_hit_point.distance(from);
+            // If the new hit is closer than the current hit, save
+            // the data.
             if (new_distance < distance)
             {
                 *material  = new_material;
