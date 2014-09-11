@@ -294,51 +294,30 @@ void STKMeshSceneNode::render()
 
             if (UserConfigParams::m_azdo)
             {
-                irr_driver->IncreaseObjectCount();
-                GLMesh &mesh = GLmeshes[i];
-                GLenum ptype = mesh.PrimitiveType;
-                GLenum itype = mesh.IndexType;
-                size_t count = mesh.IndexCount;
+                GLuint64 DiffuseHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
+                if (!glIsTextureHandleResidentARB(DiffuseHandle))
+                    glMakeTextureHandleResidentARB(DiffuseHandle);
 
-                if (UserConfigParams::m_azdo)
-                {
-                    GLuint64 DiffuseHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
-                    if (!glIsTextureHandleResidentARB(DiffuseHandle))
-                        glMakeTextureHandleResidentARB(DiffuseHandle);
+                GLuint64 SpecularHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_SPECULAR), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[1]);
+                if (!glIsTextureHandleResidentARB(SpecularHandle))
+                    glMakeTextureHandleResidentARB(SpecularHandle);
 
-                    GLuint64 SpecularHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_SPECULAR), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[1]);
-                    if (!glIsTextureHandleResidentARB(SpecularHandle))
-                        glMakeTextureHandleResidentARB(SpecularHandle);
+                GLuint64 SSAOHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_HALF1_R), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[2]);
+                if (!glIsTextureHandleResidentARB(SSAOHandle))
+                    glMakeTextureHandleResidentARB(SSAOHandle);
 
-                    GLuint64 SSAOHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_HALF1_R), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[2]);
-                    if (!glIsTextureHandleResidentARB(SSAOHandle))
-                        glMakeTextureHandleResidentARB(SSAOHandle);
-
-                    if (!mesh.TextureHandles[0])
-                        mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(spareWhiteTex), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
-                    if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
-                        glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
-                    MeshShader::ObjectPass2Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, mesh.TextureHandles[0]));
-                }
-                else
-                    MeshShader::ObjectPass2Shader::getInstance()->SetTextureUnits(createVector<GLuint>(
-                    irr_driver->getRenderTargetTexture(RTT_DIFFUSE),
-                    irr_driver->getRenderTargetTexture(RTT_SPECULAR),
-                    irr_driver->getRenderTargetTexture(RTT_HALF1_R),
-                    getTextureGLuint(spareWhiteTex)));
-
-                MeshShader::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
-                assert(mesh.vao);
-                glBindVertexArray(mesh.vao);
-                glDrawElements(ptype, count, itype, 0);
-                glBindVertexArray(0);
+                if (!mesh.TextureHandles[0])
+                    mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(spareWhiteTex), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
+                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                    glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                MeshShader::ObjectPass2Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, mesh.TextureHandles[0]));
             }
             else
                 MeshShader::ObjectPass2Shader::getInstance()->SetTextureUnits(createVector<GLuint>(
                 irr_driver->getRenderTargetTexture(RTT_DIFFUSE),
                 irr_driver->getRenderTargetTexture(RTT_SPECULAR),
                 irr_driver->getRenderTargetTexture(RTT_HALF1_R),
-                getTextureGLuint(mesh.textures[0])));
+                getTextureGLuint(spareWhiteTex)));
             MeshShader::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
             assert(mesh.vao);
             glBindVertexArray(mesh.vao);
