@@ -280,6 +280,8 @@ void STKMeshSceneNode::render()
         AbsoluteTransformation.getInverse(invmodel);
 
         glDisable(GL_CULL_FACE);
+        if (update_each_frame && !UserConfigParams::m_dynamic_lights)
+            updatevbo();
         if (!spareWhiteTex)
             spareWhiteTex = getUnicolorTexture(video::SColor(255, 255, 255, 255));
         glUseProgram(MeshShader::ObjectPass2Shader::getInstance()->Program);
