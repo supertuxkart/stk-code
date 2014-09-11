@@ -37,6 +37,9 @@ private:
     UserPointer                  m_user_pointer;
     std::vector<const Material*> m_triangleIndex2Material;
     btRigidBody                 *m_body;
+    /** Keep track if the physical body was created here or not. */
+    bool                         m_free_body;
+
     btCollisionObject           *m_collision_object;
     btTriangleMesh               m_mesh;
     btVector3 dummy1, dummy2;
@@ -59,6 +62,13 @@ public:
     void removeCollisionObject();
     btVector3 getInterpolatedNormal(unsigned int index,
                                     const btVector3 &position) const;
+    // ------------------------------------------------------------------------
+    void setBody(btRigidBody *body)
+    {
+        assert(!m_body);
+        m_free_body = false;
+        m_body = body;
+    }
     // ------------------------------------------------------------------------
     const Material* getMaterial(int n) const
                                           {return m_triangleIndex2Material[n];}

@@ -33,6 +33,7 @@
 TriangleMesh::TriangleMesh() : m_mesh()
 {
     m_body             = NULL;
+    m_free_body        = true;
     m_motion_state     = NULL;
     // FIXME: on VS in release mode this statement actually overwrites
     // part of the data of m_mesh, causing a crash later. Debugging
@@ -200,7 +201,8 @@ void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags,
  */
 void TriangleMesh::removeAll()
 {
-    if(m_body)
+    // Don't free the physical body if it was created outside this object.
+    if(m_body && m_free_body)
     {
         World::getWorld()->getPhysics()->removeBody(m_body);
         delete m_body;
@@ -301,6 +303,8 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
 
     btTransform world_trans;
     world_trans.setIdentity();
+    if(m_body)
+        world_trans = m_body->getWorldTransform();
 
     btCollisionWorld::ClosestRayResultCallback result(from, to);
 
@@ -334,8 +338,8 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
     // If this is a rigid body, m_collision_object is NULL, and the
     // rigid body is the actual collision object.
     btCollisionWorld::rayTestSingle(trans_from, trans_to,
-                                    m_collision_object ? m_collision_object
-                                                       : m_body,
+//                                    m_body ? m_body : m_collision_object,
+                                    m_collision_object ? m_collision_object : m_body,
                                     m_collision_shape, world_trans,
                                     ray_callback);
     // Get the index of the triangle hit

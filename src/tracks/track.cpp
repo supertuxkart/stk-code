@@ -2389,7 +2389,7 @@ std::vector< std::vector<float> > Track::buildHeightMap()
     }
 
     return out;
-}
+}   // buildHeightMap
 
 // ----------------------------------------------------------------------------
 /** Returns the rotation of the sun. */

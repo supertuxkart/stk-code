@@ -50,11 +50,15 @@ TrackObjectManager::~TrackObjectManager()
  *        in a separate section that's read before everything and remove all this
  *        crap
  */
-void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader)
+void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
+                             ModelDefinitionLoader& model_def_loader)
 {
     try
     {
-        m_all_objects.push_back(new TrackObject(xml_node, parent, model_def_loader));
+        TrackObject *obj = new TrackObject(xml_node, parent, model_def_loader);
+        m_all_objects.push_back(obj);
+        if(obj->isDriveable())
+            m_driveable_objects.push_back(obj);
     }
     catch (std::exception& e)
     {
@@ -119,6 +123,40 @@ void TrackObjectManager::update(float dt)
         curr->update(dt);
     }
 }   // update
+
+// ----------------------------------------------------------------------------
+void TrackObjectManager::castRay(const btVector3 &from, 
+                                 const btVector3 &to, btVector3 *hit_point, 
+                                 const Material **material,
+                                 btVector3 *normal,
+                                 bool interpolate_normal) const
+{
+    float distance = 9999.9f;
+    // If there was a hit already, compute the current distance
+    if(*material)
+    {
+        distance = hit_point->distance(from);
+    }
+    const TrackObject* curr;
+    for_in (curr, m_driveable_objects)
+    {
+        btVector3 new_hit_point;
+        const Material *new_material;
+        btVector3 new_normal;
+        if(curr->castRay(from, to, &new_hit_point, &new_material, &new_normal,
+                      interpolate_normal))
+        {
+            float new_distance = new_hit_point.distance(from);
+            if (new_distance < distance)
+            {
+                *material  = new_material;
+                *hit_point = new_hit_point;
+                *normal    = new_normal;
+                distance   = new_distance;
+            }   // if new_distance < distance
+        }   // if hit
+    }   // for all track objects.
+}   // castRay
 
 // ----------------------------------------------------------------------------
 /** Enables or disables fog for a given scene node.
