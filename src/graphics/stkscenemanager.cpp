@@ -156,6 +156,11 @@ bool isCulled(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
     if (!node->getAutomaticCulling())
         return false;
 
+    // Faster albeit less precise alternative
+/*    core::aabbox3d<f32> tbox = node->getBoundingBox();
+    node->getAbsoluteTransformation().transformBoxEx(tbox);
+    return !(tbox.intersectsWithBox(cam->getViewFrustum()->getBoundingBox()));*/
+
     scene::SViewFrustum frust = *cam->getViewFrustum();
 
     //transform the frustum to the node's current absolute transformation
