@@ -151,15 +151,10 @@ bool isBoxInFrontOfPlane(const core::plane3df &plane, const core::vector3df edge
 }
 
 static
-bool isCulled(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
+bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
 {
     if (!node->getAutomaticCulling())
         return false;
-
-    // Faster albeit less precise alternative
-/*    core::aabbox3d<f32> tbox = node->getBoundingBox();
-    node->getAbsoluteTransformation().transformBoxEx(tbox);
-    return !(tbox.intersectsWithBox(cam->getViewFrustum()->getBoundingBox()));*/
 
     scene::SViewFrustum frust = *cam->getViewFrustum();
 
@@ -177,8 +172,20 @@ bool isCulled(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
     return false;
 }
 
+static
+bool isCulledFast(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
+{
+    if (!node->getAutomaticCulling())
+        return false;
+
+    core::aabbox3d<f32> tbox = node->getBoundingBox();
+    node->getAbsoluteTransformation().transformBoxEx(tbox);
+    return !(tbox.intersectsWithBox(cam->getViewFrustum()->getBoundingBox()));
+}
+
 static void
-handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *ImmediateDraw)
+handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *ImmediateDraw,
+    const scene::ICameraSceneNode *cam, scene::ICameraSceneNode *shadowcam[4], const scene::ICameraSceneNode *rsmcam)
 {
     STKMeshCommon *node = dynamic_cast<STKMeshCommon*>(Node);
     if (!node)
@@ -191,7 +198,6 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         ImmediateDraw->push_back(Node);
         return;
     }
-
 
     // Transparent
     GLMesh *mesh;
@@ -263,6 +269,8 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         }
         else
         {
+            if (isCulledFast(cam, Node))
+                continue;
             core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
             ModelMatrix.getInverse(InvModelMatrix);
 
@@ -311,6 +319,8 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             }
             else
             {
+                if (isCulledFast(shadowcam[cascade], Node))
+                    continue;
                 core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                 ModelMatrix.getInverse(InvModelMatrix);
 
@@ -364,6 +374,8 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         }
         else
         {
+            if (isCulledFast(rsmcam, Node))
+                continue;
             core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
             ModelMatrix.getInverse(InvModelMatrix);
 
@@ -403,7 +415,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
 
 static void
 parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::ISceneNode *> *ImmediateDraw,
-    scene::ICameraSceneNode* cam)
+    const scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadow_cam[4], const scene::ICameraSceneNode *rsmcam)
 {
     core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
     for (; I != E; ++I)
@@ -416,14 +428,14 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
 
         if (ParticleSystemProxy *node = dynamic_cast<ParticleSystemProxy *>(*I))
         {
-            if (!isCulled(cam, *I) && node->update())
+            if (!isCulledPrecise(cam, *I) && node->update())
                 ParticlesList::getInstance()->push_back(node);
             continue;
         }
 
-        handleSTKCommon(*I, ImmediateDraw);
+        handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam);
 
-        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam);
+        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadow_cam, rsmcam);
     }
 }
 
@@ -484,18 +496,18 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     DeferredUpdate.clear();
     core::list<scene::ISceneNode*> List = m_scene_manager->getRootSceneNode()->getChildren();
 
-    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode);
+    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam);
 
 #pragma omp parallel for
     for (int i = 0; i < (int)DeferredUpdate.size(); i++)
     {
         scene::ISceneNode *node = dynamic_cast<scene::ISceneNode *>(DeferredUpdate[i]);
-        DeferredUpdate[i]->setCulledForPlayerCam(isCulled(camnode, node));
-        DeferredUpdate[i]->setCulledForRSMCam(isCulled(m_suncam, node));
-        DeferredUpdate[i]->setCulledForShadowCam(0, isCulled(m_shadow_camnodes[0], node));
-        DeferredUpdate[i]->setCulledForShadowCam(1, isCulled(m_shadow_camnodes[1], node));
-        DeferredUpdate[i]->setCulledForShadowCam(2, isCulled(m_shadow_camnodes[2], node));
-        DeferredUpdate[i]->setCulledForShadowCam(3, isCulled(m_shadow_camnodes[3], node));
+        DeferredUpdate[i]->setCulledForPlayerCam(isCulledPrecise(camnode, node));
+        DeferredUpdate[i]->setCulledForRSMCam(isCulledPrecise(m_suncam, node));
+        DeferredUpdate[i]->setCulledForShadowCam(0, isCulledPrecise(m_shadow_camnodes[0], node));
+        DeferredUpdate[i]->setCulledForShadowCam(1, isCulledPrecise(m_shadow_camnodes[1], node));
+        DeferredUpdate[i]->setCulledForShadowCam(2, isCulledPrecise(m_shadow_camnodes[2], node));
+        DeferredUpdate[i]->setCulledForShadowCam(3, isCulledPrecise(m_shadow_camnodes[3], node));
     }
 
     // Add a 1 s timeout
