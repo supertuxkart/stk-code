@@ -45,14 +45,21 @@ class GrandPrixEditorScreen :
     void loadGPList();
     void loadTrackList(const std::string& gpname);
     void showEditScreen(GrandPrixData* gp);
+    void enableButtons();
 
     void onNewGPWithName(const irr::core::stringw& newName);
     void onConfirm();
 
     GrandPrixData*   m_selection;
     std::string      m_action;
+    std::string      m_gpgroup;
 
 public:
+
+    static const char* ALL_GP_GROUP_ID;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

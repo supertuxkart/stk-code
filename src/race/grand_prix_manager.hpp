@@ -34,6 +34,7 @@ private:
     static const char* SUFFIX;
 
     std::vector<GrandPrixData*> m_gp_data;
+    std::vector<std::string>    m_groups;
 
     /** Load all the grands prix from the 3 directories known */
     void loadFiles();
@@ -54,6 +55,8 @@ public:
     unsigned int   getNumberOfGrandPrix()    const { return m_gp_data.size(); }
     bool existsName(const irr::core::stringw& name) const;
     void           checkConsistency();
+
+    const std::vector<std::string>& getAllGroups() const;
 
     // Methods for the gp editor
     GrandPrixData* editGrandPrix(const std::string& s) const;
