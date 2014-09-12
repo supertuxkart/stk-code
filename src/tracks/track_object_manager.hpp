@@ -44,17 +44,27 @@ protected:
       * eye candy (to reduce work for physics), ...
       */
     enum TrackObjectType {TO_PHYSICAL, TO_GRAPHICAL};
+
+    /** The list of all track objects. */
     PtrVector<TrackObject> m_all_objects;
+
+    /** A second list which holds all objects that karts can drive on. */
+    PtrVector<TrackObject, REF> m_driveable_objects;
 
 public:
          TrackObjectManager();
         ~TrackObjectManager();
-    void add(const XMLNode &xml_node, scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader);
+    void reset();
+    void init();
+    void add(const XMLNode &xml_node, scene::ISceneNode* parent,
+             ModelDefinitionLoader& model_def_loader);
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);
-    void reset();
-    void init();
+    void castRay(const btVector3 &from,
+                 const btVector3 &to, btVector3 *hit_point,
+                 const Material **material, btVector3 *normal = NULL,
+                 bool interpolate_normal = false) const;
 
     /** Enable or disable fog on objects */
     void enableFog(bool enable);
