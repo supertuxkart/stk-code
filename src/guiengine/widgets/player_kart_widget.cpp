@@ -589,7 +589,7 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
             // Add badge for per player difficulty if necessary
             m_model_view->unsetBadge(ZIPPER_BADGE);
             m_model_view->unsetBadge(ANCHOR_BADGE);
-            if (!m_parent_screen->m_from_overworld && (m_parent_screen->m_multiplayer || !profile->isSingleplayerDifficulty()))
+            if (!m_parent_screen->m_from_overworld && (m_parent_screen->m_multiplayer || profile->isSingleplayerDifficulty()))
             {
                 PerPlayerDifficulty difficulty = profile->getDifficulty();
                 if (difficulty < PLAYER_DIFFICULTY_NORMAL)

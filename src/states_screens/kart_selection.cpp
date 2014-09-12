@@ -508,9 +508,10 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
     newPlayerWidget->add();
 
     // Add badge for per player difficulty if necessary
-    if (!m_from_overworld && (m_multiplayer || !profile_to_use->isSingleplayerDifficulty()))
+    if (!m_from_overworld && (m_multiplayer || profile_to_use->isSingleplayerDifficulty()))
     {
         PerPlayerDifficulty difficulty = profile_to_use->getDifficulty();
+        Log::info("From overworld", "%d", difficulty);
         if (difficulty < PLAYER_DIFFICULTY_NORMAL)
             m_kart_widgets[new_player_id].m_model_view->setBadge(ZIPPER_BADGE);
         else if (difficulty > PLAYER_DIFFICULTY_NORMAL)
@@ -1191,7 +1192,7 @@ void KartSelectionScreen::allPlayersDone()
         race_manager->setLocalKartInfo(n, selected_kart);
         // Set per player difficulty if needed
         const PlayerProfile* profile = StateManager::get()->getActivePlayerProfile(n);
-        if (!m_from_overworld && (m_multiplayer || !profile->isSingleplayerDifficulty()))
+        if (!m_from_overworld && (m_multiplayer || profile->isSingleplayerDifficulty()))
             race_manager->setPlayerDifficulty(n, profile->getDifficulty());
     }
 
