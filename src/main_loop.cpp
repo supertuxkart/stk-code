@@ -36,7 +36,6 @@
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
-#include <thread>
 
 MainLoop* main_loop = 0;
 
@@ -109,9 +108,6 @@ void MainLoop::updateRace(float dt)
         World::getWorld()->updateWorld(dt);
 }   // updateRace
 
-
-std::thread IAThread;
-
 //-----------------------------------------------------------------------------
 /** Run the actual main loop.
  */
@@ -177,8 +173,6 @@ void MainLoop::run()
         }
 
         PROFILER_POP_CPU_MARKER();
-        if(IAThread.joinable())
-            IAThread.join();
         PROFILER_SYNC_FRAME();
     }  // while !m_abort
 

@@ -65,7 +65,7 @@
 #include <ctime>
 #include <sstream>
 #include <stdexcept>
-#include <thread>
+
 
 World* World::m_world = NULL;
 
@@ -763,8 +763,6 @@ void World::scheduleUnpause()
     }
 }   // scheduleUnpause
 
-extern std::thread IAThread;
-
 //-----------------------------------------------------------------------------
 /** This is the main interface to update the world. This function calls
  *  update(), and checks then for the end of the race. Note that race over
@@ -928,14 +926,13 @@ void World::update(float dt)
     }
 
     PROFILER_PUSH_CPU_MARKER("World::update (AI)", 0x40, 0x7F, 0x00);
-    IAThread = std::thread([&]() {
-        const int kart_amount = m_karts.size();
-        for (int i = 0; i < kart_amount; ++i)
-        {
-            // Update all karts that are not eliminated
-            if (!m_karts[i]->isEliminated()) m_karts[i]->update(dt);
-        }
-    });
+    const int kart_amount = m_karts.size();
+#pragma omp parallel for
+    for (int i = 0 ; i < kart_amount; ++i)
+    {
+        // Update all karts that are not eliminated
+        if(!m_karts[i]->isEliminated()) m_karts[i]->update(dt) ;
+    }
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (camera)", 0x60, 0x7F, 0x00);
