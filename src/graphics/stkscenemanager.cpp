@@ -409,6 +409,13 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
             continue;
         }
 
+        if (STKBillboard *node = dynamic_cast<STKBillboard *>(*I))
+        {
+            if (!isCulledPrecise(cam, *I))
+                BillBoardList::getInstance()->push_back(node);
+            continue;
+        }
+
         handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam);
 
         parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadow_cam, rsmcam);
@@ -448,6 +455,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     ListMatSplatting::getInstance()->clear();
 
     ImmediateDrawList::getInstance()->clear();
+    BillBoardList::getInstance()->clear();
     ParticlesList::getInstance()->clear();
     ListInstancedGlow::getInstance()->clear();
 
