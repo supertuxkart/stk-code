@@ -60,6 +60,9 @@ private:
     /** Wether the user can edit this grand prix or not */
     bool m_editable;
 
+    /** ID of the group to which this GP belongs. */
+    std::string m_group;
+
     /** In the last GP Fort Magma can not be used untill the final challenge.
      *  In order to provide still 5 tracks/GP, the last GP is only using 4
      *  tracks in story mode, but once nolok is unlocked Fort Magma becomes
@@ -83,6 +86,10 @@ public:
 #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
 #  pragma warning(disable:4290)
 #endif
+    static const char* STANDARD_GP_GROUP_ID;
+    static const char* USER_GP_GROUP_ID;
+    static const char* ADDON_GP_GROUP_ID;
+
     /** Load the GrandPrixData from the given filename */
     GrandPrixData(const std::string& filename);
 
@@ -141,6 +148,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the filename of the grand prix xml file. */
     const std::string& getFilename() const { return m_filename;           }
+
+    // ------------------------------------------------------------------------
+    /** Returns the group. */
+    const std::string& getGroup() const { return m_group;                 }
 };   // GrandPrixData
 
 #endif

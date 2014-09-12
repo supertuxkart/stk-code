@@ -20,6 +20,7 @@
 #include "race/grand_prix_data.hpp"
 
 #include "config/player_profile.hpp"
+#include "config/user_config.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "io/file_manager.hpp"
@@ -35,16 +36,20 @@
 #include <stdexcept>
 
 
+const char* GrandPrixData::STANDARD_GP_GROUP_ID = "standard";
+const char* GrandPrixData::USER_GP_GROUP_ID = "user";
+const char* GrandPrixData::ADDON_GP_GROUP_ID = "Add-Ons";
+
 // ----------------------------------------------------------------------------
 /** Loads a grand prix definition from a file.
  *  \param filename Name of the file to load.
  */
 GrandPrixData::GrandPrixData(const std::string& filename)
 {
-    m_filename = filename;
-    m_id       = StringUtils::getBasename(
-                                        StringUtils::removeExtension(filename));
+    setFilename(filename);
+    m_id       = StringUtils::getBasename(StringUtils::removeExtension(filename));
     m_editable = (filename.find(file_manager->getGPDir(), 0) == 0);
+
     reload();
 }   // GrandPrixData
 
@@ -67,6 +72,7 @@ void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
     m_id       = "random";
     m_name     = "Random Grand Prix";
     m_editable = false;
+    m_group    = "";
 
     if(new_tracks)
     {
@@ -191,6 +197,13 @@ void GrandPrixData::setName(const irr::core::stringw& name)
 void GrandPrixData::setFilename(const std::string& filename)
 {
     m_filename = filename;
+
+    if (filename.find(file_manager->getAsset(FileManager::GRANDPRIX, ""), 0) == 0)
+        m_group = STANDARD_GP_GROUP_ID;
+    else if (filename.find(file_manager->getGPDir(), 0) == 0)
+        m_group = USER_GP_GROUP_ID;
+    else if (filename.find(UserConfigParams::m_additional_gp_directory, 0) == 0)
+        m_group = ADDON_GP_GROUP_ID;
 }   // setFilename
 
 // ----------------------------------------------------------------------------
@@ -241,10 +254,9 @@ void GrandPrixData::reload()
     const int amount = root->getNumNodes();
     if (amount == 0)
     {
-         Log::error("GrandPrixData",
-                    "Error while trying to read grandprix file '%s': "
-                    "There is no track defined", m_filename.c_str());
-        throw std::runtime_error("No track defined");
+         Log::warn("GrandPrixData",
+                   "Grandprix file '%s': There is no track defined",
+                   m_filename.c_str());
     }
 
     // Every iteration means parsing one track entry

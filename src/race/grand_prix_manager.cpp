@@ -34,6 +34,10 @@ const char* GrandPrixManager::SUFFIX = ".grandprix";
 // ----------------------------------------------------------------------------
 GrandPrixManager::GrandPrixManager()
 {
+    m_groups.push_back(GrandPrixData::STANDARD_GP_GROUP_ID);
+    m_groups.push_back(GrandPrixData::USER_GP_GROUP_ID);
+    m_groups.push_back(GrandPrixData::ADDON_GP_GROUP_ID);
+
     loadFiles();
 }   // GrandPrixManager
 
@@ -174,6 +178,12 @@ void GrandPrixManager::checkConsistency()
         }
     }
 }   // checkConsistency
+
+// ----------------------------------------------------------------------------
+const std::vector<std::string>& GrandPrixManager::getAllGroups() const
+{
+    return m_groups;
+}
 
 // ----------------------------------------------------------------------------
 GrandPrixData* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
