@@ -117,21 +117,6 @@ void FillInstances(const std::unordered_map<scene::IMeshBuffer *, std::vector<st
     }
 }
 
-static
-void FillInstancesGrass(const std::unordered_map<scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
-    InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, const core::vector3df &dir, size_t &PolyCount,
-    std::function<bool (const scene::ISceneNode *)> cull_func)
-{
-    auto It = GatheredGLMesh.begin(), E = GatheredGLMesh.end();
-    SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
-    for (; It != E; ++It)
-    {
-        FillInstances_impl(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, PolyCount, cull_func);
-        if (!UserConfigParams::m_azdo)
-            InstancedList.push_back(It->second.front().first);
-    }
-}
-
 static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForSolidPass[MAT_COUNT];
 static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, STKMeshCommon *> > > MeshForGlowPass;
 static std::vector <STKMeshCommon *> DeferredUpdate;
@@ -442,18 +427,6 @@ GenDrawCalls(unsigned cascade, std::vector<GLMesh *> &InstancedList,
         ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
 }
 
-template<MeshMaterial Mat> static void
-GenDrawCallsGrass(unsigned cascade, std::vector<GLMesh *> &InstancedList,
-InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, const core::vector3df &dir, size_t &PolyCount)
-{
-    std::function<bool(const scene::ISceneNode *)> shadowculling = [&](const scene::ISceneNode *nd) {return dynamic_cast<const STKMeshCommon*>(nd)->isCulledForShadowCam(cascade); };
-    if (irr_driver->hasARB_draw_indirect())
-        ShadowPassCmd::getInstance()->Offset[cascade][Mat] = CommandBufferOffset; // Store command buffer offset
-    FillInstancesGrass(MeshForSolidPass[Mat], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, dir, PolyCount, shadowculling);
-    if (UserConfigParams::m_azdo)
-        ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
-}
-
 int enableOpenMP;
 
 void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
@@ -605,7 +578,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 
             // Grass
             SolidPassCmd::getInstance()->Offset[MAT_GRASS] = current_cmd;
-            FillInstancesGrass(MeshForSolidPass[MAT_GRASS], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, windDir, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_GRASS], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_GRASS] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_GRASS];
 
             if (!irr_driver->hasBufferStorageExtension())
@@ -675,7 +648,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
                 // Mat Detail
                 GenDrawCalls<MAT_DETAIL>(i, ListInstancedMatDetails::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
                 // Mat Grass
-                GenDrawCallsGrass<MAT_GRASS>(i, ListInstancedMatGrass::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, windDir, ShadowPoly);
+                GenDrawCalls<MAT_GRASS>(i, ListInstancedMatGrass::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
             }
             if (!irr_driver->hasBufferStorageExtension())
             {
