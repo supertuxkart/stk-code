@@ -24,6 +24,11 @@ const core::vector3df& scale) :
     isMaterialInitialized = false;
 }
 
+STKAnimatedMesh::~STKAnimatedMesh()
+{
+    cleanGLMeshes();
+}
+
 void STKAnimatedMesh::cleanGLMeshes()
 {
     for (u32 i = 0; i < GLmeshes.size(); ++i)
