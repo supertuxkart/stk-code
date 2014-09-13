@@ -104,7 +104,10 @@ void initGL()
     if (is_gl_init)
         return;
     is_gl_init = true;
+    // For Mesa extension reporting
+#ifdef UNIX
     glewExperimental = GL_TRUE;
+#endif
     GLenum err = glewInit();
     if (GLEW_OK != err)
         Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
