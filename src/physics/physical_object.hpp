@@ -164,6 +164,11 @@ public:
     void         move           (const Vec3& xyz, const core::vector3df& hpr);
     void         hit            (const Material *m, const Vec3 &normal);
     bool         isSoccerBall   () const;
+    bool castRay(const btVector3 &from,
+                 const btVector3 &to, btVector3 *hit_point,
+                 const Material **material, btVector3 *normal,
+                 bool interpolate_normal) const;
+
     // ------------------------------------------------------------------------
     /** Returns the ID of this physical object. */
     std::string getID()          { return m_id; }

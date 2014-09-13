@@ -628,6 +628,9 @@ void IrrDriver::renderTransparent()
             TexUnit(0, true)), ListAdditiveTransparent::getInstance());
     }
 
+    for (unsigned i = 0; i < BillBoardList::getInstance()->size(); i++)
+        BillBoardList::getInstance()->at(i)->render();
+
     if (!UserConfigParams::m_dynamic_lights)
         return;
 

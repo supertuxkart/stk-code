@@ -80,7 +80,10 @@ protected:
     bool                           m_soccer_ball;
     
     bool                           m_garage;
-    
+
+    /** True if a kart can drive on this object. This will */
+    bool                           m_is_driveable;
+
     float                          m_distance;
 
     PhysicalObject*                m_physical_object;
@@ -101,46 +104,64 @@ public:
                              const PhysicalObject::Settings* physicsSettings);
     virtual      ~TrackObject();
     virtual void update(float dt);
-    virtual void reset();
-    /** To finish object constructions. Called after the track model
-     *  is ready. */
-    virtual void init() {};
-    /** Called when an explosion happens. As a default does nothing, will
-     *  e.g. be overwritten by physical objects etc. */
-    virtual void handleExplosion(const Vec3& pos, bool directHit) {};
-    void         setEnable(bool mode);
-    void         setID(std::string obj_id) { m_id = obj_id; }
-
-    const std::string& getLodGroup() const { return m_lod_group; }
-
-    const std::string& getType() const { return m_type; }
-
-	const std::string getName() const { return m_name; }
-
-    const std::string getID() const { return m_id; }
-
-    const std::string getInteraction() const { return m_interaction; }
-
-	bool isEnabled() const { return m_enabled; }
-    bool isSoccerBall() const { return m_soccer_ball; }
-    bool isGarage() const { return m_garage; }
-    float getDistance() const { return m_distance; }
-    
-    const PhysicalObject* getPhysicalObject() const { return m_physical_object; }
-    PhysicalObject* getPhysicalObject() { return m_physical_object; }
-    //Due to above overload AngelScript cannot decide which function to bind
-    PhysicalObject* getPhysicalObjectForScript() { return m_physical_object; }
-
-    const core::vector3df getInitXYZ() const { return m_init_xyz; }
-    const core::vector3df getInitRotation() const { return m_init_hpr; }
-    const core::vector3df getInitScale() const { return m_init_scale; }
-
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
               const core::vector3df& scale, bool updateRigidBody);
 
+    virtual void reset();
+    void setEnable(bool mode);
+    const core::vector3df& getPosition() const;
+    const core::vector3df  getAbsolutePosition() const;
+    const core::vector3df& getRotation() const;
+    const core::vector3df& getScale() const;
+    bool castRay(const btVector3 &from, 
+                 const btVector3 &to, btVector3 *hit_point,
+                 const Material **material, btVector3 *normal,
+                 bool interpolate_normal) const;
+
+    // ------------------------------------------------------------------------
+    /** To finish object constructions. Called after the track model
+     *  is ready. */
+    virtual void init() {};
+    // ------------------------------------------------------------------------
+    /** Called when an explosion happens. As a default does nothing, will
+     *  e.g. be overwritten by physical objects etc. */
+    virtual void handleExplosion(const Vec3& pos, bool directHit) {};
+    void         setID(std::string obj_id) { m_id = obj_id; }
+
+    // ------------------------------------------------------------------------
+    const std::string& getLodGroup() const { return m_lod_group; }
+    // ------------------------------------------------------------------------
+    const std::string& getType() const { return m_type; }
+    // ------------------------------------------------------------------------
+	const std::string getName() const { return m_name; }
+    // ------------------------------------------------------------------------
+    const std::string getID() const { return m_id; }
+    // ------------------------------------------------------------------------
+    const std::string getInteraction() const { return m_interaction; }
+    // ------------------------------------------------------------------------
+	bool isEnabled() const { return m_enabled; }
+    // ------------------------------------------------------------------------
+    bool isSoccerBall() const { return m_soccer_ball; }
+    // ------------------------------------------------------------------------
+    bool isGarage() const { return m_garage; }
+    // ------------------------------------------------------------------------
+    float getDistance() const { return m_distance; }
+    // ------------------------------------------------------------------------
+    const PhysicalObject* getPhysicalObject() const { return m_physical_object; }
+    // ------------------------------------------------------------------------
+    PhysicalObject* getPhysicalObject() { return m_physical_object; }
+    //Due to above overload AngelScript cannot decide which function to bind
+    PhysicalObject* getPhysicalObjectForScript() { return m_physical_object; }
+    // ------------------------------------------------------------------------
+    const core::vector3df getInitXYZ() const { return m_init_xyz; }
+    // ------------------------------------------------------------------------
+    const core::vector3df getInitRotation() const { return m_init_hpr; }
+    // ------------------------------------------------------------------------
+    const core::vector3df getInitScale() const { return m_init_scale; }
+    // ------------------------------------------------------------------------
     template<typename T>
     T* getPresentation() { return dynamic_cast<T*>(m_presentation); }
-
+    // ------------------------------------------------------------------------
     template<typename T>
     const T* getPresentation() const { return dynamic_cast<T*>(m_presentation); }
 
@@ -151,17 +172,17 @@ public:
 
     TrackObjectPresentationSound* getSound(){ return getPresentation<TrackObjectPresentationSound>(); }
 
+    // ------------------------------------------------------------------------
     ThreeDAnimation* getAnimator() { return m_animator; }
+    // ------------------------------------------------------------------------
     const ThreeDAnimation* getAnimator() const { return m_animator; }
     //Due to above overload AngelScript cannot decide which function to bind
     ThreeDAnimation* getAnimatorForScript() { return m_animator; }
-
+    // ------------------------------------------------------------------------
     void setPaused(bool mode){ m_animator->setPaused(mode); }
-
-    const core::vector3df& getPosition() const;
-    const core::vector3df  getAbsolutePosition() const;
-    const core::vector3df& getRotation() const;
-    const core::vector3df& getScale() const;
+    // ------------------------------------------------------------------------
+    /** Returns if a kart can drive on this object. */
+    bool isDriveable() const { return m_is_driveable; }
 
     LEAK_CHECK()
 };   // TrackObject

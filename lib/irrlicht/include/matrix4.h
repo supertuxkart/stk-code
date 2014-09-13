@@ -12,8 +12,8 @@
 #include "aabbox3d.h"
 #include "rect.h"
 #include "irrString.h"
-#if defined(WIN32) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
-#include <intrin.h>
+#if defined(WIN32) && !defined(__MINGW32__) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
+	#include <intrin.h>
 #endif
 
 // enable this to keep track of changes to the matrix
@@ -48,7 +48,7 @@ namespace core
 	class CMatrix4
 	{
     private:
-#if defined(WIN32) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
+#if defined(WIN32) && !defined(__MINGW32__) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
         float M_raw[24];
 #endif
 		public:
@@ -409,7 +409,7 @@ namespace core
 			bool equals(const core::CMatrix4<T>& other, const T tolerance=(T)ROUNDING_ERROR_f64) const;
 
 		private:
-#if defined(WIN32) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
+#if defined(WIN32) && !defined(__MINGW32__)  && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
 			//! Matrix data, stored in row-major order
             T* M = (T*)((uintptr_t)&M_raw[4] & ~0xF);
 #else
@@ -669,7 +669,7 @@ namespace core
 		const T *m1 = other_a.M;
 		const T *m2 = other_b.M;
 
-#if defined(WIN32) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
+#if defined(WIN32) && !defined(__MINGW32__) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
         // From http://drrobsjournal.blogspot.fr/2012/10/fast-simd-4x4-matrix-multiplication.html
         // Use unaligned load/store
 
@@ -1019,13 +1019,13 @@ namespace core
 		const f64 t = 1.0 - c;
 
 		const f64 tx  = t * axis.X;
-		const f64 ty  = t * axis.Y;		
+		const f64 ty  = t * axis.Y;
 		const f64 tz  = t * axis.Z;
 
 		const f64 sx  = s * axis.X;
 		const f64 sy  = s * axis.Y;
 		const f64 sz  = s * axis.Z;
-		
+
 		M[0] = (T)(tx * axis.X + c);
 		M[1] = (T)(tx * axis.Y + sz);
 		M[2] = (T)(tx * axis.Z - sy);
@@ -1385,7 +1385,7 @@ namespace core
         }
 #endif
         const CMatrix4<T> &m = *this;
-#if defined(WIN32) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
+#if defined(WIN32) && !defined(__MINGW32__) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
         float *src = (float*)m.pointer();
         float *dst = (float*)out.pointer();
         // from http://www.intel.com/design/pentiumiii/sml/245043.htm

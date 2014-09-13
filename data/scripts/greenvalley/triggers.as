@@ -7,7 +7,7 @@ void sheep_dance()
      //displayMessage("moo");
      sheepMesh.setLoop(1,3); //rapid-nod sheep
      Vec3 newloc = Vec3(2,3,4);
-     sheepMesh.move(newloc);
+     //sheepMesh.move(newloc);
      //runScript("sheep_approach");
      TrackObject @t_obj2 = getTrackObject("waterfall");
      ParticleEmitter @waterfallemitter = t_obj2.getParticleEmitter();

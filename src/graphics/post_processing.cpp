@@ -608,7 +608,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             // Grab the sky
             out_fbo->Bind();
             glClear(GL_COLOR_BUFFER_BIT);
-            irr_driver->renderSkybox(camnode);
+//            irr_driver->renderSkybox(camnode);
 
             // Set the sun's color
             const SColor col = track->getGodRaysColor();
@@ -617,9 +617,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
 
             // The sun interposer
             STKMeshSceneNode *sun = irr_driver->getSunInterposer();
+            sun->setGlowColors(col);
             sun->setPosition(track->getGodRaysPosition());
             sun->updateAbsolutePosition();
-            irr_driver->getSceneManager()->drawAll(ESNRP_CAMERA);
             irr_driver->setPhase(GLOW_PASS);
             sun->render();
             glDisable(GL_DEPTH_TEST);

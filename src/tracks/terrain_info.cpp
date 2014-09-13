@@ -18,13 +18,15 @@
 
 #include "tracks/terrain_info.hpp"
 
-#include <math.h>
-
 #include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
+
+#include <math.h>
 
 /** Constructor to initialise terrain data.
  */
@@ -59,6 +61,10 @@ void TerrainInfo::update(const Vec3 &from)
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
     tm.castRay(from, to, &m_hit_point, &m_material, &m_normal,
                /*interpolate*/false);
+    // Now also raycast against all track objects (that are driveable).
+    World::getWorld()->getTrack()->getTrackObjectManager()
+                     ->castRay(from, to, &m_hit_point, &m_material,
+                               &m_normal, /*interpolate*/false);
 }   // update
 //-----------------------------------------------------------------------------
 /** Update the terrain information based on the latest position.
@@ -74,6 +80,13 @@ void TerrainInfo::update(const btTransform &trans, const Vec3 &offset)
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
     tm.castRay(from, to, &m_hit_point, &m_material, &m_normal,
                /*interpolate*/true);
+
+    // Now also raycast against all track objects (that are driveable). If
+    // there should be a closer result (than the one against the main track 
+    // mesh), its data will be returned.
+    World::getWorld()->getTrack()->getTrackObjectManager()
+                     ->castRay(from, to, &m_hit_point, &m_material,
+                               &m_normal, /*interpolate*/true);
 }   // update
 
 // -----------------------------------------------------------------------------

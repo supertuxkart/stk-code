@@ -1,6 +1,6 @@
 void onUpdate()
 {
-
+/*
      TrackObject @t_obj = getTrackObject("anim_sheep2.b3d");
      Mesh @sheepMesh = t_obj.getMesh();
      Vec3 newloc = Vec3(2,-2,-2);
@@ -14,4 +14,5 @@ void onUpdate()
      Vec3 kartLoc = getKartLocation(0);
      sheepMesh.move(kartLoc);
      printVec3(kartLoc);
+*/
 }
