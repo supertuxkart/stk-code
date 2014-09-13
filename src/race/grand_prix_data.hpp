@@ -36,6 +36,17 @@ class Track;
   */
 class GrandPrixData
 {
+public:
+    /** Used to classify GPs into groups */
+    enum GPGroupType
+    {
+        GP_NONE = 0,      ///< No group
+        GP_STANDARD,      ///< Standard GP, included with the game
+        GP_USER_DEFINED,  ///< Created by the user
+        GP_ADDONS,        ///< Add-on GP
+        GP_GROUP_COUNT    ///< Number of groups
+    };   // GPGroupType
+
 private:
     /** The name of the grand prix. */
     irr::core::stringw m_name;
@@ -59,6 +70,9 @@ private:
 
     /** Wether the user can edit this grand prix or not */
     bool m_editable;
+
+    /** Group to which this GP belongs. */
+    enum GPGroupType m_group;
 
     /** In the last GP Fort Magma can not be used untill the final challenge.
      *  In order to provide still 5 tracks/GP, the last GP is only using 4
@@ -84,7 +98,7 @@ public:
 #  pragma warning(disable:4290)
 #endif
     /** Load the GrandPrixData from the given filename */
-    GrandPrixData(const std::string& filename);
+    GrandPrixData(const std::string& filename, enum GPGroupType group);
 
     /** Needed for simple creation of an instance of GrandPrixData */
     GrandPrixData() {};
@@ -103,6 +117,7 @@ public:
     void setName(const irr::core::stringw& name);
     void setFilename(const std::string& filename);
     void setEditable(const bool editable);
+    void setGroup(const enum GPGroupType group);
     /** Load the grand prix from the file set by the constructor or the grand
      * prix editor */
     void reload();
@@ -141,6 +156,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the filename of the grand prix xml file. */
     const std::string& getFilename() const { return m_filename;           }
+
+    // ------------------------------------------------------------------------
+    /** Returns the group. */
+    enum GPGroupType getGroup()      const { return m_group;              }
 };   // GrandPrixData
 
 #endif

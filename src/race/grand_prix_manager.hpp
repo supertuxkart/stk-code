@@ -19,6 +19,8 @@
 #ifndef HEADER_GRAND_PRIX_MANAGER_HPP
 #define HEADER_GRAND_PRIX_MANAGER_HPP
 
+#include "race/grand_prix_data.hpp"
+
 #include <vector>
 #include <string>
 
@@ -38,9 +40,9 @@ private:
     /** Load all the grands prix from the 3 directories known */
     void loadFiles();
     /** Load all the grands prix in one directory */
-    void loadDir(const std::string& dir);
+    void loadDir(const std::string& dir, enum GrandPrixData::GPGroupType group);
     /** Load a grand prix and add it to m_gp_data*/
-    void load(const std::string &filename);
+    void load(const std::string &filename, enum GrandPrixData::GPGroupType group);
 
     /** Generates a new unique indentifier for a user defined grand prix */
     std::string generateId();
