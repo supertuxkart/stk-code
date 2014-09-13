@@ -204,7 +204,10 @@ private:
     float         m_view_blocked_by_plunger;
     float         m_speed;
 
-    std::map<std::string, SFXBase*> m_custom_sounds;
+    /** All sounds for this kart accessible through their name. Note that this
+     * is only a copy from the kart properties for easier acces, so it is
+     * allocated and freed there */
+    std::map<std::string, SFXBase*>* m_sounds;
     SFXBase      *m_terrain_sound;
     /** A pointer to the previous terrain sound needs to be saved so that an
      *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */

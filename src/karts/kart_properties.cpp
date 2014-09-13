@@ -92,7 +92,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_squash_duration = m_downward_impulse_factor =
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
         m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time =
-        m_smooth_flying_impulse = m_physical_wheel_position = 
+        m_smooth_flying_impulse = m_physical_wheel_position =
         m_graphical_y_offset =
             UNDEFINED;
 
@@ -425,51 +425,6 @@ void KartProperties::getAllData(const XMLNode * root)
         m_camera_backward_up_angle *= DEGREE_TO_RAD;
     }
 
-    if(const XMLNode *sounds_node= root->getNode("sounds"))
-    {
-        std::string s;
-        sounds_node->get("engine", &s);
-        if      (s == "large") m_engine_sfx_type = "engine_large";
-        else if (s == "small") m_engine_sfx_type = "engine_small";
-        else
-        {
-            if (sfx_manager->soundExist(s))
-            {
-                m_engine_sfx_type = s;
-            }
-            else
-            {
-                Log::error("[KartProperties]",
-                           "Kart '%s' has an invalid engine '%s'.",
-                           m_name.c_str(), s.c_str());
-                m_engine_sfx_type = "engine_small";
-            }
-        }
-
-#ifdef WILL_BE_ENABLED_ONCE_DONE_PROPERLY
-        // Load custom kart SFX files (TODO: enable back when it's implemented properly)
-        for (int i = 0; i < SFXManager::NUM_CUSTOMS; i++)
-        {
-            std::string tempFile;
-            // Get filename associated with each custom sfx tag in sfx config
-            if (sounds_node->get(sfx_manager->getCustomTagName(i), tempFile))
-            {
-                // determine absolute filename
-                // FIXME: will not work with add-on packs (is data dir the same)?
-                tempFile = file_manager->getKartFile(tempFile, getIdent());
-
-                // Create sfx in sfx manager and store id
-                m_custom_sfx_id[i] = sfx_manager->addSingleSfx(tempFile, 1, 0.2f,1.0f);
-            }
-            else
-            {
-                // if there is no filename associated with a given tag
-                m_custom_sfx_id[i] = -1;
-            }   // if custom sound
-        }   // for i<SFXManager::NUM_CUSTOMS
-#endif
-    }   // if sounds-node exist
-
     if(const XMLNode *nitro_node = root->getNode("nitro"))
     {
         nitro_node->get("consumption",          &m_nitro_consumption       );
@@ -620,6 +575,8 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         graphics_node->get("y-offset", &m_graphical_y_offset);
     }
+
+    initSound(root->getNode("sounds"), root->getNode("audio"));
 
     if(m_kart_model)
         m_kart_model->loadInfo(*root);
@@ -779,7 +736,95 @@ bool KartProperties::isInGroup(const std::string &group) const
     return std::find(m_groups.begin(), m_groups.end(), group) != m_groups.end();
 }   // isInGroups
 
+// ----------------------------------------------------------------------------
+void KartProperties::initSound(const XMLNode* sound_node, const XMLNode* audio_node)
+{
+    // Avoid a crash because sfx_manager is not initialised
+    if (!sound_node && !audio_node)
+        return;
 
+    m_sounds = new std::map<std::string, SFXBase*>();
+
+    // init some mandatory sounds with defaults
+    std::string names[] = {"horn", "crash", "boing", "goo", "skid", "shoot"};
+    for (unsigned int i = 0; i < 6; i++) {
+        // TODO: use map::emplace when C++11 is ready
+        SFXBase* tmp = sfx_manager->createSoundSource(names[i]);
+        m_sounds->insert(std::pair<std::string, SFXBase*>(names[i], tmp));
+    }
+    // TODO: Only one default engine sound called "engine"
+    SFXBase* tmp = sfx_manager->createSoundSource("engine_small");
+    m_sounds->insert(std::pair<std::string, SFXBase*>("engine", tmp));
+
+    if (sound_node)
+    {
+        // Engine Fallback
+        // TODO: Port all karts to use the new sounds and replace this code
+        std::string s;
+        sound_node->get("engine", &s);
+        std::string name;
+        if      (s == "large") name = "engine_large";
+        else if (s == "small") name = "engine_small";
+        else
+        {
+            if (sfx_manager->soundExist(s))
+            {
+                name = s;
+            }
+            else
+            {
+                Log::error("[KartProperties]",
+                           "Kart '%s' has an invalid engine '%s'.",
+                           m_name.c_str(), s.c_str());
+                name = "engine_small";
+            }
+        }
+
+        (*m_sounds)["engine"] = sfx_manager->createSoundSource(name);
+    }
+
+    if (audio_node)
+    {
+        for (unsigned int i = 0; i < audio_node->getNumNodes(); i++)
+        {
+            const XMLNode* sfx = audio_node->getNode(i);
+            std::string path, location, id, filename;
+            if(!sfx->get("id", &id) || !sfx->get("filename", &filename))
+            {
+                Log::warn("[KartProperties]", "The %d. sound in the audio "
+                          "section of the kart.xml of %s has no id or no "
+                          "filename.\n"
+                          "Skipping this sound.", i, m_name.c_str());
+                continue;
+            }
+
+            sfx->get("location", &location);
+            if (location == "from game")
+            {
+                path = file_manager->getAsset(FileManager::SFX, filename);
+            }
+            else if (location == "from kart")
+            {
+                path = m_root + filename;
+            }
+            else if (location == "custom")
+            {
+                Log::warn("[KartProperties]", "Custom audio paths shouldn't be used");
+                path = filename;
+            }
+            else
+            {
+                Log::warn("[KartProperties]", "The %d. sound in the audio "
+                          "section of the kart.xml of %s has an invalid "
+                          "location '%s'.\nSkipping this sound.",
+                          i, m_name.c_str(), location.c_str());
+                continue;
+            }
+
+            //m_sounds->insert(std::pair<std::string, std::string>(id, path));
+        }
+    }
+}
 // ----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready-set-go'. It searches
  *  through m_startup_times to find the appropriate slot, and returns the
