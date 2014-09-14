@@ -22,6 +22,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "audio/sfx_buffer.hpp"
 #include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -1983,7 +1984,10 @@ void Kart::updateSFX()
     // Set the all sound sources to the kart position
     std::map<std::string, SFXBase*>::iterator i;
     for (i = m_sounds->begin(); i != m_sounds->end(); i++)
-        i->second->position(getXYZ());
+    {
+        if (i->second->getBuffer()->isPositional())
+            i->second->position(getXYZ());
+    }
 
     if(( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
          m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&

@@ -703,7 +703,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
     glGetError();
 }
 
-bool hasGLExtension(const char* extension) 
+bool hasGLExtension(const char* extension)
 {
     if (glGetStringi != NULL)
     {

@@ -406,7 +406,7 @@ public:
     void  checkAllSet       (const std::string &filename);
     float getStartupBoost   () const;
     bool  isInGroup         (const std::string &group) const;
-    void  initSound         (const XMLNode* sound_node,
+    void  loadSound         (const XMLNode* sound_node,
                              const XMLNode* audio_node);
     bool  operator<(const KartProperties &other) const;
 

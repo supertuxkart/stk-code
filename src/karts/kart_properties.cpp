@@ -31,12 +31,14 @@
 #include "modes/world.hpp"
 #include "io/xml_node.hpp"
 #include "audio/sfx_base.hpp"
+#include "audio/sfx_buffer.hpp"
 #include "audio/sfx_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <cassert>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -581,7 +583,7 @@ void KartProperties::getAllData(const XMLNode * root)
         graphics_node->get("y-offset", &m_graphical_y_offset);
     }
 
-    initSound(root->getNode("sounds"), root->getNode("audio"));
+    loadSound(root->getNode("sounds"), root->getNode("audio"));
 
     if(m_kart_model)
         m_kart_model->loadInfo(*root);
@@ -736,7 +738,28 @@ bool KartProperties::isInGroup(const std::string &group) const
 }   // isInGroups
 
 // ----------------------------------------------------------------------------
-void KartProperties::initSound(const XMLNode* sound_node, const XMLNode* audio_node)
+/** \brief Loads the kart sounds and mofdifies them with the data from the nodes
+ * \param sound_node the "sound" node from the kart.xml. Only capable of \
+ *        deciding what sound should be used for the engine and left to \
+ *        support kart not yet updated
+ * \param audio_node The "audio" node from kart.xml. The node itself doesn't
+ *        contain any information, its only use is to capsule its children.
+ * Each child of the <audio> looks like the following:
+ * <sfx location="kart" id="zipper" filename="nyan.ogg"/>
+ * For the location, there are 3 possibilities:
+ *  - "kart": The sound is in the folder of the kart or a subfolder. For using
+ *            a subfolder, simply add the folder to the filename, e.g.
+ *            "sound/nyan.ogg"
+ *  - "game": The sound is part of the main game.
+ *  - "custom": Warning: Only for development. Use this to get access a sound
+ *              anywhere on you computer
+ * The id specifies when the sound is called, e.g. "explode" when the kart was
+ * hit by something: TODO: Full list of sfx (in the wiki?)
+ * The only thing special about the filename is that it might contain a path
+ * There are four more optional arguments - "rolloff", "positional", "volume"
+ * and "max_dist" - which can override defaults from SFXBuffer.
+ */
+void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_node)
 {
     // Avoid a crash because sfx_manager is not initialised
     if (!sound_node && !audio_node)
@@ -779,7 +802,9 @@ void KartProperties::initSound(const XMLNode* sound_node, const XMLNode* audio_n
             }
         }
 
-        (*m_sounds)["engine"] = sfx_manager->createSoundSource(name);
+        SFXBase* tmp = sfx_manager->createSoundSource(name);
+        assert(tmp != NULL);
+        m_sounds->insert(std::pair<std::string, SFXBase*>("engine", tmp);
     }
 
     if (audio_node)
@@ -788,39 +813,62 @@ void KartProperties::initSound(const XMLNode* sound_node, const XMLNode* audio_n
         {
             const XMLNode* sfx = audio_node->getNode(i);
             std::string path, location, id, filename;
-            if(!sfx->get("id", &id) || !sfx->get("filename", &filename))
+            if(!sfx->get("id",       &id      ) ||
+               !sfx->get("filename", &filename) ||
+               !sfx->get("location", &location))
             {
-                Log::warn("[KartProperties]", "The %d. sound in the audio "
-                          "section of the kart.xml of %s has no id or no "
-                          "filename.\n"
-                          "Skipping this sound.", i, m_name.c_str());
+                Log::error("[KartProperties]", "The %d. sound in the audio "
+                           "section of kart '%s' does not contain all mandatory "
+                           "parameters.", i+1, m_name.c_str());
+                Log::error("[KartProperties]", "Skipping this sound.");
                 continue;
             }
 
-            sfx->get("location", &location);
-            if (location == "from game")
+            SFXBase* tmp;
+            if (location == "game")
             {
-                path = file_manager->getAsset(FileManager::SFX, filename);
+                tmp = sfx_manager->createSoundSource(filename);
+                if (tmp == NULL)
+                    continue; // Warning already printed by createSoundSource
             }
-            else if (location == "from kart")
+            else if (location == "kart")
             {
-                path = m_root + filename;
+                SFXBuffer* buffer = new SFXBuffer(m_root + filename, sfx);
+                tmp = sfx_manager->createSoundSource(buffer, false, true);
+                if (!buffer->load())
+                {
+                    Log::error("[KartProperties]", "The %d. sound in the "
+                               "section of kart '%s' could not be loaded.",
+                               i+1, m_name.c_str());
+                    continue;
+                }
+                tmp = sfx_manager->createSoundSource(buffer, false, true);
             }
             else if (location == "custom")
             {
                 Log::warn("[KartProperties]", "Custom audio paths should be avoided");
-                path = filename;
+                SFXBuffer* buffer = new SFXBuffer(filename, sfx);
+                if (!buffer->load())
+                {
+                    Log::error("[KartProperties]", "Especially if the file "
+                                                   "can't be loaded!");
+                    delete buffer;
+                    continue;
+                }
+                tmp = sfx_manager->createSoundSource(buffer, false, true);
             }
             else
             {
-                Log::warn("[KartProperties]", "The %d. sound in the audio "
-                          "section of the kart.xml of %s has an invalid "
-                          "location '%s'.\nSkipping this sound.",
-                          i, m_name.c_str(), location.c_str());
+                Log::error("[KartProperties]", "The %d. sound in the audio "
+                           "section of the kart.xml of %s has an invalid "
+                           "location '%s'.", i+1, m_name.c_str(),
+                           location.c_str());
+                Log::error("[KartProperties]", "Skipping this sound.");
                 continue;
             }
 
-            //m_sounds->insert(std::pair<std::string, std::string>(id, path));
+            assert(tmp != NULL);
+            m_sounds->insert(std::pair<std::string, SFXBase*>(id, tmp));
         }
     }
 }
