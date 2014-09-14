@@ -1974,7 +1974,10 @@ void Kart::updatePhysics(float dt)
 }   // updatePhysics
 
 //-----------------------------------------------------------------------------
-/** Adjust the engine sound effect depending on the speed of the kart.
+/** Updates everything SFX-related:
+ *  - Adjust the engine sound effect depending on the speed of the kart.
+ *  - set the positions of all positional sounds
+ *  - starts/stops skid sound
  */
 void Kart::updateSFX()
 {
