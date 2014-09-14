@@ -804,7 +804,7 @@ void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_n
 
         SFXBase* tmp = sfx_manager->createSoundSource(name);
         assert(tmp != NULL);
-        m_sounds->insert(std::pair<std::string, SFXBase*>("engine", tmp);
+        m_sounds->insert(std::pair<std::string, SFXBase*>("engine", tmp));
     }
 
     if (audio_node)
