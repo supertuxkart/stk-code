@@ -284,7 +284,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     default:
         // There is no attachment currently, but there will be one
         // so play the character sound ("Uh-Oh")
-        m_kart->playCustomSFX("attach");
+        m_kart->playSound("attach");
 
         if(new_attachment==-1)
             new_attachment = m_random.get(3);
@@ -355,7 +355,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
                                             getTimeLeft()+
                                             stk_config->m_bomb_time_increase,
                                             m_kart);
-                other->playCustomSFX("attach");
+                other->playSound("attach");
                 clear();
             }
         }
@@ -372,12 +372,12 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         set(ATTACH_BOMB, other->getAttachment()->getTimeLeft()+
                          stk_config->m_bomb_time_increase, other);
         other->getAttachment()->clear();
-        m_kart->playCustomSFX("attach");
+        m_kart->playSound("attach");
     }
     else
     {
-        m_kart->playCustomSFX("crash");
-        other->playCustomSFX("crash");
+        m_kart->playSound("crash");
+        other->playSound("crash");
     }
 
 }   // handleCollisionWithKart

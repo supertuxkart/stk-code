@@ -309,7 +309,7 @@ public:
      *  It returns whether or not a character voice sample exists for the
      *  particular event.  If there is no voice sample, a default can be
      *  played instead. */
-    virtual void playCustomSFX(std::string type) = 0;
+    virtual void playSound(std::string type) = 0;
     // ------------------------------------------------------------------------
     /** Show fire to go with a zipper. */
     virtual void showZipperFire() = 0;

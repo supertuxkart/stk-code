@@ -79,7 +79,7 @@ public:
     virtual void                  position(const Vec3 &position);
     virtual void                  volume(float gain);
     virtual void                  masterVolume(float gain);
-    virtual SFXManager::SFXStatus getStatus();
+    virtual SFXBase::SFXStatus getStatus();
     virtual void                  onSoundEnabledBack();
     virtual void                  setRolloff(float rolloff);
 

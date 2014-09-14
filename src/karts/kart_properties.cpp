@@ -30,6 +30,8 @@
 #include "karts/skidding_properties.hpp"
 #include "modes/world.hpp"
 #include "io/xml_node.hpp"
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
@@ -60,7 +62,6 @@ KartProperties::KartProperties(const std::string &filename)
     m_shadow_z_offset = 0.0f;
 
     m_groups.clear();
-    m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
 
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
@@ -138,6 +139,12 @@ KartProperties::~KartProperties()
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         if(m_ai_properties[i])
             delete m_ai_properties[i];
+
+    // free sfx
+    std::map<std::string, SFXBase*>::iterator i;
+    for (i = m_sounds->begin(); i != m_sounds->end(); i++)
+        delete i->second;
+    delete m_sounds;
 }   // ~KartProperties
 
 //-----------------------------------------------------------------------------
@@ -198,12 +205,10 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     {
         if(!root || root->getName()!="kart")
         {
-            std::ostringstream msg;
-            msg << "Couldn't load kart properties '" << filename <<
-                "': no kart node.";
-
             delete m_kart_model;
-            throw std::runtime_error(msg.str());
+            std::string msg = "Couldn't load kart properties from '" +
+                              filename + "': no kart node.";
+            throw std::runtime_error(msg);
         }
         getAllData(root);
     }
@@ -213,7 +218,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                    filename.c_str());
         Log::error("[KartProperties]", "%s", err.what());
     }
-    if(root) delete root;
+    delete root;
 
     // Set a default group (that has to happen after init_default and load)
     if(m_groups.size()==0)
@@ -241,18 +246,15 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                                     /*make_permanent*/true,
                                                     /*complain_if_not_found*/true,
                                                     /*strip_path*/false);
-    if(m_minimap_icon_file!="")
+    if(m_minimap_icon_file != "")
         m_minimap_icon = irr_driver->getTexture(m_root+m_minimap_icon_file);
     else
         m_minimap_icon = NULL;
 
     if (m_minimap_icon == NULL)
-    {
         m_minimap_icon = getUnicolorTexture(m_color);
-    }
 
-    // Only load the model if the .kart file has the appropriate version,
-    // otherwise warnings are printed.
+    // Only load the model if the .kart file has the appropriate version
     if (m_version >= 1)
     {
         const bool success = m_kart_model->loadModels(*this);
@@ -261,7 +263,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             delete m_kart_model;
             file_manager->popTextureSearchPath();
             file_manager->popModelSearchPath();
-            throw std::runtime_error("Cannot load kart models");
+            throw std::runtime_error("Cannot load kart models: "
+                                     ".kart file has an invalid version");
         }
     }
 
@@ -325,7 +328,7 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("shadow-x-offset",   &m_shadow_x_offset  );
     root->get("shadow-z-offset",   &m_shadow_z_offset  );
 
-    root->get("type",     &m_kart_type        );
+    root->get("type",              &m_kart_type        );
 
     if(const XMLNode *dimensions_node = root->getNode("center"))
         dimensions_node->get("gravity-shift", &m_gravity_center_shift);
@@ -378,25 +381,27 @@ void KartProperties::getAllData(const XMLNode * root)
                                                    &m_downward_impulse_factor);
         stability_node->get("track-connection-accel",
                                                    &m_track_connection_accel );
-        stability_node->get("smooth-flying-impulse", &m_smooth_flying_impulse);
+        stability_node->get("smooth-flying-impulse",
+                                                   &m_smooth_flying_impulse  );
     }
 
     if(const XMLNode *collision_node = root->getNode("collision"))
     {
-        collision_node->get("impulse",         &m_collision_impulse        );
-        collision_node->get("impulse-time",    &m_collision_impulse_time   );
-        collision_node->get("terrain-impulse", &m_collision_terrain_impulse);
-        collision_node->get("restitution",     &m_restitution              );
-        collision_node->get("bevel-factor",    &m_bevel_factor             );
-        collision_node->get("physical-wheel-position",&m_physical_wheel_position);
+        collision_node->get("impulse",         &m_collision_impulse         );
+        collision_node->get("impulse-time",    &m_collision_impulse_time    );
+        collision_node->get("terrain-impulse", &m_collision_terrain_impulse );
+        collision_node->get("restitution",     &m_restitution               );
+        collision_node->get("bevel-factor",    &m_bevel_factor              );
+        collision_node->get("physical-wheel-position",
+                                               &m_physical_wheel_position   );
         std::string s;
-        collision_node->get("impulse-type",    &s                          );
+        collision_node->get("impulse-type",    &s                           );
         s = StringUtils::toLowerCase(s);
-        if(s=="none")
+        if(s == "none")
             m_terrain_impulse_type = IMPULSE_NONE;
-        else if(s=="normal")
+        else if(s == "normal")
             m_terrain_impulse_type = IMPULSE_NORMAL;
-        else if(s=="driveline")
+        else if(s == "driveline")
             m_terrain_impulse_type = IMPULSE_TO_DRIVELINE;
         else
         {
@@ -455,10 +460,10 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *explosion_node = root->getNode("explosion"))
     {
-        explosion_node->get("time",   &m_explosion_time  );
-        explosion_node->get("radius", &m_explosion_radius);
+        explosion_node->get("time",   &m_explosion_time                );
+        explosion_node->get("radius", &m_explosion_radius              );
         explosion_node->get("invulnerability-time",
-                        &m_explosion_invulnerability_time);
+                                      &m_explosion_invulnerability_time);
     }
 
     if(const XMLNode *skid_node = root->getNode("skid"))
@@ -718,16 +723,10 @@ void KartProperties::checkAllSet(const std::string &filename)
 bool KartProperties::operator<(const KartProperties &other) const
 {
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
-    bool this_is_locked = p->isLocked(getIdent());
-    bool other_is_locked = p->isLocked(other.getIdent());
-    if (this_is_locked == other_is_locked)
-    {
+    if (p->isLocked(getIdent()) == p->isLocked(other.getIdent()))
         return getName() < other.getName();
-    }
     else
-        return other_is_locked;
-
-    return true;
+        return p->isLocked(other.getIdent());
 }  // operator<
 
 // ----------------------------------------------------------------------------
@@ -809,7 +808,7 @@ void KartProperties::initSound(const XMLNode* sound_node, const XMLNode* audio_n
             }
             else if (location == "custom")
             {
-                Log::warn("[KartProperties]", "Custom audio paths shouldn't be used");
+                Log::warn("[KartProperties]", "Custom audio paths should be avoided");
                 path = filename;
             }
             else
@@ -847,9 +846,7 @@ const float KartProperties::getAvgPower() const
 {
     float sum = 0.0;
     for (unsigned int i = 0; i < m_gear_power_increase.size(); ++i)
-    {
         sum += m_gear_power_increase[i]*m_max_speed[0];
-    }
     return sum/m_gear_power_increase.size();
 }   // getAvgPower
 

@@ -42,6 +42,13 @@ class Vec3;
 class SFXBase : public NoCopy
 {
 public:
+    /** Status of a sound effect. Accessible via getStatus() */
+    enum SFXStatus
+    {
+        SFX_UNKNOWN = -1, SFX_STOPPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2,
+        SFX_INITIAL = 3
+    };
+
     virtual           ~SFXBase()                       {}
 
     /** Late creation, if SFX was initially disabled */
@@ -57,8 +64,7 @@ public:
     virtual void       speed(float factor)       = 0;
     virtual void       volume(float gain)        = 0;
     virtual void       masterVolume(float gain)  = 0;
-    virtual SFXManager::SFXStatus
-                       getStatus()               = 0;
+    virtual SFXStatus  getStatus()               = 0;
     virtual void       onSoundEnabledBack()      = 0;
     virtual void       setRolloff(float rolloff) = 0;
 

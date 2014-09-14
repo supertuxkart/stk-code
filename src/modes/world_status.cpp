@@ -162,7 +162,7 @@ void WorldStatus::update(const float dt)
             // ... phase. Since the sound effect is about 3 seconds
             // long, we use the aux timer to force the next phase
             // after 3.5 seconds.
-            if (m_track_intro_sound->getStatus() == SFXManager::SFX_PLAYING &&
+            if (m_track_intro_sound->getStatus() == SFXBase::SFX_PLAYING &&
                 m_auxiliary_timer < 3.5f)
                 return;
 

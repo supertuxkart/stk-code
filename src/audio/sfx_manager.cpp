@@ -403,9 +403,9 @@ void SFXManager::resumeAll()
     for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
         i!=m_all_sfx.end(); i++)
     {
-        SFXStatus status = (*i)->getStatus();
+        SFXBase::SFXStatus status = (*i)->getStatus();
         // Initial happens when
-        if (status==SFX_PAUSED) (*i)->resume();
+        if (status == SFXBase::SFX_PAUSED) (*i)->resume();
     }   // for i in m_all_sfx
 }   // resumeAll
 

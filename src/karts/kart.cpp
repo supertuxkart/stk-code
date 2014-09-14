@@ -322,8 +322,7 @@ void Kart::reset()
     m_terrain_sound = NULL;
     m_previous_terrain_sound = NULL;
 
-    if((*m_sounds)["engine"])
-        (*m_sounds)["engine"]->stop();
+    getSingleSFX("engine")->stop();
 
     m_controls.reset();
     m_slipstream->reset();
@@ -446,12 +445,6 @@ void Kart::setPowerup(PowerupManager::PowerupType t, int n)
 }   // setPowerup
 
 // -----------------------------------------------------------------------------
-int Kart::getNumPowerup() const
-{
-    return m_powerup->getNum();
-}   // getNumPowerup
-
-// -----------------------------------------------------------------------------
 /** Saves the old controller in m_saved_controller and stores a new
  *  controller. The save controller is needed in case of a reset.
  *  \param controller The new controller to use (atm it's always an
@@ -485,9 +478,7 @@ void Kart::blockViewWithPlunger()
         m_view_blocked_by_plunger =
                                m_kart_properties->getPlungerInFaceTime();
     if(isShielded())
-    {
         decreaseShieldTime();
-    }
 }   // blockViewWithPlunger
 
 // -----------------------------------------------------------------------------
@@ -691,7 +682,7 @@ void Kart::flyDown()
  */
 void Kart::startEngineSFX()
 {
-    if(!(*m_sounds)["engine"])
+    if(!getSingleSFX("engine"))
         return;
 
     // In multiplayer mode, sounds are NOT positional (because we have
@@ -706,14 +697,14 @@ void Kart::startEngineSFX()
         const float players_volume = (np * 2.0f) / (np*2.0f + np);
 
         if (m_controller->isPlayerController())
-            (*m_sounds)["engine"]->volume( players_volume / np );
+            getSingleSFX("engine")->volume( players_volume / np );
         else
-            (*m_sounds)["engine"]->volume( (1.0f - players_volume) / nai );
+            getSingleSFX("engine")->volume( (1.0f - players_volume) / nai );
     }
 
-    (*m_sounds)["engine"]->speed(0.6f);
-    (*m_sounds)["engine"]->setLoop(true);
-    (*m_sounds)["engine"]->play();
+    getSingleSFX("engine")->speed(0.6f);
+    getSingleSFX("engine")->setLoop(true);
+    playSound("engine");
 }   // startEngineSFX
 
 //-----------------------------------------------------------------------------
@@ -878,10 +869,8 @@ void Kart::collectedItem(Item *item, int add_info)
                                  m_kart_properties->getBubblegumSpeedFraction(),
                                  m_kart_properties->getBubblegumFadeInTime(),
                                  m_bubblegum_time);
-        (*m_sounds)["engine"]->position(getXYZ());
-        (*m_sounds)["engine"]->play();
         // Play appropriate custom character sound
-        playCustomSFX("goo");
+        playSound("goo");
         break;
     default        : break;
     }   // switch TYPE
@@ -1113,6 +1102,7 @@ void Kart::update(float dt)
     if (m_collision_particles) m_collision_particles->update(dt);
 
     updatePhysics(dt);
+    updateSFX();
 
     if(!m_controls.m_fire) m_fire_clicked = 0;
 
@@ -1124,12 +1114,6 @@ void Kart::update(float dt)
         World::getWorld()->onFirePressed(getController());
         m_fire_clicked = 1;
     }
-
-    // Set the sound source to the kart position
-    std::map<std::string, SFXBase*>::iterator i;
-    for (i = m_sounds->begin(); i != m_sounds->end(); i++)
-        i->second->position(getXYZ());
-
 
     // Check if a kart is (nearly) upside down and not moving much -->
     // automatic rescue
@@ -1402,7 +1386,7 @@ void Kart::handleMaterialSFX(const Material *material)
     }
 
     if(m_previous_terrain_sound &&
-        m_previous_terrain_sound->getStatus()==SFXManager::SFX_STOPPED)
+        m_previous_terrain_sound->getStatus()==SFXBase::SFX_STOPPED)
     {
         // We don't modify the position of m_previous_terrain_sound
         // anymore, so that it keeps on playing at the place where the
@@ -1418,8 +1402,8 @@ void Kart::handleMaterialSFX(const Material *material)
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
     if(m_terrain_sound &&
-      (m_terrain_sound->getStatus()==SFXManager::SFX_PLAYING ||
-       m_terrain_sound->getStatus()==SFXManager::SFX_PAUSED))
+      (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
+       m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED))
     {
         m_terrain_sound->position(getXYZ());
         material->setSFXSpeed(m_terrain_sound, m_speed, m_schedule_pause);
@@ -1530,7 +1514,7 @@ void Kart::handleMaterialGFX()
     const std::string &s = surface_material->getSFXName();
     if (s != "" && !dynamic_cast<RescueAnimation*>(getKartAnimation())&&
         (m_terrain_sound == NULL ||
-         m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
+         m_terrain_sound->getStatus() == SFXBase::SFX_STOPPED))
     {
         if (m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
         m_previous_terrain_sound = m_terrain_sound;
@@ -1601,7 +1585,7 @@ void Kart::handleZipper(const Material *material, bool play_sound)
                                      max_speed_increase, speed_gain,
                                      engine_force, duration, fade_out_time);
     // Play custom character sound (weee!)
-    playCustomSFX("zipper");
+    playSound("zipper");
     m_controller->handleZipper(play_sound);
 }   // handleZipper
 
@@ -1831,9 +1815,9 @@ void Kart::crashed(const Material* m, AbstractKart *k)
         if (m_body->getLinearVelocity().length()> 0.555f)
         {
             if (isShielded() || (k != NULL && k->isShielded()))
-                playCustomSFX("boing");
+                playSound("boing");
             else
-                playCustomSFX("crash");
+                playSound("crash");
         }
 
         m_bounce_back_time = 0.1f;
@@ -1848,14 +1832,14 @@ void Kart::crashed(const Material* m, AbstractKart *k)
  * are really bad
  * \param name the name of the sound effect, e.g. "beep"
  */
-void Kart::playCustomSFX(std::string name)
+void Kart::playSound(std::string name)
 {
     std::map<std::string, SFXBase*>::iterator i;
 
     // If another sound is already playing, discard to avoid overlapping sounds
     for (i = m_sounds->begin(); i != m_sounds->end(); i++)
     {
-        if (i->second->getStatus() == SFXManager::SFX_PLAYING &&
+        if (i->second->getStatus() == SFXBase::SFX_PLAYING &&
             !i->second->isLoop())
             return;
     }
@@ -1875,6 +1859,13 @@ void Kart::playCustomSFX(std::string name)
         #endif
     }
 }
+
+/** returns (*m_sounds)[name] */
+SFXBase* Kart::getSingleSFX(std::string name)
+{
+    return (*m_sounds)[name];
+}
+
 // ----------------------------------------------------------------------------
 /** Updates the physics for this kart: computing the driving force, set
  *  steering, handles skidding, terrain impact on kart, ...
@@ -1907,17 +1898,6 @@ void Kart::updatePhysics(float dt)
     m_skidding->update(dt, isOnGround(), m_controls.m_steer,
                        m_controls.m_skid);
     m_vehicle->setVisualRotation(m_skidding->getVisualSkidRotation());
-    if(( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
-         m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
-        m_skidding->getGraphicalJumpOffset()==0)
-    {
-        if(!isWheeless())
-            playCustomSFX("skid");
-    }
-    else if((*m_sounds)["skid"]->getStatus() == SFXManager::SFX_PLAYING)
-    {
-        (*m_sounds)["skid"]->stop();
-    }
 
     float steering = getMaxSteerAngle() * m_skidding->getSteeringFraction();
     m_vehicle->setSteeringValue(steering, 0);
@@ -1973,8 +1953,6 @@ void Kart::updatePhysics(float dt)
     {
         m_speed = 0;
     }
-
-    updateEngineSFX();
 #ifdef XX
     Log::info("Kart","forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f"
        ,m_vehicle->m_forwardImpulse[0]
@@ -1997,36 +1975,48 @@ void Kart::updatePhysics(float dt)
 //-----------------------------------------------------------------------------
 /** Adjust the engine sound effect depending on the speed of the kart.
  */
-void Kart::updateEngineSFX()
+void Kart::updateSFX()
 {
-    // when going faster, use higher pitch for engine
-    if(!(*m_sounds)["engine"] || !sfx_manager->sfxAllowed())
+    if(!sfx_manager->sfxAllowed())
         return;
+
+    // Set the all sound sources to the kart position
+    std::map<std::string, SFXBase*>::iterator i;
+    for (i = m_sounds->begin(); i != m_sounds->end(); i++)
+        i->second->position(getXYZ());
+
+    if(( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
+         m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
+         m_skidding->getGraphicalJumpOffset() == 0 &&
+         !isWheeless())
+    {
+        playSound("skid");
+    }
+    else if(getSingleSFX("skid")->getStatus() == SFXBase::SFX_PLAYING)
+    {
+        getSingleSFX("skid")->stop();
+    }
 
     if(isOnGround())
     {
-        float max_speed = m_max_speed->getCurrentMaxSpeed();
         // Engine noise is based half in total speed, half in fake gears:
         // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
         // ignoring the gear settings from stk_config, but providing a
         // good enough brrrBRRRbrrrBRRR sound effect. Speed factor makes
         // it a "staired sawtooth", so more acoustically rich.
-        float f = m_speed/max_speed;
-        // Speed at this stage is not yet capped, so it can be > 1, which
-        // results in odd engine sfx.
-        if (f>1.0f) f=1.0f;
+        // Speed is capped, because >1.0f results in an odd sound
+        float f = std::min(1.0f, m_speed/m_max_speed->getCurrentMaxSpeed());
 
         float gears = 3.0f * fmod(f, 0.333334f);
-        (*m_sounds)["engine"]->speed(0.6f + (f +gears)* 0.35f);
+        getSingleSFX("engine")->speed(0.6f + (f +gears)* 0.35f);
     }
     else
     {
         // When flying, fixed value but not too high pitch
         // This gives some variation (vs previous "on wheels" one)
-        (*m_sounds)["engine"]->speed(0.9f);
+        getSingleSFX("engine")->speed(0.9f);
     }
-    (*m_sounds)["engine"]->position(getXYZ());
-}   // updateEngineSFX
+}   // updateSFX
 
 //-----------------------------------------------------------------------------
 /** Sets the engine power. It considers the engine specs, items that influence

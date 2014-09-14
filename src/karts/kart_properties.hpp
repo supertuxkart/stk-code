@@ -93,10 +93,6 @@ private:
     /** Version of the .kart file. */
     int   m_version;
 
-    // SFX files
-    // ---------------
-    std::vector<int> m_custom_sfx_id;     /**< Vector of custom SFX ids */
-
     // Display and gui
     // ---------------
     std::string m_name;               /**< The human readable Name of the kart
@@ -476,11 +472,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the absolute path of the icon file of this kart. */
     const std::string& getAbsoluteIconFile() const      { return m_icon_file; }
-
-    // ------------------------------------------------------------------------
-    /** Returns custom sound effects for this kart. */
-    const int          getCustomSfxId (SFXManager::CustomSFX type)
-                                       const  {return m_custom_sfx_id[type];  }
 
     // ------------------------------------------------------------------------
     /** Returns the version of the .kart file. */

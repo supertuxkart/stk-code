@@ -328,7 +328,7 @@ void NetworkPlayerController::setPosition(int p)
             AbstractKart *kart = world->getKart(i);
             if(kart->getPosition() == p + 1)
             {
-                kart->playCustomSFX("beep");
+                kart->playSound("beep");
                 return;
             }
         }
