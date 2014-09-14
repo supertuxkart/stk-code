@@ -484,6 +484,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
         m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     PROFILER_PUSH_CPU_MARKER("- Sync Stall", 0xFF, 0x0, 0x0);
     GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000000);
+    glDeleteSync(m_sync);
     PROFILER_POP_CPU_MARKER();
     /*    switch (reason)
     {
