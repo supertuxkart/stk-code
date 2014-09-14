@@ -769,14 +769,13 @@ void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_n
 
     // init some mandatory sounds with defaults
     std::string names[] = {"horn", "crash", "boing", "goo", "skid", "shoot"};
-    for (unsigned int i = 0; i < 6; i++) {
-        // TODO: use map::emplace when C++11 is ready
-        SFXBase* tmp = sfx_manager->createSoundSource(names[i]);
-        m_sounds->insert(std::pair<std::string, SFXBase*>(names[i], tmp));
-    }
+    for (unsigned int i = 0; i < 6; i++)
+        (*m_sounds)[names[i]] = sfx_manager->createSoundSource(names[i]);
+
     // TODO: Only one default engine sound called "engine"
-    SFXBase* tmp = sfx_manager->createSoundSource("engine_small");
-    m_sounds->insert(std::pair<std::string, SFXBase*>("engine", tmp));
+    (*m_sounds)["engine"] = sfx_manager->createSoundSource("engine_small");
+    (*m_sounds)["zipper"] = sfx_manager->createSoundSource("beep"        );
+    (*m_sounds)["beep"  ] = sfx_manager->createSoundSource("horn"        );
 
     if (sound_node)
     {
@@ -868,7 +867,8 @@ void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_n
             }
 
             assert(tmp != NULL);
-            m_sounds->insert(std::pair<std::string, SFXBase*>(id, tmp));
+            //m_sounds->insert(std::pair<std::string, SFXBase*>(id, tmp));
+            (*m_sounds)[id] = tmp;
         }
     }
 }

@@ -77,7 +77,6 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
  {
     m_xyz = m_kart->getXYZ();
     m_orig_y = m_xyz.getY();
-    m_kart->playSound("explode");
     m_timer     = m_kart->getKartProperties()->getExplosionTime();
 
     // Non-direct hits will be only affected half as much.

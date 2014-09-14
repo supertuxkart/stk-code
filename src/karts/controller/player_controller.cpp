@@ -62,7 +62,6 @@ PlayerController::PlayerController(AbstractKart *kart,
     // the right camera once per frame later.
     m_camera       = Camera::createCamera(kart);
     m_bzzt_sound   = sfx_manager->createSoundSource( "bzzt" );
-    m_wee_sound    = sfx_manager->createSoundSource( "wee"  );
     m_ugh_sound    = sfx_manager->createSoundSource( "ugh"  );
     m_grab_sound   = sfx_manager->createSoundSource( "grab_collectable" );
     m_full_sound   = sfx_manager->createSoundSource( "energy_bar_full" );
@@ -76,7 +75,6 @@ PlayerController::PlayerController(AbstractKart *kart,
 PlayerController::~PlayerController()
 {
     sfx_manager->deleteSFX(m_bzzt_sound);
-    sfx_manager->deleteSFX(m_wee_sound );
     sfx_manager->deleteSFX(m_ugh_sound );
     sfx_manager->deleteSFX(m_grab_sound);
     sfx_manager->deleteSFX(m_full_sound);
@@ -429,15 +427,6 @@ void PlayerController::finishedRace(float time)
  */
 void PlayerController::handleZipper(bool play_sound)
 {
-    // Only play a zipper sound if it's not already playing, and
-    // if the material has changed (to avoid machine gun effect
-    // on conveyor belt zippers).
-    if (play_sound || (m_wee_sound->getStatus() != SFXBase::SFX_PLAYING &&
-                       m_kart->getMaterial()!=m_kart->getLastMaterial()      ) )
-    {
-        m_wee_sound->play();
-    }
-
     // Apply the motion blur according to the speed of the kart
     irr_driver->getPostProcessing()->giveBoost(m_camera->getIndex());
 

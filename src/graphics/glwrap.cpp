@@ -105,7 +105,7 @@ void initGL()
         return;
     is_gl_init = true;
     // For Mesa extension reporting
-#ifdef  __linux__ 
+#ifdef  __linux__
     glewExperimental = GL_TRUE;
 #endif
     GLenum err = glewInit();
