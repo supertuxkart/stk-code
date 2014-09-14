@@ -28,6 +28,12 @@
 using namespace irr;
 using namespace gui;
 
+#if DEBUG
+bool GLContextDebugBit = true;
+#else
+bool GLContextDebugBit = false;
+#endif
+
 const s32 texturesizes[] = {128, 256, 512, 1024, 2048, 4096, 0};
 
 const wchar_t *fileformats[]		 =  { L"bmp", L"ppm", 0 };  // bitmap font formats
