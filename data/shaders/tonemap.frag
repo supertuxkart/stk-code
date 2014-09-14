@@ -33,6 +33,8 @@ void main()
 
     // Uncharted2 tonemap with Auria's custom coefficients
     vec4 perChannel = (col * (6.9 * col + .5)) / (col * (5.2 * col + 1.7) + 0.06);
+    // Protect us from negative coefficient just in case...
+    perChannel = max(perChannel, vec4(0.));
     perChannel = pow(perChannel, vec4(2.2));
 
     vec2 inside = uv - 0.5;
