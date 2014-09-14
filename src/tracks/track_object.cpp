@@ -42,7 +42,7 @@ TrackObject::TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent,
                          ModelDefinitionLoader& model_def_loader)
 {
     init(xml_node, parent, model_def_loader);
-}
+}   // TrackObject
 
 // ----------------------------------------------------------------------------
 /**
@@ -56,29 +56,33 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
                          bool is_dynamic,
                          const PhysicalObject::Settings* physics_settings)
 {
-    m_init_xyz   = xyz;
-    m_init_hpr   = hpr;
-    m_init_scale = scale;
-    m_enabled    = true;
-    m_presentation = NULL;
-    m_animator = NULL;
+    m_init_xyz        = xyz;
+    m_init_hpr        = hpr;
+    m_init_scale      = scale;
+    m_enabled         = true;
+    m_presentation    = NULL;
+    m_animator        = NULL;
     m_physical_object = NULL;
-    m_interaction = interaction;
-
-    m_presentation = presentation;
+    m_interaction     = interaction;
+    m_presentation    = presentation;
 
     if (m_interaction != "ghost" && m_interaction != "none" &&
         physics_settings )
     {
         m_physical_object = new PhysicalObject(is_dynamic,
-                                          *physics_settings,
-                                          this);
+                                               *physics_settings,
+                                               this);
     }
 
     reset();
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
+/** Initialises the track object based on the specified XML data.
+ *  \param xml_node The XML data.
+ *  \param parent The parent scene node.
+ *  \param model_def_loader Used to load level-of-detail nodes.
+ */
 void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                        ModelDefinitionLoader& model_def_loader)
 {
@@ -99,6 +103,9 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_interaction = "static";
     xml_node.get("interaction", &m_interaction);
     xml_node.get("lod_group", &m_lod_group);
+
+    m_is_driveable = false;
+    xml_node.get("driveable", &m_is_driveable);
 
     bool lod_instance = false;
     xml_node.get("lod_instance", &lod_instance);
@@ -252,13 +259,41 @@ void TrackObject::setEnable(bool mode)
 // ----------------------------------------------------------------------------
 void TrackObject::update(float dt)
 {
-    if (m_presentation != NULL) m_presentation->update(dt);
+    if (m_presentation) m_presentation->update(dt);
 
-    if (m_physical_object != NULL) m_physical_object->update(dt);
+    if (m_physical_object) m_physical_object->update(dt);
 
-    if (m_animator != NULL) m_animator->update(dt);
+    if (m_animator) m_animator->update(dt);
 }   // update
 
+
+// ----------------------------------------------------------------------------
+/** Does a raycast against the track object. The object must have a physical
+ *  object.
+ *  \param from/to The from and to position for the raycast.
+ *  \param xyz The position in world where the ray hit.
+ *  \param material The material of the mesh that was hit.
+ *  \param normal The intrapolated normal at that position.
+ *  \param interpolate_normal If true, the returned normal is the interpolated
+ *         based on the three normals of the triangle and the location of the
+ *         hit point (which is more compute intensive, but results in much
+ *         smoother results).
+ *  \return True if a triangle was hit, false otherwise (and no output
+ *          variable will be set.
+ */
+bool TrackObject::castRay(const btVector3 &from, 
+                          const btVector3 &to, btVector3 *hit_point,
+                          const Material **material, btVector3 *normal,
+                          bool interpolate_normal) const
+{
+    if(!m_physical_object)
+    {
+        Log::warn("TrackObject", "Can't raycast on non-physical object.");
+        return false;
+    }
+    return m_physical_object->castRay(from, to, hit_point, material, normal,
+                                      interpolate_normal);
+}   // castRay
 
 // ----------------------------------------------------------------------------
 

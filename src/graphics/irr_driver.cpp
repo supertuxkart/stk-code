@@ -493,7 +493,7 @@ void IrrDriver::initDevice()
         if (strstr((const char *)glGetString(GL_VENDOR), "ATI") != NULL)
             m_need_srgb_workaround = true;
     }
-    m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
+    m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 3));
     initGL();
 
     // Parse extensions

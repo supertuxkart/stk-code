@@ -8,6 +8,7 @@
 #include "gl_headers.hpp"
 #include "stkmesh.hpp"
 #include "gpuparticles.hpp"
+#include "stkbillboard.hpp"
 
 template<typename T>
 class CommandBuffer : public Singleton<T>
@@ -32,6 +33,9 @@ public:
 };
 
 class ImmediateDrawList : public Singleton<ImmediateDrawList>, public std::vector<scene::ISceneNode *>
+{};
+
+class BillBoardList : public Singleton<BillBoardList>, public std::vector<STKBillboard *>
 {};
 
 class ParticlesList : public Singleton<ParticlesList>, public std::vector<ParticleSystemProxy *>

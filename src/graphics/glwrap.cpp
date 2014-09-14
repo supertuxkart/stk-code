@@ -104,7 +104,10 @@ void initGL()
     if (is_gl_init)
         return;
     is_gl_init = true;
+    // For Mesa extension reporting
+#ifdef  __linux__ 
     glewExperimental = GL_TRUE;
+#endif
     GLenum err = glewInit();
     if (GLEW_OK != err)
         Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
@@ -217,6 +220,8 @@ void setAttribute(AttributeType Tp, GLuint ProgramID)
         glBindAttribLocation(ProgramID, 1, "lifetime");
         glBindAttribLocation(ProgramID, 2, "size");
         glBindAttribLocation(ProgramID, 4, "quadcorner");
+        glBindAttribLocation(ProgramID, 5, "rotationvec");
+        glBindAttribLocation(ProgramID, 6, "anglespeed");
         break;
     }
 }
