@@ -45,6 +45,8 @@ class CutsceneWorld : public World
     double m_duration;
     bool m_aborted;
 
+    float m_fade_duration;
+
     // TODO find a better way than static
     static bool s_use_duration;
 
@@ -109,7 +111,7 @@ public:
     // ------------------------------------------------------------------------
     void abortCutscene()
     {
-        if (m_time < m_duration - 2.0f) m_duration = m_time + 2.0f;
+        if (m_time < m_duration - m_fade_duration) m_duration = m_time + m_fade_duration;
         m_aborted = true;
     }
 

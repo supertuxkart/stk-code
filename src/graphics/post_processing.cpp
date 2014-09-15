@@ -464,16 +464,21 @@ void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBu
 
     scene::ICameraSceneNode * const camnode =
         Camera::getCamera(cam)->getCameraSceneNode();
-    // Calculate the kart's Y position on screen
-    const core::vector3df pos =
-        Camera::getCamera(cam)->getKart()->getNode()->getPosition();
-    float ndc[4];
-    core::matrix4 trans = camnode->getProjectionMatrix();
-    trans *= camnode->getViewMatrix();
 
-    trans.transformVect(ndc, pos);
-    const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
-    setMotionBlurCenterY(cam, karty);
+    // Calculate the kart's Y position on screen
+    if (Camera::getCamera(cam)->getKart())
+    {
+        const core::vector3df pos = Camera::getCamera(cam)->getKart()->getNode()->getPosition();
+        float ndc[4];
+        core::matrix4 trans = camnode->getProjectionMatrix();
+        trans *= camnode->getViewMatrix();
+
+        trans.transformVect(ndc, pos);
+        const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
+        setMotionBlurCenterY(cam, karty);
+    }
+    else
+        setMotionBlurCenterY(cam, 0.5f);
 
     out_fbo.Bind();
     glClear(GL_COLOR_BUFFER_BIT);

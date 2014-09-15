@@ -59,6 +59,7 @@ CutsceneWorld::CutsceneWorld() : World()
     WorldStatus::setClockMode(CLOCK_NONE);
     m_use_highscores = false;
     m_play_racestart_sounds = false;
+    m_fade_duration = 1.0f;
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -240,13 +241,13 @@ void CutsceneWorld::update(float dt)
     float fade = 0.0f;
     float fadeIn = -1.0f;
     float fadeOut = -1.0f;
-    if (m_time < 2.0f)
+    if (m_time < m_fade_duration)
     {
-        fadeIn = 1.0f - (float)m_time / 2.0f;
+        fadeIn = 1.0f - (float)m_time / m_fade_duration;
     }
-    if (m_time > m_duration - 2.0f)
+    if (m_time > m_duration - m_fade_duration)
     {
-        fadeOut = (float)(m_time - (m_duration - 2.0f)) / 2.0f;
+        fadeOut = (float)(m_time - (m_duration - m_fade_duration)) / m_fade_duration;
     }
 
     if (fadeIn >= 0.0f && fadeOut >= 0.0f)
