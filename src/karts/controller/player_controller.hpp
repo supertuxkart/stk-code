@@ -52,6 +52,7 @@ private:
     SFXBase       *m_ugh_sound;
     SFXBase       *m_grab_sound;
     SFXBase       *m_full_sound;
+    SFXBase       *m_rev_sound;
 
     void           steer(float, int);
 public:

@@ -66,6 +66,7 @@ PlayerController::PlayerController(AbstractKart *kart,
     m_ugh_sound    = sfx_manager->createSoundSource( "ugh"  );
     m_grab_sound   = sfx_manager->createSoundSource( "grab_collectable" );
     m_full_sound   = sfx_manager->createSoundSource( "energy_bar_full" );
+    m_rev_sound    = sfx_manager->createSoundSource( "car_revup" );
 
     reset();
 }   // PlayerController
@@ -80,6 +81,7 @@ PlayerController::~PlayerController()
     sfx_manager->deleteSFX(m_ugh_sound );
     sfx_manager->deleteSFX(m_grab_sound);
     sfx_manager->deleteSFX(m_full_sound);
+    sfx_manager->deleteSFX(m_rev_sound);
 }   // ~PlayerController
 
 //-----------------------------------------------------------------------------
@@ -322,32 +324,24 @@ void PlayerController::update(float dt)
 
     if (World::getWorld()->isStartPhase())
     {
-        if (m_controls->m_accel || m_controls->m_brake ||
-            m_controls->m_fire  || m_controls->m_nitro)
+        if(World::getWorld()->getPhase() != WorldStatus::GO_PHASE)
         {
-            // Only give penalty time in SET_PHASE.
-            // Penalty time check makes sure it doesn't get rendered on every
-            // update.
-            if (m_penalty_time == 0.0 &&
-                World::getWorld()->getPhase() == WorldStatus::SET_PHASE)
-            {
-                RaceGUIBase* m=World::getWorld()->getRaceGUI();
-                if (m)
-                {
-                    m->addMessage(_("Penalty time!!"), m_kart, 2.0f,
-                                  video::SColor(255, 255, 128, 0));
-                    m->addMessage(_("Don't accelerate before go"), m_kart, 2.0f,
-                                  video::SColor(255, 210, 100, 50));
-                }
-                m_bzzt_sound->play();
+            // Only rev while tapping m_accel, once the player lets go we start cooling down.
+            // TODO: Floating point arithmetic is a big no-no.
+            // Temporarily use penalty time for rev accumulator to save some space in class object.
+            if(m_controls->m_accel) m_penalty_time += 1.0f;
+            //else m_penalty_time -= dt; // Always called >.>;
 
-                m_penalty_time = stk_config->m_penalty_time;
-            }   // if penalty_time = 0
+            // Burn out, happens when accel was tapped to many times. TODO: Play a burnout sound.
+            if(m_penalty_time >= 10.0f) m_penalty_time = 0.0f;
+            else if(m_penalty_time >= 5.0f && m_rev_sound) m_rev_sound->play(); // Plays a rev sound.
+                
+        } // if GO_PHASE
 
-            m_controls->m_brake = false;
-            m_controls->m_accel = 0.0f;
-        }   // if key pressed
+        else m_penalty_time = 0.0f; // This is where we would use the final rev value for boost and such.
 
+        m_controls->m_brake = false;
+        m_controls->m_accel = 0.0f;
         return;
     }   // if isStartPhase
 
