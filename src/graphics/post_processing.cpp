@@ -361,13 +361,16 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
     if (irr_driver->hasARBComputeShaders())
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     {
+#ifdef WIN32
         if (!irr_driver->hasARBComputeShaders())
+#endif
         {
             in_fbo.Bind();
 
             FullScreenShader::Gaussian17TapVShader::getInstance()->SetTextureUnits(createVector<GLuint>(auxiliary.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]));
             DrawFullScreenEffect<FullScreenShader::Gaussian17TapVShader>(core::vector2df(inv_width, inv_height));
         }
+#ifdef WIN32
         else
         {
             glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->Program);
@@ -380,6 +383,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             FullScreenShader::ComputeGaussian17TapVShader::getInstance()->setUniforms();
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
         }
+#endif
     }
     if (irr_driver->hasARBComputeShaders())
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
