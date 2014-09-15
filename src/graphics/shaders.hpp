@@ -451,10 +451,10 @@ public:
     Gaussian17TapHShader();
 };
 
-class ComputeGaussian17TapHShader : public ShaderHelperSingleton<ComputeGaussian17TapHShader>
+class ComputeGaussian17TapHShader : public ShaderHelperSingleton<ComputeGaussian17TapHShader, core::vector2df>, public TextureRead<Neared_Clamped_Filtered, Neared_Clamped_Filtered>
 {
 public:
-    GLuint TU_source, TU_dest, TU_depth;
+    GLuint TU_dest;
     ComputeGaussian17TapHShader();
 };
 
@@ -476,10 +476,10 @@ public:
     Gaussian17TapVShader();
 };
 
-class ComputeGaussian17TapVShader : public ShaderHelperSingleton<ComputeGaussian17TapVShader>
+class ComputeGaussian17TapVShader : public ShaderHelperSingleton<ComputeGaussian17TapVShader, core::vector2df>, public TextureRead<Neared_Clamped_Filtered, Neared_Clamped_Filtered>
 {
 public:
-    GLuint TU_source, TU_depth, TU_dest;
+    GLuint TU_dest;
 
     ComputeGaussian17TapVShader();
 };

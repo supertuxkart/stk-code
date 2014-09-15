@@ -348,42 +348,32 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         else
         {
             glUseProgram(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->Program);
-            glBindSampler(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_source, 0);
-            glBindSampler(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_depth, 0);
             glBindSampler(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_dest, 0);
-            glBindImageTexture(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_source, in_fbo.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
-            glBindImageTexture(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_depth, irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0], 1, false, 0, GL_READ_ONLY, GL_R32F);
+            FullScreenShader::ComputeGaussian17TapHShader::getInstance()->SetTextureUnits({ in_fbo.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0] });
             glBindImageTexture(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_dest, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
-            FullScreenShader::ComputeGaussian17TapHShader::getInstance()->setUniforms();
+            FullScreenShader::ComputeGaussian17TapHShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height));
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
         }
     }
     if (irr_driver->hasARBComputeShaders())
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     {
-#ifdef WIN32
         if (!irr_driver->hasARBComputeShaders())
-#endif
         {
             in_fbo.Bind();
 
             FullScreenShader::Gaussian17TapVShader::getInstance()->SetTextureUnits(createVector<GLuint>(auxiliary.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]));
             DrawFullScreenEffect<FullScreenShader::Gaussian17TapVShader>(core::vector2df(inv_width, inv_height));
         }
-#ifdef WIN32
         else
         {
             glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->Program);
-            glBindSampler(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_source, 0);
-            glBindSampler(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_depth, 0);
             glBindSampler(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_dest, 0);
-            glBindImageTexture(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_source, auxiliary.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
-            glBindImageTexture(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_depth, irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0], 1, false, 0, GL_READ_ONLY, GL_R32F);
+            FullScreenShader::ComputeGaussian17TapVShader::getInstance()->SetTextureUnits({ auxiliary.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0] });
             glBindImageTexture(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_dest, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
-            FullScreenShader::ComputeGaussian17TapVShader::getInstance()->setUniforms();
+            FullScreenShader::ComputeGaussian17TapVShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height));
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
         }
-#endif
     }
     if (irr_driver->hasARBComputeShaders())
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
