@@ -12,5 +12,5 @@ void main()
     float luma = getCIEYxy(col).x;
 
     col *= smoothstep(1., 10., luma);
-    FragColor = max(vec4(col, 1.0), vec4(0.));
+    FragColor = vec4(col, 1.0);
 }

@@ -10,5 +10,5 @@ void main()
     vec4 col = .125 * texture(tex_128, uv);
     col += .25 * texture(tex_256, uv);
     col += .5 * texture(tex_512, uv);
-    FragColor = max(vec4(col.xyz, 1.), vec4(0.));
+    FragColor = vec4(col.xyz, 1.);
 }
