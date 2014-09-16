@@ -158,7 +158,7 @@ void IrrDriver::renderGLSL(float dt)
             clearColor = World::getWorld()->getClearColor();
 
         glClear(GL_COLOR_BUFFER_BIT);
-        glEnable(GL_FRAMEBUFFER_SRGB);
+        glDepthMask(GL_TRUE);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
             clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
@@ -185,6 +185,8 @@ void IrrDriver::renderGLSL(float dt)
 
         // TODO: put this outside of the rendering loop
         generateDiffuseCoefficients();
+        if (!UserConfigParams::m_dynamic_lights)
+            glEnable(GL_FRAMEBUFFER_SRGB);
 
         PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
         unsigned plc = UpdateLightsInfo(camnode, dt);
