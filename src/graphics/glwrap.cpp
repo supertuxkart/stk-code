@@ -17,6 +17,7 @@ bool GLContextDebugBit = true;
 bool GLContextDebugBit = false;
 #endif
 
+
 #ifdef DEBUG
 #if !defined(__APPLE__)
 #define ARB_DEBUG_OUTPUT
@@ -733,4 +734,32 @@ bool hasGLExtension(const char* extension)
         }
     }
     return false;
-}
+}   // hasGLExtension
+
+// ----------------------------------------------------------------------------
+/** Returns a space-separated list of all GL extensions. Used for hardware
+ *  reporting.
+ */
+const std::string getGLExtensions()
+{
+    std::string result;
+    if (glGetStringi != NULL)
+    {
+        GLint num_extensions = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
+        for (GLint i = 0; i < num_extensions; i++)
+        {
+            const char* extension = (const char*)glGetStringi(GL_EXTENSIONS, i);
+            if(result.size()>0)
+                result += " ";
+            result += extension;
+        }
+    }
+    else
+    {
+        const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
+        result = extensions;
+    }
+
+    return result;
+}   // getGLExtensions

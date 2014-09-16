@@ -198,7 +198,7 @@ enum TypeRTT
 class IrrDriver : public IEventReceiver, public NoCopy
 {
 private:
-    int GLMajorVersion, GLMinorVersion;
+    int m_gl_major_version, m_gl_minor_version;
     bool hasVSLayer;
     bool hasBaseInstance;
     bool hasDrawIndirect;
@@ -283,10 +283,10 @@ public:
 
     unsigned getGLSLVersion() const
     {
-        if (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion == 3))
-            return GLMajorVersion * 100 + GLMinorVersion * 10;
-        else if (GLMajorVersion == 3)
-            return 100 + (GLMinorVersion + 3) * 10;
+        if (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version == 3))
+            return m_gl_major_version * 100 + m_gl_minor_version * 10;
+        else if (m_gl_major_version == 3)
+            return 100 + (m_gl_minor_version + 3) * 10;
         else
             return 120;
     }
@@ -428,6 +428,8 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
+    void getOpenGLData(std::string *vendor);
+
     void generateSkyboxCubemap();
     void generateDiffuseCoefficients();
     void renderSkybox(const scene::ICameraSceneNode *camera);
