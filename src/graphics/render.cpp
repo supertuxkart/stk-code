@@ -174,7 +174,7 @@ void IrrDriver::renderGLSL(float dt)
         oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-        camera->activate();
+//        camera->activate();
         rg->preRenderCallback(camera);   // adjusts start referee
         m_scene_manager->setActiveCamera(camnode);
 
@@ -258,7 +258,12 @@ void IrrDriver::renderGLSL(float dt)
                 renderShadowsDebug();
             }
             else
-                fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+            {
+                glEnable(GL_FRAMEBUFFER_SRGB);
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                camera->activate();
+                m_post_processing->renderPassThrough(fbo->getRTT()[0]);
+            }
         }
 
         PROFILER_POP_CPU_MARKER();
