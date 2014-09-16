@@ -1,7 +1,8 @@
 // From http://http.developer.nvidia.com/GPUGems3/gpugems3_ch40.html
 
-uniform layout(size1x16) restrict readonly image2D source;
-uniform layout(size1x32) restrict readonly image2D depth;
+uniform sampler2D source;
+uniform sampler2D depth;
+uniform vec2 pixel;
 uniform layout(size1x16) volatile restrict writeonly image2D dest;
 uniform float sigma = 5.;
 
@@ -13,13 +14,17 @@ shared float local_depth[8][8 + 2 * 8];
 void main()
 {
     int x = int(gl_LocalInvocationID.x), y = int(gl_LocalInvocationID.y);
-    ivec2 uv = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
-    local_src[x][y] = imageLoad(source, ivec2(uv) - ivec2(0, 8)).x;
-    local_depth[x][y] = imageLoad(depth, ivec2(uv) - ivec2(0, 8)).x;
-    local_src[x][y + 8] = imageLoad(source, ivec2(uv)).x;
-    local_depth[x][y + 8] = imageLoad(depth, ivec2(uv)).x;
-    local_src[x][y + 16] = imageLoad(source, ivec2(uv) + ivec2(0, 8)).x;
-    local_depth[x][y + 16] = imageLoad(depth, ivec2(uv) + ivec2(0, 8)).x;
+    ivec2 iuv = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
+    vec2 uv_m = (iuv - ivec2(0, 8)) * pixel;
+    vec2 uv = iuv * pixel;
+    vec2 uv_p = (iuv + ivec2(0, 8)) * pixel;
+
+    local_src[x][y] = texture(source, uv_m).x;
+    local_depth[x][y] = texture(depth, uv_m).x;
+    local_src[x][y + 8] = texture(source, uv).x;
+    local_depth[x][y + 8] = texture(depth, uv).x;
+    local_src[x][y + 16] = texture(source, uv_p).x;
+    local_depth[x][y + 16] = texture(depth, uv_p).x;
 
     barrier();
 
@@ -43,6 +48,6 @@ void main()
         g1 *= g2;
 
     }
-    imageStore(dest, ivec2(uv), vec4(sum / total_weight));
+    imageStore(dest, iuv, vec4(sum / total_weight));
 }
 

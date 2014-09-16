@@ -142,6 +142,7 @@ enum SamplerType {
     Semi_trilinear,
     Bilinear_Filtered,
     Bilinear_Clamped_Filtered,
+    Neared_Clamped_Filtered,
     Nearest_Filtered,
     Shadow_Sampler,
     Volume_Linear_Filtered,
@@ -191,6 +192,41 @@ struct BindTexture<Nearest_Filtered, tp...>
     static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
     {
         BindTextureNearest(TU[N], TexId[N]);
+        BindTexture<tp...>::exec(TU, TexId, N + 1);
+    }
+};
+
+template<SamplerType...tp>
+struct CreateSamplers<Neared_Clamped_Filtered, tp...>
+{
+    static void exec(std::vector<unsigned> &v, std::vector<GLenum> &e)
+    {
+        unsigned id;
+        glGenSamplers(1, &id);
+        glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+
+        v.push_back(createNearestSampler());
+        e.push_back(GL_TEXTURE_2D);
+        CreateSamplers<tp...>::exec(v, e);
+    }
+};
+
+template<SamplerType...tp>
+struct BindTexture<Neared_Clamped_Filtered, tp...>
+{
+    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    {
+        glActiveTexture(GL_TEXTURE0 + TU[N]);
+        glBindTexture(GL_TEXTURE_2D, TexId[N]);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
         BindTexture<tp...>::exec(TU, TexId, N + 1);
     }
 };
