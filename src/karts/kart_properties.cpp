@@ -774,7 +774,7 @@ void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_n
 
     // TODO: Only one default engine sound called "engine"
     (*m_sounds)["engine"] = sfx_manager->createSoundSource("engine_small");
-    (*m_sounds)["zipper"] = sfx_manager->createSoundSource("beep"        );
+    (*m_sounds)["zipper"] = sfx_manager->createSoundSource("wee"         );
     (*m_sounds)["beep"  ] = sfx_manager->createSoundSource("horn"        );
 
     if (sound_node)
