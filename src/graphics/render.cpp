@@ -263,6 +263,7 @@ void IrrDriver::renderGLSL(float dt)
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 camera->activate();
                 m_post_processing->renderPassThrough(fbo->getRTT()[0]);
+                glDisable(GL_FRAMEBUFFER_SRGB);
             }
         }
 
