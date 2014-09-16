@@ -1,12 +1,7 @@
 #ifndef GL_HEADER_HPP
 #define GL_HEADER_HPP
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-   // glew in the binary distribution only comes as dynamic library.
-#  undef GLEW_STATIC
-#else
-#  define GLEW_STATIC
-#endif
+#define GLEW_STATIC
 
 extern "C" {
 #include <GL/glew.h>
