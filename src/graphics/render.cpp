@@ -151,6 +151,20 @@ void IrrDriver::renderGLSL(float dt)
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
 
+    if (!UserConfigParams::m_dynamic_lights)
+    {
+        SColor clearColor(0, 150, 150, 150);
+        if (World::getWorld() != NULL)
+            clearColor = World::getWorld()->getClearColor();
+
+        glClear(GL_COLOR_BUFFER_BIT);
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
+            clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
+
     for(unsigned int cam = 0; cam < Camera::getNumCameras(); cam++)
     {
         Camera * const camera = Camera::getCamera(cam);
@@ -327,7 +341,19 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     }
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
-    renderSolidFirstPass();
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_ALPHA_TEST);
+    glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+    if (UserConfigParams::m_dynamic_lights || forceRTT)
+    {
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        glClearColor(0., 0., 0., 0.);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        renderSolidFirstPass();
+    }
     PROFILER_POP_CPU_MARKER();
 
 
@@ -350,13 +376,18 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     }
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
-    if (!UserConfigParams::m_dynamic_lights && ! forceRTT)
+    if (UserConfigParams::m_dynamic_lights || forceRTT)
     {
-        glEnable(GL_FRAMEBUFFER_SRGB);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-    else
         m_rtts->getFBO(FBO_COLORS).Bind();
+        SColor clearColor(0, 150, 150, 150);
+        if (World::getWorld() != NULL)
+            clearColor = World::getWorld()->getClearColor();
+
+        glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
+            clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glDepthMask(GL_FALSE);
+    }
     renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
 
