@@ -335,7 +335,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     // Lights
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
-        renderLights(pointlightcount, hasShadow);
+        if (UserConfigParams::m_dynamic_lights)
+            renderLights(pointlightcount, hasShadow);
         PROFILER_POP_CPU_MARKER();
     }
 
