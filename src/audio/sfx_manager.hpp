@@ -161,7 +161,5 @@ public:
 
 };
 
-extern SFXManager* sfx_manager;
-
 #endif // HEADER_SFX_MANAGER_HPP
 
