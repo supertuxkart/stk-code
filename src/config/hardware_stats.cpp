@@ -59,10 +59,20 @@ void reportHardwareStats()
 
     std::string vendor, renderer, full_version;
     irr_driver->getOpenGLData(&vendor, &renderer, &version);
-    json.add("GL_VENDOR",   vendor       );
-    json.add("GL_RENDERER", renderer     );
-    json.add("GL_VERSION",  full_version );
+    json.add("GL_VENDOR",   vendor          );
+    json.add("GL_RENDERER", renderer        );
+    json.add("GL_VERSION",  full_version    );
+    json.add("gfx_drv_ver", "OpenGL "+vendor);
 
+    std::string card_name = vendor;
+    if(StringUtils::startsWith(card_name, "ATI Technologies Inc."))
+        card_name="ATI";
+    else if (StringUtils::startsWith(card_name, "NVIDIA Corporation"))
+        card_name="NVIDIA";
+    else if(StringUtils::startsWith(card_name, "S3 Graphics"))
+        card_name="S3";
+    json.add("gfx_card", card_name+" "+renderer);
+    
     json.add("video_xres", UserConfigParams::m_width );
     json.add("video_yres", UserConfigParams::m_height);
     // Too long for debugging atm
