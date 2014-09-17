@@ -17,7 +17,6 @@
 
 #include "states_screens/dialogs/user_info_dialog.hpp"
 
-#include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"

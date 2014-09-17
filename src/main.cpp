@@ -147,6 +147,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/hardware_stats.hpp"
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
@@ -1285,6 +1286,11 @@ int main(int argc, char *argv[] )
                     Log::warn("Addons", "Exception thrown when initializing addons manager : %s", e.what());
                 }
             }
+        }
+
+        if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
+        {
+            HardwareStats::reportHardwareStats();
         }
 
         if(!UserConfigParams::m_no_start_screen)

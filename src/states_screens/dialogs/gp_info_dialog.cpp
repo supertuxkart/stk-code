@@ -17,7 +17,6 @@
 
 #include "states_screens/dialogs/gp_info_dialog.hpp"
 
-#include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/saved_grand_prix.hpp"

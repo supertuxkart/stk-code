@@ -237,22 +237,9 @@ static core::vector3df windDir;
 void IrrDriver::renderSolidFirstPass()
 {
     windDir = getWindDir();
-    m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
-    glClearColor(0., 0., 0., 0.);
-    glDepthMask(GL_TRUE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    glDepthFunc(GL_LEQUAL);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_ALPHA_TEST);
-    glDisable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
 
     if (irr_driver->hasARB_draw_indirect())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
-
-    if (!UserConfigParams::m_dynamic_lights)
-        return;
 
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
@@ -386,25 +373,8 @@ void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
 
 void IrrDriver::renderSolidSecondPass()
 {
-    SColor clearColor(0, 150, 150, 150);
-    if (World::getWorld() != NULL)
-        clearColor = World::getWorld()->getClearColor();
-
-    glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
-        clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    if (UserConfigParams::m_dynamic_lights)
-        glDepthMask(GL_FALSE);
-    else
-    {
-        glDepthMask(GL_TRUE);
-        glClear(GL_DEPTH_BUFFER_BIT);
-    }
-
     irr_driver->setPhase(SOLID_LIT_PASS);
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
 
     uint64_t DiffuseHandle = 0, SpecularHandle = 0, SSAOHandle = 0, DepthHandle = 0;

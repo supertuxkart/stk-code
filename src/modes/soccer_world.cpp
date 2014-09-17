@@ -17,9 +17,6 @@
 
 #include "modes/soccer_world.hpp"
 
-#include <string>
-#include <IMeshSceneNode.h>
-
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "io/file_manager.hpp"
@@ -35,6 +32,10 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
+
+#include <IMeshSceneNode.h>
+
+#include <string>
 
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.

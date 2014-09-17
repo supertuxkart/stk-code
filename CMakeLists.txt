@@ -55,6 +55,10 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
+# Build glew library
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
+include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
@@ -148,10 +152,6 @@ endif()
 # OpenGL
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
-
-# Glew
-find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIR})
 
 if(UNIX AND NOT APPLE)
     if(USE_XRANDR)
@@ -269,12 +269,13 @@ target_link_libraries(supertuxkart
     bulletcollision
     bulletmath
     enet
+    glew
     stkirrlicht
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES}
-    ${GLEW_LIBRARIES})
+    )
 
 if(UNIX AND NOT APPLE)
     if(USE_XRANDR)

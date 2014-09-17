@@ -18,6 +18,7 @@
 
 #include "states_screens/kart_selection.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"

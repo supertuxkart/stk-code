@@ -17,6 +17,7 @@ bool GLContextDebugBit = true;
 bool GLContextDebugBit = false;
 #endif
 
+
 #ifdef DEBUG
 #if !defined(__APPLE__)
 #define ARB_DEBUG_OUTPUT
@@ -31,6 +32,7 @@ CALLBACK
 debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
               const GLchar* msg, const void *userparam)
 {
+    return;
 #ifdef GL_DEBUG_SEVERITY_NOTIFICATION
     // ignore minor notifications sent by some drivers (notably the nvidia one)
     if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
@@ -105,7 +107,7 @@ void initGL()
         return;
     is_gl_init = true;
     // For Mesa extension reporting
-#ifdef  __linux__
+#ifndef WIN32
     glewExperimental = GL_TRUE;
 #endif
     GLenum err = glewInit();
@@ -733,4 +735,32 @@ bool hasGLExtension(const char* extension)
         }
     }
     return false;
-}
+}   // hasGLExtension
+
+// ----------------------------------------------------------------------------
+/** Returns a space-separated list of all GL extensions. Used for hardware
+ *  reporting.
+ */
+const std::string getGLExtensions()
+{
+    std::string result;
+    if (glGetStringi != NULL)
+    {
+        GLint num_extensions = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
+        for (GLint i = 0; i < num_extensions; i++)
+        {
+            const char* extension = (const char*)glGetStringi(GL_EXTENSIONS, i);
+            if(result.size()>0)
+                result += " ";
+            result += extension;
+        }
+    }
+    else
+    {
+        const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
+        result = extensions;
+    }
+
+    return result;
+}   // getGLExtensions

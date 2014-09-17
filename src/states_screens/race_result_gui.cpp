@@ -19,6 +19,7 @@
 #include "states_screens/race_result_gui.hpp"
 
 #include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"

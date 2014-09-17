@@ -465,14 +465,14 @@ void IrrDriver::initDevice()
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
 
-    GLMajorVersion = 2;
-    GLMinorVersion = 1;
+    m_gl_major_version = 2;
+    m_gl_minor_version = 1;
     // Call to glGetIntegerv should not be made if --no-graphics is used
     if(!ProfileWorld::isNoGraphics())
     {
-        glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
-        glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
-        Log::info("IrrDriver", "OpenGL version: %d.%d", GLMajorVersion, GLMinorVersion);
+        glGetIntegerv(GL_MAJOR_VERSION, &m_gl_major_version);
+        glGetIntegerv(GL_MINOR_VERSION, &m_gl_minor_version);
+        Log::info("IrrDriver", "OpenGL version: %d.%d", m_gl_major_version, m_gl_minor_version);
         Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
         Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
         Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
@@ -482,7 +482,7 @@ void IrrDriver::initDevice()
         m_need_srgb_workaround = false;
 #ifdef WIN32
         // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
-        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL && (GLMajorVersion == 3 && GLMinorVersion == 1))
+        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL && (m_gl_major_version == 3 && m_gl_minor_version == 1))
             m_need_ubo_workaround = true;
 #endif
         // Fix for Nvidia and instanced RH
@@ -494,9 +494,9 @@ void IrrDriver::initDevice()
             m_need_srgb_workaround = true;
     }
 #ifdef WIN32
-    m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 3));
+    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 3));
 #else
-    m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
+    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
 #endif
     initGL();
 
@@ -655,6 +655,15 @@ void IrrDriver::initDevice()
     m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
 }   // initDevice
+
+//-----------------------------------------------------------------------------
+void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
+                              std::string *version)
+{
+    *vendor   = (char*)glGetString(GL_VENDOR  );
+    *renderer = (char*)glGetString(GL_RENDERER);
+    *version  = (char*)glGetString(GL_VERSION );
+}   // getOpenGLData
 
 //-----------------------------------------------------------------------------
 void IrrDriver::showPointer()

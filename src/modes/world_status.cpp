@@ -18,8 +18,8 @@
 #include "modes/world_status.hpp"
 
 #include "audio/music_manager.hpp"
-#include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -157,7 +157,7 @@ void WorldStatus::update(const float dt)
             }
 
             // Work around a bug that occurred on linux once:
-            // the sfx_manager kept on reporting that it is playing,
+            // the SFXManager::get() kept on reporting that it is playing,
             // while it was not - so STK would never reach the ready
             // ... phase. Since the sound effect is about 3 seconds
             // long, we use the aux timer to force the next phase

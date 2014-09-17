@@ -17,6 +17,7 @@
 
 #include "states_screens/soccer_setup_screen.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"

@@ -1579,11 +1579,10 @@ namespace FullScreenShader
     {
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralH.comp").c_str());
-        TU_source = 0;
-        TU_depth = 1;
         TU_dest = 2;
-        AssignUniforms();
-        AssignTextureUnit(Program, TexUnit(TU_source, "source"), TexUnit(TU_depth, "depth"), TexUnit(TU_dest, "dest"));
+        AssignUniforms("pixel");
+        AssignSamplerNames(Program, 0, "source", 1, "depth");
+        AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
 
     Gaussian6HBlurShader::Gaussian6HBlurShader()
@@ -1620,10 +1619,10 @@ namespace FullScreenShader
     {
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralV.comp").c_str());
-        TU_source = 0;
-        TU_depth = 1;
         TU_dest = 2;
-        AssignTextureUnit(Program, TexUnit(TU_source, "source"), TexUnit(TU_depth, "depth"), TexUnit(TU_dest, "dest"));
+        AssignUniforms("pixel");
+        AssignSamplerNames(Program, 0, "source", 1, "depth");
+        AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
 
     Gaussian6VBlurShader::Gaussian6VBlurShader()

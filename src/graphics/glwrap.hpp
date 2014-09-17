@@ -151,5 +151,7 @@ void GL32_draw2DRectangle(irr::video::SColor color, const irr::core::rect<s32>& 
     const irr::core::rect<s32>* clip = 0);
 
 bool hasGLExtension(const char* extension);
+const std::string getGLExtensions();
+
 
 #endif
