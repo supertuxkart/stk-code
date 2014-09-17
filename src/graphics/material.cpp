@@ -691,20 +691,112 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                   m_texname.c_str());
     }
 
+    if (irr_driver->isGLSL())
+    {
+        ITexture *tex;
+        switch (m_shader_type)
+        {
+        case SHADERTYPE_SOLID_UNLIT:
+            m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+            break;
+        case SHADERTYPE_ALPHA_TEST:
+            m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+            break;
+        case SHADERTYPE_ALPHA_BLEND:
+            m->MaterialType = video::EMT_ONETEXTURE_BLEND;
+            m->MaterialTypeParam =
+                pack_textureBlendFunc(video::EBF_SRC_ALPHA,
+                video::EBF_ONE_MINUS_SRC_ALPHA,
+                video::EMFN_MODULATE_1X,
+                video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
+            break;
+        case SHADERTYPE_ADDITIVE:
+            m->MaterialType = video::EMT_ONETEXTURE_BLEND;
+            m->MaterialTypeParam = pack_textureBlendFunc(video::EBF_SRC_ALPHA,
+                video::EBF_ONE,
+                video::EMFN_MODULATE_1X,
+                video::EAS_TEXTURE |
+                video::EAS_VERTEX_COLOR);
+            break;
+        case SHADERTYPE_SPHERE_MAP:
+            m->MaterialType = irr_driver->getShader(ES_SPHERE_MAP);
+            break;
+        case SHADERTYPE_SPLATTING:
+            tex = irr_driver->getTexture(m_splatting_texture_1);
+            m->setTexture(2, tex);
+
+            if (m_splatting_texture_2.size() > 0)
+            {
+                tex = irr_driver->getTexture(m_splatting_texture_2);
+            }
+            m->setTexture(3, tex);
+
+            if (m_splatting_texture_3.size() > 0)
+            {
+                tex = irr_driver->getTexture(m_splatting_texture_3);
+            }
+            m->setTexture(4, tex);
+
+            if (m_splatting_texture_4.size() > 0)
+            {
+                tex = irr_driver->getTexture(m_splatting_texture_4);
+            }
+            m->setTexture(5, tex);
+
+            // Material and shaders
+            m->MaterialType = irr_driver->getShader(ES_SPLATTING);
+            break;
+        case SHADERTYPE_WATER:
+            m->setTexture(1, irr_driver->getTexture(FileManager::TEXTURE,
+                "waternormals.jpg"));
+            m->setTexture(2, irr_driver->getTexture(FileManager::TEXTURE,
+                "waternormals2.jpg"));
+
+            ((WaterShaderProvider *)irr_driver->getCallback(ES_WATER))->
+                setSpeed(m_water_shader_speed_1 / 100.0f, m_water_shader_speed_2 / 100.0f);
+
+            m->MaterialType = irr_driver->getShader(ES_WATER);
+            break;
+        case SHADERTYPE_VEGETATION:
+            // Only one grass speed & amplitude per map for now
+            ((GrassShaderProvider *)irr_driver->getCallback(ES_GRASS))->
+                setSpeed(m_grass_speed);
+            ((GrassShaderProvider *)irr_driver->getCallback(ES_GRASS))->
+                setAmplitude(m_grass_amplitude);
+            m->MaterialType = irr_driver->getShader(ES_GRASS_REF);
+            break;
+        case SHADERTYPE_SOLID:
+            if (m_normal_map_tex.size() > 0)
+            {
+                tex = irr_driver->getTexture(m_normal_map_tex);
+                m->setTexture(1, tex);
+
+                // Material and shaders
+                m->MaterialType = irr_driver->getShader(ES_NORMAL_MAP);
+            }
+            break;
+        case SHADERTYPE_BUBBLE:
+            if (mb)
+            {
+                BubbleEffectProvider * bubble = (BubbleEffectProvider *)
+                    irr_driver->getCallback(ES_BUBBLES);
+                bubble->addBubble(mb);
+
+                m->MaterialType = irr_driver->getShader(ES_BUBBLES);
+                m->BlendOperation = video::EBO_ADD;
+            }
+            break;
+        }
+        return;
+    }
+
 
     if (m_shader_type == SHADERTYPE_SOLID_UNLIT)
     {
-        if (irr_driver->isGLSL())
-        {
-            m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
-        }
-        else
-        {
-            m->AmbientColor = video::SColor(255, 255, 255, 255);
-            m->DiffuseColor = video::SColor(255, 255, 255, 255);
-            m->EmissiveColor = video::SColor(255, 255, 255, 255);
-            m->SpecularColor = video::SColor(255, 255, 255, 255);
-        }
+        m->AmbientColor = video::SColor(255, 255, 255, 255);
+        m->DiffuseColor = video::SColor(255, 255, 255, 255);
+        m->EmissiveColor = video::SColor(255, 255, 255, 255);
+        m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
 
     if (m_shader_type == SHADERTYPE_ALPHA_TEST)
@@ -740,73 +832,18 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 
     if (m_shader_type == SHADERTYPE_SPHERE_MAP)
     {
-        if (irr_driver->isGLSL())
-        {
-            m->MaterialType = irr_driver->getShader(ES_SPHERE_MAP);
-        }
-        else
-        {
-            m->MaterialType = video::EMT_SPHERE_MAP;
-        }
+        m->MaterialType = video::EMT_SPHERE_MAP;
     }
 
     if (m_shader_type == SHADERTYPE_SOLID && m_normal_map_tex.size() > 0)
     {
-        if (irr_driver->isGLSL())
-        {
-            // FIXME; cannot perform this check atm, because setMaterialProperties
-            // is sometimes called before calculating tangents
-            //if (mb->getVertexType() != video::EVT_TANGENTS)
-            //{
-            //    Log::warn("material", "Requiring normal map without tangent enabled mesh for <%s>",
-            //        m_texname.c_str());
-            //}
-            
-            ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
-            m->setTexture(1, tex);
-
-            // Material and shaders
-            m->MaterialType = irr_driver->getShader(ES_NORMAL_MAP);
-        }
-        else
-        {
-            // remove normal map texture so that it's not blended with the rest
-            m->setTexture(1, NULL);
-        }
+        // remove normal map texture so that it's not blended with the rest
+        m->setTexture(1, NULL);
     }
 
     if (m_shader_type == SHADERTYPE_SPLATTING)
     {
-        if (irr_driver->supportsSplatting())
-        {
-            ITexture* tex = irr_driver->getTexture(m_splatting_texture_1);
-            m->setTexture(2, tex);
-
-            if (m_splatting_texture_2.size() > 0)
-            {
-                tex = irr_driver->getTexture(m_splatting_texture_2);
-            }
-            m->setTexture(3, tex);
-
-            if (m_splatting_texture_3.size() > 0)
-            {
-                tex = irr_driver->getTexture(m_splatting_texture_3);
-            }
-            m->setTexture(4, tex);
-
-            if (m_splatting_texture_4.size() > 0)
-            {
-                tex = irr_driver->getTexture(m_splatting_texture_4);
-            }
-            m->setTexture(5, tex);
-
-            // Material and shaders
-            m->MaterialType = irr_driver->getShader(ES_SPLATTING);
-        }
-        else
-        {
-            m->MaterialType = video::EMT_SOLID;
-        }
+        m->MaterialType = video::EMT_SOLID;
     }
 
 
@@ -822,53 +859,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
 
-    if (m_shader_type == SHADERTYPE_BUBBLE && mb != NULL)
-    {
-        if (irr_driver->isGLSL())
-        {
-            BubbleEffectProvider * bubble = (BubbleEffectProvider *)
-                                            irr_driver->getCallback(ES_BUBBLES);
-            bubble->addBubble(mb);
-
-            m->MaterialType = irr_driver->getShader(ES_BUBBLES);
-            m->BlendOperation = video::EBO_ADD;
-        }
-    }
-
-    if (m_shader_type == SHADERTYPE_WATER)
-    {
-        if (irr_driver->isGLSL())
-        {
-            m->setTexture(1, irr_driver->getTexture(FileManager::TEXTURE,
-                                                    "waternormals.jpg"));
-            m->setTexture(2, irr_driver->getTexture(FileManager::TEXTURE,
-                                                    "waternormals2.jpg"));
-
-            ((WaterShaderProvider *) irr_driver->getCallback(ES_WATER))->
-                setSpeed(m_water_shader_speed_1/100.0f, m_water_shader_speed_2/100.0f);
-
-            m->MaterialType = irr_driver->getShader(ES_WATER);
-        }
-    }
-
     if (m_shader_type == SHADERTYPE_VEGETATION)
     {
-        if (UserConfigParams::m_weather_effects &&
-            irr_driver->isGLSL())
-        {
-            // Only one grass speed & amplitude per map for now
-            ((GrassShaderProvider *) irr_driver->getCallback(ES_GRASS))->
-                setSpeed(m_grass_speed);
-            ((GrassShaderProvider *) irr_driver->getCallback(ES_GRASS))->
-                setAmplitude(m_grass_amplitude);
-
-
-            m->MaterialType = irr_driver->getShader(ES_GRASS);
-        }
-        else
-        {
-            m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-        }
+        m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
     }
 
     if (m_disable_z_write)
