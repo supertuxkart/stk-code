@@ -31,13 +31,20 @@ void reportHardwareStats()
     Json json;
 #ifdef WIN32
     json.add("os_win", 1);
+#else
+    json.add("os_win", 0);
 #endif
 #ifdef __APPLE__
     json.add("os_macosx", 1);
+#else
+    json.add("os_macosx", 0);
 #endif
 #ifdef __linux__
-    json.add("os_linx", 1);
+    json.add("os_linux", 1);
     json.add("os_unix", 1);
+#else
+    json.add("os_linux", 0);
+    json.add("os_unix", 0);
 #endif
 #ifdef DEBUG
     json.add("build_debug", 1);
@@ -48,11 +55,13 @@ void reportHardwareStats()
     unsigned int minor = ogl_version - 100*major;
     std::string version = 
         StringUtils::insertValues("%d.%d", major, minor);
-    json.add("GL_VERSION", version);
+    json.add("GL_SHADING_LANGUAGE_VERSION", version);
 
-    std::string vendor;
-    irr_driver->getOpenGLData(&vendor);
-    json.add("GL_VENDOR", vendor);
+    std::string vendor, renderer, full_version;
+    irr_driver->getOpenGLData(&vendor, &renderer, &version);
+    json.add("GL_VENDOR",   vendor       );
+    json.add("GL_RENDERER", renderer     );
+    json.add("GL_VERSION",  full_version );
 
     json.add("video_xres", UserConfigParams::m_width );
     json.add("video_yres", UserConfigParams::m_height);
