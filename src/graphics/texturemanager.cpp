@@ -1,6 +1,6 @@
 #include "texturemanager.hpp"
 #include <fstream>
-#include <string>
+#include <sstream>
 #include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
 #include "irr_driver.hpp"
 
@@ -179,7 +179,7 @@ video::ITexture* getUnicolorTexture(const video::SColor &c)
     };
     video::IImage *img = irr_driver->getVideoDriver()->createImageFromData(video::ECF_A8R8G8B8, core::dimension2d<u32>(2, 2), tmp);
     img->grab();
-    std::string name("color");
-    name += colorcount++;
-    return irr_driver->getVideoDriver()->addTexture(name.c_str(), img);
+    std::stringstream name;
+    name << "color" << c.color;
+    return irr_driver->getVideoDriver()->addTexture(name.str().c_str(), img);
 }
