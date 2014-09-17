@@ -66,6 +66,7 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
 #include "utils/vs.hpp"
+#include "utils/profiler.hpp"
 
 #include <ICameraSceneNode.h>
 #include <ISceneManager.h>
@@ -1160,9 +1161,11 @@ void Kart::update(float dt)
 
     m_kart_gfx->update(dt);
     if (m_collision_particles) m_collision_particles->update(dt);
-
-    updatePhysics(dt);
     
+    PROFILER_PUSH_CPU_MARKER("Kart::updatePhysics", 0x60, 0x34, 0x7F);
+    updatePhysics(dt);
+    PROFILER_POP_CPU_MARKER();
+
     if(!m_controls.m_fire) m_fire_clicked = 0;
 
     if(m_controls.m_fire && !m_fire_clicked && !m_kart_animation)

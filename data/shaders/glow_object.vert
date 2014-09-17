@@ -19,6 +19,6 @@ void main(void)
 {
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
     mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * InverseViewMatrix);
-    gl_Position = ProjectionMatrix * ViewMatrix *  ModelMatrix * vec4(Position, 1.);
+    gl_Position = ProjectionViewMatrix * ModelMatrix * vec4(Position, 1.);
     glowColor = GlowColor;
 }
