@@ -399,8 +399,6 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
 
-    m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-
     if (getNormals())
     {
         m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
@@ -452,6 +450,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         renderTransparent();
         PROFILER_POP_CPU_MARKER();
     }
+
+    m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
     // Render particles
     {
