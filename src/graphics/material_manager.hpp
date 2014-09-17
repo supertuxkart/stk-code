@@ -47,6 +47,9 @@ private:
     int     m_shared_material_index;
 
     std::vector<Material*> m_materials;
+
+    Material* m_default_material;
+
 public:
               MaterialManager();
              ~MaterialManager();

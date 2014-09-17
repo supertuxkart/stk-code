@@ -51,9 +51,8 @@ const unsigned int VCLAMP = 2;
 //-----------------------------------------------------------------------------
 /** Create a new material using the parameters specified in the xml file.
  *  \param node Node containing the parameters for this material.
- *  \param index Index in material_manager.
  */
-Material::Material(const XMLNode *node, int index, bool deprecated)
+Material::Material(const XMLNode *node, bool deprecated)
 {
     m_shader_type = SHADERTYPE_SOLID;
     m_deprecated = deprecated;
@@ -65,7 +64,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         throw std::runtime_error("[Material] No texture name specified "
                                  "in file\n");
     }
-    init(index);
+    init();
 
     bool b = false;
 
@@ -397,26 +396,25 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
 //-----------------------------------------------------------------------------
 /** Create a standard material using the default settings for materials.
  *  \param fname Name of the texture file.
- *  \param index Unique index in material_manager.
  *  \param is_full_path If the fname contains the full path.
  */
-Material::Material(const std::string& fname, int index, bool is_full_path,
-                   bool complain_if_not_found)
+Material::Material(const std::string& fname, bool is_full_path,
+                   bool complain_if_not_found, bool load_texture)
 {
     m_deprecated = false;
 
     m_texname = fname;
-    init(index);
-    install(is_full_path, complain_if_not_found);
+    init();
+
+    if (load_texture)
+        install(is_full_path, complain_if_not_found);
 }   // Material
 
 //-----------------------------------------------------------------------------
 /** Inits all material data with the default settings.
- *  \param Index of this material in the material_manager index array.
  */
-void Material::init(unsigned int index)
+void Material::init()
 {
-    m_index                     = index;
     m_clamp_tex                 = 0;
     m_shader_type               = SHADERTYPE_SOLID;
     //m_lightmap                  = false;

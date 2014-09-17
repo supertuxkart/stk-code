@@ -40,6 +40,7 @@ MaterialManager::MaterialManager()
 {
     /* Create list - and default material zero */
 
+    m_default_material = NULL;
     m_materials.reserve(256);
     // We can't call init/loadMaterial here, since the global variable
     // material_manager has not yet been initialised, and
@@ -95,6 +96,11 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
         return;
     }
 
+    if (m_default_material == NULL)
+        m_default_material = new Material("", false, false, false);
+    m_default_material->setMaterialProperties(&(mb->getMaterial()), mb);
+
+    /*
     // This material does not appear in materials.xml. Set some common flags...
     if (UserConfigParams::m_anisotropic > 0)
     {
@@ -132,7 +138,7 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
 
     //if (UserConfigParams::m_fullscreen_antialiasing)
     //    mb->getMaterial().AntiAliasing = video::EAAM_LINE_SMOOTH;
-
+    */
 }   // setAllMaterialFlags
 
 //-----------------------------------------------------------------------------
@@ -244,7 +250,7 @@ bool MaterialManager::pushTempMaterial(const XMLNode *root,
         }
         try
         {
-            m_materials.push_back(new Material(node, m_materials.size(), deprecated));
+            m_materials.push_back(new Material(node, deprecated));
         }
         catch(std::exception& e)
         {
@@ -311,7 +317,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     }
 
     // Add the new material
-    Material* m=new Material(fname, m_materials.size(), is_full_path, complain_if_not_found);
+    Material* m = new Material(fname, is_full_path, complain_if_not_found);
     m_materials.push_back(m);
     if(make_permanent)
     {
