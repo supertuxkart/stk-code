@@ -678,10 +678,6 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) con
  */
 void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb)
 {
-    // !!======== This method is only called for materials that can be found in
-    //            materials.xml, if you want to set flags for all surfaces, see
-    //            'MaterialManager::setAllMaterialFlags'
-
     if (m_deprecated ||
         (m->getTexture(0) != NULL &&
          ((core::stringc)m->getTexture(0)->getName()).find("deprecated") != -1))
