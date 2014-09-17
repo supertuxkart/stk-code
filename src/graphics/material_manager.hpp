@@ -63,7 +63,7 @@ public:
                            scene::ISceneNode* parent,
                            bool use_fog) const;
 
-    void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const;
+    void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb);
 
     int       addEntity        (Material *m);
     Material *getMaterial      (const std::string& t,

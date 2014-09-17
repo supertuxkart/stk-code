@@ -162,7 +162,7 @@ void MaterialManager::adjustForFog(video::ITexture* t,
 
 //-----------------------------------------------------------------------------
 
-void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const
+void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb)
 {
     irr::video::SMaterial& material = mb->getMaterial();
     if (material.getTexture(0) == NULL)
@@ -175,6 +175,10 @@ void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) cons
         material.ColorMaterial = irr::video::ECM_DIFFUSE_AND_AMBIENT;
         material.MaterialType = irr::video::EMT_SOLID;
     }
+
+    if (m_default_material == NULL)
+        m_default_material = new Material("", false, false, false);
+    m_default_material->setMaterialProperties(&(mb->getMaterial()), mb);
 }
 //-----------------------------------------------------------------------------
 int MaterialManager::addEntity(Material *m)
