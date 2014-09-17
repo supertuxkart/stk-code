@@ -63,11 +63,12 @@ void reportHardwareStats()
 
     Online::HTTPRequest *request = new Online::HTTPRequest(/*manage memory*/true, 1);
     request->addParameter("user_id", 3);
-    request->addParameter("generation_date", StkTime::getTimeSinceEpoch());
-    request->addParameter("data_type", "hwdetect");
-    request->addParameter("data_version", 1);
+    request->addParameter("time", StkTime::getTimeSinceEpoch());
+    request->addParameter("type", "hwdetect");
+    request->addParameter("version", 1);
     request->addParameter("data", json.toString());
-    request->setURL("http://stats.supertuxkart.net/upload/v1");
+    request->setURL("http://stats.supertuxkart.net/upload/v1/");
+    //request->setURL("http://127.0.0.1:8000/upload/v1/");
     // FIXME: For now: don't submit
     //request->queue();
 }   // reportHardwareStats
