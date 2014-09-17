@@ -15,14 +15,12 @@ VAOManager::VAOManager()
     {
         glGenBuffers(1, &instance_vbo[i]);
         glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[i]);
-#ifdef Buffer_Storage
         if (irr_driver->hasBufferStorageExtension())
         {
             glBufferStorage(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceData), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
             Ptr[i] = glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceData), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
         }
         else
-#endif
         {
             glBufferData(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceData), 0, GL_STREAM_DRAW);
         }

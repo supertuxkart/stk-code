@@ -191,6 +191,9 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
         return;
     }
 
+    if (m_parent->m_kart_widgets[playerID].getKartInternalName() == selectionID)
+        return; // already selected
+
     m_parent->updateKartWidgetModel(playerID, selectionID, selectionText);
     m_parent->m_kart_widgets[playerID].setKartInternalName(selectionID);
     m_parent->updateKartStats(playerID, selectionID);

@@ -24,6 +24,11 @@ const core::vector3df& scale) :
     isMaterialInitialized = false;
 }
 
+STKAnimatedMesh::~STKAnimatedMesh()
+{
+    cleanGLMeshes();
+}
+
 void STKAnimatedMesh::cleanGLMeshes()
 {
     for (u32 i = 0; i < GLmeshes.size(); ++i)
@@ -100,6 +105,15 @@ void STKAnimatedMesh::updateNoGL()
         }
         isMaterialInitialized = true;
     }
+
+    for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
+    {
+        scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+        if (!mb)
+            continue;
+        if (mb)
+            GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
+    }
 }
 
 void STKAnimatedMesh::updateGL()
@@ -172,8 +186,6 @@ void STKAnimatedMesh::updateGL()
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
             }
         }
-        if (mb)
-            GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
     }
 
 }

@@ -273,15 +273,14 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         m_gravity_center_shift.setZ(0);
     }
 
-    if(m_physical_wheel_position < 0)
-        m_wheel_base = fabsf(m_kart_model->getLength() );
-    else
-    {
-        // The new (atm unused) physical position results in steering to be
-        // not sharp enough - therefore decrease the wheel base somewhat to
-        // approximate the behaviour of the old steering.
-        m_wheel_base = fabsf(m_kart_model->getLength() - 0.25f);
-    }
+    // In older STK versions the physical wheels where moved 'wheel_radius'
+    // into the physical body (i.e. 'hypothetical' wheel shape would not
+    // poke out of the physical shape). In order to make the karts a bit more
+    // stable, the physical wheel position (i.e. location of raycast) were
+    // moved to be on the corner of the shape. In order to retain the same
+    // steering behaviour, the wheel base (which in turn determines the
+    // turn angle at certain speeds) is shortened by 2*wheel_radius
+    m_wheel_base = fabsf(m_kart_model->getLength() - 2*m_wheel_radius);
 
     // Now convert the turn radius into turn angle:
     for(unsigned int i=0; i<m_turn_angle_at_speed.size(); i++)

@@ -55,6 +55,10 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
+# Build glew library
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
+include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
@@ -75,17 +79,17 @@ endif()
 include_directories(${STK_SOURCE_DIR})
 
 # These variables enable MSVC to find libraries located in "dependencies"
-if(MSVC)
-    set(ENV{PATH} ${PROJECT_SOURCE_DIR}/dependencies/include)
+if(WIN32)
+    set(ENV{PATH} "$ENV{PATH};${PROJECT_SOURCE_DIR}/dependencies/include")
     set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
     set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
-    add_definitions(/D_IRR_STATIC_LIB_)
+    if(MSVC)
+        add_definitions(/D_IRR_STATIC_LIB_)
+    elseif(MINGW)
+        add_definitions(-D_IRR_STATIC_LIB_)
+    endif()
 endif()
 
-if(MINGW)
-    set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
-    add_definitions(-D_IRR_STATIC_LIB_)
-endif()
 
 if(APPLE)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
@@ -148,10 +152,6 @@ endif()
 # OpenGL
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
-
-# Glew
-find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIR})
 
 if(UNIX AND NOT APPLE)
     if(USE_XRANDR)
@@ -269,12 +269,13 @@ target_link_libraries(supertuxkart
     bulletcollision
     bulletmath
     enet
+    glew
     stkirrlicht
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES}
-    ${GLEW_LIBRARIES})
+    )
 
 if(UNIX AND NOT APPLE)
     if(USE_XRANDR)

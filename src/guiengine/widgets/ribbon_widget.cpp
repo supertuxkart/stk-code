@@ -474,9 +474,11 @@ void RibbonWidget::select(std::string item, const int mousePlayerID)
 // ----------------------------------------------------------------------------
 EventPropagation RibbonWidget::rightPressed(const int playerID)
 {
-    if (m_deactivated) return EVENT_LET;
+    EventPropagation result = m_ribbon_type != RIBBON_TOOLBAR ? EVENT_LET : EVENT_BLOCK;
+    
+    if (m_deactivated) return result;
     // empty ribbon, or only one item (can't move right)
-    if (m_active_children.size() < 2) return EVENT_LET;
+    if (m_active_children.size() < 2) return result;
 
     m_selection[playerID]++;
 
@@ -506,15 +508,17 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
         }
     }
 
-    return m_ribbon_type != RIBBON_TOOLBAR ? EVENT_LET : EVENT_BLOCK;
+    return result;
 }   // rightPressed
 
 // ----------------------------------------------------------------------------
 EventPropagation RibbonWidget::leftPressed(const int playerID)
 {
-    if (m_deactivated) return EVENT_LET;
+    EventPropagation result = m_ribbon_type != RIBBON_TOOLBAR ? EVENT_LET : EVENT_BLOCK;
+    
+    if (m_deactivated) return result;
     // empty ribbon, or only one item (can't move left)
-    if (m_active_children.size() < 2) return EVENT_LET;
+    if (m_active_children.size() < 2) return result;
 
     m_selection[playerID]--;
     if (m_selection[playerID] < 0)
@@ -543,15 +547,12 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
         if (m_selection[playerID] > 0) leftPressed(playerID);
     }
 
-    if (m_ribbon_type != RIBBON_TOOLBAR)
-    {
+    //if (m_ribbon_type != RIBBON_TOOLBAR)
+    //{
         //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
-        return EVENT_LET;
-    }
-    else
-    {
-        return EVENT_BLOCK;
-    }
+    //}
+
+    return result;
 }   // leftPressed
 
 // ----------------------------------------------------------------------------

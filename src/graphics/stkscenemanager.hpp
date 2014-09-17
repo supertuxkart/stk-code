@@ -8,6 +8,7 @@
 #include "gl_headers.hpp"
 #include "stkmesh.hpp"
 #include "gpuparticles.hpp"
+#include "stkbillboard.hpp"
 
 template<typename T>
 class CommandBuffer : public Singleton<T>
@@ -19,14 +20,12 @@ public:
     {
         glGenBuffers(1, &drawindirectcmd);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
-#ifdef Buffer_Storage
         if (irr_driver->hasBufferStorageExtension())
         {
             glBufferStorage(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
             Ptr = (DrawElementsIndirectCommand *)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
         }
         else
-#endif
         {
             glBufferData(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_STREAM_DRAW);
         }
@@ -34,6 +33,9 @@ public:
 };
 
 class ImmediateDrawList : public Singleton<ImmediateDrawList>, public std::vector<scene::ISceneNode *>
+{};
+
+class BillBoardList : public Singleton<BillBoardList>, public std::vector<STKBillboard *>
 {};
 
 class ParticlesList : public Singleton<ParticlesList>, public std::vector<ParticleSystemProxy *>

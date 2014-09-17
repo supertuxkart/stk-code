@@ -23,6 +23,7 @@ public:
      const irr::core::vector3df& position = irr::core::vector3df(0,0,0),
      const irr::core::vector3df& rotation = irr::core::vector3df(0,0,0),
      const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
+  ~STKAnimatedMesh();
 
   virtual void render();
   virtual void setMesh(irr::scene::IAnimatedMesh* mesh);

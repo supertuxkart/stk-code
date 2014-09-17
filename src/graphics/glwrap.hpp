@@ -42,24 +42,22 @@ void printFileList(GLint ShaderType, const char *filepath, Types ... args)
     printFileList(args...);
 }
 
+enum AttributeType
+{
+    OBJECT,
+    PARTICLES_SIM,
+    PARTICLES_RENDERING,
+};
+
+void setAttribute(AttributeType Tp, GLuint ProgramID);
+
 template<typename ... Types>
-GLint LoadProgram(Types ... args)
+GLint LoadProgram(AttributeType Tp, Types ... args)
 {
     GLint ProgramID = glCreateProgram();
     loadAndAttach(ProgramID, args...);
     if (irr_driver->getGLSLVersion() < 330)
-    {
-        glBindAttribLocation(ProgramID, 0, "Position");
-        glBindAttribLocation(ProgramID, 1, "Normal");
-        glBindAttribLocation(ProgramID, 2, "Color");
-        glBindAttribLocation(ProgramID, 3, "Texcoord");
-        glBindAttribLocation(ProgramID, 4, "SecondTexcoord");
-        glBindAttribLocation(ProgramID, 5, "Tangent");
-        glBindAttribLocation(ProgramID, 6, "Bitangent");
-        glBindAttribLocation(ProgramID, 7, "Origin");
-        glBindAttribLocation(ProgramID, 8, "Orientation");
-        glBindAttribLocation(ProgramID, 9, "Scale");
-    }
+        setAttribute(Tp, ProgramID);
     glLinkProgram(ProgramID);
 
     GLint Result = GL_FALSE;
@@ -131,13 +129,7 @@ public:
 // core::rect<s32> needs these includes
 #include <rect.h>
 #include "utils/vec3.hpp"
-
-GLuint getTextureGLuint(irr::video::ITexture *tex);
-GLuint getDepthTexture(irr::video::ITexture *tex);
-void resetTextureTable();
-void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = false);
-bool loadCompressedTexture(const std::string& compressed_tex);
-void saveCompressedTexture(const std::string& compressed_tex);
+#include "texturemanager.hpp"
 
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);
@@ -159,5 +151,7 @@ void GL32_draw2DRectangle(irr::video::SColor color, const irr::core::rect<s32>& 
     const irr::core::rect<s32>* clip = 0);
 
 bool hasGLExtension(const char* extension);
+const std::string getGLExtensions();
+
 
 #endif

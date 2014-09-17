@@ -50,11 +50,15 @@ TrackObjectManager::~TrackObjectManager()
  *        in a separate section that's read before everything and remove all this
  *        crap
  */
-void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader)
+void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
+                             ModelDefinitionLoader& model_def_loader)
 {
     try
     {
-        m_all_objects.push_back(new TrackObject(xml_node, parent, model_def_loader));
+        TrackObject *obj = new TrackObject(xml_node, parent, model_def_loader);
+        m_all_objects.push_back(obj);
+        if(obj->isDriveable())
+            m_driveable_objects.push_back(obj);
     }
     catch (std::exception& e)
     {
@@ -119,6 +123,61 @@ void TrackObjectManager::update(float dt)
         curr->update(dt);
     }
 }   // update
+
+// ----------------------------------------------------------------------------
+/** Does a raycast against all driveable objects. This way part of the track
+ *  can be a physical object, and can e.g. be animated. A separate list of all
+ *  driveable objects is maintained (in one case there were over 2000 bodies,
+ *  but only one is driveable). The result of the raycast against the track
+ *  mesh are the input parameter. It is then tested if the raycast against 
+ *  a track object gives a 'closer' result. If so, the parameters hit_point,
+ *  normal, and material will be updated.
+ *  \param from/to The from and to position for the raycast.
+ *  \param xyz The position in world where the ray hit.
+ *  \param material The material of the mesh that was hit.
+ *  \param normal The intrapolated normal at that position.
+ *  \param interpolate_normal If true, the returned normal is the interpolated
+ *         based on the three normals of the triangle and the location of the
+ *         hit point (which is more compute intensive, but results in much
+ *         smoother results).
+ *  \return True if a triangle was hit, false otherwise (and no output
+ *          variable will be set.
+ 
+ */
+void TrackObjectManager::castRay(const btVector3 &from, 
+                                 const btVector3 &to, btVector3 *hit_point, 
+                                 const Material **material,
+                                 btVector3 *normal,
+                                 bool interpolate_normal) const
+{
+    float distance = 9999.9f;
+    // If there was a hit already, compute the current distance
+    if(*material)
+    {
+        distance = hit_point->distance(from);
+    }
+    const TrackObject* curr;
+    for_in (curr, m_driveable_objects)
+    {
+        btVector3 new_hit_point;
+        const Material *new_material;
+        btVector3 new_normal;
+        if(curr->castRay(from, to, &new_hit_point, &new_material, &new_normal,
+                      interpolate_normal))
+        {
+            float new_distance = new_hit_point.distance(from);
+            // If the new hit is closer than the current hit, save
+            // the data.
+            if (new_distance < distance)
+            {
+                *material  = new_material;
+                *hit_point = new_hit_point;
+                *normal    = new_normal;
+                distance   = new_distance;
+            }   // if new_distance < distance
+        }   // if hit
+    }   // for all track objects.
+}   // castRay
 
 // ----------------------------------------------------------------------------
 /** Enables or disables fog for a given scene node.

@@ -3,6 +3,8 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
+extern bool GLContextDebugBit;
+
 #include "CIrrDeviceLinux.h"
 
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
@@ -497,7 +499,37 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 {
 	GLXContext Context;
-	int compat33ctx[] =
+  int compat43ctxdebug[] =
+		{
+			GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+			GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+			None
+		};
+    int compat43ctx[] =
+    {
+        GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        None
+    };
+	int core43ctxdebug[] =
+		{
+			GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+			GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+			None
+		};
+    int core43ctx[] =
+    {
+        GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+        None
+    };
+	int compat33ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
 			GLX_CONTEXT_MINOR_VERSION_ARB, 3,
@@ -505,7 +537,14 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
-	int core33ctx[] =
+    int compat33ctx[] =
+    {
+        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        None
+    };
+	int core33ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
 			GLX_CONTEXT_MINOR_VERSION_ARB, 3,
@@ -513,12 +552,26 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
+    int core33ctx[] =
+    {
+        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+        None
+    };
+    int core31ctxdebug[] =
+    {
+        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+        GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+        GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+        None
+    };
 	int core31ctx[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
 			GLX_CONTEXT_MINOR_VERSION_ARB, 1,
 			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
 	int legacyctx[] =
@@ -530,21 +583,33 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 	PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
+  
+  // create compat 4.3 context (for proprietary drivers)
+    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? compat43ctxdebug : compat43ctx);
+	if (!XErrorSignaled)
+		return Context;
 
+  XErrorSignaled = false;
+	// create core 4.3 context (for mesa)
+    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
+	if (!XErrorSignaled)
+		return Context;
+
+	XErrorSignaled = false;
 	// create compat 3.3 context (for proprietary drivers)
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, compat33ctx);
+    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? compat33ctxdebug : compat33ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
 	// create core 3.3 context (for mesa)
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, core33ctx);
+    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
 	// create core 3.1 context (for older mesa)
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, core31ctx);
+    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
 	if (!XErrorSignaled)
 		return Context;
 

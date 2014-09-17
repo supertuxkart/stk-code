@@ -68,6 +68,9 @@ void LODNode::render()
  */
 int LODNode::getLevel()
 {
+    if (m_nodes.size() == 0)
+        return -1;
+
     // If a level is forced, use it
     if(m_forced_lod>-1)
         return m_forced_lod;
@@ -79,14 +82,13 @@ int LODNode::getLevel()
     AbstractKart* kart = camera->getKart();
     const Vec3 &pos = kart->getFrontXYZ();
 
-    // Assumes all children are at the same location
     const int dist =
-        (int)((getPosition() + m_nodes[0]->getPosition()).getDistanceFromSQ( core::vector3df(pos.getX(), pos.getY(), pos.getZ())));
+        (int)((m_nodes[0]->getAbsolutePosition()).getDistanceFromSQ( core::vector3df(pos.getX(), pos.getY(), pos.getZ())));
 
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
         if (dist < m_detail[n])
-          return n;
+            return n;
     }
 
     // If it's the shadow pass, and we would have otherwise hidden the item, show the min one
@@ -108,7 +110,7 @@ void LODNode::forceLevelOfDetail(int n)
 // ----------------------------------------------------------------------------
 void LODNode::OnAnimate(u32 timeMs)
 {
-    if (isVisible())
+    if (isVisible() && m_nodes.size() > 0)
     {
         // update absolute position
         updateAbsolutePosition();
