@@ -657,23 +657,12 @@ void IrrDriver::initDevice()
 }   // initDevice
 
 //-----------------------------------------------------------------------------
-void IrrDriver::getOpenGLData(std::string *vendor )
+void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
+                              std::string *version)
 {
-    *vendor = (char*)(glGetString(GL_VENDOR));
-#ifdef XX
-    m_gl_major_version = 2;
-    m_gl_minor_version = 1;
-    // Call to glGetIntegerv should not be made if --no-graphics is used
-    if(!ProfileWorld::isNoGraphics())
-    {
-        glGetIntegerv(GL_MAJOR_VERSION, &m_gl_major_version);
-        glGetIntegerv(GL_MINOR_VERSION, &m_gl_minor_version);
-        Log::info("IrrDriver", "OpenGL version: %d.%d", m_gl_major_version, m_gl_minor_version);
-        Log::info("IrrDriver", "OpenGL vendor: %s", );
-        Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
-        Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
-
-#endif
+    *vendor   = (char*)glGetString(GL_VENDOR  );
+    *renderer = (char*)glGetString(GL_RENDERER);
+    *version  = (char*)glGetString(GL_VERSION );
 }   // getOpenGLData
 
 //-----------------------------------------------------------------------------

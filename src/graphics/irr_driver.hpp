@@ -428,7 +428,8 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
-    void getOpenGLData(std::string *vendor);
+    void getOpenGLData(std::string *vendor, std::string *renderer,
+                       std::string *version);
 
     void generateSkyboxCubemap();
     void generateDiffuseCoefficients();
