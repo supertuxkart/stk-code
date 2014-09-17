@@ -47,6 +47,7 @@
 
 SFXManager *SFXManager::m_sfx_manager;
 
+// ----------------------------------------------------------------------------
 /** Static function to create the singleton sfx manager.
  */
 void SFXManager::create()
@@ -83,6 +84,8 @@ SFXManager::SFXManager()
 }  // SoundManager
 
 //-----------------------------------------------------------------------------
+/** Destructor, frees all sound effects.
+ */
 SFXManager::~SFXManager()
 {
     // ---- clear m_all_sfx
@@ -120,7 +123,10 @@ SFXManager::~SFXManager()
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------
-
+/** Called then sound is globally switched on or off. It either pauses or
+ *  resumes all sound effects. 
+ *  \param on If sound is switched on or off.
+ */
 void SFXManager::soundToggled(const bool on)
 {
     // When activating SFX, load all buffers
@@ -148,7 +154,9 @@ void SFXManager::soundToggled(const bool on)
 }
 
 //----------------------------------------------------------------------------
-
+/** Returns if sfx can be played. This means sfx are enabled and
+ *  the manager is correctly initialised.
+ */
 bool SFXManager::sfxAllowed()
 {
     if(!UserConfigParams::m_sfx || !m_initialized)
@@ -312,11 +320,6 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
         positional = buffer->isPositional();
     }
 
-    //printf("CREATING %s (%x), positional = %i (race_manager->getNumLocalPlayers() = %i, buffer->isPositional() = %i)\n",
-    //       buffer->getFileName().c_str(), (unsigned int)buffer,
-    //       positional,
-    //       race_manager->getNumLocalPlayers(), buffer->isPositional());
-
 #if HAVE_OGGVORBIS
     //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
@@ -338,7 +341,9 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
     std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.find(name);
     if ( i == m_all_sfx_types.end() )
     {
-        Log::error("SFXManager", "SFXManager::createSoundSource could not find the requested sound effect : '%s'\n", name.c_str());
+        Log::error("SFXManager", 
+                   "SFXManager::createSoundSource could not find the "
+                   "requested sound effect : '%s'\n", name.c_str());
         return NULL;
     }
 
@@ -366,7 +371,8 @@ void SFXManager::deleteSFXMapping(const std::string &name)
 
     if (i == m_all_sfx_types.end())
     {
-        Log::warn("SFXManager", "SFXManager::deleteSFXMapping : Warning: sfx not found in list.\n");
+        Log::warn("SFXManager",
+             "SFXManager::deleteSFXMapping : Warning: sfx not found in list.");
         return;
     }
     (*i).second->unload();
@@ -389,7 +395,8 @@ void SFXManager::deleteSFX(SFXBase *sfx)
 
     if(i==m_all_sfx.end())
     {
-        Log::warn("SFXManager", "SFXManager::deleteSFX : Warning: sfx not found in list.\n");
+        Log::warn("SFXManager", 
+                  "SFXManager::deleteSFX : Warning: sfx not found in list.");
         return;
     }
 
@@ -444,8 +451,8 @@ bool SFXManager::checkError(const std::string &context)
 
     if(error != AL_NO_ERROR)
     {
-        Log::error("SFXManager", "SFXOpenAL OpenAL error while %s: %s\n",
-            context.c_str(), SFXManager::getErrorString(error).c_str());
+        Log::error("SFXManager", "SFXOpenAL OpenAL error while %s: %s",
+                   context.c_str(), SFXManager::getErrorString(error).c_str());
         return false;
     }
 #endif
@@ -503,7 +510,10 @@ const std::string SFXManager::getErrorString(int err)
 }   // getErrorString
 
 //-----------------------------------------------------------------------------
-
+/** Sets the position and orientation of the listener.
+ *  \param position Position of the listener.
+ *  \param front Which way the listener is facing.
+ */
 void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
 {
 #if HAVE_OGGVORBIS

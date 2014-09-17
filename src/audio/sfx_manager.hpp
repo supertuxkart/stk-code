@@ -100,7 +100,10 @@ private:
     /** listener vector (position vector + up vector) */
     float                     m_listenerVec[6];
 
+    /** If the sfx manager has been initialised. */
     bool                      m_initialized;
+
+    /** Master gain value, taken from the user config value. */
     float                     m_master_gain;
 
     void                      loadSfx();
@@ -154,9 +157,13 @@ public:
     /** Called when sound was muted/unmuted */
     void                     soundToggled(const bool newValue);
 
-    /** Prints the list of currently loaded sounds to stdout. Useful to debug audio leaks */
+    // ------------------------------------------------------------------------
+    /** Prints the list of currently loaded sounds to stdout. Useful to
+     *  debug audio leaks */
     void dump();
 
+    // ------------------------------------------------------------------------
+    /** Returns the current position of the listener. */
     Vec3 getListenerPos() const { return m_position; }
 
 };
