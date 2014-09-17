@@ -169,10 +169,13 @@ void saveCompressedTexture(const std::string& compressed_tex)
 
 static unsigned colorcount = 0;
 
-video::ITexture* getUnicolorTexture(video::SColor c)
+video::ITexture* getUnicolorTexture(const video::SColor &c)
 {
-    video::SColor tmp[4] = {
-        c, c, c, c
+    unsigned tmp[4] = {
+        c.color,
+        c.color,
+        c.color,
+        c.color
     };
     video::IImage *img = irr_driver->getVideoDriver()->createImageFromData(video::ECF_A8R8G8B8, core::dimension2d<u32>(2, 2), tmp);
     img->grab();
