@@ -323,6 +323,7 @@ void InitTextures(GLMesh &mesh, MeshMaterial Mat)
     case MAT_SPHEREMAP:
     case MAT_UNLIT:
         SetTexture(mesh, 0, true);
+        SetTexture(mesh, 1, false);
         break;
     case MAT_DETAIL:
     case MAT_NORMAL_MAP:

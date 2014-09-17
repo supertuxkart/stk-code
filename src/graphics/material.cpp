@@ -37,6 +37,7 @@
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
+#include "graphics/glwrap.hpp"
 
 #include <IMaterialRendererServices.h>
 #include <ISceneNode.h>
@@ -694,14 +695,25 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     if (irr_driver->isGLSL())
     {
         ITexture *tex;
+        ITexture *glossytex;
+        if (m_gloss_map.size() > 0)
+        {
+            glossytex = irr_driver->getTexture(m_gloss_map);
+        }
+        else
+        {
+            glossytex = getUnicolorTexture(SColor(0., 0., 0., 0.));
+        }
         switch (m_shader_type)
         {
         case SHADERTYPE_SOLID_UNLIT:
             m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
-            break;
+            m->setTexture(1, glossytex);
+            return;
         case SHADERTYPE_ALPHA_TEST:
             m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-            break;
+            m->setTexture(1, glossytex);
+            return;
         case SHADERTYPE_ALPHA_BLEND:
             m->MaterialType = video::EMT_ONETEXTURE_BLEND;
             m->MaterialTypeParam =
@@ -709,7 +721,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 video::EBF_ONE_MINUS_SRC_ALPHA,
                 video::EMFN_MODULATE_1X,
                 video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
-            break;
+            return;
         case SHADERTYPE_ADDITIVE:
             m->MaterialType = video::EMT_ONETEXTURE_BLEND;
             m->MaterialTypeParam = pack_textureBlendFunc(video::EBF_SRC_ALPHA,
@@ -717,10 +729,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 video::EMFN_MODULATE_1X,
                 video::EAS_TEXTURE |
                 video::EAS_VERTEX_COLOR);
-            break;
+            return;
         case SHADERTYPE_SPHERE_MAP:
             m->MaterialType = irr_driver->getShader(ES_SPHERE_MAP);
-            break;
+            m->setTexture(1, glossytex);
+            return;
         case SHADERTYPE_SPLATTING:
             tex = irr_driver->getTexture(m_splatting_texture_1);
             m->setTexture(2, tex);
@@ -742,10 +755,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 tex = irr_driver->getTexture(m_splatting_texture_4);
             }
             m->setTexture(5, tex);
+            m->setTexture(6, glossytex);
 
             // Material and shaders
             m->MaterialType = irr_driver->getShader(ES_SPLATTING);
-            break;
+            return;
         case SHADERTYPE_WATER:
             m->setTexture(1, irr_driver->getTexture(FileManager::TEXTURE,
                 "waternormals.jpg"));
@@ -756,7 +770,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 setSpeed(m_water_shader_speed_1 / 100.0f, m_water_shader_speed_2 / 100.0f);
 
             m->MaterialType = irr_driver->getShader(ES_WATER);
-            break;
+            return;
         case SHADERTYPE_VEGETATION:
             // Only one grass speed & amplitude per map for now
             ((GrassShaderProvider *)irr_driver->getCallback(ES_GRASS))->
@@ -764,17 +778,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             ((GrassShaderProvider *)irr_driver->getCallback(ES_GRASS))->
                 setAmplitude(m_grass_amplitude);
             m->MaterialType = irr_driver->getShader(ES_GRASS_REF);
-            break;
-        case SHADERTYPE_SOLID:
-            if (m_normal_map_tex.size() > 0)
-            {
-                tex = irr_driver->getTexture(m_normal_map_tex);
-                m->setTexture(1, tex);
-
-                // Material and shaders
-                m->MaterialType = irr_driver->getShader(ES_NORMAL_MAP);
-            }
-            break;
+            m->setTexture(1, glossytex);
+            return;
         case SHADERTYPE_BUBBLE:
             if (mb)
             {
@@ -785,9 +790,21 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 m->MaterialType = irr_driver->getShader(ES_BUBBLES);
                 m->BlendOperation = video::EBO_ADD;
             }
-            break;
+            return;
         }
-        return;
+
+        if (m_normal_map_tex.size() > 0)
+        {
+            tex = irr_driver->getTexture(m_normal_map_tex);
+            m->setTexture(1, tex);
+
+            // Material and shaders
+            m->MaterialType = irr_driver->getShader(ES_NORMAL_MAP);
+            m->setTexture(2, glossytex);
+            return;
+        }
+        else if (mb && mb->getVertexType() == video::EVT_STANDARD)
+            m->setTexture(1, glossytex);
     }
 
 

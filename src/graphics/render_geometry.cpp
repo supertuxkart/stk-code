@@ -277,23 +277,23 @@ void IrrDriver::renderSolidFirstPass()
         {
             // Default
             renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeSingleTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatDefault::getInstance()->SolidPass);
+                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatDefault::getInstance()->SolidPass);
             // Alpha ref
             renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeSingleTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatAlphaRef::getInstance()->SolidPass);
+                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatAlphaRef::getInstance()->SolidPass);
             // Unlit
             renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeSingleTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatUnlit::getInstance()->SolidPass);
+            TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatUnlit::getInstance()->SolidPass);
             // Spheremap
             renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeSingleTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatSphereMap::getInstance()->SolidPass);
+                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatSphereMap::getInstance()->SolidPass);
             // Grass
             renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeSingleTex>(
                 TexUnits(TexUnit(0, true)), ListInstancedMatGrass::getInstance()->SolidPass, windDir);
 
             // Detail
             renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeDualTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatDetails::getInstance()->SolidPass);
+                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatDetails::getInstance()->SolidPass);
 
             // Normal Map
             renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeDualTex>(
