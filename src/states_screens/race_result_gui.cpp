@@ -81,7 +81,7 @@ void RaceResultGUI::init()
     getWidget("bottom")->setVisible(false);
 
     music_manager->stopMusic();
-    m_finish_sound = sfx_manager->quickSound("race_finish");
+    m_finish_sound = SFXManager::get()->quickSound("race_finish");
 
     // Calculate how many track screenshots can fit into the "result-table" widget
     GUIEngine::Widget* result_table = getWidget("result-table");

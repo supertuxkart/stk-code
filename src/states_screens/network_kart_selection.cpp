@@ -122,7 +122,7 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
 
     if (m_kart_widgets[playerID].getKartInternalName().size() == 0)
     {
-        sfx_manager->quickSound( "anvil" );
+        SFXManager::get()->quickSound( "anvil" );
         return;
     }
     if(playerID == PLAYER_ID_GAME_MASTER) // self

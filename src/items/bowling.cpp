@@ -76,7 +76,7 @@ Bowling::Bowling(AbstractKart *kart)
     // should not live forever, auto-destruct after 20 seconds
     m_max_lifespan = 20;
 
-    m_roll_sfx = sfx_manager->createSoundSource("bowling_roll");
+    m_roll_sfx = SFXManager::get()->createSoundSource("bowling_roll");
     m_roll_sfx->play();
     m_roll_sfx->setLoop(true);
 
@@ -89,7 +89,7 @@ Bowling::~Bowling()
 {
     if(m_roll_sfx->getStatus()==SFXBase::SFX_PLAYING)
         m_roll_sfx->stop();
-    sfx_manager->deleteSFX(m_roll_sfx);
+    SFXManager::get()->deleteSFX(m_roll_sfx);
 }   // ~RubberBall
 
 // -----------------------------------------------------------------------------

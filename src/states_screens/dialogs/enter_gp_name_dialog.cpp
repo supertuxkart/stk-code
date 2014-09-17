@@ -89,7 +89,7 @@ void EnterGPNameDialog::onEnterPressedInternal()
             LabelWidget* label = getWidget<LabelWidget>("title");
             assert(label != NULL);
             label->setText(_("Another grand prix with this name already exists."), false);
-            sfx_manager->quickSound("anvil");
+            SFXManager::get()->quickSound("anvil");
             return;
         }
 
@@ -102,7 +102,7 @@ void EnterGPNameDialog::onEnterPressedInternal()
         LabelWidget* label = getWidget<LabelWidget>("title");
         assert(label != NULL);
         label->setText(_("Cannot add a grand prix with this name"), false);
-        sfx_manager->quickSound("anvil");
+        SFXManager::get()->quickSound("anvil");
     }
 }
 

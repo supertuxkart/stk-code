@@ -202,8 +202,8 @@ void Kart::init(RaceManager::KartType type)
 Kart::~Kart()
 {
     delete m_kart_gfx;
-    if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
-    if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
+    if(m_terrain_sound)          SFXManager::get()->deleteSFX(m_terrain_sound);
+    if(m_previous_terrain_sound) SFXManager::get()->deleteSFX(m_previous_terrain_sound);
 
     // delete checks for NULL
     delete m_collision_particles;
@@ -313,11 +313,11 @@ void Kart::reset()
 
     if(m_terrain_sound)
     {
-        sfx_manager->deleteSFX(m_terrain_sound);
+        SFXManager::get()->deleteSFX(m_terrain_sound);
     }
     if(m_previous_terrain_sound)
     {
-        sfx_manager->deleteSFX(m_previous_terrain_sound);
+        SFXManager::get()->deleteSFX(m_previous_terrain_sound);
     }
 
     m_terrain_sound = NULL;
@@ -1355,7 +1355,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // can be used again.
         if(m_previous_terrain_sound)
         {
-            sfx_manager->deleteSFX(m_previous_terrain_sound);
+            SFXManager::get()->deleteSFX(m_previous_terrain_sound);
         }
         m_previous_terrain_sound = m_terrain_sound;
         if(m_previous_terrain_sound)
@@ -1364,7 +1364,7 @@ void Kart::handleMaterialSFX(const Material *material)
         const std::string &s = material->getSFXName();
         if (s != "")
         {
-            m_terrain_sound = sfx_manager->createSoundSource(s);
+            m_terrain_sound = SFXManager::get()->createSoundSource(s);
 
             // In multiplayer mode sounds are NOT positional, because we have
             // multiple listeners. This would make the sounds of all AIs be
@@ -1392,7 +1392,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // We don't modify the position of m_previous_terrain_sound
         // anymore, so that it keeps on playing at the place where the
         // kart left the material.
-        sfx_manager->deleteSFX(m_previous_terrain_sound);
+        SFXManager::get()->deleteSFX(m_previous_terrain_sound);
         m_previous_terrain_sound = NULL;
     }
 
@@ -1517,12 +1517,12 @@ void Kart::handleMaterialGFX()
         (m_terrain_sound == NULL ||
          m_terrain_sound->getStatus() == SFXBase::SFX_STOPPED))
     {
-        if (m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
+        if (m_previous_terrain_sound) SFXManager::get()->deleteSFX(m_previous_terrain_sound);
         m_previous_terrain_sound = m_terrain_sound;
         if(m_previous_terrain_sound)
             m_previous_terrain_sound->setLoop(false);
 
-        m_terrain_sound = sfx_manager->createSoundSource(s);
+        m_terrain_sound = SFXManager::get()->createSoundSource(s);
         m_terrain_sound->play();
         m_terrain_sound->setLoop(false);
     }
@@ -1781,7 +1781,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                 // For now, until we have scripting, special-case the overworld... (TODO)
                 if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
                 {
-                    sfx_manager->quickSound("forcefield");
+                    SFXManager::get()->quickSound("forcefield");
 
                     for (unsigned int n = 0; n < parts.size(); n++)
                     {
@@ -1981,7 +1981,7 @@ void Kart::updatePhysics(float dt)
  */
 void Kart::updateSFX()
 {
-    if(!sfx_manager->sfxAllowed())
+    if(!SFXManager::get()->sfxAllowed())
         return;
 
     // Set the all sound sources to the kart position

@@ -170,7 +170,7 @@ void GrandPrixWin::init()
     m_global_time = 0.0f;
     m_phase = 1;
 
-    sfx_manager->quickSound("gp_end");
+    SFXManager::get()->quickSound("gp_end");
 }   // init
 
 // -------------------------------------------------------------------------------------

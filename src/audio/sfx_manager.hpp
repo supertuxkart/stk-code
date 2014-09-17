@@ -51,6 +51,8 @@ class XMLNode;
 class SFXManager : public NoCopy
 {
 private:
+    /** Singleton pointer. */
+    static SFXManager *m_sfx_manager;
 
     /** Listener position */
     Vec3 m_position;
@@ -72,10 +74,21 @@ private:
     float                     m_master_gain;
 
     void                      loadSfx();
-
-public:
                              SFXManager();
     virtual                 ~SFXManager();
+
+public:
+    static void create();
+    static void destroy();
+    // ------------------------------------------------------------------------
+    /** Static function to get the singleton sfx manager. */
+    static SFXManager *get()
+    {
+        assert(m_sfx_manager);
+        return m_sfx_manager;
+    }   // get
+
+    // ------------------------------------------------------------------------
     bool                     sfxAllowed();
     SFXBuffer*               loadSingleSfx(const XMLNode* node,
                                            const std::string &path=std::string(""),
@@ -117,8 +130,6 @@ public:
     Vec3 getListenerPos() const { return m_position; }
 
 };
-
-extern SFXManager* sfx_manager;
 
 #endif // HEADER_SFX_MANAGER_HPP
 

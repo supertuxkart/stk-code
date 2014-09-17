@@ -256,7 +256,7 @@ void World::reset()
     music_manager->stopMusic();
 
     // Enable SFX again
-    sfx_manager->resumeAll();
+    SFXManager::get()->resumeAll();
 
     projectile_manager->cleanup();
     race_manager->reset();
@@ -1183,7 +1183,7 @@ void World::pause(Phase phase)
 {
     if (m_stop_music_when_dialog_open)
         music_manager->pauseMusic();
-    sfx_manager->pauseAll();
+    SFXManager::get()->pauseAll();
 
     WorldStatus::pause(phase);
 }   // pause
@@ -1193,7 +1193,7 @@ void World::unpause()
 {
     if (m_stop_music_when_dialog_open)
         music_manager->resumeMusic();
-    sfx_manager->resumeAll();
+    SFXManager::get()->resumeAll();
 
     WorldStatus::unpause();
 

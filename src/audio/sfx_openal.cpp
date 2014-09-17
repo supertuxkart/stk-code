@@ -53,7 +53,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool ownsBu
     // Don't initialise anything else if the sfx manager was not correctly
     // initialised. First of all the initialisation will not work, and it
     // will not be used anyway.
-    if (sfx_manager->sfxAllowed())
+    if (SFXManager::get()->sfxAllowed())
     {
         init();
     }
@@ -226,7 +226,7 @@ void SFXOpenAL::resume()
  */
 void SFXOpenAL::play()
 {
-    if (!sfx_manager->sfxAllowed()) return;
+    if (!SFXManager::get()->sfxAllowed()) return;
     if (!m_ok)
     {
         // lazily create OpenAL source when needed
@@ -268,7 +268,7 @@ void SFXOpenAL::position(const Vec3 &position)
     alSource3f(m_soundSource, AL_POSITION,
                (float)position.getX(), (float)position.getY(), (float)position.getZ());
 
-    if (sfx_manager->getListenerPos().distance(position) > m_soundBuffer->getMaxDist())
+    if (SFXManager::get()->getListenerPos().distance(position) > m_soundBuffer->getMaxDist())
     {
         alSourcef(m_soundSource, AL_GAIN, 0);
     }

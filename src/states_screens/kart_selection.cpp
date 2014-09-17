@@ -577,7 +577,7 @@ void PlayerKartWidget::markAsReady()
     delete m_player_ident_spinner;
     m_player_ident_spinner = NULL;
 
-    sfx_manager->quickSound( "wee" );
+    SFXManager::get()->quickSound( "wee" );
 
     m_model_view->setRotateTo(30.0f, 1.0f);
 
@@ -1152,7 +1152,7 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
     {
         Log::error("[KartSelectionScreen]", "Maximum number of players "
                   "reached");
-        sfx_manager->quickSound( "anvil" );
+        SFXManager::get()->quickSound( "anvil" );
         return false;
     }
 
@@ -1299,7 +1299,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
             // then they can't back out
             if (m_kart_widgets[n].isReady())
             {
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 return true;
             }
 
@@ -1437,7 +1437,7 @@ void KartSelectionScreen::playerConfirm(const int playerID)
 
     if (m_kart_widgets[playerID].getKartInternalName().size() == 0)
     {
-        sfx_manager->quickSound( "anvil" );
+        SFXManager::get()->quickSound( "anvil" );
         return;
     }
 
@@ -1469,7 +1469,7 @@ void KartSelectionScreen::playerConfirm(const int playerID)
                 Log::warn("[KartSelectionScreen]", "You can't select this identity "
                        "or kart, someone already took it!!");
 
-            sfx_manager->quickSound( "anvil" );
+            SFXManager::get()->quickSound( "anvil" );
             return;
         }
 

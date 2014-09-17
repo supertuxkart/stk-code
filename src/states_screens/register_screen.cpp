@@ -256,7 +256,7 @@ void RegisterScreen::doRegister()
         return;
     }
 
-    sfx_manager->quickSound( "anvil" );
+    SFXManager::get()->quickSound( "anvil" );
 }   // doRegister
 
 // -----------------------------------------------------------------------------

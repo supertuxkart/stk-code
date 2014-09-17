@@ -74,7 +74,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
                     m_kart_view_info[i].view->setBadge(BAD_BADGE);
                 }
             }
-            sfx_manager->quickSound( "anvil" );
+            SFXManager::get()->quickSound( "anvil" );
             return;
         }
         else if(!areAllKartsConfirmed())
@@ -88,7 +88,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
                     m_kart_view_info[i].view->setBadge(OK_BADGE);
                 }
             }
-            sfx_manager->quickSound( "wee" );
+            SFXManager::get()->quickSound( "wee" );
             m_schedule_continue = true;
         }
         else
@@ -319,7 +319,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
            (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 ||
             getNumKartsInTeam(SOCCER_TEAM_BLUE) == 0))
         {
-            sfx_manager->quickSound( "anvil" );
+            SFXManager::get()->quickSound( "anvil" );
             m_kart_view_info[playerId].view->setBadge(BAD_BADGE);
         }
         else
@@ -329,7 +329,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             m_kart_view_info[playerId].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
             m_kart_view_info[playerId].view->setBadge(OK_BADGE);
             m_kart_view_info[playerId].view->unsetBadge(BAD_BADGE);
-            sfx_manager->quickSound( "wee" );
+            SFXManager::get()->quickSound( "wee" );
         }
         return EVENT_BLOCK;
     }

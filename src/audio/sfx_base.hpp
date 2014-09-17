@@ -34,7 +34,7 @@ class Vec3;
  * \brief The base class for sound effects.
  *  It gets a sound buffer from the sound
  *  manager, which is shared between all instances. Do create a new sound
- *  effect object, use sfx_manager->getSFX(...); do not create an instance
+ *  effect object, use SFXManager::get()->getSFX(...); do not create an instance
  *  with new, since SFXManager makes sure to stop/restart all SFX (esp.
  *  looping sfx like engine sounds) when necessary.
  * \ingroup audio

@@ -360,7 +360,7 @@ void Camera::smoothMoveCamera(float dt)
 
     if (race_manager->getNumLocalPlayers() < 2)
     {
-        sfx_manager->positionListener(current_position,  current_target - current_position);
+        SFXManager::get()->positionListener(current_position,  current_target - current_position);
     }
 }   // smoothMoveCamera
 
@@ -565,7 +565,7 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
 
         if (race_manager->getNumLocalPlayers() < 2)
         {
-            sfx_manager->positionListener(m_camera->getPosition(),
+            SFXManager::get()->positionListener(m_camera->getPosition(),
                                       wanted_target - m_camera->getPosition());
         }
     }

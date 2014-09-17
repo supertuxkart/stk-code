@@ -53,7 +53,7 @@ Powerup::Powerup(AbstractKart* kart)
  */
 Powerup::~Powerup()
 {
-    if(m_sound_use) sfx_manager->deleteSFX(m_sound_use);
+    if(m_sound_use) SFXManager::get()->deleteSFX(m_sound_use);
 }   // ~Powerup
 
 //-----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
 
     if(m_sound_use != NULL)
     {
-        sfx_manager->deleteSFX(m_sound_use);
+        SFXManager::get()->deleteSFX(m_sound_use);
         m_sound_use = NULL;
     }
 
@@ -102,30 +102,30 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
             break ;
 
         case PowerupManager::POWERUP_BOWLING:
-            m_sound_use = sfx_manager->createSoundSource("bowling_shoot");
+            m_sound_use = SFXManager::get()->createSoundSource("bowling_shoot");
             break ;
 
         case PowerupManager::POWERUP_ANVIL:
-            m_sound_use = sfx_manager->createSoundSource("anvil");
+            m_sound_use = SFXManager::get()->createSoundSource("anvil");
             break;
 
         case PowerupManager::POWERUP_PARACHUTE:
-            m_sound_use = sfx_manager->createSoundSource("parachute");
+            m_sound_use = SFXManager::get()->createSoundSource("parachute");
             break;
 
         case PowerupManager::POWERUP_BUBBLEGUM:
-                m_sound_use = sfx_manager->createSoundSource("goo");
+                m_sound_use = SFXManager::get()->createSoundSource("goo");
             break ;
 
         case PowerupManager::POWERUP_SWITCH:
-            m_sound_use = sfx_manager->createSoundSource("swap");
+            m_sound_use = SFXManager::get()->createSoundSource("swap");
             break;
 
         case PowerupManager::POWERUP_NOTHING:
         case PowerupManager::POWERUP_CAKE:
         case PowerupManager::POWERUP_PLUNGER:
         default :
-            m_sound_use = sfx_manager->createSoundSource("shoot");
+            m_sound_use = SFXManager::get()->createSoundSource("shoot");
             break ;
     }
 
@@ -190,9 +190,9 @@ void Powerup::use()
     // FIXME - for some collectibles, set() is never called
     if(m_sound_use == NULL)
     {
-        //if (m_type == POWERUP_SWITCH) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SWAP);
+        //if (m_type == POWERUP_SWITCH) m_sound_use = SFXManager::get()->newSFX(SFXManager::SOUND_SWAP);
         //else
-        m_sound_use = sfx_manager->createSoundSource("shoot");
+        m_sound_use = SFXManager::get()->createSoundSource("shoot");
     }
 
     m_number--;
@@ -281,7 +281,7 @@ void Powerup::use()
                 }
             }
 
-            m_sound_use = sfx_manager->createSoundSource("inflate");//Extraordinary. Usually sounds are set in Powerup::set()
+            m_sound_use = SFXManager::get()->createSoundSource("inflate");//Extraordinary. Usually sounds are set in Powerup::set()
             //In this case this is a workaround, since the bubblegum item has two different sounds.
 
             Powerup::adjustSound();

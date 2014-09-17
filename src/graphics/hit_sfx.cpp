@@ -26,7 +26,7 @@
 HitSFX::HitSFX(const Vec3& coord, const char* explosion_sound)
              : HitEffect()
 {
-    m_sfx = sfx_manager->createSoundSource( explosion_sound );
+    m_sfx = SFXManager::get()->createSoundSource( explosion_sound );
     m_sfx->position(coord);
 
     // in multiplayer mode, sounds are NOT positional (because we have
@@ -45,7 +45,7 @@ HitSFX::~HitSFX()
     if (m_sfx->getStatus() == SFXBase::SFX_PLAYING)
         m_sfx->stop();
 
-    sfx_manager->deleteSFX(m_sfx);
+    SFXManager::get()->deleteSFX(m_sfx);
 }   // ~HitEffect
 
 //-----------------------------------------------------------------------------

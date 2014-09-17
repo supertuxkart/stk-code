@@ -49,7 +49,7 @@ UnlockManager::UnlockManager()
     // in main).
     unlock_manager = this;
 
-    m_locked_sound = sfx_manager->createSoundSource("locked");
+    m_locked_sound = SFXManager::get()->createSoundSource("locked");
 
 
     // Read challenges from .../data/challenges

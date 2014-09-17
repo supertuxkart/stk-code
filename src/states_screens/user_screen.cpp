@@ -257,7 +257,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
                 m_info_widget->setText(
                     _("Internet access is disabled, please enable it in the options"),
                     true);
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 m_online_cb->setState(false);
             }
         }
@@ -396,7 +396,7 @@ void BaseUserScreen::login()
         if (m_password_tb->getText() == "")
         {
             m_info_widget->setText(_("You need to enter a password."), true);
-            sfx_manager->quickSound("anvil");
+            SFXManager::get()->quickSound("anvil");
             m_options_widget->setActivated();
             return;
         }
@@ -464,7 +464,7 @@ void BaseUserScreen::loginError(const irr::core::stringw & error_message)
         player->clearSession();
     player->setLastOnlineName("");
     makeEntryFieldsVisible();
-    sfx_manager->quickSound("anvil");
+    SFXManager::get()->quickSound("anvil");
     m_info_widget->setErrorColor();
     m_info_widget->setText(error_message, false);
     m_options_widget->setActivated();
@@ -494,7 +494,7 @@ void BaseUserScreen::logoutError(const irr::core::stringw & error_message)
     if(player && player->hasSavedSession())
         player->clearSession();
     makeEntryFieldsVisible();
-    sfx_manager->quickSound("anvil");
+    SFXManager::get()->quickSound("anvil");
     m_info_widget->setErrorColor();
     m_info_widget->setText(error_message, false);
     m_options_widget->setActivated();

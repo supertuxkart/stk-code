@@ -197,7 +197,7 @@ void ServerSelection::onUpdate(float dt)
             }
             else
             {
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 new MessageDialog(m_refresh_request->getInfo());
             }
             delete m_refresh_request;

@@ -45,9 +45,28 @@
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
 
-SFXManager* sfx_manager= NULL;
 std::map<std::string, SFXBase*> SFXManager::m_quick_sounds;
+SFXManager *SFXManager::m_sfx_manager;
 
+/** Static function to create the singleton sfx manager.
+ */
+void SFXManager::create()
+{
+    assert(!m_sfx_manager);
+    m_sfx_manager = new SFXManager();
+}   // create
+
+// ------------------------------------------------------------------------
+/** Static function to delete the singleton sfx manager.
+ */
+void SFXManager::destroy()
+{
+    assert(m_sfx_manager);
+    delete m_sfx_manager;
+    m_sfx_manager = NULL;
+}    // destroy
+
+// ----------------------------------------------------------------------------
 /** Initialises the SFX manager and loads the sfx from a config file.
  */
 SFXManager::SFXManager()
@@ -99,7 +118,6 @@ SFXManager::~SFXManager()
     }
     m_all_sfx_types.clear();
 
-    sfx_manager = NULL;
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------
@@ -295,6 +313,11 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
         positional = buffer->isPositional();
     }
 
+    //printf("CREATING %s (%x), positional = %i (race_manager->getNumLocalPlayers() = %i, buffer->isPositional() = %i)\n",
+    //       buffer->getFileName().c_str(), (unsigned int)buffer,
+    //       positional,
+    //       race_manager->getNumLocalPlayers(), buffer->isPositional());
+
 #if HAVE_OGGVORBIS
     //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
@@ -405,7 +428,7 @@ void SFXManager::resumeAll()
     {
         SFXBase::SFXStatus status = (*i)->getStatus();
         // Initial happens when
-        if (status == SFXBase::SFX_PAUSED) (*i)->resume();
+        if (status==SFXBase::SFX_PAUSED) (*i)->resume();
     }   // for i in m_all_sfx
 }   // resumeAll
 
@@ -519,7 +542,7 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
     if (sound == m_quick_sounds.end())
     {
         // sound not yet in our local list of quick sounds
-        SFXBase* newSound = sfx_manager->createSoundSource(sound_type, false);
+        SFXBase* newSound = SFXManager::get()->createSoundSource(sound_type, false);
         if (newSound == NULL) return NULL;
         newSound->play();
         m_quick_sounds[sound_type] = newSound;
@@ -527,12 +550,9 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
     }
     else
     {
-        sound->second->play();
-        return sound->second;
+        (*sound).second->play();
+        return (*sound).second;
     }
-
-    //     m_locked_sound = sfx_manager->newSFX(SFXManager::SOUND_LOCKED);
-    // m_locked_sound->play();
-}
+}   // quickSound
 
 

@@ -770,12 +770,12 @@ void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_n
     // init some mandatory sounds with defaults
     std::string names[] = {"horn", "crash", "boing", "goo", "skid", "shoot"};
     for (unsigned int i = 0; i < 6; i++)
-        (*m_sounds)[names[i]] = sfx_manager->createSoundSource(names[i]);
+        (*m_sounds)[names[i]] = SFXManager::get()->createSoundSource(names[i]);
 
     // TODO: Only one default engine sound called "engine"
-    (*m_sounds)["engine"] = sfx_manager->createSoundSource("engine_small");
-    (*m_sounds)["zipper"] = sfx_manager->createSoundSource("wee"         );
-    (*m_sounds)["beep"  ] = sfx_manager->createSoundSource("horn"        );
+    (*m_sounds)["engine"] = SFXManager::get()->createSoundSource("engine_small");
+    (*m_sounds)["zipper"] = SFXManager::get()->createSoundSource("wee"         );
+    (*m_sounds)["beep"  ] = SFXManager::get()->createSoundSource("horn"        );
 
     if (sound_node)
     {
@@ -788,7 +788,7 @@ void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_n
         else if (s == "small") name = "engine_small";
         else
         {
-            if (sfx_manager->soundExist(s))
+            if (SFXManager::get()->soundExist(s))
             {
                 name = s;
             }
@@ -801,7 +801,7 @@ void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_n
             }
         }
 
-        SFXBase* tmp = sfx_manager->createSoundSource(name);
+        SFXBase* tmp = SFXManager::get()->createSoundSource(name);
         assert(tmp != NULL);
         m_sounds->insert(std::pair<std::string, SFXBase*>("engine", tmp));
     }
@@ -826,14 +826,14 @@ void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_n
             SFXBase* tmp;
             if (location == "game")
             {
-                tmp = sfx_manager->createSoundSource(filename);
+                tmp = SFXManager::get()->createSoundSource(filename);
                 if (tmp == NULL)
                     continue; // Warning already printed by createSoundSource
             }
             else if (location == "kart")
             {
                 SFXBuffer* buffer = new SFXBuffer(m_root + filename, sfx);
-                tmp = sfx_manager->createSoundSource(buffer, false, true);
+                tmp = SFXManager::get()->createSoundSource(buffer, false, true);
                 if (!buffer->load())
                 {
                     Log::error("[KartProperties]", "The %d. sound in the "
@@ -841,7 +841,7 @@ void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_n
                                i+1, m_name.c_str());
                     continue;
                 }
-                tmp = sfx_manager->createSoundSource(buffer, false, true);
+                tmp = SFXManager::get()->createSoundSource(buffer, false, true);
             }
             else if (location == "custom")
             {
@@ -854,7 +854,7 @@ void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_n
                     delete buffer;
                     continue;
                 }
-                tmp = sfx_manager->createSoundSource(buffer, false, true);
+                tmp = SFXManager::get()->createSoundSource(buffer, false, true);
             }
             else
             {

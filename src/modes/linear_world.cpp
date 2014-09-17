@@ -43,7 +43,7 @@
  */
 LinearWorld::LinearWorld() : WorldWithRank()
 {
-    m_last_lap_sfx         = sfx_manager->createSoundSource("last_lap_fanfare");
+    m_last_lap_sfx         = SFXManager::get()->createSoundSource("last_lap_fanfare");
     m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;
     m_fastest_lap          = 9999999.9f;
@@ -73,7 +73,7 @@ void LinearWorld::init()
  */
 LinearWorld::~LinearWorld()
 {
-    sfx_manager->deleteSFX(m_last_lap_sfx);
+    SFXManager::get()->deleteSFX(m_last_lap_sfx);
 }   // ~LinearWorld
 
 //-----------------------------------------------------------------------------

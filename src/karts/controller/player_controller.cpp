@@ -61,10 +61,10 @@ PlayerController::PlayerController(AbstractKart *kart,
     // Keep a pointer to the camera to remove the need to search for
     // the right camera once per frame later.
     m_camera       = Camera::createCamera(kart);
-    m_bzzt_sound   = sfx_manager->createSoundSource( "bzzt" );
-    m_ugh_sound    = sfx_manager->createSoundSource( "ugh"  );
-    m_grab_sound   = sfx_manager->createSoundSource( "grab_collectable" );
-    m_full_sound   = sfx_manager->createSoundSource( "energy_bar_full" );
+    m_bzzt_sound   = SFXManager::get()->createSoundSource( "bzzt" );
+    m_ugh_sound    = SFXManager::get()->createSoundSource( "ugh"  );
+    m_grab_sound   = SFXManager::get()->createSoundSource( "grab_collectable" );
+    m_full_sound   = SFXManager::get()->createSoundSource( "energy_bar_full" );
 
     reset();
 }   // PlayerController
@@ -74,10 +74,10 @@ PlayerController::PlayerController(AbstractKart *kart,
  */
 PlayerController::~PlayerController()
 {
-    sfx_manager->deleteSFX(m_bzzt_sound);
-    sfx_manager->deleteSFX(m_ugh_sound );
-    sfx_manager->deleteSFX(m_grab_sound);
-    sfx_manager->deleteSFX(m_full_sound);
+    SFXManager::get()->deleteSFX(m_bzzt_sound);
+    SFXManager::get()->deleteSFX(m_ugh_sound );
+    SFXManager::get()->deleteSFX(m_grab_sound);
+    SFXManager::get()->deleteSFX(m_full_sound);
 }   // ~PlayerController
 
 //-----------------------------------------------------------------------------

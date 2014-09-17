@@ -431,7 +431,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
                                       volume);
     buffer->load();
 
-    m_sound = sfx_manager->createSoundSource(buffer, true, true);
+    m_sound = SFXManager::get()->createSoundSource(buffer, true, true);
     if (m_sound != NULL)
     {
         m_sound->position(m_init_xyz);
@@ -488,7 +488,7 @@ TrackObjectPresentationSound::~TrackObjectPresentationSound()
     if (m_sound)
     {
         //delete m_sound->getBuffer();
-        sfx_manager->deleteSFX(m_sound);
+        SFXManager::get()->deleteSFX(m_sound);
     }
 }
 

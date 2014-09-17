@@ -59,7 +59,7 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
  */
 SoccerWorld::~SoccerWorld()
 {
-    sfx_manager->deleteSFX(m_goal_sound);
+    SFXManager::get()->deleteSFX(m_goal_sound);
 }   // ~SoccerWorld
 
 //-----------------------------------------------------------------------------
@@ -80,7 +80,7 @@ void SoccerWorld::init()
         exit(1);
     }
     m_goal_target = race_manager->getMaxGoal();
-    m_goal_sound = sfx_manager->createSoundSource("goal_scored");
+    m_goal_sound = SFXManager::get()->createSoundSource("goal_scored");
 
 }   // init
 

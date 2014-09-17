@@ -141,7 +141,7 @@ void ServerInfoDialog::onUpdate(float dt)
             }
             else
             {
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_server_join_request->getInfo(), false);
             }

@@ -306,7 +306,7 @@ void CutsceneWorld::update(float dt)
             rot2.setPitch(rot2.getPitch() + 90.0f);
             m_camera->setRotation(rot2.toIrrVector());
 
-            sfx_manager->positionListener(m_camera->getAbsolutePosition(),
+            SFXManager::get()->positionListener(m_camera->getAbsolutePosition(),
                                           m_camera->getTarget() -
                                             m_camera->getAbsolutePosition());
 

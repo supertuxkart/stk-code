@@ -35,9 +35,9 @@ WorldStatus::WorldStatus()
 {
     m_clock_mode        = CLOCK_CHRONO;
 
-    m_prestart_sound    = sfx_manager->createSoundSource("pre_start_race");
-    m_start_sound       = sfx_manager->createSoundSource("start_race");
-    m_track_intro_sound = sfx_manager->createSoundSource("track_intro");
+    m_prestart_sound    = SFXManager::get()->createSoundSource("pre_start_race");
+    m_start_sound       = SFXManager::get()->createSoundSource("start_race");
+    m_track_intro_sound = SFXManager::get()->createSoundSource("track_intro");
 
     music_manager->stopMusic();
 
@@ -74,9 +74,9 @@ void WorldStatus::reset()
  */
 WorldStatus::~WorldStatus()
 {
-    sfx_manager->deleteSFX(m_prestart_sound);
-    sfx_manager->deleteSFX(m_start_sound);
-    sfx_manager->deleteSFX(m_track_intro_sound);
+    SFXManager::get()->deleteSFX(m_prestart_sound);
+    SFXManager::get()->deleteSFX(m_start_sound);
+    SFXManager::get()->deleteSFX(m_track_intro_sound);
     IrrlichtDevice *device = irr_driver->getDevice();
 
     if (device->getTimer()->isStopped())  
