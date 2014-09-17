@@ -725,6 +725,19 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                                   video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
     }
 
+    if (m_shader_type == SHADERTYPE_ADDITIVE)
+    {
+        // EMT_TRANSPARENT_ADD_COLOR doesn't include vertex color alpha into
+        // account, which messes up fading in/out effects. So we use the
+        // more customizable EMT_ONETEXTURE_BLEND instead
+        m->MaterialType = video::EMT_ONETEXTURE_BLEND;
+        m->MaterialTypeParam = pack_textureBlendFunc(video::EBF_SRC_ALPHA,
+            video::EBF_ONE,
+            video::EMFN_MODULATE_1X,
+            video::EAS_TEXTURE |
+            video::EAS_VERTEX_COLOR);
+    }
+
     if (m_shader_type == SHADERTYPE_SPHERE_MAP)
     {
         if (irr_driver->isGLSL())
@@ -735,24 +748,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         {
             m->MaterialType = video::EMT_SPHERE_MAP;
         }
-    }
-
-    //if (m_lightmap)
-    //{
-    //    m->MaterialType = video::EMT_LIGHTMAP;
-    //}
-
-    if (m_shader_type == SHADERTYPE_ADDITIVE)
-    {
-        // EMT_TRANSPARENT_ADD_COLOR doesn't include vertex color alpha into
-        // account, which messes up fading in/out effects. So we use the
-        // more customizable EMT_ONETEXTURE_BLEND instead
-        m->MaterialType = video::EMT_ONETEXTURE_BLEND ;
-        m->MaterialTypeParam = pack_textureBlendFunc(video::EBF_SRC_ALPHA,
-                                                    video::EBF_ONE,
-                                                    video::EMFN_MODULATE_1X,
-                                                    video::EAS_TEXTURE |
-                                                      video::EAS_VERTEX_COLOR);
     }
 
     if (m_shader_type == SHADERTYPE_SOLID && m_normal_map_tex.size() > 0)
@@ -770,20 +765,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
             m->setTexture(1, tex);
 
-            bool with_lightmap = false;
-
-            //if (m_normal_map_shader_lightmap.size() > 0)
-            //{
-            //    ITexture* lm_tex = irr_driver->getTexture(m_normal_map_shader_lightmap);
-            //    m->setTexture(2, lm_tex);
-            //    with_lightmap = true;
-            //}
-
             // Material and shaders
-            m->MaterialType = irr_driver->getShader(
-                with_lightmap ? ES_NORMAL_MAP_LIGHTMAP : ES_NORMAL_MAP);
-            m->Lighting = false;
-            m->ZWriteEnable = true;
+            m->MaterialType = irr_driver->getShader(ES_NORMAL_MAP);
         }
         else
         {
@@ -791,28 +774,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(1, NULL);
         }
     }
-    //if (m_parallax_map)
-    //{
-    //    video::ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
-    //    if (m_is_heightmap)
-    //    {
-    //        irr_driver->getVideoDriver()->makeNormalMapTexture( tex );
-    //    }
-    //    m->setTexture(1, tex);
-    //    m->MaterialType = video::EMT_PARALLAX_MAP_SOLID;
-    //    m->MaterialTypeParam = m_parallax_height;
-    //    m->SpecularColor.set(0,0,0,0);
-    //    modes++;
-    //}
-    
-    //if(m_graphical_effect == GE_SKYBOX && irr_driver->isGLSL())
-    //{
-    //    ITexture* tex = irr_driver->getTexture("cloud_mask.png");
-    //    m->setTexture(1, tex);
-    //
-    //
-    //    m->MaterialType = irr_driver->getShader(ES_SKYBOX);
-    //}
 
     if (m_shader_type == SHADERTYPE_SPLATTING)
     {
@@ -874,7 +835,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         }
     }
 
-
     if (m_shader_type == SHADERTYPE_WATER)
     {
         if (irr_driver->isGLSL())
@@ -902,16 +862,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             ((GrassShaderProvider *) irr_driver->getCallback(ES_GRASS))->
                 setAmplitude(m_grass_amplitude);
 
-            // Material and shaders
-            //if (m_alpha_testing)
-            //{
-                m->MaterialType = irr_driver->getShader(ES_GRASS_REF);
-            //}
-            //else
-            //{
-            //    m->MaterialType = irr_driver->getShader(ES_GRASS);
-            //    m->BlendOperation = video::EBO_ADD;
-            //}
+
+            m->MaterialType = irr_driver->getShader(ES_GRASS);
         }
         else
         {
@@ -984,9 +936,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->ColorMaterial = video::ECM_NONE; // Override one above
     }
 #endif
-
-    //if (UserConfigParams::m_fullscreen_antialiasing)
-    //    m->AntiAliasing = video::EAAM_LINE_SMOOTH;
 
 } // setMaterialProperties
 
