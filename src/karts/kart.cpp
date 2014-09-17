@@ -153,16 +153,16 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
         // If id == -1 the custom sound was not defined in the .irrkart config file
         if (id != -1)
         {
-            m_custom_sounds[n] = sfx_manager->newSFX(id);
+            m_custom_sounds[n] = SFXManager::get()->newSFX(id);
         }
     }*/
 
-    m_engine_sound  = sfx_manager->createSoundSource(m_kart_properties->getEngineSfxType());
-    m_beep_sound    = sfx_manager->createSoundSource( "horn"  );
-    m_crash_sound   = sfx_manager->createSoundSource( "crash" );
-    m_boing_sound   = sfx_manager->createSoundSource( "boing" );
-    m_goo_sound     = sfx_manager->createSoundSource( "goo"   );
-    m_skid_sound    = sfx_manager->createSoundSource( "skid"  );
+    m_engine_sound  = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
+    m_beep_sound    = SFXManager::get()->createSoundSource( "horn"  );
+    m_crash_sound   = SFXManager::get()->createSoundSource( "crash" );
+    m_boing_sound   = SFXManager::get()->createSoundSource( "boing" );
+    m_goo_sound     = SFXManager::get()->createSoundSource( "goo"   );
+    m_skid_sound    = SFXManager::get()->createSoundSource( "skid"  );
     m_terrain_sound          = NULL;
     m_previous_terrain_sound = NULL;
 
@@ -242,18 +242,18 @@ Kart::~Kart()
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
     {
         if (m_custom_sounds[n] != NULL)
-            sfx_manager->deleteSFX(m_custom_sounds[n]);
+            SFXManager::get()->deleteSFX(m_custom_sounds[n]);
     }*/
 
-    sfx_manager->deleteSFX(m_engine_sound );
-    sfx_manager->deleteSFX(m_crash_sound  );
-    sfx_manager->deleteSFX(m_skid_sound   );
-    sfx_manager->deleteSFX(m_goo_sound    );
-    sfx_manager->deleteSFX(m_beep_sound   );
-    sfx_manager->deleteSFX(m_boing_sound  );
+    SFXManager::get()->deleteSFX(m_engine_sound );
+    SFXManager::get()->deleteSFX(m_crash_sound  );
+    SFXManager::get()->deleteSFX(m_skid_sound   );
+    SFXManager::get()->deleteSFX(m_goo_sound    );
+    SFXManager::get()->deleteSFX(m_beep_sound   );
+    SFXManager::get()->deleteSFX(m_boing_sound  );
     delete m_kart_gfx;
-    if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
-    if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
+    if(m_terrain_sound)          SFXManager::get()->deleteSFX(m_terrain_sound);
+    if(m_previous_terrain_sound) SFXManager::get()->deleteSFX(m_previous_terrain_sound);
     if(m_collision_particles)    delete m_collision_particles;
     if(m_slipstream)             delete m_slipstream;
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
@@ -362,11 +362,11 @@ void Kart::reset()
 
     if(m_terrain_sound)
     {
-        sfx_manager->deleteSFX(m_terrain_sound);
+        SFXManager::get()->deleteSFX(m_terrain_sound);
     }
     if(m_previous_terrain_sound)
     {
-        sfx_manager->deleteSFX(m_previous_terrain_sound);
+        SFXManager::get()->deleteSFX(m_previous_terrain_sound);
     }
 
     m_terrain_sound = NULL;
@@ -1429,7 +1429,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // can be used again.
         if(m_previous_terrain_sound)
         {
-            sfx_manager->deleteSFX(m_previous_terrain_sound);
+            SFXManager::get()->deleteSFX(m_previous_terrain_sound);
         }
         m_previous_terrain_sound = m_terrain_sound;
         if(m_previous_terrain_sound)
@@ -1438,7 +1438,7 @@ void Kart::handleMaterialSFX(const Material *material)
         const std::string &s = material->getSFXName();
         if (s != "")
         {
-            m_terrain_sound = sfx_manager->createSoundSource(s);
+            m_terrain_sound = SFXManager::get()->createSoundSource(s);
 
             // In multiplayer mode sounds are NOT positional, because we have
             // multiple listeners. This would make the sounds of all AIs be
@@ -1466,7 +1466,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // We don't modify the position of m_previous_terrain_sound
         // anymore, so that it keeps on playing at the place where the
         // kart left the material.
-        sfx_manager->deleteSFX(m_previous_terrain_sound);
+        SFXManager::get()->deleteSFX(m_previous_terrain_sound);
         m_previous_terrain_sound = NULL;
     }
     
@@ -1591,12 +1591,12 @@ void Kart::handleMaterialGFX()
         (m_terrain_sound == NULL ||
          m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
     {
-        if (m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
+        if (m_previous_terrain_sound) SFXManager::get()->deleteSFX(m_previous_terrain_sound);
         m_previous_terrain_sound = m_terrain_sound;
         if(m_previous_terrain_sound)
             m_previous_terrain_sound->setLoop(false);
 
-        m_terrain_sound = sfx_manager->createSoundSource(s);
+        m_terrain_sound = SFXManager::get()->createSoundSource(s);
         m_terrain_sound->play();
         m_terrain_sound->setLoop(false);
     }
@@ -1855,7 +1855,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                 // For now, until we have scripting, special-case the overworld... (TODO)
                 if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
                 {
-                    sfx_manager->quickSound("forcefield");
+                    SFXManager::get()->quickSound("forcefield");
 
                     for (unsigned int n = 0; n < parts.size(); n++)
                     {
@@ -1927,7 +1927,7 @@ void Kart::beep()
     event.  If there is no voice sample, a default can be played instead.
 
     Use entries from the CustomSFX enumeration as a parameter (see
-    sfx_manager.hpp).  eg. playCustomSFX(SFXManager::CUSTOM_CRASH)
+    SFXManager::get().hpp).  eg. playCustomSFX(SFXManager::CUSTOM_CRASH)
 
     Obviously we don't want a certain character voicing multiple phrases
     simultaneously.  It just sounds bad.  There are two ways of avoiding this:
@@ -1970,7 +1970,7 @@ bool Kart::playCustomSFX(unsigned int type)
         {
             ret = true;
             //printf("Kart SFX: playing %s for %s.\n",
-            //    sfx_manager->getCustomTagName(type),
+            //    SFXManager::get()->getCustomTagName(type),
             //    m_kart_properties->getIdent().c_str());
             // If it's already playing, let it finish
             if (m_custom_sounds[type]->getStatus() != SFXManager::SFX_PLAYING)
@@ -2107,7 +2107,7 @@ void Kart::updatePhysics(float dt)
 void Kart::updateEngineSFX()
 {
     // when going faster, use higher pitch for engine
-    if(!m_engine_sound || !sfx_manager->sfxAllowed())
+    if(!m_engine_sound || !SFXManager::get()->sfxAllowed())
         return;
 
     if(isOnGround())

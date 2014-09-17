@@ -1074,7 +1074,7 @@ void initRest()
     NewsManager::get();   // this will create the news manager
 
     music_manager           = new MusicManager();
-    sfx_manager             = new SFXManager();
+    SFXManager::create();
     // The order here can be important, e.g. KartPropertiesManager needs
     // defaultKartProperties, which are defined in stk_config.
     history                 = new History              ();
@@ -1457,7 +1457,7 @@ static void cleanSuperTuxKart()
     if(material_manager)        delete material_manager;
     if(history)                 delete history;
     ReplayRecorder::destroy();
-    if(sfx_manager)             delete sfx_manager;
+    SFXManager::destroy();
     if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();
     PlayerManager::destroy();

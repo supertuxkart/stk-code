@@ -80,13 +80,13 @@ Attachment::~Attachment()
 
     if (m_bomb_sound)
     {
-        sfx_manager->deleteSFX(m_bomb_sound);
+        SFXManager::get()->deleteSFX(m_bomb_sound);
         m_bomb_sound = NULL;
     }
     
     if (m_bubble_explode_sound)
     {
-        sfx_manager->deleteSFX(m_bubble_explode_sound);
+        SFXManager::get()->deleteSFX(m_bubble_explode_sound);
         m_bubble_explode_sound = NULL;
     }
 }   // ~Attachment
@@ -139,8 +139,8 @@ void Attachment::set(AttachmentType type, float time,
         break;
     case ATTACH_BOMB:
         m_node->setMesh(attachment_manager->getMesh(type));
-        if (m_bomb_sound) sfx_manager->deleteSFX(m_bomb_sound);
-        m_bomb_sound = sfx_manager->createSoundSource("clock");
+        if (m_bomb_sound) SFXManager::get()->deleteSFX(m_bomb_sound);
+        m_bomb_sound = SFXManager::get()->createSoundSource("clock");
         m_bomb_sound->setLoop(true);
         m_bomb_sound->position(m_kart->getXYZ());
         m_bomb_sound->play();
@@ -199,7 +199,7 @@ void Attachment::clear()
     if (m_bomb_sound)
     {
         m_bomb_sound->stop();
-        sfx_manager->deleteSFX(m_bomb_sound);
+        SFXManager::get()->deleteSFX(m_bomb_sound);
         m_bomb_sound = NULL;
     }
 
@@ -461,7 +461,7 @@ void Attachment::update(float dt)
             if (m_bomb_sound)
             {
                 m_bomb_sound->stop();
-                sfx_manager->deleteSFX(m_bomb_sound);
+                SFXManager::get()->deleteSFX(m_bomb_sound);
                 m_bomb_sound = NULL;
             }
         }
@@ -474,8 +474,8 @@ void Attachment::update(float dt)
         if (m_time_left < 0)
         {
             m_time_left = 0.0f;
-            if (m_bubble_explode_sound) sfx_manager->deleteSFX(m_bubble_explode_sound);
-            m_bubble_explode_sound = sfx_manager->createSoundSource("bubblegum_explode");
+            if (m_bubble_explode_sound) SFXManager::get()->deleteSFX(m_bubble_explode_sound);
+            m_bubble_explode_sound = SFXManager::get()->createSoundSource("bubblegum_explode");
             m_bubble_explode_sound->position(m_kart->getXYZ());
             m_bubble_explode_sound->play();
             

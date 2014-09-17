@@ -271,7 +271,7 @@ void OnlineUserSearch::onUpdate(float dt)
             }
             else
             {
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 new MessageDialog(m_search_request->getInfo());
             }
 

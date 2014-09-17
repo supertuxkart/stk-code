@@ -18,9 +18,6 @@
 
 #include "states_screens/grand_prix_win.hpp"
 
-#include <SColor.h>
-#include <iostream>
-
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -44,12 +41,16 @@
 #include "tracks/track_object_manager.hpp"
 #include "utils/translation.hpp"
 
-#include <IGUIEnvironment.h>
 #include <ICameraSceneNode.h>
-#include <ISceneManager.h>
-#include <ILightSceneNode.h>
+#include <IGUIEnvironment.h>
 #include <IGUIImage.h>
+#include <ILightSceneNode.h>
 #include <IMeshSceneNode.h>
+#include <ISceneManager.h>
+#include <SColor.h>
+
+#include <iostream>
+
 
 using namespace irr::core;
 using namespace irr::gui;
@@ -170,7 +171,7 @@ void GrandPrixWin::init()
     m_global_time = 0.0f;
     m_phase = 1;
 
-    sfx_manager->quickSound("gp_end");
+    SFXManager::get()->quickSound("gp_end");
 }   // init
 
 // -------------------------------------------------------------------------------------

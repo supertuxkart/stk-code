@@ -70,7 +70,7 @@ void OptionsScreenAudio::init()
     SpinnerWidget* gauge = this->getWidget<SpinnerWidget>("sfx_volume");
     assert(gauge != NULL);
 
-    gauge->setValue( (int)(sfx_manager->getMasterSFXVolume()*10.0f) );
+    gauge->setValue( (int)(SFXManager::get()->getMasterSFXVolume()*10.0f) );
 
 
     gauge = this->getWidget<SpinnerWidget>("music_volume");
@@ -137,10 +137,10 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
         assert(w != NULL);
 
-        if (sample_sound == NULL) sample_sound = sfx_manager->createSoundSource( "pre_start_race" );
+        if (sample_sound == NULL) sample_sound = SFXManager::get()->createSoundSource( "pre_start_race" );
         sample_sound->volume(1);
 
-        sfx_manager->setMasterSFXVolume( w->getValue()/10.0f );
+        SFXManager::get()->setMasterSFXVolume( w->getValue()/10.0f );
         UserConfigParams::m_sfx_volume = w->getValue()/10.0f;
 
         // play a sample sound to show the user what this volume is like
@@ -163,11 +163,11 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
 
         UserConfigParams::m_sfx = w->getState();
-        sfx_manager->soundToggled(UserConfigParams::m_sfx);
+        SFXManager::get()->soundToggled(UserConfigParams::m_sfx);
 
         if (UserConfigParams::m_sfx)
         {
-            sfx_manager->quickSound("horn");
+            SFXManager::get()->quickSound("horn");
         }
     }
 }   // eventCallback

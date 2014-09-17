@@ -20,6 +20,7 @@
 #include "animations/animation_base.hpp"
 #include "animations/three_d_animation.hpp"
 #include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/camera.hpp"
@@ -306,14 +307,11 @@ void CutsceneWorld::update(float dt)
             rot2.setPitch(rot2.getPitch() + 90.0f);
             m_camera->setRotation(rot2.toIrrVector());
 
-            sfx_manager->positionListener(m_camera->getAbsolutePosition(),
+            SFXManager::get()->positionListener(m_camera->getAbsolutePosition(),
                                           m_camera->getTarget() -
                                             m_camera->getAbsolutePosition());
 
             break;
-            //printf("Camera %f %f %f\n", curr->getNode()->getPosition().X,
-            //                            curr->getNode()->getPosition().Y,
-            //                             curr->getNode()->getPosition().Z);
         }
     }
     std::map<float, std::vector<TrackObject*> >::iterator it;

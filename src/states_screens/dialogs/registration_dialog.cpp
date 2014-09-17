@@ -17,7 +17,6 @@
 
 #include "states_screens/dialogs/registration_dialog.hpp"
 
-#include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
 #include "states_screens/state_manager.hpp"

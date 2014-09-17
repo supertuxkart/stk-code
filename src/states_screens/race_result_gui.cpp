@@ -19,6 +19,7 @@
 #include "states_screens/race_result_gui.hpp"
 
 #include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -81,7 +82,7 @@ void RaceResultGUI::init()
     getWidget("bottom")->setVisible(false);
 
     music_manager->stopMusic();
-    m_finish_sound = sfx_manager->quickSound("race_finish");
+    m_finish_sound = SFXManager::get()->quickSound("race_finish");
 
     // Calculate how many track screenshots can fit into the "result-table" widget
     GUIEngine::Widget* result_table = getWidget("result-table");

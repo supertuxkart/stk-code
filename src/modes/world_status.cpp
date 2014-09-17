@@ -18,8 +18,8 @@
 #include "modes/world_status.hpp"
 
 #include "audio/music_manager.hpp"
-#include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -35,9 +35,9 @@ WorldStatus::WorldStatus()
 {
     m_clock_mode        = CLOCK_CHRONO;
 
-    m_prestart_sound    = sfx_manager->createSoundSource("pre_start_race");
-    m_start_sound       = sfx_manager->createSoundSource("start_race");
-    m_track_intro_sound = sfx_manager->createSoundSource("track_intro");
+    m_prestart_sound    = SFXManager::get()->createSoundSource("pre_start_race");
+    m_start_sound       = SFXManager::get()->createSoundSource("start_race");
+    m_track_intro_sound = SFXManager::get()->createSoundSource("track_intro");
 
     music_manager->stopMusic();
 
@@ -74,9 +74,9 @@ void WorldStatus::reset()
  */
 WorldStatus::~WorldStatus()
 {
-    sfx_manager->deleteSFX(m_prestart_sound);
-    sfx_manager->deleteSFX(m_start_sound);
-    sfx_manager->deleteSFX(m_track_intro_sound);
+    SFXManager::get()->deleteSFX(m_prestart_sound);
+    SFXManager::get()->deleteSFX(m_start_sound);
+    SFXManager::get()->deleteSFX(m_track_intro_sound);
     IrrlichtDevice *device = irr_driver->getDevice();
 
     if (device->getTimer()->isStopped())  
@@ -157,7 +157,7 @@ void WorldStatus::update(const float dt)
             }
 
             // Work around a bug that occurred on linux once:
-            // the sfx_manager kept on reporting that it is playing,
+            // the SFXManager::get() kept on reporting that it is playing,
             // while it was not - so STK would never reach the ready
             // ... phase. Since the sound effect is about 3 seconds
             // long, we use the aux timer to force the next phase

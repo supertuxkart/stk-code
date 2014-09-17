@@ -513,7 +513,7 @@ Material::~Material()
     // tracks might use the same name.
     if(m_sfx_name!="" && m_sfx_name==m_texname)
     {
-        sfx_manager->deleteSFXMapping(m_sfx_name);
+        SFXManager::get()->deleteSFXMapping(m_sfx_name);
     }
 }   // ~Material
 
@@ -551,14 +551,14 @@ void Material::initCustomSFX(const XMLNode *sfx)
     m_sfx_pitch_per_speed = (m_sfx_max_pitch - m_sfx_min_pitch)
                           / (m_sfx_max_speed - m_sfx_min_speed);
 
-    if(!sfx_manager->soundExist(m_sfx_name))
+    if(!SFXManager::get()->soundExist(m_sfx_name))
     {
 
         // The directory for the track was added to the model search path
         // so just misuse the getModelFile function
         const std::string full_path = file_manager->getAsset(FileManager::MODEL,
                                                              filename);
-        SFXBuffer* buffer = sfx_manager->loadSingleSfx(sfx, full_path);
+        SFXBuffer* buffer = SFXManager::get()->loadSingleSfx(sfx, full_path);
 
         if (buffer != NULL)
         {

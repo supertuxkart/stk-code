@@ -187,7 +187,7 @@ void OnlineScreen::doQuickPlay()
     XMLRequest *join_request = new RequestConnection::ServerJoinRequest();
     if (!join_request)
     {
-        sfx_manager->quickSound("anvil");
+        SFXManager::get()->quickSound("anvil");
         return;
     }
 
@@ -205,7 +205,7 @@ void OnlineScreen::doQuickPlay()
     }
     else
     {
-        sfx_manager->quickSound("anvil");
+        SFXManager::get()->quickSound("anvil");
     }
 
 }   // doQuickPlay
