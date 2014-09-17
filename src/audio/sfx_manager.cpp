@@ -45,7 +45,6 @@
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
 
-std::map<std::string, SFXBase*> SFXManager::m_quick_sounds;
 SFXManager *SFXManager::m_sfx_manager;
 
 /** Static function to create the singleton sfx manager.

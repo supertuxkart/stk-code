@@ -95,7 +95,7 @@ private:
     std::vector<SFXBase*> m_all_sfx;
 
     /** To play non-positional sounds without having to create a new object for each */
-    static std::map<std::string, SFXBase*> m_quick_sounds;
+    std::map<std::string, SFXBase*> m_quick_sounds;
 
     /** listener vector (position vector + up vector) */
     float                     m_listenerVec[6];
