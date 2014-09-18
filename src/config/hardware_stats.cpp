@@ -164,6 +164,8 @@ void reportHardwareStats()
          */
         virtual void callback()
         {
+            // If the request contains incorrect data, it will not have a 
+            // download error, but return an error string as return value:
             if(hadDownloadError() || getData()=="<h1>Bad Request (400)</h1>")
             {
                 Log::error("HW report", "Error uploading the HW report.");
@@ -191,7 +193,7 @@ void reportHardwareStats()
     request->setURL("http://stats.supertuxkart.net/upload/v1/");
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     // FIXME: For now: don't submit
-    request->queue();
+    //request->queue();
 
 }   // reportHardwareStats
 
