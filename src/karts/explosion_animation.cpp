@@ -39,7 +39,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
                                                bool direct_hit)
 {
     if(kart->isInvulnerable()) return NULL;
-    
+
     float r = kart->getKartProperties()->getExplosionRadius();
 
     // Ignore explosion that are too far away.
@@ -77,7 +77,6 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
  {
     m_xyz = m_kart->getXYZ();
     m_orig_y = m_xyz.getY();
-    m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
     m_timer     = m_kart->getKartProperties()->getExplosionTime();
 
     // Non-direct hits will be only affected half as much.

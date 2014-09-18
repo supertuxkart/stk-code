@@ -269,7 +269,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     }
 
     std::string sfx_name = StringUtils::removeExtension(filename);
-    
+
     if(m_all_sfx_types.find(sfx_name)!=m_all_sfx_types.end())
     {
         Log::error("SFXManager",
@@ -426,9 +426,9 @@ void SFXManager::resumeAll()
     for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
         i!=m_all_sfx.end(); i++)
     {
-        SFXStatus status = (*i)->getStatus();
+        SFXBase::SFXStatus status = (*i)->getStatus();
         // Initial happens when
-        if (status==SFX_PAUSED) (*i)->resume();
+        if (status==SFXBase::SFX_PAUSED) (*i)->resume();
     }   // for i in m_all_sfx
 }   // resumeAll
 

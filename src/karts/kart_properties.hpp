@@ -93,10 +93,6 @@ private:
     /** Version of the .kart file. */
     int   m_version;
 
-    // SFX files
-    // ---------------
-    std::vector<int> m_custom_sfx_id;     /**< Vector of custom SFX ids */
-
     // Display and gui
     // ---------------
     std::string m_name;               /**< The human readable Name of the kart
@@ -151,8 +147,8 @@ private:
     Vec3  m_bevel_factor;
 
     /** The position of the physical wheel is a weighted average of the
-     *  two ends of the beveled shape. This determines the weight: 0 = 
-     *  a the widest end, 1 = at the narrowest front end. If the value is 
+     *  two ends of the beveled shape. This determines the weight: 0 =
+     *  a the widest end, 1 = at the narrowest front end. If the value is
      *  < 0, the old physics settings are used which places the raycast
      *  wheels outside of the chassis - but result in a more stable
      *  physics behaviour (which is therefore atm still the default).
@@ -395,6 +391,8 @@ private:
     /** The startup boost is the kart starts fast enough. */
     std::vector<float> m_startup_boost;
 
+    /** The kart associated holds a (more relevant) copy of this */
+    std::map<std::string, SFXBase*>* m_sounds;
 
     void  load              (const std::string &filename,
                              const std::string &node);
@@ -408,7 +406,9 @@ public:
     void  checkAllSet       (const std::string &filename);
     float getStartupBoost   () const;
     bool  isInGroup         (const std::string &group) const;
-    bool operator<(const KartProperties &other) const;
+    void  loadSound         (const XMLNode* sound_node,
+                             const XMLNode* audio_node);
+    bool  operator<(const KartProperties &other) const;
 
     // ------------------------------------------------------------------------
     /** Returns the (maximum) speed for a given turn radius.
@@ -474,11 +474,6 @@ public:
     const std::string& getAbsoluteIconFile() const      { return m_icon_file; }
 
     // ------------------------------------------------------------------------
-    /** Returns custom sound effects for this kart. */
-    const int          getCustomSfxId (SFXManager::CustomSFX type)
-                                       const  {return m_custom_sfx_id[type];  }
-
-    // ------------------------------------------------------------------------
     /** Returns the version of the .kart file. */
     int   getVersion                () const {return m_version;               }
 
@@ -528,7 +523,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the torque scaling factor used to keep the karts parallel to
      *  the ground when flying. */
-    float getSmoothFlyingImpulse() const 
+    float getSmoothFlyingImpulse() const
     {
         return m_smooth_flying_impulse;
     }   // getSmoothFlyingImpulse
@@ -927,14 +922,17 @@ public:
     /** Returns the bevel factor (!=0 indicates to use a bevelled box). */
     const Vec3 &getBevelFactor() const { return m_bevel_factor; }
     // ------------------------------------------------------------------------
+    /** Called by once by the kart to initialise its m_sounds */
+    std::map<std::string, SFXBase*>* getAllSounds() const { return m_sounds; }
+    // ------------------------------------------------------------------------
     /** Returns position of the physical wheel is a weighted average of the
-     *  two ends of the beveled shape. This determines the weight: 0 = 
+     *  two ends of the beveled shape. This determines the weight: 0 =
      *  a the widest end, 1 = at the narrowest, front end. If the value is <0,
      *  the old physics position is picked, which placed the raycast wheels
      *  outside of the chassis, but gives more stable physics. */
-    const float getPhysicalWheelPosition() const 
+    const float getPhysicalWheelPosition() const
     {
-        return m_physical_wheel_position; 
+        return m_physical_wheel_position;
     }   // getPhysicalWheelPosition
 };   // KartProperties
 

@@ -116,7 +116,7 @@ void RaceResultGUI::tearDown()
     m_font->setMonospaceDigits(m_was_monospace);
 
     if (m_finish_sound != NULL &&
-        m_finish_sound->getStatus() == SFXManager::SFX_PLAYING)
+        m_finish_sound->getStatus() == SFXBase::SFX_PLAYING)
     {
         m_finish_sound->stop();
     }
@@ -600,7 +600,7 @@ void RaceResultGUI::onUpdate(float dt)
     renderGlobal(dt);
 
     if (m_finish_sound != NULL &&
-        m_finish_sound->getStatus() != SFXManager::SFX_PLAYING)
+        m_finish_sound->getStatus() != SFXBase::SFX_PLAYING)
     {
         try
         {

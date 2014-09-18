@@ -42,7 +42,7 @@ HitSFX::HitSFX(const Vec3& coord, const char* explosion_sound)
  */
 HitSFX::~HitSFX()
 {
-    if (m_sfx->getStatus() == SFXManager::SFX_PLAYING)
+    if (m_sfx->getStatus() == SFXBase::SFX_PLAYING)
         m_sfx->stop();
 
     SFXManager::get()->deleteSFX(m_sfx);
@@ -67,5 +67,5 @@ void HitSFX::setPlayerKartHit()
  */
 bool HitSFX::updateAndDelete(float dt)
 {
-    return m_sfx->getStatus() != SFXManager::SFX_PLAYING;
+    return m_sfx->getStatus() != SFXBase::SFX_PLAYING;
 }   // updateAndDelete

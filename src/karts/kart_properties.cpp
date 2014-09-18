@@ -30,11 +30,15 @@
 #include "karts/skidding_properties.hpp"
 #include "modes/world.hpp"
 #include "io/xml_node.hpp"
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_buffer.hpp"
+#include "audio/sfx_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <cassert>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -60,7 +64,6 @@ KartProperties::KartProperties(const std::string &filename)
     m_shadow_z_offset = 0.0f;
 
     m_groups.clear();
-    m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
 
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
@@ -92,7 +95,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_squash_duration = m_downward_impulse_factor =
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
         m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time =
-        m_smooth_flying_impulse = m_physical_wheel_position = 
+        m_smooth_flying_impulse = m_physical_wheel_position =
         m_graphical_y_offset =
             UNDEFINED;
 
@@ -138,6 +141,12 @@ KartProperties::~KartProperties()
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         if(m_ai_properties[i])
             delete m_ai_properties[i];
+
+    // free sfx
+    std::map<std::string, SFXBase*>::iterator i;
+    for (i = m_sounds->begin(); i != m_sounds->end(); i++)
+        delete i->second;
+    delete m_sounds;
 }   // ~KartProperties
 
 //-----------------------------------------------------------------------------
@@ -198,12 +207,10 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     {
         if(!root || root->getName()!="kart")
         {
-            std::ostringstream msg;
-            msg << "Couldn't load kart properties '" << filename <<
-                "': no kart node.";
-
             delete m_kart_model;
-            throw std::runtime_error(msg.str());
+            std::string msg = "Couldn't load kart properties from '" +
+                              filename + "': no kart node.";
+            throw std::runtime_error(msg);
         }
         getAllData(root);
     }
@@ -213,7 +220,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                    filename.c_str());
         Log::error("[KartProperties]", "%s", err.what());
     }
-    if(root) delete root;
+    delete root;
 
     // Set a default group (that has to happen after init_default and load)
     if(m_groups.size()==0)
@@ -241,18 +248,15 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                                     /*make_permanent*/true,
                                                     /*complain_if_not_found*/true,
                                                     /*strip_path*/false);
-    if(m_minimap_icon_file!="")
+    if(m_minimap_icon_file != "")
         m_minimap_icon = irr_driver->getTexture(m_root+m_minimap_icon_file);
     else
         m_minimap_icon = NULL;
 
     if (m_minimap_icon == NULL)
-    {
         m_minimap_icon = getUnicolorTexture(m_color);
-    }
 
-    // Only load the model if the .kart file has the appropriate version,
-    // otherwise warnings are printed.
+    // Only load the model if the .kart file has the appropriate version
     if (m_version >= 1)
     {
         const bool success = m_kart_model->loadModels(*this);
@@ -261,7 +265,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             delete m_kart_model;
             file_manager->popTextureSearchPath();
             file_manager->popModelSearchPath();
-            throw std::runtime_error("Cannot load kart models");
+            throw std::runtime_error("Cannot load kart models: "
+                                     ".kart file has an invalid version");
         }
     }
 
@@ -324,7 +329,7 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("shadow-x-offset",   &m_shadow_x_offset  );
     root->get("shadow-z-offset",   &m_shadow_z_offset  );
 
-    root->get("type",     &m_kart_type        );
+    root->get("type",              &m_kart_type        );
 
     if(const XMLNode *dimensions_node = root->getNode("center"))
         dimensions_node->get("gravity-shift", &m_gravity_center_shift);
@@ -377,25 +382,27 @@ void KartProperties::getAllData(const XMLNode * root)
                                                    &m_downward_impulse_factor);
         stability_node->get("track-connection-accel",
                                                    &m_track_connection_accel );
-        stability_node->get("smooth-flying-impulse", &m_smooth_flying_impulse);
+        stability_node->get("smooth-flying-impulse",
+                                                   &m_smooth_flying_impulse  );
     }
 
     if(const XMLNode *collision_node = root->getNode("collision"))
     {
-        collision_node->get("impulse",         &m_collision_impulse        );
-        collision_node->get("impulse-time",    &m_collision_impulse_time   );
-        collision_node->get("terrain-impulse", &m_collision_terrain_impulse);
-        collision_node->get("restitution",     &m_restitution              );
-        collision_node->get("bevel-factor",    &m_bevel_factor             );
-        collision_node->get("physical-wheel-position",&m_physical_wheel_position);
+        collision_node->get("impulse",         &m_collision_impulse         );
+        collision_node->get("impulse-time",    &m_collision_impulse_time    );
+        collision_node->get("terrain-impulse", &m_collision_terrain_impulse );
+        collision_node->get("restitution",     &m_restitution               );
+        collision_node->get("bevel-factor",    &m_bevel_factor              );
+        collision_node->get("physical-wheel-position",
+                                               &m_physical_wheel_position   );
         std::string s;
-        collision_node->get("impulse-type",    &s                          );
+        collision_node->get("impulse-type",    &s                           );
         s = StringUtils::toLowerCase(s);
-        if(s=="none")
+        if(s == "none")
             m_terrain_impulse_type = IMPULSE_NONE;
-        else if(s=="normal")
+        else if(s == "normal")
             m_terrain_impulse_type = IMPULSE_NORMAL;
-        else if(s=="driveline")
+        else if(s == "driveline")
             m_terrain_impulse_type = IMPULSE_TO_DRIVELINE;
         else
         {
@@ -423,51 +430,6 @@ void KartProperties::getAllData(const XMLNode * root)
         camera_node->get("backward-up-angle", &m_camera_backward_up_angle);
         m_camera_backward_up_angle *= DEGREE_TO_RAD;
     }
-
-    if(const XMLNode *sounds_node= root->getNode("sounds"))
-    {
-        std::string s;
-        sounds_node->get("engine", &s);
-        if      (s == "large") m_engine_sfx_type = "engine_large";
-        else if (s == "small") m_engine_sfx_type = "engine_small";
-        else
-        {
-            if (SFXManager::get()->soundExist(s))
-            {
-                m_engine_sfx_type = s;
-            }
-            else
-            {
-                Log::error("[KartProperties]",
-                           "Kart '%s' has an invalid engine '%s'.",
-                           m_name.c_str(), s.c_str());
-                m_engine_sfx_type = "engine_small";
-            }
-        }
-
-#ifdef WILL_BE_ENABLED_ONCE_DONE_PROPERLY
-        // Load custom kart SFX files (TODO: enable back when it's implemented properly)
-        for (int i = 0; i < SFXManager::NUM_CUSTOMS; i++)
-        {
-            std::string tempFile;
-            // Get filename associated with each custom sfx tag in sfx config
-            if (sounds_node->get(SFXManager::get()->getCustomTagName(i), tempFile))
-            {
-                // determine absolute filename
-                // FIXME: will not work with add-on packs (is data dir the same)?
-                tempFile = file_manager->getKartFile(tempFile, getIdent());
-
-                // Create sfx in sfx manager and store id
-                m_custom_sfx_id[i] = SFXManager::get()->addSingleSfx(tempFile, 1, 0.2f,1.0f);
-            }
-            else
-            {
-                // if there is no filename associated with a given tag
-                m_custom_sfx_id[i] = -1;
-            }   // if custom sound
-        }   // for i<SFXManager::NUM_CUSTOMS
-#endif
-    }   // if sounds-node exist
 
     if(const XMLNode *nitro_node = root->getNode("nitro"))
     {
@@ -499,10 +461,10 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *explosion_node = root->getNode("explosion"))
     {
-        explosion_node->get("time",   &m_explosion_time  );
-        explosion_node->get("radius", &m_explosion_radius);
+        explosion_node->get("time",   &m_explosion_time                );
+        explosion_node->get("radius", &m_explosion_radius              );
         explosion_node->get("invulnerability-time",
-                        &m_explosion_invulnerability_time);
+                                      &m_explosion_invulnerability_time);
     }
 
     if(const XMLNode *skid_node = root->getNode("skid"))
@@ -619,6 +581,8 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         graphics_node->get("y-offset", &m_graphical_y_offset);
     }
+
+    loadSound(root->getNode("sounds"), root->getNode("audio"));
 
     if(m_kart_model)
         m_kart_model->loadInfo(*root);
@@ -760,16 +724,10 @@ void KartProperties::checkAllSet(const std::string &filename)
 bool KartProperties::operator<(const KartProperties &other) const
 {
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
-    bool this_is_locked = p->isLocked(getIdent());
-    bool other_is_locked = p->isLocked(other.getIdent());
-    if (this_is_locked == other_is_locked)
-    {
+    if (p->isLocked(getIdent()) == p->isLocked(other.getIdent()))
         return getName() < other.getName();
-    }
     else
-        return other_is_locked;
-
-    return true;
+        return p->isLocked(other.getIdent());
 }  // operator<
 
 // ----------------------------------------------------------------------------
@@ -778,7 +736,141 @@ bool KartProperties::isInGroup(const std::string &group) const
     return std::find(m_groups.begin(), m_groups.end(), group) != m_groups.end();
 }   // isInGroups
 
+// ----------------------------------------------------------------------------
+/** \brief Loads the kart sounds and mofdifies them with the data from the nodes
+ * \param sound_node the "sound" node from the kart.xml. Only capable of \
+ *        deciding what sound should be used for the engine and left to \
+ *        support kart not yet updated
+ * \param audio_node The "audio" node from kart.xml. The node itself doesn't
+ *        contain any information, its only use is to capsule its children.
+ * Each child of the <audio> looks like the following:
+ * <sfx location="kart" id="zipper" filename="nyan.ogg"/>
+ * For the location, there are 3 possibilities:
+ *  - "kart": The sound is in the folder of the kart or a subfolder. For using
+ *            a subfolder, simply add the folder to the filename, e.g.
+ *            "sound/nyan.ogg"
+ *  - "game": The sound is part of the main game.
+ *  - "custom": Warning: Only for development. Use this to get access a sound
+ *              anywhere on you computer
+ * The id specifies when the sound is called, e.g. "explode" when the kart was
+ * hit by something: TODO: Full list of sfx (in the wiki?)
+ * The only thing special about the filename is that it might contain a path
+ * There are four more optional arguments - "rolloff", "positional", "volume"
+ * and "max_dist" - which can override defaults from SFXBuffer.
+ */
+void KartProperties::loadSound(const XMLNode* sound_node, const XMLNode* audio_node)
+{
+    // Avoid a crash because sfx_manager is not initialised
+    if (!sound_node && !audio_node)
+        return;
 
+    m_sounds = new std::map<std::string, SFXBase*>();
+
+    // init some mandatory sounds with defaults
+    std::string names[] = {"horn", "crash", "boing", "goo", "skid", "shoot"};
+    for (unsigned int i = 0; i < 6; i++)
+        (*m_sounds)[names[i]] = SFXManager::get()->createSoundSource(names[i]);
+
+    // TODO: Only one default engine sound called "engine"
+    (*m_sounds)["engine"] = SFXManager::get()->createSoundSource("engine_small");
+    (*m_sounds)["zipper"] = SFXManager::get()->createSoundSource("wee"         );
+    (*m_sounds)["beep"  ] = SFXManager::get()->createSoundSource("horn"        );
+
+    if (sound_node)
+    {
+        // Engine Fallback
+        // TODO: Port all karts to use the new sounds and replace this code
+        std::string s;
+        sound_node->get("engine", &s);
+        std::string name;
+        if      (s == "large") name = "engine_large";
+        else if (s == "small") name = "engine_small";
+        else
+        {
+            if (SFXManager::get()->soundExist(s))
+            {
+                name = s;
+            }
+            else
+            {
+                Log::error("[KartProperties]",
+                           "Kart '%s' has an invalid engine '%s'.",
+                           m_name.c_str(), s.c_str());
+                name = "engine_small";
+            }
+        }
+
+        SFXBase* tmp = SFXManager::get()->createSoundSource(name);
+        assert(tmp != NULL);
+        m_sounds->insert(std::pair<std::string, SFXBase*>("engine", tmp));
+    }
+
+    if (audio_node)
+    {
+        for (unsigned int i = 0; i < audio_node->getNumNodes(); i++)
+        {
+            const XMLNode* sfx = audio_node->getNode(i);
+            std::string path, location, id, filename;
+            if(!sfx->get("id",       &id      ) ||
+               !sfx->get("filename", &filename) ||
+               !sfx->get("location", &location))
+            {
+                Log::error("[KartProperties]", "The %d. sound in the audio "
+                           "section of kart '%s' does not contain all mandatory "
+                           "parameters.", i+1, m_name.c_str());
+                Log::error("[KartProperties]", "Skipping this sound.");
+                continue;
+            }
+
+            SFXBase* tmp;
+            if (location == "game")
+            {
+                tmp = SFXManager::get()->createSoundSource(filename);
+                if (tmp == NULL)
+                    continue; // Warning already printed by createSoundSource
+            }
+            else if (location == "kart")
+            {
+                SFXBuffer* buffer = new SFXBuffer(m_root + filename, sfx);
+                tmp = SFXManager::get()->createSoundSource(buffer, false, true);
+                if (!buffer->load())
+                {
+                    Log::error("[KartProperties]", "The %d. sound in the "
+                               "section of kart '%s' could not be loaded.",
+                               i+1, m_name.c_str());
+                    continue;
+                }
+                tmp = SFXManager::get()->createSoundSource(buffer, false, true);
+            }
+            else if (location == "custom")
+            {
+                Log::warn("[KartProperties]", "Custom audio paths should be avoided");
+                SFXBuffer* buffer = new SFXBuffer(filename, sfx);
+                if (!buffer->load())
+                {
+                    Log::error("[KartProperties]", "Especially if the file "
+                                                   "can't be loaded!");
+                    delete buffer;
+                    continue;
+                }
+                tmp = SFXManager::get()->createSoundSource(buffer, false, true);
+            }
+            else
+            {
+                Log::error("[KartProperties]", "The %d. sound in the audio "
+                           "section of the kart.xml of %s has an invalid "
+                           "location '%s'.", i+1, m_name.c_str(),
+                           location.c_str());
+                Log::error("[KartProperties]", "Skipping this sound.");
+                continue;
+            }
+
+            assert(tmp != NULL);
+            //m_sounds->insert(std::pair<std::string, SFXBase*>(id, tmp));
+            (*m_sounds)[id] = tmp;
+        }
+    }
+}
 // ----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready-set-go'. It searches
  *  through m_startup_times to find the appropriate slot, and returns the
@@ -801,9 +893,7 @@ const float KartProperties::getAvgPower() const
 {
     float sum = 0.0;
     for (unsigned int i = 0; i < m_gear_power_increase.size(); ++i)
-    {
         sum += m_gear_power_increase[i]*m_max_speed[0];
-    }
     return sum/m_gear_power_increase.size();
 }   // getAvgPower
 

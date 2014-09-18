@@ -145,7 +145,7 @@ private:
 
     /** The torque to apply after hitting a bubble gum. */
     float        m_bubblegum_torque;
-    
+
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
 
@@ -165,10 +165,10 @@ private:
     // -----------------
     /** Time a kart is jumping. */
     float            m_jump_time;
-    
+
     /** Is time flying activated */
     bool             m_is_jumping;
-    
+
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 
@@ -204,29 +204,26 @@ private:
     float         m_view_blocked_by_plunger;
     float         m_speed;
 
-    std::vector<SFXBase*> m_custom_sounds;
-    SFXBase      *m_beep_sound;
-    SFXBase      *m_engine_sound;
-    SFXBase      *m_crash_sound;
+    /** All sounds for this kart accessible through their name. Note that this
+     * is only a copy from the kart properties for easier acces, so it is
+     * allocated and freed there */
+    std::map<std::string, SFXBase*>* m_sounds;
     SFXBase      *m_terrain_sound;
     /** A pointer to the previous terrain sound needs to be saved so that an
      *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */
     SFXBase      *m_previous_terrain_sound;
-    SFXBase      *m_skid_sound;
-    SFXBase      *m_goo_sound;
-    SFXBase      *m_boing_sound;
     float         m_time_last_crash;
-    
+
     /** To prevent using nitro in too short bursts */
     float         m_min_nitro_time;
 
-    void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);
     void          handleMaterialGFX();
+    void          updatePhysics(float dt);
+    void          updateSFX();
     void          updateFlying();
     void          updateSliding();
     void          updateEnginePowerAndBrakes(float dt);
-    void          updateEngineSFX();
     void          updateNitro(float dt);
     float         getActualWheelForce();
     void          crashed(const Material* m, AbstractKart *k);
@@ -245,22 +242,20 @@ public:
     virtual bool   isInRest         () const;
     virtual void   applyEngineForce (float force);
 
-    virtual void flyUp();
-    virtual void flyDown();
+    virtual void   flyUp();
+    virtual void   flyDown();
 
-    virtual void   startEngineSFX   ();
     virtual void   adjustSpeed      (float f);
     virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
                                     float engine_force, float duration,
                                     float fade_out_time);
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
                                float fade_in_time);
-    virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
-    virtual void  collectedItem(Item *item, int random_attachment);
-    virtual const Material *getMaterial() const;
-    virtual const Material *getLastMaterial() const;
-    /** Returns the pitch of the terrain depending on the heading. */
-    virtual float getTerrainPitch(float heading) const;
+    virtual float  getSpeedIncreaseTimeLeft(unsigned int category) const;
+    virtual void   collectedItem(Item *item, int random_attachment);
+    virtual const  Material *getMaterial() const;
+    virtual const  Material *getLastMaterial() const;
+    virtual float  getTerrainPitch(float heading) const;
 
     virtual void   reset            ();
     virtual void   handleZipper     (const Material *m=NULL,
@@ -271,55 +266,58 @@ public:
     virtual void   crashed          (const Material *m, const Vec3 &normal);
     virtual float  getHoT           () const;
     virtual void   update           (float dt);
-    virtual void   finishedRace(float time);
-    virtual void   setPosition(int p);
-    virtual void   beep             ();
+    virtual void   finishedRace     (float time);
+    virtual void   setPosition      (int p);
     virtual void   showZipperFire   ();
     virtual float  getCurrentMaxSpeed() const;
+    virtual void   setController    (Controller *controller);
 
-    virtual bool   playCustomSFX    (unsigned int type);
-    virtual void   setController(Controller *controller);
+    // SFX/sound related stuff
+    virtual SFXBase*
+                   getSingleSFX     (std::string name);
+    virtual void   playSound        (std::string name);
+    virtual void   startEngineSFX   ();
 
     // ========================================================================
     // Powerup related functions.
     // ------------------------------------------------------------------------
     /** Sets a new powerup. */
-    virtual void setPowerup (PowerupManager::PowerupType t, int n);
+    virtual void   setPowerup (PowerupManager::PowerupType t, int n);
     // ------------------------------------------------------------------------
     /** Returns the current powerup. */
-    virtual const Powerup* getPowerup() const { return m_powerup; }
+    virtual const Powerup* getPowerup() const     { return m_powerup;         }
     // ------------------------------------------------------------------------
     /** Returns the current powerup. */
-    virtual Powerup* getPowerup() { return m_powerup; }
+    virtual Powerup* getPowerup()                 { return m_powerup;         }
     // ------------------------------------------------------------------------
     /** Returns the number of powerups. */
-    virtual int getNumPowerup() const;
+    virtual int    getNumPowerup()         const { return m_powerup->getNum(); }
     // ------------------------------------------------------------------------
     /** Returns a points to this kart's graphical effects. */
-    KartGFX*       getKartGFX()                   { return m_kart_gfx;        }
+    KartGFX*       getKartGFX()                  { return m_kart_gfx;         }
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
-    virtual float  getEnergy           () const { return m_collected_energy; }
+    virtual float  getEnergy           ()  const { return m_collected_energy; }
     // ------------------------------------------------------------------------
     /** Returns the current position of this kart in the race. */
-    virtual int    getPosition         () const { return m_race_position;    }
+    virtual int    getPosition         ()  const { return m_race_position;    }
     // ------------------------------------------------------------------------
     /** Returns the coordinates of the front of the kart. This is used for
      *  determining when the lap line is crossed. */
-    virtual const Vec3& getFrontXYZ() const { return m_xyz_front; }
+    virtual const Vec3& getFrontXYZ()      const { return m_xyz_front;        }
     // ------------------------------------------------------------------------
     /** Returns the initial position of this kart. */
-    virtual int    getInitialPosition  () const { return m_initial_position; }
+    virtual int    getInitialPosition  ()  const { return m_initial_position; }
     // ------------------------------------------------------------------------
     /** Returns the finished time for a kart. */
-    virtual float  getFinishTime       () const { return m_finish_time;      }
+    virtual float  getFinishTime       ()  const { return m_finish_time;      }
     // ------------------------------------------------------------------------
     /** Returns true if this kart has finished the race. */
-    virtual bool   hasFinishedRace     () const { return m_finished_race;    }
+    virtual bool   hasFinishedRace     ()  const { return m_finished_race;    }
     // ------------------------------------------------------------------------
     /** Returns true if the kart has a plunger attached to its face. */
     virtual float  getBlockedByPlungerTime() const
-                                         { return m_view_blocked_by_plunger; }
+                                          { return m_view_blocked_by_plunger; }
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
@@ -331,8 +329,8 @@ public:
     virtual btTransform getAlignedTransform(const float customPitch=-1);
     // -------------------------------------------------------------------------
     /** Returns the color used for this kart. */
-    const video::SColor &getColor() const
-                                        {return m_kart_properties->getColor();}
+    const video::SColor &getColor     () const
+                                      { return m_kart_properties->getColor(); }
     // ------------------------------------------------------------------------
     /** Returns the time till full steering is reached for this kart.
      *  \param steer Current steer value (must be >=0), on which the time till
@@ -344,46 +342,46 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */
-    virtual float getMaxSteerAngle () const
+    virtual float getMaxSteerAngle   () const
                     { return m_kart_properties->getMaxSteerAngle(getSpeed()); }
     // ------------------------------------------------------------------------
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values). */
-    virtual const Skidding *getSkidding() const { return m_skidding; }
+    virtual const Skidding *getSkidding()  const { return m_skidding;         }
     // ------------------------------------------------------------------------
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values) - non-const. */
-    virtual Skidding *getSkidding() { return m_skidding; }
+    virtual Skidding *getSkidding   ()           { return m_skidding;         }
     // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
-    virtual btKart    *getVehicle() const {return m_vehicle;               }
+    virtual btKart    *getVehicle   ()     const { return m_vehicle;          }
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
-    virtual float        getSpeed() const {return m_speed;                 }
+    virtual float        getSpeed   ()     const { return m_speed;            }
     // ------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart
      *  from the server information.                                       */
-    virtual void         setSpeed(float s) {m_speed = s;                   }
+    virtual void         setSpeed(float s)       { m_speed = s;               }
     // ------------------------------------------------------------------------
     virtual btQuaternion getVisualRotation() const;
     // ------------------------------------------------------------------------
     /** Returns the slipstream object of this kart. */
-    virtual const SlipStream* getSlipstream() const {return m_slipstream; }
+    virtual const SlipStream* getSlipstream() const { return m_slipstream;    }
     // ------------------------------------------------------------------------
     /** Returns the slipstream object of this kart. */
-    virtual SlipStream* getSlipstream() {return m_slipstream; }
+    virtual SlipStream* getSlipstream()         { return m_slipstream;        }
     // ------------------------------------------------------------------------
     /** Activates a slipstream effect, atm that is display some nitro. */
     virtual void setSlipstreamEffect(float f);
     // ------------------------------------------------------------------------
     /** Returns the start transform, i.e. position and rotation. */
-    const btTransform& getResetTransform() const {return m_reset_transform;}
+    const btTransform& getResetTransform() const {return m_reset_transform;   }
     // ------------------------------------------------------------------------
     /** Returns the controller of this kart. */
-    virtual Controller* getController() { return m_controller; }
+    virtual Controller* getController()         { return m_controller;        }
     // ------------------------------------------------------------------------
     /** Returns the controller of this kart (const version). */
-    const Controller* getController() const { return m_controller; }
+    const Controller* getController()     const { return m_controller;        }
     // ------------------------------------------------------------------------
     /** True if the wheels are touching the ground. */
     virtual bool isOnGround() const;

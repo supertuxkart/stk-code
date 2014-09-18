@@ -328,8 +328,8 @@ void NetworkPlayerController::setPosition(int p)
             AbstractKart *kart = world->getKart(i);
             if(kart->getPosition() == p + 1)
             {
-                kart->beep();
-                break;
+                kart->playSound("beep");
+                return;
             }
         }
     }

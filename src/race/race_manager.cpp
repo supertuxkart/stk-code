@@ -380,7 +380,7 @@ void RaceManager::startNew(bool from_overworld)
 void RaceManager::startNextRace()
 {
     // Uncomment to debug audio leaks
-    // sfx_manager->dump();
+    // SFXManager::get()->dump();
 
     stk_config->getAllScores(&m_score_for_position, m_num_karts);
     IrrlichtDevice* device = irr_driver->getDevice();

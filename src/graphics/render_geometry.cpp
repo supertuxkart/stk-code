@@ -35,7 +35,6 @@
 /**
 \page render_geometry Geometry Rendering Overview
 
-/**
 \section adding_material Adding a solid material
 
 You need to consider twice before adding a new material : in the worst case a material requires 8 shaders :

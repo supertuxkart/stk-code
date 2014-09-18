@@ -185,7 +185,7 @@ void Powerup::use()
     if (m_type != PowerupManager::POWERUP_NOTHING &&
         m_type != PowerupManager::POWERUP_SWATTER &&
         m_type != PowerupManager::POWERUP_ZIPPER)
-        m_owner->playCustomSFX(SFXManager::CUSTOM_SHOOT);
+        m_owner->playSound("shoot");
 
     // FIXME - for some collectibles, set() is never called
     if(m_sound_use == NULL)
@@ -362,7 +362,7 @@ void Powerup::use()
     case PowerupManager::POWERUP_NOTHING:
         {
             if(!m_owner->getKartAnimation())
-                m_owner->beep();
+                m_owner->playSound("beep");
         }
         break;
     default : break;

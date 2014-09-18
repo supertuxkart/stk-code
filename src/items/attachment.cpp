@@ -83,7 +83,7 @@ Attachment::~Attachment()
         SFXManager::get()->deleteSFX(m_bomb_sound);
         m_bomb_sound = NULL;
     }
-    
+
     if (m_bubble_explode_sound)
     {
         SFXManager::get()->deleteSFX(m_bubble_explode_sound);
@@ -125,7 +125,7 @@ void Attachment::set(AttachmentType type, float time,
 
     clear();
     m_node_scale = 0.3f;
-    
+
     // If necessary create the appropriate plugin which encapsulates
     // the associated behavior
     switch(type)
@@ -284,7 +284,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     default:
         // There is no attachment currently, but there will be one
         // so play the character sound ("Uh-Oh")
-        m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+        m_kart->playSound("attach");
 
         if(new_attachment==-1)
             new_attachment = m_random.get(3);
@@ -330,7 +330,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
 void Attachment::handleCollisionWithKart(AbstractKart *other)
 {
     Attachment *attachment_other=other->getAttachment();
-    
+
     if(getType()==Attachment::ATTACH_BOMB)
     {
         // Don't attach a bomb when the kart is shielded
@@ -355,7 +355,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
                                             getTimeLeft()+
                                             stk_config->m_bomb_time_increase,
                                             m_kart);
-                other->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+                other->playSound("attach");
                 clear();
             }
         }
@@ -372,12 +372,12 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         set(ATTACH_BOMB, other->getAttachment()->getTimeLeft()+
                          stk_config->m_bomb_time_increase, other);
         other->getAttachment()->clear();
-        m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+        m_kart->playSound("attach");
     }
     else
     {
-        m_kart->playCustomSFX(SFXManager::CUSTOM_CRASH);
-        other->playCustomSFX(SFXManager::CUSTOM_CRASH);
+        m_kart->playSound("crash");
+        other->playSound("crash");
     }
 
 }   // handleCollisionWithKart
@@ -387,11 +387,11 @@ void Attachment::update(float dt)
 {
     if(m_type==ATTACH_NOTHING) return;
     m_time_left -=dt;
-    
-    
+
+
     bool is_shield = (m_type == ATTACH_BUBBLEGUM_SHIELD|| m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD);
     float m_wanted_node_scale = is_shield ? std::max(1.0f, m_kart->getHighestPoint()*1.1f) : 1.0f;
-    
+
     if (m_node_scale < m_wanted_node_scale)
     {
         m_node_scale += dt*1.5f;
@@ -478,7 +478,7 @@ void Attachment::update(float dt)
             m_bubble_explode_sound = SFXManager::get()->createSoundSource("bubblegum_explode");
             m_bubble_explode_sound->position(m_kart->getXYZ());
             m_bubble_explode_sound->play();
-            
+
             // drop a small bubble gum
             Vec3 hit_point;
             Vec3 normal;
@@ -495,7 +495,7 @@ void Attachment::update(float dt)
                 normal.normalize();
 
                 pos.setY(hit_point.getY()-0.05f);
-                
+
                 ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_kart);
             }
         }

@@ -107,7 +107,7 @@ RubberBall::RubberBall(AbstractKart *kart)
  */
 RubberBall::~RubberBall()
 {
-    if(m_ping_sfx->getStatus()==SFXManager::SFX_PLAYING)
+    if(m_ping_sfx->getStatus()==SFXBase::SFX_PLAYING)
         m_ping_sfx->stop();
     SFXManager::get()->deleteSFX(m_ping_sfx);
 }   // ~RubberBall
@@ -541,7 +541,7 @@ float RubberBall::updateHeight()
     if(m_height_timer>m_interval)
     {
         m_height_timer -= m_interval;
-        if(m_ping_sfx->getStatus()!=SFXManager::SFX_PLAYING)
+        if(m_ping_sfx->getStatus()!=SFXBase::SFX_PLAYING)
         {
             m_ping_sfx->position(getXYZ());
             m_ping_sfx->play();

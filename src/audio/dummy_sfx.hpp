@@ -39,13 +39,14 @@ public:
 
     virtual void       position(const Vec3 &position) {}
     virtual void       setLoop(bool status)           {}
+    virtual bool       isLoop()                       { return false; }
     virtual void       play()                         {}
     virtual void       stop()                         {}
     virtual void       pause()                        {}
     virtual void       resume()                       {}
     virtual void       speed(float factor)            {}
     virtual void       volume(float gain)             {}
-    virtual SFXManager::SFXStatus  getStatus()        { return SFXManager::SFX_STOPPED; }
+    virtual SFXStatus  getStatus()                    { return SFXBase::SFX_STOPPED; }
     virtual void       onSoundEnabledBack()           {}
     virtual void       setRolloff(float rolloff)      {}
 

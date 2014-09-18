@@ -34,7 +34,7 @@ class Vec3;
  * \brief The base class for sound effects.
  *  It gets a sound buffer from the sound
  *  manager, which is shared between all instances. Do create a new sound
- *  effect object, use sfx_manager->getSFX(...); do not create an instance
+ *  effect object, use SFXManager::get()->getSFX(...); do not create an instance
  *  with new, since SFXManager makes sure to stop/restart all SFX (esp.
  *  looping sfx like engine sounds) when necessary.
  * \ingroup audio
@@ -42,6 +42,13 @@ class Vec3;
 class SFXBase : public NoCopy
 {
 public:
+    /** Status of a sound effect. Accessible via getStatus() */
+    enum SFXStatus
+    {
+        SFX_UNKNOWN = -1, SFX_STOPPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2,
+        SFX_INITIAL = 3
+    };
+
     virtual           ~SFXBase()                       {}
 
     /** Late creation, if SFX was initially disabled */
@@ -49,6 +56,7 @@ public:
 
     virtual void       position(const Vec3 &position) = 0;
     virtual void       setLoop(bool status)      = 0;
+    virtual bool       isLoop()                  = 0;
     virtual void       play()                    = 0;
     virtual void       stop()                    = 0;
     virtual void       pause()                   = 0;
@@ -56,8 +64,7 @@ public:
     virtual void       speed(float factor)       = 0;
     virtual void       volume(float gain)        = 0;
     virtual void       masterVolume(float gain)  = 0;
-    virtual SFXManager::SFXStatus
-                       getStatus()               = 0;
+    virtual SFXStatus  getStatus()               = 0;
     virtual void       onSoundEnabledBack()      = 0;
     virtual void       setRolloff(float rolloff) = 0;
 

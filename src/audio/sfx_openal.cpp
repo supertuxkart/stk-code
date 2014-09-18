@@ -283,19 +283,19 @@ void SFXOpenAL::position(const Vec3 &position)
 //-----------------------------------------------------------------------------
 /** Returns the status of this sound effect.
  */
-SFXManager::SFXStatus SFXOpenAL::getStatus()
+SFXBase::SFXStatus SFXOpenAL::getStatus()
 {
-    if(!m_ok) return SFXManager::SFX_UNKNOWN;
+    if(!m_ok) return SFXBase::SFX_UNKNOWN;
 
     int state = 0;
     alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
     switch(state)
     {
-    case AL_STOPPED: return SFXManager::SFX_STOPPED;
-    case AL_PLAYING: return SFXManager::SFX_PLAYING;
-    case AL_PAUSED:  return SFXManager::SFX_PAUSED;
-    case AL_INITIAL: return SFXManager::SFX_INITIAL;
-    default:         return SFXManager::SFX_UNKNOWN;
+    case AL_STOPPED: return SFXBase::SFX_STOPPED;
+    case AL_PLAYING: return SFXBase::SFX_PLAYING;
+    case AL_PAUSED:  return SFXBase::SFX_PAUSED;
+    case AL_INITIAL: return SFXBase::SFX_INITIAL;
+    default:         return SFXBase::SFX_UNKNOWN;
     }
 }   // getStatus
 

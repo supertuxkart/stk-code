@@ -155,7 +155,7 @@ public:
     float getHighestPoint() const { return m_kart_highest_point;  }
     // ------------------------------------------------------------------------
     /** Called after the kart comes to rest. It can be used to e.g. compute
-     *  differences between graphical and physical chassis. Note that 
+     *  differences between graphical and physical chassis. Note that
      *  overwriting this function is possible, but this implementation must
      *  be called. */
     virtual void kartIsInRestNow();
@@ -304,14 +304,12 @@ public:
     /** Activates a slipstream effect, atm that is display some nitro. */
     virtual void setSlipstreamEffect(float f) = 0;
     // ------------------------------------------------------------------------
-    /** Plays a beep sfx. */
-    virtual void beep() = 0;
     // ------------------------------------------------------------------------
     /** This function will play a particular character voice for this kart.
      *  It returns whether or not a character voice sample exists for the
      *  particular event.  If there is no voice sample, a default can be
      *  played instead. */
-    virtual bool playCustomSFX(unsigned int type) = 0;
+    virtual void playSound(std::string type) = 0;
     // ------------------------------------------------------------------------
     /** Show fire to go with a zipper. */
     virtual void showZipperFire() = 0;

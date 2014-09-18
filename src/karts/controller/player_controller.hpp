@@ -48,7 +48,6 @@ private:
     Camera        *m_camera;
 
     SFXBase       *m_bzzt_sound;
-    SFXBase       *m_wee_sound;
     SFXBase       *m_ugh_sound;
     SFXBase       *m_grab_sound;
     SFXBase       *m_full_sound;
