@@ -26,6 +26,24 @@
 
 namespace HardwareStats
 {
+
+
+// ----------------------------------------------------------------------------
+/** Returns the amount of RAM in MB.
+ */
+int getRAM()
+{
+#ifdef __linux__
+    const uint64_t memorySize = (uint64_t)sysconf(_SC_PHYS_PAGES) 
+                                        * sysconf(_SC_PAGESIZE);
+    return long(memorySize / (1024*1024));
+#endif
+
+    return 0;
+}   // getRAM
+
+// ----------------------------------------------------------------------------
+
 void reportHardwareStats()
 {
     Json json;
@@ -75,6 +93,11 @@ void reportHardwareStats()
     
     json.add("video_xres", UserConfigParams::m_width );
     json.add("video_yres", UserConfigParams::m_height);
+
+    int mem = getRAM();
+    if(mem>0)
+        json.add("ram_total", mem);
+
     // Too long for debugging atm
     //json.add("GL_EXTENSIONS", getGLExtensions());
     json.finish();
