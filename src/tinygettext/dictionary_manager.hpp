@@ -89,7 +89,7 @@ public:
   /** Return a set of the available languages in their country code */
   std::set<Language> get_languages();
 
-  void set_filesystem(std::auto_ptr<FileSystem> filesystem);
+  //void set_filesystem(std::auto_ptr<FileSystem> filesystem);
   std::string convertFilename2Language(const std::string &s_in) const;
 
 
