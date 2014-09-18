@@ -47,7 +47,7 @@ int getRAM()
 #ifdef WIN32
     MEMORYSTATUSEX mse;
     mse.dwLength = sizeof(mse);
-    const bool ok = GlobalMemoryStatusEx(&mse);
+    const bool ok = GlobalMemoryStatusEx(&mse)==TRUE;
 
     DWORDLONG memory_size = mse.ullTotalPhys;
     // Richter, "Programming Applications for Windows": the reported
@@ -73,8 +73,19 @@ int getRAM()
 
 // ----------------------------------------------------------------------------
 
+/** If the configuration of this installation has not been reported for the
+ *  current version, collect the hardware statistics and send it to STK's
+ *  server.
+ */
 void reportHardwareStats()
 {
+    // Version of the hw report, which is stored in the DB. If new fields
+    // are added, increase this version. Each STK installation will report
+    // its configuration only once (per version number). So if the version
+    // number is increased, a new report will be sent.
+    const int report_version = 1;
+    if(UserConfigParams::m_last_hw_report_version>=report_version) return;
+
     Json json;
 #ifdef WIN32
     json.add("os_win", 1);
@@ -133,16 +144,55 @@ void reportHardwareStats()
     json.finish();
     Log::verbose("json", "'%s'", json.toString().c_str());
 
-    Online::HTTPRequest *request = new Online::HTTPRequest(/*manage memory*/true, 1);
+    // ------------------------------------------------------------------------
+    /** A small class which sends the HW report to the STK server. On
+     *  completion, it will either update the last-submitted-hw-report version,
+     *  or log an error message (in which case next time STK is started it
+     *  wil try again to log the report).
+     */
+    class HWReportRequest : public Online::HTTPRequest
+    {
+    private:
+        /** Version number of the hw report. */
+        int m_version;
+    public:
+        HWReportRequest(int version) : Online::HTTPRequest(/*manage memory*/true, 1)
+                                       ,m_version(version)
+        {}
+        // --------------------------------------------------------------------
+        /** Callback after the request has been executed. 
+         */
+        virtual void callback()
+        {
+            if(hadDownloadError() || getData()=="<h1>Bad Request (400)</h1>")
+            {
+                Log::error("HW report", "Error uploading the HW report.");
+                if(hadDownloadError())
+                    Log::error("HW report", "%s", getDownloadErrorMessage());
+                else
+                    Log::error("HW report", "%s", getData().c_str());
+            }
+            else
+            {
+                Log::info("HW report", "Upload successful.");
+                UserConfigParams::m_last_hw_report_version = m_version;
+            }
+        }   // callback
+
+    };   // HWReportRequest
+    // ------------------------------------------------------------------------
+
+    Online::HTTPRequest *request = new HWReportRequest(report_version);
     request->addParameter("user_id", 3);
     request->addParameter("time", StkTime::getTimeSinceEpoch());
     request->addParameter("type", "hwdetect");
-    request->addParameter("version", 1);
+    request->addParameter("version", report_version);
     request->addParameter("data", json.toString());
     request->setURL("http://stats.supertuxkart.net/upload/v1/");
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     // FIXME: For now: don't submit
-    //request->queue();
+    request->queue();
+
 }   // reportHardwareStats
 
 }   // namespace HardwareStats

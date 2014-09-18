@@ -680,7 +680,11 @@ namespace UserConfigParams
                                                "wasn't asked, 1: allowed, 2: "
                                                "not allowed") );
 
-    // ---- User managerment
+    PARAM_PREFIX IntUserConfigParam        m_last_hw_report_version
+            PARAM_DEFAULT(  IntUserConfigParam(0, "Version of hardware report "
+                                                  "that was reported last") );
+
+    // ---- User management
 
     PARAM_PREFIX BoolUserConfigParam        m_always_show_login_screen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "always_show_login_screen",
