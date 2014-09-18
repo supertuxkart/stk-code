@@ -1,12 +1,18 @@
 #ifndef GLWRAP_HEADER_H
 #define GLWRAP_HEADER_H
 
-#include "gl_headers.hpp"
+#include "graphics/gl_headers.hpp"
+
+#include "graphics/irr_driver.hpp"
+#include "graphics/vaomanager.hpp"
+#include "utils/log.hpp"
 
 #include <vector>
-#include "irr_driver.hpp"
-#include "utils/log.hpp"
-#include "vaomanager.hpp"
+
+namespace HardwareStats
+{
+    class Json;
+}
 
 void initGL();
 GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
@@ -152,6 +158,6 @@ void GL32_draw2DRectangle(irr::video::SColor color, const irr::core::rect<s32>& 
 
 bool hasGLExtension(const char* extension);
 const std::string getGLExtensions();
-
+void getGLLimits(HardwareStats::Json *json);
 
 #endif

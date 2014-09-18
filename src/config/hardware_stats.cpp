@@ -38,6 +38,8 @@ int getRAM()
                                         * sysconf(_SC_PAGESIZE);
     return long(memorySize / (1024*1024));
 #endif
+#ifdef WIN32
+#endif
 
     return 0;
 }   // getRAM
@@ -100,6 +102,7 @@ void reportHardwareStats()
 
     // Too long for debugging atm
     //json.add("GL_EXTENSIONS", getGLExtensions());
+    getGLLimits(&json);
     json.finish();
     Log::verbose("json", "'%s'", json.toString().c_str());
 
