@@ -24,23 +24,50 @@
 #include "online/http_request.hpp"
 #include "utils/string_utils.hpp"
 
+#ifdef __APPLE__
+#  include <sys/sysctl.h>
+#endif
+
 namespace HardwareStats
 {
 
 
 // ----------------------------------------------------------------------------
 /** Returns the amount of RAM in MB.
+ *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
  */
 int getRAM()
 {
 #ifdef __linux__
-    const uint64_t memorySize = (uint64_t)sysconf(_SC_PHYS_PAGES) 
+    const uint64_t memory_size = (uint64_t)sysconf(_SC_PHYS_PAGES) 
                                         * sysconf(_SC_PAGESIZE);
-    return long(memorySize / (1024*1024));
-#endif
-#ifdef WIN32
+    return int(memory_size / (1024*1024));
 #endif
 
+#ifdef WIN32
+    MEMORYSTATUSEX mse;
+    mse.dwLength = sizeof(mse);
+    const bool ok = GlobalMemoryStatusEx(&mse);
+
+    DWORDLONG memory_size = mse.ullTotalPhys;
+    // Richter, "Programming Applications for Windows": the reported
+    // value doesn't include non-paged pool reserved during boot;
+    // it's not considered available to the kernel. (the amount is
+    // 528 KiB on a 512 MiB WinXP/Win2k machine). we'll round up
+    // to the nearest megabyte to fix this.
+    const DWORDLONG mbyte = 1024*1024;
+    return (int)ceil(memory_size/mbyte);
+#endif
+
+#ifdef __APPLE__
+    size_t memory_size = 0;
+    size_t len = sizeof(memory_size);
+    // Argh, the API doesn't seem to be const-correct
+    /*const*/ int mib[2] = { CTL_HW, HW_PHYSMEM };
+    sysctl(mib, 2, &memory_size, &len, 0, 0);
+    memory_size /= (1024*1024);
+    return int(memory_size);
+#endif
     return 0;
 }   // getRAM
 
