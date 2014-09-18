@@ -19,10 +19,13 @@
 #ifndef HEADER_SFX_MANAGER_HPP
 #define HEADER_SFX_MANAGER_HPP
 
+#include "utils/no_copy.hpp"
+#include "utils/synchronised.hpp"
+#include "utils/vec3.hpp"
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 #if HAVE_OGGVORBIS
 #  ifdef __APPLE__
@@ -31,11 +34,9 @@
 #    include <AL/al.h>
 #  endif
 #else
-typedef unsigned int ALuint;
+  typedef unsigned int ALuint;
 #endif
 
-#include "utils/no_copy.hpp"
-#include "utils/vec3.hpp"
 
 class SFXBase;
 class SFXBuffer;
@@ -94,6 +95,9 @@ private:
     /** The actual instances (sound sources) */
     std::vector<SFXBase*> m_all_sfx;
 
+    /** The list of sound effects to be played in the next update. */
+    Synchronised< std::vector<SFXBase*> > m_sfx_to_play;
+
     /** To play non-positional sounds without having to create a new object for each */
     std::map<std::string, SFXBase*> m_quick_sounds;
 
@@ -113,6 +117,8 @@ private:
 public:
     static void create();
     static void destroy();
+    void queue(SFXBase *sfx);
+    void update();
     // ------------------------------------------------------------------------
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()

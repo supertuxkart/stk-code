@@ -67,5 +67,7 @@ void HitSFX::setPlayerKartHit()
  */
 bool HitSFX::updateAndDelete(float dt)
 {
-    return m_sfx->getStatus() != SFXManager::SFX_PLAYING;
+    SFXManager::SFXStatus status = m_sfx->getStatus();
+    if(status==SFXManager::SFX_INITIAL) return false;
+    return status!= SFXManager::SFX_PLAYING;
 }   // updateAndDelete

@@ -18,8 +18,11 @@
 
 #include "audio/dummy_sfx.hpp"
 #include "audio/music_manager.hpp"
+#include "audio/sfx_openal.hpp"
 #include "audio/sfx_buffer.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
 
 #include <stdexcept>
 #include <algorithm>
@@ -38,12 +41,6 @@
 #    include <AL/alc.h>
 #  endif
 #endif
-
-#include "audio/sfx_openal.hpp"
-#include "config/user_config.hpp"
-#include "io/file_manager.hpp"
-#include "race/race_manager.hpp"
-#include "utils/constants.hpp"
 
 SFXManager *SFXManager::m_sfx_manager;
 
@@ -80,7 +77,9 @@ SFXManager::SFXManager()
     loadSfx();
     if (!sfxAllowed()) return;
     setMasterSFXVolume( UserConfigParams::m_sfx_volume );
-
+    m_sfx_to_play.lock();
+    m_sfx_to_play.getData().clear();
+    m_sfx_to_play.unlock();
 }  // SoundManager
 
 //-----------------------------------------------------------------------------
@@ -121,6 +120,40 @@ SFXManager::~SFXManager()
     m_all_sfx_types.clear();
 
 }   // ~SFXManager
+
+//----------------------------------------------------------------------------
+/** Adds a sound effect to the queue of sfx to be started by the sfx manager.
+ *  Starting a sfx can sometimes cause a 5ms delay, so it is done in a 
+ *  separate thread.
+ *  \param sfx The sound effect to be started.
+ */
+void SFXManager::queue(SFXBase *sfx)
+{
+    // Don't add sfx that are either not working correctly (e.g. because sfx
+    // are disabled);
+    if(sfx->getStatus()==SFX_UNKNOWN ) return;
+
+    m_sfx_to_play.lock();
+    m_sfx_to_play.getData().push_back(sfx);
+    m_sfx_to_play.unlock();
+}   // playSFX
+
+//----------------------------------------------------------------------------
+/** Starts all sfx that are queues to be started. Called once per frame.
+ */
+void SFXManager::update()
+{
+    m_sfx_to_play.lock();
+    while(!m_sfx_to_play.getData().empty())
+    {
+        SFXBase *sfx = m_sfx_to_play.getData().front();
+        m_sfx_to_play.getData().erase(m_sfx_to_play.getData().begin());
+        m_sfx_to_play.unlock();
+        sfx->reallyPlayNow();
+        m_sfx_to_play.lock();
+    }   // while !empty
+    m_sfx_to_play.unlock();
+}   // update
 
 //----------------------------------------------------------------------------
 /** Called then sound is globally switched on or off. It either pauses or
@@ -327,7 +360,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain(), owns_buffer);
 #endif
 
-    sfx->masterVolume(m_master_gain);
+    sfx->setMasterVolume(m_master_gain);
 
     if (add_to_SFX_list) m_all_sfx.push_back(sfx);
 
@@ -475,7 +508,7 @@ void SFXManager::setMasterSFXVolume(float gain)
         for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
             i!=m_all_sfx.end(); i++)
         {
-            (*i)->masterVolume(m_master_gain);
+            (*i)->setMasterVolume(m_master_gain);
         }   // for i in m_all_sfx
     }
 
@@ -484,7 +517,7 @@ void SFXManager::setMasterSFXVolume(float gain)
         std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.begin();
         for (; i != m_quick_sounds.end(); i++)
         {
-            (*i).second->masterVolume(m_master_gain);
+            (*i).second->setMasterVolume(m_master_gain);
         }
     }
 

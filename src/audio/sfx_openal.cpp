@@ -85,28 +85,30 @@ bool SFXOpenAL::init()
     assert( alIsBuffer(m_soundBuffer->getBufferID()) );
     assert( alIsSource(m_soundSource) );
 
-    //std::cout << "Setting a source with buffer " << m_soundBuffer << ", rolloff " << rolloff
-    //          << ", gain=" << m_defaultGain << ", positional=" << (positional ? "true" : "false") << std::endl;
+    //std::cout << "Setting a source with buffer " << m_soundBuffer 
+    //          << ", rolloff " << rolloff
+    //          << ", gain=" << m_defaultGain << ", positional=" 
+    //          << (positional ? "true" : "false") << std::endl;
 
-    alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer->getBufferID());
+    alSourcei (m_soundSource, AL_BUFFER, m_soundBuffer->getBufferID());
 
-    if (!SFXManager::checkError("attaching the buffer to the source")) return false;
+    if (!SFXManager::checkError("attaching the buffer to the source"))
+        return false;
 
-    alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 0.0);
-    alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
-    alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
+    alSource3f(m_soundSource, AL_POSITION,       0.0, 0.0, 0.0);
+    alSource3f(m_soundSource, AL_VELOCITY,       0.0, 0.0, 0.0);
+    alSource3f(m_soundSource, AL_DIRECTION,      0.0, 0.0, 0.0);
 
-    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  m_soundBuffer->getRolloff());
-
-    alSourcef (m_soundSource, AL_MAX_DISTANCE,    m_soundBuffer->getMaxDist());
+    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR, m_soundBuffer->getRolloff());
+    alSourcef (m_soundSource, AL_MAX_DISTANCE,   m_soundBuffer->getMaxDist());
 
     if (m_gain < 0.0f)
     {
-        alSourcef (m_soundSource, AL_GAIN,        m_defaultGain * m_master_gain);
+        alSourcef (m_soundSource, AL_GAIN, m_defaultGain * m_master_gain);
     }
     else
     {
-        alSourcef (m_soundSource, AL_GAIN,        m_gain * m_master_gain);
+        alSourcef (m_soundSource, AL_GAIN, m_gain * m_master_gain);
     }
 
     if (m_positional) alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE);
@@ -117,7 +119,7 @@ bool SFXOpenAL::init()
     m_ok = SFXManager::checkError("setting up the source");
 
     return m_ok;
-}
+}   // init
 
 //-----------------------------------------------------------------------------
 /** Changes the pitch of a sound effect.
@@ -156,15 +158,16 @@ void SFXOpenAL::volume(float gain)
 
 //-----------------------------------------------------------------------------
 
-void SFXOpenAL::masterVolume(float gain)
+void SFXOpenAL::setMasterVolume(float gain)
 {
     m_master_gain = gain;
     
     if(!m_ok) return;
 
-    alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
+    alSourcef(m_soundSource, AL_GAIN, 
+               (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
     SFXManager::checkError("setting volume");
-}
+}   //setMasterVolume
 
 //-----------------------------------------------------------------------------
 /** Loops this sound effect.
@@ -222,9 +225,18 @@ void SFXOpenAL::resume()
 }   // resume
 
 //-----------------------------------------------------------------------------
-/** Plays this sound effect.
+/** This actually queues up the sfx in the sfx manager. It will be started
+ *  from a separate thread later (in this frame).
  */
 void SFXOpenAL::play()
+{
+    SFXManager::get()->queue(this);
+}   // play
+
+//-----------------------------------------------------------------------------
+/** Plays this sound effect.
+ */
+void SFXOpenAL::reallyPlayNow()
 {
     if (!SFXManager::get()->sfxAllowed()) return;
     if (!m_ok)
@@ -238,7 +250,7 @@ void SFXOpenAL::play()
 
     alSourcePlay(m_soundSource);
     SFXManager::checkError("playing");
-}   // play
+}   // reallyPlayNow
 
 //-----------------------------------------------------------------------------
 /** Sets the position where this sound effects is played.
