@@ -21,8 +21,55 @@
 #include <SViewFrustum.h>
 #include <functional>
 
+template<typename T>
+struct InstanceFiller
+{
+    static void add(GLMesh *, scene::ISceneNode *, T &);
+};
+
+template<>
+void InstanceFiller<InstanceData>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceData &Instance)
+{
+    const core::matrix4 &mat = node->getAbsoluteTransformation();
+    const core::vector3df &Origin = mat.getTranslation();
+    const core::vector3df &Orientation = mat.getRotationDegrees();
+    const core::vector3df &Scale = mat.getScale();
+    Instance.Origin.X = Origin.X;
+    Instance.Origin.Y = Origin.Y;
+    Instance.Origin.Z = Origin.Z;
+    Instance.Orientation.X = Orientation.X;
+    Instance.Orientation.Y = Orientation.Y;
+    Instance.Orientation.Z = Orientation.Z;
+    Instance.Scale.X = Scale.X;
+    Instance.Scale.Y = Scale.Y;
+    Instance.Scale.Z = Scale.Z;
+    Instance.Texture = mesh->TextureHandles[0];
+    Instance.SecondTexture = mesh->TextureHandles[1];
+}
+
+template<>
+void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, scene::ISceneNode *node, GlowInstanceData &Instance)
+{
+    STKMeshSceneNode *nd = dynamic_cast<STKMeshSceneNode*>(node);
+    const core::matrix4 &mat = node->getAbsoluteTransformation();
+    const core::vector3df &Origin = mat.getTranslation();
+    const core::vector3df &Orientation = mat.getRotationDegrees();
+    const core::vector3df &Scale = mat.getScale();
+    Instance.Color = nd->getGlowColor().color;
+    Instance.Origin.X = Origin.X;
+    Instance.Origin.Y = Origin.Y;
+    Instance.Origin.Z = Origin.Z;
+    Instance.Orientation.X = Orientation.X;
+    Instance.Orientation.Y = Orientation.Y;
+    Instance.Orientation.Z = Orientation.Z;
+    Instance.Scale.X = Scale.X;
+    Instance.Scale.Y = Scale.Y;
+    Instance.Scale.Z = Scale.Z;
+}
+
+template<typename T>
 static void
-FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > InstanceList, InstanceData * InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer,
+FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > InstanceList, T * InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer,
     size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &PolyCount, std::function<bool (const scene::ISceneNode *)> cull_func)
 {
     // Should never be empty
@@ -35,22 +82,7 @@ FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > Instan
         scene::ISceneNode *node = Tp.second;
         if (cull_func(node))
             continue;
-        InstanceData &Instance = InstanceBuffer[InstanceBufferOffset++];
-        const core::matrix4 &mat = node->getAbsoluteTransformation();
-        const core::vector3df &Origin = mat.getTranslation();
-        const core::vector3df &Orientation = mat.getRotationDegrees();
-        const core::vector3df &Scale = mat.getScale();
-        Instance.Origin.X = Origin.X;
-        Instance.Origin.Y = Origin.Y;
-        Instance.Origin.Z = Origin.Z;
-        Instance.Orientation.X = Orientation.X;
-        Instance.Orientation.Y = Orientation.Y;
-        Instance.Orientation.Z = Orientation.Z;
-        Instance.Scale.X = Scale.X;
-        Instance.Scale.Y = Scale.Y;
-        Instance.Scale.Z = Scale.Z;
-        Instance.Texture = mesh->TextureHandles[0];
-        Instance.SecondTexture = mesh->TextureHandles[1];
+        InstanceFiller<T>::add(mesh, node, InstanceBuffer[InstanceBufferOffset++]);
     }
 
     DrawElementsIndirectCommand &CurrentCommand = CommandBuffer[CommandBufferOffset++];
@@ -63,62 +95,23 @@ FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > Instan
     PolyCount += (InstanceBufferOffset - InitialOffset) * mesh->IndexCount / 3;
 }
 
-
-static void
-FillInstancesGlow_impl(std::vector<std::pair<GLMesh *, STKMeshCommon *> > InstanceList, GlowInstanceData * InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer,
-    size_t &InstanceBufferOffset, size_t &CommandBufferOffset, std::function<bool (const scene::ISceneNode *)> cull_func)
-{
-    // Should never be empty
-    GLMesh *mesh = InstanceList.front().first;
-    size_t InitialOffset = InstanceBufferOffset;
-
-    for (unsigned i = 0; i < InstanceList.size(); i++)
-    {
-        STKMeshSceneNode *node = dynamic_cast<STKMeshSceneNode*>(InstanceList[i].second);
-        if (cull_func(node))
-            continue;
-        GlowInstanceData &Instance = InstanceBuffer[InstanceBufferOffset++];
-        const core::matrix4 &mat = node->getAbsoluteTransformation();
-        const core::vector3df &Origin = mat.getTranslation();
-        const core::vector3df &Orientation = mat.getRotationDegrees();
-        const core::vector3df &Scale = mat.getScale();
-        Instance.Color = node->getGlowColor().color;
-        Instance.Origin.X = Origin.X;
-        Instance.Origin.Y = Origin.Y;
-        Instance.Origin.Z = Origin.Z;
-        Instance.Orientation.X = Orientation.X;
-        Instance.Orientation.Y = Orientation.Y;
-        Instance.Orientation.Z = Orientation.Z;
-        Instance.Scale.X = Scale.X;
-        Instance.Scale.Y = Scale.Y;
-        Instance.Scale.Z = Scale.Z;
-    }
-
-    DrawElementsIndirectCommand &CurrentCommand = CommandBuffer[CommandBufferOffset++];
-    CurrentCommand.baseVertex = mesh->vaoBaseVertex;
-    CurrentCommand.count = mesh->IndexCount;
-    CurrentCommand.firstIndex = mesh->vaoOffset / 2;
-    CurrentCommand.baseInstance = InitialOffset;
-    CurrentCommand.instanceCount = InstanceBufferOffset - InitialOffset;
-}
-
-
+template<typename T>
 static
 void FillInstances(const std::unordered_map<scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
-    InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &Polycount,
+    T *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &Polycount,
     std::function<bool (const scene::ISceneNode *)> cull_func)
 {
     auto It = GatheredGLMesh.begin(), E = GatheredGLMesh.end();
     for (; It != E; ++It)
     {
-        FillInstances_impl(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, Polycount, cull_func);
+        FillInstances_impl<T>(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, Polycount, cull_func);
         if (!UserConfigParams::m_azdo)
             InstancedList.push_back(It->second.front().first);
     }
 }
 
 static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForSolidPass[MAT_COUNT];
-static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, STKMeshCommon *> > > MeshForGlowPass;
+static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForGlowPass;
 static std::vector <STKMeshCommon *> DeferredUpdate;
 
 static core::vector3df windDir;
@@ -224,7 +217,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             for_in(mesh, node->MeshSolidMaterial[Mat])
             {
                 if (node->glow())
-                    MeshForGlowPass[mesh->mb].emplace_back(mesh, node);
+                    MeshForGlowPass[mesh->mb].emplace_back(mesh, Node);
 
                 if (Mat != MAT_SPLATTING && mesh->TextureMatrix.isIdentity())
                     MeshForSolidPass[Mat][mesh->mb].emplace_back(mesh, Node);
@@ -422,14 +415,14 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
     }
 }
 
-template<MeshMaterial Mat> static void
+template<MeshMaterial Mat, typename T> static void
 GenDrawCalls(unsigned cascade, std::vector<GLMesh *> &InstancedList,
-    InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &PolyCount)
+    T *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &PolyCount)
 {
     std::function<bool(const scene::ISceneNode *)> shadowculling = [&](const scene::ISceneNode *nd) {return dynamic_cast<const STKMeshCommon*>(nd)->isCulledForShadowCam(cascade); };
     if (irr_driver->hasARB_draw_indirect())
         ShadowPassCmd::getInstance()->Offset[cascade][Mat] = CommandBufferOffset; // Store command buffer offset
-    FillInstances(MeshForSolidPass[Mat], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, PolyCount, shadowculling);
+    FillInstances<T>(MeshForSolidPass[Mat], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, PolyCount, shadowculling);
     if (UserConfigParams::m_azdo)
         ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
 }
@@ -616,7 +609,8 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
             auto It = MeshForGlowPass.begin(), E = MeshForGlowPass.end();
             for (; It != E; ++It)
             {
-                FillInstancesGlow_impl(It->second, GlowInstanceBuffer, GlowCmdBuffer, offset, current_cmd, playercamculling);
+                size_t Polycnt = 0;
+                FillInstances_impl<GlowInstanceData>(It->second, GlowInstanceBuffer, GlowCmdBuffer, offset, current_cmd, Polycnt, playercamculling);
                 if (!UserConfigParams::m_azdo)
                     ListInstancedGlow::getInstance()->push_back(It->second.front().first);
             }
