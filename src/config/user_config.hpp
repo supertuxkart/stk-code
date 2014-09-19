@@ -680,9 +680,17 @@ namespace UserConfigParams
                                                "wasn't asked, 1: allowed, 2: "
                                                "not allowed") );
 
+    PARAM_PREFIX GroupUserConfigParam       m_hw_report_group
+            PARAM_DEFAULT( GroupUserConfigParam("HWReport",
+                                          "Everything related to hardware configuration.") );
+
     PARAM_PREFIX IntUserConfigParam        m_last_hw_report_version
-            PARAM_DEFAULT(  IntUserConfigParam(0, "Version of hardware report "
+            PARAM_DEFAULT(  IntUserConfigParam(0, "report-version", &m_hw_report_group,
+                                                  "Version of hardware report "
                                                   "that was reported last") );
+    PARAM_PREFIX IntUserConfigParam        m_random_identifier
+            PARAM_DEFAULT(  IntUserConfigParam(0, "random-identifier", &m_hw_report_group,
+                                                  "A random number to avoid duplicated reports") );
 
     // ---- User management
 

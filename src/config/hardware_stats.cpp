@@ -22,6 +22,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "online/http_request.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
 
 #ifdef __APPLE__
@@ -85,6 +86,12 @@ void reportHardwareStats()
     // number is increased, a new report will be sent.
     const int report_version = 1;
     if(UserConfigParams::m_last_hw_report_version>=report_version) return;
+    while(UserConfigParams::m_random_identifier==0)
+    {
+        RandomGenerator rg;
+        UserConfigParams::m_random_identifier = rg.get(1<<30);
+        user_config->saveConfig();
+    }
 
     Json json;
 #ifdef WIN32
@@ -178,6 +185,9 @@ void reportHardwareStats()
             {
                 Log::info("HW report", "Upload successful.");
                 UserConfigParams::m_last_hw_report_version = m_version;
+                // The callback is executed by the main thread, so no need
+                // to worry about locks when writing the file.
+                user_config->saveConfig();
             }
         }   // callback
 
@@ -185,7 +195,7 @@ void reportHardwareStats()
     // ------------------------------------------------------------------------
 
     Online::HTTPRequest *request = new HWReportRequest(report_version);
-    request->addParameter("user_id", 3);
+    request->addParameter("user_id", UserConfigParams::m_random_identifier);
     request->addParameter("time", StkTime::getTimeSinceEpoch());
     request->addParameter("type", "hwdetect");
     request->addParameter("version", report_version);
@@ -193,7 +203,7 @@ void reportHardwareStats()
     request->setURL("http://stats.supertuxkart.net/upload/v1/");
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     // FIXME: For now: don't submit
-    //request->queue();
+    request->queue();
 
 }   // reportHardwareStats
 
