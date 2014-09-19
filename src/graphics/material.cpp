@@ -800,11 +800,12 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(1, glossytex);
             return;
         }
-        else
-            m->setTexture(1, glossytex);
 
+        // Detail map : move it to slot 3 and add glossy to slot 2
         if (mb && mb->getVertexType() == video::EVT_2TCOORDS)
         {
+            m->setTexture(2, m->getTexture(1));
+            m->setTexture(1, glossytex);
             if (!m->getTexture(2))
                 m->setTexture(2, getUnicolorTexture(SColor(255, 255, 255, 255)));
         }
