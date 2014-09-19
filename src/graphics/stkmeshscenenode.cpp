@@ -169,7 +169,6 @@ void STKMeshSceneNode::updateGL()
 
         irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
         video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
-        f32 MaterialTypeParam = mb->getMaterial().MaterialTypeParam;
         video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
 
 

@@ -735,7 +735,6 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
     if(speed_ratio>1) speed_ratio = 1;
 
     video::ITexture   *bar_texture = m_speed_bar_icon->getTexture();
-    core::dimension2du bar_size    = bar_texture->getOriginalSize();
     video::S3DVertex vertices[5];
     unsigned int count;
 

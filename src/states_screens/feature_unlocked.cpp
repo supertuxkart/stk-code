@@ -438,7 +438,6 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
                 if (textureID != previousTextureID)
                 {
-                    scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)m_unlocked_stuff[n].m_root_gift_node;
                     scene::IMesh* mesh = m_unlocked_stuff[n].m_side_1->getMesh();
 
                     assert(mesh->getMeshBufferCount() == 1);

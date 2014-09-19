@@ -122,6 +122,7 @@ void VAOManager::regenerateVAO(enum VTXTYPE tp)
     glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
     switch (tp)
     {
+    case VTXTYPE_COUNT: break;  // avoid compiler warning
     case VTXTYPE_STANDARD:
         // Position
         glEnableVertexAttribArray(0);

@@ -144,7 +144,7 @@ void LODNode::updateVisibility(bool* shown)
     if (!isVisible()) return;
     if (m_nodes.size() == 0) return;
 
-    int level = getLevel();
+    unsigned int level = getLevel();
     for (size_t i = 0; i < m_nodes.size(); i++)
     {
         m_nodes[i]->setVisible(i == level);
@@ -165,7 +165,6 @@ void LODNode::OnRegisterSceneNode()
                                 m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH) &&
         now > m_last_tick)
     {
-        int level = getLevel();
         if (m_previous_visibility == WAS_HIDDEN && shown)
         {
             scene::IMesh* mesh;

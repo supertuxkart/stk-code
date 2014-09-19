@@ -235,9 +235,6 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_mesh = NULL;
     m_node = NULL;
 
-    bool animated = (UserConfigParams::m_graphical_effects ||
-        World::getWorld()->getIdent() == IDENT_CUTSCENE);
-
     m_mesh = model;
     init(NULL, NULL, true);
 }
