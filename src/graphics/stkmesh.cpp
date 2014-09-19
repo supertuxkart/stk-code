@@ -301,7 +301,7 @@ static void
 SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
 {
     if (!mesh.textures[i])
-        mesh.textures[i] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+        Log::fatal("STKMesh", "Missing texture");
     compressTexture(mesh.textures[i], isSrgb);
     if (UserConfigParams::m_azdo)
     {
