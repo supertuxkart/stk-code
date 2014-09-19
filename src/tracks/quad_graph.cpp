@@ -37,6 +37,7 @@
 #include "tracks/check_manager.hpp"
 #include "tracks/quad_set.hpp"
 #include "tracks/track.hpp"
+#include "graphics/glwrap.hpp"
 
 const int QuadGraph::UNKNOWN_SECTOR  = -1;
 QuadGraph *QuadGraph::m_quad_graph = NULL;
@@ -411,6 +412,8 @@ void QuadGraph::createMesh(bool show_invisible,
     m.Lighting         = false;
     if(enable_transparency)
         m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    m.setTexture(0, getUnicolorTexture(SColor(255, 255, 255, 255)));
+    m.setTexture(1, getUnicolorTexture(SColor(0, 0, 0, 0)));
     m_mesh             = irr_driver->createQuadMesh(&m);
     m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
