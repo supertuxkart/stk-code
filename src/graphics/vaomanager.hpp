@@ -42,7 +42,6 @@ struct InstanceDataSingleTex
         float Z;
     } Scale;
     uint64_t Texture;
-    uint64_t SecondTexture;
 #ifdef WIN32
 };
 #else
