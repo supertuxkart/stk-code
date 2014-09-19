@@ -800,8 +800,14 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(1, glossytex);
             return;
         }
-        else if (mb && mb->getVertexType() == video::EVT_STANDARD)
+        else
             m->setTexture(1, glossytex);
+
+        if (mb && mb->getVertexType() == video::EVT_2TCOORDS)
+        {
+            if (!m->getTexture(2))
+                m->setTexture(2, getUnicolorTexture(SColor(255, 255, 255, 255)));
+        }
     }
 
 
