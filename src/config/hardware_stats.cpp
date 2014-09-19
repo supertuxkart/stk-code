@@ -203,7 +203,7 @@ void reportHardwareStats()
     request->setURL("http://stats.supertuxkart.net/upload/v1/");
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     // FIXME: For now: don't submit
-    request->queue();
+    //request->queue();
 
 }   // reportHardwareStats
 
