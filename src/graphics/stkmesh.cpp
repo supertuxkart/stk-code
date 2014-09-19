@@ -329,6 +329,7 @@ void InitTextures(GLMesh &mesh, MeshMaterial Mat)
     case MAT_NORMAL_MAP:
         SetTexture(mesh, 0, true);
         SetTexture(mesh, 1, false);
+        SetTexture(mesh, 2, false);
         break;
     case MAT_SPLATTING:
         SetTexture(mesh, 0, true);

@@ -790,11 +790,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (m_normal_map_tex.size() > 0)
         {
             tex = irr_driver->getTexture(m_normal_map_tex);
-            m->setTexture(1, tex);
+            m->setTexture(2, tex);
 
             // Material and shaders
             m->MaterialType = irr_driver->getShader(ES_NORMAL_MAP);
-            m->setTexture(2, glossytex);
+            m->setTexture(1, glossytex);
             return;
         }
         else if (mb && mb->getVertexType() == video::EVT_STANDARD)

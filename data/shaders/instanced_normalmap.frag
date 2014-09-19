@@ -1,11 +1,11 @@
 #ifndef GL_ARB_bindless_texture
 uniform sampler2D normalMap;
-uniform sampler2D DiffuseForAlpha;
+uniform sampler2D glossMap;
 #endif
 
 #ifdef GL_ARB_bindless_texture
-flat in sampler2D handle;
 flat in sampler2D secondhandle;
+flat in sampler2D thirdhandle;
 #endif
 in vec3 tangent;
 in vec3 bitangent;
@@ -18,11 +18,11 @@ void main()
 {
     // normal in Tangent Space
 #ifdef GL_ARB_bindless_texture
-    vec3 TS_normal = 2.0 * texture(secondhandle, uv).rgb - 1.0;
-    float alpha = texture(handle, uv).a;
+    vec3 TS_normal = 2.0 * texture(thirdhandle, uv).rgb - 1.0;
+    float gloss = texture(secondhandle, uv).x;
 #else
     vec3 TS_normal = 2.0 * texture(normalMap, uv).rgb - 1.0;
-    float alpha = texture(DiffuseForAlpha, uv).a;
+    float gloss = texture(glossMap, uv).x;
 #endif
     // Because of interpolation, we need to renormalize
     vec3 Frag_tangent = normalize(tangent);
@@ -31,5 +31,5 @@ void main()
 
     vec3 FragmentNormal = TS_normal.x * Frag_tangent + TS_normal.y * Frag_bitangent - TS_normal.z * Frag_normal;
     EncodedNormal.xy = 0.5 * EncodeNormal(normalize(FragmentNormal)) + 0.5;
-    EncodedNormal.z = exp2(10. * (1. - alpha) + 1.);
+    EncodedNormal.z = exp2(10. * gloss + 1.);
 }

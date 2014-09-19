@@ -851,7 +851,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_normalmap.frag").c_str());
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "normalMap", 1, "DiffuseForAlpha");
+        AssignSamplerNames(Program, 0, "normalMap", 1, "glossMap");
     }
 
     // Solid Lit pass shaders
