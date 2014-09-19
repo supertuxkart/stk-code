@@ -28,7 +28,26 @@ struct InstanceFiller
 };
 
 template<>
-void InstanceFiller<InstanceData>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceData &Instance)
+void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataSingleTex &Instance)
+{
+    const core::matrix4 &mat = node->getAbsoluteTransformation();
+    const core::vector3df &Origin = mat.getTranslation();
+    const core::vector3df &Orientation = mat.getRotationDegrees();
+    const core::vector3df &Scale = mat.getScale();
+    Instance.Origin.X = Origin.X;
+    Instance.Origin.Y = Origin.Y;
+    Instance.Origin.Z = Origin.Z;
+    Instance.Orientation.X = Orientation.X;
+    Instance.Orientation.Y = Orientation.Y;
+    Instance.Orientation.Z = Orientation.Z;
+    Instance.Scale.X = Scale.X;
+    Instance.Scale.Y = Scale.Y;
+    Instance.Scale.Z = Scale.Z;
+    Instance.Texture = mesh->TextureHandles[0];
+}
+
+template<>
+void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataDualTex &Instance)
 {
     const core::matrix4 &mat = node->getAbsoluteTransformation();
     const core::vector3df &Origin = mat.getTranslation();
@@ -503,9 +522,10 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     if (!irr_driver->hasARB_draw_indirect())
         return;
 
-    InstanceData *InstanceBuffer;
-    InstanceData *ShadowInstanceBuffer;
-    InstanceData *RSMInstanceBuffer;
+    InstanceDataSingleTex *InstanceBufferSingleTex;
+    InstanceDataDualTex *InstanceBufferDualTex;
+    InstanceDataSingleTex *ShadowInstanceBuffer;
+    InstanceDataSingleTex *RSMInstanceBuffer;
     GlowInstanceData *GlowInstanceBuffer;
     DrawElementsIndirectCommand *CmdBuffer;
     DrawElementsIndirectCommand *ShadowCmdBuffer;
@@ -514,9 +534,10 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 
     if (irr_driver->hasBufferStorageExtension())
     {
-        InstanceBuffer = (InstanceData*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeDefault);
-        ShadowInstanceBuffer = (InstanceData*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeShadow);
-        RSMInstanceBuffer = (InstanceData*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeRSM);
+        InstanceBufferSingleTex = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeSingleTex);
+        InstanceBufferDualTex = (InstanceDataDualTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeDualTex);
+        ShadowInstanceBuffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeShadow);
+        RSMInstanceBuffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeRSM);
         GlowInstanceBuffer = (GlowInstanceData*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeGlow);
         CmdBuffer = SolidPassCmd::getInstance()->Ptr;
         ShadowCmdBuffer = ShadowPassCmd::getInstance()->Ptr;
@@ -547,8 +568,8 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
             size_t offset = 0, current_cmd = 0;
             if (!irr_driver->hasBufferStorageExtension())
             {
-                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeDefault));
-                InstanceBuffer = (InstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceData), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeSingleTex));
+                InstanceBufferSingleTex = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
                 CmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             }
@@ -556,33 +577,42 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 
             // Default Material
             SolidPassCmd::getInstance()->Offset[MAT_DEFAULT] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_DEFAULT], ListInstancedMatDefault::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_DEFAULT], ListInstancedMatDefault::getInstance()->SolidPass, InstanceBufferSingleTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_DEFAULT] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_DEFAULT];
             // Alpha Ref
             SolidPassCmd::getInstance()->Offset[MAT_ALPHA_REF] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_ALPHA_REF], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_ALPHA_REF], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBufferSingleTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_ALPHA_REF] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_ALPHA_REF];
             // Unlit
             SolidPassCmd::getInstance()->Offset[MAT_UNLIT] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_UNLIT], ListInstancedMatUnlit::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_UNLIT], ListInstancedMatUnlit::getInstance()->SolidPass, InstanceBufferSingleTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_UNLIT] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_UNLIT];
             // Spheremap
             SolidPassCmd::getInstance()->Offset[MAT_SPHEREMAP] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_SPHEREMAP], ListInstancedMatSphereMap::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_SPHEREMAP], ListInstancedMatSphereMap::getInstance()->SolidPass, InstanceBufferSingleTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_SPHEREMAP] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_SPHEREMAP];
+            // Grass
+            SolidPassCmd::getInstance()->Offset[MAT_GRASS] = current_cmd;
+            FillInstances(MeshForSolidPass[MAT_GRASS], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBufferSingleTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            SolidPassCmd::getInstance()->Size[MAT_GRASS] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_GRASS];
+
+            if (!irr_driver->hasBufferStorageExtension())
+            {
+                glUnmapBuffer(GL_ARRAY_BUFFER);
+                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeDualTex));
+                InstanceBufferDualTex = (InstanceDataDualTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataSingleTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+            }
+
             // Detail
             SolidPassCmd::getInstance()->Offset[MAT_DETAIL] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_DETAIL], ListInstancedMatDetails::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_DETAIL], ListInstancedMatDetails::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_DETAIL] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_DETAIL];
             // Normal Map
             SolidPassCmd::getInstance()->Offset[MAT_NORMAL_MAP] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_NORMAL_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_NORMAL_MAP];
 
-            // Grass
-            SolidPassCmd::getInstance()->Offset[MAT_GRASS] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_GRASS], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
-            SolidPassCmd::getInstance()->Size[MAT_GRASS] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_GRASS];
 
             if (!irr_driver->hasBufferStorageExtension())
             {
@@ -597,7 +627,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
             if (!irr_driver->hasBufferStorageExtension())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeGlow));
-                GlowInstanceBuffer = (GlowInstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceData), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+                GlowInstanceBuffer = (GlowInstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
                 GlowCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             }
@@ -632,7 +662,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
             if (!irr_driver->hasBufferStorageExtension())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeShadow));
-                ShadowInstanceBuffer = (InstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceData), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+                ShadowInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, ShadowPassCmd::getInstance()->drawindirectcmd);
                 ShadowCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             }
@@ -667,7 +697,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
             if (!irr_driver->hasBufferStorageExtension())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeRSM));
-                RSMInstanceBuffer = (InstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceData), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+                RSMInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, RSMPassCmd::getInstance()->drawindirectcmd);
                 RSMCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             }
