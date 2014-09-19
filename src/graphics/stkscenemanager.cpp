@@ -67,6 +67,27 @@ void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, scene::ISceneNode *n
 }
 
 template<>
+void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataThreeTex &Instance)
+{
+    const core::matrix4 &mat = node->getAbsoluteTransformation();
+    const core::vector3df &Origin = mat.getTranslation();
+    const core::vector3df &Orientation = mat.getRotationDegrees();
+    const core::vector3df &Scale = mat.getScale();
+    Instance.Origin.X = Origin.X;
+    Instance.Origin.Y = Origin.Y;
+    Instance.Origin.Z = Origin.Z;
+    Instance.Orientation.X = Orientation.X;
+    Instance.Orientation.Y = Orientation.Y;
+    Instance.Orientation.Z = Orientation.Z;
+    Instance.Scale.X = Scale.X;
+    Instance.Scale.Y = Scale.Y;
+    Instance.Scale.Z = Scale.Z;
+    Instance.Texture = mesh->TextureHandles[0];
+    Instance.SecondTexture = mesh->TextureHandles[1];
+    Instance.ThirdTexture = mesh->TextureHandles[2];
+}
+
+template<>
 void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, scene::ISceneNode *node, GlowInstanceData &Instance)
 {
     STKMeshSceneNode *nd = dynamic_cast<STKMeshSceneNode*>(node);
@@ -522,8 +543,8 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     if (!irr_driver->hasARB_draw_indirect())
         return;
 
-    InstanceDataSingleTex *InstanceBufferSingleTex;
     InstanceDataDualTex *InstanceBufferDualTex;
+    InstanceDataThreeTex *InstanceBufferThreeTex;
     InstanceDataSingleTex *ShadowInstanceBuffer;
     InstanceDataSingleTex *RSMInstanceBuffer;
     GlowInstanceData *GlowInstanceBuffer;
@@ -534,8 +555,8 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 
     if (irr_driver->hasBufferStorageExtension())
     {
-        InstanceBufferSingleTex = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeSingleTex);
         InstanceBufferDualTex = (InstanceDataDualTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeDualTex);
+        InstanceBufferThreeTex = (InstanceDataThreeTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeThreeTex);
         ShadowInstanceBuffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeShadow);
         RSMInstanceBuffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeRSM);
         GlowInstanceBuffer = (GlowInstanceData*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeGlow);
@@ -568,8 +589,8 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
             size_t offset = 0, current_cmd = 0;
             if (!irr_driver->hasBufferStorageExtension())
             {
-                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeSingleTex));
-                InstanceBufferSingleTex = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeDualTex));
+                InstanceBufferDualTex = (InstanceDataDualTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
                 CmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             }
@@ -577,40 +598,40 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 
             // Default Material
             SolidPassCmd::getInstance()->Offset[MAT_DEFAULT] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_DEFAULT], ListInstancedMatDefault::getInstance()->SolidPass, InstanceBufferSingleTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_DEFAULT], ListInstancedMatDefault::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_DEFAULT] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_DEFAULT];
             // Alpha Ref
             SolidPassCmd::getInstance()->Offset[MAT_ALPHA_REF] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_ALPHA_REF], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBufferSingleTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_ALPHA_REF], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_ALPHA_REF] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_ALPHA_REF];
             // Unlit
             SolidPassCmd::getInstance()->Offset[MAT_UNLIT] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_UNLIT], ListInstancedMatUnlit::getInstance()->SolidPass, InstanceBufferSingleTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_UNLIT], ListInstancedMatUnlit::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_UNLIT] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_UNLIT];
             // Spheremap
             SolidPassCmd::getInstance()->Offset[MAT_SPHEREMAP] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_SPHEREMAP], ListInstancedMatSphereMap::getInstance()->SolidPass, InstanceBufferSingleTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_SPHEREMAP], ListInstancedMatSphereMap::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_SPHEREMAP] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_SPHEREMAP];
             // Grass
             SolidPassCmd::getInstance()->Offset[MAT_GRASS] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_GRASS], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBufferSingleTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_GRASS], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_GRASS] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_GRASS];
 
             if (!irr_driver->hasBufferStorageExtension())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
-                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeDualTex));
-                InstanceBufferDualTex = (InstanceDataDualTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataSingleTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeThreeTex));
+                InstanceBufferThreeTex = (InstanceDataThreeTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataSingleTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
             }
 
             // Detail
             SolidPassCmd::getInstance()->Offset[MAT_DETAIL] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_DETAIL], ListInstancedMatDetails::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_DETAIL], ListInstancedMatDetails::getInstance()->SolidPass, InstanceBufferThreeTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_DETAIL] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_DETAIL];
             // Normal Map
             SolidPassCmd::getInstance()->Offset[MAT_NORMAL_MAP] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[MAT_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->SolidPass, InstanceBufferThreeTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
             SolidPassCmd::getInstance()->Size[MAT_NORMAL_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_NORMAL_MAP];
 
 

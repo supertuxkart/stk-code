@@ -81,7 +81,7 @@ public:
 private:
 
     video::ITexture *m_texture;
-    unsigned int     m_index;
+    //unsigned int     m_index;
     std::string      m_texname;
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */
@@ -228,16 +228,17 @@ private:
 
     bool  m_deprecated;
 
-    void  init    (unsigned int index);
+    void  init    ();
     void  install (bool is_full_path=false, bool complain_if_not_found=true);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
 
 public:
-          Material(const XMLNode *node, int index, bool deprecated);
-          Material(const std::string& fname, int index,
+          Material(const XMLNode *node, bool deprecated);
+          Material(const std::string& fname,
                    bool is_full_path=false,
-                   bool complain_if_not_found=true);
+                   bool complain_if_not_found=true,
+                   bool load_texture = true);
          ~Material ();
 
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
@@ -261,7 +262,7 @@ public:
     bool  highTireAdhesion   () const { return m_high_tire_adhesion; }
     const std::string&
           getTexFname        () const { return m_texname;            }
-    int   getIndex           () const { return m_index;              }
+    //int   getIndex           () const { return m_index;              }
 
     bool  isTransparent      () const
     {

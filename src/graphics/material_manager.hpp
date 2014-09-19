@@ -47,6 +47,9 @@ private:
     int     m_shared_material_index;
 
     std::vector<Material*> m_materials;
+
+    Material* m_default_material;
+
 public:
               MaterialManager();
              ~MaterialManager();
@@ -60,7 +63,7 @@ public:
                            scene::ISceneNode* parent,
                            bool use_fog) const;
 
-    void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const;
+    void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb);
 
     int       addEntity        (Material *m);
     Material *getMaterial      (const std::string& t,

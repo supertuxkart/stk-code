@@ -817,7 +817,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_pass1.frag").c_str());
 
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(Program, 0, "tex", 1, "glosstex");
     }
 
     InstancedObjectRefPass1Shader::InstancedObjectRefPass1Shader()
@@ -829,7 +829,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass1.frag").c_str());
 
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(Program, 0, "tex", 1, "glosstex");
     }
 
     InstancedGrassPass1Shader::InstancedGrassPass1Shader()
@@ -851,7 +851,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_normalmap.frag").c_str());
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "normalMap", 1, "DiffuseForAlpha");
+        AssignSamplerNames(Program, 0, "normalMap", 1, "glossMap");
     }
 
     // Solid Lit pass shaders

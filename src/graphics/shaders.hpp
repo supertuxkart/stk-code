@@ -77,13 +77,13 @@ public:
     NormalMapShader();
 };
 
-class InstancedObjectPass1Shader : public ShaderHelperSingleton<InstancedObjectPass1Shader>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedObjectPass1Shader : public ShaderHelperSingleton<InstancedObjectPass1Shader>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectPass1Shader();
 };
 
-class InstancedObjectRefPass1Shader : public ShaderHelperSingleton<InstancedObjectRefPass1Shader>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedObjectRefPass1Shader : public ShaderHelperSingleton<InstancedObjectRefPass1Shader>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectRefPass1Shader();

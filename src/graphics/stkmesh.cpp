@@ -301,7 +301,7 @@ static void
 SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
 {
     if (!mesh.textures[i])
-        mesh.textures[i] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+        Log::fatal("STKMesh", "Missing texture");
     compressTexture(mesh.textures[i], isSrgb);
     if (UserConfigParams::m_azdo)
     {
@@ -323,11 +323,13 @@ void InitTextures(GLMesh &mesh, MeshMaterial Mat)
     case MAT_SPHEREMAP:
     case MAT_UNLIT:
         SetTexture(mesh, 0, true);
+        SetTexture(mesh, 1, false);
         break;
     case MAT_DETAIL:
     case MAT_NORMAL_MAP:
         SetTexture(mesh, 0, true);
         SetTexture(mesh, 1, false);
+        SetTexture(mesh, 2, false);
         break;
     case MAT_SPLATTING:
         SetTexture(mesh, 0, true);

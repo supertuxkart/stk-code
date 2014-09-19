@@ -263,41 +263,41 @@ void IrrDriver::renderSolidFirstPass()
 
         if (UserConfigParams::m_azdo)
         {
-            multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeSingleTex>();
-            multidraw1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeSingleTex>();
-            multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeSingleTex>();
-            multidraw1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeSingleTex>();
-            multidraw1stPass<MeshShader::InstancedGrassPass1Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeSingleTex>(windDir);
+            multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeDualTex>();
+            multidraw1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeDualTex>();
+            multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeDualTex>();
+            multidraw1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeDualTex>();
+            multidraw1stPass<MeshShader::InstancedGrassPass1Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeDualTex>(windDir);
 
-            multidraw1stPass<MeshShader::InstancedNormalMapShader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeDualTex>();
-            multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeDualTex>();
+            multidraw1stPass<MeshShader::InstancedNormalMapShader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeThreeTex>();
+            multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeThreeTex>();
 
         }
         else if (irr_driver->hasARB_draw_indirect())
         {
             // Default
-            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeSingleTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatDefault::getInstance()->SolidPass);
+            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeDualTex>(
+                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatDefault::getInstance()->SolidPass);
             // Alpha ref
-            renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeSingleTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatAlphaRef::getInstance()->SolidPass);
+            renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeDualTex>(
+                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatAlphaRef::getInstance()->SolidPass);
             // Unlit
-            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeSingleTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatUnlit::getInstance()->SolidPass);
+            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeDualTex>(
+            TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatUnlit::getInstance()->SolidPass);
             // Spheremap
-            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeSingleTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatSphereMap::getInstance()->SolidPass);
+            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeDualTex>(
+                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatSphereMap::getInstance()->SolidPass);
             // Grass
-            renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeSingleTex>(
+            renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeDualTex>(
                 TexUnits(TexUnit(0, true)), ListInstancedMatGrass::getInstance()->SolidPass, windDir);
 
             // Detail
-            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeDualTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatDetails::getInstance()->SolidPass);
+            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeThreeTex>(
+                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatDetails::getInstance()->SolidPass);
 
             // Normal Map
-            renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeDualTex>(
-                TexUnits(TexUnit(1, false), TexUnit(0, true)), ListInstancedMatNormalMap::getInstance()->SolidPass);
+            renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeThreeTex>(
+                TexUnits(TexUnit(2, false), TexUnit(1, false)), ListInstancedMatNormalMap::getInstance()->SolidPass);
         }
     }
 }
@@ -443,42 +443,42 @@ void IrrDriver::renderSolidSecondPass()
 
         if (UserConfigParams::m_azdo)
         {
-            multidraw2ndPass<MeshShader::InstancedObjectPass2Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeSingleTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
-            multidraw2ndPass<MeshShader::InstancedObjectRefPass2Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeSingleTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
-            multidraw2ndPass<MeshShader::InstancedSphereMapShader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeSingleTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
-            multidraw2ndPass<MeshShader::InstancedObjectUnlitShader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeSingleTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
+            multidraw2ndPass<MeshShader::InstancedObjectPass2Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeDualTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
+            multidraw2ndPass<MeshShader::InstancedObjectRefPass2Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeDualTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
+            multidraw2ndPass<MeshShader::InstancedSphereMapShader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeDualTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
+            multidraw2ndPass<MeshShader::InstancedObjectUnlitShader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeDualTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
             SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
-            multidraw2ndPass<MeshShader::InstancedGrassPass2Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeSingleTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, DepthHandle, 0), windDir, cb->getPosition());
+            multidraw2ndPass<MeshShader::InstancedGrassPass2Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeDualTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, DepthHandle, 0), windDir, cb->getPosition());
 
-            multidraw2ndPass<MeshShader::InstancedObjectPass2Shader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeDualTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
-            multidraw2ndPass<MeshShader::InstancedDetailledObjectPass2Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeDualTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
+            multidraw2ndPass<MeshShader::InstancedObjectPass2Shader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeThreeTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
+            multidraw2ndPass<MeshShader::InstancedDetailledObjectPass2Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeThreeTex>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
         }
         else if (irr_driver->hasARB_draw_indirect())
         {
             // Default
-            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeSingleTex>(
+            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeDualTex>(
                 TexUnits(TexUnit(0, true)), DiffSpecSSAOTex, ListInstancedMatDefault::getInstance()->SolidPass);
             // Alpha ref
-            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectRefPass2Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeSingleTex>(
+            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectRefPass2Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeDualTex>(
                 TexUnits(TexUnit(0, true)), DiffSpecSSAOTex, ListInstancedMatAlphaRef::getInstance()->SolidPass);
             // Unlit
-            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectUnlitShader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeSingleTex>(
+            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectUnlitShader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeDualTex>(
                 TexUnits(TexUnit(0, true)), DiffSpecSSAOTex, ListInstancedMatUnlit::getInstance()->SolidPass);
             // Spheremap
-            renderInstancedMeshes2ndPass<MeshShader::InstancedSphereMapShader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeSingleTex>(
+            renderInstancedMeshes2ndPass<MeshShader::InstancedSphereMapShader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeDualTex>(
                 TexUnits(TexUnit(0, true)), DiffSpecSSAOTex, ListInstancedMatSphereMap::getInstance()->SolidPass);
             // Grass
             SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
             DiffSpecSSAOTex.push_back(irr_driver->getDepthStencilTexture());
-            renderInstancedMeshes2ndPass<MeshShader::InstancedGrassPass2Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeSingleTex>(
+            renderInstancedMeshes2ndPass<MeshShader::InstancedGrassPass2Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeDualTex>(
                 TexUnits(TexUnit(0, true)), DiffSpecSSAOTex, ListInstancedMatGrass::getInstance()->SolidPass, windDir, cb->getPosition());
             DiffSpecSSAOTex.pop_back();
 
             // Details
-            renderInstancedMeshes2ndPass<MeshShader::InstancedDetailledObjectPass2Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeDualTex>(
-                TexUnits(TexUnit(0, true), TexUnit(1, false)), DiffSpecSSAOTex, ListInstancedMatDetails::getInstance()->SolidPass);
+            renderInstancedMeshes2ndPass<MeshShader::InstancedDetailledObjectPass2Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeThreeTex>(
+                TexUnits(TexUnit(0, true), TexUnit(2, false)), DiffSpecSSAOTex, ListInstancedMatDetails::getInstance()->SolidPass);
             // Normal map
-            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeDualTex>(
+            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeThreeTex>(
                 TexUnits(TexUnit(0, true)), DiffSpecSSAOTex, ListInstancedMatNormalMap::getInstance()->SolidPass);
         }
     }
