@@ -56,6 +56,8 @@ class EditGPScreen :
     bool canMoveUp() const;
     bool canMoveDown() const;
 
+    void enableButtons();
+
     GrandPrixData*                     m_gp;
     GUIEngine::ListWidget*             m_list;
     irr::gui::STKModifiedSpriteBank*   m_icon_bank;

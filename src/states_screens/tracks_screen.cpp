@@ -185,6 +185,10 @@ void TracksScreen::init()
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(n);
         const std::vector<std::string> tracks = gp->getTrackNames(true);
 
+        //Skip epmpty GPs
+        if (gp->getNumberOfTracks()==0)
+            continue;
+
         std::vector<std::string> screenshots;
         for (unsigned int t=0; t<tracks.size(); t++)
         {
