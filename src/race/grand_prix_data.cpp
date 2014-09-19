@@ -158,14 +158,20 @@ void GrandPrixData::changeReverse(const GrandPrixData::GPReverseType use_reverse
     for (unsigned int i = 0; i < m_tracks.size(); i++)
     {
         if (use_reverse == GP_NO_REVERSE)
+        {
             m_reversed[i] = false;
+        }
+        else if (use_reverse == GP_ALL_REVERSE) // all reversed
+        {
+            m_reversed[i] = track_manager->getTrack(m_tracks[i])->reverseAvailable();
+        }
         else if (use_reverse == GP_RANDOM_REVERSE)
+        {
             if (track_manager->getTrack(m_tracks[i])->reverseAvailable())
                 m_reversed[i] = (rand() % 2 != 0);
             else
                 m_reversed[i] = false;
-        else // all reversed
-            m_reversed[i] = track_manager->getTrack(m_tracks[i])->reverseAvailable();
+        }
     }   // for i < m_tracks.size()
 }   // changeReverse
 

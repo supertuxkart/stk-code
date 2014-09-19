@@ -90,7 +90,8 @@ public:
     {
         GP_NO_REVERSE = 0,
         GP_ALL_REVERSE = 1,
-        GP_RANDOM_REVERSE = 2
+        GP_RANDOM_REVERSE = 2,
+        GP_DEFAULT_REVERSE = 3
     };   // GPReverseType
 
 public:
