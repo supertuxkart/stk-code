@@ -76,6 +76,90 @@ layout(location = 6) in vec3 Bitangent;
 
 */
 
+struct DefaultMaterial
+{
+    typedef MeshShader::InstancedObjectPass1Shader InstancedShader;
+    typedef ListInstancedMatDefault List;
+    static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
+    static const enum MeshMaterial MaterialType = MAT_DEFAULT;
+    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const std::vector<size_t> FirstPassTextures;
+};
+
+const std::vector<size_t> DefaultMaterial::FirstPassTextures = { 0, 1 };
+
+struct AlphaRef
+{
+    typedef MeshShader::InstancedObjectRefPass1Shader InstancedShader;
+    typedef ListInstancedMatAlphaRef List;
+    static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
+    static const enum MeshMaterial MaterialType = MAT_ALPHA_REF;
+    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const std::vector<size_t> FirstPassTextures;
+};
+
+const std::vector<size_t> AlphaRef::FirstPassTextures = { 0, 1 };
+
+struct SphereMap
+{
+    typedef MeshShader::InstancedObjectPass1Shader InstancedShader;
+    typedef ListInstancedMatSphereMap List;
+    static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
+    static const enum MeshMaterial MaterialType = MAT_SPHEREMAP;
+    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const std::vector<size_t> FirstPassTextures;
+};
+
+const std::vector<size_t> SphereMap::FirstPassTextures = { 0, 1 };
+
+struct UnlitMat
+{
+    typedef MeshShader::InstancedObjectRefPass1Shader InstancedShader;
+    typedef ListInstancedMatUnlit List;
+    static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
+    static const enum MeshMaterial MaterialType = MAT_UNLIT;
+    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const std::vector<size_t> FirstPassTextures;
+};
+
+const std::vector<size_t> UnlitMat::FirstPassTextures = { 0, 1 };
+
+struct GrassMat
+{
+    typedef MeshShader::InstancedGrassPass1Shader InstancedShader;
+    typedef ListInstancedMatGrass List;
+    static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
+    static const enum MeshMaterial MaterialType = MAT_GRASS;
+    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const std::vector<size_t> FirstPassTextures;
+};
+
+const std::vector<size_t> GrassMat::FirstPassTextures = { 0 };
+
+struct NormalMat
+{
+    typedef MeshShader::InstancedNormalMapShader InstancedShader;
+    typedef ListInstancedMatNormalMap List;
+    static const enum E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
+    static const enum MeshMaterial MaterialType = MAT_NORMAL_MAP;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
+    static const std::vector<size_t> FirstPassTextures;
+};
+
+const std::vector<size_t> NormalMat::FirstPassTextures = { 2, 1 };
+
+struct DetailMat
+{
+    typedef MeshShader::InstancedNormalMapShader InstancedShader;
+    typedef ListInstancedMatDetails List;
+    static const enum E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
+    static const enum MeshMaterial MaterialType = MAT_DETAIL;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
+    static const std::vector<size_t> FirstPassTextures;
+};
+
+const std::vector<size_t> DetailMat::FirstPassTextures = { 0, 1 };
+
 namespace RenderGeometry
 {
     struct TexUnit
@@ -195,40 +279,42 @@ void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
     }
 }
 
-template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, InstanceType IT, typename...Args>
-void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<GLMesh *> &meshes, Args...args)
+template<typename T, typename...Args>
+void renderInstancedMeshes1stPass(Args...args)
 {
-    glUseProgram(Shader::getInstance()->Program);
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(VT, IT));
+    const std::vector<size_t> &TexUnits = T::FirstPassTextures;
+    std::vector<GLMesh *> &meshes = T::List::getInstance()->SolidPass;
+    glUseProgram(T::InstancedShader::getInstance()->Program);
+    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
         std::vector<GLuint> Textures;
         GLMesh *mesh = meshes[i];
 #ifdef DEBUG
-        if (mesh->VAOType != VT)
+        if (mesh->VAOType != T::VertexType)
             Log::error("RenderGeometry", "Wrong instanced vertex format (hint : %s)", 
                         mesh->textures[0]->getName().getPath().c_str());
 #endif
         for (unsigned j = 0; j < TexUnits.size(); j++)
-            Textures.push_back(getTextureGLuint(mesh->textures[TexUnits[j].m_id]));
-        Shader::getInstance()->SetTextureUnits(Textures);
+            Textures.push_back(getTextureGLuint(mesh->textures[TexUnits[j]]));
+        T::InstancedShader::getInstance()->SetTextureUnits(Textures);
 
-        Shader::getInstance()->setUniforms(args...);
-        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((SolidPassCmd::getInstance()->Offset[Mat] + i) * sizeof(DrawElementsIndirectCommand)));
+        T::InstancedShader::getInstance()->setUniforms(args...);
+        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
     }
 }
 
-template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, InstanceType IT, typename...Args>
+template<typename T, typename...Args>
 void multidraw1stPass(Args...args)
 {
-    glUseProgram(Shader::getInstance()->Program);
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(VT, IT));
-    if (SolidPassCmd::getInstance()->Size[Mat])
+    glUseProgram(T::InstancedShader::getInstance()->Program);
+    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
+    if (SolidPassCmd::getInstance()->Size[T::MaterialType])
     {
-        Shader::getInstance()->setUniforms(args...);
+        T::InstancedShader::getInstance()->setUniforms(args...);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-            (const void*)(SolidPassCmd::getInstance()->Offset[Mat] * sizeof(DrawElementsIndirectCommand)),
-            SolidPassCmd::getInstance()->Size[Mat],
+            (const void*)(SolidPassCmd::getInstance()->Offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
+            SolidPassCmd::getInstance()->Size[T::MaterialType],
             sizeof(DrawElementsIndirectCommand));
     }
 }
@@ -264,41 +350,24 @@ void IrrDriver::renderSolidFirstPass()
 
         if (UserConfigParams::m_azdo)
         {
-            multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeDualTex>();
-            multidraw1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeDualTex>();
-            multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeDualTex>();
-            multidraw1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeDualTex>();
-            multidraw1stPass<MeshShader::InstancedGrassPass1Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeDualTex>(windDir);
+            multidraw1stPass<DefaultMaterial>();
+            multidraw1stPass<AlphaRef>();
+            multidraw1stPass<SphereMap>();
+            multidraw1stPass<UnlitMat>();
+            multidraw1stPass<GrassMat>(windDir);
 
-            multidraw1stPass<MeshShader::InstancedNormalMapShader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeThreeTex>();
-            multidraw1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeThreeTex>();
-
+            multidraw1stPass<NormalMat>();
+            multidraw1stPass<DetailMat>();
         }
         else if (irr_driver->hasARB_draw_indirect())
         {
-            // Default
-            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DEFAULT, video::EVT_STANDARD, InstanceTypeDualTex>(
-                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatDefault::getInstance()->SolidPass);
-            // Alpha ref
-            renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader, MAT_ALPHA_REF, video::EVT_STANDARD, InstanceTypeDualTex>(
-                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatAlphaRef::getInstance()->SolidPass);
-            // Unlit
-            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_UNLIT, video::EVT_STANDARD, InstanceTypeDualTex>(
-            TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatUnlit::getInstance()->SolidPass);
-            // Spheremap
-            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_SPHEREMAP, video::EVT_STANDARD, InstanceTypeDualTex>(
-                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatSphereMap::getInstance()->SolidPass);
-            // Grass
-            renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, MAT_GRASS, video::EVT_STANDARD, InstanceTypeDualTex>(
-                TexUnits(TexUnit(0, true)), ListInstancedMatGrass::getInstance()->SolidPass, windDir);
-
-            // Detail
-            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, MAT_DETAIL, video::EVT_2TCOORDS, InstanceTypeThreeTex>(
-                TexUnits(TexUnit(0, true), TexUnit(1, false)), ListInstancedMatDetails::getInstance()->SolidPass);
-
-            // Normal Map
-            renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader, MAT_NORMAL_MAP, video::EVT_TANGENTS, InstanceTypeThreeTex>(
-                TexUnits(TexUnit(2, false), TexUnit(1, false)), ListInstancedMatNormalMap::getInstance()->SolidPass);
+            renderInstancedMeshes1stPass<DefaultMaterial>();
+            renderInstancedMeshes1stPass<AlphaRef>();
+            renderInstancedMeshes1stPass<UnlitMat>();
+            renderInstancedMeshes1stPass<SphereMap>();
+            renderInstancedMeshes1stPass<GrassMat>(windDir);
+            renderInstancedMeshes1stPass<DetailMat>();
+            renderInstancedMeshes1stPass<NormalMat>();
         }
     }
 }
