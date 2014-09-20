@@ -86,6 +86,15 @@ int getNumProcessors()
     GetSystemInfo(&si);	// guaranteed to succeed
     return si.dwNumberOfProcessors;
 #endif
+#ifdef __APPLE__
+    // Mac OS X doesn't have sysconf(_SC_NPROCESSORS_CONF)
+    int mib[] = { CTL_HW, HW_NCPU };
+    int ncpus;
+    size_t len = sizeof(ncpus);
+    int ret = sysctl(mib, 2, &ncpus, &len, NULL, 0);
+    assert(ret != -1);
+    return ncpus;
+#endif
 }   // getNumProcessors
 
 // ----------------------------------------------------------------------------
