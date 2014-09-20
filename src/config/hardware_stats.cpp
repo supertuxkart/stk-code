@@ -73,7 +73,22 @@ int getRAM()
 }   // getRAM
 
 // ----------------------------------------------------------------------------
+/** Returns the number of processors on the system.
+ *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
+ */
+int getNumProcessors()
+{
+#ifdef __linux__
+    return sysconf(_SC_NPROCESSORS_CONF);
+#endif
+#ifdef WIN32
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);	// guaranteed to succeed
+    return si.dwNumberOfProcessors;
+#endif
+}   // getNumProcessors
 
+// ----------------------------------------------------------------------------
 /** If the configuration of this installation has not been reported for the
  *  current version, collect the hardware statistics and send it to STK's
  *  server.
@@ -144,6 +159,10 @@ void reportHardwareStats()
     int mem = getRAM();
     if(mem>0)
         json.add("ram_total", mem);
+
+    int nr_procs = getNumProcessors();
+    if(nr_procs>0)
+        json.add("cpu_numprocs", nr_procs);
 
     // Too long for debugging atm
     //json.add("GL_EXTENSIONS", getGLExtensions());
