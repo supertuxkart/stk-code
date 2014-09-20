@@ -802,9 +802,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         }
 
         // Detail map : move it to slot 3 and add glossy to slot 2
+        // Sometimes the material will be parsed twice, in this case we dont want to swap 1 and 2 again.
         if (mb && mb->getVertexType() == video::EVT_2TCOORDS)
         {
-            m->setTexture(2, m->getTexture(1));
+            if (m->getTexture(1) != glossytex)
+                m->setTexture(2, m->getTexture(1));
             if (!m->getTexture(2))
                 m->setTexture(2, getUnicolorTexture(SColor(255, 255, 255, 255)));
         }
