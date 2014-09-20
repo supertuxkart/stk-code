@@ -206,7 +206,7 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
         GLMesh *mesh = meshes[i];
 #ifdef DEBUG
         if (mesh->VAOType != VT)
-            Log::error("RenderGeometry", "Wrong instanced vertex format");
+            Log::error("RenderGeometry", "Wrong instanced vertex format (hint : %s)", mesh->textures[0]->getName());
 #endif
         for (unsigned j = 0; j < TexUnits.size(); j++)
             Textures.push_back(getTextureGLuint(mesh->textures[TexUnits[j].m_id]));
