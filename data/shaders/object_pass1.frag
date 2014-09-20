@@ -17,7 +17,7 @@ vec2 EncodeNormal(vec3 n);
 
 void main(void)
 {
-	vec4 col = texture(tex, uv);
+	float glossmap = texture(tex, uv).x;
 	EncodedNormal.xy = 0.5 * EncodeNormal(normalize(nor)) + 0.5;
-	EncodedNormal.z = exp2(10. * (1. - col.a) + 1.);
+	EncodedNormal.z = exp2(10. * glossmap + 1.);
 }

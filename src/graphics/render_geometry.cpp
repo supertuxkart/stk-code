@@ -81,6 +81,8 @@ struct DefaultMaterial
     typedef MeshShader::InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectPass2Shader InstancedSecondPassShader;
     typedef ListInstancedMatDefault InstancedList;
+    typedef MeshShader::ObjectPass1Shader FirstPassShader;
+    typedef ListMatDefault List;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_DEFAULT;
     static const enum InstanceType Instance = InstanceTypeDualTex;
@@ -96,6 +98,8 @@ struct AlphaRef
     typedef MeshShader::InstancedObjectRefPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectRefPass2Shader InstancedSecondPassShader;
     typedef ListInstancedMatAlphaRef InstancedList;
+    typedef MeshShader::ObjectRefPass1Shader FirstPassShader;
+    typedef ListMatAlphaRef List;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_ALPHA_REF;
     static const enum InstanceType Instance = InstanceTypeDualTex;
@@ -111,6 +115,8 @@ struct SphereMap
     typedef MeshShader::InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedSphereMapShader InstancedSecondPassShader;
     typedef ListInstancedMatSphereMap InstancedList;
+    typedef MeshShader::ObjectPass1Shader FirstPassShader;
+    typedef ListMatSphereMap List;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_SPHEREMAP;
     static const enum InstanceType Instance = InstanceTypeDualTex;
@@ -126,6 +132,8 @@ struct UnlitMat
     typedef MeshShader::InstancedObjectRefPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectUnlitShader InstancedSecondPassShader;
     typedef ListInstancedMatUnlit InstancedList;
+    typedef MeshShader::ObjectRefPass1Shader FirstPassShader;
+    typedef ListMatUnlit List;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_UNLIT;
     static const enum InstanceType Instance = InstanceTypeDualTex;
@@ -141,6 +149,8 @@ struct GrassMat
     typedef MeshShader::InstancedGrassPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedGrassPass2Shader InstancedSecondPassShader;
     typedef ListInstancedMatGrass InstancedList;
+    typedef MeshShader::GrassPass1Shader FirstPassShader;
+    typedef ListMatGrass List;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_GRASS;
     static const enum InstanceType Instance = InstanceTypeDualTex;
@@ -156,6 +166,8 @@ struct NormalMat
     typedef MeshShader::InstancedNormalMapShader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectPass2Shader InstancedSecondPassShader;
     typedef ListInstancedMatNormalMap InstancedList;
+    typedef MeshShader::NormalMapShader FirstPassShader;
+    typedef ListMatNormalMap List;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
     static const enum MeshMaterial MaterialType = MAT_NORMAL_MAP;
     static const enum InstanceType Instance = InstanceTypeThreeTex;
@@ -171,6 +183,8 @@ struct DetailMat
     typedef MeshShader::InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedDetailledObjectPass2Shader InstancedSecondPassShader;
     typedef ListInstancedMatDetails InstancedList;
+    typedef MeshShader::ObjectPass1Shader FirstPassShader;
+    typedef ListMatDetails List;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
     static const enum MeshMaterial MaterialType = MAT_DETAIL;
     static const enum InstanceType Instance = InstanceTypeThreeTex;
@@ -180,6 +194,17 @@ struct DetailMat
 
 const std::vector<size_t> DetailMat::FirstPassTextures = { 1 };
 const std::vector<size_t> DetailMat::SecondPassTextures = { 0, 2 };
+
+struct SplattingMat
+{
+    typedef MeshShader::ObjectPass1Shader FirstPassShader;
+    typedef ListMatSplatting List;
+    static const enum E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
+    static const std::vector<size_t> FirstPassTextures;
+    static const std::vector<size_t> SecondPassTextures;
+};
+
+const std::vector<size_t> SplattingMat::FirstPassTextures = { 1 };
 
 namespace RenderGeometry
 {
@@ -264,12 +289,14 @@ struct custom_unroll_args<N, List...>
 };
 
 
-template<typename Shader, enum E_VERTEX_TYPE VertexType, int ...List, typename... TupleType>
-void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > &meshes)
+template<typename T, int ...List>
+void renderMeshes1stPass()
 {
-    glUseProgram(Shader::getInstance()->Program);
+    const std::vector<size_t> &TexUnits = T::FirstPassTextures;
+    auto &meshes = T::List::getInstance()->SolidPass;
+    glUseProgram(T::FirstPassShader::getInstance()->Program);
     if (irr_driver->hasARB_base_instance())
-        glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
+        glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
         std::vector<GLuint> Textures;
@@ -280,11 +307,11 @@ void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
             if (UserConfigParams::m_azdo)
-                Handles.push_back(mesh.TextureHandles[TexUnits[j].m_id]);
+                Handles.push_back(mesh.TextureHandles[TexUnits[j]]);
             else
-                Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
+                Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j]]));
         }
-        if (mesh.VAOType != VertexType)
+        if (mesh.VAOType != T::VertexType)
         {
 #ifdef DEBUG
             Log::error("Materials", "Wrong vertex Type associed to pass 1 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
@@ -293,10 +320,10 @@ void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
         }
 
         if (UserConfigParams::m_azdo)
-            Shader::getInstance()->SetTextureHandles(Handles);
+            T::FirstPassShader::getInstance()->SetTextureHandles(Handles);
         else
-            Shader::getInstance()->SetTextureUnits(Textures);
-        custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes.at(i));
+            T::FirstPassShader::getInstance()->SetTextureUnits(Textures);
+        custom_unroll_args<List...>::template exec(T::FirstPassShader::getInstance(), meshes.at(i));
     }
 }
 
@@ -356,18 +383,14 @@ void IrrDriver::renderSolidFirstPass()
         for (unsigned i = 0; i < ImmediateDrawList::getInstance()->size(); i++)
             ImmediateDrawList::getInstance()->at(i)->render();
 
-        std::vector<TexUnit> object_pass1_texunits = TexUnits(TexUnit(0, true) );
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatDefault::getInstance()->SolidPass);
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, ListMatSplatting::getInstance()->SolidPass);
-        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(object_pass1_texunits, ListMatUnlit::getInstance()->SolidPass);
-        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), ListMatAlphaRef::getInstance()->SolidPass);
-        renderMeshes1stPass<MeshShader::GrassPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), ListMatGrass::getInstance()->SolidPass);
-        renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS, 2, 1>(TexUnits(
-            TexUnit(1, false),
-            TexUnit(0, true)
-            ), ListMatNormalMap::getInstance()->SolidPass);
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatSphereMap::getInstance()->SolidPass);
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, ListMatDetails::getInstance()->SolidPass);
+        renderMeshes1stPass<DefaultMaterial, 2, 1>();
+        renderMeshes1stPass<SplattingMat, 2, 1>();
+        renderMeshes1stPass<UnlitMat, 3, 2, 1>();
+        renderMeshes1stPass<AlphaRef, 3, 2, 1>();
+        renderMeshes1stPass<GrassMat, 3, 2, 1>();
+        renderMeshes1stPass<NormalMat, 2, 1>();
+        renderMeshes1stPass<SphereMap, 2, 1>();
+        renderMeshes1stPass<DetailMat, 2, 1>();
 
         if (UserConfigParams::m_azdo)
         {
