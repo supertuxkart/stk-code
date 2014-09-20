@@ -817,7 +817,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_pass1.frag").c_str());
 
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "tex", 1, "glosstex");
+        AssignSamplerNames(Program, 0, "glosstex");
     }
 
     InstancedObjectRefPass1Shader::InstancedObjectRefPass1Shader()

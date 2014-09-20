@@ -80,7 +80,7 @@ struct DefaultMaterial
 {
     typedef MeshShader::InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectPass2Shader InstancedSecondPassShader;
-    typedef ListInstancedMatDefault List;
+    typedef ListInstancedMatDefault InstancedList;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_DEFAULT;
     static const enum InstanceType Instance = InstanceTypeDualTex;
@@ -88,14 +88,14 @@ struct DefaultMaterial
     static const std::vector<size_t> SecondPassTextures;
 };
 
-const std::vector<size_t> DefaultMaterial::FirstPassTextures = { 0, 1 };
+const std::vector<size_t> DefaultMaterial::FirstPassTextures = { 1 };
 const std::vector<size_t> DefaultMaterial::SecondPassTextures = { 0 };
 
 struct AlphaRef
 {
     typedef MeshShader::InstancedObjectRefPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectRefPass2Shader InstancedSecondPassShader;
-    typedef ListInstancedMatAlphaRef List;
+    typedef ListInstancedMatAlphaRef InstancedList;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_ALPHA_REF;
     static const enum InstanceType Instance = InstanceTypeDualTex;
@@ -110,7 +110,7 @@ struct SphereMap
 {
     typedef MeshShader::InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedSphereMapShader InstancedSecondPassShader;
-    typedef ListInstancedMatSphereMap List;
+    typedef ListInstancedMatSphereMap InstancedList;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_SPHEREMAP;
     static const enum InstanceType Instance = InstanceTypeDualTex;
@@ -118,14 +118,14 @@ struct SphereMap
     static const std::vector<size_t> SecondPassTextures;
 };
 
-const std::vector<size_t> SphereMap::FirstPassTextures = { 0, 1 };
+const std::vector<size_t> SphereMap::FirstPassTextures = { 1 };
 const std::vector<size_t> SphereMap::SecondPassTextures = { 0 };
 
 struct UnlitMat
 {
     typedef MeshShader::InstancedObjectRefPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectUnlitShader InstancedSecondPassShader;
-    typedef ListInstancedMatUnlit List;
+    typedef ListInstancedMatUnlit InstancedList;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_UNLIT;
     static const enum InstanceType Instance = InstanceTypeDualTex;
@@ -140,7 +140,7 @@ struct GrassMat
 {
     typedef MeshShader::InstancedGrassPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedGrassPass2Shader InstancedSecondPassShader;
-    typedef ListInstancedMatGrass List;
+    typedef ListInstancedMatGrass InstancedList;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_GRASS;
     static const enum InstanceType Instance = InstanceTypeDualTex;
@@ -155,7 +155,7 @@ struct NormalMat
 {
     typedef MeshShader::InstancedNormalMapShader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectPass2Shader InstancedSecondPassShader;
-    typedef ListInstancedMatNormalMap List;
+    typedef ListInstancedMatNormalMap InstancedList;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
     static const enum MeshMaterial MaterialType = MAT_NORMAL_MAP;
     static const enum InstanceType Instance = InstanceTypeThreeTex;
@@ -168,9 +168,9 @@ const std::vector<size_t> NormalMat::SecondPassTextures = { 0 };
 
 struct DetailMat
 {
-    typedef MeshShader::InstancedNormalMapShader InstancedFirstPassShader;
+    typedef MeshShader::InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedDetailledObjectPass2Shader InstancedSecondPassShader;
-    typedef ListInstancedMatDetails List;
+    typedef ListInstancedMatDetails InstancedList;
     static const enum E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
     static const enum MeshMaterial MaterialType = MAT_DETAIL;
     static const enum InstanceType Instance = InstanceTypeThreeTex;
@@ -178,7 +178,7 @@ struct DetailMat
     static const std::vector<size_t> SecondPassTextures;
 };
 
-const std::vector<size_t> DetailMat::FirstPassTextures = { 0, 1 };
+const std::vector<size_t> DetailMat::FirstPassTextures = { 1 };
 const std::vector<size_t> DetailMat::SecondPassTextures = { 0, 2 };
 
 namespace RenderGeometry
@@ -304,7 +304,7 @@ template<typename T, typename...Args>
 void renderInstancedMeshes1stPass(Args...args)
 {
     const std::vector<size_t> &TexUnits = T::FirstPassTextures;
-    std::vector<GLMesh *> &meshes = T::List::getInstance()->SolidPass;
+    std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
     glUseProgram(T::InstancedFirstPassShader::getInstance()->Program);
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     for (unsigned i = 0; i < meshes.size(); i++)
@@ -434,7 +434,7 @@ void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
 template<typename T, typename...Args>
 void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args...args)
 {
-    std::vector<GLMesh *> &meshes = T::List::getInstance()->SolidPass;
+    std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
     const std::vector<size_t> &TexUnits = T::SecondPassTextures;
     glUseProgram(T::InstancedSecondPassShader::getInstance()->Program);
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
