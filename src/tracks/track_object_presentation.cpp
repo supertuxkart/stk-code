@@ -192,9 +192,6 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
         m_is_in_skybox = true;
     }
 
-    bool tangent = false;
-    xml_node.get("tangents", &tangent);
-    
     //std::string full_path =
     //    World::getWorld()->getTrack()->getTrackFile(model_name);
 
@@ -211,17 +208,15 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     else
     {
         m_mesh = irr_driver->getMesh(model_name);
-        
-        if (tangent)
-        {
-            m_mesh = MeshTools::createMeshWithTangents(m_mesh, &MeshTools::isNormalMap);
-        }
     }
 
     if (!m_mesh)
     {
         throw std::runtime_error("Model '" + model_name + "' cannot be found");
     }
+
+    if (!animated)
+        m_mesh = MeshTools::createMeshWithTangents(m_mesh, &MeshTools::isNormalMap);
 
     init(&xml_node, parent, enabled);
 }
