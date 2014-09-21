@@ -233,7 +233,7 @@ void reportHardwareStats()
     request->addParameter("type", "hwdetect");
     request->addParameter("version", report_version);
     request->addParameter("data", json.toString());
-    request->setURL("http://stats.supertuxkart.net/upload/v1/");
+    request->setURL((std::string)UserConfigParams::m_server_hw_report+"/upload/v1/");
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     // FIXME: For now: don't submit
     //request->queue();

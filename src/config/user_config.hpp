@@ -690,7 +690,13 @@ namespace UserConfigParams
                                                   "that was reported last") );
     PARAM_PREFIX IntUserConfigParam        m_random_identifier
             PARAM_DEFAULT(  IntUserConfigParam(0, "random-identifier", &m_hw_report_group,
-                                                  "A random number to avoid duplicated reports") );
+                                                  "A random number to avoid duplicated reports.") );
+
+    PARAM_PREFIX StringUserConfigParam      m_server_hw_report
+            PARAM_DEFAULT( StringUserConfigParam(   "http://stats.supertuxkart.net",
+                                                     "hw-report-server",
+                                                     &m_hw_report_group,
+                                                    "The server used for reporting statistics to."));
 
     // ---- User management
 
