@@ -46,6 +46,8 @@ void STKAnimatedMesh::cleanGLMeshes()
     GLmeshes.clear();
     for (unsigned i = 0; i < MAT_COUNT; i++)
         MeshSolidMaterial[i].clearWithoutDeleting();
+    for (unsigned i = 0; i < TM_COUNT; i++)
+        TransparentMesh[i].clearWithoutDeleting();
 }
 
 void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
