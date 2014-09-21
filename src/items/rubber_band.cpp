@@ -32,6 +32,7 @@
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
+#include "graphics/glwrap.hpp"
 
 #include "utils/log.hpp" //TODO: remove after debugging is done
 
@@ -69,6 +70,10 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
         verts[i].Color = color;
     }
 
+    // Color
+    mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+    // Gloss
+    mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     updatePosition();
     m_node = irr_driver->addMesh(m_mesh);
     irr_driver->applyObjectPassShader(m_node);

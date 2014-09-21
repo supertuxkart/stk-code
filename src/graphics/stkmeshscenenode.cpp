@@ -250,8 +250,6 @@ void STKMeshSceneNode::render()
             GLenum itype = mesh.IndexType;
             size_t count = mesh.IndexCount;
 
-            if (!mesh.textures[0])
-                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh.textures[0], true);
             if (UserConfigParams::m_azdo)
             {
