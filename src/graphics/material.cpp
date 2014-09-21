@@ -696,7 +696,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         }
         else
         {
-            glossytex = getUnicolorTexture(SColor(0., 0., 0., 0.));
+            glossytex = getUnicolorTexture(SColor(0, 0, 0, 0));
         }
         switch (m_shader_type)
         {
