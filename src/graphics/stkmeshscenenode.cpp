@@ -63,6 +63,8 @@ void STKMeshSceneNode::cleanGLMeshes()
     GLmeshes.clear();
     for (unsigned i = 0; i < MAT_COUNT; i++)
         MeshSolidMaterial[i].clearWithoutDeleting();
+    for (unsigned i = 0; i < TM_COUNT; i++)
+        TransparentMesh[i].clearWithoutDeleting();
 }
 
 void STKMeshSceneNode::setMesh(irr::scene::IMesh* mesh)
