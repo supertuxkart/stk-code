@@ -955,25 +955,29 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
         // it was done this way to provide a fallback for computers
         // where shaders are not supported
         video::ITexture* t2 = irr_material.getTexture(1);
+        bool is_splatting = false;
         if (t2)
         {
             Material* mat = material_manager->getMaterialFor(t2, mb);
             if (mat != NULL && mat->getShaderType() == Material::SHADERTYPE_SPLATTING)
             {
                 material_manager->setAllMaterialFlags(t2, mb);
+                is_splatting = true;
             }
         }
 
-        video::ITexture* t = irr_material.getTexture(0);
-        if (t)
+        if (!is_splatting)
         {
-            material_manager->setAllMaterialFlags(t, mb);
+            video::ITexture* t = irr_material.getTexture(0);
+            if (t)
+            {
+                material_manager->setAllMaterialFlags(t, mb);
+            }
+            else
+            {
+                material_manager->setAllUntexturedMaterialFlags(mb);
+            }
         }
-        else
-        {
-            material_manager->setAllUntexturedMaterialFlags(mb);
-        }
-
         
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags
