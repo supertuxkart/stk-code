@@ -69,6 +69,8 @@ int getRAM()
     memory_size /= (1024*1024);
     return int(memory_size);
 #endif
+    Log::error("HW report",
+              "No RAM information available for hardware report.");
     return 0;
 }   // getRAM
 
@@ -95,6 +97,9 @@ int getNumProcessors()
     assert(ret != -1);
     return ncpus;
 #endif
+    Log::error("HW report",
+               "Number of processors not available for hardware report.");
+    return 0;
 }   // getNumProcessors
 
 // ----------------------------------------------------------------------------
