@@ -749,7 +749,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 tex = irr_driver->getTexture(m_splatting_texture_4);
             }
             m->setTexture(5, tex);
-            m->setTexture(6, glossytex);
+//            m->setTexture(6, glossytex);
 
             // Material and shaders
             m->MaterialType = irr_driver->getShader(ES_SPLATTING);
