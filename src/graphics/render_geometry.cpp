@@ -212,8 +212,8 @@ struct SplattingMat
     static const std::vector<size_t> SecondPassTextures;
 };
 
-const std::vector<size_t> SplattingMat::FirstPassTextures = { 1 };
-const std::vector<size_t> SplattingMat::SecondPassTextures = { 1, 2, 3, 4, 0 };
+const std::vector<size_t> SplattingMat::FirstPassTextures = { 6 };
+const std::vector<size_t> SplattingMat::SecondPassTextures = { 1, 2, 3, 4, 5 };
 
 namespace RenderGeometry
 {

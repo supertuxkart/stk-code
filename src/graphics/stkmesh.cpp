@@ -177,7 +177,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
     case scene::EPT_QUADS:
         assert(0 && "Unsupported primitive type");
     }
-    for (unsigned i = 0; i < 6; i++)
+    for (unsigned i = 0; i < 8; i++)
         result.textures[i] = mb->getMaterial().getTexture(i);
     result.TextureMatrix = 0;
     result.VAOType = mb->getVertexType();
@@ -333,10 +333,12 @@ void InitTextures(GLMesh &mesh, MeshMaterial Mat)
         break;
     case MAT_SPLATTING:
         SetTexture(mesh, 0, true);
-        SetTexture(mesh, 1, true);
+        SetTexture(mesh, 1, false);
         SetTexture(mesh, 2, true);
         SetTexture(mesh, 3, true);
         SetTexture(mesh, 4, true);
+        SetTexture(mesh, 5, true);
+        SetTexture(mesh, 6, false);
         break;
     }
 }
