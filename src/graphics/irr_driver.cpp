@@ -963,8 +963,10 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
             if (mat != NULL && mat->getShaderType() == Material::SHADERTYPE_SPLATTING)
                 material_manager->setAllMaterialFlags(t, mb);
         }
-
-        material_manager->setAllUntexturedMaterialFlags(mb);
+        else
+        {
+            material_manager->setAllUntexturedMaterialFlags(mb);
+        }
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags
 
