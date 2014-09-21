@@ -950,6 +950,20 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
     {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         video::SMaterial &irr_material = mb->getMaterial();
+
+        // special case : for splatting, the main material is on layer 1.
+        // it was done this way to provide a fallback for computers
+        // where shaders are not supported
+        video::ITexture* t2 = irr_material.getTexture(1);
+        if (t2)
+        {
+            Material* mat = material_manager->getMaterialFor(t2, mb);
+            if (mat != NULL && mat->getShaderType() == Material::SHADERTYPE_SPLATTING)
+            {
+                material_manager->setAllMaterialFlags(t2, mb);
+            }
+        }
+
         video::ITexture* t = irr_material.getTexture(0);
         if (t)
         {
@@ -960,16 +974,6 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
             material_manager->setAllUntexturedMaterialFlags(mb);
         }
 
-        // special case : for splatting, the main material is on layer 1.
-        // it was done this way to provide a fallback for computers
-        // where shaders are not supported
-        t = irr_material.getTexture(1);
-        if (t)
-        {
-            Material* mat = material_manager->getMaterialFor(t, mb);
-            if (mat != NULL && mat->getShaderType() == Material::SHADERTYPE_SPLATTING)
-                material_manager->setAllMaterialFlags(t, mb);
-        }
         
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags
