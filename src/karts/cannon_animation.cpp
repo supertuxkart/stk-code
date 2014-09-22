@@ -46,8 +46,6 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo)
     const float dt = 0.1f;
     Vec3 xyz1;
     m_curve->update(dt, &xyz1);
-    core::vector3df rot1 = (xyz1-m_previous_orig_xyz).toIrrVector()
-                                                     .getHorizontalAngle();
     core::vector3df rot = (m_previous_orig_xyz-xyz1).toIrrVector()
                                                     .getHorizontalAngle();
     btQuaternion q(Vec3(0,1,0),rot.Y*DEGREE_TO_RAD);

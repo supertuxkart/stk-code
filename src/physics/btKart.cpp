@@ -382,8 +382,7 @@ void btKart::updateVehicle( btScalar step )
     m_visual_wheels_touch_ground = true;
     for (int i=0;i<m_wheelInfo.size();i++)
     {
-        btScalar depth;
-        depth = rayCast( i);
+        rayCast( i);
         if(m_wheelInfo[i].m_raycastInfo.m_isInContact)
             m_num_wheels_on_ground++;
     }

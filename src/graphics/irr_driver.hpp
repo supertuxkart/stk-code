@@ -208,7 +208,7 @@ private:
     bool m_need_ubo_workaround;
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
-    GLsync m_sync = 0;
+    GLsync m_sync;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
