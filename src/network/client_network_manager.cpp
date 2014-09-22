@@ -95,7 +95,9 @@ void* waitInput(void* data)
                 clrp->voteRaceCount(cnt);
             }
         }
-        else if (NetworkManager::getInstance()->getPeers().size() > 0)
+        // If STK shuts down, but should receive an input after the network 
+        // manager was deleted, the getInstance call will return NULL.
+        else if (NetworkManager::getInstance() && NetworkManager::getInstance()->getPeers().size() > 0)
         {
             NetworkString msg;
             msg.ai8(0);
