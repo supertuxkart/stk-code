@@ -245,9 +245,9 @@ RTT::RTT(size_t width, size_t height)
         somevector.push_back(RSM_Normal);
         m_RSM = new FrameBuffer(somevector, RSM_Depth, 1024, 1024, true);
 
-        RH_Red = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-        RH_Green = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-        RH_Blue = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+        RH_Red = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGB10_A2, GL_RGBA, GL_FLOAT);
+        RH_Green = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGB10_A2, GL_RGBA, GL_FLOAT);
+        RH_Blue = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGB10_A2, GL_RGBA, GL_FLOAT);
 
         somevector.clear();
         somevector.push_back(RH_Red);
