@@ -1413,8 +1413,6 @@ int main(int argc, char *argv[] )
     }
 #endif
 
-
-
     return 0 ;
 }   // main
 
@@ -1439,6 +1437,7 @@ static void cleanSuperTuxKart()
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
 
+    SFXManager::get()->stopThread();
     irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
     Referee::cleanup();

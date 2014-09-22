@@ -22,7 +22,6 @@
 #include <assert.h>
 
 #include "audio/music_manager.hpp"
-#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -140,7 +139,6 @@ void MainLoop::run()
         {
             PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
             music_manager->update(dt);
-            SFXManager::get()->update();
             input_manager->update(dt);
 
             #ifdef ENABLE_WIIUSE
