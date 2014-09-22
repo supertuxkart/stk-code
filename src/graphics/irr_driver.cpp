@@ -499,6 +499,7 @@ void IrrDriver::initDevice()
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
 #endif
     initGL();
+    m_sync = 0;
 
     // Parse extensions
     hasVSLayer = false;
