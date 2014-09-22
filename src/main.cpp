@@ -452,8 +452,6 @@ void cmdLineHelp()
     "       --mode=N           N=1 novice, N=2 driver, N=3 racer.\n"
     "       --type=N           N=0 Normal, N=1 Time trial, N=2 FTL\n"
     "       --reverse          Play track in reverse (if allowed)\n"
-    // TODO: add back "--players" switch
-    // "       --players n      Define number of players to between 1 and 4.\n"
     "  -f,  --fullscreen       Select fullscreen display.\n"
     "  -w,  --windowed         Windowed display (default).\n"
     "  -s,  --screensize=WxH   Set the screen size (e.g. 320x200).\n"
