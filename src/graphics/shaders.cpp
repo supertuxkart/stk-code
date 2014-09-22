@@ -1199,14 +1199,14 @@ namespace MeshShader
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow_grass.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
         }
         else
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow_grass.vert").c_str(),
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
         }
         AssignUniforms("layer", "ModelMatrix", "windDir");
         AssignSamplerNames(Program, 0, "tex");
