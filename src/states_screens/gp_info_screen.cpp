@@ -71,8 +71,9 @@ void GPInfoScreen::loadedFromFile()
     // (since the groups can change if addons are added/deleted).
     m_group_spinner      = getWidget<SpinnerWidget>("group-spinner");
     m_reverse_spinner    = getWidget<SpinnerWidget>("reverse-spinner");
-    m_reverse_spinner->addLabel(_("No"));
-    m_reverse_spinner->addLabel(_("Yes"));
+    m_reverse_spinner->addLabel(_("Default"));
+    m_reverse_spinner->addLabel(_("None"));
+    m_reverse_spinner->addLabel(_("All"));
     m_reverse_spinner->addLabel(_("Random"));
     m_reverse_spinner->setValue(0);
 
@@ -108,13 +109,14 @@ GrandPrixData::GPReverseType GPInfoScreen::getReverse() const
 {
     switch (m_reverse_spinner->getValue())
     {
-    case 0: return GrandPrixData::GP_NO_REVERSE;     break;
-    case 1: return GrandPrixData::GP_ALL_REVERSE;    break;
-    case 2: return GrandPrixData::GP_RANDOM_REVERSE; break;
-    default: assert(false); 
+    case 0: return GrandPrixData::GP_DEFAULT_REVERSE; break;
+    case 1: return GrandPrixData::GP_NO_REVERSE;      break;
+    case 2: return GrandPrixData::GP_ALL_REVERSE;     break;
+    case 3: return GrandPrixData::GP_RANDOM_REVERSE;  break;
+    default: assert(false);
     }   // switch
     // Avoid compiler warning
-    return GrandPrixData::GP_NO_REVERSE;
+    return GrandPrixData::GP_DEFAULT_REVERSE;
 }   // getReverse
 // ----------------------------------------------------------------------------
 void GPInfoScreen::beforeAddingWidget()
@@ -296,6 +298,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
             // Normal GP: start/continue a saved GP
             int n = getWidget<SpinnerWidget>("ai-spinner")->getValue();
 
+            m_gp.changeReverse(getReverse());
             race_manager->setNumKarts(race_manager->getNumLocalPlayers() + n);
             race_manager->startGP(m_gp, false, (name == "continue"));
         }
@@ -325,10 +328,6 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     {
         m_gp.changeTrackNumber(m_num_tracks_spinner->getValue(), m_group_name);
         addTracks();
-    }
-    else if (name=="reverse-spinner")
-    {
-        m_gp.changeReverse(getReverse());
     }
     else if(name=="back")
     {
