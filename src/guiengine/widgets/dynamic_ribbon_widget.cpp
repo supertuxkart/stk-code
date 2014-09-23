@@ -489,6 +489,11 @@ void DynamicRibbonWidget::addAnimatedItem( const irr::core::stringw& user_name, 
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::clearItems()
 {
+    if (m_animated_contents)
+    {
+        GUIEngine::needsUpdate.remove(this);
+    }
+
     m_items.clear();
     m_animated_contents = false;
     m_scroll_offset = 0;
@@ -860,7 +865,7 @@ void DynamicRibbonWidget::updateItemDisplay()
 
     // the number of items that fit perfectly the number of rows we have
     // (this value will be useful to compute scrolling)
-    int fitting_item_amount = (m_scrolling_enabled ? m_needed_cols * row_amount 
+    int fitting_item_amount = (m_scrolling_enabled ? m_needed_cols * row_amount
                                                    : (int)m_items.size());
 
     // ---- to determine which items go in which cell of the dynamic ribbon now,
