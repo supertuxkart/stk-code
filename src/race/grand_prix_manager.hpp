@@ -51,9 +51,7 @@ public:
                    GrandPrixManager();
                   ~GrandPrixManager();
     void           reload();
-    GrandPrixData* getGrandPrix(const int i) const { return m_gp_data[i];     }
     GrandPrixData* getGrandPrix(const std::string& s) const;
-    unsigned int   getNumberOfGrandPrix()    const { return m_gp_data.size(); }
     bool existsName(const irr::core::stringw& name) const;
     void           checkConsistency();
 
@@ -63,6 +61,13 @@ public:
     GrandPrixData* copy(const std::string& id,
                         const irr::core::stringw& newName);
     void           remove(const std::string& id);
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the data for the specified GP.
+     *  \param i Index of the GP. */
+    GrandPrixData* getGrandPrix(const int i) const { return m_gp_data[i];     }
+    // ------------------------------------------------------------------------
+    /** Returns the number of GPs. */
+    unsigned int   getNumberOfGrandPrix()    const { return (int)m_gp_data.size(); }
 };   // GrandPrixManager
 
 extern GrandPrixManager *grand_prix_manager;

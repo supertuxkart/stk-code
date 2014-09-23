@@ -468,6 +468,6 @@ unsigned int Skidding::getSkidBonus(float *bonus_time,
         *bonus_time  = m_skid_bonus_time[i];
         *bonus_force = m_skid_bonus_force[i];
     }
-    return m_skid_bonus_speed.size();
+    return (unsigned int) m_skid_bonus_speed.size();
 }   // getSkidBonusForce
 

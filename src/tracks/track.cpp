@@ -1704,7 +1704,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     loadMainTrack(*root);
-    unsigned int main_track_count = m_all_nodes.size();
+    unsigned int main_track_count = (unsigned int)m_all_nodes.size();
 
     ModelDefinitionLoader model_def_loader(this);
 
@@ -1754,7 +1754,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     // Enable for for all track nodes if fog is used
-    const unsigned int count = m_all_nodes.size();
+    const unsigned int count = (int)m_all_nodes.size();
     for(unsigned int i=0; i<count; i++)
     {
         adjustForFog(m_all_nodes[i]);

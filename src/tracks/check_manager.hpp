@@ -64,7 +64,7 @@ public:
     static void destroy() { delete m_check_manager; m_check_manager = NULL; }
     // ------------------------------------------------------------------------
     /** Returns the number of check structures defined. */
-    unsigned int getCheckStructureCount() const { return m_all_checks.size(); }
+    unsigned int getCheckStructureCount() const { return (unsigned int) m_all_checks.size(); }
     // ------------------------------------------------------------------------
     /** Returns the nth. check structure. */
     CheckStructure *getCheckStructure(unsigned int n) const

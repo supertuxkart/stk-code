@@ -770,7 +770,7 @@ int handleCmdLine()
         const std::vector<std::string> l=StringUtils::split(std::string(s),',');
         race_manager->setDefaultAIKartList(l);
         // Add 1 for the player kart
-        race_manager->setNumKarts(l.size()+1);
+        race_manager->setNumKarts((int)l.size()+1);
     }   // --ai
 
     if(CommandLine::has( "--mode", &s))

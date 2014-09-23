@@ -337,7 +337,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
  */
 void MaterialManager::makeMaterialsPermanent()
 {
-    m_shared_material_index = m_materials.size();
+    m_shared_material_index = (int) m_materials.size();
 }   // makeMaterialsPermanent
 
 // ----------------------------------------------------------------------------

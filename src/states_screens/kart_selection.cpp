@@ -964,7 +964,7 @@ void KartSelectionScreen::beforeAddingWidget()
 
     const std::vector<std::string>& groups =
         kart_properties_manager->getAllGroups();
-    const int group_amount = groups.size();
+    const int group_amount = (int)groups.size();
 
     // add all group first
     if (group_amount > 1)
@@ -1446,8 +1446,8 @@ void KartSelectionScreen::playerConfirm(const int playerID)
 
     // Check if we have enough karts for everybody. If there are more players
     // than karts then just allow duplicates
-    const int availableKartCount = w->getItems().size();
-    const bool willNeedDuplicates = (amount > availableKartCount);
+    const int available_kart_count = (int) w->getItems().size();
+    const bool will_need_duplicates = (amount > available_kart_count);
 
     // make sure no other player selected the same identity or kart
     for (int n=0; n<amount; n++)
@@ -1464,7 +1464,7 @@ void KartSelectionScreen::playerConfirm(const int playerID)
                                              m_kart_widgets[playerID]);
 
         if (player_ready && (ident_conflict || kart_conflict) &&
-                !willNeedDuplicates)
+                !will_need_duplicates)
         {
             if (UserConfigParams::logGUI())
                 Log::warn("[KartSelectionScreen]", "You can't select this identity "
@@ -1667,7 +1667,7 @@ void KartSelectionScreen::eventCallback(Widget* widget,
                                   " lost their selection when switching tabs!!!",n);
 
                     // Select a random kart in this case
-                    const int count = w->getItems().size();
+                    const int count = (int) w->getItems().size();
                     if (count > 0)
                     {
                         // FIXME: two players may be given the same kart by
@@ -1808,7 +1808,7 @@ void KartSelectionScreen::allPlayersDone()
     std::vector<ItemDescription> items = w->getItems();
 
     // remove the 'random' item itself
-    const int item_count = items.size();
+    const int item_count = (int) items.size();
     for (int n=0; n<item_count; n++)
     {
         if (items[n].m_code_name == RANDOM_KART_ID)

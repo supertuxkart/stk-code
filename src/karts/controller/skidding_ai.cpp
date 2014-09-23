@@ -1118,7 +1118,7 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
     // This list is usually very short, so use a simple bubble sort
     list->push_back(item);
     int i;
-    for(i=list->size()-2; i>=0; i--)
+    for(i=(int)list->size()-2; i>=0; i--)
     {
         float d = ((*list)[i]->getXYZ() - m_kart->getXYZ()).length2_2d();
         if(d<=new_distance)

@@ -130,13 +130,13 @@ public:
                                                  unsigned int count);
     void         setupPaths();
     void         computeChecklineRequirements();
-// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------======
     /** Returns the one instance of this object. It is possible that there
      *  is no instance created (e.g. in battle mode, since it doesn't have
      *  a quad graph), so we don't assert that an instance exist, and we
      *  also don't create one if it doesn't exists. */
     static QuadGraph  *get() { return m_quad_graph; }
-    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------==
     /** Creates a QuadGraph instance. */
     static void create(const std::string &quad_file_name,
                        const std::string graph_file_name,
@@ -147,7 +147,7 @@ public:
         // functions called from the constructor need it to be defined.
         new QuadGraph(quad_file_name, graph_file_name, reverse);
     }   // create
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Cleans up the quad graph. It is possible that this function is called
      *  even if no instance exists (e.g. in battle mode). So it is not an
      *  error if there is no instance. */
@@ -159,37 +159,37 @@ public:
             m_quad_graph = NULL;
         }
     }   // destroy
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the number of nodes in the graph. */
-    unsigned int getNumNodes() const { return m_all_nodes.size();         }
-    // ----------------------------------------------------------------------
+    unsigned int getNumNodes() const { return (unsigned int)m_all_nodes.size();}
+    // ------------------------------------------------------------------------
     /** Return the distance to the j-th successor of node n. */
     float        getDistanceToNext(int n, int j) const
                          { return m_all_nodes[n]->getDistanceToSuccessor(j);}
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the angle of the line between node n and its j-th.
      *  successor. */
     float        getAngleToNext(int n, int j) const
                          { return m_all_nodes[n]->getAngleToSuccessor(j);   }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the number of successors of a node n. */
     int          getNumberOfSuccessors(int n) const
                          { return m_all_nodes[n]->getNumberOfSuccessors();  }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
     const Quad&  getQuadOfNode(unsigned int j) const
           { return QuadSet::get()->getQuad(m_all_nodes[j]->getQuadIndex()); }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
     GraphNode&   getNode(unsigned int j) const{ return *m_all_nodes[j]; }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the distance from the start to the beginning of a quad. */
     float        getDistanceFromStart(int j) const
                            { return m_all_nodes[j]->getDistanceFromStart(); }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the length of the main driveline. */
     float        getLapLength() const {return m_lap_length; }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns true if the graph is to be reversed. */
     bool         isReverse() const {return m_reverse; }
 

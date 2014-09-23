@@ -543,7 +543,7 @@ public:
                                 { return m_root+"/"+s; }
     // ------------------------------------------------------------------------
     /** Returns the number of modes available for this track. */
-    unsigned int       getNumberOfModes() const { return m_all_modes.size();  }
+    unsigned int       getNumberOfModes() const { return (unsigned int) m_all_modes.size();  }
     // ------------------------------------------------------------------------
     /** Returns number of completed challenges. */
     unsigned int getNumOfCompletedChallenges();
@@ -568,7 +568,7 @@ public:
     // ------------------------------------------------------------------------
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const
-                                          { return m_start_transforms.size(); }
+                            { return (unsigned int)m_start_transforms.size(); }
     // ------------------------------------------------------------------------
     bool getWeatherLightning() {return m_weather_lightning;}
     // ------------------------------------------------------------------------

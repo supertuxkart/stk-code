@@ -175,7 +175,7 @@ void OptionsScreenVideo::init()
 
         const std::vector<IrrDriver::VideoMode>& modes =
                                                 irr_driver->getVideoModes();
-        const int amount = modes.size();
+        const int amount = (int)modes.size();
 
         bool found_config_res = false;
 

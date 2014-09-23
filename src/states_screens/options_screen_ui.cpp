@@ -92,15 +92,15 @@ void OptionsScreenUI::loadedFromFile()
         return;
     }
 
-    const int skinCount = m_skins.size();
-    for (int n=0; n<skinCount; n++)
+    const int skin_count = (int)m_skins.size();
+    for (int n=0; n<skin_count; n++)
     {
         const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
         const std::string skinName = StringUtils::removeExtension( skinFileName );
         skinSelector->addLabel( core::stringw(skinName.c_str()) );
     }
     skinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skinCount-1);
+    skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skin_count-1);
 
 
 }   // loadedFromFile
@@ -137,7 +137,7 @@ void OptionsScreenUI::init()
 
     // --- select the right skin in the spinner
     bool currSkinFound = false;
-    const int skinCount = m_skins.size();
+    const int skinCount = (int) m_skins.size();
     for (int n=0; n<skinCount; n++)
     {
         const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
@@ -164,7 +164,7 @@ void OptionsScreenUI::init()
     list_widget->addItem("system", _("System Language"));
 
     const std::vector<std::string>* lang_list = translations->getLanguageList();
-    const int amount = lang_list->size();
+    const int amount = (int)lang_list->size();
 
     // The names need to be sorted alphabetically. Store the 2-letter
     // language names in a mapping, to be able to get them from the

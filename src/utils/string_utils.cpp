@@ -167,14 +167,14 @@ namespace StringUtils
         try
         {
             std::string::size_type start=0;
-            while(start!=std::string::npos && start<s.size())
+            while(start!=std::string::npos && start<(unsigned int)s.size())
             {
                 std::string::size_type i=s.find(c, start);
                 if (i!=std::string::npos)
                 {
                     if (keepSplitChar)
                     {
-                        int from = start-1;
+                        int from = (int)start-1;
                         if (from < 0) from = 0;
 
                         result.push_back(std::string(s, from, i-from));
@@ -344,7 +344,7 @@ namespace StringUtils
 
             unsigned int insertValID = 0;
 
-            const unsigned int item_count = sv.size();
+            const unsigned int item_count = (int)sv.size();
             for (unsigned int i=0; i<item_count; i++)
             {
                 if(sv[i][0] != '%')
@@ -416,7 +416,7 @@ namespace StringUtils
 
             irr::core::stringw new_string="";
 
-            const unsigned int size = sv.size();
+            const unsigned int size = (int)sv.size();
             for (unsigned int i=0; i<size; i++)
             {
                 if(sv[i][0] != '%')
@@ -563,7 +563,7 @@ namespace StringUtils
 
         while (true)
         {
-            const int pos = wip.find(from);
+            const int pos = (int) wip.find(from);
             if (pos == -1)
             {
                 return wip;

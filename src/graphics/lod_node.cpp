@@ -100,7 +100,7 @@ int LODNode::getLevel()
  *  camera is activated, since it zooms in to the kart. */
 void LODNode::forceLevelOfDetail(int n)
 {
-    m_forced_lod = (n >=(int)m_detail.size()) ? m_detail.size()-1 : n;
+    m_forced_lod = (n >=(int)m_detail.size()) ? (int)m_detail.size()-1 : n;
 }   // forceLevelOfDetail
 
 // ----------------------------------------------------------------------------

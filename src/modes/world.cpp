@@ -569,7 +569,7 @@ void World::resetAllKarts()
     if(UserConfigParams::m_track_debug)
     {
         // Loop over all karts, in case that some karts are dfferent
-        for(unsigned int kart_id=0; kart_id<m_karts.size(); kart_id++)
+        for(unsigned int kart_id=0; kart_id<(unsigned int)m_karts.size(); kart_id++)
         {
             for(unsigned int rescue_pos=0;
                 rescue_pos<getNumberOfRescuePositions();
@@ -1020,7 +1020,7 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
     // if we ever decide to display a message (e.g. during a race)
     unsigned int *index = new unsigned int[m_karts.size()];
 
-    const unsigned int kart_amount = m_karts.size();
+    const unsigned int kart_amount = (unsigned int) m_karts.size();
     for (unsigned int i=0; i<kart_amount; i++ )
     {
         index[i] = 999; // first reset the contents of the array

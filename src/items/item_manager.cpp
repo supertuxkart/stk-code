@@ -207,9 +207,9 @@ void ItemManager::insertItem(Item *item)
     // Find where the item can be stored in the index list: either in a
     // previously deleted entry, otherwise at the end.
     int index = -1;
-    for(index=m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
+    for(index=(int)m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
 
-    if(index==-1) index = m_all_items.size();
+    if(index==-1) index = (int)m_all_items.size();
 
     if(index<(int)m_all_items.size())
         m_all_items[index] = item;
@@ -422,7 +422,7 @@ void ItemManager::deleteItem(Item *item)
         int sector = QuadGraph::UNKNOWN_SECTOR;
         QuadGraph::get()->findRoadSector(xyz, &sector);
         unsigned int indx = sector==QuadGraph::UNKNOWN_SECTOR
-                          ? m_items_in_quads->size()-1
+                          ? (unsigned int) m_items_in_quads->size()-1
                           : sector;
         AllItemTypes &items = (*m_items_in_quads)[indx];
         AllItemTypes::iterator it = std::find(items.begin(), items.end(),item);

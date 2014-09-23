@@ -228,7 +228,7 @@ void GPInfoScreen::addTracks()
 
     ListWidget *list = getWidget<ListWidget>("tracks");
     list->clear();
-    for (unsigned int i = 0; i < tracks.size(); i++)
+    for (unsigned int i = 0; i < (unsigned int)tracks.size(); i++)
     {
         const Track *track = track_manager->getTrack(tracks[i]);
         std::string s = StringUtils::toString(i);

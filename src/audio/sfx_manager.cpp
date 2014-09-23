@@ -124,7 +124,7 @@ SFXManager::~SFXManager()
     pthread_cond_destroy(&m_cond_request);
 
     // ---- clear m_all_sfx
-    const int sfx_amount = m_all_sfx.size();
+    const int sfx_amount = (int) m_all_sfx.size();
     for (int n=0; n<sfx_amount; n++)
     {
         delete m_all_sfx[n];
@@ -249,7 +249,7 @@ void SFXManager::soundToggled(const bool on)
 
         resumeAll();
 
-        const int sfx_amount = m_all_sfx.size();
+        const int sfx_amount = (int)m_all_sfx.size();
         for (int n=0; n<sfx_amount; n++)
         {
             m_all_sfx[n]->onSoundEnabledBack();

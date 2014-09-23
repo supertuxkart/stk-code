@@ -151,7 +151,7 @@ public:
     float getSkidReduceTurnMax     () const { return m_skid_reduce_turn_max;  }
     // ------------------------------------------------------------------------
     /** Returns how many boni are defined for this kart. */
-    int getNumberOfBonusTimes() const      { return m_skid_bonus_time.size(); }
+    int getNumberOfBonusTimes() const      { return (int) m_skid_bonus_time.size(); }
     // ------------------------------------------------------------------------
     /** Returns how long a kart must skid in order to reach the specified
      *  bonus level.

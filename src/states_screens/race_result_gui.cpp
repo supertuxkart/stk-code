@@ -158,7 +158,7 @@ void RaceResultGUI::enableAllButtons()
 
     // If something was unlocked
     // -------------------------
-    int n = PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size();
+    int n = (int)PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size();
     if(n>0)
     {
         top->setText(n==1 ? _("You completed a challenge!")
@@ -227,7 +227,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     // If something was unlocked, the 'continue' button was
     // actually used to display "Show unlocked feature(s)" text.
     // ---------------------------------------------------------
-    int n = PlayerManager::getCurrentPlayer()
+    int n = (int)PlayerManager::getCurrentPlayer()
                                 ->getRecentlyCompletedChallenges().size();
     if(n>0)
     {
@@ -627,7 +627,7 @@ void RaceResultGUI::renderGlobal(float dt)
 
     m_timer               += dt;
     assert(World::getWorld()->getPhase()==WorldStatus::RESULT_DISPLAY_PHASE);
-    unsigned int num_karts = m_all_row_infos.size();
+    unsigned int num_karts = (unsigned int)m_all_row_infos.size();
 
     // First: Update the finite state machine
     // ======================================

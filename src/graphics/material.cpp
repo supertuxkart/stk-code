@@ -605,7 +605,7 @@ void Material::initParticlesEffect(const XMLNode *node)
     std::vector<std::string> conditions;
     node->get("condition", &conditions);
 
-    const int count = conditions.size();
+    const int count = (int)conditions.size();
 
     if (count == 0)
     {

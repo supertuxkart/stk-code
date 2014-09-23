@@ -429,12 +429,12 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
         if (!m_unlocked_stuff[n].m_pictures.empty())
         {
-            const int pictureCount = m_unlocked_stuff[n].m_pictures.size();
+            const int picture_count = (int)m_unlocked_stuff[n].m_pictures.size();
 
-            if (pictureCount > 1)
+            if (picture_count > 1)
             {
                 const int previousTextureID = m_unlocked_stuff[n].m_curr_image;
-                const int textureID = int(m_global_time/1.2f) % pictureCount;
+                const int textureID = int(m_global_time/1.2f) % picture_count;
 
                 if (textureID != previousTextureID)
                 {
@@ -467,7 +467,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
                     m_unlocked_stuff[n].m_curr_image = textureID;
                 }   // textureID != previousTextureID
-            }   // if pictureCount>1
+            }   // if picture_count>1
         }   // if !m_unlocked_stuff[n].m_pictures.empty()
 
         float scale = m_unlocked_stuff[n].m_scale;
@@ -538,16 +538,16 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
     else
     {
         const std::vector<std::string> gptracks = gp->getTrackNames();
-        const int trackAmount = gptracks.size();
+        const int track_amount = (int)gptracks.size();
 
-        if (trackAmount == 0)
+        if (track_amount == 0)
         {
             std::cerr << "ERROR: Unlocked GP is empty???\n";
             video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"main_help.png"));
             images.push_back(WTF_image);
         }
 
-        for (int t=0; t<trackAmount; t++)
+        for (int t=0; t<track_amount; t++)
         {
             Track* track = track_manager->getTrack(gptracks[t]);
 

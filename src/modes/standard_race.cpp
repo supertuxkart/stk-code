@@ -87,7 +87,7 @@ const std::string& StandardRace::getIdent() const
  */
 void StandardRace::endRaceEarly()
 {
-    const unsigned int kart_amount = m_karts.size();
+    const unsigned int kart_amount = (unsigned int)m_karts.size();
     std::vector<int> active_players;
     // Required for debugging purposes
     beginSetKartPositions();
@@ -110,7 +110,7 @@ void StandardRace::endRaceEarly()
         else
         {
             // AI karts finish
-            setKartPosition(kartid, i - active_players.size());
+            setKartPosition(kartid, i - (unsigned int) active_players.size());
             kart->finishedRace(estimateFinishTimeForKart(kart));
         }
     } // i <= kart_amount
@@ -118,7 +118,7 @@ void StandardRace::endRaceEarly()
     for (unsigned int i = 0; i < active_players.size(); i++)
     {
         int kartid = active_players[i];
-        int position = getNumKarts() - active_players.size() + 1 + i;
+        int position = getNumKarts() - (int) active_players.size() + 1 + i;
         setKartPosition(kartid, position);
         m_karts[kartid]->eliminate();
     } // Finish the active players

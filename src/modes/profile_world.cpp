@@ -263,7 +263,7 @@ void ProfileWorld::enterRaceOverState()
     for(std::set<std::string>::iterator it = all_groups.begin();
         it !=all_groups.end(); it++)
     {
-        if(it->size()>max_len) max_len = it->size();
+        if(it->size()>max_len) max_len = (unsigned int) it->size();
     }
     max_len++;  // increase by 1 for one additional space after the name
 
@@ -281,7 +281,7 @@ void ProfileWorld::enterRaceOverState()
         int   expl_count    = 0,    off_track_count = 0;
         float skidding_time = 0.0f, rescue_time     = 0.0f, expl_time    = 0.0f;
         float av_time       = 0.0f;
-        for ( unsigned int i = 0; i < m_karts.size(); ++i)
+        for ( unsigned int i = 0; i < (unsigned int)m_karts.size(); ++i)
         {
             KartWithStats* kart = dynamic_cast<KartWithStats*>(m_karts[i]);
             const std::string &name=kart->getController()->getControllerName();

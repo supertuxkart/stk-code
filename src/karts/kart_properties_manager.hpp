@@ -99,7 +99,7 @@ public:
     void removeLastSelectedKart() { m_selected_karts.pop_back(); }
     // ------------------------------------------------------------------------
     /** Returns the number of selected karts (used in networking only). */
-    int getNumSelectedKarts() const { return m_selected_karts.size(); }
+    int getNumSelectedKarts() const { return (int) m_selected_karts.size(); }
     // ------------------------------------------------------------------------
     /** Sets a kartid to be selected (used in networking only). */
     void selectKart(int kartid) { m_selected_karts.push_back(kartid); }
