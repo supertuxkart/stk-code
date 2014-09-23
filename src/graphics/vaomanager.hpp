@@ -3,7 +3,8 @@
 
 #include "gl_headers.hpp"
 #include "utils/singleton.hpp"
-#include "irr_driver.hpp"
+#include <S3DVertex.h>
+#include <IMeshBuffer.h>
 #include <vector>
 #include <map>
 #include <unordered_map>
@@ -144,25 +145,25 @@ class VAOManager : public Singleton<VAOManager>
     void *VBOPtr[VTXTYPE_COUNT], *IBOPtr[VTXTYPE_COUNT];
     size_t RealVBOSize[VTXTYPE_COUNT], RealIBOSize[VTXTYPE_COUNT];
     size_t last_vertex[VTXTYPE_COUNT], last_index[VTXTYPE_COUNT];
-    std::unordered_map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
-    std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO;
+    std::unordered_map<irr::scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
+    std::map<std::pair<irr::video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO;
 
     void cleanInstanceVAOs();
     void regenerateBuffer(enum VTXTYPE, size_t, size_t);
     void regenerateVAO(enum VTXTYPE);
     void regenerateInstancedVAO();
     size_t getVertexPitch(enum VTXTYPE) const;
-    VTXTYPE getVTXTYPE(video::E_VERTEX_TYPE type);
-    void append(scene::IMeshBuffer *, VTXTYPE tp);
+    VTXTYPE getVTXTYPE(irr::video::E_VERTEX_TYPE type);
+    void append(irr::scene::IMeshBuffer *, VTXTYPE tp);
 public:
     VAOManager();
-    std::pair<unsigned, unsigned> getBase(scene::IMeshBuffer *);
+    std::pair<unsigned, unsigned> getBase(irr::scene::IMeshBuffer *);
     GLuint getInstanceBuffer(InstanceType it) { return instance_vbo[it]; }
     void *getInstanceBufferPtr(InstanceType it) { return Ptr[it]; }
-    unsigned getVBO(video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
-    void *getVBOPtr(video::E_VERTEX_TYPE type) { return VBOPtr[getVTXTYPE(type)]; }
-    unsigned getVAO(video::E_VERTEX_TYPE type) { return vao[getVTXTYPE(type)]; }
-    unsigned getInstanceVAO(video::E_VERTEX_TYPE vt, enum InstanceType it) { return InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(vt, it)]; }
+    unsigned getVBO(irr::video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
+    void *getVBOPtr(irr::video::E_VERTEX_TYPE type) { return VBOPtr[getVTXTYPE(type)]; }
+    unsigned getVAO(irr::video::E_VERTEX_TYPE type) { return vao[getVTXTYPE(type)]; }
+    unsigned getInstanceVAO(irr::video::E_VERTEX_TYPE vt, enum InstanceType it) { return InstanceVAO[std::pair<irr::video::E_VERTEX_TYPE, InstanceType>(vt, it)]; }
     ~VAOManager();
 };
 

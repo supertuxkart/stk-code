@@ -1,4 +1,5 @@
 #include "vaomanager.hpp"
+#include "irr_driver.hpp"
 #include "stkmesh.hpp"
 
 VAOManager::VAOManager()
