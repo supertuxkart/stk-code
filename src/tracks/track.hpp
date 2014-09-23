@@ -377,8 +377,6 @@ private:
     bool m_bloom;
     float m_bloom_threshold;
 
-    bool m_lensflare;
-
     bool m_godrays;
     core::vector3df m_godrays_position;
     float m_godrays_opacity;
@@ -623,7 +621,7 @@ public:
     bool hasClouds() const { return m_clouds; }
 
     // ------------------------------------------------------------------------
-    bool getBloom() const { return m_bloom; }
+    bool hasBloom() const { return m_bloom; }
 
     // ------------------------------------------------------------------------
     float getBloomThreshold() const { return m_bloom_threshold; }
@@ -633,9 +631,6 @@ public:
     core::vector3df getColorLevelIn() const { return m_color_inlevel; }
     // ------------------------------------------------------------------------
     core::vector2df getColorLevelOut() const { return m_color_outlevel; }
-
-    // ------------------------------------------------------------------------
-    bool hasLensFlare() const { return m_lensflare; }
     // ------------------------------------------------------------------------
     bool hasGodRays() const { return m_godrays; }
     // ------------------------------------------------------------------------

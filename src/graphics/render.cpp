@@ -539,12 +539,10 @@ void IrrDriver::renderFixed(float dt)
 void IrrDriver::computeSunVisibility()
 {
     // Is the lens flare enabled & visible? Check last frame's query.
-    bool hasflare = false;
     bool hasgodrays = false;
 
     if (World::getWorld() != NULL)
     {
-        hasflare = World::getWorld()->getTrack()->hasLensFlare();
         hasgodrays = World::getWorld()->getTrack()->hasGodRays();
     }
 
