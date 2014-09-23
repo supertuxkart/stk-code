@@ -482,7 +482,8 @@ void DynamicRibbonWidget::addAnimatedItem( const irr::core::stringw& user_name, 
          virtual void IGUIElement::OnPostRender (u32 timeMs)
          \brief animate the element and its children.
          */
-        GUIEngine::needsUpdate.push_back(this);
+        if (!GUIEngine::needsUpdate.contains(this))
+            GUIEngine::needsUpdate.push_back(this);
     }
 }
 
@@ -497,6 +498,7 @@ void DynamicRibbonWidget::clearItems()
     m_items.clear();
     m_animated_contents = false;
     m_scroll_offset = 0;
+    GUIEngine::needsUpdate.remove(this);
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::elementRemoved()

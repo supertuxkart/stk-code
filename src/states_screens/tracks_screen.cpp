@@ -67,9 +67,6 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
 
         if (selection == "random_track")
         {
-            RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
-            assert(tabs);
-
             if (m_random_track_list.empty()) return;
 
             std::string track = m_random_track_list.front();

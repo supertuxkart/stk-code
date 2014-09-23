@@ -123,7 +123,6 @@ Track::Track(const std::string &filename)
     m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
     m_color_outlevel        = core::vector2df(0.0, 255.0);
     m_clouds                = false;
-    m_lensflare             = false;
     m_godrays               = false;
     m_displacement_speed    = 1.0f;
     m_caustics_speed        = 1.0f;
@@ -484,7 +483,6 @@ void Track::loadTrackInfo()
     root->get("clouds",                &m_clouds);
     root->get("bloom",                 &m_bloom);
     root->get("bloom-threshold",       &m_bloom_threshold);
-    root->get("lens-flare",            &m_lensflare);
     root->get("shadows",               &m_shadows);
     root->get("displacement-speed",    &m_displacement_speed);
     root->get("caustics-speed",        &m_caustics_speed);
