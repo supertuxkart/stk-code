@@ -556,7 +556,7 @@ void IrrDriver::renderSolidSecondPass()
     }
 }
 
-template<enum E_VERTEX_TYPE VertexType, typename... TupleType>
+template<enum video::E_VERTEX_TYPE VertexType, typename... TupleType>
 static void renderMeshNormals(std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     glUseProgram(MeshShader::NormalVisualizer::getInstance()->Program);
