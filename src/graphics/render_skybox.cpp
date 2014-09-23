@@ -1,35 +1,7 @@
 #include "graphics/irr_driver.hpp"
-
-#include "config/user_config.hpp"
-#include "graphics/callbacks.hpp"
-#include "graphics/camera.hpp"
-#include "graphics/glwrap.hpp"
-#include "graphics/lens_flare.hpp"
-#include "graphics/light.hpp"
-#include "graphics/lod_node.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/particle_kind_manager.hpp"
-#include "graphics/per_camera_node.hpp"
-#include "graphics/post_processing.hpp"
-#include "graphics/referee.hpp"
-#include "graphics/rtts.hpp"
-#include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stkmeshscenenode.hpp"
-#include "graphics/wind.hpp"
-#include "io/file_manager.hpp"
-#include "items/item.hpp"
-#include "items/item_manager.hpp"
 #include "modes/world.hpp"
-#include "physics/physics.hpp"
-#include "tracks/track.hpp"
-#include "utils/constants.hpp"
-#include "utils/helpers.hpp"
-#include "utils/log.hpp"
 #include "utils/profiler.hpp"
-
-#include <algorithm>
-#include <limits>
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
