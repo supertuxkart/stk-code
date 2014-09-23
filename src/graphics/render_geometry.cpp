@@ -2,35 +2,17 @@
 
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
-#include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/lens_flare.hpp"
-#include "graphics/light.hpp"
-#include "graphics/lod_node.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/particle_kind_manager.hpp"
-#include "graphics/per_camera_node.hpp"
 #include "graphics/post_processing.hpp"
-#include "graphics/referee.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stkmeshscenenode.hpp"
-#include "graphics/wind.hpp"
-#include "io/file_manager.hpp"
-#include "items/item.hpp"
-#include "items/item_manager.hpp"
 #include "modes/world.hpp"
-#include "physics/physics.hpp"
-#include "tracks/track.hpp"
-#include "utils/constants.hpp"
-#include "utils/helpers.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/tuple.hpp"
 #include "stkscenemanager.hpp"
 
-#include <algorithm>
+#include <S3DVertex.h>
 
 /**
 \page render_geometry Geometry Rendering Overview
@@ -84,7 +66,7 @@ struct DefaultMaterial
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef MeshShader::ObjectPass2Shader SecondPassShader;
     typedef ListMatDefault List;
-    static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_DEFAULT;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const std::vector<size_t> FirstPassTextures;
@@ -102,7 +84,7 @@ struct AlphaRef
     typedef MeshShader::ObjectRefPass1Shader FirstPassShader;
     typedef MeshShader::ObjectRefPass2Shader SecondPassShader;
     typedef ListMatAlphaRef List;
-    static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_ALPHA_REF;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const std::vector<size_t> FirstPassTextures;
@@ -120,7 +102,7 @@ struct SphereMap
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef MeshShader::SphereMapShader SecondPassShader;
     typedef ListMatSphereMap List;
-    static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_SPHEREMAP;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const std::vector<size_t> FirstPassTextures;
@@ -138,7 +120,7 @@ struct UnlitMat
     typedef MeshShader::ObjectRefPass1Shader FirstPassShader;
     typedef MeshShader::ObjectUnlitShader SecondPassShader;
     typedef ListMatUnlit List;
-    static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_UNLIT;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const std::vector<size_t> FirstPassTextures;
@@ -156,7 +138,7 @@ struct GrassMat
     typedef MeshShader::GrassPass1Shader FirstPassShader;
     typedef MeshShader::GrassPass2Shader SecondPassShader;
     typedef ListMatGrass List;
-    static const enum E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum MeshMaterial MaterialType = MAT_GRASS;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const std::vector<size_t> FirstPassTextures;
@@ -174,7 +156,7 @@ struct NormalMat
     typedef MeshShader::NormalMapShader FirstPassShader;
     typedef MeshShader::ObjectPass2Shader SecondPassShader;
     typedef ListMatNormalMap List;
-    static const enum E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
     static const enum MeshMaterial MaterialType = MAT_NORMAL_MAP;
     static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const std::vector<size_t> FirstPassTextures;
@@ -192,7 +174,7 @@ struct DetailMat
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef MeshShader::DetailledObjectPass2Shader SecondPassShader;
     typedef ListMatDetails List;
-    static const enum E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
     static const enum MeshMaterial MaterialType = MAT_DETAIL;
     static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const std::vector<size_t> FirstPassTextures;
@@ -207,7 +189,7 @@ struct SplattingMat
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef MeshShader::SplattingShader SecondPassShader;
     typedef ListMatSplatting List;
-    static const enum E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
     static const std::vector<size_t> FirstPassTextures;
     static const std::vector<size_t> SecondPassTextures;
 };
@@ -606,7 +588,7 @@ void IrrDriver::renderNormalsVisualisation()
 //    renderMeshNormals<video::EVT_TANGENTS>(ListMatNormalMap::getInstance());
 }
 
-template<typename Shader, enum E_VERTEX_TYPE VertexType, int...List, typename... TupleType>
+template<typename Shader, enum video::E_VERTEX_TYPE VertexType, int...List, typename... TupleType>
 void renderTransparenPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     glUseProgram(Shader::getInstance()->Program);
@@ -669,7 +651,7 @@ void IrrDriver::renderTransparent()
         ImmediateDrawList::getInstance()->at(i)->render();
 
     if (irr_driver->hasARB_base_instance())
-        glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_STANDARD));
+        glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
 
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
@@ -715,7 +697,7 @@ void IrrDriver::renderTransparent()
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     if (irr_driver->hasARB_base_instance())
-        glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_2TCOORDS));
+        glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_2TCOORDS));
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
     irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
@@ -814,7 +796,7 @@ struct shadow_custom_unroll_args<N, List...>
     }
 };
 
-template<typename T, enum E_VERTEX_TYPE VertexType, int...List, typename... Args>
+template<typename T, enum video::E_VERTEX_TYPE VertexType, int...List, typename... Args>
 void renderShadow(const std::vector<GLuint> TextureUnits, unsigned cascade, const std::vector<STK::Tuple<Args...> > &t)
 {
     glUseProgram(T::getInstance()->Program);
@@ -899,14 +881,14 @@ void IrrDriver::renderShadows()
 
         std::vector<GLuint> noTexUnits;
 
-        renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(noTexUnits, cascade, ListMatDefault::getInstance()->Shadows[cascade]);
-        renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(noTexUnits, cascade, ListMatSphereMap::getInstance()->Shadows[cascade]);
-        renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(noTexUnits, cascade, ListMatDetails::getInstance()->Shadows[cascade]);
-        renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(noTexUnits, cascade, ListMatSplatting::getInstance()->Shadows[cascade]);
-        renderShadow<MeshShader::ShadowShader, EVT_TANGENTS, 1>(noTexUnits, cascade, ListMatNormalMap::getInstance()->Shadows[cascade]);
-        renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, cascade, ListMatAlphaRef::getInstance()->Shadows[cascade]);
-        renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, cascade, ListMatUnlit::getInstance()->Shadows[cascade]);
-        renderShadow<MeshShader::GrassShadowShader, EVT_STANDARD, 3, 1>(std::vector<GLuint>{ 0 }, cascade, ListMatGrass::getInstance()->Shadows[cascade]);
+        renderShadow<MeshShader::ShadowShader, video::EVT_STANDARD, 1>(noTexUnits, cascade, ListMatDefault::getInstance()->Shadows[cascade]);
+        renderShadow<MeshShader::ShadowShader, video::EVT_STANDARD, 1>(noTexUnits, cascade, ListMatSphereMap::getInstance()->Shadows[cascade]);
+        renderShadow<MeshShader::ShadowShader, video::EVT_2TCOORDS, 1>(noTexUnits, cascade, ListMatDetails::getInstance()->Shadows[cascade]);
+        renderShadow<MeshShader::ShadowShader, video::EVT_2TCOORDS, 1>(noTexUnits, cascade, ListMatSplatting::getInstance()->Shadows[cascade]);
+        renderShadow<MeshShader::ShadowShader, video::EVT_TANGENTS, 1>(noTexUnits, cascade, ListMatNormalMap::getInstance()->Shadows[cascade]);
+        renderShadow<MeshShader::RefShadowShader, video::EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, cascade, ListMatAlphaRef::getInstance()->Shadows[cascade]);
+        renderShadow<MeshShader::RefShadowShader, video::EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, cascade, ListMatUnlit::getInstance()->Shadows[cascade]);
+        renderShadow<MeshShader::GrassShadowShader, video::EVT_STANDARD, 3, 1>(std::vector<GLuint>{ 0 }, cascade, ListMatGrass::getInstance()->Shadows[cascade]);
 
         if (irr_driver->hasARB_draw_indirect())
             glBindBuffer(GL_DRAW_INDIRECT_BUFFER, ShadowPassCmd::getInstance()->drawindirectcmd);
@@ -959,7 +941,7 @@ struct rsm_custom_unroll_args<N, List...>
     }
 };
 
-template<typename T, enum E_VERTEX_TYPE VertexType, int... Selector, typename... Args>
+template<typename T, enum video::E_VERTEX_TYPE VertexType, int... Selector, typename... Args>
 void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> &TextureUnits, const std::vector<STK::Tuple<Args...> > &t)
 {
     glUseProgram(T::getInstance()->Program);
@@ -998,7 +980,7 @@ void renderRSMShadow(const std::vector<GLuint> TextureUnits, const std::vector<G
     }
 }
 
-template<typename Shader, MeshMaterial Mat, enum E_VERTEX_TYPE VertexType, typename... Args>
+template<typename Shader, MeshMaterial Mat, enum video::E_VERTEX_TYPE VertexType, typename... Args>
 void multidrawRSM(Args...args)
 {
     glUseProgram(Shader::getInstance()->Program);
@@ -1018,12 +1000,12 @@ void IrrDriver::renderRSM()
     m_rtts->getRSM().Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatDefault::getInstance()->RSM);
-    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatAlphaRef::getInstance()->RSM);
-    drawRSM<MeshShader::RSMShader, EVT_TANGENTS, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatNormalMap::getInstance()->RSM);
-    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatUnlit::getInstance()->RSM);
-    drawRSM<MeshShader::RSMShader, EVT_2TCOORDS, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatDetails::getInstance()->RSM);
-    drawRSM<MeshShader::SplattingRSMShader, EVT_2TCOORDS, 1>(rsm_matrix, createVector<GLuint>(1, 2, 3, 4, 5), ListMatSplatting::getInstance()->RSM);
+    drawRSM<MeshShader::RSMShader, video::EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatDefault::getInstance()->RSM);
+    drawRSM<MeshShader::RSMShader, video::EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatAlphaRef::getInstance()->RSM);
+    drawRSM<MeshShader::RSMShader, video::EVT_TANGENTS, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatNormalMap::getInstance()->RSM);
+    drawRSM<MeshShader::RSMShader, video::EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatUnlit::getInstance()->RSM);
+    drawRSM<MeshShader::RSMShader, video::EVT_2TCOORDS, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatDetails::getInstance()->RSM);
+    drawRSM<MeshShader::SplattingRSMShader, video::EVT_2TCOORDS, 1>(rsm_matrix, createVector<GLuint>(1, 2, 3, 4, 5), ListMatSplatting::getInstance()->RSM);
 
     if (irr_driver->hasARB_draw_indirect())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, RSMPassCmd::getInstance()->drawindirectcmd);
