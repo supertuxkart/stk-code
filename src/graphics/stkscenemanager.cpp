@@ -172,16 +172,14 @@ bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode
     if (!node->getAutomaticCulling())
         return false;
 
-    scene::SViewFrustum frust = *cam->getViewFrustum();
-
-    //transform the frustum to the node's current absolute transformation
-    core::matrix4 invTrans(node->getAbsoluteTransformation(), core::matrix4::EM4CONST_INVERSE);
-    //invTrans.makeInverse();
-    frust.transform(invTrans);
+    const core::matrix4 &trans = node->getAbsoluteTransformation();
 
     core::vector3df edges[8];
     node->getBoundingBox().getEdges(edges);
+    for (unsigned i = 0; i < 8; i++)
+        trans.transformVect(edges[i]);
 
+    scene::SViewFrustum frust = *cam->getViewFrustum();
     for (s32 i = 0; i < scene::SViewFrustum::VF_PLANE_COUNT; ++i)
         if (isBoxInFrontOfPlane(frust.planes[i], edges))
             return true;
