@@ -3,6 +3,7 @@ project(SuperTuxKart)
 set(PROJECT_VERSION "0.8.1")
 
 cmake_minimum_required(VERSION 2.8.1)
+cmake_policy(SET CMP0043 OLD)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 include(BuildTypeSTKRelease)
