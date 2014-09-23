@@ -48,7 +48,7 @@
 #  include <direct.h>
 #  include <Windows.h>
 #  include <stdio.h>
-#  ifndef __CYGWIN__
+#  if !defined(__CYGWIN__ ) && !defined(__MINGW32__)
      /*Needed by the remove directory function */
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
 #    define S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)

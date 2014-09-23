@@ -83,7 +83,7 @@ int LODNode::getLevel()
     const Vec3 &pos = kart->getFrontXYZ();
 
     const int dist =
-        (int)((m_nodes[0]->getAbsolutePosition()).getDistanceFromSQ( core::vector3df(pos.getX(), pos.getY(), pos.getZ())));
+        (int)((m_nodes[0]->getAbsolutePosition()).getDistanceFromSQ(pos.toIrrVector() ));
 
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
