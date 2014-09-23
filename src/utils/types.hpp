@@ -20,17 +20,17 @@
 #define HEADER_TYPES_HPP
 
     #if defined(_MSC_VER) && _MSC_VER < 1700
-      typedef unsigned char    uint8_t;
-      typedef unsigned short   uint16_t;
-      typedef __int32          int32_t;
-      typedef unsigned __int32 uint32_t;
-      typedef __int64          int64_t;
-      typedef unsigned __int64 uint64_t;
-    #elif defined(_MSC_VER) && _MSC_VER >= 1700
-    #  include <stdint.h>
+        typedef unsigned char    uint8_t;
+        typedef unsigned short   uint16_t;
+        typedef __int32          int32_t;
+        typedef unsigned __int32 uint32_t;
+        typedef __int64          int64_t;
+        typedef unsigned __int64 uint64_t;
     #else
-    #  include <stdint.h>
-    #  define SOCKET_ERROR -1
+        #include <stdint.h>
+        #ifndef SOCKET_ERROR
+            #define SOCKET_ERROR -1
+        #endif
     #endif
 
 #endif
