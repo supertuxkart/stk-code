@@ -69,6 +69,7 @@ void TrackInfoScreen::loadedFromFile()
     m_lap_spinner     = getWidget<SpinnerWidget>("lap-spinner");
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
     m_reverse         = getWidget<CheckBoxWidget>("reverse");
+    m_reverse->setState(false);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -134,6 +135,8 @@ void TrackInfoScreen::init()
     {
         if (UserConfigParams::m_artist_debug_mode)
             m_lap_spinner->setMin(0);
+        else
+            m_lap_spinner->setMin(1);
         m_lap_spinner->setValue(m_track->getActualNumberOfLap());
         race_manager->setNumLaps(m_lap_spinner->getValue());
     }
@@ -174,6 +177,8 @@ void TrackInfoScreen::init()
     {
         m_reverse->setState(race_manager->getReverseTrack());
     }
+    else
+        m_reverse->setState(false);
 
     // ---- High Scores
     if (has_highscores)
@@ -279,8 +284,10 @@ void TrackInfoScreen::onEnterPressedInternal()
     const int num_laps = race_manager->modeHasLaps() ? m_lap_spinner->getValue() 
                                                      : -1;
     const bool reverse_track = m_reverse == NULL ? false
-                                                  : m_reverse->getState();
-    m_track->setActualNumberOfLaps(num_laps);
+                                                 : m_reverse->getState();
+    // Avoid negative lap numbers (after e.g. easter egg mode).
+    if(num_laps>=0)
+        m_track->setActualNumberOfLaps(num_laps);
     race_manager->setReverseTrack(reverse_track);
 
     // Disable accidentally unlocking of a challenge
