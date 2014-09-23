@@ -408,7 +408,7 @@ void CutsceneWorld::enterRaceOverState()
             GUIEngine::Screen* newStack[] = { mainMenu, credits, NULL };
             race_manager->exitRace();
             StateManager::get()->resetAndSetStack(newStack);
-            StateManager::get()->pushScreen(credits);
+            credits->push();
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else  if (m_parts.size() == 1 && m_parts[0] == "gpwin")
@@ -525,7 +525,7 @@ void CutsceneWorld::enterRaceOverState()
                 KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
                 s->setMultiplayer(false);
                 s->setGoToOverworldNext();
-                StateManager::get()->pushScreen( s );
+                s->push();
             }
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably

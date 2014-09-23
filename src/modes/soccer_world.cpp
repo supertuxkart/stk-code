@@ -401,7 +401,7 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
 /** Set position and team for the karts */
 void SoccerWorld::initKartList()
 {
-    const unsigned int kart_amount = m_karts.size();
+    const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     int team_karts_amount[NB_SOCCER_TEAMS];
     memset(team_karts_amount, 0, sizeof(team_karts_amount));

@@ -271,7 +271,7 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     size_t count = mesh->IndexCount;
 
     Shader->setUniforms(Args...);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, mesh->vaoBaseVertex);
+    glDrawElementsBaseVertex(ptype, (int)count, itype, (GLvoid *)mesh->vaoOffset, (int)mesh->vaoBaseVertex);
 }
 
 template<int...List>
@@ -371,7 +371,7 @@ void multidraw1stPass(Args...args)
         T::InstancedFirstPassShader::getInstance()->setUniforms(args...);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
             (const void*)(SolidPassCmd::getInstance()->Offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
-            SolidPassCmd::getInstance()->Size[T::MaterialType],
+            (int)SolidPassCmd::getInstance()->Size[T::MaterialType],
             sizeof(DrawElementsIndirectCommand));
     }
 }
@@ -495,8 +495,8 @@ void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
         T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
             (const void*)(SolidPassCmd::getInstance()->Offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
-            SolidPassCmd::getInstance()->Size[T::MaterialType],
-            sizeof(DrawElementsIndirectCommand));
+            (int)SolidPassCmd::getInstance()->Size[T::MaterialType],
+            (int)sizeof(DrawElementsIndirectCommand));
     }
 }
 
@@ -739,7 +739,8 @@ void IrrDriver::renderTransparent()
 
         glUseProgram(MeshShader::DisplaceMaskShader::getInstance()->Program);
         MeshShader::DisplaceMaskShader::getInstance()->setUniforms(AbsoluteTransformation);
-        glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
+        glDrawElementsBaseVertex(ptype, (int)count, itype,
+                                 (GLvoid *)mesh.vaoOffset, (int)mesh.vaoBaseVertex);
     }
 
     irr_driver->getFBO(FBO_DISPLACE).Bind();
@@ -768,7 +769,7 @@ void IrrDriver::renderTransparent()
             core::vector2df(cb->getDirX(), cb->getDirY()),
             core::vector2df(cb->getDir2X(), cb->getDir2Y()));
 
-        glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
+        glDrawElementsBaseVertex(ptype, (int)count, itype, (GLvoid *)mesh.vaoOffset, (int)mesh.vaoBaseVertex);
     }
 
     irr_driver->getFBO(FBO_COLORS).Bind();
@@ -787,7 +788,7 @@ void drawShadow(const T *Shader, unsigned cascade, const GLMesh *mesh, uniforms.
     size_t count = mesh->IndexCount;
 
     Shader->setUniforms(cascade, Args...);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, mesh->vaoBaseVertex);
+    glDrawElementsBaseVertex(ptype, (int)count, itype, (GLvoid *)mesh->vaoOffset, (int)mesh->vaoBaseVertex);
 }
 
 template<int...List>
@@ -871,7 +872,9 @@ static void multidrawShadow(unsigned i, Args ...args)
     if (ShadowPassCmd::getInstance()->Size[i][Mat])
     {
         Shader::getInstance()->setUniforms(i, args...);
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)(ShadowPassCmd::getInstance()->Offset[i][Mat] * sizeof(DrawElementsIndirectCommand)), ShadowPassCmd::getInstance()->Size[i][Mat], sizeof(DrawElementsIndirectCommand));
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
+            (const void*)(ShadowPassCmd::getInstance()->Offset[i][Mat] * sizeof(DrawElementsIndirectCommand)), 
+            (int)ShadowPassCmd::getInstance()->Size[i][Mat], sizeof(DrawElementsIndirectCommand));
     }
 }
 
@@ -1003,7 +1006,9 @@ void multidrawRSM(Args...args)
     if (RSMPassCmd::getInstance()->Size[Mat])
     {
         Shader::getInstance()->setUniforms(args...);
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)(RSMPassCmd::getInstance()->Offset[Mat] * sizeof(DrawElementsIndirectCommand)), RSMPassCmd::getInstance()->Size[Mat], sizeof(DrawElementsIndirectCommand));
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
+            (const void*)(RSMPassCmd::getInstance()->Offset[Mat] * sizeof(DrawElementsIndirectCommand)), 
+            (int)RSMPassCmd::getInstance()->Size[Mat], sizeof(DrawElementsIndirectCommand));
     }
 }
 

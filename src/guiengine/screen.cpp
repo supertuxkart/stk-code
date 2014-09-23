@@ -94,6 +94,15 @@ void Screen::init()
 }   // init
 
 // -----------------------------------------------------------------------------
+/** Displays this screen bu pushing it onto the stack of screen
+ *  in the state manager. 
+ */
+void Screen::push()
+{
+    StateManager::get()->pushScreen(this);
+}   // push
+
+// -----------------------------------------------------------------------------
 /** Prepares removal of this screen. If necessary this will unpause the
  *  race (so this means that if you have several consecutive screens while
  *  the race is running the race will be unpaused and paused when switching

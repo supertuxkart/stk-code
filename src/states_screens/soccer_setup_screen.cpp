@@ -63,7 +63,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
 
     if(name == "continue")
     {
-        int nb_players = m_kart_view_info.size();
+        int nb_players = (int)m_kart_view_info.size();
 
         if (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 ||
             getNumKartsInTeam(SOCCER_TEAM_BLUE) == 0)
@@ -266,7 +266,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
     ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
     GUIEngine::EventPropagation result = EVENT_LET;
     SoccerTeam  team_switch = SOCCER_TEAM_NONE;
-    int nb_players = m_kart_view_info.size();
+    int nb_players = (int)m_kart_view_info.size();
 
     switch(action)
     {
@@ -373,7 +373,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::onUpdate(float delta)
 {
-    int nb_players = m_kart_view_info.size();
+    int nb_players = (int)m_kart_view_info.size();
     
     if(m_schedule_continue)
     {
@@ -383,7 +383,7 @@ void SoccerSetupScreen::onUpdate(float delta)
                 return;
         }
         m_schedule_continue = false;
-        StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+        ArenasScreen::getInstance()->push();
     }
 }   // onUPdate
 
@@ -391,7 +391,7 @@ void SoccerSetupScreen::onUpdate(float delta)
 bool SoccerSetupScreen::areAllKartsConfirmed() const
 {
     bool all_confirmed = true;
-    int nb_players = m_kart_view_info.size();
+    int nb_players = (int)m_kart_view_info.size();
     for(int i=0 ; i < nb_players ; i++)
     {
         if(!m_kart_view_info[i].confirmed)
@@ -407,7 +407,7 @@ bool SoccerSetupScreen::areAllKartsConfirmed() const
 int SoccerSetupScreen::getNumKartsInTeam(int team)
 {
     int karts_in_team = 0;
-    int nb_players = m_kart_view_info.size();
+    int nb_players = (int)m_kart_view_info.size();
     for(int i=0 ; i < nb_players ; i++)
     {
         if(m_kart_view_info[i].team == team)
@@ -420,7 +420,7 @@ int SoccerSetupScreen::getNumKartsInTeam(int team)
 int SoccerSetupScreen::getNumConfirmedKarts()
 {
     int confirmed_karts = 0;
-    int nb_players = m_kart_view_info.size();
+    int nb_players = (int)m_kart_view_info.size();
     for(int i=0 ; i < nb_players ; i++)
     {
         if(m_kart_view_info[i].confirmed == true)
@@ -444,7 +444,7 @@ void SoccerSetupScreen::updateKartViewsLayout()
     const int center_y = central_div->m_y + central_div->m_h/2;
 
     // Count the number of karts per team
-    int nb_players = m_kart_view_info.size();
+    int nb_players = (int)m_kart_view_info.size();
     int nb_karts_per_team[2] = {0,0};
     for(int i=0 ; i < nb_players ; i++)
         nb_karts_per_team[m_kart_view_info[i].team]++;

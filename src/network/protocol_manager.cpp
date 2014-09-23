@@ -357,7 +357,7 @@ void ProtocolManager::update()
 {
     // before updating, notice protocols that they have received events
     pthread_mutex_lock(&m_events_mutex); // secure threads
-    int size = m_events_to_process.size();
+    int size = (int)m_events_to_process.size();
     int offset = 0;
     for (int i = 0; i < size; i++)
     {
@@ -383,7 +383,7 @@ void ProtocolManager::asynchronousUpdate()
 {
     // before updating, notice protocols that they have received information
     pthread_mutex_lock(&m_events_mutex); // secure threads
-    int size = m_events_to_process.size();
+    int size = (int)m_events_to_process.size();
     int offset = 0;
     for (int i = 0; i < size; i++)
     {
@@ -435,7 +435,7 @@ void ProtocolManager::asynchronousUpdate()
 
 int ProtocolManager::runningProtocolsCount()
 {
-    return m_protocols.size();
+    return (int)m_protocols.size();
 }
 
 PROTOCOL_STATE ProtocolManager::getProtocolState(uint32_t id)

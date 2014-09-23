@@ -360,7 +360,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                             kart_model.getWheelGraphicsPosition(3) );
     for(size_t i=0 ; i < kart_model.getSpeedWeightedObjectsCount() ; i++)
     {
-        const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject(i);
+        const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject((int)i);
         m_model_view->addModel(obj.m_model, obj.m_position);
     }
     m_model_view->setRotateContinuously( 35.0f );
@@ -1601,7 +1601,7 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
                           kart_model.getWheelGraphicsPosition(3) );
             for (size_t i = 0; i < kart_model.getSpeedWeightedObjectsCount(); i++)
             {
-                const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject(i);
+                const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject((int)i);
                 w3->addModel(obj.m_model, obj.m_position);
             }
             w3->update(0);
@@ -1887,7 +1887,7 @@ void KartSelectionScreen::allPlayersDone()
     }
     else
     {
-        StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );
+        RaceSetupScreen::getInstance()->push();
     }
 }   // allPlayersDone
 
@@ -1989,7 +1989,7 @@ bool KartSelectionScreen::validateKartChoices()
     // players than karts then just allow duplicates
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
-    const unsigned int availableKartCount = w->getItems().size();
+    const unsigned int availableKartCount = (unsigned int)w->getItems().size();
     if (amount > availableKartCount) return true;
 
     // Check everyone for duplicates

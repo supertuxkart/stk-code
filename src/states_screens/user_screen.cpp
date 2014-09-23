@@ -273,7 +273,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
         }   // button==ok
         else if (button == "new_user")
         {
-            StateManager::get()->pushScreen(RegisterScreen::getInstance());
+            RegisterScreen::getInstance()->push();
             // Make sure the new user will have an empty online name field
             // that can also be edited.
             m_username_tb->setText("");
@@ -292,7 +292,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
         {
             PlayerProfile *cp = getSelectedPlayer();
             RegisterScreen::getInstance()->setRename(cp);
-            StateManager::get()->pushScreen(RegisterScreen::getInstance());
+            RegisterScreen::getInstance()->push();
             // Init will automatically be called, which
             // refreshes the player list
         }

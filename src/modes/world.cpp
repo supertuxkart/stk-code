@@ -548,7 +548,7 @@ void World::terminateRace()
         results->clearHighscores();
     }
 
-    StateManager::get()->pushScreen(results);
+    results->push();
     WorldStatus::terminateRace();
 }   // terminateRace
 
@@ -926,7 +926,7 @@ void World::update(float dt)
     }
 
     PROFILER_PUSH_CPU_MARKER("World::update (AI)", 0x40, 0x7F, 0x00);
-    const int kart_amount = m_karts.size();
+    const int kart_amount = (int)m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {
         // Update all karts that are not eliminated

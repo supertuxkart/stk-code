@@ -197,7 +197,7 @@ void GPInfoScreen::init()
         // was shown), adjust it:
         int max_num_tracks = m_group_name=="all" 
                            ? track_manager->getNumberOfRaceTracks()
-                           : track_manager->getTracksInGroup(m_group_name).size();
+                           : (int)track_manager->getTracksInGroup(m_group_name).size();
         m_num_tracks_spinner->setMax(max_num_tracks);
         if(m_num_tracks_spinner->getValue() > max_num_tracks)
         {
@@ -313,7 +313,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
         // can be bigger than the maximum. (Might be a TODO to fix this)
         int max_num_tracks = m_group_name=="all" 
                            ? track_manager->getNumberOfRaceTracks()
-                           : track_manager->getTracksInGroup(m_group_name).size();
+                           : (int)track_manager->getTracksInGroup(m_group_name).size();
         m_num_tracks_spinner->setMax(max_num_tracks);
         if (m_num_tracks_spinner->getValue() > max_num_tracks)
             m_num_tracks_spinner->setValue(max_num_tracks);

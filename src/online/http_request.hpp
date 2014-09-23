@@ -147,8 +147,8 @@ namespace Online
             assert(isPreparing());
             std::string s = StringUtils::toString(value);
 
-            char *s1 = curl_easy_escape(m_curl_session, name.c_str(), name.size());
-            char *s2 = curl_easy_escape(m_curl_session, s.c_str(), s.size());
+            char *s1 = curl_easy_escape(m_curl_session, name.c_str(), (int)name.size());
+            char *s2 = curl_easy_escape(m_curl_session, s.c_str(), (int)s.size());
             m_parameters.append(std::string(s1) + "=" + s2 + "&");
             curl_free(s1);
             curl_free(s2);

@@ -223,7 +223,7 @@ void IrrDriver::renderGLSL(float dt)
                     const float *tmp = vertex.data();
                     for (unsigned int i = 0; i < vertex.size(); i += 1024 * 6)
                     {
-                        unsigned count = MIN2(vertex.size() - i, 1024 * 6);
+                        unsigned count = MIN2((int)vertex.size() - i, 1024 * 6);
                         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
 
                         glDrawArrays(GL_LINES, 0, count / 3);
@@ -842,7 +842,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glClearColor(0, 0, 0, 0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    const u32 glowcount = glows.size();
+    const u32 glowcount = (int)glows.size();
     ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -879,7 +879,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
             {
                 glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
                     (const void*)(GlowPassCmd::getInstance()->Offset * sizeof(DrawElementsIndirectCommand)),
-                    GlowPassCmd::getInstance()->Size,
+                    (int)GlowPassCmd::getInstance()->Size,
                     sizeof(DrawElementsIndirectCommand));
             }
         }

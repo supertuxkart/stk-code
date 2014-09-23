@@ -113,7 +113,7 @@ void EditGPScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
             assert(edit != NULL);
             //By default, 3 laps and no reversing
             edit->setSelection(NULL, 3, false);
-            StateManager::get()->pushScreen(edit);
+            edit->push();
         }
         else if (m_action == "remove")
         {
@@ -301,7 +301,7 @@ void EditGPScreen::edit()
             m_gp->getTrackId(m_selected)),
             m_gp->getLaps((unsigned int)m_selected),
             m_gp->getReverse((unsigned int)m_selected));
-        StateManager::get()->pushScreen(edit_screen);
+        edit_screen->push();
     }
 }
 

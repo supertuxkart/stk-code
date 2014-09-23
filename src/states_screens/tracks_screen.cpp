@@ -81,7 +81,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             if (clicked_track)
             {
                 TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
+                TrackInfoScreen::getInstance()->push();
             }   // if clicked_track
 
         }   // selection=="random_track"
@@ -98,7 +98,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             if (clicked_track)
             {
                 TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
+                TrackInfoScreen::getInstance()->push();
             }
         }
     }   // name=="tracks"
@@ -117,7 +117,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             GPInfoScreen *gpis = GPInfoScreen::getInstance();
             gpis->setGP( selection == "Random Grand Prix" ? "random" 
                                                           : selection);
-            StateManager::get()->pushScreen(gpis);
+            gpis->push();
         }
     }
     else if (name == "trackgroups")

@@ -376,7 +376,7 @@ stringw SpinnerWidget::getStringValue() const
 
 void SpinnerWidget::setValue(irr::core::stringw new_value)
 {
-    const int size = m_labels.size();
+    const int size = (int)m_labels.size();
     for (int n=0; n<size; n++)
     {
         if (m_labels[n] == new_value)

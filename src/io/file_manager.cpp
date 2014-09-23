@@ -422,7 +422,9 @@ XMLNode *FileManager::createXMLTreeFromString(const std::string & content)
     {
         char *b = new char[content.size()];
         memcpy(b, content.c_str(), content.size());
-        io::IReadFile * ireadfile = m_file_system->createMemoryReadFile(b, content.size(), "tempfile", true);
+        io::IReadFile * ireadfile = 
+            m_file_system->createMemoryReadFile(b, (int)content.size(), 
+                                                "tempfile", true);
         io::IXMLReader * reader = m_file_system->createXMLReader(ireadfile);
         XMLNode* node = new XMLNode(reader);
         reader->drop();

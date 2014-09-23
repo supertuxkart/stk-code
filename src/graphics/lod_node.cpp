@@ -78,7 +78,7 @@ int LODNode::getLevel()
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
     Camera* camera = Camera::getActiveCamera();
     if (camera == NULL)
-        return m_detail.size() - 1;
+        return (int)m_detail.size() - 1;
     AbstractKart* kart = camera->getKart();
     const Vec3 &pos = kart->getFrontXYZ();
 

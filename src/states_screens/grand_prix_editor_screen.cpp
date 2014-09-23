@@ -181,7 +181,7 @@ void GrandPrixEditorScreen::loadTrackList (const std::string& gpname)
     const std::vector<std::string> tracks = gp->getTrackNames(true);
 
     tracks_widget->clearItems();
-    tracks_widget->setItemCountHint(tracks.size());
+    tracks_widget->setItemCountHint((int)tracks.size());
     for (unsigned int t = 0; t < tracks.size(); t++)
     {
         Track* curr = track_manager->getTrack(tracks[t]);
@@ -248,7 +248,7 @@ void GrandPrixEditorScreen::showEditScreen(GrandPrixData* gp)
     assert(gp != NULL);
     EditGPScreen* edit = EditGPScreen::getInstance();
     edit->setSelectedGP(gp);
-    StateManager::get()->pushScreen(edit);
+    edit->push();
 }
 
 // -----------------------------------------------------------------------------
