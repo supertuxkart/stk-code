@@ -3,10 +3,12 @@
 
 vec3 getCIEYxy(vec3 rgbColor)
 {
-    mat3 sRGB2XYZ = transpose(mat3(
+    mat3 RGB2XYZ = transpose(mat3(
         vec3(.4125, .2126, .0193),
         vec3(.3576, .7152, .1192),
         vec3(.1805, .0722, .9505)));
 
-    return sRGB2XYZ * rgbColor;
+    vec3 xYz = RGB2XYZ * rgbColor;
+    float tmp = xYz.x + xYz.y + xYz.z;
+    return vec3(xYz.y, xYz.xy / tmp);
 }
