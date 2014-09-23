@@ -42,6 +42,7 @@
 #include "states_screens/grand_prix_editor_screen.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/offline_kart_selection.hpp"
+#include "states_screens/online_profile_overview.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
@@ -441,7 +442,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         }
         if (PlayerManager::getCurrentOnlineId())
         {
-            OnlineScreen::getInstance()->push();
+            // For 0.8.2 disable the server menu, instead go to online profile
+            //OnlineScreen::getInstance()->push();
+            ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
+            OnlineProfileOverview::getInstance()->push();
+
         }
         else
         {
