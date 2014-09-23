@@ -15,7 +15,10 @@
                 child_height="120" keep_selection="true" />
         </box>
 
-        <spacer height="10" />
+        <!-- Populated dynamically at runtime -->
+        <tabs width="100%" height="30" id="gpgroups"> </tabs>
+
+        <spacer height="20" />
 
         <box proportion="2" width="100%" layout="vertical-row">
             <label id="gpname" text_align="center" width="100%"

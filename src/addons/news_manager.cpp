@@ -224,6 +224,14 @@ void NewsManager::checkRedirect(const XMLNode *xml)
         }
         UserConfigParams::m_server_addons = new_server;
     }
+
+    std::string hw_report_server;
+    if(xml->get("hw-report-server", &hw_report_server)==1 && hw_report_server.size()>0)
+    {
+        Log::info("hw report", "New server at '%s'.", hw_report_server.c_str());
+        UserConfigParams::m_server_hw_report = hw_report_server;
+    }
+
 }   // checkRedirect
 
 // ----------------------------------------------------------------------------

@@ -367,7 +367,6 @@ void FrameBuffer::Bind()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glViewport(0, 0, width, height);
-    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver*)irr_driver->getDevice()->getVideoDriver();
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(RenderTargets.size(), bufs);
 }
@@ -770,7 +769,7 @@ const std::string getGLExtensions()
 
 // ----------------------------------------------------------------------------
 /** Adds GL limits to the json data structure.
- *  Thanks to Wildfire Games / 0.A.D. for allowing us to port their sources.
+ *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
  */
 void getGLLimits(HardwareStats::Json *json)
 {

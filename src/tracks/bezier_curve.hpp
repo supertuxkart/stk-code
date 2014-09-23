@@ -56,6 +56,6 @@ public:
     Vec3 getHPR(float t) const;
 
     /** Returns the number of points in this bezier curve. */
-    unsigned int getNumPoints() const {return m_all_data.size(); }
+    unsigned int getNumPoints() const {return (unsigned int) m_all_data.size(); }
 };   // BezierCurve
 #endif

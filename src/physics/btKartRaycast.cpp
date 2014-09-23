@@ -75,11 +75,13 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
             if(m_smooth_normals &&
                 rayCallback.getTriangleIndex()>-1)
             {
+#undef DEBUG_NORMALS
+#ifdef DEBUG_NORMALS
                 btVector3 n=result.m_hitNormalInWorld;
+#endif
                 result.m_hitNormalInWorld =
                     tm.getInterpolatedNormal(rayCallback.getTriangleIndex(),
                                              result.m_hitPointInWorld);
-#undef DEBUG_NORMALS
 #ifdef DEBUG_NORMALS
                 printf("old %f %f %f new %f %f %f\n",
                     n.getX(), n.getY(), n.getZ(),

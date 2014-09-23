@@ -194,9 +194,7 @@ void EndController::update(float dt)
     }
     /*Get information that is needed by more than 1 of the handling funcs*/
     //Detect if we are going to crash with the track and/or kart
-    int steps = 0;
-
-    steps = calcSteps();
+    calcSteps();
 
     /*Response handling functions*/
     handleSteering(dt);

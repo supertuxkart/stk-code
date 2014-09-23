@@ -67,7 +67,7 @@ void ArenasScreen::beforeAddingWidget()
 
     bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     const std::vector<std::string>& groups = track_manager->getAllArenaGroups(soccer_mode);
-    const int group_amount = groups.size();
+    const int group_amount = (int)groups.size();
 
     if (group_amount > 1)
     {
@@ -161,7 +161,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             }
 
             RandomGenerator random;
-            const int randomID = random.get(curr_group.size());
+            const int randomID = random.get((int)curr_group.size());
 
             Track* clicked_track = track_manager->getTrack( curr_group[randomID] );
             if (clicked_track != NULL)
@@ -218,9 +218,9 @@ void ArenasScreen::buildTrackList()
 
     if (curr_group_name == ALL_ARENA_GROUPS_ID)
     {
-        const int trackAmount = track_manager->getNumberOfTracks();
+        const int track_amount = (int)track_manager->getNumberOfTracks();
 
-        for (int n=0; n<trackAmount; n++)
+        for (int n=0; n<track_amount; n++)
         {
             Track* curr = track_manager->getTrack(n);
             if (soccer_mode)
@@ -248,9 +248,9 @@ void ArenasScreen::buildTrackList()
     else
     {
         const std::vector<int>& currArenas = track_manager->getArenasInGroup(curr_group_name, soccer_mode);
-        const int trackAmount = currArenas.size();
+        const int track_amount = (int)currArenas.size();
 
-        for (int n=0; n<trackAmount; n++)
+        for (int n=0; n<track_amount; n++)
         {
             Track* curr = track_manager->getTrack(currArenas[n]);
             if (soccer_mode)

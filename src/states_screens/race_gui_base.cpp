@@ -821,7 +821,6 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 
         if (info.special_title.size() > 0)
         {
-            static video::SColor color = video::SColor(255, 255, 0, 0);
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5,
                                 x+ICON_PLAYER_WIDTH, y+5);
             core::stringw s(info.special_title.c_str());

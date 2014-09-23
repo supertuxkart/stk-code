@@ -19,6 +19,8 @@
 #ifndef HEADER_GRAND_PRIX_MANAGER_HPP
 #define HEADER_GRAND_PRIX_MANAGER_HPP
 
+#include "race/grand_prix_data.hpp"
+
 #include <vector>
 #include <string>
 
@@ -38,9 +40,9 @@ private:
     /** Load all the grands prix from the 3 directories known */
     void loadFiles();
     /** Load all the grands prix in one directory */
-    void loadDir(const std::string& dir);
+    void loadDir(const std::string& dir, enum GrandPrixData::GPGroupType group);
     /** Load a grand prix and add it to m_gp_data*/
-    void load(const std::string &filename);
+    void load(const std::string &filename, enum GrandPrixData::GPGroupType group);
 
     /** Generates a new unique indentifier for a user defined grand prix */
     std::string generateId();
@@ -49,9 +51,7 @@ public:
                    GrandPrixManager();
                   ~GrandPrixManager();
     void           reload();
-    GrandPrixData* getGrandPrix(const int i) const { return m_gp_data[i];     }
     GrandPrixData* getGrandPrix(const std::string& s) const;
-    unsigned int   getNumberOfGrandPrix()    const { return m_gp_data.size(); }
     bool existsName(const irr::core::stringw& name) const;
     void           checkConsistency();
 
@@ -61,6 +61,13 @@ public:
     GrandPrixData* copy(const std::string& id,
                         const irr::core::stringw& newName);
     void           remove(const std::string& id);
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the data for the specified GP.
+     *  \param i Index of the GP. */
+    GrandPrixData* getGrandPrix(const int i) const { return m_gp_data[i];     }
+    // ------------------------------------------------------------------------
+    /** Returns the number of GPs. */
+    unsigned int   getNumberOfGrandPrix()    const { return (int)m_gp_data.size(); }
 };   // GrandPrixManager
 
 extern GrandPrixManager *grand_prix_manager;

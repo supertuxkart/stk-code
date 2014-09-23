@@ -99,7 +99,7 @@ public:
     // ------------------------------------------------------------------------
     unsigned int size() const
     {
-        return m_contents_vector.size();
+        return (int) m_contents_vector.size();
     }   // size
 
     // ------------------------------------------------------------------------

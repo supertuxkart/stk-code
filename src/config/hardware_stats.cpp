@@ -22,7 +22,12 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "online/http_request.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
+
+#ifdef __APPLE__
+#  include <sys/sysctl.h>
+#endif
 
 namespace HardwareStats
 {
@@ -30,24 +35,93 @@ namespace HardwareStats
 
 // ----------------------------------------------------------------------------
 /** Returns the amount of RAM in MB.
+ *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
  */
 int getRAM()
 {
 #ifdef __linux__
-    const uint64_t memorySize = (uint64_t)sysconf(_SC_PHYS_PAGES) 
+    const uint64_t memory_size = (uint64_t)sysconf(_SC_PHYS_PAGES) 
                                         * sysconf(_SC_PAGESIZE);
-    return long(memorySize / (1024*1024));
-#endif
-#ifdef WIN32
+    return int(memory_size / (1024*1024));
 #endif
 
+#ifdef WIN32
+    MEMORYSTATUSEX mse;
+    mse.dwLength = sizeof(mse);
+    const bool ok = GlobalMemoryStatusEx(&mse)==TRUE;
+
+    DWORDLONG memory_size = mse.ullTotalPhys;
+    // Richter, "Programming Applications for Windows": the reported
+    // value doesn't include non-paged pool reserved during boot;
+    // it's not considered available to the kernel. (the amount is
+    // 528 KiB on a 512 MiB WinXP/Win2k machine). we'll round up
+    // to the nearest megabyte to fix this.
+    const DWORDLONG mbyte = 1024*1024;
+    return (int)ceil(memory_size/mbyte);
+#endif
+
+#ifdef __APPLE__
+    size_t memory_size = 0;
+    size_t len = sizeof(memory_size);
+    // Argh, the API doesn't seem to be const-correct
+    /*const*/ int mib[2] = { CTL_HW, HW_PHYSMEM };
+    sysctl(mib, 2, &memory_size, &len, 0, 0);
+    memory_size /= (1024*1024);
+    return int(memory_size);
+#endif
+    Log::error("HW report",
+              "No RAM information available for hardware report.");
     return 0;
 }   // getRAM
 
 // ----------------------------------------------------------------------------
+/** Returns the number of processors on the system.
+ *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
+ */
+int getNumProcessors()
+{
+#ifdef __linux__
+    return sysconf(_SC_NPROCESSORS_CONF);
+#endif
+#ifdef WIN32
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);	// guaranteed to succeed
+    return si.dwNumberOfProcessors;
+#endif
+#ifdef __APPLE__
+    // Mac OS X doesn't have sysconf(_SC_NPROCESSORS_CONF)
+    int mib[] = { CTL_HW, HW_NCPU };
+    int ncpus;
+    size_t len = sizeof(ncpus);
+    int ret = sysctl(mib, 2, &ncpus, &len, NULL, 0);
+    assert(ret != -1);
+    return ncpus;
+#endif
+    Log::error("HW report",
+               "Number of processors not available for hardware report.");
+    return 0;
+}   // getNumProcessors
 
+// ----------------------------------------------------------------------------
+/** If the configuration of this installation has not been reported for the
+ *  current version, collect the hardware statistics and send it to STK's
+ *  server.
+ */
 void reportHardwareStats()
 {
+    // Version of the hw report, which is stored in the DB. If new fields
+    // are added, increase this version. Each STK installation will report
+    // its configuration only once (per version number). So if the version
+    // number is increased, a new report will be sent.
+    const int report_version = 1;
+    if(UserConfigParams::m_last_hw_report_version>=report_version) return;
+    while(UserConfigParams::m_random_identifier==0)
+    {
+        RandomGenerator rg;
+        UserConfigParams::m_random_identifier = rg.get(1<<30);
+        user_config->saveConfig();
+    }
+
     Json json;
 #ifdef WIN32
     json.add("os_win", 1);
@@ -100,22 +174,70 @@ void reportHardwareStats()
     if(mem>0)
         json.add("ram_total", mem);
 
+    int nr_procs = getNumProcessors();
+    if(nr_procs>0)
+        json.add("cpu_numprocs", nr_procs);
+
     // Too long for debugging atm
     //json.add("GL_EXTENSIONS", getGLExtensions());
     getGLLimits(&json);
     json.finish();
     Log::verbose("json", "'%s'", json.toString().c_str());
 
-    Online::HTTPRequest *request = new Online::HTTPRequest(/*manage memory*/true, 1);
-    request->addParameter("user_id", 3);
+    // ------------------------------------------------------------------------
+    /** A small class which sends the HW report to the STK server. On
+     *  completion, it will either update the last-submitted-hw-report version,
+     *  or log an error message (in which case next time STK is started it
+     *  wil try again to log the report).
+     */
+    class HWReportRequest : public Online::HTTPRequest
+    {
+    private:
+        /** Version number of the hw report. */
+        int m_version;
+    public:
+        HWReportRequest(int version) : Online::HTTPRequest(/*manage memory*/true, 1)
+                                       ,m_version(version)
+        {}
+        // --------------------------------------------------------------------
+        /** Callback after the request has been executed. 
+         */
+        virtual void callback()
+        {
+            // If the request contains incorrect data, it will not have a 
+            // download error, but return an error string as return value:
+            if(hadDownloadError() || getData()=="<h1>Bad Request (400)</h1>")
+            {
+                Log::error("HW report", "Error uploading the HW report.");
+                if(hadDownloadError())
+                    Log::error("HW report", "%s", getDownloadErrorMessage());
+                else
+                    Log::error("HW report", "%s", getData().c_str());
+            }
+            else
+            {
+                Log::info("HW report", "Upload successful.");
+                UserConfigParams::m_last_hw_report_version = m_version;
+                // The callback is executed by the main thread, so no need
+                // to worry about locks when writing the file.
+                user_config->saveConfig();
+            }
+        }   // callback
+
+    };   // HWReportRequest
+    // ------------------------------------------------------------------------
+
+    Online::HTTPRequest *request = new HWReportRequest(report_version);
+    request->addParameter("user_id", UserConfigParams::m_random_identifier);
     request->addParameter("time", StkTime::getTimeSinceEpoch());
     request->addParameter("type", "hwdetect");
-    request->addParameter("version", 1);
+    request->addParameter("version", report_version);
     request->addParameter("data", json.toString());
-    request->setURL("http://stats.supertuxkart.net/upload/v1/");
+    request->setURL((std::string)UserConfigParams::m_server_hw_report+"/upload/v1/");
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     // FIXME: For now: don't submit
     //request->queue();
+
 }   // reportHardwareStats
 
 }   // namespace HardwareStats

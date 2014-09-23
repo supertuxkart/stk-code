@@ -111,7 +111,7 @@ public:
     void           switchItems     ();
     // ------------------------------------------------------------------------
     /** Returns the number of items. */
-    unsigned int   getNumberOfItems() const { return m_all_items.size(); }
+    unsigned int   getNumberOfItems() const { return (unsigned int) m_all_items.size(); }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
     const Item*   getItem(unsigned int n) const { return m_all_items[n]; };

@@ -31,7 +31,6 @@ static PtrVector<UserConfigParam, REF> all_params;
 #define PARAM_DEFAULT(X) = X
 #include "config/user_config.hpp"
 
-#include "config/player_profile.hpp"
 #include "config/saved_grand_prix.hpp"
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
@@ -91,7 +90,7 @@ GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
 // ----------------------------------------------------------------------------
 void GroupUserConfigParam::write(std::ofstream& stream) const
 {
-    const int attr_amount = m_attributes.size();
+    const int attr_amount = (int)m_attributes.size();
 
     // comments
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
@@ -110,7 +109,7 @@ void GroupUserConfigParam::write(std::ofstream& stream) const
         m_attributes[n]->writeInner(stream, 1);
     }
     stream << "    >\n";
-    const int children_amount = m_children.size();
+    const int children_amount = (int)m_children.size();
     for (int n=0; n<children_amount; n++)
     {
         m_children[n]->writeInner(stream, 1);

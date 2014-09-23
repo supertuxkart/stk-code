@@ -10,7 +10,8 @@
 
 enum InstanceType
 {
-    InstanceTypeDefault,
+    InstanceTypeDualTex,
+    InstanceTypeThreeTex,
     InstanceTypeShadow,
     InstanceTypeRSM,
     InstanceTypeGlow,
@@ -20,7 +21,34 @@ enum InstanceType
 #ifdef WIN32
 #pragma pack(push, 1)
 #endif
-struct InstanceData
+struct InstanceDataSingleTex
+{
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Origin;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Orientation;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Scale;
+    uint64_t Texture;
+#ifdef WIN32
+};
+#else
+} __attribute__((packed));
+#endif
+
+struct InstanceDataDualTex
 {
     struct
     {
@@ -42,6 +70,35 @@ struct InstanceData
     } Scale;
     uint64_t Texture;
     uint64_t SecondTexture;
+#ifdef WIN32
+};
+#else
+} __attribute__((packed));
+#endif
+
+struct InstanceDataThreeTex
+{
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Origin;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Orientation;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Scale;
+    uint64_t Texture;
+    uint64_t SecondTexture;
+    uint64_t ThirdTexture;
 #ifdef WIN32
 };
 #else

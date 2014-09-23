@@ -89,8 +89,6 @@ RTT::RTT(size_t width, size_t height)
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
     const dimension2du shadowsize2(shadowside / 4, shadowside / 4);
     const dimension2du shadowsize3(shadowside / 8, shadowside / 8);
-    const dimension2du warpvsize(1, 512);
-    const dimension2du warphsize(512, 1);
 
     unsigned linear_depth_mip_levels = int(ceilf(log2f( float(max_(res.Width, res.Height)) )));
 

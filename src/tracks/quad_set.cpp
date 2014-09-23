@@ -59,7 +59,7 @@ void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name,
 {
     std::string s;
     xml->get(attribute_name, &s);
-    int pos=s.find_first_of(":");
+    int pos=(int)s.find_first_of(":");
     if(pos>0)   // n:p specification
     {
         std::vector<std::string> l = StringUtils::split(s, ':');

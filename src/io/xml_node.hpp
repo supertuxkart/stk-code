@@ -70,7 +70,7 @@ public:
     const XMLNode     *getNode(const std::string &name) const;
     const void         getNodes(const std::string &s, std::vector<XMLNode*>& out) const;
     const XMLNode     *getNode(unsigned int i) const;
-    unsigned int       getNumNodes() const {return m_nodes.size(); }
+    unsigned int       getNumNodes() const {return (unsigned int) m_nodes.size(); }
     int get(const std::string &attribute, std::string *value) const;
     int get(const std::string &attribute, core::stringw *value) const;
     int get(const std::string &attribute, int32_t  *value) const;

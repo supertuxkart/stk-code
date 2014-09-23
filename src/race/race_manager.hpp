@@ -476,7 +476,7 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getNumLocalPlayers() const
     {
-        return m_local_player_karts.size();
+        return (unsigned int)m_local_player_karts.size();
     }
     // ------------------------------------------------------------------------
     /** Returns the selected number of karts (selected number of players and
@@ -488,7 +488,7 @@ public:
     // ------------------------------------------------------------------------
     MinorRaceModeType getMinorMode() const { return m_minor_mode; }
     // ------------------------------------------------------------------------
-    unsigned int getNumPlayers() const { return m_player_karts.size(); }
+    unsigned int getNumPlayers() const { return (unsigned int) m_player_karts.size(); }
     // ------------------------------------------------------------------------
     /** \brief Returns the number lf laps.
      *  In case of FTL or battle mode always return 9999, since they don't

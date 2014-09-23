@@ -737,7 +737,7 @@ namespace GUIEngine
     void showMessage(const wchar_t* message, const float time)
     {
         // check for duplicates
-        const int count = gui_messages.size();
+        const int count = (int) gui_messages.size();
         for (int n=0; n<count; n++)
         {
             if (gui_messages[n].m_message == message) return;
@@ -1330,7 +1330,7 @@ namespace GUIEngine
                            SColor(255,255,255,255),
                            true/* center h */, false /* center v */ );
 
-        const int icon_count = g_loading_icons.size();
+        const int icon_count = (int)g_loading_icons.size();
         const int icon_size = (int)(screen_w / 16.0f);
         const int ICON_MARGIN = 6;
         int x = ICON_MARGIN;

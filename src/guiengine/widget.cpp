@@ -317,7 +317,9 @@ void Widget::setParent(IGUIElement* parent)
 bool Widget::isVisible() const
 {
     if (m_element != NULL)
+    {
         assert(m_element->isVisible() == m_is_visible);
+    }
     return m_is_visible;
 }
 

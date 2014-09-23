@@ -221,7 +221,7 @@ void DynamicRibbonWidget::add()
 
                 if (item_count < 1)
                 {
-                    item_count = m_items.size();
+                    item_count = (int) m_items.size();
                 }
 
                 if (item_count < 1)
@@ -327,7 +327,7 @@ void DynamicRibbonWidget::buildInternalStructure()
     m_col_amount = (int)roundf( m_w / ( m_child_width*ratio_zoom ) );
 
     // ajust column amount to not add more item slots than we actually need
-    const int item_count = m_items.size();
+    const int item_count = (int) m_items.size();
     //std::cout << "item_count=" << item_count << ", row_amount*m_col_amount=" << m_row_amount*m_col_amount << std::endl;
     if (m_row_amount*m_col_amount > item_count)
     {
@@ -647,7 +647,7 @@ EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w,
         if (selected_ribbon != NULL)
         {
             m_selected_item[playerID] = selected_ribbon->m_selection[playerID] + m_scroll_offset;
-            if (m_selected_item[playerID] >= (int)m_items.size()) m_selected_item[playerID] -= m_items.size();
+            if (m_selected_item[playerID] >= (int)m_items.size()) m_selected_item[playerID] -= (int)m_items.size();
         }
     }
 
@@ -755,7 +755,7 @@ void DynamicRibbonWidget::scroll(const int x_delta)
         {
             RibbonWidget* ribbon = m_rows.get(0); // there is a single row when we can select items
             int id = m_selected_item[n] - m_scroll_offset;
-            if (id < 0) id += m_items.size();
+            if (id < 0) id += (int) m_items.size();
             ribbon->setSelection(id, n);
         }
     }
@@ -791,7 +791,7 @@ void DynamicRibbonWidget::propagateSelection()
         if (m_combo)
         {
             m_selected_item[p] = relative_selection + m_scroll_offset;
-            if (m_selected_item[p] >= (int)m_items.size()) m_selected_item[p] -= m_items.size();
+            if (m_selected_item[p] >= (int)m_items.size()) m_selected_item[p] -= (int)m_items.size();
         }
 
         // set same selection in all ribbons
@@ -819,7 +819,7 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
 
     std::string selection_id = row->getSelectionIDString(playerID);
 
-    const int amount = m_items.size();
+    const int amount = (int)m_items.size();
     for (int n=0; n<amount; n++)
     {
         if (m_items[n].m_code_name == selection_id)
@@ -844,14 +844,14 @@ void DynamicRibbonWidget::updateItemDisplay()
     if ((int)m_items.size() != m_previous_item_count)
     {
         buildInternalStructure();
-        m_previous_item_count = m_items.size();
+        m_previous_item_count = (int)m_items.size();
     }
 
     // ---- some variables
     int icon_id = 0;
 
-    const int row_amount = m_rows.size();
-    const int item_amount = m_items.size();
+    const int row_amount = (int)m_rows.size();
+    const int item_amount = (int)m_items.size();
 
     //FIXME: isn't this set by 'buildInternalStructure' already?
     m_needed_cols = (int)ceil( (float)item_amount / (float)row_amount );
@@ -860,7 +860,8 @@ void DynamicRibbonWidget::updateItemDisplay()
 
     // the number of items that fit perfectly the number of rows we have
     // (this value will be useful to compute scrolling)
-    int fitting_item_amount = (m_scrolling_enabled ? m_needed_cols * row_amount : m_items.size());
+    int fitting_item_amount = (m_scrolling_enabled ? m_needed_cols * row_amount 
+                                                   : (int)m_items.size());
 
     // ---- to determine which items go in which cell of the dynamic ribbon now,
     //      we create a temporary 2D table and fill them with the ID of the item
@@ -980,7 +981,7 @@ void DynamicRibbonWidget::update(float dt)
         {
             int col_scroll = i + m_scroll_offset;
             int item_id = (col_scroll)*row_amount + n;
-            if (item_id >= (int)m_items.size()) item_id -= m_items.size();
+            if (item_id >= (int)m_items.size()) item_id -= (int)m_items.size();
 
             assert(item_id >= 0);
             assert(item_id < (int)m_items.size());
@@ -1097,7 +1098,7 @@ bool DynamicRibbonWidget::setSelection(const std::string &item_codename,
 {
     if (m_deactivated && !evenIfDeactivated) return false;
 
-    const int item_count = m_items.size();
+    const int item_count = (int)m_items.size();
     for (int n=0; n<item_count; n++)
     {
         if (m_items[n].m_code_name == item_codename)

@@ -95,7 +95,10 @@ void* waitInput(void* data)
                 clrp->voteRaceCount(cnt);
             }
         }
-        else if (NetworkManager::getInstance()->getPeers().size() > 0)
+        // If STK shuts down, but should receive an input after the network 
+        // manager was deleted, the getInstance call will return NULL.
+        else if (NetworkManager::getInstance() && 
+                 NetworkManager::getInstance()->getPeers().size() > 0)
         {
             NetworkString msg;
             msg.ai8(0);
@@ -136,6 +139,14 @@ void ClientNetworkManager::run()
 
     Log::info("ClientNetworkManager", "Host initialized.");
 
+    m_thread_keyboard = NULL;
+    // This code can cause crashes atm (see #1529): if the 
+    // client_network_manager receives input after the network manager
+    // has been deleted, stk will crash. And this happens on windows
+    // in release mode (since there is no console, so no stdin), and
+    // apparently on osx at shutdown time - getline returns an empty string
+    // (not sure if it has an error condition).
+#ifdef RE_ENABLE_LATER
     // On windows in release mode the console is suppressed, so nothing can
     // be read from std::cin. Since getline(std::cin,...) then returns
     // an empty string, the waitInput thread is running all the time, consuming
@@ -146,6 +157,7 @@ void ClientNetworkManager::run()
     // listen keyboard console input
     m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
     pthread_create(m_thread_keyboard, NULL, waitInput, NULL);
+#endif
 #endif
     NetworkManager::run();
 

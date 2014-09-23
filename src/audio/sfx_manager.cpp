@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 
+#include <pthread.h>
 #include <stdexcept>
 #include <algorithm>
 #include <map>
@@ -68,6 +69,7 @@ void SFXManager::destroy()
  */
 SFXManager::SFXManager()
 {
+
     // The sound manager initialises OpenAL
     m_initialized = music_manager->initialized();
     m_master_gain = UserConfigParams::m_sfx_volume;
@@ -75,11 +77,39 @@ SFXManager::SFXManager()
     m_position    = Vec3(0,0,0);
 
     loadSfx();
+
+    pthread_cond_init(&m_cond_request, NULL);
+
+    pthread_attr_t  attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+    // Should be the default, but just in case:
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+
+    m_thread_id.setAtomic(new pthread_t());
+    // The thread is created even if there atm sfx are disabled
+    // (since the user might enable it later).
+    int error = pthread_create(m_thread_id.getData(), &attr,
+                               &SFXManager::mainLoop, this);
+    if (error)
+    {
+        m_thread_id.lock();
+        delete m_thread_id.getData();
+        m_thread_id.unlock();
+        m_thread_id.setAtomic(0);
+        Log::error("HTTP Manager", "Could not create thread, error=%d.",
+                   errno);
+    }
+    pthread_attr_destroy(&attr);
+
     if (!sfxAllowed()) return;
+
     setMasterSFXVolume( UserConfigParams::m_sfx_volume );
     m_sfx_to_play.lock();
     m_sfx_to_play.getData().clear();
     m_sfx_to_play.unlock();
+
 }  // SoundManager
 
 //-----------------------------------------------------------------------------
@@ -87,8 +117,14 @@ SFXManager::SFXManager()
  */
 SFXManager::~SFXManager()
 {
+    m_thread_id.lock();
+    pthread_join(*m_thread_id.getData(), NULL);
+    delete m_thread_id.getData();
+    m_thread_id.unlock();
+    pthread_cond_destroy(&m_cond_request);
+
     // ---- clear m_all_sfx
-    const int sfx_amount = m_all_sfx.size();
+    const int sfx_amount = (int) m_all_sfx.size();
     for (int n=0; n<sfx_amount; n++)
     {
         delete m_all_sfx[n];
@@ -131,29 +167,68 @@ void SFXManager::queue(SFXBase *sfx)
 {
     // Don't add sfx that are either not working correctly (e.g. because sfx
     // are disabled);
-    if(sfx->getStatus()==SFX_UNKNOWN ) return;
+    if(sfx && sfx->getStatus()==SFX_UNKNOWN ) return;
 
     m_sfx_to_play.lock();
     m_sfx_to_play.getData().push_back(sfx);
     m_sfx_to_play.unlock();
-}   // playSFX
+    // Wake up the sfx thread
+    pthread_cond_signal(&m_cond_request);
+
+}   // queue
 
 //----------------------------------------------------------------------------
-/** Starts all sfx that are queues to be started. Called once per frame.
+/** Puts a NULL request into the queue, which will trigger the thread to
+ *  exit.
  */
-void SFXManager::update()
+void SFXManager::stopThread()
 {
-    m_sfx_to_play.lock();
-    while(!m_sfx_to_play.getData().empty())
+    queue(NULL);
+}   // stopThread
+
+//----------------------------------------------------------------------------
+/** This loops runs in a different threads, and starts sfx to be played.
+ *  This can sometimes take up to 5 ms, so it needs to be handled in a thread
+ *  in order to avoid rendering delays.
+ *  \param obj A pointer to the SFX singleton.
+ */
+void* SFXManager::mainLoop(void *obj)
+{
+    SFXManager *me = (SFXManager*)obj;
+
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+
+    me->m_sfx_to_play.lock();
+
+    // Wait till we have an empty sfx in the queue
+    while (me->m_sfx_to_play.getData().empty() ||
+           me->m_sfx_to_play.getData().front()!=NULL    )
     {
-        SFXBase *sfx = m_sfx_to_play.getData().front();
-        m_sfx_to_play.getData().erase(m_sfx_to_play.getData().begin());
-        m_sfx_to_play.unlock();
-        sfx->reallyPlayNow();
-        m_sfx_to_play.lock();
-    }   // while !empty
-    m_sfx_to_play.unlock();
-}   // update
+        bool empty = me->m_sfx_to_play.getData().empty();
+
+        // Wait in cond_wait for a request to arrive. The 'while' is necessary
+        // since "spurious wakeups from the pthread_cond_wait ... may occur"
+        // (pthread_cond_wait man page)!
+        while (empty)
+        {
+            pthread_cond_wait(&me->m_cond_request, me->m_sfx_to_play.getMutex());
+            empty = me->m_sfx_to_play.getData().empty();
+        }
+
+        SFXBase *current = me->m_sfx_to_play.getData().front();
+        me->m_sfx_to_play.getData().erase(me->m_sfx_to_play.getData().begin());
+
+        if (!current)   // empty sfx indicates to abort the sfx manager
+            break;
+
+        me->m_sfx_to_play.unlock();
+        current->reallyPlayNow();
+        me->m_sfx_to_play.lock();
+
+    }   // while
+
+    return NULL;
+}   // mainLoop
 
 //----------------------------------------------------------------------------
 /** Called then sound is globally switched on or off. It either pauses or
@@ -174,7 +249,7 @@ void SFXManager::soundToggled(const bool on)
 
         resumeAll();
 
-        const int sfx_amount = m_all_sfx.size();
+        const int sfx_amount = (int)m_all_sfx.size();
         for (int n=0; n<sfx_amount; n++)
         {
             m_all_sfx[n]->onSoundEnabledBack();

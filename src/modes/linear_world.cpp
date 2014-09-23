@@ -87,7 +87,7 @@ void LinearWorld::reset()
     m_last_lap_sfx_played = false;
     m_last_lap_sfx_playing = false;
 
-    const unsigned int kart_amount = m_karts.size();
+    const unsigned int kart_amount = (unsigned int) m_karts.size();
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_kart_info[i].reset();
@@ -650,7 +650,7 @@ void LinearWorld::updateRacePosition()
 {
     // Mostly for debugging:
     beginSetKartPositions();
-    const unsigned int kart_amount = m_karts.size();
+    const unsigned int kart_amount = (unsigned int) m_karts.size();
 
 #ifdef DEBUG
     bool rank_changed = false;

@@ -680,7 +680,25 @@ namespace UserConfigParams
                                                "wasn't asked, 1: allowed, 2: "
                                                "not allowed") );
 
-    // ---- User managerment
+    PARAM_PREFIX GroupUserConfigParam       m_hw_report_group
+            PARAM_DEFAULT( GroupUserConfigParam("HWReport",
+                                          "Everything related to hardware configuration.") );
+
+    PARAM_PREFIX IntUserConfigParam        m_last_hw_report_version
+            PARAM_DEFAULT(  IntUserConfigParam(0, "report-version", &m_hw_report_group,
+                                                  "Version of hardware report "
+                                                  "that was reported last") );
+    PARAM_PREFIX IntUserConfigParam        m_random_identifier
+            PARAM_DEFAULT(  IntUserConfigParam(0, "random-identifier", &m_hw_report_group,
+                                                  "A random number to avoid duplicated reports.") );
+
+    PARAM_PREFIX StringUserConfigParam      m_server_hw_report
+            PARAM_DEFAULT( StringUserConfigParam(   "http://stats.supertuxkart.net",
+                                                     "hw-report-server",
+                                                     &m_hw_report_group,
+                                                    "The server used for reporting statistics to."));
+
+    // ---- User management
 
     PARAM_PREFIX BoolUserConfigParam        m_always_show_login_screen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "always_show_login_screen",

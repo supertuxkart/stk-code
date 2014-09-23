@@ -110,15 +110,21 @@ private:
     /** Master gain value, taken from the user config value. */
     float                     m_master_gain;
 
+    /** Thread id of the thread running in this object. */
+    Synchronised<pthread_t *> m_thread_id;
+
+    /** A conditional variable to wake up the main loop. */
+    pthread_cond_t            m_cond_request;
+
     void                      loadSfx();
                              SFXManager();
     virtual                 ~SFXManager();
 
+    static void* mainLoop(void *obj);
 public:
     static void create();
     static void destroy();
     void queue(SFXBase *sfx);
-    void update();
     // ------------------------------------------------------------------------
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()
@@ -128,6 +134,7 @@ public:
     }   // get
 
     // ------------------------------------------------------------------------
+    void                     stopThread();
     bool                     sfxAllowed();
     SFXBuffer*               loadSingleSfx(const XMLNode* node,
                                            const std::string &path=std::string(""),

@@ -572,7 +572,6 @@ void Kart::createPhysics()
 {
     // First: Create the chassis of the kart
     // -------------------------------------
-    float kart_width  = getKartWidth();
     float kart_length = getKartLength();
     float kart_height = getKartHeight();
 
@@ -2606,7 +2605,7 @@ void Kart::setOnScreenText(const wchar_t *text)
     if (irr_driver->isGLSL())
     {
         gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont() : GUIEngine::getTitleFont();
-        STKTextBillboard* tb = new STKTextBillboard(text, font,
+        new STKTextBillboard(text, font,
             video::SColor(255, 255, 225, 0),
             video::SColor(255, 255, 89, 0),
             getNode(), irr_driver->getSceneManager(), -1,
