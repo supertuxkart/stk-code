@@ -77,8 +77,8 @@ void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &h
 {
     track_x = f1, track_z = f2, track_x_len = f3, track_z_len = f4;
 
-    unsigned width = hm.size();
-    unsigned height = hm[0].size();
+    unsigned width  = (unsigned)hm.size();
+    unsigned height = (unsigned)hm[0].size();
     float *hm_array = new float[width * height];
     for (unsigned i = 0; i < width; i++)
     {

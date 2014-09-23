@@ -79,7 +79,7 @@ struct UniformHelper
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const std::vector<float> &v, Args... arg)
     {
-        glUniform1fv(uniforms[N], v.size(), v.data());
+        glUniform1fv(uniforms[N], (int)v.size(), v.data());
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 

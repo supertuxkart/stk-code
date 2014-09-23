@@ -57,7 +57,7 @@ static void renderPointLights(unsigned count)
 
 unsigned IrrDriver::UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt)
 {
-    const u32 lightcount = m_lights.size();
+    const u32 lightcount = (u32)m_lights.size();
     const core::vector3df &campos = camnode->getAbsolutePosition();
 
     std::vector<LightNode *> BucketedLN[15];

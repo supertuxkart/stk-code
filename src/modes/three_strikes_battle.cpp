@@ -88,7 +88,7 @@ void ThreeStrikesBattle::reset()
 {
     WorldWithRank::reset();
 
-    const unsigned int kart_amount = m_karts.size();
+    const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     for(unsigned int n=0; n<kart_amount; n++)
     {

@@ -94,7 +94,7 @@ void RaceResultGUI::init()
     // Calculate screenshot scrolling parameters
     const std::vector<std::string> tracks =
         race_manager->getGrandPrix().getTrackNames();
-    int n_tracks = tracks.size();
+    int n_tracks = (int)tracks.size();
     int currentTrack = race_manager->getTrackNumber();
     m_start_track = currentTrack;
     if (n_tracks > m_max_tracks)

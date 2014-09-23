@@ -352,7 +352,7 @@ void RaceManager::startNew(bool from_overworld)
                                                          m_grand_prix.getId(),
                                                          m_difficulty,
                                                          m_num_karts,
-                                                         m_player_karts.size());
+                                                         (int)m_player_karts.size());
 
         // Start the race with the appropriate track
         // =========================================
@@ -503,7 +503,7 @@ void RaceManager::next()
                                            m_grand_prix.getId(),
                                            m_difficulty,
                                            m_num_karts,
-                                           m_player_karts.size());
+                                           (int)m_player_karts.size());
             if(gp != NULL)
             {
                 //if so addept it
@@ -519,7 +519,7 @@ void RaceManager::next()
                                            ->getUniqueID(),
                         m_grand_prix.getId(),
                         m_difficulty,
-                        m_player_karts.size(),
+                        (int)m_player_karts.size(),
                         m_track_number,
                         m_kart_status
                     )
@@ -639,7 +639,7 @@ void RaceManager::exitRace(bool delete_world)
                                            m_grand_prix.getId(),
                                            m_difficulty,
                                            m_num_karts,
-                                           m_player_karts.size());
+                                           (int)m_player_karts.size());
             if(gp != NULL) gp->remove();
         }
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
@@ -816,7 +816,7 @@ void RaceManager::setupPlayerKartInfo()
     std::sort(kart_info.begin(), kart_info.end());
 
     // Set the player kart information
-    setNumPlayers(kart_info.size());
+    setNumPlayers((int)kart_info.size());
 
     // Set the global player ID for each player
     for(unsigned int i=0; i<kart_info.size(); i++)

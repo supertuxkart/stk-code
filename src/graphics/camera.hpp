@@ -201,7 +201,7 @@ public:
     LEAK_CHECK()
 
     /** Returns the number of cameras used. */
-    static unsigned int getNumCameras() { return m_all_cameras.size(); }
+    static unsigned int getNumCameras() { return (unsigned int)m_all_cameras.size(); }
 
     // ------------------------------------------------------------------------
     /** Returns a camera. */
@@ -223,7 +223,7 @@ public:
      */
     static Camera* createCamera(AbstractKart* kart)
     {
-        Camera *c = new Camera(m_all_cameras.size(), kart);
+        Camera *c = new Camera((int)m_all_cameras.size(), kart);
         m_all_cameras.push_back(c);
         return c;
     }   // createCamera

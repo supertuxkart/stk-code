@@ -103,7 +103,9 @@ public:
     int askUserToConnectWiimotes();
     // ------------------------------------------------------------------------
     /** Returns the number of wiimotes connected. */
-    unsigned int  getNumberOfWiimotes() const   {return m_wiimotes.size();}
+    unsigned int getNumberOfWiimotes() const  {
+        return (unsigned int)m_wiimotes.size();
+    }   // getNumberOfWiimotes
 
 };   // class WiimoteManager
 

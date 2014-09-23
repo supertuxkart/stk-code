@@ -2505,7 +2505,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
 void IrrDriver::clearLights()
 {
     u32 i;
-    const u32 max = m_lights.size();
+    const u32 max = (int)m_lights.size();
     for (i = 0; i < max; i++)
     {
         m_lights[i]->drop();

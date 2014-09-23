@@ -172,7 +172,7 @@ GLuint LoadShader(const char * file, unsigned type)
     int InfoLogLength;
     Log::info("GLWrap", "Compiling shader : %s", file);
     char const * SourcePointer = Code.c_str();
-    int length = strlen(SourcePointer);
+    int length = (int)strlen(SourcePointer);
     glShaderSource(Id, 1, &SourcePointer, &length);
     glCompileShader(Id);
 
@@ -366,16 +366,17 @@ FrameBuffer::~FrameBuffer()
 void FrameBuffer::Bind()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, (int)width, (int)height);
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    glDrawBuffers(RenderTargets.size(), bufs);
+    glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
 void FrameBuffer::Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask, GLenum filter)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, Src.fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst.fbo);
-    glBlitFramebuffer(0, 0, Src.width, Src.height, 0, 0, Dst.width, Dst.height, mask, filter);
+    glBlitFramebuffer(0, 0, (int)Src.width, (int)Src.height, 0, 0,
+                      (int)Dst.width, (int)Dst.height, mask, filter);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
@@ -384,7 +385,7 @@ void FrameBuffer::BlitToDefault(size_t x0, size_t y0, size_t x1, size_t y1)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, width, height, x0, y0, x1, y1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBlitFramebuffer(0, 0, (int)width, (int)height, (int)x0, (int)y0, (int)x1, (int)y1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
@@ -583,7 +584,7 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
         tex_width, tex_height,
         tex_center_pos_x, tex_center_pos_y;
 
-    getSize(texture_w, texture_h, true,
+    getSize((int)texture_w, (int)texture_h, true,
         destRect, sourceRect, width, height, center_pos_x, center_pos_y,
         tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
 
