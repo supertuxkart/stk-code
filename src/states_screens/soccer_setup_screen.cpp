@@ -383,7 +383,7 @@ void SoccerSetupScreen::onUpdate(float delta)
                 return;
         }
         m_schedule_continue = false;
-        StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+        ArenasScreen::getInstance()->push();
     }
 }   // onUPdate
 

@@ -139,12 +139,12 @@ void NotificationDialog::onUpdate(float dt)
             if(type == T_Friends)
             {
                 ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-                StateManager::get()->pushScreen(OnlineProfileFriends::getInstance());
+                OnlineProfileFriends::getInstance()->push();
             }
             else if (type == T_Achievements)
             {
                 ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-                StateManager::get()->pushScreen(OnlineProfileAchievements::getInstance());
+                OnlineProfileAchievements::getInstance()->push();
             }
         }
         return;

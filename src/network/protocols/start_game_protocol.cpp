@@ -12,7 +12,6 @@
 #include "network/protocols/synchronization_protocol.hpp"
 #include "online/online_profile.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/state_manager.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/network_kart_selection.hpp"
 #include "utils/log.hpp"
@@ -159,7 +158,7 @@ void StartGameProtocol::update()
         KartSelectionScreen* s = KartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(false);
-        StateManager::get()->pushScreen( s );*/
+        s->push();*/
     }
     else if (m_state == SYNCHRONIZATION_WAIT)
     {

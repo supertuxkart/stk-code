@@ -1887,7 +1887,7 @@ void KartSelectionScreen::allPlayersDone()
     }
     else
     {
-        StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );
+        RaceSetupScreen::getInstance()->push();
     }
 }   // allPlayersDone
 

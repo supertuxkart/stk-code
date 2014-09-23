@@ -548,7 +548,7 @@ void World::terminateRace()
         results->clearHighscores();
     }
 
-    StateManager::get()->pushScreen(results);
+    results->push();
     WorldStatus::terminateRace();
 }   // terminateRace
 

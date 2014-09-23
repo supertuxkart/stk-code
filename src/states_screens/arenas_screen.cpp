@@ -167,7 +167,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             if (clicked_track != NULL)
             {
                 TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
+                TrackInfoScreen::getInstance()->push();
             }
 
         }
@@ -184,7 +184,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             if (clicked_track != NULL)
             {
                 TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
+                TrackInfoScreen::getInstance()->push();
             }   // clickedTrack !=  NULL
         }   // if random_track
 

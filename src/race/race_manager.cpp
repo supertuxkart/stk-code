@@ -692,14 +692,14 @@ void RaceManager::exitRace(bool delete_world)
         {
             race_manager->startSingleRace("gpwin", 999, false);
             GrandPrixWin* scene = GrandPrixWin::getInstance();
-            StateManager::get()->pushScreen(scene);
+            scene->push();
             scene->setKarts(winners);
         }
         else
         {
             race_manager->startSingleRace("gplose", 999, false);
             GrandPrixLose* scene = GrandPrixLose::getInstance();
-            StateManager::get()->pushScreen(scene);
+            scene->push();
 
             if (humanLosers.size() >= 1)
             {

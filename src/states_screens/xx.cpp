@@ -43,6 +43,7 @@
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/online_screen.hpp"
+#include "states_screens/online_profile_overview.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
@@ -355,11 +356,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "about")
     {
-        CreditsScreen::getInstance()->push();
+        StateManager::get()->pushScreen(CreditsScreen::getInstance());
     }
     else if (selection == "help")
     {
-        HelpScreen1::getInstance()->push();
+        StateManager::get()->pushScreen(HelpScreen1::getInstance());
     }
     else if (selection == "startTutorial")
     {
@@ -441,7 +442,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         }
         if (PlayerManager::getCurrentOnlineId())
         {
-            OnlineScreen::getInstance()->push();
+            // For 0.8.2 disable the server menu, instead go to online profile
+            // StateManager::get()->pushScreen(OnlineScreen::getInstance());
+            ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
+            OnlineProfileOverview::getInstance()->push();
         }
         else
         {

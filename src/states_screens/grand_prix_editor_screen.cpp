@@ -248,7 +248,7 @@ void GrandPrixEditorScreen::showEditScreen(GrandPrixData* gp)
     assert(gp != NULL);
     EditGPScreen* edit = EditGPScreen::getInstance();
     edit->setSelectedGP(gp);
-    StateManager::get()->pushScreen(edit);
+    edit->push();
 }
 
 // -----------------------------------------------------------------------------

@@ -295,7 +295,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         UserConfigParams::m_language = selection.c_str();
         user_config->saveConfig();
 
-        GUIEngine::getStateManager()->pushScreen(OptionsScreenUI::getInstance());
+        OptionsScreenUI::getInstance()->push();
     }
 
 }   // eventCallback

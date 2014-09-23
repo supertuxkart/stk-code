@@ -1300,16 +1300,16 @@ int main(int argc, char *argv[] )
             if(PlayerManager::getCurrentPlayer() && !
                 UserConfigParams::m_always_show_login_screen)
             {
-                StateManager::get()->pushScreen(MainMenuScreen::getInstance());
+                MainMenuScreen::getInstance()->push();
             }
             else
             {
-                StateManager::get()->pushScreen(UserScreen::getInstance());
+                UserScreen::getInstance()->push();
                 // If there is no player, push the RegisterScreen on top of
                 // the login screen. This way on first start players are
                 // forced to create a player.
                 if(PlayerManager::get()->getNumPlayers()==0)
-                    StateManager::get()->pushScreen(RegisterScreen::getInstance());
+                    RegisterScreen::getInstance()->push();
             }
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */

@@ -289,7 +289,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 
                 scene->addTrophy(race_manager->getDifficulty());
                 scene->findWhatWasUnlocked(race_manager->getDifficulty());
-                StateManager::get()->pushScreen(scene);
+                scene->push();
                 race_manager->setAIKartOverride("");
 
                 std::vector<std::string> parts;

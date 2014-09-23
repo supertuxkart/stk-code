@@ -86,7 +86,7 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
                 if (clicked_track != NULL)
                 {
                     TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                    StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
+                    TrackInfoScreen::getInstance()->push();
                 }
 
             }
@@ -100,7 +100,7 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
                 if (clicked_track != NULL)
                 {
                     TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                    StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
+                    TrackInfoScreen::getInstance()->push();
                 }
             }
         }
