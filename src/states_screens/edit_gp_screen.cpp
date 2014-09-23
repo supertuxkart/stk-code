@@ -261,6 +261,10 @@ void EditGPScreen::loadList(const int selected)
         m_list->setSelectionID(selected);
         setSelected(selected);
     }
+    else
+    {
+        enableButtons();
+    }
 }
 
 // -----------------------------------------------------------------------------

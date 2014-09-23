@@ -175,7 +175,7 @@ void GPInfoScreen::init()
         // been added or deleted since the last time this screen was shown.
         m_group_spinner->clearLabels();
         m_group_spinner->addLabel("all");
-        int index_standard;
+        int index_standard=0;
         const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
         for (unsigned int i = 0; i < groups.size(); i++)
         {
