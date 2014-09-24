@@ -693,7 +693,7 @@ namespace UserConfigParams
                                                   "A random number to avoid duplicated reports.") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_hw_report
-            PARAM_DEFAULT( StringUserConfigParam(   "http://stats.supertuxkart.net",
+            PARAM_DEFAULT( StringUserConfigParam(   "http://104.131.193.44:8080",
                                                      "hw-report-server",
                                                      &m_hw_report_group,
                                                     "The server used for reporting statistics to."));
