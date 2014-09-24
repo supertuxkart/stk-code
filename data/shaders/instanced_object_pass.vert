@@ -13,6 +13,7 @@ layout(location = 9) in vec3 Scale;
 #ifdef GL_ARB_bindless_texture
 layout(location = 10) in sampler2D Handle;
 layout(location = 11) in sampler2D SecondHandle;
+layout(location = 13) in sampler2D ThirdHandle;
 #endif
 
 #else
@@ -37,6 +38,7 @@ out vec4 color;
 #ifdef GL_ARB_bindless_texture
 flat out sampler2D handle;
 flat out sampler2D secondhandle;
+flat out sampler2D thirdhandle;
 #endif
 
 mat4 getWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
@@ -56,5 +58,6 @@ void main(void)
 #ifdef GL_ARB_bindless_texture
     handle = Handle;
     secondhandle = SecondHandle;
+    thirdhandle = ThirdHandle;
 #endif
 }

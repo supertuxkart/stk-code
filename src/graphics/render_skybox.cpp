@@ -1,35 +1,7 @@
 #include "graphics/irr_driver.hpp"
-
-#include "config/user_config.hpp"
-#include "graphics/callbacks.hpp"
-#include "graphics/camera.hpp"
-#include "graphics/glwrap.hpp"
-#include "graphics/lens_flare.hpp"
-#include "graphics/light.hpp"
-#include "graphics/lod_node.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/particle_kind_manager.hpp"
-#include "graphics/per_camera_node.hpp"
-#include "graphics/post_processing.hpp"
-#include "graphics/referee.hpp"
-#include "graphics/rtts.hpp"
-#include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stkmeshscenenode.hpp"
-#include "graphics/wind.hpp"
-#include "io/file_manager.hpp"
-#include "items/item.hpp"
-#include "items/item_manager.hpp"
 #include "modes/world.hpp"
-#include "physics/physics.hpp"
-#include "tracks/track.hpp"
-#include "utils/constants.hpp"
-#include "utils/helpers.hpp"
-#include "utils/log.hpp"
 #include "utils/profiler.hpp"
-
-#include <algorithm>
-#include <limits>
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
@@ -119,7 +91,6 @@ static void getYml(GLenum face, size_t width, size_t height,
 static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height, float *Coeff, float *Y00, float *Y1minus1, float *Y10, float *Y11,
     float *Y2minus2, float * Y2minus1, float * Y20, float *Y21, float *Y22)
 {
-    float d = sqrt((float)(i * i + j * j + 1));
     float solidangle = 1.;
     size_t idx = i * height + j;
     float reconstructedVal = Y00[idx] * Coeff[0];

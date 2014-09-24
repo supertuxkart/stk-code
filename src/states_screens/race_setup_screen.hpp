@@ -22,8 +22,6 @@
 
 namespace GUIEngine { class Widget; }
 
-class GameModeRibbonListener;
-
 /**
   * \brief Screen with race setup options (difficulty, game mode, etc...)
   * \ingroup states_screens
@@ -31,11 +29,8 @@ class GameModeRibbonListener;
 class RaceSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<RaceSetupScreen>
 {
     friend class GUIEngine::ScreenSingleton<RaceSetupScreen>;
-    friend class GameModeRibbonListener;
 
     RaceSetupScreen();
-
-    GameModeRibbonListener* m_mode_listener;
 
     void onGameModeChanged();
 

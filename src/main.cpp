@@ -452,8 +452,6 @@ void cmdLineHelp()
     "       --mode=N           N=1 novice, N=2 driver, N=3 racer.\n"
     "       --type=N           N=0 Normal, N=1 Time trial, N=2 FTL\n"
     "       --reverse          Play track in reverse (if allowed)\n"
-    // TODO: add back "--players" switch
-    // "       --players n      Define number of players to between 1 and 4.\n"
     "  -f,  --fullscreen       Select fullscreen display.\n"
     "  -w,  --windowed         Windowed display (default).\n"
     "  -s,  --screensize=WxH   Set the screen size (e.g. 320x200).\n"
@@ -772,7 +770,7 @@ int handleCmdLine()
         const std::vector<std::string> l=StringUtils::split(std::string(s),',');
         race_manager->setDefaultAIKartList(l);
         // Add 1 for the player kart
-        race_manager->setNumKarts(l.size()+1);
+        race_manager->setNumKarts((int)l.size()+1);
     }   // --ai
 
     if(CommandLine::has( "--mode", &s))
@@ -1074,7 +1072,7 @@ void initRest()
     NewsManager::get();   // this will create the news manager
 
     music_manager           = new MusicManager();
-    sfx_manager             = new SFXManager();
+    SFXManager::create();
     // The order here can be important, e.g. KartPropertiesManager needs
     // defaultKartProperties, which are defined in stk_config.
     history                 = new History              ();
@@ -1302,16 +1300,16 @@ int main(int argc, char *argv[] )
             if(PlayerManager::getCurrentPlayer() && !
                 UserConfigParams::m_always_show_login_screen)
             {
-                StateManager::get()->pushScreen(MainMenuScreen::getInstance());
+                MainMenuScreen::getInstance()->push();
             }
             else
             {
-                StateManager::get()->pushScreen(UserScreen::getInstance());
+                UserScreen::getInstance()->push();
                 // If there is no player, push the RegisterScreen on top of
                 // the login screen. This way on first start players are
                 // forced to create a player.
                 if(PlayerManager::get()->getNumPlayers()==0)
-                    StateManager::get()->pushScreen(RegisterScreen::getInstance());
+                    RegisterScreen::getInstance()->push();
             }
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */
@@ -1415,8 +1413,6 @@ int main(int argc, char *argv[] )
     }
 #endif
 
-
-
     return 0 ;
 }   // main
 
@@ -1441,6 +1437,7 @@ static void cleanSuperTuxKart()
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
 
+    SFXManager::get()->stopThread();
     irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
     Referee::cleanup();
@@ -1457,7 +1454,7 @@ static void cleanSuperTuxKart()
     if(material_manager)        delete material_manager;
     if(history)                 delete history;
     ReplayRecorder::destroy();
-    if(sfx_manager)             delete sfx_manager;
+    SFXManager::destroy();
     if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();
     PlayerManager::destroy();

@@ -111,7 +111,7 @@ void GetPublicAddress::asynchronousUpdate()
         std::vector<std::string> stun_servers = UserConfigParams::m_stun_servers;
 
         RandomGenerator random_gen;
-        int rand_result = random_gen.get(stun_servers.size());
+        int rand_result = random_gen.get((int)stun_servers.size());
         Log::verbose("GetPublicAddress", "Using STUN server %s",
                      stun_servers[rand_result].c_str());
 

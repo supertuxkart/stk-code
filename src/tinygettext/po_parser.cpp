@@ -207,7 +207,7 @@ next:
         if (pedantic)
           warning("leading whitespace before string");
 
-      get_string_line(out, i);
+      get_string_line(out, (unsigned int) i);
       goto next;
     }
     else if (isspace(current_line[i]))
@@ -245,7 +245,7 @@ POParser::parse_header(const std::string& header)
       if (has_prefix(line, "Content-Type:"))
       {
         // from_charset = line.substr(len);
-        unsigned int len = strlen("Content-Type: text/plain; charset=");
+        unsigned int len = (unsigned int) strlen("Content-Type: text/plain; charset=");
         if (line.compare(0, len, "Content-Type: text/plain; charset=") == 0)
         {
           from_charset = line.substr(len);

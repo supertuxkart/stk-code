@@ -218,7 +218,7 @@ void AddonsManager::initAddons(const XMLNode *xml)
             else
             {
                 m_addons_list.getData().push_back(addon);
-                index = m_addons_list.getData().size()-1;
+                index = (int) m_addons_list.getData().size()-1;
             }
             // Mark that this addon still exists on the server
             m_addons_list.getData()[index].setStillExists();
@@ -240,7 +240,7 @@ void AddonsManager::initAddons(const XMLNode *xml)
     // an addon that's still on the server and an invalid entry in the
     // addons installed file), it will be re-downloaded later.
     m_addons_list.lock();
-    unsigned int count = m_addons_list.getData().size();
+    unsigned int count = (unsigned int) m_addons_list.getData().size();
 
     for(unsigned int i=0; i<count;)
     {

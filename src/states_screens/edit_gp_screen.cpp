@@ -113,7 +113,7 @@ void EditGPScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
             assert(edit != NULL);
             //By default, 3 laps and no reversing
             edit->setSelection(NULL, 3, false);
-            StateManager::get()->pushScreen(edit);
+            edit->push();
         }
         else if (m_action == "remove")
         {
@@ -187,6 +187,7 @@ void EditGPScreen::init()
         loadList(m_selected);
         m_action.clear();
     }
+    enableButtons();
 }
 
 // -----------------------------------------------------------------------------
@@ -213,7 +214,10 @@ void EditGPScreen::onCancel()
 {
     ModalDialog::dismiss();
     if (m_action == "back")
+    {
+        m_gp->reload(); // Discard changes
         back();
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -231,8 +235,14 @@ void EditGPScreen::loadList(const int selected)
 
         Track* t = track_manager->getTrack(m_gp->getTrackId(i));
         assert(t != NULL);
+
         video::ITexture* screenShot = irr_driver->getTexture(t->getScreenshotFile());
-        assert(screenShot != NULL);
+        if (screenShot == NULL)
+        {
+            screenShot = irr_driver->getTexture(
+                file_manager->getAsset(FileManager::GUI, "main_help.png"));
+        }
+        assert (screenShot != NULL);
         m_icons.push_back(m_icon_bank->addTextureAsSprite(screenShot));
 
         row.push_back(GUIEngine::ListWidget::ListCell(
@@ -251,6 +261,10 @@ void EditGPScreen::loadList(const int selected)
         m_list->setSelectionID(selected);
         setSelected(selected);
     }
+    else
+    {
+        enableButtons();
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -264,15 +278,19 @@ void EditGPScreen::setModified(const bool modified)
         save_button->setActivated();
     else
         save_button->setDeactivated();
+
+    LabelWidget* header = getWidget<LabelWidget>("title");
+    assert(header != NULL);
+    header->setText(m_gp->getName() + (modified ? L" (+)" : L""), true);
+
+    enableButtons();
 }
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::setSelected(const int selected)
 {
-    assert(getWidget<IconButtonWidget>("up") != NULL);
-    assert(getWidget<IconButtonWidget>("down") != NULL);
-
     m_selected = selected;
+    enableButtons();
 }
 
 // -----------------------------------------------------------------------------
@@ -287,7 +305,7 @@ void EditGPScreen::edit()
             m_gp->getTrackId(m_selected)),
             m_gp->getLaps((unsigned int)m_selected),
             m_gp->getReverse((unsigned int)m_selected));
-        StateManager::get()->pushScreen(edit_screen);
+        edit_screen->push();
     }
 }
 
@@ -326,4 +344,39 @@ bool EditGPScreen::canMoveUp() const
 bool EditGPScreen::canMoveDown() const
 {
     return (0 <= m_selected && m_selected < m_list->getItemCount() - 1);
+}
+
+// -----------------------------------------------------------------------------
+void EditGPScreen::enableButtons()
+{
+    IconButtonWidget* up_button = getWidget<IconButtonWidget>("up");
+    IconButtonWidget* down_button = getWidget<IconButtonWidget>("down");
+    IconButtonWidget* edit_button = getWidget<IconButtonWidget>("edit");
+    IconButtonWidget* remove_button = getWidget<IconButtonWidget>("remove");
+    assert(up_button != NULL);
+    assert(down_button != NULL);
+    assert(edit_button != NULL);
+    assert(remove_button != NULL);
+
+    if (m_selected >= 0 && m_list->getItemCount() > 1)
+    {
+        up_button->setActivated();
+        down_button->setActivated();
+    }
+    else
+    {
+        up_button->setDeactivated();
+        down_button->setDeactivated();
+    }
+
+    if (m_selected >= 0)
+    {
+        edit_button->setActivated();
+        remove_button->setActivated();
+    }
+    else
+    {
+        edit_button->setDeactivated();
+        remove_button->setDeactivated();
+    }
 }

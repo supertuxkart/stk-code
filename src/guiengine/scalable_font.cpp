@@ -575,7 +575,6 @@ void ScalableFont::doDraw(const core::stringw& text,
         fallback_positions = NULL;
     }
 
-    video::IVideoDriver* driver = GUIEngine::getDriver();
     const int spriteAmount      = sprites.size();
     for (int n=0; n<indiceAmount; n++)
     {
@@ -707,6 +706,7 @@ void ScalableFont::doDraw(const core::stringw& text,
                     color, true);
             }
 #ifdef FONT_DEBUG
+            video::IVideoDriver* driver = GUIEngine::getDriver();
             driver->draw2DLine(core::position2d<s32>(dest.UpperLeftCorner.X,  dest.UpperLeftCorner.Y),
                                core::position2d<s32>(dest.UpperLeftCorner.X,  dest.LowerRightCorner.Y),
                                video::SColor(255, 255,0,0));

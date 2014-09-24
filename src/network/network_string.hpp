@@ -154,7 +154,7 @@ class NetworkString
 
         int size() const
         {
-            return m_string.size();
+            return (int)m_string.size();
         }
 
         uint8_t* getBytes() { return &m_string[0]; };

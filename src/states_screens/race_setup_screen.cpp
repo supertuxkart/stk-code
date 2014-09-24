@@ -45,24 +45,6 @@ const int CONFIG_CODE_SOCCER    = 5;
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( RaceSetupScreen );
 
-class GameModeRibbonListener : public DynamicRibbonHoverListener
-{
-    RaceSetupScreen* m_parent;
-public:
-
-    GameModeRibbonListener(RaceSetupScreen* parent)
-    {
-        m_parent = parent;
-    }
-
-    virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID,
-                                    const irr::core::stringw& selectionText, const int playerID)
-    {
-        // game mode changed!!
-        m_parent->onGameModeChanged();
-    }
-};   // GameModeRibbonListener
-
 // -----------------------------------------------------------------------------
 
 RaceSetupScreen::RaceSetupScreen() : Screen("racesetup.stkgui")
@@ -94,13 +76,13 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
             UserConfigParams::m_game_mode = CONFIG_CODE_NORMAL;
-            StateManager::get()->pushScreen( TracksScreen::getInstance() );
+            TracksScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_TTRIAL)
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
             UserConfigParams::m_game_mode = CONFIG_CODE_TIMETRIAL;
-            StateManager::get()->pushScreen( TracksScreen::getInstance() );
+            TracksScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_FTL)
         {
@@ -110,21 +92,21 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
 
             race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
             UserConfigParams::m_game_mode = CONFIG_CODE_FTL;
-            StateManager::get()->pushScreen( TracksScreen::getInstance() );
+            TracksScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_STRIKES)
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
             UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
-            StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+            ArenasScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_EASTER)
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_EASTER_EGG);
             UserConfigParams::m_game_mode = CONFIG_CODE_EASTER;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
-            StateManager::get()->pushScreen( EasterEggScreen::getInstance() );
+            EasterEggScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_SOCCER)
         {
@@ -133,9 +115,9 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
             // 1 player -> no need to choose a team or determine when the match ends
             if(race_manager->getNumLocalPlayers() <= 1)
-                StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+                ArenasScreen::getInstance()->push();
             else
-                StateManager::get()->pushScreen( SoccerSetupScreen::getInstance() );
+                SoccerSetupScreen::getInstance()->push();
         }
         else if (selectedMode == "locked")
         {
@@ -189,21 +171,6 @@ void RaceSetupScreen::assignDifficulty()
         }
     }
 }
-
-// -----------------------------------------------------------------------------
-
-void RaceSetupScreen::onGameModeChanged()
-{
-    DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
-    assert( w2 != NULL );
-
-    std::string gamemode_str = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-    if (gamemode_str == "locked") return;
-
-    RaceManager::MinorRaceModeType gamemode =
-        RaceManager::getModeIDFromInternalName(gamemode_str);
-
-}   // onGameModeChanged
 
 // -----------------------------------------------------------------------------
 
@@ -313,10 +280,6 @@ void RaceSetupScreen::init()
             w2->setSelection(IDENT_SOCCER, PLAYER_ID_GAME_MASTER, true);
             break;
     }
-
-    m_mode_listener = new GameModeRibbonListener(this);
-    w2->registerHoverListener(m_mode_listener);
-
 
     if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {

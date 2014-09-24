@@ -139,7 +139,6 @@ void MainLoop::run()
         {
             PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
             music_manager->update(dt);
-
             input_manager->update(dt);
 
             #ifdef ENABLE_WIIUSE

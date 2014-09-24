@@ -17,9 +17,6 @@
 
 #include "modes/soccer_world.hpp"
 
-#include <string>
-#include <IMeshSceneNode.h>
-
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "io/file_manager.hpp"
@@ -35,6 +32,10 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
+
+#include <IMeshSceneNode.h>
+
+#include <string>
 
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
@@ -59,7 +60,7 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
  */
 SoccerWorld::~SoccerWorld()
 {
-    sfx_manager->deleteSFX(m_goal_sound);
+    SFXManager::get()->deleteSFX(m_goal_sound);
 }   // ~SoccerWorld
 
 //-----------------------------------------------------------------------------
@@ -80,7 +81,7 @@ void SoccerWorld::init()
         exit(1);
     }
     m_goal_target = race_manager->getMaxGoal();
-    m_goal_sound = sfx_manager->createSoundSource("goal_scored");
+    m_goal_sound = SFXManager::get()->createSoundSource("goal_scored");
 
 }   // init
 
@@ -400,7 +401,7 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
 /** Set position and team for the karts */
 void SoccerWorld::initKartList()
 {
-    const unsigned int kart_amount = m_karts.size();
+    const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     int team_karts_amount[NB_SOCCER_TEAMS];
     memset(team_karts_amount, 0, sizeof(team_karts_amount));

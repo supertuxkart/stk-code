@@ -259,7 +259,7 @@ void World::reset()
     music_manager->stopMusic();
 
     // Enable SFX again
-    sfx_manager->resumeAll();
+    SFXManager::get()->resumeAll();
 
     projectile_manager->cleanup();
     race_manager->reset();
@@ -553,7 +553,7 @@ void World::terminateRace()
         results->clearHighscores();
     }
 
-    StateManager::get()->pushScreen(results);
+    results->push();
     WorldStatus::terminateRace();
 }   // terminateRace
 
@@ -574,7 +574,7 @@ void World::resetAllKarts()
     if(UserConfigParams::m_track_debug)
     {
         // Loop over all karts, in case that some karts are dfferent
-        for(unsigned int kart_id=0; kart_id<m_karts.size(); kart_id++)
+        for(unsigned int kart_id=0; kart_id<(unsigned int)m_karts.size(); kart_id++)
         {
             for(unsigned int rescue_pos=0;
                 rescue_pos<getNumberOfRescuePositions();
@@ -931,7 +931,7 @@ void World::update(float dt)
     }
 
     PROFILER_PUSH_CPU_MARKER("World::update (AI)", 0x40, 0x7F, 0x00);
-    const int kart_amount = m_karts.size();
+    const int kart_amount = (int)m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {
         // Update all karts that are not eliminated
@@ -1025,7 +1025,7 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
     // if we ever decide to display a message (e.g. during a race)
     unsigned int *index = new unsigned int[m_karts.size()];
 
-    const unsigned int kart_amount = m_karts.size();
+    const unsigned int kart_amount = (unsigned int) m_karts.size();
     for (unsigned int i=0; i<kart_amount; i++ )
     {
         index[i] = 999; // first reset the contents of the array
@@ -1188,7 +1188,7 @@ void World::pause(Phase phase)
 {
     if (m_stop_music_when_dialog_open)
         music_manager->pauseMusic();
-    sfx_manager->pauseAll();
+    SFXManager::get()->pauseAll();
 
     WorldStatus::pause(phase);
 }   // pause
@@ -1198,7 +1198,7 @@ void World::unpause()
 {
     if (m_stop_music_when_dialog_open)
         music_manager->resumeMusic();
-    sfx_manager->resumeAll();
+    SFXManager::get()->resumeAll();
 
     WorldStatus::unpause();
 

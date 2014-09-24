@@ -291,7 +291,7 @@ public:
     RaceGUIBase    *getRaceGUI() const { return m_race_gui;}
     // ------------------------------------------------------------------------
     /** Returns the number of karts in the race. */
-    unsigned int    getNumKarts() const { return m_karts.size(); }
+    unsigned int    getNumKarts() const { return (unsigned int) m_karts.size(); }
     // ------------------------------------------------------------------------
     /** Returns the kart with a given world id. */
     AbstractKart       *getKart(int kartId) const {

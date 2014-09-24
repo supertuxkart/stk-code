@@ -81,7 +81,7 @@ public:
     void         setErrorState() { m_state.setAtomic(STATE_ERROR); }
     // ------------------------------------------------------------------------
     /** Returns the list of addons (installed and uninstalled). */
-    unsigned int getNumAddons() const { return m_addons_list.getData().size();}
+    unsigned int getNumAddons() const { return (unsigned int) m_addons_list.getData().size();}
     // ------------------------------------------------------------------------
     /** Returns the i-th addons. */
     const Addon& getAddon(unsigned int i) { return m_addons_list.getData()[i];}

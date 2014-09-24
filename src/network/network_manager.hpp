@@ -98,13 +98,13 @@ class NetworkManager : public AbstractSingleton<NetworkManager>
         virtual bool isConnectedTo(TransportAddress peer);
 
         virtual bool isServer() = 0;
-        inline bool isClient()              { return !isServer();       }
-        bool isPlayingOnline()              { return m_playing_online;  }
-        STKHost* getHost()                  { return m_localhost;       }
-        std::vector<STKPeer*> getPeers()    { return m_peers;           }
-        unsigned int getPeerCount()         { return m_peers.size();    }
-        TransportAddress getPublicAddress() { return m_public_address;  }
-        GameSetup* getGameSetup()           { return m_game_setup;      }
+        inline bool isClient()              { return !isServer();         }
+        bool isPlayingOnline()              { return m_playing_online;    }
+        STKHost* getHost()                  { return m_localhost;         }
+        std::vector<STKPeer*> getPeers()    { return m_peers;             }
+        unsigned int getPeerCount()         { return (int)m_peers.size(); }
+        TransportAddress getPublicAddress() { return m_public_address;    }
+        GameSetup* getGameSetup()           { return m_game_setup;        }
 
     protected:
         NetworkManager();

@@ -187,7 +187,7 @@ void OnlineScreen::doQuickPlay()
     XMLRequest *join_request = new RequestConnection::ServerJoinRequest();
     if (!join_request)
     {
-        sfx_manager->quickSound("anvil");
+        SFXManager::get()->quickSound("anvil");
         return;
     }
 
@@ -198,14 +198,14 @@ void OnlineScreen::doQuickPlay()
     if (join_request->isSuccess())
     {
         delete join_request;
-        StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+        NetworkingLobby::getInstance()->push();
         ConnectToServer *cts = new ConnectToServer(server->getServerId(),
                                                    server->getHostId());
         ProtocolManager::getInstance()->requestStart(cts);
     }
     else
     {
-        sfx_manager->quickSound("anvil");
+        SFXManager::get()->quickSound("anvil");
     }
 
 }   // doQuickPlay
@@ -233,15 +233,15 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == m_profile_widget->m_properties[PROP_ID])
     {
         ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-        StateManager::get()->pushScreen(OnlineProfileOverview::getInstance());
+        OnlineProfileOverview::getInstance()->push();
     }
     else if (selection == m_find_server_widget->m_properties[PROP_ID])
     {
-        StateManager::get()->pushScreen(ServerSelection::getInstance());
+        ServerSelection::getInstance()->push();
     }
     else if (selection == m_create_server_widget->m_properties[PROP_ID])
     {
-        StateManager::get()->pushScreen(CreateServerScreen::getInstance());
+        CreateServerScreen::getInstance()->push();
     }
     else if (selection == m_quick_play_widget->m_properties[PROP_ID])
     {

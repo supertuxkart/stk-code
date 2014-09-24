@@ -432,7 +432,7 @@ void KartProperties::getAllData(const XMLNode * root)
         else if (s == "small") m_engine_sfx_type = "engine_small";
         else
         {
-            if (sfx_manager->soundExist(s))
+            if (SFXManager::get()->soundExist(s))
             {
                 m_engine_sfx_type = s;
             }
@@ -451,14 +451,14 @@ void KartProperties::getAllData(const XMLNode * root)
         {
             std::string tempFile;
             // Get filename associated with each custom sfx tag in sfx config
-            if (sounds_node->get(sfx_manager->getCustomTagName(i), tempFile))
+            if (sounds_node->get(SFXManager::get()->getCustomTagName(i), tempFile))
             {
                 // determine absolute filename
                 // FIXME: will not work with add-on packs (is data dir the same)?
                 tempFile = file_manager->getKartFile(tempFile, getIdent());
 
                 // Create sfx in sfx manager and store id
-                m_custom_sfx_id[i] = sfx_manager->addSingleSfx(tempFile, 1, 0.2f,1.0f);
+                m_custom_sfx_id[i] = SFXManager::get()->addSingleSfx(tempFile, 1, 0.2f,1.0f);
             }
             else
             {

@@ -63,6 +63,8 @@ void STKMeshSceneNode::cleanGLMeshes()
     GLmeshes.clear();
     for (unsigned i = 0; i < MAT_COUNT; i++)
         MeshSolidMaterial[i].clearWithoutDeleting();
+    for (unsigned i = 0; i < TM_COUNT; i++)
+        TransparentMesh[i].clearWithoutDeleting();
 }
 
 void STKMeshSceneNode::setMesh(irr::scene::IMesh* mesh)
@@ -169,7 +171,6 @@ void STKMeshSceneNode::updateGL()
 
         irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
         video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
-        f32 MaterialTypeParam = mb->getMaterial().MaterialTypeParam;
         video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
 
 
@@ -251,8 +252,6 @@ void STKMeshSceneNode::render()
             GLenum itype = mesh.IndexType;
             size_t count = mesh.IndexCount;
 
-            if (!mesh.textures[0])
-                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh.textures[0], true);
             if (UserConfigParams::m_azdo)
             {
@@ -282,8 +281,6 @@ void STKMeshSceneNode::render()
         glDisable(GL_CULL_FACE);
         if (update_each_frame && !UserConfigParams::m_dynamic_lights)
             updatevbo();
-        if (!spareWhiteTex)
-            spareWhiteTex = getUnicolorTexture(video::SColor(255, 255, 255, 255));
         glUseProgram(MeshShader::ObjectPass2Shader::getInstance()->Program);
         // Only untextured
         for (unsigned i = 0; i < GLmeshes.size(); i++)
@@ -309,7 +306,7 @@ void STKMeshSceneNode::render()
                     glMakeTextureHandleResidentARB(SSAOHandle);
 
                 if (!mesh.TextureHandles[0])
-                    mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(spareWhiteTex), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
+                    mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                 MeshShader::ObjectPass2Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, mesh.TextureHandles[0]));
@@ -319,7 +316,7 @@ void STKMeshSceneNode::render()
                 irr_driver->getRenderTargetTexture(RTT_DIFFUSE),
                 irr_driver->getRenderTargetTexture(RTT_SPECULAR),
                 irr_driver->getRenderTargetTexture(RTT_HALF1_R),
-                getTextureGLuint(spareWhiteTex)));
+                getTextureGLuint(mesh.textures[0])));
             MeshShader::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
             assert(mesh.vao);
             glBindVertexArray(mesh.vao);
@@ -381,8 +378,6 @@ void STKMeshSceneNode::render()
                         tmpcol.getGreen() / 255.0f,
                         tmpcol.getBlue() / 255.0f);
 
-                    if (!mesh.textures[0])
-                        mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
                     compressTexture(mesh.textures[0], true);
                     if (UserConfigParams::m_azdo)
                     {
@@ -412,8 +407,7 @@ void STKMeshSceneNode::render()
                     GLenum ptype = mesh.PrimitiveType;
                     GLenum itype = mesh.IndexType;
                     size_t count = mesh.IndexCount;
-                    if (!mesh.textures[0])
-                        mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+
                     compressTexture(mesh.textures[0], true);
                     if (UserConfigParams::m_azdo)
                     {

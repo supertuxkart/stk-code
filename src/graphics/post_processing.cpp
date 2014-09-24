@@ -352,7 +352,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             FullScreenShader::ComputeGaussian17TapHShader::getInstance()->SetTextureUnits({ in_fbo.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0] });
             glBindImageTexture(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_dest, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
             FullScreenShader::ComputeGaussian17TapHShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height));
-            glDispatchCompute(in_fbo.getWidth() / 8 + 1, in_fbo.getHeight() / 8 + 1, 1);
+            glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, (int)in_fbo.getHeight() / 8 + 1, 1);
         }
     }
     if (irr_driver->hasARBComputeShaders())
@@ -372,7 +372,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             FullScreenShader::ComputeGaussian17TapVShader::getInstance()->SetTextureUnits({ auxiliary.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0] });
             glBindImageTexture(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_dest, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
             FullScreenShader::ComputeGaussian17TapVShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height));
-            glDispatchCompute(in_fbo.getWidth() / 8 + 1, in_fbo.getHeight() / 8 + 1, 1);
+            glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, (int)in_fbo.getHeight() / 8 + 1, 1);
         }
     }
     if (irr_driver->hasARBComputeShaders())

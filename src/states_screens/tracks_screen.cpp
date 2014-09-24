@@ -67,9 +67,6 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
 
         if (selection == "random_track")
         {
-            RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
-            assert(tabs);
-
             if (m_random_track_list.empty()) return;
 
             std::string track = m_random_track_list.front();
@@ -81,7 +78,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             if (clicked_track)
             {
                 TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
+                TrackInfoScreen::getInstance()->push();
             }   // if clicked_track
 
         }   // selection=="random_track"
@@ -98,7 +95,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             if (clicked_track)
             {
                 TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
+                TrackInfoScreen::getInstance()->push();
             }
         }
     }   // name=="tracks"
@@ -117,7 +114,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             GPInfoScreen *gpis = GPInfoScreen::getInstance();
             gpis->setGP( selection == "Random Grand Prix" ? "random" 
                                                           : selection);
-            StateManager::get()->pushScreen(gpis);
+            gpis->push();
         }
     }
     else if (name == "trackgroups")
@@ -141,7 +138,7 @@ void TracksScreen::beforeAddingWidget()
     tabs->clearAllChildren();
 
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
-    const int group_amount = groups.size();
+    const int group_amount = (int)groups.size();
 
     if (group_amount > 1)
     {
@@ -161,7 +158,7 @@ void TracksScreen::beforeAddingWidget()
         tabs->addTextChild( _(groups[n].c_str()), groups[n] );
 
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
-    tracks_widget->setItemCountHint( track_manager->getNumberOfTracks()+1 );
+    tracks_widget->setItemCountHint( (int)track_manager->getNumberOfTracks()+1 );
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
@@ -184,6 +181,10 @@ void TracksScreen::init()
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(n);
         const std::vector<std::string> tracks = gp->getTrackNames(true);
+
+        //Skip epmpty GPs
+        if (gp->getNumberOfTracks()==0)
+            continue;
 
         std::vector<std::string> screenshots;
         for (unsigned int t=0; t<tracks.size(); t++)
@@ -252,7 +253,7 @@ void TracksScreen::buildTrackList()
 
     const std::string& curr_group_name = tabs->getSelectionIDString(0);
 
-    const int track_amount = track_manager->getNumberOfTracks();
+    const int track_amount = (int)track_manager->getNumberOfTracks();
 
     // First build a list of all tracks to be displayed
     // (e.g. exclude arenas, ...)

@@ -245,7 +245,7 @@ void ClientLobbyRoomProtocol::update()
     case KART_SELECTION:
     {
         NetworkKartSelectionScreen* screen = NetworkKartSelectionScreen::getInstance();
-        StateManager::get()->pushScreen(screen);
+        screen->push();
         m_state = SELECTING_KARTS;
     }
     break;

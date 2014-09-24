@@ -390,7 +390,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
         // Enable rim lighting for the kart
         irr_driver->applyObjectPassShader(lod_node, true);
         std::vector<scene::ISceneNode*> &lodnodes = lod_node->getAllNodes();
-        const u32 max = lodnodes.size();
+        const u32 max = (u32)lodnodes.size();
         for (u32 i = 0; i < max; i++)
         {
             irr_driver->applyObjectPassShader(lodnodes[i], true);

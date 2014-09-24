@@ -20,12 +20,11 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
-#include "race/grand_prix_data.hpp"
 #include "utils/string_utils.hpp"
 
 #include <algorithm>
 #include <set>
-#include <sstream>
+
 
 GrandPrixManager *grand_prix_manager = NULL;
 
@@ -47,44 +46,47 @@ GrandPrixManager::~GrandPrixManager()
 // ----------------------------------------------------------------------------
 void GrandPrixManager::loadFiles()
 {
+    // Add the directories to a set to avoid duplicates
     std::set<std::string> dirs;
+    std::string dir;
 
-    // Add all the directories to a set to avoid duplicates
-    dirs.insert(file_manager->getAsset(FileManager::GRANDPRIX, ""));
-    dirs.insert(file_manager->getGPDir());
-    dirs.insert(UserConfigParams::m_additional_gp_directory);
+    //Standard GPs
+    loadDir(file_manager->getAsset(FileManager::GRANDPRIX, ""), GrandPrixData::GP_STANDARD);
 
-    for (std::set<std::string>::const_iterator it  = dirs.begin();
-                                               it != dirs.end  (); ++it)
-    {
-        std::string dir = *it;
-        if (!dir.empty() && dir[dir.size() - 1] == '/')
-            loadDir(dir);
-    }
+    //User defined GPs
+    dir = file_manager->getGPDir();
+    if (!dir.empty() && dir[dir.size() - 1] == '/' && dirs.count(dir) == 0)
+        loadDir(dir, GrandPrixData::GP_USER_DEFINED);
+
+    //Add-on GPs
+    dir = UserConfigParams::m_additional_gp_directory;
+    if (!dir.empty() && dir[dir.size() - 1] == '/' && dirs.count(dir) == 0)
+        loadDir(dir, GrandPrixData::GP_ADDONS);
 }   // loadFiles
 
 // ----------------------------------------------------------------------------
-void GrandPrixManager::loadDir(const std::string& dir)
+void GrandPrixManager::loadDir(const std::string& dir, enum GrandPrixData::GPGroupType group)
 {
     Log::info("GrandPrixManager",
               "Loading Grand Prix files from %s", dir.c_str());
     assert(!dir.empty() && dir[dir.size() - 1] == '/');
 
-    // Findout which grand prix are available and load them
+    // Find out which grand prix are available and load them
     std::set<std::string> result;
     file_manager->listFiles(result, dir);
-    for(std::set<std::string>::iterator i  = result.begin();
-                                        i != result.end(); i++)
+    for(std::set<std::string>::iterator i = result.begin(); i != result.end(); i++)
+    {
         if (StringUtils::hasSuffix(*i, SUFFIX))
-            load(dir + *i);
+            load(dir + *i, group);
+    }
 }   // loadDir
 
 // ----------------------------------------------------------------------------
-void GrandPrixManager::load(const std::string& filename)
+void GrandPrixManager::load(const std::string& filename, enum GrandPrixData::GPGroupType group)
 {
     try
     {
-        GrandPrixData* gp = new GrandPrixData(filename);
+        GrandPrixData* gp = new GrandPrixData(filename, group);
         m_gp_data.push_back(gp);
         Log::debug("GrandPrixManager",
                    "Grand Prix '%s' loaded from %s",
@@ -188,6 +190,7 @@ GrandPrixData* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
     gp->setName(newName);
     gp->setFilename(file_manager->getGPDir() + newID + SUFFIX);
     gp->setEditable(true);
+    gp->setGroup(GrandPrixData::GP_USER_DEFINED);
     gp->writeToFile();
     m_gp_data.push_back(gp);
 

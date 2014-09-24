@@ -304,14 +304,14 @@ void TrackManager::updateGroups(const Track* track)
              (track->isSoccer() ? m_soccer_arena_group_names :
                m_track_group_names));
 
-    const unsigned int groups_amount = new_groups.size();
+    const unsigned int groups_amount = (unsigned int)new_groups.size();
     for(unsigned int i=0; i<groups_amount; i++)
     {
         bool group_exists = group_2_indices.find(new_groups[i])
                                                       != group_2_indices.end();
         if(!group_exists)
             group_names.push_back(new_groups[i]);
-        group_2_indices[new_groups[i]].push_back(m_tracks.size()-1);
+        group_2_indices[new_groups[i]].push_back((int)m_tracks.size()-1);
     }
 }   // updateGroups
 

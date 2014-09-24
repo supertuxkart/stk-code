@@ -192,9 +192,6 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
         m_is_in_skybox = true;
     }
 
-    bool tangent = false;
-    xml_node.get("tangents", &tangent);
-    
     //std::string full_path =
     //    World::getWorld()->getTrack()->getTrackFile(model_name);
 
@@ -211,17 +208,15 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     else
     {
         m_mesh = irr_driver->getMesh(model_name);
-        
-        if (tangent)
-        {
-            m_mesh = MeshTools::createMeshWithTangents(m_mesh, &MeshTools::isNormalMap);
-        }
     }
 
     if (!m_mesh)
     {
         throw std::runtime_error("Model '" + model_name + "' cannot be found");
     }
+
+    if (!animated)
+        m_mesh = MeshTools::createMeshWithTangents(m_mesh, &MeshTools::isNormalMap);
 
     init(&xml_node, parent, enabled);
 }
@@ -234,9 +229,6 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_is_looped = false;
     m_mesh = NULL;
     m_node = NULL;
-
-    bool animated = (UserConfigParams::m_graphical_effects ||
-        World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
     m_mesh = model;
     init(NULL, NULL, true);
@@ -431,7 +423,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
                                       volume);
     buffer->load();
 
-    m_sound = sfx_manager->createSoundSource(buffer, true, true);
+    m_sound = SFXManager::get()->createSoundSource(buffer, true, true);
     if (m_sound != NULL)
     {
         m_sound->position(m_init_xyz);
@@ -488,7 +480,7 @@ TrackObjectPresentationSound::~TrackObjectPresentationSound()
     if (m_sound)
     {
         //delete m_sound->getBuffer();
-        sfx_manager->deleteSFX(m_sound);
+        SFXManager::get()->deleteSFX(m_sound);
     }
 }
 

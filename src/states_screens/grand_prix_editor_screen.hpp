@@ -19,6 +19,7 @@
 #define HEADER_GRAND_PRIX_EDITOR_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "race/grand_prix_data.hpp"
 #include "states_screens/dialogs/enter_gp_name_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 
@@ -45,14 +46,21 @@ class GrandPrixEditorScreen :
     void loadGPList();
     void loadTrackList(const std::string& gpname);
     void showEditScreen(GrandPrixData* gp);
+    void enableButtons();
 
     void onNewGPWithName(const irr::core::stringw& newName);
     void onConfirm();
 
-    GrandPrixData*   m_selection;
-    std::string      m_action;
+    static const wchar_t* getGroupName(enum GrandPrixData::GPGroupType group);
+
+    GrandPrixData*                  m_selection;
+    std::string                     m_action;
+    enum GrandPrixData::GPGroupType m_gpgroup;
 
 public:
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

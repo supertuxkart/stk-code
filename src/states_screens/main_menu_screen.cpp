@@ -42,6 +42,7 @@
 #include "states_screens/grand_prix_editor_screen.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/offline_kart_selection.hpp"
+#include "states_screens/online_profile_overview.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
@@ -251,7 +252,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setNumLocalPlayers(0);
         race_manager->startSingleRace("gpwin", 999, false);
         GrandPrixWin* scene = GrandPrixWin::getInstance();
-        StateManager::get()->pushScreen(scene);
+        scene->push();
         const std::string winners[] = { "elephpant", "nolok", "pidgin" };
         scene->setKarts(winners);
     }
@@ -264,7 +265,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setNumLocalPlayers(0);
         race_manager->startSingleRace("gplose", 999, false);
         GrandPrixLose* scene = GrandPrixLose::getInstance();
-        StateManager::get()->pushScreen(scene);
+        scene->push();
         std::vector<std::string> losers;
         losers.push_back("nolok");
         losers.push_back("elephpant");
@@ -305,7 +306,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                     L"You unlocked <actual text would go here...>"
                                    );
             scene->addUnlockedTrack(track_manager->getTrack("lighthouse"));
-            StateManager::get()->pushScreen(scene);
+            scene->push();
         }
         else if (selection == "test_unlocked2")
         {
@@ -325,7 +326,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
             scene->addUnlockedPictures(textures, 4.0, 3.0, L"You unlocked <actual text would go here...>");
 
-            StateManager::get()->pushScreen(scene);
+            scene->push();
         }
     }
     else
@@ -335,18 +336,18 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance(); //FIXME : that was for tests
         s->setMultiplayer(false);
         s->setFromOverworld(false);
-        StateManager::get()->pushScreen( s );
+        s->push();
     }
     else if (selection == "multiplayer")
     {
         KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
         s->setMultiplayer(true);
         s->setFromOverworld(false);
-        StateManager::get()->pushScreen( s );
+        s->push();
     }
     else if (selection == "options")
     {
-        StateManager::get()->pushScreen( OptionsScreenVideo::getInstance() );
+        OptionsScreenVideo::getInstance()->push();
     }
     else if (selection == "quit")
     {
@@ -355,11 +356,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "about")
     {
-        StateManager::get()->pushScreen(CreditsScreen::getInstance());
+        CreditsScreen::getInstance()->push();
     }
     else if (selection == "help")
     {
-        StateManager::get()->pushScreen(HelpScreen1::getInstance());
+        HelpScreen1::getInstance()->push();
     }
     else if (selection == "startTutorial")
     {
@@ -440,11 +441,16 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             return;
         }
         if (PlayerManager::getCurrentOnlineId())
-            StateManager::get()->pushScreen(OnlineScreen::getInstance());
+        {
+            // For 0.8.2 disable the server menu, instead go to online profile
+            //OnlineScreen::getInstance()->push();
+            ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
+            OnlineProfileOverview::getInstance()->push();
+
+        }
         else
         {
-            BaseUserScreen *login = UserScreen::getInstance();
-            StateManager::get()->pushScreen(login);
+            UserScreen::getInstance()->push();
         }
     }
     else if (selection == "addons")
@@ -460,11 +466,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Allow STK to connect to the Internet\"."));
             return;
         }
-        StateManager::get()->pushScreen(AddonsScreen::getInstance());
+        AddonsScreen::getInstance()->push();
     }
     else if (selection == "gpEditor")
     {
-        StateManager::get()->pushScreen(GrandPrixEditorScreen::getInstance());
+        GrandPrixEditorScreen::getInstance()->push();
     }
 }   // eventCallback
 

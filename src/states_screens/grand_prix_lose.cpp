@@ -185,7 +185,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
     m_kart_y = KART_Y;
     m_kart_z = KART_Z;
 
-    const int count = ident_arg.size();
+    const int count = (int)ident_arg.size();
     for (int n=0; n<count; n++)
     {
         const KartProperties* kart = kart_properties_manager->getKart(ident_arg[n]);

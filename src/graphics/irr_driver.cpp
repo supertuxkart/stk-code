@@ -499,6 +499,7 @@ void IrrDriver::initDevice()
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
 #endif
     initGL();
+    m_sync = 0;
 
     // Parse extensions
     hasVSLayer = false;
@@ -949,22 +950,36 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
     for(unsigned int i=0; i<n; i++)
     {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-        video::SMaterial &irr_material=mb->getMaterial();
-        video::ITexture* t=irr_material.getTexture(0);
-        if(t) material_manager->setAllMaterialFlags(t, mb);
+        video::SMaterial &irr_material = mb->getMaterial();
 
         // special case : for splatting, the main material is on layer 1.
         // it was done this way to provide a fallback for computers
         // where shaders are not supported
-        t = irr_material.getTexture(1);
-        if (t)
+        video::ITexture* t2 = irr_material.getTexture(1);
+        bool is_splatting = false;
+        if (t2)
         {
-            Material* mat = material_manager->getMaterialFor(t, mb);
+            Material* mat = material_manager->getMaterialFor(t2, mb);
             if (mat != NULL && mat->getShaderType() == Material::SHADERTYPE_SPLATTING)
-                material_manager->setAllMaterialFlags(t, mb);
+            {
+                material_manager->setAllMaterialFlags(t2, mb);
+                is_splatting = true;
+            }
         }
 
-        material_manager->setAllUntexturedMaterialFlags(mb);
+        if (!is_splatting)
+        {
+            video::ITexture* t = irr_material.getTexture(0);
+            if (t)
+            {
+                material_manager->setAllMaterialFlags(t, mb);
+            }
+            else
+            {
+                material_manager->setAllUntexturedMaterialFlags(mb);
+            }
+        }
+        
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags
 
@@ -2490,7 +2505,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
 void IrrDriver::clearLights()
 {
     u32 i;
-    const u32 max = m_lights.size();
+    const u32 max = (int)m_lights.size();
     for (i = 0; i < max; i++)
     {
         m_lights[i]->drop();

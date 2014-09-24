@@ -81,7 +81,7 @@ RubberBall::RubberBall(AbstractKart *kart)
     m_height_timer       = 0.0f;
     m_interval           = m_st_interval;
     m_current_max_height = m_max_height;
-    m_ping_sfx           = sfx_manager->createSoundSource("ball_bounce");
+    m_ping_sfx           = SFXManager::get()->createSoundSource("ball_bounce");
     // Just init the previoux coordinates with some value that's not getXYZ()
     m_previous_xyz       = m_owner->getXYZ();
     m_previous_height    = 2.0f;  //
@@ -109,7 +109,7 @@ RubberBall::~RubberBall()
 {
     if(m_ping_sfx->getStatus()==SFXManager::SFX_PLAYING)
         m_ping_sfx->stop();
-    sfx_manager->deleteSFX(m_ping_sfx);
+    SFXManager::get()->deleteSFX(m_ping_sfx);
 }   // ~RubberBall
 
 // ----------------------------------------------------------------------------

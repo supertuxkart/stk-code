@@ -439,31 +439,31 @@ bool onEvent(const SEvent &event)
                 {
 #if !defined(__APPLE__)
                     DebugSliderDialog *dsd = new DebugSliderDialog();
-                    dsd->setSliderHook( "red_slider", 0, 255, [](){ return irr_driver->getAmbientLight().r * 255.f; },
+                    dsd->setSliderHook( "red_slider", 0, 255, [](){ return int(irr_driver->getAmbientLight().r * 255.f); },
                         [](int v){
                             video::SColorf ambient = irr_driver->getAmbientLight();
                             ambient.setColorComponentValue(0, v / 255.f);
                             irr_driver->setAmbientLight(ambient); }
                     );
-                    dsd->setSliderHook("green_slider", 0, 255, [](){ return irr_driver->getAmbientLight().g * 255.f; },
+                    dsd->setSliderHook("green_slider", 0, 255, [](){ return int(irr_driver->getAmbientLight().g * 255.f); },
                         [](int v){
                         video::SColorf ambient = irr_driver->getAmbientLight();
                         ambient.setColorComponentValue(1, v / 255.f);
                         irr_driver->setAmbientLight(ambient); }
                     );
-                    dsd->setSliderHook("blue_slider", 0, 255, [](){ return irr_driver->getAmbientLight().b * 255.f; },
+                    dsd->setSliderHook("blue_slider", 0, 255, [](){ return int(irr_driver->getAmbientLight().b * 255.f); },
                         [](int v){
                         video::SColorf ambient = irr_driver->getAmbientLight();
                         ambient.setColorComponentValue(2, v / 255.f);
                         irr_driver->setAmbientLight(ambient); }
                     );
-                    dsd->setSliderHook("ssao_radius", 0, 100, [](){ return irr_driver->getSSAORadius() * 10.f; },
+                    dsd->setSliderHook("ssao_radius", 0, 100, [](){ return int(irr_driver->getSSAORadius() * 10.f); },
                         [](int v){irr_driver->setSSAORadius(v / 10.f); }
                     );
-                    dsd->setSliderHook("ssao_k", 0, 100, [](){ return irr_driver->getSSAOK() * 10.f; },
+                    dsd->setSliderHook("ssao_k", 0, 100, [](){ return int(irr_driver->getSSAOK() * 10.f); },
                         [](int v){irr_driver->setSSAOK(v / 10.f); }
                     );
-                    dsd->setSliderHook("ssao_sigma", 0, 100, [](){ return irr_driver->getSSAOSigma() * 10.f; },
+                    dsd->setSliderHook("ssao_sigma", 0, 100, [](){ return int(irr_driver->getSSAOSigma() * 10.f); },
                         [](int v){irr_driver->setSSAOSigma(v / 10.f); }
                     );
 #endif

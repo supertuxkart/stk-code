@@ -78,22 +78,18 @@ int LODNode::getLevel()
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
     Camera* camera = Camera::getActiveCamera();
     if (camera == NULL)
-        return m_detail.size() - 1;
+        return (int)m_detail.size() - 1;
     AbstractKart* kart = camera->getKart();
     const Vec3 &pos = kart->getFrontXYZ();
 
     const int dist =
-        (int)((m_nodes[0]->getAbsolutePosition()).getDistanceFromSQ( core::vector3df(pos.getX(), pos.getY(), pos.getZ())));
+        (int)((m_nodes[0]->getAbsolutePosition()).getDistanceFromSQ(pos.toIrrVector() ));
 
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
         if (dist < m_detail[n])
             return n;
     }
-
-    // If it's the shadow pass, and we would have otherwise hidden the item, show the min one
-    if (curr_cam->isOrthogonal())
-        return m_detail.size() - 1;
 
     return -1;
 }  // getLevel
@@ -104,7 +100,7 @@ int LODNode::getLevel()
  *  camera is activated, since it zooms in to the kart. */
 void LODNode::forceLevelOfDetail(int n)
 {
-    m_forced_lod = (n >=(int)m_detail.size()) ? m_detail.size()-1 : n;
+    m_forced_lod = (n >=(int)m_detail.size()) ? (int)m_detail.size()-1 : n;
 }   // forceLevelOfDetail
 
 // ----------------------------------------------------------------------------
@@ -144,7 +140,7 @@ void LODNode::updateVisibility(bool* shown)
     if (!isVisible()) return;
     if (m_nodes.size() == 0) return;
 
-    int level = getLevel();
+    unsigned int level = getLevel();
     for (size_t i = 0; i < m_nodes.size(); i++)
     {
         m_nodes[i]->setVisible(i == level);
@@ -165,7 +161,6 @@ void LODNode::OnRegisterSceneNode()
                                 m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH) &&
         now > m_last_tick)
     {
-        int level = getLevel();
         if (m_previous_visibility == WAS_HIDDEN && shown)
         {
             scene::IMesh* mesh;

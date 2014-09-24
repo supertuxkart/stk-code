@@ -70,6 +70,7 @@ public:
     virtual bool                  init();
 
     virtual void                  play();
+    virtual void                  reallyPlayNow();
     virtual void                  setLoop(bool status);
     virtual void                  stop();
     virtual void                  pause();
@@ -77,7 +78,7 @@ public:
     virtual void                  speed(float factor);
     virtual void                  position(const Vec3 &position);
     virtual void                  volume(float gain);
-    virtual void                  masterVolume(float gain);
+    virtual void                  setMasterVolume(float gain);
     virtual SFXManager::SFXStatus getStatus();
     virtual void                  onSoundEnabledBack();
     virtual void                  setRolloff(float rolloff);

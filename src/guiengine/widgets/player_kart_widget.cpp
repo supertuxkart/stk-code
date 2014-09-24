@@ -205,7 +205,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                             kart_model.getWheelGraphicsPosition(3) );
     for(size_t i=0 ; i < kart_model.getSpeedWeightedObjectsCount() ; i++)
     {
-        const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject(i);
+        const SpeedWeightedObject& obj = kart_model.getSpeedWeightedObject((int)i);
         m_model_view->addModel(obj.m_model, obj.m_position);
     }
     m_model_view->setRotateContinuously( 35.0f );
@@ -420,7 +420,7 @@ void PlayerKartWidget::markAsReady()
     delete m_player_ident_spinner;
     m_player_ident_spinner = NULL;
 
-    sfx_manager->quickSound( "wee" );
+    SFXManager::get()->quickSound( "wee" );
 
     m_model_view->setRotateTo(30.0f, 1.0f);
 

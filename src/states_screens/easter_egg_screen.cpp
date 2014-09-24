@@ -86,7 +86,7 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
                 if (clicked_track != NULL)
                 {
                     TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                    StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
+                    TrackInfoScreen::getInstance()->push();
                 }
 
             }
@@ -100,7 +100,7 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
                 if (clicked_track != NULL)
                 {
                     TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                    StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
+                    TrackInfoScreen::getInstance()->push();
                 }
             }
         }
@@ -130,7 +130,7 @@ void EasterEggScreen::beforeAddingWidget()
     tabs->clearAllChildren();
 
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
-    const int group_amount = groups.size();
+    const int group_amount = (int)groups.size();
 
     if (group_amount > 1)
     {
@@ -210,7 +210,7 @@ void EasterEggScreen::buildTrackList()
     // Build track list
     if (curr_group_name == ALL_TRACK_GROUPS_ID)
     {
-        const int trackAmount = track_manager->getNumberOfTracks();
+        const int trackAmount = (int)track_manager->getNumberOfTracks();
 
         for (int n=0; n<trackAmount; n++)
         {
@@ -240,7 +240,7 @@ void EasterEggScreen::buildTrackList()
     else
     {
         const std::vector<int>& curr_group = track_manager->getTracksInGroup( curr_group_name );
-        const int trackAmount = curr_group.size();
+        const int trackAmount = (int)curr_group.size();
 
         for (int n=0; n<trackAmount; n++)
         {

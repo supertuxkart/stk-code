@@ -190,7 +190,7 @@ const AbstractKart *RaceManager::getKartWithGPRank(unsigned int n)
  */
 int RaceManager::getLocalPlayerGPRank(const int player_id) const
 {
-    const int amount = m_kart_status.size();
+    const int amount = (int)m_kart_status.size();
     for (int n=0; n<amount; n++)
     {
         if (m_kart_status[n].m_local_player_id == player_id)
@@ -247,7 +247,7 @@ void RaceManager::setTrack(const std::string& track)
  */
 void RaceManager::computeRandomKartList()
 {
-    int n = m_num_karts - m_player_karts.size();
+    int n = m_num_karts - (int)m_player_karts.size();
     if(UserConfigParams::logMisc())
         std::cout << "AI karts count = " << n << " for m_num_karts="
                   << m_num_karts << " and m_player_karts.size()="
@@ -319,7 +319,7 @@ void RaceManager::startNew(bool from_overworld)
         race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER
         ? -1
         : 0;
-    const unsigned int ai_kart_count = m_ai_kart_list.size();
+    const unsigned int ai_kart_count = (unsigned int) m_ai_kart_list.size();
     for(unsigned int i=0; i<ai_kart_count; i++)
     {
         m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1,
@@ -334,7 +334,7 @@ void RaceManager::startNew(bool from_overworld)
 
     // Then the players, which start behind the AI karts
     // -------------------------------------------------
-    for(unsigned int i=0; i<m_player_karts.size(); i++)
+    for(unsigned int i=0; i<(int)m_player_karts.size(); i++)
     {
         KartType kt= m_player_karts[i].isNetworkPlayer() ? KT_NETWORK_PLAYER : KT_PLAYER;
         m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,
@@ -362,7 +362,7 @@ void RaceManager::startNew(bool from_overworld)
                                                          m_grand_prix.getId(),
                                                          m_difficulty,
                                                          m_num_karts,
-                                                         m_player_karts.size());
+                                                         (int)m_player_karts.size());
 
         // Start the race with the appropriate track
         // =========================================
@@ -418,7 +418,7 @@ void RaceManager::startNextRace()
             // the end because of the simple reason that they
             // are at the end when getting added. Keep them out
             // of the later sorting and they will stay there.
-            player_last_offset = m_player_karts.size();
+            player_last_offset = (int)m_player_karts.size();
         }
 
         std::sort(m_kart_status.begin()+offset,
@@ -513,7 +513,7 @@ void RaceManager::next()
                                            m_grand_prix.getId(),
                                            m_difficulty,
                                            m_num_karts,
-                                           m_player_karts.size());
+                                           (int)m_player_karts.size());
             if(gp != NULL)
             {
                 //if so addept it
@@ -529,7 +529,7 @@ void RaceManager::next()
                                            ->getUniqueID(),
                         m_grand_prix.getId(),
                         m_difficulty,
-                        m_player_karts.size(),
+                        (int)m_player_karts.size(),
                         m_track_number,
                         m_kart_status
                     )
@@ -649,19 +649,19 @@ void RaceManager::exitRace(bool delete_world)
                                            m_grand_prix.getId(),
                                            m_difficulty,
                                            m_num_karts,
-                                           m_player_karts.size());
+                                           (int)m_player_karts.size());
             if(gp != NULL) gp->remove();
         }
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
 
         bool someHumanPlayerWon = false;
-        const unsigned int kartStatusCount = m_kart_status.size();
+        const unsigned int kart_status_count = (unsigned int)m_kart_status.size();
 
         const int loserThreshold = 3;
 
         std::string winners[3];
         std::vector<std::string> humanLosers; // because we don't care about AIs that lost
-        for (unsigned int i=0; i < kartStatusCount; ++i)
+        for (unsigned int i=0; i < kart_status_count; ++i)
         {
             if(UserConfigParams::logMisc())
             {
@@ -702,14 +702,14 @@ void RaceManager::exitRace(bool delete_world)
         {
             race_manager->startSingleRace("gpwin", 999, false);
             GrandPrixWin* scene = GrandPrixWin::getInstance();
-            StateManager::get()->pushScreen(scene);
+            scene->push();
             scene->setKarts(winners);
         }
         else
         {
             race_manager->startSingleRace("gplose", 999, false);
             GrandPrixLose* scene = GrandPrixLose::getInstance();
-            StateManager::get()->pushScreen(scene);
+            scene->push();
 
             if (humanLosers.size() >= 1)
             {
@@ -826,7 +826,7 @@ void RaceManager::setupPlayerKartInfo()
     std::sort(kart_info.begin(), kart_info.end());
 
     // Set the player kart information
-    setNumPlayers(kart_info.size());
+    setNumPlayers((int)kart_info.size());
 
     // Set the global player ID for each player
     for(unsigned int i=0; i<kart_info.size(); i++)

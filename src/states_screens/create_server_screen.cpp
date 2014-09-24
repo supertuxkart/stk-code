@@ -103,7 +103,7 @@ void CreateServerScreen::onUpdate(float delta)
             }
             else
             {
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_server_creation_request->getInfo(), false);
             }
@@ -146,7 +146,7 @@ void CreateServerScreen::serverCreationRequest()
 
         return;
     }
-    sfx_manager->quickSound("anvil");
+    SFXManager::get()->quickSound("anvil");
 }
 // --------------------------------------------------------------------
 void CreateServerScreen::ServerCreationRequest::callback()

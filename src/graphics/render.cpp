@@ -20,38 +20,26 @@
 
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
-#include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/lens_flare.hpp"
-#include "graphics/light.hpp"
 #include "graphics/lod_node.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/particle_kind_manager.hpp"
-#include "graphics/per_camera_node.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stkmeshscenenode.hpp"
-#include "graphics/wind.hpp"
-#include "io/file_manager.hpp"
-#include "items/item.hpp"
 #include "items/item_manager.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
-#include "utils/constants.hpp"
-#include "utils/helpers.hpp"
-#include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "stkscenemanager.hpp"
 #include "items/powerup_manager.hpp"
 #include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
 
-#include <algorithm>
 #include <limits>
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
@@ -174,7 +162,8 @@ void IrrDriver::renderGLSL(float dt)
         oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-//        camera->activate();
+        if (!UserConfigParams::m_dynamic_lights)
+            camera->activate();
         rg->preRenderCallback(camera);   // adjusts start referee
         m_scene_manager->setActiveCamera(camnode);
 
@@ -222,7 +211,7 @@ void IrrDriver::renderGLSL(float dt)
                     const float *tmp = vertex.data();
                     for (unsigned int i = 0; i < vertex.size(); i += 1024 * 6)
                     {
-                        unsigned count = MIN2(vertex.size() - i, 1024 * 6);
+                        unsigned count = MIN2((int)vertex.size() - i, 1024 * 6);
                         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
 
                         glDrawArrays(GL_LINES, 0, count / 3);
@@ -261,7 +250,8 @@ void IrrDriver::renderGLSL(float dt)
             {
                 glEnable(GL_FRAMEBUFFER_SRGB);
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                camera->activate();
+                if (UserConfigParams::m_dynamic_lights)
+                    camera->activate();
                 m_post_processing->renderPassThrough(fbo->getRTT()[0]);
                 glDisable(GL_FRAMEBUFFER_SRGB);
             }
@@ -399,8 +389,6 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
 
-    m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-
     if (getNormals())
     {
         m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
@@ -452,6 +440,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         renderTransparent();
         PROFILER_POP_CPU_MARKER();
     }
+
+    m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
     // Render particles
     {
@@ -549,12 +539,10 @@ void IrrDriver::renderFixed(float dt)
 void IrrDriver::computeSunVisibility()
 {
     // Is the lens flare enabled & visible? Check last frame's query.
-    bool hasflare = false;
     bool hasgodrays = false;
 
     if (World::getWorld() != NULL)
     {
-        hasflare = World::getWorld()->getTrack()->hasLensFlare();
         hasgodrays = World::getWorld()->getTrack()->hasGodRays();
     }
 
@@ -840,7 +828,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glClearColor(0, 0, 0, 0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    const u32 glowcount = glows.size();
+    const u32 glowcount = (int)glows.size();
     ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -877,7 +865,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
             {
                 glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
                     (const void*)(GlowPassCmd::getInstance()->Offset * sizeof(DrawElementsIndirectCommand)),
-                    GlowPassCmd::getInstance()->Size,
+                    (int)GlowPassCmd::getInstance()->Size,
                     sizeof(DrawElementsIndirectCommand));
             }
         }

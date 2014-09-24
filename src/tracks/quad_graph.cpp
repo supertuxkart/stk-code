@@ -37,6 +37,7 @@
 #include "tracks/check_manager.hpp"
 #include "tracks/quad_set.hpp"
 #include "tracks/track.hpp"
+#include "graphics/glwrap.hpp"
 
 const int QuadGraph::UNKNOWN_SECTOR  = -1;
 QuadGraph *QuadGraph::m_quad_graph = NULL;
@@ -96,7 +97,7 @@ void QuadGraph::load(const std::string &filename)
         // i.e. each quad is part of the graph exactly once.
         // First create an empty graph node for each quad:
         for(unsigned int i=0; i<QuadSet::get()->getNumberOfQuads(); i++)
-            m_all_nodes.push_back(new GraphNode(i, m_all_nodes.size()));
+            m_all_nodes.push_back(new GraphNode(i, (unsigned int) m_all_nodes.size()));
         // Then set the default loop:
         setDefaultSuccessors();
         computeDirectionData();
@@ -130,7 +131,7 @@ void QuadGraph::load(const std::string &filename)
             xml_node->get("to-quad", &to);
             for(unsigned int i=from; i<=to; i++)
             {
-                m_all_nodes.push_back(new GraphNode(i, m_all_nodes.size()));
+                m_all_nodes.push_back(new GraphNode(i, (unsigned int) m_all_nodes.size()));
             }
         }
         else if(xml_node->getName()=="node")
@@ -138,7 +139,7 @@ void QuadGraph::load(const std::string &filename)
             // A single quad is connected to a single graph node.
             unsigned int id;
             xml_node->get("quad", &id);
-            m_all_nodes.push_back(new GraphNode(id, m_all_nodes.size()));
+            m_all_nodes.push_back(new GraphNode(id, (unsigned int) m_all_nodes.size()));
         }
 
         // Then the definition of edges between the graph nodes:
@@ -411,6 +412,8 @@ void QuadGraph::createMesh(bool show_invisible,
     m.Lighting         = false;
     if(enable_transparency)
         m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    m.setTexture(0, getUnicolorTexture(SColor(255, 255, 255, 255)));
+    m.setTexture(1, getUnicolorTexture(SColor(0, 0, 0, 0)));
     m_mesh             = irr_driver->createQuadMesh(&m);
     m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
@@ -749,7 +752,7 @@ void QuadGraph::determineDirection(unsigned int current,
 
     // If the direction is still the same during a lap the last node
     // in the same direction is the previous node;
-    int max_step = m_all_nodes.size()-1;
+    int max_step = (int)m_all_nodes.size()-1;
 
     while(max_step-- != 0)
     {
@@ -838,8 +841,8 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
     // the node on F, and then keep on going straight ahead instead of
     // using the loop at all.
     unsigned int max_count  = (*sector!=UNKNOWN_SECTOR && all_sectors!=NULL)
-                            ? all_sectors->size()
-                            : m_all_nodes.size();
+                            ? (unsigned int)all_sectors->size()
+                            : (unsigned int)m_all_nodes.size();
     *sector = UNKNOWN_SECTOR;
     for(unsigned int i=0; i<max_count; i++)
     {
@@ -893,7 +896,7 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
                                    const int curr_sector,
                                    std::vector<int> *all_sectors) const
 {
-    int count = (all_sectors!=NULL) ? all_sectors->size() : getNumNodes();
+    int count = (all_sectors!=NULL) ? (int) all_sectors->size() : getNumNodes();
     int current_sector = 0;
     if(curr_sector != UNKNOWN_SECTOR && !all_sectors)
     {

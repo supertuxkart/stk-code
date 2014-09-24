@@ -48,7 +48,7 @@
 #  include <direct.h>
 #  include <Windows.h>
 #  include <stdio.h>
-#  ifndef __CYGWIN__
+#  if !defined(__CYGWIN__ ) && !defined(__MINGW32__)
      /*Needed by the remove directory function */
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
 #    define S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
@@ -422,7 +422,9 @@ XMLNode *FileManager::createXMLTreeFromString(const std::string & content)
     {
         char *b = new char[content.size()];
         memcpy(b, content.c_str(), content.size());
-        io::IReadFile * ireadfile = m_file_system->createMemoryReadFile(b, content.size(), "tempfile", true);
+        io::IReadFile * ireadfile = 
+            m_file_system->createMemoryReadFile(b, (int)content.size(), 
+                                                "tempfile", true);
         io::IXMLReader * reader = m_file_system->createXMLReader(ireadfile);
         XMLNode* node = new XMLNode(reader);
         reader->drop();

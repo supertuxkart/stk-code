@@ -55,7 +55,7 @@ public:
         m_y.push_back(y);
         if(m_y.size()>1)
         {
-            const unsigned int last=m_x.size()-1;
+            const unsigned int last=(unsigned int) m_x.size()-1;
             // Avoid division by zero, just set m_delta to a large
             // value with the right sign
             if(m_x[last]==m_x[last-1])
@@ -69,7 +69,7 @@ public:
     }   // push_back
     // ------------------------------------------------------------------------
     /** Returns the number of X/Y points. */
-    unsigned int size() const { return m_x.size(); }
+    unsigned int size() const { return (unsigned int) m_x.size(); }
     // ------------------------------------------------------------------------
     /** Returns the X value for a specified point. */
     float getX(unsigned int i) const { return m_x[i]; }
@@ -121,7 +121,7 @@ public:
         {
             if(y > m_y[0]) return m_x[0];
 
-            const unsigned int last = m_x.size();
+            const unsigned int last = (unsigned int) m_x.size();
 
             for(unsigned int i=1; i<last; i++)
             {
@@ -134,7 +134,7 @@ public:
         {
             if(y < m_y[0]) return m_x[0];
 
-            const unsigned int last = m_x.size();
+            const unsigned int last = (unsigned int) m_x.size();
 
             for(unsigned int i=1; i<last; i++)
             {

@@ -18,9 +18,13 @@
 
 #include "audio/dummy_sfx.hpp"
 #include "audio/music_manager.hpp"
+#include "audio/sfx_openal.hpp"
 #include "audio/sfx_buffer.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
 
+#include <pthread.h>
 #include <stdexcept>
 #include <algorithm>
 #include <map>
@@ -39,19 +43,33 @@
 #  endif
 #endif
 
-#include "audio/sfx_openal.hpp"
-#include "config/user_config.hpp"
-#include "io/file_manager.hpp"
-#include "race/race_manager.hpp"
-#include "utils/constants.hpp"
+SFXManager *SFXManager::m_sfx_manager;
 
-SFXManager* sfx_manager= NULL;
-std::map<std::string, SFXBase*> SFXManager::m_quick_sounds;
+// ----------------------------------------------------------------------------
+/** Static function to create the singleton sfx manager.
+ */
+void SFXManager::create()
+{
+    assert(!m_sfx_manager);
+    m_sfx_manager = new SFXManager();
+}   // create
 
+// ------------------------------------------------------------------------
+/** Static function to delete the singleton sfx manager.
+ */
+void SFXManager::destroy()
+{
+    assert(m_sfx_manager);
+    delete m_sfx_manager;
+    m_sfx_manager = NULL;
+}    // destroy
+
+// ----------------------------------------------------------------------------
 /** Initialises the SFX manager and loads the sfx from a config file.
  */
 SFXManager::SFXManager()
 {
+
     // The sound manager initialises OpenAL
     m_initialized = music_manager->initialized();
     m_master_gain = UserConfigParams::m_sfx_volume;
@@ -59,16 +77,54 @@ SFXManager::SFXManager()
     m_position    = Vec3(0,0,0);
 
     loadSfx();
+
+    pthread_cond_init(&m_cond_request, NULL);
+
+    pthread_attr_t  attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+    // Should be the default, but just in case:
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+
+    m_thread_id.setAtomic(new pthread_t());
+    // The thread is created even if there atm sfx are disabled
+    // (since the user might enable it later).
+    int error = pthread_create(m_thread_id.getData(), &attr,
+                               &SFXManager::mainLoop, this);
+    if (error)
+    {
+        m_thread_id.lock();
+        delete m_thread_id.getData();
+        m_thread_id.unlock();
+        m_thread_id.setAtomic(0);
+        Log::error("HTTP Manager", "Could not create thread, error=%d.",
+                   errno);
+    }
+    pthread_attr_destroy(&attr);
+
     if (!sfxAllowed()) return;
+
     setMasterSFXVolume( UserConfigParams::m_sfx_volume );
+    m_sfx_to_play.lock();
+    m_sfx_to_play.getData().clear();
+    m_sfx_to_play.unlock();
 
 }  // SoundManager
 
 //-----------------------------------------------------------------------------
+/** Destructor, frees all sound effects.
+ */
 SFXManager::~SFXManager()
 {
+    m_thread_id.lock();
+    pthread_join(*m_thread_id.getData(), NULL);
+    delete m_thread_id.getData();
+    m_thread_id.unlock();
+    pthread_cond_destroy(&m_cond_request);
+
     // ---- clear m_all_sfx
-    const int sfx_amount = m_all_sfx.size();
+    const int sfx_amount = (int) m_all_sfx.size();
     for (int n=0; n<sfx_amount; n++)
     {
         delete m_all_sfx[n];
@@ -99,11 +155,86 @@ SFXManager::~SFXManager()
     }
     m_all_sfx_types.clear();
 
-    sfx_manager = NULL;
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------
+/** Adds a sound effect to the queue of sfx to be started by the sfx manager.
+ *  Starting a sfx can sometimes cause a 5ms delay, so it is done in a 
+ *  separate thread.
+ *  \param sfx The sound effect to be started.
+ */
+void SFXManager::queue(SFXBase *sfx)
+{
+    // Don't add sfx that are either not working correctly (e.g. because sfx
+    // are disabled);
+    if(sfx && sfx->getStatus()==SFX_UNKNOWN ) return;
 
+    m_sfx_to_play.lock();
+    m_sfx_to_play.getData().push_back(sfx);
+    m_sfx_to_play.unlock();
+    // Wake up the sfx thread
+    pthread_cond_signal(&m_cond_request);
+
+}   // queue
+
+//----------------------------------------------------------------------------
+/** Puts a NULL request into the queue, which will trigger the thread to
+ *  exit.
+ */
+void SFXManager::stopThread()
+{
+    queue(NULL);
+}   // stopThread
+
+//----------------------------------------------------------------------------
+/** This loops runs in a different threads, and starts sfx to be played.
+ *  This can sometimes take up to 5 ms, so it needs to be handled in a thread
+ *  in order to avoid rendering delays.
+ *  \param obj A pointer to the SFX singleton.
+ */
+void* SFXManager::mainLoop(void *obj)
+{
+    SFXManager *me = (SFXManager*)obj;
+
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+
+    me->m_sfx_to_play.lock();
+
+    // Wait till we have an empty sfx in the queue
+    while (me->m_sfx_to_play.getData().empty() ||
+           me->m_sfx_to_play.getData().front()!=NULL    )
+    {
+        bool empty = me->m_sfx_to_play.getData().empty();
+
+        // Wait in cond_wait for a request to arrive. The 'while' is necessary
+        // since "spurious wakeups from the pthread_cond_wait ... may occur"
+        // (pthread_cond_wait man page)!
+        while (empty)
+        {
+            pthread_cond_wait(&me->m_cond_request, me->m_sfx_to_play.getMutex());
+            empty = me->m_sfx_to_play.getData().empty();
+        }
+
+        SFXBase *current = me->m_sfx_to_play.getData().front();
+        me->m_sfx_to_play.getData().erase(me->m_sfx_to_play.getData().begin());
+
+        if (!current)   // empty sfx indicates to abort the sfx manager
+            break;
+
+        me->m_sfx_to_play.unlock();
+        current->reallyPlayNow();
+        me->m_sfx_to_play.lock();
+
+    }   // while
+
+    return NULL;
+}   // mainLoop
+
+//----------------------------------------------------------------------------
+/** Called then sound is globally switched on or off. It either pauses or
+ *  resumes all sound effects. 
+ *  \param on If sound is switched on or off.
+ */
 void SFXManager::soundToggled(const bool on)
 {
     // When activating SFX, load all buffers
@@ -118,7 +249,7 @@ void SFXManager::soundToggled(const bool on)
 
         resumeAll();
 
-        const int sfx_amount = m_all_sfx.size();
+        const int sfx_amount = (int)m_all_sfx.size();
         for (int n=0; n<sfx_amount; n++)
         {
             m_all_sfx[n]->onSoundEnabledBack();
@@ -131,7 +262,9 @@ void SFXManager::soundToggled(const bool on)
 }
 
 //----------------------------------------------------------------------------
-
+/** Returns if sfx can be played. This means sfx are enabled and
+ *  the manager is correctly initialised.
+ */
 bool SFXManager::sfxAllowed()
 {
     if(!UserConfigParams::m_sfx || !m_initialized)
@@ -295,11 +428,6 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
         positional = buffer->isPositional();
     }
 
-    //printf("CREATING %s (%x), positional = %i (race_manager->getNumLocalPlayers() = %i, buffer->isPositional() = %i)\n",
-    //       buffer->getFileName().c_str(), (unsigned int)buffer,
-    //       positional,
-    //       race_manager->getNumLocalPlayers(), buffer->isPositional());
-
 #if HAVE_OGGVORBIS
     //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
@@ -307,7 +435,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain(), owns_buffer);
 #endif
 
-    sfx->masterVolume(m_master_gain);
+    sfx->setMasterVolume(m_master_gain);
 
     if (add_to_SFX_list) m_all_sfx.push_back(sfx);
 
@@ -321,7 +449,9 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
     std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.find(name);
     if ( i == m_all_sfx_types.end() )
     {
-        Log::error("SFXManager", "SFXManager::createSoundSource could not find the requested sound effect : '%s'\n", name.c_str());
+        Log::error("SFXManager", 
+                   "SFXManager::createSoundSource could not find the "
+                   "requested sound effect : '%s'\n", name.c_str());
         return NULL;
     }
 
@@ -349,7 +479,8 @@ void SFXManager::deleteSFXMapping(const std::string &name)
 
     if (i == m_all_sfx_types.end())
     {
-        Log::warn("SFXManager", "SFXManager::deleteSFXMapping : Warning: sfx not found in list.\n");
+        Log::warn("SFXManager",
+             "SFXManager::deleteSFXMapping : Warning: sfx not found in list.");
         return;
     }
     (*i).second->unload();
@@ -372,7 +503,8 @@ void SFXManager::deleteSFX(SFXBase *sfx)
 
     if(i==m_all_sfx.end())
     {
-        Log::warn("SFXManager", "SFXManager::deleteSFX : Warning: sfx not found in list.\n");
+        Log::warn("SFXManager", 
+                  "SFXManager::deleteSFX : Warning: sfx not found in list.");
         return;
     }
 
@@ -427,8 +559,8 @@ bool SFXManager::checkError(const std::string &context)
 
     if(error != AL_NO_ERROR)
     {
-        Log::error("SFXManager", "SFXOpenAL OpenAL error while %s: %s\n",
-            context.c_str(), SFXManager::getErrorString(error).c_str());
+        Log::error("SFXManager", "SFXOpenAL OpenAL error while %s: %s",
+                   context.c_str(), SFXManager::getErrorString(error).c_str());
         return false;
     }
 #endif
@@ -451,7 +583,7 @@ void SFXManager::setMasterSFXVolume(float gain)
         for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
             i!=m_all_sfx.end(); i++)
         {
-            (*i)->masterVolume(m_master_gain);
+            (*i)->setMasterVolume(m_master_gain);
         }   // for i in m_all_sfx
     }
 
@@ -460,7 +592,7 @@ void SFXManager::setMasterSFXVolume(float gain)
         std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.begin();
         for (; i != m_quick_sounds.end(); i++)
         {
-            (*i).second->masterVolume(m_master_gain);
+            (*i).second->setMasterVolume(m_master_gain);
         }
     }
 
@@ -486,7 +618,10 @@ const std::string SFXManager::getErrorString(int err)
 }   // getErrorString
 
 //-----------------------------------------------------------------------------
-
+/** Sets the position and orientation of the listener.
+ *  \param position Position of the listener.
+ *  \param front Which way the listener is facing.
+ */
 void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
 {
 #if HAVE_OGGVORBIS
@@ -524,7 +659,7 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
     if (sound == m_quick_sounds.end())
     {
         // sound not yet in our local list of quick sounds
-        SFXBase* newSound = sfx_manager->createSoundSource(sound_type, false);
+        SFXBase* newSound = SFXManager::get()->createSoundSource(sound_type, false);
         if (newSound == NULL) return NULL;
         newSound->play();
         m_quick_sounds[sound_type] = newSound;
@@ -535,9 +670,6 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
         (*sound).second->play();
         return (*sound).second;
     }
-
-    //     m_locked_sound = sfx_manager->newSFX(SFXManager::SOUND_LOCKED);
-    // m_locked_sound->play();
-}
+}   // quickSound
 
 

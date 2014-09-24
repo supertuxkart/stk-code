@@ -377,8 +377,6 @@ private:
     bool m_bloom;
     float m_bloom_threshold;
 
-    bool m_lensflare;
-
     bool m_godrays;
     core::vector3df m_godrays_position;
     float m_godrays_opacity;
@@ -543,7 +541,7 @@ public:
                                 { return m_root+"/"+s; }
     // ------------------------------------------------------------------------
     /** Returns the number of modes available for this track. */
-    unsigned int       getNumberOfModes() const { return m_all_modes.size();  }
+    unsigned int       getNumberOfModes() const { return (unsigned int) m_all_modes.size();  }
     // ------------------------------------------------------------------------
     /** Returns number of completed challenges. */
     unsigned int getNumOfCompletedChallenges();
@@ -568,7 +566,7 @@ public:
     // ------------------------------------------------------------------------
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const
-                                          { return m_start_transforms.size(); }
+                            { return (unsigned int)m_start_transforms.size(); }
     // ------------------------------------------------------------------------
     bool getWeatherLightning() {return m_weather_lightning;}
     // ------------------------------------------------------------------------
@@ -623,7 +621,7 @@ public:
     bool hasClouds() const { return m_clouds; }
 
     // ------------------------------------------------------------------------
-    bool getBloom() const { return m_bloom; }
+    bool hasBloom() const { return m_bloom; }
 
     // ------------------------------------------------------------------------
     float getBloomThreshold() const { return m_bloom_threshold; }
@@ -633,9 +631,6 @@ public:
     core::vector3df getColorLevelIn() const { return m_color_inlevel; }
     // ------------------------------------------------------------------------
     core::vector2df getColorLevelOut() const { return m_color_outlevel; }
-
-    // ------------------------------------------------------------------------
-    bool hasLensFlare() const { return m_lensflare; }
     // ------------------------------------------------------------------------
     bool hasGodRays() const { return m_godrays; }
     // ------------------------------------------------------------------------

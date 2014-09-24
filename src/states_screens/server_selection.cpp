@@ -17,16 +17,16 @@
 
 #include "states_screens/server_selection.hpp"
 
-#include <iostream>
-#include <assert.h>
-
+#include "audio/sfx_manager.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "audio/sfx_manager.hpp"
+
+#include <iostream>
+#include <assert.h>
 
 using namespace Online;
 
@@ -197,7 +197,7 @@ void ServerSelection::onUpdate(float dt)
             }
             else
             {
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 new MessageDialog(m_refresh_request->getInfo());
             }
             delete m_refresh_request;

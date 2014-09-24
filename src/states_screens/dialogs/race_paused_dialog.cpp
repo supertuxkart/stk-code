@@ -134,13 +134,13 @@ GUIEngine::EventPropagation
         else if (selection == "help")
         {
             dismiss();
-            StateManager::get()->pushScreen(HelpScreen1::getInstance());
+            HelpScreen1::getInstance()->push();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "options")
         {
             dismiss();
-            StateManager::get()->pushScreen(OptionsScreenVideo::getInstance());
+            OptionsScreenVideo::getInstance()->push();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "restart")

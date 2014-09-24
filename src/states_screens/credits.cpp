@@ -350,7 +350,7 @@ void CreditsScreen::onUpdate(float elapsed_time)
             color, false /* center h */, true /* center v */, NULL,
             true /* ignore RTL */                                   );
 
-        const int subamount = m_sections[m_curr_section]
+        const int subamount = (int)m_sections[m_curr_section]
                              .m_entries[m_curr_element].m_subentries.size();
         int suby = m_y + m_h/3;
         const int inc = subamount == 0 ? m_h/8

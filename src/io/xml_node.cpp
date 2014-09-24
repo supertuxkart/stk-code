@@ -404,7 +404,7 @@ int XMLNode::get(const std::string &attribute,
     if(!get(attribute, &s)) return 0;
 
     *value = StringUtils::split(s,' ');
-    return value->size();
+    return (int) value->size();
 }   // get(vector<string>)
 
 // ----------------------------------------------------------------------------
@@ -423,7 +423,7 @@ int XMLNode::get(const std::string &attribute,
     std::vector<std::string> v = StringUtils::split(s,' ');
     value->clear();
 
-    const unsigned int count = v.size();
+    const unsigned int count = (unsigned int)v.size();
     for (unsigned int i=0; i<count; i++)
     {
         float curr;
@@ -436,7 +436,7 @@ int XMLNode::get(const std::string &attribute,
 
         value->push_back(curr);
     }
-    return value->size();
+    return (int) value->size();
 }   // get(vector<float>)
 
 // ----------------------------------------------------------------------------
@@ -454,7 +454,7 @@ int XMLNode::get(const std::string &attribute, std::vector<int> *value) const
     std::vector<std::string> v = StringUtils::split(s,' ');
     value->clear();
 
-    const unsigned int count = v.size();
+    const unsigned int count = (unsigned int)v.size();
     for (unsigned int i=0; i<count; i++)
     {
         int val;
@@ -467,7 +467,7 @@ int XMLNode::get(const std::string &attribute, std::vector<int> *value) const
 
         value->push_back(val);
     }
-    return value->size();
+    return (int) value->size();
 }   // get(vector<int>)
 
 // ----------------------------------------------------------------------------
@@ -529,7 +529,6 @@ int XMLNode::get(core::vector3df *value) const
 {
     float f;
     int bits=0;
-    core::vector3df result = *value;
     if(get("x", &f)) { value->X = f; bits |= 1; }
     if(get("h", &f)) { value->X = f; bits |= 1; }
     if(get("y", &f)) { value->Y = f; bits |= 2; }
@@ -551,7 +550,6 @@ int XMLNode::getXYZ(core::vector3df *value) const
 {
     float f;
     int bits=0;
-    core::vector3df result = *value;
     if(get("x", &f)) { value->X = f; bits |= 1; }
     if(get("y", &f)) { value->Y = f; bits |= 2; }
     if(get("z", &f)) { value->Z = f; bits |= 4; }
@@ -570,7 +568,6 @@ int XMLNode::getXYZ(Vec3 *value) const
 {
     float f;
     int bits=0;
-    Vec3 result = *value;
     if(get("x", &f)) { value->setX(f); bits |= 1; }
     if(get("y", &f)) { value->setY(f); bits |= 2; }
     if(get("z", &f)) { value->setZ(f); bits |= 4; }
@@ -589,7 +586,6 @@ int XMLNode::getHPR(core::vector3df *value) const
 {
     float f;
     int bits=0;
-    core::vector3df result = *value;
     if(get("h", &f)) { value->X = f; bits |= 1; }
     if(get("p", &f)) { value->Y = f; bits |= 2; }
     if(get("r", &f)) { value->Z = f; bits |= 4; }
@@ -608,7 +604,6 @@ int XMLNode::getHPR(Vec3 *value) const
 {
     float f;
     int bits=0;
-    Vec3 result = *value;
     if(get("h", &f)) { value->setX(f); bits |= 1; }
     if(get("p", &f)) { value->setY(f); bits |= 2; }
     if(get("r", &f)) { value->setZ(f); bits |= 4; }

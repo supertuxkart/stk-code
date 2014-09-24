@@ -64,7 +64,7 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id, bool fr
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-}
+}   // ServerInfoDialog
 
 // -----------------------------------------------------------------------------
 ServerInfoDialog::~ServerInfoDialog()
@@ -72,7 +72,8 @@ ServerInfoDialog::~ServerInfoDialog()
     if (m_server_join_request)
         delete m_server_join_request;
     m_server_join_request = NULL;
-}
+}   // ~ServerInfoDialog
+
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
@@ -81,9 +82,9 @@ void ServerInfoDialog::requestJoin()
     Online::ServersManager::get()->setJoinedServer(m_server_id);
     ProtocolManager::getInstance()->requestStart(new ConnectToServer(m_server_id, m_host_id));
     ModalDialog::dismiss();
-    StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+    NetworkingLobby::getInstance()->push();
     //Online::CurrentUser::release();
-}
+}   // requestJoin
 
 // -----------------------------------------------------------------------------
 GUIEngine::EventPropagation ServerInfoDialog::processEvent(const std::string& eventSource)
@@ -104,7 +105,7 @@ GUIEngine::EventPropagation ServerInfoDialog::processEvent(const std::string& ev
         }
     }
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
 // -----------------------------------------------------------------------------
 
@@ -116,7 +117,7 @@ void ServerInfoDialog::onEnterPressedInternal()
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
     requestJoin();
-}
+}   // onEnterPressedInternal
 
 // -----------------------------------------------------------------------------
 
@@ -125,7 +126,7 @@ bool ServerInfoDialog::onEscapePressed()
     if (m_cancel_widget->isActivated())
         m_self_destroy = true;
     return false;
-}
+}   // onEscapePressed
 
 // -----------------------------------------------------------------------------
 
@@ -141,7 +142,7 @@ void ServerInfoDialog::onUpdate(float dt)
             }
             else
             {
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_server_join_request->getInfo(), false);
             }
@@ -166,7 +167,7 @@ void ServerInfoDialog::onUpdate(float dt)
         if (m_from_server_creation)
             StateManager::get()->popMenu();
         if (m_enter_lobby)
-            StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+            NetworkingLobby::getInstance()->push();
         return;
     }
-}
+}   // onUpdate

@@ -71,8 +71,9 @@ void GPInfoScreen::loadedFromFile()
     // (since the groups can change if addons are added/deleted).
     m_group_spinner      = getWidget<SpinnerWidget>("group-spinner");
     m_reverse_spinner    = getWidget<SpinnerWidget>("reverse-spinner");
-    m_reverse_spinner->addLabel(_("No"));
-    m_reverse_spinner->addLabel(_("Yes"));
+    m_reverse_spinner->addLabel(_("Default"));
+    m_reverse_spinner->addLabel(_("None"));
+    m_reverse_spinner->addLabel(_("All"));
     m_reverse_spinner->addLabel(_("Random"));
     m_reverse_spinner->setValue(0);
 
@@ -80,7 +81,6 @@ void GPInfoScreen::loadedFromFile()
     // Only init the number of tracks here, this way the previously selected
     // number of tracks will be the default.
     m_num_tracks_spinner->setValue(1);
-    int number_of_tracks = m_num_tracks_spinner->getValue();
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -109,13 +109,14 @@ GrandPrixData::GPReverseType GPInfoScreen::getReverse() const
 {
     switch (m_reverse_spinner->getValue())
     {
-    case 0: return GrandPrixData::GP_NO_REVERSE;     break;
-    case 1: return GrandPrixData::GP_ALL_REVERSE;    break;
-    case 2: return GrandPrixData::GP_RANDOM_REVERSE; break;
-    default: assert(false); 
+    case 0: return GrandPrixData::GP_DEFAULT_REVERSE; break;
+    case 1: return GrandPrixData::GP_NO_REVERSE;      break;
+    case 2: return GrandPrixData::GP_ALL_REVERSE;     break;
+    case 3: return GrandPrixData::GP_RANDOM_REVERSE;  break;
+    default: assert(false);
     }   // switch
     // Avoid compiler warning
-    return GrandPrixData::GP_NO_REVERSE;
+    return GrandPrixData::GP_DEFAULT_REVERSE;
 }   // getReverse
 // ----------------------------------------------------------------------------
 void GPInfoScreen::beforeAddingWidget()
@@ -157,7 +158,6 @@ void GPInfoScreen::init()
 
     bool random = m_gp.isRandomGP();
 
-    SpinnerWidget *reverse_spinner = getWidget<SpinnerWidget>("reverse-spinner");
     getWidget<LabelWidget  >("track-text"   )->setVisible(random);
     m_num_tracks_spinner->setVisible(random);
     getWidget<LabelWidget  >("group-text"   )->setVisible(random);
@@ -175,7 +175,7 @@ void GPInfoScreen::init()
         // been added or deleted since the last time this screen was shown.
         m_group_spinner->clearLabels();
         m_group_spinner->addLabel("all");
-        int index_standard;
+        int index_standard=0;
         const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
         for (unsigned int i = 0; i < groups.size(); i++)
         {
@@ -197,7 +197,7 @@ void GPInfoScreen::init()
         // was shown), adjust it:
         int max_num_tracks = m_group_name=="all" 
                            ? track_manager->getNumberOfRaceTracks()
-                           : track_manager->getTracksInGroup(m_group_name).size();
+                           : (int)track_manager->getTracksInGroup(m_group_name).size();
         m_num_tracks_spinner->setMax(max_num_tracks);
         if(m_num_tracks_spinner->getValue() > max_num_tracks)
         {
@@ -230,7 +230,7 @@ void GPInfoScreen::addTracks()
 
     ListWidget *list = getWidget<ListWidget>("tracks");
     list->clear();
-    for (unsigned int i = 0; i < tracks.size(); i++)
+    for (unsigned int i = 0; i < (unsigned int)tracks.size(); i++)
     {
         const Track *track = track_manager->getTrack(tracks[i]);
         std::string s = StringUtils::toString(i);
@@ -298,6 +298,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
             // Normal GP: start/continue a saved GP
             int n = getWidget<SpinnerWidget>("ai-spinner")->getValue();
 
+            m_gp.changeReverse(getReverse());
             race_manager->setNumKarts(race_manager->getNumLocalPlayers() + n);
             race_manager->startGP(m_gp, false, (name == "continue"));
         }
@@ -312,10 +313,8 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
         // can be bigger than the maximum. (Might be a TODO to fix this)
         int max_num_tracks = m_group_name=="all" 
                            ? track_manager->getNumberOfRaceTracks()
-                           : track_manager->getTracksInGroup(m_group_name).size();
+                           : (int)track_manager->getTracksInGroup(m_group_name).size();
         m_num_tracks_spinner->setMax(max_num_tracks);
-        int number_of_tracks = std::min(max_num_tracks,
-                                        m_num_tracks_spinner->getValue());
         if (m_num_tracks_spinner->getValue() > max_num_tracks)
             m_num_tracks_spinner->setValue(max_num_tracks);
         // Create a new (i.e. with new tracks) random gp, since the old
@@ -329,10 +328,6 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     {
         m_gp.changeTrackNumber(m_num_tracks_spinner->getValue(), m_group_name);
         addTracks();
-    }
-    else if (name=="reverse-spinner")
-    {
-        m_gp.changeReverse(getReverse());
     }
     else if(name=="back")
     {

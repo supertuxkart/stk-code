@@ -44,7 +44,7 @@
                title="Unstoppable" description="Win 5 single races in a row.">
     <wins goal="5"/>
   </achievement>
-  <achievement id="9" check-type="all-at-least" reset-after-race="yes"
+  <achievement id="9" check-type="all-at-least" reset-type="race"
                title="Banana Lover" description="Collect at least 5 bananas in one race.">
     <banana goal="5"/>
   </achievement>

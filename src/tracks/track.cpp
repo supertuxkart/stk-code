@@ -123,7 +123,6 @@ Track::Track(const std::string &filename)
     m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
     m_color_outlevel        = core::vector2df(0.0, 255.0);
     m_clouds                = false;
-    m_lensflare             = false;
     m_godrays               = false;
     m_displacement_speed    = 1.0f;
     m_caustics_speed        = 1.0f;
@@ -484,7 +483,6 @@ void Track::loadTrackInfo()
     root->get("clouds",                &m_clouds);
     root->get("bloom",                 &m_bloom);
     root->get("bloom-threshold",       &m_bloom_threshold);
-    root->get("lens-flare",            &m_lensflare);
     root->get("shadows",               &m_shadows);
     root->get("displacement-speed",    &m_displacement_speed);
     root->get("caustics-speed",        &m_caustics_speed);
@@ -725,9 +723,6 @@ void Track::createPhysicsModel(unsigned int main_track_count)
  */
 void Track::convertTrackToBullet(scene::ISceneNode *node)
 {
-    const core::vector3df &hpr = node->getRotation();
-    const core::vector3df &scale = node->getScale();
-
     if (node->getType() == scene::ESNT_LOD_NODE)
     {
         node = ((LODNode*)node)->getFirstNode();
@@ -742,8 +737,6 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 
     std::vector<core::matrix4> matrices;
     matrices.push_back(node->getAbsoluteTransformation());
-
-    const core::vector3df &pos   = node->getAbsolutePosition();
 
     scene::IMesh *mesh;
     // In case of readonly materials we have to get the material from
@@ -1709,7 +1702,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     loadMainTrack(*root);
-    unsigned int main_track_count = m_all_nodes.size();
+    unsigned int main_track_count = (unsigned int)m_all_nodes.size();
 
     ModelDefinitionLoader model_def_loader(this);
 
@@ -1759,7 +1752,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     // Enable for for all track nodes if fog is used
-    const unsigned int count = m_all_nodes.size();
+    const unsigned int count = (int)m_all_nodes.size();
     for(unsigned int i=0; i<count; i++)
     {
         adjustForFog(m_all_nodes[i]);

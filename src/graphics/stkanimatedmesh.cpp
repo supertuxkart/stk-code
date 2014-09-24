@@ -43,15 +43,18 @@ void STKAnimatedMesh::cleanGLMeshes()
         if (mesh.index_buffer)
             glDeleteBuffers(1, &(mesh.index_buffer));
     }
+    GLmeshes.clear();
+    for (unsigned i = 0; i < MAT_COUNT; i++)
+        MeshSolidMaterial[i].clearWithoutDeleting();
+    for (unsigned i = 0; i < TM_COUNT; i++)
+        TransparentMesh[i].clearWithoutDeleting();
 }
 
 void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
 {
     isGLInitialized = false;
     isMaterialInitialized = false;
-    GLmeshes.clear();
-    for (unsigned i = 0; i < MAT_COUNT; i++)
-        MeshSolidMaterial[i].clearWithoutDeleting();
+    cleanGLMeshes();
     CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
