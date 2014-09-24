@@ -351,20 +351,22 @@ void IrrDriver::initDevice()
         core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, 
                                                     UserConfigParams::m_height);
         
-        
-        if (modes->getVideoModeCount() > 0)
+        if (UserConfigParams::m_fullscreen)
         {
-            res = modes->getVideoModeResolution(res, res);
-
-            UserConfigParams::m_width = res.Width;
-            UserConfigParams::m_height = res.Height;
-        }
-        else
-        {
-            Log::verbose("irr_driver", "Cannot get information about "
-                         "resolutions. Try to use the default one.");
-            UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
-            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
+            if (modes->getVideoModeCount() > 0)
+            {
+                res = modes->getVideoModeResolution(res, res);
+    
+                UserConfigParams::m_width = res.Width;
+                UserConfigParams::m_height = res.Height;
+            }
+            else
+            {
+                Log::verbose("irr_driver", "Cannot get information about "
+                             "resolutions. Try to use the default one.");
+                UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
+                UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
+            }
         }
 
         m_device->closeDevice();
