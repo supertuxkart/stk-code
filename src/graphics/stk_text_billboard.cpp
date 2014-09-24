@@ -153,21 +153,16 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
     return Mesh;
 }
 
-void STKTextBillboard::OnRegisterSceneNode()
+void STKTextBillboard::updateNoGL()
 {
-    if (IsVisible)
-    {
-        SceneManager->registerNodeForRendering(this, scene::ESNRP_SOLID);
+    scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
+    core::vector3df cam_pos = curr_cam->getPosition();
+    core::vector3df text_pos = this->getAbsolutePosition();
+    float angle = atan2(text_pos.X - cam_pos.X, text_pos.Z - cam_pos.Z);
+    this->setRotation(core::vector3df(0.0f, angle * 180.0f / M_PI, 0.0f));
+    updateAbsolutePosition();
 
-        scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
-        core::vector3df cam_pos = curr_cam->getPosition();
-        core::vector3df text_pos = this->getAbsolutePosition();
-        float angle = atan2(text_pos.X - cam_pos.X, text_pos.Z - cam_pos.Z);
-        this->setRotation(core::vector3df(0.0f, angle * 180.0f / M_PI, 0.0f));
-        updateAbsolutePosition();
-    }
-
-    ISceneNode::OnRegisterSceneNode();
+    STKMeshSceneNode::updateNoGL();
 }
 
 void STKTextBillboard::collectChar(video::ITexture* texture,

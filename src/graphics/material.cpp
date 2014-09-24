@@ -341,6 +341,11 @@ Material::Material(const XMLNode *node, bool deprecated)
         // ---- End backwards compatibility
     }
 
+    if (m_shader_type == SHADERTYPE_SOLID)
+    {
+        node->get("normal-map", &m_normal_map_tex);
+    }
+
     if (m_disable_z_write && m_shader_type != SHADERTYPE_ALPHA_BLEND && m_shader_type != SHADERTYPE_ADDITIVE)
     {
         Log::debug("material", "Disabling writes to z buffer only makes sense when compositing is blending or additive (for %s)", m_texname.c_str());
@@ -967,13 +972,13 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
         // above fog and thus unaffected by it
         if (use_fog && !m_fog && m_shader_type != SHADERTYPE_ALPHA_BLEND && m_shader_type != SHADERTYPE_ADDITIVE)
         {
-            m->ZWriteEnable = true;
-            m->MaterialType = video::EMT_ONETEXTURE_BLEND;
-            m->MaterialTypeParam =
-                pack_textureBlendFunc(video::EBF_SRC_ALPHA,
-                                        video::EBF_ONE_MINUS_SRC_ALPHA,
-                                        video::EMFN_MODULATE_1X,
-                                        video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
+            //m->ZWriteEnable = true;
+            //m->MaterialType = video::EMT_ONETEXTURE_BLEND;
+            //m->MaterialTypeParam =
+            //    pack_textureBlendFunc(video::EBF_SRC_ALPHA,
+            //                            video::EBF_ONE_MINUS_SRC_ALPHA,
+            //                            video::EMFN_MODULATE_1X,
+            //                            video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
         }
     }
     else

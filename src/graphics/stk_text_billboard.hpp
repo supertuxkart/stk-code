@@ -56,7 +56,7 @@ public:
         const irr::core::vector3df& position,
         const irr::core::vector3df& size);
 
-    virtual void OnRegisterSceneNode() OVERRIDE;
+    virtual void updateNoGL() OVERRIDE;
 
     virtual void collectChar(irr::video::ITexture* texture,
         const irr::core::rect<irr::s32>& destRect,
