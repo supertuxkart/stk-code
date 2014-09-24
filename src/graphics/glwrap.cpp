@@ -145,6 +145,8 @@ GLuint LoadShader(const char * file, unsigned type)
     char versionString[20];
     sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
     std::string Code = versionString;
+    if (irr_driver->hasVSLayerExtension())
+        Code += "#extension GL_AMD_vertex_shader_layer : enable\n";
     if (UserConfigParams::m_azdo)
         Code += "#extension GL_ARB_bindless_texture : enable\n";
     else
