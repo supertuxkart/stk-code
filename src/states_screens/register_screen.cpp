@@ -79,7 +79,6 @@ void RegisterScreen::init()
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget);
     m_info_widget->setDefaultColor();
-    m_info_widget->setText("", false);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget);
 

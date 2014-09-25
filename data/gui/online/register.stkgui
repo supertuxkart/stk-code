@@ -6,17 +6,17 @@
                 I18N="In the registration dialog" />
         <spacer height="15" width="10"/>
 
-        <box proportion="1" width="100%" layout="vertical-row">
-            <div width="80%" align="center" layout="vertical-row" height="fit">
+        <box proportion="1" width="100%" height="100%" layout="vertical-row">
+            <div width="90%" align="center" layout="vertical-row" height="80%">
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <label   proportion="1" height="100%" text_align="left"
                              I18N="In the registration dialog" text="Local Username"/>
                     <textbox id="local_username" proportion="2" height="fit" I18N="In the registration dialog"/>
                 </div>
                 <div width="100%" height="fit" layout="horizontal-row" >
-                     <label    id="label_online" proportion="1" height="100%" text_align="left"
-                               I18N="In the login screen" text="Online"/>
-                     <checkbox id="online" I18N="In the login screen" text_align="left"/>
+                    <label    id="label_online" proportion="1" height="100%" text_align="left"
+                              I18N="In the login screen" text="Create online account"/>
+                    <checkbox id="online" I18N="In the login screen" text_align="left"/>
                 </div>
 
                 <div width="100%" height="fit" layout="horizontal-row" >
@@ -56,12 +56,13 @@
                              I18N="In the registration dialog" text="Confirm"/>
                     <textbox id="email_confirm" proportion="2" height="fit" I18N="In the registration dialog"/>
                 </div>
-            <spacer height="20" width="50"/>
+                <spacer height="30" width="50"/>
 
-            <label id="info" proportion="1" width="90%" align="center" text_align="center" word_wrap="true"
-               I18N="In the registration dialog" text="You don't need to register if you have a STK Addons account!"/>
+                <label id="info" height="20%" width="100%" align="center" text_align="center" word_wrap="true"
+                   I18N="In the registration dialog" 
+                       text="You can play without creating an online account by unchecking the online checkbox, though then you can not connect to friends, vote for addons etc. You can also use an existing SuperTuxKart Addons account in the next screen if you already have one. Please read our privacy statement at http://privacy.supertuxkart.net"/>
 
-            <spacer height="20" width="50"/>
+                <spacer height="20" width="50"/>
 
             </div>
 
