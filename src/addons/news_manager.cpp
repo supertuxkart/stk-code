@@ -235,6 +235,16 @@ void NewsManager::checkRedirect(const XMLNode *xml)
         UserConfigParams::m_server_hw_report = hw_report_server;
     }
 
+    float polling;
+    if(xml->get("menu-polling-interval", &polling))
+    {
+        RequestManager::get()->setMenuPollingInterval(polling);
+    }
+    if(xml->get("game-polling-interval", &polling))
+    {
+        RequestManager::get()->setGamePollingInterval(polling);
+    }
+
 }   // checkRedirect
 
 // ----------------------------------------------------------------------------

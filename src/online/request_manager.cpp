@@ -40,30 +40,17 @@ using namespace Online;
 
 namespace Online
 {
-    #define MENU_POLLING_INTERVAL 10.0f
-    #define GAME_POLLING_INTERVAL 15.0f
-
-    static RequestManager * http_singleton = NULL;
-
-    // ------------------------------------------------------------------------
-    RequestManager* RequestManager::get()
-    {
-        if (http_singleton == NULL)
-        {
-            http_singleton = new RequestManager();
-        }
-        return http_singleton;
-    }   // get
+    RequestManager * RequestManager::m_request_manager = NULL;
 
     // ------------------------------------------------------------------------
     /** Deletes the http manager.
      */
     void RequestManager::deallocate()
     {
-        if (http_singleton != NULL)
+        if (m_request_manager!= NULL)
         {
-            delete http_singleton;
-            http_singleton = NULL;
+            delete m_request_manager;
+            m_request_manager = NULL;
         }
     }   // deallocate
 
@@ -72,17 +59,20 @@ namespace Online
      */
     bool RequestManager::isRunning()
     {
-        return http_singleton != NULL;
+        return m_request_manager != NULL;
     }   // isRunning
     // ------------------------------------------------------------------------
-
-
+    /** Constructor. It only initialised values, it does not start the actual
+     *  thread. 
+     */
     RequestManager::RequestManager()
     {
+        m_menu_polling_interval = 60;  // Default polling: every 60 seconds.
+        m_game_polling_interval = 60;  // same for game polling
+        m_time_since_poll       = m_menu_polling_interval;
         curl_global_init(CURL_GLOBAL_DEFAULT);
         pthread_cond_init(&m_cond_request, NULL);
         m_abort.setAtomic(false);
-        m_time_since_poll = MENU_POLLING_INTERVAL * 0.9;
     }   // RequestManager
 
     // ------------------------------------------------------------------------
@@ -305,9 +295,9 @@ namespace Online
             return;
 
         m_time_since_poll += dt;
-        float interval = GAME_POLLING_INTERVAL;
+        float interval = m_game_polling_interval;
         if (StateManager::get()->getGameState() == GUIEngine::MENU)
-                interval = MENU_POLLING_INTERVAL;
+                interval = m_menu_polling_interval;
 
         if (m_time_since_poll > interval)
         {

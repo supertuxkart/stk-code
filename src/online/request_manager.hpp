@@ -90,7 +90,7 @@ namespace Online
             IPERM_ALLOWED     = 1,
             IPERM_NOT_ALLOWED = 2
         };
-    protected:
+    private:
             /** Time passed since the last poll request. */
             float                     m_time_since_poll;
 
@@ -103,10 +103,17 @@ namespace Online
             /** Signal an abort in case that a download is still happening. */
             Synchronised<bool>        m_abort;
 
+            /** The polling interval while a game is running. */
+            float m_game_polling_interval;
+
+            /** The polling interval while the menu is shown. */
+            float m_menu_polling_interval;
+
             /** Thread id of the thread running in this object. */
             Synchronised<pthread_t *> m_thread_id;
 
-            /** The list of pointers to all requests that still need to be handled. */
+            /** The list of pointers to all requests that still need to be
+             *  handled. */
             Synchronised< std::priority_queue <
                                                 Online::Request*,
                                                 std::vector<Online::Request*>,
@@ -114,7 +121,9 @@ namespace Online
                                                >
                         >  m_request_queue;
 
-            /** The list of pointers to all requests that are already executed by the networking thread, but still need to be processed by the main thread. */
+            /** The list of pointers to all requests that are already executed
+             *  by the networking thread, but still need to be processed by the 
+             *  main thread. */
             Synchronised< std::queue<Online::Request*> >    m_result_queue;
 
             void addResult(Online::Request *request);
@@ -124,12 +133,25 @@ namespace Online
 
             RequestManager(); //const std::string &url
             ~RequestManager();
+            
+            static RequestManager * m_request_manager;
 
         public:
             static const int HTTP_MAX_PRIORITY = 9999;
 
-            // singleton
-            static RequestManager* get();
+            // ----------------------------------------------------------------
+            /** Singleton access function. Creates the RequestManager if
+             * necessary. */
+            static RequestManager* get()
+            {
+                    if (m_request_manager == NULL)
+                    {
+                        m_request_manager = new RequestManager();
+                    }
+                    return m_request_manager;
+            }   // get
+            // ----------------------------------------------------------------
+
             static void deallocate();
             static bool isRunning();
 
@@ -139,6 +161,23 @@ namespace Online
 
             bool getAbort(){ return m_abort.getAtomic(); }
             void update(float dt);
+
+            // ----------------------------------------------------------------
+            /** Sets the interval with which poll requests are send to the
+             *  server. This can happen from the news manager (i.e. info 
+             *  contained in the news.xml file), or a poll request. */
+            void setMenuPollingInterval(float polling_interval)
+            {
+                m_menu_polling_interval = polling_interval;
+            }   // setPollingInterval
+            // ----------------------------------------------------------------
+            /** Sets the interval with which poll requests are send to the
+             *  server. This can happen from the news manager (i.e. info 
+             *  contained in the news.xml file), or a poll request. */
+            void setGamePollingInterval(float polling_interval)
+            {
+                m_game_polling_interval = polling_interval;
+            }   // setPollingInterval
 
     }; //class RequestManager
 } // namespace Online
