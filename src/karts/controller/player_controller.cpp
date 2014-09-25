@@ -92,6 +92,7 @@ void PlayerController::reset()
     m_prev_brake   = 0;
     m_prev_accel   = 0;
     m_prev_nitro   = false;
+    m_sound_schedule = false;
     m_penalty_time = 0;
 }   // reset
 
@@ -108,6 +109,7 @@ void PlayerController::resetInputState()
     m_prev_brake            = 0;
     m_prev_accel            = 0;
     m_prev_nitro            = false;
+    m_sound_schedule        = false;
     m_controls->reset();
 }   // resetInputState
 
@@ -378,14 +380,20 @@ void PlayerController::update(float dt)
     // Only accept rescue if there is no kart animation is already playing
     // (e.g. if an explosion happens, wait till the explosion is over before
     // starting any other animation).
-    if ( m_controls->m_rescue && !m_kart->getKartAnimation() )
+    if (m_controls->m_rescue && !m_kart->getKartAnimation())
     {
         new RescueAnimation(m_kart);
         m_controls->m_rescue=false;
     }
-    if (m_kart->getKartAnimation() &&
+
+    if (m_kart->getKartAnimation() && m_sound_schedule == false &&
         m_kart->getAttachment()->getType() != Attachment::ATTACH_TINYTUX)
     {
+        m_sound_schedule = true;
+    }
+    else if (!m_kart->getKartAnimation() && m_sound_schedule == true)
+    {
+        m_sound_schedule = false;
         m_bzzt_sound->play();
     }
 }   // update
