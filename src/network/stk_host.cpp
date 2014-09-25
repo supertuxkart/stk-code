@@ -19,6 +19,7 @@
 #include "network/stk_host.hpp"
 
 #include "config/user_config.hpp"
+#include "io/file_manager.hpp"
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -90,13 +91,17 @@ void* STKHost::receive_data(void* self)
 
 STKHost::STKHost()
 {
-    m_host = NULL;
+    m_host             = NULL;
     m_listening_thread = NULL;
-    m_log_file = NULL;
+    m_log_file         = NULL;
     pthread_mutex_init(&m_exit_mutex, NULL);
     pthread_mutex_init(&m_log_mutex, NULL);
     if (UserConfigParams::m_packets_log_filename.toString() != "")
-        m_log_file = fopen(UserConfigParams::m_packets_log_filename.c_str(), "w+");
+    {
+        std::string s = 
+            file_manager->getUserConfigFile(UserConfigParams::m_packets_log_filename);
+        m_log_file = fopen(s.c_str(), "w+");
+    }
     if (!m_log_file)
         Log::warn("STKHost", "Network packets won't be logged: no file.");
 }

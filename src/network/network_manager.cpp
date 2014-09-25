@@ -79,7 +79,9 @@ void NetworkManager::reset()
 void NetworkManager::abort()
 {
     m_localhost->stopListening();
-    reset();
+    // FIXME: Why a reset here? This creates a new stk_host, which will open
+    // a new packet_log file (and therefore delete the previous file)???
+    // reset();
     ProtocolManager::getInstance()->abort();
 }
 

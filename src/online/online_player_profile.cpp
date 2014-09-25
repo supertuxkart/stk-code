@@ -324,6 +324,11 @@ namespace Online
 
         if (!PlayerManager::getCurrentPlayer()->isLoggedIn())
             return;
+        float f;
+        if(getXMLData()->get("menu-polling-interval", &f))
+            RequestManager::get()->setMenuPollingInterval(f);
+        if(getXMLData()->get("game-polling-interval", &f))
+            RequestManager::get()->setGamePollingInterval(f);
 
         if (PlayerManager::getCurrentPlayer()->getProfile()->hasFetchedFriends())
         {
