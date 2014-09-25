@@ -301,7 +301,10 @@ static void
 SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
 {
     if (!mesh.textures[i])
-        Log::fatal("STKMesh", "Missing texture");
+    {
+        Log::warn("STKMesh", "Missing texture");
+        return;
+    }
     compressTexture(mesh.textures[i], isSrgb);
     if (UserConfigParams::m_azdo)
     {
