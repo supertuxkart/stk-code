@@ -41,7 +41,11 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_label = NULL;
     m_texture = NULL;
     m_highlight_texture = NULL;
+    m_deactivated_texture = NULL;
     m_custom_aspect_ratio = 1.0f;
+
+    m_texture_w = 0;
+    m_texture_h = 0;
 
     m_tab_stop = tab_stop;
     m_focusable = focusable;
@@ -57,12 +61,12 @@ void IconButtonWidget::add()
     {
         if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
         {
-            m_texture = irr_driver->getTexture(m_properties[PROP_ICON]);
+            setTexture(irr_driver->getTexture(m_properties[PROP_ICON]));
         }
         else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
         {
             std::string file = file_manager->getAsset(m_properties[PROP_ICON]);
-            m_texture = irr_driver->getTexture(file);
+            setTexture(irr_driver->getTexture(file));
         }
     }
 
@@ -72,13 +76,11 @@ void IconButtonWidget::add()
                     "add() : error, cannot find texture '%s'.",
                    m_properties[PROP_ICON].c_str());
         std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
-        m_texture = irr_driver->getTexture(file);
+        setTexture(irr_driver->getTexture(file));
         if(!m_texture)
             Log::fatal("IconButtonWidget",
                   "Can't find fallback texture 'gui/main_help.png, aborting.");
     }
-    m_texture_w = m_texture->getSize().Width;
-    m_texture_h = m_texture->getSize().Height;
 
     if (m_properties[PROP_FOCUS_ICON].size() > 0)
     {
@@ -207,12 +209,12 @@ void IconButtonWidget::setImage(const char* path_to_texture, IconPathType pathTy
 
     if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
     {
-        m_texture = irr_driver->getTexture(m_properties[PROP_ICON]);
+        setTexture(irr_driver->getTexture(m_properties[PROP_ICON]));
     }
     else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
     {
         std::string file = file_manager->getAsset(m_properties[PROP_ICON]);
-        m_texture = irr_driver->getTexture(file);
+        setTexture(irr_driver->getTexture(file));
     }
 
     if (!m_texture)
@@ -220,11 +222,8 @@ void IconButtonWidget::setImage(const char* path_to_texture, IconPathType pathTy
         Log::error("icon_button", "Texture '%s' not found!\n",
                    m_properties[PROP_ICON].c_str());
         std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
-        m_texture = irr_driver->getTexture(file);
+        setTexture(irr_driver->getTexture(file));
     }
-
-    m_texture_w = m_texture->getSize().Width;
-    m_texture_h = m_texture->getSize().Height;
 }
 
 // -----------------------------------------------------------------------------
@@ -233,21 +232,18 @@ void IconButtonWidget::setImage(ITexture* texture)
 {
     if (texture != NULL)
     {
-        m_texture = texture;
-
-        m_texture_w = m_texture->getSize().Width;
-        m_texture_h = m_texture->getSize().Height;
+        setTexture(texture);
     }
     else
     {
         Log::error("icon_button",
                    "setImage invoked with NULL image pointer\n");
         std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
-        m_texture = irr_driver->getTexture(file);
+        setTexture(irr_driver->getTexture(file));
     }
 }
 // -----------------------------------------------------------------------------
-void IconButtonWidget::setLabel(stringw new_label)
+void IconButtonWidget::setLabel(const stringw& new_label)
 {
     if (m_label == NULL) return;
 
@@ -288,4 +284,52 @@ void IconButtonWidget::unfocused(const int playerID, Widget* new_focus)
     }
 }
 
+// -----------------------------------------------------------------------------
+video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
+{
+    SColor c;
+    u32 g;
 
+    video::IVideoDriver* driver = irr_driver->getVideoDriver();
+    video::IImage* image = driver->createImageFromData (texture->getColorFormat(),
+        texture->getSize(), texture->lock(), false);
+    texture->unlock();
+
+    //Turn the image into grayscale
+    for (u32 x = 0; x < image->getDimension().Width; x++)
+    {
+        for (u32 y = 0; y < image->getDimension().Height; y++)
+        {
+            c = image->getPixel(x, y);
+            g = ((c.getRed() + c.getGreen() + c.getBlue()) / 3);
+            c.set(std::max (0, (int)c.getAlpha() - 120), g, g, g);
+            image->setPixel(x, y, c);
+        }
+    }
+
+    texture = driver->addTexture(texture->getName().getPath() + "_disabled", image);
+    texture->grab();
+
+    return texture;
+}
+
+// -----------------------------------------------------------------------------
+void IconButtonWidget::setTexture(video::ITexture* texture)
+{
+    m_texture = texture;
+    if (texture == NULL)
+    {
+        if (m_deactivated_texture != NULL)
+            m_deactivated_texture->drop();
+
+        m_deactivated_texture = NULL;
+        m_texture_w = 0;
+        m_texture_h = 0;
+    }
+    else
+    {
+        m_deactivated_texture = getDeactivatedTexture(texture);
+        m_texture_w = texture->getSize().Width;
+        m_texture_h = texture->getSize().Height;
+    }
+}
