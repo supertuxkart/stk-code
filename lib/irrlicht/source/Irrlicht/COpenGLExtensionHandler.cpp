@@ -15,7 +15,7 @@ namespace irr
 {
 namespace video
 {
-
+    extern bool useCoreContext;
 COpenGLExtensionHandler::COpenGLExtensionHandler() :
 		StencilBuffer(false), MultiTextureExtension(false),
 		TextureCompressionExtension(false),
@@ -568,7 +568,8 @@ void COpenGLExtensionHandler::initExtensions(bool stencilBuffer)
 	if (Version>102 || FeatureAvailable[IRR_ARB_multitexture])
 	{
 #if defined(GL_MAX_TEXTURE_UNITS)
-		glGetIntegerv(GL_MAX_TEXTURE_UNITS, &num);
+        if (!useCoreContext)
+		    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &num);
 #elif defined(GL_MAX_TEXTURE_UNITS_ARB)
 		glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &num);
 #endif
@@ -587,7 +588,8 @@ void COpenGLExtensionHandler::initExtensions(bool stencilBuffer)
 		MaxSupportedTextures=core::max_(MaxSupportedTextures,static_cast<u8>(num));
 	}
 #endif
-	glGetIntegerv(GL_MAX_LIGHTS, &num);
+    if (!useCoreContext)
+	    glGetIntegerv(GL_MAX_LIGHTS, &num);
 	MaxLights=static_cast<u8>(num);
 #ifdef GL_EXT_texture_filter_anisotropic
 	if (FeatureAvailable[IRR_EXT_texture_filter_anisotropic])
@@ -621,7 +623,8 @@ void COpenGLExtensionHandler::initExtensions(bool stencilBuffer)
 #endif
 	glGetIntegerv(GL_MAX_CLIP_PLANES, &num);
 	MaxUserClipPlanes=static_cast<u8>(num);
-	glGetIntegerv(GL_AUX_BUFFERS, &num);
+    if (!useCoreContext)
+	    glGetIntegerv(GL_AUX_BUFFERS, &num);
 	MaxAuxBuffers=static_cast<u8>(num);
 #ifdef GL_ARB_draw_buffers
 	if (FeatureAvailable[IRR_ARB_draw_buffers])
@@ -641,7 +644,8 @@ void COpenGLExtensionHandler::initExtensions(bool stencilBuffer)
 	}
 #endif
 	glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, DimAliasedLine);
-	glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, DimAliasedPoint);
+    if (!useCoreContext)
+	    glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, DimAliasedPoint);
 	glGetFloatv(GL_SMOOTH_LINE_WIDTH_RANGE, DimSmoothedLine);
 	glGetFloatv(GL_SMOOTH_POINT_SIZE_RANGE, DimSmoothedPoint);
 #if defined(GL_ARB_shading_language_100) || defined (GL_VERSION_2_0)

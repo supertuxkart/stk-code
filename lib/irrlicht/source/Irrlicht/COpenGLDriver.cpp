@@ -818,7 +818,8 @@ bool COpenGLDriver::genericDriverInit()
 //		glEnable(GL_RESCALE_NORMAL_EXT);
 
 	glClearDepth(1.0);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    if (!useCoreContext)
+	    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
 	glDepthFunc(GL_LEQUAL);
@@ -2659,7 +2660,8 @@ void COpenGLDriver::setRenderStates3DMode()
 	{
 		// Reset Texture Stages
 		glDisable(GL_BLEND);
-		glDisable(GL_ALPHA_TEST);
+        if (!useCoreContext)
+		    glDisable(GL_ALPHA_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// switch back the matrices
@@ -2858,7 +2860,7 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 			    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 			break;
 		}
-		if (material.ColorMaterial != ECM_NONE)
+        if (material.ColorMaterial != ECM_NONE && !useCoreContext)
 			glEnable(GL_COLOR_MATERIAL);
 	}
 
@@ -2996,9 +2998,9 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 	// lighting
 	if (resetAllRenderStates || (lastmaterial.Lighting != material.Lighting))
 	{
-		if (material.Lighting)
+        if (material.Lighting && !useCoreContext)
 			glEnable(GL_LIGHTING);
-		else
+        else if (!useCoreContext)
 			glDisable(GL_LIGHTING);
 	}
 
@@ -3079,18 +3081,18 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 	// fog
 	if (resetAllRenderStates || lastmaterial.FogEnable != material.FogEnable)
 	{
-		if (material.FogEnable)
+        if (material.FogEnable && !useCoreContext)
 			glEnable(GL_FOG);
-		else
+        else if (!useCoreContext)
 			glDisable(GL_FOG);
 	}
 
 	// normalization
 	if (resetAllRenderStates || lastmaterial.NormalizeNormals != material.NormalizeNormals)
 	{
-		if (material.NormalizeNormals)
+        if (material.NormalizeNormals && !useCoreContext)
 			glEnable(GL_NORMALIZE);
-		else
+        else if (!useCoreContext)
 			glDisable(GL_NORMALIZE);
 	}
 
