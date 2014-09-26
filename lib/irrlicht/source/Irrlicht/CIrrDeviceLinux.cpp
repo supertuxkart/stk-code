@@ -574,7 +574,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 		return Context;
 
 	XErrorSignaled = false;
-    useCoreContext = false;
+    irr::video::useCoreContext = false;
 	// fall back to legacy context
 	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, legacyctx);
 	return Context;
