@@ -2530,14 +2530,16 @@ bool COpenGLDriver::setActiveTexture(u32 stage, const video::ITexture* texture)
 
 	if (!texture)
 	{
-		glDisable(GL_TEXTURE_2D);
+        if (!useCoreContext)
+		    glDisable(GL_TEXTURE_2D);
 		return true;
 	}
 	else
 	{
 		if (texture->getDriverType() != EDT_OPENGL)
 		{
-			glDisable(GL_TEXTURE_2D);
+            if (!useCoreContext)
+			    glDisable(GL_TEXTURE_2D);
 			CurrentTexture.set(stage, 0);
 			os::Printer::log("Fatal Error: Tried to set a texture not owned by this driver.", ELL_ERROR);
 			return false;
