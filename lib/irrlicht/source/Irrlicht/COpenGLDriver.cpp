@@ -31,7 +31,7 @@ namespace irr
 {
 namespace video
 {
-
+    bool useCoreContext;
 // -----------------------------------------------------------------------
 // WINDOWS CONSTRUCTOR
 // -----------------------------------------------------------------------
@@ -88,7 +88,6 @@ bool COpenGLDriver::changeRenderContext(const SExposedVideoData& videoData, CIrr
 }
 
 static PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs_ARB;
-bool useCoreContext;
 
 static HGLRC getMeAGLContext(HDC HDc)
 {
