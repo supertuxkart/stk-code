@@ -58,7 +58,6 @@ namespace irr
 {
 	namespace video
 	{
-        bool useCoreContext;
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
 	}
