@@ -500,7 +500,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 {
 	GLXContext Context;
-    useCoreContext = true;
+    irr::video::useCoreContext = true;
 	int core43ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
