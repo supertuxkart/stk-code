@@ -1853,6 +1853,9 @@ void COpenGLDriver::draw2DVertexPrimitiveList(const void* vertices, u32 vertexCo
 	if (!primitiveCount || !vertexCount)
 		return;
 
+    if (useCoreContext)
+        return;
+
 	if (!checkPrimitiveCount(primitiveCount))
 		return;
 
