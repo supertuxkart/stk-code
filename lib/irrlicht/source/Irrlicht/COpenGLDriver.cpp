@@ -2544,7 +2544,8 @@ bool COpenGLDriver::setActiveTexture(u32 stage, const video::ITexture* texture)
 			return false;
 		}
 
-		glEnable(GL_TEXTURE_2D);
+        if (!useCoreContext)
+		    glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D,
 			static_cast<const COpenGLTexture*>(texture)->getOpenGLTextureName());
 	}
@@ -3878,38 +3879,42 @@ void COpenGLDriver::setFog(SColor c, E_FOG_TYPE fogType, f32 start,
 {
 	CNullDriver::setFog(c, fogType, start, end, density, pixelFog, rangeFog);
 
-	glFogf(GL_FOG_MODE, GLfloat((fogType==EFT_FOG_LINEAR)? GL_LINEAR : (fogType==EFT_FOG_EXP)?GL_EXP:GL_EXP2));
+    if (!useCoreContext)
+	    glFogf(GL_FOG_MODE, GLfloat((fogType==EFT_FOG_LINEAR)? GL_LINEAR : (fogType==EFT_FOG_EXP)?GL_EXP:GL_EXP2));
 
 #ifdef GL_EXT_fog_coord
-	if (FeatureAvailable[IRR_EXT_fog_coord])
+    if (FeatureAvailable[IRR_EXT_fog_coord] && !useCoreContext)
 		glFogi(GL_FOG_COORDINATE_SOURCE, GL_FRAGMENT_DEPTH);
 #endif
 #ifdef GL_NV_fog_distance
 	if (FeatureAvailable[IRR_NV_fog_distance])
 	{
-		if (rangeFog)
+        if (rangeFog && !useCoreContext)
 			glFogi(GL_FOG_DISTANCE_MODE_NV, GL_EYE_RADIAL_NV);
-		else
+        else if (!useCoreContext)
 			glFogi(GL_FOG_DISTANCE_MODE_NV, GL_EYE_PLANE_ABSOLUTE_NV);
 	}
 #endif
 
 	if (fogType==EFT_FOG_LINEAR)
 	{
-		glFogf(GL_FOG_START, start);
-		glFogf(GL_FOG_END, end);
+        if (!useCoreContext)
+		    glFogf(GL_FOG_START, start);
+        if (!useCoreContext)
+		    glFogf(GL_FOG_END, end);
 	}
-	else
+    else if (!useCoreContext)
 		glFogf(GL_FOG_DENSITY, density);
 
-	if (pixelFog)
+    if (pixelFog && !useCoreContext)
 		glHint(GL_FOG_HINT, GL_NICEST);
-	else
+    else if (!useCoreContext)
 		glHint(GL_FOG_HINT, GL_FASTEST);
 
 	SColorf color(c);
 	GLfloat data[4] = {color.r, color.g, color.b, color.a};
-	glFogfv(GL_FOG_COLOR, data);
+    if (!useCoreContext)
+	    glFogfv(GL_FOG_COLOR, data);
 }
 
 
