@@ -2490,7 +2490,6 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
             m_suncam->updateAbsolutePosition();
 
             ((WaterShaderProvider *) m_shaders->m_callbacks[ES_WATER])->setSunPosition(pos);
-            ((SkyboxProvider *) m_shaders->m_callbacks[ES_SKYBOX])->setSunPosition(pos);
         }
 
         return light;

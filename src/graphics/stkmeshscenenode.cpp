@@ -432,18 +432,5 @@ void STKMeshSceneNode::render()
             }
             return;
         }
-
-        GLMesh* mesh;
-        if (!TransparentMesh[TM_BUBBLE].empty())
-            glUseProgram(MeshShader::BubbleShader::Program);
-        if (irr_driver->hasARB_base_instance())
-            glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
-        for_in(mesh, TransparentMesh[TM_BUBBLE])
-        {
-            if (irr_driver->hasARB_base_instance())
-                glBindVertexArray(mesh->vao);
-            drawBubble(*mesh, ModelViewProjectionMatrix);
-        }
-        return;
     }
 }
