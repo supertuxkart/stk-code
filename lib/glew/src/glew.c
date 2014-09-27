@@ -10100,11 +10100,12 @@ static GLboolean _glewInit_GL_WIN_swap_hint (GLEW_CONTEXT_ARG_DEF_INIT)
 
 GLboolean GLEWAPIENTRY glewGetExtension (const char* name)
 {
-  if (ext_hashset != NULL)
-    return _glewSearchExtension(name, NULL, NULL);
-
   const GLubyte* start;
   const GLubyte* end;
+  
+  if (ext_hashset != NULL)
+      return _glewSearchExtension(name, NULL, NULL);
+
   start = (const GLubyte*)glGetString(GL_EXTENSIONS);
   if (start == 0)
     return GL_FALSE;
