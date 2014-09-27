@@ -66,7 +66,9 @@ MaterialManager::~MaterialManager()
 Material* MaterialManager::getMaterialFor(video::ITexture* t,
                                           scene::IMeshBuffer *mb)
 {
-    assert(t != NULL);
+    if (t == NULL)
+        return m_default_material;
+
     const std::string image = StringUtils::getBasename(core::stringc(t->getName()).c_str());
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )

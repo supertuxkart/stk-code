@@ -10,7 +10,7 @@
 #include "graphics/camera.hpp"
 #include "modes/world.hpp"
 
-MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp)
+MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp, Material* material)
 {
     if (MaterialType == irr_driver->getShader(ES_SPHERE_MAP))
         return MAT_SPHEREMAP;
@@ -29,7 +29,7 @@ MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, vid
     return MAT_DEFAULT;
 }
 
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam)
+TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam, Material* material)
 {
     if (type == irr_driver->getShader(ES_DISPLACE))
         return TM_DISPLACEMENT;
