@@ -422,8 +422,8 @@ XMLNode *FileManager::createXMLTreeFromString(const std::string & content)
     {
         char *b = new char[content.size()];
         memcpy(b, content.c_str(), content.size());
-        io::IReadFile * ireadfile = 
-            m_file_system->createMemoryReadFile(b, (int)content.size(), 
+        io::IReadFile * ireadfile =
+            m_file_system->createMemoryReadFile(b, (int)content.size(),
                                                 "tempfile", true);
         io::IXMLReader * reader = m_file_system->createXMLReader(ireadfile);
         XMLNode* node = new XMLNode(reader);
@@ -1290,7 +1290,7 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
         {
             Log::error("FileManager", "Write error copying '%s' to '%s",
                         source.c_str(), dest.c_str());
-            delete buffer;
+            delete[] buffer;
             fclose(f_source);
             fclose(f_dest);
             return false;
@@ -1298,7 +1298,7 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
         }   // if fwrite()!=n
     }   // while
 
-    delete buffer;
+    delete[] buffer;
     fclose(f_source);
     fclose(f_dest);
     return true;
