@@ -110,14 +110,10 @@ Shaders::Shaders()
     // Callbacks
     memset(m_callbacks, 0, sizeof(m_callbacks));
 
-    m_callbacks[ES_SKYBOX] = new SkyboxProvider();
     m_callbacks[ES_WATER] = new WaterShaderProvider();
     m_callbacks[ES_GRASS] = new GrassShaderProvider();
-    m_callbacks[ES_BUBBLES] = new BubbleEffectProvider();
     m_callbacks[ES_MOTIONBLUR] = new MotionBlurProvider();
-    m_callbacks[ES_GAUSSIAN3V] = m_callbacks[ES_GAUSSIAN3H] = new GaussianBlurProvider();
     m_callbacks[ES_MIPVIZ] = new MipVizProvider();
-    m_callbacks[ES_COLORIZE] = new ColorizeProvider();
     m_callbacks[ES_SUNLIGHT] = new SunLightProvider();
     m_callbacks[ES_DISPLACE] = new DisplaceProvider();
 
@@ -346,9 +342,6 @@ void Shaders::loadShaders()
     m_shaders[ES_GRASS_REF] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                       m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
 
-    m_shaders[ES_BUBBLES] = glslmat(dir + "pass.vert", dir + "pass.frag",
-                                    m_callbacks[ES_BUBBLES], EMT_TRANSPARENT_ALPHA_CHANNEL);
-
     m_shaders[ES_MOTIONBLUR] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_MOTIONBLUR]);
 
@@ -407,7 +400,6 @@ void Shaders::loadShaders()
     initFrustrumVBO();
     initShadowVPMUBO();
     initParticleQuadVBO();
-    MeshShader::BubbleShader::init();
     MeshShader::ViewFrustrumShader::init();
     UtilShader::ColoredLine::init();
 }
@@ -998,30 +990,6 @@ namespace MeshShader
             5, "tex_detail1",
             6, "tex_detail2",
             7, "tex_detail3");
-    }
-
-    GLuint BubbleShader::Program;
-    GLuint BubbleShader::uniform_MVP;
-    GLuint BubbleShader::uniform_tex;
-    GLuint BubbleShader::uniform_time;
-    GLuint BubbleShader::uniform_transparency;
-
-    void BubbleShader::init()
-    {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/bubble.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bubble.frag").c_str());
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_time = glGetUniformLocation(Program, "time");
-        uniform_transparency = glGetUniformLocation(Program, "transparency");
-    }
-    void BubbleShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency)
-    {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform1f(uniform_time, time);
-        glUniform1f(uniform_transparency, transparency);
     }
 
     TransparentShader::TransparentShader()

@@ -94,36 +94,6 @@ void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int use
 }
 
 //-------------------------------------
-void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    srv->setVertexShaderConstant("time", &time, 1);
-
-    vector3df sun_pos = m_sunpos;
-    srv->setVertexShaderConstant("sun_pos", &sun_pos.X, 3);
-    
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-
-    if (!firstdone)
-    {
-        s32 tex = 0;
-        srv->setPixelShaderConstant("tex", &tex, 1);
-        s32 glow_tex = 1;
-        srv->setPixelShaderConstant("glow_tex", &glow_tex, 1);
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
-void BubbleEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-}
-
-//-------------------------------------
 
 void MotionBlurProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
@@ -160,13 +130,6 @@ void MotionBlurProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void GaussianBlurProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setVertexShaderConstant("pixel", m_pixel, 2);
-}
-
-//-------------------------------------
-
 void MipVizProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const ITexture * const tex = mat.TextureLayer[0].Texture;
@@ -183,18 +146,6 @@ void MipVizProvider::OnSetConstants(IMaterialRendererServices *srv, int)
         };
 
     srv->setVertexShaderConstant("texsize", texsize, 2);
-}
-
-//-------------------------------------
-
-void ColorizeProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-}
-
-//-------------------------------------
-
-void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
 }
 
 //-------------------------------------

@@ -179,16 +179,6 @@ public:
     SplattingShader();
 };
 
-class BubbleShader
-{
-public:
-    static GLuint Program;
-    static GLuint uniform_MVP, uniform_tex, uniform_time, uniform_transparency;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency);
-};
-
 class TransparentShader : public ShaderHelperSingleton<TransparentShader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
@@ -628,7 +618,6 @@ public:
     ACT(ES_SPHERE_MAP) \
     ACT(ES_GRASS) \
     ACT(ES_GRASS_REF) \
-    ACT(ES_BUBBLES) \
     ACT(ES_MOTIONBLUR) \
     ACT(ES_GAUSSIAN3H) \
     ACT(ES_GAUSSIAN3V) \

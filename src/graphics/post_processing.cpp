@@ -621,8 +621,6 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
 
             // Set the sun's color
             const SColor col = track->getGodRaysColor();
-            ColorizeProvider * const colcb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
-            colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
 
             // The sun interposer
             STKMeshSceneNode *sun = irr_driver->getSunInterposer();

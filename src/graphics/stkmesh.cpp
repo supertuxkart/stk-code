@@ -33,8 +33,6 @@ TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE typ
 {
     if (type == irr_driver->getShader(ES_DISPLACE))
         return TM_DISPLACEMENT;
-    if (type == irr_driver->getShader(ES_BUBBLES))
-        return TM_BUBBLE;
     video::E_BLEND_FACTOR srcFact, DstFact;
     video::E_MODULATE_FUNC mod;
     u32 alpha;
@@ -241,23 +239,6 @@ core::vector3df getWindDir()
     return m_speed * vector3df(1., 0., 0.) * cos(time);
 }
 
-void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    float transparency = 1.;
-
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    compressTexture(mesh.textures[0], true);
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-    MeshShader::BubbleShader::setUniforms(ModelViewProjectionMatrix, 0, time, transparency);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
-}
-
 bool isObject(video::E_MATERIAL_TYPE type)
 {
     if (type == irr_driver->getShader(ES_OBJECTPASS))
@@ -275,8 +256,6 @@ bool isObject(video::E_MATERIAL_TYPE type)
     if (type == irr_driver->getShader(ES_GRASS))
         return true;
     if (type == irr_driver->getShader(ES_GRASS_REF))
-        return true;
-    if (type == irr_driver->getShader(ES_BUBBLES))
         return true;
     if (type == irr_driver->getShader(ES_DISPLACE))
         return true;
