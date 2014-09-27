@@ -342,7 +342,6 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     if (UserConfigParams::m_dynamic_lights || forceRTT)
@@ -836,7 +835,6 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glEnable(GL_STENCIL_TEST);
 
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_ALPHA_TEST);
     glDepthMask(GL_FALSE);
     glDisable(GL_BLEND);
 

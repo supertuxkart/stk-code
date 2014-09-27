@@ -419,7 +419,6 @@ void PostProcessing::renderSSAO()
 {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
-    glDisable(GL_ALPHA_TEST);
 
     // Generate linear depth buffer
     irr_driver->getFBO(FBO_LINEAR_DEPTH).Bind();
