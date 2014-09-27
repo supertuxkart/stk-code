@@ -12,21 +12,26 @@
 
 MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp, Material* material)
 {
-    if (MaterialType == irr_driver->getShader(ES_SPHERE_MAP))
+    switch (material->getShaderType())
+    {
+    case Material::SHADERTYPE_SPHERE_MAP:
         return MAT_SPHEREMAP;
-    if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
-        return MAT_NORMAL_MAP;
-    else if (MaterialType == irr_driver->getShader(ES_OBJECTPASS_REF) || MaterialType == video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF)
+    case Material::SHADERTYPE_ALPHA_TEST:
         return MAT_ALPHA_REF;
-    else if (MaterialType == irr_driver->getShader(ES_GRASS) || MaterialType == irr_driver->getShader(ES_GRASS_REF))
+    case Material::SHADERTYPE_VEGETATION:
         return MAT_GRASS;
-    else if (MaterialType == irr_driver->getShader(ES_SPLATTING))
+    case Material::SHADERTYPE_SPLATTING:
         return MAT_SPLATTING;
-    else if (MaterialType == irr_driver->getShader(ES_OBJECT_UNLIT))
+    case Material::SHADERTYPE_SOLID_UNLIT:
         return MAT_UNLIT;
-    else if (tp == video::EVT_2TCOORDS)
-        return MAT_DETAIL;
-    return MAT_DEFAULT;
+    default:
+        if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
+            return MAT_NORMAL_MAP;
+        else if (tp == video::EVT_2TCOORDS)
+            return MAT_DETAIL;
+        return MAT_DEFAULT;
+    }
+
 }
 
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam, Material* material)
