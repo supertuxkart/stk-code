@@ -79,7 +79,7 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
         }
     }   // for i
 
-    return NULL;
+    return m_default_material;
 }
 
 //-----------------------------------------------------------------------------
