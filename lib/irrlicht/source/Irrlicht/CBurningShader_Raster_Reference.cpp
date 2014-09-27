@@ -3,7 +3,6 @@
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
 #include "IrrCompileConfig.h"
-#include "IBurningShader.h"
 
 #ifdef _IRR_COMPILE_WITH_BURNINGSVIDEO_
 
