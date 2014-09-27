@@ -3477,8 +3477,9 @@ const wchar_t* COpenGLDriver::getName() const
 //! deletes all dynamic lights there are
 void COpenGLDriver::deleteAllDynamicLights()
 {
-	for (s32 i=0; i<MaxLights; ++i)
-		glDisable(GL_LIGHT0 + i);
+    if (!useCoreContext)
+	    for (s32 i=0; i<MaxLights; ++i)
+		    glDisable(GL_LIGHT0 + i);
 
 	RequestedLights.clear();
 
