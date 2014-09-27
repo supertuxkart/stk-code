@@ -426,6 +426,8 @@ void Track::cleanup()
         }
 #endif
     }   // if verbose
+
+    irr_driver->getSceneManager()->getMeshCache()->clearUnusedMeshes();
 }   // cleanup
 
 //-----------------------------------------------------------------------------
