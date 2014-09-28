@@ -39,6 +39,7 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
                                    const bool focusable, IconPathType pathType) : Widget(WTYPE_ICON_BUTTON)
 {
     m_label = NULL;
+    m_font = NULL;
     m_texture = NULL;
     m_highlight_texture = NULL;
     m_deactivated_texture = NULL;
@@ -52,6 +53,12 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_scale_mode = scale_mode;
 
     m_icon_path_type = pathType;
+}
+// -----------------------------------------------------------------------------
+IconButtonWidget::~IconButtonWidget()
+{
+    if (m_deactivated_texture != NULL)
+        m_deactivated_texture->drop();
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
@@ -176,13 +183,7 @@ void IconButtonWidget::add()
             m_label->setVisible(false);
         }
 
-        const int max_w = m_label->getAbsolutePosition().getWidth();
-
-        if (!word_wrap &&
-            (int)GUIEngine::getFont()->getDimension(message.c_str()).Width > max_w + 4) // arbitrarily allow for 4 pixels
-        {
-            m_label->setOverrideFont( GUIEngine::getSmallFont() );
-        }
+        setLabelFont();
 
 #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
         m_label->setRightToLeft( translations->isRTLLanguage() );
@@ -248,20 +249,12 @@ void IconButtonWidget::setLabel(const stringw& new_label)
     if (m_label == NULL) return;
 
     m_label->setText( new_label.c_str() );
-
-    const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
-    const int max_w = m_label->getAbsolutePosition().getWidth();
-
-    if (!word_wrap &&
-        (int)GUIEngine::getFont()->getDimension(new_label.c_str()).Width
-                    > max_w + 4) // arbitrarily allow for 4 pixels
-    {
-        m_label->setOverrideFont( GUIEngine::getSmallFont() );
-    }
-    else
-    {
-        m_label->setOverrideFont( NULL );
-    }
+    setLabelFont();
+}
+// -----------------------------------------------------------------------------
+void IconButtonWidget::setLabelFont(irr::gui::ScalableFont* font)
+{
+    m_font = font;
 }
 // -----------------------------------------------------------------------------
 EventPropagation IconButtonWidget::focused(const int playerID)
@@ -331,5 +324,31 @@ void IconButtonWidget::setTexture(video::ITexture* texture)
         m_deactivated_texture = getDeactivatedTexture(texture);
         m_texture_w = texture->getSize().Width;
         m_texture_h = texture->getSize().Height;
+    }
+}
+
+
+// -----------------------------------------------------------------------------
+void IconButtonWidget::setLabelFont()
+{
+    if (m_font != NULL)
+    {
+        m_label->setOverrideFont( m_font );
+    }
+    else
+    {
+        const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
+        const int max_w = m_label->getAbsolutePosition().getWidth();
+
+        if (!word_wrap &&
+            (int)GUIEngine::getFont()->getDimension(m_label->getText()).Width
+                        > max_w + 4) // arbitrarily allow for 4 pixels
+        {
+            m_label->setOverrideFont( GUIEngine::getSmallFont() );
+        }
+        else
+        {
+            m_label->setOverrideFont( NULL );
+        }
     }
 }

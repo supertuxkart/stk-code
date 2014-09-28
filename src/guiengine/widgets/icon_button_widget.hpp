@@ -23,7 +23,11 @@
 #include <irrString.h>
 namespace irr
 {
-    namespace gui   { class IGUIStaticText; }
+    namespace gui
+    {
+        class IGUIStaticText;
+        class ScalableFont;
+    }
     namespace video { class ITexture;       }
 }
 
@@ -44,6 +48,7 @@ namespace GUIEngine
         int m_texture_w, m_texture_h;
 
         video::ITexture* getDeactivatedTexture(video::ITexture* texture);
+        void setLabelFont();
 
     public:
         enum ScaleMode
@@ -69,6 +74,7 @@ namespace GUIEngine
         friend class Skin;
 
         irr::gui::IGUIStaticText* m_label;
+        irr::gui::ScalableFont* m_font;
 
         ScaleMode m_scale_mode;
         float m_custom_aspect_ratio;
@@ -84,7 +90,7 @@ namespace GUIEngine
 
         IconButtonWidget(ScaleMode scale_mode=SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, const bool tab_stop=true,
                          const bool focusable=true, IconPathType pathType=ICON_PATH_TYPE_RELATIVE);
-        virtual ~IconButtonWidget() {}
+        virtual ~IconButtonWidget();
 
         /** \brief Implement callback from base class Widget */
         virtual void add();
@@ -104,6 +110,13 @@ namespace GUIEngine
           * \note         Calling this method on a button without label will have no effect
           */
         void setLabel(const irr::core::stringw& new_label);
+
+        /**
+          * \brief Sets the font used to draw the label.
+          *
+          * \note         Calling this method on a button without label will have no effect
+          */
+        void setLabelFont(irr::gui::ScalableFont* font);
 
         /**
          * Change the texture used for this icon.
