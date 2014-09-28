@@ -143,7 +143,7 @@ void STKMeshSceneNode::updateNoGL()
             else
             {
                 assert(!isDisplacement);
-                Material::ShaderType MatType = material->getShaderType();// MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
+                Material::ShaderType MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
                 if (!immediate_draw)
                     MeshSolidMaterial[MatType].push_back(&mesh);
             }

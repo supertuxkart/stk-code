@@ -10,30 +10,21 @@
 #include "graphics/camera.hpp"
 #include "modes/world.hpp"
 
-/*
-MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp, Material* material)
+
+Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp, Material* material)
 {
     switch (material->getShaderType())
     {
-    case Material::SHADERTYPE_SPHERE_MAP:
-        return MAT_SPHEREMAP;
-    case Material::SHADERTYPE_ALPHA_TEST:
-        return MAT_ALPHA_REF;
-    case Material::SHADERTYPE_VEGETATION:
-        return MAT_GRASS;
-    case Material::SHADERTYPE_SPLATTING:
-        return MAT_SPLATTING;
-    case Material::SHADERTYPE_SOLID_UNLIT:
-        return MAT_UNLIT;
     default:
+        return material->getShaderType();
+    case Material::SHADERTYPE_SOLID:
         if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
-            return MAT_NORMAL_MAP;
+            return Material::SHADERTYPE_NORMAL_MAP;
         else if (tp == video::EVT_2TCOORDS)
-            return MAT_DETAIL;
-        return MAT_DEFAULT;
+            return Material::SHADERTYPE_DETAIL_MAP;
+        return Material::SHADERTYPE_SOLID;
     }
 }
-*/
 
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam, Material* material)
 {
@@ -287,7 +278,7 @@ SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
 {
     if (!mesh.textures[i])
     {
-        Log::warn("STKMesh", "Missing texture");
+        Log::fatal("STKMesh", "Missing texture");
         return;
     }
     compressTexture(mesh.textures[i], isSrgb);

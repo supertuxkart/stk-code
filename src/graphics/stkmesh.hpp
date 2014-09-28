@@ -174,6 +174,7 @@ class ListDisplacement : public MiscList<ListDisplacement, GLMesh *, core::matri
 class ListInstancedGlow : public Singleton<ListInstancedGlow>, public std::vector<GLMesh *>
 {};
 
+Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp, Material* material);
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam, Material* material);
 
 void InitTextures(GLMesh &mesh, Material::ShaderType);
