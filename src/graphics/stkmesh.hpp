@@ -9,21 +9,9 @@
 #include "../lib/irrlicht/source/Irrlicht/CMeshSceneNode.h"
 
 #include <vector>
+#include "material.hpp"
 
 class Material;
-
-enum MeshMaterial
-{
-    MAT_DEFAULT,
-    MAT_ALPHA_REF,
-    MAT_NORMAL_MAP,
-    MAT_GRASS,
-    MAT_SPHEREMAP,
-    MAT_SPLATTING,
-    MAT_UNLIT,
-    MAT_DETAIL,
-    MAT_COUNT
-};
 
 enum TransparentMaterial
 {
@@ -67,7 +55,7 @@ protected:
     bool m_culledForShadowCam[4];
     bool m_culledForRSMCam;
 public:
-    PtrVector<GLMesh, REF> MeshSolidMaterial[MAT_COUNT];
+    PtrVector<GLMesh, REF> MeshSolidMaterial[Material::SHADERTYPE_COUNT];
     PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
     virtual void updateNoGL() = 0;
     virtual void updateGL() = 0;
@@ -186,9 +174,8 @@ class ListDisplacement : public MiscList<ListDisplacement, GLMesh *, core::matri
 class ListInstancedGlow : public Singleton<ListInstancedGlow>, public std::vector<GLMesh *>
 {};
 
-MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE, Material* material);
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam, Material* material);
 
-void InitTextures(GLMesh &mesh, MeshMaterial);
+void InitTextures(GLMesh &mesh, Material::ShaderType);
 
 #endif // STKMESH_H

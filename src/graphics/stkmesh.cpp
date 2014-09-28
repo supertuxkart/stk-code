@@ -10,6 +10,7 @@
 #include "graphics/camera.hpp"
 #include "modes/world.hpp"
 
+/*
 MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp, Material* material)
 {
     switch (material->getShaderType())
@@ -31,8 +32,8 @@ MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, vid
             return MAT_DETAIL;
         return MAT_DEFAULT;
     }
-
 }
+*/
 
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam, Material* material)
 {
@@ -299,26 +300,26 @@ SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
     }
 }
 
-void InitTextures(GLMesh &mesh, MeshMaterial Mat)
+void InitTextures(GLMesh &mesh, Material::ShaderType Mat)
 {
     switch (Mat)
     {
     default:
-    case MAT_DEFAULT:
-    case MAT_ALPHA_REF:
-    case MAT_GRASS:
-    case MAT_SPHEREMAP:
-    case MAT_UNLIT:
+    case Material::SHADERTYPE_SOLID:
+    case Material::SHADERTYPE_ALPHA_TEST:
+    case Material::SHADERTYPE_VEGETATION:
+    case Material::SHADERTYPE_SPHERE_MAP:
+    case Material::SHADERTYPE_SOLID_UNLIT:
         SetTexture(mesh, 0, true);
         SetTexture(mesh, 1, false);
         break;
-    case MAT_DETAIL:
-    case MAT_NORMAL_MAP:
+    case Material::SHADERTYPE_DETAIL_MAP:
+    case Material::SHADERTYPE_NORMAL_MAP:
         SetTexture(mesh, 0, true);
         SetTexture(mesh, 1, false);
         SetTexture(mesh, 2, false);
         break;
-    case MAT_SPLATTING:
+    case Material::SHADERTYPE_SPLATTING:
         SetTexture(mesh, 0, true);
         SetTexture(mesh, 1, false);
         SetTexture(mesh, 2, true);
