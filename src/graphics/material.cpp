@@ -784,6 +784,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             // Material and shaders
             m->MaterialType = irr_driver->getShader(ES_NORMAL_MAP);
             m->setTexture(1, glossytex);
+            m_shader_type = SHADERTYPE_NORMAL_MAP;
             return;
         }
 
@@ -795,6 +796,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 m->setTexture(2, m->getTexture(1));
             if (!m->getTexture(2))
                 m->setTexture(2, getUnicolorTexture(SColor(255, 255, 255, 255)));
+            m_shader_type = SHADERTYPE_DETAIL_MAP;
         }
         m->setTexture(1, glossytex);
     }
