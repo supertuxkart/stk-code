@@ -156,6 +156,27 @@ static HGLRC getMeAGLContext(HDC HDc)
     if (hrc)
         return hrc;
 
+    int ctx31debug[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        0
+    };
+
+    int ctx31[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        0
+    };
+
+    hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx31debug : ctx31);
+    if (hrc)
+        return hrc;
+
     useCoreContext = false;
     int legacyctx[] =
     {
