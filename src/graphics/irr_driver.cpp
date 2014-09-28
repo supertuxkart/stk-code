@@ -496,7 +496,7 @@ void IrrDriver::initDevice()
             m_need_srgb_workaround = true;
     }
 #ifdef WIN32
-    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 3));
+    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
 #else
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
 #endif
