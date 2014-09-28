@@ -10,6 +10,8 @@
 
 #include <vector>
 
+class Material;
+
 enum MeshMaterial
 {
     MAT_DEFAULT,
@@ -27,7 +29,6 @@ enum TransparentMaterial
 {
     TM_DEFAULT,
     TM_ADDITIVE,
-    TM_BUBBLE,
     TM_DISPLACEMENT,
     TM_COUNT
 };
@@ -185,11 +186,8 @@ class ListDisplacement : public MiscList<ListDisplacement, GLMesh *, core::matri
 class ListInstancedGlow : public Singleton<ListInstancedGlow>, public std::vector<GLMesh *>
 {};
 
-// Forward pass (for transparents meshes)
-void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
-
-MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE);
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam);
+MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE, Material* material);
+TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam, Material* material);
 
 void InitTextures(GLMesh &mesh, MeshMaterial);
 

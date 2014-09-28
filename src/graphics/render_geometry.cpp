@@ -639,7 +639,6 @@ static video::ITexture *displaceTex = 0;
 void IrrDriver::renderTransparent()
 {
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_ALPHA_TEST);
     glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
@@ -688,7 +687,6 @@ void IrrDriver::renderTransparent()
     cb->update();
 
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_ALPHA_TEST);
     glDepthMask(GL_FALSE);
     glDisable(GL_BLEND);
     glClear(GL_STENCIL_BUFFER_BIT);
@@ -868,7 +866,6 @@ void IrrDriver::renderShadows()
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
-    glDisable(GL_ALPHA_TEST);
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.5, 0.);
     m_rtts->getShadowFBO().Bind();

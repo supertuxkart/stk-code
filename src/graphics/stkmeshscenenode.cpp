@@ -8,6 +8,7 @@
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/material_manager.hpp"
 #include "modes/world.hpp"
 #include "utils/helpers.hpp"
 #include "utils/tuple.hpp"
@@ -132,16 +133,17 @@ void STKMeshSceneNode::updateNoGL()
             }
 
             GLMesh &mesh = GLmeshes[i];
+            Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
             if (rnd->isTransparent())
             {
-                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
+                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam, material);
                 if (!immediate_draw)
                     TransparentMesh[TranspMat].push_back(&mesh);
             }
             else
             {
                 assert(!isDisplacement);
-                MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
+                MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
                 if (!immediate_draw)
                     MeshSolidMaterial[MatType].push_back(&mesh);
             }
@@ -176,7 +178,8 @@ void STKMeshSceneNode::updateGL()
 
         if (!rnd->isTransparent())
         {
-            MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType()); 
+            Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
+            MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material); 
             if (!immediate_draw)
                 InitTextures(mesh, MatType);
         }
@@ -429,18 +432,5 @@ void STKMeshSceneNode::render()
             }
             return;
         }
-
-        GLMesh* mesh;
-        if (!TransparentMesh[TM_BUBBLE].empty())
-            glUseProgram(MeshShader::BubbleShader::Program);
-        if (irr_driver->hasARB_base_instance())
-            glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
-        for_in(mesh, TransparentMesh[TM_BUBBLE])
-        {
-            if (irr_driver->hasARB_base_instance())
-                glBindVertexArray(mesh->vao);
-            drawBubble(*mesh, ModelViewProjectionMatrix);
-        }
-        return;
     }
 }

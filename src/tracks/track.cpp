@@ -2062,6 +2062,10 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         {
             // handled above
         }
+        else if (name == "lightshaft")
+        {
+            // handled above
+        }
         else if (name == "instancing")
         {
             // TODO: eventually remove, this is now automatic

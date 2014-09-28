@@ -429,7 +429,7 @@ void setupRaceStart()
  */
 void cmdLineHelp()
 {
-    Log::info("main",
+    fprintf(stdout,
     "Usage: %s [OPTIONS]\n\n"
     "Run SuperTuxKart, a racing game with go-kart that features"
     " the Tux and friends.\n\n"
