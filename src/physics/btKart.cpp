@@ -234,8 +234,13 @@ btScalar btKart::rayCast(unsigned int index)
 
     btScalar depth = -1;
 
-    btScalar raylen = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius
-                    + wheel.m_maxSuspensionTravelCm*0.01f;
+    btScalar max_susp_len = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius
+                          + wheel.m_maxSuspensionTravelCm*0.01f;
+
+    // Do a slightly longer raycast to see if the kart might soon hit the 
+    // ground and some 'cushioning' is needed to avoid that the chassis
+    // hits the ground.
+    btScalar raylen = max_susp_len + 0.5f;
 
     btVector3 rayvector = wheel.m_raycastInfo.m_wheelDirectionWS * (raylen);
     const btVector3& source = wheel.m_raycastInfo.m_hardPointWS;
@@ -252,10 +257,10 @@ btScalar btKart::rayCast(unsigned int index)
 
     wheel.m_raycastInfo.m_groundObject = 0;
 
-    if (object)
+    depth = raylen * rayResults.m_distFraction;
+    if (object &&  depth < max_susp_len)
     {
         param = rayResults.m_distFraction;
-        depth = raylen * rayResults.m_distFraction;
         wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
         wheel.m_raycastInfo.m_contactNormalWS.normalize();
         wheel.m_raycastInfo.m_isInContact = true;
@@ -309,6 +314,18 @@ btScalar btKart::rayCast(unsigned int index)
 
     } else
     {
+        if(object)
+        {
+
+            if(depth + m_chassisBody->getLinearVelocity().getY() *1./60.f < max_susp_len)
+            {
+                btVector3 v = -0.25f*0.5f*m_chassisBody->getLinearVelocity();
+                v.setZ(0);
+                v.setX(0);
+                m_chassisBody->applyCentralImpulse(v/m_chassisBody->getInvMass());
+            }
+        }
+        depth = btScalar(-1.0);
         //put wheel info as in rest position
         wheel.m_raycastInfo.m_suspensionLength = wheel.getSuspensionRestLength();
         wheel.m_suspensionRelativeVelocity = btScalar(0.0);
