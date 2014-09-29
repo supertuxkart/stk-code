@@ -22,6 +22,8 @@
 #include <IMeshBuffer.h>
 #include "utils/log.hpp"
 #include "graphics/irr_driver.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
 
 void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
 
@@ -325,7 +327,8 @@ bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
 {
     if (!irr_driver->isGLSL())
         return false;
-    return (mb->getMaterial().MaterialType == irr_driver->getShader(ES_NORMAL_MAP));
+    return (mb->getMaterial().MaterialType == irr_driver->getShader(ES_NORMAL_MAP) &&
+        mb->getVertexType() != video::EVT_TANGENTS);
 }
 
 // Copied from irrlicht
@@ -435,7 +438,28 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predic
     if (calculateTangents)
         recalculateTangents(clone, recalculateNormals, smooth, angleWeighted);
     
+    int mbcount = clone->getMeshBufferCount();
+    for (int i = 0; i < mbcount; i++)
+    {
+        scene::IMeshBuffer* mb = clone->getMeshBuffer(i);
+
+        for (int t = 0; t < video::MATERIAL_MAX_TEXTURES; t++)
+        {
+            video::ITexture* texture = mb->getMaterial().TextureLayer[t].Texture;
+            if (texture != NULL)
+                texture->grab();
+        }
+    }
+
+    scene::IMeshCache* meshCache = irr_driver->getSceneManager()->getMeshCache();
+    io::SNamedPath path = meshCache->getMeshName(mesh);
     irr_driver->removeMeshFromCache(mesh);
+
+    scene::SAnimatedMesh* amesh = new scene::SAnimatedMesh(clone);
+    meshCache->addMesh(path, amesh);
+    amesh->drop();
+
+    World::getWorld()->getTrack()->addCachedMesh(amesh);
 
     return clone;
 }
