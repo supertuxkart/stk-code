@@ -62,7 +62,7 @@ void STKMeshSceneNode::cleanGLMeshes()
             glDeleteBuffers(1, &(mesh.index_buffer));
     }
     GLmeshes.clear();
-    for (unsigned i = 0; i < MAT_COUNT; i++)
+    for (unsigned i = 0; i < Material::SHADERTYPE_COUNT; i++)
         MeshSolidMaterial[i].clearWithoutDeleting();
     for (unsigned i = 0; i < TM_COUNT; i++)
         TransparentMesh[i].clearWithoutDeleting();
@@ -143,7 +143,7 @@ void STKMeshSceneNode::updateNoGL()
             else
             {
                 assert(!isDisplacement);
-                MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
+                Material::ShaderType MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
                 if (!immediate_draw)
                     MeshSolidMaterial[MatType].push_back(&mesh);
             }
@@ -179,7 +179,7 @@ void STKMeshSceneNode::updateGL()
         if (!rnd->isTransparent())
         {
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
-            MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material); 
+            Material::ShaderType MatType = material->getShaderType();// MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
             if (!immediate_draw)
                 InitTextures(mesh, MatType);
         }

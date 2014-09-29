@@ -1321,10 +1321,10 @@ namespace LightShader
         glEnableVertexAttribArray(attrib_Radius);
         glVertexAttribPointer(attrib_Radius, 1, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(7 * sizeof(float)));
 
-        glVertexAttribDivisor(attrib_Position, 1);
-        glVertexAttribDivisor(attrib_Energy, 1);
-        glVertexAttribDivisor(attrib_Color, 1);
-        glVertexAttribDivisor(attrib_Radius, 1);
+        glVertexAttribDivisorARB(attrib_Position, 1);
+        glVertexAttribDivisorARB(attrib_Energy, 1);
+        glVertexAttribDivisorARB(attrib_Color, 1);
+        glVertexAttribDivisorARB(attrib_Radius, 1);
     }
 }
 

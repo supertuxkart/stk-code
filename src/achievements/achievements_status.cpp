@@ -148,7 +148,7 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
     if(ids.size()>0)
     {
         ids = ids.substr(0, ids.size() - 1); // delete the last "," in the string
-        Log::info("Achievements", "Synching achievement %d to server.",
+        Log::info("Achievements", "Synching achievement %s to server.",
                   ids.c_str());
         Online::HTTPRequest * request = new Online::HTTPRequest(true, 2);
         PlayerManager::setUserDetails(request, "achieving");
