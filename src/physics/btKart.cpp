@@ -314,15 +314,33 @@ btScalar btKart::rayCast(unsigned int index)
 
     } else
     {
+        // The raycast either hit nothing (object=NULL), or it hit something,
+        // but not in the maximum suspension range. If it hit something,
+        // check for the need of cushioning:
         if(object)
         {
+            // If the raycast hit something, see if the jump needs cushioning:
+            // i.e. a slowdown in fall speed in order to avoid that on landing
+            // the chassis hits the ground (causing a severe slowdown of the
+            // kart). The cushioning is done if the fall distance (v_down * dt)
+            // in this physics step is large enough that the kart would hit the
+            // ground, i.e. the maximum suspension length plus fall distance
+            // is larger than the distance to the object that was just detected.
 
-            if(depth + m_chassisBody->getLinearVelocity().getY() *1./60.f < max_susp_len)
+            // To allow for wall driving, properly project the velocity
+            // onto the normal
+            btVector3 v = m_chassisBody->getLinearVelocity();
+            btVector3 down(0, 1, 0);
+            btVector3 v_down = (v * down) * down;
+
+            if(depth < max_susp_len + v_down.length() *1./60.f)
             {
-                btVector3 v = -0.25f*0.5f*m_chassisBody->getLinearVelocity();
-                v.setZ(0);
-                v.setX(0);
-                m_chassisBody->applyCentralImpulse(v/m_chassisBody->getInvMass());
+                // Apply an impulse that will roughly half the speed. Since
+                // there are 4 wheels, a single wheel should apply 1/4 of
+                // the necessary impulse:
+                btVector3 impulse = (-0.25f*0.5f/m_chassisBody->getInvMass())
+                                  * v_down;
+                m_chassisBody->applyCentralImpulse(impulse);
             }
         }
         depth = btScalar(-1.0);
