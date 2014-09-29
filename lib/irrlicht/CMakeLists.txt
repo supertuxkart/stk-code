@@ -104,7 +104,6 @@ source/Irrlicht/CAttributes.cpp
 source/Irrlicht/CGUIStaticText.cpp
 source/Irrlicht/CSceneNodeAnimatorCollisionResponse.cpp
 source/Irrlicht/CGUIFont.cpp
-source/Irrlicht/CBurningShader_Raster_Reference.cpp
 source/Irrlicht/CTriangleSelector.cpp
 source/Irrlicht/CParticlePointEmitter.cpp
 source/Irrlicht/CTextSceneNode.cpp
