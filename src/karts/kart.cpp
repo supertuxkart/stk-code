@@ -129,6 +129,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_is_jumping           = false;
     m_min_nitro_time       = 0.0f;
     m_fire_clicked         = 0;
+    m_wrongway_counter     = 0;
     
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;

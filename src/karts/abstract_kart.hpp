@@ -414,6 +414,10 @@ public:
     /** Set a text that is displayed on top of a kart.
      */
     virtual void setOnScreenText(const wchar_t *text) = 0;
+    // ------------------------------------------------------------------------- 
+    /** Counter which is used for displaying wrong way message after a delay */
+    virtual float getWrongwayCounter() = 0;
+    virtual void setWrongwayCounter(float counter) = 0;
 
 };   // AbstractKart
 

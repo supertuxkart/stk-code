@@ -200,7 +200,7 @@ void LinearWorld::update(float dt)
             m_kart_info[i].m_estimated_finish =
                 estimateFinishTimeForKart(m_karts[i]);
         }
-        checkForWrongDirection(i);
+        checkForWrongDirection(i, dt);
     }
 
 #ifdef DEBUG
@@ -830,38 +830,63 @@ void LinearWorld::updateRacePosition()
  *  player karts to display a message to the player.
  *  \param i Kart id.
  */
-void LinearWorld::checkForWrongDirection(unsigned int i)
+void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
-    if(!m_karts[i]->getController()->isPlayerController()) return;
-    if(!m_kart_info[i].getTrackSector()->isOnRoad()||
-        m_karts[i]->getKartAnimation()) return;
+    if (!m_karts[i]->getController()->isPlayerController()) 
+        return;
 
+    float wrongway_counter = m_karts[i]->getWrongwayCounter();
+    
     const AbstractKart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
     // don't do any reverse message handling, since it is likely that there
     // will be one direction in which it isn't going backwards anyway.
     int sector = m_kart_info[i].getTrackSector()->getCurrentGraphNode();
-    if(QuadGraph::get()->getNumberOfSuccessors(sector)>1)
+    
+    if (QuadGraph::get()->getNumberOfSuccessors(sector) > 1)
         return;
 
     // check if the player is going in the wrong direction
-    float angle_diff = kart->getHeading() -
-                       m_track->getAngle(sector);
-    if(angle_diff > M_PI) angle_diff -= 2*M_PI;
-    else if (angle_diff < -M_PI) angle_diff += 2*M_PI;
+    float angle_diff = kart->getHeading() - m_track->getAngle(sector);
+    
+    if (angle_diff > M_PI) 
+        angle_diff -= 2*M_PI;
+    else if (angle_diff < -M_PI) 
+        angle_diff += 2*M_PI;
+        
     // Display a warning message if the kart is going back way (unless
     // the kart has already finished the race).
-    if (( angle_diff >  DEGREE_TO_RAD* 120.0f ||
-          angle_diff < -DEGREE_TO_RAD*120.0f)      &&
-        kart->getVelocityLC().getY() > 0.0f        &&
-        !kart->hasFinishedRace() )
+    if ((angle_diff > DEGREE_TO_RAD * 120.0f ||
+        angle_diff < -DEGREE_TO_RAD * 120.0f) &&
+        kart->getVelocityLC().getY() > 0.0f &&
+        !kart->hasFinishedRace())
+    {
+        wrongway_counter += dt;
+        
+        if (wrongway_counter > 2.0f)
+            wrongway_counter = 2.0f;
+    }
+    else
+    {
+        wrongway_counter -= dt;
+
+        if (wrongway_counter < 0)
+            wrongway_counter = 0;
+    }
+    
+    if (kart->getKartAnimation())
+        wrongway_counter = 0;
+    
+    if (wrongway_counter > 1.0f)
     {
         m_race_gui->addMessage(_("WRONG WAY!"), kart,
-                              /* time */ -1.0f,
+                               /* time */ -1.0f,
                                video::SColor(255,255,255,255),
                                /*important*/ true,
                                /*big font*/  true);
     }  // if angle is too big
+    
+    m_karts[i]->setWrongwayCounter(wrongway_counter);
 }   // checkForWrongDirection
 
 //-----------------------------------------------------------------------------
