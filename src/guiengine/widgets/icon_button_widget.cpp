@@ -28,6 +28,7 @@
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
 #include <IGUIStaticText.h>
+#include <algorithm>
 
 using namespace GUIEngine;
 using namespace irr::video;
