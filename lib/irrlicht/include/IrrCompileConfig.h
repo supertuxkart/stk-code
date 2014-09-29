@@ -145,13 +145,6 @@ If not defined, Windows Multimedia library is used, which offers also broad supp
 // #define _IRR_COMPILE_WITH_DIRECT3D_8_
 #undef _IRR_COMPILE_WITH_DIRECT3D_9_
 
-#ifdef NO_IRR_COMPILE_WITH_DIRECT3D_8_
-#undef _IRR_COMPILE_WITH_DIRECT3D_8_
-#endif
-#ifdef NO_IRR_COMPILE_WITH_DIRECT3D_9_
-#undef _IRR_COMPILE_WITH_DIRECT3D_9_
-#endif
-
 #endif
 
 //! Define _IRR_COMPILE_WITH_OPENGL_ to compile the Irrlicht engine with OpenGL.
@@ -160,21 +153,6 @@ define out. */
 #define _IRR_COMPILE_WITH_OPENGL_
 #ifdef NO_IRR_COMPILE_WITH_OPENGL_
 #undef _IRR_COMPILE_WITH_OPENGL_
-#endif
-
-//! Define _IRR_COMPILE_WITH_SOFTWARE_ to compile the Irrlicht engine with software driver
-/** If you do not need the software driver, or want to use Burning's Video instead,
-comment this define out */
-//#define _IRR_COMPILE_WITH_SOFTWARE_
-#ifdef NO_IRR_COMPILE_WITH_SOFTWARE_
-#undef _IRR_COMPILE_WITH_SOFTWARE_
-#endif
-
-//! Define _IRR_COMPILE_WITH_BURNINGSVIDEO_ to compile the Irrlicht engine with Burning's video driver
-/** If you do not need this software driver, you can comment this define out. */
-//#define _IRR_COMPILE_WITH_BURNINGSVIDEO_
-#ifdef NO_IRR_COMPILE_WITH_BURNINGSVIDEO_
-#undef _IRR_COMPILE_WITH_BURNINGSVIDEO_
 #endif
 
 //! Define _IRR_COMPILE_WITH_X11_ to compile the Irrlicht engine with X11 support.
@@ -264,31 +242,6 @@ the engine will no longer read .png images. */
 #define _IRR_USE_NON_SYSTEM_LIB_PNG_
 #ifdef NO_IRR_USE_NON_SYSTEM_LIB_PNG_
 #undef _IRR_USE_NON_SYSTEM_LIB_PNG_
-#endif
-
-//! Define _IRR_D3D_NO_SHADER_DEBUGGING to disable shader debugging in D3D9
-/** If _IRR_D3D_NO_SHADER_DEBUGGING is undefined in IrrCompileConfig.h,
-it is possible to debug all D3D9 shaders in VisualStudio. All shaders
-(which have been generated in memory or read from archives for example) will be emitted
-into a temporary file at runtime for this purpose. To debug your shaders, choose
-Debug->Direct3D->StartWithDirect3DDebugging in Visual Studio, and for every shader a
-file named 'irr_dbg_shader_%%.vsh' or 'irr_dbg_shader_%%.psh' will be created. Drag'n'drop
-the file you want to debug into visual studio. That's it. You can now set breakpoints and
-watch registers, variables etc. This works with ASM, HLSL, and both with pixel and vertex shaders.
-Note that the engine will run in D3D REF for this, which is a lot slower than HAL. */
-#define _IRR_D3D_NO_SHADER_DEBUGGING
-#ifdef NO_IRR_D3D_NO_SHADER_DEBUGGING
-#undef _IRR_D3D_NO_SHADER_DEBUGGING
-#endif
-
-//! Define _IRR_D3D_USE_LEGACY_HLSL_COMPILER to enable the old HLSL compiler in recent DX SDKs
-/** This enables support for ps_1_x shaders for recent DX SDKs. Otherwise, support
-for this shader model is not available anymore in SDKs after Oct2006. You need to
-distribute the OCT2006_d3dx9_31_x86.cab or OCT2006_d3dx9_31_x64.cab though, in order
-to provide the user with the proper DLL. That's why it's disabled by default. */
-//#define _IRR_D3D_USE_LEGACY_HLSL_COMPILER
-#ifdef NO_IRR_D3D_USE_LEGACY_HLSL_COMPILER
-#undef _IRR_D3D_USE_LEGACY_HLSL_COMPILER
 #endif
 
 //! Define _IRR_COMPILE_WITH_CG_ to enable Cg Shading Language support
@@ -388,11 +341,6 @@ B3D, MS3D or X meshes */
 #define _IRR_COMPILE_WITH_MD3_LOADER_
 #ifdef NO_IRR_COMPILE_WITH_MD3_LOADER_
 #undef _IRR_COMPILE_WITH_MD3_LOADER_
-#endif
-//! Define _IRR_COMPILE_WITH_3DS_LOADER_ if you want to load 3D Studio Max files
-#define _IRR_COMPILE_WITH_3DS_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_3DS_LOADER_
-#undef _IRR_COMPILE_WITH_3DS_LOADER_
 #endif
 //! Define _IRR_COMPILE_WITH_COLLADA_LOADER_ if you want to load Collada files
 #define _IRR_COMPILE_WITH_COLLADA_LOADER_

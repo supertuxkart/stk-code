@@ -181,7 +181,6 @@ source/Irrlicht/CImageLoaderRGB.cpp
 source/Irrlicht/CSkinnedMesh.cpp
 source/Irrlicht/CXMLReader.cpp
 source/Irrlicht/CDummyTransformationSceneNode.cpp
-source/Irrlicht/C3DSMeshFileLoader.cpp
 source/Irrlicht/CGUITable.cpp
 source/Irrlicht/CB3DMeshFileLoader.cpp
 source/Irrlicht/CGeometryCreator.cpp
@@ -326,7 +325,6 @@ source/Irrlicht/CXMLReaderImpl.h
 source/Irrlicht/COpenGLMaterialRenderer.h
 source/Irrlicht/CVideoModeList.h
 source/Irrlicht/CParticleAnimatedMeshSceneNodeEmitter.h
-source/Irrlicht/C3DSMeshFileLoader.h
 source/Irrlicht/CImageLoaderTGA.h
 source/Irrlicht/CColorConverter.h
 source/Irrlicht/CWaterSurfaceSceneNode.h
