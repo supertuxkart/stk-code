@@ -305,16 +305,6 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_B3D_LOADER_
 #undef _IRR_COMPILE_WITH_B3D_LOADER_
 #endif
-//! Define _IRR_COMPILE_WITH_MS3D_LOADER_ if you want to Milkshape files
-#define _IRR_COMPILE_WITH_MS3D_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_MS3D_LOADER_
-#undef _IRR_COMPILE_WITH_MS3D_LOADER_
-#endif
-//! Define _IRR_COMPILE_WITH_X_LOADER_ if you want to use Microsoft X files
-#define _IRR_COMPILE_WITH_X_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_X_LOADER_
-#undef _IRR_COMPILE_WITH_X_LOADER_
-#endif
 #endif	// _IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_
 
 //! Define _IRR_COMPILE_WITH_IRR_MESH_LOADER_ if you want to load Irrlicht Engine .irrmesh files

@@ -127,7 +127,6 @@ source/Irrlicht/CImageWriterPPM.cpp
 source/Irrlicht/CSTLMeshFileLoader.cpp
 source/Irrlicht/CMountPointReader.cpp
 source/Irrlicht/CBillboardSceneNode.cpp
-source/Irrlicht/CMS3DMeshFileLoader.cpp
 source/Irrlicht/CGUIImageList.cpp
 source/Irrlicht/CSceneCollisionManager.cpp
 source/Irrlicht/CIrrDeviceWin32.cpp
@@ -152,7 +151,6 @@ source/Irrlicht/CSTLMeshWriter.cpp
 source/Irrlicht/COctreeTriangleSelector.cpp
 source/Irrlicht/CSMFMeshFileLoader.cpp
 source/Irrlicht/CFileList.cpp
-source/Irrlicht/CXMeshFileLoader.cpp
 source/Irrlicht/CImageLoaderPCX.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/COSOperator.cpp
@@ -205,7 +203,6 @@ source/Irrlicht/CB3DMeshFileLoader.h
 source/Irrlicht/CIrrDeviceLinux.h
 source/Irrlicht/CMeshCache.h
 source/Irrlicht/CAttributes.h
-source/Irrlicht/CMS3DMeshFileLoader.h
 source/Irrlicht/CParticleMeshEmitter.h
 source/Irrlicht/CImageWriterPPM.h
 source/Irrlicht/CParticlePointEmitter.h
@@ -389,7 +386,6 @@ source/Irrlicht/CImageWriterBMP.h
 source/Irrlicht/BuiltInFont.h
 source/Irrlicht/CMemoryFile.h
 source/Irrlicht/CFPSCounter.h
-source/Irrlicht/CXMeshFileLoader.h
 source/Irrlicht/CGUITreeView.h
 source/Irrlicht/CGUIContextMenu.h
 source/Irrlicht/CFileList.h
