@@ -81,7 +81,6 @@ source/Irrlicht/CNPKReader.cpp
 source/Irrlicht/CIrrMeshFileLoader.cpp
 source/Irrlicht/COpenGLSLMaterialRenderer.cpp
 source/Irrlicht/CParticleRotationAffector.cpp
-source/Irrlicht/CAnimatedMeshHalfLife.cpp
 source/Irrlicht/CDepthBuffer.cpp
 source/Irrlicht/CImageLoaderPSD.cpp
 source/Irrlicht/CTriangleBBSelector.cpp
@@ -232,7 +231,6 @@ source/Irrlicht/COpenGLTexture.h
 source/Irrlicht/Octree.h
 source/Irrlicht/os.h
 source/Irrlicht/CDefaultGUIElementFactory.h
-source/Irrlicht/CAnimatedMeshHalfLife.h
 source/Irrlicht/CSceneNodeAnimatorFlyCircle.h
 source/Irrlicht/CBSPMeshFileLoader.h
 source/Irrlicht/CTriangleBBSelector.h
