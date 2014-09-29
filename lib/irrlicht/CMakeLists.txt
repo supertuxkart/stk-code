@@ -89,7 +89,6 @@ source/Irrlicht/CGUIComboBox.cpp
 source/Irrlicht/CSceneNodeAnimatorTexture.cpp
 source/Irrlicht/CColladaMeshWriter.cpp
 source/Irrlicht/COpenGLTexture.cpp
-source/Irrlicht/COgreMeshFileLoader.cpp
 source/Irrlicht/COctreeSceneNode.cpp
 source/Irrlicht/CWaterSurfaceSceneNode.cpp
 source/Irrlicht/CQuake3ShaderSceneNode.cpp
@@ -383,7 +382,6 @@ source/Irrlicht/CGUIEnvironment.h
 source/Irrlicht/CTerrainTriangleSelector.h
 source/Irrlicht/CSMFMeshFileLoader.h
 source/Irrlicht/CAttributeImpl.h
-source/Irrlicht/COgreMeshFileLoader.h
 source/Irrlicht/CAnimatedMeshMD3.h
 source/Irrlicht/CGeometryCreator.h
 source/Irrlicht/CSkyBoxSceneNode.h
