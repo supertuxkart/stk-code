@@ -568,7 +568,15 @@ void IrrDriver::initDevice()
         glGenQueries(1, &m_lensflare_query);
         m_query_issued = false;
 
-        scene::IMesh * const sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
+        scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
+        for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
+        {
+            scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
+            if (!mb)
+                continue;
+            mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+            mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        }
         m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1);
         m_sun_interposer->grab();
         m_sun_interposer->setParent(NULL);
