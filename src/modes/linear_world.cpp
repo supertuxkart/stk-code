@@ -92,6 +92,7 @@ void LinearWorld::reset()
     {
         m_kart_info[i].reset();
         m_kart_info[i].getTrackSector()->update(m_karts[i]->getXYZ());
+        m_karts[i]->setWrongwayCounter(0);
     }   // next kart
 
     // At the moment the last kart would be the one that is furthest away
