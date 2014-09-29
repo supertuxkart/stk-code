@@ -1939,17 +1939,16 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             node->get("scale", &scale);
 
             XMLNode* libroot;
-            std::string lib_path = file_manager->getAsset("library/" + name);
+            std::string lib_path = file_manager->getAsset("library/" + name)+"/";
             bool create_lod_definitions = true;
 
             if (library_nodes.find(name) == library_nodes.end())
             {
-                std::string node_path = "library/" + name + "/node.xml";
-                std::string lib_node_path = file_manager->getAsset(node_path);
+                std::string lib_node_path = lib_path+"node.xml";
                 libroot = file_manager->createXMLTree(lib_node_path);
                 if (libroot == NULL)
                 {
-                    Log::error("Track", "Cannot find library '%s'", node_path.c_str());
+                    Log::error("Track", "Cannot find library '%s'", lib_node_path.c_str());
                     continue;
                 }
 
