@@ -27,9 +27,7 @@
 #include <string.h>
 #if defined(WIN32)
 #  include "Ws2tcpip.h"
-#  if defined(InetNtop)
-#    define inet_ntop InetNtop
-#  endif
+#  define inet_ntop InetNtop
 #else
 #  include <arpa/inet.h>
 #  include <errno.h>
@@ -37,7 +35,7 @@
 #include <pthread.h>
 #include <signal.h>
 
-#if !defined(inet_ntop)
+#ifdef __MINGW32__
 const char* inet_ntop(int af, const void* src, char* dst, int cnt)
 {
     struct sockaddr_in srcaddr;
@@ -49,8 +47,6 @@ const char* inet_ntop(int af, const void* src, char* dst, int cnt)
     if (WSAAddressToString((struct sockaddr*) &srcaddr,
         sizeof(struct sockaddr_in), 0, dst, (LPDWORD) &cnt) != 0)
     {
-        DWORD rv = WSAGetLastError();
-        printf("WSAAddressToString() : %d\n",rv);
         return NULL;
     }
     return dst;
