@@ -426,6 +426,17 @@ void Track::cleanup()
         }
 #endif
     }   // if verbose
+
+#ifdef __DEBUG_DUMP_MESH_CACHE_AFTER_CLEANUP__
+    scene::IMeshCache* meshCache = irr_driver->getSceneManager()->getMeshCache();
+    int count = meshCache->getMeshCount();
+    for (int i = 0; i < count; i++)
+    {
+        scene::IAnimatedMesh* mesh = meshCache->getMeshByIndex(i);
+        io::SNamedPath path = meshCache->getMeshName(mesh);
+        Log::info("CACHE", "[%i] %s", i, path.getPath().c_str());
+    }
+#endif
 }   // cleanup
 
 //-----------------------------------------------------------------------------
