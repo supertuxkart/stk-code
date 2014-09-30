@@ -426,6 +426,17 @@ void Track::cleanup()
         }
 #endif
     }   // if verbose
+
+#ifdef __DEBUG_DUMP_MESH_CACHE_AFTER_CLEANUP__
+    scene::IMeshCache* meshCache = irr_driver->getSceneManager()->getMeshCache();
+    int count = meshCache->getMeshCount();
+    for (int i = 0; i < count; i++)
+    {
+        scene::IAnimatedMesh* mesh = meshCache->getMeshByIndex(i);
+        io::SNamedPath path = meshCache->getMeshName(mesh);
+        Log::info("CACHE", "[%i] %s", i, path.getPath().c_str());
+    }
+#endif
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -1928,17 +1939,17 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             node->get("scale", &scale);
 
             XMLNode* libroot;
-            std::string lib_path = file_manager->getAsset("library/" + name);
+            std::string lib_path = 
+                file_manager->getAsset(FileManager::LIBRARY, name)+"/";
             bool create_lod_definitions = true;
 
             if (library_nodes.find(name) == library_nodes.end())
             {
-                std::string node_path = "library/" + name + "/node.xml";
-                std::string lib_node_path = file_manager->getAsset(node_path);
+                std::string lib_node_path = lib_path+"node.xml";
                 libroot = file_manager->createXMLTree(lib_node_path);
                 if (libroot == NULL)
                 {
-                    Log::error("Track", "Cannot find library '%s'", node_path.c_str());
+                    Log::error("Track", "Cannot find library '%s'", lib_node_path.c_str());
                     continue;
                 }
 
@@ -2059,6 +2070,10 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             // handled above
         }
         else if (name == "lod")
+        {
+            // handled above
+        }
+        else if (name == "lightshaft")
         {
             // handled above
         }

@@ -4,6 +4,7 @@
 #include <IMaterialRenderer.h>
 #include <ISkinnedMesh.h>
 #include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
@@ -44,7 +45,7 @@ void STKAnimatedMesh::cleanGLMeshes()
             glDeleteBuffers(1, &(mesh.index_buffer));
     }
     GLmeshes.clear();
-    for (unsigned i = 0; i < MAT_COUNT; i++)
+    for (unsigned i = 0; i < Material::SHADERTYPE_COUNT; i++)
         MeshSolidMaterial[i].clearWithoutDeleting();
     for (unsigned i = 0; i < TM_COUNT; i++)
         TransparentMesh[i].clearWithoutDeleting();
@@ -95,14 +96,16 @@ void STKAnimatedMesh::updateNoGL()
                 continue;
             }
             GLMesh &mesh = GLmeshes[i];
+            Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
+
             if (rnd->isTransparent())
             {
-                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
+                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam, material);
                 TransparentMesh[TranspMat].push_back(&mesh);
             }
             else
             {
-                MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
+                Material::ShaderType MatType = material->getShaderType();// MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
                 MeshSolidMaterial[MatType].push_back(&mesh);
             }
         }
@@ -138,7 +141,8 @@ void STKAnimatedMesh::updateGL()
 
             if (!rnd->isTransparent())
             {
-                MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
+                Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
+                Material::ShaderType MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
                 InitTextures(mesh, MatType);
             }
 

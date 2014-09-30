@@ -122,18 +122,20 @@ void ProfileManager::addToCache(OnlineProfile * profile)
 void ProfileManager::addDirectToCache(OnlineProfile* profile)
 {
     assert(profile != NULL);
-    if (m_profiles_cache.size() == m_max_cache_size)
+    if (m_profiles_cache.size() >= m_max_cache_size)
     {
-        // We have to replace a cached entry, find one entry that
-        // doesn't have its used bit set
+        // Cache already full, try to find entries that
+        // don't have their used bit set
         ProfilesMap::iterator iter;
         for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end();)
         {
             if (!iter->second->getCacheBit())
             {
                 delete iter->second;
-                m_profiles_cache.erase(iter);
-                break;
+                iter = m_profiles_cache.erase(iter);
+                // Keep on deleting till enough space is available.
+                if(m_profiles_cache.size()<m_max_cache_size)
+                    break;
             }
             else
             {
@@ -143,7 +145,6 @@ void ProfileManager::addDirectToCache(OnlineProfile* profile)
     }
 
     m_profiles_cache[profile->getID()] = profile;
-    assert(m_profiles_cache.size() <= m_max_cache_size);
 }   // addDirectToCache
 
 // ------------------------------------------------------------------------
@@ -175,7 +176,7 @@ bool ProfileManager::isInCache(const uint32_t id)
 void ProfileManager::updateCacheBits(OnlineProfile * profile)
 {
     profile->setCacheBit(true);
-    if (m_profiles_cache.size() == m_max_cache_size)
+    if (m_profiles_cache.size() >= m_max_cache_size)
     {
         ProfilesMap::iterator iter;
         for (iter = m_profiles_cache.begin();

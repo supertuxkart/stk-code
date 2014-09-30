@@ -57,28 +57,31 @@ NewsManager::~NewsManager()
  */
 void NewsManager::init(bool force_refresh)
 {
-    // The rest (which potentially involves downloading news.xml) is handled
-    // in a separate thread, so that the GUI remains responsive.
-
-    pthread_attr_t  attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    // Should be the default, but just in case:
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-    //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-
     m_force_refresh = force_refresh;
 
-    pthread_t thread_id;
-    int error = pthread_create(&thread_id, &attr,
-                                &NewsManager::downloadNews, this);
-    if(error)
+    // The rest (which potentially involves downloading news.xml) is handled
+    // in a separate thread, so that the GUI remains responsive. It is only
+    // started if internet access is enabled, else nothing is done in the
+    // thread anyway (and the addons menu is disabled as a result).
+    if(UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED)
     {
-        Log::warn("news", "Could not create thread, error=%d", error);
-        // In this case just execute the downloading code with this thread
-        downloadNews(this);
+        pthread_attr_t  attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+        // Should be the default, but just in case:
+        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+        //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+        pthread_t thread_id;
+        int error = pthread_create(&thread_id, &attr,
+            &NewsManager::downloadNews, this);
+        if (error)
+        {
+            Log::warn("news", "Could not create thread, error=%d", error);
+            // In this case just execute the downloading code with this thread
+            downloadNews(this);
+        }
+        pthread_attr_destroy(&attr);
     }
-    pthread_attr_destroy(&attr);
 
 }   //init
 
@@ -230,6 +233,16 @@ void NewsManager::checkRedirect(const XMLNode *xml)
     {
         Log::info("hw report", "New server at '%s'.", hw_report_server.c_str());
         UserConfigParams::m_server_hw_report = hw_report_server;
+    }
+
+    float polling;
+    if(xml->get("menu-polling-interval", &polling))
+    {
+        RequestManager::get()->setMenuPollingInterval(polling);
+    }
+    if(xml->get("game-polling-interval", &polling))
+    {
+        RequestManager::get()->setGamePollingInterval(polling);
     }
 
 }   // checkRedirect

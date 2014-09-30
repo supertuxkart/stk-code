@@ -53,13 +53,14 @@ public:
         SHADERTYPE_ALPHA_BLEND,
         SHADERTYPE_ADDITIVE,
         SHADERTYPE_SOLID_UNLIT,
-        /** Effect where the UV texture is moved in a wave pattern */
-        SHADERTYPE_BUBBLE,
         /** Effect that makes grass wave as in the wind */
         SHADERTYPE_VEGETATION,
         SHADERTYPE_WATER,
         SHADERTYPE_SPHERE_MAP,
-        SHADERTYPE_SPLATTING
+        SHADERTYPE_NORMAL_MAP,
+        SHADERTYPE_DETAIL_MAP,
+        SHADERTYPE_SPLATTING,
+        SHADERTYPE_COUNT,
     };
 
     enum ParticleConditions

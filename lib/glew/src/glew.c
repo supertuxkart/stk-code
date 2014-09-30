@@ -296,6 +296,30 @@ static GLboolean _glewStrSame3 (GLubyte** a, GLuint* na, const GLubyte* b, GLuin
   return GL_FALSE;
 }
 
+#include <string.h>
+#include <stdlib.h>
+
+/* A simple open addressing hashset for extensions on OpenGL 3+. */
+static const char ** ext_hashset = NULL;
+size_t ext_hashset_size = 0;
+
+static unsigned hash_string(const char * key)
+{
+  unsigned hash = 0;
+  unsigned i = 0;
+  for (; i < strlen(key); ++i)
+  {
+    hash += key[i];
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+  }
+  hash += (hash << 3);
+  hash ^= (hash >> 11);
+  hash += (hash << 15);
+
+  return hash;
+}
+
 /*
  * Search for name in the extensions string. Use of strstr()
  * is not sufficient because extension names can be prefixes of
@@ -304,14 +328,37 @@ static GLboolean _glewStrSame3 (GLubyte** a, GLuint* na, const GLubyte* b, GLuin
  */
 static GLboolean _glewSearchExtension (const char* name, const GLubyte *start, const GLubyte *end)
 {
-  const GLubyte* p;
-  GLuint len = _glewStrLen((const GLubyte*)name);
-  p = start;
-  while (p < end)
+  if (ext_hashset != NULL)
   {
-    GLuint n = _glewStrCLen(p, ' ');
-    if (len == n && _glewStrSame((const GLubyte*)name, p, n)) return GL_TRUE;
-    p += n+1;
+    unsigned hash = hash_string(name);
+
+    /*
+     * As the hashset is bigger than the number of extensions
+     * this will eventually break.
+     */
+    while(1)
+    {
+        unsigned index = hash % ext_hashset_size;
+        if (ext_hashset[index] == NULL)
+            break;
+
+        if (!strcmp(ext_hashset[index], name))
+            return GL_TRUE;
+
+        hash++;
+    }
+  }
+  else
+  {
+    const GLubyte* p;
+    GLuint len = _glewStrLen((const GLubyte*)name);
+    p = start;
+    while (p < end)
+    {
+      GLuint n = _glewStrCLen(p, ' ');
+      if (len == n && _glewStrSame((const GLubyte*)name, p, n)) return GL_TRUE;
+      p += n+1;
+    }
   }
   return GL_FALSE;
 }
@@ -10052,9 +10099,13 @@ static GLboolean _glewInit_GL_WIN_swap_hint (GLEW_CONTEXT_ARG_DEF_INIT)
 /* ------------------------------------------------------------------------- */
 
 GLboolean GLEWAPIENTRY glewGetExtension (const char* name)
-{    
+{
   const GLubyte* start;
   const GLubyte* end;
+  
+  if (ext_hashset != NULL)
+      return _glewSearchExtension(name, NULL, NULL);
+
   start = (const GLubyte*)glGetString(GL_EXTENSIONS);
   if (start == 0)
     return GL_FALSE;
@@ -10114,9 +10165,39 @@ GLenum GLEWAPIENTRY glewContextInit (GLEW_CONTEXT_ARG_DEF_LIST)
     GLEW_VERSION_1_2   = GLEW_VERSION_1_2_1 == GL_TRUE || ( major == 1 && minor >= 2 ) ? GL_TRUE : GL_FALSE;
     GLEW_VERSION_1_1   = GLEW_VERSION_1_2   == GL_TRUE || ( major == 1 && minor >= 1 ) ? GL_TRUE : GL_FALSE;
   }
+  
+  if (major >= 3) /* glGetString method is deprecated */
+  {
+    GLint n, i;
+    glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+    glGetStringi = (PFNGLGETSTRINGIPROC)glewGetProcAddress((const GLubyte*)"glGetStringi");
 
-  /* query opengl extensions string */
-  extStart = glGetString(GL_EXTENSIONS);
+    free(ext_hashset); /* In case we get called a second time. */
+
+    ext_hashset_size = (n * 3) / 2;
+    ext_hashset = calloc(ext_hashset_size, sizeof(const char *));
+    for (i = 0; i < n; ++i)
+    {
+      const char * extension;
+      unsigned hash;
+ 
+      extension = (const char *)glGetStringi(GL_EXTENSIONS, i);
+      hash = hash_string(extension);
+
+      while(ext_hashset[hash % ext_hashset_size] != NULL)
+        hash++;
+        
+      ext_hashset[hash % ext_hashset_size] = extension;
+    }
+
+    extStart = 0;
+  }
+  else
+  {
+    /* query opengl extensions string */
+    extStart = glGetString(GL_EXTENSIONS);
+  }
+
   if (extStart == 0)
     extStart = (const GLubyte*)"";
   extEnd = extStart + _glewStrLen(extStart);

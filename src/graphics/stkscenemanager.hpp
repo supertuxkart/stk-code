@@ -45,19 +45,19 @@ class ParticlesList : public Singleton<ParticlesList>, public std::vector<Partic
 class SolidPassCmd : public CommandBuffer<SolidPassCmd>
 {
 public:
-    size_t Offset[MAT_COUNT], Size[MAT_COUNT];
+    size_t Offset[Material::SHADERTYPE_COUNT], Size[Material::SHADERTYPE_COUNT];
 };
 
 class ShadowPassCmd : public CommandBuffer<ShadowPassCmd>
 {
 public:
-    size_t Offset[4][MAT_COUNT], Size[4][MAT_COUNT];
+    size_t Offset[4][Material::SHADERTYPE_COUNT], Size[4][Material::SHADERTYPE_COUNT];
 };
 
 class RSMPassCmd : public CommandBuffer<RSMPassCmd>
 {
 public:
-    size_t Offset[MAT_COUNT], Size[MAT_COUNT];
+    size_t Offset[Material::SHADERTYPE_COUNT], Size[Material::SHADERTYPE_COUNT];
 };
 
 class GlowPassCmd : public CommandBuffer<GlowPassCmd>

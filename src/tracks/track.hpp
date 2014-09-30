@@ -654,7 +654,11 @@ public:
     // ------------------------------------------------------------------------
     void setActualNumberOfLaps(unsigned int laps)
                                          { m_actual_number_of_laps = laps; }
+    // ------------------------------------------------------------------------
     bool operator<(const Track &other) const;
+    // ------------------------------------------------------------------------
+    /** Adds mesh to cleanup list */
+    void addCachedMesh(scene::IMesh* mesh) { m_all_cached_meshes.push_back(mesh); }
 };   // class Track
 
 #endif

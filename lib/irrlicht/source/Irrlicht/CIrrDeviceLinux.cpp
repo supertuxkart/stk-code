@@ -58,6 +58,7 @@ namespace irr
 {
 	namespace video
 	{
+        extern bool useCoreContext;
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
 	}
@@ -499,21 +500,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 {
 	GLXContext Context;
-  int compat43ctxdebug[] =
-		{
-			GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
-			GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
-			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-			None
-		};
-    int compat43ctx[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
-        None
-    };
+    irr::video::useCoreContext = true;
 	int core43ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
@@ -527,21 +514,6 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
         GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
         GLX_CONTEXT_MINOR_VERSION_ARB, 3,
         GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-        None
-    };
-	int compat33ctxdebug[] =
-		{
-			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-			GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
-			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-			None
-		};
-    int compat33ctx[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
         None
     };
 	int core33ctxdebug[] =
@@ -584,25 +556,13 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
   
-  // create compat 4.3 context (for proprietary drivers)
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? compat43ctxdebug : compat43ctx);
-	if (!XErrorSignaled)
-		return Context;
-
-  XErrorSignaled = false;
-	// create core 4.3 context (for mesa)
+	// create core 4.3 context
     Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
-	// create compat 3.3 context (for proprietary drivers)
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? compat33ctxdebug : compat33ctx);
-	if (!XErrorSignaled)
-		return Context;
-
-	XErrorSignaled = false;
-	// create core 3.3 context (for mesa)
+	// create core 3.3 context
     Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
 	if (!XErrorSignaled)
 		return Context;
@@ -614,6 +574,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 		return Context;
 
 	XErrorSignaled = false;
+    irr::video::useCoreContext = false;
 	// fall back to legacy context
 	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, legacyctx);
 	return Context;

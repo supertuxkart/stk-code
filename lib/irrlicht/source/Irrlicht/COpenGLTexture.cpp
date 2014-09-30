@@ -18,7 +18,7 @@ namespace irr
 {
 namespace video
 {
-
+    extern bool useCoreContext;
 //! constructor for usual textures
 COpenGLTexture::COpenGLTexture(IImage* origImage, const io::path& name, void* mipmapData, COpenGLDriver* driver)
 	: ITexture(name), ColorFormat(ECF_A8R8G8B8), Driver(driver), Image(0), MipImage(0),
@@ -350,12 +350,12 @@ void COpenGLTexture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 		// auto generate if possible and no mipmap data is given
 		if (HasMipMaps && !mipmapData && Driver->queryFeature(EVDF_MIP_MAP_AUTO_UPDATE))
 		{
-			if (Driver->getTextureCreationFlag(ETCF_OPTIMIZED_FOR_SPEED))
+            if (Driver->getTextureCreationFlag(ETCF_OPTIMIZED_FOR_SPEED) && !useCoreContext)
 				glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_FASTEST);
-			else if (Driver->getTextureCreationFlag(ETCF_OPTIMIZED_FOR_QUALITY))
+            else if (Driver->getTextureCreationFlag(ETCF_OPTIMIZED_FOR_QUALITY) && !useCoreContext)
 				glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_NICEST);
-			else
-				glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_DONT_CARE);
+            else if (!useCoreContext)
+                glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_DONT_CARE);
 
 			AutomaticMipmapUpdate=true;
 
@@ -405,7 +405,8 @@ void COpenGLTexture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 
 	if (!MipmapLegacyMode && AutomaticMipmapUpdate)
 	{
-		glEnable(GL_TEXTURE_2D);
+        if (!useCoreContext)
+		    glEnable(GL_TEXTURE_2D);
 		Driver->extGlGenerateMipmap(GL_TEXTURE_2D);
 	}
 

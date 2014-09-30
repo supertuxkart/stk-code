@@ -19,27 +19,40 @@
 #include "network/stk_host.hpp"
 
 #include "config/user_config.hpp"
+#include "io/file_manager.hpp"
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
 #include <string.h>
-#if defined(WIN32) && !defined(__MINGW32__)
+#if defined(WIN32)
 #  include "Ws2tcpip.h"
-#  define   inet_ntop  InetNtop
-
-// TODO: It's very ugly hack which allows to compile STK on windows using gcc.
-// Solution would be nice seen.
-#elif defined(__MINGW32__)
-#  include "Ws2tcpip.h"
-#  define   inet_ntop
-
+#  define inet_ntop InetNtop
 #else
 #  include <arpa/inet.h>
 #  include <errno.h>
 #endif
 #include <pthread.h>
 #include <signal.h>
+
+#ifdef __MINGW32__
+const char* inet_ntop(int af, const void* src, char* dst, int cnt)
+{
+    struct sockaddr_in srcaddr;
+
+    memset(&srcaddr, 0, sizeof(struct sockaddr_in));
+    memcpy(&(srcaddr.sin_addr), src, sizeof(srcaddr.sin_addr));
+
+    srcaddr.sin_family = af;
+    if (WSAAddressToString((struct sockaddr*) &srcaddr,
+        sizeof(struct sockaddr_in), 0, dst, (LPDWORD) &cnt) != 0)
+    {
+        return NULL;
+    }
+    return dst;
+}
+#endif
+
 
 FILE* STKHost::m_log_file = NULL;
 pthread_mutex_t STKHost::m_log_mutex;
@@ -90,13 +103,17 @@ void* STKHost::receive_data(void* self)
 
 STKHost::STKHost()
 {
-    m_host = NULL;
+    m_host             = NULL;
     m_listening_thread = NULL;
-    m_log_file = NULL;
+    m_log_file         = NULL;
     pthread_mutex_init(&m_exit_mutex, NULL);
     pthread_mutex_init(&m_log_mutex, NULL);
     if (UserConfigParams::m_packets_log_filename.toString() != "")
-        m_log_file = fopen(UserConfigParams::m_packets_log_filename.c_str(), "w+");
+    {
+        std::string s =
+            file_manager->getUserConfigFile(UserConfigParams::m_packets_log_filename);
+        m_log_file = fopen(s.c_str(), "w+");
+    }
     if (!m_log_file)
         Log::warn("STKHost", "Network packets won't be logged: no file.");
 }

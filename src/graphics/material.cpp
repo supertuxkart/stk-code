@@ -203,10 +203,6 @@ Material::Material(const XMLNode *node, bool deprecated)
             node->get("splatting-texture-3", &m_splatting_texture_3);
             node->get("splatting-texture-4", &m_splatting_texture_4);
         }
-        else if (s == "bubble")
-        {
-            m_shader_type = SHADERTYPE_BUBBLE;
-        }
         else
         {
             Log::warn("Material", "Unknown shader type <%s> for <%s>", s.c_str(), m_texname.c_str());
@@ -260,10 +256,6 @@ Material::Material(const XMLNode *node, bool deprecated)
         if (s == "water")
         {
             m_water_splash = true;
-        }
-        else if (s == "bubble")
-        {
-            m_shader_type = SHADERTYPE_BUBBLE;
         }
         else if (s == "grass")
         {
@@ -779,17 +771,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->MaterialType = irr_driver->getShader(ES_GRASS_REF);
             m->setTexture(1, glossytex);
             return;
-        case SHADERTYPE_BUBBLE:
-            if (mb)
-            {
-                BubbleEffectProvider * bubble = (BubbleEffectProvider *)
-                    irr_driver->getCallback(ES_BUBBLES);
-                bubble->addBubble(mb);
-
-                m->MaterialType = irr_driver->getShader(ES_BUBBLES);
-                m->BlendOperation = video::EBO_ADD;
-            }
-            return;
         }
 
         if (!m->getTexture(0))
@@ -996,12 +977,6 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
 void Material::onMadeVisible(scene::IMeshBuffer* who)
 {
     if (!irr_driver->isGLSL()) return;
-
-    BubbleEffectProvider * bubble = (BubbleEffectProvider *)
-                                     irr_driver->getCallback(ES_BUBBLES);
-
-    if (bubble != NULL)
-        bubble->onMadeVisible(who);
 }
 
 //-----------------------------------------------------------------------------
@@ -1010,11 +985,6 @@ void Material::onMadeVisible(scene::IMeshBuffer* who)
 void Material::onHidden(scene::IMeshBuffer* who)
 {
     if (!irr_driver->isGLSL()) return;
-
-    BubbleEffectProvider * bubble = (BubbleEffectProvider *)
-                                     irr_driver->getCallback(ES_BUBBLES);
-    if (bubble != NULL)
-        bubble->onHidden(who);
 }
 
 //-----------------------------------------------------------------------------
@@ -1022,11 +992,6 @@ void Material::onHidden(scene::IMeshBuffer* who)
 void Material::isInitiallyHidden(scene::IMeshBuffer* who)
 {
     if (!irr_driver->isGLSL()) return;
-
-    BubbleEffectProvider * bubble = (BubbleEffectProvider *)
-                                     irr_driver->getCallback(ES_BUBBLES);
-    if (bubble != NULL)
-        bubble->isInitiallyHidden(who);
 }
 
 //-----------------------------------------------------------------------------

@@ -1512,13 +1512,13 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
                              SColor(100,255,255,255),
                              SColor(100,255,255,255) };
         core::recti r(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h);
-        draw2DImage(icon_widget->m_texture, sized_rect,
+        draw2DImage(icon_widget->getTexture(), sized_rect,
                                             r, 0 /* no clipping */, colors,
                                             true /* alpha */);
     }
     else
     {
-        video::ITexture* t = icon_widget->m_texture;
+        const video::ITexture* t = icon_widget->getTexture();
 
         const bool mouseInside =
             rect.isPointInside(irr_driver->getDevice()->getCursorControl()

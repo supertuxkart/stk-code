@@ -171,7 +171,7 @@ endif()
 
 
 # Set some compiler options
-if(UNIX)
+if(UNIX OR MINGW)
     add_definitions(-Wall)
 endif()
 
@@ -181,6 +181,9 @@ if(WIN32)
 
     # And shut up about unsafe stuff
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
+if(MSVC)
     # VS will automatically add NDEBUG for release mode, but only _DEBUG in debug mode.
     # Since STK uses DEBUG, this is added for debug compilation only:
     set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG DEBUG)

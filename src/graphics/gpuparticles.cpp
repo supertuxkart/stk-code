@@ -266,13 +266,13 @@ void ParticleSystemProxy::CommonRenderingVAO(GLuint PositionBuffer)
     glBindBuffer(GL_ARRAY_BUFFER, PositionBuffer);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), 0);
-    glVertexAttribDivisor(0, 1);
+    glVertexAttribDivisorARB(0, 1);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(3 * sizeof(float)));
-    glVertexAttribDivisor(1, 1);
+    glVertexAttribDivisorARB(1, 1);
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(7 * sizeof(float)));
-    glVertexAttribDivisor(2, 1);
+    glVertexAttribDivisorARB(2, 1);
 }
 
 void ParticleSystemProxy::AppendQuaternionRenderingVAO(GLuint QuaternionBuffer)
@@ -281,11 +281,11 @@ void ParticleSystemProxy::AppendQuaternionRenderingVAO(GLuint QuaternionBuffer)
     glEnableVertexAttribArray(5);
 
     glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glVertexAttribDivisor(5, 1);
+    glVertexAttribDivisorARB(5, 1);
 
     glEnableVertexAttribArray(6);
     glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
-    glVertexAttribDivisor(6, 1);
+    glVertexAttribDivisorARB(6, 1);
 }
 
 void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo)

@@ -40,6 +40,7 @@ private:
     int            m_prev_accel;
     bool           m_prev_brake;
     bool           m_prev_nitro;
+    bool           m_sound_schedule;
 
     float          m_penalty_time;
 

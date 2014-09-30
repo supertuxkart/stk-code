@@ -351,20 +351,22 @@ void IrrDriver::initDevice()
         core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width,
                                                     UserConfigParams::m_height);
         
-        
-        if (modes->getVideoModeCount() > 0)
+        if (UserConfigParams::m_fullscreen)
         {
-            res = modes->getVideoModeResolution(res, res);
-
-            UserConfigParams::m_width = res.Width;
-            UserConfigParams::m_height = res.Height;
-        }
-        else
-        {
-            Log::verbose("irr_driver", "Cannot get information about "
-                         "resolutions. Try to use the default one.");
-            UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
-            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
+            if (modes->getVideoModeCount() > 0)
+            {
+                res = modes->getVideoModeResolution(res, res);
+    
+                UserConfigParams::m_width = res.Width;
+                UserConfigParams::m_height = res.Height;
+            }
+            else
+            {
+                Log::verbose("irr_driver", "Cannot get information about "
+                             "resolutions. Try to use the default one.");
+                UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
+                UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
+            }
         }
 
         m_device->closeDevice();
@@ -494,7 +496,7 @@ void IrrDriver::initDevice()
             m_need_srgb_workaround = true;
     }
 #ifdef WIN32
-    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 3));
+    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
 #else
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
 #endif
@@ -566,7 +568,15 @@ void IrrDriver::initDevice()
         glGenQueries(1, &m_lensflare_query);
         m_query_issued = false;
 
-        scene::IMesh * const sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
+        scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
+        for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
+        {
+            scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
+            if (!mb)
+                continue;
+            mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+            mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        }
         m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1);
         m_sun_interposer->grab();
         m_sun_interposer->setParent(NULL);
@@ -2488,7 +2498,6 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
             m_suncam->updateAbsolutePosition();
 
             ((WaterShaderProvider *) m_shaders->m_callbacks[ES_WATER])->setSunPosition(pos);
-            ((SkyboxProvider *) m_shaders->m_callbacks[ES_SKYBOX])->setSunPosition(pos);
         }
 
         return light;

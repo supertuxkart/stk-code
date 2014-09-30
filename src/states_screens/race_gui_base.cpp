@@ -46,6 +46,14 @@
 
 #include <ICameraSceneNode.h>
 
+namespace irr
+{
+    namespace video
+    {
+        extern bool useCoreContext;
+    }
+}
+
 RaceGUIBase::RaceGUIBase()
 {
     m_ignore_unimportant_messages = false;
@@ -418,7 +426,8 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
         glviewport[3] = viewport.LowerRightCorner.Y;
         //glGetIntegerv(GL_VIEWPORT, glviewport);
 
-        glDisable(GL_TEXTURE_2D);
+        if (!irr::video::useCoreContext)
+            glDisable(GL_TEXTURE_2D);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
         glEnable(GL_BLEND);
@@ -433,7 +442,8 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
         glVertex3d(glviewport[2],glviewport[3],0);
         glVertex3d(glviewport[2],glviewport[1],0);
         glEnd();
-        glEnable(GL_TEXTURE_2D);
+        if (!irr::video::useCoreContext)
+            glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #endif
     }

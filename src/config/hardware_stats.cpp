@@ -178,11 +178,9 @@ void reportHardwareStats()
     if(nr_procs>0)
         json.add("cpu_numprocs", nr_procs);
 
-    // Too long for debugging atm
-    //json.add("GL_EXTENSIONS", getGLExtensions());
+    json.add("GL_EXTENSIONS", getGLExtensions());
     getGLLimits(&json);
     json.finish();
-    Log::verbose("json", "'%s'", json.toString().c_str());
 
     // ------------------------------------------------------------------------
     /** A small class which sends the HW report to the STK server. On
@@ -235,8 +233,7 @@ void reportHardwareStats()
     request->addParameter("data", json.toString());
     request->setURL((std::string)UserConfigParams::m_server_hw_report+"/upload/v1/");
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
-    // FIXME: For now: don't submit
-    //request->queue();
+    request->queue();
 
 }   // reportHardwareStats
 

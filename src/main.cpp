@@ -429,7 +429,7 @@ void setupRaceStart()
  */
 void cmdLineHelp()
 {
-    Log::info("main",
+    fprintf(stdout,
     "Usage: %s [OPTIONS]\n\n"
     "Run SuperTuxKart, a racing game with go-kart that features"
     " the Tux and friends.\n\n"
@@ -1127,8 +1127,17 @@ void askForInternetPermission()
         public:
             virtual void onConfirm()
             {
+                // Typically internet is disabled here (just better safe
+                // than sorry). If internet should be allowed, the news
+                // manager needs to be started (which in turn activates
+                // the addons manager).
+                bool need_to_start_news_manager = 
+                     UserConfigParams::m_internet_status!=
+                                       Online::RequestManager::IPERM_ALLOWED;
                 UserConfigParams::m_internet_status =
                     Online::RequestManager::IPERM_ALLOWED;
+                if(need_to_start_news_manager)
+                    NewsManager::get()->init(false);
                 GUIEngine::ModalDialog::dismiss();
             }   // onConfirm
             // --------------------------------------------------------
