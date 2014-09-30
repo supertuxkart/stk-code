@@ -108,31 +108,6 @@ enum TypeFBO
     FBO_COUNT
 };
 
-enum QueryPerf
-{
-    Q_SOLID_PASS1,
-    Q_SHADOWS,
-    Q_RSM,
-    Q_RH,
-    Q_GI,
-    Q_ENVMAP,
-    Q_SUN,
-    Q_POINTLIGHTS,
-    Q_SSAO,
-    Q_SOLID_PASS2,
-    Q_TRANSPARENT,
-    Q_PARTICLES,
-    Q_DISPLACEMENT,
-    Q_DOF,
-    Q_GODRAYS,
-    Q_BLOOM,
-    Q_TONEMAP,
-    Q_MOTIONBLUR,
-    Q_MLAA,
-    Q_GUI,
-    Q_LAST
-};
-
 enum TypeRTT
 {
     RTT_TMP1 = 0,

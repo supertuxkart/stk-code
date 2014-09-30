@@ -39,7 +39,8 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char 
 {
     // short emision time, explosion, not constant flame
     m_remaining_time  = burst_time;
-    
+    m_emission_frames = 0;
+
     ParticleKindManager* pkm = ParticleKindManager::get();
     ParticleKind* particles = pkm->getParticles(particle_file);
     m_emitter = new ParticleEmitter(particles, coord,  NULL);
@@ -67,6 +68,7 @@ bool Explosion::updateAndDelete(float dt)
     // so no need to save the result of the update call.
     HitSFX::updateAndDelete(dt);
 
+    m_emission_frames++;
     m_remaining_time -= dt;
 
     if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
@@ -77,15 +79,14 @@ bool Explosion::updateAndDelete(float dt)
         node->getMaterial(0).AmbientColor.setGreen(intensity);
         node->getMaterial(0).DiffuseColor.setGreen(intensity);
         node->getMaterial(0).EmissiveColor.setGreen(intensity);
-
+        
         node->getMaterial(0).AmbientColor.setBlue(intensity);
         node->getMaterial(0).DiffuseColor.setBlue(intensity);
         node->getMaterial(0).EmissiveColor.setBlue(intensity);
-
+        
         node->getMaterial(0).AmbientColor.setRed(intensity);
         node->getMaterial(0).DiffuseColor.setRed(intensity);
         node->getMaterial(0).EmissiveColor.setRed(intensity);
-
     }
 
 
@@ -97,9 +98,14 @@ bool Explosion::updateAndDelete(float dt)
     // object is removed.
     if (m_remaining_time > -explosion_time)
     {
-        // Stop the emitter and wait a little while for all particles to have time to fade out
-        m_emitter->getNode()->getEmitter()->setMinParticlesPerSecond(0);
-        m_emitter->getNode()->getEmitter()->setMaxParticlesPerSecond(0);
+        // if framerate is very low, emit for at least a few frames, in case
+        // burst time is lower than the time of 1 frame
+        if (m_emission_frames > 2)
+        {
+            // Stop the emitter and wait a little while for all particles to have time to fade out
+            m_emitter->getNode()->getEmitter()->setMinParticlesPerSecond(0);
+            m_emitter->getNode()->getEmitter()->setMaxParticlesPerSecond(0);
+        }
     }
     else
     {

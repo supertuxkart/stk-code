@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
@@ -53,10 +54,14 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_selected_item[0] = 0; // only player 0 has a selection by default
 
     m_item_count_hint = 0;
+
+    m_font = GUIEngine::getFont()->getHollowCopy();
+    m_max_label_width = 0;
 }
 // -----------------------------------------------------------------------------
 DynamicRibbonWidget::~DynamicRibbonWidget()
 {
+    m_font->drop();
     if (m_animated_contents)
     {
         GUIEngine::needsUpdate.remove(this);
@@ -379,6 +384,13 @@ void DynamicRibbonWidget::buildInternalStructure()
         ribbon->m_properties[PROP_ID] = name.str();
         ribbon->m_event_handler = this;
 
+        // calculate font size
+        if (m_col_amount > 0)
+        {
+            m_font->setScale(GUIEngine::getFont()->getScale() *
+                getFontScale((ribbon->m_w / m_col_amount) - 30));
+        }
+
         // add columns
         for (int i=0; i<m_col_amount; i++)
         {
@@ -392,6 +404,7 @@ void DynamicRibbonWidget::buildInternalStructure()
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
             icon->m_w = atoi(icon->m_properties[PROP_WIDTH].c_str());
             icon->m_h = atoi(icon->m_properties[PROP_HEIGHT].c_str());
+            icon->setLabelFont(m_font);
 
             // If we want each icon to have its own label, we must make it non-empty, otherwise
             // it will assume there is no label and none will be created (FIXME: that's ugly)
@@ -438,14 +451,14 @@ void DynamicRibbonWidget::buildInternalStructure()
         assert(childrenCount == (int)m_items.size());
     }
 #endif
- }
+}
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const std::string& code_name,
                                    const std::string& image_file, const unsigned int badges,
                                    IconButtonWidget::IconPathType image_path_type)
 {
     ItemDescription desc;
-    desc.m_user_name = user_name;
+    desc.m_user_name = getUserName(user_name);
     desc.m_code_name = code_name;
     desc.m_sshot_file = image_file;
     desc.m_badges = badges;
@@ -453,6 +466,8 @@ void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const st
     desc.m_image_path_type = image_path_type;
 
     m_items.push_back(desc);
+
+    setLabelSize(desc.m_user_name);
 }
 
 // -----------------------------------------------------------------------------
@@ -462,7 +477,7 @@ void DynamicRibbonWidget::addAnimatedItem( const irr::core::stringw& user_name, 
                                            const unsigned int badges, IconButtonWidget::IconPathType image_path_type )
 {
     ItemDescription desc;
-    desc.m_user_name = user_name;
+    desc.m_user_name = getUserName(user_name);
     desc.m_code_name = code_name;
     desc.m_all_images = image_files;
     desc.m_badges = badges;
@@ -472,6 +487,8 @@ void DynamicRibbonWidget::addAnimatedItem( const irr::core::stringw& user_name, 
     desc.m_image_path_type = image_path_type;
 
     m_items.push_back(desc);
+
+    setLabelSize(desc.m_user_name);
 
     if (!m_animated_contents)
     {
@@ -498,6 +515,7 @@ void DynamicRibbonWidget::clearItems()
     m_items.clear();
     m_animated_contents = false;
     m_scroll_offset = 0;
+    m_max_label_width = 0;
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::elementRemoved()
@@ -1097,7 +1115,9 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID,
     propagateSelection();
     return true;
 }
+
 // ----------------------------------------------------------------------------
+
 bool DynamicRibbonWidget::setSelection(const std::string &item_codename,
                                        const int playerID, const bool focusIt,
                                        bool evenIfDeactivated)
@@ -1117,4 +1137,29 @@ bool DynamicRibbonWidget::setSelection(const std::string &item_codename,
 
 // -----------------------------------------------------------------------------
 
+void DynamicRibbonWidget::setLabelSize(const irr::core::stringw& text)
+{
+    int w = GUIEngine::getFont()->getDimension(text.c_str()).Width;
+    if (w > m_max_label_width)
+        m_max_label_width = w;
+}
 
+// -----------------------------------------------------------------------------
+
+float DynamicRibbonWidget::getFontScale(int icon_width) const
+{
+    if (m_max_label_width <= icon_width || m_max_label_width == 0 || icon_width == 0)
+        return 1.0f;
+    else
+        return std::max (0.5f, ((float)icon_width / (float)m_max_label_width));
+}
+
+// -----------------------------------------------------------------------------
+
+irr::core::stringw DynamicRibbonWidget::getUserName(const irr::core::stringw& user_name) const
+{
+    if (user_name.size() < MAX_LABEL_LENGTH)
+        return user_name;
+    else
+        return (user_name.subString(0, MAX_LABEL_LENGTH - 3) + L"...");
+}

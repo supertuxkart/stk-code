@@ -434,6 +434,8 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predic
     clone->recalculateBoundingBox();
     if (calculateTangents)
         recalculateTangents(clone, recalculateNormals, smooth, angleWeighted);
+    
+    irr_driver->removeMeshFromCache(mesh);
 
     return clone;
 }

@@ -10,28 +10,20 @@
 #include "graphics/camera.hpp"
 #include "modes/world.hpp"
 
-MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp, Material* material)
+
+Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp, Material* material)
 {
     switch (material->getShaderType())
     {
-    case Material::SHADERTYPE_SPHERE_MAP:
-        return MAT_SPHEREMAP;
-    case Material::SHADERTYPE_ALPHA_TEST:
-        return MAT_ALPHA_REF;
-    case Material::SHADERTYPE_VEGETATION:
-        return MAT_GRASS;
-    case Material::SHADERTYPE_SPLATTING:
-        return MAT_SPLATTING;
-    case Material::SHADERTYPE_SOLID_UNLIT:
-        return MAT_UNLIT;
     default:
+        return material->getShaderType();
+    case Material::SHADERTYPE_SOLID:
         if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
-            return MAT_NORMAL_MAP;
+            return Material::SHADERTYPE_NORMAL_MAP;
         else if (tp == video::EVT_2TCOORDS)
-            return MAT_DETAIL;
-        return MAT_DEFAULT;
+            return Material::SHADERTYPE_DETAIL_MAP;
+        return Material::SHADERTYPE_SOLID;
     }
-
 }
 
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam, Material* material)
@@ -282,11 +274,11 @@ bool isObject(video::E_MATERIAL_TYPE type)
 }
 
 static void
-SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
+SetTexture(GLMesh &mesh, unsigned i, bool isSrgb, const std::string &matname)
 {
     if (!mesh.textures[i])
     {
-        Log::warn("STKMesh", "Missing texture");
+        Log::fatal("STKMesh", "Missing texture %d for material %s", i, matname.c_str());
         return;
     }
     compressTexture(mesh.textures[i], isSrgb);
@@ -299,33 +291,58 @@ SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
     }
 }
 
-void InitTextures(GLMesh &mesh, MeshMaterial Mat)
+static std::string
+getShaderTypeName(Material::ShaderType Mat)
 {
     switch (Mat)
     {
     default:
-    case MAT_DEFAULT:
-    case MAT_ALPHA_REF:
-    case MAT_GRASS:
-    case MAT_SPHEREMAP:
-    case MAT_UNLIT:
-        SetTexture(mesh, 0, true);
-        SetTexture(mesh, 1, false);
+    case Material::SHADERTYPE_SOLID:
+        return "Solid";
+    case Material::SHADERTYPE_ALPHA_TEST:
+        return "Alpha Test";
+    case Material::SHADERTYPE_VEGETATION:
+        return "Grass";
+    case Material::SHADERTYPE_SPHERE_MAP:
+        return "Sphere Map";
+    case Material::SHADERTYPE_SOLID_UNLIT:
+        return "Unlit";
+    case Material::SHADERTYPE_DETAIL_MAP:
+        return "Detail";
+    case Material::SHADERTYPE_NORMAL_MAP:
+        return "Normal";
+    case Material::SHADERTYPE_SPLATTING:
+        return "Splatting";
+    }
+}
+
+void InitTextures(GLMesh &mesh, Material::ShaderType Mat)
+{
+    switch (Mat)
+    {
+    default:
+    case Material::SHADERTYPE_SOLID:
+    case Material::SHADERTYPE_ALPHA_TEST:
+    case Material::SHADERTYPE_VEGETATION:
+    case Material::SHADERTYPE_SPHERE_MAP:
+    case Material::SHADERTYPE_SOLID_UNLIT:
+        SetTexture(mesh, 0, true, getShaderTypeName(Mat));
+        SetTexture(mesh, 1, false, getShaderTypeName(Mat));
         break;
-    case MAT_DETAIL:
-    case MAT_NORMAL_MAP:
-        SetTexture(mesh, 0, true);
-        SetTexture(mesh, 1, false);
-        SetTexture(mesh, 2, false);
+    case Material::SHADERTYPE_DETAIL_MAP:
+    case Material::SHADERTYPE_NORMAL_MAP:
+        SetTexture(mesh, 0, true, getShaderTypeName(Mat));
+        SetTexture(mesh, 1, false, getShaderTypeName(Mat));
+        SetTexture(mesh, 2, false, getShaderTypeName(Mat));
         break;
-    case MAT_SPLATTING:
-        SetTexture(mesh, 0, true);
-        SetTexture(mesh, 1, false);
-        SetTexture(mesh, 2, true);
-        SetTexture(mesh, 3, true);
-        SetTexture(mesh, 4, true);
-        SetTexture(mesh, 5, true);
-        SetTexture(mesh, 6, false);
+    case Material::SHADERTYPE_SPLATTING:
+        SetTexture(mesh, 0, true, getShaderTypeName(Mat));
+        SetTexture(mesh, 1, false, getShaderTypeName(Mat));
+        SetTexture(mesh, 2, true, getShaderTypeName(Mat));
+        SetTexture(mesh, 3, true, getShaderTypeName(Mat));
+        SetTexture(mesh, 4, true, getShaderTypeName(Mat));
+        SetTexture(mesh, 5, true, getShaderTypeName(Mat));
+        SetTexture(mesh, 6, false, getShaderTypeName(Mat));
         break;
     }
 }

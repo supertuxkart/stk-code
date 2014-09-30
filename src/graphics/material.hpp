@@ -57,7 +57,10 @@ public:
         SHADERTYPE_VEGETATION,
         SHADERTYPE_WATER,
         SHADERTYPE_SPHERE_MAP,
-        SHADERTYPE_SPLATTING
+        SHADERTYPE_NORMAL_MAP,
+        SHADERTYPE_DETAIL_MAP,
+        SHADERTYPE_SPLATTING,
+        SHADERTYPE_COUNT,
     };
 
     enum ParticleConditions

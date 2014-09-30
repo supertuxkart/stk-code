@@ -210,7 +210,7 @@ void EasterEggHunt::getKartsDisplayInfo(
  *  direction messages in the easter egg mode since there is no direction there.
  *  \param i Kart id.
  */
-void EasterEggHunt::checkForWrongDirection(unsigned int i)
+void EasterEggHunt::checkForWrongDirection(unsigned int i, float dt)
 {
 }   // checkForWrongDirection
 

@@ -11,6 +11,7 @@
 #include "utils/profiler.hpp"
 #include "utils/tuple.hpp"
 #include "stkscenemanager.hpp"
+#include "utils/profiler.hpp"
 
 #include <S3DVertex.h>
 
@@ -67,7 +68,7 @@ struct DefaultMaterial
     typedef MeshShader::ObjectPass2Shader SecondPassShader;
     typedef ListMatDefault List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum MeshMaterial MaterialType = MAT_DEFAULT;
+    static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_SOLID;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const std::vector<size_t> FirstPassTextures;
     static const std::vector<size_t> SecondPassTextures;
@@ -85,7 +86,7 @@ struct AlphaRef
     typedef MeshShader::ObjectRefPass2Shader SecondPassShader;
     typedef ListMatAlphaRef List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum MeshMaterial MaterialType = MAT_ALPHA_REF;
+    static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_ALPHA_TEST;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const std::vector<size_t> FirstPassTextures;
     static const std::vector<size_t> SecondPassTextures;
@@ -103,7 +104,7 @@ struct SphereMap
     typedef MeshShader::SphereMapShader SecondPassShader;
     typedef ListMatSphereMap List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum MeshMaterial MaterialType = MAT_SPHEREMAP;
+    static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_SPHERE_MAP;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const std::vector<size_t> FirstPassTextures;
     static const std::vector<size_t> SecondPassTextures;
@@ -121,7 +122,7 @@ struct UnlitMat
     typedef MeshShader::ObjectUnlitShader SecondPassShader;
     typedef ListMatUnlit List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum MeshMaterial MaterialType = MAT_UNLIT;
+    static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_SOLID_UNLIT;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const std::vector<size_t> FirstPassTextures;
     static const std::vector<size_t> SecondPassTextures;
@@ -139,7 +140,7 @@ struct GrassMat
     typedef MeshShader::GrassPass2Shader SecondPassShader;
     typedef ListMatGrass List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum MeshMaterial MaterialType = MAT_GRASS;
+    static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_VEGETATION;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const std::vector<size_t> FirstPassTextures;
     static const std::vector<size_t> SecondPassTextures;
@@ -157,7 +158,7 @@ struct NormalMat
     typedef MeshShader::ObjectPass2Shader SecondPassShader;
     typedef ListMatNormalMap List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
-    static const enum MeshMaterial MaterialType = MAT_NORMAL_MAP;
+    static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_NORMAL_MAP;
     static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const std::vector<size_t> FirstPassTextures;
     static const std::vector<size_t> SecondPassTextures;
@@ -175,7 +176,7 @@ struct DetailMat
     typedef MeshShader::DetailledObjectPass2Shader SecondPassShader;
     typedef ListMatDetails List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
-    static const enum MeshMaterial MaterialType = MAT_DETAIL;
+    static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_DETAIL_MAP;
     static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const std::vector<size_t> FirstPassTextures;
     static const std::vector<size_t> SecondPassTextures;
@@ -823,7 +824,7 @@ void renderShadow(const std::vector<GLuint> TextureUnits, unsigned cascade, cons
     }
 }
 
-template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
+template<typename Shader, Material::ShaderType Mat, video::E_VERTEX_TYPE VT, typename...Args>
 void renderInstancedShadow(const std::vector<GLuint> TextureUnits, unsigned cascade, const std::vector<GLMesh *> &t, Args ...args)
 {
     glUseProgram(Shader::getInstance()->Program);
@@ -844,7 +845,7 @@ void renderInstancedShadow(const std::vector<GLuint> TextureUnits, unsigned casc
     }
 }
 
-template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
+template<typename Shader, Material::ShaderType Mat, video::E_VERTEX_TYPE VT, typename...Args>
 static void multidrawShadow(unsigned i, Args ...args)
 {
     glUseProgram(Shader::getInstance()->Program);
@@ -860,8 +861,6 @@ static void multidrawShadow(unsigned i, Args ...args)
 
 void IrrDriver::renderShadows()
 {
-    ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
-
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -875,7 +874,7 @@ void IrrDriver::renderShadows()
 
     for (unsigned cascade = 0; cascade < 4; cascade++)
     {
-
+        ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
         std::vector<GLuint> noTexUnits;
 
         renderShadow<MeshShader::ShadowShader, video::EVT_STANDARD, 1>(noTexUnits, cascade, ListMatDefault::getInstance()->Shadows[cascade]);
@@ -892,21 +891,21 @@ void IrrDriver::renderShadows()
 
         if (UserConfigParams::m_azdo)
         {
-            multidrawShadow<MeshShader::InstancedShadowShader, MAT_DEFAULT, video::EVT_STANDARD>(cascade);
-            multidrawShadow<MeshShader::InstancedShadowShader, MAT_DETAIL, video::EVT_2TCOORDS>(cascade);
-            multidrawShadow<MeshShader::InstancedShadowShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(cascade);
-            multidrawShadow<MeshShader::InstancedRefShadowShader, MAT_ALPHA_REF, video::EVT_STANDARD>(cascade);
-            multidrawShadow<MeshShader::InstancedRefShadowShader, MAT_UNLIT, video::EVT_STANDARD>(cascade);
-            multidrawShadow<MeshShader::InstancedGrassShadowShader, MAT_GRASS, video::EVT_STANDARD>(cascade, windDir);
+            multidrawShadow<MeshShader::InstancedShadowShader, Material::SHADERTYPE_SOLID, video::EVT_STANDARD>(cascade);
+            multidrawShadow<MeshShader::InstancedShadowShader, Material::SHADERTYPE_DETAIL_MAP, video::EVT_2TCOORDS>(cascade);
+            multidrawShadow<MeshShader::InstancedShadowShader, Material::SHADERTYPE_NORMAL_MAP, video::EVT_TANGENTS>(cascade);
+            multidrawShadow<MeshShader::InstancedRefShadowShader, Material::SHADERTYPE_ALPHA_TEST, video::EVT_STANDARD>(cascade);
+            multidrawShadow<MeshShader::InstancedRefShadowShader, Material::SHADERTYPE_SOLID_UNLIT, video::EVT_STANDARD>(cascade);
+            multidrawShadow<MeshShader::InstancedGrassShadowShader, Material::SHADERTYPE_VEGETATION, video::EVT_STANDARD>(cascade, windDir);
         }
         else if (irr_driver->hasARB_draw_indirect())
         {
-            renderInstancedShadow<MeshShader::InstancedShadowShader, MAT_DEFAULT, video::EVT_STANDARD>(noTexUnits, cascade, ListInstancedMatDefault::getInstance()->Shadows[cascade]);
-            renderInstancedShadow<MeshShader::InstancedShadowShader, MAT_DETAIL, video::EVT_2TCOORDS>(noTexUnits, cascade, ListInstancedMatDetails::getInstance()->Shadows[cascade]);
-            renderInstancedShadow<MeshShader::InstancedRefShadowShader, MAT_ALPHA_REF, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, cascade, ListInstancedMatAlphaRef::getInstance()->Shadows[cascade]);
-            renderInstancedShadow<MeshShader::InstancedRefShadowShader, MAT_UNLIT, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, cascade, ListInstancedMatUnlit::getInstance()->Shadows[cascade]);
-            renderInstancedShadow<MeshShader::InstancedGrassShadowShader, MAT_GRASS, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, cascade, ListInstancedMatGrass::getInstance()->Shadows[cascade], windDir);
-            renderInstancedShadow<MeshShader::InstancedShadowShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(noTexUnits, cascade, ListInstancedMatNormalMap::getInstance()->Shadows[cascade]);
+            renderInstancedShadow<MeshShader::InstancedShadowShader, Material::SHADERTYPE_SOLID, video::EVT_STANDARD>(noTexUnits, cascade, ListInstancedMatDefault::getInstance()->Shadows[cascade]);
+            renderInstancedShadow<MeshShader::InstancedShadowShader, Material::SHADERTYPE_DETAIL_MAP, video::EVT_2TCOORDS>(noTexUnits, cascade, ListInstancedMatDetails::getInstance()->Shadows[cascade]);
+            renderInstancedShadow<MeshShader::InstancedRefShadowShader, Material::SHADERTYPE_ALPHA_TEST, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, cascade, ListInstancedMatAlphaRef::getInstance()->Shadows[cascade]);
+            renderInstancedShadow<MeshShader::InstancedRefShadowShader, Material::SHADERTYPE_SOLID_UNLIT, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, cascade, ListInstancedMatUnlit::getInstance()->Shadows[cascade]);
+            renderInstancedShadow<MeshShader::InstancedGrassShadowShader, Material::SHADERTYPE_VEGETATION, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, cascade, ListInstancedMatGrass::getInstance()->Shadows[cascade], windDir);
+            renderInstancedShadow<MeshShader::InstancedShadowShader, Material::SHADERTYPE_NORMAL_MAP, video::EVT_TANGENTS>(noTexUnits, cascade, ListInstancedMatNormalMap::getInstance()->Shadows[cascade]);
         }
     }
 
@@ -957,7 +956,7 @@ void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> &Textur
     }
 }
 
-template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
+template<typename Shader, Material::ShaderType Mat, video::E_VERTEX_TYPE VT, typename...Args>
 void renderRSMShadow(const std::vector<GLuint> TextureUnits, const std::vector<GLMesh *> &t, Args ...args)
 {
     glUseProgram(Shader::getInstance()->Program);
@@ -977,7 +976,7 @@ void renderRSMShadow(const std::vector<GLuint> TextureUnits, const std::vector<G
     }
 }
 
-template<typename Shader, MeshMaterial Mat, enum video::E_VERTEX_TYPE VertexType, typename... Args>
+template<typename Shader, Material::ShaderType Mat, enum video::E_VERTEX_TYPE VertexType, typename... Args>
 void multidrawRSM(Args...args)
 {
     glUseProgram(Shader::getInstance()->Program);
@@ -1009,18 +1008,18 @@ void IrrDriver::renderRSM()
 
     if (UserConfigParams::m_azdo)
     {
-        multidrawRSM<MeshShader::InstancedRSMShader, MAT_DEFAULT, video::EVT_STANDARD>(rsm_matrix);
-        multidrawRSM<MeshShader::InstancedRSMShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(rsm_matrix);
-        multidrawRSM<MeshShader::InstancedRSMShader, MAT_ALPHA_REF, video::EVT_STANDARD>(rsm_matrix);
-        multidrawRSM<MeshShader::InstancedRSMShader, MAT_UNLIT, video::EVT_STANDARD>(rsm_matrix);
-        multidrawRSM<MeshShader::InstancedRSMShader, MAT_DETAIL, video::EVT_2TCOORDS>(rsm_matrix);
+        multidrawRSM<MeshShader::InstancedRSMShader, Material::SHADERTYPE_SOLID, video::EVT_STANDARD>(rsm_matrix);
+        multidrawRSM<MeshShader::InstancedRSMShader, Material::SHADERTYPE_NORMAL_MAP, video::EVT_TANGENTS>(rsm_matrix);
+        multidrawRSM<MeshShader::InstancedRSMShader, Material::SHADERTYPE_ALPHA_TEST, video::EVT_STANDARD>(rsm_matrix);
+        multidrawRSM<MeshShader::InstancedRSMShader, Material::SHADERTYPE_SOLID_UNLIT, video::EVT_STANDARD>(rsm_matrix);
+        multidrawRSM<MeshShader::InstancedRSMShader, Material::SHADERTYPE_DETAIL_MAP, video::EVT_2TCOORDS>(rsm_matrix);
     }
     else if (irr_driver->hasARB_draw_indirect())
     {
-        renderRSMShadow<MeshShader::InstancedRSMShader, MAT_DEFAULT, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, ListInstancedMatDefault::getInstance()->RSM, rsm_matrix);
-        renderRSMShadow<MeshShader::InstancedRSMShader, MAT_ALPHA_REF, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, ListInstancedMatAlphaRef::getInstance()->RSM, rsm_matrix);
-        renderRSMShadow<MeshShader::InstancedRSMShader, MAT_UNLIT, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, ListInstancedMatUnlit::getInstance()->RSM, rsm_matrix);
-        renderRSMShadow<MeshShader::InstancedRSMShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(std::vector < GLuint > { 0 }, ListInstancedMatNormalMap::getInstance()->RSM, rsm_matrix);
-        renderRSMShadow<MeshShader::InstancedRSMShader, MAT_DETAIL, video::EVT_2TCOORDS>(std::vector < GLuint > { 0 }, ListInstancedMatDetails::getInstance()->RSM, rsm_matrix);
+        renderRSMShadow<MeshShader::InstancedRSMShader, Material::SHADERTYPE_SOLID, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, ListInstancedMatDefault::getInstance()->RSM, rsm_matrix);
+        renderRSMShadow<MeshShader::InstancedRSMShader, Material::SHADERTYPE_ALPHA_TEST, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, ListInstancedMatAlphaRef::getInstance()->RSM, rsm_matrix);
+        renderRSMShadow<MeshShader::InstancedRSMShader, Material::SHADERTYPE_SOLID_UNLIT, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, ListInstancedMatUnlit::getInstance()->RSM, rsm_matrix);
+        renderRSMShadow<MeshShader::InstancedRSMShader, Material::SHADERTYPE_NORMAL_MAP, video::EVT_TANGENTS>(std::vector < GLuint > { 0 }, ListInstancedMatNormalMap::getInstance()->RSM, rsm_matrix);
+        renderRSMShadow<MeshShader::InstancedRSMShader, Material::SHADERTYPE_DETAIL_MAP, video::EVT_2TCOORDS>(std::vector < GLuint > { 0 }, ListInstancedMatDetails::getInstance()->RSM, rsm_matrix);
     }
 }
