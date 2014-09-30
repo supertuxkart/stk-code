@@ -409,8 +409,10 @@ void btKart::updateVehicle( btScalar step )
         if(-v_down.getY() > max_compensate_speed)
         {
             btVector3 impulse = down * (-v_down.getY() - max_compensate_speed) / m_chassisBody->getInvMass();
-            Log::verbose("physics", "Cushioning %f", impulse.getY());
+            float v_old = m_chassisBody->getLinearVelocity().getY();
             m_chassisBody->applyCentralImpulse(impulse);
+            Log::verbose("physics", "Cushioning %f from %f m/s to %f m/s", impulse.getY(),
+                v_old, m_chassisBody->getLinearVelocity().getY());
         }
     }
     for(int i=0; i<m_wheelInfo.size(); i++)
