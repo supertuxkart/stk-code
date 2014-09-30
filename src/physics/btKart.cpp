@@ -260,18 +260,15 @@ btScalar btKart::rayCast(unsigned int index)
     depth = raylen * rayResults.m_distFraction;
     if (object &&  depth < max_susp_len)
     {
-        param = rayResults.m_distFraction;
         wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
         wheel.m_raycastInfo.m_contactNormalWS.normalize();
         wheel.m_raycastInfo.m_isInContact = true;
         ///@todo for driving on dynamic/movable objects!;
         wheel.m_raycastInfo.m_groundObject = &getFixedBody();
 
-        btScalar hitDistance = param*raylen;
-        wheel.m_raycastInfo.m_suspensionLength =
-            hitDistance - wheel.m_wheelsRadius;
-        //clamp on max suspension travel
+        wheel.m_raycastInfo.m_suspensionLength = depth - wheel.m_wheelsRadius;
 
+        //clamp on max suspension travel
         btScalar minSuspensionLength = wheel.getSuspensionRestLength()
                                 - wheel.m_maxSuspensionTravelCm*btScalar(0.01);
         btScalar maxSuspensionLength = wheel.getSuspensionRestLength()
@@ -314,17 +311,6 @@ btScalar btKart::rayCast(unsigned int index)
 
     } else
     {
-        if(object)
-        {
-
-            if(depth + m_chassisBody->getLinearVelocity().getY() *1./60.f < max_susp_len)
-            {
-                btVector3 v = -0.25f*0.5f*m_chassisBody->getLinearVelocity();
-                v.setZ(0);
-                v.setX(0);
-                m_chassisBody->applyCentralImpulse(v/m_chassisBody->getInvMass());
-            }
-        }
         depth = btScalar(-1.0);
         //put wheel info as in rest position
         wheel.m_raycastInfo.m_suspensionLength = wheel.getSuspensionRestLength();
@@ -404,6 +390,34 @@ void btKart::updateVehicle( btScalar step )
             m_num_wheels_on_ground++;
     }
 
+    bool needs_cushioning_test = false;
+    for(int i=0; i<m_wheelInfo.size(); i++)
+    {
+        btWheelInfo &wheel = m_wheelInfo[i];
+        if(!wheel.m_was_on_ground && wheel.m_raycastInfo.m_isInContact)
+        {
+            needs_cushioning_test = true;
+            break;
+        }
+    }
+    if(needs_cushioning_test)
+    {
+        const btVector3 &v = m_chassisBody->getLinearVelocity();
+        btVector3 down(0, 1, 0);
+        btVector3 v_down = (v * down) * down;
+        btScalar max_compensate_speed = m_wheelInfo[0].m_maxSuspensionForce * m_chassisBody->getInvMass() * step *4;
+        if(-v_down.getY() > max_compensate_speed)
+        {
+            btVector3 impulse = down * (-v_down.getY() - max_compensate_speed) / m_chassisBody->getInvMass();
+            float v_old = m_chassisBody->getLinearVelocity().getY();
+            m_chassisBody->applyCentralImpulse(impulse);
+            Log::verbose("physics", "Cushioning %f from %f m/s to %f m/s", impulse.getY(),
+                v_old, m_chassisBody->getLinearVelocity().getY());
+        }
+    }
+    for(int i=0; i<m_wheelInfo.size(); i++)
+        m_wheelInfo[i].m_was_on_ground = m_wheelInfo[i].m_raycastInfo.m_isInContact;
+
     // If the kart is flying, try to keep it parallel to the ground.
     if(m_num_wheels_on_ground==0)
     {
@@ -413,7 +427,7 @@ void btKart::updateVehicle( btScalar step )
         // Give a nicely balanced feeling for rebalancing the kart
         m_chassisBody->applyTorqueImpulse(axis * m_kart->getKartProperties()->getSmoothFlyingImpulse());
     }
-
+    
     // Work around: make sure that either both wheels on one axis
     // are on ground, or none of them. This avoids the problem of
     // the kart suddenly getting additional angular velocity because
