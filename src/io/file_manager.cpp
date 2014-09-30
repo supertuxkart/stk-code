@@ -114,13 +114,14 @@ FileManager::FileManager()
     m_subdir_name[GFX        ] = "gfx";
     m_subdir_name[GRANDPRIX  ] = "grandprix";
     m_subdir_name[GUI        ] = "gui";
+    m_subdir_name[LIBRARY    ] = "library";
     m_subdir_name[MODEL      ] = "models";
     m_subdir_name[MUSIC      ] = "music";
-    m_subdir_name[TRANSLATION] = "po";
-    m_subdir_name[TEXTURE    ] = "textures";
     m_subdir_name[SFX        ] = "sfx";
     m_subdir_name[SKIN       ] = "skins";
     m_subdir_name[SHADER     ] = "shaders";
+    m_subdir_name[TEXTURE    ] = "textures";
+    m_subdir_name[TRANSLATION] = "po";
 #ifdef __APPLE__
     // irrLicht's createDevice method has a nasty habit of messing the CWD.
     // since the code above may rely on it, save it to be able to restore
