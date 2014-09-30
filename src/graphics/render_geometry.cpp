@@ -11,6 +11,7 @@
 #include "utils/profiler.hpp"
 #include "utils/tuple.hpp"
 #include "stkscenemanager.hpp"
+#include "utils/profiler.hpp"
 
 #include <S3DVertex.h>
 
@@ -860,8 +861,6 @@ static void multidrawShadow(unsigned i, Args ...args)
 
 void IrrDriver::renderShadows()
 {
-    ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
-
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -875,7 +874,7 @@ void IrrDriver::renderShadows()
 
     for (unsigned cascade = 0; cascade < 4; cascade++)
     {
-
+        ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
         std::vector<GLuint> noTexUnits;
 
         renderShadow<MeshShader::ShadowShader, video::EVT_STANDARD, 1>(noTexUnits, cascade, ListMatDefault::getInstance()->Shadows[cascade]);
