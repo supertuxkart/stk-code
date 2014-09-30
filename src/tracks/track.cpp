@@ -1939,7 +1939,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             node->get("scale", &scale);
 
             XMLNode* libroot;
-            std::string lib_path = file_manager->getAsset("library/" + name)+"/";
+            std::string lib_path = 
+                file_manager->getAsset(FileManager::LIBRARY, name)+"/";
             bool create_lod_definitions = true;
 
             if (library_nodes.find(name) == library_nodes.end())
