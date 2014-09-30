@@ -65,7 +65,7 @@ public:
     void collectedEasterEgg(const AbstractKart *kart);
     void readData(const std::string &filename);
 
-    virtual void checkForWrongDirection(unsigned int i) OVERRIDE;
+    virtual void checkForWrongDirection(unsigned int i, float dt) OVERRIDE;
     virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
 
 };   // EasterEggHunt

@@ -111,7 +111,7 @@ protected:
       */
     AlignedArray<KartInfo> m_kart_info;
 
-    virtual void  checkForWrongDirection(unsigned int i);
+    virtual void  checkForWrongDirection(unsigned int i, float dt);
     void          updateRacePosition();
     virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
 

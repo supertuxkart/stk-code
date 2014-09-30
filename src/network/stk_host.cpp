@@ -25,22 +25,34 @@
 #include "utils/time.hpp"
 
 #include <string.h>
-#if defined(WIN32) && !defined(__MINGW32__)
+#if defined(WIN32)
 #  include "Ws2tcpip.h"
-#  define   inet_ntop  InetNtop
-
-// TODO: It's very ugly hack which allows to compile STK on windows using gcc.
-// Solution would be nice seen.
-#elif defined(__MINGW32__)
-#  include "Ws2tcpip.h"
-#  define   inet_ntop
-
+#  define inet_ntop InetNtop
 #else
 #  include <arpa/inet.h>
 #  include <errno.h>
 #endif
 #include <pthread.h>
 #include <signal.h>
+
+#ifdef __MINGW32__
+const char* inet_ntop(int af, const void* src, char* dst, int cnt)
+{
+    struct sockaddr_in srcaddr;
+
+    memset(&srcaddr, 0, sizeof(struct sockaddr_in));
+    memcpy(&(srcaddr.sin_addr), src, sizeof(srcaddr.sin_addr));
+
+    srcaddr.sin_family = af;
+    if (WSAAddressToString((struct sockaddr*) &srcaddr,
+        sizeof(struct sockaddr_in), 0, dst, (LPDWORD) &cnt) != 0)
+    {
+        return NULL;
+    }
+    return dst;
+}
+#endif
+
 
 FILE* STKHost::m_log_file = NULL;
 pthread_mutex_t STKHost::m_log_mutex;
@@ -98,7 +110,7 @@ STKHost::STKHost()
     pthread_mutex_init(&m_log_mutex, NULL);
     if (UserConfigParams::m_packets_log_filename.toString() != "")
     {
-        std::string s = 
+        std::string s =
             file_manager->getUserConfigFile(UserConfigParams::m_packets_log_filename);
         m_log_file = fopen(s.c_str(), "w+");
     }
