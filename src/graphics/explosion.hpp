@@ -32,7 +32,7 @@ class Vec3;
 class SFXBase;
 class ParticleEmitter;
 
-const float explosion_time = 1.5f;
+const float explosion_time = 2.0f;
 
 /**
   * \ingroup graphics
@@ -41,6 +41,7 @@ class Explosion : public HitSFX
 {
 private:
     float            m_remaining_time;
+    int              m_emission_frames;
     ParticleEmitter* m_emitter;
 
 public:
