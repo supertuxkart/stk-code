@@ -113,7 +113,7 @@ irr::core::stringw AchievementInfo::toString() const
         count = m_goal_values.begin()->second;
         break;
     default:
-        Log::fatal("AchievementInfo", "Missing toString for type %d. ",
+        Log::fatal("AchievementInfo", "Missing toString for type %d.",
                    m_check_type);
     }
     return StringUtils::toWString(count);
