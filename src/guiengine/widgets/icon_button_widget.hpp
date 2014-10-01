@@ -44,10 +44,8 @@ namespace GUIEngine
     private:
         irr::video::ITexture* m_texture;
         irr::video::ITexture* m_highlight_texture;
-        irr::video::ITexture* m_deactivated_texture;
         int m_texture_w, m_texture_h;
 
-        video::ITexture* getDeactivatedTexture(video::ITexture* texture);
         void setLabelFont();
 
     public:
@@ -90,7 +88,7 @@ namespace GUIEngine
 
         IconButtonWidget(ScaleMode scale_mode=SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, const bool tab_stop=true,
                          const bool focusable=true, IconPathType pathType=ICON_PATH_TYPE_RELATIVE);
-        virtual ~IconButtonWidget();
+        virtual ~IconButtonWidget() {};
 
         /** \brief Implement callback from base class Widget */
         virtual void add();
@@ -160,8 +158,7 @@ namespace GUIEngine
         virtual void unfocused(const int playerID, Widget* new_focus);
         // --------------------------------------------------------------------
         /** Returns the texture of this button. */
-        const video::ITexture* getTexture() const {
-            return (Widget::isActivated() ? m_texture : m_deactivated_texture); }
+        const video::ITexture* getTexture() const { return m_texture; }
     };
 }
 

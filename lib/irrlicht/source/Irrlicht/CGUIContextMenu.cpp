@@ -584,30 +584,30 @@ void CGUIContextMenu::draw()
 					skin->getColor(c), false, true, clip);
 
 			// draw submenu symbol
-			if (Items[i].SubMenu && sprites)
-			{
-				core::rect<s32> r = rect;
-				r.UpperLeftCorner.X = r.LowerRightCorner.X - 15;
-
-				sprites->draw2DSprite(skin->getIcon(EGDI_CURSOR_RIGHT),
-					r.getCenter(), clip, skin->getColor(c),
-					(i == HighLighted) ? ChangeTime : 0,
-					(i == HighLighted) ? os::Timer::getTime() : 0,
-					(i == HighLighted), true);
-			}
+			//if (Items[i].SubMenu && sprites)
+			//{
+			//	core::rect<s32> r = rect;
+			//	r.UpperLeftCorner.X = r.LowerRightCorner.X - 15;
+            //
+			//	sprites->draw2DSprite(skin->getIcon(EGDI_CURSOR_RIGHT),
+			//		r.getCenter(), clip, skin->getColor(c),
+			//		(i == HighLighted) ? ChangeTime : 0,
+			//		(i == HighLighted) ? os::Timer::getTime() : 0,
+			//		(i == HighLighted), true);
+			//}
 
 			// draw checked symbol
-			if (Items[i].Checked && sprites)
-			{
-				core::rect<s32> r = rect;
-				r.LowerRightCorner.X = r.UpperLeftCorner.X - 15;
-				r.UpperLeftCorner.X = r.LowerRightCorner.X + 15;
-				sprites->draw2DSprite(skin->getIcon(EGDI_CHECK_BOX_CHECKED),
-					r.getCenter(), clip, skin->getColor(c),
-					(i == HighLighted) ? ChangeTime : 0,
-					(i == HighLighted) ? os::Timer::getTime() : 0,
-					(i == HighLighted), true);
-			}
+			//if (Items[i].Checked && sprites)
+			//{
+			//	core::rect<s32> r = rect;
+			//	r.LowerRightCorner.X = r.UpperLeftCorner.X - 15;
+			//	r.UpperLeftCorner.X = r.LowerRightCorner.X + 15;
+			//	sprites->draw2DSprite(skin->getIcon(EGDI_CHECK_BOX_CHECKED),
+			//		r.getCenter(), clip, skin->getColor(c),
+			//		(i == HighLighted) ? ChangeTime : 0,
+			//		(i == HighLighted) ? os::Timer::getTime() : 0,
+			//		(i == HighLighted), true);
+			//}
 		}
 	}
 

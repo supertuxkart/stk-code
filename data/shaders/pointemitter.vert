@@ -35,7 +35,7 @@ void main(void)
   float updated_lifetime = lifetime  + (float(dt)/lifetime_initial);
   if (updated_lifetime > 1.)
   {
-    if (gl_VertexID <= level)
+    if (gl_VertexID < level)
     {
       float dt_from_last_frame = fract(updated_lifetime) * lifetime_initial;
       vec4 updated_initialposition = sourcematrix * vec4(particle_position_initial, 1.0);

@@ -390,6 +390,9 @@ void btKart::updateVehicle( btScalar step )
             m_num_wheels_on_ground++;
     }
 
+    // Test if the kart is falling so fast 
+    // that the chassis might hit the track
+    // ------------------------------------
     bool needs_cushioning_test = false;
     for(int i=0; i<m_wheelInfo.size(); i++)
     {
@@ -405,20 +408,33 @@ void btKart::updateVehicle( btScalar step )
         const btVector3 &v = m_chassisBody->getLinearVelocity();
         btVector3 down(0, 1, 0);
         btVector3 v_down = (v * down) * down;
-        btScalar max_compensate_speed = m_wheelInfo[0].m_maxSuspensionForce * m_chassisBody->getInvMass() * step *4;
+        // Estimate what kind of downward speed can be compensated by the
+        // suspension. Atm the parameters are set that the suspension is
+        // actually capped at max suspension force, so the maximum
+        // speed that can be caught by the suspension without the chassis
+        // hitting the ground can be based on that. Note that there are
+        // 4 suspensions, all adding together.
+        btScalar max_compensate_speed = m_wheelInfo[0].m_maxSuspensionForce 
+                                      * m_chassisBody->getInvMass() 
+                                      * step * 4;
+        // If the downward speed is too fast to be caught by the suspension,
+        // slow down the falling speed by applying an appropriately impulse:
         if(-v_down.getY() > max_compensate_speed)
         {
-            btVector3 impulse = down * (-v_down.getY() - max_compensate_speed) / m_chassisBody->getInvMass();
-            float v_old = m_chassisBody->getLinearVelocity().getY();
+            btVector3 impulse = down * (-v_down.getY() - max_compensate_speed) 
+                              / m_chassisBody->getInvMass();
+            //float v_old = m_chassisBody->getLinearVelocity().getY();
             m_chassisBody->applyCentralImpulse(impulse);
-            Log::verbose("physics", "Cushioning %f from %f m/s to %f m/s", impulse.getY(),
-                v_old, m_chassisBody->getLinearVelocity().getY());
+            //Log::verbose("physics", "Cushioning %f from %f m/s to %f m/s", impulse.getY(),
+            //    v_old, m_chassisBody->getLinearVelocity().getY());
         }
     }
     for(int i=0; i<m_wheelInfo.size(); i++)
         m_wheelInfo[i].m_was_on_ground = m_wheelInfo[i].m_raycastInfo.m_isInContact;
 
+
     // If the kart is flying, try to keep it parallel to the ground.
+    // -------------------------------------------------------------
     if(m_num_wheels_on_ground==0)
     {
         btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
@@ -431,7 +447,8 @@ void btKart::updateVehicle( btScalar step )
     // Work around: make sure that either both wheels on one axis
     // are on ground, or none of them. This avoids the problem of
     // the kart suddenly getting additional angular velocity because
-    // e.g. only one rear wheel is on the ground.
+    // e.g. only one rear wheel is on the ground and then the kart
+    // rotates very abruptly.
     for(int i=0; i<m_wheelInfo.size(); i+=2)
     {
         if( m_wheelInfo[i  ].m_raycastInfo.m_isInContact !=
@@ -453,8 +470,10 @@ void btKart::updateVehicle( btScalar step )
         }
     }   // for i=0; i<m_wheelInfo.size(); i+=2
 
-    updateSuspension(step);
 
+    // Apply suspension forcen (i.e. upwards force)
+    // --------------------------------------------
+    updateSuspension(step);
 
     for (int i=0;i<m_wheelInfo.size();i++)
     {
@@ -476,8 +495,9 @@ void btKart::updateVehicle( btScalar step )
 
     }
 
+    // Update friction (i.e. forward force)
+    // ------------------------------------
     updateFriction( step);
-
 
     for (int i=0;i<m_wheelInfo.size();i++)
     {
@@ -512,13 +532,20 @@ void btKart::updateVehicle( btScalar step )
         wheel.m_deltaRotation *= btScalar(0.99);
 
     }
-    float f = -m_kart->getSpeed()
-            * m_kart->getKartProperties()->getDownwardImpulseFactor();
-    btVector3 downwards_impulse = m_chassisBody->getWorldTransform().getBasis()
-                                * btVector3(0, f, 0);
 
-    m_chassisBody->applyCentralImpulse(downwards_impulse);
+    // If configured, add a force to keep karts on the track
+    // -----------------------------------------------------
+    float dif = m_kart->getKartProperties()->getDownwardImpulseFactor();
+    if(dif!=0)
+    {
+        float f = -m_kart->getSpeed() * dif;
+        btVector3 downwards_impulse = m_chassisBody->getWorldTransform().getBasis()
+                                    * btVector3(0, f, 0);
+        m_chassisBody->applyCentralImpulse(downwards_impulse);
+    }
 
+    // Apply additional impulse set by supertuxkart
+    // --------------------------------------------
     if(m_time_additional_impulse>0)
     {
         float dt = step > m_time_additional_impulse
@@ -528,6 +555,8 @@ void btKart::updateVehicle( btScalar step )
         m_time_additional_impulse -= dt;
     }
 
+    // Apply additional rotation set by supertuxkart
+    // ---------------------------------------------
     if(m_time_additional_rotation>0)
     {
         btTransform &t = m_chassisBody->getWorldTransform();
