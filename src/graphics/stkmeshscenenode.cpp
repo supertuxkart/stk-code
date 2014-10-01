@@ -179,7 +179,7 @@ void STKMeshSceneNode::updateGL()
         if (!rnd->isTransparent())
         {
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
-            Material::ShaderType MatType = material->getShaderType();// MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
+            Material::ShaderType MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
             if (!immediate_draw)
                 InitTextures(mesh, MatType);
         }

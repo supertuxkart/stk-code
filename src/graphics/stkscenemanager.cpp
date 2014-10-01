@@ -167,7 +167,7 @@ bool isBoxInFrontOfPlane(const core::plane3df &plane, const core::vector3df edge
 }
 
 static
-bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
+bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node, bool aera_check)
 {
     if (!node->getAutomaticCulling())
         return false;
@@ -183,6 +183,10 @@ bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode
     for (s32 i = 0; i < scene::SViewFrustum::VF_PLANE_COUNT; ++i)
         if (isBoxInFrontOfPlane(frust.planes[i], edges))
             return true;
+
+    float ratio = cam->getProjectionMatrix().pointer()[0] * cam->getProjectionMatrix().pointer()[5];
+    if (aera_check && node->getBoundingBox().getArea() * ratio < 1.)
+        return true;
     return false;
 }
 
@@ -435,14 +439,14 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
 
         if (ParticleSystemProxy *node = dynamic_cast<ParticleSystemProxy *>(*I))
         {
-            if (!isCulledPrecise(cam, *I) && node->update())
+            if (!isCulledPrecise(cam, *I, false))
                 ParticlesList::getInstance()->push_back(node);
             continue;
         }
 
         if (STKBillboard *node = dynamic_cast<STKBillboard *>(*I))
         {
-            if (!isCulledPrecise(cam, *I))
+            if (!isCulledPrecise(cam, *I, false))
                 BillBoardList::getInstance()->push_back(node);
             continue;
         }
@@ -502,12 +506,12 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     for (int i = 0; i < (int)DeferredUpdate.size(); i++)
     {
         scene::ISceneNode *node = dynamic_cast<scene::ISceneNode *>(DeferredUpdate[i]);
-        DeferredUpdate[i]->setCulledForPlayerCam(isCulledPrecise(camnode, node));
-        DeferredUpdate[i]->setCulledForRSMCam(isCulledPrecise(m_suncam, node));
-        DeferredUpdate[i]->setCulledForShadowCam(0, isCulledPrecise(m_shadow_camnodes[0], node));
-        DeferredUpdate[i]->setCulledForShadowCam(1, isCulledPrecise(m_shadow_camnodes[1], node));
-        DeferredUpdate[i]->setCulledForShadowCam(2, isCulledPrecise(m_shadow_camnodes[2], node));
-        DeferredUpdate[i]->setCulledForShadowCam(3, isCulledPrecise(m_shadow_camnodes[3], node));
+        DeferredUpdate[i]->setCulledForPlayerCam(isCulledPrecise(camnode, node, false));
+        DeferredUpdate[i]->setCulledForRSMCam(isCulledPrecise(m_suncam, node, true));
+        DeferredUpdate[i]->setCulledForShadowCam(0, isCulledPrecise(m_shadow_camnodes[0], node, true));
+        DeferredUpdate[i]->setCulledForShadowCam(1, isCulledPrecise(m_shadow_camnodes[1], node, true));
+        DeferredUpdate[i]->setCulledForShadowCam(2, isCulledPrecise(m_shadow_camnodes[2], node, true));
+        DeferredUpdate[i]->setCulledForShadowCam(3, isCulledPrecise(m_shadow_camnodes[3], node, true));
     }
 
     // Add a 1 s timeout

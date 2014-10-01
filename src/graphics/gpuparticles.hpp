@@ -70,7 +70,6 @@ public:
 
     virtual void setEmitter(scene::IParticleEmitter* emitter);
     virtual void render();
-    virtual void OnRegisterSceneNode();
     void setAlphaAdditive(bool val) { m_alpha_additive = val; }
     void setIncreaseFactor(float val) { size_increase_factor = val; }
     void setColorFrom(float r, float g, float b) { m_color_from[0] = r; m_color_from[1] = g; m_color_from[2] = b; }
@@ -79,7 +78,6 @@ public:
     const float* getColorTo() const { return m_color_to; }
     void setHeightmap(const std::vector<std::vector<float> >&, float, float, float, float);
     void setFlip();
-    bool update();
 };
 
 #endif // GPUPARTICLES_H
