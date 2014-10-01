@@ -40,7 +40,7 @@
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/server_selection.hpp"
 #include "states_screens/create_server_screen.hpp"
-#include "states_screens/online_profile_overview.hpp"
+#include "states_screens/online_profile_achievements.hpp"
 
 #include <string>
 #include <iostream>
@@ -233,7 +233,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == m_profile_widget->m_properties[PROP_ID])
     {
         ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-        OnlineProfileOverview::getInstance()->push();
+        OnlineProfileAchievements::getInstance()->push();
     }
     else if (selection == m_find_server_widget->m_properties[PROP_ID])
     {

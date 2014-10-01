@@ -24,7 +24,6 @@
 #include "online/online_profile.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
-#include "states_screens/online_profile_overview.hpp"
 #include "states_screens/online_profile_friends.hpp"
 #include "states_screens/online_profile_achievements.hpp"
 #include "states_screens/online_profile_settings.hpp"
@@ -52,9 +51,6 @@ void OnlineProfileBase::loadedFromFile()
     m_header = getWidget<LabelWidget>("title");
     assert(m_header != NULL);
 
-    m_overview_tab =
-        (IconButtonWidget *)m_profile_tabs->findWidgetNamed("tab_overview");
-    assert(m_overview_tab != NULL);
     m_friends_tab =
         (IconButtonWidget *) m_profile_tabs->findWidgetNamed("tab_friends");
     assert(m_friends_tab != NULL);
@@ -91,7 +87,6 @@ void OnlineProfileBase::init()
 {
     Screen::init();
 
-    m_overview_tab->setTooltip( _("Overview") );
     m_friends_tab->setTooltip( _("Friends") );
     m_achievements_tab->setTooltip( _("Achievements") );
     m_settings_tab->setTooltip( _("Account Settings") );
@@ -119,9 +114,7 @@ void OnlineProfileBase::eventCallback(Widget* widget, const std::string& name,
         std::string selection =
             ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         StateManager *sm = StateManager::get();
-        if (selection == m_overview_tab->m_properties[PROP_ID])
-            sm->replaceTopMostScreen(OnlineProfileOverview::getInstance());
-        else if (selection == m_friends_tab->m_properties[PROP_ID])
+        if (selection == m_friends_tab->m_properties[PROP_ID])
             sm->replaceTopMostScreen(OnlineProfileFriends::getInstance());
         else if (selection == m_achievements_tab->m_properties[PROP_ID])
             sm->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
