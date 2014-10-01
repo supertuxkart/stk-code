@@ -439,7 +439,7 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
 
         if (ParticleSystemProxy *node = dynamic_cast<ParticleSystemProxy *>(*I))
         {
-            if (!isCulledPrecise(cam, *I, false) && node->update())
+            if (!isCulledPrecise(cam, *I, false))
                 ParticlesList::getInstance()->push_back(node);
             continue;
         }
