@@ -43,7 +43,6 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_font = NULL;
     m_texture = NULL;
     m_highlight_texture = NULL;
-    m_deactivated_texture = NULL;
     m_custom_aspect_ratio = 1.0f;
 
     m_texture_w = 0;
@@ -54,12 +53,6 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_scale_mode = scale_mode;
 
     m_icon_path_type = pathType;
-}
-// -----------------------------------------------------------------------------
-IconButtonWidget::~IconButtonWidget()
-{
-    if (m_deactivated_texture != NULL)
-        m_deactivated_texture->drop();
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
@@ -279,55 +272,20 @@ void IconButtonWidget::unfocused(const int playerID, Widget* new_focus)
 }
 
 // -----------------------------------------------------------------------------
-video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
-{
-    SColor c;
-    u32 g;
-
-    video::IVideoDriver* driver = irr_driver->getVideoDriver();
-    video::IImage* image = driver->createImageFromData (texture->getColorFormat(),
-        texture->getSize(), texture->lock(), false);
-    texture->unlock();
-
-    //Turn the image into grayscale
-    for (u32 x = 0; x < image->getDimension().Width; x++)
-    {
-        for (u32 y = 0; y < image->getDimension().Height; y++)
-        {
-            c = image->getPixel(x, y);
-            g = ((c.getRed() + c.getGreen() + c.getBlue()) / 3);
-            c.set(std::max (0, (int)c.getAlpha() - 120), g, g, g);
-            image->setPixel(x, y, c);
-        }
-    }
-
-    texture = driver->addTexture(texture->getName().getPath() + "_disabled", image);
-    texture->grab();
-
-    return texture;
-}
-
-// -----------------------------------------------------------------------------
 void IconButtonWidget::setTexture(video::ITexture* texture)
 {
     m_texture = texture;
     if (texture == NULL)
     {
-        if (m_deactivated_texture != NULL)
-            m_deactivated_texture->drop();
-
-        m_deactivated_texture = NULL;
         m_texture_w = 0;
         m_texture_h = 0;
     }
     else
     {
-        m_deactivated_texture = getDeactivatedTexture(texture);
         m_texture_w = texture->getSize().Width;
         m_texture_h = texture->getSize().Height;
     }
 }
-
 
 // -----------------------------------------------------------------------------
 void IconButtonWidget::setLabelFont()
