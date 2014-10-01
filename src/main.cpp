@@ -202,7 +202,6 @@
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
-
 static void cleanSuperTuxKart();
 static void cleanUserConfig();
 
