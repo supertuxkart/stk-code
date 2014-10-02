@@ -524,6 +524,8 @@ void QuadGraph::createMesh(bool show_invisible,
     m_mesh_buffer->recalculateBoundingBox();
     m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
 
+    m_mesh_buffer->getMaterial().setTexture(0, irr_driver->getTexture("unlit.png"));
+
     delete[] ind;
     delete[] new_v;
 }   // createMesh
