@@ -321,11 +321,11 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
                                 /*new tracks*/ true );
             addTracks();
         }
-        else if (button == "start" || button=="continue")
+        else if (button == "start" || button == "continue")
         {
             // Normal GP: start/continue a saved GP
             m_gp.changeReverse(getReverse());
-            race_manager->startGP(m_gp, false, (name == "continue"));
+            race_manager->startGP(m_gp, false, (button == "continue"));
         }
     }   // name=="buttons"
     else if (name=="group-spinner")
