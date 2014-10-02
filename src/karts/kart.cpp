@@ -573,8 +573,9 @@ void Kart::createPhysics()
 {
     // First: Create the chassis of the kart
     // -------------------------------------
-    float kart_length = getKartLength();
-    float kart_height = getKartHeight();
+    const float kart_length = getKartLength();
+    const float kart_width  = getKartWidth();
+    float       kart_height = getKartHeight();
 
     // improve physics for tall karts
     if (kart_height > kart_length*0.6f)
@@ -596,9 +597,9 @@ void Kart::createPhysics()
         {
             for (int x = -1; x <= 1; x += 2)
             {
-                Vec3 p(x*getKartModel()->getWidth() *0.5f,
-                       y*getKartModel()->getHeight()*0.5f,
-                       z*getKartModel()->getLength()*0.5f);
+                Vec3 p(x*kart_width  *0.5f,
+                       y*kart_height *0.5f,
+                       z*kart_length *0.5f);
 
                 hull->addPoint(p*orig_factor);
                 hull->addPoint(p*bevel_factor);
@@ -614,7 +615,7 @@ void Kart::createPhysics()
                     {
                         // All wheel positions are relative to the center of
                         // the collision shape.
-                        wheel_pos[index].setX(x*0.5f*getKartWidth());
+                        wheel_pos[index].setX(x*0.5f*kart_width);
                         float radius = getKartProperties()->getWheelRadius();
                         // The y position of the wheels (i.e. the points where
                         // the suspension is attached to) is just at the
@@ -624,8 +625,8 @@ void Kart::createPhysics()
                         // point 'radius' up. That means that if the suspension
                         // is fully compressed (0), the wheel will just be at
                         // the bottom of the kart chassis and touch the ground
-                        wheel_pos[index].setY(- 0.5f*getKartHeight() + radius);
-                        wheel_pos[index].setZ((0.5f*getKartLength() - radius)* z);
+                        wheel_pos[index].setY(- 0.5f*kart_height + radius);
+                        wheel_pos[index].setZ((0.5f*kart_length - radius)* z);
 
                     }
                     else

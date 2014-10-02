@@ -153,8 +153,8 @@
                  when the camera is pointing backwards. This is usually 
                  larger than the forward-up-angle, since the kart itself
                  otherwise obstricts too much of the view.  -->
-    <camera distance="1.5" forward-up-angle="15"
-            backward-up-angle="30"/>
+    <camera distance="1.0" forward-up-angle="15"
+            backward-up-angle="5"/>
     <!-- Additional offset to move graphical chassis with regards to the physics. -->
     <graphics y-offset="0.0"/>
 
@@ -380,7 +380,7 @@
     <stability roll-influence="0.3"
                chassis-linear-damping="0.2"
                chassis-angular-damping="0"
-               downward-impulse-factor="0"
+               downward-impulse-factor="5"
                track-connection-accel="2"
                smooth-flying-impulse="25"/>
 

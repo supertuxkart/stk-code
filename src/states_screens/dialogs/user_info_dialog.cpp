@@ -21,8 +21,8 @@
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"
 #include "online/online_profile.hpp"
+#include "states_screens/online_profile_achievements.hpp"
 #include "states_screens/online_profile_friends.hpp"
-#include "states_screens/online_profile_overview.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -481,7 +481,7 @@ void UserInfoDialog::onUpdate(float dt)
     {
         ModalDialog::dismiss();
         if (m_enter_profile)
-            StateManager::get()->replaceTopMostScreen(OnlineProfileOverview::getInstance());
+            StateManager::get()->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
         return;
     }
 }   // onUpdate
