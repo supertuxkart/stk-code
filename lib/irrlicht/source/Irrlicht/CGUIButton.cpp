@@ -285,7 +285,7 @@ void CGUIButton::draw()
 		}
 	}
 
-	if (SpriteBank)
+	if (false) //SpriteBank)
 	{
 		// pressed / unpressed animation
 		u32 state = Pressed ? (u32)EGBS_BUTTON_DOWN : (u32)EGBS_BUTTON_UP;
