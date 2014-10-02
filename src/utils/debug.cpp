@@ -17,12 +17,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "debug.hpp"
+
 #include "config/user_config.hpp"
-#include "karts/controller/controller.hpp"
-#include "karts/abstract_kart.hpp"
 #include "graphics/irr_driver.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physics.hpp"
@@ -30,8 +31,10 @@
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
+#include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
+
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
 
@@ -86,6 +89,7 @@ enum DebugMenuCommand
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
+    DEBUG_PRINT_START_POS,
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -93,7 +97,7 @@ enum DebugMenuCommand
 void addPowerup(PowerupManager::PowerupType powerup)
 {
     World* world = World::getWorld();
-    if (world == NULL) return;
+    if (!world) return;
     for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
     {
         AbstractKart* kart = world->getLocalPlayerKart(i);
@@ -202,7 +206,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
             mnu->addItem(L"Toggle GUI", DEBUG_TOGGLE_GUI);
             mnu->addItem(L"Hide karts", DEBUG_HIDE_KARTS);
-
+            mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();
@@ -425,21 +429,31 @@ bool onEvent(const SEvent &event)
                 }
                 else if (cmdID == DEBUG_TOGGLE_GUI)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
+                    if (!world) return false;
                     RaceGUIBase* gui = world->getRaceGUI();
                     if (gui != NULL) gui->m_enabled = !gui->m_enabled;
                 }
                 else if (cmdID == DEBUG_HIDE_KARTS)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
-                    const int count = World::getWorld()->getNumKarts();
-                    for (int n = 0; n<count; n++)
+                    if (!world) return false;
+                    for (int n = 0; n<world->getNumKarts(); n++)
                     {
                         AbstractKart* kart = world->getKart(n);
                         if (kart->getController()->isPlayerController())
                             kart->getNode()->setVisible(false);
+                    }
+                }
+                else if (cmdID == DEBUG_PRINT_START_POS)
+                {
+                    if(!world) return false;
+                    for(unsigned int i=0; i<world->getNumKarts(); i++)
+                    {
+                        AbstractKart *kart = world->getKart(i);
+                        Log::warn(kart->getIdent().c_str(),
+                            "<start pos=\"%d\" x=\"%f\" y=\"%f\" z=\"%f\" h=\"%f\"/>",
+                            i, kart->getXYZ().getX(), kart->getXYZ().getY(), 
+                            kart->getXYZ().getZ(),kart->getHeading()*RAD_TO_DEGREE
+                            );
                     }
                 }
                 else if (cmdID == DEBUG_VISUAL_VALUES)
