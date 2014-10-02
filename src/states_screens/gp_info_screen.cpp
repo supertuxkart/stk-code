@@ -81,6 +81,8 @@ void GPInfoScreen::loadedFromFile()
     // Only init the number of tracks here, this way the previously selected
     // number of tracks will be the default.
     m_num_tracks_spinner->setValue(1);
+    
+    m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -213,6 +215,32 @@ void GPInfoScreen::init()
         getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
         m_gp.checkConsistency();
     }
+    
+    // Number of AIs
+    // -------------
+    const bool has_AI = race_manager->hasAI();
+    m_ai_kart_spinner->setVisible(has_AI);
+    getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
+    if (has_AI)
+    {
+        m_ai_kart_spinner->setActivated();
+
+        // Avoid negative numbers (which can happen if e.g. the number of karts
+        // in a previous race was lower than the number of players now.
+        int num_ai = UserConfigParams::m_num_karts - race_manager->getNumLocalPlayers();
+        if (num_ai < 0) num_ai = 0;
+        m_ai_kart_spinner->setValue(num_ai);
+        race_manager->setNumKarts(num_ai + race_manager->getNumLocalPlayers());
+        m_ai_kart_spinner->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers());
+        // A ftl reace needs at least three karts to make any sense
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            m_ai_kart_spinner->setMin(3-race_manager->getNumLocalPlayers());
+        }
+        else
+            m_ai_kart_spinner->setMin(0);
+
+    }   // has_AI
 
     addTracks();
     addScreenshot();
@@ -296,10 +324,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
         else if (button == "start" || button=="continue")
         {
             // Normal GP: start/continue a saved GP
-            int n = getWidget<SpinnerWidget>("ai-spinner")->getValue();
-
             m_gp.changeReverse(getReverse());
-            race_manager->setNumKarts(race_manager->getNumLocalPlayers() + n);
             race_manager->startGP(m_gp, false, (name == "continue"));
         }
     }   // name=="buttons"
@@ -328,6 +353,12 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     {
         m_gp.changeTrackNumber(m_num_tracks_spinner->getValue(), m_group_name);
         addTracks();
+    }
+    else if (name=="ai-spinner")
+    {
+        const int num_ai = m_ai_kart_spinner->getValue();
+        race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
+        UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() + num_ai;
     }
     else if(name=="back")
     {
