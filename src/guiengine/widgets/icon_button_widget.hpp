@@ -43,9 +43,11 @@ namespace GUIEngine
     {
     private:
         irr::video::ITexture* m_texture;
+        irr::video::ITexture* m_deactivated_texture;
         irr::video::ITexture* m_highlight_texture;
         int m_texture_w, m_texture_h;
 
+        video::ITexture* getDeactivatedTexture(video::ITexture* texture);
         void setLabelFont();
 
     public:
@@ -158,7 +160,7 @@ namespace GUIEngine
         virtual void unfocused(const int playerID, Widget* new_focus);
         // --------------------------------------------------------------------
         /** Returns the texture of this button. */
-        const video::ITexture* getTexture() const { return m_texture; }
+        const video::ITexture* getTexture();
     };
 }
 
