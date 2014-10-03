@@ -350,6 +350,18 @@ void Camera::smoothMoveCamera(float dt)
         current_position += (wanted_position - current_position) * dt * 5;
     }
 
+    // Avoid camera crash: if the speed is negative, the current_position
+    // can oscillate between plus and minus, getting bigger and bigger. If
+    // this happens often enough, floating point overflow happens (large
+    // negative speeds can happen when the kart is tumbling/falling)
+    // To avoid this, we just move the camera to the wanted position if
+    // the distance becomes too large (see #1356).
+    if( (current_position - wanted_position).getLengthSQ() > 100)
+    {
+        Log::debug("camera", "Resetting camera position to avoid crash");
+        current_position = wanted_position;
+    }
+
     if(m_mode!=CM_FALLING)
         m_camera->setPosition(current_position);
     m_camera->setTarget(current_target);//set new target
