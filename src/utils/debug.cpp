@@ -450,7 +450,7 @@ bool onEvent(const SEvent &event)
                     {
                         AbstractKart *kart = world->getKart(i);
                         Log::warn(kart->getIdent().c_str(),
-                            "<start pos=\"%d\" x=\"%f\" y=\"%f\" z=\"%f\" h=\"%f\"/>",
+                            "<start position=\"%d\" x=\"%f\" y=\"%f\" z=\"%f\" h=\"%f\"/>",
                             i, kart->getXYZ().getX(), kart->getXYZ().getY(), 
                             kart->getXYZ().getZ(),kart->getHeading()*RAD_TO_DEGREE
                             );
