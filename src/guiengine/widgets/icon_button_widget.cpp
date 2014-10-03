@@ -293,8 +293,8 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
     u32 g;
 
     video::IVideoDriver* driver = irr_driver->getVideoDriver();
-    video::IImage* image = driver->createImageFromData (texture->getColorFormat(),
-        texture->getSize(), texture->lock(), false);
+    std::auto_ptr<video::IImage> image (driver->createImageFromData (texture->getColorFormat(),
+        texture->getSize(), texture->lock(), false));
     texture->unlock();
 
     //Turn the image into grayscale
@@ -309,10 +309,7 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
         }
     }
 
-    texture = driver->addTexture(texture->getName().getPath() + "_disabled", image);
-    image->drop();
-
-    return texture;
+    return driver->addTexture(texture->getName().getPath() + "_disabled", image.get ());
 }
 
 // -----------------------------------------------------------------------------
