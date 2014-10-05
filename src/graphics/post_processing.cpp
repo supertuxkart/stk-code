@@ -662,7 +662,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
 
             // Blend
             glEnable(GL_BLEND);
-            glBlendFunc(GL_ONE, GL_ONE);
+            glBlendColor(0., 0., 0., track->getGodRaysOpacity());
+            glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
 
             in_fbo->Bind();
