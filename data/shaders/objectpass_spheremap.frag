@@ -31,5 +31,5 @@ void main() {
 #endif
 #endif
 
-    FragColor = vec4(getLightFactor(detail0.xyz, vec3(1.), 1.), 1.);
+    FragColor = vec4(getLightFactor(detail0.xyz, vec3(1.), 0.), 1.);
 }

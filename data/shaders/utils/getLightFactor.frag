@@ -14,6 +14,6 @@ vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapVa
     vec3 DiffuseComponent = texture(DiffuseMap, tc).xyz;
     vec3 SpecularComponent = texture(SpecularMap, tc).xyz;
     float ao = texture(SSAO, tc).x;
-    vec3 tmp = diffuseMatColor * DiffuseComponent + specularMatColor * SpecularComponent * specMapValue;
+    vec3 tmp = diffuseMatColor * DiffuseComponent * (1. - specMapValue) + specularMatColor * SpecularComponent * specMapValue;
     return tmp * ao;
 }
