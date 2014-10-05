@@ -14,10 +14,20 @@ in vec3 nor;
 in vec2 uv;
 out vec4 FragColor;
 
-vec3 getLightFactor(float specMapValue);
+vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue);
 
 void main(void)
 {
+#ifdef GL_ARB_bindless_texture
+    vec4 color = texture(handle, uv);
+#ifdef SRGBBindlessFix
+    color.xyz = pow(color.xyz, vec3(2.2));
+#endif
+#else
+    vec4 color = texture(Albedo, uv);
+#endif
+    if (color.a < 0.5) discard;
+
     vec2 texc = gl_FragCoord.xy / screen;
     float z = texture(dtex, texc).x;
 
@@ -33,15 +43,7 @@ void main(void)
     float fLdotNBack  = max(0., - dot(nor, SunDir) * 0.6 + 0.4);
     float scattering = mix(fPowEdotL, fLdotNBack, .5);
 
-#ifdef GL_ARB_bindless_texture
-    vec4 color = texture(handle, uv);
-#ifdef SRGBBindlessFix
-    color.xyz = pow(color.xyz, vec3(2.2));
-#endif
-#else
-    vec4 color = texture(Albedo, uv);
-#endif
-    if (color.a < 0.5) discard;
-    vec3 LightFactor = (scattering * 0.3) + getLightFactor(1.);
-    FragColor = vec4(color.xyz * LightFactor, 1.);
+
+    vec3 LightFactor = color.xyz * (scattering * 0.3) + getLightFactor(color.xyz, vec3(1.), 1.);
+    FragColor = vec4(LightFactor, 1.);
 }
