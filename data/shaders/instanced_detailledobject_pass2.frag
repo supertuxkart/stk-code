@@ -1,10 +1,12 @@
 #ifndef GL_ARB_bindless_texture
 uniform sampler2D Albedo;
 uniform sampler2D Detail;
+uniform sampler2D SpecMap;
 #endif
 
 #ifdef GL_ARB_bindless_texture
 flat in sampler2D handle;
+flat in sampler2D secondhandle;
 flat in sampler2D thirdhandle;
 #endif
 in vec2 uv;
@@ -17,6 +19,7 @@ void main(void)
 {
 #ifdef GL_ARB_bindless_texture
     vec4 color = texture(handle, uv);
+    float specmap = texture(secondhandle, uv).g;
 #ifdef SRGBBindlessFix
     color.xyz = pow(color.xyz, vec3(2.2));
 #endif
@@ -24,7 +27,8 @@ void main(void)
 #else
     vec4 color = texture(Albedo, uv);
     vec4 detail = texture(Detail, uv_bis);
+    float specmap = texture(SpecMap, uv).g;
 #endif
     color *= detail;
-    FragColor = vec4(getLightFactor(color.xyz, vec3(1.), 1.), 1.);
+    FragColor = vec4(getLightFactor(color.xyz, vec3(1.), specmap), 1.);
 }

@@ -107,13 +107,13 @@ public:
     ObjectPass2Shader();
 };
 
-class InstancedObjectPass2Shader : public ShaderHelperSingleton<InstancedObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedObjectPass2Shader : public ShaderHelperSingleton<InstancedObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectPass2Shader();
 };
 
-class InstancedObjectRefPass2Shader : public ShaderHelperSingleton<InstancedObjectRefPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedObjectRefPass2Shader : public ShaderHelperSingleton<InstancedObjectRefPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectRefPass2Shader();
@@ -125,7 +125,7 @@ public:
     DetailledObjectPass2Shader();
 };
 
-class InstancedDetailledObjectPass2Shader : public ShaderHelperSingleton<InstancedDetailledObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedDetailledObjectPass2Shader : public ShaderHelperSingleton<InstancedDetailledObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedDetailledObjectPass2Shader();
@@ -155,7 +155,7 @@ public:
     GrassPass2Shader();
 };
 
-class InstancedGrassPass2Shader : public ShaderHelperSingleton<InstancedGrassPass2Shader, core::vector3df, core::vector3df>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Nearest_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedGrassPass2Shader : public ShaderHelperSingleton<InstancedGrassPass2Shader, core::vector3df, core::vector3df>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Nearest_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedGrassPass2Shader();

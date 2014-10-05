@@ -865,7 +865,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_pass2.frag").c_str());
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedObjectRefPass2Shader::InstancedObjectRefPass2Shader()
@@ -876,7 +876,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass2.frag").c_str());
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     DetailledObjectPass2Shader::DetailledObjectPass2Shader()
@@ -897,7 +897,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_detailledobject_pass2.frag").c_str());
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
     }
 
     ObjectUnlitShader::ObjectUnlitShader()
@@ -947,7 +947,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_grass_pass2.frag").c_str());
         AssignUniforms("windDir", "SunDir");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo", 4, "SpecMap");
     }
 
     SphereMapShader::SphereMapShader()
