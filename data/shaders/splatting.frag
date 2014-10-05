@@ -46,5 +46,5 @@ void main() {
         splatting.b * detail2 +
         max(0., (1.0 - splatting.r - splatting.g - splatting.b)) * detail3;
 
-    FragColor = vec4(getLightFactor(splatted.xyz, vec3(1.), 1.), 1.);
+    FragColor = vec4(getLightFactor(splatted.xyz, vec3(1.), 0.), 1.);
 }
