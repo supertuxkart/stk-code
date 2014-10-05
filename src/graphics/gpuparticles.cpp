@@ -450,20 +450,3 @@ void ParticleSystemProxy::render() {
     simulate();
     draw();
 }
-
-bool ParticleSystemProxy::update()
-{
-    doParticleSystem(os::Timer::getTime());
-    return (IsVisible && (Particles.size() != 0));
-}
-
-void ParticleSystemProxy::OnRegisterSceneNode()
-{
-    doParticleSystem(os::Timer::getTime());
-
-    if (IsVisible && (Particles.size() != 0))
-    {
-        SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT_EFFECT);
-        ISceneNode::OnRegisterSceneNode();
-    }
-}

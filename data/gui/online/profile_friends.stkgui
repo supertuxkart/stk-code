@@ -9,9 +9,8 @@
         <spacer height="25" width="10"/>
 
         <tabs id="profile_tabs" height="10%" max_height="110" x="2%" width="98%" align="center">
-            <icon-button id="tab_overview" width="128" height="128" icon="gui/options_ui.png" />
-            <icon-button id="tab_friends" width="128" height="128" icon="gui/options_players.png" I18N="Section in the profile menu" text="Friends"/>
             <icon-button id="tab_achievements" width="128" height="128" icon="gui/options_players.png"/>
+            <icon-button id="tab_friends" width="128" height="128" icon="gui/options_players.png" I18N="Section in the profile menu" text="Friends"/>
             <icon-button id="tab_settings" width="128" height="128" icon="gui/main_options.png"/>
         </tabs>
 

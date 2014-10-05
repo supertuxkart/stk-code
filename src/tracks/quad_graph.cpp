@@ -524,6 +524,8 @@ void QuadGraph::createMesh(bool show_invisible,
     m_mesh_buffer->recalculateBoundingBox();
     m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
 
+    m_mesh_buffer->getMaterial().setTexture(0, irr_driver->getTexture("unlit.png"));
+
     delete[] ind;
     delete[] new_v;
 }   // createMesh
@@ -981,6 +983,7 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
 {
     const SColor oldClearColor = World::getWorld()->getClearColor();
     World::getWorld()->setClearbackBufferColor(SColor(0, 255, 255, 255));
+    World::getWorld()->forceFogDisabled(true);
     *oldRttMinimap = NULL;
     *newRttMinimap = NULL;
 
@@ -1100,6 +1103,7 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     *oldRttMinimap = texture;
     *newRttMinimap = frame_buffer;
     World::getWorld()->setClearbackBufferColor(oldClearColor);
+    World::getWorld()->forceFogDisabled(false);
 }   // makeMiniMap
 
 //-----------------------------------------------------------------------------

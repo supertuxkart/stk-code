@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<materials>
+  <!-- Fonts -->
+  <material name="title_font.png" shader="unlit"/>
+  <material name="title_font_2.png" shader="unlit"/>
+  <material name="sigmar0.png" shader="unlit"/>
+  <material name="AR_PL_SungtiL_GB0.png" shader="unlit"/>
+  <material name="comix.png" shader="unlit"/>
+  <material name="LayneHansom0.png" shader="unlit"/>
+  <material name="LayneHansomBigDigits.png" shader="unlit"/>
+  <material name="Mplus2p_JP0.png" shader="unlit"/>
+  <material name="rasheeq0.png" shader="unlit"/>
+  <material name="rasheeq3.png" shader="unlit"/>
+  <material name="rasheeq4.png" shader="unlit"/>
+  <material name="wqyMicroHei0.png" shader="unlit"/>
+  <material name="wqyMicroHei1.png" shader="unlit"/>
+  <material name="wqyMicroHei2.png" shader="unlit"/>
+  <material name="wqyMicroHei3.png" shader="unlit"/>
+  <material name="wqyMicroHei4.png" shader="unlit"/>
+  <material name="wqyMicroHei5.png" shader="unlit"/>
+
+</materials>
