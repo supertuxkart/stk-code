@@ -1,9 +1,11 @@
 #ifdef GL_ARB_bindless_texture
 layout(bindless_sampler) uniform sampler2D Albedo;
 layout(bindless_sampler) uniform sampler2D dtex;
+layout(bindless_sampler) uniform sampler2D SpecMap;
 #else
 uniform sampler2D Albedo;
 uniform sampler2D dtex;
+uniform sampler2D SpecMap;
 #endif
 
 uniform vec3 SunDir;
@@ -38,7 +40,8 @@ void main(void)
 
     float fLdotNBack  = max(0., - dot(nor, SunDir) * 0.6 + 0.4);
     float scattering = mix(fPowEdotL, fLdotNBack, .5);
+    float specmap = texture(SpecMap, uv).g;
 
-    vec3 LightFactor = color.xyz * (scattering * 0.3) + getLightFactor(color.xyz, vec3(1.), 1.);
+    vec3 LightFactor = color.xyz * (scattering * 0.3) + getLightFactor(color.xyz, vec3(1.), specmap);
     FragColor = vec4(color.xyz * LightFactor, 1.);
 }

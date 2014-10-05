@@ -1,9 +1,11 @@
 #ifdef GL_ARB_bindless_texture
 layout(bindless_sampler) uniform sampler2D Albedo;
 layout(bindless_sampler) uniform sampler2D Detail;
+layout(bindless_sampler) uniform sampler2D SpecMap;
 #else
 uniform sampler2D Albedo;
 uniform sampler2D Detail;
+uniform sampler2D SpecMap;
 #endif
 
 #if __VERSION__ >= 130
@@ -28,5 +30,6 @@ void main(void)
 #endif
     vec4 detail = texture(Detail, uv_bis);
     color *= detail;
-    FragColor = vec4(getLightFactor(color.xyz, vec3(1.), 1.), 1.);
+    float specmap = texture(SpecMap, uv).g;
+    FragColor = vec4(getLightFactor(color.xyz, vec3(1.), specmap), 1.);
 }
