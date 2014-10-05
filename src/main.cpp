@@ -1208,12 +1208,11 @@ int main(int argc, char *argv[] )
         main_loop = new MainLoop();
         material_manager->loadMaterial();
 
-        // Load the font textures
-        file_manager->pushTextureSearchPath(
-                   file_manager->getAsset(FileManager::FONT,""));
+        // Load the font textures - they are all lazily loaded
+        // so no need to push a texture search path. They will actually
+        // be loaded from ScalableFont.
         material_manager->addSharedMaterial(
                    file_manager->getAsset(FileManager::FONT,"materials.xml"));
-        file_manager->popTextureSearchPath();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));
