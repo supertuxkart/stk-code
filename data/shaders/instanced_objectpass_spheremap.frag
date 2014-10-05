@@ -30,5 +30,5 @@ void main() {
     vec4 detail0 = texture(tex, r.xy / m + .5);
 #endif
 
-    FragColor = vec4(getLightFactor(detail0.xyz, vec3(1.), 1.), 1.);
+    FragColor = vec4(getLightFactor(detail0.xyz, vec3(1.), 0.), 1.);
 }
