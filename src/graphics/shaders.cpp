@@ -854,7 +854,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Specmap");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedObjectPass2Shader::InstancedObjectPass2Shader()
@@ -886,7 +886,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/detailledobject_pass2.frag").c_str());
         AssignUniforms("ModelMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "Specmap");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
     }
 
     InstancedDetailledObjectPass2Shader::InstancedDetailledObjectPass2Shader()
@@ -926,7 +926,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Specmap");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     GrassPass2Shader::GrassPass2Shader()
@@ -936,7 +936,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "windDir");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Specmap");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedGrassPass2Shader::InstancedGrassPass2Shader()
