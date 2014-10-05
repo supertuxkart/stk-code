@@ -23,5 +23,5 @@ void main(void)
     col.xyz *= pow(color.xyz, vec3(2.2));
     if (col.a * color.a < 0.5) discard;
     float specmap = texture(SpecMap, uv).g;
-    FragColor = vec4(getLightFactor(color.xyz, vec3(1.), specmap), 1.);
+    FragColor = vec4(getLightFactor(col.xyz, vec3(1.), specmap), 1.);
 }
