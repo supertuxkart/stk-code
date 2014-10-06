@@ -50,7 +50,7 @@ void main(void)
     sampleDirection = (InverseViewMatrix * vec4(sampleDirection, 0.)).xyz;
 
     float specval = texture(ntex, uv).z;
-    float lodval = 8 * (1 - (log2(specval) / 10 - 1));
+    float lodval = 16 * (1. - ((log2(specval) - 1.) / 10.));
     vec4 specular = textureLod(tex, sampleDirection, lodval);
     Spec = max(specular, vec4(0.));
 }
