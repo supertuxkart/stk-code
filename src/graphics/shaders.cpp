@@ -1496,7 +1496,7 @@ namespace FullScreenShader
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
         }
 
-        AssignUniforms("RSMMatrix", "RHMatrix", "extents");
+        AssignUniforms("RSMMatrix", "RHMatrix", "extents", "suncol");
         AssignSamplerNames(Program, 0, "ctex", 1, "ntex", 2, "dtex");
     }
 
@@ -1507,7 +1507,7 @@ namespace FullScreenShader
             GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/rhpassthrough.geom").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
 
-        AssignUniforms("RSMMatrix", "RHMatrix", "extents", "slice");
+        AssignUniforms("RSMMatrix", "RHMatrix", "extents", "slice", "suncol");
 
         AssignSamplerNames(Program, 0, "ctex", 1, "ntex", 2, "dtex");
     }
