@@ -25,11 +25,14 @@
 
 #include "utils/no_copy.hpp"
 #include "utils/string_utils.hpp"
+
 namespace HardwareStats
 {
+    /** A class to manage json data. */
     class Json : public NoCopy
     {
     private:
+        /** The accumulated json data. */
         std::string m_data;
     public:
         /** Constructor. */
@@ -78,6 +81,7 @@ namespace HardwareStats
 
     // ========================================================================
     void reportHardwareStats();
+    const std::string& getOSVersion();
 };   // HardwareStats
 
 #endif
