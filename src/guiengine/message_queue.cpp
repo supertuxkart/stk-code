@@ -95,7 +95,7 @@ std::priority_queue<Message*, std::vector<Message*>,
 float        g_current_display_time = -1.0f;
 
 /** How long the current message should be displaed. */
-float        g_max_display_time     = -1.0f;
+float        g_max_display_time     = 5.0f;
 
 /** The label widget used to show the current message. */
 SkinWidgetContainer *g_container    = NULL;

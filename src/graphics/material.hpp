@@ -22,12 +22,10 @@
 
 #include "utils/no_copy.hpp"
 
+#include <assert.h>
 #include <map>
 #include <string>
 #include <vector>
-
-#include <IShaderConstantSetCallBack.h>
-
 
 namespace irr
 {
@@ -81,9 +79,18 @@ public:
 
 private:
 
+    /** Pointer to the texture. */
     video::ITexture *m_texture;
-    //unsigned int     m_index;
+
+    /** Name of the texture. */
     std::string      m_texname;
+
+    /** If true, the texture will not automatically be loaded and bound
+     *  at load time, it must be loaded elsewhere. This is used to store
+     *  material settings for font textures, without loading fonts for
+     *  languages that might not be needed at all. */
+    bool             m_lazy_load;
+
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */
     std::string      m_sfx_name;
@@ -114,7 +121,7 @@ private:
     /** If a kart is rescued when driving on this surface. */
     bool             m_drive_reset;
 
-    /** True if this is a texture that will start the jump animatoin when
+    /** True if this is a texture that will start the jump animation when
      *  leaving it and being in the air. */
     bool             m_is_jump_texture;
 
@@ -244,27 +251,45 @@ public:
 
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
-    void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, bool use_fog) const;
+    void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, 
+                       bool use_fog) const;
+    void onMadeVisible(scene::IMeshBuffer* who);
+    void onHidden(scene::IMeshBuffer* who);
+    void isInitiallyHidden(scene::IMeshBuffer* who);
 
     /** Returns the ITexture associated with this material. */
-    video::ITexture *getTexture() const   { return m_texture;        }
+    video::ITexture *getTexture() const
+    {
+        // Note that atm lazy load means that the textures are not loaded
+        // via the material. So getTexture should only get called for non
+        // lazily loaded textures (used atm for font textures.
+        assert(!m_lazy_load);
+        return m_texture;
+    }   // getTexture
+    // ------------------------------------------------------------------------
     bool  isIgnore           () const { return m_ignore;             }
+    // ------------------------------------------------------------------------
     /** Returns true if this material is a zipper. */
     bool  isZipper           () const { return m_zipper;             }
+    // ------------------------------------------------------------------------
     /** Returns if this material should trigger a rescue if a kart
      *  is driving on it. */
     bool  isDriveReset       () const { return m_drive_reset;        }
+    // ------------------------------------------------------------------------
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */
     CollisionReaction  getCollisionReaction() const { return m_collision_reaction; }
 
+    // ------------------------------------------------------------------------
     std::string getCrashResetParticles() const { return m_collision_particles; }
 
+    // ------------------------------------------------------------------------
     bool  highTireAdhesion   () const { return m_high_tire_adhesion; }
+    // ------------------------------------------------------------------------
     const std::string&
           getTexFname        () const { return m_texname;            }
-    //int   getIndex           () const { return m_index;              }
 
+    // ------------------------------------------------------------------------
     bool  isTransparent      () const
     {
         return m_shader_type == SHADERTYPE_ADDITIVE ||
@@ -272,12 +297,6 @@ public:
                m_shader_type == SHADERTYPE_ALPHA_TEST;
     }
 
-    // ------------------------------------------------------------------------
-    /** Returns true if this materials need pre-multiply of alpha. */
-    //bool isPreMul() const {return m_adjust_image==ADJ_PREMUL; }
-    // ------------------------------------------------------------------------
-    /** Returns true if this materials need pre-division of alpha. */
-    //bool isPreDiv() const {return m_adjust_image==ADJ_DIV; }
     // ------------------------------------------------------------------------
     /** Returns the fraction of maximum speed on this material. */
     float getMaxSpeedFraction() const { return m_max_speed_fraction; }
@@ -300,17 +319,20 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of a special sfx to play while a kart is on this
      *  terrain. The string will be "" if no special sfx exists. */
-    const std::string &
-         getSFXName          () const { return m_sfx_name; }
+    const std::string &getSFXName() const { return m_sfx_name; }
 
+    // ------------------------------------------------------------------------
+    /** Returns if fog is enabled. */
     bool isFogEnabled() const { return m_fog; }
 
-    /**
-      * \brief Get the kind of particles that are to be used on this material, in the given conditions
-      * \return The particles to use, or NULL if none
-      */
-    const ParticleKind* getParticlesWhen(ParticleConditions cond) const { return m_particles_effects[cond]; }
-
+    // ------------------------------------------------------------------------
+    /** \brief Get the kind of particles that are to be used on this material,
+     *  in the given conditions.
+     * \return The particles to use, or NULL if none. */
+    const ParticleKind* getParticlesWhen(ParticleConditions cond) const
+    {
+        return m_particles_effects[cond]; 
+    }   // getParticlesWhen
     // ------------------------------------------------------------------------
     /** Returns true if a kart falling over this kind of material triggers
      *  the special falling camera. */
@@ -346,9 +368,6 @@ public:
     // ------------------------------------------------------------------------
     ShaderType getShaderType() const { return m_shader_type; }
     // ------------------------------------------------------------------------
-    void onMadeVisible(scene::IMeshBuffer* who);
-    void onHidden(scene::IMeshBuffer* who);
-    void isInitiallyHidden(scene::IMeshBuffer* who);
 } ;
 
 

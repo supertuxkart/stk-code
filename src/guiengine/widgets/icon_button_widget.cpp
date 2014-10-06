@@ -189,6 +189,9 @@ void IconButtonWidget::add()
     m_id = m_element->getID();
     if (m_tab_stop) m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
+    
+    if (!m_is_visible)
+        m_element->setVisible(false);
 }
 
 // -----------------------------------------------------------------------------

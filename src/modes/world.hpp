@@ -92,6 +92,7 @@ protected:
     RandomGenerator           m_random;
 
     Physics*      m_physics;
+    bool          m_force_disable_fog;
     AbstractKart* m_fastest_kart;
     /** Number of eliminated karts. */
     int         m_eliminated_karts;
@@ -332,6 +333,8 @@ public:
     {
         m_clear_color       = color;
     }
+    /** Override track fog value to force disabled */
+    void forceFogDisabled(bool v) { m_force_disable_fog = v; }
     // ------------------------------------------------------------------------
     /** Override if you want to know when a kart presses fire */
     virtual void onFirePressed(Controller* who) {}

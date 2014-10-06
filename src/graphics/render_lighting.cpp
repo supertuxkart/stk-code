@@ -152,12 +152,12 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
     }
 
+    m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
+
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
-        m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
+        m_post_processing->renderEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff, SkyboxCubeMap);
     }
-
-    m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
 
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())

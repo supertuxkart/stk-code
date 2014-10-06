@@ -325,7 +325,8 @@ void STKMeshSceneNode::render()
                 irr_driver->getRenderTargetTexture(RTT_DIFFUSE),
                 irr_driver->getRenderTargetTexture(RTT_SPECULAR),
                 irr_driver->getRenderTargetTexture(RTT_HALF1_R),
-                getTextureGLuint(mesh.textures[0])));
+                getTextureGLuint(mesh.textures[0]),
+                getTextureGLuint(mesh.textures[1])));
             MeshShader::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
             assert(mesh.vao);
             glBindVertexArray(mesh.vao);

@@ -2,11 +2,15 @@ uniform float blueLmn[9];
 uniform float greenLmn[9];
 uniform float redLmn[9];
 uniform sampler2D ntex;
+uniform sampler2D dtex;
+uniform samplerCube tex;
 uniform mat4 TransposeViewMatrix;
 
 out vec4 Diff;
+out vec4 Spec;
 
 vec3 DecodeNormal(vec2 n);
+vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
 mat4 getMatrix(float L[9])
 {
@@ -24,8 +28,9 @@ void main(void)
 {
     vec2 uv = gl_FragCoord.xy / screen;
     vec3 normal = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
+
     // Convert normal in world space (where SH coordinates were computed)
-    vec4 extendednormal = TransposeViewMatrix * vec4(normal, 1.);
+    vec4 extendednormal = TransposeViewMatrix * vec4(normal, 0.);
     extendednormal.w = 1.;
     mat4 rmat = getMatrix(redLmn);
     mat4 gmat = getMatrix(greenLmn);
@@ -36,4 +41,16 @@ void main(void)
     float b = dot(extendednormal, bmat * extendednormal);
 
     Diff = max(0.25 * vec4(r, g, b, .1), vec4(0.));
+
+    float z = texture(dtex, uv).x;
+
+    vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
+    vec3 eyedir = -normalize(xpos.xyz);
+    vec3 sampleDirection = reflect(-eyedir, normal);
+    sampleDirection = (InverseViewMatrix * vec4(sampleDirection, 0.)).xyz;
+
+    float specval = texture(ntex, uv).z;
+    float lodval = 16 * (1. - ((log2(specval) - 1.) / 10.));
+    vec4 specular = textureLod(tex, sampleDirection, lodval);
+    Spec = max(specular, vec4(0.));
 }
