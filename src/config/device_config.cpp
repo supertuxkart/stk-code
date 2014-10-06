@@ -83,6 +83,10 @@ irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) 
                 returnString += id;
                 break;
 
+            case Input::IT_NONE:
+                returnString += "none";
+                break;
+
             default:
                 assert(false);
                 returnString += type;

@@ -447,6 +447,23 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
             updateInputButtons();
         }
     }
+    else if (sensed_input.m_type == Input::IT_NONE)
+    {
+        if (UserConfigParams::logMisc())
+        {
+            std::cout << "% Binding " << KartActionStrings[binding_to_set]
+                << " : setting to keyboard key NONE\n\n";
+        }
+
+        KeyboardConfig* keyboard = (KeyboardConfig*)m_config;
+        keyboard->setBinding(binding_to_set, Input::IT_NONE,
+                             sensed_input.m_button_id, Input::AD_NEUTRAL,
+                             Input::AR_HALF,
+                             sensed_input.m_character);
+
+        // refresh display
+        updateInputButtons();
+    }
     else
     {
         return;
