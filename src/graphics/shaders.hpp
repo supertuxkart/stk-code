@@ -395,10 +395,10 @@ public:
     SunLightShader();
 };
 
-class DiffuseEnvMapShader : public ShaderHelperSingleton<DiffuseEnvMapShader, core::matrix4, std::vector<float>, std::vector<float>, std::vector<float> >, public TextureRead<Nearest_Filtered>
+class EnvMapShader : public ShaderHelperSingleton<EnvMapShader, core::matrix4, std::vector<float>, std::vector<float>, std::vector<float> >, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_cubemap>
 {
 public:
-    DiffuseEnvMapShader();
+    EnvMapShader();
 };
 
 class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShader, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>

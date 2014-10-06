@@ -221,19 +221,19 @@ void renderBloom(GLuint in)
     DrawFullScreenEffect<FullScreenShader::BloomShader>();
 }
 
-void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff)
+void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff, GLuint skybox)
 {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    glUseProgram(FullScreenShader::DiffuseEnvMapShader::getInstance()->Program);
+    glUseProgram(FullScreenShader::EnvMapShader::getInstance()->Program);
     glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
-    FullScreenShader::DiffuseEnvMapShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH)));
+    FullScreenShader::EnvMapShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox));
     core::matrix4 TVM = irr_driver->getViewMatrix().getTransposed();
-    FullScreenShader::DiffuseEnvMapShader::getInstance()->setUniforms(TVM, std::vector<float>(bSHCoeff, bSHCoeff + 9), std::vector<float>(gSHCoeff, gSHCoeff + 9), std::vector<float>(rSHCoeff, rSHCoeff + 9));
+    FullScreenShader::EnvMapShader::getInstance()->setUniforms(TVM, std::vector<float>(bSHCoeff, bSHCoeff + 9), std::vector<float>(gSHCoeff, gSHCoeff + 9), std::vector<float>(rSHCoeff, rSHCoeff + 9));
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);

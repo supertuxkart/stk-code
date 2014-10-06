@@ -1455,14 +1455,15 @@ namespace FullScreenShader
         AssignUniforms("direction", "col");
     }
 
-    DiffuseEnvMapShader::DiffuseEnvMapShader()
+    EnvMapShader::EnvMapShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
         AssignUniforms("TransposeViewMatrix", "blueLmn[0]", "greenLmn[0]", "redLmn[0]");
-        AssignSamplerNames(Program, 0, "ntex");
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "tex");
     }
 
     ShadowedSunLightShader::ShadowedSunLightShader()
