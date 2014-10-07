@@ -85,10 +85,8 @@ bool SFXOpenAL::init()
     assert( alIsBuffer(m_soundBuffer->getBufferID()) );
     assert( alIsSource(m_soundSource) );
 
-    //std::cout << "Setting a source with buffer " << m_soundBuffer 
-    //          << ", rolloff " << rolloff
-    //          << ", gain=" << m_defaultGain << ", positional=" 
-    //          << (positional ? "true" : "false") << std::endl;
+    //Log::info("SFXOpenAL", "Setting a source with buffer, %p, rolloff %f, gain = %f, position = %s",
+    //    m_soundBuffer, rolloff, m_defaultGain, positional ? "true" : "false");
 
     alSourcei (m_soundSource, AL_BUFFER, m_soundBuffer->getBufferID());
 

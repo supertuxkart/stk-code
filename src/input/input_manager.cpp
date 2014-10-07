@@ -298,7 +298,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
                                 int value)
 {
 #if INPUT_MODE_DEBUG
-    std::cout << "INPUT SENSING... ";
+    Log::info("InputManager::inputSensing", "Start sensing input");
 #endif
 
     // don't store if we're trying to do something like bindings keyboard
@@ -310,7 +310,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
         return;
 
 #if INPUT_MODE_DEBUG
-    std::cout << (store_new ? "storing it" : "ignoring it") << "\n";
+    Log::info("InputManager::inputSensing", store_new ? "storing it" : "ignoring it");
 #endif
 
 
@@ -350,10 +350,9 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
         break;
     case Input::IT_STICKMOTION:
         {
-        std::cout << "%% storing new axis binding, value=" << value <<
-            " deviceID=" << deviceID << " button=" << button <<
-            " axisDirection=" <<
-            (axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n";
+        Log::info("InputManager::inputSensing", "Storing new axis binding, value = %d; "
+            "deviceID = %d; button = %d; axisDirection = %s", value, deviceID, button,
+            axisDirection == Input::AD_NEGATIVE ? "-" : "+");
         // We have to save the direction in which the axis was moved.
         // This is done by storing it as a sign (and since button can
         // be zero, we add one before changing the sign).
@@ -573,8 +572,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                     InputDevice *device = NULL;
                     if (type == Input::IT_KEYBOARD)
                     {
-                        //std::cout << "==== New Player Joining with Key " <<
-                        // button << " ====" << std::endl;
+                        //Log::info("InputManager", "New Player Joining with Key %d", button);
                         device = m_device_manager->getKeyboardFromBtnID(button);
                     }
                     else if (type == Input::IT_STICKBUTTON ||
@@ -609,8 +607,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
             if (pk == NULL)
             {
-                std::cerr <<
-                    "Error, trying to process action for an unknown player\n";
+                Log::error("InputManager::dispatchInput", "Trying to process "
+                    "action for an unknown player");
                 return;
             }
 
@@ -700,8 +698,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 void InputManager::setMasterPlayerOnly(bool enabled)
 {
 #if INPUT_MODE_DEBUG
-    std::cout <<
-        "====== InputManager::setMasterPlayerOnly(" << enabled << ") ======\n";
+    Log::info("InputManager::setMasterPlayerOnly", enabled ? "enabled" : "disabled");
 #endif
     m_master_player_only = enabled;
 }
@@ -955,7 +952,7 @@ void InputManager::setMode(InputDriverMode new_mode)
     {
         case MENU:
 #if INPUT_MODE_DEBUG
-            std::cout << "====== InputManager::setMode(MENU) ======\n";
+            Log::info("InputManager::setMode", "MENU");
 #endif
             switch (m_mode)
             {
@@ -1017,7 +1014,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             break;
         case INGAME:
 #if INPUT_MODE_DEBUG
-            std::cout << "====== InputManager::setMode(INGAME) ======\n";
+            Log::info("InputManager::setMode", "INGAME");
 #endif
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
@@ -1036,7 +1033,7 @@ void InputManager::setMode(InputDriverMode new_mode)
         case INPUT_SENSE_KEYBOARD:
         case INPUT_SENSE_GAMEPAD:
 #if INPUT_MODE_DEBUG
-            std::cout << "====== InputManager::setMode(INPUT_SENSE_*) ======\n";
+            Log::info("InputManager::setMode", "INPUT_SENSE_*");
 #endif
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
@@ -1050,7 +1047,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             /*
         case LOWLEVEL:
 #if INPUT_MODE_DEBUG
-            std::cout << "====== InputManager::setMode(LOWLEVEL) ======\n";
+            Log::info("InputManager::setMode", "LOWLEVEL");
 #endif
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);

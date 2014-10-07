@@ -594,7 +594,7 @@ EventPropagation RibbonWidget::mouseHovered(Widget* child,
 
     if (m_ribbon_type == RIBBON_COMBO || m_ribbon_type == RIBBON_TABS)
     {
-        //std::cout << "SETTING m_mouse_focus\n";
+        //Log::info("RibbonWidget", "Setting m_mouse_focus");
         m_mouse_focus = child;
     }
 
@@ -642,7 +642,6 @@ void RibbonWidget::updateSelection()
 
     // FIXME: m_selection, m_selected, m_mouse_focus... what a mess...
 
-    //std::cout << "----\n";
     // Update selection flags for mouse player
     for (unsigned int p=0; p<MAX_PLAYER_COUNT; p++)
     {

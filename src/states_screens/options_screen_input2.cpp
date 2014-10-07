@@ -394,9 +394,8 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     {
         if (UserConfigParams::logMisc())
         {
-            std::cout << "% Binding " << KartActionStrings[binding_to_set]
-                << " : setting to keyboard key " << sensed_input.m_button_id
-                << " \n\n";
+            Log::info("OptionsScreenInput2", "Binding %s: setting to keyboard key %d",
+                KartActionStrings[binding_to_set].c_str(), sensed_input.m_button_id);
         }
 
         KeyboardConfig* keyboard = (KeyboardConfig*)m_config;
@@ -412,24 +411,21 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     {
         if (UserConfigParams::logMisc())
         {
-            std::cout << "% Binding " << KartActionStrings[binding_to_set]
-                      << " : setting to gamepad #"
-                      << sensed_input.m_device_id<< " : ";
+            Log::info("OptionsScreenInput2", "Binding %s: setting to gamepad #%d",
+                KartActionStrings[binding_to_set].c_str(), sensed_input.m_device_id);
 
             if (sensed_input.m_type == Input::IT_STICKMOTION)
             {
-                std::cout << "axis " <<sensed_input.m_button_id<< " direction "
-                          << (sensed_input.m_axis_direction==Input::AD_NEGATIVE
-                              ? "-" : "+")
-                          << "\n\n";
+                Log::info("OptionsScreenInput2", "Axis %d; direction %s", sensed_input.m_button_id,
+                    sensed_input.m_axis_direction == Input::AD_NEGATIVE ? "-" : "+");
             }
             else if (sensed_input.m_type == Input::IT_STICKBUTTON)
             {
-                std::cout << "button " << sensed_input.m_button_id<< "\n\n";
+                Log::info("OptionsScreenInput2", "Button %d", sensed_input.m_button_id);
             }
             else
             {
-                std::cout << "Sensed unknown gamepad event type??\n";
+                Log::info("OptionsScreenInput2", "Sensed unknown gamepad event type??");
             }
         }
 
@@ -451,8 +447,8 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     {
         if (UserConfigParams::logMisc())
         {
-            std::cout << "% Binding " << KartActionStrings[binding_to_set]
-                << " : setting to keyboard key NONE\n\n";
+            Log::info("OptionsScreenInput2", "Binding %s: setting to keyboard key NONE",
+                KartActionStrings[binding_to_set].c_str());
         }
 
         KeyboardConfig* keyboard = (KeyboardConfig*)m_config;
@@ -541,9 +537,8 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
                 // we found which one. show the "press a key" dialog.
                 if (UserConfigParams::logMisc())
                 {
-                    std::cout << "\n% Entering sensing mode for "
-                              << m_config->getName().c_str()
-                              << std::endl;
+                    Log::info("OptionsScreenInput2", "Entering sensing mode for %s",
+                         m_config->getName().c_str());
                 }
 
                 binding_to_set = (PlayerAction)n;
@@ -560,8 +555,8 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
                 }
                 else
                 {
-                    std::cerr << "unknown selection device in options : "
-                              << m_config->getName().c_str() << std::endl;
+                    Log::error("OptionsScreenInput2", "Unknown selection device in options: %s",
+                        m_config->getName().c_str());
                 }
                 break;
             }

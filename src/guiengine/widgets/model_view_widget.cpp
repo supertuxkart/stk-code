@@ -136,8 +136,9 @@ void ModelViewWidget::update(float delta)
             distance_with_negative_rotation = (int)(angle - m_rotation_target);
         }
         
-        //std::cout << "distance_with_positive_rotation=" << distance_with_positive_rotation <<
-        //" distance_with_negative_rotation=" << distance_with_negative_rotation << " angle="<< angle  <<std::endl;
+        //Log::info("ModelViewWidget", "distance_with_positive_rotation = %d; "
+        //    "distance_with_negative_rotation = %d; angle = %f", distance_with_positive_rotation,
+        //    distance_with_negative_rotation, angle);
         
         if (distance_with_positive_rotation < distance_with_negative_rotation)
         {
@@ -242,7 +243,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
             node->setAnimationSpeed(0);
             node->updateAbsolutePosition();
             node->setScale(mesh_scale[n].toIrrVector());
-            //std::cout << "(((( set frame " << model_frames[n] << " ))))\n";
+            //Log::info("ModelViewWidget", "Set frame %d", model_frames[n]);
         }
     }
     

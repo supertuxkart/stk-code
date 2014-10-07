@@ -140,8 +140,7 @@ void GroupUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
     const XMLNode* child = node->getNode( m_param_name );
     if (child == NULL)
     {
-        //std::cerr << "/!\\ User Config : Couldn't find parameter group "
-        //          << paramName << std::endl;
+        //Log::error("User Config", "Couldn't find parameter group %s", m_param_name.c_str());
         return;
     }
 
@@ -271,8 +270,7 @@ void ListUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
     const XMLNode* child = node->getNode( m_param_name );
     if (child == NULL)
     {
-        //std::cerr << "/!\\ User Config : Couldn't find parameter group "
-        //          << paramName << std::endl;
+        //Log::error("User Config", "Couldn't find parameter group %s", m_param_name.c_str());
         return;
     }
 
@@ -374,12 +372,12 @@ void IntUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
     const XMLNode* child = node->getNode( m_param_name );
     if(child == NULL)
     {
-        //std::cout << "Couldn't find int parameter " << paramName << std::endl;
+        //Log::error("UserConfigParam", "Couldn't find int parameter %s", m_param_name.c_str());
         return;
     }
 
     child->get( "value", &m_value );
-    //std::cout << "read int " << paramName << ", value=" << value << std::endl;
+    //Log::info("UserConfigParam", "Read int %s ,value = %d", m_param_name.c_str(), value);
 }   // findYourDataInAChildOf
 
 // ----------------------------------------------------------------------------
@@ -442,7 +440,7 @@ void TimeUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
     const XMLNode* child = node->getNode( m_param_name );
     if(child == NULL)
     {
-        //std::cout << "Couldn't find int parameter " << paramName <<std::endl;
+        //Log::error("UserConfigParam", "Couldn't find int parameter %s", m_param_name.c_str());
         return;
     }
 
@@ -564,8 +562,7 @@ void BoolUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
     }
     else
     {
-        std::cerr << "Unknown value for " << m_param_name
-                  << "; expected true or false\n";
+        Log::error("User Config", "Unknown value for %s; expected true or false", m_param_name.c_str());
     }
 }   // findYourDataInAChildOf
 
@@ -585,8 +582,7 @@ void BoolUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
     }
     else
     {
-        std::cerr << "Unknown value for " << m_param_name
-                  << "; expected true or false\n";
+        Log::error("User Config", "Unknown value for %s; expected true or false", m_param_name.c_str());
     }
 }   // findYourDataInAnAttributeOf
 
@@ -760,7 +756,7 @@ void UserConfig::saveConfig()
         const int paramAmount = all_params.size();
         for(int i=0; i<paramAmount; i++)
         {
-            //std::cout << "saving parameter " << i << " to file\n";
+            //Log::info("UserConfig", "Saving parameter %d to file", i);
             all_params[i].write(configfile);
         }
 
@@ -769,8 +765,8 @@ void UserConfig::saveConfig()
     }
     catch (std::runtime_error& e)
     {
-        std::cerr << "[UserConfig::saveConfig] ERROR: Failed to write config to " << filename.c_str()
-                  << "; cause : " << e.what() << "\n";
+        Log::error("UserConfig::saveConfig", "Failed to write config to %s, because %s",
+            filename.c_str(), e.what());
     }
 
 }   // saveConfig
