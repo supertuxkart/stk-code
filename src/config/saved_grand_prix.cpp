@@ -71,7 +71,7 @@ SavedGrandPrix::SavedGrandPrix(unsigned int player_id,
                                const std::vector<RaceManager::KartStatus> &kart_list)
               : m_savedgp_group("SavedGP",
                                 "Represents the saved state of a GP"),
-                m_player_id(player_id),
+                m_player_id(player_id, "player_id", &m_savedgp_group),
                 m_gp_id(gp_id.c_str(), "gp_id", &m_savedgp_group),
                 m_difficulty((int)difficulty,"difficulty", &m_savedgp_group),
                 m_player_karts(player_karts,"player_karts", &m_savedgp_group),
@@ -94,13 +94,14 @@ SavedGrandPrix::SavedGrandPrix(unsigned int player_id,
 SavedGrandPrix::SavedGrandPrix(const XMLNode* node)
               : m_savedgp_group("SavedGP",
                                 "Represents the saved state of a GP"),
-                m_player_id(0),
+                m_player_id(0, "player_id", &m_savedgp_group),
                 m_gp_id("-", "gp_id", &m_savedgp_group),
                 m_difficulty(0,"difficulty", &m_savedgp_group),
                 m_player_karts(0,"player_karts", &m_savedgp_group),
                 m_next_track(0,"last_track", &m_savedgp_group)
 {
     //m_player_group.findYourDataInAChildOf(node);
+    m_player_id.findYourDataInAnAttributeOf(node);
     m_gp_id.findYourDataInAnAttributeOf(node);
     m_difficulty.findYourDataInAnAttributeOf(node);
     m_player_karts.findYourDataInAnAttributeOf(node);
