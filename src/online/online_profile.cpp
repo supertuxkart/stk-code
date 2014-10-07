@@ -297,7 +297,7 @@ void OnlineProfile::deleteRelationalInfo()
 const OnlineProfile::IDList& OnlineProfile::getFriends()
 {
     assert(m_has_fetched_friends            && 
-           (m_state & S_FETCHING_FRIENDS) != 0);
+           (m_state & S_FETCHING_FRIENDS) == 0);
     return m_friends;
 }    // getFriends
 
