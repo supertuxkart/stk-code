@@ -37,6 +37,7 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_needed_cols          = 0;
     m_col_amount           = 0;
     m_previous_item_count  = 0;
+    m_max_label_length     = 0;
     m_multi_row            = multi_row;
     m_combo                = combo;
     m_has_label            = false;
@@ -1158,8 +1159,8 @@ float DynamicRibbonWidget::getFontScale(int icon_width) const
 
 irr::core::stringw DynamicRibbonWidget::getUserName(const irr::core::stringw& user_name) const
 {
-    if (user_name.size() < MAX_LABEL_LENGTH)
+    if (m_max_label_length == 0 || user_name.size() < m_max_label_length)
         return user_name;
     else
-        return (user_name.subString(0, MAX_LABEL_LENGTH - 3) + L"...");
+        return (user_name.subString(0, m_max_label_length - 3) + L"...");
 }

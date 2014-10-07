@@ -282,7 +282,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
         else if (button == "cancel")
         {
             StateManager::get()->popMenu();
-            onEscapePressed();
+            StateManager::get()->escapePressed();
         }
         else if (button == "recover")
         {

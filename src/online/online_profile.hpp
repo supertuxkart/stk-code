@@ -126,6 +126,10 @@ public:
     bool hasFetchedAchievements() const { return m_has_fetched_achievements; }
 
     // ------------------------------------------------------------------------
+    /** Unsets the flag that all friends of this profile are in cache. Used
+     *  when a profile is pushed out of cache. */
+    void unsetHasFetchedFriends() { m_has_fetched_friends = false;  }
+    // ------------------------------------------------------------------------
     /** Returns true if the friend list for this profile has been fetched. */
     bool hasFetchedFriends() const { return m_has_fetched_friends; }
 
