@@ -22,9 +22,10 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
+#include <algorithm>
+#include <assert.h>
 #include <sstream>
 #include <stdlib.h>
-#include <assert.h>
 
 using namespace Online;
 
