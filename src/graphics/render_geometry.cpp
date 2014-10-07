@@ -146,7 +146,7 @@ struct GrassMat
     static const std::vector<size_t> SecondPassTextures;
 };
 
-const std::vector<size_t> GrassMat::FirstPassTextures = { 0 };
+const std::vector<size_t> GrassMat::FirstPassTextures = { 0, 1 };
 const std::vector<size_t> GrassMat::SecondPassTextures = { 0, 1 };
 
 struct NormalMat
