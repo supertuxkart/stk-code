@@ -124,7 +124,6 @@ bool readEtcReleaseFile(const std::string &filename)
 {
     std::ifstream in(filename);
     std::string s, distro, version;
-    int bits = 0;
     while( (distro.empty() || version.empty()) && 
            std::getline(in, s) )
     {
@@ -135,6 +134,8 @@ bool readEtcReleaseFile(const std::string &filename)
     }
     if(!distro.empty() && !version.empty())
     {
+        distro = StringUtils::replace(distro, "\"", "");
+        version = StringUtils::replace(version, "\"", "");
         m_os_version = distro + " " + version;
         return true;
     }
@@ -170,7 +171,7 @@ void determineOSVersion()
 
     HKEY hKey;
     if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-                      "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, 
+                      "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0,
                       KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
     {
         m_os_version = "windows-unknown";
