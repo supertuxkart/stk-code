@@ -289,27 +289,37 @@ const video::ITexture* IconButtonWidget::getTexture()
 // -----------------------------------------------------------------------------
 video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
 {
-    SColor c;
-    u32 g;
+    video::ITexture* t;
 
-    video::IVideoDriver* driver = irr_driver->getVideoDriver();
-    std::auto_ptr<video::IImage> image (driver->createImageFromData (texture->getColorFormat(),
-        texture->getSize(), texture->lock(), false));
-    texture->unlock();
-
-    //Turn the image into grayscale
-    for (u32 x = 0; x < image->getDimension().Width; x++)
+    std::string name = texture->getName().getPath().c_str();
+    name += "_disabled";
+    t = irr_driver->getTexture(name);
+    if (t == NULL)
     {
-        for (u32 y = 0; y < image->getDimension().Height; y++)
+        SColor c;
+        u32 g;
+
+        video::IVideoDriver* driver = irr_driver->getVideoDriver();
+        std::auto_ptr<video::IImage> image (driver->createImageFromData (texture->getColorFormat(),
+            texture->getSize(), texture->lock(), false));
+        texture->unlock();
+
+        //Turn the image into grayscale
+        for (u32 x = 0; x < image->getDimension().Width; x++)
         {
-            c = image->getPixel(x, y);
-            g = ((c.getRed() + c.getGreen() + c.getBlue()) / 3);
-            c.set(std::max (0, (int)c.getAlpha() - 120), g, g, g);
-            image->setPixel(x, y, c);
+            for (u32 y = 0; y < image->getDimension().Height; y++)
+            {
+                c = image->getPixel(x, y);
+                g = ((c.getRed() + c.getGreen() + c.getBlue()) / 3);
+                c.set(std::max (0, (int)c.getAlpha() - 120), g, g, g);
+                image->setPixel(x, y, c);
+            }
         }
+
+        t = driver->addTexture(name.c_str(), image.get ());
     }
 
-    return driver->addTexture(texture->getName().getPath() + "_disabled", image.get ());
+    return t;
 }
 
 // -----------------------------------------------------------------------------
