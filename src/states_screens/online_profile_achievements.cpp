@@ -157,7 +157,7 @@ void OnlineProfileAchievements::onUpdate(float delta)
 {
     if (!m_waiting_for_achievements) return;
 
-    if (!m_visiting_profile->isReady())
+    if (!m_visiting_profile->hasFetchedAchievements())
     {
         // This will display an increasing number of dots while waiting.
         m_achievements_list_widget->renameItem("loading",

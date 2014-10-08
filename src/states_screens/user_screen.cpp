@@ -214,6 +214,14 @@ void BaseUserScreen::makeEntryFieldsVisible()
     {
         getWidget<LabelWidget>("label_password")->setVisible(online);
         m_password_tb->setVisible(online);
+        if(player && player->hasSavedSession())
+        {
+            // Even though this field is invisible we need to set
+            // the name, otherwise in update a change of user name
+            // will be detected, causing a clearing of this player
+            // (which then removes the associated online user name).
+            m_username_tb->setText(player->getLastOnlineName());
+        }
     }
 }   // makeEntryFieldsVisible
 

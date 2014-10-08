@@ -218,7 +218,7 @@ void ConnectToServer::asynchronousUpdate()
                         }   // while insufficient buffer
                         for(unsigned int i=0; i<table->dwNumEntries; i++)
                         {
-                            int ip = ntohl(table->table[i].dwAddr);
+                            unsigned int ip = ntohl(table->table[i].dwAddr);
                             if(sender.ip == ip) // this interface is ours
                             {
                                 sender.ip = 0x7f000001; // 127.0.0.1

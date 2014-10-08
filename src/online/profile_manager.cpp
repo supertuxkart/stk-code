@@ -22,9 +22,10 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
+#include <algorithm>
+#include <assert.h>
 #include <sstream>
 #include <stdlib.h>
-#include <assert.h>
 
 using namespace Online;
 
@@ -38,7 +39,7 @@ ProfileManager* ProfileManager::m_profile_manager = NULL;
  */
 ProfileManager::ProfileManager()
 {
-    m_max_cache_size = 2;
+    m_max_cache_size = 100;
     m_currently_visiting = NULL;
 }   // ProfileManager
 
@@ -131,6 +132,7 @@ void ProfileManager::addDirectToCache(OnlineProfile* profile)
         {
             if (!iter->second->getCacheBit())
             {
+                updateAllFriendFlags(iter->second);
                 delete iter->second;
                 iter = m_profiles_cache.erase(iter);
                 // Keep on deleting till enough space is available.
@@ -162,6 +164,44 @@ bool ProfileManager::isInCache(const uint32_t id)
 
     return false;
 }   // isInCache
+
+// ------------------------------------------------------------------------
+/** This function is called when the specified profile id is removed from
+ *  cache. It will search all currently cached profiles that have the
+ *  'friends fetched' flag set, and reset that flag if the profile id is
+ *  one of their friends. This fixes the problem that friend lists can
+ *  get shortened if some of their friends are being pushed out of 
+ *  cache. 
+ */
+void ProfileManager::updateFriendFlagsInCache(const ProfilesMap &cache,
+                                              uint32_t profile_id)
+{
+    ProfilesMap::const_iterator i;
+    for(i=cache.begin(); i!=cache.end(); i++)
+    {
+        // Profile has no friends fetched, no need to test
+        if(!(*i).second->hasFetchedFriends()) continue;
+        const OnlineProfile::IDList &friend_list = (*i).second->getFriends();
+        OnlineProfile::IDList::const_iterator frnd;
+        frnd = std::find(friend_list.begin(), friend_list.end(), profile_id);
+        if(frnd!=friend_list.end())
+            (*i).second->unsetHasFetchedFriends();
+    }
+}   // updateFriendFlagsInCache
+
+// ------------------------------------------------------------------------
+/** This function is called when the specified profile is removed from
+ *  cache. It searches through all caches for profiles X, that have the
+ *  given profile as friend, and then reset the 'friends fetched' flag
+ *  in profile X. Otherwise if a profile is pushed out of the cache,
+ *  all friends of this profile in cache will have an incomplete list
+ *  of friends.
+ */
+void ProfileManager::updateAllFriendFlags(const OnlineProfile *profile)
+{
+    updateFriendFlagsInCache(m_profiles_persistent, profile->getID());
+    updateFriendFlagsInCache(m_profiles_cache,      profile->getID());
+}   // updateAllFriendFlags
 
 // ------------------------------------------------------------------------
 /** This function updates the cache bits of all cached entries. It will

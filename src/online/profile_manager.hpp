@@ -70,9 +70,11 @@ private:
      *  loaded, to make sure they can be all stored). */
     unsigned int  m_max_cache_size;
 
-    void updateCacheBits(OnlineProfile * profile);
-    void addDirectToCache(OnlineProfile * profile);
-
+    void updateCacheBits(OnlineProfile *profile);
+    void addDirectToCache(OnlineProfile *profile);
+    void updateFriendFlagsInCache(const ProfilesMap &cache,
+                                  uint32_t profile_id);
+    void updateAllFriendFlags(const OnlineProfile *profile);
 public:
     /** Create the singleton instance. */
     static void create()
