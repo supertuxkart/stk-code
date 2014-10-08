@@ -101,7 +101,7 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                 /*
                 const wchar_t* iflangis = xml->getAttributeValue(L"iflanguage");
 
-                printf("langcode = %s\n", translations->getCurrentLanguageCode().c_str());
+                Log::info("ScalableFont", "langcode = %s", translations->getCurrentLanguageCode().c_str());
 
                 if (iflangis != NULL &&
                     core::stringc(iflangis) != translations->getCurrentLanguageCode().c_str())
@@ -128,8 +128,10 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
 
                 float scale=1.0f;
                 if(xml->getAttributeValue(L"scale"))
+                {
                     scale = xml->getAttributeValueAsFloat(L"scale");
-                    //std::cout  << "scale = " << scale << std::endl;
+                    //Log::info("ScalableFont", "scale = %f", scale);
+                }
 
                 bool excludeFromMaxHeightCalculation = false;
                 if (xml->getAttributeValue(L"excludeFromMaxHeightCalculation"))
@@ -137,7 +139,7 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
 
                 core::stringw alpha = xml->getAttributeValue(L"hasAlpha");
 
-                //std::cout << "---- Adding font texture " << fn.c_str() << "; alpha=" << alpha.c_str() << std::endl;
+                //Log::info("ScalableFont", "Adding font texture %s; alpha = %s", fn.c_str(), alpha.c_str());
 
 
                 // make sure the sprite bank has enough textures in it
@@ -227,7 +229,7 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
 
                 CharacterMap[ch] = Areas.size();
 
-                //std::cout << "Inserting character '" << (int)ch << "' with area " << Areas.size() << std::endl;
+                //Log::info("ScalableFont", "Inserting character '%d' with area %d", (int)ch, Areas.size());
 
                 // make frame
                 f.rectNumber = SpriteBank->getPositions().size();
@@ -366,18 +368,18 @@ s32 ScalableFont::getAreaIDFromCharacter(const wchar_t c, bool* fallback_font) c
     if (n != CharacterMap.end())
     {
         if (fallback_font != NULL) *fallback_font = false;
-        // std::cout << "Character " << (int)c << " found in font\n";
+        //Log::info("ScalableFont", "Character %d found in font", (int)c);
         return (*n).second;
     }
     else if (m_fallback_font != NULL && fallback_font != NULL)
     {
-        // std::cout << "Font does not have this character : <" << (int)c << ">, trying fallback font" << std::endl;
+        //Log::warn("ScalableFont", "Font does not have this character: <%d>, try fallback font", (int)c);
         *fallback_font = true;
         return m_fallback_font->getAreaIDFromCharacter(c, NULL);
     }
     else
     {
-        // std::cout << "The font does not have this character : <" << (int)c << ">" << std::endl;
+        //Log::warn("ScalableFont", "The font does not have this character: <%d>", (int)c);
         if (fallback_font != NULL) *fallback_font = false;
         return WrongCharacter;
     }
@@ -453,12 +455,12 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
     dim.Height += thisLine.Height;
     if (dim.Width < thisLine.Width) dim.Width = thisLine.Width;
 
-   // std::cout << "ScalableFont::getDimension returns : " << dim.Width << ", " << dim.Height << " --> ";
+   //Log::info("ScalableFont", "ScalableFont::getDimension returns: %d, %d", dim.Width, dim.Height);
 
     dim.Width  = (int)(dim.Width + 0.9f); // round up
     dim.Height = (int)(dim.Height + 0.9f);
 
-    //std::cout << dim.Width << ", " << dim.Height << std::endl;
+    //Log::info("ScalableFont", "After: %d, %d", dim.Width, dim.Height);
 
     return dim;
 }
@@ -616,10 +618,9 @@ void ScalableFont::doDraw(const core::stringw& text,
         /*
         if (fallback[n])
         {
-            std::cout << "USING fallback font " << core::stringc(texture->getName()).c_str()
-                      << "; source area is " << source.UpperLeftCorner.X << ", " << source.UpperLeftCorner.Y
-                      << ", size " << source.getWidth() << ", " << source.getHeight() << "; dest = "
-                      << offsets[n].X << ", " << offsets[n].Y << std::endl;
+            Log::info("ScalableFont", "Using fallback font %s; source area is %d, %d; size %d, %d; dest = %d, %d",
+                core::stringc(texture->getName()).c_str(), source.UpperLeftCorner.X, source.UpperLeftCorner.Y,
+                source.getWidth(), source.getHeight(), offsets[n].X, offsets[n].Y);
         }
         */
 
@@ -773,7 +774,7 @@ int ScalableFont::getCharWidth(const SFontArea& area, const bool fallback) const
     assert(info.m_file_name.size() > 0);
     const float char_scale = info.m_scale;
 
-    //std::cout << "area.spriteno=" << area.spriteno << ", char_scale=" << char_scale << std::endl;
+    //Log::info("ScalableFont", "area.spriteno = %d, char_scale = %f", area.spriteno, char_scale);
 
     if (fallback) return (int)(((area.width + area.overhang)*m_fallback_font_scale + m_fallback_kerning_width) * m_scale * char_scale);
     else          return (int)((area.width + area.overhang + GlobalKerningWidth) * m_scale * char_scale);

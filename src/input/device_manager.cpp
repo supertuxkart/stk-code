@@ -145,9 +145,9 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
     m_assign_mode = assignMode;
 
 #if INPUT_MODE_DEBUG
-    if (assignMode == NO_ASSIGN) std::cout << "====== DeviceManager::setAssignMode(NO_ASSIGN) ======\n";
-    if (assignMode == ASSIGN) std::cout << "====== DeviceManager::setAssignMode(ASSIGN) ======\n";
-    if (assignMode == DETECT_NEW) std::cout << "====== DeviceManager::setAssignMode(DETECT_NEW) ======\n";
+    if (assignMode == NO_ASSIGN) Log::info("DeviceManager::setAssignMode", "NO_ASSIGN);
+    if (assignMode == ASSIGN) Log::info("DeviceManager::setAssignMode", "ASSIGN);
+    if (assignMode == DETECT_NEW) Log::info("DeviceManager::setAssignMode", "DETECT_NEW);
 #endif
 
     // when going back to no-assign mode, do some cleanup
@@ -289,7 +289,7 @@ InputDevice* DeviceManager::mapKeyboardInput( int btnID, InputManager::InputDriv
 {
     const int keyboard_amount = m_keyboards.size();
 
-    //std::cout << "mapKeyboardInput " << btnID << " to " << keyboard_amount << " keyboards\n";
+    //Log::info("DeviceManager::mapKeyboardInput", "Map %d to %d", btnID, keyboard_amount);
 
     for (int n=0; n<keyboard_amount; n++)
     {
@@ -297,10 +297,10 @@ InputDevice* DeviceManager::mapKeyboardInput( int btnID, InputManager::InputDriv
 
         if (keyboard->processAndMapInput(btnID, mode, action))
         {
-            //std::cout << "   binding found in keyboard #"  << (n+1) << "; action is " << KartActionStrings[*action] << "\n";
+            //Log::info("DeviceManager::mapKeyboardInput", "Binding found in keyboard #%d; action is %s", n + 1, KartActionStrings[*action]);
             if (m_single_player != NULL)
             {
-                //printf("Single player\n");
+                //Log::info("DeviceManager", "Single player");
                 *player = m_single_player;
             }
             else if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
@@ -423,7 +423,7 @@ InputDevice* DeviceManager::getLatestUsedDevice()
 
     if (m_latest_used_device == NULL)
     {
-        //std::cout<< "========== No latest device, returning keyboard ==========\n";
+        //Log::info("DeviceManager", "No latest device, returning keyboard);
         return m_keyboards.get(0); // FIXME: is this right?
     }
 

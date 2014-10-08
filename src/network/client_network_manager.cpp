@@ -94,6 +94,7 @@ void* waitInput(void* data)
                 std::cin >> cnt;
                 clrp->voteRaceCount(cnt);
             }
+            std::cout << "\n";
         }
         // If STK shuts down, but should receive an input after the network 
         // manager was deleted, the getInstance call will return NULL.

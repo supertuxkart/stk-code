@@ -8,6 +8,8 @@
 
         <button id="assignEsc" I18N="When configuring input" text="Assign to ESC key" align="center"/>
         <spacer height="10" width="10" />
+        <button id="assignNone"    I18N="When configuring input" text="Assign nothing" align="center"/>
+        <spacer height="10" width="10" />
         <button id="cancel"    I18N="When configuring input" text="Press ESC to cancel" align="center"/>
 
     </div>

@@ -153,17 +153,16 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
     /*
     const std::set<Language>& languages = m_dictionary_manager.get_languages();
-    std::cout << "Number of languages: " << languages.size() << std::endl;
+    Log::info("Translatings", "Number of languages: %d", languages.size());
     for (std::set<Language>::const_iterator i = languages.begin();
                                             i != languages.end(); ++i)
     {
         const Language& language = *i;
-        std::cout << "Env:       " << language.str()           << std::endl
-                  << "Name:      " << language.get_name()      << std::endl
-                  << "Language:  " << language.get_language()  << std::endl
-                  << "Country:   " << language.get_country()   << std::endl
-                  << "Modifier:  " << language.get_modifier()  << std::endl
-                  << std::endl;
+        Log::info("Translatings", "Env:       %s", language.str());
+        Log::info("Translatings", "Name:      %s", language.get_name());
+        Log::info("Translatings", "Language:  %s", language.get_language());
+        Log::info("Translatings", "Country:   %s", language.get_country());
+        Log::info("Translatings", "Modifier:  %s", language.get_modifier());
     }
     */
 
@@ -297,8 +296,7 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 
             if (n == FRIBIDI_BUFFER_SIZE-1) // prevent buffeoverflows
             {
-                std::cerr
-                    << "WARNING : translated string too long, truncating!\n";
+                Log::warn("Translations::fribidize", "translated string too long, truncating");
                 fribidiInput[n] = 0;
                 break;
             }
@@ -329,7 +327,7 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 
         if (!result)
         {
-            std::cerr << "Fribidi failed in 'fribidi_log2vis' =(\n";
+            Log::error("Translations::fribidize", "Fribidi failed in 'fribidi_log2vis' =(");
             m_converted_string = core::stringw(in_ptr);
             return m_converted_string.c_str();
         }
@@ -373,7 +371,7 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     if (original[0] == '\0') return L"";
 
 #if TRANSLATE_VERBOSE
-    std::cout << "Translating " << original << "\n";
+    Log::info("Translations", "Translating %s", original);
 #endif
 
     const std::string& original_t = (context == NULL ?
