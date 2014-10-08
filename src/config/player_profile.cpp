@@ -235,12 +235,13 @@ void PlayerProfile::saveSession(int user_id, const std::string &token)
 
 // ------------------------------------------------------------------------
 /** Unsets any saved session data. */
-void PlayerProfile::clearSession()
+void PlayerProfile::clearSession(bool save)
 {
     m_saved_session = false;
     m_saved_user_id = 0;
     m_saved_token   = "";
-    PlayerManager::get()->save();
+    if(save)
+        PlayerManager::get()->save();
 }   // clearSession
 
 //------------------------------------------------------------------------------
