@@ -30,6 +30,7 @@
 
 #include <fstream>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -51,7 +52,7 @@ namespace HardwareStats
 int getRAM()
 {
 #ifdef __linux__
-    const uint64_t memory_size = (uint64_t)sysconf(_SC_PHYS_PAGES) 
+    const uint64_t memory_size = (uint64_t)sysconf(_SC_PHYS_PAGES)
                                         * sysconf(_SC_PAGESIZE);
     return int(memory_size / (1024*1024));
 #endif
@@ -117,14 +118,14 @@ int getNumProcessors()
 /** Tries opening and parsing the specified release file in /etc to find
  *  information about the distro used.
  *  \param filename Full path of the file to open.
- *  \return True if file could be read and valid information was paresed, 
+ *  \return True if file could be read and valid information was paresed,
  *          false otherwise.
  */
 bool readEtcReleaseFile(const std::string &filename)
 {
     std::ifstream in(filename);
     std::string s, distro, version;
-    while( (distro.empty() || version.empty()) && 
+    while( (distro.empty() || version.empty()) &&
            std::getline(in, s) )
     {
         std::vector<std::string> l = StringUtils::split(s, '=');
@@ -158,7 +159,7 @@ void determineOSVersion()
 
     std::set<std::string> file_list;
     file_manager->listFiles(file_list, "./", true);
-    for(std::set<std::string>::iterator i  = file_list.begin(); 
+    for(std::set<std::string>::iterator i  = file_list.begin();
                                         i != file_list.end(); i++)
     {
         // Only try reading /etc/*-release files
@@ -181,7 +182,13 @@ void determineOSVersion()
     DWORD size = sizeof(windows_version_string);
     RegQueryValueEx(hKey, "CurrentVersion", 0, 0, (LPBYTE)windows_version_string, &size);
     unsigned major = 0, minor = 0;
-    const int ret = sscanf_s(windows_version_string, "%u.%u", &major, &minor);
+
+    std::stringstream sstr(windows_version_string);
+    sstr >> major;
+    if (sstr.peek() == '.')
+        sstr.ignore();
+    sstr >> minor;
+
     int windows_version = (major << 8) | minor;
     RegCloseKey(hKey);
 
@@ -194,7 +201,7 @@ void determineOSVersion()
     case 0x0601: m_os_version="Windows 7";     break;
     case 0x0602: m_os_version="Windows 8";     break;
     default: {
-                 m_os_version = StringUtils::insertValues("Windows %d", 
+                 m_os_version = StringUtils::insertValues("Windows %d",
                                                           windows_version);
                  break;
              }
@@ -260,7 +267,7 @@ void reportHardwareStats()
     unsigned int ogl_version = irr_driver->getGLSLVersion();
     unsigned int major = ogl_version/100;
     unsigned int minor = ogl_version - 100*major;
-    std::string version = 
+    std::string version =
         StringUtils::insertValues("%d.%d", major, minor);
     json.add("GL_SHADING_LANGUAGE_VERSION", version);
 
@@ -279,7 +286,7 @@ void reportHardwareStats()
     else if(StringUtils::startsWith(card_name, "S3 Graphics"))
         card_name="S3";
     json.add("gfx_card", card_name+" "+renderer);
-    
+
     json.add("video_xres", UserConfigParams::m_width );
     json.add("video_yres", UserConfigParams::m_height);
 
@@ -311,11 +318,11 @@ void reportHardwareStats()
                                      , m_version(version)
         {}
         // --------------------------------------------------------------------
-        /** Callback after the request has been executed. 
+        /** Callback after the request has been executed.
          */
         virtual void callback()
         {
-            // If the request contains incorrect data, it will not have a 
+            // If the request contains incorrect data, it will not have a
             // download error, but return an error string as return value:
             if(hadDownloadError() || getData()=="<h1>Bad Request (400)</h1>")
             {
