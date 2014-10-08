@@ -30,6 +30,7 @@
 #include <assert.h>
 
 #ifdef __MINGW32__
+#  undef _WIN32_WINNT
 #  define _WIN32_WINNT 0x501
 #endif
 

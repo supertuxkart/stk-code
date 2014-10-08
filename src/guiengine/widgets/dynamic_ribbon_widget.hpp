@@ -187,7 +187,7 @@ namespace GUIEngine
         int m_max_label_width;
 
         /** Max length of a label, in characters */
-        int m_max_label_length;
+        unsigned int m_max_label_length;
 
     public:
 
@@ -298,7 +298,7 @@ namespace GUIEngine
         /** Set approximately how many items are expected to be in this ribbon; will help the layout
           * algorithm next time add() is called */
         void setItemCountHint(int hint) { m_item_count_hint = hint; }
-        
+
         /** Set max length of displayed text. */
         void setMaxLabelLength(int length) { m_max_label_length = length; }
     };
