@@ -924,7 +924,7 @@ void Kart::collectedItem(Item *item, int add_info)
 		StateManager::ActivePlayer * player = m_owner->getController()->getPlayer();
 		if (player != NULL && player->getConstProfile() == PlayerManager::getCurrentPlayer())
 		{
-			PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_GUM, "Sticky gum");
+			PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_GUM, "gum");
 		}
 
         // slow down
