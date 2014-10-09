@@ -203,7 +203,11 @@ void BaseUserScreen::makeEntryFieldsVisible()
     getWidget<LabelWidget>("label_remember")->setVisible(online);
     getWidget<CheckBoxWidget>("remember-user")->setVisible(online);
     PlayerProfile *player = getSelectedPlayer();
-    if(player && player->hasSavedSession() && online)
+    // Don't show the password fields if the player wants to be online
+    // and either is the current player (no need to enter a password then)
+    // or has a saved session.
+    if(player && online  &&
+        (player->hasSavedSession() || player==PlayerManager::getCurrentPlayer()))
     {
         // If we show the online login fields, but the player has a
         // saved session, don't show the password field.
