@@ -175,7 +175,10 @@ void determineOSVersion()
         m_os_version = "Linux unknown";
         return;
     }
-    m_os_version = std::string(u.sysname) + " " + u.release;
+    // Ignore data after "-", since it could identify a system (self compiled
+    // kernels).
+    std::vector<std::string> l = StringUtils::split(std::string(u.release),'-');
+    m_os_version = std::string(u.sysname) + " " + l[0];
 
 #endif
 
@@ -186,7 +189,10 @@ void determineOSVersion()
         m_os_version = "BSD unknown";
         return;
     }
-    m_os_version = std::string(u.sysname) + " " + u.release;
+    // Ignore data after "-", since it could identify a system (self compiled
+    // kernels).
+    std::vector<std::string> l = StringUtils::split(std::string(u.release),'-');
+    m_os_version = std::string(u.sysname) + " " + l[0];
 #endif
 
 #ifdef WIN32
