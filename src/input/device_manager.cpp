@@ -145,9 +145,9 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
     m_assign_mode = assignMode;
 
 #if INPUT_MODE_DEBUG
-    if (assignMode == NO_ASSIGN) Log::info("DeviceManager::setAssignMode", "NO_ASSIGN);
-    if (assignMode == ASSIGN) Log::info("DeviceManager::setAssignMode", "ASSIGN);
-    if (assignMode == DETECT_NEW) Log::info("DeviceManager::setAssignMode", "DETECT_NEW);
+    if (assignMode == NO_ASSIGN) Log::info("DeviceManager::setAssignMode(NO_ASSIGN)");
+    if (assignMode == ASSIGN) Log::info("DeviceManager::setAssignMode(ASSIGN)");
+    if (assignMode == DETECT_NEW) Log::info("DeviceManager::setAssignMode(DETECT_NEW)");
 #endif
 
     // when going back to no-assign mode, do some cleanup
