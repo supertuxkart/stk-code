@@ -19,6 +19,7 @@
 
 #include "karts/kart.hpp"
 
+#include "achievements/achievement_info.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
@@ -919,6 +920,12 @@ void Kart::collectedItem(Item *item, int add_info)
     case Item::ITEM_BUBBLEGUM:
         m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL &&
                                     item->getEmitter()->getIdent() == "nolok");
+
+		StateManager::ActivePlayer * player = m_owner->getController()->getPlayer();
+		if (player != NULL && player->getConstProfile() == PlayerManager::getCurrentPlayer())
+		{
+			PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_GUM, "Sticky gum");
+		}
 
         // slow down
         m_bubblegum_time = m_kart_properties->getBubblegumTime();
