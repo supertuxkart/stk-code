@@ -103,7 +103,7 @@ void OnlineProfileAchievements::init()
         {
             std::vector<ListWidget::ListCell> row;
             const Achievement *a = it->second;
-            if(a->getInfo()->isSecret())
+            if(a->getInfo()->isSecret() && !a->isAchieved())
                 continue;
             ListWidget::ListCell title(a->getInfo()->getTitle(), -1, 2);
             ListWidget::ListCell progress(a->getProgressAsString(), -1, 1);
