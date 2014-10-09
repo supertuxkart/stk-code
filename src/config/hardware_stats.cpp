@@ -32,8 +32,10 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include <sys/param.h>    // To get BSD macro
-#include <sys/utsname.h>
+#ifndef WIN32
+#  include <sys/param.h>    // To get BSD macro
+#  include <sys/utsname.h>
+#endif
 #include <vector>
 
 
