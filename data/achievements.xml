@@ -48,4 +48,8 @@
                title="Banana Lover" description="Collect at least 5 bananas in one race.">
     <banana goal="5"/>
   </achievement>
+  <achievement id="10" secret="yes" check-type="all-at-least" reset-type="race"
+               title="It's secret" description="Really ... a secret.">
+  </achievement>
+
 </achievements>

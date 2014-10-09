@@ -94,6 +94,9 @@ private:
     /** Determines when the achievement needs to be reset */
     ResetType m_reset_type;
 
+    /** A secret achievement has its progress not shown. */
+    bool m_is_secret;
+
 public:
              AchievementInfo(const XMLNode * input);
     virtual ~AchievementInfo() {};
@@ -118,6 +121,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the check type for this achievement. */
     AchievementCheckType getCheckType() const { return m_check_type; }
+    // ------------------------------------------------------------------------
+    /** Returns if this achievement is a secret achievement. */
+    bool isSecret() const { return m_is_secret; }
     // ------------------------------------------------------------------------
 };   // class AchievementInfo
 
