@@ -32,6 +32,8 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <sys/param.h>    // To get BSD macro
+#include <sys/utsname.h>
 #include <vector>
 
 
@@ -166,7 +168,27 @@ void determineOSVersion()
         if(StringUtils::hasSuffix(*i, "-release"))
             if (readEtcReleaseFile(*i)) return;
     }
+    // Fallback in case that we can't find any valid information in /etc/*release
+    struct utsname u;
+    if (uname(&u))
+    {
+        m_os_version = "Linux unknown";
+        return;
+    }
+    m_os_version = std::string(u.sysname) + " " + u.release;
+
 #endif
+
+#ifdef BSD
+    struct utsname u;
+    if (uname(&u))
+    {
+        m_os_version = "BSD unknown";
+        return;
+    }
+    m_os_version = std::string(u.sysname) + " " + u.release;
+#endif
+
 #ifdef WIN32
     //  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs.
 
