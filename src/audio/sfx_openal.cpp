@@ -43,6 +43,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool ownsBu
     m_soundBuffer = buffer;
     m_soundSource = 0;
     m_ok          = false;
+    m_is_playing  = false;
     m_positional  = positional;
     m_defaultGain = gain;
     m_loop        = false;
@@ -187,7 +188,8 @@ void SFXOpenAL::stop()
 {
     if(!m_ok) return;
 
-    m_loop = false;
+    m_is_playing = false;
+    m_loop       = false;
     alSourcei(m_soundSource, AL_LOOPING, AL_FALSE);
     alSourceStop(m_soundSource);
     SFXManager::checkError("stoping");
@@ -228,6 +230,10 @@ void SFXOpenAL::resume()
  */
 void SFXOpenAL::play()
 {
+    // Technically the sfx is only playing after the sfx thread starts it,
+    // but for STK this is correct since we don't want to start the same
+    // sfx twice.
+    m_is_playing = true;
     SFXManager::get()->queue(this);
 }   // play
 
@@ -249,6 +255,14 @@ void SFXOpenAL::reallyPlayNow()
     alSourcePlay(m_soundSource);
     SFXManager::checkError("playing");
 }   // reallyPlayNow
+
+//-----------------------------------------------------------------------------
+/** Returns true if the sound effect is currently playing.
+ */
+bool SFXOpenAL::isPlaying()
+{
+    return m_is_playing;
+}   // isPlaying
 
 //-----------------------------------------------------------------------------
 /** Sets the position where this sound effects is played.

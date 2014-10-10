@@ -2018,10 +2018,10 @@ void Kart::updatePhysics(float dt)
          m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
         m_skidding->getGraphicalJumpOffset()==0)
     {
-        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING &&!isWheeless())
+        if(!m_skid_sound->isPlaying() && !isWheeless())
             m_skid_sound->play();
     }
-    else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
+    else if(m_skid_sound->isPlaying())
     {
         m_skid_sound->stop();
     }
