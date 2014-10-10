@@ -73,6 +73,15 @@ void BaseUserScreen::init()
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
 
+    // The behaviour of the screen is slightly different at startup, i.e.
+    // when it is the first screen: cancel will exit the game, and in
+    // this case no 'back' error should be shown.
+    bool is_first_screen = StateManager::get()->getMenuStackSize()==1;
+    getWidget<IconButtonWidget>("back")->setVisible(!is_first_screen);
+    getWidget<IconButtonWidget>("cancel")->setLabel(is_first_screen 
+                                                    ? _("Exit game") 
+                                                    : _("Cancel")      );
+
     m_sign_out_name = "";
     m_sign_in_name  = "";
 
@@ -293,7 +302,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
         }
         else if (button == "cancel")
         {
-            StateManager::get()->popMenu();
+            // EscapePressed will pop this screen.
             StateManager::get()->escapePressed();
         }
         else if (button == "recover")
