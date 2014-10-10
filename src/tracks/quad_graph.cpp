@@ -983,6 +983,7 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
 {
     const SColor oldClearColor = World::getWorld()->getClearColor();
     World::getWorld()->setClearbackBufferColor(SColor(0, 255, 255, 255));
+    World::getWorld()->forceFogDisabled(true);
     *oldRttMinimap = NULL;
     *newRttMinimap = NULL;
 
@@ -1102,6 +1103,7 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     *oldRttMinimap = texture;
     *newRttMinimap = frame_buffer;
     World::getWorld()->setClearbackBufferColor(oldClearColor);
+    World::getWorld()->forceFogDisabled(false);
 }   // makeMiniMap
 
 //-----------------------------------------------------------------------------

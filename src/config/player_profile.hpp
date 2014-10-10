@@ -121,7 +121,7 @@ public:
     bool operator<(const PlayerProfile &other);
     void raceFinished();
     void saveSession(int user_id, const std::string &token);
-    void clearSession();
+    void clearSession(bool save=true);
     void addIcon();
 
     /** Abstract virtual classes, to be implemented by the OnlinePlayer. */

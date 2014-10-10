@@ -57,8 +57,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     m_shader_type = SHADERTYPE_SOLID;
     m_deprecated = deprecated;
 
-    node->get("name", &m_texname);
-
+    node->get("name",      &m_texname);
     if (m_texname=="")
     {
         throw std::runtime_error("[Material] No texture name specified "
@@ -66,6 +65,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     }
     init();
 
+    node->get("lazy-load", &m_lazy_load);
     bool b = false;
 
     node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.4 style
@@ -412,10 +412,10 @@ Material::Material(const std::string& fname, bool is_full_path,
  */
 void Material::init()
 {
+    m_lazy_load                 = false;
+    m_texture                   = NULL;
     m_clamp_tex                 = 0;
     m_shader_type               = SHADERTYPE_SOLID;
-    //m_lightmap                  = false;
-    //m_adjust_image              = ADJ_NONE;
     m_backface_culling          = true;
     m_high_tire_adhesion        = false;
     m_below_surface             = false;
@@ -455,6 +455,9 @@ void Material::init()
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path, bool complain_if_not_found)
 {
+    // Don't load a texture that is lazily loaded.
+    if(m_lazy_load) return;
+
     const std::string &full_path = is_full_path
                                  ? m_texname
                                  : file_manager->searchTexture(m_texname);

@@ -35,6 +35,7 @@ AchievementInfo::AchievementInfo(const XMLNode * input)
     m_id               = 0;
     m_title            = "";
     m_description      = "";
+    m_is_secret        = false;
     bool all;
     all = input->get("id",               &m_id              ) &&
           input->get("title",            &m_title           ) &&
@@ -69,6 +70,7 @@ AchievementInfo::AchievementInfo(const XMLNode * input)
     else
         Log::warn("AchievementInfo", "Achievement check type '%s' unknown.",
                   s.c_str());
+    input->get("secret", &m_is_secret);
 
     // Now load the goal nodes
     for (unsigned int n = 0; n < input->getNumNodes(); n++)

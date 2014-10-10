@@ -14,5 +14,5 @@ void main()
 
     Yxy.x = smoothstep(WhiteYxy.x, WhiteYxy.x * 4, Yxy.x);
 
-    FragColor = vec4(getRGBFromCIEXxy(Yxy), 1.0);
+    FragColor = vec4(max(vec3(0.), getRGBFromCIEXxy(Yxy)), 1.0);
 }

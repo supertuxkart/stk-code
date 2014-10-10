@@ -787,7 +787,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         AssignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(Program, 0, "tex", 1, "glosstex");
     }
 
     NormalMapShader::NormalMapShader()
@@ -832,7 +832,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass1.frag").c_str());
         AssignUniforms("windDir");
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(Program, 0, "tex", 1, "glosstex");
     }
 
     InstancedNormalMapShader::InstancedNormalMapShader()
@@ -854,7 +854,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedObjectPass2Shader::InstancedObjectPass2Shader()
@@ -865,7 +865,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_pass2.frag").c_str());
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedObjectRefPass2Shader::InstancedObjectRefPass2Shader()
@@ -876,7 +876,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass2.frag").c_str());
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     DetailledObjectPass2Shader::DetailledObjectPass2Shader()
@@ -886,7 +886,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/detailledobject_pass2.frag").c_str());
         AssignUniforms("ModelMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
     }
 
     InstancedDetailledObjectPass2Shader::InstancedDetailledObjectPass2Shader()
@@ -897,7 +897,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_detailledobject_pass2.frag").c_str());
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
     }
 
     ObjectUnlitShader::ObjectUnlitShader()
@@ -926,7 +926,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     GrassPass2Shader::GrassPass2Shader()
@@ -936,7 +936,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "windDir");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedGrassPass2Shader::InstancedGrassPass2Shader()
@@ -947,7 +947,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_grass_pass2.frag").c_str());
         AssignUniforms("windDir", "SunDir");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo", 5, "SpecMap");
     }
 
     SphereMapShader::SphereMapShader()
@@ -1455,14 +1455,15 @@ namespace FullScreenShader
         AssignUniforms("direction", "col");
     }
 
-    DiffuseEnvMapShader::DiffuseEnvMapShader()
+    EnvMapShader::EnvMapShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
         AssignUniforms("TransposeViewMatrix", "blueLmn[0]", "greenLmn[0]", "redLmn[0]");
-        AssignSamplerNames(Program, 0, "ntex");
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "tex");
     }
 
     ShadowedSunLightShader::ShadowedSunLightShader()
@@ -1495,7 +1496,7 @@ namespace FullScreenShader
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
         }
 
-        AssignUniforms("RSMMatrix", "RHMatrix", "extents");
+        AssignUniforms("RSMMatrix", "RHMatrix", "extents", "suncol");
         AssignSamplerNames(Program, 0, "ctex", 1, "ntex", 2, "dtex");
     }
 
@@ -1506,7 +1507,7 @@ namespace FullScreenShader
             GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/rhpassthrough.geom").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
 
-        AssignUniforms("RSMMatrix", "RHMatrix", "extents", "slice");
+        AssignUniforms("RSMMatrix", "RHMatrix", "extents", "slice", "suncol");
 
         AssignSamplerNames(Program, 0, "ctex", 1, "ntex", 2, "dtex");
     }

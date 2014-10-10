@@ -141,14 +141,8 @@ void RibbonWidget::add()
         total_needed_space += m_active_children[i].m_w;
     }
 
-    int free_w_space = m_w - total_needed_space;
-
     //int biggest_y = 0;
     const int button_y = 10;
-    float global_zoom = 1;
-
-    const int min_free_space = 50;
-    global_zoom = (float)m_w / (float)( m_w - free_w_space + min_free_space );
 
     const int one_button_space =
         int(roundf((float)m_w / (float)subbuttons_amount));
@@ -320,22 +314,10 @@ void RibbonWidget::add()
 
             float image_h = (float)image->getSize().Height;
             float image_w = image_h*imageRatio;
-
-            // scale to fit (FIXME: calculate the right value directly...)
-            float zoom = global_zoom;
-
-            if (button_y + image_h*zoom + needed_space_under_button > m_h)
-            {
-                // scale down
-                while (button_y + image_h*zoom +
-                       needed_space_under_button > m_h)  zoom -= 0.01f;
-            }
-            else
-            {
-                // scale up
-                while (button_y + image_h*zoom +
-                       needed_space_under_button < m_h)  zoom += 0.01f;
-            }
+            float zoom = (float) (m_h - button_y - needed_space_under_button) / image_h;
+            float zoom_x = (float) one_button_space / image_w;
+            if(zoom_x < zoom)
+                zoom = zoom_x;
 
             // ---- add bitmap button part
             // backup and restore position in case the same object is added
@@ -612,7 +594,7 @@ EventPropagation RibbonWidget::mouseHovered(Widget* child,
 
     if (m_ribbon_type == RIBBON_COMBO || m_ribbon_type == RIBBON_TABS)
     {
-        //std::cout << "SETTING m_mouse_focus\n";
+        //Log::info("RibbonWidget", "Setting m_mouse_focus");
         m_mouse_focus = child;
     }
 
@@ -660,7 +642,6 @@ void RibbonWidget::updateSelection()
 
     // FIXME: m_selection, m_selected, m_mouse_focus... what a mess...
 
-    //std::cout << "----\n";
     // Update selection flags for mouse player
     for (unsigned int p=0; p<MAX_PLAYER_COUNT; p++)
     {

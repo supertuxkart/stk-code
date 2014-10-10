@@ -9,6 +9,7 @@ uniform mat4 RSMMatrix;
 uniform sampler2D dtex;
 uniform sampler2D ctex;
 uniform sampler2D ntex;
+uniform vec3 suncol;
 
 flat in int slice;
 layout (location = 0) out vec4 SHRed;
@@ -63,7 +64,7 @@ void loop(in int i,
     float dotprod = max(dot(RSM_to_RH_dir, normal.xyz), 0.);
     float factor = dotprod / (0.1 + dist * dist);
 
-    vec3 color = RSMAlbedo.rgb * factor;
+    vec3 color = RSMAlbedo.rgb * factor * suncol.rgb;
 
     SHr += DirToSh(RSM_to_RH_dir, color.r);
     SHg += DirToSh(RSM_to_RH_dir, color.g);

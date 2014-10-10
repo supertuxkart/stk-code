@@ -48,6 +48,7 @@ public:
     virtual bool       init()                         = 0;
     virtual void       position(const Vec3 &position) = 0;
     virtual void       setLoop(bool status)           = 0;
+    virtual bool       isPlaying()                    = 0;
     virtual void       play()                         = 0;
     virtual void       reallyPlayNow()                = 0;
     virtual void       stop()                         = 0;

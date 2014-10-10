@@ -2279,7 +2279,7 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
             node->setAnimationSpeed(0);
             node->updateAbsolutePosition();
             node->setScale( mesh_scale[n].toIrrVector() );
-            //std::cout << "(((( set frame " << model_frames[n] << " ))))\n";
+            //Log::info("RTTProvider::setupRTTScene", "Set frame %d", model_frames[n]);
         }
     }
 
