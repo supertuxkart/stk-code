@@ -1893,12 +1893,12 @@ void Kart::crashed(const Material* m, AbstractKart *k)
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-                if (m_boing_sound->getStatus() != SFXManager::SFX_PLAYING)
+                if (!m_boing_sound->isPlaying())
                     m_boing_sound->play();
             }
             else
             {
-                if(m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
+                if(!m_crash_sound->isPlaying())
                     m_crash_sound->play();
             }
         }
@@ -1973,7 +1973,7 @@ bool Kart::playCustomSFX(unsigned int type)
             //    SFXManager::get()->getCustomTagName(type),
             //    m_kart_properties->getIdent().c_str());
             // If it's already playing, let it finish
-            if (m_custom_sounds[type]->getStatus() != SFXManager::SFX_PLAYING)
+            if (!m_custom_sounds[type]->isPlaying())
             {
                 m_custom_sounds[type]->play();
             }
@@ -2018,10 +2018,10 @@ void Kart::updatePhysics(float dt)
          m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
         m_skidding->getGraphicalJumpOffset()==0)
     {
-        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING &&!isWheeless())
+        if(!m_skid_sound->isPlaying() && !isWheeless())
             m_skid_sound->play();
     }
-    else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
+    else if(m_skid_sound->isPlaying())
     {
         m_skid_sound->stop();
     }

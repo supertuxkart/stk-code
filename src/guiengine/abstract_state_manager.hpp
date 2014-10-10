@@ -167,6 +167,10 @@ namespace GUIEngine
 
         virtual void onTopMostScreenChanged() = 0;
 
+        // --------------------------------------------------------------------
+        /** Returns the number of screens on the stack. Is used to decide
+         *  if exiting a screen would cause STK to end or not. */
+        unsigned int getMenuStackSize() const { return m_menu_stack.size(); }
     };   // Class AbstractStateManager
 
 }   // GUIEngine

@@ -126,7 +126,7 @@ void RaceManager::setDefaultAIKartList(const std::vector<std::string>& ai_list)
         // player (and therefore the current slot) is not defined yet.
         //if(unlock_manager->getCurrentSlot()->isLocked(name))
         //{
-        //   printf("Kart '%s' is locked and therefore ignored.\n",
+        //   Log::info("RaceManager", "Kart '%s' is locked and therefore ignored.",
         //           name.c_str());
         //    continue;
         //}
@@ -240,9 +240,8 @@ void RaceManager::computeRandomKartList()
 {
     int n = m_num_karts - (int)m_player_karts.size();
     if(UserConfigParams::logMisc())
-        std::cout << "AI karts count = " << n << " for m_num_karts="
-                  << m_num_karts << " and m_player_karts.size()="
-                  << m_player_karts.size() << std::endl;
+        Log::info("RaceManager", "AI karts count = %d for m_num_karts = %d and "
+            "m_player_karts.size() = %d", n, m_num_karts, m_player_karts.size());
 
     // If less kart selected than there are player karts, adjust the number of
     // karts to the minimum
@@ -655,8 +654,8 @@ void RaceManager::exitRace(bool delete_world)
         {
             if(UserConfigParams::logMisc())
             {
-                std::cout << m_kart_status[i].m_ident << " has GP final rank "
-                          << m_kart_status[i].m_gp_rank << std::endl;
+                Log::info("RaceManager", "%s has GP final rank %d",
+                    m_kart_status[i].m_ident.c_str(), m_kart_status[i].m_gp_rank);
             }
 
             const int rank = m_kart_status[i].m_gp_rank;

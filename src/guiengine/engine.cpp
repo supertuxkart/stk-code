@@ -1019,12 +1019,10 @@ namespace GUIEngine
             g_skin->drop(); // GUI env grabbed it
             assert(g_skin->getReferenceCount() == 1);
         }
-        catch (std::runtime_error& err)
+        catch (std::runtime_error& /*err*/)
         {
-            (void)err;   // avoid warning about unused variable
-            std::cerr <<
-                "ERROR, cannot load skin specified in user config. Falling "
-                "back to defaults.\n";
+            Log::error("Engine::init", "Cannot load skin specified in user config. "
+                "Falling back to defaults.");
             UserConfigParams::m_skin_file.revertToDefaults();
 
             try
@@ -1036,8 +1034,7 @@ namespace GUIEngine
             }
             catch (std::runtime_error& err)
             {
-                std::cerr << "FATAL, cannot load default GUI skin\n";
-                throw err;
+                Log::fatal("Engine::init", "Canot load default GUI skin");
             }
         }
 
@@ -1135,10 +1132,9 @@ namespace GUIEngine
             // one so that the fallback skin is not dropped
             newSkin = new Skin(fallbackSkin);
         }
-        catch (std::runtime_error& err)
+        catch (std::runtime_error& /*err*/)
         {
-            (void)err;  // avoid warning about unused variable
-            std::cerr << "ERROR, cannot load newly specified skin!\n";
+            Log::error("Engine::reloadSkin", "Canot load newly specified skin");
             return;
         }
 
@@ -1369,8 +1365,8 @@ namespace GUIEngine
         }
         else
         {
-            std::cerr << "WARNING: GUIEngine::addLoadingIcon given "
-                         "NULL icon\n";
+            Log::warn("Engine::addLoadingIcon", "Given "
+                "NULL icon");
         }
     } // addLoadingIcon
 

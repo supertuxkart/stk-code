@@ -258,9 +258,9 @@ void DynamicRibbonWidget::add()
                 const float score = log(2.0f*visible_items) *
                                       std::min(ratio, 1.0f) * std::min(taken_area/total_area, 1.0f);
 
-                //std::cout << "   " << row_count << " rows : " <<  visible_items << " visible items; area = "
-                //          << taken_area << "; size penalty = " << std::min((float)item_height / (float)m_child_height, 1.0f)
-                //          << "; score = " << score << "\n";
+                //Log::info("DynamicRibbonWidget", "%d rown: %d visible items; area = %f; "
+                //    "size penalty = %f; score = %f", row_count, visible_items, taken_area,
+                //    std::min((float)item_height / (float)m_child_height, 1.0f), score);
 
                 if (score > max_score_so_far)
                 {
@@ -276,8 +276,8 @@ void DynamicRibbonWidget::add()
             const int max_rows = atoi(m_properties[PROP_MAX_ROWS].c_str());
             if (max_rows < 1)
             {
-                std::cout << "/!\\ WARNING : the 'max_rows' property must be an integer greater than zero."
-                          << " Ingoring current value '" << m_properties[PROP_MAX_ROWS] << "'\n";
+                Log::warn("DynamicRibbonWidget", "The 'max_rows' property must be an integer greater than zero; "
+                    "Ignoring current value '%s'", m_properties[PROP_MAX_ROWS].c_str());
             }
             else
             {
@@ -300,7 +300,7 @@ void DynamicRibbonWidget::add()
     for (int i=0; i<m_row_amount; i++)
     {
         m_ids[i] = getNewID();
-        //std::cout << "ribbon : getNewID returns " <<  m_ids[i] << std::endl;
+        //Log::info("DynamicRibbonWidget", "getNewID returns %d", m_ids[i]);
     }
 
     buildInternalStructure();
@@ -334,11 +334,11 @@ void DynamicRibbonWidget::buildInternalStructure()
 
     // ajust column amount to not add more item slots than we actually need
     const int item_count = (int) m_items.size();
-    //std::cout << "item_count=" << item_count << ", row_amount*m_col_amount=" << m_row_amount*m_col_amount << std::endl;
+    //Log::info("DynamicRibbonWidget", "%d items; %d cells", item_count, row_amount * m_col_amount);
     if (m_row_amount*m_col_amount > item_count)
     {
         m_col_amount = (int)ceil((float)item_count/(float)m_row_amount);
-        //std::cout << "Adjusting m_col_amount to be " << m_col_amount << std::endl;
+        //Log::info("DynamicRibbonWidget", "Adjusting m_col_amount to be %d", m_col_amount);
     }
 
     assert( m_left_widget->ok() );
@@ -411,7 +411,7 @@ void DynamicRibbonWidget::buildInternalStructure()
             // it will assume there is no label and none will be created (FIXME: that's ugly)
             if (m_properties[PROP_LABELS_LOCATION] == "each") icon->m_text = " ";
 
-            // std::cout << "ribbon text = " << m_properties[PROP_TEXT].c_str() << std::endl;
+            //Log::info("DynamicRibbonWidget", "Ribbon text = %s", m_properties[PROP_TEXT].c_str());
 
             ribbon->m_children.push_back( icon );
             added_item_count++;
@@ -612,12 +612,12 @@ EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
                                                     getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
         }
     }
-    //std::cout << "rightpressed (dynamic ribbon) " << m_properties[PROP_ID] << "\n";
+    //Log::info("DynamicRibbonWidget", "Rightpressed %s", m_properties[PROP_ID].c_str());
 
     assert(m_rows.size() >= 1);
     if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return EVENT_BLOCK;
 
-    //std::cout << "     rightpressed returning EVENT_LET\n";
+    //Log::info("DynamicRibbonWidget", "Rightpressed returning EVENT_LET");
 
     return EVENT_LET;
 }
@@ -682,7 +682,7 @@ EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w,
 EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child, const int playerID)
 {
     if (m_deactivated) return EVENT_LET;
-    //std::cout << "DynamicRibbonWidget::mouseHovered " << playerID << std::endl;
+    //Log::info("DynamicRibbonWidget", "mouseHovered %d", playerID);
 
     updateLabel();
     propagateSelection();
@@ -1085,15 +1085,14 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID,
 
         if (iterations > 50)
         {
-            assert(false);
-            std::cerr << "DynamicRibbonWidget::setSelection cannot find item " << item_id << " (" << name.c_str() << ")\n";
+            Log::fatal("DynamicRibbonWidget::setSelection", "Cannot find item %d (%s)", item_id, name.c_str());
             return false;
         }
 
         iterations++;
     }
 
-    //std::cout << "Player " << playerID << " has item " << item_id << " (" << name.c_str() << ") in row " << row << std::endl;
+    //Log::info("DynamicRibbonWidget", "Player %d has item %d (%s) in row %d", playerID, item_id, name.c_str(), row);
     m_rows[row].setSelection(id, playerID);
     if (focusIt)
     {

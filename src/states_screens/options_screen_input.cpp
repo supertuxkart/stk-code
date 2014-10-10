@@ -235,7 +235,8 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             }
             else
             {
-                std::cerr << "Cannot read internal gamepad input device ID : " << selection.c_str() << std::endl;
+                Log::error("OptionsScreenInput", "Cannot read internal gamepad input device ID: %s",
+                    selection.c_str());
             }
         }
         else if (selection.find("keyboard") != std::string::npos)
@@ -250,12 +251,13 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             }
             else
             {
-                std::cerr << "Cannot read internal keyboard input device ID : " << selection.c_str() << std::endl;
+                Log::error("OptionsScreenInput", "Cannot read internal keyboard input device ID: %s",
+                    selection.c_str());
             }
         }
         else
         {
-            std::cerr << "Cannot read internal input device ID : " << selection.c_str() << std::endl;
+            Log::error("OptionsScreenInput", "Cannot read internal input device ID: %s", selection.c_str());
         }
     }
 

@@ -93,8 +93,8 @@ void AbstractStateManager::pushMenu(std::string name)
 
     if (UserConfigParams::logGUI())
     {
-        std::cout << "[AbstractStateManager::pushMenu] switching to screen "
-                  << name.c_str() << std::endl;
+        Log::info("AbstractStateManager::pushMenu", "Switching to screen %s",
+            name.c_str());
     }
 
     // Send tear-down event to previous menu
@@ -125,8 +125,8 @@ void AbstractStateManager::pushScreen(Screen* screen)
 
     if (UserConfigParams::logGUI())
     {
-        std::cout << "[AbstractStateManager::pushScreen] switching to screen "
-                  << screen->getName().c_str() << std::endl;
+        Log::info("AbstractStateManager::pushScreen", "Switching to screen %s",
+            screen->getName().c_str());
     }
 
     if (!screen->isLoaded()) screen->loadFromFile();
@@ -152,8 +152,8 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen, GUIEngine::GameS
 
     if (UserConfigParams::logGUI())
     {
-        std::cout << "[AbstractStateManager::replaceTopmostScreen] "
-                     "switching to screen " << name.c_str() << std::endl;
+        Log::info("AbstractStateManager::replaceTopMostScreen", "Switching to screen %s",
+            name.c_str());
     }
 
     assert(m_menu_stack.size() > 0);
@@ -215,8 +215,8 @@ void AbstractStateManager::popMenu()
 
     if (UserConfigParams::logGUI())
     {
-        std::cout << "[AbstractStateManager::popMenu] switching to screen "
-                  << m_menu_stack[m_menu_stack.size()-1].c_str() << std::endl;
+        Log::info("AbstractStateManager::popMenu", "Switching to screen %s",
+            m_menu_stack[m_menu_stack.size()-1].c_str());
     }
 
     if (m_menu_stack[m_menu_stack.size()-1] == RACE_STATE_NAME)
@@ -247,10 +247,8 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     std::string name = screen->getName();
 
     if (UserConfigParams::logGUI())
-    {
-        std::cout << "[AbstractStateManager::resetAndGoToScreen] "
-                     "switching to screen " << name.c_str() << std::endl;
-    }
+        Log::info("AbstractStateManager::resetAndGoToScreen", "Switching to screen %s",
+            name.c_str());
 
     if (m_game_mode != GAME) getCurrentScreen()->tearDown();
     m_menu_stack.clear();

@@ -73,6 +73,15 @@ void BaseUserScreen::init()
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
 
+    // The behaviour of the screen is slightly different at startup, i.e.
+    // when it is the first screen: cancel will exit the game, and in
+    // this case no 'back' error should be shown.
+    bool is_first_screen = StateManager::get()->getMenuStackSize()==1;
+    getWidget<IconButtonWidget>("back")->setVisible(!is_first_screen);
+    getWidget<IconButtonWidget>("cancel")->setLabel(is_first_screen 
+                                                    ? _("Exit game") 
+                                                    : _("Cancel")      );
+
     m_sign_out_name = "";
     m_sign_in_name  = "";
 
@@ -203,7 +212,11 @@ void BaseUserScreen::makeEntryFieldsVisible()
     getWidget<LabelWidget>("label_remember")->setVisible(online);
     getWidget<CheckBoxWidget>("remember-user")->setVisible(online);
     PlayerProfile *player = getSelectedPlayer();
-    if(player && player->hasSavedSession() && online)
+    // Don't show the password fields if the player wants to be online
+    // and either is the current player (no need to enter a password then)
+    // or has a saved session.
+    if(player && online  &&
+        (player->hasSavedSession() || player==PlayerManager::getCurrentPlayer()))
     {
         // If we show the online login fields, but the player has a
         // saved session, don't show the password field.
@@ -289,7 +302,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
         }
         else if (button == "cancel")
         {
-            StateManager::get()->popMenu();
+            // EscapePressed will pop this screen.
             StateManager::get()->escapePressed();
         }
         else if (button == "recover")

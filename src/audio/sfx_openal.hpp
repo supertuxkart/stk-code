@@ -55,6 +55,9 @@ private:
      the sound source won't be created and we'll be left with no clue when enabling
      sounds later. */
     float m_gain;
+
+    /** True when the sfx is currently playing. */
+    bool m_is_playing;
     
     /** The master gain set in user preferences */
     float m_master_gain;
@@ -72,6 +75,7 @@ public:
     virtual void                  play();
     virtual void                  reallyPlayNow();
     virtual void                  setLoop(bool status);
+    virtual bool                  isPlaying();
     virtual void                  stop();
     virtual void                  pause();
     virtual void                  resume();
