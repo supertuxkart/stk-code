@@ -17,6 +17,7 @@
 
 #include "states_screens/online_profile_base.hpp"
 
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
@@ -121,9 +122,16 @@ void OnlineProfileBase::eventCallback(Widget* widget, const std::string& name,
         else if (selection == m_settings_tab->m_properties[PROP_ID])
             sm->replaceTopMostScreen(OnlineProfileSettings::getInstance());
     }
-    else if (name == "back")
-    {
-        StateManager::get()->escapePressed();
-    }
+	else if (name == "back")
+	{
+		if (!m_visiting_profile || m_visiting_profile->isCurrentUser())
+			StateManager::get()->escapePressed();
+		else
+		{
+			ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
+			StateManager::get()->popMenu();
+			OnlineProfileAchievements::getInstance()->push();
+		}
+	}
 }   // eventCallback
 
