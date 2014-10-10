@@ -1893,12 +1893,12 @@ void Kart::crashed(const Material* m, AbstractKart *k)
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-                if (!m_boing_sound->isPlaying())
+                if (m_boing_sound->getStatus() != SFXManager::SFX_PLAYING)
                     m_boing_sound->play();
             }
             else
             {
-                if(!m_crash_sound->isPlaying())
+                if(m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
                     m_crash_sound->play();
             }
         }
@@ -1973,7 +1973,7 @@ bool Kart::playCustomSFX(unsigned int type)
             //    SFXManager::get()->getCustomTagName(type),
             //    m_kart_properties->getIdent().c_str());
             // If it's already playing, let it finish
-            if (!m_custom_sounds[type]->isPlaying())
+            if (m_custom_sounds[type]->getStatus() != SFXManager::SFX_PLAYING)
             {
                 m_custom_sounds[type]->play();
             }
