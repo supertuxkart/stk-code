@@ -19,6 +19,7 @@
 #ifndef HEADER_SFX_MANAGER_HPP
 #define HEADER_SFX_MANAGER_HPP
 
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/vec3.hpp"
@@ -57,6 +58,18 @@ private:
 
 public:
 
+    /** The various commands to be executed by the sfx manager thread
+     *  for each sfx. */
+    enum SFXCommands
+    {
+        SFX_PLAY   = 1,
+        SFX_STOP   = 2,
+        SFX_PAUSE  = 3,
+        SFX_RESUME = 4,
+        SFX_DELETE = 5,
+        SFX_EXIT   = 6,
+    };   // SFXCommands
+
     /**
       *  Entries for custom SFX sounds.  These are unique for each kart.
       * eg. kart->playCustomSFX(SFX_MANAGER::CUSTOM_HORN)
@@ -85,6 +98,22 @@ public:
 
 private:
 
+    /** Data structure for the queue, which stores a sfx and the command to 
+     *  execute for it. */
+    class SFXCommand : public NoCopy
+    {
+    private:
+        LEAK_CHECK()
+    public:
+        SFXBase    *m_sfx;
+        SFXCommands m_command;
+        SFXCommand(SFXCommands command, SFXBase *base)
+        {
+            m_command = command;
+            m_sfx     = base;
+        }
+    };   // SFXCommand
+
     /** Listener position */
     Vec3 m_position;
 
@@ -96,7 +125,7 @@ private:
     std::vector<SFXBase*> m_all_sfx;
 
     /** The list of sound effects to be played in the next update. */
-    Synchronised< std::vector<SFXBase*> > m_sfx_to_play;
+    Synchronised< std::vector<SFXCommand*> > m_sfx_commands;
 
     /** To play non-positional sounds without having to create a new object for each */
     std::map<std::string, SFXBase*> m_quick_sounds;
@@ -124,7 +153,7 @@ private:
 public:
     static void create();
     static void destroy();
-    void queue(SFXBase *sfx);
+    void queue(SFXCommands command,  SFXBase *sfx);
     // ------------------------------------------------------------------------
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()

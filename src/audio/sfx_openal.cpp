@@ -234,7 +234,7 @@ void SFXOpenAL::play()
     // but for STK this is correct since we don't want to start the same
     // sfx twice.
     m_is_playing = true;
-    SFXManager::get()->queue(this);
+    SFXManager::get()->queue(SFXManager::SFX_PLAY, this);
 }   // play
 
 //-----------------------------------------------------------------------------

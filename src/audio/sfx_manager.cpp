@@ -106,9 +106,9 @@ SFXManager::SFXManager()
     if (!sfxAllowed()) return;
 
     setMasterSFXVolume( UserConfigParams::m_sfx_volume );
-    m_sfx_to_play.lock();
-    m_sfx_to_play.getData().clear();
-    m_sfx_to_play.unlock();
+    m_sfx_commands.lock();
+    m_sfx_commands.getData().clear();
+    m_sfx_commands.unlock();
 
 }  // SoundManager
 
@@ -163,15 +163,17 @@ SFXManager::~SFXManager()
  *  separate thread.
  *  \param sfx The sound effect to be started.
  */
-void SFXManager::queue(SFXBase *sfx)
+void SFXManager::queue(SFXCommands command,  SFXBase *sfx)
 {
     // Don't add sfx that are either not working correctly (e.g. because sfx
     // are disabled);
     if(sfx && sfx->getStatus()==SFX_UNKNOWN ) return;
 
-    m_sfx_to_play.lock();
-    m_sfx_to_play.getData().push_back(sfx);
-    m_sfx_to_play.unlock();
+    SFXCommand *sfx_command = new SFXCommand(command, sfx);
+
+    m_sfx_commands.lock();
+    m_sfx_commands.getData().push_back(sfx_command);
+    m_sfx_commands.unlock();
     // Wake up the sfx thread
     pthread_cond_signal(&m_cond_request);
 
@@ -183,7 +185,7 @@ void SFXManager::queue(SFXBase *sfx)
  */
 void SFXManager::stopThread()
 {
-    queue(NULL);
+    queue(SFX_EXIT, NULL);
 }   // stopThread
 
 //----------------------------------------------------------------------------
@@ -198,35 +200,47 @@ void* SFXManager::mainLoop(void *obj)
 
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
-    me->m_sfx_to_play.lock();
+    me->m_sfx_commands.lock();
 
     // Wait till we have an empty sfx in the queue
-    while (me->m_sfx_to_play.getData().empty() ||
-           me->m_sfx_to_play.getData().front()!=NULL    )
+    while (me->m_sfx_commands.getData().empty() ||
+           me->m_sfx_commands.getData().front()->m_command!=SFX_EXIT)
     {
-        bool empty = me->m_sfx_to_play.getData().empty();
+        bool empty = me->m_sfx_commands.getData().empty();
 
         // Wait in cond_wait for a request to arrive. The 'while' is necessary
         // since "spurious wakeups from the pthread_cond_wait ... may occur"
         // (pthread_cond_wait man page)!
         while (empty)
         {
-            pthread_cond_wait(&me->m_cond_request, me->m_sfx_to_play.getMutex());
-            empty = me->m_sfx_to_play.getData().empty();
+            pthread_cond_wait(&me->m_cond_request, me->m_sfx_commands.getMutex());
+            empty = me->m_sfx_commands.getData().empty();
         }
 
-        SFXBase *current = me->m_sfx_to_play.getData().front();
-        me->m_sfx_to_play.getData().erase(me->m_sfx_to_play.getData().begin());
+        SFXCommand *current = me->m_sfx_commands.getData().front();
+        me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
 
-        if (!current)   // empty sfx indicates to abort the sfx manager
+        if (current->m_command == SFX_EXIT)
             break;
 
-        me->m_sfx_to_play.unlock();
-        current->reallyPlayNow();
-        me->m_sfx_to_play.lock();
+        me->m_sfx_commands.unlock();
+        switch(current->m_command)
+        {
+        case SFX_PLAY: current->m_sfx->reallyPlayNow(); break;
+        default: assert("Not yet supported.");
+        }
+        delete current;
+        current = NULL;
+        me->m_sfx_commands.lock();
 
     }   // while
 
+    // Clean up memory to avoid leak detection
+    while(!me->m_sfx_commands.getData().empty())
+    {
+        delete me->m_sfx_commands.getData().front();
+        me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
+    }
     return NULL;
 }   // mainLoop
 
