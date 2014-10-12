@@ -479,8 +479,9 @@ void UserInfoDialog::onUpdate(float dt)
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
+        bool enter_profile = m_enter_profile;
         ModalDialog::dismiss();
-        if (m_enter_profile)
+        if (enter_profile)
             StateManager::get()->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
         return;
     }
