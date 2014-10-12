@@ -51,11 +51,11 @@ Weather::Weather(bool lightning, std::string sound)
 Weather::~Weather()
 {
     if (m_thunder_sound != NULL) 
-        SFXManager::get()->deleteSFX(m_thunder_sound);
+        m_thunder_sound->deleteSFX();
         
     if (m_weather_sound != NULL) 
-        SFXManager::get()->deleteSFX(m_weather_sound);
-}
+        m_weather_sound->deleteSFX();
+}   // ~Weather
 
 // ----------------------------------------------------------------------------
 

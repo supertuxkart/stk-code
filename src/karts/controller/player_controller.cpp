@@ -74,11 +74,11 @@ PlayerController::PlayerController(AbstractKart *kart,
  */
 PlayerController::~PlayerController()
 {
-    SFXManager::get()->deleteSFX(m_bzzt_sound);
-    SFXManager::get()->deleteSFX(m_wee_sound );
-    SFXManager::get()->deleteSFX(m_ugh_sound );
-    SFXManager::get()->deleteSFX(m_grab_sound);
-    SFXManager::get()->deleteSFX(m_full_sound);
+    m_bzzt_sound->deleteSFX();
+    m_wee_sound ->deleteSFX();
+    m_ugh_sound ->deleteSFX();
+    m_grab_sound->deleteSFX();
+    m_full_sound->deleteSFX();
 }   // ~PlayerController
 
 //-----------------------------------------------------------------------------

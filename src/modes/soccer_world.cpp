@@ -60,7 +60,7 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
  */
 SoccerWorld::~SoccerWorld()
 {
-    SFXManager::get()->deleteSFX(m_goal_sound);
+    m_goal_sound->deleteSFX();
 }   // ~SoccerWorld
 
 //-----------------------------------------------------------------------------

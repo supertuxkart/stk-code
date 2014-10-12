@@ -74,9 +74,9 @@ void WorldStatus::reset()
  */
 WorldStatus::~WorldStatus()
 {
-    SFXManager::get()->deleteSFX(m_prestart_sound);
-    SFXManager::get()->deleteSFX(m_start_sound);
-    SFXManager::get()->deleteSFX(m_track_intro_sound);
+    m_prestart_sound->deleteSFX();
+    m_start_sound->deleteSFX();
+    m_track_intro_sound->deleteSFX();
     IrrlichtDevice *device = irr_driver->getDevice();
 
     if (device->getTimer()->isStopped())  

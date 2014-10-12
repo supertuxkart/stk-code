@@ -182,9 +182,16 @@ void SFXOpenAL::setLoop(bool status)
 }   // loop
 
 //-----------------------------------------------------------------------------
-/** Stops playing this sound effect.
+/** Queues a stop for this effect to the sound manager.
  */
 void SFXOpenAL::stop()
+{
+    SFXManager::get()->queue(SFXManager::SFX_STOP, this);
+}   // stop
+//-----------------------------------------------------------------------------
+/** The sfx manager thread executes a stop for this sfx.
+ */
+void SFXOpenAL::reallyStopNow()
 {
     if(!m_ok) return;
 
@@ -193,23 +200,39 @@ void SFXOpenAL::stop()
     alSourcei(m_soundSource, AL_LOOPING, AL_FALSE);
     alSourceStop(m_soundSource);
     SFXManager::checkError("stoping");
-}   // stop
+}   // reallyStopNow
+
+//-----------------------------------------------------------------------------
+/** Queues up a pause command for this sfx.
+ */
+void SFXOpenAL::pause()
+{
+    SFXManager::get()->queue(SFXManager::SFX_PAUSE, this);
+}   // pause
 
 //-----------------------------------------------------------------------------
 /** Pauses a SFX that's currently played. Nothing happens it the effect is
  *  currently not being played.
  */
-void SFXOpenAL::pause()
+void SFXOpenAL::reallyPauseNow()
 {
     if(!m_ok) return;
     alSourcePause(m_soundSource);
     SFXManager::checkError("pausing");
-}   // pause
+}   // reallyPauseNow
+
+//-----------------------------------------------------------------------------
+/** Queues up a resume command for this sound effect.
+ */
+void SFXOpenAL::resume()
+{
+    SFXManager::get()->queue(SFXManager::SFX_RESUME, this);
+}   // resume
 
 //-----------------------------------------------------------------------------
 /** Resumes a sound effect.
  */
-void SFXOpenAL::resume()
+void SFXOpenAL::reallyResumeNow()
 {
     if (!m_ok)
     {
@@ -222,7 +245,17 @@ void SFXOpenAL::resume()
 
     alSourcePlay(m_soundSource);
     SFXManager::checkError("resuming");
-}   // resume
+}   // reallyResumeNow
+
+//-----------------------------------------------------------------------------
+/** Queues up a delete request for this object. This is necessary to avoid
+ *  a crash if the sfx manager thread might be delayed and access this object
+ *  after it was deleted.
+ */
+void SFXOpenAL::deleteSFX()
+{
+    SFXManager::get()->queue(SFXManager::SFX_DELETE, this);
+}   // deleteSFX
 
 //-----------------------------------------------------------------------------
 /** This actually queues up the sfx in the sfx manager. It will be started

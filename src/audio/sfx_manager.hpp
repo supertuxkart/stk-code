@@ -122,7 +122,7 @@ private:
     std::map<std::string, SFXBuffer*> m_all_sfx_types;
 
     /** The actual instances (sound sources) */
-    std::vector<SFXBase*> m_all_sfx;
+    Synchronised<std::vector<SFXBase*> > m_all_sfx;
 
     /** The list of sound effects to be played in the next update. */
     Synchronised< std::vector<SFXCommand*> > m_sfx_commands;
@@ -150,6 +150,7 @@ private:
     virtual                 ~SFXManager();
 
     static void* mainLoop(void *obj);
+    void deleteSFX(SFXBase *sfx);
 public:
     static void create();
     static void destroy();
@@ -182,7 +183,6 @@ public:
     SFXBase*                 createSoundSource(const std::string &name,
                                                const bool addToSFXList=true);
 
-    void                     deleteSFX(SFXBase *sfx);
     void                     deleteSFXMapping(const std::string &name);
     void                     pauseAll();
     void                     resumeAll();

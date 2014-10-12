@@ -53,7 +53,7 @@ Powerup::Powerup(AbstractKart* kart)
  */
 Powerup::~Powerup()
 {
-    if(m_sound_use) SFXManager::get()->deleteSFX(m_sound_use);
+    if(m_sound_use) m_sound_use->deleteSFX();
 }   // ~Powerup
 
 //-----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
 
     if(m_sound_use != NULL)
     {
-        SFXManager::get()->deleteSFX(m_sound_use);
+        m_sound_use->deleteSFX();
         m_sound_use = NULL;
     }
 

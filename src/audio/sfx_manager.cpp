@@ -124,13 +124,15 @@ SFXManager::~SFXManager()
     pthread_cond_destroy(&m_cond_request);
 
     // ---- clear m_all_sfx
-    const int sfx_amount = (int) m_all_sfx.size();
+    // not strictly necessary, but might avoid copy&paste problems
+    m_all_sfx.lock();
+    const int sfx_amount = (int) m_all_sfx.getData().size();
     for (int n=0; n<sfx_amount; n++)
     {
-        delete m_all_sfx[n];
+        delete m_all_sfx.getData()[n];
     }
-    m_all_sfx.clear();
-
+    m_all_sfx.getData().clear();
+    m_all_sfx.unlock();
     // ---- clear m_quick_sounds
     {
         std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.begin();
@@ -226,7 +228,15 @@ void* SFXManager::mainLoop(void *obj)
         me->m_sfx_commands.unlock();
         switch(current->m_command)
         {
-        case SFX_PLAY: current->m_sfx->reallyPlayNow(); break;
+        case SFX_PLAY:   current->m_sfx->reallyPlayNow();   break;
+        case SFX_STOP:   current->m_sfx->reallyStopNow();   break;
+        case SFX_PAUSE:  current->m_sfx->reallyPauseNow();  break;
+        case SFX_RESUME: current->m_sfx->reallyResumeNow(); break;
+        case SFX_DELETE: {
+                            current->m_sfx->reallyStopNow();
+                            me->deleteSFX(current->m_sfx);
+                            break;
+                         }
         default: assert("Not yet supported.");
         }
         delete current;
@@ -262,12 +272,13 @@ void SFXManager::soundToggled(const bool on)
         }
 
         resumeAll();
-
-        const int sfx_amount = (int)m_all_sfx.size();
+        m_all_sfx.lock();
+        const int sfx_amount = (int)m_all_sfx.getData().size();
         for (int n=0; n<sfx_amount; n++)
         {
-            m_all_sfx[n]->onSoundEnabledBack();
+            m_all_sfx.getData()[n]->onSoundEnabledBack();
         }
+        m_all_sfx.unlock();
     }
     else
     {
@@ -451,7 +462,14 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
 
     sfx->setMasterVolume(m_master_gain);
 
-    if (add_to_SFX_list) m_all_sfx.push_back(sfx);
+    if (add_to_SFX_list) 
+    {
+        m_all_sfx.lock();
+        m_all_sfx.getData().push_back(sfx);
+        m_all_sfx.unlock();
+    }
+    else
+        printf("");
 
     return sfx;
 }   // createSoundSource
@@ -511,21 +529,26 @@ void SFXManager::deleteSFXMapping(const std::string &name)
  */
 void SFXManager::deleteSFX(SFXBase *sfx)
 {
-    if(sfx) sfx->stop();
+    if(sfx) sfx->reallyStopNow();
     std::vector<SFXBase*>::iterator i;
-    i=std::find(m_all_sfx.begin(), m_all_sfx.end(), sfx);
+    
+    // The whole block needs to be locked, otherwise the iterator
+    // could become invalid.
+    m_all_sfx.lock();
+    i=std::find(m_all_sfx.getData().begin(), m_all_sfx.getData().end(), sfx);
 
-    if(i==m_all_sfx.end())
+    if(i==m_all_sfx.getData().end())
     {
         Log::warn("SFXManager", 
-                  "SFXManager::deleteSFX : Warning: sfx not found in list.");
+                  "SFXManager::deleteSFX : Warning: sfx '%s' %lx not found in list.",
+                  sfx->getBuffer()->getFileName().c_str(), sfx);
         return;
     }
 
+    m_all_sfx.getData().erase(i);
     delete sfx;
 
-    m_all_sfx.erase(i);
-
+    m_all_sfx.unlock();
 }   // deleteSFX
 
 //----------------------------------------------------------------------------
@@ -535,11 +558,13 @@ void SFXManager::deleteSFX(SFXBase *sfx)
  */
 void SFXManager::pauseAll()
 {
-    for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
-        i!=m_all_sfx.end(); i++)
+    m_all_sfx.lock();
+    for (std::vector<SFXBase*>::iterator i= m_all_sfx.getData().begin();
+                                         i!=m_all_sfx.getData().end(); i++)
     {
         (*i)->pause();
     }   // for i in m_all_sfx
+    m_all_sfx.unlock();
 }   // pauseAll
 
 //----------------------------------------------------------------------------
@@ -551,13 +576,15 @@ void SFXManager::resumeAll()
     // ignore unpausing if sound is disabled
     if (!sfxAllowed()) return;
 
-    for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
-        i!=m_all_sfx.end(); i++)
+    m_all_sfx.lock();
+    for (std::vector<SFXBase*>::iterator i =m_all_sfx.getData().begin();
+                                         i!=m_all_sfx.getData().end(); i++)
     {
         SFXStatus status = (*i)->getStatus();
         // Initial happens when
         if (status==SFX_PAUSED) (*i)->resume();
     }   // for i in m_all_sfx
+    m_all_sfx.unlock();
 }   // resumeAll
 
 //-----------------------------------------------------------------------------
@@ -594,11 +621,13 @@ void SFXManager::setMasterSFXVolume(float gain)
 
     // regular SFX
     {
-        for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
-            i!=m_all_sfx.end(); i++)
+        m_all_sfx.lock();
+        for (std::vector<SFXBase*>::iterator i =m_all_sfx.getData().begin();
+                                             i!=m_all_sfx.getData().end(); i++)
         {
             (*i)->setMasterVolume(m_master_gain);
         }   // for i in m_all_sfx
+        m_all_sfx.unlock();
     }
 
     // quick SFX
