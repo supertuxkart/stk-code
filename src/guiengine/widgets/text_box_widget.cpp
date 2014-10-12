@@ -101,7 +101,7 @@ void TextBoxWidget::add()
     //                                               true /* border */, m_parent, getNewID());
     m_id = m_element->getID();
     m_element->setTabOrder(m_id);
-    m_element->setTabGroup(false);
+    m_element->setTabGroup(true);
     m_element->setTabStop(true);
 }
 
