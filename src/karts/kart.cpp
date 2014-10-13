@@ -1079,6 +1079,7 @@ void Kart::eliminate()
  */
 void Kart::update(float dt)
 {
+    Log::verbose("sfx", "%s crash state %d", getIdent().c_str(),  m_crash_sound->getStatus());
     if ( UserConfigParams::m_graphical_effects )
     {
         // update star effect (call will do nothing if stars are not activated)
@@ -1461,7 +1462,7 @@ void Kart::handleMaterialSFX(const Material *material)
     }
 
     if(m_previous_terrain_sound &&
-        m_previous_terrain_sound->getStatus()==SFXManager::SFX_STOPPED)
+        m_previous_terrain_sound->getStatus()==SFXBase::SFX_STOPPED)
     {
         // We don't modify the position of m_previous_terrain_sound
         // anymore, so that it keeps on playing at the place where the
@@ -1477,8 +1478,8 @@ void Kart::handleMaterialSFX(const Material *material)
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
     if(m_terrain_sound &&
-      (m_terrain_sound->getStatus()==SFXManager::SFX_PLAYING ||
-       m_terrain_sound->getStatus()==SFXManager::SFX_PAUSED))
+      (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
+       m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED))
     {
         m_terrain_sound->position(getXYZ());
         material->setSFXSpeed(m_terrain_sound, m_speed, m_schedule_pause);
@@ -1589,7 +1590,7 @@ void Kart::handleMaterialGFX()
     const std::string &s = surface_material->getSFXName();
     if (s != "" && !dynamic_cast<RescueAnimation*>(getKartAnimation())&&
         (m_terrain_sound == NULL ||
-         m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
+         m_terrain_sound->getStatus() == SFXBase::SFX_STOPPED))
     {
         if (m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
         m_previous_terrain_sound = m_terrain_sound;
@@ -1892,12 +1893,12 @@ void Kart::crashed(const Material* m, AbstractKart *k)
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-                if (m_boing_sound->getStatus() != SFXManager::SFX_PLAYING)
+                if (m_boing_sound->getStatus() != SFXBase::SFX_PLAYING)
                     m_boing_sound->play();
             }
             else
             {
-                if(m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
+                if(m_crash_sound->getStatus() != SFXBase::SFX_PLAYING)
                     m_crash_sound->play();
             }
         }

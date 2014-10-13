@@ -458,7 +458,7 @@ void TrackObjectPresentationSound::update(float dt)
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::onTriggerItemApproached(Item* who)
 {
-    if (m_sound != NULL && m_sound->getStatus() != SFXManager::SFX_PLAYING)
+    if (m_sound != NULL && m_sound->getStatus() != SFXBase::SFX_PLAYING)
     {
         m_sound->play();
     }

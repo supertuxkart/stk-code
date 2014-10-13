@@ -23,7 +23,6 @@
 #include "audio/sfx_base.hpp"
 
 
-
 /**
  * \brief Dummy sound when ogg or openal aren't available
  * \ingroup audio
@@ -50,7 +49,7 @@ public:
     virtual void       deleteSFX()                    { delete this; }
     virtual void       speed(float factor)            {}
     virtual void       volume(float gain)             {}
-    virtual SFXManager::SFXStatus  getStatus()        { return SFXManager::SFX_STOPPED; }
+    virtual SFXStatus  getStatus()                    { return SFX_STOPPED; }
     virtual void       onSoundEnabledBack()           {}
     virtual void       setRolloff(float rolloff)      {}
     virtual bool       isPlaying()                    { return false; }

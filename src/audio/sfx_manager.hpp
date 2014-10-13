@@ -89,13 +89,6 @@ public:
         NUM_CUSTOMS
     };
 
-    /** Status of a sound effect. */
-    enum SFXStatus
-    {
-        SFX_UNKNOWN = -1, SFX_STOPPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2,
-        SFX_INITIAL = 3
-    };
-
 private:
 
     /** Data structure for the queue, which stores a sfx and the command to 

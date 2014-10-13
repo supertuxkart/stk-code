@@ -646,14 +646,14 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) con
     if (speed < 0) speed = -speed;
 
     // If we paused it due to too low speed earlier, we can continue now.
-    if (sfx->getStatus() == SFXManager::SFX_PAUSED)
+    if (sfx->getStatus() == SFXBase::SFX_PAUSED)
     {
         if (speed<m_sfx_min_speed || should_be_paused == 1) return;
         // TODO: Do we first need to stop the sound completely so it
         // starts over?
         sfx->play();
     }
-    else if (sfx->getStatus() == SFXManager::SFX_PLAYING)
+    else if (sfx->getStatus() == SFXBase::SFX_PLAYING)
     {
         if (speed<m_sfx_min_speed || should_be_paused == 1)
         {

@@ -167,6 +167,10 @@ SFXManager::~SFXManager()
  */
 void SFXManager::queue(SFXCommands command,  SFXBase *sfx)
 {
+    // Don't add sfx that are either not working correctly (e.g. because sfx
+    // are disabled);
+    if(sfx && sfx->getStatus()==SFXBase::SFX_UNKNOWN) return;
+
     SFXCommand *sfx_command = new SFXCommand(command, sfx);
 
     m_sfx_commands.lock();
@@ -576,9 +580,7 @@ void SFXManager::resumeAll()
     for (std::vector<SFXBase*>::iterator i =m_all_sfx.getData().begin();
                                          i!=m_all_sfx.getData().end(); i++)
     {
-        SFXStatus status = (*i)->getStatus();
-        // Initial happens when
-        if (status==SFX_PAUSED) (*i)->resume();
+        (*i)->resume();
     }   // for i in m_all_sfx
     m_all_sfx.unlock();
 }   // resumeAll

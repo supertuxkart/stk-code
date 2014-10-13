@@ -28,7 +28,6 @@
 #  include <AL/al.h>
 #endif
 #include "audio/sfx_base.hpp"
-#include "audio/sfx_manager.hpp"
 #include "utils/leak_check.hpp"
 
 /**
@@ -38,8 +37,12 @@
 class SFXOpenAL : public SFXBase
 {
 private:
-    SFXBuffer*   m_soundBuffer;   //!< Buffers hold sound data.
-    ALuint       m_soundSource;   //!< Sources are points emitting sound.
+    /** Buffers hold sound data. */
+    SFXBuffer*   m_sound_buffer;
+
+    /** Sources are points emitting sound. */
+    ALuint       m_sound_source;
+
     bool         m_ok;
     bool         m_positional;
     float        m_defaultGain;
@@ -87,11 +90,11 @@ public:
     virtual void                  position(const Vec3 &position);
     virtual void                  volume(float gain);
     virtual void                  setMasterVolume(float gain);
-    virtual SFXManager::SFXStatus getStatus();
+    virtual SFXStatus             getStatus();
     virtual void                  onSoundEnabledBack();
     virtual void                  setRolloff(float rolloff);
 
-    virtual const SFXBuffer* getBuffer() const { return m_soundBuffer; }
+    virtual const SFXBuffer* getBuffer() const { return m_sound_buffer; }
 
     LEAK_CHECK()
 

@@ -172,7 +172,7 @@ bool Bowling::updateAndDelete(float dt)
         return true;
     }
 
-    if (m_roll_sfx->getStatus()==SFXManager::SFX_PLAYING)
+    if (m_roll_sfx->getStatus()==SFXBase::SFX_PLAYING)
         m_roll_sfx->position(getXYZ());
 
     return false;
