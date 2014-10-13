@@ -87,9 +87,9 @@ Bowling::Bowling(AbstractKart *kart)
  */
 Bowling::~Bowling()
 {
-    if(m_roll_sfx->getStatus()==SFXManager::SFX_PLAYING)
-        m_roll_sfx->stop();
-    SFXManager::get()->deleteSFX(m_roll_sfx);
+    // This will stop the sfx and delete the object.
+    m_roll_sfx->deleteSFX();
+
 }   // ~RubberBall
 
 // -----------------------------------------------------------------------------

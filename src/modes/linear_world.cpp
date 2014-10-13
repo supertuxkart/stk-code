@@ -73,7 +73,7 @@ void LinearWorld::init()
  */
 LinearWorld::~LinearWorld()
 {
-    SFXManager::get()->deleteSFX(m_last_lap_sfx);
+    m_last_lap_sfx->deleteSFX();
 }   // ~LinearWorld
 
 //-----------------------------------------------------------------------------

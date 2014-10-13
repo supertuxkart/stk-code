@@ -52,8 +52,12 @@ public:
     virtual void       play()                         = 0;
     virtual void       reallyPlayNow()                = 0;
     virtual void       stop()                         = 0;
+    virtual void       reallyStopNow()                = 0;
     virtual void       pause()                        = 0;
+    virtual void       reallyPauseNow()               = 0;
     virtual void       resume()                       = 0;
+    virtual void       reallyResumeNow()              = 0;
+    virtual void       deleteSFX()                    = 0;
     virtual void       speed(float factor)            = 0;
     virtual void       volume(float gain)             = 0;
     virtual void       setMasterVolume(float gain)    = 0;

@@ -100,7 +100,7 @@ Swatter::~Swatter()
     }
     if (m_swat_sound)
     {
-        SFXManager::get()->deleteSFX(m_swat_sound);
+        m_swat_sound->deleteSFX();
     }
 }   // ~Swatter
 

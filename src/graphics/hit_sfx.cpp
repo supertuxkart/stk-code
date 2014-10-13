@@ -42,10 +42,7 @@ HitSFX::HitSFX(const Vec3& coord, const char* explosion_sound)
  */
 HitSFX::~HitSFX()
 {
-    if (m_sfx->getStatus() == SFXManager::SFX_PLAYING)
-        m_sfx->stop();
-
-    SFXManager::get()->deleteSFX(m_sfx);
+    m_sfx->deleteSFX();
 }   // ~HitEffect
 
 //-----------------------------------------------------------------------------

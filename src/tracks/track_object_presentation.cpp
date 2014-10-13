@@ -382,8 +382,9 @@ void TrackObjectPresentationMesh::reset()
 // ----------------------------------------------------------------------------
 
 
-TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_node, scene::ISceneNode* parent) :
-    TrackObjectPresentation(xml_node)
+TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_node,
+                                                           scene::ISceneNode* parent) 
+                            : TrackObjectPresentation(xml_node)
 {
     // TODO: respect 'parent' if any
 
@@ -440,8 +441,9 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
     {
         ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
     }
-}
+}   // TrackObjectPresentationSound
 
+// ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::update(float dt)
 {
     if (m_sound != NULL)
@@ -451,16 +453,18 @@ void TrackObjectPresentationSound::update(float dt)
         // moved
         m_sound->position(m_xyz);
     }
-}
+}   // update
 
+// ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::onTriggerItemApproached(Item* who)
 {
     if (m_sound != NULL && m_sound->getStatus() != SFXManager::SFX_PLAYING)
     {
         m_sound->play();
     }
-}
+}   // onTriggerItemApproached
 
+// ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::triggerSound(bool loop)
 {
     if (m_sound != NULL)
@@ -468,34 +472,37 @@ void TrackObjectPresentationSound::triggerSound(bool loop)
         m_sound->setLoop(loop);
         m_sound->play();
     }
-}
+}   // triggerSound
 
+// ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::stopSound()
 {
     if (m_sound != NULL) m_sound->stop();
-}
+}   // stopSound
 
+// ----------------------------------------------------------------------------
 TrackObjectPresentationSound::~TrackObjectPresentationSound()
 {
     if (m_sound)
     {
-        //delete m_sound->getBuffer();
-        SFXManager::get()->deleteSFX(m_sound);
+        m_sound->deleteSFX();
     }
-}
+}   // ~TrackObjectPresentationSound
 
-void TrackObjectPresentationSound::move(const core::vector3df& xyz, const core::vector3df& hpr,
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationSound::move(const core::vector3df& xyz, 
+                                        const core::vector3df& hpr,
                                         const core::vector3df& scale)
 {
     m_xyz = xyz;
     if (m_sound != NULL) m_sound->position(xyz);
-}
+}   // move
 
 // ----------------------------------------------------------------------------
 
-
-TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(const XMLNode& xml_node, scene::ISceneNode* parent) :
-    TrackObjectPresentationSceneNode(xml_node)
+TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(const XMLNode& xml_node, 
+                                                                   scene::ISceneNode* parent)
+                                : TrackObjectPresentationSceneNode(xml_node)
 {
     std::string texture_name;
     float       width, height;
@@ -529,6 +536,7 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(const XMLNode
     m_node->setPosition(m_init_xyz);
 }
 
+// ----------------------------------------------------------------------------
 void TrackObjectPresentationBillboard::update(float dt)
 {
     if (m_fade_out_when_close)
@@ -554,6 +562,7 @@ void TrackObjectPresentationBillboard::update(float dt)
     }
 }
 
+// ----------------------------------------------------------------------------
 TrackObjectPresentationBillboard::~TrackObjectPresentationBillboard()
 {
     if (m_node)
@@ -613,6 +622,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
     }
 }
 
+// ----------------------------------------------------------------------------
 TrackObjectPresentationParticles::~TrackObjectPresentationParticles()
 {
     if (m_emitter)
@@ -626,6 +636,7 @@ TrackObjectPresentationParticles::~TrackObjectPresentationParticles()
     }
 }
 
+// ----------------------------------------------------------------------------
 void TrackObjectPresentationParticles::update(float dt)
 {
     if (m_emitter != NULL)
@@ -634,6 +645,7 @@ void TrackObjectPresentationParticles::update(float dt)
     }
 }
 
+// ----------------------------------------------------------------------------
 void TrackObjectPresentationParticles::triggerParticles()
 {
     if (m_emitter != NULL)
@@ -671,6 +683,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(const XMLNode& xml_no
     }
 }
 
+// ----------------------------------------------------------------------------
 TrackObjectPresentationLight::~TrackObjectPresentationLight()
 {
 }
@@ -693,6 +706,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
     ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
 }
 
+// ----------------------------------------------------------------------------
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 {
     if (!m_action_active) return;

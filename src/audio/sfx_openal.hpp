@@ -77,8 +77,12 @@ public:
     virtual void                  setLoop(bool status);
     virtual bool                  isPlaying();
     virtual void                  stop();
+    virtual void                  reallyStopNow();
     virtual void                  pause();
+    virtual void                  reallyPauseNow();
     virtual void                  resume();
+    virtual void                  reallyResumeNow();
+    virtual void                  deleteSFX();
     virtual void                  speed(float factor);
     virtual void                  position(const Vec3 &position);
     virtual void                  volume(float gain);

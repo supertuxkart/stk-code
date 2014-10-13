@@ -40,9 +40,14 @@ public:
     virtual void       position(const Vec3 &position) {}
     virtual void       setLoop(bool status)           {}
     virtual void       play()                         {}
+    virtual void       reallyPlayNow()                {}
     virtual void       stop()                         {}
+    virtual void       reallyStopNow()                {}
     virtual void       pause()                        {}
+    virtual void       reallyPauseNow()               {}
     virtual void       resume()                       {}
+    virtual void       reallyResumeNow()              {}
+    virtual void       deleteSFX()                    { delete this; }
     virtual void       speed(float factor)            {}
     virtual void       volume(float gain)             {}
     virtual SFXManager::SFXStatus  getStatus()        { return SFXManager::SFX_STOPPED; }

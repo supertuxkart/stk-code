@@ -109,7 +109,7 @@ RubberBall::~RubberBall()
 {
     if(m_ping_sfx->getStatus()==SFXManager::SFX_PLAYING)
         m_ping_sfx->stop();
-    SFXManager::get()->deleteSFX(m_ping_sfx);
+    m_ping_sfx->deleteSFX();
 }   // ~RubberBall
 
 // ----------------------------------------------------------------------------

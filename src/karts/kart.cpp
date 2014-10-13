@@ -246,15 +246,15 @@ Kart::~Kart()
             SFXManager::get()->deleteSFX(m_custom_sounds[n]);
     }*/
 
-    SFXManager::get()->deleteSFX(m_engine_sound );
-    SFXManager::get()->deleteSFX(m_crash_sound  );
-    SFXManager::get()->deleteSFX(m_skid_sound   );
-    SFXManager::get()->deleteSFX(m_goo_sound    );
-    SFXManager::get()->deleteSFX(m_beep_sound   );
-    SFXManager::get()->deleteSFX(m_boing_sound  );
+    m_engine_sound->deleteSFX();
+    m_crash_sound ->deleteSFX();
+    m_skid_sound  ->deleteSFX();
+    m_goo_sound   ->deleteSFX();
+    m_beep_sound  ->deleteSFX();
+    m_boing_sound ->deleteSFX();
     delete m_kart_gfx;
-    if(m_terrain_sound)          SFXManager::get()->deleteSFX(m_terrain_sound);
-    if(m_previous_terrain_sound) SFXManager::get()->deleteSFX(m_previous_terrain_sound);
+    if(m_terrain_sound)          m_terrain_sound->deleteSFX();
+    if(m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
     if(m_collision_particles)    delete m_collision_particles;
     if(m_slipstream)             delete m_slipstream;
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
@@ -363,15 +363,14 @@ void Kart::reset()
 
     if(m_terrain_sound)
     {
-        SFXManager::get()->deleteSFX(m_terrain_sound);
+        m_terrain_sound->deleteSFX();
+        m_terrain_sound = NULL;
     }
     if(m_previous_terrain_sound)
     {
-        SFXManager::get()->deleteSFX(m_previous_terrain_sound);
+        m_previous_terrain_sound->deleteSFX();
+        m_previous_terrain_sound = NULL;
     }
-
-    m_terrain_sound = NULL;
-    m_previous_terrain_sound = NULL;
 
     if(m_engine_sound)
         m_engine_sound->stop();
@@ -1430,7 +1429,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // can be used again.
         if(m_previous_terrain_sound)
         {
-            SFXManager::get()->deleteSFX(m_previous_terrain_sound);
+            m_previous_terrain_sound->deleteSFX();
         }
         m_previous_terrain_sound = m_terrain_sound;
         if(m_previous_terrain_sound)
@@ -1467,7 +1466,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // We don't modify the position of m_previous_terrain_sound
         // anymore, so that it keeps on playing at the place where the
         // kart left the material.
-        SFXManager::get()->deleteSFX(m_previous_terrain_sound);
+        m_previous_terrain_sound->deleteSFX();
         m_previous_terrain_sound = NULL;
     }
     
@@ -1592,7 +1591,7 @@ void Kart::handleMaterialGFX()
         (m_terrain_sound == NULL ||
          m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
     {
-        if (m_previous_terrain_sound) SFXManager::get()->deleteSFX(m_previous_terrain_sound);
+        if (m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
         m_previous_terrain_sound = m_terrain_sound;
         if(m_previous_terrain_sound)
             m_previous_terrain_sound->setLoop(false);
