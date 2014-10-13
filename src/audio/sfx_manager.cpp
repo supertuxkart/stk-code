@@ -167,10 +167,6 @@ SFXManager::~SFXManager()
  */
 void SFXManager::queue(SFXCommands command,  SFXBase *sfx)
 {
-    // Don't add sfx that are either not working correctly (e.g. because sfx
-    // are disabled);
-    if(sfx && sfx->getStatus()==SFX_UNKNOWN ) return;
-
     SFXCommand *sfx_command = new SFXCommand(command, sfx);
 
     m_sfx_commands.lock();
@@ -255,7 +251,7 @@ void* SFXManager::mainLoop(void *obj)
 }   // mainLoop
 
 //----------------------------------------------------------------------------
-/** Called then sound is globally switched on or off. It either pauses or
+/** Called when sound is globally switched on or off. It either pauses or
  *  resumes all sound effects. 
  *  \param on If sound is switched on or off.
  */
