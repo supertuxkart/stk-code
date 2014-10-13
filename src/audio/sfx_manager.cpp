@@ -589,6 +589,7 @@ void SFXManager::resumeAll()
 /** Returns whether or not an openal error has occurred. If so, an error
  *  message is printed containing the given context.
  *  \param context Context to specify in the error message.
+ *  \return True if no error happened.
  */
 bool SFXManager::checkError(const std::string &context)
 {

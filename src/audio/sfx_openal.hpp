@@ -37,13 +37,17 @@
 class SFXOpenAL : public SFXBase
 {
 private:
+    LEAK_CHECK()
+
     /** Buffers hold sound data. */
     SFXBuffer*   m_sound_buffer;
 
     /** Sources are points emitting sound. */
     ALuint       m_sound_source;
 
-    bool         m_ok;
+    /** The status of this SFX. */
+    SFXStatus    m_status;
+
     bool         m_positional;
     float        m_defaultGain;
 
@@ -65,38 +69,41 @@ private:
     /** The master gain set in user preferences */
     float m_master_gain;
 
+    /** If this sfx should also free the sound buffer. */
     bool m_owns_buffer;
 
+    /** Time at which a sfx ends playing. Used to avoid frequently getting
+     *  the openl status (which can slow down stk). */
+    float m_end_time;
+
 public:
-                                  SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
-                                            bool owns_buffer = false);
-    virtual                      ~SFXOpenAL();
+              SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
+                        bool owns_buffer = false);
+    virtual  ~SFXOpenAL();
 
-    /** Late creation, if SFX was initially disabled */
-    virtual bool                  init();
+    virtual bool      init();
+    virtual void      play();
+    virtual void      reallyPlayNow();
+    virtual void      setLoop(bool status);
+    virtual bool      isPlaying();
+    virtual void      stop();
+    virtual void      reallyStopNow();
+    virtual void      pause();
+    virtual void      reallyPauseNow();
+    virtual void      resume();
+    virtual void      reallyResumeNow();
+    virtual void      deleteSFX();
+    virtual void      speed(float factor);
+    virtual void      position(const Vec3 &position);
+    virtual void      volume(float gain);
+    virtual void      setMasterVolume(float gain);
+    virtual void      onSoundEnabledBack();
+    virtual void      setRolloff(float rolloff);
+    virtual SFXStatus getStatus();
 
-    virtual void                  play();
-    virtual void                  reallyPlayNow();
-    virtual void                  setLoop(bool status);
-    virtual bool                  isPlaying();
-    virtual void                  stop();
-    virtual void                  reallyStopNow();
-    virtual void                  pause();
-    virtual void                  reallyPauseNow();
-    virtual void                  resume();
-    virtual void                  reallyResumeNow();
-    virtual void                  deleteSFX();
-    virtual void                  speed(float factor);
-    virtual void                  position(const Vec3 &position);
-    virtual void                  volume(float gain);
-    virtual void                  setMasterVolume(float gain);
-    virtual SFXStatus             getStatus();
-    virtual void                  onSoundEnabledBack();
-    virtual void                  setRolloff(float rolloff);
-
+    // ------------------------------------------------------------------------
+    /** Returns the buffer associated with this sfx. */
     virtual const SFXBuffer* getBuffer() const { return m_sound_buffer; }
-
-    LEAK_CHECK()
 
 };   // SFXOpenAL
 
