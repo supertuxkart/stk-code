@@ -1079,7 +1079,6 @@ void Kart::eliminate()
  */
 void Kart::update(float dt)
 {
-    Log::verbose("sfx", "%s crash state %d", getIdent().c_str(),  m_crash_sound->getStatus());
     if ( UserConfigParams::m_graphical_effects )
     {
         // update star effect (call will do nothing if stars are not activated)
