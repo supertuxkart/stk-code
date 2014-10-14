@@ -160,26 +160,59 @@ SFXManager::~SFXManager()
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------
-/** Adds a sound effect to the queue of sfx to be started by the sfx manager.
- *  Starting a sfx can sometimes cause a 5ms delay, so it is done in a 
- *  separate thread.
+/** Adds a sound effect command to the queue of the sfx manager. Openal 
+ *  commands can sometimes cause a 5ms delay, so it is done in a separate 
+ *  thread.
+ *  \param command The command to execute.
  *  \param sfx The sound effect to be started.
  */
 void SFXManager::queue(SFXCommands command,  SFXBase *sfx)
 {
-    // Don't add sfx that are either not working correctly (e.g. because sfx
-    // are disabled);
-    if(sfx && sfx->getStatus()==SFXBase::SFX_UNKNOWN) return;
-
     SFXCommand *sfx_command = new SFXCommand(command, sfx);
+    queueCommand(sfx_command);
+}   // queue
 
+//----------------------------------------------------------------------------
+/** Adds a sound effect command with a single floating point parameter to the
+ *  queue of the sfx manager. Openal commands can sometimes cause a 5ms delay,
+ *  so it is done in a separate thread.
+ *  \param command The command to execute.
+ *  \param sfx The sound effect to be started.
+ *  \param f Floating point parameter for the command.
+ */
+void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f)
+{
+    SFXCommand *sfx_command = new SFXCommand(command, sfx, f);
+    queueCommand(sfx_command);
+}   // queue(float)
+
+//----------------------------------------------------------------------------
+/** Adds a sound effect command with a Vec3 parameter to the queue of the sfx
+ *  manager. Openal commands can sometimes cause a 5ms delay, so it is done in
+ *  a separate thread.
+ *  \param command The command to execute.
+ *  \param sfx The sound effect to be started.
+ *  \param p A Vec3 parameter for the command.
+ */
+void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
+{
+   SFXCommand *sfx_command = new SFXCommand(command, sfx, p);
+   queueCommand(sfx_command);
+}   // queue (Vec3)
+
+//----------------------------------------------------------------------------
+/** Enqueues a command to the sfx queue threadsafe. Then signal the
+ *  sfx manager to wake up.
+ *  \param command Pointer to the command to queue up.
+ */
+void SFXManager::queueCommand(SFXCommand *command)
+{
     m_sfx_commands.lock();
-    m_sfx_commands.getData().push_back(sfx_command);
+    m_sfx_commands.getData().push_back(command);
     m_sfx_commands.unlock();
     // Wake up the sfx thread
     pthread_cond_signal(&m_cond_request);
-
-}   // queue
+}   // queueCommand
 
 //----------------------------------------------------------------------------
 /** Puts a NULL request into the queue, which will trigger the thread to
@@ -228,10 +261,16 @@ void* SFXManager::mainLoop(void *obj)
         me->m_sfx_commands.unlock();
         switch(current->m_command)
         {
-        case SFX_PLAY:   current->m_sfx->reallyPlayNow();   break;
-        case SFX_STOP:   current->m_sfx->reallyStopNow();   break;
-        case SFX_PAUSE:  current->m_sfx->reallyPauseNow();  break;
-        case SFX_RESUME: current->m_sfx->reallyResumeNow(); break;
+        case SFX_PLAY:   current->m_sfx->reallyPlayNow();       break;
+        case SFX_STOP:   current->m_sfx->reallyStopNow();       break;
+        case SFX_PAUSE:  current->m_sfx->reallyPauseNow();      break;
+        case SFX_RESUME: current->m_sfx->reallyResumeNow();     break;
+        case SFX_SPEED:  current->m_sfx->reallySetSpeed(
+                                  current->m_parameter.getX()); break;
+        case SFX_POSITION: current->m_sfx->reallySetPosition(
+                                         current->m_parameter); break;
+        case SFX_VOLUME: current->m_sfx->reallySetVolume(
+                                  current->m_parameter.getX()); break;
         case SFX_DELETE: {
                             current->m_sfx->reallyStopNow();
                             me->deleteSFX(current->m_sfx);

@@ -664,12 +664,12 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) con
     }
     if (speed > m_sfx_max_speed)
     {
-        sfx->speed(m_sfx_max_pitch);
+        sfx->setSpeed(m_sfx_max_pitch);
         return;
     }
 
     float f = m_sfx_pitch_per_speed*(speed-m_sfx_min_speed) + m_sfx_min_pitch;
-    sfx->speed(f);
+    sfx->setSpeed(f);
 }   // setSFXSpeed
 
 //-----------------------------------------------------------------------------

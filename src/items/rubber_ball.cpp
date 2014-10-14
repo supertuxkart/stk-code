@@ -543,7 +543,7 @@ float RubberBall::updateHeight()
         m_height_timer -= m_interval;
         if(m_ping_sfx->getStatus()!=SFXBase::SFX_PLAYING)
         {
-            m_ping_sfx->position(getXYZ());
+            m_ping_sfx->setPosition(getXYZ());
             m_ping_sfx->play();
         }
 

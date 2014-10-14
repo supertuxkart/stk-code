@@ -62,12 +62,15 @@ public:
      *  for each sfx. */
     enum SFXCommands
     {
-        SFX_PLAY   = 1,
-        SFX_STOP   = 2,
-        SFX_PAUSE  = 3,
-        SFX_RESUME = 4,
-        SFX_DELETE = 5,
-        SFX_EXIT   = 6,
+        SFX_PLAY = 1,
+        SFX_STOP,
+        SFX_PAUSE,
+        SFX_RESUME,
+        SFX_DELETE,
+        SFX_SPEED,
+        SFX_POSITION,
+        SFX_VOLUME,
+        SFX_EXIT,
     };   // SFXCommands
 
     /**
@@ -98,15 +101,34 @@ private:
     private:
         LEAK_CHECK()
     public:
+        /** The sound effect for which the command should be executed. */
         SFXBase    *m_sfx;
+        /** The command to execute. */
         SFXCommands m_command;
+        /** Optional parameter for commands that need more input. */
+        Vec3        m_parameter;
+        // --------------------------------------------------------------------
         SFXCommand(SFXCommands command, SFXBase *base)
         {
-            m_command = command;
-            m_sfx     = base;
-        }
+            m_command   = command;
+            m_sfx       = base;
+        }   // SFXCommand()
+        // --------------------------------------------------------------------
+        SFXCommand(SFXCommands command, SFXBase *base, float parameter)
+        {
+            m_command   = command;
+            m_sfx       = base;
+            m_parameter.setX(parameter);
+        }   // SFXCommand(float)
+        // --------------------------------------------------------------------
+        SFXCommand(SFXCommands command, SFXBase *base, const Vec3 &parameter)
+        {
+            m_command   = command;
+            m_sfx       = base;
+            m_parameter = parameter;
+        }   // SFXCommand(Vec3)
     };   // SFXCommand
-
+    // ========================================================================
     /** Listener position */
     Vec3 m_position;
 
@@ -144,10 +166,13 @@ private:
 
     static void* mainLoop(void *obj);
     void deleteSFX(SFXBase *sfx);
+    void queueCommand(SFXCommand *command);
 public:
     static void create();
     static void destroy();
     void queue(SFXCommands command,  SFXBase *sfx);
+    void queue(SFXCommands command,  SFXBase *sfx, float f);
+    void queue(SFXCommands command,  SFXBase *sfx, const Vec3 &p);
     // ------------------------------------------------------------------------
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()

@@ -136,13 +136,23 @@ SFXBase::SFXStatus SFXOpenAL::getStatus()
 }   // getStatus;
 
 //-----------------------------------------------------------------------------
-/** Changes the pitch of a sound effect.
+/** Queues up a change of the pitch of a sound effect to the sfx manager.
  *  \param factor Speedup/slowdown between 0.5 and 2.0
  */
-void SFXOpenAL::speed(float factor)
+void SFXOpenAL::setSpeed(float factor)
 {
-    if(m_status==SFX_UNKNOWN || isnan(factor)) return;
+    if(m_status==SFX_UNKNOWN) return;
+    assert(!isnan(factor));
+    SFXManager::get()->queue(SFXManager::SFX_SPEED, this, factor);
+}   // setSpeed
 
+//-----------------------------------------------------------------------------
+/** Changes the pitch of a sound effect. Executed from the sfx manager thread.
+ *  \param factor Speedup/slowdown between 0.5 and 2.0
+ */
+void SFXOpenAL::reallySetSpeed(float factor)
+{
+    if(m_status==SFX_UNKNOWN) return;
     //OpenAL only accepts pitches in the range of 0.5 to 2.0
     if(factor > 2.0f)
     {
@@ -153,22 +163,32 @@ void SFXOpenAL::speed(float factor)
         factor = 0.5f;
     }
     alSourcef(m_sound_source,AL_PITCH,factor);
-    SFXManager::checkError("changing the speed");
-}   // speed
+}   // reallySetSpeed
 
 //-----------------------------------------------------------------------------
 /** Changes the volume of a sound effect.
  *  \param gain Volume adjustment between 0.0 (mute) and 1.0 (full volume).
  */
-void SFXOpenAL::volume(float gain)
+void SFXOpenAL::setVolume(float gain)
 {
+    if(m_status==SFX_UNKNOWN) return;
+    assert(!isnan(gain)) ;
+    SFXManager::get()->queue(SFXManager::SFX_VOLUME, this, gain);
+}   // setVolume
+
+//-----------------------------------------------------------------------------
+/** Changes the volume of a sound effect.
+ *  \param gain Volume adjustment between 0.0 (mute) and 1.0 (full volume).
+ */
+void SFXOpenAL::reallySetVolume(float gain)
+{
+    if(m_status==SFX_UNKNOWN) return;
     m_gain = m_defaultGain * gain;
 
     if(m_status==SFX_UNKNOWN) return;
 
     alSourcef(m_sound_source, AL_GAIN, m_gain * m_master_gain);
-    SFXManager::checkError("setting volume");
-}   // volume
+}   // reallySetVolume
 
 //-----------------------------------------------------------------------------
 
@@ -329,7 +349,18 @@ bool SFXOpenAL::isPlaying()
 /** Sets the position where this sound effects is played.
  *  \param position Position of the sound effect.
  */
-void SFXOpenAL::position(const Vec3 &position)
+void SFXOpenAL::setPosition(const Vec3 &position)
+{
+    if (m_status == SFX_UNKNOWN) return;
+    SFXManager::get()->queue(SFXManager::SFX_POSITION, this, position);
+
+}   // setPosition
+
+//-----------------------------------------------------------------------------
+/** Sets the position where this sound effects is played.
+ *  \param position Position of the sound effect.
+ */
+void SFXOpenAL::reallySetPosition(const Vec3 &position)
 {
     if(!UserConfigParams::m_sfx)
         return;
@@ -364,7 +395,7 @@ void SFXOpenAL::position(const Vec3 &position)
     }
 
     SFXManager::checkError("positioning");
-}   // position
+}   // reallySetPosition
 
 //-----------------------------------------------------------------------------
 

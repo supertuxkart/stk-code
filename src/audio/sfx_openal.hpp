@@ -93,9 +93,12 @@ public:
     virtual void      resume();
     virtual void      reallyResumeNow();
     virtual void      deleteSFX();
-    virtual void      speed(float factor);
-    virtual void      position(const Vec3 &position);
-    virtual void      volume(float gain);
+    virtual void      setSpeed(float factor);
+    virtual void      reallySetSpeed(float factor);
+    virtual void      setPosition(const Vec3 &position);
+    virtual void      reallySetPosition(const Vec3 &p);
+    virtual void      setVolume(float gain);
+    virtual void      reallySetVolume(float gain);
     virtual void      setMasterVolume(float gain);
     virtual void      onSoundEnabledBack();
     virtual void      setRolloff(float rolloff);

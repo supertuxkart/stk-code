@@ -183,19 +183,19 @@ void Kart::init(RaceManager::KartType type)
         {
             // players have louder sounds than AIs
             const float factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
-            m_goo_sound->volume( 1.0f / factor );
-            m_skid_sound->volume( 1.0f / factor );
-            m_crash_sound->volume( 1.0f / factor );
-            m_boing_sound->volume( 1.0f / factor );
-            m_beep_sound->volume( 1.0f / factor );
+            m_goo_sound->setVolume( 1.0f / factor );
+            m_skid_sound->setVolume( 1.0f / factor );
+            m_crash_sound->setVolume( 1.0f / factor );
+            m_boing_sound->setVolume( 1.0f / factor );
+            m_beep_sound->setVolume( 1.0f / factor );
         }
         else
         {
-            m_goo_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_skid_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_crash_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_beep_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_boing_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+            m_goo_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
+            m_skid_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
+            m_crash_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
+            m_beep_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
+            m_boing_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
         }
     }
 
@@ -756,12 +756,12 @@ void Kart::startEngineSFX()
         const float players_volume = (np * 2.0f) / (np*2.0f + np);
 
         if (m_controller->isPlayerController())
-            m_engine_sound->volume( players_volume / np );
+            m_engine_sound->setVolume( players_volume / np );
         else
-            m_engine_sound->volume( (1.0f - players_volume) / nai );
+            m_engine_sound->setVolume( (1.0f - players_volume) / nai );
     }
 
-    m_engine_sound->speed(0.6f);
+    m_engine_sound->setSpeed(0.6f);
     m_engine_sound->setLoop(true);
     m_engine_sound->play();
 }   // startEngineSFX
@@ -928,7 +928,7 @@ void Kart::collectedItem(Item *item, int add_info)
                                  m_kart_properties->getBubblegumSpeedFraction(),
                                  m_kart_properties->getBubblegumFadeInTime(),
                                  m_bubblegum_time);
-        m_goo_sound->position(getXYZ());
+        m_goo_sound->setPosition(getXYZ());
         m_goo_sound->play();
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
@@ -1184,11 +1184,11 @@ void Kart::update(float dt)
     }
      */
 
-    m_beep_sound->position   ( getXYZ() );
-    m_engine_sound->position ( getXYZ() );
-    m_crash_sound->position  ( getXYZ() );
-    m_skid_sound->position   ( getXYZ() );
-    m_boing_sound->position  ( getXYZ() );
+    m_beep_sound->setPosition   ( getXYZ() );
+    m_engine_sound->setPosition ( getXYZ() );
+    m_crash_sound->setPosition  ( getXYZ() );
+    m_skid_sound->setPosition   ( getXYZ() );
+    m_boing_sound->setPosition  ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much -->
     // automatic rescue
@@ -1447,7 +1447,7 @@ void Kart::handleMaterialSFX(const Material *material)
             {
                 if (!m_controller->isPlayerController())
                 {
-                    m_terrain_sound->volume( 0.0f );
+                    m_terrain_sound->setVolume( 0.0f );
                 }
             }
 
@@ -1480,7 +1480,7 @@ void Kart::handleMaterialSFX(const Material *material)
       (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
        m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED))
     {
-        m_terrain_sound->position(getXYZ());
+        m_terrain_sound->setPosition(getXYZ());
         material->setSFXSpeed(m_terrain_sound, m_speed, m_schedule_pause);
     }
 
@@ -2123,15 +2123,15 @@ void Kart::updateEngineSFX()
         if (f>1.0f) f=1.0f;
 
         float gears = 3.0f * fmod(f, 0.333334f);
-        m_engine_sound->speed(0.6f + (f +gears)* 0.35f);
+        m_engine_sound->setSpeed(0.6f + (f +gears)* 0.35f);
     }
     else
     {
         // When flying, fixed value but not too high pitch
         // This gives some variation (vs previous "on wheels" one)
-        m_engine_sound->speed(0.9f);
+        m_engine_sound->setSpeed(0.9f);
     }
-    m_engine_sound->position(getXYZ());
+    m_engine_sound->setPosition(getXYZ());
 }   // updateEngineSFX
 
 //-----------------------------------------------------------------------------
