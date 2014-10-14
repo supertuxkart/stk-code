@@ -138,7 +138,7 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         assert(w != NULL);
 
         if (sample_sound == NULL) sample_sound = SFXManager::get()->createSoundSource( "pre_start_race" );
-        sample_sound->volume(1);
+        sample_sound->setVolume(1);
 
         SFXManager::get()->setMasterSFXVolume( w->getValue()/10.0f );
         UserConfigParams::m_sfx_volume = w->getValue()/10.0f;

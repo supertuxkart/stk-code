@@ -42,6 +42,7 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_label = NULL;
     m_font = NULL;
     m_texture = NULL;
+    m_deactivated_texture = NULL;
     m_highlight_texture = NULL;
     m_custom_aspect_ratio = 1.0f;
 
@@ -273,6 +274,56 @@ void IconButtonWidget::unfocused(const int playerID, Widget* new_focus)
         m_label->setVisible(false);
     }
 }
+// -----------------------------------------------------------------------------
+const video::ITexture* IconButtonWidget::getTexture()
+{
+    if (Widget::isActivated())
+    {
+        return m_texture;
+    }
+    else
+    {
+        if (m_deactivated_texture == NULL)
+            m_deactivated_texture = getDeactivatedTexture(m_texture);
+        return m_deactivated_texture;
+    }
+}
+
+// -----------------------------------------------------------------------------
+video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
+{
+    video::ITexture* t;
+
+    std::string name = texture->getName().getPath().c_str();
+    name += "_disabled";
+    t = irr_driver->getTexture(name);
+    if (t == NULL)
+    {
+        SColor c;
+        u32 g;
+
+        video::IVideoDriver* driver = irr_driver->getVideoDriver();
+        std::auto_ptr<video::IImage> image (driver->createImageFromData (texture->getColorFormat(),
+            texture->getSize(), texture->lock(), false));
+        texture->unlock();
+
+        //Turn the image into grayscale
+        for (u32 x = 0; x < image->getDimension().Width; x++)
+        {
+            for (u32 y = 0; y < image->getDimension().Height; y++)
+            {
+                c = image->getPixel(x, y);
+                g = ((c.getRed() + c.getGreen() + c.getBlue()) / 3);
+                c.set(std::max (0, (int)c.getAlpha() - 120), g, g, g);
+                image->setPixel(x, y, c);
+            }
+        }
+
+        t = driver->addTexture(name.c_str(), image.get ());
+    }
+
+    return t;
+}
 
 // -----------------------------------------------------------------------------
 void IconButtonWidget::setTexture(video::ITexture* texture)
@@ -280,6 +331,7 @@ void IconButtonWidget::setTexture(video::ITexture* texture)
     m_texture = texture;
     if (texture == NULL)
     {
+        m_deactivated_texture = NULL;
         m_texture_w = 0;
         m_texture_h = 0;
     }

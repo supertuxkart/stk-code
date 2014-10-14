@@ -70,6 +70,16 @@ void TrackInfoScreen::loadedFromFile()
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
     m_reverse         = getWidget<CheckBoxWidget>("reverse");
     m_reverse->setState(false);
+
+    m_highscore_label = getWidget<LabelWidget>("highscores");
+
+    m_kart_icons[0] = getWidget<IconButtonWidget>("iconscore1");
+    m_kart_icons[1] = getWidget<IconButtonWidget>("iconscore2");
+    m_kart_icons[2] = getWidget<IconButtonWidget>("iconscore3");
+
+    m_highscore_entries[0] = getWidget<LabelWidget>("highscore1");
+    m_highscore_entries[1] = getWidget<LabelWidget>("highscore2");
+    m_highscore_entries[2] = getWidget<LabelWidget>("highscore3");
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -181,30 +191,16 @@ void TrackInfoScreen::init()
         m_reverse->setState(false);
 
     // ---- High Scores
-    if (has_highscores)
-    {
-        m_kart_icons[0] = getWidget<IconButtonWidget>("iconscore1");
-        m_kart_icons[1] = getWidget<IconButtonWidget>("iconscore2");
-        m_kart_icons[2] = getWidget<IconButtonWidget>("iconscore3");
+    m_highscore_label->setVisible(has_highscores);
 
-        m_highscore_entries[0] = getWidget<LabelWidget>("highscore1");
-        m_highscore_entries[1] = getWidget<LabelWidget>("highscore2");
-        m_highscore_entries[2] = getWidget<LabelWidget>("highscore3");
+    m_kart_icons[0]->setVisible(has_highscores);
+    m_kart_icons[1]->setVisible(has_highscores);
+    m_kart_icons[2]->setVisible(has_highscores);
 
-        updateHighScores();
-    }
-    else
-    {
-        getWidget<IconButtonWidget>("iconscore1")->setVisible(false);
-        getWidget<IconButtonWidget>("iconscore2")->setVisible(false);
-        getWidget<IconButtonWidget>("iconscore3")->setVisible(false);
+    m_highscore_entries[0]->setVisible(has_highscores);
+    m_highscore_entries[1]->setVisible(has_highscores);
+    m_highscore_entries[2]->setVisible(has_highscores);
 
-        getWidget<LabelWidget>("highscores")->setVisible(false);
-        getWidget<LabelWidget>("highscore1")->setVisible(false);
-        getWidget<LabelWidget>("highscore2")->setVisible(false);
-        getWidget<LabelWidget>("highscore3")->setVisible(false);
-    }
-    
     RibbonWidget* bt_start = getWidget<GUIEngine::RibbonWidget>("buttons");
     bt_start->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
@@ -220,6 +216,9 @@ TrackInfoScreen::~TrackInfoScreen()
 
 void TrackInfoScreen::updateHighScores()
 {
+    if (!race_manager->modeHasHighscores())
+        return;
+
     std::string game_mode_ident = RaceManager::getIdentOf( race_manager->getMinorMode() );
     const Highscores::HighscoreType type = "HST_" + game_mode_ident;
 
@@ -281,7 +280,7 @@ void TrackInfoScreen::onEnterPressedInternal()
 
     // Create a copy of member variables we still need, since they will
     // not be accessible after dismiss:
-    const int num_laps = race_manager->modeHasLaps() ? m_lap_spinner->getValue() 
+    const int num_laps = race_manager->modeHasLaps() ? m_lap_spinner->getValue()
                                                      : -1;
     const bool reverse_track = m_reverse == NULL ? false
                                                  : m_reverse->getState();
@@ -318,10 +317,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setReverseTrack(m_reverse->getState());
         // Makes sure the highscores get swapped when clicking the 'reverse'
         // checkbox.
-        if (race_manager->modeHasHighscores())
-        {
-            updateHighScores();
-        }
+        updateHighScores();
     }
     else if (name == "lap-spinner")
     {

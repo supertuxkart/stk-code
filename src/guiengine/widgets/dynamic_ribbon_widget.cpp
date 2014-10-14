@@ -23,7 +23,6 @@
 #include "utils/vs.hpp"
 
 #include <IGUIEnvironment.h>
-#include <sstream>
 #include <iostream>
 #include <algorithm>
 
@@ -46,6 +45,7 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_check_inside_me      = true;
     m_supports_multiplayer = true;
     m_scrolling_enabled    = true;
+    m_animated_contents    = false;
 
     // by default, set all players to have no selection in this ribbon
     for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
@@ -62,7 +62,7 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
 // -----------------------------------------------------------------------------
 DynamicRibbonWidget::~DynamicRibbonWidget()
 {
-    m_font->drop();
+    delete m_font;
     if (m_animated_contents)
     {
         GUIEngine::needsUpdate.remove(this);

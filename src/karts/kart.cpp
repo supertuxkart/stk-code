@@ -183,19 +183,19 @@ void Kart::init(RaceManager::KartType type)
         {
             // players have louder sounds than AIs
             const float factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
-            m_goo_sound->volume( 1.0f / factor );
-            m_skid_sound->volume( 1.0f / factor );
-            m_crash_sound->volume( 1.0f / factor );
-            m_boing_sound->volume( 1.0f / factor );
-            m_beep_sound->volume( 1.0f / factor );
+            m_goo_sound->setVolume( 1.0f / factor );
+            m_skid_sound->setVolume( 1.0f / factor );
+            m_crash_sound->setVolume( 1.0f / factor );
+            m_boing_sound->setVolume( 1.0f / factor );
+            m_beep_sound->setVolume( 1.0f / factor );
         }
         else
         {
-            m_goo_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_skid_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_crash_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_beep_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-            m_boing_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+            m_goo_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
+            m_skid_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
+            m_crash_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
+            m_beep_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
+            m_boing_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
         }
     }
 
@@ -246,15 +246,15 @@ Kart::~Kart()
             SFXManager::get()->deleteSFX(m_custom_sounds[n]);
     }*/
 
-    SFXManager::get()->deleteSFX(m_engine_sound );
-    SFXManager::get()->deleteSFX(m_crash_sound  );
-    SFXManager::get()->deleteSFX(m_skid_sound   );
-    SFXManager::get()->deleteSFX(m_goo_sound    );
-    SFXManager::get()->deleteSFX(m_beep_sound   );
-    SFXManager::get()->deleteSFX(m_boing_sound  );
+    m_engine_sound->deleteSFX();
+    m_crash_sound ->deleteSFX();
+    m_skid_sound  ->deleteSFX();
+    m_goo_sound   ->deleteSFX();
+    m_beep_sound  ->deleteSFX();
+    m_boing_sound ->deleteSFX();
     delete m_kart_gfx;
-    if(m_terrain_sound)          SFXManager::get()->deleteSFX(m_terrain_sound);
-    if(m_previous_terrain_sound) SFXManager::get()->deleteSFX(m_previous_terrain_sound);
+    if(m_terrain_sound)          m_terrain_sound->deleteSFX();
+    if(m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
     if(m_collision_particles)    delete m_collision_particles;
     if(m_slipstream)             delete m_slipstream;
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
@@ -363,15 +363,14 @@ void Kart::reset()
 
     if(m_terrain_sound)
     {
-        SFXManager::get()->deleteSFX(m_terrain_sound);
+        m_terrain_sound->deleteSFX();
+        m_terrain_sound = NULL;
     }
     if(m_previous_terrain_sound)
     {
-        SFXManager::get()->deleteSFX(m_previous_terrain_sound);
+        m_previous_terrain_sound->deleteSFX();
+        m_previous_terrain_sound = NULL;
     }
-
-    m_terrain_sound = NULL;
-    m_previous_terrain_sound = NULL;
 
     if(m_engine_sound)
         m_engine_sound->stop();
@@ -757,12 +756,12 @@ void Kart::startEngineSFX()
         const float players_volume = (np * 2.0f) / (np*2.0f + np);
 
         if (m_controller->isPlayerController())
-            m_engine_sound->volume( players_volume / np );
+            m_engine_sound->setVolume( players_volume / np );
         else
-            m_engine_sound->volume( (1.0f - players_volume) / nai );
+            m_engine_sound->setVolume( (1.0f - players_volume) / nai );
     }
 
-    m_engine_sound->speed(0.6f);
+    m_engine_sound->setSpeed(0.6f);
     m_engine_sound->setLoop(true);
     m_engine_sound->play();
 }   // startEngineSFX
@@ -929,7 +928,7 @@ void Kart::collectedItem(Item *item, int add_info)
                                  m_kart_properties->getBubblegumSpeedFraction(),
                                  m_kart_properties->getBubblegumFadeInTime(),
                                  m_bubblegum_time);
-        m_goo_sound->position(getXYZ());
+        m_goo_sound->setPosition(getXYZ());
         m_goo_sound->play();
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
@@ -1185,11 +1184,11 @@ void Kart::update(float dt)
     }
      */
 
-    m_beep_sound->position   ( getXYZ() );
-    m_engine_sound->position ( getXYZ() );
-    m_crash_sound->position  ( getXYZ() );
-    m_skid_sound->position   ( getXYZ() );
-    m_boing_sound->position  ( getXYZ() );
+    m_beep_sound->setPosition   ( getXYZ() );
+    m_engine_sound->setPosition ( getXYZ() );
+    m_crash_sound->setPosition  ( getXYZ() );
+    m_skid_sound->setPosition   ( getXYZ() );
+    m_boing_sound->setPosition  ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much -->
     // automatic rescue
@@ -1430,7 +1429,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // can be used again.
         if(m_previous_terrain_sound)
         {
-            SFXManager::get()->deleteSFX(m_previous_terrain_sound);
+            m_previous_terrain_sound->deleteSFX();
         }
         m_previous_terrain_sound = m_terrain_sound;
         if(m_previous_terrain_sound)
@@ -1448,7 +1447,7 @@ void Kart::handleMaterialSFX(const Material *material)
             {
                 if (!m_controller->isPlayerController())
                 {
-                    m_terrain_sound->volume( 0.0f );
+                    m_terrain_sound->setVolume( 0.0f );
                 }
             }
 
@@ -1462,12 +1461,12 @@ void Kart::handleMaterialSFX(const Material *material)
     }
 
     if(m_previous_terrain_sound &&
-        m_previous_terrain_sound->getStatus()==SFXManager::SFX_STOPPED)
+        m_previous_terrain_sound->getStatus()==SFXBase::SFX_STOPPED)
     {
         // We don't modify the position of m_previous_terrain_sound
         // anymore, so that it keeps on playing at the place where the
         // kart left the material.
-        SFXManager::get()->deleteSFX(m_previous_terrain_sound);
+        m_previous_terrain_sound->deleteSFX();
         m_previous_terrain_sound = NULL;
     }
     
@@ -1478,10 +1477,10 @@ void Kart::handleMaterialSFX(const Material *material)
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
     if(m_terrain_sound &&
-      (m_terrain_sound->getStatus()==SFXManager::SFX_PLAYING ||
-       m_terrain_sound->getStatus()==SFXManager::SFX_PAUSED))
+      (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
+       m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED))
     {
-        m_terrain_sound->position(getXYZ());
+        m_terrain_sound->setPosition(getXYZ());
         material->setSFXSpeed(m_terrain_sound, m_speed, m_schedule_pause);
     }
 
@@ -1590,9 +1589,9 @@ void Kart::handleMaterialGFX()
     const std::string &s = surface_material->getSFXName();
     if (s != "" && !dynamic_cast<RescueAnimation*>(getKartAnimation())&&
         (m_terrain_sound == NULL ||
-         m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
+         m_terrain_sound->getStatus() == SFXBase::SFX_STOPPED))
     {
-        if (m_previous_terrain_sound) SFXManager::get()->deleteSFX(m_previous_terrain_sound);
+        if (m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
         m_previous_terrain_sound = m_terrain_sound;
         if(m_previous_terrain_sound)
             m_previous_terrain_sound->setLoop(false);
@@ -1893,12 +1892,12 @@ void Kart::crashed(const Material* m, AbstractKart *k)
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-                if (!m_boing_sound->isPlaying())
+                if (m_boing_sound->getStatus() != SFXBase::SFX_PLAYING)
                     m_boing_sound->play();
             }
             else
             {
-                if(!m_crash_sound->isPlaying())
+                if(m_crash_sound->getStatus() != SFXBase::SFX_PLAYING)
                     m_crash_sound->play();
             }
         }
@@ -1973,7 +1972,7 @@ bool Kart::playCustomSFX(unsigned int type)
             //    SFXManager::get()->getCustomTagName(type),
             //    m_kart_properties->getIdent().c_str());
             // If it's already playing, let it finish
-            if (!m_custom_sounds[type]->isPlaying())
+            if (m_custom_sounds[type]->getStatus() != SFXManager::SFX_PLAYING)
             {
                 m_custom_sounds[type]->play();
             }
@@ -2124,15 +2123,15 @@ void Kart::updateEngineSFX()
         if (f>1.0f) f=1.0f;
 
         float gears = 3.0f * fmod(f, 0.333334f);
-        m_engine_sound->speed(0.6f + (f +gears)* 0.35f);
+        m_engine_sound->setSpeed(0.6f + (f +gears)* 0.35f);
     }
     else
     {
         // When flying, fixed value but not too high pitch
         // This gives some variation (vs previous "on wheels" one)
-        m_engine_sound->speed(0.9f);
+        m_engine_sound->setSpeed(0.9f);
     }
-    m_engine_sound->position(getXYZ());
+    m_engine_sound->setPosition(getXYZ());
 }   // updateEngineSFX
 
 //-----------------------------------------------------------------------------

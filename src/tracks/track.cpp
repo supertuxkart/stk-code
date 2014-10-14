@@ -1419,6 +1419,9 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
             continue;
         }
 
+        // to lower case, for case-insensitive comparison
+        name = StringUtils::toLowerCase(name);
+
         for(unsigned int i=0; i<node->getMaterialCount(); i++)
         {
             video::SMaterial &irrMaterial=node->getMaterial(i);
@@ -1426,9 +1429,13 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
             {
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
-                const std::string texture_name =
+                std::string texture_name =
                     StringUtils::getBasename(core::stringc(t->getName()).c_str());
-                if(texture_name!=name) continue;
+
+                // to lower case, for case-insensitive comparison
+                texture_name = StringUtils::toLowerCase(texture_name);
+
+                if (texture_name != name) continue;
                 core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
                 m_animated_textures.push_back(new MovingTexture(m, *texture_node));
             }   // for j<MATERIAL_MAX_TEXTURES

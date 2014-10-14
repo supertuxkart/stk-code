@@ -247,8 +247,6 @@ btScalar btKart::rayCast(unsigned int index)
     wheel.m_raycastInfo.m_contactPointWS = source + rayvector;
     const btVector3& target = wheel.m_raycastInfo.m_contactPointWS;
 
-    btScalar param = btScalar(0.);
-
     btVehicleRaycaster::btVehicleRaycasterResult rayResults;
 
     btAssert(m_vehicleRaycaster);

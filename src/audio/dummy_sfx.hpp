@@ -23,7 +23,6 @@
 #include "audio/sfx_base.hpp"
 
 
-
 /**
  * \brief Dummy sound when ogg or openal aren't available
  * \ingroup audio
@@ -37,19 +36,27 @@ public:
     /** Late creation, if SFX was initially disabled */
     virtual bool       init() { return true; }
 
-    virtual void       position(const Vec3 &position) {}
-    virtual void       setLoop(bool status)           {}
-    virtual void       play()                         {}
-    virtual void       stop()                         {}
-    virtual void       pause()                        {}
-    virtual void       resume()                       {}
-    virtual void       speed(float factor)            {}
-    virtual void       volume(float gain)             {}
-    virtual SFXManager::SFXStatus  getStatus()        { return SFXManager::SFX_STOPPED; }
-    virtual void       onSoundEnabledBack()           {}
-    virtual void       setRolloff(float rolloff)      {}
-    virtual bool       isPlaying()                    { return false; }
-    virtual const SFXBuffer* getBuffer() const        { return NULL; }
+    virtual void       setLoop(bool status)             {}
+    virtual void       setPosition(const Vec3 &p)       {}
+    virtual void       reallySetPosition(const Vec3 &p) {}
+    virtual void       play()                           {}
+    virtual void       reallyPlayNow()                  {}
+    virtual void       stop()                           {}
+    virtual void       reallyStopNow()                  {}
+    virtual void       pause()                          {}
+    virtual void       reallyPauseNow()                 {}
+    virtual void       resume()                         {}
+    virtual void       reallyResumeNow()                {}
+    virtual void       deleteSFX()                      { delete this; }
+    virtual void       setSpeed(float factor)           {}
+    virtual void       reallySetSpeed(float factor)     {}
+    virtual void       setVolume(float gain)            {}
+    virtual void       reallySetVolume(float gain)      {}
+    virtual SFXStatus  getStatus()                      { return SFX_STOPPED; }
+    virtual void       onSoundEnabledBack()             {}
+    virtual void       setRolloff(float rolloff)        {}
+    virtual bool       isPlaying()                      { return false; }
+    virtual const SFXBuffer* getBuffer() const          { return NULL; }
 
 };   // DummySFX
 
