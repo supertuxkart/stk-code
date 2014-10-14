@@ -1085,7 +1085,7 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID,
 
         if (iterations > 50)
         {
-            Log::fatal("DynamicRibbonWidget::setSelection", "Cannot find item %d (%s)", item_id, name.c_str());
+            Log::error("DynamicRibbonWidget::setSelection", "Cannot find item %d (%s)", item_id, name.c_str());
             return false;
         }
 
