@@ -223,6 +223,7 @@ void SFXOpenAL::stop()
 {
     SFXManager::get()->queue(SFXManager::SFX_STOP, this);
 }   // stop
+
 //-----------------------------------------------------------------------------
 /** The sfx manager thread executes a stop for this sfx.
  */
@@ -252,7 +253,11 @@ void SFXOpenAL::pause()
  */
 void SFXOpenAL::reallyPauseNow()
 {
-    if(m_status==SFX_UNKNOWN) return;
+    // This updates the status, i.e. potentially switches from
+    // playing to stopped.
+    getStatus();
+    if(m_status!=SFX_PLAYING) return;
+
     m_status = SFX_PAUSED;
     alSourcePause(m_sound_source);
     SFXManager::checkError("pausing");
@@ -271,15 +276,8 @@ void SFXOpenAL::resume()
  */
 void SFXOpenAL::reallyResumeNow()
 {
-    if (m_status==SFX_UNKNOWN)
-    {
-        // lazily create OpenAL source when needed
-        init();
-
-        // creation of OpenAL source failed, giving up
-        if (m_status==SFX_UNKNOWN) return;
-    }
-
+    // Will init the sfx (lazy) if necessary.
+    getStatus();
     if(m_status==SFX_PAUSED)
     {
         alSourcePlay(m_sound_source);
