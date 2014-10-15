@@ -310,7 +310,6 @@ void OptionsScreenVideo::init()
 
     } // end if not inited
 
-    res->setActivated();
     res->updateItemDisplay();
 
     // ---- select current resolution every time
