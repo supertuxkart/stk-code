@@ -70,6 +70,7 @@ public:
         SFX_SPEED,
         SFX_POSITION,
         SFX_VOLUME,
+        SFX_LISTENER,
         SFX_EXIT,
     };   // SFXCommands
 
@@ -129,8 +130,17 @@ private:
         }   // SFXCommand(Vec3)
     };   // SFXCommand
     // ========================================================================
-    /** Listener position */
-    Vec3 m_position;
+
+    /** The position of the listener. Its lock will be used to
+     *  access m_listener_{position,front, up}. */
+    Synchronised<Vec3>        m_listener_position;
+
+    /** The direction the listener is facing. */
+    Vec3                      m_listener_front;
+
+    /** Up vector of the listener. */
+    Vec3                      m_listener_up;
+
 
     /** The buffers and info for all sound effects. These are shared among all
      *  instances of SFXOpenal. */
@@ -144,9 +154,6 @@ private:
 
     /** To play non-positional sounds without having to create a new object for each */
     std::map<std::string, SFXBase*> m_quick_sounds;
-
-    /** listener vector (position vector + up vector) */
-    float                     m_listenerVec[6];
 
     /** If the sfx manager has been initialised. */
     bool                      m_initialized;
@@ -167,6 +174,8 @@ private:
     static void* mainLoop(void *obj);
     void deleteSFX(SFXBase *sfx);
     void queueCommand(SFXCommand *command);
+    void reallyPositionListenerNow();
+
 public:
     static void create();
     static void destroy();
@@ -211,7 +220,8 @@ public:
     static bool              checkError(const std::string &context);
     static const std::string getErrorString(int err);
 
-    void                     positionListener(const Vec3 &position, const Vec3 &front);
+    void                     positionListener(const Vec3 &position,
+                                              const Vec3 &front, const Vec3 &up);
     SFXBase*                 quickSound(const std::string &soundName);
 
     /** Called when sound was muted/unmuted */
@@ -224,7 +234,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the current position of the listener. */
-    Vec3 getListenerPos() const { return m_position; }
+    Vec3 getListenerPos() const { return m_listener_position.getData(); }
 
 };
 

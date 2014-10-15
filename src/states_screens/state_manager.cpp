@@ -201,7 +201,7 @@ void StateManager::onGameStateChange(GameState new_state)
     {
         irr_driver->showPointer();
         input_manager->setMode(InputManager::MENU);
-        SFXManager::get()->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
+        SFXManager::get()->positionListener( Vec3(0,0,0), Vec3(0,1,0), Vec3(0, 1, 0) );
 
         if (new_state == MENU)
         {

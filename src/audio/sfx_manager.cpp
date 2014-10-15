@@ -74,7 +74,10 @@ SFXManager::SFXManager()
     m_initialized = music_manager->initialized();
     m_master_gain = UserConfigParams::m_sfx_volume;
     // Init position, since it can be used before positionListener is called.
-    m_position    = Vec3(0,0,0);
+    // No need to use lock here, since the thread will be created later.
+    m_listener_position.getData() = Vec3(0, 0, 0);
+    m_listener_front              = Vec3(0, 0, 1);
+    m_listener_up                 = Vec3(0, 1, 0);
 
     loadSfx();
 
@@ -261,21 +264,21 @@ void* SFXManager::mainLoop(void *obj)
         me->m_sfx_commands.unlock();
         switch(current->m_command)
         {
-        case SFX_PLAY:   current->m_sfx->reallyPlayNow();       break;
-        case SFX_STOP:   current->m_sfx->reallyStopNow();       break;
-        case SFX_PAUSE:  current->m_sfx->reallyPauseNow();      break;
-        case SFX_RESUME: current->m_sfx->reallyResumeNow();     break;
-        case SFX_SPEED:  current->m_sfx->reallySetSpeed(
+        case SFX_PLAY:     current->m_sfx->reallyPlayNow();     break;
+        case SFX_STOP:     current->m_sfx->reallyStopNow();     break;
+        case SFX_PAUSE:    current->m_sfx->reallyPauseNow();    break;
+        case SFX_RESUME:   current->m_sfx->reallyResumeNow();   break;
+        case SFX_SPEED:    current->m_sfx->reallySetSpeed(
                                   current->m_parameter.getX()); break;
         case SFX_POSITION: current->m_sfx->reallySetPosition(
                                          current->m_parameter); break;
-        case SFX_VOLUME: current->m_sfx->reallySetVolume(
+        case SFX_VOLUME:   current->m_sfx->reallySetVolume(
                                   current->m_parameter.getX()); break;
-        case SFX_DELETE: {
-                            current->m_sfx->reallyStopNow();
-                            me->deleteSFX(current->m_sfx);
-                            break;
-                         }
+        case SFX_DELETE:   {
+                              current->m_sfx->reallyStopNow();
+                              me->deleteSFX(current->m_sfx);    break;
+                           }
+        case SFX_LISTENER: me->reallyPositionListenerNow();     break;
         default: assert("Not yet supported.");
         }
         delete current;
@@ -702,28 +705,51 @@ const std::string SFXManager::getErrorString(int err)
 /** Sets the position and orientation of the listener.
  *  \param position Position of the listener.
  *  \param front Which way the listener is facing.
+ *  \param up The up direction of the listener.
  */
-void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
+void SFXManager::positionListener(const Vec3 &position, const Vec3 &front,
+                                  const Vec3 &up)
+{
+    m_listener_position.lock();
+    m_listener_position.getData() = position;
+    m_listener_front              = front;
+    m_listener_up                 = up;
+    m_listener_position.unlock();
+    queue(SFX_LISTENER, NULL);
+}   // positionListener
+
+//-----------------------------------------------------------------------------
+/** Sets the position and orientation of the listener.
+ *  \param position Position of the listener.
+ *  \param front Which way the listener is facing.
+ */
+void SFXManager::reallyPositionListenerNow()
 {
 #if HAVE_OGGVORBIS
     if (!UserConfigParams::m_sfx || !m_initialized) return;
 
-    m_position = position;
+    m_listener_position.lock();
+    {
 
-    //forward vector
-    m_listenerVec[0] = front.getX();
-    m_listenerVec[1] = front.getY();
-    m_listenerVec[2] = front.getZ();
+        //forward vector
+        float orientation[6];
+        orientation[0] = m_listener_front.getX();
+        orientation[1] = m_listener_front.getY();
+        orientation[2] = m_listener_front.getZ();
 
-    //up vector
-    m_listenerVec[3] = 0;
-    m_listenerVec[4] = 0;
-    m_listenerVec[5] = 1;
+        //up vector
+        orientation[3] = m_listener_up.getX();
+        orientation[4] = m_listener_up.getY();
+        orientation[5] = m_listener_up.getZ();
 
-    alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
-    alListenerfv(AL_ORIENTATION, m_listenerVec);
+        const Vec3 &pos = m_listener_position.getData();
+        alListener3f(AL_POSITION, pos.getX(), pos.getY(), pos.getZ());
+        alListenerfv(AL_ORIENTATION, orientation);
+    }
+    m_listener_position.unlock();
+
 #endif
-}
+}   // reallyPositionListenerNow
 
 //-----------------------------------------------------------------------------
 /** Positional sound is cool, but creating a new object just to play a simple
