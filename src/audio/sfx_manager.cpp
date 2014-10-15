@@ -74,7 +74,10 @@ SFXManager::SFXManager()
     m_initialized = music_manager->initialized();
     m_master_gain = UserConfigParams::m_sfx_volume;
     // Init position, since it can be used before positionListener is called.
-    m_position    = Vec3(0,0,0);
+    // No need to use lock here, since the thread will be created later.
+    m_listener_position.getData() = Vec3(0, 0, 0);
+    m_listener_front              = Vec3(0, 0, 1);
+    m_listener_up                 = Vec3(0, 1, 0);
 
     loadSfx();
 
@@ -160,22 +163,69 @@ SFXManager::~SFXManager()
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------
-/** Adds a sound effect to the queue of sfx to be started by the sfx manager.
- *  Starting a sfx can sometimes cause a 5ms delay, so it is done in a 
- *  separate thread.
+/** Adds a sound effect command to the queue of the sfx manager. Openal 
+ *  commands can sometimes cause a 5ms delay, so it is done in a separate 
+ *  thread.
+ *  \param command The command to execute.
  *  \param sfx The sound effect to be started.
  */
 void SFXManager::queue(SFXCommands command,  SFXBase *sfx)
 {
     SFXCommand *sfx_command = new SFXCommand(command, sfx);
+    queueCommand(sfx_command);
+}   // queue
 
+//----------------------------------------------------------------------------
+/** Adds a sound effect command with a single floating point parameter to the
+ *  queue of the sfx manager. Openal commands can sometimes cause a 5ms delay,
+ *  so it is done in a separate thread.
+ *  \param command The command to execute.
+ *  \param sfx The sound effect to be started.
+ *  \param f Floating point parameter for the command.
+ */
+void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f)
+{
+    SFXCommand *sfx_command = new SFXCommand(command, sfx, f);
+    queueCommand(sfx_command);
+}   // queue(float)
+
+//----------------------------------------------------------------------------
+/** Adds a sound effect command with a Vec3 parameter to the queue of the sfx
+ *  manager. Openal commands can sometimes cause a 5ms delay, so it is done in
+ *  a separate thread.
+ *  \param command The command to execute.
+ *  \param sfx The sound effect to be started.
+ *  \param p A Vec3 parameter for the command.
+ */
+void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
+{
+   SFXCommand *sfx_command = new SFXCommand(command, sfx, p);
+   queueCommand(sfx_command);
+}   // queue (Vec3)
+
+//----------------------------------------------------------------------------
+/** Enqueues a command to the sfx queue threadsafe. Then signal the
+ *  sfx manager to wake up.
+ *  \param command Pointer to the command to queue up.
+ */
+void SFXManager::queueCommand(SFXCommand *command)
+{
     m_sfx_commands.lock();
-    m_sfx_commands.getData().push_back(sfx_command);
+    m_sfx_commands.getData().push_back(command);
     m_sfx_commands.unlock();
     // Wake up the sfx thread
-    pthread_cond_signal(&m_cond_request);
+}   // queueCommand
 
-}   // queue
+//----------------------------------------------------------------------------
+/** Make sures that the sfx thread is started at least one per frame. It also
+ *  adds an update command for the music manager.
+ *  \param dt Time step size.
+ */
+void SFXManager::update(float dt)
+{
+    queue(SFX_UPDATE_MUSIC, NULL, dt);
+    pthread_cond_signal(&m_cond_request);
+}   // update
 
 //----------------------------------------------------------------------------
 /** Puts a NULL request into the queue, which will trigger the thread to
@@ -224,15 +274,23 @@ void* SFXManager::mainLoop(void *obj)
         me->m_sfx_commands.unlock();
         switch(current->m_command)
         {
-        case SFX_PLAY:   current->m_sfx->reallyPlayNow();   break;
-        case SFX_STOP:   current->m_sfx->reallyStopNow();   break;
-        case SFX_PAUSE:  current->m_sfx->reallyPauseNow();  break;
-        case SFX_RESUME: current->m_sfx->reallyResumeNow(); break;
-        case SFX_DELETE: {
-                            current->m_sfx->reallyStopNow();
-                            me->deleteSFX(current->m_sfx);
-                            break;
-                         }
+        case SFX_PLAY:     current->m_sfx->reallyPlayNow();     break;
+        case SFX_STOP:     current->m_sfx->reallyStopNow();     break;
+        case SFX_PAUSE:    current->m_sfx->reallyPauseNow();    break;
+        case SFX_RESUME:   current->m_sfx->reallyResumeNow();   break;
+        case SFX_SPEED:    current->m_sfx->reallySetSpeed(
+                                  current->m_parameter.getX()); break;
+        case SFX_POSITION: current->m_sfx->reallySetPosition(
+                                         current->m_parameter); break;
+        case SFX_VOLUME:   current->m_sfx->reallySetVolume(
+                                  current->m_parameter.getX()); break;
+        case SFX_DELETE:   {
+                              current->m_sfx->reallyStopNow();
+                              me->deleteSFX(current->m_sfx);    break;
+                           }
+        case SFX_LISTENER: me->reallyPositionListenerNow();     break;
+        case SFX_UPDATE_MUSIC: music_manager->update(
+                                  current->m_parameter.getX()); break;
         default: assert("Not yet supported.");
         }
         delete current;
@@ -280,7 +338,7 @@ void SFXManager::soundToggled(const bool on)
     {
         pauseAll();
     }
-}
+}   // soundToggled
 
 //----------------------------------------------------------------------------
 /** Returns if sfx can be played. This means sfx are enabled and
@@ -576,9 +634,7 @@ void SFXManager::resumeAll()
     for (std::vector<SFXBase*>::iterator i =m_all_sfx.getData().begin();
                                          i!=m_all_sfx.getData().end(); i++)
     {
-        SFXStatus status = (*i)->getStatus();
-        // Initial happens when
-        if (status==SFX_PAUSED) (*i)->resume();
+        (*i)->resume();
     }   // for i in m_all_sfx
     m_all_sfx.unlock();
 }   // resumeAll
@@ -587,6 +643,7 @@ void SFXManager::resumeAll()
 /** Returns whether or not an openal error has occurred. If so, an error
  *  message is printed containing the given context.
  *  \param context Context to specify in the error message.
+ *  \return True if no error happened.
  */
 bool SFXManager::checkError(const std::string &context)
 {
@@ -660,28 +717,51 @@ const std::string SFXManager::getErrorString(int err)
 /** Sets the position and orientation of the listener.
  *  \param position Position of the listener.
  *  \param front Which way the listener is facing.
+ *  \param up The up direction of the listener.
  */
-void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
+void SFXManager::positionListener(const Vec3 &position, const Vec3 &front,
+                                  const Vec3 &up)
+{
+    m_listener_position.lock();
+    m_listener_position.getData() = position;
+    m_listener_front              = front;
+    m_listener_up                 = up;
+    m_listener_position.unlock();
+    queue(SFX_LISTENER, NULL);
+}   // positionListener
+
+//-----------------------------------------------------------------------------
+/** Sets the position and orientation of the listener.
+ *  \param position Position of the listener.
+ *  \param front Which way the listener is facing.
+ */
+void SFXManager::reallyPositionListenerNow()
 {
 #if HAVE_OGGVORBIS
     if (!UserConfigParams::m_sfx || !m_initialized) return;
 
-    m_position = position;
+    m_listener_position.lock();
+    {
 
-    //forward vector
-    m_listenerVec[0] = front.getX();
-    m_listenerVec[1] = front.getY();
-    m_listenerVec[2] = front.getZ();
+        //forward vector
+        float orientation[6];
+        orientation[0] = m_listener_front.getX();
+        orientation[1] = m_listener_front.getY();
+        orientation[2] = m_listener_front.getZ();
 
-    //up vector
-    m_listenerVec[3] = 0;
-    m_listenerVec[4] = 0;
-    m_listenerVec[5] = 1;
+        //up vector
+        orientation[3] = m_listener_up.getX();
+        orientation[4] = m_listener_up.getY();
+        orientation[5] = m_listener_up.getZ();
 
-    alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
-    alListenerfv(AL_ORIENTATION, m_listenerVec);
+        const Vec3 &pos = m_listener_position.getData();
+        alListener3f(AL_POSITION, pos.getX(), pos.getY(), pos.getZ());
+        alListenerfv(AL_ORIENTATION, orientation);
+    }
+    m_listener_position.unlock();
+
 #endif
-}
+}   // reallyPositionListenerNow
 
 //-----------------------------------------------------------------------------
 /** Positional sound is cool, but creating a new object just to play a simple

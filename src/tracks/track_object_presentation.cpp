@@ -427,7 +427,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
     m_sound = SFXManager::get()->createSoundSource(buffer, true, true);
     if (m_sound != NULL)
     {
-        m_sound->position(m_init_xyz);
+        m_sound->setPosition(m_init_xyz);
         if (!trigger_when_near && m_trigger_condition.empty())
         {
             m_sound->setLoop(true);
@@ -451,14 +451,14 @@ void TrackObjectPresentationSound::update(float dt)
         // muting when too far is implemented manually since not supported by OpenAL
         // so need to call this every frame to update the muting state if listener
         // moved
-        m_sound->position(m_xyz);
+        m_sound->setPosition(m_xyz);
     }
 }   // update
 
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::onTriggerItemApproached(Item* who)
 {
-    if (m_sound != NULL && m_sound->getStatus() != SFXManager::SFX_PLAYING)
+    if (m_sound != NULL && m_sound->getStatus() != SFXBase::SFX_PLAYING)
     {
         m_sound->play();
     }
@@ -495,7 +495,7 @@ void TrackObjectPresentationSound::move(const core::vector3df& xyz,
                                         const core::vector3df& scale)
 {
     m_xyz = xyz;
-    if (m_sound != NULL) m_sound->position(xyz);
+    if (m_sound != NULL) m_sound->setPosition(xyz);
 }   // move
 
 // ----------------------------------------------------------------------------

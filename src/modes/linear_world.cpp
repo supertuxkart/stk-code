@@ -155,7 +155,7 @@ void LinearWorld::update(float dt)
     WorldWithRank::update(dt);
 
     if (m_last_lap_sfx_playing &&
-        m_last_lap_sfx->getStatus() != SFXManager::SFX_PLAYING)
+        m_last_lap_sfx->getStatus() != SFXBase::SFX_PLAYING)
     {
         if(music_manager->getCurrentMusic())
             music_manager->getCurrentMusic()->resetTemporaryVolume();

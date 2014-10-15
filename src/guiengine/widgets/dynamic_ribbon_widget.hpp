@@ -159,7 +159,7 @@ namespace GUIEngine
         void buildInternalStructure();
 
         /** Call this to scroll within a scrollable ribbon */
-        void scroll(const int x_delta);
+        void scroll(int x_delta, bool evenIfDeactivated = false);
 
         /** Used  for combo ribbons, to contain the ID of the currently selected item for each player */
         int m_selected_item[MAX_PLAYER_COUNT];

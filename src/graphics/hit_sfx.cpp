@@ -27,13 +27,13 @@ HitSFX::HitSFX(const Vec3& coord, const char* explosion_sound)
              : HitEffect()
 {
     m_sfx = SFXManager::get()->createSoundSource( explosion_sound );
-    m_sfx->position(coord);
+    m_sfx->setPosition(coord);
 
     // in multiplayer mode, sounds are NOT positional (because we have
     // multiple listeners) so the sounds of all AIs are constantly heard.
     // Therefore reduce volume of sounds.
     float vol = race_manager->getNumLocalPlayers() > 1 ? 0.5f : 1.0f;
-    m_sfx->volume(vol);
+    m_sfx->setVolume(vol);
     m_sfx->play();
 }   // HitSFX
 
@@ -53,7 +53,7 @@ HitSFX::~HitSFX()
 void HitSFX::setPlayerKartHit()
 {
     if(race_manager->getNumLocalPlayers())
-        m_sfx->volume(1.0f);
+        m_sfx->setVolume(1.0f);
 }   // setPlayerKartHit
 
 //-----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ void HitSFX::setPlayerKartHit()
  */
 bool HitSFX::updateAndDelete(float dt)
 {
-    SFXManager::SFXStatus status = m_sfx->getStatus();
-    if(status==SFXManager::SFX_INITIAL) return false;
-    return status!= SFXManager::SFX_PLAYING;
+    SFXBase::SFXStatus status = m_sfx->getStatus();
+    if(status==SFXBase::SFX_INITIAL) return false;
+    return status!= SFXBase::SFX_PLAYING;
 }   // updateAndDelete

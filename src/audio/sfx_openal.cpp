@@ -23,8 +23,7 @@
 
 #include "audio/sfx_buffer.hpp"
 #include "config/user_config.hpp"
-#include "io/file_manager.hpp"
-#include "race/race_manager.hpp"
+#include "modes/world.hpp"
 #include "utils/vs.hpp"
 
 #ifdef __APPLE__
@@ -38,18 +37,19 @@
 #include <stdio.h>
 #include <string>
 
-SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool ownsBuffer) : SFXBase()
+SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool owns_buffer) : SFXBase()
 {
-    m_soundBuffer = buffer;
-    m_soundSource = 0;
-    m_ok          = false;
-    m_is_playing  = false;
-    m_positional  = positional;
-    m_defaultGain = gain;
-    m_loop        = false;
-    m_gain        = -1.0f;
-    m_master_gain = 1.0f;
-    m_owns_buffer = ownsBuffer;
+    m_sound_buffer = buffer;
+    m_sound_source = 0;
+    m_status       = SFX_UNKNOWN;
+    m_is_playing   = false;
+    m_positional   = positional;
+    m_defaultGain  = gain;
+    m_loop         = false;
+    m_gain         = -1.0f;
+    m_master_gain  = 1.0f;
+    m_owns_buffer  = owns_buffer;
+    m_end_time     = -1.0f;
 
     // Don't initialise anything else if the sfx manager was not correctly
     // initialised. First of all the initialisation will not work, and it
@@ -61,18 +61,19 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool ownsBu
 }   // SFXOpenAL
 
 //-----------------------------------------------------------------------------
-
+/** Deletes the sfx source, and if it owns the buffer, also deletes the sound
+ *  buffer. */
 SFXOpenAL::~SFXOpenAL()
 {
-    if (m_ok)
+    if (m_status!=SFX_UNKNOWN)
     {
-        alDeleteSources(1, &m_soundSource);
+        alDeleteSources(1, &m_sound_source);
     }
 
-    if (m_owns_buffer && m_soundBuffer != NULL)
+    if (m_owns_buffer && m_sound_buffer)
     {
-        m_soundBuffer->unload();
-        delete m_soundBuffer;
+        m_sound_buffer->unload();
+        delete m_sound_buffer;
     }
 }   // ~SFXOpenAL
 
@@ -80,54 +81,78 @@ SFXOpenAL::~SFXOpenAL()
 
 bool SFXOpenAL::init()
 {
-    alGenSources(1, &m_soundSource );
+    alGenSources(1, &m_sound_source );
     if (!SFXManager::checkError("generating a source")) return false;
 
-    assert( alIsBuffer(m_soundBuffer->getBufferID()) );
-    assert( alIsSource(m_soundSource) );
+    assert( alIsBuffer(m_sound_buffer->getBufferID()) );
+    assert( alIsSource(m_sound_source) );
 
-    //Log::info("SFXOpenAL", "Setting a source with buffer, %p, rolloff %f, gain = %f, position = %s",
-    //    m_soundBuffer, rolloff, m_defaultGain, positional ? "true" : "false");
-
-    alSourcei (m_soundSource, AL_BUFFER, m_soundBuffer->getBufferID());
+    alSourcei (m_sound_source, AL_BUFFER, m_sound_buffer->getBufferID());
 
     if (!SFXManager::checkError("attaching the buffer to the source"))
         return false;
 
-    alSource3f(m_soundSource, AL_POSITION,       0.0, 0.0, 0.0);
-    alSource3f(m_soundSource, AL_VELOCITY,       0.0, 0.0, 0.0);
-    alSource3f(m_soundSource, AL_DIRECTION,      0.0, 0.0, 0.0);
+    alSource3f(m_sound_source, AL_POSITION,       0.0, 0.0, 0.0);
+    alSource3f(m_sound_source, AL_VELOCITY,       0.0, 0.0, 0.0);
+    alSource3f(m_sound_source, AL_DIRECTION,      0.0, 0.0, 0.0);
 
-    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR, m_soundBuffer->getRolloff());
-    alSourcef (m_soundSource, AL_MAX_DISTANCE,   m_soundBuffer->getMaxDist());
+    alSourcef (m_sound_source, AL_ROLLOFF_FACTOR, m_sound_buffer->getRolloff());
+    alSourcef (m_sound_source, AL_MAX_DISTANCE,   m_sound_buffer->getMaxDist());
 
     if (m_gain < 0.0f)
     {
-        alSourcef (m_soundSource, AL_GAIN, m_defaultGain * m_master_gain);
+        alSourcef (m_sound_source, AL_GAIN, m_defaultGain * m_master_gain);
     }
     else
     {
-        alSourcef (m_soundSource, AL_GAIN, m_gain * m_master_gain);
+        alSourcef (m_sound_source, AL_GAIN, m_gain * m_master_gain);
     }
 
-    if (m_positional) alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE);
-    else              alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE);
+    if (m_positional) alSourcei (m_sound_source, AL_SOURCE_RELATIVE, AL_FALSE);
+    else              alSourcei (m_sound_source, AL_SOURCE_RELATIVE, AL_TRUE);
 
-    alSourcei(m_soundSource, AL_LOOPING, m_loop ? AL_TRUE : AL_FALSE);
+    alSourcei(m_sound_source, AL_LOOPING, m_loop ? AL_TRUE : AL_FALSE);
 
-    m_ok = SFXManager::checkError("setting up the source");
+    if(SFXManager::checkError("setting up the source"))
+        m_status = SFX_INITIAL;
 
-    return m_ok;
+    return m_status==SFX_INITIAL;
 }   // init
 
+// ------------------------------------------------------------------------
+/** Returns the status of this sfx. */
+SFXBase::SFXStatus SFXOpenAL::getStatus()
+{
+    if(m_status==SFX_PLAYING)
+    {
+        if(m_loop) return SFX_PLAYING;
+        if(World::getWorld() && World::getWorld()->getTime() > m_end_time)
+        {
+            m_status = SFX_STOPPED;
+            return m_status;
+        }
+    }
+    return m_status; 
+}   // getStatus;
+
 //-----------------------------------------------------------------------------
-/** Changes the pitch of a sound effect.
+/** Queues up a change of the pitch of a sound effect to the sfx manager.
  *  \param factor Speedup/slowdown between 0.5 and 2.0
  */
-void SFXOpenAL::speed(float factor)
+void SFXOpenAL::setSpeed(float factor)
 {
-    if(!m_ok || isnan(factor)) return;
+    if(m_status==SFX_UNKNOWN) return;
+    assert(!isnan(factor));
+    SFXManager::get()->queue(SFXManager::SFX_SPEED, this, factor);
+}   // setSpeed
 
+//-----------------------------------------------------------------------------
+/** Changes the pitch of a sound effect. Executed from the sfx manager thread.
+ *  \param factor Speedup/slowdown between 0.5 and 2.0
+ */
+void SFXOpenAL::reallySetSpeed(float factor)
+{
+    if(m_status==SFX_UNKNOWN) return;
     //OpenAL only accepts pitches in the range of 0.5 to 2.0
     if(factor > 2.0f)
     {
@@ -137,23 +162,33 @@ void SFXOpenAL::speed(float factor)
     {
         factor = 0.5f;
     }
-    alSourcef(m_soundSource,AL_PITCH,factor);
-    SFXManager::checkError("changing the speed");
-}   // speed
+    alSourcef(m_sound_source,AL_PITCH,factor);
+}   // reallySetSpeed
 
 //-----------------------------------------------------------------------------
 /** Changes the volume of a sound effect.
  *  \param gain Volume adjustment between 0.0 (mute) and 1.0 (full volume).
  */
-void SFXOpenAL::volume(float gain)
+void SFXOpenAL::setVolume(float gain)
 {
+    if(m_status==SFX_UNKNOWN) return;
+    assert(!isnan(gain)) ;
+    SFXManager::get()->queue(SFXManager::SFX_VOLUME, this, gain);
+}   // setVolume
+
+//-----------------------------------------------------------------------------
+/** Changes the volume of a sound effect.
+ *  \param gain Volume adjustment between 0.0 (mute) and 1.0 (full volume).
+ */
+void SFXOpenAL::reallySetVolume(float gain)
+{
+    if(m_status==SFX_UNKNOWN) return;
     m_gain = m_defaultGain * gain;
 
-    if(!m_ok) return;
+    if(m_status==SFX_UNKNOWN) return;
 
-    alSourcef(m_soundSource, AL_GAIN, m_gain * m_master_gain);
-    SFXManager::checkError("setting volume");
-}   // volume
+    alSourcef(m_sound_source, AL_GAIN, m_gain * m_master_gain);
+}   // reallySetVolume
 
 //-----------------------------------------------------------------------------
 
@@ -161,9 +196,9 @@ void SFXOpenAL::setMasterVolume(float gain)
 {
     m_master_gain = gain;
     
-    if(!m_ok) return;
+    if(m_status==SFX_UNKNOWN) return;
 
-    alSourcef(m_soundSource, AL_GAIN, 
+    alSourcef(m_sound_source, AL_GAIN, 
                (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
     SFXManager::checkError("setting volume");
 }   //setMasterVolume
@@ -175,9 +210,9 @@ void SFXOpenAL::setLoop(bool status)
 {
     m_loop = status;
 
-    if(!m_ok) return;
+    if(m_status==SFX_UNKNOWN) return;
 
-    alSourcei(m_soundSource, AL_LOOPING, status ? AL_TRUE : AL_FALSE);
+    alSourcei(m_sound_source, AL_LOOPING, status ? AL_TRUE : AL_FALSE);
     SFXManager::checkError("looping");
 }   // loop
 
@@ -188,17 +223,19 @@ void SFXOpenAL::stop()
 {
     SFXManager::get()->queue(SFXManager::SFX_STOP, this);
 }   // stop
+
 //-----------------------------------------------------------------------------
 /** The sfx manager thread executes a stop for this sfx.
  */
 void SFXOpenAL::reallyStopNow()
 {
-    if(!m_ok) return;
+    if(m_status==SFX_UNKNOWN) return;
 
     m_is_playing = false;
+    m_status     = SFX_STOPPED;
     m_loop       = false;
-    alSourcei(m_soundSource, AL_LOOPING, AL_FALSE);
-    alSourceStop(m_soundSource);
+    alSourcei(m_sound_source, AL_LOOPING, AL_FALSE);
+    alSourceStop(m_sound_source);
     SFXManager::checkError("stoping");
 }   // reallyStopNow
 
@@ -216,8 +253,13 @@ void SFXOpenAL::pause()
  */
 void SFXOpenAL::reallyPauseNow()
 {
-    if(!m_ok) return;
-    alSourcePause(m_soundSource);
+    // This updates the status, i.e. potentially switches from
+    // playing to stopped.
+    getStatus();
+    if(m_status!=SFX_PLAYING) return;
+
+    m_status = SFX_PAUSED;
+    alSourcePause(m_sound_source);
     SFXManager::checkError("pausing");
 }   // reallyPauseNow
 
@@ -234,17 +276,14 @@ void SFXOpenAL::resume()
  */
 void SFXOpenAL::reallyResumeNow()
 {
-    if (!m_ok)
+    // Will init the sfx (lazy) if necessary.
+    getStatus();
+    if(m_status==SFX_PAUSED)
     {
-        // lazily create OpenAL source when needed
-        init();
-
-        // creation of OpenAL source failed, giving up
-        if (!m_ok) return;
+        alSourcePlay(m_sound_source);
+        SFXManager::checkError("resuming");
+        m_status = SFX_PLAYING;
     }
-
-    alSourcePlay(m_soundSource);
-    SFXManager::checkError("resuming");
 }   // reallyResumeNow
 
 //-----------------------------------------------------------------------------
@@ -276,17 +315,24 @@ void SFXOpenAL::play()
 void SFXOpenAL::reallyPlayNow()
 {
     if (!SFXManager::get()->sfxAllowed()) return;
-    if (!m_ok)
+    if (m_status==SFX_UNKNOWN)
     {
         // lazily create OpenAL source when needed
         init();
 
         // creation of OpenAL source failed, giving up
-        if (!m_ok) return;
+        if (m_status==SFX_UNKNOWN) return;
     }
 
-    alSourcePlay(m_soundSource);
+    alSourcePlay(m_sound_source);
+    m_status = SFX_PLAYING;
     SFXManager::checkError("playing");
+
+    // At non-race time the end time is not important 
+    if(World::getWorld())
+        m_end_time = World::getWorld()->getTime()+m_sound_buffer->getDuration();
+    else
+        m_end_time = 1.0f;
 }   // reallyPlayNow
 
 //-----------------------------------------------------------------------------
@@ -301,13 +347,25 @@ bool SFXOpenAL::isPlaying()
 /** Sets the position where this sound effects is played.
  *  \param position Position of the sound effect.
  */
-void SFXOpenAL::position(const Vec3 &position)
+void SFXOpenAL::setPosition(const Vec3 &position)
+{
+    if (m_status == SFX_UNKNOWN) return;
+    SFXManager::get()->queue(SFXManager::SFX_POSITION, this, position);
+
+}   // setPosition
+
+//-----------------------------------------------------------------------------
+/** Sets the position where this sound effects is played.
+ *  \param position Position of the sound effect.
+ */
+void SFXOpenAL::reallySetPosition(const Vec3 &position)
 {
     if(!UserConfigParams::m_sfx)
         return;
-    if (!m_ok)
+    if (m_status==SFX_UNKNOWN)
     {
-        Log::warn("SFX", "Position called on non-ok SFX <%s>", m_soundBuffer->getFileName().c_str());
+        Log::warn("SFX", "Position called on non-ok SFX <%s>",
+                 m_sound_buffer->getFileName().c_str());
         return;
     }
     if (!m_positional)
@@ -322,39 +380,20 @@ void SFXOpenAL::position(const Vec3 &position)
         return;
     }
 
-    alSource3f(m_soundSource, AL_POSITION,
+    alSource3f(m_sound_source, AL_POSITION,
                (float)position.getX(), (float)position.getY(), (float)position.getZ());
 
-    if (SFXManager::get()->getListenerPos().distance(position) > m_soundBuffer->getMaxDist())
+    if (SFXManager::get()->getListenerPos().distance(position) > m_sound_buffer->getMaxDist())
     {
-        alSourcef(m_soundSource, AL_GAIN, 0);
+        alSourcef(m_sound_source, AL_GAIN, 0);
     }
     else
     {
-        alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
+        alSourcef(m_sound_source, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
     }
 
     SFXManager::checkError("positioning");
-}   // position
-
-//-----------------------------------------------------------------------------
-/** Returns the status of this sound effect.
- */
-SFXManager::SFXStatus SFXOpenAL::getStatus()
-{
-    if(!m_ok) return SFXManager::SFX_UNKNOWN;
-
-    int state = 0;
-    alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
-    switch(state)
-    {
-    case AL_STOPPED: return SFXManager::SFX_STOPPED;
-    case AL_PLAYING: return SFXManager::SFX_PLAYING;
-    case AL_PAUSED:  return SFXManager::SFX_PAUSED;
-    case AL_INITIAL: return SFXManager::SFX_INITIAL;
-    default:         return SFXManager::SFX_UNKNOWN;
-    }
-}   // getStatus
+}   // reallySetPosition
 
 //-----------------------------------------------------------------------------
 
@@ -362,22 +401,22 @@ void SFXOpenAL::onSoundEnabledBack()
 {
     if (m_loop)
     {
-        if (!m_ok) init();
-        if (m_ok)
+        if (m_status==SFX_UNKNOWN) init();
+        if (m_status!=SFX_UNKNOWN)
         {
-            alSourcef(m_soundSource, AL_GAIN, 0);
+            alSourcef(m_sound_source, AL_GAIN, 0);
             play();
             pause();
-            alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
+            alSourcef(m_sound_source, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
         }
     }
-}
+}   // onSoundEnabledBack
 
 //-----------------------------------------------------------------------------
 
 void SFXOpenAL::setRolloff(float rolloff)
 {
-    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  rolloff);
+    alSourcef (m_sound_source, AL_ROLLOFF_FACTOR,  rolloff);
 }
 
 #endif //if HAVE_OGGVORBIS

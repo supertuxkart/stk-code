@@ -439,7 +439,7 @@ void PlayerController::handleZipper(bool play_sound)
     // Only play a zipper sound if it's not already playing, and
     // if the material has changed (to avoid machine gun effect
     // on conveyor belt zippers).
-    if (play_sound || (m_wee_sound->getStatus() != SFXManager::SFX_PLAYING &&
+    if (play_sound || (m_wee_sound->getStatus() != SFXBase::SFX_PLAYING &&
                        m_kart->getMaterial()!=m_kart->getLastMaterial()      ) )
     {
         m_wee_sound->play();

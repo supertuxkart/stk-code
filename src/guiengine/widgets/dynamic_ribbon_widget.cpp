@@ -757,9 +757,9 @@ void DynamicRibbonWidget::onRibbonWidgetFocus(RibbonWidget* emitter, const int p
 #pragma mark Setters / Actions
 #endif
 
-void DynamicRibbonWidget::scroll(const int x_delta)
+void DynamicRibbonWidget::scroll(int x_delta, bool evenIfDeactivated)
 {
-    if (m_deactivated) return;
+    if (m_deactivated && !evenIfDeactivated) return;
 
     // Refuse to scroll when everything is visible
     if ((int)m_items.size() <= m_row_amount*m_col_amount) return;
@@ -1081,11 +1081,11 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID,
     while (!findItemInRows(name.c_str(), &row, &id))
     {
         // if we get here it means the item is scrolled out. Try to find it.
-        scroll(1);
+        scroll(1, evenIfDeactivated);
 
         if (iterations > 50)
         {
-            Log::fatal("DynamicRibbonWidget::setSelection", "Cannot find item %d (%s)", item_id, name.c_str());
+            Log::error("DynamicRibbonWidget::setSelection", "Cannot find item %d (%s)", item_id, name.c_str());
             return false;
         }
 
