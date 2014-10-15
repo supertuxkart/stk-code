@@ -214,8 +214,18 @@ void SFXManager::queueCommand(SFXCommand *command)
     m_sfx_commands.getData().push_back(command);
     m_sfx_commands.unlock();
     // Wake up the sfx thread
-    pthread_cond_signal(&m_cond_request);
 }   // queueCommand
+
+//----------------------------------------------------------------------------
+/** Make sures that the sfx thread is started at least one per frame. It also
+ *  adds an update command for the music manager.
+ *  \param dt Time step size.
+ */
+void SFXManager::update(float dt)
+{
+    queue(SFX_UPDATE_MUSIC, NULL, dt);
+    pthread_cond_signal(&m_cond_request);
+}   // update
 
 //----------------------------------------------------------------------------
 /** Puts a NULL request into the queue, which will trigger the thread to
@@ -279,6 +289,8 @@ void* SFXManager::mainLoop(void *obj)
                               me->deleteSFX(current->m_sfx);    break;
                            }
         case SFX_LISTENER: me->reallyPositionListenerNow();     break;
+        case SFX_UPDATE_MUSIC: music_manager->update(
+                                  current->m_parameter.getX()); break;
         default: assert("Not yet supported.");
         }
         delete current;
@@ -326,7 +338,7 @@ void SFXManager::soundToggled(const bool on)
     {
         pauseAll();
     }
-}
+}   // soundToggled
 
 //----------------------------------------------------------------------------
 /** Returns if sfx can be played. This means sfx are enabled and

@@ -71,6 +71,7 @@ public:
         SFX_POSITION,
         SFX_VOLUME,
         SFX_LISTENER,
+        SFX_UPDATE_MUSIC,
         SFX_EXIT,
     };   // SFXCommands
 
@@ -213,6 +214,7 @@ public:
     void                     deleteSFXMapping(const std::string &name);
     void                     pauseAll();
     void                     resumeAll();
+    void                     update(float dt);
     bool                     soundExist(const std::string &name);
     void                     setMasterSFXVolume(float gain);
     float                    getMasterSFXVolume() const { return m_master_gain; }
