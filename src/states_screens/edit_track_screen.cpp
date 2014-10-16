@@ -85,7 +85,11 @@ bool EditTrackScreen::getResult() const
 // -----------------------------------------------------------------------------
 void EditTrackScreen::loadedFromFile()
 {
+    static const int MAX_LABEL_LENGTH = 35;
 
+    DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
+    assert(tracks_widget != NULL);
+    tracks_widget->setMaxLabelLength(MAX_LABEL_LENGTH);
 }
 
 // -----------------------------------------------------------------------------
