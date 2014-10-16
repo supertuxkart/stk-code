@@ -138,7 +138,6 @@ void MainLoop::run()
         if (!m_abort && !ProfileWorld::isNoGraphics())
         {
             PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
-            SFXManager::get()->update(dt);
             input_manager->update(dt);
 
             #ifdef ENABLE_WIIUSE
@@ -150,6 +149,13 @@ void MainLoop::run()
 
             PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
             irr_driver->update(dt);
+            PROFILER_POP_CPU_MARKER();
+
+            // Update sfx and music after graphics, so that graphics code
+            // can use as many threads as possible without interfering
+            // with audia
+            PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
+            SFXManager::get()->update(dt);
             PROFILER_POP_CPU_MARKER();
 
             PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
