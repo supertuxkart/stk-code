@@ -338,7 +338,18 @@ void SFXOpenAL::reallyPlayNow()
 
     // At non-race time the end time is not important 
     if(World::getWorld())
-        m_end_time = World::getWorld()->getTime()+m_sound_buffer->getDuration();
+    {
+        float t= World::getWorld()->getTime();
+        // A special case: the track intro music starts at world clock = 0,
+        // and has a duration of 3.7 seconds. So if the game is paused in the
+        // first 3.7 seconds, the sfx wil be considered to be not finished
+        // (since the world clock stays at 0 before the race start), and
+        // therefore resumed if the game is resumed, which means it is
+        // played again. To avoid this, any sound starting at t=0 is set
+        // to have an end time of 0 - which means the track intro music is
+        // not resumed in this case.
+        m_end_time = t>0 ? t+m_sound_buffer->getDuration() : 0;
+    }
     else
         m_end_time = 1.0f;
 }   // reallyPlayNow
