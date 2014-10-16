@@ -213,7 +213,6 @@ void SFXManager::queueCommand(SFXCommand *command)
     m_sfx_commands.lock();
     m_sfx_commands.getData().push_back(command);
     m_sfx_commands.unlock();
-    // Wake up the sfx thread
 }   // queueCommand
 
 //----------------------------------------------------------------------------
@@ -224,6 +223,7 @@ void SFXManager::queueCommand(SFXCommand *command)
 void SFXManager::update(float dt)
 {
     queue(SFX_UPDATE_MUSIC, NULL, dt);
+    // Wake up the sfx thread to handle all queued up audio commands.
     pthread_cond_signal(&m_cond_request);
 }   // update
 
@@ -234,6 +234,8 @@ void SFXManager::update(float dt)
 void SFXManager::stopThread()
 {
     queue(SFX_EXIT, NULL);
+    // Make sure the thread wakes up.
+    pthread_cond_signal(&m_cond_request);
 }   // stopThread
 
 //----------------------------------------------------------------------------
