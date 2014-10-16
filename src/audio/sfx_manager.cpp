@@ -234,6 +234,8 @@ void SFXManager::update(float dt)
 void SFXManager::stopThread()
 {
     queue(SFX_EXIT, NULL);
+    // Make sure the thread wakes up.
+    pthread_cond_signal(&m_cond_request);
 }   // stopThread
 
 //----------------------------------------------------------------------------
