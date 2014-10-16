@@ -100,7 +100,7 @@ Swatter::~Swatter()
     }
     if (m_swat_sound)
     {
-        SFXManager::get()->deleteSFX(m_swat_sound);
+        m_swat_sound->deleteSFX();
     }
 }   // ~Swatter
 
@@ -275,7 +275,7 @@ void Swatter::squashThingsAround()
     assert(swatter_node);
     Vec3 swatter_pos = swatter_node->getAbsolutePosition();
 
-    m_swat_sound->position(swatter_pos);
+    m_swat_sound->setPosition(swatter_pos);
     m_swat_sound->play();
 
     // Squash karts around

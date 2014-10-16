@@ -309,7 +309,8 @@ void CutsceneWorld::update(float dt)
 
             SFXManager::get()->positionListener(m_camera->getAbsolutePosition(),
                                           m_camera->getTarget() -
-                                            m_camera->getAbsolutePosition());
+                                            m_camera->getAbsolutePosition(),
+                                            Vec3(0,1,0));
 
             break;
         }

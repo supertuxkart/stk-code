@@ -318,15 +318,10 @@ void OptionsScreenVideo::init()
                                          (int)UserConfigParams::m_height);
 
 
-    if (res->setSelection(searching_for, PLAYER_ID_GAME_MASTER,
+    if (!res->setSelection(searching_for, PLAYER_ID_GAME_MASTER,
                           false /* focus it */, true /* even if deactivated*/))
     {
-        // ok found
-    }
-    else
-    {
-        std::cerr << "[OptionsScreenVideo] Cannot find resolution '"
-                  << searching_for << "'\n";
+        Log::error("OptionsScreenVideo", "Cannot find resolution %s", searching_for);
     }
 
 
@@ -517,8 +512,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         int w = -1, h = -1;
         if (sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1)
         {
-            std::cerr << "Failed to decode resolution : " << res.c_str()
-                      << std::endl;
+            Log::error("OptionsScreenVideo", "Failed to decode resolution %s", res.c_str());
             return;
         }
 

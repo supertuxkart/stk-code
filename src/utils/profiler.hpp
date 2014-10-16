@@ -28,6 +28,34 @@
 #include <iostream>
 
 
+enum QueryPerf
+{
+    Q_SHADOWS_CASCADE0,
+    Q_SHADOWS_CASCADE1,
+    Q_SHADOWS_CASCADE2,
+    Q_SHADOWS_CASCADE3,
+    Q_SOLID_PASS1,
+    Q_RSM,
+    Q_RH,
+    Q_GI,
+    Q_ENVMAP,
+    Q_SUN,
+    Q_POINTLIGHTS,
+    Q_SSAO,
+    Q_SOLID_PASS2,
+    Q_TRANSPARENT,
+    Q_PARTICLES,
+    Q_DISPLACEMENT,
+    Q_DOF,
+    Q_GODRAYS,
+    Q_BLOOM,
+    Q_TONEMAP,
+    Q_MOTIONBLUR,
+    Q_MLAA,
+    Q_GUI,
+    Q_LAST
+};
+
 class Profiler;
 extern Profiler profiler;
 

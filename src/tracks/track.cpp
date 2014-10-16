@@ -1419,6 +1419,9 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
             continue;
         }
 
+        // to lower case, for case-insensitive comparison
+        name = StringUtils::toLowerCase(name);
+
         for(unsigned int i=0; i<node->getMaterialCount(); i++)
         {
             video::SMaterial &irrMaterial=node->getMaterial(i);
@@ -1426,9 +1429,13 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
             {
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
-                const std::string texture_name =
+                std::string texture_name =
                     StringUtils::getBasename(core::stringc(t->getName()).c_str());
-                if(texture_name!=name) continue;
+
+                // to lower case, for case-insensitive comparison
+                texture_name = StringUtils::toLowerCase(texture_name);
+
+                if (texture_name != name) continue;
                 core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
                 m_animated_textures.push_back(new MovingTexture(m, *texture_node));
             }   // for j<MATERIAL_MAX_TEXTURES
@@ -1939,17 +1946,17 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             node->get("scale", &scale);
 
             XMLNode* libroot;
-            std::string lib_path = file_manager->getAsset("library/" + name);
+            std::string lib_path = 
+                file_manager->getAsset(FileManager::LIBRARY, name)+"/";
             bool create_lod_definitions = true;
 
             if (library_nodes.find(name) == library_nodes.end())
             {
-                std::string node_path = "library/" + name + "/node.xml";
-                std::string lib_node_path = file_manager->getAsset(node_path);
+                std::string lib_node_path = lib_path+"node.xml";
                 libroot = file_manager->createXMLTree(lib_node_path);
                 if (libroot == NULL)
                 {
-                    Log::error("Track", "Cannot find library '%s'", node_path.c_str());
+                    Log::error("Track", "Cannot find library '%s'", lib_node_path.c_str());
                     continue;
                 }
 

@@ -39,8 +39,6 @@ WorldStatus::WorldStatus()
     m_start_sound       = SFXManager::get()->createSoundSource("start_race");
     m_track_intro_sound = SFXManager::get()->createSoundSource("track_intro");
 
-    music_manager->stopMusic();
-
     m_play_racestart_sounds = true;
 
     IrrlichtDevice *device = irr_driver->getDevice();
@@ -74,9 +72,9 @@ void WorldStatus::reset()
  */
 WorldStatus::~WorldStatus()
 {
-    SFXManager::get()->deleteSFX(m_prestart_sound);
-    SFXManager::get()->deleteSFX(m_start_sound);
-    SFXManager::get()->deleteSFX(m_track_intro_sound);
+    m_prestart_sound->deleteSFX();
+    m_start_sound->deleteSFX();
+    m_track_intro_sound->deleteSFX();
     IrrlichtDevice *device = irr_driver->getDevice();
 
     if (device->getTimer()->isStopped())  
@@ -162,7 +160,7 @@ void WorldStatus::update(const float dt)
             // ... phase. Since the sound effect is about 3 seconds
             // long, we use the aux timer to force the next phase
             // after 3.5 seconds.
-            if (m_track_intro_sound->getStatus() == SFXManager::SFX_PLAYING &&
+            if (m_track_intro_sound->getStatus() == SFXBase::SFX_PLAYING &&
                 m_auxiliary_timer < 3.5f)
                 return;
 

@@ -11,12 +11,16 @@
 #include "modes/world.hpp"
 
 
-Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp, Material* material)
+Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp,
+    Material* material, Material* layer2Material)
 {
+    if (layer2Material != NULL && layer2Material->getShaderType() == Material::SHADERTYPE_SPLATTING)
+        return Material::SHADERTYPE_SPLATTING;
+
     switch (material->getShaderType())
     {
     default:
-        return material->getShaderType();
+        return material->getShaderType();   
     case Material::SHADERTYPE_SOLID:
         if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
             return Material::SHADERTYPE_NORMAL_MAP;

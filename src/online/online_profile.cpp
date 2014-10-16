@@ -60,7 +60,7 @@ OnlineProfile::OnlineProfile(const uint32_t  & userid,
                              const irr::core::stringw & username,
                              bool is_current_user)
 {
-    m_state                    = S_READY;
+    m_state                    = (State)0;
     m_cache_bit                = true;
     m_id                       = userid;
     m_is_current_user          = is_current_user;
@@ -112,7 +112,7 @@ OnlineProfile::OnlineProfile(const XMLNode * xml, ConstructorType type)
     xml->get("id",        &m_id      );
     xml->get("user_name", &m_username);
     m_is_current_user = (m_id == PlayerManager::getCurrentOnlineId());
-    m_state = S_READY;
+    m_state = (State)0;
 }   // OnlineProfile(XMLNode)
 
 // ----------------------------------------------------------------------------
@@ -132,7 +132,7 @@ void OnlineProfile::fetchAchievements()
     if (m_has_fetched_achievements || m_is_current_user)
         return;
 
-    m_state = S_FETCHING;
+    m_state = State(m_state | S_FETCHING_ACHIEVEMENTS);
 
     // ------------------------------------------------------------------------
     /** A simple class that receives the achievements, and calls the right
@@ -173,7 +173,7 @@ void OnlineProfile::storeAchievements(const XMLNode * input)
         m_achievements = StringUtils::splitToUInt(achieved_string, ' ');
     }
     m_has_fetched_achievements = true;
-    m_state = S_READY;
+    m_state = State(m_state & ~S_FETCHING_ACHIEVEMENTS);
 }   // storeAchievements
 
 // ----------------------------------------------------------------------------
@@ -187,7 +187,7 @@ void OnlineProfile::fetchFriends()
     if (m_has_fetched_friends)
         return;
 
-    m_state = S_FETCHING;
+    m_state = State(m_state | S_FETCHING_FRIENDS);
 
     // ------------------------------------------------------------------------
     class FriendsListRequest : public XMLRequest
@@ -239,7 +239,7 @@ void OnlineProfile::storeFriends(const XMLNode * input)
         }
     }   // for i in nodes
     m_has_fetched_friends = true;
-    m_state = S_READY;
+    m_state = State(m_state & ~S_FETCHING_FRIENDS);
 }   // storeFriends
 
 // ----------------------------------------------------------------------------
@@ -296,7 +296,8 @@ void OnlineProfile::deleteRelationalInfo()
  */
 const OnlineProfile::IDList& OnlineProfile::getFriends()
 {
-    assert(m_has_fetched_friends && m_state == S_READY);
+    assert(m_has_fetched_friends            && 
+           (m_state & S_FETCHING_FRIENDS) == 0);
     return m_friends;
 }    // getFriends
 
@@ -305,7 +306,9 @@ const OnlineProfile::IDList& OnlineProfile::getFriends()
  */
 const OnlineProfile::IDList& OnlineProfile::getAchievements()
 {
-    assert(m_has_fetched_achievements && m_state == S_READY && !m_is_current_user);
+    assert(m_has_fetched_achievements               && 
+           (m_state & S_FETCHING_ACHIEVEMENTS) == 0 &&
+           !m_is_current_user);
     return m_achievements;
 }   // getAchievements
 

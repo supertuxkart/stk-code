@@ -310,7 +310,7 @@ namespace StringUtils
             for(int i=(int)dirs.size()-1; i>=0; i--)
             {
                 if(dirs[i].size()>1) continue;
-                if(i==dirs.size()-1)    // last element
+                if(i==(int)dirs.size()-1)    // last element
                 {
                     dirs[i]+=":";      // turn "c" back into "c:"
                 }

@@ -171,6 +171,7 @@ void TracksScreen::init()
 
     // Reset GP list everytime (accounts for locking changes, etc.)
     gps_widget->clearItems();
+    gps_widget->setMaxLabelLength(30);
 
     // Ensure that no GP and no track is NULL
     grand_prix_manager->checkConsistency();

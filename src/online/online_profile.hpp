@@ -78,8 +78,8 @@ private:
     /** The profile can either be fetching data, or be ready. */
     enum State
     {
-        S_FETCHING = 1,
-        S_READY
+        S_FETCHING_ACHIEVEMENTS = 0x01,
+        S_FETCHING_FRIENDS      = 0x02,
     };
 
     State                           m_state;
@@ -126,12 +126,26 @@ public:
     bool hasFetchedAchievements() const { return m_has_fetched_achievements; }
 
     // ------------------------------------------------------------------------
+    /** Unsets the flag that all friends of this profile are in cache. Used
+     *  when a profile is pushed out of cache. */
+    void unsetHasFetchedFriends() { m_has_fetched_friends = false;  }
+    // ------------------------------------------------------------------------
     /** Returns true if the friend list for this profile has been fetched. */
     bool hasFetchedFriends() const { return m_has_fetched_friends; }
 
     // ------------------------------------------------------------------------
-    /** True if the profile is not fetching data atm. */
-    bool isReady() const { return m_state == S_READY; }
+    /** True if the profile has fetched friends. */
+    bool finishedFetchingFriends() const
+    {
+        return (m_state & S_FETCHING_FRIENDS) == 0;
+    }   // finishedFetchingFriends
+
+    // ------------------------------------------------------------------------
+    /** True if the profile has fetched friends. */
+    bool finishedFetchingAchievements() const
+    {
+        return (m_state & S_FETCHING_ACHIEVEMENTS) == 0;
+    }   // hasFetchedAchievements
 
     // ------------------------------------------------------------------------
     /** Returns true if this item is the current user. */

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<materials>
+  <!-- Fonts -->
+  <material name="title_font.png"           shader="unlit" lazy-load="Y"/>
+  <material name="title_font_2.png"         shader="unlit" lazy-load="Y"/>
+  <material name="sigmar0.png"              shader="unlit" lazy-load="Y"/>
+  <material name="comix.png"                shader="unlit" lazy-load="Y"/>
+  <material name="LayneHansom0.png"         shader="unlit" lazy-load="Y"/>
+  <material name="Mplus2p_JP0.png"          shader="unlit" lazy-load="Y"/>
+  <material name="rasheeq0.png"             shader="unlit" lazy-load="Y"/>
+  <material name="rasheeq3.png"             shader="unlit" lazy-load="Y"/>
+  <material name="rasheeq4.png"             shader="unlit" lazy-load="Y"/>
+  <material name="wqyMicroHei0.png"         shader="unlit" lazy-load="Y"/>
+  <material name="wqyMicroHei1.png"         shader="unlit" lazy-load="Y"/>
+  <material name="wqyMicroHei2.png"         shader="unlit" lazy-load="Y"/>
+  <material name="wqyMicroHei3.png"         shader="unlit" lazy-load="Y"/>
+  <material name="wqyMicroHei4.png"         shader="unlit" lazy-load="Y"/>
+  <material name="wqyMicroHei5.png"         shader="unlit" lazy-load="Y"/>
+  <material name="AR_PL_SungtiL_GB0.png"    shader="unlit" lazy-load="Y"/>
+  <material name="LayneHansomBigDigits.png" shader="unlit" lazy-load="Y"/>
+
+</materials>

@@ -77,6 +77,8 @@ struct btWheelInfo
 	
 	bool m_bIsFrontWheel;
 	
+    bool m_was_on_ground;
+
 	void*		m_clientInfo;//can be used to store pointer to sync transforms...
 
 	btWheelInfo(btWheelInfoConstructionInfo& ci)
@@ -102,7 +104,7 @@ struct btWheelInfo
 		m_rollInfluence = btScalar(0.1);
 		m_bIsFrontWheel = ci.m_bIsFrontWheel;
 		m_maxSuspensionForce = ci.m_maxSuspensionForce;
-
+        m_was_on_ground = true;
 	}
 
 	void	updateWheel(const btRigidBody& chassis,RaycastInfo& raycastInfo);

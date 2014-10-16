@@ -13,32 +13,32 @@
                                square_items="true" child_width="128" child_height="128" />
 
             <spacer height="15" width="10"/>
-            <div width="80%" align="center" layout="vertical-row" height="fit">
+            <div width="90%" align="center" layout="vertical-row" height="fit">
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label proportion="1" height="100%" text_align="left" I18N="In the login screen" text="Online"/>
-                    <checkbox id="online" I18N="In the login screen" text_align="left"/>
+                    <label width="40%" height="100%" text_align="left" I18N="In the login screen" text="Online"/>
+                    <checkbox width="fit" id="online" I18N="In the login screen" text_align="left"/>
                 </div>
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label    id="label_remember" proportion="1" height="100%" text_align="left"
+                    <label  width="40%"  id="label_remember" height="100%" text_align="left"
                               I18N="In the login screen" text="Remember password"/>
-                    <checkbox id="remember-user" I18N="In the login screen" text_align="left"/>
+                    <checkbox width="fit" id="remember-user" I18N="In the login screen" text_align="left"/>
                 </div>
                 <!-- Disable guest accounts for now
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label id="label_guest" proportion="1" height="100%" text_align="left"
+                    <label width="40%" id="label_guest" height="100%" text_align="left"
                            I18N="In the login screen" text="Guest login"/>
                     <checkbox id="guest" I18N="In the login screen" text_align="left"/>
                 </div>
                 -->
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label id="label_username" proportion="1" height="100%" text_align="left"
+                    <label width="40%" id="label_username" height="100%" text_align="left"
                            I18N="In the login screen" text="Username"/>
                     <textbox id="username" proportion="2" height="fit" I18N="In the registration dialog"/>
                 </div>
                 <spacer height="20" width="20"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label id="label_password" proportion="1" height="100%" text_align="left"
+                    <label id="label_password" width="40%" height="100%" text_align="left"
                            I18N="In the registration dialog" text="Password"/>
                     <textbox id="password" proportion="2" height="fit" I18N="In the registration dialog"/>
                 </div>
@@ -54,8 +54,6 @@
                              I18N="Login dialog" text="Add user" label_location="bottom"/>
                 <icon-button id="delete" width="64" height="64" icon="gui/gp_remove_track.png"
                              I18N="Login dialog" text="Delete" label_location="bottom"/>
-                <icon-button id="recover" width="64" height="64" icon="gui/main_options.png"
-                             I18N="Login dialog" text="Recovery" label_location="bottom"/>
                 <icon-button id="rename" width="64" height="64" icon="gui/gp_rename.png"
                              I18N="Login dialog" text="Rename" label_location="bottom"/>
                 <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"

@@ -48,7 +48,7 @@ public:
      *  The last entry ASSET_COUNT specifies the number of entries. */
     enum AssetType {ASSET_MIN,
                     CHALLENGE=ASSET_MIN,
-                    FONT, GFX, GRANDPRIX, GUI, MODEL, MUSIC,
+                    FONT, GFX, GRANDPRIX, GUI, LIBRARY, MODEL, MUSIC,
                     SFX, SHADER, SKIN, TEXTURE, TRANSLATION,
                     ASSET_MAX = TRANSLATION,
                     ASSET_COUNT};

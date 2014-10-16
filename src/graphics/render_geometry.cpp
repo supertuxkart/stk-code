@@ -11,6 +11,7 @@
 #include "utils/profiler.hpp"
 #include "utils/tuple.hpp"
 #include "stkscenemanager.hpp"
+#include "utils/profiler.hpp"
 
 #include <S3DVertex.h>
 
@@ -74,7 +75,7 @@ struct DefaultMaterial
 };
 
 const std::vector<size_t> DefaultMaterial::FirstPassTextures = { 1 };
-const std::vector<size_t> DefaultMaterial::SecondPassTextures = { 0 };
+const std::vector<size_t> DefaultMaterial::SecondPassTextures = { 0, 1 };
 
 struct AlphaRef
 {
@@ -92,7 +93,7 @@ struct AlphaRef
 };
 
 const std::vector<size_t> AlphaRef::FirstPassTextures = { 0, 1 };
-const std::vector<size_t> AlphaRef::SecondPassTextures = { 0 };
+const std::vector<size_t> AlphaRef::SecondPassTextures = { 0, 1 };
 
 struct SphereMap
 {
@@ -145,8 +146,8 @@ struct GrassMat
     static const std::vector<size_t> SecondPassTextures;
 };
 
-const std::vector<size_t> GrassMat::FirstPassTextures = { 0 };
-const std::vector<size_t> GrassMat::SecondPassTextures = { 0 };
+const std::vector<size_t> GrassMat::FirstPassTextures = { 0, 1 };
+const std::vector<size_t> GrassMat::SecondPassTextures = { 0, 1 };
 
 struct NormalMat
 {
@@ -164,7 +165,7 @@ struct NormalMat
 };
 
 const std::vector<size_t> NormalMat::FirstPassTextures = { 2, 1 };
-const std::vector<size_t> NormalMat::SecondPassTextures = { 0 };
+const std::vector<size_t> NormalMat::SecondPassTextures = { 0, 1 };
 
 struct DetailMat
 {
@@ -182,7 +183,7 @@ struct DetailMat
 };
 
 const std::vector<size_t> DetailMat::FirstPassTextures = { 1 };
-const std::vector<size_t> DetailMat::SecondPassTextures = { 0, 2 };
+const std::vector<size_t> DetailMat::SecondPassTextures = { 0, 2, 1 };
 
 struct SplattingMat
 {
@@ -530,15 +531,15 @@ void IrrDriver::renderSolidSecondPass()
 
         if (UserConfigParams::m_azdo)
         {
-            multidraw2ndPass<DefaultMaterial>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
-            multidraw2ndPass<AlphaRef>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
+            multidraw2ndPass<DefaultMaterial>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
+            multidraw2ndPass<AlphaRef>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
             multidraw2ndPass<SphereMap>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
             multidraw2ndPass<UnlitMat>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
             SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
-            multidraw2ndPass<GrassMat>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, DepthHandle, 0), windDir, cb->getPosition());
+            multidraw2ndPass<GrassMat>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, DepthHandle, 0, 0), windDir, cb->getPosition());
 
-            multidraw2ndPass<NormalMat>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
-            multidraw2ndPass<DetailMat>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
+            multidraw2ndPass<NormalMat>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
+            multidraw2ndPass<DetailMat>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0, 0));
         }
         else if (irr_driver->hasARB_draw_indirect())
         {
@@ -860,8 +861,6 @@ static void multidrawShadow(unsigned i, Args ...args)
 
 void IrrDriver::renderShadows()
 {
-    ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
-
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -875,7 +874,7 @@ void IrrDriver::renderShadows()
 
     for (unsigned cascade = 0; cascade < 4; cascade++)
     {
-
+        ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
         std::vector<GLuint> noTexUnits;
 
         renderShadow<MeshShader::ShadowShader, video::EVT_STANDARD, 1>(noTexUnits, cascade, ListMatDefault::getInstance()->Shadows[cascade]);

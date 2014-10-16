@@ -19,6 +19,7 @@
 #ifndef HEADER_SFX_MANAGER_HPP
 #define HEADER_SFX_MANAGER_HPP
 
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/vec3.hpp"
@@ -57,6 +58,24 @@ private:
 
 public:
 
+    /** The various commands to be executed by the sfx manager thread
+     *  for each sfx. */
+    enum SFXCommands
+    {
+        SFX_PLAY = 1,
+        SFX_STOP,
+        SFX_PAUSE,
+        SFX_RESUME,
+        SFX_DELETE,
+        SFX_SPEED,
+        SFX_POSITION,
+        SFX_VOLUME,
+        SFX_LOOP,
+        SFX_LISTENER,
+        SFX_UPDATE_MUSIC,
+        SFX_EXIT,
+    };   // SFXCommands
+
     /**
       *  Entries for custom SFX sounds.  These are unique for each kart.
       * eg. kart->playCustomSFX(SFX_MANAGER::CUSTOM_HORN)
@@ -76,33 +95,67 @@ public:
         NUM_CUSTOMS
     };
 
-    /** Status of a sound effect. */
-    enum SFXStatus
-    {
-        SFX_UNKNOWN = -1, SFX_STOPPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2,
-        SFX_INITIAL = 3
-    };
-
 private:
 
-    /** Listener position */
-    Vec3 m_position;
+    /** Data structure for the queue, which stores a sfx and the command to 
+     *  execute for it. */
+    class SFXCommand : public NoCopy
+    {
+    private:
+        LEAK_CHECK()
+    public:
+        /** The sound effect for which the command should be executed. */
+        SFXBase    *m_sfx;
+        /** The command to execute. */
+        SFXCommands m_command;
+        /** Optional parameter for commands that need more input. */
+        Vec3        m_parameter;
+        // --------------------------------------------------------------------
+        SFXCommand(SFXCommands command, SFXBase *base)
+        {
+            m_command   = command;
+            m_sfx       = base;
+        }   // SFXCommand()
+        // --------------------------------------------------------------------
+        SFXCommand(SFXCommands command, SFXBase *base, float parameter)
+        {
+            m_command   = command;
+            m_sfx       = base;
+            m_parameter.setX(parameter);
+        }   // SFXCommand(float)
+        // --------------------------------------------------------------------
+        SFXCommand(SFXCommands command, SFXBase *base, const Vec3 &parameter)
+        {
+            m_command   = command;
+            m_sfx       = base;
+            m_parameter = parameter;
+        }   // SFXCommand(Vec3)
+    };   // SFXCommand
+    // ========================================================================
+
+    /** The position of the listener. Its lock will be used to
+     *  access m_listener_{position,front, up}. */
+    Synchronised<Vec3>        m_listener_position;
+
+    /** The direction the listener is facing. */
+    Vec3                      m_listener_front;
+
+    /** Up vector of the listener. */
+    Vec3                      m_listener_up;
+
 
     /** The buffers and info for all sound effects. These are shared among all
      *  instances of SFXOpenal. */
     std::map<std::string, SFXBuffer*> m_all_sfx_types;
 
     /** The actual instances (sound sources) */
-    std::vector<SFXBase*> m_all_sfx;
+    Synchronised<std::vector<SFXBase*> > m_all_sfx;
 
     /** The list of sound effects to be played in the next update. */
-    Synchronised< std::vector<SFXBase*> > m_sfx_to_play;
+    Synchronised< std::vector<SFXCommand*> > m_sfx_commands;
 
     /** To play non-positional sounds without having to create a new object for each */
     std::map<std::string, SFXBase*> m_quick_sounds;
-
-    /** listener vector (position vector + up vector) */
-    float                     m_listenerVec[6];
 
     /** If the sfx manager has been initialised. */
     bool                      m_initialized;
@@ -121,10 +174,16 @@ private:
     virtual                 ~SFXManager();
 
     static void* mainLoop(void *obj);
+    void deleteSFX(SFXBase *sfx);
+    void queueCommand(SFXCommand *command);
+    void reallyPositionListenerNow();
+
 public:
     static void create();
     static void destroy();
-    void queue(SFXBase *sfx);
+    void queue(SFXCommands command,  SFXBase *sfx);
+    void queue(SFXCommands command,  SFXBase *sfx, float f);
+    void queue(SFXCommands command,  SFXBase *sfx, const Vec3 &p);
     // ------------------------------------------------------------------------
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()
@@ -153,10 +212,10 @@ public:
     SFXBase*                 createSoundSource(const std::string &name,
                                                const bool addToSFXList=true);
 
-    void                     deleteSFX(SFXBase *sfx);
     void                     deleteSFXMapping(const std::string &name);
     void                     pauseAll();
     void                     resumeAll();
+    void                     update(float dt);
     bool                     soundExist(const std::string &name);
     void                     setMasterSFXVolume(float gain);
     float                    getMasterSFXVolume() const { return m_master_gain; }
@@ -164,7 +223,8 @@ public:
     static bool              checkError(const std::string &context);
     static const std::string getErrorString(int err);
 
-    void                     positionListener(const Vec3 &position, const Vec3 &front);
+    void                     positionListener(const Vec3 &position,
+                                              const Vec3 &front, const Vec3 &up);
     SFXBase*                 quickSound(const std::string &soundName);
 
     /** Called when sound was muted/unmuted */
@@ -177,7 +237,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the current position of the listener. */
-    Vec3 getListenerPos() const { return m_position; }
+    Vec3 getListenerPos() const { return m_listener_position.getData(); }
 
 };
 

@@ -10,7 +10,7 @@
 * Added Tutorial
 * Added new Supertux difficulty
 * New bubblegum shield weapon
-* New Speeodmeter and nitro meter
+* New Speedometer and nitro meter
 * Add ability to filter addons
 * Updated nitro models
 * Add ability to save and resume Grand Prix

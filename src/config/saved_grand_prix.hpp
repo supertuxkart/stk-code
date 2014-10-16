@@ -60,7 +60,7 @@ protected:
      * WARNING : m_savedgp_group has to be declared before the other userconfigparams!
      */
     GroupUserConfigParam        m_savedgp_group;
-    unsigned int                m_player_id;
+    IntUserConfigParam          m_player_id;
 
     /** Identifier of this GP. */
     StringUserConfigParam       m_gp_id;
@@ -145,6 +145,7 @@ public:
         for (unsigned int n=0; n<UserConfigParams::m_saved_grand_prix_list.size(); n++)
         {
             SavedGrandPrix* gp = &UserConfigParams::m_saved_grand_prix_list[n];
+
             if ((gp->getGPID()       == gpid) &&
                 (gp->getPlayerID()    ==  player) &&
                 (gp->getDifficulty()  == difficulty) &&

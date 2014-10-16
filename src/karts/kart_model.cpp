@@ -441,7 +441,6 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                 obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, node);
                 obj.m_node->grab();
 
-                obj.m_node->setAnimationStrength(0.0f);
                 obj.m_node->setFrameLoop(m_animation_frame[AF_SPEED_WEIGHTED_START], m_animation_frame[AF_SPEED_WEIGHTED_END]);
 
         #ifdef DEBUG
@@ -826,7 +825,6 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
             strength = speed * strength_factor;
             btClamp<float>(strength, 0.0f, 1.0f);
         }
-        obj.m_node->setAnimationStrength(strength);
         
         // Animation speed
         const float speed_factor =   GET_VALUE(obj, m_speed_factor);

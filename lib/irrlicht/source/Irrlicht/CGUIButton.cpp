@@ -277,7 +277,7 @@ void CGUIButton::draw()
 				pos.X += skin->getSize(EGDS_BUTTON_PRESSED_IMAGE_OFFSET_X);
 				pos.Y += skin->getSize(EGDS_BUTTON_PRESSED_IMAGE_OFFSET_Y);
 			}
-			driver->draw2DImage(PressedImage,
+			skin->draw2DImage(PressedImage,
 					ScaleImage? AbsoluteRect :
 						core::recti(pos, PressedImageRect.getSize()),
 					PressedImageRect, &AbsoluteClippingRect,
@@ -285,7 +285,7 @@ void CGUIButton::draw()
 		}
 	}
 
-	if (SpriteBank)
+	if (false) //SpriteBank)
 	{
 		// pressed / unpressed animation
 		u32 state = Pressed ? (u32)EGBS_BUTTON_DOWN : (u32)EGBS_BUTTON_UP;

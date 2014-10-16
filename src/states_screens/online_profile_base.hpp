@@ -30,7 +30,7 @@ namespace GUIEngine { class Widget; }
 
 
 /** Online profile base screen. Used for displaying friends, achievements,
- *  overview, and settings. It handles the tabs which are common to each
+ *  and settings. It handles the tabs which are common to each
  *  of those screens, and keeps track of the profile to display.
  * \ingroup states_screens
  */
@@ -42,7 +42,6 @@ protected:
     /** Pointer to the various widgets on the screen. */
     GUIEngine::LabelWidget * m_header;
     GUIEngine::RibbonWidget* m_profile_tabs;
-    GUIEngine::IconButtonWidget * m_overview_tab;
     GUIEngine::IconButtonWidget * m_friends_tab;
     GUIEngine::IconButtonWidget * m_achievements_tab;
     GUIEngine::IconButtonWidget * m_settings_tab;
@@ -62,6 +61,8 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
+
+    virtual bool onEscapePressed() OVERRIDE;
 
     virtual void beforeAddingWidget() OVERRIDE;
 };

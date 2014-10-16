@@ -231,7 +231,7 @@ EventPropagation SpinnerWidget::rightPressed(const int playerID)
     // if widget is deactivated, do nothing
     if (m_deactivated) return EVENT_BLOCK;
 
-    //std::cout  << "Right pressed\n";
+    //Log::info("SpinnerWidget", "Right pressed");
     if (m_value+1 <= m_max)
     {
         setValue(m_value+1);
@@ -253,7 +253,7 @@ EventPropagation SpinnerWidget::leftPressed(const int playerID)
     // if widget is deactivated, do nothing
     if (m_deactivated) return EVENT_BLOCK;
 
-    //std::cout  << "Left pressed\n";
+    //Log::info("SpinnerWidget", "Left pressed");
     if (m_value-1 >= m_min)
     {
         setValue(m_value-1);
@@ -386,9 +386,7 @@ void SpinnerWidget::setValue(irr::core::stringw new_value)
         }
     }
 
-    std::cerr << "ERROR [SpinnerWidget::setValue] : cannot find element named '"
-              <<  irr::core::stringc(new_value.c_str()).c_str() << "'\n";
-    assert(false);
+    Log::fatal("SpinnerWidget::setValue", "Cannot find element named '%s'", irr::core::stringc(new_value.c_str()).c_str());
 }
 
 // -----------------------------------------------------------------------------

@@ -21,8 +21,8 @@
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"
 #include "online/online_profile.hpp"
+#include "states_screens/online_profile_achievements.hpp"
 #include "states_screens/online_profile_friends.hpp"
-#include "states_screens/online_profile_overview.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -479,9 +479,10 @@ void UserInfoDialog::onUpdate(float dt)
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
+        bool enter_profile = m_enter_profile;
         ModalDialog::dismiss();
-        if (m_enter_profile)
-            StateManager::get()->replaceTopMostScreen(OnlineProfileOverview::getInstance());
+        if (enter_profile)
+            StateManager::get()->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
         return;
     }
 }   // onUpdate

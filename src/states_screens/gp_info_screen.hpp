@@ -47,6 +47,9 @@ private:
 
     /** Spinner for number of tracks (in case of random GP). */
     GUIEngine::SpinnerWidget *m_num_tracks_spinner;
+    
+    /** Spinner for number of AI karts. */
+    GUIEngine::SpinnerWidget* m_ai_kart_spinner;
 
     /** The currently selected group name. */
     std::string m_group_name;

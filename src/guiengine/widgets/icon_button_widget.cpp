@@ -28,6 +28,7 @@
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
 #include <IGUIStaticText.h>
+#include <algorithm>
 
 using namespace GUIEngine;
 using namespace irr::video;
@@ -39,9 +40,14 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
                                    const bool focusable, IconPathType pathType) : Widget(WTYPE_ICON_BUTTON)
 {
     m_label = NULL;
+    m_font = NULL;
     m_texture = NULL;
+    m_deactivated_texture = NULL;
     m_highlight_texture = NULL;
     m_custom_aspect_ratio = 1.0f;
+
+    m_texture_w = 0;
+    m_texture_h = 0;
 
     m_tab_stop = tab_stop;
     m_focusable = focusable;
@@ -57,12 +63,12 @@ void IconButtonWidget::add()
     {
         if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
         {
-            m_texture = irr_driver->getTexture(m_properties[PROP_ICON]);
+            setTexture(irr_driver->getTexture(m_properties[PROP_ICON]));
         }
         else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
         {
             std::string file = file_manager->getAsset(m_properties[PROP_ICON]);
-            m_texture = irr_driver->getTexture(file);
+            setTexture(irr_driver->getTexture(file));
         }
     }
 
@@ -72,13 +78,11 @@ void IconButtonWidget::add()
                     "add() : error, cannot find texture '%s'.",
                    m_properties[PROP_ICON].c_str());
         std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
-        m_texture = irr_driver->getTexture(file);
+        setTexture(irr_driver->getTexture(file));
         if(!m_texture)
             Log::fatal("IconButtonWidget",
                   "Can't find fallback texture 'gui/main_help.png, aborting.");
     }
-    m_texture_w = m_texture->getSize().Width;
-    m_texture_h = m_texture->getSize().Height;
 
     if (m_properties[PROP_FOCUS_ICON].size() > 0)
     {
@@ -174,13 +178,7 @@ void IconButtonWidget::add()
             m_label->setVisible(false);
         }
 
-        const int max_w = m_label->getAbsolutePosition().getWidth();
-
-        if (!word_wrap &&
-            (int)GUIEngine::getFont()->getDimension(message.c_str()).Width > max_w + 4) // arbitrarily allow for 4 pixels
-        {
-            m_label->setOverrideFont( GUIEngine::getSmallFont() );
-        }
+        setLabelFont();
 
 #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
         m_label->setRightToLeft( translations->isRTLLanguage() );
@@ -192,6 +190,9 @@ void IconButtonWidget::add()
     m_id = m_element->getID();
     if (m_tab_stop) m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
+    
+    if (!m_is_visible)
+        m_element->setVisible(false);
 }
 
 // -----------------------------------------------------------------------------
@@ -207,12 +208,12 @@ void IconButtonWidget::setImage(const char* path_to_texture, IconPathType pathTy
 
     if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
     {
-        m_texture = irr_driver->getTexture(m_properties[PROP_ICON]);
+        setTexture(irr_driver->getTexture(m_properties[PROP_ICON]));
     }
     else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
     {
         std::string file = file_manager->getAsset(m_properties[PROP_ICON]);
-        m_texture = irr_driver->getTexture(file);
+        setTexture(irr_driver->getTexture(file));
     }
 
     if (!m_texture)
@@ -220,11 +221,8 @@ void IconButtonWidget::setImage(const char* path_to_texture, IconPathType pathTy
         Log::error("icon_button", "Texture '%s' not found!\n",
                    m_properties[PROP_ICON].c_str());
         std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
-        m_texture = irr_driver->getTexture(file);
+        setTexture(irr_driver->getTexture(file));
     }
-
-    m_texture_w = m_texture->getSize().Width;
-    m_texture_h = m_texture->getSize().Height;
 }
 
 // -----------------------------------------------------------------------------
@@ -233,39 +231,28 @@ void IconButtonWidget::setImage(ITexture* texture)
 {
     if (texture != NULL)
     {
-        m_texture = texture;
-
-        m_texture_w = m_texture->getSize().Width;
-        m_texture_h = m_texture->getSize().Height;
+        setTexture(texture);
     }
     else
     {
         Log::error("icon_button",
                    "setImage invoked with NULL image pointer\n");
         std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
-        m_texture = irr_driver->getTexture(file);
+        setTexture(irr_driver->getTexture(file));
     }
 }
 // -----------------------------------------------------------------------------
-void IconButtonWidget::setLabel(stringw new_label)
+void IconButtonWidget::setLabel(const stringw& new_label)
 {
     if (m_label == NULL) return;
 
     m_label->setText( new_label.c_str() );
-
-    const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
-    const int max_w = m_label->getAbsolutePosition().getWidth();
-
-    if (!word_wrap &&
-        (int)GUIEngine::getFont()->getDimension(new_label.c_str()).Width
-                    > max_w + 4) // arbitrarily allow for 4 pixels
-    {
-        m_label->setOverrideFont( GUIEngine::getSmallFont() );
-    }
-    else
-    {
-        m_label->setOverrideFont( NULL );
-    }
+    setLabelFont();
+}
+// -----------------------------------------------------------------------------
+void IconButtonWidget::setLabelFont(irr::gui::ScalableFont* font)
+{
+    m_font = font;
 }
 // -----------------------------------------------------------------------------
 EventPropagation IconButtonWidget::focused(const int playerID)
@@ -287,5 +274,95 @@ void IconButtonWidget::unfocused(const int playerID, Widget* new_focus)
         m_label->setVisible(false);
     }
 }
+// -----------------------------------------------------------------------------
+const video::ITexture* IconButtonWidget::getTexture()
+{
+    if (Widget::isActivated())
+    {
+        return m_texture;
+    }
+    else
+    {
+        if (m_deactivated_texture == NULL)
+            m_deactivated_texture = getDeactivatedTexture(m_texture);
+        return m_deactivated_texture;
+    }
+}
 
+// -----------------------------------------------------------------------------
+video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
+{
+    video::ITexture* t;
 
+    std::string name = texture->getName().getPath().c_str();
+    name += "_disabled";
+    t = irr_driver->getTexture(name);
+    if (t == NULL)
+    {
+        SColor c;
+        u32 g;
+
+        video::IVideoDriver* driver = irr_driver->getVideoDriver();
+        std::auto_ptr<video::IImage> image (driver->createImageFromData (texture->getColorFormat(),
+            texture->getSize(), texture->lock(), false));
+        texture->unlock();
+
+        //Turn the image into grayscale
+        for (u32 x = 0; x < image->getDimension().Width; x++)
+        {
+            for (u32 y = 0; y < image->getDimension().Height; y++)
+            {
+                c = image->getPixel(x, y);
+                g = ((c.getRed() + c.getGreen() + c.getBlue()) / 3);
+                c.set(std::max (0, (int)c.getAlpha() - 120), g, g, g);
+                image->setPixel(x, y, c);
+            }
+        }
+
+        t = driver->addTexture(name.c_str(), image.get ());
+    }
+
+    return t;
+}
+
+// -----------------------------------------------------------------------------
+void IconButtonWidget::setTexture(video::ITexture* texture)
+{
+    m_texture = texture;
+    if (texture == NULL)
+    {
+        m_deactivated_texture = NULL;
+        m_texture_w = 0;
+        m_texture_h = 0;
+    }
+    else
+    {
+        m_texture_w = texture->getSize().Width;
+        m_texture_h = texture->getSize().Height;
+    }
+}
+
+// -----------------------------------------------------------------------------
+void IconButtonWidget::setLabelFont()
+{
+    if (m_font != NULL)
+    {
+        m_label->setOverrideFont( m_font );
+    }
+    else
+    {
+        const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
+        const int max_w = m_label->getAbsolutePosition().getWidth();
+
+        if (!word_wrap &&
+            (int)GUIEngine::getFont()->getDimension(m_label->getText()).Width
+                        > max_w + 4) // arbitrarily allow for 4 pixels
+        {
+            m_label->setOverrideFont( GUIEngine::getSmallFont() );
+        }
+        else
+        {
+            m_label->setOverrideFont( NULL );
+        }
+    }
+}

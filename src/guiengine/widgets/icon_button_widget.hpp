@@ -23,13 +23,16 @@
 #include <irrString.h>
 namespace irr
 {
-    namespace gui   { class IGUIStaticText; }
+    namespace gui
+    {
+        class IGUIStaticText;
+        class ScalableFont;
+    }
     namespace video { class ITexture;       }
 }
 
 #include "guiengine/widget.hpp"
 #include "utils/leak_check.hpp"
-#include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
 {
@@ -38,6 +41,15 @@ namespace GUIEngine
       */
     class IconButtonWidget : public Widget
     {
+    private:
+        irr::video::ITexture* m_texture;
+        irr::video::ITexture* m_deactivated_texture;
+        irr::video::ITexture* m_highlight_texture;
+        int m_texture_w, m_texture_h;
+
+        video::ITexture* getDeactivatedTexture(video::ITexture* texture);
+        void setLabelFont();
+
     public:
         enum ScaleMode
         {
@@ -54,42 +66,41 @@ namespace GUIEngine
               * the path type as it currently is */
             ICON_PATH_TYPE_NO_CHANGE
         };
-        
-    protected:
-        
-        IconPathType m_icon_path_type;
-        
-        friend class Skin;
-        
-        irr::gui::IGUIStaticText* m_label;
-        irr::video::ITexture* m_texture;
-        irr::video::ITexture* m_highlight_texture;
 
-        int m_texture_w, m_texture_h;
-        
+    protected:
+
+        IconPathType m_icon_path_type;
+
+        friend class Skin;
+
+        irr::gui::IGUIStaticText* m_label;
+        irr::gui::ScalableFont* m_font;
+
         ScaleMode m_scale_mode;
         float m_custom_aspect_ratio;
-        
+
+        void setTexture(video::ITexture* texture);
+
     public:
 
         LEAK_CHECK()
-        
+
         /** Whether to make the widget included in keyboard navigation order when adding */
         bool m_tab_stop;
 
         IconButtonWidget(ScaleMode scale_mode=SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, const bool tab_stop=true,
                          const bool focusable=true, IconPathType pathType=ICON_PATH_TYPE_RELATIVE);
-        virtual ~IconButtonWidget() {}
-        
+        virtual ~IconButtonWidget() {};
+
         /** \brief Implement callback from base class Widget */
         virtual void add();
-        
+
         /**
           * \brief Call this if scale mode is SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO.
           * \param custom_aspect_ratio  The width/height aspect ratio
           */
         void setCustomAspectRatio(float custom_aspect_ratio) { m_custom_aspect_ratio = custom_aspect_ratio; }
-        
+
         /**
           * \brief Temporarily change the text label if there is a label (next time this screen is
           *        visited, the previous label will be back. For a permanent change, edit the 'text'
@@ -98,8 +109,15 @@ namespace GUIEngine
           * \pre Must be called after this widget is add()ed to have any effect
           * \note         Calling this method on a button without label will have no effect
           */
-        void setLabel(irr::core::stringw new_label);
-        
+        void setLabel(const irr::core::stringw& new_label);
+
+        /**
+          * \brief Sets the font used to draw the label.
+          *
+          * \note         Calling this method on a button without label will have no effect
+          */
+        void setLabelFont(irr::gui::ScalableFont* font);
+
         /**
          * Change the texture used for this icon.
          * \pre At the moment, the new texture must have the same aspct ratio
@@ -109,7 +127,7 @@ namespace GUIEngine
          */
         void setImage(const char* path_to_texture,
                       IconPathType path_type=ICON_PATH_TYPE_NO_CHANGE);
-        // --------------------------------------------------------------------        
+        // --------------------------------------------------------------------
         /** Convenience function taking std::string. */
         void setImage(const std::string &path_to_texture,
                       IconPathType path_type=ICON_PATH_TYPE_NO_CHANGE)
@@ -126,23 +144,23 @@ namespace GUIEngine
           * \note May safely be called no matter if the widget is add()ed or not
           */
         void setImage(irr::video::ITexture* texture);
-        
+
         // --------------------------------------------------------------------
         void setHighlightedImage(irr::video::ITexture* texture)
         {
             m_highlight_texture = texture;
         }
-        
+
         // --------------------------------------------------------------------
         /** \brief override from base class */
         virtual EventPropagation focused(const int playerID);
-        
+
         // --------------------------------------------------------------------
         /** \brief override from base class */
         virtual void unfocused(const int playerID, Widget* new_focus);
         // --------------------------------------------------------------------
         /** Returns the texture of this button. */
-        const video::ITexture* getTexture() const { return m_texture; }
+        const video::ITexture* getTexture();
     };
 }
 

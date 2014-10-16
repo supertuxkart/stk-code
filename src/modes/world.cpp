@@ -1229,7 +1229,7 @@ void World::escapePressed()
 
 bool World::isFogEnabled() const
 {
-    return m_track != NULL && m_track->isFogEnabled();
+    return !m_force_disable_fog && (m_track != NULL && m_track->isFogEnabled());
 }
 
 /* EOF */

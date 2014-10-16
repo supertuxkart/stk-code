@@ -164,7 +164,7 @@ void OnlineProfileFriends::onUpdate(float delta)
 {
     if(m_waiting_for_friends)
     {
-        if(m_visiting_profile->isReady())
+        if(m_visiting_profile->hasFetchedFriends())
         {
             displayResults();
         }
