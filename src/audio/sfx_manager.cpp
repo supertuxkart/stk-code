@@ -526,8 +526,6 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
         m_all_sfx.getData().push_back(sfx);
         m_all_sfx.unlock();
     }
-    else
-        printf("");
 
     return sfx;
 }   // createSoundSource

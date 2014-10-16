@@ -48,8 +48,11 @@ private:
     /** The status of this SFX. */
     SFXStatus    m_status;
 
+    /** If the sfx is positional. */
     bool         m_positional;
-    float        m_defaultGain;
+
+    /** Default gain value. */
+    float        m_default_gain;
 
     /** The OpenAL source contains this info, but if audio is disabled initially then
         the sound source won't be created and we'll be left with no clue when enabling
@@ -62,9 +65,6 @@ private:
      the sound source won't be created and we'll be left with no clue when enabling
      sounds later. */
     float m_gain;
-
-    /** True when the sfx is currently playing. */
-    bool m_is_playing;
     
     /** The master gain set in user preferences */
     float m_master_gain;
@@ -86,7 +86,6 @@ public:
     virtual void      reallyPlayNow();
     virtual void      setLoop(bool status);
     virtual void      reallySetLoop(bool status);
-    virtual bool      isPlaying();
     virtual void      stop();
     virtual void      reallyStopNow();
     virtual void      pause();

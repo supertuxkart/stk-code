@@ -1,7 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Patrick Ammann <pammann@aro.ch>
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C)      2014 Joerg Henrichs
+//  Copyright (C) 2006-2014 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2009-2014 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -37,14 +38,15 @@
 #include <stdio.h>
 #include <string>
 
-SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool owns_buffer) : SFXBase()
+SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, 
+                     bool owns_buffer) 
+         : SFXBase()
 {
     m_sound_buffer = buffer;
     m_sound_source = 0;
     m_status       = SFX_UNKNOWN;
-    m_is_playing   = false;
     m_positional   = positional;
-    m_defaultGain  = gain;
+    m_default_gain = gain;
     m_loop         = false;
     m_gain         = -1.0f;
     m_master_gain  = 1.0f;
@@ -78,7 +80,8 @@ SFXOpenAL::~SFXOpenAL()
 }   // ~SFXOpenAL
 
 //-----------------------------------------------------------------------------
-
+/** Initialises the sfx. 
+ */
 bool SFXOpenAL::init()
 {
     alGenSources(1, &m_sound_source );
@@ -101,7 +104,7 @@ bool SFXOpenAL::init()
 
     if (m_gain < 0.0f)
     {
-        alSourcef (m_sound_source, AL_GAIN, m_defaultGain * m_master_gain);
+        alSourcef (m_sound_source, AL_GAIN, m_default_gain * m_master_gain);
     }
     else
     {
@@ -113,10 +116,11 @@ bool SFXOpenAL::init()
 
     alSourcei(m_sound_source, AL_LOOPING, m_loop ? AL_TRUE : AL_FALSE);
 
-    if(SFXManager::checkError("setting up the source"))
-        m_status = SFX_INITIAL;
+    if(!SFXManager::checkError("setting up the source"))
+        return false;
 
-    return m_status==SFX_INITIAL;
+    m_status = SFX_STOPPED;
+    return true;
 }   // init
 
 // ------------------------------------------------------------------------
@@ -152,7 +156,6 @@ void SFXOpenAL::setSpeed(float factor)
  */
 void SFXOpenAL::reallySetSpeed(float factor)
 {
-    if(m_status==SFX_UNKNOWN) return;
     //OpenAL only accepts pitches in the range of 0.5 to 2.0
     if(factor > 2.0f)
     {
@@ -182,8 +185,7 @@ void SFXOpenAL::setVolume(float gain)
  */
 void SFXOpenAL::reallySetVolume(float gain)
 {
-    if(m_status==SFX_UNKNOWN) return;
-    m_gain = m_defaultGain * gain;
+    m_gain = m_default_gain * gain;
 
     if(m_status==SFX_UNKNOWN) return;
 
@@ -199,7 +201,7 @@ void SFXOpenAL::setMasterVolume(float gain)
     if(m_status==SFX_UNKNOWN) return;
 
     alSourcef(m_sound_source, AL_GAIN, 
-               (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
+               (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
     SFXManager::checkError("setting volume");
 }   //setMasterVolume
 
@@ -239,7 +241,6 @@ void SFXOpenAL::reallyStopNow()
 {
     if(m_status==SFX_UNKNOWN) return;
 
-    m_is_playing = false;
     m_status     = SFX_STOPPED;
     m_loop       = false;
     alSourcei(m_sound_source, AL_LOOPING, AL_FALSE);
@@ -313,7 +314,7 @@ void SFXOpenAL::play()
     // Technically the sfx is only playing after the sfx thread starts it,
     // but for STK this is correct since we don't want to start the same
     // sfx twice.
-    m_is_playing = true;
+    m_status = SFX_PLAYING;
     SFXManager::get()->queue(SFXManager::SFX_PLAY, this);
 }   // play
 
@@ -333,7 +334,6 @@ void SFXOpenAL::reallyPlayNow()
     }
 
     alSourcePlay(m_sound_source);
-    m_status = SFX_PLAYING;
     SFXManager::checkError("playing");
 
     // At non-race time the end time is not important 
@@ -353,14 +353,6 @@ void SFXOpenAL::reallyPlayNow()
     else
         m_end_time = 1.0f;
 }   // reallyPlayNow
-
-//-----------------------------------------------------------------------------
-/** Returns true if the sound effect is currently playing.
- */
-bool SFXOpenAL::isPlaying()
-{
-    return m_is_playing;
-}   // isPlaying
 
 //-----------------------------------------------------------------------------
 /** Sets the position where this sound effects is played.
@@ -389,9 +381,9 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
     }
     if (!m_positional)
     {
-        // in multiplayer, all sounds are positional, so in this case don't bug users with
-        // an error message if (race_manager->getNumLocalPlayers() > 1)
-        // (note that 0 players is also possible, in cutscenes)
+        // in multiplayer, all sounds are positional, so in this case don't
+        // bug users with an error message if (note that 0 players is also
+        // possible, in cutscenes)
         if (race_manager->getNumLocalPlayers() < 2)
         {
             Log::warn("SFX", "Position called on non-positional SFX");
@@ -399,16 +391,18 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
         return;
     }
 
-    alSource3f(m_sound_source, AL_POSITION,
-               (float)position.getX(), (float)position.getY(), (float)position.getZ());
+    alSource3f(m_sound_source, AL_POSITION, (float)position.getX(),
+               (float)position.getY(), (float)position.getZ());
 
-    if (SFXManager::get()->getListenerPos().distance(position) > m_sound_buffer->getMaxDist())
+    if (SFXManager::get()->getListenerPos().distance(position) 
+        > m_sound_buffer->getMaxDist())
     {
         alSourcef(m_sound_source, AL_GAIN, 0);
     }
     else
     {
-        alSourcef(m_sound_source, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
+        alSourcef(m_sound_source, AL_GAIN, 
+                  (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
     }
 
     SFXManager::checkError("positioning");
@@ -426,7 +420,8 @@ void SFXOpenAL::onSoundEnabledBack()
             alSourcef(m_sound_source, AL_GAIN, 0);
             play();
             pause();
-            alSourcef(m_sound_source, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
+            alSourcef(m_sound_source, AL_GAIN,
+                     (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
         }
     }
 }   // onSoundEnabledBack

@@ -56,7 +56,6 @@ public:
     virtual SFXStatus  getStatus()                      { return SFX_STOPPED; }
     virtual void       onSoundEnabledBack()             {}
     virtual void       setRolloff(float rolloff)        {}
-    virtual bool       isPlaying()                      { return false; }
     virtual const SFXBuffer* getBuffer() const          { return NULL; }
 
 };   // DummySFX

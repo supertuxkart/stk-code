@@ -207,7 +207,7 @@ public:
                                           const bool         load = true);
 
     SFXBase*                 createSoundSource(SFXBuffer* info,
-                                               const bool addToSFXList=true,
+                                               const bool add_to_SFX_list=true,
                                                const bool owns_buffer=false);
     SFXBase*                 createSoundSource(const std::string &name,
                                                const bool addToSFXList=true);

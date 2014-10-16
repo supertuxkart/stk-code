@@ -2010,10 +2010,10 @@ void Kart::updatePhysics(float dt)
          m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
         m_skidding->getGraphicalJumpOffset()==0)
     {
-        if(!m_skid_sound->isPlaying() && !isWheeless())
+        if(m_skid_sound->getStatus()!=SFXBase::SFX_PLAYING && !isWheeless())
             m_skid_sound->play();
     }
-    else if(m_skid_sound->isPlaying())
+    else if(m_skid_sound->getStatus()==SFXBase::SFX_PLAYING)
     {
         m_skid_sound->stop();
     }
