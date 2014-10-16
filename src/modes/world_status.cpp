@@ -39,8 +39,6 @@ WorldStatus::WorldStatus()
     m_start_sound       = SFXManager::get()->createSoundSource("start_race");
     m_track_intro_sound = SFXManager::get()->createSoundSource("track_intro");
 
-    music_manager->stopMusic();
-
     m_play_racestart_sounds = true;
 
     IrrlichtDevice *device = irr_driver->getDevice();
