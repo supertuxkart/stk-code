@@ -1436,21 +1436,14 @@ void Kart::handleMaterialSFX(const Material *material)
             m_previous_terrain_sound->setLoop(false);
 
         const std::string &s = material->getSFXName();
-        if (s != "")
+
+        // In multiplayer mode sounds are NOT positional, because we have
+        // multiple listeners. This would make the sounds of all AIs be
+        // audible at all times. So silence AI karts.
+        if (s.size()!=0 && (race_manager->getNumPlayers()==1 || 
+                            m_controller->isPlayerController()  ) )
         {
             m_terrain_sound = SFXManager::get()->createSoundSource(s);
-
-            // In multiplayer mode sounds are NOT positional, because we have
-            // multiple listeners. This would make the sounds of all AIs be
-            // audible at all times. So silence AI karts.
-            if (race_manager->getNumLocalPlayers() > 1)
-            {
-                if (!m_controller->isPlayerController())
-                {
-                    m_terrain_sound->setVolume( 0.0f );
-                }
-            }
-
             m_terrain_sound->play();
             m_terrain_sound->setLoop(true);
         }
