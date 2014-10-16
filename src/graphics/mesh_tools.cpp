@@ -388,28 +388,28 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predic
         {
             switch (vType)
             {
-            case video::EVT_STANDARD:
-            {
-                                        const video::S3DVertex* v =
-                                            (const video::S3DVertex*)original->getVertices();
-                                        vNew = video::S3DVertexTangents(
-                                            v[idx[i]].Pos, v[idx[i]].Normal, v[idx[i]].Color, v[idx[i]].TCoords);
-            }
+                case video::EVT_STANDARD:
+                {
+                    const video::S3DVertex* v =
+                        (const video::S3DVertex*)original->getVertices();
+                    vNew = video::S3DVertexTangents(
+                        v[idx[i]].Pos, v[idx[i]].Normal, v[idx[i]].Color, v[idx[i]].TCoords);
+                }
                 break;
-            case video::EVT_2TCOORDS:
-            {
-                                        const video::S3DVertex2TCoords* v =
-                                            (const video::S3DVertex2TCoords*)original->getVertices();
-                                        vNew = video::S3DVertexTangents(
-                                            v[idx[i]].Pos, v[idx[i]].Normal, v[idx[i]].Color, v[idx[i]].TCoords);
-            }
+                case video::EVT_2TCOORDS:
+                {
+                    const video::S3DVertex2TCoords* v =
+                        (const video::S3DVertex2TCoords*)original->getVertices();
+                    vNew = video::S3DVertexTangents(
+                        v[idx[i]].Pos, v[idx[i]].Normal, v[idx[i]].Color, v[idx[i]].TCoords);
+                }
                 break;
-            case video::EVT_TANGENTS:
-            {
-                                        const video::S3DVertexTangents* v =
-                                            (const video::S3DVertexTangents*)original->getVertices();
-                                        vNew = v[idx[i]];
-            }
+                case video::EVT_TANGENTS:
+                {
+                        const video::S3DVertexTangents* v =
+                            (const video::S3DVertexTangents*)original->getVertices();
+                        vNew = v[idx[i]];
+                }
                 break;
             }
             core::map<video::S3DVertexTangents, int>::Node* n = vertMap.find(vNew);
@@ -457,7 +457,6 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predic
 
     scene::SAnimatedMesh* amesh = new scene::SAnimatedMesh(clone);
     meshCache->addMesh(path, amesh);
-    amesh->drop();
 
     World::getWorld()->getTrack()->addCachedMesh(amesh);
 
