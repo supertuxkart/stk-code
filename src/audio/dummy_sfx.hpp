@@ -37,6 +37,7 @@ public:
     virtual bool       init() { return true; }
 
     virtual void       setLoop(bool status)             {}
+    virtual void       reallySetLoop(bool status)       {}
     virtual void       setPosition(const Vec3 &p)       {}
     virtual void       reallySetPosition(const Vec3 &p) {}
     virtual void       play()                           {}

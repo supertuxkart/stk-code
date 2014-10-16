@@ -208,13 +208,21 @@ void SFXOpenAL::setMasterVolume(float gain)
  */
 void SFXOpenAL::setLoop(bool status)
 {
+    SFXManager::get()->queue(SFXManager::SFX_LOOP, this, status ? 1.0f : 0.0f);
+}   // setLoop
+
+//-----------------------------------------------------------------------------
+/** Loops this sound effect.
+ */
+void SFXOpenAL::reallySetLoop(bool status)
+{
     m_loop = status;
 
     if(m_status==SFX_UNKNOWN) return;
 
     alSourcei(m_sound_source, AL_LOOPING, status ? AL_TRUE : AL_FALSE);
     SFXManager::checkError("looping");
-}   // loop
+}   // reallySetLoop
 
 //-----------------------------------------------------------------------------
 /** Queues a stop for this effect to the sound manager.

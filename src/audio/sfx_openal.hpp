@@ -85,6 +85,7 @@ public:
     virtual void      play();
     virtual void      reallyPlayNow();
     virtual void      setLoop(bool status);
+    virtual void      reallySetLoop(bool status);
     virtual bool      isPlaying();
     virtual void      stop();
     virtual void      reallyStopNow();
