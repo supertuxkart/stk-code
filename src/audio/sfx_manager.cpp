@@ -101,7 +101,7 @@ SFXManager::SFXManager()
         delete m_thread_id.getData();
         m_thread_id.unlock();
         m_thread_id.setAtomic(0);
-        Log::error("HTTP Manager", "Could not create thread, error=%d.",
+        Log::error("SFXManager", "Could not create thread, error=%d.",
                    errno);
     }
     pthread_attr_destroy(&attr);
@@ -211,6 +211,23 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 void SFXManager::queueCommand(SFXCommand *command)
 {
     m_sfx_commands.lock();
+    if(m_sfx_commands.getData().size() > 20*race_manager->getNumberOfKarts()+20)
+    {
+        if(command->m_command==SFX_POSITION || command->m_command==SFX_LOOP ||
+            command->m_command==SFX_PLAY   || command->m_command==SFX_SPEED    )
+        {
+            delete command;
+            static int count_messages = 0;
+            if(count_messages < 5)
+            {
+                Log::warn("SFXManager", "Throttling sfx - queue size %d",
+                         m_sfx_commands.getData().size());
+                count_messages++;
+            }
+            m_sfx_commands.unlock();
+            return;
+        }   // if throttling
+    }
     m_sfx_commands.getData().push_back(command);
     m_sfx_commands.unlock();
 }   // queueCommand
@@ -266,13 +283,11 @@ void* SFXManager::mainLoop(void *obj)
             pthread_cond_wait(&me->m_cond_request, me->m_sfx_commands.getMutex());
             empty = me->m_sfx_commands.getData().empty();
         }
-
         SFXCommand *current = me->m_sfx_commands.getData().front();
         me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
 
         if (current->m_command == SFX_EXIT)
             break;
-
         me->m_sfx_commands.unlock();
         switch(current->m_command)
         {
@@ -443,7 +458,7 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
     }
 
     if (UserConfigParams::logMisc())
-        Log::debug("SFXManager", "Loading SFX %s\n", sfx_file.c_str());
+        Log::debug("SFXManager", "Loading SFX %s", sfx_file.c_str());
 
     if (load && buffer->load()) return buffer;
 
@@ -463,7 +478,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     if (node->get("filename", &filename) == 0)
     {
         Log::error("SFXManager",
-                "/!\\ The 'filename' attribute is mandatory in the SFX XML file!\n");
+                "The 'filename' attribute is mandatory in the SFX XML file!");
         return NULL;
     }
 
@@ -472,7 +487,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     if(m_all_sfx_types.find(sfx_name)!=m_all_sfx_types.end())
     {
         Log::error("SFXManager",
-                "There is already a sfx named '%s' installed - new one is ignored.\n",
+                "There is already a sfx named '%s' installed - new one is ignored.",
                 sfx_name.c_str());
         return NULL;
     }
@@ -540,7 +555,7 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
     {
         Log::error("SFXManager", 
                    "SFXManager::createSoundSource could not find the "
-                   "requested sound effect : '%s'\n", name.c_str());
+                   "requested sound effect : '%s'.", name.c_str());
         return NULL;
     }
 
