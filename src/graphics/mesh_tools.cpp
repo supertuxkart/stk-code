@@ -22,6 +22,8 @@
 #include <IMeshBuffer.h>
 #include "utils/log.hpp"
 #include "graphics/irr_driver.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
 
 void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
 
@@ -325,7 +327,8 @@ bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
 {
     if (!irr_driver->isGLSL())
         return false;
-    return (mb->getMaterial().MaterialType == irr_driver->getShader(ES_NORMAL_MAP));
+    return (mb->getMaterial().MaterialType == irr_driver->getShader(ES_NORMAL_MAP) &&
+        mb->getVertexType() != video::EVT_TANGENTS);
 }
 
 // Copied from irrlicht
@@ -385,28 +388,28 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predic
         {
             switch (vType)
             {
-            case video::EVT_STANDARD:
-            {
-                                        const video::S3DVertex* v =
-                                            (const video::S3DVertex*)original->getVertices();
-                                        vNew = video::S3DVertexTangents(
-                                            v[idx[i]].Pos, v[idx[i]].Normal, v[idx[i]].Color, v[idx[i]].TCoords);
-            }
+                case video::EVT_STANDARD:
+                {
+                    const video::S3DVertex* v =
+                        (const video::S3DVertex*)original->getVertices();
+                    vNew = video::S3DVertexTangents(
+                        v[idx[i]].Pos, v[idx[i]].Normal, v[idx[i]].Color, v[idx[i]].TCoords);
+                }
                 break;
-            case video::EVT_2TCOORDS:
-            {
-                                        const video::S3DVertex2TCoords* v =
-                                            (const video::S3DVertex2TCoords*)original->getVertices();
-                                        vNew = video::S3DVertexTangents(
-                                            v[idx[i]].Pos, v[idx[i]].Normal, v[idx[i]].Color, v[idx[i]].TCoords);
-            }
+                case video::EVT_2TCOORDS:
+                {
+                    const video::S3DVertex2TCoords* v =
+                        (const video::S3DVertex2TCoords*)original->getVertices();
+                    vNew = video::S3DVertexTangents(
+                        v[idx[i]].Pos, v[idx[i]].Normal, v[idx[i]].Color, v[idx[i]].TCoords);
+                }
                 break;
-            case video::EVT_TANGENTS:
-            {
-                                        const video::S3DVertexTangents* v =
-                                            (const video::S3DVertexTangents*)original->getVertices();
-                                        vNew = v[idx[i]];
-            }
+                case video::EVT_TANGENTS:
+                {
+                        const video::S3DVertexTangents* v =
+                            (const video::S3DVertexTangents*)original->getVertices();
+                        vNew = v[idx[i]];
+                }
                 break;
             }
             core::map<video::S3DVertexTangents, int>::Node* n = vertMap.find(vNew);
@@ -435,7 +438,27 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predic
     if (calculateTangents)
         recalculateTangents(clone, recalculateNormals, smooth, angleWeighted);
     
+    int mbcount = clone->getMeshBufferCount();
+    for (int i = 0; i < mbcount; i++)
+    {
+        scene::IMeshBuffer* mb = clone->getMeshBuffer(i);
+
+        for (int t = 0; t < video::MATERIAL_MAX_TEXTURES; t++)
+        {
+            video::ITexture* texture = mb->getMaterial().TextureLayer[t].Texture;
+            if (texture != NULL)
+                texture->grab();
+        }
+    }
+
+    scene::IMeshCache* meshCache = irr_driver->getSceneManager()->getMeshCache();
+    io::SNamedPath path = meshCache->getMeshName(mesh);
     irr_driver->removeMeshFromCache(mesh);
+
+    scene::SAnimatedMesh* amesh = new scene::SAnimatedMesh(clone);
+    meshCache->addMesh(path, amesh);
+
+    World::getWorld()->getTrack()->addCachedMesh(amesh);
 
     return clone;
 }
