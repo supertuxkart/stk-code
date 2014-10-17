@@ -140,9 +140,15 @@ void SavedGrandPrix::setKarts(const std::vector<RaceManager::KartStatus> &kart_l
     }
 }   // setKarts
 
+/* compares two KartStatus-objects for std::sort in the next function */
+bool cmp__l(RaceManager::KartStatus first, RaceManager::KartStatus second)
+{
+    return (first.m_score > second.m_score);
+}
 //------------------------------------------------------------------------------
 void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
 {
+
     int aikarts = 0;
     for(unsigned int i = 0; i < m_karts.size(); i++)
     {
@@ -169,4 +175,6 @@ void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
             }   // for x
         }   // if m_local_player_id == -1
     }   // for i
+
+    std::sort(kart_list.begin(), kart_list.end(), cmp__l);
 }   // loadKarts

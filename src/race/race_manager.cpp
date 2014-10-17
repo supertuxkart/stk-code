@@ -362,7 +362,7 @@ void RaceManager::startNew(bool from_overworld)
         init_gp_rank ++;
     }
 
-    if (MAJOR_MODE_GRAND_PRIX)
+    if (m_major_mode == MAJOR_MODE_GRAND_PRIX)
     {
         if (m_continue_saved_gp)
         {
