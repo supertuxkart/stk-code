@@ -132,6 +132,68 @@ public:
     void BlitToDefault(size_t, size_t, size_t, size_t);
 };
 
+class VertexUtils
+{
+public:
+    static void bindVertexArrayAttrib(enum video::E_VERTEX_TYPE tp)
+    {
+        switch (tp)
+        {
+        case video::EVT_STANDARD:
+            // Position
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), 0);
+            // Normal
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)12);
+            // Color
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(tp), (GLvoid*)24);
+            // Texcoord
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)28);
+            break;
+        case video::EVT_2TCOORDS:
+            // Position
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), 0);
+            // Normal
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)12);
+            // Color
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(tp), (GLvoid*)24);
+            // Texcoord
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)28);
+            // SecondTexcoord
+            glEnableVertexAttribArray(4);
+            glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)36);
+            break;
+        case video::EVT_TANGENTS:
+            // Position
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), 0);
+            // Normal
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)12);
+            // Color
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(tp), (GLvoid*)24);
+            // Texcoord
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)28);
+            // Tangent
+            glEnableVertexAttribArray(5);
+            glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)36);
+            // Bitangent
+            glEnableVertexAttribArray(6);
+            glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)48);
+            break;
+        }
+    }
+};
+
 // core::rect<s32> needs these includes
 #include <rect.h>
 #include "utils/vec3.hpp"
@@ -152,6 +214,10 @@ void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
     const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
+
+void draw2DVertexPrimitiveList(const void* vertices,
+    u32 vertexCount, const void* indexList, u32 primitiveCount,
+    video::E_VERTEX_TYPE vType = video::EVT_STANDARD, scene::E_PRIMITIVE_TYPE pType = scene::EPT_TRIANGLES, video::E_INDEX_TYPE iType = video::EIT_16BIT);
 
 void GL32_draw2DRectangle(irr::video::SColor color, const irr::core::rect<s32>& position,
     const irr::core::rect<s32>* clip = 0);

@@ -655,6 +655,39 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
     glGetError();
 }
 
+void draw2DVertexPrimitiveList(const void* vertices,
+    u32 vertexCount, const void* indexList, u32 primitiveCount,
+    video::E_VERTEX_TYPE vType, scene::E_PRIMITIVE_TYPE pType, video::E_INDEX_TYPE iType)
+{
+    if (!irr_driver->isGLSL())
+    {
+        irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, vertexCount, indexList, primitiveCount, vType, pType, iType);
+        return;
+    }
+    GLuint tmpvao, tmpvbo, tmpibo;
+    glGenVertexArrays(1, &tmpvao);
+    glBindVertexArray(tmpvao);
+    glGenBuffers(1, &tmpvbo);
+    glBindBuffer(GL_ARRAY_BUFFER, tmpvbo);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * getVertexPitchFromType(vType), vertices, GL_STREAM_DRAW);
+    glGenBuffers(1, &tmpibo);
+    glBindBuffer(GL_ARRAY_BUFFER, tmpibo);
+    glBufferData(GL_ARRAY_BUFFER, primitiveCount * sizeof(u16), indexList, GL_STREAM_DRAW);
+
+    glUseProgram(MeshShader::TransparentShader::getInstance()->Program);
+    MeshShader::TransparentShader::getInstance()->setUniforms(core::IdentityMatrix, core::IdentityMatrix);
+    const video::SOverrideMaterial &m = irr_driver->getVideoDriver()->getOverrideMaterial();
+    video::ITexture* tex = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+    compressTexture(tex, false);
+    MeshShader::TransparentShader::getInstance()->SetTextureUnits({ getTextureGLuint(tex) });
+    glDrawElements(GL_TRIANGLE_FAN, primitiveCount, GL_UNSIGNED_SHORT, 0);
+
+    glDeleteVertexArrays(1, &tmpvao);
+    glDeleteBuffers(1, &tmpvbo);
+    glDeleteBuffers(1, &tmpibo);
+
+}
+
 void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
                           const core::rect<s32>* clip)
 {
