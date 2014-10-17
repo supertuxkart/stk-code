@@ -36,10 +36,10 @@ CALLBACK
 debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
               const GLchar* msg, const void *userparam)
 {
+    return;
 #ifdef GL_DEBUG_SEVERITY_NOTIFICATION
     // ignore minor notifications sent by some drivers (notably the nvidia one)
     if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
-        return;
 #endif
 
     switch(source)
@@ -751,7 +751,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
     glGetError();
 }
 
-bool hasGLExtension(const char* extension) 
+bool hasGLExtension(const char* extension)
 {
     if (glGetStringi != NULL)
     {
