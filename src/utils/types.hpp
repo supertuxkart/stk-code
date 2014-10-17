@@ -26,10 +26,10 @@
         typedef unsigned __int32 uint32_t;
         typedef __int64          int64_t;
         typedef unsigned __int64 uint64_t;
-    #elif defined(_MSC_VER) && _MSC_VER >= 1700 	
+    #elif defined(_MSC_VER) && _MSC_VER >= 1700
         #include <stdint.h>
         // We can't use the ifndef SOCKET_ERROR below in this case, since
-        // SOCKET_ERROR will be defined again in winsock2.h later 
+        // SOCKET_ERROR will be defined again in winsock2.h later
         // - without the #ifdef guard then causing a compiler error.
     #else
         #include <stdint.h>

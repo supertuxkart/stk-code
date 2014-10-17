@@ -833,7 +833,7 @@ void LinearWorld::updateRacePosition()
  */
 void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
-    if (!m_karts[i]->getController()->isPlayerController()) 
+    if (!m_karts[i]->getController()->isPlayerController())
         return;
 
     float wrongway_counter = m_karts[i]->getWrongwayCounter();
@@ -850,9 +850,9 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
     // check if the player is going in the wrong direction
     float angle_diff = kart->getHeading() - m_track->getAngle(sector);
     
-    if (angle_diff > M_PI) 
+    if (angle_diff > M_PI)
         angle_diff -= 2*M_PI;
-    else if (angle_diff < -M_PI) 
+    else if (angle_diff < -M_PI)
         angle_diff += 2*M_PI;
         
     // Display a warning message if the kart is going back way (unless

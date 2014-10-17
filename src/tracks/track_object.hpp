@@ -108,7 +108,7 @@ public:
     const core::vector3df  getAbsolutePosition() const;
     const core::vector3df& getRotation() const;
     const core::vector3df& getScale() const;
-    bool castRay(const btVector3 &from, 
+    bool castRay(const btVector3 &from,
                  const btVector3 &to, btVector3 *hit_point,
                  const Material **material, btVector3 *normal,
                  bool interpolate_normal) const;

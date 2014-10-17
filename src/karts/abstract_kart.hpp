@@ -155,7 +155,7 @@ public:
     float getHighestPoint() const { return m_kart_highest_point;  }
     // ------------------------------------------------------------------------
     /** Called after the kart comes to rest. It can be used to e.g. compute
-     *  differences between graphical and physical chassis. Note that 
+     *  differences between graphical and physical chassis. Note that
      *  overwriting this function is possible, but this implementation must
      *  be called. */
     virtual void kartIsInRestNow();
@@ -414,7 +414,7 @@ public:
     /** Set a text that is displayed on top of a kart.
      */
     virtual void setOnScreenText(const wchar_t *text) = 0;
-    // ------------------------------------------------------------------------- 
+    // -------------------------------------------------------------------------
     /** Counter which is used for displaying wrong way message after a delay */
     virtual float getWrongwayCounter() = 0;
     virtual void setWrongwayCounter(float counter) = 0;

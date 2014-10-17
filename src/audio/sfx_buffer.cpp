@@ -88,7 +88,7 @@ SFXBuffer::SFXBuffer(const std::string& file,
 
 //----------------------------------------------------------------------------
 /** \brief load the buffer from file into OpenAL.
- *  \note If this buffer is already loaded, this call does nothing and 
+ *  \note If this buffer is already loaded, this call does nothing and
   *       returns false.
  *  \return Whether loading was successful.
  */

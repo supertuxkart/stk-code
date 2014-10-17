@@ -71,7 +71,7 @@ public:
     void setBody(btRigidBody *body)
     {
         assert(!m_body);
-        // Mark that the body should not be deleted when this object is 
+        // Mark that the body should not be deleted when this object is
         // deleted, since the body is managed elsewhere.
         m_free_body = false;
         m_body = body;

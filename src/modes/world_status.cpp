@@ -63,7 +63,7 @@ void WorldStatus::reset()
 
     IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (device->getTimer()->isStopped()) 
+    if (device->getTimer()->isStopped())
         device->getTimer()->start();
 }   // reset
 
@@ -77,7 +77,7 @@ WorldStatus::~WorldStatus()
     m_track_intro_sound->deleteSFX();
     IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (device->getTimer()->isStopped())  
+    if (device->getTimer()->isStopped())
         device->getTimer()->start();
 }   // ~WorldStatus
 
@@ -170,7 +170,7 @@ void WorldStatus::update(const float dt)
 
             m_auxiliary_timer = 0.0f;
 
-            if (m_play_racestart_sounds) 
+            if (m_play_racestart_sounds)
                 m_prestart_sound->play();
 
             m_phase = READY_PHASE;
@@ -339,7 +339,7 @@ void WorldStatus::pause(Phase phase)
     m_phase          = phase;
     IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (!device->getTimer()->isStopped())  
+    if (!device->getTimer()->isStopped())
         device->getTimer()->stop();
 }   // pause
 
@@ -354,6 +354,6 @@ void WorldStatus::unpause()
     m_previous_phase = UNDEFINED_PHASE;
     IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (device->getTimer()->isStopped()) 
+    if (device->getTimer()->isStopped())
         device->getTimer()->start();
 }   // unpause

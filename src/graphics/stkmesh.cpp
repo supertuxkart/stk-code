@@ -20,7 +20,7 @@ Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialT
     switch (material->getShaderType())
     {
     default:
-        return material->getShaderType();   
+        return material->getShaderType();
     case Material::SHADERTYPE_SOLID:
         if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
             return Material::SHADERTYPE_NORMAL_MAP;

@@ -38,8 +38,8 @@
 #include <stdio.h>
 #include <string>
 
-SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, 
-                     bool owns_buffer) 
+SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
+                     bool owns_buffer)
          : SFXBase()
 {
     m_sound_buffer = buffer;
@@ -80,7 +80,7 @@ SFXOpenAL::~SFXOpenAL()
 }   // ~SFXOpenAL
 
 //-----------------------------------------------------------------------------
-/** Initialises the sfx. 
+/** Initialises the sfx.
  */
 bool SFXOpenAL::init()
 {
@@ -136,7 +136,7 @@ SFXBase::SFXStatus SFXOpenAL::getStatus()
             return m_status;
         }
     }
-    return m_status; 
+    return m_status;
 }   // getStatus;
 
 //-----------------------------------------------------------------------------
@@ -200,7 +200,7 @@ void SFXOpenAL::setMasterVolume(float gain)
     
     if(m_status==SFX_UNKNOWN) return;
 
-    alSourcef(m_sound_source, AL_GAIN, 
+    alSourcef(m_sound_source, AL_GAIN,
                (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
     SFXManager::checkError("setting volume");
 }   //setMasterVolume
@@ -338,7 +338,7 @@ void SFXOpenAL::reallyPlayNow()
     alSourcePlay(m_sound_source);
     SFXManager::checkError("playing");
 
-    // At non-race time the end time is not important 
+    // At non-race time the end time is not important
     if(World::getWorld())
     {
         float t= World::getWorld()->getTime();
@@ -396,14 +396,14 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
     alSource3f(m_sound_source, AL_POSITION, (float)position.getX(),
                (float)position.getY(), (float)position.getZ());
 
-    if (SFXManager::get()->getListenerPos().distance(position) 
+    if (SFXManager::get()->getListenerPos().distance(position)
         > m_sound_buffer->getMaxDist())
     {
         alSourcef(m_sound_source, AL_GAIN, 0);
     }
     else
     {
-        alSourcef(m_sound_source, AL_GAIN, 
+        alSourcef(m_sound_source, AL_GAIN,
                   (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
     }
 

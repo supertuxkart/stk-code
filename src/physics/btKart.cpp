@@ -237,7 +237,7 @@ btScalar btKart::rayCast(unsigned int index)
     btScalar max_susp_len = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius
                           + wheel.m_maxSuspensionTravelCm*0.01f;
 
-    // Do a slightly longer raycast to see if the kart might soon hit the 
+    // Do a slightly longer raycast to see if the kart might soon hit the
     // ground and some 'cushioning' is needed to avoid that the chassis
     // hits the ground.
     btScalar raylen = max_susp_len + 0.5f;
@@ -388,7 +388,7 @@ void btKart::updateVehicle( btScalar step )
             m_num_wheels_on_ground++;
     }
 
-    // Test if the kart is falling so fast 
+    // Test if the kart is falling so fast
     // that the chassis might hit the track
     // ------------------------------------
     bool needs_cushioning_test = false;
@@ -412,14 +412,14 @@ void btKart::updateVehicle( btScalar step )
         // speed that can be caught by the suspension without the chassis
         // hitting the ground can be based on that. Note that there are
         // 4 suspensions, all adding together.
-        btScalar max_compensate_speed = m_wheelInfo[0].m_maxSuspensionForce 
-                                      * m_chassisBody->getInvMass() 
+        btScalar max_compensate_speed = m_wheelInfo[0].m_maxSuspensionForce
+                                      * m_chassisBody->getInvMass()
                                       * step * 4;
         // If the downward speed is too fast to be caught by the suspension,
         // slow down the falling speed by applying an appropriately impulse:
         if(-v_down.getY() > max_compensate_speed)
         {
-            btVector3 impulse = down * (-v_down.getY() - max_compensate_speed) 
+            btVector3 impulse = down * (-v_down.getY() - max_compensate_speed)
                               / m_chassisBody->getInvMass();
             //float v_old = m_chassisBody->getLinearVelocity().getY();
             //float x = m_wheelInfo[0].m_raycastInfo.m_isInContact ?    m_wheelInfo[0].m_raycastInfo.m_contactPointWS.getY() : -100;

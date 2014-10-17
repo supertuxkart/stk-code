@@ -12,6 +12,6 @@
 #endif
 
 #ifdef __MINGW32__
-	#include <cmath>
-	using std::isnan;
+    #include <cmath>
+    using std::isnan;
 #endif

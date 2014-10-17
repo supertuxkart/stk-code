@@ -160,7 +160,7 @@ void  Powerup::adjustSound()
         }
         else
         {
-            m_sound_use->setVolume( 
+            m_sound_use->setVolume(
                      std::min(0.5f, 1.0f / race_manager->getNumberOfKarts()) );
         }
     }

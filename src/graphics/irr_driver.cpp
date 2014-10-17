@@ -348,7 +348,7 @@ void IrrDriver::initDevice()
             UserConfigParams::m_height = (int)ssize.Height;
         }
 
-        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, 
+        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width,
                                                     UserConfigParams::m_height);
         
         if (UserConfigParams::m_fullscreen)
