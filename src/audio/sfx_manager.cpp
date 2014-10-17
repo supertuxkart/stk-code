@@ -233,7 +233,7 @@ void SFXManager::update(float dt)
  */
 void SFXManager::stopThread()
 {
-    queue(SFX_EXIT, NULL);
+    queue(SFX_EXIT);
     // Make sure the thread wakes up.
     pthread_cond_signal(&m_cond_request);
 }   // stopThread
@@ -291,7 +291,9 @@ void* SFXManager::mainLoop(void *obj)
         case SFX_DELETE:   {
                               me->deleteSFX(current->m_sfx);    break;
                            }
-        case SFX_LISTENER: me->reallyPositionListenerNow();     break;
+        case SFX_PAUSE_ALL:  me->reallyPauseAllNow();           break;
+        case SFX_RESUME_ALL: me->reallyResumeAllNow();          break;
+        case SFX_LISTENER:   me->reallyPositionListenerNow();   break;
         case SFX_UPDATE_MUSIC: music_manager->update(
                                   current->m_parameter.getX()); break;
         default: assert("Not yet supported.");
@@ -610,24 +612,41 @@ void SFXManager::deleteSFX(SFXBase *sfx)
 //----------------------------------------------------------------------------
 /** Pauses all looping SFXs. Non-looping SFX will be finished, since it's
  *  otherwise not possible to determine which SFX must be resumed (i.e. were
- *  actually playing at the time pause was called.
+ *  actually playing at the time pause was called).
  */
 void SFXManager::pauseAll()
+{
+    queue(SFX_PAUSE_ALL);
+}   // pauseAll
+
+//----------------------------------------------------------------------------
+/** Pauses all looping SFXs. Non-looping SFX will be finished, since it's
+ *  otherwise not possible to determine which SFX must be resumed (i.e. were
+ *  actually playing at the time pause was called.
+ */
+void SFXManager::reallyPauseAllNow()
 {
     m_all_sfx.lock();
     for (std::vector<SFXBase*>::iterator i= m_all_sfx.getData().begin();
                                          i!=m_all_sfx.getData().end(); i++)
     {
-        (*i)->pause();
+        (*i)->reallyPauseNow();
     }   // for i in m_all_sfx
     m_all_sfx.unlock();
 }   // pauseAll
 
 //----------------------------------------------------------------------------
-/**
-  * Resumes all paused SFXs. If sound is disabled, does nothing.
+/** Resumes all paused SFXs. If sound is disabled, does nothing.
   */
 void SFXManager::resumeAll()
+{
+    queue(SFX_RESUME_ALL);
+}   // resumeAll
+
+//----------------------------------------------------------------------------
+/** Resumes all paused SFXs. If sound is disabled, does nothing.
+  */
+void SFXManager::reallyResumeAllNow()
 {
     // ignore unpausing if sound is disabled
     if (!sfxAllowed()) return;
@@ -636,7 +655,7 @@ void SFXManager::resumeAll()
     for (std::vector<SFXBase*>::iterator i =m_all_sfx.getData().begin();
                                          i!=m_all_sfx.getData().end(); i++)
     {
-        (*i)->resume();
+        (*i)->reallyResumeNow();
     }   // for i in m_all_sfx
     m_all_sfx.unlock();
 }   // resumeAll
@@ -729,7 +748,7 @@ void SFXManager::positionListener(const Vec3 &position, const Vec3 &front,
     m_listener_front              = front;
     m_listener_up                 = up;
     m_listener_position.unlock();
-    queue(SFX_LISTENER, NULL);
+    queue(SFX_LISTENER);
 }   // positionListener
 
 //-----------------------------------------------------------------------------

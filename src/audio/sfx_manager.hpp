@@ -65,7 +65,9 @@ public:
         SFX_PLAY = 1,
         SFX_STOP,
         SFX_PAUSE,
+        SFX_PAUSE_ALL,
         SFX_RESUME,
+        SFX_RESUME_ALL,
         SFX_DELETE,
         SFX_SPEED,
         SFX_POSITION,
@@ -181,7 +183,7 @@ private:
 public:
     static void create();
     static void destroy();
-    void queue(SFXCommands command,  SFXBase *sfx);
+    void queue(SFXCommands command,  SFXBase *sfx=NULL);
     void queue(SFXCommands command,  SFXBase *sfx, float f);
     void queue(SFXCommands command,  SFXBase *sfx, const Vec3 &p);
     // ------------------------------------------------------------------------
@@ -214,7 +216,9 @@ public:
 
     void                     deleteSFXMapping(const std::string &name);
     void                     pauseAll();
+    void                     reallyPauseAllNow();
     void                     resumeAll();
+    void                     reallyResumeAllNow();
     void                     update(float dt);
     bool                     soundExist(const std::string &name);
     void                     setMasterSFXVolume(float gain);
