@@ -312,8 +312,10 @@ void SFXOpenAL::deleteSFX()
 void SFXOpenAL::play()
 {
     // Technically the sfx is only playing after the sfx thread starts it,
-    // but for STK this is correct since we don't want to start the same
-    // sfx twice.
+    // but this is important to set this here since stk might decide the
+    // delete a sfx if it has finished playing (i.e. is in stopped state)
+    // - which can happen if the sfx thread had no time to actually start
+    // it yet.
     m_status = SFX_PLAYING;
     SFXManager::get()->queue(SFXManager::SFX_PLAY, this);
 }   // play
