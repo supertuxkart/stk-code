@@ -289,7 +289,6 @@ void* SFXManager::mainLoop(void *obj)
         case SFX_LOOP:     current->m_sfx->reallySetLoop(
                                current->m_parameter.getX()!=0); break;
         case SFX_DELETE:   {
-                              current->m_sfx->reallyStopNow();
                               me->deleteSFX(current->m_sfx);    break;
                            }
         case SFX_LISTENER: me->reallyPositionListenerNow();     break;
@@ -598,13 +597,14 @@ void SFXManager::deleteSFX(SFXBase *sfx)
         Log::warn("SFXManager", 
                   "SFXManager::deleteSFX : Warning: sfx '%s' %lx not found in list.",
                   sfx->getBuffer()->getFileName().c_str(), sfx);
+        m_all_sfx.unlock();
         return;
     }
 
     m_all_sfx.getData().erase(i);
-    delete sfx;
-
     m_all_sfx.unlock();
+
+    delete sfx;
 }   // deleteSFX
 
 //----------------------------------------------------------------------------
