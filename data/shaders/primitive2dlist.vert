@@ -22,6 +22,9 @@ out vec4 color;
 void main(void)
 {
     color = Color.zyxw;
-    gl_Position = vec4(Position, 1.) / vec4(screen, 1., 1.);
+    vec3 P = Position / vec3(screen, 1.);
+    P = 2. * P - 1.;
+    P.y *= -1;
+    gl_Position = vec4(P, 1.);
     uv = Texcoord;
 }
