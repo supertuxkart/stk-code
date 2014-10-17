@@ -19,10 +19,12 @@
 #ifndef HEADER_SAVED_GRAND_PRIX_HPP
 #define HEADER_SAVED_GRAND_PRIX_HPP
 
-#include <string>
 #include "config/user_config.hpp"
 #include "race/race_manager.hpp"
 #include "utils/ptr_vector.hpp"
+
+#include <algorithm>
+#include <string>
 
 class RaceManager;
 
@@ -151,7 +153,6 @@ public:
         return NULL;
     }   // getSavedGP
     // ------------------------------------------------------------------------
-
 };   // class SavedGrandPrix
 
 #endif
