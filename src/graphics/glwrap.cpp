@@ -665,21 +665,24 @@ void draw2DVertexPrimitiveList(const void* vertices,
         return;
     }
     GLuint tmpvao, tmpvbo, tmpibo;
+    primitiveCount += 2;
     glGenVertexArrays(1, &tmpvao);
     glBindVertexArray(tmpvao);
     glGenBuffers(1, &tmpvbo);
     glBindBuffer(GL_ARRAY_BUFFER, tmpvbo);
     glBufferData(GL_ARRAY_BUFFER, vertexCount * getVertexPitchFromType(vType), vertices, GL_STREAM_DRAW);
     glGenBuffers(1, &tmpibo);
-    glBindBuffer(GL_ARRAY_BUFFER, tmpibo);
-    glBufferData(GL_ARRAY_BUFFER, primitiveCount * sizeof(u16), indexList, GL_STREAM_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tmpibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, primitiveCount * sizeof(u16), indexList, GL_STREAM_DRAW);
 
-    glUseProgram(MeshShader::TransparentShader::getInstance()->Program);
-    MeshShader::TransparentShader::getInstance()->setUniforms(core::IdentityMatrix, core::IdentityMatrix);
+    VertexUtils::bindVertexArrayAttrib(vType);
+
+    glUseProgram(UIShader::Primitive2DList::getInstance()->Program);
+    UIShader::Primitive2DList::getInstance()->setUniforms();
     const video::SOverrideMaterial &m = irr_driver->getVideoDriver()->getOverrideMaterial();
     video::ITexture* tex = getUnicolorTexture(video::SColor(255, 255, 255, 255));
     compressTexture(tex, false);
-    MeshShader::TransparentShader::getInstance()->SetTextureUnits({ getTextureGLuint(tex) });
+    UIShader::Primitive2DList::getInstance()->SetTextureUnits({ getTextureGLuint(tex) });
     glDrawElements(GL_TRIANGLE_FAN, primitiveCount, GL_UNSIGNED_SHORT, 0);
 
     glDeleteVertexArrays(1, &tmpvao);

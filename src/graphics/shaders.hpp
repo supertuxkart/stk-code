@@ -580,6 +580,13 @@ public:
 
 namespace UIShader
 {
+
+class Primitive2DList : public ShaderHelperSingleton<Primitive2DList>, public TextureRead < Bilinear_Filtered >
+{
+public:
+    Primitive2DList();
+};
+
 class TextureRectShader : public ShaderHelperSingleton<TextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df>, public TextureRead<Bilinear_Filtered>
 {
 public:
