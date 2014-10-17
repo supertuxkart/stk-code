@@ -135,25 +135,19 @@ public:
 
     // ------------------------------------------------------------------------
     /** Finds the right SavedGrandPrix given the specified data, or
-     *  NULL if no matching GP was found.
-     */
+     *  NULL if no matching GP was found. */
     static SavedGrandPrix* getSavedGP(unsigned int player,
-                                const std::string &gpid,
-                                int difficulty, int total_karts,
-                                int player_karts)
+                                      const std::string &gpid,
+                                      const unsigned int number_of_players)
     {
         for (unsigned int n=0; n<UserConfigParams::m_saved_grand_prix_list.size(); n++)
         {
             SavedGrandPrix* gp = &UserConfigParams::m_saved_grand_prix_list[n];
-
-            if ((gp->getGPID()       == gpid) &&
-                (gp->getPlayerID()    ==  player) &&
-                (gp->getDifficulty()  == difficulty) &&
-                (gp->getTotalKarts()  == total_karts) &&
-                (gp->getPlayerKarts() == player_karts)){
+            if (gp->getGPID()        == gpid   &&
+                gp->getPlayerID()    == player &&
+                gp->getPlayerKarts() == (int)number_of_players)
                 return gp;
-            }   // if
-        }   // for n
+        }
         return NULL;
     }   // getSavedGP
     // ------------------------------------------------------------------------

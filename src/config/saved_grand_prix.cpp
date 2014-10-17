@@ -143,29 +143,27 @@ void SavedGrandPrix::setKarts(const std::vector<RaceManager::KartStatus> &kart_l
 //------------------------------------------------------------------------------
 void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
 {
-    //Fix aikarts
     int aikarts = 0;
     for(unsigned int i = 0; i < m_karts.size(); i++)
     {
         const KartProperties *kp = kart_properties_manager->getKart(m_karts[i].m_ident);
 
-        if(m_karts[i].m_local_player_id == -1)
+        if(m_karts[i].m_local_player_id == -1) // AI kart
         {
-            //AI kart found
             if(kp) kart_list[aikarts].m_ident = m_karts[i].m_ident;
-            kart_list[aikarts].m_score = m_karts[i].m_score;
+            kart_list[aikarts].m_score        = m_karts[i].m_score;
             kart_list[aikarts].m_overall_time = m_karts[i].m_overall_time;
             aikarts++;
         }
         else
         {
-            //Get correct player
+            // Get correct player
             for(unsigned int x = kart_list.size()-m_player_karts;
                 x < kart_list.size(); x++)
             {
                 if(kart_list[x].m_local_player_id == m_karts[i].m_local_player_id)
                 {
-                    kart_list[x].m_score = m_karts[i].m_score;
+                    kart_list[x].m_score        = m_karts[i].m_score;
                     kart_list[x].m_overall_time = m_karts[i].m_overall_time;
                 }   // if kart_list[x].m_local_player_id == m_karts[i].,_local
             }   // for x
