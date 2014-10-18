@@ -23,7 +23,7 @@
 #include <algorithm>
 
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/2dutils.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"

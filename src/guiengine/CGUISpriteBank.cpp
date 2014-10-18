@@ -9,7 +9,7 @@
 #include "IVideoDriver.h"
 #include "ITexture.h"
 #include <cassert>
-#include "graphics/glwrap.hpp"
+#include "graphics/2dutils.hpp"
 
 namespace irr
 {

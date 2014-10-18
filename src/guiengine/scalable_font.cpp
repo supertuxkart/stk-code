@@ -13,7 +13,7 @@
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "utils/translation.hpp"
-#include "graphics/glwrap.hpp"
+#include "graphics/2dutils.hpp"
 
 namespace irr
 {
