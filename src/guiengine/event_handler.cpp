@@ -184,6 +184,15 @@ bool EventHandler::OnEvent (const SEvent &event)
         // FIXME? it may be a bit unclean that all input events go trough
         // the gui module
         const EventPropagation blockPropagation = input_manager->input(event);
+
+        if (event.EventType == EET_KEY_INPUT_EVENT &&
+            event.KeyInput.Key == irr::KEY_TAB)
+        {
+            // block all tab events, if we let them go, irrlicht will try
+            // to apply its own focus code
+            return true; // EVENT_BLOCK
+        }
+
         return blockPropagation == EVENT_BLOCK;
     }
     else if (event.EventType == EET_LOG_TEXT_EVENT)
