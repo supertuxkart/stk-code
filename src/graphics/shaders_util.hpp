@@ -12,6 +12,77 @@ bool needsUBO();
 
 unsigned getGLSLVersion();
 
+GLuint LoadShader(const char * file, unsigned type);
+GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
+
+template<typename ... Types>
+void loadAndAttach(GLint ProgramID)
+{
+    return;
+}
+
+template<typename ... Types>
+void loadAndAttach(GLint ProgramID, GLint ShaderType, const char *filepath, Types ... args)
+{
+    GLint ShaderID = LoadShader(filepath, ShaderType);
+    glAttachShader(ProgramID, ShaderID);
+    glDeleteShader(ShaderID);
+    loadAndAttach(ProgramID, args...);
+}
+
+template<typename ...Types>
+void printFileList()
+{
+    return;
+}
+
+template<typename ...Types>
+void printFileList(GLint ShaderType, const char *filepath, Types ... args)
+{
+    Log::error("GLWrapp", filepath);
+    printFileList(args...);
+}
+
+enum AttributeType
+{
+    OBJECT,
+    PARTICLES_SIM,
+    PARTICLES_RENDERING,
+};
+
+void setAttribute(AttributeType Tp, GLuint ProgramID);
+
+template<typename ... Types>
+GLint LoadProgram(AttributeType Tp, Types ... args)
+{
+    GLint ProgramID = glCreateProgram();
+    loadAndAttach(ProgramID, args...);
+    if (irr_driver->getGLSLVersion() < 330)
+        setAttribute(Tp, ProgramID);
+    glLinkProgram(ProgramID);
+
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
+    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+    if (Result == GL_FALSE) {
+        Log::error("GLWrapp", "Error when linking these shaders :");
+        printFileList(args...);
+        glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+        char *ErrorMessage = new char[InfoLogLength];
+        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
+        Log::error("GLWrapp", ErrorMessage);
+        delete[] ErrorMessage;
+    }
+
+    GLenum glErr = glGetError();
+    if (glErr != GL_NO_ERROR)
+    {
+        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
+    }
+
+    return ProgramID;
+}
+
 struct UniformHelper
 {
     template<unsigned N = 0>
