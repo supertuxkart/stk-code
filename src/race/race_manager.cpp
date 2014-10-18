@@ -308,6 +308,8 @@ void RaceManager::startNew(bool from_overworld)
             } else {
                 setNumKarts(m_saved_gp->getTotalKarts());
                 setupPlayerKartInfo();
+                m_grand_prix.changeReverse((GrandPrixData::GPReverseType)m_saved_gp->getReverseType());
+                m_reverse_track = m_grand_prix.getReverse();
             }
         }
     }
@@ -519,6 +521,7 @@ void RaceManager::next()
                         m_difficulty,
                         (int)m_player_karts.size(),
                         m_track_number,
+                        m_grand_prix.getReverseType(),
                         m_kart_status
                     )
                 );

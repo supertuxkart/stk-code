@@ -70,6 +70,7 @@ void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
     m_name     = "Random Grand Prix";
     m_editable = false;
     m_group    = GP_NONE;
+    m_reverse_type = use_reverse;
 
     if(new_tracks)
     {
@@ -155,6 +156,7 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
  */
 void GrandPrixData::changeReverse(const GrandPrixData::GPReverseType use_reverse)
 {
+    m_reverse_type = use_reverse;
     for (unsigned int i = 0; i < m_tracks.size(); i++)
     {
         if (use_reverse == GP_NO_REVERSE)
