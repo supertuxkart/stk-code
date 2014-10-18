@@ -506,7 +506,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         m.setTexture(0, m_gauge_goal);
         m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
         irr_driver->getVideoDriver()->setMaterial(m);
-        draw2DVertexPrimitiveList(vertices, count,
+        draw2DVertexPrimitiveList(m_gauge_goal, vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
 
     }
@@ -594,7 +594,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
             m.setTexture(0, m_gauge_full);
         m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
         irr_driver->getVideoDriver()->setMaterial(m);
-        draw2DVertexPrimitiveList(vertices, count,
+        draw2DVertexPrimitiveList(m.getTexture(0), vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
 
     }
@@ -800,7 +800,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
     m.setTexture(0, m_speed_bar_icon->getTexture());
     m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     irr_driver->getVideoDriver()->setMaterial(m);
-    draw2DVertexPrimitiveList(vertices, count,
+    draw2DVertexPrimitiveList(m_speed_bar_icon->getTexture(), vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
 
 }   // drawSpeedEnergyRank
