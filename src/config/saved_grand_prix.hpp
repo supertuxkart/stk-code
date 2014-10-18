@@ -76,6 +76,9 @@ protected:
     /** Index of the next to run track. */
     IntUserConfigParam          m_next_track;
 
+    /** GPReverseType of the GP as int */
+    IntUserConfigParam          m_reverse_type;
+
     PtrVector<SavedGPKart> m_karts;
 
 public:
@@ -88,6 +91,7 @@ public:
                    RaceManager::Difficulty difficulty,
                    int player_karts,
                    int last_track,
+                   int reverse_type,
                    const std::vector<RaceManager::KartStatus> &kart_list);
 
     /**
@@ -121,6 +125,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the index of the last track finished when this GP was saved. */
     int getNextTrack() const { return m_next_track; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the reverse Type. */
+    int getReverseType() const { return m_reverse_type; }
 
     // ------------------------------------------------------------------------
     /** Sets the index of the last track finished. */
