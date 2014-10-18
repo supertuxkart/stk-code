@@ -685,8 +685,11 @@ public:
       * \brief Higher-level method to start a GP without having to care about
       *  the exact startup sequence
       */
-    void  startGP(const GrandPrixData &gp, bool from_overworld,
-                  bool continue_saved_gp);
+    void startGP(const GrandPrixData &gp, bool from_overworld,
+                 bool continue_saved_gp);
+
+    /** Saves the current GP to the config */
+    void saveGP();
 
     /**
       * \brief Higher-level method to start a GP without having to care about
