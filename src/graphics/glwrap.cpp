@@ -397,6 +397,33 @@ void draw3DLine(const core::vector3df& start,
     glGetError();
 }
 
+bool hasGLExtension(const char* extension)
+{
+    if (glGetStringi != NULL)
+    {
+        GLint numExtensions = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+        for (GLint i = 0; i < numExtensions; i++)
+        {
+            const char* foundExtension =
+                (const char*) glGetStringi(GL_EXTENSIONS, i);
+            if (foundExtension && strcmp(foundExtension, extension) == 0)
+            {
+                return true;
+            }
+        }
+    }
+    else
+    {
+        const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
+        if (extensions && strstr(extensions, extension) != NULL)
+        {
+            return true;
+        }
+    }
+    return false;
+}   // hasGLExtension
+
 // ----------------------------------------------------------------------------
 /** Returns a space-separated list of all GL extensions. Used for hardware
  *  reporting.
