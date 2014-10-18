@@ -655,7 +655,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
     glGetError();
 }
 
-void draw2DVertexPrimitiveList(const void* vertices,
+void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
     u32 vertexCount, const void* indexList, u32 primitiveCount,
     video::E_VERTEX_TYPE vType, scene::E_PRIMITIVE_TYPE pType, video::E_INDEX_TYPE iType)
 {
@@ -680,7 +680,6 @@ void draw2DVertexPrimitiveList(const void* vertices,
     glUseProgram(UIShader::Primitive2DList::getInstance()->Program);
     UIShader::Primitive2DList::getInstance()->setUniforms();
     const video::SOverrideMaterial &m = irr_driver->getVideoDriver()->getOverrideMaterial();
-    video::ITexture* tex = getUnicolorTexture(video::SColor(255, 255, 255, 255));
     compressTexture(tex, false);
     UIShader::Primitive2DList::getInstance()->SetTextureUnits({ getTextureGLuint(tex) });
     glDrawElements(GL_TRIANGLE_FAN, primitiveCount, GL_UNSIGNED_SHORT, 0);

@@ -215,7 +215,7 @@ void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
     const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
 
-void draw2DVertexPrimitiveList(const void* vertices,
+void draw2DVertexPrimitiveList(video::ITexture *t, const void* vertices,
     u32 vertexCount, const void* indexList, u32 primitiveCount,
     video::E_VERTEX_TYPE vType = video::EVT_STANDARD, scene::E_PRIMITIVE_TYPE pType = scene::EPT_TRIANGLES, video::E_INDEX_TYPE iType = video::EIT_16BIT);
 
