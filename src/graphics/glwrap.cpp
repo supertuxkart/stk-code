@@ -256,22 +256,6 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
     return Program;
 }
 
-void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF)
-{
-    glActiveTexture(GL_TEXTURE0 + TextureUnit);
-    glBindTexture(GL_TEXTURE_2D, TextureId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, MagFilter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, MinFilter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    int aniso = UserConfigParams::m_anisotropic;
-    if (aniso == 0) aniso = 1;
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, allowAF ? (float)aniso : 1.0f);
-
-    glGetError();
-}
-
 ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 {
     if (!UserConfigParams::m_profiler_enabled) return;
