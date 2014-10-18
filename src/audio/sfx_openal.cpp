@@ -51,7 +51,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
     m_gain         = -1.0f;
     m_master_gain  = 1.0f;
     m_owns_buffer  = owns_buffer;
-    m_end_time     = -1.0f;
+    m_play_time    = 0.0f;
 
     // Don't initialise anything else if the sfx manager was not correctly
     // initialised. First of all the initialisation will not work, and it
@@ -124,18 +124,23 @@ bool SFXOpenAL::init()
 }   // init
 
 // ------------------------------------------------------------------------
+/** Updates the status of a playing sfx. If the sound has been played long
+ *  enough, mark it to be finished. This avoid (a potentially costly)
+ *  call to openal.
+ *  \param dt Time step size.
+ */
+void SFXOpenAL::updatePlayingSFX(float dt)
+{
+    assert(m_status==SFX_PLAYING);
+    m_play_time += dt;
+    if(!m_loop && m_play_time > m_sound_buffer->getDuration())
+        m_status = SFX_STOPPED;
+}   // updatePlayingSFX
+
+// ------------------------------------------------------------------------
 /** Returns the status of this sfx. */
 SFXBase::SFXStatus SFXOpenAL::getStatus()
 {
-    if(m_status==SFX_PLAYING)
-    {
-        if(m_loop) return SFX_PLAYING;
-        if(World::getWorld() && World::getWorld()->getTime() > m_end_time)
-        {
-            m_status = SFX_STOPPED;
-            return m_status;
-        }
-    }
     return m_status; 
 }   // getStatus;
 
@@ -296,23 +301,16 @@ void SFXOpenAL::reallyResumeNow()
 }   // reallyResumeNow
 
 //-----------------------------------------------------------------------------
-/** Queues up a delete request for this object. This is necessary to avoid
- *  a crash if the sfx manager thread might be delayed and access this object
- *  after it was deleted.
- */
-void SFXOpenAL::deleteSFX()
-{
-    SFXManager::get()->queue(SFXManager::SFX_DELETE, this);
-}   // deleteSFX
-
-//-----------------------------------------------------------------------------
 /** This actually queues up the sfx in the sfx manager. It will be started
  *  from a separate thread later (in this frame).
  */
 void SFXOpenAL::play()
 {
+    if(m_status==SFX_STOPPED)
+        m_play_time = 0.0f;
+
     // Technically the sfx is only playing after the sfx thread starts it,
-    // but this is important to set this here since stk might decide the
+    // but it is important to set this here since stk might decide to
     // delete a sfx if it has finished playing (i.e. is in stopped state)
     // - which can happen if the sfx thread had no time to actually start
     // it yet.
@@ -337,23 +335,6 @@ void SFXOpenAL::reallyPlayNow()
 
     alSourcePlay(m_sound_source);
     SFXManager::checkError("playing");
-
-    // At non-race time the end time is not important 
-    if(World::getWorld())
-    {
-        float t= World::getWorld()->getTime();
-        // A special case: the track intro music starts at world clock = 0,
-        // and has a duration of 3.7 seconds. So if the game is paused in the
-        // first 3.7 seconds, the sfx wil be considered to be not finished
-        // (since the world clock stays at 0 before the race start), and
-        // therefore resumed if the game is resumed, which means it is
-        // played again. To avoid this, any sound starting at t=0 is set
-        // to have an end time of 0 - which means the track intro music is
-        // not resumed in this case.
-        m_end_time = t>0 ? t+m_sound_buffer->getDuration() : 0;
-    }
-    else
-        m_end_time = 1.0f;
 }   // reallyPlayNow
 
 //-----------------------------------------------------------------------------
@@ -409,6 +390,16 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
 
     SFXManager::checkError("positioning");
 }   // reallySetPosition
+
+//-----------------------------------------------------------------------------
+/** Queues up a delete request for this object. This is necessary to avoid
+ *  a crash if the sfx manager thread might be delayed and access this object
+ *  after it was deleted.
+ */
+void SFXOpenAL::deleteSFX()
+{
+    SFXManager::get()->queue(SFXManager::SFX_DELETE, this);
+}   // deleteSFX
 
 //-----------------------------------------------------------------------------
 

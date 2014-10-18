@@ -35,7 +35,7 @@ public:
 
     /** Late creation, if SFX was initially disabled */
     virtual bool       init() { return true; }
-
+    virtual void       updatePlayingSFX(float dt)       {}
     virtual void       setLoop(bool status)             {}
     virtual void       reallySetLoop(bool status)       {}
     virtual void       setPosition(const Vec3 &p)       {}
