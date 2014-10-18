@@ -492,7 +492,6 @@ void RaceManager::startNextRace()
 }   // startNextRace
 
 //-----------------------------------------------------------------------------
-
 void RaceManager::next()
 {
     World::deleteWorld();
@@ -509,24 +508,12 @@ void RaceManager::next()
             {
                 m_saved_gp->setKarts(m_kart_status);
                 m_saved_gp->setNextTrack(m_track_number);
+                user_config->saveConfig();
             }
             else
             {
-                // Otherwise we create a new entry
-                UserConfigParams::m_saved_grand_prix_list.push_back(
-                    new SavedGrandPrix(
-                        StateManager::get()->getActivePlayerProfile(0)
-                                           ->getUniqueID(),
-                        m_grand_prix.getId(),
-                        m_difficulty,
-                        (int)m_player_karts.size(),
-                        m_track_number,
-                        m_grand_prix.getReverseType(),
-                        m_kart_status
-                    )
-                );
+                saveGP();
             }
-            user_config->saveConfig();
         }
         startNextRace();
     }
@@ -535,6 +522,24 @@ void RaceManager::next()
         exitRace();
     }
 }   // next
+
+//-----------------------------------------------------------------------------
+void RaceManager::saveGP()
+{
+    UserConfigParams::m_saved_grand_prix_list.push_back(
+        new SavedGrandPrix(
+            StateManager::get()->getActivePlayerProfile(0)
+                               ->getUniqueID(),
+            m_grand_prix.getId(),
+            m_difficulty,
+            (int)m_player_karts.size(),
+            m_track_number,
+            m_grand_prix.getReverseType(),
+            m_kart_status
+        )
+    );
+    user_config->saveConfig();
+}
 
 //-----------------------------------------------------------------------------
 
