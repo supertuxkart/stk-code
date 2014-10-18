@@ -150,7 +150,7 @@ SFXBase::SFXStatus SFXOpenAL::getStatus()
  */
 void SFXOpenAL::setSpeed(float factor)
 {
-    if(m_status==SFX_UNKNOWN) return;
+    if(m_status==SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
     assert(!isnan(factor));
     SFXManager::get()->queue(SFXManager::SFX_SPEED, this, factor);
 }   // setSpeed
@@ -179,7 +179,7 @@ void SFXOpenAL::reallySetSpeed(float factor)
  */
 void SFXOpenAL::setVolume(float gain)
 {
-    if(m_status==SFX_UNKNOWN) return;
+    if(m_status==SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
     assert(!isnan(gain)) ;
     SFXManager::get()->queue(SFXManager::SFX_VOLUME, this, gain);
 }   // setVolume
@@ -215,6 +215,7 @@ void SFXOpenAL::setMasterVolume(float gain)
  */
 void SFXOpenAL::setLoop(bool status)
 {
+    if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_LOOP, this, status ? 1.0f : 0.0f);
 }   // setLoop
 
@@ -225,8 +226,6 @@ void SFXOpenAL::reallySetLoop(bool status)
 {
     m_loop = status;
 
-    if(m_status==SFX_UNKNOWN) return;
-
     alSourcei(m_sound_source, AL_LOOPING, status ? AL_TRUE : AL_FALSE);
     SFXManager::checkError("looping");
 }   // reallySetLoop
@@ -236,6 +235,7 @@ void SFXOpenAL::reallySetLoop(bool status)
  */
 void SFXOpenAL::stop()
 {
+    if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_STOP, this);
 }   // stop
 
@@ -244,8 +244,6 @@ void SFXOpenAL::stop()
  */
 void SFXOpenAL::reallyStopNow()
 {
-    if(m_status==SFX_UNKNOWN) return;
-
     m_status     = SFX_STOPPED;
     m_loop       = false;
     alSourcei(m_sound_source, AL_LOOPING, AL_FALSE);
@@ -258,6 +256,7 @@ void SFXOpenAL::reallyStopNow()
  */
 void SFXOpenAL::pause()
 {
+    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_PAUSE, this);
 }   // pause
 
@@ -267,11 +266,6 @@ void SFXOpenAL::pause()
  */
 void SFXOpenAL::reallyPauseNow()
 {
-    // This updates the status, i.e. potentially switches from
-    // playing to stopped.
-    getStatus();
-    if(m_status!=SFX_PLAYING) return;
-
     m_status = SFX_PAUSED;
     alSourcePause(m_sound_source);
     SFXManager::checkError("pausing");
@@ -282,6 +276,7 @@ void SFXOpenAL::reallyPauseNow()
  */
 void SFXOpenAL::resume()
 {
+    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_RESUME, this);
 }   // resume
 
@@ -290,8 +285,6 @@ void SFXOpenAL::resume()
  */
 void SFXOpenAL::reallyResumeNow()
 {
-    // Will init the sfx (lazy) if necessary.
-    getStatus();
     if(m_status==SFX_PAUSED)
     {
         alSourcePlay(m_sound_source);
@@ -306,6 +299,8 @@ void SFXOpenAL::reallyResumeNow()
  */
 void SFXOpenAL::play()
 {
+    if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
+
     if(m_status==SFX_STOPPED)
         m_play_time = 0.0f;
 
@@ -343,7 +338,7 @@ void SFXOpenAL::reallyPlayNow()
  */
 void SFXOpenAL::setPosition(const Vec3 &position)
 {
-    if (m_status == SFX_UNKNOWN) return;
+    if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_POSITION, this, position);
 
 }   // setPosition

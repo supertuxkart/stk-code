@@ -650,6 +650,7 @@ void SFXManager::deleteSFX(SFXBase *sfx)
  */
 void SFXManager::pauseAll()
 {
+    if (!sfxAllowed()) return;
     queue(SFX_PAUSE_ALL);
 }   // pauseAll
 
@@ -674,6 +675,8 @@ void SFXManager::reallyPauseAllNow()
   */
 void SFXManager::resumeAll()
 {
+    // ignore unpausing if sound is disabled
+    if (!sfxAllowed()) return;
     queue(SFX_RESUME_ALL);
 }   // resumeAll
 
@@ -682,9 +685,6 @@ void SFXManager::resumeAll()
   */
 void SFXManager::reallyResumeAllNow()
 {
-    // ignore unpausing if sound is disabled
-    if (!sfxAllowed()) return;
-
     m_all_sfx.lock();
     for (std::vector<SFXBase*>::iterator i =m_all_sfx.getData().begin();
                                          i!=m_all_sfx.getData().end(); i++)
