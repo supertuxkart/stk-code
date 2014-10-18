@@ -74,7 +74,7 @@ public:
         SFX_VOLUME,
         SFX_LOOP,
         SFX_LISTENER,
-        SFX_UPDATE_MUSIC,
+        SFX_UPDATE,
         SFX_EXIT,
     };   // SFXCommands
 
@@ -220,6 +220,7 @@ public:
     void                     resumeAll();
     void                     reallyResumeAllNow();
     void                     update(float dt);
+    void                     reallyUpdateNow(SFXCommand *current);
     bool                     soundExist(const std::string &name);
     void                     setMasterSFXVolume(float gain);
     float                    getMasterSFXVolume() const { return m_master_gain; }

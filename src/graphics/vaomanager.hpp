@@ -154,6 +154,7 @@ class VAOManager : public Singleton<VAOManager>
     void regenerateInstancedVAO();
     size_t getVertexPitch(enum VTXTYPE) const;
     VTXTYPE getVTXTYPE(irr::video::E_VERTEX_TYPE type);
+    irr::video::E_VERTEX_TYPE getVertexType(enum VTXTYPE tp);
     void append(irr::scene::IMeshBuffer *, VTXTYPE tp);
 public:
     VAOManager();

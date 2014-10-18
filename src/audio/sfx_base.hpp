@@ -52,6 +52,7 @@ public:
 
     /** Late creation, if SFX was initially disabled */
     virtual bool       init()                           = 0;
+    virtual void       updatePlayingSFX(float dt)       = 0;
     virtual void       setPosition(const Vec3 &p)       = 0;
     virtual void       reallySetPosition(const Vec3 &p) = 0;
     virtual void       setLoop(bool status)             = 0;

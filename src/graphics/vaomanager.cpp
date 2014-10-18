@@ -1,6 +1,7 @@
 #include "vaomanager.hpp"
 #include "irr_driver.hpp"
 #include "stkmesh.hpp"
+#include "glwrap.hpp"
 
 VAOManager::VAOManager()
 {
@@ -121,61 +122,8 @@ void VAOManager::regenerateVAO(enum VTXTYPE tp)
     glGenVertexArrays(1, &vao[tp]);
     glBindVertexArray(vao[tp]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
-    switch (tp)
-    {
-    case VTXTYPE_COUNT: break;  // avoid compiler warning
-    case VTXTYPE_STANDARD:
-        // Position
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), 0);
-        // Normal
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)12);
-        // Color
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitch(tp), (GLvoid*)24);
-        // Texcoord
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)28);
-        break;
-    case VTXTYPE_TCOORD:
-        // Position
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), 0);
-        // Normal
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)12);
-        // Color
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitch(tp), (GLvoid*)24);
-        // Texcoord
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)28);
-        // SecondTexcoord
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)36);
-        break;
-    case VTXTYPE_TANGENT:
-        // Position
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), 0);
-        // Normal
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)12);
-        // Color
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitch(tp), (GLvoid*)24);
-        // Texcoord
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)28);
-        // Tangent
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)36);
-        // Bitangent
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)48);
-        break;
-    }
+
+    VertexUtils::bindVertexArrayAttrib(getVertexType(tp));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[tp]);
     glBindVertexArray(0);
@@ -318,6 +266,20 @@ VAOManager::VTXTYPE VAOManager::getVTXTYPE(video::E_VERTEX_TYPE type)
         return VTXTYPE_TANGENT;
     }
 };
+
+irr::video::E_VERTEX_TYPE VAOManager::getVertexType(enum VTXTYPE tp)
+{
+    switch (tp)
+    {
+    default:
+    case VTXTYPE_STANDARD:
+        return video::EVT_STANDARD;
+    case VTXTYPE_TCOORD:
+        return video::EVT_2TCOORDS;
+    case VTXTYPE_TANGENT:
+        return video::EVT_TANGENTS;
+    }
+}
 
 void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
 {

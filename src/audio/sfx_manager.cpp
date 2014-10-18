@@ -233,18 +233,6 @@ void SFXManager::queueCommand(SFXCommand *command)
 }   // queueCommand
 
 //----------------------------------------------------------------------------
-/** Make sures that the sfx thread is started at least one per frame. It also
- *  adds an update command for the music manager.
- *  \param dt Time step size.
- */
-void SFXManager::update(float dt)
-{
-    queue(SFX_UPDATE_MUSIC, NULL, dt);
-    // Wake up the sfx thread to handle all queued up audio commands.
-    pthread_cond_signal(&m_cond_request);
-}   // update
-
-//----------------------------------------------------------------------------
 /** Puts a NULL request into the queue, which will trigger the thread to
  *  exit.
  */
@@ -309,8 +297,7 @@ void* SFXManager::mainLoop(void *obj)
         case SFX_PAUSE_ALL:  me->reallyPauseAllNow();           break;
         case SFX_RESUME_ALL: me->reallyResumeAllNow();          break;
         case SFX_LISTENER:   me->reallyPositionListenerNow();   break;
-        case SFX_UPDATE_MUSIC: music_manager->update(
-                                  current->m_parameter.getX()); break;
+        case SFX_UPDATE:     me->reallyUpdateNow(current);      break;
         default: assert("Not yet supported.");
         }
         delete current;
@@ -594,6 +581,38 @@ void SFXManager::deleteSFXMapping(const std::string &name)
 }   // deleteSFXMapping
 
 //----------------------------------------------------------------------------
+/** Make sures that the sfx thread is started at least one per frame. It also
+ *  adds an update command for the music manager.
+ *  \param dt Time step size.
+ */
+void SFXManager::update(float dt)
+{
+    queue(SFX_UPDATE, NULL, dt);
+    // Wake up the sfx thread to handle all queued up audio commands.
+    pthread_cond_signal(&m_cond_request);
+}   // update
+
+//----------------------------------------------------------------------------
+/** Updates the status of all playing sfx (to test if they are finished).
+ * This function is executed once per thread (triggered by the 
+*/
+void SFXManager::reallyUpdateNow(SFXCommand *current)
+{
+    assert(current->m_command==SFX_UPDATE);
+    float dt = current->m_parameter.getX();
+    music_manager->update(dt);
+    m_all_sfx.lock();
+    for (std::vector<SFXBase*>::iterator i =  m_all_sfx.getData().begin();
+                                         i != m_all_sfx.getData().end(); i++)
+    {
+        if((*i)->getStatus()==SFXBase::SFX_PLAYING)
+            (*i)->updatePlayingSFX(dt);
+    }   // for i in m_all_sfx
+    m_all_sfx.unlock();
+
+}   // reallyUpdateNow
+
+//----------------------------------------------------------------------------
 /** Delete a sound effect object, and removes it from the internal list of
  *  all SFXs. This call deletes the object, and removes it from the list of
  *  all SFXs.
@@ -631,6 +650,7 @@ void SFXManager::deleteSFX(SFXBase *sfx)
  */
 void SFXManager::pauseAll()
 {
+    if (!sfxAllowed()) return;
     queue(SFX_PAUSE_ALL);
 }   // pauseAll
 
@@ -655,6 +675,8 @@ void SFXManager::reallyPauseAllNow()
   */
 void SFXManager::resumeAll()
 {
+    // ignore unpausing if sound is disabled
+    if (!sfxAllowed()) return;
     queue(SFX_RESUME_ALL);
 }   // resumeAll
 
@@ -663,9 +685,6 @@ void SFXManager::resumeAll()
   */
 void SFXManager::reallyResumeAllNow()
 {
-    // ignore unpausing if sound is disabled
-    if (!sfxAllowed()) return;
-
     m_all_sfx.lock();
     for (std::vector<SFXBase*>::iterator i =m_all_sfx.getData().begin();
                                          i!=m_all_sfx.getData().end(); i++)

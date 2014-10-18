@@ -72,15 +72,15 @@ private:
     /** If this sfx should also free the sound buffer. */
     bool m_owns_buffer;
 
-    /** Time at which a sfx ends playing. Used to avoid frequently getting
-     *  the openl status (which can slow down stk). */
-    float m_end_time;
+    /** How long the sfx has been playing. */
+    float m_play_time;
 
 public:
               SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
                         bool owns_buffer = false);
     virtual  ~SFXOpenAL();
 
+    virtual void      updatePlayingSFX(float dt);
     virtual bool      init();
     virtual void      play();
     virtual void      reallyPlayNow();
