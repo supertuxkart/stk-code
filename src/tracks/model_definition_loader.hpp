@@ -23,6 +23,7 @@ class LODNode;
 class Track;
 class STKInstancedSceneNode;
 
+#include <cassert>
 #include <map>
 #include <vector>
 #include <string>
