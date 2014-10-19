@@ -81,7 +81,7 @@ void GPInfoScreen::loadedFromFile()
     // Only init the number of tracks here, this way the previously selected
     // number of tracks will be the default.
     m_num_tracks_spinner->setValue(1);
-    
+
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
 }   // loadedFromFile
 
@@ -97,14 +97,14 @@ void GPInfoScreen::setGP(const std::string &gp_ident)
     {
         // Doesn't matter what kind of GP we create, it just gets the
         // right id ("random").
-        m_gp.createRandomGP(1, "standard", 
+        m_gp.createRandomGP(1, "standard",
                             m_reverse_spinner ? getReverse()
                                               : GrandPrixData::GP_NO_REVERSE);
     }
 }   // setGP
 
 // ----------------------------------------------------------------------------
-/** Converts the currently selected reverse status into a value of type 
+/** Converts the currently selected reverse status into a value of type
 *  GPReverseType .
 */
 GrandPrixData::GPReverseType GPInfoScreen::getReverse() const
@@ -130,8 +130,6 @@ void GPInfoScreen::beforeAddingWidget()
         SavedGrandPrix* saved_gp = SavedGrandPrix::getSavedGP(
             StateManager::get()->getActivePlayerProfile(0)->getUniqueID(),
             m_gp.getId(),
-            race_manager->getDifficulty(),
-            race_manager->getNumberOfKarts(),
             race_manager->getNumLocalPlayers());
 
         RibbonWidget* ribbonButtons = getWidget<RibbonWidget>("buttons");
@@ -194,10 +192,10 @@ void GPInfoScreen::init()
         else
             m_group_name = stringc(m_group_spinner->getStringValue().c_str()).c_str();
 
-        // If there are more tracks selected atm as in the group (which can 
+        // If there are more tracks selected atm as in the group (which can
         // happen if the group has been changed since last time this screen
         // was shown), adjust it:
-        int max_num_tracks = m_group_name=="all" 
+        int max_num_tracks = m_group_name=="all"
                            ? track_manager->getNumberOfRaceTracks()
                            : (int)track_manager->getTracksInGroup(m_group_name).size();
         m_num_tracks_spinner->setMax(max_num_tracks);
@@ -207,7 +205,7 @@ void GPInfoScreen::init()
         }
 
         // Now create the random GP:
-        m_gp.createRandomGP(m_num_tracks_spinner->getValue(), 
+        m_gp.createRandomGP(m_num_tracks_spinner->getValue(),
                             m_group_name, getReverse(), true);
     }
     else
@@ -215,7 +213,7 @@ void GPInfoScreen::init()
         getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
         m_gp.checkConsistency();
     }
-    
+
     // Number of AIs
     // -------------
     const bool has_AI = race_manager->hasAI();
@@ -288,7 +286,7 @@ void GPInfoScreen::addScreenshot()
     m_screenshot_widget->m_h = screenshot_div->m_h;
 
 
-    // Temporary icon, will replace it just after 
+    // Temporary icon, will replace it just after
     // (but it will be shown if the given icon is not found)
     m_screenshot_widget->m_properties[PROP_ICON] = "gui/main_help.png";
     m_screenshot_widget->add();
@@ -336,7 +334,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
         // the current track. The current value in the Number-of-tracks-spinner
         // has to be updated, since otherwise the displayed (and used) value
         // can be bigger than the maximum. (Might be a TODO to fix this)
-        int max_num_tracks = m_group_name=="all" 
+        int max_num_tracks = m_group_name=="all"
                            ? track_manager->getNumberOfRaceTracks()
                            : (int)track_manager->getTracksInGroup(m_group_name).size();
         m_num_tracks_spinner->setMax(max_num_tracks);
@@ -344,7 +342,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
             m_num_tracks_spinner->setValue(max_num_tracks);
         // Create a new (i.e. with new tracks) random gp, since the old
         // tracks might not all belong to the newly selected group.
-        
+
         m_gp.createRandomGP(m_num_tracks_spinner->getValue(), m_group_name,
                             getReverse(),  /*new_tracks*/true);
         addTracks();
@@ -359,7 +357,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
         const int num_ai = m_ai_kart_spinner->getValue();
         race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
         UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() + num_ai;
-        
+
         //Redraw scene because available buttons depend on current settings
         getWidget<RibbonWidget>("buttons")->setSelection(0, PLAYER_ID_GAME_MASTER);
         reshowCurrentScreen();

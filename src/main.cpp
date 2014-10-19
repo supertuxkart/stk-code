@@ -1131,7 +1131,7 @@ void askForInternetPermission()
                 // than sorry). If internet should be allowed, the news
                 // manager needs to be started (which in turn activates
                 // the addons manager).
-                bool need_to_start_news_manager = 
+                bool need_to_start_news_manager =
                      UserConfigParams::m_internet_status!=
                                        Online::RequestManager::IPERM_ALLOWED;
                 UserConfigParams::m_internet_status =

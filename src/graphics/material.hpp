@@ -251,7 +251,7 @@ public:
 
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
-    void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, 
+    void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
                        bool use_fog) const;
     void onMadeVisible(scene::IMeshBuffer* who);
     void onHidden(scene::IMeshBuffer* who);
@@ -331,7 +331,7 @@ public:
      * \return The particles to use, or NULL if none. */
     const ParticleKind* getParticlesWhen(ParticleConditions cond) const
     {
-        return m_particles_effects[cond]; 
+        return m_particles_effects[cond];
     }   // getParticlesWhen
     // ------------------------------------------------------------------------
     /** Returns true if a kart falling over this kind of material triggers

@@ -199,7 +199,7 @@ void World::init()
     
     if (UserConfigParams::m_weather_effects)
     {
-        m_weather = new Weather(m_track->getWeatherLightning(), 
+        m_weather = new Weather(m_track->getWeatherLightning(),
                           m_track->getWeatherSound());
     }
 }   // init

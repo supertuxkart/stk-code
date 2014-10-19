@@ -101,7 +101,7 @@ int getNumProcessors()
 #endif
 #ifdef WIN32
     SYSTEM_INFO si;
-    GetSystemInfo(&si);	// guaranteed to succeed
+    GetSystemInfo(&si);    // guaranteed to succeed
     return si.dwNumberOfProcessors;
 #endif
 #ifdef __APPLE__

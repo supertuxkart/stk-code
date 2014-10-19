@@ -285,7 +285,7 @@ void TrackObject::update(float dt)
  *  \return True if a triangle was hit, false otherwise (and no output
  *          variable will be set.
  */
-bool TrackObject::castRay(const btVector3 &from, 
+bool TrackObject::castRay(const btVector3 &from,
                           const btVector3 &to, btVector3 *hit_point,
                           const Material **material, btVector3 *normal,
                           bool interpolate_normal) const

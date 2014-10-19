@@ -78,8 +78,8 @@ void BaseUserScreen::init()
     // this case no 'back' error should be shown.
     bool is_first_screen = StateManager::get()->getMenuStackSize()==1;
     getWidget<IconButtonWidget>("back")->setVisible(!is_first_screen);
-    getWidget<IconButtonWidget>("cancel")->setLabel(is_first_screen 
-                                                    ? _("Exit game") 
+    getWidget<IconButtonWidget>("cancel")->setLabel(is_first_screen
+                                                    ? _("Exit game")
                                                     : _("Cancel")      );
 
     m_sign_out_name = "";
@@ -219,9 +219,9 @@ void BaseUserScreen::makeEntryFieldsVisible()
     // and either is the current player and logged in (no need to enter a
     // password then) or has a saved session.
     if(player && online  &&
-        (player->hasSavedSession() || 
-          (player==PlayerManager::getCurrentPlayer() && player->isLoggedIn() ) 
-        ) 
+        (player->hasSavedSession() ||
+          (player==PlayerManager::getCurrentPlayer() && player->isLoggedIn() )
+        )
       )
     {
         // If we show the online login fields, but the player has a

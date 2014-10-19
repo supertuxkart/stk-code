@@ -36,7 +36,6 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
 #ifdef GL_DEBUG_SEVERITY_NOTIFICATION
     // ignore minor notifications sent by some drivers (notably the nvidia one)
     if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
-        return;
 #endif
 
     switch(source)
@@ -261,7 +260,7 @@ void draw3DLine(const core::vector3df& start,
     glGetError();
 }
 
-bool hasGLExtension(const char* extension) 
+bool hasGLExtension(const char* extension)
 {
     if (glGetStringi != NULL)
     {

@@ -332,7 +332,7 @@ void renderInstancedMeshes1stPass(Args...args)
         GLMesh *mesh = meshes[i];
 #ifdef DEBUG
         if (mesh->VAOType != T::VertexType)
-            Log::error("RenderGeometry", "Wrong instanced vertex format (hint : %s)", 
+            Log::error("RenderGeometry", "Wrong instanced vertex format (hint : %s)",
                         mesh->textures[0]->getName().getPath().c_str());
 #endif
         for (unsigned j = 0; j < TexUnits.size(); j++)
@@ -853,8 +853,8 @@ static void multidrawShadow(unsigned i, Args ...args)
     if (ShadowPassCmd::getInstance()->Size[i][Mat])
     {
         Shader::getInstance()->setUniforms(i, args...);
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
-            (const void*)(ShadowPassCmd::getInstance()->Offset[i][Mat] * sizeof(DrawElementsIndirectCommand)), 
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
+            (const void*)(ShadowPassCmd::getInstance()->Offset[i][Mat] * sizeof(DrawElementsIndirectCommand)),
             (int)ShadowPassCmd::getInstance()->Size[i][Mat], sizeof(DrawElementsIndirectCommand));
     }
 }
@@ -984,8 +984,8 @@ void multidrawRSM(Args...args)
     if (RSMPassCmd::getInstance()->Size[Mat])
     {
         Shader::getInstance()->setUniforms(args...);
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
-            (const void*)(RSMPassCmd::getInstance()->Offset[Mat] * sizeof(DrawElementsIndirectCommand)), 
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
+            (const void*)(RSMPassCmd::getInstance()->Offset[Mat] * sizeof(DrawElementsIndirectCommand)),
             (int)RSMPassCmd::getInstance()->Size[Mat], sizeof(DrawElementsIndirectCommand));
     }
 }

@@ -43,8 +43,8 @@ using namespace gui;
 
 namespace Debug {
 
-/** This is to let mouse input events go through when the debug menu is 
- *  visible, otherwise GUI events would be blocked while in a race... 
+/** This is to let mouse input events go through when the debug menu is
+ *  visible, otherwise GUI events would be blocked while in a race...
  */
 static bool g_debug_menu_visible = false;
 
@@ -152,7 +152,7 @@ bool onEvent(const SEvent &event)
         {
             // root menu
             gui::IGUIEnvironment* guienv = irr_driver->getGUI();
-            core::rect<s32> r(event.MouseInput.X,     event.MouseInput.Y, 
+            core::rect<s32> r(event.MouseInput.X,     event.MouseInput.Y,
                               event.MouseInput.Y+100, event.MouseInput.Y+100);
             IGUIContextMenu* mnu = guienv->addContextMenu(r, NULL);
             int graphicsMenuIndex = mnu->addItem(L"Graphics >",-1,true,true);
@@ -198,7 +198,7 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
-                mnu->addItem(L"Toggle capture profiler report", 
+                mnu->addItem(L"Toggle capture profiler report",
                              DEBUG_PROFILER_GENERATE_REPORT);
             mnu->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
             mnu->addItem(L"FPS",DEBUG_FPS);
@@ -220,7 +220,7 @@ bool onEvent(const SEvent &event)
 
     if (event.EventType == EET_GUI_EVENT)
     {
-        if (event.GUIEvent.Caller != NULL && 
+        if (event.GUIEvent.Caller != NULL &&
             event.GUIEvent.Caller->getType() == EGUIET_CONTEXT_MENU )
         {
             IGUIContextMenu *menu = (IGUIContextMenu*)event.GUIEvent.Caller;
@@ -242,14 +242,14 @@ bool onEvent(const SEvent &event)
                 }
                 else if (cmdID == DEBUG_GRAPHICS_RESET)
                 {
-                    if (physics) 
+                    if (physics)
                         physics->setDebugMode(IrrDebugDrawer::DM_NONE);
 
                     irr_driver->resetDebugModes();
                 }
                 else if (cmdID == DEBUG_GRAPHICS_WIREFRAME)
                 {
-                    if (physics) 
+                    if (physics)
                         physics->setDebugMode(IrrDebugDrawer::DM_NONE);
 
                     irr_driver->resetDebugModes();
@@ -257,7 +257,7 @@ bool onEvent(const SEvent &event)
                 }
                 else if (cmdID == DEBUG_GRAPHICS_MIPMAP_VIZ)
                 {
-                    if (physics) 
+                    if (physics)
                         physics->setDebugMode(IrrDebugDrawer::DM_NONE);
 
                     irr_driver->resetDebugModes();
@@ -407,7 +407,7 @@ bool onEvent(const SEvent &event)
                 else if (cmdID == DEBUG_POWERUP_NITRO)
                 {
                     if (!world) return false;
-                    const unsigned int num_local_players = 
+                    const unsigned int num_local_players =
                         race_manager->getNumLocalPlayers();
                     for(unsigned int i = 0; i < num_local_players; i++)
                     {
@@ -451,7 +451,7 @@ bool onEvent(const SEvent &event)
                         AbstractKart *kart = world->getKart(i);
                         Log::warn(kart->getIdent().c_str(),
                             "<start position=\"%d\" x=\"%f\" y=\"%f\" z=\"%f\" h=\"%f\"/>",
-                            i, kart->getXYZ().getX(), kart->getXYZ().getY(), 
+                            i, kart->getXYZ().getX(), kart->getXYZ().getY(),
                             kart->getXYZ().getZ(),kart->getHeading()*RAD_TO_DEGREE
                             );
                     }
@@ -460,14 +460,14 @@ bool onEvent(const SEvent &event)
                 {
 #if !defined(__APPLE__)
                     DebugSliderDialog *dsd = new DebugSliderDialog();
-                    dsd->setSliderHook( "red_slider", 0, 255, 
+                    dsd->setSliderHook( "red_slider", 0, 255,
                         [](){ return int(irr_driver->getAmbientLight().r * 255.f); },
                         [](int v){
                             video::SColorf ambient = irr_driver->getAmbientLight();
                             ambient.setColorComponentValue(0, v / 255.f);
                             irr_driver->setAmbientLight(ambient); }
                     );
-                    dsd->setSliderHook("green_slider", 0, 255, 
+                    dsd->setSliderHook("green_slider", 0, 255,
                         [](){ return int(irr_driver->getAmbientLight().g * 255.f); },
                         [](int v){
                         video::SColorf ambient = irr_driver->getAmbientLight();
@@ -481,7 +481,7 @@ bool onEvent(const SEvent &event)
                         ambient.setColorComponentValue(2, v / 255.f);
                         irr_driver->setAmbientLight(ambient); }
                     );
-                    dsd->setSliderHook("ssao_radius", 0, 100, 
+                    dsd->setSliderHook("ssao_radius", 0, 100,
                         [](){ return int(irr_driver->getSSAORadius() * 10.f); },
                         [](int v){irr_driver->setSSAORadius(v / 10.f); }
                     );
@@ -504,7 +504,7 @@ bool onEvent(const SEvent &event)
 }   // onEvent
 
 // ----------------------------------------------------------------------------
-/** Returns if the debug menu is visible. 
+/** Returns if the debug menu is visible.
  */
 bool isOpen()
 {

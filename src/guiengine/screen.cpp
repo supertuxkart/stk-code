@@ -95,7 +95,7 @@ void Screen::init()
 
 // -----------------------------------------------------------------------------
 /** Displays this screen bu pushing it onto the stack of screen
- *  in the state manager. 
+ *  in the state manager.
  */
 void Screen::push()
 {

@@ -112,7 +112,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         else
         {
             GPInfoScreen *gpis = GPInfoScreen::getInstance();
-            gpis->setGP( selection == "Random Grand Prix" ? "random" 
+            gpis->setGP( selection == "Random Grand Prix" ? "random"
                                                           : selection);
             gpis->push();
         }

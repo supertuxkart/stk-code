@@ -163,8 +163,8 @@ SFXManager::~SFXManager()
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------
-/** Adds a sound effect command to the queue of the sfx manager. Openal 
- *  commands can sometimes cause a 5ms delay, so it is done in a separate 
+/** Adds a sound effect command to the queue of the sfx manager. Openal
+ *  commands can sometimes cause a 5ms delay, so it is done in a separate
  *  thread.
  *  \param command The command to execute.
  *  \param sfx The sound effect to be started.
@@ -317,7 +317,7 @@ void* SFXManager::mainLoop(void *obj)
 
 //----------------------------------------------------------------------------
 /** Called when sound is globally switched on or off. It either pauses or
- *  resumes all sound effects. 
+ *  resumes all sound effects.
  *  \param on If sound is switched on or off.
  */
 void SFXManager::soundToggled(const bool on)
@@ -523,7 +523,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
 
     sfx->setMasterVolume(m_master_gain);
 
-    if (add_to_SFX_list) 
+    if (add_to_SFX_list)
     {
         m_all_sfx.lock();
         m_all_sfx.getData().push_back(sfx);
@@ -540,7 +540,7 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
     std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.find(name);
     if ( i == m_all_sfx_types.end() )
     {
-        Log::error("SFXManager", 
+        Log::error("SFXManager",
                    "SFXManager::createSoundSource could not find the "
                    "requested sound effect : '%s'.", name.c_str());
         return NULL;
@@ -630,7 +630,7 @@ void SFXManager::deleteSFX(SFXBase *sfx)
 
     if(i==m_all_sfx.getData().end())
     {
-        Log::warn("SFXManager", 
+        Log::warn("SFXManager",
                   "SFXManager::deleteSFX : Warning: sfx '%s' %lx not found in list.",
                   sfx->getBuffer()->getFileName().c_str(), sfx);
         m_all_sfx.unlock();

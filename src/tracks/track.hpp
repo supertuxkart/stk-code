@@ -461,7 +461,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this track is a racing track. This means it is not an
      *  internal track (like cut scenes), arena, or soccer field. */
-    bool isRaceTrack() const 
+    bool isRaceTrack() const
     {
         return !m_internal && !m_is_arena && !m_is_soccer;
     }   // isRaceTrack

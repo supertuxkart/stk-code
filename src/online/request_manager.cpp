@@ -63,7 +63,7 @@ namespace Online
     }   // isRunning
     // ------------------------------------------------------------------------
     /** Constructor. It only initialised values, it does not start the actual
-     *  thread. 
+     *  thread.
      */
     RequestManager::RequestManager()
     {

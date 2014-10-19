@@ -454,7 +454,7 @@ void TrackObjectPresentationMesh::reset()
 
 
 TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_node,
-                                                           scene::ISceneNode* parent) 
+                                                           scene::ISceneNode* parent)
                             : TrackObjectPresentation(xml_node)
 {
     // TODO: respect 'parent' if any
@@ -561,7 +561,7 @@ TrackObjectPresentationSound::~TrackObjectPresentationSound()
 }   // ~TrackObjectPresentationSound
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationSound::move(const core::vector3df& xyz, 
+void TrackObjectPresentationSound::move(const core::vector3df& xyz,
                                         const core::vector3df& hpr,
                                         const core::vector3df& scale)
 {
@@ -571,7 +571,7 @@ void TrackObjectPresentationSound::move(const core::vector3df& xyz,
 
 // ----------------------------------------------------------------------------
 
-TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(const XMLNode& xml_node, 
+TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(const XMLNode& xml_node,
                                                                    scene::ISceneNode* parent)
                                 : TrackObjectPresentationSceneNode(xml_node)
 {

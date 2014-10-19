@@ -38,8 +38,8 @@
 #include <stdio.h>
 #include <string>
 
-SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, 
-                     bool owns_buffer) 
+SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
+                     bool owns_buffer)
          : SFXBase()
 {
     m_sound_buffer = buffer;
@@ -80,7 +80,7 @@ SFXOpenAL::~SFXOpenAL()
 }   // ~SFXOpenAL
 
 //-----------------------------------------------------------------------------
-/** Initialises the sfx. 
+/** Initialises the sfx.
  */
 bool SFXOpenAL::init()
 {
@@ -141,7 +141,7 @@ void SFXOpenAL::updatePlayingSFX(float dt)
 /** Returns the status of this sfx. */
 SFXBase::SFXStatus SFXOpenAL::getStatus()
 {
-    return m_status; 
+    return m_status;
 }   // getStatus;
 
 //-----------------------------------------------------------------------------
@@ -202,10 +202,10 @@ void SFXOpenAL::reallySetVolume(float gain)
 void SFXOpenAL::setMasterVolume(float gain)
 {
     m_master_gain = gain;
-    
+
     if(m_status==SFX_UNKNOWN) return;
 
-    alSourcef(m_sound_source, AL_GAIN, 
+    alSourcef(m_sound_source, AL_GAIN,
                (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
     SFXManager::checkError("setting volume");
 }   //setMasterVolume
@@ -375,14 +375,14 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
     alSource3f(m_sound_source, AL_POSITION, (float)position.getX(),
                (float)position.getY(), (float)position.getZ());
 
-    if (SFXManager::get()->getListenerPos().distance(position) 
+    if (SFXManager::get()->getListenerPos().distance(position)
         > m_sound_buffer->getMaxDist())
     {
         alSourcef(m_sound_source, AL_GAIN, 0);
     }
     else
     {
-        alSourcef(m_sound_source, AL_GAIN, 
+        alSourcef(m_sound_source, AL_GAIN,
                   (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
     }
 

@@ -608,7 +608,7 @@ void Kart::createPhysics()
                 {
                     int index = (x + 1) / 2 + 1 - z;  // get index of wheel
                     float f = getKartProperties()->getPhysicalWheelPosition();
-                    // f < 0 indicates to use the old physics position, i.e. 
+                    // f < 0 indicates to use the old physics position, i.e.
                     // to place the wheels outside of the chassis
                     if(f<0)
                     {
@@ -1440,7 +1440,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // In multiplayer mode sounds are NOT positional, because we have
         // multiple listeners. This would make the sounds of all AIs be
         // audible at all times. So silence AI karts.
-        if (s.size()!=0 && (race_manager->getNumPlayers()==1 || 
+        if (s.size()!=0 && (race_manager->getNumPlayers()==1 ||
                             m_controller->isPlayerController()  ) )
         {
             m_terrain_sound = SFXManager::get()->createSoundSource(s);
@@ -2425,7 +2425,7 @@ void Kart::kartIsInRestNow()
         f +=  wi.m_chassisConnectionPointCS.getY()
             - wi.m_raycastInfo.m_suspensionLength - wi.m_wheelsRadius;
     }
-    m_graphical_y_offset = f/m_vehicle->getNumWheels() 
+    m_graphical_y_offset = f/m_vehicle->getNumWheels()
                          + getKartProperties()->getGraphicalYOffset();
 
     m_kart_model->setDefaultSuspension();
@@ -2539,7 +2539,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     float heading = m_skidding->getVisualSkidRotation();
     float xx = fabsf(m_speed)* getKartProperties()->getDownwardImpulseFactor()*0.0006f;
-    Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset() 
+    Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset()
                               + lean_height +m_graphical_y_offset+xx, 0);
     center_shift = getTrans().getBasis() * center_shift;
 
