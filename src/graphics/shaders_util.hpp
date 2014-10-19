@@ -57,7 +57,7 @@ GLint LoadProgram(AttributeType Tp, Types ... args)
 {
     GLint ProgramID = glCreateProgram();
     loadAndAttach(ProgramID, args...);
-    if (irr_driver->getGLSLVersion() < 330)
+    if (getGLSLVersion() < 330)
         setAttribute(Tp, ProgramID);
     glLinkProgram(ProgramID);
 
