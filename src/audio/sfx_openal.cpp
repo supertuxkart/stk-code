@@ -259,7 +259,6 @@ void SFXOpenAL::reallyStopNow()
  */
 void SFXOpenAL::pause()
 {
-    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_PAUSE, this);
 }   // pause
 
@@ -269,6 +268,9 @@ void SFXOpenAL::pause()
  */
 void SFXOpenAL::reallyPauseNow()
 {
+    // Need to be tested again here, since this function can be called
+    // from pauseAll, and we have to make sure to only pause playing sfx.
+    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
     m_status = SFX_PAUSED;
     alSourcePause(m_sound_source);
     SFXManager::checkError("pausing");
