@@ -244,11 +244,14 @@ void SFXOpenAL::stop()
  */
 void SFXOpenAL::reallyStopNow()
 {
-    m_status     = SFX_STOPPED;
-    m_loop       = false;
-    alSourcei(m_sound_source, AL_LOOPING, AL_FALSE);
-    alSourceStop(m_sound_source);
-    SFXManager::checkError("stoping");
+    if(m_status==SFX_PLAYING || m_status==SFX_PAUSED)
+    {
+        m_status = SFX_STOPPED;
+        m_loop = false;
+        alSourcei(m_sound_source, AL_LOOPING, AL_FALSE);
+        alSourceStop(m_sound_source);
+        SFXManager::checkError("stoping");
+    }
 }   // reallyStopNow
 
 //-----------------------------------------------------------------------------
