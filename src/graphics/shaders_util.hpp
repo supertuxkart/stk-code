@@ -1,7 +1,6 @@
 #ifndef SHADERS_UTIL_HPP
 #define SHADERS_UTIL_HPP
 
-#include "graphics/irr_driver.hpp"
 #include "utils/singleton.hpp"
 #include <vector>
 #include <matrix4.h>
