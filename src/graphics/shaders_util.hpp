@@ -1,7 +1,6 @@
 #ifndef SHADERS_UTIL_HPP
 #define SHADERS_UTIL_HPP
 
-#include "graphics/irr_driver.hpp"
 #include "utils/singleton.hpp"
 #include <vector>
 #include <matrix4.h>
@@ -58,7 +57,7 @@ GLint LoadProgram(AttributeType Tp, Types ... args)
 {
     GLint ProgramID = glCreateProgram();
     loadAndAttach(ProgramID, args...);
-    if (irr_driver->getGLSLVersion() < 330)
+    if (getGLSLVersion() < 330)
         setAttribute(Tp, ProgramID);
     glLinkProgram(ProgramID);
 
