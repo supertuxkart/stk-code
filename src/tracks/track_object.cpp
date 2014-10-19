@@ -132,6 +132,10 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         m_type = "light";
         m_presentation = new TrackObjectPresentationLight(xml_node, parent);
     }
+    else if (xml_node.getName() == "library")
+    {
+        m_presentation = new TrackObjectPresentationLibraryNode(xml_node, model_def_loader);
+    }
     else if (type == "sfx-emitter")
     {
         // FIXME: at this time sound emitters are just disabled in multiplayer
