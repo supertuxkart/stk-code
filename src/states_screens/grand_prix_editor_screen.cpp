@@ -62,7 +62,15 @@ void GrandPrixEditorScreen::beforeAddingWidget()
 // -----------------------------------------------------------------------------
 void GrandPrixEditorScreen::loadedFromFile()
 {
+    static const int MAX_LABEL_LENGTH = 35;
 
+    DynamicRibbonWidget* gplist_widget = getWidget<DynamicRibbonWidget>("gplist");
+    assert (gplist_widget != NULL);
+    gplist_widget->setMaxLabelLength(MAX_LABEL_LENGTH);
+
+    DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
+    assert(tracks_widget != NULL);
+    tracks_widget->setMaxLabelLength(MAX_LABEL_LENGTH);
 }
 
 // -----------------------------------------------------------------------------

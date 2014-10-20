@@ -19,10 +19,12 @@
 #ifndef HEADER_SAVED_GRAND_PRIX_HPP
 #define HEADER_SAVED_GRAND_PRIX_HPP
 
-#include <string>
 #include "config/user_config.hpp"
 #include "race/race_manager.hpp"
 #include "utils/ptr_vector.hpp"
+
+#include <algorithm>
+#include <string>
 
 class RaceManager;
 
@@ -74,6 +76,9 @@ protected:
     /** Index of the next to run track. */
     IntUserConfigParam          m_next_track;
 
+    /** GPReverseType of the GP as int */
+    IntUserConfigParam          m_reverse_type;
+
     PtrVector<SavedGPKart> m_karts;
 
 public:
@@ -86,6 +91,7 @@ public:
                    RaceManager::Difficulty difficulty,
                    int player_karts,
                    int last_track,
+                   int reverse_type,
                    const std::vector<RaceManager::KartStatus> &kart_list);
 
     /**
@@ -121,6 +127,10 @@ public:
     int getNextTrack() const { return m_next_track; }
 
     // ------------------------------------------------------------------------
+    /** Returns the reverse Type. */
+    int getReverseType() const { return m_reverse_type; }
+
+    // ------------------------------------------------------------------------
     /** Sets the index of the last track finished. */
     void setNextTrack(int next_track) { m_next_track = next_track; }
 
@@ -135,29 +145,22 @@ public:
 
     // ------------------------------------------------------------------------
     /** Finds the right SavedGrandPrix given the specified data, or
-     *  NULL if no matching GP was found.
-     */
+     *  NULL if no matching GP was found. */
     static SavedGrandPrix* getSavedGP(unsigned int player,
-                                const std::string &gpid,
-                                int difficulty, int total_karts,
-                                int player_karts)
+                                      const std::string &gpid,
+                                      const unsigned int number_of_players)
     {
         for (unsigned int n=0; n<UserConfigParams::m_saved_grand_prix_list.size(); n++)
         {
             SavedGrandPrix* gp = &UserConfigParams::m_saved_grand_prix_list[n];
-
-            if ((gp->getGPID()       == gpid) &&
-                (gp->getPlayerID()    ==  player) &&
-                (gp->getDifficulty()  == difficulty) &&
-                (gp->getTotalKarts()  == total_karts) &&
-                (gp->getPlayerKarts() == player_karts)){
+            if (gp->getGPID()        == gpid   &&
+                gp->getPlayerID()    == player &&
+                gp->getPlayerKarts() == (int)number_of_players)
                 return gp;
-            }   // if
-        }   // for n
+        }
         return NULL;
     }   // getSavedGP
     // ------------------------------------------------------------------------
-
 };   // class SavedGrandPrix
 
 #endif

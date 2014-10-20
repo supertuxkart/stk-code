@@ -19,8 +19,7 @@
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/glwrap.hpp"
+#include "graphics/2dutils.hpp"
 #include "states_screens/cutscene_gui.hpp"
 
 // -----------------------------------------------------------------------------

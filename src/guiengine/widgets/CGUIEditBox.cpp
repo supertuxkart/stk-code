@@ -12,8 +12,7 @@
 //#include "os.h"
 #include "Keycodes.h"
 
-#include "graphics/glwrap.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/2dutils.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
 

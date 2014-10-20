@@ -17,6 +17,7 @@
 
 #include "states_screens/online_profile_base.hpp"
 
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
@@ -71,6 +72,8 @@ void OnlineProfileBase::beforeAddingWidget()
     m_visiting_profile = ProfileManager::get()->getVisitingProfile();
     if (!m_visiting_profile || !m_visiting_profile->isCurrentUser())
         m_settings_tab->setVisible(false);
+    else
+        m_settings_tab->setVisible(true);
 
     // If not logged in, don't show profile or friends
     if (!m_visiting_profile)
@@ -102,6 +105,19 @@ void OnlineProfileBase::init()
         Log::error("OnlineProfileBase", "No visting profile");
 
 }   // init
+
+// -----------------------------------------------------------------------------
+bool OnlineProfileBase::onEscapePressed()
+{
+    //return to main menu if it's your profile
+    if (!m_visiting_profile || m_visiting_profile->isCurrentUser())
+        return true;
+
+    //return to your profile if it's another profile
+    ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
+    StateManager::get()->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
+    return false;
+}   // onEscapePressed
 
 // -----------------------------------------------------------------------------
 /** Called when an event occurs (i.e. user clicks on something).

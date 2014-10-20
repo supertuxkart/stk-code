@@ -30,13 +30,16 @@
 class DummySFX : public SFXBase
 {
 public:
-                       DummySFX(SFXBuffer* buffer, bool positional, float gain) {}
+                       DummySFX(SFXBuffer* buffer, bool positional,
+                                float gain) {}
     virtual           ~DummySFX()                     {}
 
     /** Late creation, if SFX was initially disabled */
-    virtual bool       init() { return true; }
-
+    virtual bool       init()                           { return true;  }
+    virtual bool       isLooped()                       { return false; }
+    virtual void       updatePlayingSFX(float dt)       {}
     virtual void       setLoop(bool status)             {}
+    virtual void       reallySetLoop(bool status)       {}
     virtual void       setPosition(const Vec3 &p)       {}
     virtual void       reallySetPosition(const Vec3 &p) {}
     virtual void       play()                           {}
@@ -52,10 +55,11 @@ public:
     virtual void       reallySetSpeed(float factor)     {}
     virtual void       setVolume(float gain)            {}
     virtual void       reallySetVolume(float gain)      {}
+    virtual void       setMasterVolume(float gain)      {}
+    virtual void       reallySetMasterVolumeNow(float gain) {}
     virtual SFXStatus  getStatus()                      { return SFX_STOPPED; }
     virtual void       onSoundEnabledBack()             {}
     virtual void       setRolloff(float rolloff)        {}
-    virtual bool       isPlaying()                      { return false; }
     virtual const SFXBuffer* getBuffer() const          { return NULL; }
 
 };   // DummySFX

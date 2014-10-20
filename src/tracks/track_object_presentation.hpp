@@ -152,6 +152,18 @@ public:
     virtual ~TrackObjectPresentationEmpty();
 };
 
+/**
+* \ingroup tracks
+* A track object representation that is a library node
+*/
+class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNode
+{
+public:
+
+    TrackObjectPresentationLibraryNode(const XMLNode& xml_node,
+        ModelDefinitionLoader& model_def_loader);
+    virtual ~TrackObjectPresentationLibraryNode();
+};
 
 /**
  * \ingroup tracks

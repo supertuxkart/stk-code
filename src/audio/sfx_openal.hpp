@@ -48,8 +48,11 @@ private:
     /** The status of this SFX. */
     SFXStatus    m_status;
 
+    /** If the sfx is positional. */
     bool         m_positional;
-    float        m_defaultGain;
+
+    /** Default gain value. */
+    float        m_default_gain;
 
     /** The OpenAL source contains this info, but if audio is disabled initially then
         the sound source won't be created and we'll be left with no clue when enabling
@@ -62,9 +65,6 @@ private:
      the sound source won't be created and we'll be left with no clue when enabling
      sounds later. */
     float m_gain;
-
-    /** True when the sfx is currently playing. */
-    bool m_is_playing;
     
     /** The master gain set in user preferences */
     float m_master_gain;
@@ -72,20 +72,20 @@ private:
     /** If this sfx should also free the sound buffer. */
     bool m_owns_buffer;
 
-    /** Time at which a sfx ends playing. Used to avoid frequently getting
-     *  the openl status (which can slow down stk). */
-    float m_end_time;
+    /** How long the sfx has been playing. */
+    float m_play_time;
 
 public:
               SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
                         bool owns_buffer = false);
     virtual  ~SFXOpenAL();
 
+    virtual void      updatePlayingSFX(float dt);
     virtual bool      init();
     virtual void      play();
     virtual void      reallyPlayNow();
     virtual void      setLoop(bool status);
-    virtual bool      isPlaying();
+    virtual void      reallySetLoop(bool status);
     virtual void      stop();
     virtual void      reallyStopNow();
     virtual void      pause();
@@ -100,9 +100,15 @@ public:
     virtual void      setVolume(float gain);
     virtual void      reallySetVolume(float gain);
     virtual void      setMasterVolume(float gain);
+    virtual void      reallySetMasterVolumeNow(float gain);
     virtual void      onSoundEnabledBack();
     virtual void      setRolloff(float rolloff);
-    virtual SFXStatus getStatus();
+    // ------------------------------------------------------------------------
+    /** Returns if this sfx is looped or not. */
+    virtual bool      isLooped() { return m_loop; }
+    // ------------------------------------------------------------------------
+    /** Returns the status of this sfx. */
+    virtual SFXStatus getStatus() { return m_status; }
 
     // ------------------------------------------------------------------------
     /** Returns the buffer associated with this sfx. */
