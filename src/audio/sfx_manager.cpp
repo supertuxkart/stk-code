@@ -333,7 +333,7 @@ void SFXManager::soundToggled(const bool on)
             buffer->load();
         }
 
-        resumeAll();
+        reallyResumeAllNow();
         m_all_sfx.lock();
         const int sfx_amount = (int)m_all_sfx.getData().size();
         for (int n=0; n<sfx_amount; n++)
