@@ -288,24 +288,26 @@ void RaceManager::startNew(bool from_overworld)
         m_num_laps      = m_grand_prix.getLaps();
         m_reverse_track = m_grand_prix.getReverse();
 
+        // We look if Player 1 has a saved version of this GP.
+        m_saved_gp = SavedGrandPrix::getSavedGP(
+                                     StateManager::get()
+                                     ->getActivePlayerProfile(0)
+                                     ->getUniqueID(),
+                                     m_grand_prix.getId(),
+                                     m_player_karts.size());
+
         // Saved GP only in offline mode
         if (m_continue_saved_gp && !NetworkWorld::getInstance<NetworkWorld>()->isRunning())
         {
-            // We look if Player 1 has a saved version of this GP.
-            m_saved_gp = SavedGrandPrix::getSavedGP(
-                                         StateManager::get()
-                                         ->getActivePlayerProfile(0)
-                                         ->getUniqueID(),
-                                         m_grand_prix.getId(),
-                                         m_player_karts.size());
-
             if (m_saved_gp == NULL)
             {
                 Log::error("Race Manager", "Can not continue Grand Prix '%s'"
                                            "because it could not exist",
                                            m_grand_prix.getId().c_str());
                 m_continue_saved_gp = false; // simple and working
-            } else {
+            }
+            else
+            {
                 setNumKarts(m_saved_gp->getTotalKarts());
                 setupPlayerKartInfo();
                 m_grand_prix.changeReverse((GrandPrixData::GPReverseType)m_saved_gp->getReverseType());
@@ -364,6 +366,7 @@ void RaceManager::startNew(bool from_overworld)
         init_gp_rank ++;
     }
 
+    m_track_number = 0;
     if (m_major_mode == MAJOR_MODE_GRAND_PRIX)
     {
         if (m_continue_saved_gp)
@@ -371,10 +374,10 @@ void RaceManager::startNew(bool from_overworld)
             m_track_number  = m_saved_gp->getNextTrack();
             m_saved_gp->loadKarts(m_kart_status);
         }
-        else
+        else if (m_saved_gp != NULL)
         {
-            m_track_number = 0;
             m_saved_gp->remove();
+            m_saved_gp = NULL;
         }
     }
 
