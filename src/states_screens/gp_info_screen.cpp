@@ -357,11 +357,6 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
         const int num_ai = m_ai_kart_spinner->getValue();
         race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
         UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() + num_ai;
-
-        //Redraw scene because available buttons depend on current settings
-        getWidget<RibbonWidget>("buttons")->setSelection(0, PLAYER_ID_GAME_MASTER);
-        reshowCurrentScreen();
-        m_ai_kart_spinner->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
     else if(name=="back")
     {
