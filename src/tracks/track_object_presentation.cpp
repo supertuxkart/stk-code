@@ -482,7 +482,8 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
     xml_node.get("max_dist", &max_dist );
 
     // first try track dir, then global dir
-    std::string soundfile = file_manager->getAsset(FileManager::MODEL,sound);
+    std::string soundfile = World::getWorld()->getTrack()->getTrackFile(sound);
+    //std::string soundfile = file_manager->getAsset(FileManager::MODEL,sound);
     if (!file_manager->fileExists(soundfile))
     {
         soundfile = file_manager->getAsset(FileManager::SFX, sound);
