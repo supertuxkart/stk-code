@@ -159,7 +159,7 @@ namespace GUIEngine
         void buildInternalStructure();
 
         /** Call this to scroll within a scrollable ribbon */
-        void scroll(const int x_delta);
+        void scroll(int x_delta, bool evenIfDeactivated = false);
 
         /** Used  for combo ribbons, to contain the ID of the currently selected item for each player */
         int m_selected_item[MAX_PLAYER_COUNT];
@@ -187,7 +187,7 @@ namespace GUIEngine
         int m_max_label_width;
 
         /** Max length of a label, in characters */
-        static const int MAX_LABEL_LENGTH = 30;
+        unsigned int m_max_label_length;
 
     public:
 
@@ -298,6 +298,9 @@ namespace GUIEngine
         /** Set approximately how many items are expected to be in this ribbon; will help the layout
           * algorithm next time add() is called */
         void setItemCountHint(int hint) { m_item_count_hint = hint; }
+
+        /** Set max length of displayed text. */
+        void setMaxLabelLength(int length) { m_max_label_length = length; }
     };
 
 }

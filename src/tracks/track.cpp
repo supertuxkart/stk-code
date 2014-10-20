@@ -1419,6 +1419,9 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
             continue;
         }
 
+        // to lower case, for case-insensitive comparison
+        name = StringUtils::toLowerCase(name);
+
         for(unsigned int i=0; i<node->getMaterialCount(); i++)
         {
             video::SMaterial &irrMaterial=node->getMaterial(i);
@@ -1426,9 +1429,13 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
             {
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
-                const std::string texture_name =
+                std::string texture_name =
                     StringUtils::getBasename(core::stringc(t->getName()).c_str());
-                if(texture_name!=name) continue;
+
+                // to lower case, for case-insensitive comparison
+                texture_name = StringUtils::toLowerCase(texture_name);
+
+                if (texture_name != name) continue;
                 core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
                 m_animated_textures.push_back(new MovingTexture(m, *texture_node));
             }   // for j<MATERIAL_MAX_TEXTURES
@@ -1731,18 +1738,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
     }
 
-    std::map<std::string, XMLNode*> library_nodes;
-    loadObjects(root, path, model_def_loader, true, NULL, library_nodes);
+    loadObjects(root, path, model_def_loader, true, NULL);
 
-    // Cleanup library nodes
-    for (std::map<std::string, XMLNode*>::iterator it = library_nodes.begin();
-         it != library_nodes.end(); it++)
-    {
-        delete it->second;
-
-        file_manager->popTextureSearchPath();
-        file_manager->popModelSearchPath();
-    }
+    model_def_loader.cleanLibraryNodesAfterLoad();
 
     // Init all track objects
     m_track_object_manager->init();
@@ -1907,8 +1905,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 //-----------------------------------------------------------------------------
 
 void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& model_def_loader,
-                        bool create_lod_definitions, scene::ISceneNode* parent,
-                        std::map<std::string, XMLNode*>& library_nodes)
+                        bool create_lod_definitions, scene::ISceneNode* parent)
 {
     unsigned int start_position_counter = 0;
 
@@ -1920,74 +1917,9 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         // The track object was already converted before the loop, and the
         // default start was already used, too - so ignore those.
         if (name == "track" || name == "default-start") continue;
-        if (name == "object")
+        if (name == "object" || name == "library")
         {
             m_track_object_manager->add(*node, parent, model_def_loader);
-        }
-        else if (name == "library")
-        {
-            std::string name;
-            node->get("name", &name);
-
-            core::vector3df xyz;
-            node->get("xyz", &xyz);
-
-            core::vector3df hpr;
-            node->get("hpr", &hpr);
-
-            core::vector3df scale;
-            node->get("scale", &scale);
-
-            XMLNode* libroot;
-            std::string lib_path = 
-                file_manager->getAsset(FileManager::LIBRARY, name)+"/";
-            bool create_lod_definitions = true;
-
-            if (library_nodes.find(name) == library_nodes.end())
-            {
-                std::string lib_node_path = lib_path+"node.xml";
-                libroot = file_manager->createXMLTree(lib_node_path);
-                if (libroot == NULL)
-                {
-                    Log::error("Track", "Cannot find library '%s'", lib_node_path.c_str());
-                    continue;
-                }
-
-                file_manager->pushTextureSearchPath(lib_path + "/");
-                file_manager->pushModelSearchPath  (lib_path);
-                material_manager->pushTempMaterial(lib_path + "/materials.xml");
-                library_nodes[name] = libroot;
-
-                // Load LOD groups
-                const XMLNode *lod_xml_node = libroot->getNode("lod");
-                if (lod_xml_node != NULL)
-                {
-                    for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
-                    {
-                        const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
-                        for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
-                        {
-                            model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
-                        }
-                    }
-                }
-            }
-            else
-            {
-                libroot = library_nodes[name];
-                create_lod_definitions = false; // LOD definitions are already created, don't create them again
-            }
-
-            scene::ISceneNode* parent = irr_driver->getSceneManager()->addEmptySceneNode();
-#ifdef DEBUG
-            parent->setName(("libnode_" + name).c_str());
-#endif
-            parent->setPosition(xyz);
-            parent->setRotation(hpr);
-            parent->setScale(scale);
-            parent->updateAbsolutePosition();
-            loadObjects(libroot, lib_path, model_def_loader, create_lod_definitions, parent, library_nodes);
-            //m_all_nodes.push_back(parent);
         }
         else if (name == "water")
         {

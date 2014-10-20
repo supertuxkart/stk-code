@@ -80,29 +80,31 @@ void EnterGPNameDialog::onEnterPressedInternal()
     //Otherwise, see if we can accept the new name
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     assert(textCtrl != NULL);
+    LabelWidget* label = getWidget<LabelWidget>("title");
+    assert(label != NULL);
+
     stringw name = textCtrl->getText().trim();
-    if (name.size() > 0 && name != "Random Grand Prix")
+    if (name.size() == 0)
+    {
+        label->setText(_("Name is empty."), false);
+        SFXManager::get()->quickSound("anvil");
+    }
+    else if (grand_prix_manager->existsName(name) || name == "Random Grand Prix")
     {
         // check for duplicate names
-        if (grand_prix_manager->existsName(name))
-        {
-            LabelWidget* label = getWidget<LabelWidget>("title");
-            assert(label != NULL);
-            label->setText(_("Another grand prix with this name already exists."), false);
-            SFXManager::get()->quickSound("anvil");
-            return;
-        }
-
-        // It's unsafe to delete from inside the event handler so we do it
-        // in onUpdate (which checks for m_self_destroy)
-        m_self_destroy = true;
+        label->setText(_("Another grand prix with this name already exists."), false);
+        SFXManager::get()->quickSound("anvil");
+    }
+    else if (name.size() > 30)
+    {
+        label->setText(_("Name is too long."), false);
+        SFXManager::get()->quickSound("anvil");
     }
     else
     {
-        LabelWidget* label = getWidget<LabelWidget>("title");
-        assert(label != NULL);
-        label->setText(_("Cannot add a grand prix with this name"), false);
-        SFXManager::get()->quickSound("anvil");
+        // It's unsafe to delete from inside the event handler so we do it
+        // in onUpdate (which checks for m_self_destroy)
+        m_self_destroy = true;
     }
 }
 

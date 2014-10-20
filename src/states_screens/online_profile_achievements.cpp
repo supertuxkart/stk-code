@@ -103,6 +103,8 @@ void OnlineProfileAchievements::init()
         {
             std::vector<ListWidget::ListCell> row;
             const Achievement *a = it->second;
+            if(a->getInfo()->isSecret() && !a->isAchieved())
+                continue;
             ListWidget::ListCell title(a->getInfo()->getTitle(), -1, 2);
             ListWidget::ListCell progress(a->getProgressAsString(), -1, 1);
             row.push_back(title);
@@ -157,7 +159,7 @@ void OnlineProfileAchievements::onUpdate(float delta)
 {
     if (!m_waiting_for_achievements) return;
 
-    if (!m_visiting_profile->isReady())
+    if (!m_visiting_profile->hasFetchedAchievements())
     {
         // This will display an increasing number of dots while waiting.
         m_achievements_list_widget->renameItem("loading",

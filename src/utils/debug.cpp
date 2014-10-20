@@ -436,7 +436,7 @@ bool onEvent(const SEvent &event)
                 else if (cmdID == DEBUG_HIDE_KARTS)
                 {
                     if (!world) return false;
-                    for (int n = 0; n<world->getNumKarts(); n++)
+                    for (unsigned int n = 0; n<world->getNumKarts(); n++)
                     {
                         AbstractKart* kart = world->getKart(n);
                         if (kart->getController()->isPlayerController())

@@ -24,8 +24,8 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/2dutils.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -187,11 +187,11 @@ void RaceGUIOverworld::renderPlayerView(const Camera *camera, float dt)
 
     const core::recti &viewport = camera->getViewport();
     core::vector2df scaling     = camera->getScaling();
-    //std::cout << "Applied ratio : " << viewport.getWidth()/800.0f << std::endl;
+    //Log::info("RaceGUIOverworld", "Applied ratio: %f", viewport.getWidth()/800.0f);
 
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
 
-    //std::cout << "Scale : " << scaling.X << ", " << scaling.Y << std::endl;
+    //Log::info("RaceGUIOverworld", "Scale: %f, %f", scaling.X, scaling.Y);
 
     drawAllMessages     (kart, viewport, scaling);
 

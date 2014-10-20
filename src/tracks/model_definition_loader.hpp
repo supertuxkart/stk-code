@@ -23,6 +23,7 @@ class LODNode;
 class Track;
 class STKInstancedSceneNode;
 
+#include <cassert>
 #include <map>
 #include <vector>
 #include <string>
@@ -68,12 +69,13 @@ struct ModelDefinition
     }
 };
 
-/** Utility class to load level-of-detail nodes and instaincing nodes
+/** Utility class to load level-of-detail nodes and library nodes
  * \ingroup tracks
  */
 class ModelDefinitionLoader
 {
 private:
+    std::map<std::string, XMLNode*> m_library_nodes;
     std::map< std::string, std::vector< ModelDefinition > > m_lod_groups;
     std::map< std::string, STKInstancedSceneNode* > m_instancing_nodes;
     Track* m_track;
@@ -86,8 +88,25 @@ public:
 
     void clear();
 
-
     scene::IMesh* getFirstMeshFor(const std::string& name);
+
+    std::map<std::string, XMLNode*>& getLibraryNodes()
+    {
+        return m_library_nodes;
+    }
+
+    void cleanLibraryNodesAfterLoad();
+
+    bool containsLibraryNode(const std::string& name) const
+    {
+        return m_library_nodes.find(name) != m_library_nodes.end();
+    }
+
+    void addToLibrary(const std::string& name, XMLNode* xml)
+    {
+        assert(xml != NULL);
+        m_library_nodes[name] = xml;
+    }
 };  // ModelDefinitionLoader
 
 #endif // HEADER_LOD_NODE_LOADER_HPP

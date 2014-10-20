@@ -250,8 +250,8 @@ void FeatureUnlockedCutScene::addUnlockedPicture(irr::video::ITexture* picture,
 {
     if (picture == NULL)
     {
-        std::cerr << "[FeatureUnlockedCutScene::addUnlockedPicture] WARNING: unlockable has no picture : "
-                  << core::stringc(msg.c_str()).c_str() << "\n";
+        Log::warn("FeatureUnlockedCutScene::addUnlockedPicture", "Unlockable has no picture: %s",
+            core::stringc(msg.c_str()).c_str());
         picture = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"main_help.png"));
 
     }
@@ -278,7 +278,8 @@ void FeatureUnlockedCutScene::init()
 
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
-    if (unlockedStuffCount == 0)  std::cerr << "There is nothing in the unlock chest!!!\n";
+    if (unlockedStuffCount == 0)
+        Log::error("FeatureUnlockedCutScene::init", "There is nothing in the unlock chest");
 
     m_all_kart_models.clearAndDeleteAll();
     for (int n=0; n<unlockedStuffCount; n++)
@@ -350,7 +351,7 @@ void FeatureUnlockedCutScene::init()
         }
         else
         {
-            std::cerr << "Malformed unlocked goody!!!\n";
+            Log::error("FeatureUnlockedCutScene::init", "Malformed unlocked goody");
         }
     }
 
@@ -402,8 +403,8 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
                 else if (n > 1) pos.X += 1.0f*dt*(n - 0.3f);
 
                 //else            pos.X += 6.2f*dt*float( int((n + 1)/2) );
-                //std::cout << "Object " << n << " moving by " <<
-                //  (n % 2 == 0 ? -4.0f : 4.0f)*float( n/2 + 1 ) << std::endl;
+                //Log::info("FeatureUnlockedCutScene", "Object %d moving by %f", n,
+                //    (n % 2 == 0 ? -4.0f : 4.0f)*float( n/2 + 1 ));
             }
             else
             {
@@ -514,7 +515,7 @@ void FeatureUnlockedCutScene::addUnlockedTrack(const Track* track)
 {
     if (track == NULL)
     {
-        std::cerr << "ERROR: Unlocked track does not exist???\n";
+        Log::error("FeatureUnlockedCutScene::addUnlockedTrack", "Unlocked track does not exist");
         return;
     }
 
@@ -531,7 +532,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
     std::vector<ITexture*> images;
     if (gp == NULL)
     {
-        std::cerr << "ERROR: Unlocked GP does not exist???\n";
+        Log::error("FeatureUnlockedCutScene::addUnlockedGP", "Unlocked GP does not exist");
         video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"main_help.png"));
         images.push_back(WTF_image);
     }
@@ -542,7 +543,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
 
         if (track_amount == 0)
         {
-            std::cerr << "ERROR: Unlocked GP is empty???\n";
+            Log::error("FeatureUnlockedCutScene::addUnlockedGP", "Unlocked GP is empty");
             video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"main_help.png"));
             images.push_back(WTF_image);
         }

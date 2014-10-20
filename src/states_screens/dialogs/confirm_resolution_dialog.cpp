@@ -79,7 +79,7 @@ void ConfirmResolutionDialog::updateMessage()
 {
     //I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
     stringw msg = _("Confirm resolution within %i seconds", (int)m_remaining_time);
-    //std::cout << stringc(msg.c_str()).c_str() << std::endl;
+    //Log::info("ConfirmResolutionDialog", "stringc(msg.c_str()).c_str());
 
     LabelWidget* countdown_message = getWidget<LabelWidget>("title");
     countdown_message->setText( msg.c_str(), false );

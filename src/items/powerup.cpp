@@ -53,7 +53,7 @@ Powerup::Powerup(AbstractKart* kart)
  */
 Powerup::~Powerup()
 {
-    if(m_sound_use) SFXManager::get()->deleteSFX(m_sound_use);
+    if(m_sound_use) m_sound_use->deleteSFX();
 }   // ~Powerup
 
 //-----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
 
     if(m_sound_use != NULL)
     {
-        SFXManager::get()->deleteSFX(m_sound_use);
+        m_sound_use->deleteSFX();
         m_sound_use = NULL;
     }
 
@@ -140,18 +140,14 @@ Material *Powerup::getIcon() const
     // Check if it's one of the types which have a separate
     // data file which includes the icon:
     return powerup_manager->getIcon(m_type);
-}
-
-
-
-
+}   // getIcon
 
 //-----------------------------------------------------------------------------
 /** Does the sound configuration.
  */
 void  Powerup::adjustSound()
 {
-    m_sound_use->position(m_owner->getXYZ());
+    m_sound_use->setPosition(m_owner->getXYZ());
     // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
     // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
     if (race_manager->getNumLocalPlayers() > 1)
@@ -160,14 +156,16 @@ void  Powerup::adjustSound()
 
         if (m_owner->getController()->isPlayerController())
         {
-            m_sound_use->volume( 1.0f );
+            m_sound_use->setVolume( 1.0f );
         }
         else
         {
-            m_sound_use->volume( std::min(0.5f, 1.0f / race_manager->getNumberOfKarts()) );
+            m_sound_use->setVolume( 
+                     std::min(0.5f, 1.0f / race_manager->getNumberOfKarts()) );
         }
     }
-}
+}   // adjustSound
+
 //-----------------------------------------------------------------------------
 /** Use (fire) this powerup.
  */
@@ -205,7 +203,7 @@ void Powerup::use()
     case PowerupManager::POWERUP_SWITCH:
         {
             ItemManager::get()->switchItems();
-            m_sound_use->position(m_owner->getXYZ());
+            m_sound_use->setPosition(m_owner->getXYZ());
             m_sound_use->play();
             break;
         }
@@ -311,9 +309,9 @@ void Powerup::use()
                 // Meanwhile, don't play it near AI karts since they obviously
                 // don't hear anything
                 if(kart->getController()->isPlayerController())
-                    m_sound_use->position(kart->getXYZ());
+                    m_sound_use->setPosition(kart->getXYZ());
                 else
-                    m_sound_use->position(m_owner->getXYZ());
+                    m_sound_use->setPosition(m_owner->getXYZ());
 
                 m_sound_use->play();
                 break;
@@ -353,9 +351,9 @@ void Powerup::use()
             // Meanwhile, don't play it near AI karts since they obviously
             // don't hear anything
             if(m_owner->getController()->isPlayerController())
-                m_sound_use->position(m_owner->getXYZ());
+                m_sound_use->setPosition(m_owner->getXYZ());
             else if(player_kart)
-                m_sound_use->position(player_kart->getXYZ());
+                m_sound_use->setPosition(player_kart->getXYZ());
             m_sound_use->play();
         }
         break;

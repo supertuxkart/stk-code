@@ -16,30 +16,22 @@
 
         <box proportion="1" width="100%" layout="vertical-row">
 
+            <spacer height="15" width="10"/>
+
             <scrollable_ribbon id="players" height="120" y="10" x="10" width="98%" align="center" label_location="each"
                                square_items="true" child_width="128" child_height="128" />
 
-            <spacer height="5" width="10"/>
+            <spacer height="15" width="10"/>
             <div width="90%" align="center" layout="vertical-row" height="fit">
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <gauge id="difficulty" min_value="0" max_value="4" width="300" align="center" />
+                    <checkbox width="fit" id="online" I18N="In the login screen" text_align="left"/>
                     <spacer width="10"/>
-                    <label id="label_difficulty" height="100%" text_align="left" I18N="In the user screen" text="Multiplayer Boost/Handicap"/>
+                    <label proportion="1" height="100%" text_align="left" I18N="In the login screen" text="Online"/>
                 </div>
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <checkbox id="singleplayer-difficulty" I18N="In the user screen" text_align="left"/>
+                    <checkbox width="fit" id="remember-user" I18N="In the login screen" text_align="left"/>
                     <spacer width="10"/>
-                    <label id="label_singleplayer-difficulty" height="100%" text_align="left" I18N="In the user screen" text="Apply Boost/Handicap in singleplayer too"/>
-                </div>
-                <div width="100%" height="fit" layout="horizontal-row" >
-                    <checkbox id="online" I18N="In the user screen" text_align="left"/>
-                    <spacer width="10"/>
-                    <label height="100%" text_align="left" I18N="In the user screen" text="Online"/>
-                </div>
-                <div width="100%" height="fit" layout="horizontal-row" >
-                    <checkbox id="remember-user" I18N="In the user screen" text_align="left"/>
-                    <spacer width="10"/>
-                    <label    id="label_remember" height="100%" text_align="left"
+                    <label id="label_remember" proportion="1" height="100%" text_align="left"
                               I18N="In the user screen" text="Remember password"/>
                 </div>
                 <!-- Disable guest accounts for now
@@ -50,14 +42,14 @@
                 </div>
                 -->
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label id="label_username" proportion="1" height="100%" text_align="left"
+                    <label id="label_username" width="40%" height="100%" text_align="left"
                            I18N="In the user screen" text="Username"/>
                     <textbox id="username" proportion="2" height="fit" I18N="In the registration dialog"/>
                 </div>
-                <spacer height="5" width="20"/>
+                <spacer height="20" width="20"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label id="label_password" proportion="1" height="100%" text_align="left"
+                    <label id="label_password" width="40%" height="100%" text_align="left"
                            I18N="In the registration dialog" text="Password"/>
                     <textbox id="password" proportion="2" height="fit" I18N="In the registration dialog"/>
                 </div>
@@ -65,6 +57,7 @@
             <div width="80%" align="center" layout="vertical-row" height="fit">
                 <label id="message" width="80%" align="center" text_align="left"/>
             </div>
+            <spacer width="20" height="25"/>
             <buttonbar id="options" width="90%" height="13%" align="center">
                 <icon-button id="ok" width="64" height="64" icon="gui/green_check.png"
                              I18N="Login dialog" text="OK" label_location="bottom"/>

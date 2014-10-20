@@ -22,7 +22,7 @@ varying vec2 uv_bis;
 #define FragColor gl_FragColor
 #endif
 
-vec3 getLightFactor(float specMapValue);
+vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue);
 
 void main() {
     // Splatting part
@@ -46,6 +46,5 @@ void main() {
         splatting.b * detail2 +
         max(0., (1.0 - splatting.r - splatting.g - splatting.b)) * detail3;
 
-    vec3 LightFactor = getLightFactor(1.);
-    FragColor = vec4(splatted.xyz * LightFactor, 1.);
+    FragColor = vec4(getLightFactor(splatted.xyz, vec3(1.), 0.), 1.);
 }

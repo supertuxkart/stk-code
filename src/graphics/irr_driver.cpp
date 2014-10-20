@@ -22,6 +22,7 @@
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/2dutils.hpp"
 #include "graphics/hardware_skinning.hpp"
 #include "graphics/lens_flare.hpp"
 #include "graphics/light.hpp"
@@ -2279,7 +2280,7 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
             node->setAnimationSpeed(0);
             node->updateAbsolutePosition();
             node->setScale( mesh_scale[n].toIrrVector() );
-            //std::cout << "(((( set frame " << model_frames[n] << " ))))\n";
+            //Log::info("RTTProvider::setupRTTScene", "Set frame %d", model_frames[n]);
         }
     }
 

@@ -170,7 +170,11 @@ PlayerManager::~PlayerManager()
     for_var_in(PlayerProfile*, player, m_all_players)
     {
         if(!player->rememberPassword())
-            player->clearSession();
+        {
+            // Don't let the player trigger a save, since it
+            // will be done below anyway.
+            player->clearSession(/*save*/false);
+        }
     }
     save();
 

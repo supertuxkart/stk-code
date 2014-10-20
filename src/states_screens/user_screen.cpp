@@ -59,17 +59,6 @@ void BaseUserScreen::loadedFromFile()
 
 void BaseUserScreen::init()
 {
-    m_difficulty = getWidget<SpinnerWidget>("difficulty");
-    assert(m_difficulty);
-    m_difficulty->clearLabels();
-    m_difficulty->addLabel(_("Big boost"));
-    m_difficulty->addLabel(_("Boost"));
-    m_difficulty->addLabel(_("Normal"));
-    m_difficulty->addLabel(_("Handicap"));
-    m_difficulty->addLabel(_("Big handicap"));
-
-    m_singleplayer_difficulty = getWidget<CheckBoxWidget>("singleplayer-difficulty");
-    assert(m_singleplayer_difficulty);
     m_online_cb = getWidget<CheckBoxWidget>("online");
     assert(m_online_cb);
     m_username_tb = getWidget<TextBoxWidget >("username");
@@ -83,6 +72,15 @@ void BaseUserScreen::init()
     assert(m_options_widget);
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
+
+    // The behaviour of the screen is slightly different at startup, i.e.
+    // when it is the first screen: cancel will exit the game, and in
+    // this case no 'back' error should be shown.
+    bool is_first_screen = StateManager::get()->getMenuStackSize()==1;
+    getWidget<IconButtonWidget>("back")->setVisible(!is_first_screen);
+    getWidget<IconButtonWidget>("cancel")->setLabel(is_first_screen 
+                                                    ? _("Exit game") 
+                                                    : _("Cancel")      );
 
     m_sign_out_name = "";
     m_sign_in_name  = "";
@@ -165,13 +163,23 @@ void BaseUserScreen::selectUser(int index)
 
     m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
                             /*focusIt*/ true);
-
-    // Display the saved data if the user was online last time and change the visibility
-    m_difficulty->setValue(profile->getDifficulty());
-    m_singleplayer_difficulty->setState(profile->isSingleplayerDifficulty());
-    m_online_cb->setState(profile->wasOnlineLastTime() && profile->getLastOnlineName().size() > 0);
-    makeEntryFieldsVisible();
+    
     m_username_tb->setText(profile->getLastOnlineName());
+    // Delete a password that might have been typed for another user
+    m_password_tb->setText("");
+
+    // Last game was not online, so make the offline settings the default
+    // (i.e. unckeck online checkbox, and make entry fields invisible).
+    if (!profile->wasOnlineLastTime() || profile->getLastOnlineName() == "")
+    {
+        m_online_cb->setState(false);
+        makeEntryFieldsVisible();
+        return;
+    }
+
+    // Now last use was with online --> Display the saved data
+    m_online_cb->setState(true);
+    makeEntryFieldsVisible();
     getWidget<CheckBoxWidget>("remember-user")->setState(
         profile->rememberPassword());
     if(profile->getLastOnlineName().size() > 0)
@@ -206,7 +214,15 @@ void BaseUserScreen::makeEntryFieldsVisible()
     getWidget<LabelWidget>("label_remember")->setVisible(online);
     getWidget<CheckBoxWidget>("remember-user")->setVisible(online);
     PlayerProfile *player = getSelectedPlayer();
-    if(player && player->hasSavedSession() && online)
+
+    // Don't show the password fields if the player wants to be online
+    // and either is the current player and logged in (no need to enter a
+    // password then) or has a saved session.
+    if(player && online  &&
+        (player->hasSavedSession() || 
+          (player==PlayerManager::getCurrentPlayer() && player->isLoggedIn() ) 
+        ) 
+      )
     {
         // If we show the online login fields, but the player has a
         // saved session, don't show the password field.
@@ -284,8 +300,8 @@ void BaseUserScreen::eventCallback(Widget* widget,
         }
         else if (button == "cancel")
         {
-            StateManager::get()->popMenu();
-            onEscapePressed();
+            // EscapePressed will pop this screen.
+            StateManager::get()->escapePressed();
         }
         else if (button == "recover")
         {
@@ -356,10 +372,6 @@ void BaseUserScreen::login()
     PlayerManager::get()->setCurrentPlayer(player);
     assert(player);
 
-    // Save difficulty
-    player->setDifficulty((PerPlayerDifficulty) m_difficulty->getValue());
-    player->setSingleplayerDifficulty(m_singleplayer_difficulty->getState());
-
     // If no online login requested, log the player out (if necessary)
     // and go to the main menu screen (though logout needs to finish first)
     if(!m_online_cb->getState())
@@ -427,17 +439,6 @@ void BaseUserScreen::onUpdate(float dt)
                               : _(L"Signing in '%s'", m_sign_in_name.c_str());
         m_info_widget->setText(StringUtils::loadingDots(message.c_str()),
                                false                                      );
-    }
-    PlayerProfile *player = getSelectedPlayer();
-    if(player)
-    {
-        // If the player changes the online name, clear the saved session
-        // flag, and make the password field visible again.
-        if (m_username_tb->getText()!=player->getLastOnlineName())
-        {
-            player->clearSession();
-            makeEntryFieldsVisible();
-        }
     }
 }   // onUpdate
 
