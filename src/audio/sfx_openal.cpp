@@ -44,7 +44,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
 {
     m_sound_buffer = buffer;
     m_sound_source = 0;
-    m_status       = SFX_UNKNOWN;
+    m_status       = SFX_NOT_INITIALISED;
     m_positional   = positional;
     m_default_gain = gain;
     m_loop         = false;
@@ -84,8 +84,11 @@ SFXOpenAL::~SFXOpenAL()
  */
 bool SFXOpenAL::init()
 {
+    m_status = SFX_UNKNOWN;
+
     alGenSources(1, &m_sound_source );
-    if (!SFXManager::checkError("generating a source")) return false;
+    if (!SFXManager::checkError("generating a source"))
+        return false;
 
     assert( alIsBuffer(m_sound_buffer->getBufferID()) );
     assert( alIsSource(m_sound_source) );
@@ -137,13 +140,6 @@ void SFXOpenAL::updatePlayingSFX(float dt)
         m_status = SFX_STOPPED;
 }   // updatePlayingSFX
 
-// ------------------------------------------------------------------------
-/** Returns the status of this sfx. */
-SFXBase::SFXStatus SFXOpenAL::getStatus()
-{
-    return m_status; 
-}   // getStatus;
-
 //-----------------------------------------------------------------------------
 /** Queues up a change of the pitch of a sound effect to the sfx manager.
  *  \param factor Speedup/slowdown between 0.5 and 2.0
@@ -161,6 +157,13 @@ void SFXOpenAL::setSpeed(float factor)
  */
 void SFXOpenAL::reallySetSpeed(float factor)
 {
+    if(m_status==SFX_NOT_INITIALISED)
+    {
+        init();
+        if(m_status==SFX_UNKNOWN)
+            return;
+    }
+
     //OpenAL only accepts pitches in the range of 0.5 to 2.0
     if(factor > 2.0f)
     {
@@ -194,6 +197,13 @@ void SFXOpenAL::reallySetVolume(float gain)
 
     if(m_status==SFX_UNKNOWN) return;
 
+    if(m_status==SFX_NOT_INITIALISED)
+    {
+        init();
+        if(m_status==SFX_UNKNOWN)
+            return;
+    }
+
     alSourcef(m_sound_source, AL_GAIN, m_gain * m_master_gain);
 }   // reallySetVolume
 
@@ -204,6 +214,13 @@ void SFXOpenAL::setMasterVolume(float gain)
     m_master_gain = gain;
     
     if(m_status==SFX_UNKNOWN) return;
+    if(m_status==SFX_NOT_INITIALISED)
+    {
+        init();
+        if(m_status==SFX_UNKNOWN)
+            return;
+    }
+
 
     alSourcef(m_sound_source, AL_GAIN, 
                (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
@@ -224,6 +241,12 @@ void SFXOpenAL::setLoop(bool status)
  */
 void SFXOpenAL::reallySetLoop(bool status)
 {
+    if(m_status==SFX_NOT_INITIALISED)
+    {
+        init();
+        if(m_status==SFX_UNKNOWN)
+            return;
+    }
     m_loop = status;
 
     alSourcei(m_sound_source, AL_LOOPING, status ? AL_TRUE : AL_FALSE);
@@ -290,6 +313,13 @@ void SFXOpenAL::resume()
  */
 void SFXOpenAL::reallyResumeNow()
 {
+    if(m_status==SFX_NOT_INITIALISED)
+    {
+        init();
+        if(m_status==SFX_UNKNOWN)
+            return;
+    }
+
     if(m_status==SFX_PAUSED)
     {
         alSourcePlay(m_sound_source);
@@ -324,7 +354,7 @@ void SFXOpenAL::play()
 void SFXOpenAL::reallyPlayNow()
 {
     if (!SFXManager::get()->sfxAllowed()) return;
-    if (m_status==SFX_UNKNOWN)
+    if (m_status==SFX_NOT_INITIALISED)
     {
         // lazily create OpenAL source when needed
         init();
@@ -354,14 +384,13 @@ void SFXOpenAL::setPosition(const Vec3 &position)
  */
 void SFXOpenAL::reallySetPosition(const Vec3 &position)
 {
-    if(!UserConfigParams::m_sfx)
-        return;
-    if (m_status==SFX_UNKNOWN)
+    if(m_status==SFX_NOT_INITIALISED)
     {
-        Log::warn("SFX", "Position called on non-ok SFX <%s>",
-                 m_sound_buffer->getFileName().c_str());
-        return;
+        init();
+        if(m_status==SFX_UNKNOWN)
+            return;
     }
+
     if (!m_positional)
     {
         // in multiplayer, all sounds are positional, so in this case don't
@@ -407,7 +436,7 @@ void SFXOpenAL::onSoundEnabledBack()
 {
     if (m_loop)
     {
-        if (m_status==SFX_UNKNOWN) init();
+        if (m_status==SFX_NOT_INITIALISED) init();
         if (m_status!=SFX_UNKNOWN)
         {
             alSourcef(m_sound_source, AL_GAIN, 0);

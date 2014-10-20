@@ -106,8 +106,6 @@ SFXManager::SFXManager()
     }
     pthread_attr_destroy(&attr);
 
-    if (!sfxAllowed()) return;
-
     setMasterSFXVolume( UserConfigParams::m_sfx_volume );
     m_sfx_commands.lock();
     m_sfx_commands.getData().clear();
@@ -343,6 +341,17 @@ void SFXManager::soundToggled(const bool on)
     }
     else
     {
+        // First stop all sfx that are not looped
+        const int sfx_amount = (int)m_all_sfx.getData().size();
+        m_all_sfx.lock();
+        for (int i=0; i<sfx_amount; i++)
+        {
+            if(!m_all_sfx.getData()[i]->isLooped())
+            {
+                m_all_sfx.getData()[i]->reallyStopNow();
+            }
+        }
+        m_all_sfx.unlock();
         pauseAll();
     }
 }   // soundToggled

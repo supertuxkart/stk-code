@@ -102,7 +102,12 @@ public:
     virtual void      setMasterVolume(float gain);
     virtual void      onSoundEnabledBack();
     virtual void      setRolloff(float rolloff);
-    virtual SFXStatus getStatus();
+    // ------------------------------------------------------------------------
+    /** Returns if this sfx is looped or not. */
+    virtual bool      isLooped() { return m_loop; }
+    // ------------------------------------------------------------------------
+    /** Returns the status of this sfx. */
+    virtual SFXStatus getStatus() { return m_status; }
 
     // ------------------------------------------------------------------------
     /** Returns the buffer associated with this sfx. */

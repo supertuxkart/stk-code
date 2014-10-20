@@ -45,13 +45,15 @@ public:
     /** Status of a sound effect. */
     enum SFXStatus
     {
-        SFX_UNKNOWN = -1, SFX_STOPPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2
+        SFX_UNKNOWN = -1, SFX_STOPPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2,
+        SFX_NOT_INITIALISED = 3
     };
 
     virtual           ~SFXBase()  {}
 
     /** Late creation, if SFX was initially disabled */
     virtual bool       init()                           = 0;
+    virtual bool       isLooped()                       = 0;
     virtual void       updatePlayingSFX(float dt)       = 0;
     virtual void       setPosition(const Vec3 &p)       = 0;
     virtual void       reallySetPosition(const Vec3 &p) = 0;

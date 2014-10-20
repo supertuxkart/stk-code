@@ -30,11 +30,13 @@
 class DummySFX : public SFXBase
 {
 public:
-                       DummySFX(SFXBuffer* buffer, bool positional, float gain) {}
+                       DummySFX(SFXBuffer* buffer, bool positional,
+                                float gain) {}
     virtual           ~DummySFX()                     {}
 
     /** Late creation, if SFX was initially disabled */
-    virtual bool       init() { return true; }
+    virtual bool       init()                           { return true;  }
+    virtual bool       isLooped()                       { return false; }
     virtual void       updatePlayingSFX(float dt)       {}
     virtual void       setLoop(bool status)             {}
     virtual void       reallySetLoop(bool status)       {}
