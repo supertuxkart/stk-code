@@ -72,6 +72,7 @@ public:
         SFX_SPEED,
         SFX_POSITION,
         SFX_VOLUME,
+        SFX_MASTER_VOLUME,
         SFX_LOOP,
         SFX_LISTENER,
         SFX_UPDATE,

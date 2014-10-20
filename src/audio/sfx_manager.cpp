@@ -287,6 +287,9 @@ void* SFXManager::mainLoop(void *obj)
                                          current->m_parameter); break;
         case SFX_VOLUME:   current->m_sfx->reallySetVolume(
                                   current->m_parameter.getX()); break;
+        case SFX_MASTER_VOLUME: 
+                           current->m_sfx->reallySetMasterVolumeNow(
+                                  current->m_parameter.getX()); break;
         case SFX_LOOP:     current->m_sfx->reallySetLoop(
                                current->m_parameter.getX()!=0); break;
         case SFX_DELETE:   {

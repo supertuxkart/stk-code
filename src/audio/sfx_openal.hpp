@@ -100,6 +100,7 @@ public:
     virtual void      setVolume(float gain);
     virtual void      reallySetVolume(float gain);
     virtual void      setMasterVolume(float gain);
+    virtual void      reallySetMasterVolumeNow(float gain);
     virtual void      onSoundEnabledBack();
     virtual void      setRolloff(float rolloff);
     // ------------------------------------------------------------------------
