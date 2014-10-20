@@ -234,7 +234,7 @@ public:
     SFXBase*                 quickSound(const std::string &soundName);
 
     /** Called when sound was muted/unmuted */
-    void                     soundToggled(const bool newValue);
+    void                     toggleSound(const bool newValue);
 
     // ------------------------------------------------------------------------
     /** Prints the list of currently loaded sounds to stdout. Useful to

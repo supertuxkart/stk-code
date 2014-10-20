@@ -163,7 +163,7 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
 
         UserConfigParams::m_sfx = w->getState();
-        SFXManager::get()->soundToggled(UserConfigParams::m_sfx);
+        SFXManager::get()->toggleSound(UserConfigParams::m_sfx);
 
         if (UserConfigParams::m_sfx)
         {

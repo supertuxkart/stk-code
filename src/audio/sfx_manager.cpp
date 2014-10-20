@@ -321,7 +321,7 @@ void* SFXManager::mainLoop(void *obj)
  *  resumes all sound effects. 
  *  \param on If sound is switched on or off.
  */
-void SFXManager::soundToggled(const bool on)
+void SFXManager::toggleSound(const bool on)
 {
     // When activating SFX, load all buffers
     if (on)
@@ -357,7 +357,7 @@ void SFXManager::soundToggled(const bool on)
         m_all_sfx.unlock();
         pauseAll();
     }
-}   // soundToggled
+}   // toggleSound
 
 //----------------------------------------------------------------------------
 /** Returns if sfx can be played. This means sfx are enabled and
