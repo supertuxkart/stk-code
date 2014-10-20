@@ -203,8 +203,6 @@ void GPInfoDialog::addButtons()
                                                ->getActivePlayerProfile(0)
                                                ->getUniqueID(),
                                                m_gp.getId(),
-                                               race_manager->getDifficulty(),
-                                               race_manager->getNumberOfKarts(),
                                                race_manager->getNumLocalPlayers());
 
     okBtn->m_properties[PROP_ID] = "start";

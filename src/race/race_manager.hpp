@@ -36,6 +36,7 @@
 #include "utils/vec3.hpp"
 
 class AbstractKart;
+class SavedGrandPrix;
 class Track;
 
 static const std::string IDENT_STD      ("STANDARD"        );
@@ -326,6 +327,7 @@ private:
     std::vector<std::string>         m_ai_kart_list;
     int                              m_track_number;
     GrandPrixData                    m_grand_prix;
+    SavedGrandPrix*                  m_saved_gp;
     int                              m_num_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
@@ -411,10 +413,12 @@ public:
     void setDifficulty(Difficulty diff);
 
     // ------------------------------------------------------------------------
+    void setCoinTarget(int num)   { m_coin_target = num;        }
+    // ------------------------------------------------------------------------
     void setGrandPrix(const GrandPrixData &gp)
     {
         m_grand_prix = gp;
-        m_coin_target = 0;
+        setCoinTarget(0);
     }
     // ------------------------------------------------------------------------
     void setAIKartOverride(const std::string& kart)
@@ -452,8 +456,6 @@ public:
         m_ai_kart_override = "";
         m_ai_superpower = SUPERPOWER_NONE;
     }
-    // ------------------------------------------------------------------------
-    void setCoinTarget(int num)   { m_coin_target = num;        }
     // ------------------------------------------------------------------------
     void setTimeTarget(float num) { m_has_time_target = true;
                                     m_time_target = num;        }
@@ -683,8 +685,11 @@ public:
       * \brief Higher-level method to start a GP without having to care about
       *  the exact startup sequence
       */
-    void  startGP(const GrandPrixData &gp, bool from_overworld,
-                  bool continue_saved_gp);
+    void startGP(const GrandPrixData &gp, bool from_overworld,
+                 bool continue_saved_gp);
+
+    /** Saves the current GP to the config */
+    void saveGP();
 
     /**
       * \brief Higher-level method to start a GP without having to care about
