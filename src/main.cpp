@@ -1156,7 +1156,7 @@ void askForInternetPermission()
             "at a later time, go to options, select tab "
             "'User Interface', and edit \"Allow STK to connect to the "
             "Internet\" and \"Allow STK to send anonymous HW statistics\")."),
-            MessageDialog::MESSAGE_DIALOG_CONFIRM,
+            MessageDialog::MESSAGE_DIALOG_YESNO,
             new ConfirmServer(), true);
     }
 

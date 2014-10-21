@@ -95,6 +95,14 @@ void MessageDialog::doInit(MessageDialogType type,
         cancelbtn->setText(_("OK"));
         cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
+    else if (type == MessageDialog::MESSAGE_DIALOG_YESNO)
+    {
+        ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
+
+        ButtonWidget* cancelbtn = getWidget<ButtonWidget>("cancel");
+        cancelbtn->setText(_("No"));
+
+    }
     else if (type == MessageDialog::MESSAGE_DIALOG_OK_CANCEL)
     {
         // In case of a OK_CANCEL dialog, change the text from 'Yes' to 'Ok'
