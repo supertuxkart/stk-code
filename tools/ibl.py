@@ -50,19 +50,16 @@ for (Xd, Yd, Zd) in FaceGrid:
 # From http://www.rorydriscoll.com/2012/01/15/cubemap-texel-solid-angle/
 def areaToPoint(x, y):
     return np.arctan2(x * y, np.sqrt(x * x + y * y + 1))
+    
 def getSolidAngleGrid(Xgrid, Ygrid):
     "Compute solid angles using Xgrid/Ygrid/Zgrid texel position"
-    result = np.zeros((n,n))
-    for i in range(n):
-        for j in range(n):
-            x = Xgrid[i,j]
-            y = Ygrid[i,j]
-            x0 = x - (1. / n)
-            x1 = x + (1. / n)
-            y0 = y - (1. / n)
-            y1 = y + (1. / n)
-            result[i,j] = areaToPoint(x0,y0) - areaToPoint(x1, y0) - areaToPoint(x0, y1) + areaToPoint(x1, y1)
-    return result
+    (step, _) = np.shape(Xgrid)
+    x0 = Xgrid - (1. / step)
+    x1 = Xgrid + (1. / step)
+    y0 = Ygrid - (1. / step)
+    y1 = Ygrid + (1. / step)
+    return areaToPoint(x0,y0) - areaToPoint(x1, y0) - areaToPoint(x0, y1) + areaToPoint(x1, y1)
+
     
 print(getSolidAngleGrid(GridI, GridJ))
 
