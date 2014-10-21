@@ -814,15 +814,15 @@ void SFXManager::reallyPositionListenerNow()
         float orientation[6];
         orientation[0] = m_listener_front.getX();
         orientation[1] = m_listener_front.getY();
-        orientation[2] = m_listener_front.getZ();
+        orientation[2] = -m_listener_front.getZ();
 
         //up vector
         orientation[3] = m_listener_up.getX();
         orientation[4] = m_listener_up.getY();
-        orientation[5] = m_listener_up.getZ();
+        orientation[5] = -m_listener_up.getZ();
 
         const Vec3 &pos = m_listener_position.getData();
-        alListener3f(AL_POSITION, pos.getX(), pos.getY(), pos.getZ());
+        alListener3f(AL_POSITION, pos.getX(), pos.getY(), -pos.getZ());
         alListenerfv(AL_ORIENTATION, orientation);
     }
     m_listener_position.unlock();

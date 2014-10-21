@@ -410,8 +410,8 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
         return;
     }
 
-    alSource3f(m_sound_source, AL_POSITION, (float)position.getX(),
-               (float)position.getY(), (float)position.getZ());
+    alSource3f(m_sound_source, AL_POSITION, position.getX(),
+               position.getY(), -position.getZ());
 
     if (SFXManager::get()->getListenerPos().distance(position) 
         > m_sound_buffer->getMaxDist())
