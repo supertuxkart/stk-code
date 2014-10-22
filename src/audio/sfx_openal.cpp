@@ -239,6 +239,9 @@ void SFXOpenAL::reallySetMasterVolumeNow(float gain)
  */
 void SFXOpenAL::setLoop(bool status)
 {
+    // Set the flag (even if sfx are disabled), so that the right settings
+    // are available on restart.
+    m_loop = status;
     if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_LOOP, this, status ? 1.0f : 0.0f);
 }   // setLoop
@@ -254,7 +257,6 @@ void SFXOpenAL::reallySetLoop(bool status)
         if(m_status==SFX_UNKNOWN)
             return;
     }
-    m_loop = status;
 
     alSourcei(m_sound_source, AL_LOOPING, status ? AL_TRUE : AL_FALSE);
     SFXManager::checkError("looping");
