@@ -350,3 +350,20 @@ void InitTextures(GLMesh &mesh, Material::ShaderType Mat)
         break;
     }
 }
+
+void InitTexturesTransparent(GLMesh &mesh)
+{
+    if (!mesh.textures[0])
+    {
+        Log::fatal("STKMesh", "Missing texture for material transparent");
+        return;
+    }
+    compressTexture(mesh.textures[0], true);
+    if (UserConfigParams::m_azdo)
+    {
+        if (!mesh.TextureHandles[0])
+            mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
+        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+            glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+    }
+}

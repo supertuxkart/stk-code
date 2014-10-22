@@ -189,6 +189,8 @@ void STKMeshSceneNode::updateGL()
             if (!immediate_draw)
                 InitTextures(mesh, MatType);
         }
+        else if (!immediate_draw)
+            InitTexturesTransparent(mesh);
 
         if (!immediate_draw && irr_driver->hasARB_base_instance())
         {

@@ -149,6 +149,8 @@ void STKAnimatedMesh::updateGL()
                 Material::ShaderType MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material, material2);
                 InitTextures(mesh, MatType);
             }
+            else
+                InitTexturesTransparent(mesh);
 
             if (irr_driver->hasARB_base_instance())
             {

@@ -723,25 +723,9 @@ void renderTransparenPass(const std::vector<TexUnit> &TexUnits, std::vector<STK:
         glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
-        std::vector<uint64_t> Handles;
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
         if (!irr_driver->hasARB_base_instance())
             glBindVertexArray(mesh.vao);
-        for (unsigned j = 0; j < TexUnits.size(); j++)
-        {
-            if (!mesh.textures[TexUnits[j].m_id])
-                mesh.textures[TexUnits[j].m_id] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
-            if (UserConfigParams::m_azdo)
-            {
-                if (!mesh.TextureHandles[TexUnits[j].m_id])
-                    mesh.TextureHandles[TexUnits[j].m_id] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[TexUnits[j].m_id]), Shader::getInstance()->SamplersId[Handles.size()]);
-                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[TexUnits[j].m_id]))
-                    glMakeTextureHandleResidentARB(mesh.TextureHandles[TexUnits[j].m_id]);
-                Handles.push_back(mesh.TextureHandles[TexUnits[j].m_id]);
-            }
-        }
-
         if (mesh.VAOType != VertexType)
         {
 #ifdef DEBUG
@@ -751,7 +735,7 @@ void renderTransparenPass(const std::vector<TexUnit> &TexUnits, std::vector<STK:
         }
 
         if (UserConfigParams::m_azdo)
-            Shader::getInstance()->SetTextureHandles(Handles[0]);
+            Shader::getInstance()->SetTextureHandles(mesh.TextureHandles[0]);
         else
             Shader::getInstance()->SetTextureUnits(getTextureGLuint(mesh.textures[0]));
         custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
