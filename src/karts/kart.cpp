@@ -1894,8 +1894,6 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
                     m_crash_sound->play();
             }
         }    // if lin_vel > 0.555
-
-        m_bounce_back_time = 0.1f;
     }   // if m_bounce_back_time <= 0
 }   // playCrashSFX
 
