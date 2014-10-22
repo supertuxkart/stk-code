@@ -1720,7 +1720,7 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
         getAttachment()->handleCollisionWithKart(k);
     }
     m_controller->crashed(k);
-    crashed(NULL, k);
+    playCrashSFX(NULL, k);
 }   // crashed(Kart, update_attachments
 
 // -----------------------------------------------------------------------------
@@ -1729,6 +1729,7 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
  */
 void Kart::crashed(const Material *m, const Vec3 &normal)
 {
+    playCrashSFX(m, NULL);
 #ifdef DEBUG
     // Simple debug output for people playing without sound.
     // This makes it easier to see if a kart hit the track (esp.
@@ -1861,7 +1862,6 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     }   // if(m && m->getCollisionReaction() != Material::NORMAL &&
         //   !getKartAnimation())
     m_controller->crashed(m);
-    crashed(m, NULL);
 }   // crashed(Material)
 
 // -----------------------------------------------------------------------------
@@ -1869,7 +1869,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
  * @param m The material collided into, or NULL if none
  * @param k The kart collided into, or NULL if none
  */
-void Kart::crashed(const Material* m, AbstractKart *k)
+void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 {
     if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
 
@@ -1893,11 +1893,11 @@ void Kart::crashed(const Material* m, AbstractKart *k)
                 if(m_crash_sound->getStatus() != SFXBase::SFX_PLAYING)
                     m_crash_sound->play();
             }
-        }
+        }    // if lin_vel > 0.555
 
         m_bounce_back_time = 0.1f;
-    }
-}   // crashed
+    }   // if m_bounce_back_time <= 0
+}   // playCrashSFX
 
 // -----------------------------------------------------------------------------
 /** Plays a beep sfx.
