@@ -412,9 +412,6 @@ private:
                              std::vector<MusicInformation*>& m_music   );
     void loadCurves(const XMLNode &node);
     void handleSky(const XMLNode &root, const std::string &filename);
-    void loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& lod_loader,
-                     bool create_lod_definitions, scene::ISceneNode* parent,
-                     std::map<std::string, XMLNode*>& library_nodes);
 
 public:
 
@@ -471,6 +468,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this track has easter eggs. */
     bool hasEasterEggs() const { return m_has_easter_eggs; }
+    // ------------------------------------------------------------------------
+    void loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& lod_loader,
+        bool create_lod_definitions, scene::ISceneNode* parent);
     // ------------------------------------------------------------------------
     bool               isSoccer             () const { return m_is_soccer; }
     // ------------------------------------------------------------------------

@@ -436,6 +436,11 @@ void SoccerWorld::initKartList()
     for(unsigned int n=0; n<kart_amount; n++)
     {
         SoccerTeam team = race_manager->getLocalKartInfo(n).getSoccerTeam();
+#ifdef DEBUG
+        // In debug mode it's possible to play soccer with a single player
+        // (in artist debug mode). Avoid overwriting memory in this case.
+        if(team==SOCCER_TEAM_NONE) team=SOCCER_TEAM_RED;
+#endif
         m_karts[n]->setPosition(team_cur_position[team]);
         team_cur_position[team]++;
     }   // next kart

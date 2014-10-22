@@ -74,7 +74,10 @@ SFXManager::SFXManager()
     m_initialized = music_manager->initialized();
     m_master_gain = UserConfigParams::m_sfx_volume;
     // Init position, since it can be used before positionListener is called.
-    m_position    = Vec3(0,0,0);
+    // No need to use lock here, since the thread will be created later.
+    m_listener_position.getData() = Vec3(0, 0, 0);
+    m_listener_front              = Vec3(0, 0, 1);
+    m_listener_up                 = Vec3(0, 1, 0);
 
     loadSfx();
 
@@ -98,12 +101,10 @@ SFXManager::SFXManager()
         delete m_thread_id.getData();
         m_thread_id.unlock();
         m_thread_id.setAtomic(0);
-        Log::error("HTTP Manager", "Could not create thread, error=%d.",
+        Log::error("SFXManager", "Could not create thread, error=%d.",
                    errno);
     }
     pthread_attr_destroy(&attr);
-
-    if (!sfxAllowed()) return;
 
     setMasterSFXVolume( UserConfigParams::m_sfx_volume );
     m_sfx_commands.lock();
@@ -208,10 +209,25 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 void SFXManager::queueCommand(SFXCommand *command)
 {
     m_sfx_commands.lock();
+    if(m_sfx_commands.getData().size() > 20*race_manager->getNumberOfKarts()+20)
+    {
+        if(command->m_command==SFX_POSITION || command->m_command==SFX_LOOP ||
+            command->m_command==SFX_PLAY   || command->m_command==SFX_SPEED    )
+        {
+            delete command;
+            static int count_messages = 0;
+            if(count_messages < 5)
+            {
+                Log::warn("SFXManager", "Throttling sfx - queue size %d",
+                         m_sfx_commands.getData().size());
+                count_messages++;
+            }
+            m_sfx_commands.unlock();
+            return;
+        }   // if throttling
+    }
     m_sfx_commands.getData().push_back(command);
     m_sfx_commands.unlock();
-    // Wake up the sfx thread
-    pthread_cond_signal(&m_cond_request);
 }   // queueCommand
 
 //----------------------------------------------------------------------------
@@ -220,7 +236,9 @@ void SFXManager::queueCommand(SFXCommand *command)
  */
 void SFXManager::stopThread()
 {
-    queue(SFX_EXIT, NULL);
+    queue(SFX_EXIT);
+    // Make sure the thread wakes up.
+    pthread_cond_signal(&m_cond_request);
 }   // stopThread
 
 //----------------------------------------------------------------------------
@@ -251,31 +269,36 @@ void* SFXManager::mainLoop(void *obj)
             pthread_cond_wait(&me->m_cond_request, me->m_sfx_commands.getMutex());
             empty = me->m_sfx_commands.getData().empty();
         }
-
         SFXCommand *current = me->m_sfx_commands.getData().front();
         me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
 
         if (current->m_command == SFX_EXIT)
             break;
-
         me->m_sfx_commands.unlock();
         switch(current->m_command)
         {
-        case SFX_PLAY:   current->m_sfx->reallyPlayNow();       break;
-        case SFX_STOP:   current->m_sfx->reallyStopNow();       break;
-        case SFX_PAUSE:  current->m_sfx->reallyPauseNow();      break;
-        case SFX_RESUME: current->m_sfx->reallyResumeNow();     break;
-        case SFX_SPEED:  current->m_sfx->reallySetSpeed(
+        case SFX_PLAY:     current->m_sfx->reallyPlayNow();     break;
+        case SFX_STOP:     current->m_sfx->reallyStopNow();     break;
+        case SFX_PAUSE:    current->m_sfx->reallyPauseNow();    break;
+        case SFX_RESUME:   current->m_sfx->reallyResumeNow();   break;
+        case SFX_SPEED:    current->m_sfx->reallySetSpeed(
                                   current->m_parameter.getX()); break;
         case SFX_POSITION: current->m_sfx->reallySetPosition(
                                          current->m_parameter); break;
-        case SFX_VOLUME: current->m_sfx->reallySetVolume(
+        case SFX_VOLUME:   current->m_sfx->reallySetVolume(
                                   current->m_parameter.getX()); break;
-        case SFX_DELETE: {
-                            current->m_sfx->reallyStopNow();
-                            me->deleteSFX(current->m_sfx);
-                            break;
-                         }
+        case SFX_MASTER_VOLUME: 
+                           current->m_sfx->reallySetMasterVolumeNow(
+                                  current->m_parameter.getX()); break;
+        case SFX_LOOP:     current->m_sfx->reallySetLoop(
+                               current->m_parameter.getX()!=0); break;
+        case SFX_DELETE:   {
+                              me->deleteSFX(current->m_sfx);    break;
+                           }
+        case SFX_PAUSE_ALL:  me->reallyPauseAllNow();           break;
+        case SFX_RESUME_ALL: me->reallyResumeAllNow();          break;
+        case SFX_LISTENER:   me->reallyPositionListenerNow();   break;
+        case SFX_UPDATE:     me->reallyUpdateNow(current);      break;
         default: assert("Not yet supported.");
         }
         delete current;
@@ -298,7 +321,7 @@ void* SFXManager::mainLoop(void *obj)
  *  resumes all sound effects. 
  *  \param on If sound is switched on or off.
  */
-void SFXManager::soundToggled(const bool on)
+void SFXManager::toggleSound(const bool on)
 {
     // When activating SFX, load all buffers
     if (on)
@@ -310,7 +333,7 @@ void SFXManager::soundToggled(const bool on)
             buffer->load();
         }
 
-        resumeAll();
+        reallyResumeAllNow();
         m_all_sfx.lock();
         const int sfx_amount = (int)m_all_sfx.getData().size();
         for (int n=0; n<sfx_amount; n++)
@@ -321,9 +344,20 @@ void SFXManager::soundToggled(const bool on)
     }
     else
     {
+        // First stop all sfx that are not looped
+        const int sfx_amount = (int)m_all_sfx.getData().size();
+        m_all_sfx.lock();
+        for (int i=0; i<sfx_amount; i++)
+        {
+            if(!m_all_sfx.getData()[i]->isLooped())
+            {
+                m_all_sfx.getData()[i]->reallyStopNow();
+            }
+        }
+        m_all_sfx.unlock();
         pauseAll();
     }
-}
+}   // toggleSound
 
 //----------------------------------------------------------------------------
 /** Returns if sfx can be played. This means sfx are enabled and
@@ -423,7 +457,7 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
     }
 
     if (UserConfigParams::logMisc())
-        Log::debug("SFXManager", "Loading SFX %s\n", sfx_file.c_str());
+        Log::debug("SFXManager", "Loading SFX %s", sfx_file.c_str());
 
     if (load && buffer->load()) return buffer;
 
@@ -443,7 +477,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     if (node->get("filename", &filename) == 0)
     {
         Log::error("SFXManager",
-                "/!\\ The 'filename' attribute is mandatory in the SFX XML file!\n");
+                "The 'filename' attribute is mandatory in the SFX XML file!");
         return NULL;
     }
 
@@ -452,7 +486,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     if(m_all_sfx_types.find(sfx_name)!=m_all_sfx_types.end())
     {
         Log::error("SFXManager",
-                "There is already a sfx named '%s' installed - new one is ignored.\n",
+                "There is already a sfx named '%s' installed - new one is ignored.",
                 sfx_name.c_str());
         return NULL;
     }
@@ -507,8 +541,6 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
         m_all_sfx.getData().push_back(sfx);
         m_all_sfx.unlock();
     }
-    else
-        printf("");
 
     return sfx;
 }   // createSoundSource
@@ -522,7 +554,7 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
     {
         Log::error("SFXManager", 
                    "SFXManager::createSoundSource could not find the "
-                   "requested sound effect : '%s'\n", name.c_str());
+                   "requested sound effect : '%s'.", name.c_str());
         return NULL;
     }
 
@@ -561,6 +593,38 @@ void SFXManager::deleteSFXMapping(const std::string &name)
 }   // deleteSFXMapping
 
 //----------------------------------------------------------------------------
+/** Make sures that the sfx thread is started at least one per frame. It also
+ *  adds an update command for the music manager.
+ *  \param dt Time step size.
+ */
+void SFXManager::update(float dt)
+{
+    queue(SFX_UPDATE, NULL, dt);
+    // Wake up the sfx thread to handle all queued up audio commands.
+    pthread_cond_signal(&m_cond_request);
+}   // update
+
+//----------------------------------------------------------------------------
+/** Updates the status of all playing sfx (to test if they are finished).
+ * This function is executed once per thread (triggered by the 
+*/
+void SFXManager::reallyUpdateNow(SFXCommand *current)
+{
+    assert(current->m_command==SFX_UPDATE);
+    float dt = current->m_parameter.getX();
+    music_manager->update(dt);
+    m_all_sfx.lock();
+    for (std::vector<SFXBase*>::iterator i =  m_all_sfx.getData().begin();
+                                         i != m_all_sfx.getData().end(); i++)
+    {
+        if((*i)->getStatus()==SFXBase::SFX_PLAYING)
+            (*i)->updatePlayingSFX(dt);
+    }   // for i in m_all_sfx
+    m_all_sfx.unlock();
+
+}   // reallyUpdateNow
+
+//----------------------------------------------------------------------------
 /** Delete a sound effect object, and removes it from the internal list of
  *  all SFXs. This call deletes the object, and removes it from the list of
  *  all SFXs.
@@ -581,45 +645,63 @@ void SFXManager::deleteSFX(SFXBase *sfx)
         Log::warn("SFXManager", 
                   "SFXManager::deleteSFX : Warning: sfx '%s' %lx not found in list.",
                   sfx->getBuffer()->getFileName().c_str(), sfx);
+        m_all_sfx.unlock();
         return;
     }
 
     m_all_sfx.getData().erase(i);
-    delete sfx;
-
     m_all_sfx.unlock();
+
+    delete sfx;
 }   // deleteSFX
+
+//----------------------------------------------------------------------------
+/** Pauses all looping SFXs. Non-looping SFX will be finished, since it's
+ *  otherwise not possible to determine which SFX must be resumed (i.e. were
+ *  actually playing at the time pause was called).
+ */
+void SFXManager::pauseAll()
+{
+    if (!sfxAllowed()) return;
+    queue(SFX_PAUSE_ALL);
+}   // pauseAll
 
 //----------------------------------------------------------------------------
 /** Pauses all looping SFXs. Non-looping SFX will be finished, since it's
  *  otherwise not possible to determine which SFX must be resumed (i.e. were
  *  actually playing at the time pause was called.
  */
-void SFXManager::pauseAll()
+void SFXManager::reallyPauseAllNow()
 {
     m_all_sfx.lock();
     for (std::vector<SFXBase*>::iterator i= m_all_sfx.getData().begin();
                                          i!=m_all_sfx.getData().end(); i++)
     {
-        (*i)->pause();
+        (*i)->reallyPauseNow();
     }   // for i in m_all_sfx
     m_all_sfx.unlock();
 }   // pauseAll
 
 //----------------------------------------------------------------------------
-/**
-  * Resumes all paused SFXs. If sound is disabled, does nothing.
+/** Resumes all paused SFXs. If sound is disabled, does nothing.
   */
 void SFXManager::resumeAll()
 {
     // ignore unpausing if sound is disabled
     if (!sfxAllowed()) return;
+    queue(SFX_RESUME_ALL);
+}   // resumeAll
 
+//----------------------------------------------------------------------------
+/** Resumes all paused SFXs. If sound is disabled, does nothing.
+  */
+void SFXManager::reallyResumeAllNow()
+{
     m_all_sfx.lock();
     for (std::vector<SFXBase*>::iterator i =m_all_sfx.getData().begin();
                                          i!=m_all_sfx.getData().end(); i++)
     {
-        (*i)->resume();
+        (*i)->reallyResumeNow();
     }   // for i in m_all_sfx
     m_all_sfx.unlock();
 }   // resumeAll
@@ -702,28 +784,51 @@ const std::string SFXManager::getErrorString(int err)
 /** Sets the position and orientation of the listener.
  *  \param position Position of the listener.
  *  \param front Which way the listener is facing.
+ *  \param up The up direction of the listener.
  */
-void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
+void SFXManager::positionListener(const Vec3 &position, const Vec3 &front,
+                                  const Vec3 &up)
+{
+    m_listener_position.lock();
+    m_listener_position.getData() = position;
+    m_listener_front              = front;
+    m_listener_up                 = up;
+    m_listener_position.unlock();
+    queue(SFX_LISTENER);
+}   // positionListener
+
+//-----------------------------------------------------------------------------
+/** Sets the position and orientation of the listener.
+ *  \param position Position of the listener.
+ *  \param front Which way the listener is facing.
+ */
+void SFXManager::reallyPositionListenerNow()
 {
 #if HAVE_OGGVORBIS
     if (!UserConfigParams::m_sfx || !m_initialized) return;
 
-    m_position = position;
+    m_listener_position.lock();
+    {
 
-    //forward vector
-    m_listenerVec[0] = front.getX();
-    m_listenerVec[1] = front.getY();
-    m_listenerVec[2] = front.getZ();
+        //forward vector
+        float orientation[6];
+        orientation[0] = m_listener_front.getX();
+        orientation[1] = m_listener_front.getY();
+        orientation[2] = -m_listener_front.getZ();
 
-    //up vector
-    m_listenerVec[3] = 0;
-    m_listenerVec[4] = 0;
-    m_listenerVec[5] = 1;
+        //up vector
+        orientation[3] = m_listener_up.getX();
+        orientation[4] = m_listener_up.getY();
+        orientation[5] = -m_listener_up.getZ();
 
-    alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
-    alListenerfv(AL_ORIENTATION, m_listenerVec);
+        const Vec3 &pos = m_listener_position.getData();
+        alListener3f(AL_POSITION, pos.getX(), pos.getY(), -pos.getZ());
+        alListenerfv(AL_ORIENTATION, orientation);
+    }
+    m_listener_position.unlock();
+
 #endif
-}
+}   // reallyPositionListenerNow
 
 //-----------------------------------------------------------------------------
 /** Positional sound is cool, but creating a new object just to play a simple

@@ -148,6 +148,77 @@ TrackObjectPresentationEmpty::~TrackObjectPresentationEmpty()
 
 // ----------------------------------------------------------------------------
 
+TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
+    const XMLNode& xml_node,
+    ModelDefinitionLoader& model_def_loader) :
+TrackObjectPresentationSceneNode(xml_node)
+{
+    std::string name;
+    xml_node.get("name", &name);
+
+    m_node = irr_driver->getSceneManager()->addEmptySceneNode();
+#ifdef DEBUG
+    m_node->setName(("libnode_" + name).c_str());
+#endif
+
+    XMLNode* libroot;
+    std::string lib_path =
+        file_manager->getAsset(FileManager::LIBRARY, name) + "/";
+    bool create_lod_definitions = true;
+
+    if (!model_def_loader.containsLibraryNode(name))
+    {
+        std::string lib_node_path = lib_path + "node.xml";
+        libroot = file_manager->createXMLTree(lib_node_path);
+        if (libroot == NULL)
+        {
+            Log::error("TrackObjectPresentationLibraryNode", "Cannot find library '%s'", lib_node_path.c_str());
+            return;
+        }
+
+        file_manager->pushTextureSearchPath(lib_path + "/");
+        file_manager->pushModelSearchPath(lib_path);
+        material_manager->pushTempMaterial(lib_path + "/materials.xml");
+        model_def_loader.addToLibrary(name, libroot);
+
+        // Load LOD groups
+        const XMLNode *lod_xml_node = libroot->getNode("lod");
+        if (lod_xml_node != NULL)
+        {
+            for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
+            {
+                const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
+                for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
+                {
+                    model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
+                }
+            }
+        }
+    }
+    else
+    {
+        libroot = model_def_loader.getLibraryNodes()[name];
+        assert(libroot != NULL);
+        create_lod_definitions = false; // LOD definitions are already created, don't create them again
+    }
+
+    m_node->setPosition(m_init_xyz);
+    m_node->setRotation(m_init_hpr);
+    m_node->setScale(m_init_scale);
+    m_node->updateAbsolutePosition();
+
+    assert(libroot != NULL);
+    World::getWorld()->getTrack()->loadObjects(libroot, lib_path, model_def_loader,
+        create_lod_definitions, m_node);
+}
+
+TrackObjectPresentationLibraryNode::~TrackObjectPresentationLibraryNode()
+{
+    irr_driver->removeNode(m_node);
+}
+
+// ----------------------------------------------------------------------------
+
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
     scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader) :
     TrackObjectPresentationSceneNode(xml_node)
@@ -411,7 +482,8 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
     xml_node.get("max_dist", &max_dist );
 
     // first try track dir, then global dir
-    std::string soundfile = file_manager->getAsset(FileManager::MODEL,sound);
+    std::string soundfile = World::getWorld()->getTrack()->getTrackFile(sound);
+    //std::string soundfile = file_manager->getAsset(FileManager::MODEL,sound);
     if (!file_manager->fileExists(soundfile))
     {
         soundfile = file_manager->getAsset(FileManager::SFX, sound);

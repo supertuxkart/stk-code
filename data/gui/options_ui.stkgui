@@ -34,15 +34,22 @@
             </div>
 
             <div width="75%" height="fit" layout="horizontal-row" >
+                <checkbox id="show-login"/>
+                <spacer width="20" height="100%" />
+                <label height="100%" I18N="In the ui settings" text="Always show login screen"/>
+            </div>
+
+            <div width="75%" height="fit" layout="horizontal-row" >
                 <checkbox id="enable-internet"/>
                 <spacer width="20" height="100%" />
                 <label height="100%" I18N="In the ui settings" text="Allow STK to connect to the Internet"/>
             </div>
 
             <div width="75%" height="fit" layout="horizontal-row" >
-                <checkbox id="show-login"/>
+                <checkbox id="enable-hw-report"/>
                 <spacer width="20" height="100%" />
-                <label height="100%" I18N="In the ui settings" text="Always show login screen"/>
+                <label id="label-hw-report" height="100%" I18N="In the ui settings"
+                       text="Allow STK to send anonymous HW statistics"/>
             </div>
 
             <spacer height="18" width="4"/>

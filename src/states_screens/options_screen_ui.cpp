@@ -21,12 +21,14 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "config/hardware_stats.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
@@ -130,6 +132,23 @@ void OptionsScreenUI::init()
     assert( news != NULL );
     news->setState( UserConfigParams::m_internet_status
                                      ==RequestManager::IPERM_ALLOWED );
+    CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
+    assert( stats != NULL );
+    LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
+    assert( stats_label );
+            stats->setState(UserConfigParams::m_hw_report_enable);
+
+    if(news->getState())
+    {
+        stats_label->setVisible(true);
+        stats->setVisible(true);
+        stats->setState(UserConfigParams::m_hw_report_enable);
+    }
+    else
+    {
+        stats_label->setVisible(false);
+        stats->setVisible(false);
+    }
 
     CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
     assert( show_login!= NULL );
@@ -251,8 +270,28 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         // If internet gets enabled, re-initialise the addon manager (which
         // happens in a separate thread) so that news.xml etc can be
         // downloaded if necessary.
+        CheckBoxWidget *stats = getWidget<CheckBoxWidget>("enable-hw-report");
+        LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
         if(internet->getState())
+        {
             NewsManager::get()->init(false);
+            stats->setVisible(true);
+            stats_label->setVisible(true);
+            stats->setState(UserConfigParams::m_hw_report_enable);
+        }
+        else
+        {
+            stats->setVisible(false);
+            stats_label->setVisible(false);
+        }
+
+    }
+    else if (name=="enable-hw-report")
+    {
+        CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
+        UserConfigParams::m_hw_report_enable = stats->getState();
+        if(stats->getState())
+            HardwareStats::reportHardwareStats();
     }
     else if (name=="show-login")
     {

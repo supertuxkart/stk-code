@@ -622,9 +622,9 @@ void KartModel::loadWheelInfo(const XMLNode &node,
         // stk_config file is read (which has no model information).
         if(m_model_filename!="")
         {
-            Log::error("Kart_Model", "Missing wheel information '%s' for model"
+            Log::error("Kart_Model", "Missing wheel information '%s' for model "
                        "'%s'.", wheel_name.c_str(), m_model_filename.c_str());
-            Log::error("Kart_Model", "This can be ignored, but the wheels will"
+            Log::error("Kart_Model", "This can be ignored, but the wheels will "
                        "not rotate.");
         }
         return;

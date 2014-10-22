@@ -29,7 +29,7 @@ static void renderPointLights(unsigned count)
     glBindBuffer(GL_ARRAY_BUFFER, LightShader::PointLightShader::getInstance()->vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(LightShader::PointLightInfo), PointLightsInfo);
 
-    LightShader::PointLightShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture()));
+    LightShader::PointLightShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture());
     LightShader::PointLightShader::getInstance()->setUniforms();
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
@@ -120,7 +120,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         {
             glUseProgram(FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->Program);
             FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->SetTextureUnits(
-                createVector<GLuint>(m_rtts->getRSM().getRTT()[0], m_rtts->getRSM().getRTT()[1], m_rtts->getRSM().getDepthTexture()));
+                m_rtts->getRSM().getRTT()[0], m_rtts->getRSM().getRTT()[1], m_rtts->getRSM().getDepthTexture());
             for (unsigned i = 0; i < 32; i++)
             {
                 FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->setUniforms(rsm_matrix, rh_matrix, rh_extend, i, video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
@@ -131,11 +131,9 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         {
             glUseProgram(FullScreenShader::RadianceHintsConstructionShader::getInstance()->Program);
             FullScreenShader::RadianceHintsConstructionShader::getInstance()->SetTextureUnits(
-                createVector<GLuint>(
                     m_rtts->getRSM().getRTT()[0],
                     m_rtts->getRSM().getRTT()[1],
                     m_rtts->getRSM().getDepthTexture()
-                )
             );
             FullScreenShader::RadianceHintsConstructionShader::getInstance()->setUniforms(rsm_matrix, rh_matrix, rh_extend, video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
             glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);

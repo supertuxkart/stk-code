@@ -15,13 +15,15 @@
             <spacer height="15" width="10"/>
             <div width="90%" align="center" layout="vertical-row" height="fit">
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label width="40%" height="100%" text_align="left" I18N="In the login screen" text="Online"/>
                     <checkbox width="fit" id="online" I18N="In the login screen" text_align="left"/>
+                    <spacer width="10"/>
+                    <label proportion="1" height="100%" text_align="left" I18N="In the login screen" text="Online"/>
                 </div>
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label  width="40%"  id="label_remember" height="100%" text_align="left"
-                              I18N="In the login screen" text="Remember password"/>
                     <checkbox width="fit" id="remember-user" I18N="In the login screen" text_align="left"/>
+                    <spacer width="10"/>
+                    <label proportion="1" id="label_remember" height="100%" text_align="left"
+                              I18N="In the login screen" text="Remember password"/>
                 </div>
                 <!-- Disable guest accounts for now
                 <div width="100%" height="fit" layout="horizontal-row" >

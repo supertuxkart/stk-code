@@ -1150,12 +1150,13 @@ void askForInternetPermission()
         };   // ConfirmServer
 
         new MessageDialog(_("SuperTuxKart may connect to a server "
-            "to download add-ons and notify you of updates. Would you "
-            "like this feature to be enabled? (To change this setting "
+            "to download add-ons and notify you of updates. We also collect "
+            "anonymous hardware statistics to help with the development of STK. "
+            "Would you like this feature to be enabled? (To change this setting "
             "at a later time, go to options, select tab "
             "'User Interface', and edit \"Allow STK to connect to the "
-            "Internet\")."),
-            MessageDialog::MESSAGE_DIALOG_CONFIRM,
+            "Internet\" and \"Allow STK to send anonymous HW statistics\")."),
+            MessageDialog::MESSAGE_DIALOG_YESNO,
             new ConfirmServer(), true);
     }
 
@@ -1302,6 +1303,8 @@ int main(int argc, char *argv[] )
             }
         }
 
+        // Note that on the very first run of STK internet status is set to
+        // "not asked", so the report will only be sent in the next run.
         if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
         {
             HardwareStats::reportHardwareStats();

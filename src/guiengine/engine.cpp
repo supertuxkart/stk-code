@@ -657,7 +657,7 @@ namespace GUIEngine
 #include "guiengine/engine.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/2dutils.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "guiengine/event_handler.hpp"

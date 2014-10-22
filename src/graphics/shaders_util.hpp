@@ -12,6 +12,77 @@ bool needsUBO();
 
 unsigned getGLSLVersion();
 
+GLuint LoadShader(const char * file, unsigned type);
+GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
+
+template<typename ... Types>
+void loadAndAttach(GLint ProgramID)
+{
+    return;
+}
+
+template<typename ... Types>
+void loadAndAttach(GLint ProgramID, GLint ShaderType, const char *filepath, Types ... args)
+{
+    GLint ShaderID = LoadShader(filepath, ShaderType);
+    glAttachShader(ProgramID, ShaderID);
+    glDeleteShader(ShaderID);
+    loadAndAttach(ProgramID, args...);
+}
+
+template<typename ...Types>
+void printFileList()
+{
+    return;
+}
+
+template<typename ...Types>
+void printFileList(GLint ShaderType, const char *filepath, Types ... args)
+{
+    Log::error("GLWrapp", filepath);
+    printFileList(args...);
+}
+
+enum AttributeType
+{
+    OBJECT,
+    PARTICLES_SIM,
+    PARTICLES_RENDERING,
+};
+
+void setAttribute(AttributeType Tp, GLuint ProgramID);
+
+template<typename ... Types>
+GLint LoadProgram(AttributeType Tp, Types ... args)
+{
+    GLint ProgramID = glCreateProgram();
+    loadAndAttach(ProgramID, args...);
+    if (getGLSLVersion() < 330)
+        setAttribute(Tp, ProgramID);
+    glLinkProgram(ProgramID);
+
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
+    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+    if (Result == GL_FALSE) {
+        Log::error("GLWrapp", "Error when linking these shaders :");
+        printFileList(args...);
+        glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+        char *ErrorMessage = new char[InfoLogLength];
+        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
+        Log::error("GLWrapp", ErrorMessage);
+        delete[] ErrorMessage;
+    }
+
+    GLenum glErr = glGetError();
+    if (glErr != GL_NO_ERROR)
+    {
+        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
+    }
+
+    return ProgramID;
+}
+
 struct UniformHelper
 {
     template<unsigned N = 0>
@@ -167,7 +238,8 @@ struct CreateSamplers<>
 template<>
 struct BindTexture<>
 {
-    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    template<int N>
+    static void exec(const std::vector<unsigned> &TU)
     {}
 };
 
@@ -189,10 +261,11 @@ void BindTextureNearest(unsigned TU, unsigned tid);
 template<SamplerType...tp>
 struct BindTexture<Nearest_Filtered, tp...>
 {
-    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    template<int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
     {
-        BindTextureNearest(TU[N], TexId[N]);
-        BindTexture<tp...>::exec(TU, TexId, N + 1);
+        BindTextureNearest(TU[N], TexId);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
 
@@ -218,16 +291,17 @@ struct CreateSamplers<Neared_Clamped_Filtered, tp...>
 template<SamplerType...tp>
 struct BindTexture<Neared_Clamped_Filtered, tp...>
 {
-    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    template<int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
     {
         glActiveTexture(GL_TEXTURE0 + TU[N]);
-        glBindTexture(GL_TEXTURE_2D, TexId[N]);
+        glBindTexture(GL_TEXTURE_2D, TexId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
-        BindTexture<tp...>::exec(TU, TexId, N + 1);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
 
@@ -249,10 +323,11 @@ void BindTextureBilinear(unsigned TU, unsigned tex);
 template<SamplerType...tp>
 struct BindTexture<Bilinear_Filtered, tp...>
 {
-    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    template<int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
     {
-        BindTextureBilinear(TU[N], TexId[N]);
-        BindTexture<tp...>::exec(TU, TexId, N + 1);
+        BindTextureBilinear(TU[N], TexId);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
 
@@ -274,10 +349,11 @@ void BindTextureBilinearClamped(unsigned TU, unsigned tex);
 template<SamplerType...tp>
 struct BindTexture<Bilinear_Clamped_Filtered, tp...>
 {
-    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    template<int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
     {
-        BindTextureBilinearClamped(TU[N], TexId[N]);
-        BindTexture<tp...>::exec(TU, TexId, N + 1);
+        BindTextureBilinearClamped(TU[N], TexId);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
 
@@ -299,10 +375,11 @@ void BindTextureSemiTrilinear(unsigned TU, unsigned tex);
 template<SamplerType...tp>
 struct BindTexture<Semi_trilinear, tp...>
 {
-    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    template<int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
     {
-        BindTextureSemiTrilinear(TU[N], TexId[N]);
-        BindTexture<tp...>::exec(TU, TexId, N + 1);
+        BindTextureSemiTrilinear(TU[N], TexId);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
 
@@ -337,20 +414,22 @@ void BindCubemapTrilinear(unsigned TU, unsigned tex);
 template<SamplerType...tp>
 struct BindTexture<Trilinear_cubemap, tp...>
 {
-    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    template<int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
     {
-        BindCubemapTrilinear(TU[N], TexId[N]);
-        BindTexture<tp...>::exec(TU, TexId, N + 1);
+        BindCubemapTrilinear(TU[N], TexId);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
 
 template<SamplerType...tp>
 struct BindTexture<Trilinear_Anisotropic_Filtered, tp...>
 {
-    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    template<int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
     {
-        BindTextureTrilinearAnisotropic(TU[N], TexId[N]);
-        BindTexture<tp...>::exec(TU, TexId, N + 1);
+        BindTextureTrilinearAnisotropic(TU[N], TexId);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
 
@@ -370,10 +449,11 @@ void BindTextureVolume(unsigned TU, unsigned tex);
 template<SamplerType...tp>
 struct BindTexture<Volume_Linear_Filtered, tp...>
 {
-    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    template<int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
     {
-        BindTextureVolume(TU[N], TexId[N]);
-        BindTexture<tp...>::exec(TU, TexId, N + 1);
+        BindTextureVolume(TU[N], TexId);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
 
@@ -395,10 +475,11 @@ void BindTextureShadow(unsigned TU, unsigned tex);
 template<SamplerType...tp>
 struct BindTexture<Shadow_Sampler, tp...>
 {
-    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    template <int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
     {
-        BindTextureShadow(TU[N], TexId[N]);
-        BindTexture<tp...>::exec(TU, TexId, N + 1);
+        BindTextureShadow(TU[N], TexId);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
 
@@ -436,21 +517,44 @@ protected:
         glUseProgram(0);
     }
 
+    template<int N>
+    void SetTextureUnits_impl()
+    {
+        static_assert(N == sizeof...(tp), "Not enough texture set");
+    }
+
+    template<int N, typename... TexIds>
+    void SetTextureUnits_impl(GLuint texid, TexIds... args)
+    {
+        setTextureSampler(TextureType[N], TextureUnits[N], texid, SamplersId[N]);
+        SetTextureUnits_impl<N + 1>(args...);
+    }
+
+
+    template<int N>
+    void SetTextureHandles_impl()
+    {
+        static_assert(N == sizeof...(tp), "Not enough handle set");
+    }
+
+    template<int N, typename... HandlesId>
+    void SetTextureHandles_impl(uint64_t handle, HandlesId... args)
+    {
+        if (handle)
+            glUniformHandleui64ARB(TextureLocation[N], handle);
+        SetTextureHandles_impl<N + 1>(args...);
+    }
+
 public:
     std::vector<GLuint> SamplersId;
-    void SetTextureUnits(const std::vector<GLuint> &args)
+
+    template<typename... TexIds>
+    void SetTextureUnits(TexIds... args)
     {
-        if (args.size() != sizeof...(tp))
-            abort();
         if (getGLSLVersion() >= 330)
-        {
-            for (unsigned i = 0; i < args.size(); i++)
-            {
-                setTextureSampler(TextureType[i], TextureUnits[i], args[i], SamplersId[i]);
-            }
-        }
+            SetTextureUnits_impl<0>(args...);
         else
-            BindTexture<tp...>::exec(TextureUnits, args, 0);
+            BindTexture<tp...>::template exec<0>(TextureUnits, args...);
     }
 
     ~TextureRead()
@@ -459,14 +563,10 @@ public:
             glDeleteSamplers(1, &SamplersId[i]);
     }
 
-    void SetTextureHandles(const std::vector<uint64_t> &args)
+    template<typename... HandlesId>
+    void SetTextureHandles(HandlesId... ids)
     {
-        assert(args.size() == TextureLocation.size() && "Wrong Handle count");
-        for (unsigned i = 0; i < args.size(); i++)
-        {
-            if (args[i])
-                glUniformHandleui64ARB(TextureLocation[i], args[i]);
-        }
+        SetTextureHandles_impl<0>(ids...);
     }
 };
 #endif

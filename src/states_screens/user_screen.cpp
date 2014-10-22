@@ -163,10 +163,13 @@ void BaseUserScreen::selectUser(int index)
 
     m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
                             /*focusIt*/ true);
+    
+    m_username_tb->setText(profile->getLastOnlineName());
+    // Delete a password that might have been typed for another user
+    m_password_tb->setText("");
 
     // Last game was not online, so make the offline settings the default
     // (i.e. unckeck online checkbox, and make entry fields invisible).
-    
     if (!profile->wasOnlineLastTime() || profile->getLastOnlineName() == "")
     {
         m_online_cb->setState(false);
@@ -177,7 +180,6 @@ void BaseUserScreen::selectUser(int index)
     // Now last use was with online --> Display the saved data
     m_online_cb->setState(true);
     makeEntryFieldsVisible();
-    m_username_tb->setText(profile->getLastOnlineName());
     getWidget<CheckBoxWidget>("remember-user")->setState(
         profile->rememberPassword());
     if(profile->getLastOnlineName().size()>0)
@@ -212,11 +214,15 @@ void BaseUserScreen::makeEntryFieldsVisible()
     getWidget<LabelWidget>("label_remember")->setVisible(online);
     getWidget<CheckBoxWidget>("remember-user")->setVisible(online);
     PlayerProfile *player = getSelectedPlayer();
+
     // Don't show the password fields if the player wants to be online
-    // and either is the current player (no need to enter a password then)
-    // or has a saved session.
+    // and either is the current player and logged in (no need to enter a
+    // password then) or has a saved session.
     if(player && online  &&
-        (player->hasSavedSession() || player==PlayerManager::getCurrentPlayer()))
+        (player->hasSavedSession() || 
+          (player==PlayerManager::getCurrentPlayer() && player->isLoggedIn() ) 
+        ) 
+      )
     {
         // If we show the online login fields, but the player has a
         // saved session, don't show the password field.
@@ -227,14 +233,6 @@ void BaseUserScreen::makeEntryFieldsVisible()
     {
         getWidget<LabelWidget>("label_password")->setVisible(online);
         m_password_tb->setVisible(online);
-        if(player && player->hasSavedSession())
-        {
-            // Even though this field is invisible we need to set
-            // the name, otherwise in update a change of user name
-            // will be detected, causing a clearing of this player
-            // (which then removes the associated online user name).
-            m_username_tb->setText(player->getLastOnlineName());
-        }
     }
 }   // makeEntryFieldsVisible
 
@@ -441,17 +439,6 @@ void BaseUserScreen::onUpdate(float dt)
                               : _(L"Signing in '%s'", m_sign_in_name.c_str());
         m_info_widget->setText(StringUtils::loadingDots(message.c_str()),
                                false                                      );
-    }
-    PlayerProfile *player = getSelectedPlayer();
-    if(player)
-    {
-        // If the player changes the online name, clear the saved session
-        // flag, and make the password field visible again.
-        if (m_username_tb->getText()!=player->getLastOnlineName())
-        {
-            player->clearSession();
-            makeEntryFieldsVisible();
-        }
     }
 }   // onUpdate
 

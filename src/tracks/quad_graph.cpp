@@ -1104,6 +1104,13 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     *newRttMinimap = frame_buffer;
     World::getWorld()->setClearbackBufferColor(oldClearColor);
     World::getWorld()->forceFogDisabled(false);
+
+    irr_driver->getSceneManager()->clear();
+    VAOManager::kill();
+    irr_driver->clearGlowingNodes();
+    irr_driver->clearLights();
+    irr_driver->clearForcedBloom();
+    irr_driver->clearBackgroundNodes();
 }   // makeMiniMap
 
 //-----------------------------------------------------------------------------

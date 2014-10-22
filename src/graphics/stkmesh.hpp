@@ -179,5 +179,6 @@ Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialT
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam, Material* material);
 
 void InitTextures(GLMesh &mesh, Material::ShaderType);
+void InitTexturesTransparent(GLMesh &mesh);
 
 #endif // STKMESH_H
