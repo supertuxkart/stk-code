@@ -97,18 +97,18 @@ void MainMenuScreen::init()
 {
     Screen::init();
 
-    LabelWidget *user_id = getWidget<LabelWidget>("user-id");
+    ButtonWidget *user_id = getWidget<ButtonWidget>("user-id");
     assert(user_id);
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if(player)
     {
         if(player->isLoggedIn())
-            user_id->setText(player->getLastOnlineName()+"@stk", true);
+            user_id->setText(player->getLastOnlineName()+"@stk");
         else
-            user_id->setText(player->getName(), true);
+            user_id->setText(player->getName());
     }
     else
-        user_id->setText("", true);
+        user_id->setText("");
 
     // reset in case we're coming back from a race
     StateManager::get()->resetActivePlayers();
