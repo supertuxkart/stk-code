@@ -97,18 +97,8 @@ void MainMenuScreen::init()
 {
     Screen::init();
 
-    ButtonWidget *user_id = getWidget<ButtonWidget>("user-id");
-    assert(user_id);
-    PlayerProfile *player = PlayerManager::getCurrentPlayer();
-    if(player)
-    {
-        if(player->isLoggedIn())
-            user_id->setText(player->getLastOnlineName()+"@stk");
-        else
-            user_id->setText(player->getName());
-    }
-    else
-        user_id->setText("");
+    m_user_id = getWidget<ButtonWidget>("user-id");
+    assert(m_user_id);
 
     // reset in case we're coming back from a race
     StateManager::get()->resetActivePlayers();
@@ -168,9 +158,11 @@ void MainMenuScreen::init()
 void MainMenuScreen::onUpdate(float delta)
 
 {
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if(PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST  ||
        PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
     {
+        m_user_id->setText(player->getLastOnlineName() + "@stk");
         m_online->setActivated();
         m_online->setLabel( _("Online"));
     }
@@ -178,9 +170,14 @@ void MainMenuScreen::onUpdate(float delta)
     {
         m_online->setActivated();
         m_online->setLabel( _("Login" ));
+        m_user_id->setText(player->getName());
     }
-    else // now must be either logging in or logging out
+    else 
+    {
+        // now must be either logging in or logging out
         m_online->setDeactivated();
+        m_user_id->setText(player->getName());
+    }
 
     m_online->setLabel(PlayerManager::getCurrentOnlineId() ? _("Online")
                                                            : _("Login" )  );
