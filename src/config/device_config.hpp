@@ -86,7 +86,7 @@ public:
     irr::core::stringw getMappingIdString (const PlayerAction action) const;
 
     void        serialize           (std::ofstream& stream);
-    bool        deserializeAction   (irr::io::IrrXMLReader* xml);
+    bool        load(const XMLNode *config);
 
     void        setBinding          (const PlayerAction     action,
                                      const Input::InputType type,
@@ -172,7 +172,7 @@ public:
 
     void        serialize           (std::ofstream& stream);
     void        setDefaultBinds     ();
-    GamepadConfig           (irr::io::IrrXMLReader* xml);
+    GamepadConfig           (const XMLNode *config);
     GamepadConfig           (const std::string     &name,
                              const int              axis_count=0,
                              const int              button_ount=0);

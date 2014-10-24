@@ -61,7 +61,7 @@ bool DeviceManager::initialize()
         Log::info("-","---------------------------");
     }
 
-    deserialize();
+    load();
 
     // Assign a configuration to the keyboard, or create one if we haven't yet
     if(UserConfigParams::logMisc()) Log::info("Device manager","Initializing keyboard support.");
@@ -437,123 +437,88 @@ void DeviceManager::clearLatestUsedDevice()
 }   // clearLatestUsedDevice
 
 // -----------------------------------------------------------------------------
-bool DeviceManager::deserialize()
+/** Loads the configuration from the user's input.xml file.
+ */
+bool DeviceManager::load()
 {
-    static std::string filepath = file_manager->getUserConfigFile(INPUT_FILE_NAME);
+    std::string filepath = file_manager->getUserConfigFile(INPUT_FILE_NAME);
 
     if(UserConfigParams::logMisc())
-        Log::info("Device manager","Deserializing input.xml...");
+        Log::info("Device manager","Loading input.xml...");
 
-    if(!file_manager->fileExists(filepath))
+    const XMLNode *input = file_manager->createXMLTree(filepath);
+
+    if(!input)
     {
         if(UserConfigParams::logMisc())
             Log::warn("Device manager","No configuration file exists.");
+        return false;
     }
-    else
+
+    if(input->getName()!="input")
     {
-        irr::io::IrrXMLReader* xml = irr::io::createIrrXMLReader( filepath.c_str() );
-
-        const int GAMEPAD = 1;
-        const int KEYBOARD = 2;
-        const int NOTHING = 3;
-
-        int reading_now = NOTHING;
-
-        KeyboardConfig* keyboard_config = NULL;
-        GamepadConfig* gamepad_config = NULL;
-
-
-        // parse XML file
-        while(xml && xml->read())
-        {
-            switch(xml->getNodeType())
-            {
-                case irr::io::EXN_TEXT:
-                    break;
-
-                case irr::io::EXN_ELEMENT:
-                {
-                    if (strcmp("input", xml->getNodeName()) == 0)
-                    {
-                        const char *version_string = xml->getAttributeValue("version");
-                        if (version_string == NULL || atoi(version_string) != INPUT_FILE_VERSION)
-                        {
-                            //I18N: shown when config file is too old
-                            GUIEngine::showMessage( _("Please re-configure your key bindings.") );
-
-                            GUIEngine::showMessage( _("Your input config file is not compatible with this version of STK.") );
-                            return false;
-                        }
-                    }
-                    if (strcmp("keyboard", xml->getNodeName()) == 0)
-                    {
-                        keyboard_config = new KeyboardConfig();
-                        reading_now = KEYBOARD;
-                    }
-                    else if (strcmp("gamepad", xml->getNodeName()) == 0)
-                    {
-                        gamepad_config = new GamepadConfig(xml);
-                        reading_now = GAMEPAD;
-                    }
-                    else if (strcmp("action", xml->getNodeName()) == 0)
-                    {
-                        if(reading_now == KEYBOARD)
-                        {
-                            if(keyboard_config != NULL)
-                                if(!keyboard_config->deserializeAction(xml))
-                                    Log::error("Device manager","Ignoring an ill-formed keyboard action in input config.");
-                        }
-                        else if(reading_now == GAMEPAD)
-                        {
-                            if(gamepad_config != NULL)
-                                if(!gamepad_config->deserializeAction(xml))
-                                     Log::error("Device manager","Ignoring an ill-formed gamepad action in input config.");
-                        }
-                        else  Log::warn("Device manager","An action is placed in an unexpected area in the input config file.");
-                    }
-                }
-                break;
-                // ---- section ending
-                case irr::io::EXN_ELEMENT_END:
-                {
-                    if (strcmp("keyboard", xml->getNodeName()) == 0)
-                    {
-                        m_keyboard_configs.push_back(keyboard_config);
-                        reading_now = NOTHING;
-                    }
-                    else if (strcmp("gamepad", xml->getNodeName()) == 0)
-                    {
-                        m_gamepad_configs.push_back(gamepad_config);
-                        reading_now = NOTHING;
-                    }
-                }
-                    break;
-
-                default: break;
-
-            } // end switch
-        } // end while
-
-        if(UserConfigParams::logMisc())
-        {
-            Log::info("Device manager","Found %d keyboard and %d gamepad configurations.",
-                   m_keyboard_configs.size(), m_gamepad_configs.size());
-        }
-
-        // For Debugging....
-        /*
-        for (int n = 0; n < m_keyboard_configs.size(); n++)
-            printf("Config #%d\n%s", n + 1, m_keyboard_configs[n].toString().c_str());
-
-        for (int n = 0; n < m_gamepad_configs.size(); n++)
-            printf("%s", m_gamepad_configs[n].toString().c_str());
-        */
-
-        delete xml;
+        Log::warn("DeviceManager", "Invalid input.xml file - no input node.");
+        return false;
     }
+
+    int version=0;
+    if(!input->get("version", &version) || version != INPUT_FILE_VERSION )
+    {
+        //I18N: shown when config file is too old
+        GUIEngine::showMessage(_("Please re-configure your key bindings."));
+        GUIEngine::showMessage(_("Your input config file is not compatible "
+                                 "with this version of STK."));
+        return false;
+    }
+
+    for(unsigned int i=0; i<input->getNumNodes(); i++)
+    {
+        const XMLNode *config = input->getNode(i);
+        if(config->getName()=="keyboard")
+        {
+            KeyboardConfig* keyboard_config = new KeyboardConfig();
+            if(!keyboard_config->load(config))
+            {
+                Log::error("Device manager",
+                    "Ignoring an ill-formed keyboard action in input config.");
+            }
+            m_keyboard_configs.push_back(keyboard_config);
+        }
+        else if (config->getName()=="gamepad")
+        {
+            GamepadConfig* gamepad_config = new GamepadConfig(config);
+            gamepad_config->load(config);
+            m_gamepad_configs.push_back(gamepad_config);
+        }
+        else
+        {
+            Log::warn("DeviceManager",
+                      "Invalid node '%s' in input.xml - ignored.",
+                      config->getName().c_str());
+            continue;
+        }
+    }   // for i < getNumNodes
+
+    if (UserConfigParams::logMisc())
+    {
+        Log::info("Device manager",
+                  "Found %d keyboard and %d gamepad configurations.",
+                  m_keyboard_configs.size(), m_gamepad_configs.size());
+    }
+
+    // For Debugging....
+    /*
+    for (int n = 0; n < m_keyboard_configs.size(); n++)
+        printf("Config #%d\n%s", n + 1, m_keyboard_configs[n].toString().c_str());
+
+    for (int n = 0; n < m_gamepad_configs.size(); n++)
+        printf("%s", m_gamepad_configs[n].toString().c_str());
+    */
+
+    delete input;
 
     return true;
-}   // deserialize
+}   // load
 
 // -----------------------------------------------------------------------------
 void DeviceManager::serialize()
