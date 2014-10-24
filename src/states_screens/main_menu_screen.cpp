@@ -223,6 +223,12 @@ void MainMenuScreen::onUpdate(float delta)
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                    const int playerID)
 {
+    if(name=="user-id")
+    {
+        UserScreen::getInstance()->push();
+        return;
+    }
+
     // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
 
@@ -459,7 +465,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             //OnlineScreen::getInstance()->push();
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
             OnlineProfileAchievements::getInstance()->push();
-
         }
         else
         {
