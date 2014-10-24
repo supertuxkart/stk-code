@@ -208,7 +208,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     else
     {
         scene::IAnimatedMeshSceneNode* node =
-        irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)mesh.get(0), NULL);
+        irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)mesh.get(0), "rtt_mesh", NULL);
         node->setPosition(mesh_location[0].toIrrVector());
         node->setFrameLoop(model_frames[0], model_frames[0]);
         node->setAnimationSpeed(0);
@@ -228,7 +228,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         if (model_frames[n] == -1)
         {
             scene::ISceneNode* node =
-            irr_driver->addMesh(mesh.get(n), m_rtt_main_node);
+            irr_driver->addMesh(mesh.get(n), "rtt_node", m_rtt_main_node);
             node->setPosition(mesh_location[n].toIrrVector());
             node->updateAbsolutePosition();
             node->setScale(mesh_scale[n].toIrrVector());
@@ -237,7 +237,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         {
             scene::IAnimatedMeshSceneNode* node =
             irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)mesh.get(n),
-                                        m_rtt_main_node);
+                                        "modelviewrtt", m_rtt_main_node);
             node->setPosition(mesh_location[n].toIrrVector());
             node->setFrameLoop(model_frames[n], model_frames[n]);
             node->setAnimationSpeed(0);

@@ -75,7 +75,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
     // Gloss
     mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     updatePosition();
-    m_node = irr_driver->addMesh(m_mesh);
+    m_node = irr_driver->addMesh(m_mesh, "rubberband");
     irr_driver->applyObjectPassShader(m_node);
     if (STKMeshSceneNode *stkm = dynamic_cast<STKMeshSceneNode *>(m_node))
         stkm->setReloadEachFrame(true);

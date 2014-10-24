@@ -15,7 +15,7 @@
 using namespace irr;
 
 STKAnimatedMesh::STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::ISceneNode* parent,
-irr::scene::ISceneManager* mgr, s32 id,
+irr::scene::ISceneManager* mgr, s32 id, const std::string& debug_name,
 const core::vector3df& position,
 const core::vector3df& rotation,
 const core::vector3df& scale) :
@@ -23,6 +23,9 @@ const core::vector3df& scale) :
 {
     isGLInitialized = false;
     isMaterialInitialized = false;
+#ifdef DEBUG
+    m_debug_name = debug_name;
+#endif
 }
 
 STKAnimatedMesh::~STKAnimatedMesh()
@@ -77,7 +80,7 @@ void STKAnimatedMesh::updateNoGL()
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-            GLmeshes.push_back(allocateMeshBuffer(mb));
+            GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name));
         }
 
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)

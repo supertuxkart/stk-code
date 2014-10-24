@@ -190,7 +190,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         new SkidMarkQuads(raycast_right-delta, raycast_right+delta,
                           m_material, m_avoid_z_fighting, custom_color);
     new_mesh->addMeshBuffer(smq_right);
-    scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
+    scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh, "skidmark");
     if (STKMeshSceneNode* stkm = dynamic_cast<STKMeshSceneNode*>(new_node))
         stkm->setReloadEachFrame(true);
 #ifdef DEBUG

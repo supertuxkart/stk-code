@@ -14,7 +14,8 @@
 #include "utils/tuple.hpp"
 #include "utils/cpp2011.hpp"
 
-STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
+STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr,
+    irr::s32 id, const std::string& debug_name,
     const irr::core::vector3df& position,
     const irr::core::vector3df& rotation,
     const irr::core::vector3df& scale, bool createGLMeshes) :
@@ -24,6 +25,8 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     immediate_draw = false;
     update_each_frame = false;
     isGlow = false;
+
+    m_debug_name = debug_name;
 
     if (createGLMeshes)
         this->createGLMeshes();
@@ -41,7 +44,7 @@ void STKMeshSceneNode::createGLMeshes()
     for (u32 i = 0; i<Mesh->getMeshBufferCount(); ++i)
     {
         scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-        GLmeshes.push_back(allocateMeshBuffer(mb));
+        GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name));
     }
     isMaterialInitialized = false;
     isGLInitialized = false;

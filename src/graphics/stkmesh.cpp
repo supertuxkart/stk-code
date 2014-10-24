@@ -121,12 +121,16 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
     return vao;
 }
 
-GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
+GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name)
 {
     GLMesh result = {};
     if (!mb)
         return result;
     result.mb = mb;
+
+#ifdef DEBUG
+    result.debug_name = debug_name;
+#endif
 
     result.IndexCount = mb->getIndexCount();
     switch (mb->getIndexType())

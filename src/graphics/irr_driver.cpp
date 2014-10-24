@@ -578,7 +578,8 @@ void IrrDriver::initDevice()
             mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
             mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         }
-        m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1);
+        m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1, "sun_interposer");
+
         m_sun_interposer->grab();
         m_sun_interposer->setParent(NULL);
         m_sun_interposer->setScale(core::vector3df(20));
@@ -1077,6 +1078,7 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
  *  \param mesh The mesh to add.
  */
 scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
+                                          const std::string& debug_name,
                                           scene::ISceneNode *parent)
 {
     if (!isGLSL())
@@ -1085,7 +1087,7 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
 
-    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, m_scene_manager, -1);
+    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, m_scene_manager, -1, debug_name);
     node->drop();
 
     return node;
@@ -1261,21 +1263,25 @@ void IrrDriver::removeTexture(video::ITexture *t)
 /** Adds an animated mesh to the scene.
  *  \param mesh The animated mesh to add.
  */
-scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh, scene::ISceneNode* parent)
+scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh,
+    const std::string& debug_name, scene::ISceneNode* parent)
 {
     if (!isGLSL())
+    {
         return m_scene_manager->addAnimatedMeshSceneNode(mesh, parent, -1,
-                                                     core::vector3df(0,0,0),
-                                                     core::vector3df(0,0,0),
-                                                     core::vector3df(1,1,1),
-                                                     /*addIfMeshIsZero*/true);
+            core::vector3df(0, 0, 0),
+            core::vector3df(0, 0, 0),
+            core::vector3df(1, 1, 1),
+            /*addIfMeshIsZero*/true);
+    }
 
-      if (!parent)
-         parent = m_scene_manager->getRootSceneNode();
-      scene::IAnimatedMeshSceneNode* node =
-         new STKAnimatedMesh(mesh, parent, m_scene_manager, -1, core::vector3df(0,0,0), core::vector3df(0,0,0), core::vector3df(1,1,1));
-      node->drop();
-      return node;
+    if (!parent)
+        parent = m_scene_manager->getRootSceneNode();
+    scene::IAnimatedMeshSceneNode* node =
+        new STKAnimatedMesh(mesh, parent, m_scene_manager, -1, debug_name,
+        core::vector3df(0, 0, 0), core::vector3df(0, 0, 0), core::vector3df(1, 1, 1));
+    node->drop();
+    return node;
 }   // addAnimatedMesh
 
 // ----------------------------------------------------------------------------

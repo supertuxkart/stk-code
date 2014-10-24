@@ -48,12 +48,12 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     LODNode* lodnode    = new LODNode("item",
                                       irr_driver->getSceneManager()->getRootSceneNode(),
                                       irr_driver->getSceneManager());
-    scene::IMeshSceneNode* meshnode = irr_driver->addMesh(mesh);
+    scene::IMeshSceneNode* meshnode = irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
 
     if (lowres_mesh != NULL)
     {
         lodnode->add(35, meshnode, true);
-        scene::IMeshSceneNode* meshnode = irr_driver->addMesh(lowres_mesh);
+        scene::IMeshSceneNode* meshnode = irr_driver->addMesh(lowres_mesh, StringUtils::insertValues("item_lo_%i", (int)type));
         lodnode->add(100, meshnode, true);
     }
     else

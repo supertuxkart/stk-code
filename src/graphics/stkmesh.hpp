@@ -36,9 +36,12 @@ struct GLMesh {
     video::E_VERTEX_TYPE VAOType;
     uint64_t TextureHandles[6];
     scene::IMeshBuffer *mb;
+#ifdef DEBUG
+    std::string debug_name;
+#endif
 };
 
-GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb);
+GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name);
 void fillLocalBuffer(GLMesh &, scene::IMeshBuffer* mb);
 video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride);
 GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type);
@@ -54,6 +57,8 @@ protected:
     bool m_culledForPlayerCam;
     bool m_culledForShadowCam[4];
     bool m_culledForRSMCam;
+    std::string m_debug_name;
+
 public:
     PtrVector<GLMesh, REF> MeshSolidMaterial[Material::SHADERTYPE_COUNT];
     PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
