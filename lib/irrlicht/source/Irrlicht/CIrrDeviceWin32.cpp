@@ -16,6 +16,8 @@
 #include "COSOperator.h"
 #include "dimension2d.h"
 #include "IGUISpriteBank.h"
+#include <mmsystem.h>
+#include <regstr.h>
 #include <winuser.h>
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
@@ -358,12 +360,6 @@ void pollJoysticks()
 #endif
 #endif // _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 }
-
-#include <stdio.h>
-#include <mmsystem.h>
-#include <regstr.h>
-
-
 
 /** This function is ported from SDL and released under zlip:
  *  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
