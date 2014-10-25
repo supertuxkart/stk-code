@@ -25,6 +25,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_2.hpp"
@@ -63,7 +64,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
         race_manager->setReverseTrack(false);
 
         // Use keyboard 0 by default (FIXME: let player choose?)
-        InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+        InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
 
         // Create player and associate player with keyboard
         StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
@@ -79,8 +80,8 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
 
         // ASSIGN should make sure that only input from assigned devices
         // is read.
-        input_manager->getDeviceList()->setAssignMode(ASSIGN);
-        input_manager->getDeviceList()
+        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+        input_manager->getDeviceManager()
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         StateManager::get()->enterGameState();

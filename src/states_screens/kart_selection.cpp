@@ -1031,7 +1031,7 @@ void KartSelectionScreen::init()
 
     m_kart_widgets.clearAndDeleteAll();
     StateManager::get()->resetActivePlayers();
-    input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
+    input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
@@ -1069,7 +1069,7 @@ void KartSelectionScreen::init()
     else */
     // For now this is what will happen
     {
-        joinPlayer( input_manager->getDeviceList()->getLatestUsedDevice(),
+        joinPlayer( input_manager->getDeviceManager()->getLatestUsedDevice(),
                     true );
         w->updateItemDisplay();
     }
@@ -1083,7 +1083,7 @@ void KartSelectionScreen::init()
     // This flag will cause that a 'fire' event will be mapped to 'select' (if
     // 'fire' is not assigned to a GUI event). This is done to support the old
     // way of player joining by pressing 'fire' instead of 'select'.
-    input_manager->getDeviceList()->mapFireToSelect(true);
+    input_manager->getDeviceManager()->mapFireToSelect(true);
 
 }   // init
 
@@ -1092,7 +1092,7 @@ void KartSelectionScreen::init()
 void KartSelectionScreen::tearDown()
 {
     // Reset the 'map fire to select' option of the device manager
-    input_manager->getDeviceList()->mapFireToSelect(false);
+    input_manager->getDeviceManager()->mapFireToSelect(false);
 
     // if a removed widget is currently shrinking down, remove it upon leaving
     // the screen
@@ -1263,7 +1263,7 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
 
     if (!m_multiplayer)
     {
-        input_manager->getDeviceList()->setSinglePlayer( StateManager::get()
+        input_manager->getDeviceManager()->setSinglePlayer( StateManager::get()
                                                          ->getActivePlayer(0));
     }
 
@@ -1866,16 +1866,16 @@ void KartSelectionScreen::allPlayersDone()
     }
 
     // ---- Switch to assign mode
-    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
     if (!m_multiplayer)
     {
-        input_manager->getDeviceList()
+        input_manager->getDeviceManager()
         ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
     }
     else
     {
-        input_manager->getDeviceList()->setSinglePlayer( NULL );
+        input_manager->getDeviceManager()->setSinglePlayer( NULL );
     }
 
     // ---- Go to next screen or return to overworld

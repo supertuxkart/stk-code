@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "input/device_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "input/input_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -140,12 +141,12 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     InputDevice *device;
 
     // Use keyboard 0 by default in --no-start-screen
-    device = input_manager->getDeviceList()->getKeyboard(0);
+    device = input_manager->getDeviceManager()->getKeyboard(0);
     StateManager::get()->createActivePlayer(
                            PlayerManager::get()->getPlayer(0), device);
     // ASSIGN should make sure that only input from assigned devices
     // is read.
-    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
     m_do_demo = true;
     race_manager->setNumKarts(m_num_karts);

@@ -23,6 +23,8 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "input/gamepad_device.hpp"
+#include "input/keyboard_device.hpp"
 #include "input/wiimote_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/kart_selection.hpp"
@@ -138,6 +140,18 @@ bool DeviceManager::initialize()
 
     return created;
 }   // initialize
+
+// -----------------------------------------------------------------------------
+void DeviceManager::clearKeyboard()
+{
+    m_keyboards.clearAndDeleteAll();
+}   // clearKeyboard
+
+// -----------------------------------------------------------------------------
+void DeviceManager::clearGamepads()
+{
+    m_gamepads.clearAndDeleteAll(); 
+}   // clearGamepads
 
 // -----------------------------------------------------------------------------
 void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)

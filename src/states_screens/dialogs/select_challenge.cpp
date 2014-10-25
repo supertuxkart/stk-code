@@ -187,7 +187,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         //StateManager::get()->resetActivePlayers();
 
         // Use latest used device
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         assert(device != NULL);
 
         // Set up race manager appropriately
@@ -196,10 +196,10 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         race_manager->setReverseTrack(false);
 
         //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
-        input_manager->getDeviceList()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+        input_manager->getDeviceManager()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         // ASSIGN should make sure that only input from assigned devices is read.
-        input_manager->getDeviceList()->setAssignMode(ASSIGN);
+        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
         // Go straight to the race
         StateManager::get()->enterGameState();

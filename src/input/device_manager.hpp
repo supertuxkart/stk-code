@@ -26,6 +26,9 @@
 
 #include <irrArray.h>
 
+class GamePadDevice;
+class KeyboardDevice;
+
 enum PlayerAssignMode
 {
     NO_ASSIGN,  //!< react to all devices
@@ -118,14 +121,14 @@ public:
     GamePadDevice*      getGamePad(const int i)             { return m_gamepads.get(i); }
     GamepadConfig*      getGamepadConfig(const int i)       { return m_gamepad_configs.get(i); }
     GamePadDevice*      getGamePadFromIrrID(const int i);
-    void                clearGamepads()                     { m_gamepads.clearAndDeleteAll();  }
+    void                clearGamepads();
     /** Returns the keyboard that has a binding for this button, or NULL if none */
     bool                getConfigForGamepad(const int sdl_id, const core::stringc& pname, GamepadConfig **config);
 
     // ---- Keyboard(s) ----
     void addEmptyKeyboard();
     void addKeyboard(KeyboardDevice* d);
-    void                clearKeyboard()                     { m_keyboards.clearAndDeleteAll(); }
+    void                clearKeyboard();
     int                 getKeyboardAmount()                 { return m_keyboards.size(); }
     int                 getKeyboardConfigAmount() const     { return m_keyboard_configs.size(); }
     KeyboardDevice*     getKeyboard(const int i)            { return m_keyboards.get(i); }

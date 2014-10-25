@@ -28,6 +28,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/gamepad_device.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "states_screens/options_screen_audio.hpp"
@@ -109,7 +110,7 @@ void OptionsScreenInput2::init()
     {
         deleteBtn->setLabel(_("Delete Configuration"));
 
-        if (input_manager->getDeviceList()->getKeyboardAmount() < 2)
+        if (input_manager->getDeviceManager()->getKeyboardAmount() < 2)
         {
             // don't allow deleting the last config
             deleteBtn->setDeactivated();
@@ -430,7 +431,9 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
         }
 
 
-        std::string gamepad_name = input_manager->getDeviceList()->getGamePadFromIrrID(sensed_input.m_device_id)->m_name;
+        std::string gamepad_name = input_manager->getDeviceManager()
+                                 ->getGamePadFromIrrID(sensed_input.m_device_id)
+                                 ->m_name;
         if (m_config->getName() == gamepad_name)
         {
             GamepadConfig* config =  (GamepadConfig*)m_config;
@@ -484,7 +487,7 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     //if(btn != NULL) btn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     // save new binding to file
-    input_manager->getDeviceList()->serialize();
+    input_manager->getDeviceManager()->serialize();
 }   // gotSensedInput
 
 
@@ -583,7 +586,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
             deleteBtn->setLabel(m_config->isEnabled() ? _("Disable Device")
                                                       : _("Enable Device")  );
 
-            input_manager->getDeviceList()->serialize();
+            input_manager->getDeviceManager()->serialize();
         }
     }
 
@@ -610,13 +613,13 @@ bool OptionsScreenInput2::onEscapePressed()
 void OptionsScreenInput2::onConfirm()
 {
     const bool success =
-        input_manager->getDeviceList()->deleteConfig(m_config);
+        input_manager->getDeviceManager()->deleteConfig(m_config);
     assert(success);
     if (!success)
         Log::error("OptionsScreenInput2", "Failed to delete config!");
 
     m_config = NULL;
-    input_manager->getDeviceList()->serialize();
+    input_manager->getDeviceManager()->serialize();
     ModalDialog::dismiss();
     StateManager::get()
         ->replaceTopMostScreen(OptionsScreenInput::getInstance());
@@ -630,10 +633,10 @@ bool OptionsScreenInput2::conflictsBetweenKbdConfig(PlayerAction action,
 {
     KeyboardConfig* other_kbd_config;
     int id = m_config->getBinding(action).getId();
-    for (int i=0; i < input_manager->getDeviceList()->getKeyboardAmount(); i++)
+    for (int i=0; i < input_manager->getDeviceManager()->getKeyboardAmount(); i++)
     {
         other_kbd_config =
-            input_manager->getDeviceList()->getKeyboardConfig(i);
+            input_manager->getDeviceManager()->getKeyboardConfig(i);
 
         if (m_config != other_kbd_config  &&
             other_kbd_config->hasBindingFor(id, from, to)

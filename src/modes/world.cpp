@@ -30,6 +30,7 @@
 #include "graphics/hardware_skinning.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
@@ -842,7 +843,7 @@ void World::updateWorld(float dt)
                 race_manager->setReverseTrack(false);
 
                 // Use keyboard 0 by default (FIXME: let player choose?)
-                InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+                InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
 
                 // Create player and associate player with keyboard
                 StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
@@ -859,8 +860,8 @@ void World::updateWorld(float dt)
 
                 // ASSIGN should make sure that only input from assigned devices
                 // is read.
-                input_manager->getDeviceList()->setAssignMode(ASSIGN);
-                input_manager->getDeviceList()
+                input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+                input_manager->getDeviceManager()
                     ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
                 StateManager::get()->enterGameState();

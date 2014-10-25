@@ -25,6 +25,7 @@
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -63,7 +64,7 @@ void OverWorld::enterOverWorld()
     race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
 
     // Use keyboard 0 by default (FIXME: let player choose?)
-    InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+    InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
 
     // Create player and associate player with keyboard
     StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
@@ -81,8 +82,8 @@ void OverWorld::enterOverWorld()
 
     // ASSIGN should make sure that only input from assigned devices
     // is read.
-    input_manager->getDeviceList()->setAssignMode(ASSIGN);
-    input_manager->getDeviceList()
+    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+    input_manager->getDeviceManager()
         ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
     StateManager::get()->enterGameState();

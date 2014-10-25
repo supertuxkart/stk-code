@@ -812,7 +812,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
             m_action_active = false;
             //World::getWorld()->getRaceGUI()->clearAllMessages();
 
-            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
             DeviceConfig* config = device->getConfiguration();
             irr::core::stringw accel = config->getBindingAsString(PA_ACCEL);
             irr::core::stringw left = config->getBindingAsString(PA_STEER_LEFT);
@@ -831,7 +831,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     else if (m_action == "tutorial_giftboxes")
     {
         m_action_active = false;
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
 
@@ -841,7 +841,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     else if (m_action == "tutorial_backgiftboxes")
     {
         m_action_active = false;
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
         
@@ -858,7 +858,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     else if (m_action == "tutorial_nitro_use")
     {
         m_action_active = false;
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw nitro = config->getBindingAsString(PA_NITRO);
 
@@ -868,7 +868,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     else if (m_action == "tutorial_rescue")
     {
         m_action_active = false;
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw rescue = config->getBindingAsString(PA_RESCUE);
 
@@ -880,7 +880,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         m_action_active = false;
         //World::getWorld()->getRaceGUI()->clearAllMessages();
 
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw skid = config->getBindingAsString(PA_DRIFT);
 
