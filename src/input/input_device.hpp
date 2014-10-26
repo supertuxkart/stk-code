@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include "config/device_config.hpp"
+#include "input/device_config.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/state_manager.hpp"

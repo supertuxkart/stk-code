@@ -19,8 +19,8 @@
 #ifndef DEVICE_MANAGER_HPP
 #define DEVICE_MANAGER_HPP
 
+#include "input/device_config.hpp"
 #include "input/input_device.hpp"
-#include "config/device_config.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 

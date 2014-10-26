@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "config/device_config.hpp"
+#include "input/device_config.hpp"
 
 #include "io/xml_node.hpp"
 #include "utils/log.hpp"
