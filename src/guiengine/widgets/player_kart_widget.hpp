@@ -46,6 +46,8 @@ namespace GUIEngine
     {
         /** Whether this player confirmed their selection */
         bool m_ready;
+        /** If the player is handicapped. */
+        bool m_handicapped;
 
         /** widget coordinates */
         int player_name_x, player_name_y, player_name_w, player_name_h;
@@ -134,6 +136,10 @@ namespace GUIEngine
         // ------------------------------------------------------------------------
         /** \return Whether this player confirmed his kart and indent selection */
         bool isReady();
+
+        // ------------------------------------------------------------------------
+        /** \return Whether this player is handicapped or not */
+        bool isHandicapped();
 
         // -------------------------------------------------------------------------
         /** Updates the animation (moving/shrinking/etc.) */

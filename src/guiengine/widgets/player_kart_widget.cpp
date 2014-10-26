@@ -54,6 +54,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     w_speed = 1.0f;
     h_speed = 1.0f;
     m_ready = false;
+    m_handicapped = false;
     m_not_updated_yet = true;
 
     m_irrlicht_widget_id = irrlicht_widget_id;
@@ -351,6 +352,9 @@ void PlayerKartWidget::add()
         {
             core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
             m_player_ident_spinner->addLabel(translations->fribidize(name));
+            if (UserConfigParams::m_per_player_difficulty)
+                // The second player is the same, but with handicap
+                m_player_ident_spinner->addLabel(translations->fribidize(name));
         }
 
         // select the right player profile in the spinner
@@ -361,6 +365,9 @@ void PlayerKartWidget::add()
         m_player_ident_spinner->addLabel(name);
         m_player_ident_spinner->setVisible(false);
     }
+
+    // Add anchor badge if the player is handicapped
+    int spinner_value = m_player_ident_spinner->getValue();
 
     assert(m_player_ident_spinner->getStringValue() == name);
 }   // add
@@ -436,6 +443,14 @@ bool PlayerKartWidget::isReady()
     assert(m_magic_number == 0x33445566);
     return m_ready;
 }   // isReady
+
+// ------------------------------------------------------------------------
+/** \return Whether this player is handicapped or not */
+bool PlayerKartWidget::isHandicapped()
+{
+    assert(m_magic_number == 0x33445566);
+    return m_handicapped;
+}   // isHandicapped
 
 // -------------------------------------------------------------------------
 /** Updates the animation (moving/shrinking/etc.) */
@@ -582,20 +597,19 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
 
         if (m_parent_screen->m_multiplayer)
         {
+            int spinner_value = m_player_ident_spinner->getValue();
             PlayerProfile* profile = PlayerManager::get()->getPlayer(
-                m_player_ident_spinner->getValue());
+                UserConfigParams::m_per_player_difficulty ? spinner_value / 2 : spinner_value);
             m_associated_player->setPlayerProfile(profile);
-
-            // Add badge for per player difficulty if necessary
-            m_model_view->unsetBadge(ZIPPER_BADGE);
-            m_model_view->unsetBadge(ANCHOR_BADGE);
-            if (!m_parent_screen->m_from_overworld && (m_parent_screen->m_multiplayer || profile->isSingleplayerDifficulty()))
+            if(UserConfigParams::m_per_player_difficulty && spinner_value % 2 != 0)
             {
-                PerPlayerDifficulty difficulty = profile->getDifficulty();
-                if (difficulty < PLAYER_DIFFICULTY_NORMAL)
-                    m_model_view->setBadge(ZIPPER_BADGE);
-                else if (difficulty > PLAYER_DIFFICULTY_NORMAL)
-                    m_model_view->setBadge(ANCHOR_BADGE);
+                m_handicapped = true;
+                m_model_view->setBadge(ANCHOR_BADGE);
+            }
+            else
+            {
+                m_handicapped = false;
+                m_model_view->unsetBadge(ANCHOR_BADGE);
             }
         }
     }

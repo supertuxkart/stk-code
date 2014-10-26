@@ -130,6 +130,12 @@ void OptionsScreenUI::init()
     assert( news != NULL );
     news->setState( UserConfigParams::m_internet_status
                                      ==RequestManager::IPERM_ALLOWED );
+    CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
+    assert( difficulty != NULL );
+    difficulty->setState( UserConfigParams::m_per_player_difficulty );
+    CheckBoxWidget* ai_handicap = getWidget<CheckBoxWidget>("aiHandicap");
+    assert( ai_handicap != NULL );
+    ai_handicap->setState( UserConfigParams::m_ai_handicap );
 
     CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
     assert( show_login!= NULL );
@@ -259,6 +265,18 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
         assert( show_login != NULL );
         UserConfigParams::m_always_show_login_screen = show_login->getState();
+    }
+    else if (name=="perPlayerDifficulty")
+    {
+        CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
+        assert( difficulty != NULL );
+        UserConfigParams::m_per_player_difficulty = difficulty->getState();
+    }
+    else if (name=="aiHandicap")
+    {
+        CheckBoxWidget* ai_handicap = getWidget<CheckBoxWidget>("aiHandicap");
+        assert( ai_handicap != NULL );
+        UserConfigParams::m_ai_handicap = ai_handicap->getState();
     }
     else if (name == "language")
     {

@@ -41,8 +41,6 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_local_name          = name;
     m_is_guest_account    = is_guest;
     m_use_frequency       = is_guest ? -1 : 0;
-    m_difficulty          = PLAYER_DIFFICULTY_NORMAL;
-    m_singleplayer_difficulty = false;
     m_unique_id           = PlayerManager::get()->getUniqueId();
     m_saved_session       = false;
     m_saved_token         = "";
@@ -70,8 +68,6 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 */
 PlayerProfile::PlayerProfile(const XMLNode* node)
 {
-    m_difficulty          = PLAYER_DIFFICULTY_NORMAL;
-    m_singleplayer_difficulty = false;
     m_saved_session       = false;
     m_saved_token         = "";
     m_saved_user_id       = 0;
@@ -85,8 +81,6 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     node->get("name",              &m_local_name       );
     node->get("guest",             &m_is_guest_account );
     node->get("use-frequency",     &m_use_frequency    );
-    node->get("difficulty",        (int*) &m_difficulty);
-    node->get("singleplayer-difficulty", &m_singleplayer_difficulty);
     node->get("unique-id",         &m_unique_id        );
     node->get("saved-session",     &m_saved_session    );
     node->get("saved-user",        &m_saved_user_id    );
@@ -205,9 +199,6 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
 
     out << L"            icon-filename=\"" << m_icon_filename << L"\"\n";
-
-    out << L"            difficulty=\"" << m_difficulty
-        << L"\" singleplayer-difficulty=\"" << m_singleplayer_difficulty << L"\"\n";
 
     out << L"            unique-id=\""  << m_unique_id
         << L"\" saved-session=\""       << m_saved_session << L"\"\n";

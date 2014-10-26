@@ -68,11 +68,8 @@ std::string PlayerDifficulty::getIdent() const
 {
     switch(m_difficulty)
     {
-    case PLAYER_DIFFICULTY_EASIEST: return "easiest"; break;
-    case PLAYER_DIFFICULTY_EASY:    return "easy";    break;
-    case PLAYER_DIFFICULTY_NORMAL:  return "normal";  break;
-    case PLAYER_DIFFICULTY_HARD:    return "hard";    break;
-    case PLAYER_DIFFICULTY_HARDEST: return "hardest"; break;
+    case PLAYER_DIFFICULTY_NORMAL:   return "normal";   break;
+    case PLAYER_DIFFICULTY_HANDICAP: return "handicap"; break;
     default:  assert(false);
     }
     return "";

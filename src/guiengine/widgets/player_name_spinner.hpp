@@ -40,10 +40,10 @@ namespace GUIEngine
         PlayerNameSpinner(KartSelectionScreen* parent, const int playerID);
         // ------------------------------------------------------------------------
         void setID(const int m_playerID);
+
         // ------------------------------------------------------------------------
         /** Add a red mark on the spinner to mean "invalid choice" */
         void markAsIncorrect();
-
         // ------------------------------------------------------------------------
         /** Remove any red mark set with 'markAsIncorrect' */
         void markAsCorrect();

@@ -87,13 +87,6 @@ private:
     /** Absolute path of the icon file for this player. */
     std::string m_icon_filename;
 
-    /** The difficulty (boost or handicap) for this player. */
-    PerPlayerDifficulty m_difficulty;
-
-    /** If the per player difficulty should be applied for singleplayer games.
-        Story mode is excluded to prevent cheating. */
-    bool m_singleplayer_difficulty;
-
     /** True if this user has a saved session. */
     bool m_saved_session;
 
@@ -166,42 +159,6 @@ public:
         assert(m_magic_number == 0xABCD1234);
         return m_local_name.c_str();
     }   // getName
-
-    // ------------------------------------------------------------------------
-    /** Sets the per player difficulty for this player. */
-    void setDifficulty(const PerPlayerDifficulty difficulty)
-    {
-        #ifdef DEBUG
-        assert(m_magic_number == 0xABCD1234);
-        #endif
-        m_difficulty = difficulty;
-    }   // setDifficulty
-
-    // ------------------------------------------------------------------------
-    /** Returns the per player difficulty of this player. */
-    PerPlayerDifficulty getDifficulty() const
-    {
-        assert(m_magic_number == 0xABCD1234);
-        return m_difficulty;
-    }   // getDifficulty
-
-    // ------------------------------------------------------------------------
-    /** Sets the singleplayer difficulty for this player. */
-    void setSingleplayerDifficulty(const bool singleplayer_difficulty)
-    {
-        #ifdef DEBUG
-        assert(m_magic_number == 0xABCD1234);
-        #endif
-        m_singleplayer_difficulty = singleplayer_difficulty;
-    }   // setSingleplayerDifficulty
-
-    // ------------------------------------------------------------------------
-    /** Returns the per player difficulty of this player. */
-    bool isSingleplayerDifficulty() const
-    {
-        assert(m_magic_number == 0xABCD1234);
-        return m_singleplayer_difficulty;
-    }   // getDifficulty
 
     // ------------------------------------------------------------------------
     /** Returns true if this player is a guest account. */
