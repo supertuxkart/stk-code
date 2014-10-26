@@ -74,7 +74,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
     m_max_lifespan = -1;
 
     // Add the graphical model
-    setNode(irr_driver->addMesh(m_st_model[type]));
+    setNode(irr_driver->addMesh(m_st_model[type], StringUtils::insertValues("flyable_%i", (int)type)));
     irr_driver->applyObjectPassShader(getNode());
 #ifdef DEBUG
     std::string debug_name("flyable: ");

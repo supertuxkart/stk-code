@@ -52,7 +52,7 @@ void main(void)
     float specval = texture(ntex, uv).z;
     // From http://graphics.cs.williams.edu/papers/EnvMipReport2013/
     int texSize = textureSize(tex, 0).x;
-    float lodval = log2(texSize * sqrt(3)) - .5 * log2(specval + 1);
+    float lodval = clamp(log2(texSize * sqrt(3)) - .5 * log2(specval + 1), 0., 10.);
     vec4 specular = textureLod(tex, sampleDirection, lodval);
     Spec = max(specular, vec4(0.));
 }

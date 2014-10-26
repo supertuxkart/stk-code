@@ -551,7 +551,7 @@ void QuadGraph::createDebugMesh()
         c.setBlue((i%2) ? 0 : 255);
         v[i].Color = c;
     }
-    m_node = irr_driver->addMesh(m_mesh);
+    m_node = irr_driver->addMesh(m_mesh, "quad_graph_debug");
 #ifdef DEBUG
     m_node->setName("track-debug-mesh");
 #endif
@@ -1006,7 +1006,7 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
                /*track_color*/    &fill_color,
                /*lap line color*/  &red                       );
 
-    m_node = irr_driver->addMesh(m_mesh);
+    m_node = irr_driver->addMesh(m_mesh, "mini_map");
 #ifdef DEBUG
     m_node->setName("minimap-mesh");
 #endif

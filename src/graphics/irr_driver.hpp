@@ -453,6 +453,7 @@ public:
     scene::IMeshSceneNode*addSphere(float radius,
                  const video::SColor &color=video::SColor(128, 255, 255, 255));
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
+                                  const std::string& debug_name,
                                   scene::ISceneNode *parent=NULL);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
@@ -473,7 +474,7 @@ public:
     void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);
     scene::IAnimatedMeshSceneNode
-                         *addAnimatedMesh(scene::IAnimatedMesh *mesh, scene::ISceneNode* parent=NULL);
+        *addAnimatedMesh(scene::IAnimatedMesh *mesh, const std::string& debug_name, scene::ISceneNode* parent = NULL);
     scene::ICameraSceneNode
                          *addCameraSceneNode();
     Camera               *addCamera(unsigned int index, AbstractKart *kart);

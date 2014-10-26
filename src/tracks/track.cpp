@@ -999,7 +999,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
-    scene::ISceneNode *scene_node = irr_driver->addMesh(tangent_mesh);
+    scene::ISceneNode *scene_node = irr_driver->addMesh(tangent_mesh, "track_main");
     //scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
     // We should drop the merged mesh (since it's now referred to in the
     // scene node), but then we need to grab it since it's in the
@@ -1213,7 +1213,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             // create a node out of this mesh just for bullet; delete it after, normal maps are special
             // and require tangent meshes
-            scene_node = irr_driver->addMesh(original_mesh);
+            scene_node = irr_driver->addMesh(original_mesh, "original_mesh");
 
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
@@ -1228,7 +1228,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             irr_driver->grabAllTextures(mesh);
 
             m_all_cached_meshes.push_back(mesh);
-            scene_node = irr_driver->addMesh(mesh);
+            scene_node = irr_driver->addMesh(mesh, "original_mesh_with_tangents");
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
             scene_node->setScale(scale);
@@ -1276,7 +1276,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             m_all_cached_meshes.push_back(a_mesh);
             irr_driver->grabAllTextures(a_mesh);
             a_mesh->grab();
-            scene_node = irr_driver->addMesh(a_mesh);
+            scene_node = irr_driver->addMesh(a_mesh, model_name);
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
             scene_node->setScale(scale);
@@ -1532,7 +1532,7 @@ void Track::createWater(const XMLNode &node)
     }
     else
     {*/
-        scene_node = irr_driver->addMesh(mesh);
+        scene_node = irr_driver->addMesh(mesh, "water");
     //}
 
     if(!mesh || !scene_node)

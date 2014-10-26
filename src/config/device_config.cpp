@@ -16,11 +16,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <assert.h>
 
 #include "config/device_config.hpp"
+
+#include "io/xml_node.hpp"
 #include "utils/log.hpp"
+
 #include <SKeyMap.h>
+
+#include <assert.h>
+
 using namespace irr;
 
 //==== D E V I C E C O N F I G =================================================
@@ -223,39 +228,51 @@ void DeviceConfig::serialize (std::ofstream& stream)
 }   // serialize
 
 //------------------------------------------------------------------------------
-
-bool DeviceConfig::deserializeAction(irr::io::IrrXMLReader* xml)
+/** Reads a device configuration from input.xml.
+ *  \param config The XML Node of the configuration.
+ *  \return False if an error occurred.
+ */
+bool DeviceConfig::load(const XMLNode *config)
 {
-    int                  binding_id = -1;
-
-    // Never hurts to check ;)
-    if (xml == NULL)
+    bool error = false;
+    for(unsigned int i=0; i<config->getNumNodes(); i++)
     {
-        Log::error("DeviceConfig", "Null pointer (DeviceConfig::deserializeAction)");
-        return false;
-    }
-
-    // Read tags from XML
-    const char *name_string     = xml->getAttributeValue("name");
-    // Try to determine action # for verbose action name
-    for (int i = 0; i < PA_COUNT; i++)
-    {
-        if (strcmp(name_string, KartActionStrings[i].c_str()) == 0)
+        const XMLNode *action = config->getNode(i);
+        if(action->getName()!="action")
         {
-            binding_id = i;
-            break;
+            Log::warn("DeviceConfig", "Invalid configuration '%s' - ignored.");
+            continue;
         }
-    }
-    if(binding_id==-1)
-    {
-        Log::warn("DeviceConfig", "DeviceConfig::deserializeAction : action '%s' is unknown.",
-                  name_string);
-        return false;
-    }
+        std::string name;
+        action->get("name", &name);
+        int binding_id = -1;
+        for (int i = 0; i < PA_COUNT; i++)
+        {
+            if (name==KartActionStrings[i])
+            {
+                binding_id = i;
+                break;
+            }
+        }
+        if (binding_id == -1)
+        {
+            Log::warn("DeviceConfig",
+                      "DeviceConfig::deserializeAction : action '%s' is unknown.",
+                      name.c_str());
+            error=true;
+        }
 
-    return m_bindings[binding_id].deserialize(xml);
-}   // deserializeAction
+        if(!m_bindings[binding_id].load(action))
+        {
+            Log::error("Device manager",
+                       "Ignoring an ill-formed keyboard action in input config.");
+            error=true;
+        }
+    }   // for i in nodes
+    return !error;
+}   // load
 
+// ---------------------------------------------------------------------------
 
 //  KeyboardConfig & GamepadConfig classes really should be in a separate cpp
 //  file but they are so small that we'll just leave them here for now.
@@ -350,19 +367,13 @@ GamepadConfig::GamepadConfig   ( const std::string     &name,
 
 //------------------------------------------------------------------------------
 
-GamepadConfig::GamepadConfig(irr::io::IrrXMLReader* xml) : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
+GamepadConfig::GamepadConfig(const XMLNode *config) 
+             : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
 {
-    const char* name_string = xml->getAttributeValue("name");
-    if(name_string == NULL)
+    if(!config->get("name", &m_name))
         Log::error("DeviceConfig", "Unnamed joystick in config file.");
-    else
-        m_name = name_string;
 
-    const char* enabled_string = xml->getAttributeValue("enabled");
-    if (enabled_string != NULL)
-        m_enabled = (strcmp(enabled_string, "true") == 0);
-    else
-        m_enabled = true;
+    config->get("enabled", &m_enabled);
 
     m_plugged = 0;
     setDefaultBinds();

@@ -99,7 +99,7 @@ private:
      *  pressing fire. */
     bool m_map_fire_to_select;
 
-    bool deserialize();
+    bool load();
     void shutdown();
 
 public:

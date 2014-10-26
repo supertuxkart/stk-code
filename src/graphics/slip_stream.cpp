@@ -55,7 +55,7 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     m.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
 
     createMesh(m);
-    m_node = irr_driver->addMesh(m_mesh);
+    m_node = irr_driver->addMesh(m_mesh, "splistream");
     m_mesh->drop();
 
 #ifdef DEBUG
@@ -101,7 +101,7 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
         }
         buffer->recalculateBoundingBox();
         m_mesh->setBoundingBox(buffer->getBoundingBox());
-        m_debug_node = irr_driver->addMesh(m_debug_mesh, m_kart->getNode());
+        m_debug_node = irr_driver->addMesh(m_debug_mesh, "splistream_debug", m_kart->getNode());
         m_debug_node->grab();
     }
     else

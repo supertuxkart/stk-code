@@ -99,7 +99,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         }
         buffer->recalculateBoundingBox();
         mesh->setBoundingBox(buffer->getBoundingBox());
-        m_debug_node = irr_driver->addMesh(mesh);
+        m_debug_node = irr_driver->addMesh(mesh, "checkdebug");
         mesh->drop();
     }
     else
