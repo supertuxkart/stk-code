@@ -68,6 +68,7 @@ SavedGrandPrix::SavedGrandPrix(unsigned int player_id,
                                RaceManager::Difficulty difficulty,
                                int player_karts,
                                int last_track,
+                               int reverse_type,
                                const std::vector<RaceManager::KartStatus> &kart_list)
               : m_savedgp_group("SavedGP",
                                 "Represents the saved state of a GP"),
@@ -75,7 +76,8 @@ SavedGrandPrix::SavedGrandPrix(unsigned int player_id,
                 m_gp_id(gp_id.c_str(), "gp_id", &m_savedgp_group),
                 m_difficulty((int)difficulty,"difficulty", &m_savedgp_group),
                 m_player_karts(player_karts,"player_karts", &m_savedgp_group),
-                m_next_track(last_track,"last_track", &m_savedgp_group)
+                m_next_track(last_track,"last_track", &m_savedgp_group),
+                m_reverse_type(reverse_type,"reverse_type", &m_savedgp_group)
 {
     for(unsigned int i =0; i < kart_list.size(); i++)
     {
@@ -94,18 +96,20 @@ SavedGrandPrix::SavedGrandPrix(unsigned int player_id,
 SavedGrandPrix::SavedGrandPrix(const XMLNode* node)
               : m_savedgp_group("SavedGP",
                                 "Represents the saved state of a GP"),
-                m_player_id(0, "player_id", &m_savedgp_group),
-                m_gp_id("-", "gp_id", &m_savedgp_group),
-                m_difficulty(0,"difficulty", &m_savedgp_group),
+                m_player_id   (0, "player_id",   &m_savedgp_group),
+                m_gp_id     ("-", "gp_id",       &m_savedgp_group),
+                m_difficulty  (0,"difficulty",   &m_savedgp_group),
                 m_player_karts(0,"player_karts", &m_savedgp_group),
-                m_next_track(0,"last_track", &m_savedgp_group)
+                m_next_track  (0,"last_track",   &m_savedgp_group),
+                m_reverse_type(0,"reverse_type", &m_savedgp_group)
 {
     //m_player_group.findYourDataInAChildOf(node);
-    m_player_id.findYourDataInAnAttributeOf(node);
-    m_gp_id.findYourDataInAnAttributeOf(node);
-    m_difficulty.findYourDataInAnAttributeOf(node);
+    m_player_id.   findYourDataInAnAttributeOf(node);
+    m_gp_id.       findYourDataInAnAttributeOf(node);
+    m_difficulty.  findYourDataInAnAttributeOf(node);
     m_player_karts.findYourDataInAnAttributeOf(node);
-    m_next_track.findYourDataInAnAttributeOf(node);
+    m_next_track.  findYourDataInAnAttributeOf(node);
+    m_reverse_type.findYourDataInAnAttributeOf(node);
 
     std::vector<XMLNode*> karts;
     node->getNodes("Kart", karts);
@@ -140,35 +144,41 @@ void SavedGrandPrix::setKarts(const std::vector<RaceManager::KartStatus> &kart_l
     }
 }   // setKarts
 
+/* compares two KartStatus-objects for std::sort in the next function */
+bool cmp__l(RaceManager::KartStatus first, RaceManager::KartStatus second)
+{
+    return (first.m_score > second.m_score);
+}
 //------------------------------------------------------------------------------
 void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
 {
-    //Fix aikarts
+
     int aikarts = 0;
     for(unsigned int i = 0; i < m_karts.size(); i++)
     {
         const KartProperties *kp = kart_properties_manager->getKart(m_karts[i].m_ident);
 
-        if(m_karts[i].m_local_player_id == -1)
+        if(m_karts[i].m_local_player_id == -1) // AI kart
         {
-            //AI kart found
             if(kp) kart_list[aikarts].m_ident = m_karts[i].m_ident;
-            kart_list[aikarts].m_score = m_karts[i].m_score;
+            kart_list[aikarts].m_score        = m_karts[i].m_score;
             kart_list[aikarts].m_overall_time = m_karts[i].m_overall_time;
             aikarts++;
         }
         else
         {
-            //Get correct player
+            // Get correct player
             for(unsigned int x = kart_list.size()-m_player_karts;
                 x < kart_list.size(); x++)
             {
                 if(kart_list[x].m_local_player_id == m_karts[i].m_local_player_id)
                 {
-                    kart_list[x].m_score = m_karts[i].m_score;
+                    kart_list[x].m_score        = m_karts[i].m_score;
                     kart_list[x].m_overall_time = m_karts[i].m_overall_time;
                 }   // if kart_list[x].m_local_player_id == m_karts[i].,_local
             }   // for x
         }   // if m_local_player_id == -1
     }   // for i
+
+    std::sort(kart_list.begin(), kart_list.end(), cmp__l);
 }   // loadKarts

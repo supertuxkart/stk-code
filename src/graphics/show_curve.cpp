@@ -33,7 +33,7 @@ ShowCurve::ShowCurve(float width, float height,
 {
     m_color = color;
     addEmptyMesh();
-    m_scene_node      = irr_driver->addMesh(m_mesh);
+    m_scene_node      = irr_driver->addMesh(m_mesh, "showcurve");
     // After addMesh ref count is 1 (for the attachment to the
     // scene). We keep a copy here, so increase the ref count.
     m_scene_node->grab();

@@ -16,6 +16,8 @@
 #include "COSOperator.h"
 #include "dimension2d.h"
 #include "IGUISpriteBank.h"
+#include <mmsystem.h>
+#include <regstr.h>
 #include <winuser.h>
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
@@ -359,6 +361,63 @@ void pollJoysticks()
 #endif // _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 }
 
+/** This function is ported from SDL and released under zlip:
+ *  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+ */
+void setJoystickName(int index, const JOYCAPS &caps, SJoystickInfo *joystick)
+{
+    // As a default use the name given in the joystick structure
+    // - though that is always the same name, independent of joystick :(
+    joystick->Name = caps.szPname;
+
+    core::stringc key = core::stringc(REGSTR_PATH_JOYCONFIG)+"\\"+caps.szRegKey
+                      + "\\"+REGSTR_KEY_JOYCURR;
+    HKEY hTopKey = HKEY_LOCAL_MACHINE;
+    HKEY hKey;
+    long regresult = RegOpenKeyExA(hTopKey, key.c_str(), 0, KEY_READ, &hKey);
+    if (regresult != ERROR_SUCCESS)
+    {
+        hTopKey = HKEY_CURRENT_USER;
+        regresult = RegOpenKeyExA(hTopKey, key.c_str(), 0, KEY_READ, &hKey);
+    }
+    if (regresult != ERROR_SUCCESS) return;
+
+    /* find the registry key name for the joystick's properties */
+    char regname[256];
+    DWORD regsize = sizeof(regname);
+    core::stringc regvalue = core::stringc("Joystick")+core::stringc(index+1)
+                           + REGSTR_VAL_JOYOEMNAME;
+    regresult = RegQueryValueExA(hKey, regvalue.c_str(), 0, 0,
+                                 (LPBYTE)regname, &regsize);
+    RegCloseKey(hKey);
+    if (regresult != ERROR_SUCCESS) return;
+
+    /* open that registry key */
+    core::stringc regkey = core::stringc(REGSTR_PATH_JOYOEM)+"\\"+regname;
+    regresult = RegOpenKeyExA(hTopKey, regkey.c_str(), 0, KEY_READ, &hKey);
+    if (regresult != ERROR_SUCCESS) return;
+
+    /* find the size for the OEM name text */
+    regsize = sizeof(regvalue);
+    regresult = RegQueryValueExA(hKey, REGSTR_VAL_JOYOEMNAME, 0, 0,
+                                 NULL, &regsize);
+    if (regresult == ERROR_SUCCESS)
+    {
+        char *name;
+        /* allocate enough memory for the OEM name text ... */
+        name = new char[regsize];
+        if (name)
+        {
+            /* ... and read it from the registry */
+            regresult = RegQueryValueExA(hKey, REGSTR_VAL_JOYOEMNAME, 0, 0,
+                                         (LPBYTE)name, &regsize            );
+            joystick->Name = name;
+        }   // if name
+    }    // if SUCCESS
+    RegCloseKey(hKey);
+}
+
+
 bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo)
 {
 #if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
@@ -407,11 +466,10 @@ bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo)
 		{
 			activeJoystick.Index = joystick;
 			ActiveJoysticks.push_back(activeJoystick);
-
 			returnInfo.Joystick = (u8)joystick;
 			returnInfo.Axes = activeJoystick.Caps.wNumAxes;
 			returnInfo.Buttons = activeJoystick.Caps.wNumButtons;
-			returnInfo.Name = activeJoystick.Caps.szPname;
+			setJoystickName(joystick, activeJoystick.Caps, &returnInfo);
 			returnInfo.PovHat = ((activeJoystick.Caps.wCaps & JOYCAPS_HASPOV) == JOYCAPS_HASPOV)
 								? SJoystickInfo::POV_HAT_PRESENT : SJoystickInfo::POV_HAT_ABSENT;
 

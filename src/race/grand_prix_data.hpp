@@ -94,6 +94,9 @@ public:
         GP_DEFAULT_REVERSE = 3
     };   // GPReverseType
 
+private:
+    GPReverseType m_reverse_type;
+
 public:
 #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
 #  pragma warning(disable:4290)
@@ -145,22 +148,25 @@ public:
     // ------------------------------------------------------------------------
     /** @return the (potentially translated) user-visible name of the Grand
      *  Prix (apply fribidi as needed) */
-    irr::core::stringw getName()     const { return _LTR(m_name.c_str()); }
+    irr::core::stringw getName()      const { return _LTR(m_name.c_str()); }
 
     // ------------------------------------------------------------------------
     /** @return the internal indentifier of the Grand Prix (not translated) */
-    const std::string& getId()       const { return m_id;                 }
+    const std::string& getId()        const { return m_id;                 }
 
     // ------------------------------------------------------------------------
     /** Returns true if this GP is a random GP. */
-    bool isRandomGP() const { return m_id=="random"; }
+    bool isRandomGP()                 const { return m_id=="random";       }
     // ------------------------------------------------------------------------
     /** Returns the filename of the grand prix xml file. */
-    const std::string& getFilename() const { return m_filename;           }
+    const std::string& getFilename()  const { return m_filename;           }
 
     // ------------------------------------------------------------------------
-    /** Returns the group. */
-    enum GPGroupType getGroup()      const { return m_group;              }
+    enum GPGroupType getGroup()       const { return m_group;              }
+
+    // ------------------------------------------------------------------------
+    enum GPReverseType getReverseType()
+                                      const { return m_reverse_type;       }
 };   // GrandPrixData
 
 #endif

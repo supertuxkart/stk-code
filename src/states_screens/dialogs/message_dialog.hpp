@@ -62,7 +62,7 @@ public:
     };
 
     enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM,
-                             MESSAGE_DIALOG_OK_CANCEL                    };
+                             MESSAGE_DIALOG_OK_CANCEL, MESSAGE_DIALOG_YESNO };
     
 private:
     

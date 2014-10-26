@@ -59,7 +59,7 @@ Attachment::Attachment(AbstractKart* kart)
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
     m_node = irr_driver->addAnimatedMesh(
-                         attachment_manager->getMesh(Attachment::ATTACH_BOMB));
+                         attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb");
 #ifdef DEBUG
     std::string debug_name = kart->getIdent()+" (attachment)";
     m_node->setName(debug_name.c_str());
@@ -113,7 +113,7 @@ void Attachment::set(AttachmentType type, float time,
         bomb_scene_node = m_node;
 
         m_node = irr_driver->addAnimatedMesh(
-                     attachment_manager->getMesh(Attachment::ATTACH_BOMB));
+                     attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb");
 #ifdef DEBUG
         std::string debug_name = m_kart->getIdent() + " (attachment)";
         m_node->setName(debug_name.c_str());

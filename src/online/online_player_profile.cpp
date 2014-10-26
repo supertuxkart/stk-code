@@ -29,7 +29,6 @@
 #include "states_screens/online_profile_friends.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/change_password_dialog.hpp"
-#include "states_screens/dialogs/notification_dialog.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"

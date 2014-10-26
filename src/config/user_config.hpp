@@ -704,6 +704,12 @@ namespace UserConfigParams
                                                      &m_hw_report_group,
                                                     "The server used for reporting statistics to."));
 
+    PARAM_PREFIX BoolUserConfigParam      m_hw_report_enable
+            PARAM_DEFAULT( BoolUserConfigParam(   true,
+                                                     "hw-report-enabled",
+                                                     &m_hw_report_group,
+                                                    "If HW reports are enabled."));
+
     // ---- User management
 
     PARAM_PREFIX BoolUserConfigParam        m_always_show_login_screen

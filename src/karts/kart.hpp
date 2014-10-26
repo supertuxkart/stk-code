@@ -232,7 +232,7 @@ private:
     void          updateEngineSFX();
     void          updateNitro(float dt);
     float         getActualWheelForce();
-    void          crashed(const Material* m, AbstractKart *k);
+    void          playCrashSFX(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
 
 public:

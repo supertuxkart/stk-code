@@ -139,7 +139,7 @@ Referee::Referee()
     // mesh. ATM it doesn't make any difference, but if we ever should
     // decide to use more than one referee model at startup we only
     // have to change the textures once, and all models will be in synch.
-    m_scene_node = irr_driver->addAnimatedMesh(NULL);
+    m_scene_node = irr_driver->addAnimatedMesh(NULL, "referee");
     m_scene_node->setReadOnlyMaterials(true);
     m_scene_node->setMesh(m_st_referee_mesh);
     m_scene_node->grab();
@@ -175,7 +175,7 @@ Referee::Referee(const AbstractKart &kart)
     // mesh. ATM it doesn't make any difference, but if we ever should
     // decide to use more than one referee model at startup we only
     // have to change the textures once, and all models will be in synch.
-    m_scene_node = irr_driver->addAnimatedMesh(NULL);
+    m_scene_node = irr_driver->addAnimatedMesh(NULL, "referee");
     m_scene_node->setReadOnlyMaterials(true);
     m_scene_node->setMesh(m_st_referee_mesh);
     m_scene_node->grab();

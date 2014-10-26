@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
+    <div x="0" y="0" width="100%" height="fit" layout="vertical-row">
+        <button id="user-id" width="20%" height="fit" align="right"/>
+    </div>
+
     <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
         <icon id="logo" align="center" proportion="5" width="100%" icon="gui/logo.png"/>
 

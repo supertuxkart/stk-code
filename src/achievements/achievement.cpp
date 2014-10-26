@@ -24,7 +24,6 @@
 #include "guiengine/message_queue.hpp"
 #include "io/utf_writer.hpp"
 #include "config/player_manager.hpp"
-#include "states_screens/dialogs/notification_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 

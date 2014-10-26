@@ -1744,7 +1744,7 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
         getAttachment()->handleCollisionWithKart(k);
     }
     m_controller->crashed(k);
-    crashed(NULL, k);
+    playCrashSFX(NULL, k);
 }   // crashed(Kart, update_attachments
 
 // -----------------------------------------------------------------------------
@@ -1753,6 +1753,7 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
  */
 void Kart::crashed(const Material *m, const Vec3 &normal)
 {
+    playCrashSFX(m, NULL);
 #ifdef DEBUG
     // Simple debug output for people playing without sound.
     // This makes it easier to see if a kart hit the track (esp.
@@ -1858,26 +1859,33 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
-            if (m_bounce_back_time <= 0.2f) // this variable is sometimes set to 0.1 somewhere else
+            // This variable is set to 0.2 in case of a kart-terrain collision
+            if (m_bounce_back_time <= 0.2f)
             {
                 btVector3 push = m_body->getLinearVelocity().normalized();
                 push[1] = 0.1f;
                 m_body->applyCentralImpulse( -4000.0f*push );
                 m_bounce_back_time = 2.0f;
 
-                core::stringw msg = _("You need more points\nto enter this challenge!\nCheck the minimap for\navailable challenges.");
-                std::vector<core::stringw> parts = StringUtils::split(msg, '\n', false);
+                core::stringw msg = _("You need more points\n"
+                                      "to enter this challenge!\n"
+                                      "Check the minimap for\n"
+                                      "available challenges.");
+                std::vector<core::stringw> parts = 
+                    StringUtils::split(msg, '\n', false);
 
-                // For now, until we have scripting, special-case the overworld... (TODO)
+                // For now, until we have scripting, special-case 
+                // the overworld... (TODO)
                 if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
                 {
                     SFXManager::get()->quickSound("forcefield");
 
                     for (unsigned int n = 0; n < parts.size(); n++)
                     {
-                        World::getWorld()->getRaceGUI()->addMessage(parts[n], NULL, 4.0f,
-                                                                    video::SColor(255, 255,255,255),
-                                                                    true, true);
+                        World::getWorld()->getRaceGUI()
+                                         ->addMessage(parts[n], NULL, 4.0f,
+                                                      video::SColor(255, 255,255,255),
+                                                       true, true);
                     }   // for n<parts.size()
                 }   // if world exist
             }   // if m_bounce_back_time <= 0.2f
@@ -1885,7 +1893,6 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     }   // if(m && m->getCollisionReaction() != Material::NORMAL &&
         //   !getKartAnimation())
     m_controller->crashed(m);
-    crashed(m, NULL);
 }   // crashed(Material)
 
 // -----------------------------------------------------------------------------
@@ -1893,7 +1900,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
  * @param m The material collided into, or NULL if none
  * @param k The kart collided into, or NULL if none
  */
-void Kart::crashed(const Material* m, AbstractKart *k)
+void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 {
     if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
 
@@ -1917,11 +1924,9 @@ void Kart::crashed(const Material* m, AbstractKart *k)
                 if(m_crash_sound->getStatus() != SFXBase::SFX_PLAYING)
                     m_crash_sound->play();
             }
-        }
-
-        m_bounce_back_time = 0.1f;
-    }
-}   // crashed
+        }    // if lin_vel > 0.555
+    }   // if m_bounce_back_time <= 0
+}   // playCrashSFX
 
 // -----------------------------------------------------------------------------
 /** Plays a beep sfx.

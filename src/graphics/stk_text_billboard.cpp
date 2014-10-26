@@ -20,7 +20,7 @@ STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
     irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position, const irr::core::vector3df& size) :
     STKMeshSceneNode(new scene::SMesh(),
-        parent, irr_driver->getSceneManager(), -1,
+        parent, irr_driver->getSceneManager(), -1, "text_billboard",
         position, core::vector3df(0.0f, 0.0f, 0.0f), size, false)
 {
     m_color_top = color_top;

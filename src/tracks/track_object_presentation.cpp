@@ -370,7 +370,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
     else if (animated)
     {
         scene::IAnimatedMeshSceneNode *node =
-            irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh, parent);
+            irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh, m_model_file, parent);
         m_node = node;
 
         m_frame_start = node->getStartFrame();
@@ -387,7 +387,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
         if (xml_node)
             xml_node->get("displacing", &displacing);
 
-        m_node = irr_driver->addMesh(m_mesh, parent);
+        m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
 
         STKMeshSceneNode* stkmesh = dynamic_cast<STKMeshSceneNode*>(m_node);
         if (displacing && stkmesh != NULL)
@@ -482,7 +482,8 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
     xml_node.get("max_dist", &max_dist );
 
     // first try track dir, then global dir
-    std::string soundfile = file_manager->getAsset(FileManager::MODEL,sound);
+    std::string soundfile = World::getWorld()->getTrack()->getTrackFile(sound);
+    //std::string soundfile = file_manager->getAsset(FileManager::MODEL,sound);
     if (!file_manager->fileExists(soundfile))
     {
         soundfile = file_manager->getAsset(FileManager::SFX, sound);

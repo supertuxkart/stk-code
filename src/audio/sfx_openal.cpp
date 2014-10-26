@@ -208,30 +208,40 @@ void SFXOpenAL::reallySetVolume(float gain)
 }   // reallySetVolume
 
 //-----------------------------------------------------------------------------
-
+/** Schedules setting of the master volume.
+ *  \param gain Gain value.
+ */
 void SFXOpenAL::setMasterVolume(float gain)
+{
+    // This needs to be called even if sfx are disabled atm, so only exit
+    // in case that the sfx could not be loaded in the first place.
+    if(m_status==SFX_UNKNOWN) return;
+    SFXManager::get()->queue(SFXManager::SFX_MASTER_VOLUME, this, gain);
+}   // setMasterVolume
+
+//-----------------------------------------------------------------------------
+/** Sets the master volume.
+ *  \param gain Master volume.
+ */
+void SFXOpenAL::reallySetMasterVolumeNow(float gain)
 {
     m_master_gain = gain;
     
-    if(m_status==SFX_UNKNOWN) return;
-    if(m_status==SFX_NOT_INITIALISED)
-    {
-        init();
-        if(m_status==SFX_UNKNOWN)
-            return;
-    }
-
+    if(m_status==SFX_UNKNOWN || m_status == SFX_NOT_INITIALISED) return;
 
     alSourcef(m_sound_source, AL_GAIN, 
                (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
     SFXManager::checkError("setting volume");
-}   //setMasterVolume
+}   // reallySetMasterVolumeNow
 
 //-----------------------------------------------------------------------------
 /** Loops this sound effect.
  */
 void SFXOpenAL::setLoop(bool status)
 {
+    // Set the flag (even if sfx are disabled), so that the right settings
+    // are available on restart.
+    m_loop = status;
     if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_LOOP, this, status ? 1.0f : 0.0f);
 }   // setLoop
@@ -247,7 +257,6 @@ void SFXOpenAL::reallySetLoop(bool status)
         if(m_status==SFX_UNKNOWN)
             return;
     }
-    m_loop = status;
 
     alSourcei(m_sound_source, AL_LOOPING, status ? AL_TRUE : AL_FALSE);
     SFXManager::checkError("looping");
@@ -403,8 +412,8 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
         return;
     }
 
-    alSource3f(m_sound_source, AL_POSITION, (float)position.getX(),
-               (float)position.getY(), (float)position.getZ());
+    alSource3f(m_sound_source, AL_POSITION, position.getX(),
+               position.getY(), -position.getZ());
 
     if (SFXManager::get()->getListenerPos().distance(position) 
         > m_sound_buffer->getMaxDist())

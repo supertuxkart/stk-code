@@ -97,6 +97,9 @@ void MainMenuScreen::init()
 {
     Screen::init();
 
+    m_user_id = getWidget<ButtonWidget>("user-id");
+    assert(m_user_id);
+
     // reset in case we're coming back from a race
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
@@ -155,9 +158,11 @@ void MainMenuScreen::init()
 void MainMenuScreen::onUpdate(float delta)
 
 {
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if(PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST  ||
        PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
     {
+        m_user_id->setText(player->getLastOnlineName() + "@stk");
         m_online->setActivated();
         m_online->setLabel( _("Online"));
     }
@@ -165,9 +170,14 @@ void MainMenuScreen::onUpdate(float delta)
     {
         m_online->setActivated();
         m_online->setLabel( _("Login" ));
+        m_user_id->setText(player->getName());
     }
-    else // now must be either logging in or logging out
+    else 
+    {
+        // now must be either logging in or logging out
         m_online->setDeactivated();
+        m_user_id->setText(player->getName());
+    }
 
     m_online->setLabel(PlayerManager::getCurrentOnlineId() ? _("Online")
                                                            : _("Login" )  );
@@ -210,6 +220,12 @@ void MainMenuScreen::onUpdate(float delta)
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                    const int playerID)
 {
+    if(name=="user-id")
+    {
+        UserScreen::getInstance()->push();
+        return;
+    }
+
     // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
 
@@ -446,7 +462,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             //OnlineScreen::getInstance()->push();
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
             OnlineProfileAchievements::getInstance()->push();
-
         }
         else
         {

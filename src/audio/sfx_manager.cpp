@@ -287,6 +287,9 @@ void* SFXManager::mainLoop(void *obj)
                                          current->m_parameter); break;
         case SFX_VOLUME:   current->m_sfx->reallySetVolume(
                                   current->m_parameter.getX()); break;
+        case SFX_MASTER_VOLUME: 
+                           current->m_sfx->reallySetMasterVolumeNow(
+                                  current->m_parameter.getX()); break;
         case SFX_LOOP:     current->m_sfx->reallySetLoop(
                                current->m_parameter.getX()!=0); break;
         case SFX_DELETE:   {
@@ -318,7 +321,7 @@ void* SFXManager::mainLoop(void *obj)
  *  resumes all sound effects. 
  *  \param on If sound is switched on or off.
  */
-void SFXManager::soundToggled(const bool on)
+void SFXManager::toggleSound(const bool on)
 {
     // When activating SFX, load all buffers
     if (on)
@@ -330,7 +333,7 @@ void SFXManager::soundToggled(const bool on)
             buffer->load();
         }
 
-        resumeAll();
+        reallyResumeAllNow();
         m_all_sfx.lock();
         const int sfx_amount = (int)m_all_sfx.getData().size();
         for (int n=0; n<sfx_amount; n++)
@@ -354,7 +357,7 @@ void SFXManager::soundToggled(const bool on)
         m_all_sfx.unlock();
         pauseAll();
     }
-}   // soundToggled
+}   // toggleSound
 
 //----------------------------------------------------------------------------
 /** Returns if sfx can be played. This means sfx are enabled and
@@ -811,15 +814,15 @@ void SFXManager::reallyPositionListenerNow()
         float orientation[6];
         orientation[0] = m_listener_front.getX();
         orientation[1] = m_listener_front.getY();
-        orientation[2] = m_listener_front.getZ();
+        orientation[2] = -m_listener_front.getZ();
 
         //up vector
         orientation[3] = m_listener_up.getX();
         orientation[4] = m_listener_up.getY();
-        orientation[5] = m_listener_up.getZ();
+        orientation[5] = -m_listener_up.getZ();
 
         const Vec3 &pos = m_listener_position.getData();
-        alListener3f(AL_POSITION, pos.getX(), pos.getY(), pos.getZ());
+        alListener3f(AL_POSITION, pos.getX(), pos.getY(), -pos.getZ());
         alListenerfv(AL_ORIENTATION, orientation);
     }
     m_listener_position.unlock();

@@ -20,8 +20,8 @@
 
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine { class Widget; class ListWidget;
-                      class IconButtonWidget;         }
+namespace GUIEngine { class Widget;       class ListWidget; 
+                      class ButtonWidget; class IconButtonWidget; }
 
 /**
   * \brief Handles the main menu
@@ -34,6 +34,9 @@ private:
 
     /** Keep the widget to avoid looking it up every frame. */
     GUIEngine::IconButtonWidget* m_online;
+
+    /** Keep the widget to to the user name. */
+    GUIEngine::ButtonWidget *m_user_id;
 
     MainMenuScreen();
 

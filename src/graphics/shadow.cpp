@@ -50,7 +50,7 @@ Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node,
     v[3].Normal  = normal;
     buffer->recalculateBoundingBox();
 
-    m_node   = irr_driver->addMesh(m_mesh);
+    m_node   = irr_driver->addMesh(m_mesh, "shadow");
 #ifdef DEBUG
     m_node->setName("shadow");
 #endif

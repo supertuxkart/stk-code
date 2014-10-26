@@ -72,6 +72,7 @@ public:
         SFX_SPEED,
         SFX_POSITION,
         SFX_VOLUME,
+        SFX_MASTER_VOLUME,
         SFX_LOOP,
         SFX_LISTENER,
         SFX_UPDATE,
@@ -233,7 +234,7 @@ public:
     SFXBase*                 quickSound(const std::string &soundName);
 
     /** Called when sound was muted/unmuted */
-    void                     soundToggled(const bool newValue);
+    void                     toggleSound(const bool newValue);
 
     // ------------------------------------------------------------------------
     /** Prints the list of currently loaded sounds to stdout. Useful to

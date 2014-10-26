@@ -257,6 +257,9 @@ const std::string& getOSVersion()
  */
 void reportHardwareStats()
 {
+    if(!UserConfigParams::m_hw_report_enable)
+        return;
+
     // Version of the hw report, which is stored in the DB. If new fields
     // are added, increase this version. Each STK installation will report
     // its configuration only once (per version number). So if the version

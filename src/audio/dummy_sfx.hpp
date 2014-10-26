@@ -55,6 +55,8 @@ public:
     virtual void       reallySetSpeed(float factor)     {}
     virtual void       setVolume(float gain)            {}
     virtual void       reallySetVolume(float gain)      {}
+    virtual void       setMasterVolume(float gain)      {}
+    virtual void       reallySetMasterVolumeNow(float gain) {}
     virtual SFXStatus  getStatus()                      { return SFX_STOPPED; }
     virtual void       onSoundEnabledBack()             {}
     virtual void       setRolloff(float rolloff)        {}

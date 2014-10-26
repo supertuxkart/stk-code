@@ -1034,6 +1034,7 @@ namespace GUIEngine
             }
             catch (std::runtime_error& err)
             {
+                (void)err;
                 Log::fatal("Engine::init", "Canot load default GUI skin");
             }
         }
