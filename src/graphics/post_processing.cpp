@@ -453,6 +453,7 @@ void PostProcessing::renderSSAO()
     DrawFullScreenEffect<FullScreenShader::SSAOShader>(irr_driver->getSSAORadius(), irr_driver->getSSAOK(), irr_driver->getSSAOSigma());
 }
 
+
 void PostProcessing::renderFog()
 {
     const Track * const track = World::getWorld()->getTrack();

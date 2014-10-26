@@ -657,17 +657,28 @@ struct CascadeBoundingBox
 static size_t currentCBB = 0;
 static CascadeBoundingBox *CBB[2];
 
+struct Histogram
+{
+    int bin[1024];
+    int mindepth;
+    int maxdepth;
+    int count;
+};
+
+
 /** Update shadowSplit values and make Cascade Bounding Box pointer valid.
 * The function aunches two compute kernel that generates an histogram of the depth buffer value (between 0 and 250 with increment of 0.25)
 * and get an axis aligned bounding box (from SunCamMatrix view) containing all depth buffer value.
 * It also retrieves the result from the previous computations (in a Round Robin fashion) and update CBB pointer.
 * \param width of the depth buffer
 * \param height of the depth buffer
+* TODO : The depth histogram part is commented out, needs to tweak it when I have some motivation
 */
 void IrrDriver::UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, size_t height)
 {
     // Value that should be kept between multiple calls
     static GLuint ssbo[2];
+    static Histogram *Hist[2];
     static GLsync LightcoordBBFence = 0;
     static size_t currentHist = 0;
     static GLuint ssboSplit[2];
@@ -682,6 +693,14 @@ void IrrDriver::UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, si
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[1]);
         glBufferStorage(GL_SHADER_STORAGE_BUFFER, 4 * sizeof(CascadeBoundingBox), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
         CBB[1] = (CascadeBoundingBox *)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, 4 * sizeof(CascadeBoundingBox), GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
+
+/*        glGenBuffers(2, ssboSplit);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboSplit[0]);
+        glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(Histogram), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
+        Hist[0] = (Histogram *)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Histogram), GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboSplit[1]);
+        glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(Histogram), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
+        Hist[1] = (Histogram *)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Histogram), GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);*/
     }
 
     // Use bounding boxes from last frame
@@ -691,17 +710,70 @@ void IrrDriver::UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, si
         glDeleteSync(LightcoordBBFence);
     }
 
+/*    {
+        memcpy(shadowSplit, tmpshadowSplit, 5 * sizeof(float));
+        unsigned numpix = Hist[currentHist]->count;
+        unsigned split = 0;
+        unsigned i;
+        for (i = 0; i < 1022; i++)
+        {
+            split += Hist[currentHist]->bin[i];
+            if (split > numpix / 2)
+                break;
+        }
+        tmpshadowSplit[1] = (float)++i / 4.;
+
+        for (; i < 1023; i++)
+        {
+            split += Hist[currentHist]->bin[i];
+            if (split > 3 * numpix / 4)
+                break;
+        }
+        tmpshadowSplit[2] = (float)++i / 4.;
+
+        for (; i < 1024; i++)
+        {
+            split += Hist[currentHist]->bin[i];
+            if (split > 7 * numpix / 8)
+                break;
+        }
+        tmpshadowSplit[3] = (float)++i / 4.;
+
+        for (; i < 1024; i++)
+        {
+            split += Hist[currentHist]->bin[i];
+        }
+
+        tmpshadowSplit[0] = (float)(Hist[currentHist]->bin[1024] - 1) / 4.;
+        tmpshadowSplit[4] = (float)(Hist[currentHist]->bin[1025] + 1) / 4.;
+                printf("numpix is %d\n", numpix);
+        printf("total : %d\n", split);
+        printf("split 0 : %f\n", tmpshadowSplit[1]);
+        printf("split 1 : %f\n", tmpshadowSplit[2]);
+        printf("split 2 : %f\n", tmpshadowSplit[3]);
+        printf("min %f max %f\n", tmpshadowSplit[0], tmpshadowSplit[4]);
+        currentHist = (currentHist + 1) % 2;
+    }*/
+
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo[currentCBB]);
+//    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboSplit[currentHist]);
     for (unsigned i = 0; i < 4; i++)
     {
         CBB[currentCBB][i].xmin = CBB[currentCBB][i].ymin = CBB[currentCBB][i].zmin = 1000;
         CBB[currentCBB][i].xmax = CBB[currentCBB][i].ymax = CBB[currentCBB][i].zmax = -1000;
     }
+//    memset(Hist[currentHist], 0, sizeof(Histogram));
+//    Hist[currentHist]->mindepth = 3000;
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
     glUseProgram(FullScreenShader::LightspaceBoundingBoxShader::getInstance()->Program);
     FullScreenShader::LightspaceBoundingBoxShader::getInstance()->SetTextureUnits(getDepthStencilTexture());
     FullScreenShader::LightspaceBoundingBoxShader::getInstance()->setUniforms(m_suncam->getViewMatrix(), tmpshadowSplit[1], tmpshadowSplit[2], tmpshadowSplit[3], tmpshadowSplit[4]);
     glDispatchCompute((int)width / 64, (int)height / 64, 1);
+
+/*    glUseProgram(FullScreenShader::DepthHistogramShader::getInstance()->Program);
+    FullScreenShader::DepthHistogramShader::getInstance()->SetTextureUnits(getDepthStencilTexture());
+    FullScreenShader::DepthHistogramShader::getInstance()->setUniforms();
+    glDispatchCompute((int)width / 32, (int)height / 32, 1);*/
 
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     LightcoordBBFence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);

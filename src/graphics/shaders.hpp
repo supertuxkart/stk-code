@@ -517,6 +517,12 @@ public:
     LightspaceBoundingBoxShader();
 };
 
+class DepthHistogramShader : public ShaderHelperSingleton<DepthHistogramShader>, public TextureRead <Nearest_Filtered>
+{
+public:
+    DepthHistogramShader();
+};
+
 class GlowShader : public ShaderHelperSingleton<GlowShader>, public TextureRead<Bilinear_Filtered>
 {
 public:
