@@ -826,7 +826,7 @@ void World::updateWorld(float dt)
         if (m_schedule_exit_race)
         {
             m_schedule_exit_race = false;
-            race_manager->exitRace();
+            race_manager->exitRace(false);
             race_manager->setAIKartOverride("");
 
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
@@ -864,12 +864,16 @@ void World::updateWorld(float dt)
                 input_manager->getDeviceManager()
                     ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
+                delete this;
+
                 StateManager::get()->enterGameState();
                 race_manager->setupPlayerKartInfo();
                 race_manager->startNew(true);
             }
             else
             {
+                delete this;
+
                 if (race_manager->raceWasStartedFromOverworld())
                 {
                     OverWorld::enterOverWorld();
