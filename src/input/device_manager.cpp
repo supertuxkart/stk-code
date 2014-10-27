@@ -136,7 +136,7 @@ bool DeviceManager::initialize()
         addGamepad(gamepadDevice);
     } // end for
 
-    if (created) serialize();
+    if (created) save();
 
     return created;
 }   // initialize
@@ -535,7 +535,7 @@ bool DeviceManager::load()
 }   // load
 
 // -----------------------------------------------------------------------------
-void DeviceManager::serialize()
+void DeviceManager::save()
 {
     static std::string filepath = file_manager->getUserConfigFile(INPUT_FILE_NAME);
     if(UserConfigParams::logMisc()) Log::info("Device manager","Serializing input.xml...");
@@ -555,17 +555,17 @@ void DeviceManager::serialize()
 
     for(unsigned int n=0; n<m_keyboard_configs.size(); n++)
     {
-        m_keyboard_configs[n].serialize(configfile);
+        m_keyboard_configs[n].save(configfile);
     }
     for(unsigned int n=0; n<m_gamepad_configs.size(); n++)
     {
-        m_gamepad_configs[n].serialize(configfile);
+        m_gamepad_configs[n].save(configfile);
     }
 
     configfile << "</input>\n";
     configfile.close();
     if(UserConfigParams::logMisc()) Log::info("Device manager","Serialization complete.");
-}   // serialize
+}   // save
 
 // -----------------------------------------------------------------------------
 

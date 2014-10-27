@@ -24,10 +24,10 @@
 
 #include <SKeyMap.h>
 
-/** Convert thjis binding to XML attributes. The full XML node is actually
+/** Convert this binding to XML attributes. The full XML node is actually
  *  written by device_config, so we only have to add the attributes here.
  */
-void Binding::serialize(std::ofstream& stream) const
+void Binding::save(std::ofstream& stream) const
 {
     stream << "id=\""        << m_id        << "\" "
            << "event=\""     << m_type      << "\" "
@@ -39,7 +39,7 @@ void Binding::serialize(std::ofstream& stream) const
         stream << "direction=\"" << m_dir    << "\" ";
         stream << "range=\""     << m_range    << "\" ";
     }
-}   // serialize
+}   // save
 
 // ----------------------------------------------------------------------------
 bool Binding::load(const XMLNode *action)
@@ -51,8 +51,10 @@ bool Binding::load(const XMLNode *action)
         return false;
     }
     m_type = (Input::InputType)n;
-    core::stringw s;
+
     m_character = 0;
+    // XMLNode only supports stringw, not wchar_t*
+    core::stringw s;
     action->get("character", &s);
     if(s.size()>0)
         m_character = s[0];

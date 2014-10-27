@@ -19,6 +19,7 @@
 
 #include "input/keyboard_device.hpp"
 
+#include "input/keyboard_config.hpp"
 // ----------------------------------------------------------------------------
 KeyboardDevice::KeyboardDevice(KeyboardConfig *configuration)
 {

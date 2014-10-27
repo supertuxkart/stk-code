@@ -19,6 +19,7 @@
 
 #include "input/gamepad_device.hpp"
 
+#include "input/gamepad_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
 

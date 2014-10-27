@@ -28,25 +28,35 @@
 
 using namespace irr;
 
-//==== D E V I C E C O N F I G =================================================
+DeviceConfig::DeviceConfig(DeviceConfigType type)
+{
+    m_type    = type;
+    m_enabled = true;
+    m_plugged = 0;
+}   // DeviceConfig
 
+// ------------------------------------------------------------------------
+/** Get a user-readable string describing the bound action.
+ */
 irr::core::stringw DeviceConfig::getBindingAsString (const PlayerAction action) const
 {
-    irr::core::stringw returnString = "";
+    irr::core::stringw return_string = "";
 
     if ((action < PA_COUNT) && (action >= 0))
     {
-        returnString = m_bindings[action].getAsString();
+        return_string = m_bindings[action].getAsString();
     }
 
-    return returnString;
-}
+    return return_string;
+}   // getBindingAsString
 
 //------------------------------------------------------------------------------
-
+/** Get an internal unique string describing the bound action.
+ *  \param action The action for which to get the string.
+ */
 irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) const
 {
-    irr::core::stringw returnString = "";
+    irr::core::stringw return_string = "";
 
     if ((action < PA_COUNT) && (action >= 0))
     {
@@ -58,71 +68,76 @@ irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) 
         switch (type)
         {
             case Input::IT_KEYBOARD:
-                returnString += "keyb_";
-                returnString += id;
+                return_string += "keyb_";
+                return_string += id;
                 break;
 
             case Input::IT_STICKMOTION:
-                returnString += "stkmo_";
-                returnString += id;
-                returnString += "$";
-                returnString += dir;
-                returnString += "$";
-                returnString += range;
+                return_string += "stkmo_";
+                return_string += id;
+                return_string += "$";
+                return_string += dir;
+                return_string += "$";
+                return_string += range;
                 break;
 
             case Input::IT_STICKBUTTON:
-                returnString += "stkbt_";
-                returnString += id;
+                return_string += "stkbt_";
+                return_string += id;
                 break;
 
             case Input::IT_MOUSEMOTION:
-                returnString += "mousemo_";
-                returnString += id;
-                returnString += "$";
-                returnString += dir;
+                return_string += "mousemo_";
+                return_string += id;
+                return_string += "$";
+                return_string += dir;
                 break;
 
             case Input::IT_MOUSEBUTTON:
-                returnString += "mousebtn_";
-                returnString += id;
+                return_string += "mousebtn_";
+                return_string += id;
                 break;
 
             case Input::IT_NONE:
-                returnString += "none";
+                return_string += "none";
                 break;
 
             default:
                 assert(false);
-                returnString += type;
-                returnString += "_";
-                returnString += id;
-                returnString += "$";
-                returnString += dir;
+                return_string += type;
+                return_string += "_";
+                return_string += id;
+                return_string += "$";
+                return_string += dir;
         }
     }
 
-    return returnString;
-}
-
+    return return_string;
+}   // getMappingIdString
 
 //------------------------------------------------------------------------------
 
 irr::core::stringw DeviceConfig::toString ()
 {
-    irr::core::stringw returnString = "";
+    irr::core::stringw return_string = "";
     for (int n = 0; n < PA_COUNT; n++)
     {
-        returnString += KartActionStrings[n].c_str();
-        returnString += ": ";
-        returnString += m_bindings[n].getAsString();
-        returnString += "\n";
+        return_string += KartActionStrings[n].c_str();
+        return_string += ": ";
+        return_string += m_bindings[n].getAsString();
+        return_string += "\n";
     }
-    return returnString;
-}
+    return return_string;
+}   // toString
 
 //------------------------------------------------------------------------------
-
+/** Sets the bindings for an action.
+ *  \param action The action to be bound.
+ *  \param type Input type (stick button, stick motion, ...).
+ *  \param id An id for this binding.
+ *  \param direction In which direction the stick is moved.
+ *  \param 
+ */
 void DeviceConfig::setBinding ( const PlayerAction      action,
                                 const Input::InputType  type,
                                 const int               id,
@@ -131,32 +146,46 @@ void DeviceConfig::setBinding ( const PlayerAction      action,
                                 wchar_t                 character)
 {
     m_bindings[action].set(type, id, direction, range, character);
-}
+}   // setBinding
 
 //------------------------------------------------------------------------------
-
-// Don't call this directly unless you are KeyboardDevice or GamepadDevice
+/** Searches for a game actions associated with the given input event.
+ * \note               Don't call this directly unless you are KeyboardDevice or
+ *                     GamepadDevice.
+ * \param[out] action  the result, only set if method returned true.
+ * \return             whether finding an action associated to this input was
+ *                     successful.
+ */
 bool DeviceConfig::getGameAction(Input::InputType    type,
                                  const int           id,
                                  int*                value, /* inout */
                                  PlayerAction*       action /* out */ )
 {
-    return doGetAction(type, id, value, PA_FIRST_GAME_ACTION, PA_LAST_GAME_ACTION, action);
-}
+    return doGetAction(type, id, value, PA_FIRST_GAME_ACTION,
+                       PA_LAST_GAME_ACTION, action);
+}   // getGameAction
 
 //------------------------------------------------------------------------------
-
-// Don't call this directly unless you are KeyboardDevice or GamepadDevice
+/** Searches for a game actions associated with the given input event.
+ *  \note Don't call this directly unless you are KeyboardDevice or
+ *        GamepadDevice.
+ *  \param[out] action  The result, only set if method returned true.
+ *  \return             Whether finding an action associated to this input
+ *                      was successful
+ */
 bool DeviceConfig::getMenuAction(Input::InputType    type,
                                  const int           id,
                                  int*                value,
                                  PlayerAction*       action /* out */ )
 {
-    return doGetAction(type, id, value, PA_FIRST_MENU_ACTION, PA_LAST_MENU_ACTION, action);
-}
+    return doGetAction(type, id, value, PA_FIRST_MENU_ACTION,
+                       PA_LAST_MENU_ACTION, action);
+}   // getMenuAction
 
 //------------------------------------------------------------------------------
-
+/** internal helper method for DeviceConfig::getGameAction and 
+ *  DeviceConfig::getMenuAction
+ */
 bool DeviceConfig::doGetAction(Input::InputType    type,
                                const int           id,
                                int*                value, /* inout */
@@ -211,21 +240,23 @@ bool DeviceConfig::doGetAction(Input::InputType    type,
     } // end for n
 
     return success;
-}
+}   // doGetAction
 
 //------------------------------------------------------------------------------
-
-void DeviceConfig::serialize (std::ofstream& stream)
+/** Saves the configuration to a file.
+ *  \param stream The stream to save to.
+ */
+void DeviceConfig::save (std::ofstream& stream)
 {
     for(int n = 0; n < PA_COUNT; n++) // Start at 0?
     {
         stream << "    "
                << "<action "
                << "name=\""      << KartActionStrings[n] << "\" ";
-        m_bindings[n].serialize(stream);
+        m_bindings[n].save(stream);
         stream   << "/>\n";
     }
-}   // serialize
+}   // save
 
 //------------------------------------------------------------------------------
 /** Reads a device configuration from input.xml.
@@ -274,140 +305,3 @@ bool DeviceConfig::load(const XMLNode *config)
 
 // ---------------------------------------------------------------------------
 
-//  KeyboardConfig & GamepadConfig classes really should be in a separate cpp
-//  file but they are so small that we'll just leave them here for now.
-
-//==== K E Y B O A R D C O N F I G =============================================
-
-void KeyboardConfig::serialize (std::ofstream& stream)
-{
-    stream << "<keyboard>\n\n";
-    DeviceConfig::serialize(stream);
-    stream << "</keyboard>\n\n\n";
-}
-
-//------------------------------------------------------------------------------
-
-void KeyboardConfig::setDefaultBinds()
-{
-    setBinding(PA_NITRO,       Input::IT_KEYBOARD, KEY_KEY_N);
-    setBinding(PA_ACCEL,       Input::IT_KEYBOARD, KEY_UP);
-    setBinding(PA_BRAKE,       Input::IT_KEYBOARD, KEY_DOWN);
-    setBinding(PA_STEER_LEFT,  Input::IT_KEYBOARD, KEY_LEFT);
-    setBinding(PA_STEER_RIGHT, Input::IT_KEYBOARD, KEY_RIGHT);
-    setBinding(PA_DRIFT,       Input::IT_KEYBOARD, KEY_KEY_V);
-    setBinding(PA_RESCUE,      Input::IT_KEYBOARD, KEY_BACK);
-    setBinding(PA_FIRE,        Input::IT_KEYBOARD, KEY_SPACE);
-    setBinding(PA_LOOK_BACK,   Input::IT_KEYBOARD, KEY_KEY_B);
-    setBinding(PA_PAUSE_RACE,  Input::IT_KEYBOARD, KEY_ESCAPE);
-
-    setBinding(PA_MENU_UP,     Input::IT_KEYBOARD, KEY_UP);
-    setBinding(PA_MENU_DOWN,   Input::IT_KEYBOARD, KEY_DOWN);
-    setBinding(PA_MENU_LEFT,   Input::IT_KEYBOARD, KEY_LEFT);
-    setBinding(PA_MENU_RIGHT,  Input::IT_KEYBOARD, KEY_RIGHT);
-    setBinding(PA_MENU_SELECT, Input::IT_KEYBOARD, KEY_RETURN);
-    setBinding(PA_MENU_CANCEL, Input::IT_KEYBOARD, KEY_BACK);
-}
-
-//------------------------------------------------------------------------------
-
-KeyboardConfig::KeyboardConfig() : DeviceConfig(DEVICE_CONFIG_TYPE_KEYBOARD)
-{
-    m_name = "Keyboard";
-    m_plugged = 1;
-    setDefaultBinds();
-}
-
-//==== G A M E P A D C O N F I G ===============================================
-
-void GamepadConfig::serialize (std::ofstream& stream)
-{
-    stream << "<gamepad name =\"" << m_name.c_str() << "\" enabled=\""
-           << (m_enabled ? "true" : "false") << "\">\n\n";
-    DeviceConfig::serialize(stream);
-    stream << "</gamepad>\n\n\n";
-}
-
-//------------------------------------------------------------------------------
-
-void GamepadConfig::setDefaultBinds ()
-{
-    setBinding(PA_STEER_LEFT,   Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
-    setBinding(PA_STEER_RIGHT,  Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
-    setBinding(PA_ACCEL,        Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
-    setBinding(PA_BRAKE,        Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
-    setBinding(PA_FIRE,         Input::IT_STICKBUTTON, 0);
-    setBinding(PA_NITRO,        Input::IT_STICKBUTTON, 1);
-    setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, 2);
-    setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, 3);
-    setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, 4);
-    setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, 5);
-
-    setBinding(PA_MENU_UP,      Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
-    setBinding(PA_MENU_DOWN,    Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
-    setBinding(PA_MENU_LEFT,    Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
-    setBinding(PA_MENU_RIGHT,   Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
-    setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, 0);
-    setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, 3);
-}
-
-//------------------------------------------------------------------------------
-
-GamepadConfig::GamepadConfig   ( const std::string     &name,
-                                 const int              axis_count,
-                                 const int              button_count )
-             : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
-{
-    m_name         = name;
-    m_axis_count   = axis_count;
-    m_button_count = button_count;
-    m_plugged      = 0;
-    setDefaultBinds();
-}
-
-//------------------------------------------------------------------------------
-
-GamepadConfig::GamepadConfig(const XMLNode *config) 
-             : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
-{
-    if(!config->get("name", &m_name))
-        Log::error("DeviceConfig", "Unnamed joystick in config file.");
-
-    config->get("enabled", &m_enabled);
-
-    m_plugged = 0;
-    setDefaultBinds();
-}
-
-//------------------------------------------------------------------------------
-
-irr::core::stringw GamepadConfig::toString ()
-{
-    irr::core::stringw returnString = "";
-    returnString += getName().c_str();
-    returnString += "\n";
-    returnString += DeviceConfig::toString();
-    return returnString;
-}
-
-//------------------------------------------------------------------------------
-
-bool DeviceConfig::hasBindingFor(const int button_id) const
-{
-    for (int n=0; n<PA_COUNT; n++)
-    {
-        if (m_bindings[n].getId() == button_id) return true;
-    }
-    return false;
-}
-
-//------------------------------------------------------------------------------
-
-bool DeviceConfig::hasBindingFor(const int button_id, PlayerAction from, PlayerAction to) const
-{
-    for (int n=from; n<=to; n++)
-    {
-        if (m_bindings[n].getId() == button_id) return true;
-    }
-    return false;
-}

@@ -22,6 +22,8 @@
 
 #include "input/input_device.hpp"
 
+class KeyboardConfig;
+
 /**
   * \brief specialisation of InputDevice for keyboard type devices
   * \ingroup input

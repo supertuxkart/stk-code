@@ -88,8 +88,8 @@ void OptionsScreenInput2::init()
     tabBar->getRibbonChildren()[3].setTooltip( _("Players") );
 
 
-    ButtonWidget* deleteBtn = getWidget<ButtonWidget>("delete");
-    if (m_config->getType() != DEVICE_CONFIG_TYPE_KEYBOARD)
+    ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
+    if (m_config->getType() != DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD)
     {
         core::stringw label = (m_config->isEnabled()
                             ? //I18N: button to disable a gamepad configuration
@@ -101,34 +101,34 @@ void OptionsScreenInput2::init()
         // from the original value
         core::dimension2d<u32> size =
             GUIEngine::getFont()->getDimension(label.c_str());
-        const int needed = size.Width + deleteBtn->getWidthNeededAroundLabel();
-        if (deleteBtn->m_w < needed) deleteBtn->m_w = needed;
+        const int needed = size.Width + delete_button->getWidthNeededAroundLabel();
+        if (delete_button->m_w < needed) delete_button->m_w = needed;
 
-        deleteBtn->setLabel(label);
+        delete_button->setLabel(label);
     }
     else
     {
-        deleteBtn->setLabel(_("Delete Configuration"));
+        delete_button->setLabel(_("Delete Configuration"));
 
         if (input_manager->getDeviceManager()->getKeyboardAmount() < 2)
         {
             // don't allow deleting the last config
-            deleteBtn->setDeactivated();
+            delete_button->setDeactivated();
         }
         else
         {
-            deleteBtn->setActivated();
+            delete_button->setActivated();
         }
     }
 
     // Make the two buttons the same length, not strictly needed but will
     // look nicer...
     ButtonWidget* backBtn = getWidget<ButtonWidget>("back_to_device_list");
-    if (backBtn->m_w < deleteBtn->m_w) backBtn->m_w   = deleteBtn->m_w;
-    else                               deleteBtn->m_w = backBtn->m_w;
+    if (backBtn->m_w < delete_button->m_w) backBtn->m_w   = delete_button->m_w;
+    else                               delete_button->m_w = backBtn->m_w;
 
     backBtn->moveIrrlichtElement();
-    deleteBtn->moveIrrlichtElement();
+    delete_button->moveIrrlichtElement();
 
     LabelWidget* label = getWidget<LabelWidget>("title");
     label->setText( m_config->getName().c_str(), false );
@@ -178,24 +178,26 @@ void OptionsScreenInput2::init()
 // -----------------------------------------------------------------------------
 
 void OptionsScreenInput2::addListItemSubheader(GUIEngine::ListWidget* actions,
-    const char* id,
-    const core::stringw& text)
+                                               const char* id,
+                                               const core::stringw& text)
 {
     std::vector<GUIEngine::ListWidget::ListCell> row;
     row.push_back(GUIEngine::ListWidget::ListCell(text, -1, 1, false));
     row.push_back(GUIEngine::ListWidget::ListCell(L"", -1, 1, false));
     actions->addItem(id, row);
-}
+}   // addListItemSubheader
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenInput2::addListItem(GUIEngine::ListWidget* actions, PlayerAction pa)
+void OptionsScreenInput2::addListItem(GUIEngine::ListWidget* actions,
+                                      PlayerAction pa)
 {
     std::vector<GUIEngine::ListWidget::ListCell> row;
-    row.push_back(GUIEngine::ListWidget::ListCell(core::stringw(KartActionStrings[pa].c_str()), -1, 1, false));
+    core::stringw s(KartActionStrings[pa].c_str());
+    row.push_back(GUIEngine::ListWidget::ListCell(s, -1, 1, false));
     row.push_back(GUIEngine::ListWidget::ListCell(L"", -1, 1, false));
     actions->addItem(KartActionStrings[pa], row);
-}
+}   // addListItem
 
 // -----------------------------------------------------------------------------
 
@@ -280,16 +282,16 @@ void OptionsScreenInput2::updateInputButtons()
     bool conflicts_inside  = false;
     // ---- make sure there are no binding conflicts
     // (same key used for two actions)
-    std::set<irr::core::stringw> currentlyUsedKeys;
+    std::set<irr::core::stringw> currently_used_keys;
     for (PlayerAction action = PA_FIRST_GAME_ACTION;
          action <= PA_LAST_GAME_ACTION;
          action=PlayerAction(action+1))
     {
         const irr::core::stringw item = m_config->getMappingIdString(action);
-        if (currentlyUsedKeys.find(item) == currentlyUsedKeys.end())
+        if (currently_used_keys.find(item) == currently_used_keys.end())
         {
-            currentlyUsedKeys.insert( item );
-            if (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD
+            currently_used_keys.insert( item );
+            if (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD
                 && conflictsBetweenKbdConfig(action, PA_FIRST_GAME_ACTION,
                                              PA_LAST_GAME_ACTION))
             {
@@ -322,16 +324,16 @@ void OptionsScreenInput2::updateInputButtons()
 
     // menu keys and game keys can overlap, no problem, so forget game keys
     // before checking menu keys
-    currentlyUsedKeys.clear();
+    currently_used_keys.clear();
     for (PlayerAction action = PA_FIRST_MENU_ACTION;
          action <= PA_LAST_MENU_ACTION;
          action=PlayerAction(action+1))
     {
         const irr::core::stringw item = m_config->getBindingAsString(action);
-        if (currentlyUsedKeys.find(item) == currentlyUsedKeys.end())
+        if (currently_used_keys.find(item) == currently_used_keys.end())
         {
-            currentlyUsedKeys.insert( item );
-            if (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD
+            currently_used_keys.insert( item );
+            if (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD
                 && conflictsBetweenKbdConfig(action, PA_FIRST_MENU_ACTION,
                                              PA_LAST_MENU_ACTION))
             {
@@ -339,7 +341,7 @@ void OptionsScreenInput2::updateInputButtons()
                 actions->markItemBlue (KartActionStrings[action]);
             }
         }
-        else
+        else   // existing key
         {
             // binding conflict!
             actions->markItemRed( KartActionStrings[action] );
@@ -355,12 +357,11 @@ void OptionsScreenInput2::updateInputButtons()
                     conflicts_inside = true;
                     actions->markItemRed( KartActionStrings[others] );
                 }
-            }
+            }   // for others < action
 
-            //actions->renameItem( KartActionStrings[action],
-            //                     _("Binding Conflict!") );
-        }
-    }
+        }   // if existing key
+    }   // for action <= PA_LAST_MENU_ACTION;
+    
 
     GUIEngine::Widget* conflict_label =
         getWidget<GUIEngine::LabelWidget>("conflict");
@@ -385,11 +386,11 @@ static std::string binding_to_set_button;
 
 void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
 {
-    const bool keyboard = (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD&&
+    const bool keyboard = (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD&&
                            sensed_input.m_type == Input::IT_KEYBOARD);
     const bool gamepad =  (sensed_input.m_type == Input::IT_STICKMOTION ||
                            sensed_input.m_type == Input::IT_STICKBUTTON) &&
-                           m_config->getType() == DEVICE_CONFIG_TYPE_GAMEPAD;
+                           m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_GAMEPAD;
 
     if (keyboard)
     {
@@ -487,7 +488,7 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     //if(btn != NULL) btn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     // save new binding to file
-    input_manager->getDeviceManager()->serialize();
+    input_manager->getDeviceManager()->save();
 }   // gotSensedInput
 
 
@@ -548,11 +549,11 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
 
                 new PressAKeyDialog(0.4f, 0.4f);
 
-                if (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD)
+                if (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD)
                 {
                     input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);
                 }
-                else if (m_config->getType() == DEVICE_CONFIG_TYPE_GAMEPAD)
+                else if (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_GAMEPAD)
                 {
                     input_manager->setMode(InputManager::INPUT_SENSE_GAMEPAD);
                 }
@@ -567,7 +568,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
     }
     else if (name == "delete")
     {
-        if (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD)
+        if (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD)
         {
            // keyboard configs may be deleted
            //I18N: shown before deleting an input configuration
@@ -582,11 +583,11 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
             else                        m_config->setEnabled(true);
 
             // update widget label
-            ButtonWidget* deleteBtn = getWidget<ButtonWidget>("delete");
-            deleteBtn->setLabel(m_config->isEnabled() ? _("Disable Device")
+            ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
+            delete_button->setLabel(m_config->isEnabled() ? _("Disable Device")
                                                       : _("Enable Device")  );
 
-            input_manager->getDeviceManager()->serialize();
+            input_manager->getDeviceManager()->save();
         }
     }
 
@@ -619,7 +620,7 @@ void OptionsScreenInput2::onConfirm()
         Log::error("OptionsScreenInput2", "Failed to delete config!");
 
     m_config = NULL;
-    input_manager->getDeviceManager()->serialize();
+    input_manager->getDeviceManager()->save();
     ModalDialog::dismiss();
     StateManager::get()
         ->replaceTopMostScreen(OptionsScreenInput::getInstance());

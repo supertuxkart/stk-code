@@ -20,7 +20,9 @@
 #define DEVICE_MANAGER_HPP
 
 #include "input/device_config.hpp"
+#include "input/gamepad_config.hpp"
 #include "input/input_device.hpp"
+#include "input/keyboard_config.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -162,7 +164,7 @@ public:
     void                clearLatestUsedDevice();
     InputDevice*        getLatestUsedDevice();
     bool initialize();
-    void serialize();
+    void save();
 
     StateManager::ActivePlayer* getSinglePlayer()       { return m_single_player; }
     void setSinglePlayer(StateManager::ActivePlayer* p) { m_single_player = p;    }

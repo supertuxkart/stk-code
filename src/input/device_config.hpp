@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef DEVICE_CONFIG_HPP
-#define DEVICE_CONFIG_HPP
+#ifndef HEADER_DEVICE_CONFIG_HPP
+#define HEADER_DEVICE_CONFIG_HPP
 
 #include "input/binding.hpp"
 #include "input/input.hpp"
@@ -31,13 +31,6 @@
   * \ingroup config
   */
 
-enum DeviceConfigType
-{
-    DEVICE_CONFIG_TYPE_GAMEPAD,
-    DEVICE_CONFIG_TYPE_KEYBOARD
-};
-
-
 //==== D E V I C E C O N F I G =================================================
 
 /**
@@ -46,143 +39,94 @@ enum DeviceConfigType
   */
 class DeviceConfig : public NoCopy
 {
+public:
+    enum DeviceConfigType
+    {
+        DEVICE_CONFIG_TYPE_GAMEPAD,
+        DEVICE_CONFIG_TYPE_KEYBOARD
+    };
 protected:
 
     Binding  m_bindings[PA_COUNT];
-    int      m_plugged;  //!< How many devices connected to the system which uses this config?
 
-    bool     m_enabled;  //!< If set to false, this device will be ignored. Currently for gamepads only
+    /** How many devices connected to the system which uses this config? */
+    int m_plugged; 
 
+    /** If set to false, this device will be ignored. 
+     *  Currently for gamepads only. */
+    bool m_enabled;
+
+    /** Name of this configuratiom. */
     std::string m_name;
 
+    /** Configuration type. */
     DeviceConfigType m_type;
 
-    DeviceConfig(DeviceConfigType type)
-    {
-        m_type = type;
-        m_enabled = true;
-    }
+    DeviceConfig(DeviceConfigType type);
 
-    /**
-      * \brief internal helper method for DeviceConfig::getGameAction and DeviceConfig::getMenuAction
-      */
     bool doGetAction(Input::InputType    type,
                      const int           id,
                      int*                value, /* inout */
                      const PlayerAction  firstActionToCheck,
                      const PlayerAction  lastActionToCheck,
                      PlayerAction*       action /* out */ );
-
+protected:
+    /** Those two classes need to be able to call getGameAction. */
+    friend class GamePadDevice;
+    friend class KeyboardDevice;
+    bool getGameAction(Input::InputType       type,
+                       const int              id,
+                       int*                   value, /* inout */
+                       PlayerAction*          action /* out */);
 public:
 
-    std::string        getName           () const { return m_name; };
-    irr::core::stringw toString          ();
-    DeviceConfigType   getType           () const { return m_type; }
-
-    /** Get a user-readable string describing the bound action */
+    irr::core::stringw toString();
+    bool hasBindingFor(const int buttonID) const;
+    bool hasBindingFor(const int buttonID, PlayerAction from,
+                       PlayerAction to) const;
+    void setBinding(const PlayerAction     action,
+                    const Input::InputType type,
+                    const int              id,
+                    Input::AxisDirection   direction = Input::AD_NEUTRAL,
+                    Input::AxisRange       range     = Input::AR_HALF,
+                    wchar_t                character=0);
+    bool getMenuAction(Input::InputType       type,
+                       const int              id,
+                       int*                   value,
+                       PlayerAction*          action /* out */);
+    irr::core::stringw getMappingIdString (const PlayerAction action) const;
     irr::core::stringw getBindingAsString(const PlayerAction action) const;
 
-    /** Get an internal unique string describing the bound action */
-    irr::core::stringw getMappingIdString (const PlayerAction action) const;
+    virtual DeviceConfigType getType() const = 0;
+    virtual void save(std::ofstream& stream);
+    virtual bool load(const XMLNode *config);
+    // ------------------------------------------------------------------------
+    /** Returns the name for this device configuration. */
+    const std::string& getName() const { return m_name; };
 
-    void        serialize           (std::ofstream& stream);
-    bool        load(const XMLNode *config);
+    // ------------------------------------------------------------------------
+    /** Increase ref counter. */
+    void setPlugged() { m_plugged++; }
 
-    void        setBinding          (const PlayerAction     action,
-                                     const Input::InputType type,
-                                     const int              id,
-                                     Input::AxisDirection   direction = Input::AD_NEUTRAL,
-                                     Input::AxisRange       range     = Input::AR_HALF,
-                                     wchar_t                character=0);
+    // ------------------------------------------------------------------------
+    /** Returns if this config is sed by any devices. */
+    bool isPlugged() const { return m_plugged > 0; }
 
-    void        setPlugged          () { m_plugged++; }
-    bool        isPlugged           () const { return m_plugged > 0; }
-    int         getNumberOfDevices  () const { return m_plugged;     }
+    // ------------------------------------------------------------------------
+    /** Returns the number of devices using this configuration. */
+    int getNumberOfDevices() const { return m_plugged;     }
 
-    /**
-      * \brief              Searches for a game actions associated with the given input event
-      * \note               Don't call this directly unless you are KeyboardDevice or GamepadDevice
-      * \param[out] action  the result, only set if method returned true
-      * \return             whether finding an action associated to this input was successful
-      */
-    bool        getGameAction       (Input::InputType       type,
-                                     const int              id,
-                                     int*                   value, /* inout */
-                                     PlayerAction*          action /* out */);
-
-    /**
-      * \brief              Searches for a game actions associated with the given input event
-      * \note Don't call this directly unless you are KeyboardDevice or GamepadDevice
-      * \param[out] action  the result, only set if method returned true
-      * \return             whether finding an action associated to this input was successful
-      */
-    bool        getMenuAction       (Input::InputType       type,
-                                     const int              id,
-                                     int*                   value,
-                                     PlayerAction*          action /* out */);
-
+    // ------------------------------------------------------------------------
+    /** Returns the binding of a given index. */
     Binding&    getBinding          (int i) {return m_bindings[i];}
 
-    bool hasBindingFor(const int buttonID) const;
-    bool hasBindingFor(const int buttonID, PlayerAction from, PlayerAction to) const;
-
+    // ------------------------------------------------------------------------
     /** At this time only relevant for gamepads, keyboards are always enabled */
     bool isEnabled() const { return m_enabled; }
 
-    void setEnabled(bool newValue) { m_enabled = newValue; }
-};
-
-//==== K E Y B O A R D C O N F I G =============================================
-
-/**
-  * \brief specialisation of DeviceConfig for keyboard type devices
-  * \ingroup config
-  */
-class KeyboardConfig : public DeviceConfig
-{
-
-public:
-
-    void        setDefaultBinds     ();
-    void        serialize           (std::ofstream& stream);
-
-    KeyboardConfig                  ();
-};
-
-
-//==== G A M E P A D C O N F I G ===============================================
-
-/**
-  * \brief specialisation of DeviceConfig for gamepad type devices
-  * \ingroup config
-  */
-class GamepadConfig : public DeviceConfig
-{
-
-private:
-    /** Number of axis this device has. */
-    int         m_axis_count;
-
-    /** Number of buttons this device has. */
-    int         m_button_count;
-
-public:
-
-    irr::core::stringw toString     ();
-
-    void        serialize           (std::ofstream& stream);
-    void        setDefaultBinds     ();
-    GamepadConfig           (const XMLNode *config);
-    GamepadConfig           (const std::string     &name,
-                             const int              axis_count=0,
-                             const int              button_ount=0);
     // ------------------------------------------------------------------------
-    /** Sets the number of buttons this device has. */
-    void setNumberOfButtons(int count) { m_button_count = count; }
-    // ------------------------------------------------------------------------
-    /** Sets the number of axis this device has. */
-    void setNumberOfAxis(int count) { m_axis_count = count; }
-    //        ~GamepadConfig();
-};
+    /** Sets this config to be enabled or disabled. */
+    void setEnabled(bool new_value) { m_enabled = new_value; }
+};   // class DeviceConfig
 
 #endif

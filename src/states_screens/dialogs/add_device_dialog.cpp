@@ -166,7 +166,7 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
     else if (eventSource == "addkeyboard")
     {
         input_manager->getDeviceManager()->addEmptyKeyboard();
-        input_manager->getDeviceManager()->serialize();
+        input_manager->getDeviceManager()->save();
         ModalDialog::dismiss();
 
         ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();

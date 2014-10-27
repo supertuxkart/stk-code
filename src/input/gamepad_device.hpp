@@ -21,6 +21,7 @@
 
 #include "input/input_device.hpp"
 
+class GamepadConfig;
 /**
   * \brief specialisation of Inputdevice for gamepad type devices
   * \ingroup input
