@@ -153,6 +153,7 @@ irr::core::stringw Binding::getAsString() const
             case irr::KEY_KEY_1      : s = "1"; break;
             case irr::KEY_KEY_2      : s = "2"; break;
             case irr::KEY_KEY_3      : s = "3"; break;
+            case irr::KEY_KEY_4      : s = "4"; break;
             case irr::KEY_KEY_5      : s = "5"; break;
             case irr::KEY_KEY_6      : s = "6"; break;
             case irr::KEY_KEY_7      : s = "7"; break;
