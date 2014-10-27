@@ -47,7 +47,7 @@ public:
     /** Returns the type of this configuration. */
     virtual DeviceConfigType getType() const
     {
-        return DEVICE_CONFIG_TYPE_GAMEPAD;
+        return DEVICE_CONFIG_TYPE_KEYBOARD;
     }   // getType
 };
 
