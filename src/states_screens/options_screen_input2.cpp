@@ -434,7 +434,7 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
 
         std::string gamepad_name = input_manager->getDeviceManager()
                                  ->getGamePadFromIrrID(sensed_input.m_device_id)
-                                 ->m_name;
+                                 ->getName();
         if (m_config->getName() == gamepad_name)
         {
             GamepadConfig* config =  (GamepadConfig*)m_config;

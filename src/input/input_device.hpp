@@ -42,27 +42,54 @@ enum DeviceType
   */
 class InputDevice: public NoCopy
 {
-    friend class DeviceManager;
 protected:
+    /** Device type (keyboard, gamepad). */
     DeviceType m_type;
+
+    /** Which player is using this device. */
     StateManager::ActivePlayer* m_player;
+
+    /** The configuration for this device. */
     DeviceConfig* m_configuration;
 
-public:
-     /** If device has a name; unused for keyboards since AFAIK we
-      *  can't tell keyboards apart. */
+    /** If device has a name; unused for keyboards since AFAIK we
+     *  can't tell keyboards apart. */
     std::string m_name;
 
-    InputDevice();
-    ~InputDevice();
+public:
 
+             InputDevice();
+    virtual ~InputDevice();
+#ifdef NOTYET
+    virtual bool processAndMapInput(Input::InputType type, const int id,
+                                    int* value,
+                                    InputManager::InputDriverMode mode,
+                                    PlayerAction* action);
+
+#endif
+    // ------------------------------------------------------------------------
+    /** Sets which players uses this device; or pass NULL to say no player 
+     *  uses it. */
+    void setPlayer(StateManager::ActivePlayer* owner) { m_player = owner; }
+
+    // ------------------------------------------------------------------------
+    /** Sets the configuration to be used by this input device. */
     void setConfiguration(DeviceConfig *config) {m_configuration = config;}
+
+    // ------------------------------------------------------------------------
+    /** Returns the configuration for this device. */
     DeviceConfig *getConfiguration() {return m_configuration;}
 
+    // ------------------------------------------------------------------------
+    /** Returns the type of this device. */
     DeviceType getType() const { return m_type; };
 
-    void setPlayer(StateManager::ActivePlayer* owner);
+    // ------------------------------------------------------------------------
+    /** Returns the player using this device. */
     StateManager::ActivePlayer *getPlayer() { return m_player; }
-};
+    // ------------------------------------------------------------------------
+    /** Returns the name of this device. */
+    const std::string& getName() const { return m_name; }
+};   // class InputDevice
 
 #endif

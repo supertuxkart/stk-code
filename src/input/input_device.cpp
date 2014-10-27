@@ -30,19 +30,12 @@
 
 InputDevice::InputDevice()
 {
-    m_player = NULL;
+    m_player        = NULL;
     m_configuration = NULL;
-}
+}   // InputDevice
+
 // ----------------------------------------------------------------------------
 InputDevice::~InputDevice()
 {
 }   // ~InputDevice
 
-// ----------------------------------------------------------------------------
-/**
-  * Sets which players uses this device; or pass NULL to say no player uses it.
-  */
-void InputDevice::setPlayer(StateManager::ActivePlayer* owner)
-{
-    m_player = owner;
-}

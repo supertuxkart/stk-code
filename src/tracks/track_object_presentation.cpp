@@ -31,6 +31,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
+#include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "items/item_manager.hpp"
 #include "modes/world.hpp"

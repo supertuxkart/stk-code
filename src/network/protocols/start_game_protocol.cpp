@@ -2,6 +2,7 @@
 
 #include "config/player_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "modes/world.hpp"

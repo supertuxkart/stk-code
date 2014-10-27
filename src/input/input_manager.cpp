@@ -646,7 +646,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                         // is not associated to any player
                         GUIEngine::showMessage(
                             _("Ignoring '%s', you needed to join earlier to play!",
-                            irr::core::stringw(gp->m_name.c_str()).c_str())      );
+                            irr::core::stringw(gp->getName().c_str()).c_str())      );
                     }
                 }
                 return;

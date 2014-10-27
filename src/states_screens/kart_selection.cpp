@@ -1787,7 +1787,7 @@ void KartSelectionScreen::allPlayersDone()
             Log::info("[KartSelectionScreen]", "     Player %u is %s on %s",n,
                     core::stringc(
                           players[n].getConstProfile()->getName().c_str()).c_str(),
-                    players[n].getDevice()->m_name.c_str());
+                    players[n].getDevice()->getName().c_str());
         }
     }
 

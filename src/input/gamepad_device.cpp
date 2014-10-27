@@ -28,7 +28,6 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name,
                              GamepadConfig *configuration)
 {
     m_type                  = DT_GAMEPAD;
-    m_deadzone              = DEADZONE_JOYSTICK;
     m_prev_axis_directions  = NULL;
     m_configuration         = configuration;
     m_axis_count            = axis_count;
@@ -79,14 +78,13 @@ void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 // ----------------------------------------------------------------------------
 
 void GamePadDevice::resetAxisDirection(const int axis,
-                                       Input::AxisDirection direction,
-                                       StateManager::ActivePlayer* player)
+                                       Input::AxisDirection direction)
 {
     // ignore this while in menus
     if (StateManager::get()->getGameState() != GUIEngine::GAME) return;
 
-    AbstractKart* pk = player->getKart();
-    if (pk == NULL)
+    AbstractKart* pk = getPlayer()->getKart();
+    if (!pk)
     {
         Log::error("Binding", "Trying to reset axis for an unknown player.");
         return;
@@ -113,7 +111,6 @@ void GamePadDevice::resetAxisDirection(const int axis,
 bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
                                        int* value, /* inout */
                                        InputManager::InputDriverMode mode,
-                                       StateManager::ActivePlayer* player,
                                        PlayerAction* action /* out */)
 {
     if (!m_configuration->isEnabled()) return false;
@@ -126,20 +123,20 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
         // this gamepad doesn't even have that many axes
         if (id >= m_axis_count) return false;
 
-        if (player != NULL)
+        if (getPlayer())
         {
             // going to negative from positive
             if (*value < 0 && m_prev_axis_directions[id] == Input::AD_POSITIVE)
             {
                 //  set positive id to 0
-                resetAxisDirection(id, Input::AD_POSITIVE, player);
+                resetAxisDirection(id, Input::AD_POSITIVE);
             }
             // going to positive from negative
             else if (*value > 0 &&
                      m_prev_axis_directions[id] == Input::AD_NEGATIVE)
             {
                 //  set negative id to 0
-                resetAxisDirection(id, Input::AD_NEGATIVE, player);
+                resetAxisDirection(id, Input::AD_NEGATIVE);
             }
         }
 
@@ -161,7 +158,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
         }
 
         // check if within deadzone
-        if(*value > -m_deadzone && *value < m_deadzone && player != NULL)
+        if(*value > -m_deadzone && *value < m_deadzone && getPlayer())
         {
             // Axis stands still: This is reported once for digital axes and
             // can be called multipled times for analog ones. Uses the
@@ -174,12 +171,12 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
             if(m_prev_axis_directions[id] == Input::AD_NEGATIVE)
             {
                 // set negative id to 0
-                resetAxisDirection(id, Input::AD_NEGATIVE, player);
+                resetAxisDirection(id, Input::AD_NEGATIVE);
             }
             else if(m_prev_axis_directions[id] == Input::AD_POSITIVE)
             {
                 // set positive id to 0
-                resetAxisDirection(id, Input::AD_POSITIVE, player);
+                resetAxisDirection(id, Input::AD_POSITIVE);
             }
             m_prev_axis_directions[id] = Input::AD_NEUTRAL;
 

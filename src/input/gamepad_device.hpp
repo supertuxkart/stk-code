@@ -28,8 +28,7 @@ class GamepadConfig;
   */
 class GamePadDevice : public InputDevice
 {
-    void resetAxisDirection(const int axis, Input::AxisDirection direction,
-                            StateManager::ActivePlayer* player);
+    void resetAxisDirection(const int axis, Input::AxisDirection direction);
     bool m_buttonPressed[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
 
 public:
@@ -69,8 +68,6 @@ public:
      * was pressed is associated with a binding. If yes, sets action and
      * returns true; otherwise returns false.
      *
-     * \param      player  Only passed to know where to send 'axis reset's
-     *                     when necessary
      * \param      id      ID of the key that was pressed or of the axis
      *                     that was triggered (depending on
      *                     the value of the 'type' parameter)
@@ -84,7 +81,6 @@ public:
     bool processAndMapInput(Input::InputType type, const int id,
                             int* value,
                             InputManager::InputDriverMode mode,
-                            StateManager::ActivePlayer* player,
                             PlayerAction* action);
 
 };

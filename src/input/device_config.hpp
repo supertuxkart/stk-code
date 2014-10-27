@@ -118,7 +118,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the binding of a given index. */
-    Binding&    getBinding          (int i) {return m_bindings[i];}
+    Binding& getBinding(int i) {return m_bindings[i];}
 
     // ------------------------------------------------------------------------
     /** At this time only relevant for gamepads, keyboards are always enabled */
