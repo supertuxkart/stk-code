@@ -181,6 +181,7 @@ private:
     bool hasComputeShaders;
     bool hasTextureStorage;
     bool hasTextureView;
+    bool m_support_sdsm;
     bool m_need_ubo_workaround;
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
@@ -265,6 +266,11 @@ public:
             return 100 + (m_gl_minor_version + 3) * 10;
         else
             return 120;
+    }
+
+    bool supportsSDSM() const
+    {
+        return m_support_sdsm;
     }
 
     bool needUBOWorkaround() const
@@ -773,6 +779,7 @@ public:
 
     void renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadows, bool forceRTT);
     unsigned UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
+    void UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, size_t height);
     void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
 
     // --------------------- OLD RTT --------------------

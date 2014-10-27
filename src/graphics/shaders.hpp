@@ -511,6 +511,12 @@ public:
     LinearizeDepthShader();
 };
 
+class LightspaceBoundingBoxShader : public ShaderHelperSingleton<LightspaceBoundingBoxShader, core::matrix4, float, float, float, float>, public TextureRead < Nearest_Filtered >
+{
+public:
+    LightspaceBoundingBoxShader();
+};
+
 class GlowShader : public ShaderHelperSingleton<GlowShader>, public TextureRead<Bilinear_Filtered>
 {
 public:
