@@ -72,6 +72,7 @@ void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
  */
 void TrackObjectManager::init()
 {
+
     TrackObject* curr;
     for_in (curr, m_all_objects)
     {
@@ -87,10 +88,101 @@ void TrackObjectManager::reset()
     for_in (curr, m_all_objects)
     {
         curr->reset();
+        if (!curr->isEnabled())
+        {
+            //PhysicalObjects may need to be added
+            if (curr->getType() == "mesh")
+            {
+                if (curr->getPhysicalObject() != NULL)
+                    curr->getPhysicalObject()->addBody();
+            }
+        }
+        curr->setEnable(true);
     }
 }   // reset
 
 // ----------------------------------------------------------------------------
+/** disables all track objects with a particular ID
+ *  \param name Name or ID for disabling
+ */
+void TrackObjectManager::disable(std::string name)
+{
+     TrackObject* curr;
+     for_in (curr,m_all_objects)
+     {
+        if (curr->getName() == (name) || curr->getID() == (name))
+        {
+
+			curr->setEnable(false);
+            if (curr->getType() == "mesh")
+            {
+                if (curr->getPhysicalObject()!=NULL)
+                    curr->getPhysicalObject()->removeBody();
+            }
+        }
+     }
+}
+// ----------------------------------------------------------------------------
+/** enables all track objects with a particular ID
+ *  \param name Name or ID for enabling
+ */
+void TrackObjectManager::enable(std::string name)
+{
+    TrackObject* curr;
+    for_in (curr,m_all_objects)
+    {
+        if (curr->getName() == (name) || curr->getID() == (name))
+        {
+            curr->reset();
+            curr->setEnable(true);
+            if (curr->getType() == "mesh")
+            {
+                if (curr->getPhysicalObject() != NULL)
+                curr->getPhysicalObject()->addBody();
+            }
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
+/**  returns activation status for all track objects
+ *   with a particular ID
+ *   \param name Name or ID of track object
+ */
+bool TrackObjectManager::getStatus(std::string name)
+{
+     TrackObject* curr;
+     for_in (curr,m_all_objects){
+            if (curr->getName() == (name)||curr->getID()==(name))
+            {
+
+				return curr->isEnabled();
+            
+            }
+     }
+     //object not found
+     return false;
+}
+// ----------------------------------------------------------------------------
+/** returns a reference to the track object
+ *  with a particular ID
+ *  \param name Name or ID of track object
+ */
+TrackObject* TrackObjectManager::getTrackObject(std::string name)
+{
+    TrackObject* curr;
+    for_in(curr, m_all_objects)
+    {
+        if (curr->getName() == (name) || curr->getID() == (name))
+        {
+
+            return curr;
+
+        }
+    }
+    //object not found
+    return NULL;
+}
 /** Handles an explosion, i.e. it makes sure that all physical objects are
  *  affected accordingly.
  *  \param pos  Position of the explosion.

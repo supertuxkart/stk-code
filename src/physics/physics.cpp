@@ -37,6 +37,7 @@
 #include "physics/physical_object.hpp"
 #include "physics/stk_dynamics_world.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
 
@@ -166,6 +167,12 @@ void Physics::update(float dt)
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),
                               p->getContactPointCS(1)                );
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
+            int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
+            Scripting::Physics::setCollision(kartid1,kartid2);
+            Scripting::Physics::setCollisionType("KartKart");
+            script_engine->runScript("collisions");
             continue;
         }  // if kart-kart collision
 
@@ -173,6 +180,15 @@ void Physics::update(float dt)
         {
             // Kart hits physical object
             // -------------------------
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::Physics::setCollision(0, 0);
+            Scripting::Physics::setCollisionType("KartObject"); //object as in physical object
+            Scripting::Physics::setCollision
+                (
+                p->getUserPointer(0)->getPointerPhysicalObject()->getID(),
+                "kart"
+                );
+            script_engine->runScript("collisions");
             PhysicalObject *obj = p->getUserPointer(0)
                                    ->getPointerPhysicalObject();
             if(obj->isCrashReset())
@@ -235,9 +251,19 @@ void Physics::update(float dt)
         {
             // Projectile hits physical object
             // -------------------------------
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::Physics::setCollision(0,0); //TODO : support item types etc
+            Scripting::Physics::setCollisionType("ItemObject");
+            Scripting::Physics::setCollision
+                (
+                p->getUserPointer(1)->getPointerPhysicalObject()->getID(),
+                "item"
+                );
+            script_engine->runScript("collisions");
             p->getUserPointer(0)->getPointerFlyable()
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
+
             if(obj->isSoccerBall())
             {
                 int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();

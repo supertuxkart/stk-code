@@ -28,6 +28,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 #include <string>
+#include "animations/three_d_animation.hpp"
 
 class XMLNode;
 class ThreeDAnimation;
@@ -52,6 +53,10 @@ private:
     bool                     m_enabled;
 
     TrackObjectPresentation* m_presentation;
+
+	std::string m_name;
+
+    std::string m_id;
 
 protected:
 
@@ -121,10 +126,20 @@ public:
     /** Called when an explosion happens. As a default does nothing, will
      *  e.g. be overwritten by physical objects etc. */
     virtual void handleExplosion(const Vec3& pos, bool directHit) {};
+    void         setID(std::string obj_id) { m_id = obj_id; }
+
     // ------------------------------------------------------------------------
     const std::string& getLodGroup() const { return m_lod_group; }
     // ------------------------------------------------------------------------
     const std::string& getType() const { return m_type; }
+    // ------------------------------------------------------------------------
+	const std::string getName() const { return m_name; }
+    // ------------------------------------------------------------------------
+    const std::string getID() const { return m_id; }
+    // ------------------------------------------------------------------------
+    const std::string getInteraction() const { return m_interaction; }
+    // ------------------------------------------------------------------------
+	bool isEnabled() const { return m_enabled; }
     // ------------------------------------------------------------------------
     bool isSoccerBall() const { return m_soccer_ball; }
     // ------------------------------------------------------------------------
@@ -135,6 +150,8 @@ public:
     const PhysicalObject* getPhysicalObject() const { return m_physical_object; }
     // ------------------------------------------------------------------------
     PhysicalObject* getPhysicalObject() { return m_physical_object; }
+    //Due to above overload AngelScript cannot decide which function to bind
+    PhysicalObject* getPhysicalObjectForScript() { return m_physical_object; }
     // ------------------------------------------------------------------------
     const core::vector3df getInitXYZ() const { return m_init_xyz; }
     // ------------------------------------------------------------------------
@@ -147,10 +164,22 @@ public:
     // ------------------------------------------------------------------------
     template<typename T>
     const T* getPresentation() const { return dynamic_cast<T*>(m_presentation); }
+
+    //specialized getters for scripts
+    TrackObjectPresentationMesh* getMesh(){ return getPresentation<TrackObjectPresentationMesh>(); }
+
+    TrackObjectPresentationParticles* getParticles(){ return getPresentation<TrackObjectPresentationParticles>(); }
+
+    TrackObjectPresentationSound* getSound(){ return getPresentation<TrackObjectPresentationSound>(); }
+
     // ------------------------------------------------------------------------
     ThreeDAnimation* getAnimator() { return m_animator; }
     // ------------------------------------------------------------------------
     const ThreeDAnimation* getAnimator() const { return m_animator; }
+    //Due to above overload AngelScript cannot decide which function to bind
+    ThreeDAnimation* getAnimatorForScript() { return m_animator; }
+    // ------------------------------------------------------------------------
+    void setPaused(bool mode){ m_animator->setPaused(mode); }
     // ------------------------------------------------------------------------
     /** Returns if a kart can drive on this object. */
     bool isDriveable() const { return m_is_driveable; }
