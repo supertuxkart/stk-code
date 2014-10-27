@@ -35,9 +35,9 @@ using namespace irr;
 
 void KeyboardConfig::save(std::ofstream& stream)
 {
-    stream << "<keyboard>\n\n";
+    stream << "<keyboard>\n";
     DeviceConfig::save(stream);
-    stream << "</keyboard>\n\n\n";
+    stream << "</keyboard>\n\n";
 }  // save
 
 //------------------------------------------------------------------------------
