@@ -55,13 +55,13 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
 {
     init();
     std::string shape;
+    xml_node.get("id",      &m_id          );
     xml_node.get("mass",    &m_mass        );
     xml_node.get("radius",  &m_radius      );
-    xml_node.get("shape",   &shape        );
+    xml_node.get("shape",   &shape         );
     xml_node.get("reset",   &m_crash_reset );
     xml_node.get("explode", &m_knock_kart  );
     xml_node.get("flatten", &m_flatten_kart);
-
     m_reset_when_too_low =
         xml_node.get("reset-when-below", &m_reset_height) == 1;
 
@@ -130,6 +130,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_init_hpr   = object->getRotation();
     m_init_scale = object->getScale();
 
+    m_id                 = settings.m_id;
     m_mass               = settings.m_mass;
     m_radius             = settings.m_radius;
     m_body_type          = settings.m_body_type;
@@ -584,6 +585,34 @@ bool PhysicalObject::isSoccerBall() const
 {
     return m_object->isSoccerBall();
 }   // is SoccerBall
+
+// ----------------------------------------------------------------------------
+/** Sets interaction type for object*/
+void PhysicalObject::setInteraction(std::string interaction){
+    if ( interaction == "flatten") m_flatten_kart = true;
+    if ( interaction == "reset") m_crash_reset = true;
+    if ( interaction == "explode") m_explode_kart = true;
+    if ( interaction == "none" )
+    {
+        m_flatten_kart = false;
+        m_crash_reset = false;
+        m_explode_kart = false;
+    }
+}   // set interaction
+
+// ----------------------------------------------------------------------------
+/** Remove body from physics dynamic world interaction type for object*/
+void PhysicalObject::removeBody()
+{
+    World::getWorld()->getPhysics()->removeBody(m_body);
+}   // Remove body
+
+// ----------------------------------------------------------------------------
+/** Add body to physics dynamic world */
+void PhysicalObject::addBody()
+{
+    World::getWorld()->getPhysics()->addBody(m_body);
+}   // Add body
 
 // ----------------------------------------------------------------------------
 /** Called when a physical object hits the track. Atm only used to push a

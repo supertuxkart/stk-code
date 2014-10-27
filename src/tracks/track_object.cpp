@@ -95,6 +95,8 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 
     m_physical_object = NULL;
 
+    xml_node.get("id",      &m_id        );
+    xml_node.get("model",   &m_name      );
     xml_node.get("xyz",     &m_init_xyz  );
     xml_node.get("hpr",     &m_init_hpr  );
     xml_node.get("scale",   &m_init_scale);
@@ -148,6 +150,8 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         std::string m_action;
         xml_node.get("action", &m_action);
         xml_node.get("distance", &m_distance);
+        m_name = m_action;
+        //adds action as name so that it can be found by using getName()
         if (m_action == "garage")
         {
             m_garage = true;

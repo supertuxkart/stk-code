@@ -44,6 +44,11 @@ class PhysicalObject;
 class Physics;
 class Track;
 
+namespace Scripting
+{
+    class ScriptEngine;
+}
+
 namespace irr
 {
     namespace scene { class ISceneNode; }
@@ -124,6 +129,9 @@ protected:
     /** Pointer to the track. The track is managed by world. */
     Track* m_track;
 
+    /**Pointer to scripting engine  */
+    Scripting::ScriptEngine* m_script_engine;
+
     /** Pointer to the race GUI. The race GUI is handled by world. */
     RaceGUIBase *m_race_gui;
 
@@ -174,7 +182,6 @@ protected:
     virtual void  update(float dt);
     virtual void  createRaceGUI();
             void  updateTrack(float dt);
-    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** Used for AI karts that are still racing when all player kart finished.
      *  Generally it should estimate the arrival time for those karts, but as
@@ -315,7 +322,13 @@ public:
     /** Returns a pointer to the track. */
     Track          *getTrack() const { return m_track; }
     // ------------------------------------------------------------------------
+    /** Returns a pointer to the Scripting Engine. */
+    Scripting::ScriptEngine   *getScriptEngine() 
+                               const { return m_script_engine; }
+    //-------------------------------------------------------------------------
     bool            isFogEnabled() const;
+    // ------------------------------------------------------------------------
+    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */

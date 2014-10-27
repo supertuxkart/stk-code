@@ -41,6 +41,7 @@ class ModelDefinitionLoader;
 
 #include "graphics/material.hpp"
 #include "items/item.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "tracks/quad_graph.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/translation.hpp"
@@ -59,6 +60,10 @@ class TrackObjectManager;
 class TriangleMesh;
 class World;
 class XMLNode;
+namespace Scripting
+{
+    class ScriptEngine;
+}
 
 const int HEIGHT_MAP_RESOLUTION = 256;
 
@@ -165,6 +170,8 @@ private:
     std::string              m_description;
     core::stringw            m_designer;
 
+    /* For running the startup script */
+    bool m_startup_run;
     /** The full filename of the config (xml) file. */
     std::string              m_filename;
 
