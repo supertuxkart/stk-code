@@ -642,6 +642,8 @@ core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform, const std::
     return tmp_matrix;
 }
 
+float shadowSplit[5] = {1., 5., 20., 50., 150 };
+
 void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
     static_cast<scene::CSceneManager *>(m_scene_manager)->OnAnimate(os::Timer::getTime());
@@ -656,17 +658,17 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
     {
-        6.,
-        21.,
-        55.,
-        150.,
+        shadowSplit[1],
+        shadowSplit[2],
+        shadowSplit[3],
+        shadowSplit[4],
     };
     float NearValues[] =
     {
-        oldnear,
-        5.,
-        20.,
-        50.,
+        shadowSplit[0],
+        shadowSplit[1],
+        shadowSplit[2],
+        shadowSplit[3]
     };
 
 

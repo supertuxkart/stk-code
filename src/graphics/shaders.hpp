@@ -402,7 +402,7 @@ public:
     EnvMapShader();
 };
 
-class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShader, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
+class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShader, float, float, float, float, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
 {
 public:
     ShadowedSunLightShader();
