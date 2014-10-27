@@ -16,16 +16,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef INPUT_DEVICE_HPP
-#define INPUT_DEVICE_HPP
+#ifndef HEADER_INPUT_DEVICE_HPP
+#define HEADER_INPUT_DEVICE_HPP
 
-#include <string>
 
 #include "input/device_config.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/no_copy.hpp"
+
+#include <string>
+
 /**
   * \brief Input device type
   * \ingroup input
@@ -60,13 +62,21 @@ public:
 
              InputDevice();
     virtual ~InputDevice();
+        bool processAndMapInput(PlayerAction* action, Input::InputType type,  int id, InputManager::InputDriverMode mode);
+
+    bool processAndMapInput(PlayerAction* action, Input::InputType type, const int id,
+                            int* value, InputManager::InputDriverMode mode);
+
 #ifdef NOTYET
-    virtual bool processAndMapInput(Input::InputType type, const int id,
+    virtual bool processAndMapInput(PlayerAction *action,
+                                    Input::InputType type, 
+
+                                    const int id,
                                     int* value,
                                     InputManager::InputDriverMode mode,
-                                    PlayerAction* action);
-
+                                    PlayerAction* action) = 0;
 #endif
+
     // ------------------------------------------------------------------------
     /** Sets which players uses this device; or pass NULL to say no player 
      *  uses it. */

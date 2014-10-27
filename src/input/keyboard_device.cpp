@@ -39,10 +39,12 @@ KeyboardDevice::KeyboardDevice()
 
 // ----------------------------------------------------------------------------
 
-bool KeyboardDevice::processAndMapInput(const int id,
-                                        InputManager::InputDriverMode mode,
-                                        PlayerAction* action /* out */)
+bool KeyboardDevice::processAndMapInput(PlayerAction* action /* out */,
+                                        Input::InputType type,
+                                        const int id,
+                                        InputManager::InputDriverMode mode)
 {
+    assert(type==Input::IT_KEYBOARD);
     if (mode == InputManager::INGAME)
     {
         return m_configuration->getGameAction(Input::IT_KEYBOARD, id, 0,

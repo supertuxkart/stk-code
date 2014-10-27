@@ -317,7 +317,7 @@ InputDevice* DeviceManager::mapKeyboardInput(int button_id,
     {
         KeyboardDevice *keyboard = m_keyboards.get(n);
 
-        if (keyboard->processAndMapInput(button_id, mode, action))
+        if (keyboard->processAndMapInput(action, Input::IT_KEYBOARD, button_id, mode))
         {
             if (m_single_player != NULL)
             {
@@ -363,7 +363,7 @@ InputDevice *DeviceManager::mapGamepadInput(Input::InputType type,
 
     if (gPad != NULL)
     {
-        if (gPad->processAndMapInput(type, button_id, value, mode, action))
+        if (gPad->processAndMapInput(action, type, button_id, mode, value))
         {
             if (m_single_player != NULL)
             {

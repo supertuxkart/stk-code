@@ -22,6 +22,8 @@
 
 #include "input/input_device.hpp"
 
+#include "input/input.hpp"
+
 class KeyboardConfig;
 
 /**
@@ -46,8 +48,9 @@ public:
      * \param[out] action  The action associated to this input (only check
      *                     this value if method returned true)
      */
-    bool processAndMapInput(const int id, InputManager::InputDriverMode mode,
-                            PlayerAction* action);
+    bool processAndMapInput(PlayerAction* action, Input::InputType type, 
+                            const int id,
+                            InputManager::InputDriverMode mode);
 
 };   // KeyboardDevice
 

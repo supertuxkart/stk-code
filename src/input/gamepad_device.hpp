@@ -78,10 +78,9 @@ public:
      *
      * \return Whether the pressed key/button is bound with an action
      */
-    bool processAndMapInput(Input::InputType type, const int id,
-                            int* value,
-                            InputManager::InputDriverMode mode,
-                            PlayerAction* action);
+    bool processAndMapInput(PlayerAction* action, Input::InputType type,
+                            const int id, 
+                            InputManager::InputDriverMode mode, int* value);
 
 };
 

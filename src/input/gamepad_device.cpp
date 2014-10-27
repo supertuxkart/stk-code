@@ -108,10 +108,10 @@ void GamePadDevice::resetAxisDirection(const int axis,
 
 // ----------------------------------------------------------------------------
 
-bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
-                                       int* value, /* inout */
+bool GamePadDevice::processAndMapInput(PlayerAction* action /* out */,
+                                       Input::InputType type, const int id,
                                        InputManager::InputDriverMode mode,
-                                       PlayerAction* action /* out */)
+                                       int* value/* inout */)
 {
     if (!m_configuration->isEnabled()) return false;
 
