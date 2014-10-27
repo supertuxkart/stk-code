@@ -16,18 +16,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <assert.h>
-#include <angelscript.h>
-#include "modes/world.hpp"
 #include "script_track.hpp"
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
-#include "tracks/track_object_manager.hpp"
-#include "tracks/track_object.hpp"
-#include "tracks/track.hpp"
+
 #include "animations/three_d_animation.hpp"
-#include <iostream> //debug
-#include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/input_device.hpp"
+#include "input/input_manager.hpp"
+#include "modes/world.hpp"
+#include "states_screens/dialogs/tutorial_message_dialog.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_object.hpp"
+#include "tracks/track_object_manager.hpp"
+
+#include <angelscript.h>
+
+#include <assert.h>
+#include <iostream> //debug
 
 namespace Scripting
 {
@@ -121,7 +125,7 @@ namespace Scripting
         void getKeyBinding(asIScriptGeneric *gen)
         {
             int Enum_value = (int)gen->GetArgDWord(0);
-            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
             DeviceConfig* config = device->getConfiguration();
             irr::core::stringw control;
             PlayerAction ScriptAction = (PlayerAction)Enum_value;
