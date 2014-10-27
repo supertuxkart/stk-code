@@ -69,7 +69,7 @@ bool GamepadConfig::load(const XMLNode *config)
 void GamepadConfig::save (std::ofstream& stream)
 {
     stream << "<gamepad name =\"" << m_name.c_str() << "\" enabled=\""
-           << (m_enabled ? "true" : "false") << "\n";
+           << (m_enabled ? "true\"\n" : "false\"\n");
     stream << "         deadzone=\""<<m_deadzone << "\">\n";
     DeviceConfig::save(stream);
     stream << "</gamepad>\n\n";
