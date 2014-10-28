@@ -78,8 +78,10 @@ protected:
                        const int              id,
                        int*                   value, /* inout */
                        PlayerAction*          action /* out */);
+
 public:
 
+    static DeviceConfig* create(const XMLNode *config);
     irr::core::stringw toString();
     bool hasBindingFor(const int buttonID) const;
     bool hasBindingFor(const int buttonID, PlayerAction from,

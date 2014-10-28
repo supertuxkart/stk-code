@@ -19,7 +19,6 @@
 #ifndef DEVICE_MANAGER_HPP
 #define DEVICE_MANAGER_HPP
 
-#include "input/device_config.hpp"
 #include "input/gamepad_config.hpp"
 #include "input/input_manager.hpp"
 #include "input/keyboard_config.hpp"
@@ -31,6 +30,7 @@
 #include <IEventReceiver.h>
 using namespace irr;
 
+class DeviceConfig;
 class InputDevice;
 class GamePadDevice;
 class KeyboardDevice;
@@ -115,7 +115,9 @@ public:
     GamePadDevice*      getGamePadFromIrrID(const int i);
     void                clearGamepads();
     /** Returns the keyboard that has a binding for this button, or NULL if none */
-    bool                getConfigForGamepad(const int sdl_id, const core::stringc& pname, GamepadConfig **config);
+    bool                getConfigForGamepad(const int sdl_id, 
+                                            const std::string& name,
+                                            GamepadConfig **config);
 
     // ---- Keyboard(s) ----
     void addEmptyKeyboard();

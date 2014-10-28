@@ -67,7 +67,14 @@ GamePadDevice::~GamePadDevice()
 }   // ~GamePadDevice
 
 // ----------------------------------------------------------------------------
+/** Returns if the specified value is larger than the deadzone. */
+bool GamePadDevice::moved(int value) const
+{
+    int dz = static_cast<GamepadConfig*>(m_configuration)->getDeadzone();
+    return abs(value) > dz;
+}   // moved
 
+// ----------------------------------------------------------------------------
 bool GamePadDevice::isButtonPressed(const int i)
 {
     return m_buttonPressed[i];
@@ -177,8 +184,9 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
             }
         }
 
+        int dz = static_cast<GamepadConfig*>(m_configuration)->getDeadzone();
         // check if within deadzone
-        if(*value > -m_deadzone && *value < m_deadzone && getPlayer())
+        if(*value > -dz && *value < dz && getPlayer())
         {
             // Axis stands still: This is reported once for digital axes and
             // can be called multipled times for analog ones. Uses the

@@ -115,7 +115,7 @@ bool DeviceManager::initialize()
         }
 
         // Returns true if new configuration was created
-        if (getConfigForGamepad(id, name, &gamepadConfig) == true)
+        if (getConfigForGamepad(id, name.c_str(), &gamepadConfig) == true)
         {
             if(UserConfigParams::logMisc())
                Log::info("Device manager","creating new configuration.");
@@ -200,7 +200,7 @@ GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
  *  otherwise false.
  */
 bool DeviceManager::getConfigForGamepad(const int irr_id,
-                                        const core::stringc& name,
+                                        const std::string& name,
                                         GamepadConfig **config)
 {
     bool found = false;
@@ -209,7 +209,7 @@ bool DeviceManager::getConfigForGamepad(const int irr_id,
     // Find appropriate configuration
     for(unsigned int n=0; n < m_gamepad_configs.size(); n++)
     {
-        if(m_gamepad_configs[n].getName() == name.c_str())
+        if(m_gamepad_configs[n].getName() == name)
         {
             *config = m_gamepad_configs.get(n);
             found = true;
@@ -221,7 +221,7 @@ bool DeviceManager::getConfigForGamepad(const int irr_id,
     {
         if(irr_id < (int)(m_irrlicht_gamepads.size()))
         {
-            *config = new GamepadConfig( name.c_str(),
+            *config = new GamepadConfig( name,
                                          m_irrlicht_gamepads[irr_id].Axes,
                                          m_irrlicht_gamepads[irr_id].Buttons );
         }
@@ -504,28 +504,23 @@ bool DeviceManager::load()
     for(unsigned int i=0; i<input->getNumNodes(); i++)
     {
         const XMLNode *config = input->getNode(i);
-        if(config->getName()=="keyboard")
-        {
-            KeyboardConfig* keyboard_config = new KeyboardConfig();
-            if(!keyboard_config->load(config))
-            {
-                Log::error("Device manager",
-                    "Ignoring an ill-formed keyboard action in input config.");
-            }
-            m_keyboard_configs.push_back(keyboard_config);
-        }
-        else if (config->getName()=="gamepad")
-        {
-            GamepadConfig* gamepad_config = new GamepadConfig(config);
-            gamepad_config->load(config);
-            m_gamepad_configs.push_back(gamepad_config);
-        }
-        else
+        DeviceConfig *device_config = DeviceConfig::create(config);
+        if(!device_config)
         {
             Log::warn("DeviceManager",
                       "Invalid node '%s' in input.xml - ignored.",
                       config->getName().c_str());
             continue;
+        }
+        if(config->getName()=="keyboard")
+        {
+            KeyboardConfig *kc = static_cast<KeyboardConfig*>(device_config);
+            m_keyboard_configs.push_back(kc);
+        }
+        else if (config->getName()=="gamepad")
+        {
+            GamepadConfig *gc = static_cast<GamepadConfig*>(device_config);
+            m_gamepad_configs.push_back(gc);
         }
     }   // for i < getNumNodes
 

@@ -48,9 +48,6 @@ class GamePadDevice : public InputDevice
     /** \see m_prev_axis_value */
     bool                 *m_axis_ok;
 
-    /** Deadzone for this gamepad. */
-    int                   m_deadzone;
-
     /** Irrlicht index of this gamepad. */
     int                   m_irr_index;
 
@@ -73,16 +70,17 @@ public:
                                     InputManager::InputDriverMode mode,
                                     PlayerAction *action, int* value = NULL
                                     ) OVERRIDE;
+    bool moved(int value) const;
 
     // ------------------------------------------------------------------------
     /** Returns the irrlicht index of this gamepad. */
     int getIrrIndex() const { return m_irr_index; }
-    // ------------------------------------------------------------------------
-    /** Returns the deadzone of this gamepad. */
-    int getDeadzone() const { return m_deadzone; }
+
     // ------------------------------------------------------------------------
     /** Returns the number of buttons of this gamepad. */
     int getNumberOfButtons() const { return m_button_count; }
+    // ------------------------------------------------------------------------
+
 };   // class GamepadDevice
 
 #endif

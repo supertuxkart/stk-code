@@ -28,11 +28,15 @@
 
 using namespace irr;
 
-//  KeyboardConfig & GamepadConfig classes really should be in a separate cpp
-//  file but they are so small that we'll just leave them here for now.
 
-//==== K E Y B O A R D C O N F I G =============================================
+KeyboardConfig::KeyboardConfig() : DeviceConfig(DEVICE_CONFIG_TYPE_KEYBOARD)
+{
+    m_name = "Keyboard";
+    m_plugged = 1;
+    setDefaultBinds();
+}   // KeyboardConfig
 
+// ----------------------------------------------------------------------------
 void KeyboardConfig::save(std::ofstream& stream)
 {
     stream << "<keyboard>\n";
@@ -64,11 +68,4 @@ void KeyboardConfig::setDefaultBinds()
 }
 
 //------------------------------------------------------------------------------
-
-KeyboardConfig::KeyboardConfig() : DeviceConfig(DEVICE_CONFIG_TYPE_KEYBOARD)
-{
-    m_name = "Keyboard";
-    m_plugged = 1;
-    setDefaultBinds();
-}
 

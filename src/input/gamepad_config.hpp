@@ -22,6 +22,7 @@
 #include "input/binding.hpp"
 #include "input/device_config.hpp"
 #include "input/input.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
 
 #include <iosfwd>
@@ -39,11 +40,12 @@ class GamepadConfig : public DeviceConfig
 
 private:
     /** Number of axis this device has. */
-    int         m_axis_count;
+    int m_axis_count;
 
     /** Number of buttons this device has. */
-    int         m_button_count;
+    int m_button_count;
 
+    /** Deadzone of this gamepad. */
     int m_deadzone;
 
 public:
@@ -52,11 +54,11 @@ public:
 
     virtual void save(std::ofstream& stream);
     void        setDefaultBinds     ();
-    GamepadConfig           (const XMLNode *config);
+    GamepadConfig           ();
     GamepadConfig           (const std::string     &name,
                              const int              axis_count=0,
                              const int              button_ount=0);
-    virtual bool load(const XMLNode *config);
+    virtual bool load(const XMLNode *config) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Sets the number of buttons this device has. */
     void setNumberOfButtons(int count) { m_button_count = count; }
@@ -66,6 +68,9 @@ public:
     void setNumberOfAxis(int count) { m_axis_count = count; }
     //        ~GamepadConfig();
 
+    // ------------------------------------------------------------------------
+    /** Return deadzone of this configuration. */
+    int getDeadzone() const { return m_deadzone; }
     // ------------------------------------------------------------------------
     /** Returns the type of this configuration. */
     virtual DeviceConfig::DeviceConfigType getType() const

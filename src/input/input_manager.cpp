@@ -639,8 +639,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                     GamePadDevice* gp =
                         getDeviceManager()->getGamePadFromIrrID(deviceID);
 
-                    if (gp != NULL &&
-                        abs(value)>gp->getDeadzone())
+                    // Check for deadzone
+                    if (gp != NULL && gp->moved(value))
                     {
                         //I18N: message shown when an input device is used but
                         // is not associated to any player

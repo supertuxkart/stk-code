@@ -28,7 +28,6 @@
 #include <irrString.h>
 #include <string>
 
-//==== K E Y B O A R D C O N F I G =============================================
 
 /**
   * \brief specialisation of DeviceConfig for keyboard type devices

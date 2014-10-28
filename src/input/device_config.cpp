@@ -19,6 +19,8 @@
 
 #include "input/device_config.hpp"
 
+#include "input/gamepad_config.hpp"
+#include "input/keyboard_config.hpp"
 #include "io/xml_node.hpp"
 #include "utils/log.hpp"
 
@@ -28,6 +30,39 @@
 
 using namespace irr;
 
+// ------------------------------------------------------------------------
+/** A simple factory that creates either a gamepad or a keyboard
+ *  configuration.
+ *  \param type "gamepad" or "keyboard".
+ *  \param config The XML node with additional configuration parameters.
+ */
+DeviceConfig* DeviceConfig::create(const XMLNode *config)
+{
+    DeviceConfig *device_config = NULL;
+    if(config->getName()=="keyboard")
+    {
+        device_config = new KeyboardConfig();
+    }
+    else if(config->getName()=="gamepad")
+    {
+        device_config = new GamepadConfig();
+    }
+    else
+    {
+        Log::error("DeviceConfig", "Incorrect type: '%s'.", 
+                   config->getName().c_str());
+        return NULL;
+    }
+    // A default keyboard etc is created without
+    if(config && !device_config->load(config))
+    {
+        delete device_config;
+        return NULL;
+    }
+    return device_config;
+}   // create
+
+// ------------------------------------------------------------------------
 DeviceConfig::DeviceConfig(DeviceConfigType type)
 {
     m_type    = type;
@@ -265,6 +300,7 @@ void DeviceConfig::save (std::ofstream& stream)
  */
 bool DeviceConfig::load(const XMLNode *config)
 {
+    config->get("enabled", &m_enabled);
     bool error = false;
     for(unsigned int i=0; i<config->getNumNodes(); i++)
     {

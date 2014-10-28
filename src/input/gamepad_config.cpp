@@ -44,22 +44,26 @@ GamepadConfig::GamepadConfig   ( const std::string     &name,
 
 //------------------------------------------------------------------------------
 
-GamepadConfig::GamepadConfig(const XMLNode *config) 
-             : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
+GamepadConfig::GamepadConfig() : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
 {
-    if(!config->get("name", &m_name))
-        Log::error("DeviceConfig", "Unnamed joystick in config file.");
-
-    config->get("enabled", &m_enabled);
-
-    m_plugged = 0;
+    m_plugged  = 0;
     m_deadzone = 2000;
+    m_name     = "";
     setDefaultBinds();
-}   // GamepadConfig(XMLNode)
+}   // GamepadConfig
 
 //------------------------------------------------------------------------------
+/** Loads this configuration from the given XML node.
+ *  \param config The XML tree.
+ *  \return False in case of an error.
+ */
 bool GamepadConfig::load(const XMLNode *config)
 {
+    if(!config->get("name", &m_name))
+    {
+        Log::error("DeviceConfig", "Unnamed joystick in config file.");
+        return false;
+    }
     m_deadzone = 2000;
     config->get("deadzone", &m_deadzone);
     return DeviceConfig::load(config);
