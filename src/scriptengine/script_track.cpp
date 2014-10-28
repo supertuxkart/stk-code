@@ -83,10 +83,7 @@ namespace Scripting
         //move objects of type TrackObjectPresentation, to the specified location
         void movePresentation(Vec3 *new_pos, void *memory)
         {
-            core::vector3df xyz = core::vector3df(0, 0, 0);
-            xyz.X = new_pos->getX();
-            xyz.Y = new_pos->getY();
-            xyz.Z = new_pos->getZ();
+            core::vector3df xyz = new_pos->toIrrVector();
             core::vector3df hpr = core::vector3df(0, 0, 0);
             core::vector3df scale = core::vector3df(1, 1, 1);
             ((TrackObjectPresentation*)(memory))->move(xyz, hpr, scale);
