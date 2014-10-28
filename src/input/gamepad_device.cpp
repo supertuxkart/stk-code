@@ -23,7 +23,12 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
 
-GamePadDevice::GamePadDevice(const int irrIndex, const std::string name,
+/** Constructor for GamePadDevice from a connected gamepad for which no
+ *  configuration existed (defaults will be used)
+ *  \param irrIndex Index of stick as given by irrLicht.
+ */
+
+GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
                              const int axis_count, const int button_count,
                              GamepadConfig *configuration)
 {
@@ -35,7 +40,7 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name,
     m_prev_axis_value       = new int[axis_count];
     m_axis_ok               = new bool[axis_count];
     m_button_count          = button_count;
-    m_index                 = irrIndex;
+    m_irr_index             = irr_index;
     m_name                  = name;
 
     for (int i = 0; i < axis_count; i++)
@@ -107,11 +112,26 @@ void GamePadDevice::resetAxisDirection(const int axis,
 }   // resetAxisDirection
 
 // ----------------------------------------------------------------------------
+/** Invoked when this device it used. Verifies if the key/button that was
+ *  pressed is associated with a binding. If yes, sets action and returns
+ *  true; otherwise returns false. It can also modify the value used.
+ *  \param type Type of input (e.g. IT_STICKMOTION, ...).
+ *  \param id   ID of the key that was pressed or of the axis that was
+ *              triggered (depending on the value of the 'type' parameter).
+ *  \param mode Used to determine whether to map menu actions or
+ *              game actions
+ * \param[out] action  The action associated to this input (only check
+ *                     this value if method returned true)
+ * \param[in,out] value The value associated with this type (typically
+ *                      how far a gamepad axis is moved).
+ *
+ * \return Whether the pressed key/button is bound with an action
+ */
 
-bool GamePadDevice::processAndMapInput(PlayerAction* action /* out */,
-                                       Input::InputType type, const int id,
+bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
                                        InputManager::InputDriverMode mode,
-                                       int* value/* inout */)
+                                       PlayerAction* action /* out */,
+                                       int* value           /* inout */ )
 {
     if (!m_configuration->isEnabled()) return false;
 

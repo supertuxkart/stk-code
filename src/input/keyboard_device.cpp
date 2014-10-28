@@ -38,11 +38,24 @@ KeyboardDevice::KeyboardDevice()
 }   // KeyboardDevice
 
 // ----------------------------------------------------------------------------
-
-bool KeyboardDevice::processAndMapInput(PlayerAction* action /* out */,
-                                        Input::InputType type,
-                                        const int id,
-                                        InputManager::InputDriverMode mode)
+/** Invoked when this device it used. Verifies if the key/button that was
+ *  pressed is associated with a binding. If yes, sets action and returns
+ *  true; otherwise returns false. It can also modify the value used.
+ *  \param type Type of input (e.g. IT_STICKMOTION, ...).
+ *  \param id   ID of the key that was pressed or of the axis that was
+ *              triggered (depending on the value of the 'type' parameter).
+ *  \param mode Used to determine whether to map menu actions or
+ *              game actions
+ * \param[out] action  The action associated to this input (only check
+ *                     this value if method returned true)
+ * \param[in,out] value The value associated with this type (typically
+ *                      how far a gamepad axis is moved).
+ *
+ * \return Whether the pressed key/button is bound with an action
+ */
+bool KeyboardDevice::processAndMapInput(Input::InputType type,  const int id,
+                                        InputManager::InputDriverMode mode,
+                                        PlayerAction *action, int* value)
 {
     assert(type==Input::IT_KEYBOARD);
     if (mode == InputManager::INGAME)

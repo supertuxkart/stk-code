@@ -20,8 +20,10 @@
 #define HEADER_GAMEPAD_DEVICE_HPP
 
 #include "input/input_device.hpp"
+#include "utils/cpp2011.hpp"
 
 class GamepadConfig;
+
 /**
   * \brief specialisation of Inputdevice for gamepad type devices
   * \ingroup input
@@ -31,7 +33,6 @@ class GamePadDevice : public InputDevice
     void resetAxisDirection(const int axis, Input::AxisDirection direction);
     bool m_buttonPressed[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
 
-public:
     Input::AxisDirection *m_prev_axis_directions;
 
     /** used to determine if an axis is valid; an axis is considered valid
@@ -43,46 +44,45 @@ public:
       * uninteresting axis values)
       */
     int                  *m_prev_axis_value;
+
     /** \see m_prev_axis_value */
     bool                 *m_axis_ok;
 
+    /** Deadzone for this gamepad. */
     int                   m_deadzone;
-    int                   m_index;
+
+    /** Irrlicht index of this gamepad. */
+    int                   m_irr_index;
+
+    /** Number of axis for this gamepad. */
     int                   m_axis_count;
+
+    /** Number of buttons of this gamepad. */
     int                   m_button_count;
 
-    /** Constructor for GamePadDevice from a connected gamepad for which no
-      * configuration existed (defaults will be used)
-      *  \param irrIndex Index of stick as given by irrLicht.
-      */
-    GamePadDevice(const int irrIndex, const std::string name,
-                  const int axis_number,
-                  const int btnAmount, GamepadConfig *configuration);
+public:
+             GamePadDevice(const int irrIndex, const std::string &name,
+                           const int axis_number,
+                           const int button_count,
+                           GamepadConfig *configuration);
     virtual ~GamePadDevice();
+    bool     isButtonPressed(const int i);
+    void     setButtonPressed(const int i, bool isButtonPressed);
 
-    bool isButtonPressed(const int i);
-    void setButtonPressed(const int i, bool isButtonPressed);
+    virtual bool processAndMapInput(Input::InputType type,  const int id,
+                                    InputManager::InputDriverMode mode,
+                                    PlayerAction *action, int* value = NULL
+                                    ) OVERRIDE;
 
-    /**
-     * Invoked when this device it used. Verifies if the key/button that
-     * was pressed is associated with a binding. If yes, sets action and
-     * returns true; otherwise returns false.
-     *
-     * \param      id      ID of the key that was pressed or of the axis
-     *                     that was triggered (depending on
-     *                     the value of the 'type' parameter)
-     * \param      mode    Used to determine whether to map menu actions or
-     *                     game actions
-     * \param[out] action  The action associated to this input (only check
-     *                     this value if method returned true)
-     *
-     * \return Whether the pressed key/button is bound with an action
-     */
-    bool processAndMapInput(PlayerAction* action, Input::InputType type,
-                            const int id, 
-                            InputManager::InputDriverMode mode, int* value);
-
-};
-
+    // ------------------------------------------------------------------------
+    /** Returns the irrlicht index of this gamepad. */
+    int getIrrIndex() const { return m_irr_index; }
+    // ------------------------------------------------------------------------
+    /** Returns the deadzone of this gamepad. */
+    int getDeadzone() const { return m_deadzone; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of buttons of this gamepad. */
+    int getNumberOfButtons() const { return m_button_count; }
+};   // class GamepadDevice
 
 #endif

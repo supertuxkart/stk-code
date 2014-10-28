@@ -640,7 +640,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                         getDeviceManager()->getGamePadFromIrrID(deviceID);
 
                     if (gp != NULL &&
-                        abs(value)>gp->m_deadzone)
+                        abs(value)>gp->getDeadzone())
                     {
                         //I18N: message shown when an input device is used but
                         // is not associated to any player
@@ -778,7 +778,7 @@ EventPropagation InputManager::input(const SEvent& event)
             return EVENT_BLOCK;
         }
 
-        for(int i=0; i<gp->m_button_count; i++)
+        for(int i=0; i<gp->getNumberOfButtons(); i++)
         {
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
 

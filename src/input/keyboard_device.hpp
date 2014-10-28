@@ -22,7 +22,7 @@
 
 #include "input/input_device.hpp"
 
-#include "input/input.hpp"
+#include "utils/cpp2011.hpp"
 
 class KeyboardConfig;
 
@@ -37,20 +37,10 @@ public:
     KeyboardDevice(KeyboardConfig *configuration);
 
     virtual ~KeyboardDevice() {}
-
-    /**
-     * Checks if this key belongs to this device. if yes, sets action and
-     *  returns true; otherwise returns false
-     *
-     * \param      id      ID of the key that was pressed
-     * \param      mode    Used to determine whether to bind menu actions or
-     *                     game actions
-     * \param[out] action  The action associated to this input (only check
-     *                     this value if method returned true)
-     */
-    bool processAndMapInput(PlayerAction* action, Input::InputType type, 
-                            const int id,
-                            InputManager::InputDriverMode mode);
+    virtual bool processAndMapInput(Input::InputType type,  const int id,
+                                    InputManager::InputDriverMode mode,
+                                    PlayerAction *action, int* value = NULL
+                                    ) OVERRIDE;
 
 };   // KeyboardDevice
 
