@@ -683,36 +683,54 @@ void IrrDriver::renderSolidSecondPass()
     }
 }
 
-template<enum video::E_VERTEX_TYPE VertexType, typename... TupleType>
-static void renderMeshNormals(std::vector<STK::Tuple<TupleType...> > *meshes)
+template<typename T>
+static void renderInstancedMeshNormals()
+{
+    std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
+    glUseProgram(MeshShader::NormalVisualizer::getInstance()->Program);
+    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
+    for (unsigned i = 0; i < meshes.size(); i++)
+    {
+        GLMesh *mesh = meshes[i];
+        MeshShader::NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
+        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
+    }
+}
+
+template<typename T>
+static void renderMultiMeshNormals()
 {
     glUseProgram(MeshShader::NormalVisualizer::getInstance()->Program);
-    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
-    for (unsigned i = 0; i < meshes->size(); i++)
+    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
+    if (SolidPassCmd::getInstance()->Size[T::MaterialType])
     {
-        GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
-
-        if (mesh.VAOType != VertexType)
-        {
-#ifdef DEBUG
-            Log::error("Materials", "Wrong vertex Type associed to pass 2 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
-#endif
-            continue;
-        }
-        draw(MeshShader::NormalVisualizer::getInstance(), STK::tuple_get<0>(meshes->at(i)), STK::tuple_get<1>(meshes->at(i)), STK::tuple_get<2>(meshes->at(i)), video::SColor(255, 0, 255, 0));
+        MeshShader::NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
+            (const void*)(SolidPassCmd::getInstance()->Offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
+            (int)SolidPassCmd::getInstance()->Size[T::MaterialType],
+            (int)sizeof(DrawElementsIndirectCommand));
     }
 }
 
 void IrrDriver::renderNormalsVisualisation()
 {
-//    renderMeshNormals<video::EVT_STANDARD>(ListMatDefault::getInstance());
-//    renderMeshNormals<video::EVT_STANDARD>(ListMatAlphaRef::getInstance());
-//    renderMeshNormals<video::EVT_STANDARD>(ListMatSphereMap::getInstance());
-//    renderMeshNormals<video::EVT_STANDARD>(ListMatGrass::getInstance());
-//    renderMeshNormals<video::EVT_2TCOORDS>(ListMatDetails::getInstance());
-//    renderMeshNormals<video::EVT_STANDARD>(ListMatUnlit::getInstance());
-//    renderMeshNormals<video::EVT_2TCOORDS>(ListMatSplatting::getInstance());
-//    renderMeshNormals<video::EVT_TANGENTS>(ListMatNormalMap::getInstance());
+    if (UserConfigParams::m_azdo) {
+        renderMultiMeshNormals<DefaultMaterial>();
+        renderMultiMeshNormals<AlphaRef>();
+        renderMultiMeshNormals<UnlitMat>();
+        renderMultiMeshNormals<SphereMap>();
+        renderMultiMeshNormals<DetailMat>();
+        renderMultiMeshNormals<NormalMat>();
+    }
+    else if (irr_driver->hasARB_draw_indirect())
+    {
+        renderInstancedMeshNormals<DefaultMaterial>();
+        renderInstancedMeshNormals<AlphaRef>();
+        renderInstancedMeshNormals<UnlitMat>();
+        renderInstancedMeshNormals<SphereMap>();
+        renderInstancedMeshNormals<DetailMat>();
+        renderInstancedMeshNormals<NormalMat>();
+    }
 }
 
 template<typename Shader, enum video::E_VERTEX_TYPE VertexType, int...List, typename... TupleType>
