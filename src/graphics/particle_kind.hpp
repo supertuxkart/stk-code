@@ -103,6 +103,9 @@ private:
         player by rotating around the Y axis only */
     bool m_vertical_particles;
 
+    /** Used mainly for weather, like snow */
+    bool m_randomize_initial_y;
+
 public:
 
     /**
@@ -166,6 +169,8 @@ public:
     bool      getFlips() const { return m_flips; }
 
     bool      isVerticalParticles() const { return m_vertical_particles; }
+
+    bool      randomizeInitialY() const { return m_randomize_initial_y; }
 
     std::string getName() const { return m_name; }
 };
