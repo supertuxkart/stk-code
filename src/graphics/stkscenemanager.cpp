@@ -173,28 +173,22 @@ bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode
         return false;
 
     const core::matrix4 &trans = node->getAbsoluteTransformation();
+    const scene::SViewFrustum &frust = *cam->getViewFrustum();
+
+    core::aabbox3d<f32> tbox = node->getBoundingBox();
+    trans.transformBoxEx(tbox);
+    if (!(tbox.intersectsWithBox(frust.getBoundingBox())))
+        return true;
 
     core::vector3df edges[8];
     node->getBoundingBox().getEdges(edges);
     for (unsigned i = 0; i < 8; i++)
         trans.transformVect(edges[i]);
 
-    scene::SViewFrustum frust = *cam->getViewFrustum();
     for (s32 i = 0; i < scene::SViewFrustum::VF_PLANE_COUNT; ++i)
         if (isBoxInFrontOfPlane(frust.planes[i], edges))
             return true;
     return false;
-}
-
-static
-bool isCulledFast(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
-{
-    if (!node->getAutomaticCulling())
-        return false;
-
-    core::aabbox3d<f32> tbox = node->getBoundingBox();
-    node->getAbsoluteTransformation().transformBoxEx(tbox);
-    return !(tbox.intersectsWithBox(cam->getViewFrustum()->getBoundingBox()));
 }
 
 static void
@@ -283,7 +277,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         }
         else
         {
-            if (isCulledFast(cam, Node))
+            if (isCulledPrecise(cam, Node))
                 continue;
             core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
             ModelMatrix.getInverse(InvModelMatrix);
@@ -328,7 +322,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         {
             if (!irr_driver->hasARB_draw_indirect())
             {
-                if (isCulledFast(shadowcam[cascade], Node))
+                if (isCulledPrecise(shadowcam[cascade], Node))
                     continue;
                 core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                 ModelMatrix.getInverse(InvModelMatrix);
@@ -381,7 +375,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         }
         else
         {
-            if (isCulledFast(rsmcam, Node))
+            if (isCulledPrecise(rsmcam, Node))
                 continue;
             core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
             ModelMatrix.getInverse(InvModelMatrix);
