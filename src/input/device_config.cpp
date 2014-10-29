@@ -63,8 +63,9 @@ DeviceConfig* DeviceConfig::create(const XMLNode *config)
 }   // create
 
 // ------------------------------------------------------------------------
-DeviceConfig::DeviceConfig(DeviceConfigType type)
+DeviceConfig::DeviceConfig( DeviceConfigType type)
 {
+    m_name    = "";
     m_type    = type;
     m_enabled = true;
     m_plugged = 0;
@@ -305,6 +306,7 @@ void DeviceConfig::save (std::ofstream& stream)
  */
 bool DeviceConfig::load(const XMLNode *config)
 {
+    config->get("name", &m_name);
     config->get("enabled", &m_enabled);
     bool error = false;
     for(unsigned int i=0; i<config->getNumNodes(); i++)

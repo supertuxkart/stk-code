@@ -51,15 +51,15 @@ private:
      *  Currently for gamepads only. */
     bool m_enabled;
 
-protected:
-
-    Binding  m_bindings[PA_COUNT];
-
     /** How many devices connected to the system which uses this config? */
     int m_plugged; 
 
     /** Name of this configuratiom. */
     std::string m_name;
+
+protected:
+
+    Binding  m_bindings[PA_COUNT];
 
     /** Configuration type. */
     DeviceConfigType m_type;
@@ -104,6 +104,9 @@ public:
     virtual DeviceConfigType getType() const = 0;
     virtual void save(std::ofstream& stream);
     virtual bool load(const XMLNode *config);
+    // ------------------------------------------------------------------------
+    /** Sets the name of this device. */
+    void setName(const std::string &name) { m_name = name; }
     // ------------------------------------------------------------------------
     /** Returns the name for this device configuration. */
     const std::string& getName() const { return m_name; };

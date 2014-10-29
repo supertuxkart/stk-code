@@ -29,11 +29,11 @@
 using namespace irr;
 
 
-KeyboardConfig::KeyboardConfig() : DeviceConfig(DEVICE_CONFIG_TYPE_KEYBOARD)
+KeyboardConfig::KeyboardConfig() 
+              : DeviceConfig(DEVICE_CONFIG_TYPE_KEYBOARD)
 {
-    m_name = "Keyboard";
-    m_plugged = 1;
     setDefaultBinds();
+    setPlugged();
 }   // KeyboardConfig
 
 // ----------------------------------------------------------------------------

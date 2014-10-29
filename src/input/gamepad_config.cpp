@@ -29,26 +29,23 @@
 using namespace irr;
 
 
-GamepadConfig::GamepadConfig   ( const std::string     &name,
-                                 const int              axis_count,
-                                 const int              button_count )
-             : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
+GamepadConfig::GamepadConfig( const std::string &name,
+                              const int        axis_count,
+                              const int        button_count )
+             : DeviceConfig(DEVICE_CONFIG_TYPE_GAMEPAD )
 {
-    m_name         = name;
+    setName(name);
     m_axis_count   = axis_count;
     m_button_count = button_count;
     m_deadzone     = 2000;
-    m_plugged      = 0;
     setDefaultBinds();
 }   // GamepadConfig
 
 //------------------------------------------------------------------------------
 
-GamepadConfig::GamepadConfig() : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
+GamepadConfig::GamepadConfig() : DeviceConfig(DEVICE_CONFIG_TYPE_GAMEPAD )
 {
-    m_plugged  = 0;
     m_deadzone = 2000;
-    m_name     = "";
     setDefaultBinds();
 }   // GamepadConfig
 
@@ -59,14 +56,16 @@ GamepadConfig::GamepadConfig() : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
  */
 bool GamepadConfig::load(const XMLNode *config)
 {
-    if(!config->get("name", &m_name))
+    config->get("deadzone", &m_deadzone);
+    bool ok = DeviceConfig::load(config);
+
+    if(getName()=="")
     {
         Log::error("DeviceConfig", "Unnamed joystick in config file.");
         return false;
     }
-    m_deadzone = 2000;
-    config->get("deadzone", &m_deadzone);
-    return DeviceConfig::load(config);
+
+    return ok;
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -77,7 +76,7 @@ bool GamepadConfig::load(const XMLNode *config)
  */
 void GamepadConfig::save (std::ofstream& stream)
 {
-    stream << "<gamepad name =\"" << m_name.c_str()
+    stream << "<gamepad name =\"" << getName()
            <<"\" deadzone=\""<<m_deadzone << "\"\n";
     stream << "         ";
     DeviceConfig::save(stream);
