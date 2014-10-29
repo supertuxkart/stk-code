@@ -278,11 +278,16 @@ bool DeviceConfig::doGetAction(Input::InputType    type,
 }   // doGetAction
 
 //------------------------------------------------------------------------------
-/** Saves the configuration to a file.
+/** Saves the configuration to a file. The calling node must have written
+ *  the beginning of the xml node, so that this function can immediately
+ *  start writing attributes.
  *  \param stream The stream to save to.
  */
 void DeviceConfig::save (std::ofstream& stream)
 {
+    stream << "enabled=\""
+        << (m_enabled ? "true\">\n" : "false\">\n");
+
     for(int n = 0; n < PA_COUNT; n++) // Start at 0?
     {
         stream << "    "

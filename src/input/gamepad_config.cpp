@@ -70,11 +70,16 @@ bool GamepadConfig::load(const XMLNode *config)
 }   // load
 
 // ----------------------------------------------------------------------------
+/** Saves the configuration to a file. It writes the name for a gamepad
+ *  config, saves the device specific parameters, and calls
+ *  DeviceConfig::save() to save the rest.
+ *  \param stream The stream to save to.
+ */
 void GamepadConfig::save (std::ofstream& stream)
 {
-    stream << "<gamepad name =\"" << m_name.c_str() << "\" enabled=\""
-           << (m_enabled ? "true\"\n" : "false\"\n");
-    stream << "         deadzone=\""<<m_deadzone << "\">\n";
+    stream << "<gamepad name =\"" << m_name.c_str()
+           <<"\" deadzone=\""<<m_deadzone << "\"\n";
+    stream << "         ";
     DeviceConfig::save(stream);
     stream << "</gamepad>\n\n";
 }   // save

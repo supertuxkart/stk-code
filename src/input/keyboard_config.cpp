@@ -37,9 +37,14 @@ KeyboardConfig::KeyboardConfig() : DeviceConfig(DEVICE_CONFIG_TYPE_KEYBOARD)
 }   // KeyboardConfig
 
 // ----------------------------------------------------------------------------
+/** Saves the configuration to a file. It writes the name for a gamepad
+ *  config, saves the device specific parameters, and calls
+ *  DeviceConfig::save() to save the rest.
+ *  \param stream The stream to save to.
+ */
 void KeyboardConfig::save(std::ofstream& stream)
 {
-    stream << "<keyboard>\n";
+    stream << "<keyboard ";
     DeviceConfig::save(stream);
     stream << "</keyboard>\n\n";
 }  // save

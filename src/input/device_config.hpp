@@ -45,16 +45,18 @@ public:
         DEVICE_CONFIG_TYPE_GAMEPAD,
         DEVICE_CONFIG_TYPE_KEYBOARD
     };
+
+private:
+    /** If set to false, this device will be ignored. 
+     *  Currently for gamepads only. */
+    bool m_enabled;
+
 protected:
 
     Binding  m_bindings[PA_COUNT];
 
     /** How many devices connected to the system which uses this config? */
     int m_plugged; 
-
-    /** If set to false, this device will be ignored. 
-     *  Currently for gamepads only. */
-    bool m_enabled;
 
     /** Name of this configuratiom. */
     std::string m_name;
