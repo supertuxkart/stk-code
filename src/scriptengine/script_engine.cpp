@@ -103,7 +103,7 @@ void ScriptEngine::runScript(std::string scriptName)
     r = compileScript(m_engine,scriptName);
     if( r < 0 )
     {
-        m_engine->Release();
+        //m_engine->Release();
         return;
     }
 
@@ -112,7 +112,7 @@ void ScriptEngine::runScript(std::string scriptName)
     if( ctx == 0 ) 
     {
         std::cout << "Failed to create the context." << std::endl;
-        m_engine->Release();
+        //m_engine->Release();
         return;
     }
 
@@ -120,7 +120,7 @@ void ScriptEngine::runScript(std::string scriptName)
     {
         std::cout << "Failed to set the line callback function." << std::endl;
         ctx->Release();
-        m_engine->Release();
+        //m_engine->Release();
         return;
     }
 
@@ -149,7 +149,7 @@ void ScriptEngine::runScript(std::string scriptName)
     {
         std::cout << "The required function was not found." << std::endl;
         ctx->Release();
-        m_engine->Release();
+        //m_engine->Release();
         return;
     }
 
@@ -163,7 +163,7 @@ void ScriptEngine::runScript(std::string scriptName)
     {
         std::cout << "Failed to prepare the context." << std::endl;
         ctx->Release();
-        m_engine->Release();
+        //m_engine->Release();
         return;
     }
 
