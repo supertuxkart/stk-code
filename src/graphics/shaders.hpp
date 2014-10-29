@@ -284,7 +284,7 @@ public:
     GLuint cubevao;
 };
 
-class NormalVisualizer : public ShaderHelperSingleton<NormalVisualizer, core::matrix4, core::matrix4, video::SColor>
+class NormalVisualizer : public ShaderHelperSingleton<NormalVisualizer, video::SColor>
 {
 public:
     NormalVisualizer();

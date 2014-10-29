@@ -1387,10 +1387,11 @@ namespace MeshShader
     NormalVisualizer::NormalVisualizer()
     {
         Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/normal_visualizer.geom").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
-        AssignUniforms("ModelMatrix", "InverseModelMatrix", "color");
+        AssignUniforms("color");
     }
 
     GLuint ViewFrustrumShader::Program;

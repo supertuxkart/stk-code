@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!-- For sky particles, the size of the box is ignored -->
-<particles emitter="box">
+<particles emitter="box" randomize-initial-y="true">
 
     <spreading angle="3"           />
     

@@ -270,7 +270,7 @@ void STKMeshSceneNode::render()
             if (UserConfigParams::m_azdo)
             {
                 if (!mesh.TextureHandles[0])
-                    mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
+                    mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                 MeshShader::ObjectPass1Shader::getInstance()->SetTextureHandles(mesh.TextureHandles[0]);
@@ -320,11 +320,11 @@ void STKMeshSceneNode::render()
                     glMakeTextureHandleResidentARB(SSAOHandle);
 
                 if (!mesh.TextureHandles[0])
-                    mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
+                    mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                 if (!mesh.TextureHandles[1])
-                    mesh.TextureHandles[1] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[1]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
+                    mesh.TextureHandles[1] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[1]), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[1]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[1]);
                 MeshShader::ObjectPass2Shader::getInstance()->SetTextureHandles(DiffuseHandle, SpecularHandle, SSAOHandle, mesh.TextureHandles[0], mesh.TextureHandles[1]);
