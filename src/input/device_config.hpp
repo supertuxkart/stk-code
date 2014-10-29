@@ -57,12 +57,12 @@ private:
     /** Name of this configuratiom. */
     std::string m_name;
 
+    /** Configuration type. */
+    DeviceConfigType m_type;
+
 protected:
 
     Binding  m_bindings[PA_COUNT];
-
-    /** Configuration type. */
-    DeviceConfigType m_type;
 
     DeviceConfig(DeviceConfigType type);
 
