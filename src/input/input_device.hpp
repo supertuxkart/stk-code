@@ -20,13 +20,14 @@
 #define HEADER_INPUT_DEVICE_HPP
 
 
-#include "input/device_config.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/no_copy.hpp"
 
 #include <string>
+
+class DeviceConfig;
 
 /**
   * \brief Input device type
