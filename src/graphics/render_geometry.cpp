@@ -978,6 +978,8 @@ void IrrDriver::renderShadows()
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.5, 0.);
     m_rtts->getShadowFBO().Bind();
@@ -1022,6 +1024,7 @@ void IrrDriver::renderShadows()
     }
 
     glDisable(GL_POLYGON_OFFSET_FILL);
+    glCullFace(GL_BACK);
 }
 
 
