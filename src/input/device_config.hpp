@@ -39,12 +39,6 @@
   */
 class DeviceConfig : public NoCopy
 {
-public:
-    enum DeviceConfigType
-    {
-        DEVICE_CONFIG_TYPE_GAMEPAD,
-        DEVICE_CONFIG_TYPE_KEYBOARD
-    };
 
 private:
     /** If set to false, this device will be ignored. 
@@ -57,14 +51,11 @@ private:
     /** Name of this configuratiom. */
     std::string m_name;
 
-    /** Configuration type. */
-    DeviceConfigType m_type;
-
 protected:
 
     Binding  m_bindings[PA_COUNT];
 
-    DeviceConfig(DeviceConfigType type);
+    DeviceConfig();
 
     bool doGetAction(Input::InputType    type,
                      const int           id,
@@ -100,8 +91,8 @@ public:
                        PlayerAction*          action /* out */);
     irr::core::stringw getMappingIdString (const PlayerAction action) const;
     irr::core::stringw getBindingAsString(const PlayerAction action) const;
-
-    virtual DeviceConfigType getType() const = 0;
+    virtual bool isGamePad()  const = 0;
+    virtual bool isKeyboard() const = 0;
     virtual void save(std::ofstream& stream);
     virtual bool load(const XMLNode *config);
     // ------------------------------------------------------------------------

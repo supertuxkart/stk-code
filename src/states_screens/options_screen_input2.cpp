@@ -89,7 +89,7 @@ void OptionsScreenInput2::init()
 
 
     ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
-    if (m_config->getType() != DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD)
+    if (m_config->isKeyboard())
     {
         core::stringw label = (m_config->isEnabled()
                             ? //I18N: button to disable a gamepad configuration
@@ -291,7 +291,7 @@ void OptionsScreenInput2::updateInputButtons()
         if (currently_used_keys.find(item) == currently_used_keys.end())
         {
             currently_used_keys.insert( item );
-            if (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD
+            if (m_config->isKeyboard()
                 && conflictsBetweenKbdConfig(action, PA_FIRST_GAME_ACTION,
                                              PA_LAST_GAME_ACTION))
             {
@@ -333,7 +333,7 @@ void OptionsScreenInput2::updateInputButtons()
         if (currently_used_keys.find(item) == currently_used_keys.end())
         {
             currently_used_keys.insert( item );
-            if (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD
+            if (m_config->isKeyboard()
                 && conflictsBetweenKbdConfig(action, PA_FIRST_MENU_ACTION,
                                              PA_LAST_MENU_ACTION))
             {
@@ -386,11 +386,11 @@ static std::string binding_to_set_button;
 
 void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
 {
-    const bool keyboard = (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD&&
+    const bool keyboard = (m_config->isKeyboard() &&
                            sensed_input.m_type == Input::IT_KEYBOARD);
     const bool gamepad =  (sensed_input.m_type == Input::IT_STICKMOTION ||
                            sensed_input.m_type == Input::IT_STICKBUTTON) &&
-                           m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_GAMEPAD;
+                           m_config->isGamePad();
 
     if (keyboard)
     {
@@ -549,11 +549,11 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
 
                 new PressAKeyDialog(0.4f, 0.4f);
 
-                if (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD)
+                if (m_config->isKeyboard())
                 {
                     input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);
                 }
-                else if (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_GAMEPAD)
+                else if (m_config->isGamePad())
                 {
                     input_manager->setMode(InputManager::INPUT_SENSE_GAMEPAD);
                 }
@@ -568,7 +568,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
     }
     else if (name == "delete")
     {
-        if (m_config->getType() == DeviceConfig::DEVICE_CONFIG_TYPE_KEYBOARD)
+        if (m_config->isKeyboard())
         {
            // keyboard configs may be deleted
            //I18N: shown before deleting an input configuration

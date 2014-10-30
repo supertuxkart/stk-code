@@ -29,12 +29,10 @@
 #include <irrString.h>
 #include <string>
 
-//==== G A M E P A D C O N F I G ===============================================
 
-/**
-  * \brief specialisation of DeviceConfig for gamepad type devices
-  * \ingroup config
-  */
+/** \brief specialisation of DeviceConfig for gamepad type devices
+ *  \ingroup config
+ */
 class GamepadConfig : public DeviceConfig
 {
 
@@ -72,11 +70,10 @@ public:
     /** Return deadzone of this configuration. */
     int getDeadzone() const { return m_deadzone; }
     // ------------------------------------------------------------------------
-    /** Returns the type of this configuration. */
-    virtual DeviceConfig::DeviceConfigType getType() const
-    {
-        return DeviceConfig::DEVICE_CONFIG_TYPE_GAMEPAD;
-    }   // getType
-};
+    virtual bool isGamePad()  const { return true; }
+    // ------------------------------------------------------------------------
+    virtual bool isKeyboard() const { return false; }
+
+};   // class GamepadConfig
 
 #endif

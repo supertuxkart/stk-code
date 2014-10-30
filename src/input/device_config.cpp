@@ -63,10 +63,9 @@ DeviceConfig* DeviceConfig::create(const XMLNode *config)
 }   // create
 
 // ------------------------------------------------------------------------
-DeviceConfig::DeviceConfig( DeviceConfigType type)
+DeviceConfig::DeviceConfig()
 {
     m_name    = "";
-    m_type    = type;
     m_enabled = true;
     m_plugged = 0;
 }   // DeviceConfig

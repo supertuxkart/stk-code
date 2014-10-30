@@ -23,11 +23,9 @@
 #include "input/device_config.hpp"
 #include "input/input.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/cpp2011.hpp"
 
 #include <iosfwd>
-#include <irrString.h>
-#include <string>
-
 
 /**
   * \brief specialisation of DeviceConfig for keyboard type devices
@@ -43,12 +41,10 @@ public:
 
     KeyboardConfig                  ();
     // ------------------------------------------------------------------------
-    /** Returns the type of this configuration. */
-    virtual DeviceConfigType getType() const
-    {
-        return DEVICE_CONFIG_TYPE_KEYBOARD;
-    }   // getType
-};
+    virtual bool isGamePad()  const { return false; }
+    // ------------------------------------------------------------------------
+    virtual bool isKeyboard() const { return true; }
 
+};   // class KeyboardConfig
 
 #endif

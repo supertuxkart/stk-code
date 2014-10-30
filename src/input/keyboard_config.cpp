@@ -30,7 +30,7 @@ using namespace irr;
 
 
 KeyboardConfig::KeyboardConfig() 
-              : DeviceConfig(DEVICE_CONFIG_TYPE_KEYBOARD)
+              : DeviceConfig()
 {
     setDefaultBinds();
     setPlugged();

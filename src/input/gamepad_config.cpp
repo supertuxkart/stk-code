@@ -32,7 +32,7 @@ using namespace irr;
 GamepadConfig::GamepadConfig( const std::string &name,
                               const int        axis_count,
                               const int        button_count )
-             : DeviceConfig(DEVICE_CONFIG_TYPE_GAMEPAD )
+             : DeviceConfig()
 {
     setName(name);
     m_axis_count   = axis_count;
@@ -43,7 +43,7 @@ GamepadConfig::GamepadConfig( const std::string &name,
 
 //------------------------------------------------------------------------------
 
-GamepadConfig::GamepadConfig() : DeviceConfig(DEVICE_CONFIG_TYPE_GAMEPAD )
+GamepadConfig::GamepadConfig() : DeviceConfig()
 {
     m_deadzone = 2000;
     setDefaultBinds();
