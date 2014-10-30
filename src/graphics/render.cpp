@@ -45,8 +45,12 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
+
+extern std::vector<float> BoundingBoxes;
+
 void IrrDriver::renderGLSL(float dt)
 {
+    BoundingBoxes.clear();
     World *world = World::getWorld(); // Never NULL.
 
     Track *track = world->getTrack();
@@ -184,6 +188,23 @@ void IrrDriver::renderGLSL(float dt)
         computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         PROFILER_POP_CPU_MARKER();
         renderScene(camnode, plc, glows, dt, track->hasShadows(), false);
+
+        // Render bounding boxes
+        if (irr_driver->getBoundingBoxesViz())
+        {
+            glUseProgram(UtilShader::ColoredLine::Program);
+            glBindVertexArray(UtilShader::ColoredLine::vao);
+            glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
+            UtilShader::ColoredLine::setUniforms(SColor(255, 255, 0, 0));
+            const float *tmp = BoundingBoxes.data();
+            for (unsigned int i = 0; i < BoundingBoxes.size(); i += 1024 * 6)
+            {
+                unsigned count = MIN2((int)BoundingBoxes.size() - i, 1024 * 6);
+                glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
+
+                glDrawArrays(GL_LINES, 0, count / 3);
+            }
+        }
 
         // Debug physic
         // Note that drawAll must be called before rendering

@@ -67,6 +67,7 @@ enum DebugMenuCommand
     DEBUG_GRAPHICS_DISTORT_VIZ,
     DEBUG_GRAPHICS_BULLET_1,
     DEBUG_GRAPHICS_BULLET_2,
+    DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ,
     DEBUG_PROFILER,
     DEBUG_PROFILER_GENERATE_REPORT,
     DEBUG_FPS,
@@ -173,6 +174,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Distort viz", DEBUG_GRAPHICS_DISTORT_VIZ );
             sub->addItem(L"Physics debug", DEBUG_GRAPHICS_BULLET_1);
             sub->addItem(L"Physics debug (no kart)", DEBUG_GRAPHICS_BULLET_2);
+            sub->addItem(L"Bounding Boxes viz", DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ);
             sub->addItem(L"Reset debug views", DEBUG_GRAPHICS_RESET );
 
             mnu->addItem(L"Items >",-1,true,true);
@@ -341,6 +343,11 @@ bool onEvent(const SEvent &event)
                     if (!world) return false;
                     Physics *physics = world->getPhysics();
                     physics->setDebugMode(IrrDebugDrawer::DM_NO_KARTS_GRAPHICS);
+                }
+                else if (cmdID == DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ)
+                {
+                    irr_driver->resetDebugModes();
+                    irr_driver->toggleBoundingBoxesViz();
                 }
                 else if (cmdID == DEBUG_PROFILER)
                 {
