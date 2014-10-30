@@ -51,12 +51,6 @@ class GamePadDevice : public InputDevice
     /** Irrlicht index of this gamepad. */
     int                   m_irr_index;
 
-    /** Number of axis for this gamepad. */
-    int                   m_axis_count;
-
-    /** Number of buttons of this gamepad. */
-    int                   m_button_count;
-
 public:
              GamePadDevice(const int irrIndex, const std::string &name,
                            const int axis_number,
@@ -70,15 +64,13 @@ public:
                                     InputManager::InputDriverMode mode,
                                     PlayerAction *action, int* value = NULL
                                     ) OVERRIDE;
+    int getNumberOfButtons() const;
     bool moved(int value) const;
 
     // ------------------------------------------------------------------------
     /** Returns the irrlicht index of this gamepad. */
     int getIrrIndex() const { return m_irr_index; }
 
-    // ------------------------------------------------------------------------
-    /** Returns the number of buttons of this gamepad. */
-    int getNumberOfButtons() const { return m_button_count; }
     // ------------------------------------------------------------------------
 
 };   // class GamepadDevice

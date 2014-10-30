@@ -35,11 +35,23 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
     m_type                  = DT_GAMEPAD;
     m_prev_axis_directions  = NULL;
     m_configuration         = configuration;
-    m_axis_count            = axis_count;
+    GamepadConfig *config = static_cast<GamepadConfig*>(m_configuration);
+    if(m_configuration->getNumberOfButtons()!=button_count)
+    {
+        Log::warn("GamePadDevice",
+                  "Different number of buttons for '%s': was %d now %d.",
+                  getName().c_str(), config->getNumberOfButtons(),
+                  button_count);
+    }
+    if(m_configuration->getNumberOfAxes()!=axis_count)
+    {
+        Log::warn("GamePadDevice",
+                  "Different number of axis for '%s': was %d now %d.",
+                  getName().c_str(), config->getNumberOfAxes(), axis_count);
+    }
     m_prev_axis_directions  = new Input::AxisDirection[axis_count];
     m_prev_axis_value       = new int[axis_count];
     m_axis_ok               = new bool[axis_count];
-    m_button_count          = button_count;
     m_irr_index             = irr_index;
     m_name                  = name;
 
@@ -73,6 +85,13 @@ bool GamePadDevice::moved(int value) const
     int dz = static_cast<GamepadConfig*>(m_configuration)->getDeadzone();
     return abs(value) > dz;
 }   // moved
+
+// ----------------------------------------------------------------------------
+/** Returns the number of buttons of this gamepad. */
+int GamePadDevice::getNumberOfButtons() const
+{
+    return m_configuration->getNumberOfButtons();
+}   // getNumberOfButtons
 
 // ----------------------------------------------------------------------------
 bool GamePadDevice::isButtonPressed(const int i)
@@ -148,7 +167,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
     if (type == Input::IT_STICKMOTION)
     {
         // this gamepad doesn't even have that many axes
-        if (id >= m_axis_count) return false;
+        if (id >= m_configuration->getNumberOfAxes()) return false;
 
         if (getPlayer())
         {

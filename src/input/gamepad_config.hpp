@@ -57,10 +57,18 @@ public:
                              const int              axis_count=0,
                              const int              button_ount=0);
     virtual bool load(const XMLNode *config) OVERRIDE;
+
+    // ------------------------------------------------------------------------
+    /** Returns the number of buttons in this configuration. */
+    virtual int getNumberOfButtons() const OVERRIDE { return m_button_count; }
+
     // ------------------------------------------------------------------------
     /** Sets the number of buttons this device has. */
     void setNumberOfButtons(int count) { m_button_count = count; }
 
+    // ------------------------------------------------------------------------
+    /** Returns the number of axis of this configufation. */
+    virtual int getNumberOfAxes() const OVERRIDE { return m_axis_count; }
     // ------------------------------------------------------------------------
     /** Sets the number of axis this device has. */
     void setNumberOfAxis(int count) { m_axis_count = count; }

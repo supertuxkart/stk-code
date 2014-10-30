@@ -23,6 +23,7 @@
 #include "input/input.hpp"
 #include "utils/no_copy.hpp"
 
+#include <assert.h>
 #include <iosfwd>
 #include <irrString.h>
 #include <string>
@@ -93,11 +94,29 @@ public:
     irr::core::stringw getBindingAsString(const PlayerAction action) const;
     virtual bool isGamePad()  const = 0;
     virtual bool isKeyboard() const = 0;
+
     virtual void save(std::ofstream& stream);
     virtual bool load(const XMLNode *config);
     // ------------------------------------------------------------------------
+    /** Should only be called for gamepads, which has its own implementation.
+     *  of this function. */
+    virtual int getNumberOfButtons() const
+    {
+        assert(false); return 0;
+    }   // getNumberOfButtons
+
+    // ------------------------------------------------------------------------
+    /** Should only be called for gamepads, which has its own implementation.
+     *  of this function. */
+    virtual int getNumberOfAxes() const
+    {
+        assert(false); return 0;
+    }   // getNumberOfAxes
+
+    // ------------------------------------------------------------------------
     /** Sets the name of this device. */
     void setName(const std::string &name) { m_name = name; }
+
     // ------------------------------------------------------------------------
     /** Returns the name for this device configuration. */
     const std::string& getName() const { return m_name; };
