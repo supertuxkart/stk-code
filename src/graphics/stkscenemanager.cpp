@@ -187,11 +187,6 @@ bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode
     const core::matrix4 &trans = node->getAbsoluteTransformation();
     const scene::SViewFrustum &frust = *cam->getViewFrustum();
 
-    core::aabbox3d<f32> tbox = node->getBoundingBox();
-    trans.transformBoxEx(tbox);
-    if (!(tbox.intersectsWithBox(frust.getBoundingBox())))
-        return true;
-
     core::vector3df edges[8];
     node->getBoundingBox().getEdges(edges);
     for (unsigned i = 0; i < 8; i++)
