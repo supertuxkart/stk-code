@@ -28,7 +28,7 @@
             <spacer width="20" height="18" />
 
             <div layout="horizontal-row" width="100%" height="fit">
-                <div proportion="1" height="fit" layout="horizontal-row" >
+                <div proportion="1" height="fit" layout="horizontal-row">
                     <checkbox id="showfps"/>
                     <spacer width="20" height="100%" />
                     <label height="100%" I18N="In the ui settings" text="Display FPS"/>
@@ -39,14 +39,14 @@
                 <div layout="horizontal-row" proportion="1" height="fit">
                     <checkbox id="perPlayerDifficulty"/>
                     <spacer width="20" height="100%" />
-                    <label I18N="In the ui settings" text="Enable handicaped users"/>
+                    <label height="100%" I18N="In the ui settings" text="Enable handicaped users"/>
                 </div>
             </div>
 
             <spacer height="4" width="10" />
 
             <div layout="horizontal-row" width="100%" height="fit">
-                <div width="75%" height="fit" layout="horizontal-row" >
+                <div layout="horizontal-row" proportion="1" height="fit">
                     <checkbox id="show-login"/>
                     <spacer width="20" height="100%" />
                     <label height="100%" I18N="In the ui settings" text="Always show login screen"/>
@@ -57,7 +57,7 @@
                 <div layout="horizontal-row" proportion="1" height="fit">
                     <checkbox id="aiHandicap"/>
                     <spacer width="20" height="100%" />
-                    <label I18N="In the ui settings" text="Handicap AI karts"/>
+                    <label height="100%" I18N="In the ui settings" text="Handicap AI karts"/>
                 </div>
             </div>
 
@@ -72,10 +72,10 @@
 
                 <spacer height="4" width="10" />
 
-                <div width="75%" height="fit" layout="horizontal-row" >
+                <div layout="horizontal-row" proportion="1" height="fit">
                     <checkbox id="enable-hw-report"/>
                     <spacer width="20" height="100%" />
-                    <label id="label-hw-report" height="100%" I18N="In the ui settings"
+                    <label height="100%" id="label-hw-report" I18N="In the ui settings"
                            text="Allow STK to send anonymous HW statistics"/>
                 </div>
             </div>
