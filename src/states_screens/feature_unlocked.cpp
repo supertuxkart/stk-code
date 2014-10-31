@@ -24,6 +24,7 @@
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -299,7 +300,7 @@ void FeatureUnlockedCutScene::init()
             m_unlocked_stuff[n].m_root_gift_node = kart_model->attachModel(true, false);
             m_unlocked_stuff[n].m_scale = 5.0f;
             kart_model->setAnimation(KartModel::AF_DEFAULT);
-            kart_model->update(0.0f, 0.0f, 0.0f, 0.0f);
+            //kart_model->update(0.0f, 0.0f, 0.0f, 0.0f);
 
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked kart");
@@ -337,12 +338,14 @@ void FeatureUnlockedCutScene::init()
                                                    m_unlocked_stuff[n].m_w,
                                                    m_unlocked_stuff[n].m_h);
             m_unlocked_stuff[n].m_root_gift_node = irr_driver->getSceneManager()->addEmptySceneNode();
+            irr_driver->setAllMaterialFlags(mesh);
             m_unlocked_stuff[n].m_side_1 = irr_driver->addMesh(mesh, "unlocked_picture", m_unlocked_stuff[n].m_root_gift_node);
             //mesh->drop();
 
             mesh = irr_driver->createTexturedQuadMesh(&m,
                 m_unlocked_stuff[n].m_w,
                 m_unlocked_stuff[n].m_h);
+            irr_driver->setAllMaterialFlags(mesh);
             m_unlocked_stuff[n].m_side_2 = irr_driver->addMesh(mesh, "unlocked_picture",  m_unlocked_stuff[n].m_root_gift_node);
             m_unlocked_stuff[n].m_side_2->setRotation(core::vector3df(0.0f, 180.0f, 0.0f));
             //mesh->drop();
