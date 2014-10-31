@@ -1202,6 +1202,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         bool lod_instance = false;
         n->get("lod_instance", &lod_instance);
 
+        /*
         if (tangent)
         {
             scene::IMesh* original_mesh = irr_driver->getMesh(full_path);
@@ -1243,7 +1244,8 @@ bool Track::loadMainTrack(const XMLNode &root)
             handleAnimatedTextures(scene_node, *n);
             m_all_nodes.push_back( scene_node );
         }
-        else if (lod_instance)
+        else*/
+        if (lod_instance)
         {
             LODNode* node = lodLoader.instanciateAsLOD(n, NULL);
             if (node != NULL)
@@ -1266,6 +1268,8 @@ bool Track::loadMainTrack(const XMLNode &root)
                            full_path.c_str());
                 continue;
             }
+
+            a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
 
             // The meshes loaded here are in irrlicht's mesh cache. So we
             // have to keep track of them in order to properly remove them

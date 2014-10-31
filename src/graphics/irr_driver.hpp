@@ -345,6 +345,7 @@ private:
     bool                 m_shadowviz;
     bool                 m_lightviz;
     bool                 m_distortviz;
+    bool                 m_boundingboxesviz;
     /** Performance stats */
     unsigned             m_last_light_bucket_distance;
     unsigned             object_count[PASS_COUNT];
@@ -623,6 +624,7 @@ public:
         m_shadowviz = false;
         m_lightviz = false;
         m_distortviz = false;
+        m_boundingboxesviz = false;
     }
     // ------------------------------------------------------------------------
     void toggleWireframe() { m_wireframe = !m_wireframe; }
@@ -660,6 +662,10 @@ public:
     void toggleDistortViz() { m_distortviz = !m_distortviz; }
     // ------------------------------------------------------------------------
     bool getDistortViz() { return m_distortviz; }
+    // ------------------------------------------------------------------------
+    void toggleBoundingBoxesViz() { m_boundingboxesviz = !m_boundingboxesviz; }
+    // ------------------------------------------------------------------------
+    bool getBoundingBoxesViz() { return m_boundingboxesviz; }
     // ------------------------------------------------------------------------
     u32 getRenderPass() { return m_renderpass; }
     // ------------------------------------------------------------------------
