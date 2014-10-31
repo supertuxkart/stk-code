@@ -36,10 +36,12 @@ class KeyboardConfig : public DeviceConfig
 
 public:
 
+                KeyboardConfig();
+    virtual    ~KeyboardConfig() {}
+
     void        setDefaultBinds     ();
     virtual void save(std::ofstream& stream);
 
-    KeyboardConfig                  ();
     // ------------------------------------------------------------------------
     virtual bool isGamePad()  const { return false; }
     // ------------------------------------------------------------------------

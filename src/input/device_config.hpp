@@ -75,6 +75,8 @@ protected:
 
 public:
 
+    virtual ~DeviceConfig() {}
+
     static DeviceConfig* create(const XMLNode *config);
     irr::core::stringw toString();
     bool hasBindingFor(const int buttonID) const;
@@ -97,6 +99,11 @@ public:
 
     virtual void save(std::ofstream& stream);
     virtual bool load(const XMLNode *config);
+
+    // ------------------------------------------------------------------------
+    /** Returns true if this device has analog axis, so that steering values
+     *  will not be affected by time-full-steer delays. */
+    virtual bool isAnalog() const { return false;}
     // ------------------------------------------------------------------------
     /** Should only be called for gamepads, which has its own implementation.
      *  of this function. */

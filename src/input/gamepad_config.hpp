@@ -46,16 +46,21 @@ private:
     /** Deadzone of this gamepad. */
     int m_deadzone;
 
+    /** If this device has analog axis, steering etc. must be set immediately
+     *  from the input values, not having a delayed time (time-full-steer). */
+    bool m_is_analog;
 public:
 
-    irr::core::stringw toString     ();
+             GamepadConfig           ();
+             GamepadConfig(const std::string &name,
+                           const int          axis_count=0,
+                           const int          button_ount=0);
+    virtual ~GamepadConfig() {}
+
+    irr::core::stringw toString();
 
     virtual void save(std::ofstream& stream);
     void        setDefaultBinds     ();
-    GamepadConfig           ();
-    GamepadConfig           (const std::string     &name,
-                             const int              axis_count=0,
-                             const int              button_ount=0);
     virtual bool load(const XMLNode *config) OVERRIDE;
 
     // ------------------------------------------------------------------------
@@ -69,10 +74,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of axis of this configufation. */
     virtual int getNumberOfAxes() const OVERRIDE { return m_axis_count; }
+
     // ------------------------------------------------------------------------
     /** Sets the number of axis this device has. */
     void setNumberOfAxis(int count) { m_axis_count = count; }
-    //        ~GamepadConfig();
 
     // ------------------------------------------------------------------------
     /** Return deadzone of this configuration. */

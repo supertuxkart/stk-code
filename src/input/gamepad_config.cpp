@@ -45,7 +45,8 @@ GamepadConfig::GamepadConfig( const std::string &name,
 
 GamepadConfig::GamepadConfig() : DeviceConfig()
 {
-    m_deadzone = 2000;
+    m_deadzone  = 2000;
+    m_is_analog = true;
     setDefaultBinds();
 }   // GamepadConfig
 
@@ -57,6 +58,7 @@ GamepadConfig::GamepadConfig() : DeviceConfig()
 bool GamepadConfig::load(const XMLNode *config)
 {
     config->get("deadzone", &m_deadzone);
+    config->get("analog",  &m_is_analog);
     bool ok = DeviceConfig::load(config);
 
     if(getName()=="")
@@ -77,7 +79,8 @@ bool GamepadConfig::load(const XMLNode *config)
 void GamepadConfig::save (std::ofstream& stream)
 {
     stream << "<gamepad name =\"" << getName()
-           <<"\" deadzone=\""<<m_deadzone << "\"\n";
+           << "\" deadzone=\""    << m_deadzone
+           << "\" analog=\""      << m_is_analog<<"\"\n";
     stream << "         ";
     DeviceConfig::save(stream);
     stream << "</gamepad>\n\n";
