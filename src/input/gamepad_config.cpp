@@ -38,6 +38,8 @@ GamepadConfig::GamepadConfig( const std::string &name,
     m_axis_count   = axis_count;
     m_button_count = button_count;
     m_deadzone     = 2000;
+    m_is_analog    = true;
+    m_desensitize  = false;
     setDefaultBinds();
 }   // GamepadConfig
 
@@ -45,9 +47,11 @@ GamepadConfig::GamepadConfig( const std::string &name,
 
 GamepadConfig::GamepadConfig() : DeviceConfig()
 {
-    m_deadzone    = 2000;
-    m_is_analog   = true;
-    m_desensitize = false;
+    m_axis_count   = 0;
+    m_button_count = 0;
+    m_deadzone     = 2000;
+    m_is_analog    = true;
+    m_desensitize  = false;
     setDefaultBinds();
 }   // GamepadConfig
 
@@ -58,9 +62,9 @@ GamepadConfig::GamepadConfig() : DeviceConfig()
  */
 bool GamepadConfig::load(const XMLNode *config)
 {
-    config->get("deadzone",     &m_deadzone   );
-    config->get("analog",       &m_is_analog  );
-    config->get("desensitize",  &m_desensitize);
+    config->get("deadzone",     &m_deadzone    );
+    config->get("analog",       &m_is_analog   );
+    config->get("desensitize",  &m_desensitize );
     bool ok = DeviceConfig::load(config);
 
     if(getName()=="")
