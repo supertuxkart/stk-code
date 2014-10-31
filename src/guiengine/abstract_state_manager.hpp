@@ -42,7 +42,7 @@ namespace GUIEngine
         GAME,
         INGAME_MENU,
         /** Dummy GameState e. g. for parameters. */
-        CURRENT = MENU | GAME | INGAME_MENU
+        CURRENT
     };   // GameState
 
     /**
