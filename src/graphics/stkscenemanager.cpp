@@ -566,12 +566,14 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     DeferredUpdate.clear();
     core::list<scene::ISceneNode*> List = m_scene_manager->getRootSceneNode()->getChildren();
 
+PROFILER_PUSH_CPU_MARKER("- culling", 0xFF, 0xFF, 0x0);
     for (scene::ISceneNode *child : List)
         FixBoundingBoxes(child);
 
     bool cam = false, rsmcam = false;
     bool shadowcam[4] = { false, false, false, false };
     parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam, cam, shadowcam, rsmcam);
+PROFILER_POP_CPU_MARKER();
 
     // Add a 1 s timeout
     if (!m_sync)
