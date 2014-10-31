@@ -54,9 +54,6 @@ core::vector3df getWindDir();
 class STKMeshCommon
 {
 protected:
-    bool m_culledForPlayerCam;
-    bool m_culledForShadowCam[4];
-    bool m_culledForRSMCam;
     std::string m_debug_name;
 
 public:
@@ -66,12 +63,6 @@ public:
     virtual void updateGL() = 0;
     virtual bool glow() const = 0;
     virtual bool isImmediateDraw() const { return false; }
-    bool isCulledForPlayerCam() const { return m_culledForPlayerCam; }
-    void setCulledForPlayerCam(bool v) { m_culledForPlayerCam = v; }
-    bool isCulledForShadowCam(unsigned cascade) const { return m_culledForShadowCam[cascade]; }
-    void setCulledForShadowCam(unsigned cascade, bool v) { m_culledForShadowCam[cascade] = v; }
-    bool isCulledForRSMCam() const { return m_culledForRSMCam; }
-    void setCulledForRSMCam(bool v) { m_culledForRSMCam = v; }
 };
 
 template<typename T, typename... Args>
