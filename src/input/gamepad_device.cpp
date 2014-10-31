@@ -36,18 +36,13 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
     m_prev_axis_directions  = NULL;
     m_configuration         = configuration;
     GamepadConfig *config = static_cast<GamepadConfig*>(m_configuration);
-    if(m_configuration->getNumberOfButtons()!=button_count)
+    if(m_configuration->getNumberOfButtons()<button_count)
     {
-        Log::warn("GamePadDevice",
-                  "Different number of buttons for '%s': was %d now %d.",
-                  getName().c_str(), config->getNumberOfButtons(),
-                  button_count);
+        static_cast<GamepadConfig*>(m_configuration)->setNumberOfButtons(button_count);
     }
-    if(m_configuration->getNumberOfAxes()!=axis_count)
+    if(m_configuration->getNumberOfAxes()<axis_count)
     {
-        Log::warn("GamePadDevice",
-                  "Different number of axis for '%s': was %d now %d.",
-                  getName().c_str(), config->getNumberOfAxes(), axis_count);
+        static_cast<GamepadConfig*>(m_configuration)->setNumberOfAxis(axis_count);
     }
     m_prev_axis_directions  = new Input::AxisDirection[axis_count];
     m_prev_axis_value       = new int[axis_count];
@@ -181,7 +176,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
         // x/32767 is in [-1,1], (x/32767)^2 is in [0,1]. Take care of the
         // sign and map this back to [0,32767] by multiplying by 32767.
         // Which all in all results in:
-        *value = int( (*value / 32767) * fabsf(*value) );
+        *value = int( (*value / 32767.0f) * fabsf(*value) );
     }
 
     bool success = false;
