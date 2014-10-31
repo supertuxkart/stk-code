@@ -344,7 +344,8 @@ void gamepadVisualisation()
                 core::position2di pos(axis_x, axis_y + a*axis_h);
                 core::dimension2di size(axis_w, axis_h);
 
-                const bool deadzone = (abs(g.m_axis[a]) < DEADZONE_JOYSTICK);
+                // Assume a default deadzone value of 4096
+                const bool deadzone = (abs(g.m_axis[a]) < 4096);
 
                 core::recti fillbar(core::position2di(axis_x + axis_w/2,
                                                       axis_y + a*axis_h),
