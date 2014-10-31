@@ -105,6 +105,10 @@ public:
      *  will not be affected by time-full-steer delays. */
     virtual bool isAnalog() const { return false;}
     // ------------------------------------------------------------------------
+    /** Returns true if this device should desensitize its input at values
+     *  close to 0 (to avoid 'oversteering'). */
+    virtual bool desensitize() const { return false;}
+    // ------------------------------------------------------------------------
     /** Should only be called for gamepads, which has its own implementation.
      *  of this function. */
     virtual int getNumberOfButtons() const

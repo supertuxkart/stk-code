@@ -49,6 +49,11 @@ private:
     /** If this device has analog axis, steering etc. must be set immediately
      *  from the input values, not having a delayed time (time-full-steer). */
     bool m_is_analog;
+
+    /** If set to true, map any analog axis from x in [0,1] to x^x --> at
+     *  values close to 0 the joystick will react less sensitive. */
+    bool m_desensitize;
+
 public:
 
              GamepadConfig           ();
@@ -65,6 +70,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if this device uses analog axes. */
     virtual bool isAnalog() const OVERRIDE { return m_is_analog; }
+
+    // ------------------------------------------------------------------------
+    /** Returns true if this device should desensitize its input at values
+     *  close to 0 (to avoid 'oversteering'). */
+    virtual bool desensitize() const { return m_desensitize;}
 
     // ------------------------------------------------------------------------
     /** Returns the number of buttons in this configuration. */

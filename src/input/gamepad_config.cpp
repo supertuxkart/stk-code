@@ -45,8 +45,9 @@ GamepadConfig::GamepadConfig( const std::string &name,
 
 GamepadConfig::GamepadConfig() : DeviceConfig()
 {
-    m_deadzone  = 2000;
-    m_is_analog = true;
+    m_deadzone    = 2000;
+    m_is_analog   = true;
+    m_desensitize = false;
     setDefaultBinds();
 }   // GamepadConfig
 
@@ -57,8 +58,9 @@ GamepadConfig::GamepadConfig() : DeviceConfig()
  */
 bool GamepadConfig::load(const XMLNode *config)
 {
-    config->get("deadzone", &m_deadzone);
-    config->get("analog",  &m_is_analog);
+    config->get("deadzone",     &m_deadzone   );
+    config->get("analog",       &m_is_analog  );
+    config->get("desensitize",  &m_desensitize);
     bool ok = DeviceConfig::load(config);
 
     if(getName()=="")
@@ -80,6 +82,7 @@ void GamepadConfig::save (std::ofstream& stream)
 {
     stream << "<gamepad name =\"" << getName()
            << "\" deadzone=\""    << m_deadzone
+           << "\" desensitize=\"" << m_desensitize
            << "\" analog=\""      << m_is_analog<<"\"\n";
     stream << "         ";
     DeviceConfig::save(stream);
@@ -107,9 +110,7 @@ void GamepadConfig::setDefaultBinds ()
     setBinding(PA_MENU_RIGHT,   Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
     setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, 0);
     setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, 3);
-}
-
-//------------------------------------------------------------------------------
+}   // setDefaultBinds
 
 //------------------------------------------------------------------------------
 /** Converts the configuration to a string.

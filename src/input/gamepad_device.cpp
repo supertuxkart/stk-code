@@ -172,6 +172,18 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
         else if(*value==-32768)
             *value = -32767;
     }
+
+    // Desensitizing means to map an input in the range x in [0,1] to
+    // x^2. This results in changes close to 0 to have less impact
+    // (less sensitive).
+    if(m_configuration->desensitize())
+    {
+        // x/32767 is in [-1,1], (x/32767)^2 is in [0,1]. Take care of the
+        // sign and map this back to [0,32767] by multiplying by 32767.
+        // Which all in all results in:
+        *value = int( (*value / 32767) * fabsf(*value) );
+    }
+
     bool success = false;
     if(m_prev_axis_directions == NULL) return false; // device not open
 
