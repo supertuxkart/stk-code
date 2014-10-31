@@ -352,9 +352,9 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
         break;
     case Input::IT_STICKMOTION:
         {
-        Log::info("InputManager::inputSensing", "Storing new axis binding, value = %d; "
-            "deviceID = %d; button = %d; axisDirection = %s", value, deviceID, button,
-            axisDirection == Input::AD_NEGATIVE ? "-" : "+");
+//        Log::info("InputManager::inputSensing", "Storing new axis binding, value = %d; "
+//            "deviceID = %d; button = %d; axisDirection = %s", value, deviceID, button,
+//            axisDirection == Input::AD_NEGATIVE ? "-" : "+");
         // We have to save the direction in which the axis was moved.
         // This is done by storing it as a sign (and since button can
         // be zero, we add one before changing the sign).
