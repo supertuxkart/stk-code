@@ -197,7 +197,8 @@ bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode
 
 static void
 handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *ImmediateDraw,
-    const scene::ICameraSceneNode *cam, scene::ICameraSceneNode *shadowcam[4], const scene::ICameraSceneNode *rsmcam)
+    const scene::ICameraSceneNode *cam, scene::ICameraSceneNode *shadowcam[4], const scene::ICameraSceneNode *rsmcam,
+    bool &culledforcam, bool culledforshadowcam[4], bool &culledforrsm)
 {
     STKMeshCommon *node = dynamic_cast<STKMeshCommon*>(Node);
     if (!node)
@@ -246,6 +247,11 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         return;
     }
 
+    culledforcam = culledforcam || isCulledPrecise(cam, Node);
+    culledforrsm = culledforrsm || isCulledPrecise(rsmcam, Node);
+    for (unsigned i = 0; i < 4; i++)
+        culledforshadowcam[i] = culledforshadowcam[i] || isCulledPrecise(shadowcam[i], Node);
+
     // Transparent
     GLMesh *mesh;
     if (World::getWorld() && World::getWorld()->isFogEnabled())
@@ -281,7 +287,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     for_in(mesh, node->TransparentMesh[TM_DISPLACEMENT])
         pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
 
-    if (!isCulledPrecise(cam, Node))
+    if (!culledforcam)
     {
         for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
@@ -358,7 +364,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         return;
     for (unsigned cascade = 0; cascade < 4; ++cascade)
     {
-        if (isCulledPrecise(shadowcam[cascade], Node))
+        if (culledforshadowcam[cascade])
             continue;
         for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
@@ -406,7 +412,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     }
     if (!UserConfigParams::m_gi)
         return;
-    if (!isCulledPrecise(rsmcam, Node))
+    if (!culledforrsm)
     {
         for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
@@ -468,7 +474,8 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
 
 static void
 parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::ISceneNode *> *ImmediateDraw,
-    const scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadow_cam[4], const scene::ICameraSceneNode *rsmcam)
+    const scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadow_cam[4], const scene::ICameraSceneNode *rsmcam,
+    bool culledforcam, bool culledforshadowcam[4], bool culledforrsm)
 {
     core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
     for (; I != E; ++I)
@@ -493,9 +500,13 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
             continue;
         }
 
-        handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam);
+        bool newculledforcam = culledforcam;
+        bool newculledforrsm = culledforrsm;
+        bool newculledforshadowcam[4] = { culledforshadowcam[0], culledforshadowcam[1], culledforshadowcam[2], culledforshadowcam[3] };
 
-        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadow_cam, rsmcam);
+        handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm);
+
+        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm);
     }
 }
 
@@ -511,6 +522,15 @@ GenDrawCalls(unsigned cascade, std::vector<GLMesh *> &InstancedList,
 }
 
 int enableOpenMP;
+
+static void FixBoundingBoxes(scene::ISceneNode* node)
+{
+    for (scene::ISceneNode *child : node->getChildren())
+    {
+        FixBoundingBoxes(child);
+        const_cast<core::aabbox3df&>(node->getBoundingBox()).addInternalBox(child->getBoundingBox());
+    }
+}
 
 void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 {
@@ -546,7 +566,12 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     DeferredUpdate.clear();
     core::list<scene::ISceneNode*> List = m_scene_manager->getRootSceneNode()->getChildren();
 
-    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam);
+    for (scene::ISceneNode *child : List)
+        FixBoundingBoxes(child);
+
+    bool cam = false, rsmcam = false;
+    bool shadowcam[4] = { false, false, false, false };
+    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam, cam, shadowcam, rsmcam);
 
     // Add a 1 s timeout
     if (!m_sync)
