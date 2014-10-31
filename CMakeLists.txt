@@ -78,6 +78,9 @@ if(USE_WIIUSE)
     include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
 endif()
 
+# Build the angelscript library
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
+include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
 
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
@@ -274,6 +277,7 @@ target_link_libraries(supertuxkart
     enet
     glew
     stkirrlicht
+    angelscript
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}

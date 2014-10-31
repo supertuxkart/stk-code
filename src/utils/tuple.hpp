@@ -8,7 +8,12 @@ namespace STK {
     template<typename... _Types> class Tuple;
 
     // empty tuple
-    template<> class Tuple<> {};
+    template<> class Tuple<> {
+    public:
+        Tuple()
+        {
+        }
+    };
 
     // recursive tuple definition
     template<typename _This, typename... _Rest>

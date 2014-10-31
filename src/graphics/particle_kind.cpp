@@ -58,7 +58,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_wind_speed = 0;
     m_flips = false;
     m_vertical_particles = false;
-
+    m_randomize_initial_y = false;
 
     // ----- Read XML file
 
@@ -81,6 +81,8 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
 
     std::string emitterShape = "point";
     xml->get("emitter", &emitterShape);
+
+    xml->get("randomize-initial-y", &m_randomize_initial_y);
 
     if (emitterShape == "point")
     {

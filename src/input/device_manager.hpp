@@ -19,12 +19,22 @@
 #ifndef DEVICE_MANAGER_HPP
 #define DEVICE_MANAGER_HPP
 
-#include "input/input_device.hpp"
-#include "config/device_config.hpp"
+#include "input/device_config.hpp"
+#include "input/gamepad_config.hpp"
+#include "input/input_manager.hpp"
+#include "input/keyboard_config.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 
 #include <irrArray.h>
+#include <IEventReceiver.h>
+using namespace irr;
+
+class InputDevice;
+class GamePadDevice;
+class KeyboardDevice;
+
 
 enum PlayerAssignMode
 {
@@ -58,46 +68,31 @@ private:
     PtrVector<GamepadConfig, HOLD>     m_gamepad_configs;
 
     /** The list of all joysticks that were found and activated. */
-    core::array<SJoystickInfo>          m_irrlicht_gamepads;
-    InputDevice*                        m_latest_used_device;
-    PlayerAssignMode                    m_assign_mode;
+    core::array<SJoystickInfo>         m_irrlicht_gamepads;
+    InputDevice*                       m_latest_used_device;
+    PlayerAssignMode                   m_assign_mode;
 
-    /**
-      * Helper method, only used internally. Takes care of analyzing gamepad input.
-      *
-      * \param[out]  player     Which player this input belongs to (only set in ASSIGN mode)
-      * \param[out]  action     Which action is related to this input trigger
-      * \param       mode       Used to determine whether to determine menu actions or game actions
-      * \return                 The device to which this input belongs
-      */
-    InputDevice *mapGamepadInput      ( Input::InputType type,
-                                        int deviceID,
-                                        int btnID,
-                                        int axisDir,
-                                        int* value /* inout */,
-                                        InputManager::InputDriverMode mode,
-                                        StateManager::ActivePlayer **player /* out */,
-                                        PlayerAction *action /* out */);
 
     /** Will be non-null in single-player mode */
     StateManager::ActivePlayer* m_single_player;
 
-    /**
-     * Helper method, only used internally. Takes care of analyzing keyboard input.
-     *
-     * \param[out]  player     Which player this input belongs to (only set in ASSIGN mode)
-     * \param[out]  action     Which action is related to this input trigger
-     * \param       mode       Used to determine whether to determine menu actions or game actions
-     * \return                 The device to which this input belongs
-     */
-    InputDevice *mapKeyboardInput     ( int btnID, InputManager::InputDriverMode mode,
-                                        StateManager::ActivePlayer **player /* out */,
-                                        PlayerAction *action /* out */);
     /** If this is flag is set the next fire event (if the fire key is not
      *  mapped to anything else) will be mapped to 'select'. This is used
      *  in the kart select GUI to support the old way of adding players by
      *  pressing fire. */
     bool m_map_fire_to_select;
+
+
+    InputDevice *mapGamepadInput( Input::InputType type, int deviceID,
+                                  int btnID, int axisDir,
+                                  int* value /* inout */,
+                                  InputManager::InputDriverMode mode,
+                                  StateManager::ActivePlayer **player /* out */,
+                                  PlayerAction *action /* out */);
+    InputDevice *mapKeyboardInput(int button_id,
+                                  InputManager::InputDriverMode mode,
+                                  StateManager::ActivePlayer **player /* out */,
+                                  PlayerAction *action /* out */);
 
     bool load();
     void shutdown();
@@ -118,14 +113,14 @@ public:
     GamePadDevice*      getGamePad(const int i)             { return m_gamepads.get(i); }
     GamepadConfig*      getGamepadConfig(const int i)       { return m_gamepad_configs.get(i); }
     GamePadDevice*      getGamePadFromIrrID(const int i);
-    void                clearGamepads()                     { m_gamepads.clearAndDeleteAll();  }
+    void                clearGamepads();
     /** Returns the keyboard that has a binding for this button, or NULL if none */
     bool                getConfigForGamepad(const int sdl_id, const core::stringc& pname, GamepadConfig **config);
 
     // ---- Keyboard(s) ----
     void addEmptyKeyboard();
     void addKeyboard(KeyboardDevice* d);
-    void                clearKeyboard()                     { m_keyboards.clearAndDeleteAll(); }
+    void                clearKeyboard();
     int                 getKeyboardAmount()                 { return m_keyboards.size(); }
     int                 getKeyboardConfigAmount() const     { return m_keyboard_configs.size(); }
     KeyboardDevice*     getKeyboard(const int i)            { return m_keyboards.get(i); }
@@ -159,7 +154,7 @@ public:
     void                clearLatestUsedDevice();
     InputDevice*        getLatestUsedDevice();
     bool initialize();
-    void serialize();
+    void save();
 
     StateManager::ActivePlayer* getSinglePlayer()       { return m_single_player; }
     void setSinglePlayer(StateManager::ActivePlayer* p) { m_single_player = p;    }

@@ -35,8 +35,10 @@
 #include "graphics/stkanimatedmesh.hpp"
 #include "graphics/stkbillboard.hpp"
 #include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stkscenemanager.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
+#include "graphics/texturemanager.hpp"
 #include "graphics/water.hpp"
 #include "graphics/wind.hpp"
 #include "guiengine/engine.hpp"
@@ -111,7 +113,7 @@ IrrDriver::IrrDriver()
     m_post_processing     = NULL;
     m_wind                = new Wind();
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
-        m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
+        m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = m_boundingboxesviz = false;
     SkyboxCubeMap = m_last_light_bucket_distance = 0;
     m_shadow_camnodes[0] = NULL;
     m_shadow_camnodes[1] = NULL;
@@ -804,6 +806,12 @@ void IrrDriver::applyResolutionSettings()
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
     m_shaders->killShaders();
+    VAOManager::getInstance()->kill();
+    SolidPassCmd::getInstance()->kill();
+    ShadowPassCmd::getInstance()->kill();
+    RSMPassCmd::getInstance()->kill();
+    GlowPassCmd::getInstance()->kill();
+    resetTextureTable();
     // initDevice will drop the current device.
     initDevice();
 

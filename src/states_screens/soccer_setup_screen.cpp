@@ -227,7 +227,7 @@ void SoccerSetupScreen::init()
     // This flag will cause that a 'fire' event will be mapped to 'select' (if
     // 'fire' is not assigned to a GUI event). This is done to support the old
     // way of player joining by pressing 'fire' instead of 'select'.
-    input_manager->getDeviceList()->mapFireToSelect(true);
+    input_manager->getDeviceManager()->mapFireToSelect(true);
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -236,7 +236,7 @@ void SoccerSetupScreen::tearDown()
     Widget* central_div = getWidget<Widget>("central_div");
 
     // Reset the 'map fire to select' option of the device manager
-    input_manager->getDeviceList()->mapFireToSelect(false);
+    input_manager->getDeviceManager()->mapFireToSelect(false);
     
     UserConfigParams::m_num_goals = getWidget<SpinnerWidget>("goalamount")->getValue();
     UserConfigParams::m_soccer_time_limit = getWidget<SpinnerWidget>("timeamount")->getValue();

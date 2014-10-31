@@ -30,6 +30,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
@@ -102,8 +103,8 @@ void MainMenuScreen::init()
 
     // reset in case we're coming back from a race
     StateManager::get()->resetActivePlayers();
-    input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
-    input_manager->getDeviceList()->setSinglePlayer( NULL );
+    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
+    input_manager->getDeviceManager()->setSinglePlayer( NULL );
     input_manager->setMasterPlayerOnly(false);
 
     // Avoid incorrect behaviour in certain race circumstances:
@@ -117,7 +118,7 @@ void MainMenuScreen::init()
     // select will add a new player). See bug 3090931
     // To avoid this, we will clean the last used device, making
     // the key bindings for the first player the default again.
-    input_manager->getDeviceList()->clearLatestUsedDevice();
+    input_manager->getDeviceManager()->clearLatestUsedDevice();
 
     if (addons_manager->isLoading())
     {
@@ -389,7 +390,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setReverseTrack(false);
 
         // Use keyboard 0 by default (FIXME: let player choose?)
-        InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+        InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
 
         // Create player and associate player with keyboard
         StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
@@ -405,8 +406,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
         // ASSIGN should make sure that only input from assigned devices
         // is read.
-        input_manager->getDeviceList()->setAssignMode(ASSIGN);
-        input_manager->getDeviceList()
+        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+        input_manager->getDeviceManager()
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         StateManager::get()->enterGameState();

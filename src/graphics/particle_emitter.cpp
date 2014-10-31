@@ -450,7 +450,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         else
         {
             if (m_is_glsl)
-                m_node = ParticleSystemProxy::addParticleNode(m_is_glsl, false);
+                m_node = ParticleSystemProxy::addParticleNode(m_is_glsl, type->randomizeInitialY());
             else
                 m_node = irr_driver->addParticleNode();
             

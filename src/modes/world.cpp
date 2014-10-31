@@ -30,6 +30,7 @@
 #include "graphics/hardware_skinning.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
@@ -47,6 +48,7 @@
 #include "race/race_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -153,6 +155,7 @@ void World::init()
 
     // Grab the track file
     m_track = track_manager->getTrack(race_manager->getTrackName());
+	m_script_engine = new Scripting::ScriptEngine();
     if(!m_track)
     {
         std::ostringstream msg;
@@ -830,7 +833,7 @@ void World::updateWorld(float dt)
         if (m_schedule_exit_race)
         {
             m_schedule_exit_race = false;
-            race_manager->exitRace();
+            race_manager->exitRace(false);
             race_manager->setAIKartOverride("");
 
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
@@ -847,7 +850,7 @@ void World::updateWorld(float dt)
                 race_manager->setReverseTrack(false);
 
                 // Use keyboard 0 by default (FIXME: let player choose?)
-                InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+                InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
 
                 // Create player and associate player with keyboard
                 StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
@@ -864,9 +867,11 @@ void World::updateWorld(float dt)
 
                 // ASSIGN should make sure that only input from assigned devices
                 // is read.
-                input_manager->getDeviceList()->setAssignMode(ASSIGN);
-                input_manager->getDeviceList()
+                input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+                input_manager->getDeviceManager()
                     ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+
+                delete this;
 
                 StateManager::get()->enterGameState();
                 race_manager->setupPlayerKartInfo();
@@ -874,6 +879,8 @@ void World::updateWorld(float dt)
             }
             else
             {
+                delete this;
+
                 if (race_manager->raceWasStartedFromOverworld())
                 {
                     OverWorld::enterOverWorld();

@@ -73,6 +73,10 @@ public:
         m_init_hpr = hpr;
         m_init_scale = scale;
     }
+    TrackObjectPresentation(const core::vector3df& xyz)
+    {
+        m_init_xyz = xyz;
+    }
 
     virtual ~TrackObjectPresentation() {}
 
@@ -216,6 +220,12 @@ public:
         scene::IAnimatedMesh* mesh, const core::vector3df& xyz,
         const core::vector3df& hpr, const core::vector3df& scale);
 
+    void setLoop(int start, int end); //set custom loops, as well as pause by scripts
+
+    void setCurrentFrame(int frame);
+
+    int getCurrentFrame();
+
     virtual ~TrackObjectPresentationMesh();
 
     virtual void reset() OVERRIDE;
@@ -329,15 +339,20 @@ private:
 
     bool m_action_active;
 
+
 public:
 
 
     TrackObjectPresentationActionTrigger(const XMLNode& xml_node);
+    TrackObjectPresentationActionTrigger(const core::vector3df& xyz,std::string scriptname, float distance);
+
     virtual ~TrackObjectPresentationActionTrigger() {}
 
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
 
     virtual void reset() OVERRIDE { m_action_active = true; }
+
+    virtual void setEnable(bool status) OVERRIDE{ m_action_active = status; }
 };
 
 

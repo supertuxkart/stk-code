@@ -31,6 +31,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
+#include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "items/item_manager.hpp"
 #include "modes/world.hpp"
@@ -38,7 +39,8 @@
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
-
+#include "tracks/track_object_manager.hpp"
+#include "scriptengine/script_engine.hpp"
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
 #include <ICameraSceneNode.h>
@@ -449,7 +451,41 @@ void TrackObjectPresentationMesh::reset()
     }
 }
 
+int TrackObjectPresentationMesh::getCurrentFrame()
+{
+    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
+    {
+        scene::IAnimatedMeshSceneNode *a_node =
+            (scene::IAnimatedMeshSceneNode*)m_node;
 
+        return (int)a_node->getFrameNr();
+    }
+    return -1; //Not a skeletal animation
+}
+
+void TrackObjectPresentationMesh::setCurrentFrame(int frame)
+{
+    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
+    {
+        scene::IAnimatedMeshSceneNode *a_node =
+            (scene::IAnimatedMeshSceneNode*)m_node;
+
+        a_node->setCurrentFrame((f32)frame);
+    }
+}
+
+void TrackObjectPresentationMesh::setLoop(int start, int end)
+{
+    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
+    {
+        scene::IAnimatedMeshSceneNode *a_node =
+            (scene::IAnimatedMeshSceneNode*)m_node;
+
+        // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
+        // last frame, even if looping is disabled
+        a_node->setFrameLoop(start, end);
+    }
+}
 // ----------------------------------------------------------------------------
 
 
@@ -779,9 +815,27 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
 }
 
 // ----------------------------------------------------------------------------
+
+TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger
+(const core::vector3df& xyz,std::string script_name, float distance)
+:TrackObjectPresentation(xyz)
+{
+    m_init_xyz = xyz;
+    m_init_hpr = core::vector3df(0, 0, 0);
+    m_init_scale = core::vector3df(1, 1, 1);
+    float trigger_distance = distance;
+    m_action = script_name;
+    m_action_active = true;
+
+
+    ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
+}
+
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 {
     if (!m_action_active) return;
+
+    // TODO: replace all of these hardcoded actions with scripting
 
     if (m_action == "garage")
     {
@@ -812,14 +866,14 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
             m_action_active = false;
             //World::getWorld()->getRaceGUI()->clearAllMessages();
 
-            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
             DeviceConfig* config = device->getConfiguration();
             irr::core::stringw accel = config->getBindingAsString(PA_ACCEL);
             irr::core::stringw left = config->getBindingAsString(PA_STEER_LEFT);
             irr::core::stringw right = config->getBindingAsString(PA_STEER_RIGHT);
 
             new TutorialMessageDialog(_("Accelerate with <%s> and steer with <%s> and <%s>", accel, left, right),
-                                      false);
+                false);
         }
     }
     else if (m_action == "tutorial_bananas")
@@ -831,62 +885,62 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     else if (m_action == "tutorial_giftboxes")
     {
         m_action_active = false;
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
 
         new TutorialMessageDialog(_("Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!", fire),
-                                true);
+            true);
     }
     else if (m_action == "tutorial_backgiftboxes")
     {
         m_action_active = false;
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
-        
+
         new TutorialMessageDialog(_("Press <B> to look behind, to fire the weapon with <%s> while pressing <B> to to fire behind!", fire),
-                                  true);
+            true);
     }
     else if (m_action == "tutorial_nitro_collect")
     {
         m_action_active = false;
 
         new TutorialMessageDialog(_("Collect nitro bottles (we will use them after the curve)"),
-                                  true);
+            true);
     }
     else if (m_action == "tutorial_nitro_use")
     {
         m_action_active = false;
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw nitro = config->getBindingAsString(PA_NITRO);
 
         new TutorialMessageDialog(_("Use the nitro you collected by pressing <%s>!", nitro),
-                                 true);
+            true);
     }
     else if (m_action == "tutorial_rescue")
     {
         m_action_active = false;
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw rescue = config->getBindingAsString(PA_RESCUE);
 
         new TutorialMessageDialog(_("Oops! When you're in trouble, press <%s> to be rescued", rescue),
-                                  false);
+            false);
     }
     else if (m_action == "tutorial_skidding")
     {
         m_action_active = false;
         //World::getWorld()->getRaceGUI()->clearAllMessages();
 
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw skid = config->getBindingAsString(PA_DRIFT);
 
 
         new TutorialMessageDialog(_("Accelerate and press the <%s> key while turning to skid. Skidding for a short while can help you turn faster to take sharp turns.", skid),
-                                 true);
+            true);
     }
     else if (m_action == "tutorial_skidding2")
     {
@@ -894,7 +948,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         World::getWorld()->getRaceGUI()->clearAllMessages();
 
         new TutorialMessageDialog(_("Note that if you manage to skid for several seconds, you will receive a bonus speedup as a reward!"),
-                                true);
+            true);
     }
     else if (m_action == "tutorial_endmessage")
     {
@@ -902,7 +956,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         World::getWorld()->getRaceGUI()->clearAllMessages();
 
         new TutorialMessageDialog(_("You are now ready to race. Good luck!"),
-                                  true);
+            true);
     }
     else if (m_action == "tutorial_exit")
     {
@@ -910,7 +964,19 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         return;
     }
     else
-        Log::warn("TrackObject", "Unknown action '%s'", m_action.c_str());
+    {	
+        //TODO move all above functions into scripts and remove the ifs
+        Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
+        m_action_active = false;
+        m_script_engine->runScript(m_action);
+        
+        /*
+        Catch exception -> script not found
+        fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
+                m_action.c_str());
+        
+         */
+    }
 }
 
 

@@ -371,4 +371,3 @@ void InitTexturesTransparent(GLMesh &mesh)
             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
     }
 }
-

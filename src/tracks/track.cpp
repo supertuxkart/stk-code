@@ -138,6 +138,7 @@ Track::Track(const std::string &filename)
                               m_ident=="overworld";
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
+    m_startup_run = false;
     m_default_number_of_laps= 3;
     m_all_nodes.clear();
     m_all_physics_only_nodes.clear();
@@ -261,6 +262,7 @@ void Track::reset()
     CheckManager::get()->reset(*this);
     ItemManager::get()->reset();
     m_track_object_manager->reset();
+    m_startup_run = false;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -1200,6 +1202,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         bool lod_instance = false;
         n->get("lod_instance", &lod_instance);
 
+        /*
         if (tangent)
         {
             scene::IMesh* original_mesh = irr_driver->getMesh(full_path);
@@ -1241,7 +1244,8 @@ bool Track::loadMainTrack(const XMLNode &root)
             handleAnimatedTextures(scene_node, *n);
             m_all_nodes.push_back( scene_node );
         }
-        else if (lod_instance)
+        else*/
+        if (lod_instance)
         {
             LODNode* node = lodLoader.instanciateAsLOD(n, NULL);
             if (node != NULL)
@@ -1264,6 +1268,8 @@ bool Track::loadMainTrack(const XMLNode &root)
                            full_path.c_str());
                 continue;
             }
+
+            a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
 
             // The meshes loaded here are in irrlicht's mesh cache. So we
             // have to keep track of them in order to properly remove them
@@ -1449,6 +1455,12 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
  */
 void Track::update(float dt)
 {
+    if (!m_startup_run) // first time running update = good point to run startup script
+    {
+        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+        script_engine->runScript("start");
+        m_startup_run = true;
+    }
     m_track_object_manager->update(dt);
 
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
@@ -1457,7 +1469,8 @@ void Track::update(float dt)
     }
     CheckManager::get()->update(dt);
     ItemManager::get()->update(dt);
-
+    Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+    script_engine->runScript("update");
 }   // update
 
 // ----------------------------------------------------------------------------

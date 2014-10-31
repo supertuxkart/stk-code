@@ -48,6 +48,7 @@ class OptionsScreenInput2 : public GUIEngine::Screen,
     bool conflictsBetweenKbdConfig(PlayerAction action, PlayerAction from,
                                    PlayerAction to);
 
+    /** The configuration to use. */
     DeviceConfig* m_config;
 
     void renameRow(GUIEngine::ListWidget* actions,
@@ -63,6 +64,7 @@ class OptionsScreenInput2 : public GUIEngine::Screen,
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput2>;
 
+    /** Sets the configuration to be used. */
     void setDevice(DeviceConfig* config) { m_config = config; }
 
     /** \brief implement callback from parent class GUIEngine::Screen */

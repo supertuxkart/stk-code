@@ -43,9 +43,6 @@ public:
         INGAME,
         INPUT_SENSE_KEYBOARD,
         INPUT_SENSE_GAMEPAD,
-        //INPUT_SENSE_PREFER_AXIS,
-        //INPUT_SENSE_PREFER_BUTTON,
-        //LOWLEVEL,
         BOOTSTRAP
     };
 
@@ -71,9 +68,11 @@ private:
     */
     int    m_mouse_val_x, m_mouse_val_y;
 
-    void   dispatchInput(Input::InputType, int deviceID, int btnID, Input::AxisDirection direction, int value);
+    void   dispatchInput(Input::InputType, int deviceID, int btnID,
+                         Input::AxisDirection direction, int value);
     void   handleStaticAction(int id0, int value);
-    void   inputSensing(Input::InputType type, int deviceID, int btnID, Input::AxisDirection axisDirection,  int value);
+    void   inputSensing(Input::InputType type, int deviceID, int btnID,
+                        Input::AxisDirection axisDirection,  int value);
 public:
            InputManager();
           ~InputManager();
@@ -82,21 +81,24 @@ public:
     //void   input();
     GUIEngine::EventPropagation   input(const irr::SEvent& event);
 
-    DeviceManager* getDeviceList() { return m_device_manager; }
+    DeviceManager* getDeviceManager() { return m_device_manager; }
 
     void   setMode(InputDriverMode);
     bool   isInMode(InputDriverMode);
     InputDriverMode getMode() { return m_mode; }
 
-    /** When this mode is enabled, only the master player will be able to play with menus (only works in 'assign' mode) */
+    /** When this mode is enabled, only the master player will be able to play
+     *  with menus (only works in 'assign' mode) */
     void   setMasterPlayerOnly(bool enabled);
 
-    /** Returns whether only the master player should be allowed to perform changes in menus */
+    /** Returns whether only the master player should be allowed to perform
+     *  changes in menus. */
     bool    masterPlayerOnly() const;
 
     void   update(float dt);
 
-    /** Returns the ID of the player that plays with the keyboard, or -1 if none */
+    /** Returns the ID of the player that plays with the keyboard,
+     *  or -1 if none. */
     int    getPlayerKeyboardID() const;
 };
 

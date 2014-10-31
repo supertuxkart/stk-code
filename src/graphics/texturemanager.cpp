@@ -16,10 +16,13 @@ GLuint getDepthTexture(irr::video::ITexture *tex)
     return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
 }
 
-std::set<irr::video::ITexture *> AlreadyTransformedTexture;
+static std::set<irr::video::ITexture *> AlreadyTransformedTexture;
+static std::map<int, video::ITexture*> unicolor_cache;
+
 void resetTextureTable()
 {
     AlreadyTransformedTexture.clear();
+    unicolor_cache.clear();
 }
 
 void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
@@ -166,10 +169,6 @@ void saveCompressedTexture(const std::string& compressed_tex)
     }
     delete[] data;
 }
-
-static unsigned colorcount = 0;
-
-std::map<int, video::ITexture*> unicolor_cache;
 
 video::ITexture* getUnicolorTexture(const video::SColor &c)
 {

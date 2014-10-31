@@ -64,7 +64,7 @@ public:
     }   // set
 
     // ------------------------------------------------------------------------
-    void               serialize  (std::ofstream& stream) const;
+    void               save(std::ofstream& stream) const;
     bool               load(const XMLNode *action);
     irr::core::stringw getAsString() const;
 };

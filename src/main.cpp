@@ -162,6 +162,7 @@
 #include "guiengine/dialog_queue.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "input/wiimote_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
@@ -400,7 +401,7 @@ void setupRaceStart()
     InputDevice *device;
 
     // Use keyboard 0 by default in --no-start-screen
-    device = input_manager->getDeviceList()->getKeyboard(0);
+    device = input_manager->getDeviceManager()->getKeyboard(0);
 
     // Create player and associate player with keyboard
     StateManager::get()->createActivePlayer(
@@ -421,7 +422,7 @@ void setupRaceStart()
 
     // ASSIGN should make sure that only input from assigned devices
     // is read.
-    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 }   // setupRaceStart
 
 // ----------------------------------------------------------------------------

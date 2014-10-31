@@ -166,6 +166,18 @@ bool isBoxInFrontOfPlane(const core::plane3df &plane, const core::vector3df edge
     return true;
 }
 
+std::vector<float> BoundingBoxes;
+
+static void addEdge(const core::vector3df &P0, const core::vector3df &P1)
+{
+    BoundingBoxes.push_back(P0.X);
+    BoundingBoxes.push_back(P0.Y);
+    BoundingBoxes.push_back(P0.Z);
+    BoundingBoxes.push_back(P1.X);
+    BoundingBoxes.push_back(P1.Y);
+    BoundingBoxes.push_back(P1.Z);
+}
+
 static
 bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
 {
@@ -173,28 +185,17 @@ bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode
         return false;
 
     const core::matrix4 &trans = node->getAbsoluteTransformation();
+    const scene::SViewFrustum &frust = *cam->getViewFrustum();
 
     core::vector3df edges[8];
     node->getBoundingBox().getEdges(edges);
     for (unsigned i = 0; i < 8; i++)
         trans.transformVect(edges[i]);
 
-    scene::SViewFrustum frust = *cam->getViewFrustum();
     for (s32 i = 0; i < scene::SViewFrustum::VF_PLANE_COUNT; ++i)
         if (isBoxInFrontOfPlane(frust.planes[i], edges))
             return true;
     return false;
-}
-
-static
-bool isCulledFast(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
-{
-    if (!node->getAutomaticCulling())
-        return false;
-
-    core::aabbox3d<f32> tbox = node->getBoundingBox();
-    node->getAbsoluteTransformation().transformBoxEx(tbox);
-    return !(tbox.intersectsWithBox(cam->getViewFrustum()->getBoundingBox()));
 }
 
 static void
@@ -206,6 +207,41 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         return;
     node->updateNoGL();
     DeferredUpdate.push_back(node);
+
+
+    const core::matrix4 &trans = Node->getAbsoluteTransformation();
+
+    core::vector3df edges[8];
+    Node->getBoundingBox().getEdges(edges);
+    for (unsigned i = 0; i < 8; i++)
+        trans.transformVect(edges[i]);
+
+    /* From irrlicht
+       /3--------/7
+      / |       / |
+     /  |      /  |
+    1---------5   |
+    |  /2- - -|- -6
+    | /       |  /
+    |/        | /
+    0---------4/
+    */
+
+    if (irr_driver->getBoundingBoxesViz())
+    {
+        addEdge(edges[0], edges[1]);
+        addEdge(edges[1], edges[5]);
+        addEdge(edges[5], edges[4]);
+        addEdge(edges[4], edges[0]);
+        addEdge(edges[2], edges[3]);
+        addEdge(edges[3], edges[7]);
+        addEdge(edges[7], edges[6]);
+        addEdge(edges[6], edges[2]);
+        addEdge(edges[0], edges[2]);
+        addEdge(edges[1], edges[3]);
+        addEdge(edges[5], edges[7]);
+        addEdge(edges[4], edges[6]);
+    }
 
     if (node->isImmediateDraw())
     {
@@ -283,7 +319,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         }
         else
         {
-            if (isCulledFast(cam, Node))
+            if (isCulledPrecise(cam, Node))
                 continue;
             core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
             ModelMatrix.getInverse(InvModelMatrix);
@@ -328,7 +364,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         {
             if (!irr_driver->hasARB_draw_indirect())
             {
-                if (isCulledFast(shadowcam[cascade], Node))
+                if (isCulledPrecise(shadowcam[cascade], Node))
                     continue;
                 core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                 ModelMatrix.getInverse(InvModelMatrix);
@@ -381,7 +417,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         }
         else
         {
-            if (isCulledFast(rsmcam, Node))
+            if (isCulledPrecise(rsmcam, Node))
                 continue;
             core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
             ModelMatrix.getInverse(InvModelMatrix);

@@ -23,6 +23,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "gamepad_device.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/wiimote.hpp"
@@ -158,7 +159,7 @@ void WiimoteManager::launchDetection(int timeout)
 
     // ---------------------------------------------------
     // Create or find a GamepadConfig for all wiimotes
-    DeviceManager* device_manager = input_manager->getDeviceList();
+    DeviceManager* device_manager = input_manager->getDeviceManager();
     GamepadConfig* gamepad_config = NULL;
 
     device_manager->getConfigForGamepad(WIIMOTE_START_IRR_ID, "Wiimote",
@@ -245,7 +246,7 @@ void WiimoteManager::cleanup()
 {
     if(m_wiimotes.size() > 0)
     {
-        DeviceManager* device_manager = input_manager->getDeviceList();
+        DeviceManager* device_manager = input_manager->getDeviceManager();
 
         GamePadDevice* first_gamepad_device =
                      device_manager->getGamePadFromIrrID(WIIMOTE_START_IRR_ID);

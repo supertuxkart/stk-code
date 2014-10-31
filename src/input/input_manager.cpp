@@ -26,6 +26,8 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
+#include "input/gamepad_device.hpp"
+#include "input/keyboard_device.hpp"
 #include "input/input.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
@@ -635,7 +637,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                     type == Input::IT_STICKBUTTON)
                 {
                     GamePadDevice* gp =
-                        getDeviceList()->getGamePadFromIrrID(deviceID);
+                        getDeviceManager()->getGamePadFromIrrID(deviceID);
 
                     if (gp != NULL &&
                         abs(value)>gp->m_deadzone)
@@ -644,7 +646,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                         // is not associated to any player
                         GUIEngine::showMessage(
                             _("Ignoring '%s', you needed to join earlier to play!",
-                            irr::core::stringw(gp->m_name.c_str()).c_str())      );
+                            irr::core::stringw(gp->getName().c_str()).c_str())      );
                     }
                 }
                 return;
@@ -768,7 +770,7 @@ EventPropagation InputManager::input(const SEvent& event)
         }
 
         GamePadDevice* gp =
-            getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
+            getDeviceManager()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
 
         if (gp == NULL)
         {
@@ -805,7 +807,7 @@ EventPropagation InputManager::input(const SEvent& event)
         // Key value, but do have a value defined in the Char field.
         // So to distinguish them (otherwise [] would both be mapped to
         // the same value 0, which means we can't distinguish which key
-        // was actually pressed anymore). We set bit 10 which should
+        // was actually pressed anymore), we set bit 10 which should
         // allow us to distinguish those artifical keys from the
         // 'real' keys.
         const int key = event.KeyInput.Key ? event.KeyInput.Key
@@ -902,7 +904,7 @@ EventPropagation InputManager::input(const SEvent& event)
     // allow typing, and except in modal dialogs in-game)
     // FIXME: 1) that's awful logic 2) that's not what the code below does,
     // events are never blocked in menus
-    if (getDeviceList()->getAssignMode() != NO_ASSIGN &&
+    if (getDeviceManager()->getAssignMode() != NO_ASSIGN &&
         !GUIEngine::isWithinATextBox() &&
         (!GUIEngine::ModalDialog::isADialogActive() &&
         StateManager::get()->getGameState() == GUIEngine::GAME))

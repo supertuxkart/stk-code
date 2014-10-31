@@ -23,6 +23,8 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "input/gamepad_device.hpp"
+#include "input/keyboard_device.hpp"
 #include "input/wiimote_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/kart_selection.hpp"
@@ -134,10 +136,22 @@ bool DeviceManager::initialize()
         addGamepad(gamepadDevice);
     } // end for
 
-    if (created) serialize();
+    if (created) save();
 
     return created;
 }   // initialize
+
+// -----------------------------------------------------------------------------
+void DeviceManager::clearKeyboard()
+{
+    m_keyboards.clearAndDeleteAll();
+}   // clearKeyboard
+
+// -----------------------------------------------------------------------------
+void DeviceManager::clearGamepads()
+{
+    m_gamepads.clearAndDeleteAll(); 
+}   // clearGamepads
 
 // -----------------------------------------------------------------------------
 void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
@@ -225,7 +239,8 @@ bool DeviceManager::getConfigForGamepad(const int irr_id,
     }
 
     return configCreated;
-}
+}   // getConfigForGamepad
+
 // -----------------------------------------------------------------------------
 void DeviceManager::addKeyboard(KeyboardDevice* d)
 {
@@ -282,25 +297,30 @@ bool DeviceManager::deleteConfig(DeviceConfig* config)
 }   // deleteConfig
 
 // -----------------------------------------------------------------------------
-
-InputDevice* DeviceManager::mapKeyboardInput( int btnID, InputManager::InputDriverMode mode,
-                                              StateManager::ActivePlayer **player /* out */,
-                                              PlayerAction *action /* out */ )
+/** Helper method, only used internally. Takes care of analyzing keyboard input.
+ *  \param[in]   button_id  Id of the key pressed.
+ *  \param[in]   mode       Used to determine whether to determine menu actions
+ *                          or game actions
+ *  \param[out]  player     Which player this input belongs to (only set in 
+ *                          ASSIGN mode).
+ *  \param[out]  action     Which action is related to this input trigger.
+ *  \return                 The device to which this input belongs
+ */
+InputDevice* DeviceManager::mapKeyboardInput(int button_id,
+                                             InputManager::InputDriverMode mode,
+                                             StateManager::ActivePlayer **player,
+                                             PlayerAction *action /* out */)
 {
     const int keyboard_amount = m_keyboards.size();
-
-    //Log::info("DeviceManager::mapKeyboardInput", "Map %d to %d", btnID, keyboard_amount);
 
     for (int n=0; n<keyboard_amount; n++)
     {
         KeyboardDevice *keyboard = m_keyboards.get(n);
 
-        if (keyboard->processAndMapInput(btnID, mode, action))
+        if (keyboard->processAndMapInput(action, Input::IT_KEYBOARD, button_id, mode))
         {
-            //Log::info("DeviceManager::mapKeyboardInput", "Binding found in keyboard #%d; action is %s", n + 1, KartActionStrings[*action]);
             if (m_single_player != NULL)
             {
-                //Log::info("DeviceManager", "Single player");
                 *player = m_single_player;
             }
             else if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
@@ -309,7 +329,7 @@ InputDevice* DeviceManager::mapKeyboardInput( int btnID, InputManager::InputDriv
             }
             else
             {
-                *player = keyboard->m_player;
+                *player = keyboard->getPlayer();
             }
             return keyboard;
         }
@@ -319,21 +339,31 @@ InputDevice* DeviceManager::mapKeyboardInput( int btnID, InputManager::InputDriv
 }   // mapKeyboardInput
 
 //-----------------------------------------------------------------------------
+/** Helper method, only used internally. Takes care of analyzing gamepad
+ *  input.
+ *  \param[in]  type    Type of gamepad event (IT_STICKMOTION etc).
+ *  \param[out] player  Which player this input belongs to (only set in
+ *                      ASSIGN mode)
+ *  \param[out] action  Which action is related to this input trigger
+ *  \param      mode    Used to determine whether to determine menu actions
+ *                      or game actions
+ *  \return             The device to which this input belongs
+ */
 
-InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
-                                             int deviceID,
-                                             int btnID,
-                                             int axisDir,
+InputDevice *DeviceManager::mapGamepadInput(Input::InputType type,
+                                             int device_id,
+                                             int button_id,
+                                             int axis_dir,
                                              int *value /* inout */,
                                              InputManager::InputDriverMode mode,
                                              StateManager::ActivePlayer **player /* out */,
                                              PlayerAction *action /* out */)
 {
-    GamePadDevice  *gPad = getGamePadFromIrrID(deviceID);
+    GamePadDevice  *gPad = getGamePadFromIrrID(device_id);
 
     if (gPad != NULL)
     {
-        if (gPad->processAndMapInput(type, btnID, value, mode, gPad->getPlayer(), action))
+        if (gPad->processAndMapInput(action, type, button_id, mode, value))
         {
             if (m_single_player != NULL)
             {
@@ -360,9 +390,9 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
 //-----------------------------------------------------------------------------
 
 bool DeviceManager::translateInput( Input::InputType type,
-                                    int deviceID,
-                                    int btnID,
-                                    int axisDir,
+                                    int device_id,
+                                    int button_id,
+                                    int axis_dir,
                                     int* value /* inout */,
                                     InputManager::InputDriverMode mode,
                                     StateManager::ActivePlayer** player /* out */,
@@ -370,7 +400,7 @@ bool DeviceManager::translateInput( Input::InputType type,
 {
     if (GUIEngine::getCurrentScreen() != NULL)
     {
-        GUIEngine::getCurrentScreen()->filterInput(type, deviceID, btnID, axisDir, *value);
+        GUIEngine::getCurrentScreen()->filterInput(type, device_id, button_id, axis_dir, *value);
     }
 
     InputDevice *device = NULL;
@@ -379,12 +409,12 @@ bool DeviceManager::translateInput( Input::InputType type,
     switch (type)
     {
         case Input::IT_KEYBOARD:
-            device = mapKeyboardInput(btnID, mode, player, action);
+            device = mapKeyboardInput(button_id, mode, player, action);
             // If the action is not recognised, check if it's a fire key
             // that should be mapped to select
             if(!device && m_map_fire_to_select)
             {
-                device = mapKeyboardInput(btnID, InputManager::INGAME, player,
+                device = mapKeyboardInput(button_id, InputManager::INGAME, player,
                                           action);
                 if(device && *action == PA_FIRE)
                     *action = PA_MENU_SELECT;
@@ -392,11 +422,11 @@ bool DeviceManager::translateInput( Input::InputType type,
             break;
         case Input::IT_STICKBUTTON:
         case Input::IT_STICKMOTION:
-            device = mapGamepadInput(type, deviceID, btnID, axisDir, value,
+            device = mapGamepadInput(type, device_id, button_id, axis_dir, value,
                                      mode, player, action);
             if(!device && m_map_fire_to_select)
             {
-                device = mapGamepadInput(type, deviceID, btnID, axisDir, value,
+                device = mapGamepadInput(type, device_id, button_id, axis_dir, value,
                                          InputManager::INGAME, player, action);
                 if(device && *action == PA_FIRE)
                     *action = PA_MENU_SELECT;
@@ -521,7 +551,7 @@ bool DeviceManager::load()
 }   // load
 
 // -----------------------------------------------------------------------------
-void DeviceManager::serialize()
+void DeviceManager::save()
 {
     static std::string filepath = file_manager->getUserConfigFile(INPUT_FILE_NAME);
     if(UserConfigParams::logMisc()) Log::info("Device manager","Serializing input.xml...");
@@ -541,31 +571,31 @@ void DeviceManager::serialize()
 
     for(unsigned int n=0; n<m_keyboard_configs.size(); n++)
     {
-        m_keyboard_configs[n].serialize(configfile);
+        m_keyboard_configs[n].save(configfile);
     }
     for(unsigned int n=0; n<m_gamepad_configs.size(); n++)
     {
-        m_gamepad_configs[n].serialize(configfile);
+        m_gamepad_configs[n].save(configfile);
     }
 
     configfile << "</input>\n";
     configfile.close();
     if(UserConfigParams::logMisc()) Log::info("Device manager","Serialization complete.");
-}   // serialize
+}   // save
 
 // -----------------------------------------------------------------------------
 
-KeyboardDevice* DeviceManager::getKeyboardFromBtnID(const int btnID)
+KeyboardDevice* DeviceManager::getKeyboardFromBtnID(const int button_id)
 {
     const int keyboard_amount = m_keyboards.size();
     for (int n=0; n<keyboard_amount; n++)
     {
-        if (m_keyboards[n].getConfiguration()->hasBindingFor(btnID))
+        if (m_keyboards[n].getConfiguration()->hasBindingFor(button_id))
             return m_keyboards.get(n);
     }
 
     return NULL;
-}   // getKeyboardFromBtnID
+}   // getKeyboardFromButtonID
 
 // -----------------------------------------------------------------------------
 

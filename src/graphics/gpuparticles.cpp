@@ -33,6 +33,9 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     const core::vector3df& scale,
     bool randomize_initial_y) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false), m_first_execution(true)
 {
+    if (randomize_initial_y)
+        m_randomize_initial_y = randomize_initial_y;
+
     m_randomize_initial_y = randomize_initial_y;
     size_increase_factor = 0.;
     ParticleParams = NULL;
