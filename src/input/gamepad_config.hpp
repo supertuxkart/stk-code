@@ -62,6 +62,9 @@ public:
     virtual void save(std::ofstream& stream);
     void        setDefaultBinds     ();
     virtual bool load(const XMLNode *config) OVERRIDE;
+    // ------------------------------------------------------------------------
+    /** Returns if this device uses analog axes. */
+    virtual bool isAnalog() const OVERRIDE { return m_is_analog; }
 
     // ------------------------------------------------------------------------
     /** Returns the number of buttons in this configuration. */
