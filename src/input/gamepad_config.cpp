@@ -117,11 +117,6 @@ void GamepadConfig::setDefaultBinds ()
 }   // setDefaultBinds
 
 //------------------------------------------------------------------------------
-core::stringw getBindingAsString(const PlayerAction action) const
-{
-}   // getBindingAsString
-
-//------------------------------------------------------------------------------
 /** Converts the configuration to a string.
  */
 irr::core::stringw GamepadConfig::toString()
