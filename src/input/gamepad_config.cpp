@@ -37,7 +37,7 @@ GamepadConfig::GamepadConfig( const std::string &name,
     setName(name);
     m_axis_count   = axis_count;
     m_button_count = button_count;
-    m_deadzone     = 2000;
+    m_deadzone     = 4096;
     m_is_analog    = true;
     m_desensitize  = false;
     setDefaultBinds();
@@ -49,7 +49,7 @@ GamepadConfig::GamepadConfig() : DeviceConfig()
 {
     m_axis_count   = 0;
     m_button_count = 0;
-    m_deadzone     = 2000;
+    m_deadzone     = 4096;
     m_is_analog    = true;
     m_desensitize  = false;
     setDefaultBinds();
@@ -115,6 +115,11 @@ void GamepadConfig::setDefaultBinds ()
     setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, 0);
     setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, 3);
 }   // setDefaultBinds
+
+//------------------------------------------------------------------------------
+core::stringw getBindingAsString(const PlayerAction action) const
+{
+}   // getBindingAsString
 
 //------------------------------------------------------------------------------
 /** Converts the configuration to a string.
