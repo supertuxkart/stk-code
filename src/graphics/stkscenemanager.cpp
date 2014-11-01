@@ -110,7 +110,7 @@ void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, scene::ISceneNode *node
 template<typename T>
 static void
 FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > InstanceList, T * InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer,
-    size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &PolyCount, std::function<bool (const scene::ISceneNode *)> cull_func)
+    size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &PolyCount)
 {
     // Should never be empty
     GLMesh *mesh = InstanceList.front().first;
@@ -120,8 +120,6 @@ FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > Instan
     {
         auto &Tp = InstanceList[i];
         scene::ISceneNode *node = Tp.second;
-        if (cull_func(node))
-            continue;
         InstanceFiller<T>::add(mesh, node, InstanceBuffer[InstanceBufferOffset++]);
     }
 
@@ -138,19 +136,18 @@ FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > Instan
 template<typename T>
 static
 void FillInstances(const std::unordered_map<scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
-    T *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &Polycount,
-    std::function<bool (const scene::ISceneNode *)> cull_func)
+    T *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &Polycount)
 {
     auto It = GatheredGLMesh.begin(), E = GatheredGLMesh.end();
     for (; It != E; ++It)
     {
-        FillInstances_impl<T>(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, Polycount, cull_func);
+        FillInstances_impl<T>(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, Polycount);
         if (!UserConfigParams::m_azdo)
             InstancedList.push_back(It->second.front().first);
     }
 }
 
-static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForSolidPass[Material::SHADERTYPE_COUNT];
+static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForSolidPass[Material::SHADERTYPE_COUNT], MeshForShadowPass[Material::SHADERTYPE_COUNT][4], MeshForRSM[Material::SHADERTYPE_COUNT];
 static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForGlowPass;
 static std::vector <STKMeshCommon *> DeferredUpdate;
 
@@ -200,7 +197,8 @@ bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode
 
 static void
 handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *ImmediateDraw,
-    const scene::ICameraSceneNode *cam, scene::ICameraSceneNode *shadowcam[4], const scene::ICameraSceneNode *rsmcam)
+    const scene::ICameraSceneNode *cam, scene::ICameraSceneNode *shadowcam[4], const scene::ICameraSceneNode *rsmcam,
+    bool &culledforcam, bool culledforshadowcam[4], bool &culledforrsm)
 {
     STKMeshCommon *node = dynamic_cast<STKMeshCommon*>(Node);
     if (!node)
@@ -249,6 +247,11 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         return;
     }
 
+    culledforcam = culledforcam || isCulledPrecise(cam, Node);
+    culledforrsm = culledforrsm || isCulledPrecise(rsmcam, Node);
+    for (unsigned i = 0; i < 4; i++)
+        culledforshadowcam[i] = culledforshadowcam[i] || isCulledPrecise(shadowcam[i], Node);
+
     // Transparent
     GLMesh *mesh;
     if (World::getWorld() && World::getWorld()->isFogEnabled())
@@ -284,21 +287,48 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     for_in(mesh, node->TransparentMesh[TM_DISPLACEMENT])
         pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
 
-    for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
+    if (!culledforcam)
     {
-        if (irr_driver->hasARB_draw_indirect())
+        for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
-            for_in(mesh, node->MeshSolidMaterial[Mat])
+            if (irr_driver->hasARB_draw_indirect())
             {
-                if (node->glow())
-                    MeshForGlowPass[mesh->mb].emplace_back(mesh, Node);
-
-                if (Mat != Material::SHADERTYPE_SPLATTING && mesh->TextureMatrix.isIdentity())
-                    MeshForSolidPass[Mat][mesh->mb].emplace_back(mesh, Node);
-                else
+                for_in(mesh, node->MeshSolidMaterial[Mat])
                 {
-                    core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
-                    ModelMatrix.getInverse(InvModelMatrix);
+                    if (node->glow())
+                        MeshForGlowPass[mesh->mb].emplace_back(mesh, Node);
+
+                    if (Mat != Material::SHADERTYPE_SPLATTING && mesh->TextureMatrix.isIdentity())
+                        MeshForSolidPass[Mat][mesh->mb].emplace_back(mesh, Node);
+                    else
+                    {
+                        core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
+                        ModelMatrix.getInverse(InvModelMatrix);
+                        switch (Mat)
+                        {
+                        case Material::SHADERTYPE_SOLID:
+                            ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                            break;
+                        case Material::SHADERTYPE_ALPHA_TEST:
+                            ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                            break;
+                        case Material::SHADERTYPE_SOLID_UNLIT:
+                            ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                            break;
+                        case Material::SHADERTYPE_SPLATTING:
+                            ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
+                ModelMatrix.getInverse(InvModelMatrix);
+
+                for_in(mesh, node->MeshSolidMaterial[Mat])
+                {
                     switch (Mat)
                     {
                     case Material::SHADERTYPE_SOLID:
@@ -307,65 +337,44 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                     case Material::SHADERTYPE_ALPHA_TEST:
                         ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
+                    case Material::SHADERTYPE_NORMAL_MAP:
+                        ListMatNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_DETAIL_MAP:
+                        ListMatDetails::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
                     case Material::SHADERTYPE_SOLID_UNLIT:
                         ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_SPHERE_MAP:
+                        ListMatSphereMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case Material::SHADERTYPE_SPLATTING:
                         ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
+                    case Material::SHADERTYPE_VEGETATION:
+                        ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, windDir);
+                        break;
                     }
-                }
-            }
-        }
-        else
-        {
-            if (isCulledPrecise(cam, Node))
-                continue;
-            core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
-            ModelMatrix.getInverse(InvModelMatrix);
-
-            for_in(mesh, node->MeshSolidMaterial[Mat])
-            {
-                switch (Mat)
-                {
-                case Material::SHADERTYPE_SOLID:
-                    ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_ALPHA_TEST:
-                    ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_NORMAL_MAP:
-                    ListMatNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_DETAIL_MAP:
-                    ListMatDetails::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_SOLID_UNLIT:
-                    ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_SPHERE_MAP:
-                    ListMatSphereMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_SPLATTING:
-                    ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
-                    break;
-                case Material::SHADERTYPE_VEGETATION:
-                    ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, windDir);
-                    break;
                 }
             }
         }
     }
     if (!UserConfigParams::m_shadows)
         return;
-    for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
+    for (unsigned cascade = 0; cascade < 4; ++cascade)
     {
-        for (unsigned cascade = 0; cascade < 4; ++cascade)
+        if (culledforshadowcam[cascade])
+            continue;
+        for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
-            if (!irr_driver->hasARB_draw_indirect())
+            if (irr_driver->hasARB_draw_indirect())
             {
-                if (isCulledPrecise(shadowcam[cascade], Node))
-                    continue;
+                for_in(mesh, node->MeshSolidMaterial[Mat])
+                    MeshForShadowPass[Mat][cascade][mesh->mb].emplace_back(mesh, Node);
+            }
+            else
+            {
                 core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                 ModelMatrix.getInverse(InvModelMatrix);
 
@@ -403,53 +412,60 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     }
     if (!UserConfigParams::m_gi)
         return;
-    for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
+    if (!culledforrsm)
     {
-        if (irr_driver->hasARB_draw_indirect())
+        for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
-            if (Mat == Material::SHADERTYPE_SPLATTING)
+            if (irr_driver->hasARB_draw_indirect())
+            {
+                if (Mat == Material::SHADERTYPE_SPLATTING)
+                    for_in(mesh, node->MeshSolidMaterial[Mat])
+                    {
+                        core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
+                        ModelMatrix.getInverse(InvModelMatrix);
+                       ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
+                     }
+                else
+                {
+                    for_in(mesh, node->MeshSolidMaterial[Mat])
+                        MeshForRSM[Mat][mesh->mb].emplace_back(mesh, Node);
+                }
+            }
+            else
+            {
+
+                core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
+                ModelMatrix.getInverse(InvModelMatrix);
+
                 for_in(mesh, node->MeshSolidMaterial[Mat])
                 {
-                    core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
-                    ModelMatrix.getInverse(InvModelMatrix);
-                    ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
-                }
-        }
-        else
-        {
-            if (isCulledPrecise(rsmcam, Node))
-                continue;
-            core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
-            ModelMatrix.getInverse(InvModelMatrix);
-
-            for_in(mesh, node->MeshSolidMaterial[Mat])
-            {
-                switch (Mat)
-                {
-                case Material::SHADERTYPE_SOLID:
-                    ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_ALPHA_TEST:
-                    ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_NORMAL_MAP:
-                    ListMatNormalMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_DETAIL_MAP:
-                    ListMatDetails::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_SOLID_UNLIT:
-                    ListMatUnlit::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_SPHERE_MAP:
-                    ListMatSphereMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                    break;
-                case Material::SHADERTYPE_SPLATTING:
-                    ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
-                    break;
-                case Material::SHADERTYPE_VEGETATION:
-                    ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, windDir);
-                    break;
+                    switch (Mat)
+                    {
+                    case Material::SHADERTYPE_SOLID:
+                        ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_ALPHA_TEST:
+                        ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_NORMAL_MAP:
+                        ListMatNormalMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_DETAIL_MAP:
+                        ListMatDetails::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_SOLID_UNLIT:
+                        ListMatUnlit::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_SPHERE_MAP:
+                        ListMatSphereMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_SPLATTING:
+                        ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
+                        break;
+                    case Material::SHADERTYPE_VEGETATION:
+                        ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, windDir);
+                        break;
+                    }
                 }
             }
         }
@@ -458,7 +474,8 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
 
 static void
 parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::ISceneNode *> *ImmediateDraw,
-    const scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadow_cam[4], const scene::ICameraSceneNode *rsmcam)
+    const scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadow_cam[4], const scene::ICameraSceneNode *rsmcam,
+    bool culledforcam, bool culledforshadowcam[4], bool culledforrsm)
 {
     core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
     for (; I != E; ++I)
@@ -483,9 +500,13 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
             continue;
         }
 
-        handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam);
+        bool newculledforcam = culledforcam;
+        bool newculledforrsm = culledforrsm;
+        bool newculledforshadowcam[4] = { culledforshadowcam[0], culledforshadowcam[1], culledforshadowcam[2], culledforshadowcam[3] };
 
-        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadow_cam, rsmcam);
+        handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm);
+
+        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm);
     }
 }
 
@@ -493,15 +514,23 @@ template<Material::ShaderType Mat, typename T> static void
 GenDrawCalls(unsigned cascade, std::vector<GLMesh *> &InstancedList,
     T *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &PolyCount)
 {
-    std::function<bool(const scene::ISceneNode *)> shadowculling = [&](const scene::ISceneNode *nd) {return dynamic_cast<const STKMeshCommon*>(nd)->isCulledForShadowCam(cascade); };
     if (irr_driver->hasARB_draw_indirect())
         ShadowPassCmd::getInstance()->Offset[cascade][Mat] = CommandBufferOffset; // Store command buffer offset
-    FillInstances<T>(MeshForSolidPass[Mat], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, PolyCount, shadowculling);
+    FillInstances<T>(MeshForShadowPass[Mat][cascade], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, PolyCount);
     if (UserConfigParams::m_azdo)
         ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
 }
 
 int enableOpenMP;
+
+static void FixBoundingBoxes(scene::ISceneNode* node)
+{
+    for (scene::ISceneNode *child : node->getChildren())
+    {
+        FixBoundingBoxes(child);
+        const_cast<core::aabbox3df&>(node->getBoundingBox()).addInternalBox(child->getBoundingBox());
+    }
+}
 
 void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 {
@@ -527,24 +556,24 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     ListInstancedGlow::getInstance()->clear();
 
     for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
+    {
         MeshForSolidPass[Mat].clear();
+        MeshForRSM[Mat].clear();
+        for (unsigned i = 0; i < 4; i++)
+            MeshForShadowPass[Mat][i].clear();
+    }
     MeshForGlowPass.clear();
     DeferredUpdate.clear();
     core::list<scene::ISceneNode*> List = m_scene_manager->getRootSceneNode()->getChildren();
 
-    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam);
+PROFILER_PUSH_CPU_MARKER("- culling", 0xFF, 0xFF, 0x0);
+    for (scene::ISceneNode *child : List)
+        FixBoundingBoxes(child);
 
-#pragma omp parallel for
-    for (int i = 0; i < (int)DeferredUpdate.size(); i++)
-    {
-        scene::ISceneNode *node = dynamic_cast<scene::ISceneNode *>(DeferredUpdate[i]);
-        DeferredUpdate[i]->setCulledForPlayerCam(isCulledPrecise(camnode, node));
-        DeferredUpdate[i]->setCulledForRSMCam(isCulledPrecise(m_suncam, node));
-        DeferredUpdate[i]->setCulledForShadowCam(0, isCulledPrecise(m_shadow_camnodes[0], node));
-        DeferredUpdate[i]->setCulledForShadowCam(1, isCulledPrecise(m_shadow_camnodes[1], node));
-        DeferredUpdate[i]->setCulledForShadowCam(2, isCulledPrecise(m_shadow_camnodes[2], node));
-        DeferredUpdate[i]->setCulledForShadowCam(3, isCulledPrecise(m_shadow_camnodes[3], node));
-    }
+    bool cam = false, rsmcam = false;
+    bool shadowcam[4] = { false, false, false, false };
+    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam, cam, shadowcam, rsmcam);
+PROFILER_POP_CPU_MARKER();
 
     // Add a 1 s timeout
     if (!m_sync)
@@ -615,7 +644,6 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 
     PROFILER_PUSH_CPU_MARKER("- Draw Command upload", 0xFF, 0x0, 0xFF);
 
-    auto playercamculling = [](const scene::ISceneNode *nd) {return dynamic_cast<const STKMeshCommon*>(nd)->isCulledForPlayerCam(); };
 #pragma omp parallel sections if(enableOpenMP)
     {
 #pragma omp section
@@ -632,23 +660,23 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 
             // Default Material
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_SOLID], ListInstancedMatDefault::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[Material::SHADERTYPE_SOLID], ListInstancedMatDefault::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID];
             // Alpha Ref
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_ALPHA_TEST] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_ALPHA_TEST], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[Material::SHADERTYPE_ALPHA_TEST], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_ALPHA_TEST] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_ALPHA_TEST];
             // Unlit
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_UNLIT] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_SOLID_UNLIT], ListInstancedMatUnlit::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[Material::SHADERTYPE_SOLID_UNLIT], ListInstancedMatUnlit::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID_UNLIT] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_UNLIT];
             // Spheremap
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SPHERE_MAP] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_SPHERE_MAP], ListInstancedMatSphereMap::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[Material::SHADERTYPE_SPHERE_MAP], ListInstancedMatSphereMap::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_SPHERE_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SPHERE_MAP];
             // Grass
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_VEGETATION] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_VEGETATION], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[Material::SHADERTYPE_VEGETATION], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_VEGETATION] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_VEGETATION];
 
             if (!irr_driver->hasBufferStorageExtension())
@@ -661,11 +689,11 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 
             // Detail
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_DETAIL_MAP] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_DETAIL_MAP], ListInstancedMatDetails::getInstance()->SolidPass, InstanceBufferThreeTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[Material::SHADERTYPE_DETAIL_MAP], ListInstancedMatDetails::getInstance()->SolidPass, InstanceBufferThreeTex, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_DETAIL_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_DETAIL_MAP];
             // Normal Map
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->SolidPass, InstanceBufferThreeTex, CmdBuffer, offset, current_cmd, SolidPoly, playercamculling);
+            FillInstances(MeshForSolidPass[Material::SHADERTYPE_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->SolidPass, InstanceBufferThreeTex, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_NORMAL_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP];
 
 
@@ -695,7 +723,7 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
             for (; It != E; ++It)
             {
                 size_t Polycnt = 0;
-                FillInstances_impl<GlowInstanceData>(It->second, GlowInstanceBuffer, GlowCmdBuffer, offset, current_cmd, Polycnt, playercamculling);
+                FillInstances_impl<GlowInstanceData>(It->second, GlowInstanceBuffer, GlowCmdBuffer, offset, current_cmd, Polycnt);
                 if (!UserConfigParams::m_azdo)
                     ListInstancedGlow::getInstance()->push_back(It->second.front().first);
             }
@@ -747,7 +775,6 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
         }
 #pragma omp section
         {
-            auto rsmcamculling = [](const scene::ISceneNode *nd) {return dynamic_cast<const STKMeshCommon*>(nd)->isCulledForRSMCam(); };
             size_t offset = 0, current_cmd = 0;
             if (!irr_driver->hasBufferStorageExtension())
             {
@@ -759,23 +786,23 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 
             // Default Material
             RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_SOLID], ListInstancedMatDefault::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly, rsmcamculling);
+            FillInstances(MeshForRSM[Material::SHADERTYPE_SOLID], ListInstancedMatDefault::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID];
             // Alpha Ref
             RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_ALPHA_TEST] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_ALPHA_TEST], ListInstancedMatAlphaRef::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly, rsmcamculling);
+            FillInstances(MeshForRSM[Material::SHADERTYPE_ALPHA_TEST], ListInstancedMatAlphaRef::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_ALPHA_TEST] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_ALPHA_TEST];
             // Unlit
             RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_UNLIT] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_SOLID_UNLIT], ListInstancedMatUnlit::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly, rsmcamculling);
+            FillInstances(MeshForRSM[Material::SHADERTYPE_SOLID_UNLIT], ListInstancedMatUnlit::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID_UNLIT] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_UNLIT];
             // Detail
             RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_DETAIL_MAP] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_DETAIL_MAP], ListInstancedMatDetails::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly, rsmcamculling);
+            FillInstances(MeshForRSM[Material::SHADERTYPE_DETAIL_MAP], ListInstancedMatDetails::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_DETAIL_MAP] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_DETAIL_MAP];
             // Normal Map
             RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP] = current_cmd;
-            FillInstances(MeshForSolidPass[Material::SHADERTYPE_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly, rsmcamculling);
+            FillInstances(MeshForRSM[Material::SHADERTYPE_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_NORMAL_MAP] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP];
 
             if (!irr_driver->hasBufferStorageExtension())
