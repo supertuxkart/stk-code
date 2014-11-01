@@ -42,16 +42,21 @@ float getShadowFactor(vec3 pos, float bias, int index)
 
 //float shadowmapz = 2. * texture(shadowtex, vec3(shadowtexcoord, shadowcoord.z).x - 1.;
 //	bias += smoothstep(0.001, 0.1, moved) * 0.014; // According to the warping
-	float sum = 0.;
-	for (float i = -1.5; i <= 1.5; i+= 1.)
-	{
-		for (float j = -1.5; j <= 1.5; j+= 1.)
-		{
-			float z = texture(shadowtex, vec3(shadowtexcoord +vec2(i, j) / 1024., float(index))).x;
-			sum += (z > 0.5 * shadowcoord.z + 0.5) ? 1. : 0.;
-		}
-	}
-	return sum / 16.;
+
+//	float sum = 0.;
+//	for (float i = -1.5; i <= 1.5; i+= 1.)
+//	{
+//		for (float j = -1.5; j <= 1.5; j+= 1.)
+//		{
+//			float z = texture(shadowtex, vec3(shadowtexcoord +vec2(i, j) / 1024., float(index))).x;
+//			sum += (z > 0.5 * shadowcoord.z + 0.5) ? 1. : 0.;
+//		}
+//	}
+//	return sum / 16.;
+
+	float z = texture(shadowtex, vec3(shadowtexcoord, float(index))).x;
+	float d = .5 * shadowcoord.z + .5;
+	return min(exp(1024 *(z - d)), 1.);
 }
 
 void main() {
