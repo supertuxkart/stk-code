@@ -1019,6 +1019,9 @@ void IrrDriver::renderShadows()
             renderInstancedShadow<NormalMat>(cascade);
         }
     }
+
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_rtts->getShadowFBO().getRTT()[0]);
+    glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
 
 

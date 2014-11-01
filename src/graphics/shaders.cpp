@@ -859,9 +859,13 @@ GLuint createShadowSampler()
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    int aniso = UserConfigParams::m_anisotropic;
+    if (aniso == 0) aniso = 1;
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
     return id;
 #endif
 }
