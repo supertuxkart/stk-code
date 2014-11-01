@@ -224,7 +224,7 @@ RTT::RTT(size_t width, size_t height)
     if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
     {
         shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R32F, GL_RED, GL_FLOAT, 10);
-        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH_COMPONENT32, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT, 10);
+        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 10);
 
         somevector.clear();
         somevector.push_back(shadowColorTex);
@@ -235,7 +235,7 @@ RTT::RTT(size_t width, size_t height)
         glTexStorage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 8, GL_R32F, 1024, 1024, 4, true);
         glGenTextures(1, &shadowDepthMSAATex);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, shadowDepthMSAATex);
-        glTexStorage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 8, GL_DEPTH_COMPONENT32, 1024, 1024, 4, true);
+        glTexStorage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 8, GL_DEPTH24_STENCIL8, 1024, 1024, 4, true);
 
         somevector.clear();
         somevector.push_back(shadowColorMSAATex);
