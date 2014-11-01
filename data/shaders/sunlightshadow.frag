@@ -1,6 +1,6 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
-uniform sampler2DArrayShadow shadowtex;
+uniform sampler2DArray shadowtex;
 //uniform sampler2D warpx;
 ///uniform sampler2D warpy;
 
@@ -46,7 +46,10 @@ float getShadowFactor(vec3 pos, float bias, int index)
 	for (float i = -1.5; i <= 1.5; i+= 1.)
 	{
 		for (float j = -1.5; j <= 1.5; j+= 1.)
-			sum += texture(shadowtex, vec4(shadowtexcoord +vec2(i, j) / 1024., float(index), 0.5 * shadowcoord.z + 0.5));
+		{
+			float z = texture(shadowtex, vec3(shadowtexcoord +vec2(i, j) / 1024., float(index))).x;
+			sum += (z > 0.5 * shadowcoord.z + 0.5) ? 1. : 0.;
+		}
 	}
 	return sum / 16.;
 }

@@ -824,16 +824,16 @@ void IrrDriver::renderShadowsDebug()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 0);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 0);
     renderWireFrameFrustrum(m_shadows_cam[0], 0);
     glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 1);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 1);
     renderWireFrameFrustrum(m_shadows_cam[1], 1);
     glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 2);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 2);
     renderWireFrameFrustrum(m_shadows_cam[2], 2);
     glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 3);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 3);
     renderWireFrameFrustrum(m_shadows_cam[3], 3);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }

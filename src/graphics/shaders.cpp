@@ -862,8 +862,6 @@ GLuint createShadowSampler()
     glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glSamplerParameterf(id, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-    glSamplerParameterf(id, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     return id;
 #endif
 }
@@ -1185,14 +1183,14 @@ namespace MeshShader
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
         }
         else
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
         }
         AssignUniforms("layer", "ModelMatrix");
     }
@@ -1238,7 +1236,7 @@ namespace MeshShader
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
         }
         else
         {
@@ -1246,7 +1244,7 @@ namespace MeshShader
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/instanced_shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
         }
         AssignUniforms("layer");
     }
@@ -1260,14 +1258,14 @@ namespace MeshShader
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadowref.frag").c_str());
         }
         else
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadowref.frag").c_str());
         }
         AssignUniforms("layer", "ModelMatrix");
         AssignSamplerNames(Program, 0, "tex");

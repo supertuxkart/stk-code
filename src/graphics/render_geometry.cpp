@@ -983,9 +983,9 @@ void IrrDriver::renderShadows()
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.5, 0.);
     m_rtts->getShadowFBO().Bind();
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glDrawBuffer(GL_NONE);
-
+    glClearColor(1., 1., 1., 1.);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glClearColor(0., 0., 0., 0.);
 
     for (unsigned cascade = 0; cascade < 4; cascade++)
     {
