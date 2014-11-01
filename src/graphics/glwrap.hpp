@@ -43,7 +43,7 @@ public:
 class FrameBuffer
 {
 private:
-    GLuint fbo;
+    GLuint fbo, layerfbo;
     std::vector<GLuint> RenderTargets;
     GLuint DepthTexture;
     size_t width, height;
@@ -59,6 +59,7 @@ public:
     size_t getHeight() const { return height; }
     static void Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST);
     void BlitToDefault(size_t, size_t, size_t, size_t);
+    static void BlitLayer(const FrameBuffer &Src, FrameBuffer &Dst, unsigned layer, GLbitfield mask, GLenum filter);
 };
 
 class VertexUtils

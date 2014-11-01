@@ -978,11 +978,14 @@ void IrrDriver::renderShadows()
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
-    m_rtts->getShadowFBO().Bind();
+    m_rtts->getShadowMSAAFBO().Bind();
 
     glClearColor(1., 1., 1., 1.);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glClearColor(0., 0., 0., 0.);
+
+
+    glEnable(GL_MULTISAMPLE);
 
     for (unsigned cascade = 0; cascade < 4; cascade++)
     {
@@ -1020,6 +1023,10 @@ void IrrDriver::renderShadows()
         }
     }
 
+    glDisable(GL_MULTISAMPLE);
+
+    for (unsigned i = 0; i < 4; i++)
+        FrameBuffer::BlitLayer(m_rtts->getShadowMSAAFBO(), m_rtts->getShadowFBO(), i, GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_rtts->getShadowFBO().getRTT()[0]);
     glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }

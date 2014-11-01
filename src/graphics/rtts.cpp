@@ -229,6 +229,17 @@ RTT::RTT(size_t width, size_t height)
         somevector.clear();
         somevector.push_back(shadowColorTex);
         m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
+
+        glGenTextures(1, &shadowColorMSAATex);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, shadowColorMSAATex);
+        glTexStorage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 8, GL_R32F, 1024, 1024, 4, true);
+        glGenTextures(1, &shadowDepthMSAATex);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, shadowDepthMSAATex);
+        glTexStorage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 8, GL_DEPTH_COMPONENT32, 1024, 1024, 4, true);
+
+        somevector.clear();
+        somevector.push_back(shadowColorMSAATex);
+        m_shadowMSAA_FBO = new FrameBuffer(somevector, shadowDepthMSAATex, 1024, 1024, true);
     }
 
     if (UserConfigParams::m_gi)

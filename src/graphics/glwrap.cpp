@@ -162,10 +162,10 @@ unsigned GPUTimer::elapsedTimeus()
     return result / 1000;
 }
 
-FrameBuffer::FrameBuffer() {}
+FrameBuffer::FrameBuffer() : layerfbo(0) {}
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h, bool layered) :
-    RenderTargets(RTTs), DepthTexture(0), width(w), height(h)
+RenderTargets(RTTs), DepthTexture(0), width(w), height(h), layerfbo(0)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -184,7 +184,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h, bo
 }
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered) :
-    RenderTargets(RTTs), DepthTexture(DS), width(w), height(h)
+RenderTargets(RTTs), DepthTexture(DS), width(w), height(h), layerfbo(0)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -202,11 +202,16 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w, s
     }
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+
+    if (layered)
+        glGenFramebuffers(1, &layerfbo);
 }
 
 FrameBuffer::~FrameBuffer()
 {
     glDeleteFramebuffers(1, &fbo);
+    if (layerfbo)
+        glDeleteFramebuffers(1, &layerfbo);
 }
 
 void FrameBuffer::Bind()
@@ -223,6 +228,20 @@ void FrameBuffer::Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst.fbo);
     glBlitFramebuffer(0, 0, (int)Src.width, (int)Src.height, 0, 0,
                       (int)Dst.width, (int)Dst.height, mask, filter);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void FrameBuffer::BlitLayer(const FrameBuffer &Src, FrameBuffer &Dst, unsigned layer, GLbitfield mask, GLenum filter)
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, Src.layerfbo);
+    glFramebufferTextureLayer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, Src.RenderTargets[0], 0, layer);
+    glFramebufferTextureLayer(GL_READ_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, Src.DepthTexture, 0, layer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst.layerfbo);
+    glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, Dst.RenderTargets[0], 0, layer);
+    glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, Dst.DepthTexture, 0, layer);
+    glBlitFramebuffer(0, 0, (int)Src.width, (int)Src.height, 0, 0,
+        (int)Dst.width, (int)Dst.height, mask, filter);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }

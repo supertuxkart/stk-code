@@ -42,6 +42,7 @@ public:
     ~RTT();
 
     FrameBuffer &getShadowFBO() { return *m_shadow_FBO; }
+    FrameBuffer &getShadowMSAAFBO() { return *m_shadowMSAA_FBO; }
     FrameBuffer &getRH() { return *m_RH_FBO; }
     FrameBuffer &getRSM() { return *m_RSM; }
 
@@ -60,9 +61,10 @@ private:
     int m_height;
 
     unsigned shadowColorTex, shadowNormalTex, shadowDepthTex;
+    unsigned shadowColorMSAATex, shadowDepthMSAATex;
     unsigned RSM_Color, RSM_Normal, RSM_Depth;
     unsigned RH_Red, RH_Green, RH_Blue;
-    FrameBuffer* m_shadow_FBO, *m_RSM, *m_RH_FBO;
+    FrameBuffer* m_shadow_FBO, *m_shadowMSAA_FBO, *m_RSM, *m_RH_FBO;
 
     LEAK_CHECK();
 };
