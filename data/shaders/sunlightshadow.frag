@@ -56,7 +56,7 @@ float getShadowFactor(vec3 pos, float bias, int index)
 
 	float z = texture(shadowtex, vec3(shadowtexcoord, float(index))).x;
 	float d = shadowcoord.z;
-	return min(pow(exp(-80. * d) * z, 4.), 1.);
+	return min(pow(exp(-1. * d) * z, 240.), 1.);
 }
 
 void main() {
