@@ -1,6 +1,8 @@
 uniform sampler2D tex;
 uniform vec2 pixel;
 
+float sigma = 1.;
+
 // Gaussian separated blur with radius 6.
 
 out vec4 FragColor;
@@ -8,17 +10,22 @@ out vec4 FragColor;
 void main()
 {
     vec2 uv = gl_FragCoord.xy * pixel;
-    vec4 sum = vec4(0.0);
     float X = uv.x;
     float Y = uv.y;
 
-    sum += texture(tex, vec2(X, Y - 5.13333 * pixel.y)) * 0.00640869;
-    sum += texture(tex, vec2(X, Y - 3.26667 * pixel.y)) * 0.083313;
-    sum += texture(tex, vec2(X, Y - 1.4 * pixel.y)) * 0.305481;
-    sum += texture(tex, vec2(X, Y)) * 0.209473;
-    sum += texture(tex, vec2(X, Y + 1.4 * pixel.y)) * 0.305481;
-    sum += texture(tex, vec2(X, Y + 3.26667 * pixel.y)) * 0.083313;
-    sum += texture(tex, vec2(X, Y + 5.13333 * pixel.y)) * 0.00640869;
+    float g0, g1, g2;
+    g0 = 1.0 / (sqrt(2.0 * 3.14) * sigma);
+    g1 = exp(-0.5 / (sigma * sigma));
+    g2 = g1 * g1;
+    vec4 sum = texture(tex, vec2(X, Y)) * g0;
+    g0 *= g1;
+    g1 *= g2;
+    for (int i = 1; i < 3; i++) {
+        sum += texture(tex, vec2(X, Y - i * pixel.y)) * g0;
+        sum += texture(tex, vec2(X, Y + i * pixel.y)) * g0;
+        g0 *= g1;
+        g1 *= g2;
+    }
 
     FragColor = sum;
 }
