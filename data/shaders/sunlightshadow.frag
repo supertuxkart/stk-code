@@ -30,7 +30,7 @@ float getShadowFactor(vec3 pos, float bias, int index)
 	);
 
 	vec4 shadowcoord = (ShadowViewProjMatrixes[index] * InverseViewMatrix * vec4(pos, 1.0));
-	shadowcoord /= shadowcoord.w;
+	shadowcoord.xy /= shadowcoord.w;
 	vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
 //	shadowcoord = (shadowcoord * 0.5) + vec3(0.5);
 
@@ -55,7 +55,7 @@ float getShadowFactor(vec3 pos, float bias, int index)
 //	return sum / 16.;
 
 	float z = texture(shadowtex, vec3(shadowtexcoord, float(index))).x;
-	float d = .5 * shadowcoord.z + .5;
+	float d = shadowcoord.z;
 	return min(exp(1024 *(z - d)), 1.);
 }
 

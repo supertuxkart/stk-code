@@ -978,8 +978,6 @@ void IrrDriver::renderShadows()
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
-    glCullFace(GL_FRONT);
-    glEnable(GL_CULL_FACE);
     m_rtts->getShadowFBO().Bind();
 
     glClearColor(1., 1., 1., 1.);
@@ -1021,9 +1019,6 @@ void IrrDriver::renderShadows()
             renderInstancedShadow<NormalMat>(cascade);
         }
     }
-
-    glCullFace(GL_BACK);
-    glDisable(GL_CULL_FACE);
 
     m_post_processing->renderGaussian6BlurLayer(m_rtts->getShadowFBO());
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_rtts->getShadowFBO().getRTT()[0]);
