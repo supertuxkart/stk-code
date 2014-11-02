@@ -770,7 +770,7 @@ void KartModel::setDefaultSuspension()
  *  \param rotation_dt How far the wheels have rotated since last time.
  *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
- *  \param speed The speed of the kart in meters/sec, used for the 
+ *  \param speed The speed of the kart in meters/sec, used for the
  *         speed-weighted objects' animations
  */
 void KartModel::update(float dt, float rotation_dt, float steer,  float speed)

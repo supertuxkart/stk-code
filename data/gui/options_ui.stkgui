@@ -16,40 +16,68 @@
 
         <box proportion="1" width="100%" layout="vertical-row">
 
-            <spacer height="5" width="10"/>
+            <spacer height="5" width="10" />
 
             <!-- ************ SKIN CHOICE ************ -->
             <div layout="horizontal-row" width="100%" height="fit">
-                <label I18N="In the graphics settings" text="Skin" align="center"/>
+                <label I18N="In the ui settings" text="Skin" align="center"/>
                 <spacer width="20" height="20"/>
                 <spinner id="skinchoice" width="30%"/>
             </div>
 
             <spacer width="20" height="18" />
 
-            <div width="75%" height="fit" layout="horizontal-row" >
-                <checkbox id="showfps"/>
-                <spacer width="20" height="100%" />
-                <label height="100%" I18N="In the ui settings" text="Display FPS"/>
+            <div layout="horizontal-row" width="100%" height="fit">
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <checkbox id="showfps"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Display FPS"/>
+                </div>
+
+                <spacer height="4" width="10" />
+
+                <div layout="horizontal-row" proportion="1" height="fit">
+                    <checkbox id="perPlayerDifficulty"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Enable handicaped users"/>
+                </div>
             </div>
 
-            <div width="75%" height="fit" layout="horizontal-row" >
-                <checkbox id="show-login"/>
-                <spacer width="20" height="100%" />
-                <label height="100%" I18N="In the ui settings" text="Always show login screen"/>
+            <spacer height="4" width="10" />
+
+            <div layout="horizontal-row" width="100%" height="fit">
+                <div layout="horizontal-row" proportion="1" height="fit">
+                    <checkbox id="show-login"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Always show login screen"/>
+                </div>
+
+                <spacer height="4" width="10" />
+
+                <div layout="horizontal-row" proportion="1" height="fit">
+                    <checkbox id="aiHandicap"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Handicap AI karts"/>
+                </div>
             </div>
 
-            <div width="75%" height="fit" layout="horizontal-row" >
-                <checkbox id="enable-internet"/>
-                <spacer width="20" height="100%" />
-                <label height="100%" I18N="In the ui settings" text="Allow STK to connect to the Internet"/>
-            </div>
+            <spacer height="4" width="10" />
 
-            <div width="75%" height="fit" layout="horizontal-row" >
-                <checkbox id="enable-hw-report"/>
-                <spacer width="20" height="100%" />
-                <label id="label-hw-report" height="100%" I18N="In the ui settings"
-                       text="Allow STK to send anonymous HW statistics"/>
+            <div layout="horizontal-row" width="100%" height="fit">
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <checkbox id="enable-internet"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Allow STK to connect to the Internet"/>
+                </div>
+
+                <spacer height="4" width="10" />
+
+                <div layout="horizontal-row" proportion="1" height="fit">
+                    <checkbox id="enable-hw-report"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" id="label-hw-report" I18N="In the ui settings"
+                           text="Allow STK to send anonymous HW statistics"/>
+                </div>
             </div>
 
             <spacer height="18" width="4"/>

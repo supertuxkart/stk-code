@@ -466,7 +466,8 @@ int SoccerWorld::getTeamLeader(unsigned int team)
 //-----------------------------------------------------------------------------
 AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
                                 int local_player_id, int global_player_id,
-                                RaceManager::KartType kart_type)
+                                RaceManager::KartType kart_type,
+                                const PlayerDifficulty *difficulty)
 {
     int posIndex = index;
     int position = index+1;
@@ -482,7 +483,8 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 
     btTransform init_pos = m_track->getStartTransform(posIndex);
 
-    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos);
+    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
+            difficulty);
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
 

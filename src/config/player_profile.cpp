@@ -198,7 +198,7 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" guest=\""         << m_is_guest_account
         << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
 
-    out << L"            icon-filename=\"" << m_icon_filename <<L"\"\n";
+    out << L"            icon-filename=\"" << m_icon_filename << L"\"\n";
 
     out << L"            unique-id=\""  << m_unique_id
         << L"\" saved-session=\""       << m_saved_session << L"\"\n";

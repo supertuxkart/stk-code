@@ -181,9 +181,12 @@ void World::init()
                                : race_manager->getKartIdent(i);
         int local_player_id  = race_manager->getKartLocalPlayerId(i);
         int global_player_id = race_manager->getKartGlobalPlayerId(i);
+        const PlayerDifficulty *player_difficulty =
+            stk_config->getPlayerDifficulty(race_manager->getPlayerDifficulty(i));
         AbstractKart* newkart = createKart(kart_ident, i, local_player_id,
                                    global_player_id,
-                                   race_manager->getKartType(i));
+                                   race_manager->getKartType(i),
+                                   player_difficulty);
         m_karts.push_back(newkart);
         m_track->adjustForFog(newkart->getNode());
 
@@ -202,7 +205,7 @@ void World::init()
     
     if (UserConfigParams::m_weather_effects)
     {
-        m_weather = new Weather(m_track->getWeatherLightning(), 
+        m_weather = new Weather(m_track->getWeatherLightning(),
                           m_track->getWeatherSound());
     }
 }   // init
@@ -293,11 +296,13 @@ void World::createRaceGUI()
  */
 AbstractKart *World::createKart(const std::string &kart_ident, int index,
                                 int local_player_id, int global_player_id,
-                                RaceManager::KartType kart_type)
+                                RaceManager::KartType kart_type,
+                                const PlayerDifficulty *difficulty)
 {
     int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(index);
-    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos);
+    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
+            difficulty);
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)
@@ -469,7 +474,7 @@ void World::terminateRace()
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MARATHONER,
                                            "laps", race_manager->getNumLaps());
     }
-    
+
     Achievement *achiev = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER);
     if (achiev)
     {
@@ -501,7 +506,7 @@ void World::terminateRace()
             }
         } // for i < kart_amount
     } // if (achiev)
-    
+
     Achievement *win = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
     //if achivement has been unlocked
     if (win->getValue("wins") < 5 )
@@ -818,7 +823,7 @@ void World::updateWorld(float dt)
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);
 #endif
-    
+
     if( (!isFinishPhase()) && isRaceOver())
     {
         enterRaceOverState();

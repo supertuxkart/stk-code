@@ -22,6 +22,7 @@
 #include <string>
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 
 namespace GUIEngine
 {
@@ -63,6 +64,12 @@ private:
     /** The user name that is currently being logged out. Used to
      *  display more meaningful sign-out message. */
     irr::core::stringw m_sign_in_name;
+
+    /** Per player difficulty. */
+    GUIEngine::SpinnerWidget *m_difficulty;
+
+    /** Apply per player difficulty in singleplayer mode. */
+    GUIEngine::CheckBoxWidget *m_singleplayer_difficulty;
 
     /** Online check box. */
     GUIEngine::CheckBoxWidget *m_online_cb;

@@ -38,10 +38,12 @@ using namespace irr;
 // -----------------------------------------------------------------------------
 
 SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
-                                   bool multiplayer, const int value,
-                                   const stringw& label) : Widget(WTYPE_DIV)
+                                   bool multiplayer, bool display_text,
+                                   const int value, const stringw& label)
+                                  : Widget(WTYPE_DIV)
 {
     m_player_id = player_id;
+    m_display_text = display_text;
 
     setSize(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
             area.getWidth(), area.getHeight()               );
@@ -79,6 +81,7 @@ void SkillLevelWidget::add()
 {
     m_bar->add();
     m_label->add();
+    m_label->setVisible(m_display_text);
 }
 
 // -----------------------------------------------------------------------------
@@ -115,7 +118,10 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
     m_h = h;
 
     // -- sizes
-    m_bar_w = 3*(w/2)/4;
+    if (m_display_text)
+        m_bar_w = (w / 2) * 3 / 4;
+    else
+        m_bar_w = w * 2 / 3;
     m_bar_h = h;
     m_label_w = w/2;
     m_label_h = h;
@@ -128,7 +134,10 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
         m_label_h = (int)(m_label_h*factor);
     }
 
-    m_bar_x = x + w/2;
+    if (m_display_text)
+        m_bar_x = x + w / 2;
+    else
+        m_bar_x = x + w / 6;
     m_bar_y = y + m_h/2 - m_bar_h/2;
 
     m_label_x = x;
@@ -139,8 +148,7 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
 
 void SkillLevelWidget::setValue(const int value)
 {
-    m_bar->setValue(value);
-
+    m_bar->moveValue(value);
 }
 
 // -----------------------------------------------------------------------------
@@ -148,5 +156,15 @@ void SkillLevelWidget::setValue(const int value)
 void SkillLevelWidget::setLabel(const irr::core::stringw& label)
 {
     m_label->setText(label, false);
+}
+
+void SkillLevelWidget::setDisplayText(bool display_text)
+{
+    if(m_display_text != display_text)
+    {
+        m_display_text = display_text;
+        m_label->setVisible(display_text);
+        setSize(m_x, m_y, m_w, m_h);
+    }
 }
 
