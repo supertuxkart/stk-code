@@ -180,6 +180,7 @@ private:
     bool hasBuffserStorage;
     bool hasComputeShaders;
     bool hasTextureStorage;
+    bool hasTextureView;
     bool m_need_ubo_workaround;
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
@@ -309,6 +310,11 @@ public:
     bool hasARBTextureStorage() const
     {
         return hasTextureStorage;
+    }
+
+    bool hasARBTextureView() const
+    {
+        return hasTextureView;
     }
 
     video::SColorf getAmbientLight() const;
