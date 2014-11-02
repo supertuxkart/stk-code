@@ -54,8 +54,7 @@ namespace Scripting
             unsigned int index = World::getWorld()->getRescuePositionIndex(kart);
             btTransform s = World::getWorld()->getRescueTransform(index);
             const btVector3 &xyz = s.getOrigin();
-            float angle = atan2(0, 0);
-            s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), angle));
+            s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0.0f));
             World::getWorld()->moveKartTo(kart, s);
         }
         //Attempts to project kart to the given 2D location, to the position
@@ -81,7 +80,7 @@ namespace Scripting
             float d = (sqrtf(dx*dx + dy*dy));
             float normalized_dx = dx / d;
             float normalized_dy = dy / d;
-            float g = 9.81;
+            float g = 9.81f;
             float velocity = sqrtf(d * g);
             
             kart->setVelocity(btVector3(velocity * normalized_dx, velocity, velocity * normalized_dy));
