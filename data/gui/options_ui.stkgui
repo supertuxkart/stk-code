@@ -67,7 +67,7 @@
                 <div proportion="1" height="fit" layout="horizontal-row" >
                     <checkbox id="enable-internet"/>
                     <spacer width="20" height="100%" />
-                    <label height="100%" I18N="In the ui settings" text="Allow STK to connect to the Internet"/>
+                    <label height="100%" I18N="In the ui settings" text="Connect to the Internet"/>
                 </div>
 
                 <spacer height="4" width="10" />
@@ -76,7 +76,7 @@
                     <checkbox id="enable-hw-report"/>
                     <spacer width="20" height="100%" />
                     <label height="100%" id="label-hw-report" I18N="In the ui settings"
-                           text="Allow STK to send anonymous HW statistics"/>
+                           text="Send anonymous HW statistics"/>
                 </div>
             </div>
 
