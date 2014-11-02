@@ -21,6 +21,8 @@
 
 #include "io/xml_node.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <SKeyMap.h>
 
@@ -41,6 +43,7 @@ GamepadConfig::GamepadConfig( const std::string &name,
     m_is_analog    = true;
     m_desensitize  = false;
     setDefaultBinds();
+    detectType();
 }   // GamepadConfig
 
 //------------------------------------------------------------------------------
@@ -72,7 +75,7 @@ bool GamepadConfig::load(const XMLNode *config)
         Log::error("DeviceConfig", "Unnamed joystick in config file.");
         return false;
     }
-
+    detectType();
     return ok;
 }   // load
 
@@ -92,6 +95,23 @@ void GamepadConfig::save (std::ofstream& stream)
     DeviceConfig::save(stream);
     stream << "</gamepad>\n\n";
 }   // save
+
+//-----------------------------------------------------------------------------
+/** Try to identify a gamepad type (e.g. 'xbox'), so that better defaults
+ *  and button names can be set. Atm the gamepad name is used.
+ */
+void GamepadConfig::detectType()
+{
+    m_type = GP_UNIDENTIFIED;
+
+    std::string lower = StringUtils::toLowerCase(getName());
+
+    if(lower.find("xbox")!=std::string::npos)
+    {
+        m_type = GP_XBOX;
+        return;
+    }
+}   // detectType
 
 //------------------------------------------------------------------------------
 
@@ -115,6 +135,72 @@ void GamepadConfig::setDefaultBinds ()
     setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, 0);
     setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, 3);
 }   // setDefaultBinds
+
+//------------------------------------------------------------------------------
+core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
+{
+    // Default names if gamepad is not identified
+    if(m_type==GP_UNIDENTIFIED) return DeviceConfig::getBindingAsString(action);
+    const Binding &b = getBinding(action);
+    int id = b.getId();
+    Input::AxisDirection ad = b.getDirection();
+    Input::InputType it = b.getType();
+
+    // XBOX controller
+    // ---------------
+    if(m_type==GP_XBOX)
+    {
+        if(it==Input::IT_STICKBUTTON)
+        {
+            switch(id)
+            {
+            case 0: return "A";
+            case 1: return "B";
+            case 2: return "X";
+            case 3: return "Y";
+            case 4: return _("Left bumper");
+            case 5: return _("Right bumper");
+            case 6: return _("Back");
+            case 7: return _("Start");
+            case 8: return _("Left stick button");
+            case 9: return _("Return stick button");
+            default: return DeviceConfig::getBindingAsString(action);
+            }   // switch
+        }   // if IT_STICKBUTTON
+        if(it==Input::IT_STICKMOTION)
+        {
+            if(id==2)
+                return ad==Input::AD_POSITIVE ? _("Left trigger")
+                                              : _("Right trigger");
+            if (id == Input::HAT_H_ID)
+            {
+                return (ad == Input::AD_POSITIVE) ? _("DPad up") 
+                                                  : _("DPad down");
+            }
+            else if (id == Input::HAT_V_ID)
+            {
+                return (ad == Input::AD_POSITIVE) ? _("DPad right")
+                                                  : _("DPad left");
+            }
+            switch(id)
+            {
+            case 0: return (ad==Input::AD_POSITIVE) ? _("Left thumb right")
+                                                    : _("Left thumb left");
+            case 1: return (ad==Input::AD_POSITIVE) ? _("Left thumb down")
+                                                    : _("Left thumb up");
+            case 3: return (ad==Input::AD_POSITIVE) ? _("Right thumb down")
+                                                    : _("Right thumb up");
+            case 4: return (ad==Input::AD_POSITIVE) ? _("Right thumb right")
+                                                    : _("Right thumb left");
+            }   // switch
+        }
+    }   // xbox
+
+    // Offer a fallback ... just in case
+    Log::warn("GamepadConfig", "Missing action string for pad '%s' action '%d'",
+              getName().c_str(), action);
+    return DeviceConfig::getBindingAsString(action);
+}   // getBindingAsString
 
 //------------------------------------------------------------------------------
 /** Converts the configuration to a string.

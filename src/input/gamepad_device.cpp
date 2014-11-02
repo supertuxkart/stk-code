@@ -116,9 +116,9 @@ void GamePadDevice::resetAxisDirection(const int axis,
         return;
     }
 
-    for(int n=0; n<PA_COUNT; n++)
+    for(int n=PA_BEFORE_FIRST+1; n<PA_COUNT; n++)
     {
-        Binding& bind = m_configuration->getBinding(n);
+        const Binding& bind = m_configuration->getBinding(n);
         if(bind.getType() == Input::IT_STICKMOTION &&
            bind.getId() == axis &&
            bind.getDirection()== direction &&
@@ -176,7 +176,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
         // x/32767 is in [-1,1], (x/32767)^2 is in [0,1]. Take care of the
         // sign and map this back to [0,32767] by multiplying by 32767.
         // Which all in all results in:
-        *value = int( (*value / 32767.0f) * fabsf(*value) );
+        *value = int( (*value / 32767.0f) * fabsf(float(*value)) );
     }
 
     bool success = false;

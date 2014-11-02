@@ -73,7 +73,7 @@ DeviceConfig::DeviceConfig()
 // ------------------------------------------------------------------------
 /** Get a user-readable string describing the bound action.
  */
-irr::core::stringw DeviceConfig::getBindingAsString (const PlayerAction action) const
+irr::core::stringw DeviceConfig::getBindingAsString(const PlayerAction action) const
 {
     irr::core::stringw return_string = "";
 

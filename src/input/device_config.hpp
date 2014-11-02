@@ -93,7 +93,7 @@ public:
                        int*                   value,
                        PlayerAction*          action /* out */);
     irr::core::stringw getMappingIdString (const PlayerAction action) const;
-    irr::core::stringw getBindingAsString(const PlayerAction action) const;
+    virtual irr::core::stringw getBindingAsString(const PlayerAction action) const;
     virtual bool isGamePad()  const = 0;
     virtual bool isKeyboard() const = 0;
 
@@ -146,7 +146,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the binding of a given index. */
-    Binding& getBinding(int i) {return m_bindings[i];}
+    const Binding& getBinding(int i) const {return m_bindings[i];}
 
     // ------------------------------------------------------------------------
     /** At this time only relevant for gamepads, keyboards are always enabled */

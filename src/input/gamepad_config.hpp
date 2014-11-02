@@ -29,6 +29,7 @@
 #include <irrString.h>
 #include <string>
 
+using namespace irr;
 
 /** \brief specialisation of DeviceConfig for gamepad type devices
  *  \ingroup config
@@ -54,6 +55,11 @@ private:
      *  values close to 0 the joystick will react less sensitive. */
     bool m_desensitize;
 
+    /** A type to keep track if the gamepad has been identified (which is
+     *  used to display better button names and better defaults). */
+    enum {GP_UNIDENTIFIED, GP_XBOX} m_type;
+
+    void detectType();
 public:
 
              GamepadConfig           ();
@@ -62,10 +68,11 @@ public:
                            const int          button_ount=0);
     virtual ~GamepadConfig() {}
 
-    irr::core::stringw toString();
+    core::stringw toString();
 
     virtual void save(std::ofstream& stream);
     void        setDefaultBinds     ();
+    virtual core::stringw getBindingAsString(const PlayerAction action) const OVERRIDE;
     virtual bool load(const XMLNode *config) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns if this device uses analog axes. */
