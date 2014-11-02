@@ -1020,7 +1020,7 @@ void IrrDriver::renderShadows()
         }
     }
 
-    m_post_processing->renderGaussian6BlurLayer(m_rtts->getShadowFBO());
+//    m_post_processing->renderGaussian6BlurLayer(m_rtts->getShadowFBO());
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_rtts->getShadowFBO().getRTT()[0]);
     glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
