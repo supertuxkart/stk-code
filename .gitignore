@@ -39,6 +39,7 @@ src/html
 *.vcxproj.filters
 *.vcxproj.user
 *~
+*.swp
 
 packets_log.txt
 history.dat

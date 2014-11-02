@@ -49,7 +49,7 @@ KartGFX::KartGFX(const AbstractKart *kart)
 
     Vec3 rear_center(0, kart->getKartHeight()*0.35f,
                        -kart->getKartLength()*0.35f);
-                       
+
     Vec3 rear_nitro_center(0, kart->getKartHeight()*0.2f,
                        -kart->getKartLength()*0.1f);
 
@@ -275,7 +275,8 @@ void KartGFX::updateTerrain(const ParticleKind *pk)
     if (skidding > 1.0f && on_ground)
         rate = fabsf(m_kart->getControls().m_steer) > 0.8 ? skidding - 1 : 0;
     else if (speed >= 0.5f && on_ground)
-        rate = speed/m_kart->getKartProperties()->getMaxSpeed();
+        rate = speed/m_kart->getKartProperties()->getMaxSpeed() *
+               m_kart->getPlayerDifficulty()->getMaxSpeed();
     else
     {
         pe->setCreationRateAbsolute(0);

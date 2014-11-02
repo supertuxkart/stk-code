@@ -33,8 +33,15 @@ using namespace irr;
 ProgressBarWidget::ProgressBarWidget(bool show_label) : Widget(WTYPE_PROGRESS)
 {
     m_value = 0;
+    m_target_value = 0;
+    m_previous_value = 0;
     m_show_label = show_label;
     setFocusable(false);
+}
+
+ProgressBarWidget::~ProgressBarWidget()
+{
+    GUIEngine::needsUpdate.remove(this);
 }
 
 // -----------------------------------------------------------------------------
@@ -48,17 +55,52 @@ void ProgressBarWidget::add()
     m_id = m_element->getID();
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
+
+    /* Copied from model_view_widget.cpp
+     FIXME: remove this unclean thing, I think irrlicht provides this feature:
+     virtual void IGUIElement::OnPostRender (u32 timeMs)
+     \brief animate the element and its children.
+     */
+    GUIEngine::needsUpdate.push_back(this);
 }
+
 // -----------------------------------------------------------------------------
 
 void ProgressBarWidget::setValue(int value)
 {
     m_value = value;
+    m_target_value = value;
+    m_previous_value = value;
     if (m_show_label)
-    {
         setLabel(std::string(StringUtils::toString(value) + "%").c_str());
+}
+
+// -----------------------------------------------------------------------------
+
+void ProgressBarWidget::moveValue(int value)
+{
+    m_previous_value = m_value;
+    m_target_value = value;
+    if (m_show_label)
+        setLabel(std::string(StringUtils::toString(value) + "%").c_str());
+}
+
+// -----------------------------------------------------------------------------
+
+void ProgressBarWidget::update(float delta)
+{
+    if (m_target_value != m_value)
+    {
+        // Compute current progress in the animation
+        float cur = (static_cast<float>(m_value) - m_previous_value) / (m_target_value - m_previous_value);
+        // Animation time: 1.0 seconds
+        cur += delta * 10;
+        if (cur > 1)
+            cur = 1;
+        m_value = m_previous_value + cur * (m_target_value - m_previous_value);
     }
 }
+
 // -----------------------------------------------------------------------------
 
 void ProgressBarWidget::setLabel(irr::core::stringw label)

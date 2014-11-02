@@ -286,10 +286,7 @@ SetTexture(GLMesh &mesh, unsigned i, bool isSrgb, const std::string &matname)
 {
     if (!mesh.textures[i])
     {
-#ifdef DEBUG
-        Log::fatal("STKMesh", "Missing texture %d for material %s, mesh <%s>",
-            i, matname.c_str(), mesh.debug_name.c_str());
-#endif
+        Log::fatal("STKMesh", "Missing texture %d for material %s", i, matname.c_str());
         return;
     }
     compressTexture(mesh.textures[i], isSrgb);

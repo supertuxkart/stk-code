@@ -159,7 +159,7 @@ bool Plunger::updateAndDelete(float dt)
 bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 {
     if(isOwnerImmunity(kart)) return false;
-    
+
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
     if( m_reverse_mode || race_manager->isBattleMode() )
@@ -178,7 +178,8 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
     }
     else
     {
-        m_keep_alive = m_owner->getKartProperties()->getRubberBandDuration();
+        m_keep_alive = m_owner->getKartProperties()->getRubberBandDuration() *
+                       m_owner->getPlayerDifficulty()->getRubberBandDuration();
 
         // Make this object invisible by placing it faaar down. Not that if this
         // objects is simply removed from the scene graph, it might be auto-deleted

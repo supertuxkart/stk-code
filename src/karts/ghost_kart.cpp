@@ -24,7 +24,8 @@
 
 GhostKart::GhostKart(const std::string& ident)
              : Kart(ident, /*world kart id*/99999,
-                    /*position*/-1, btTransform())
+                    /*position*/-1, btTransform(), stk_config->getPlayerDifficulty(
+                        PLAYER_DIFFICULTY_NORMAL))
 {
     m_current_transform = 0;
     m_next_event        = 0;

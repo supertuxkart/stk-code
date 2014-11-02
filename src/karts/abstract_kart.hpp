@@ -22,6 +22,7 @@
 #include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
 #include "karts/controller/kart_control.hpp"
+#include "karts/player_difficulty.hpp"
 #include "race/race_manager.hpp"
 
 class AbstractKartAnimation;
@@ -63,6 +64,9 @@ protected:
     /** The kart properties. */
     const KartProperties *m_kart_properties;
 
+    /** The per-player difficulty. */
+    const PlayerDifficulty *m_difficulty;
+
     /** This stores a copy of the kart model. It has to be a copy
      *  since otherwise incosistencies can happen if the same kart
      *  is used more than once. */
@@ -80,7 +84,8 @@ protected:
 public:
                    AbstractKart(const std::string& ident,
                                 int world_kart_id,
-                                int position, const btTransform& init_transform);
+                                int position, const btTransform& init_transform,
+                                const PlayerDifficulty *difficulty);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();
@@ -109,6 +114,16 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the kart properties. */
     void setKartProperties(const KartProperties *kp) { m_kart_properties=kp; }
+
+    // ========================================================================
+    // Access to the per-player difficulty.
+    // ------------------------------------------------------------------------
+    /** Returns the per-player difficulty of this kart. */
+    const PlayerDifficulty* getPlayerDifficulty() const
+                            { return m_difficulty; }
+    // ------------------------------------------------------------------------
+    /** Sets the per-player difficulty. */
+    void setPlayerDifficulty(const PlayerDifficulty *pd) { m_difficulty=pd; }
 
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this kart (name of the directory the
@@ -155,7 +170,7 @@ public:
     float getHighestPoint() const { return m_kart_highest_point;  }
     // ------------------------------------------------------------------------
     /** Called after the kart comes to rest. It can be used to e.g. compute
-     *  differences between graphical and physical chassis. Note that 
+     *  differences between graphical and physical chassis. Note that
      *  overwriting this function is possible, but this implementation must
      *  be called. */
     virtual void kartIsInRestNow();

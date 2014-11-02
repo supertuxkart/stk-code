@@ -35,11 +35,11 @@
                 I18N="Menu item" text="New" />
             <icon-button id="copy" width="128" height="128" icon="gui/gp_copy.png"
                 I18N="Menu item" text="Copy" />
-            <icon-button id="edit" width="128" height="128" icon="gui/gp_edit.png"
+            <icon-button id="edit" width="128" height="128" icon="gui/edit.png"
                 I18N="Menu item" text="Edit" />
             <icon-button id="remove" width="128" height="128" icon="gui/gp_remove.png"
                 I18N="Menu item" text="Remove" />
-            <icon-button id="rename" width="128" height="128" icon="gui/gp_rename.png"
+            <icon-button id="rename" width="128" height="128" icon="gui/rename.png"
                 I18N="Menu item" text="Rename" />
         </buttonbar>
 

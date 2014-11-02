@@ -37,31 +37,39 @@ namespace GUIEngine
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getWidthNeededAroundLabel()  const { return 35; }
-        
+
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 4; }
-        
+
         /**  Change the label on the widget */
         void setLabel(const irr::core::stringw label);
         int m_value;
         bool m_show_label;
-        
+
+        /** Values for animation */
+        int m_target_value;
+        int m_previous_value;
+
     public:
-        
+
         LEAK_CHECK()
         ProgressBarWidget(bool show_label = true);
-        virtual ~ProgressBarWidget() {}
-        
+        virtual ~ProgressBarWidget();
+
         /** Change the value of the widget, it must be a percent. */
         void setValue(int value);
-        
-        
+
+        /** Change the value of the widget smooth, it must be a percent. */
+        void moveValue(int value);
+
+        virtual void update(float delta);
+
         void add();
-        
+
         /** Get the current value of the widget. */
         int getValue() {return m_value; };
-        
+
     };
 }
 
