@@ -121,6 +121,7 @@ FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > Instan
         auto &Tp = InstanceList[i];
         scene::ISceneNode *node = Tp.second;
         InstanceFiller<T>::add(mesh, node, InstanceBuffer[InstanceBufferOffset++]);
+        assert(InstanceBufferOffset * sizeof(T) < 10000 * sizeof(InstanceDataDualTex));
     }
 
     DrawElementsIndirectCommand &CurrentCommand = CommandBuffer[CommandBufferOffset++];
