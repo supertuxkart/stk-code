@@ -369,7 +369,7 @@ void setJoystickName(int index, const JOYCAPS &caps, SJoystickInfo *joystick)
     // As a default use the name given in the joystick structure
     // - though that is always the same name, independent of joystick :(
     joystick->Name              = caps.szPname;
-    joystick->HasNonDefaultName = true;
+    joystick->HasGenericName = true;
 
     core::stringc key = core::stringc(REGSTR_PATH_JOYCONFIG)+"\\"+caps.szRegKey
                       + "\\"+REGSTR_KEY_JOYCURR;
@@ -413,7 +413,7 @@ void setJoystickName(int index, const JOYCAPS &caps, SJoystickInfo *joystick)
             regresult = RegQueryValueExA(hKey, REGSTR_VAL_JOYOEMNAME, 0, 0,
                                          (LPBYTE)name, &regsize            );
             joystick->Name = name;
-            joystick->HasNonDefaultName = false;
+            joystick->HasGenericName = false;
         }   // if name
     }    // if SUCCESS
     RegCloseKey(hKey);

@@ -483,11 +483,11 @@ struct SJoystickInfo
 	} PovHat;
 
     //! Set if the name of the joystick is useful:
-    /** On windows the default name is useless, since it's always the same
+    /** On windows the generic name is useless, since it's always the same
      *  indepentent of what joystick is connected ("Microsoft PC-joystick driver").
      *  We will try to get a better name from the registry, but if this should
      *  fail this flag is set and used by STK. */
-    bool HasNonDefaultName;
+    bool HasGenericName;
 
 }; // struct SJoystickInfo
 

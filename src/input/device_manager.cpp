@@ -101,14 +101,12 @@ bool DeviceManager::initialize()
         // Some linux systems report a disk accelerometer as a gamepad, skip that
         if (name.find("LIS3LV02DL") != -1) continue;
 
-        if(!m_irrlicht_gamepads[id].HasNonDefaultName)
+        if(m_irrlicht_gamepads[id].HasGenericName)
         {
             // On Windows all gamepads are given the same name ('microsoft
-            // pc-joystick driver') - unless we add DirectInput or so as
-            // dependency. We can't test for the name, since the name is even
-            // translated. Irrlicht now tries to get a better name from the
-            // registry, but in case this should fail we still have all
-            // gamepads with the same name shown in the GUI. This makes
+            // pc-joystick driver'). Irrlicht now tries to get a better name
+            // from the registry, but in case this should fail we still have
+            // all gamepads with the same name shown in the GUI. This makes
             // configuration totally useless, so append an ID to the name.
             name = name + " " + StringUtils::toString(id).c_str();
         }
