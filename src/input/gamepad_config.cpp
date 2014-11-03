@@ -166,13 +166,19 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
         }
         if(it==Input::IT_STICKMOTION)
         {
-            // right and left trigger are on different axis
-            if(id==5) return _("Right trigger");
-            if(id==2) return _("Left trigger");
-            if (id == 6) return (ad == Input::AD_POSITIVE) ? _("DPad up") 
-                                                           : _("DPad down");
-            if (id == 7) return (ad == Input::AD_POSITIVE) ? _("DPad right")
-                                                           : _("DPad left");
+            switch(id)
+            {
+            case 2: return _("Left trigger");
+            case 3: return (ad==Input::AD_POSITIVE) ? _("Right thumb right")
+                                                    : _("Right thumb left");
+            case 4: return (ad==Input::AD_POSITIVE) ? _("Right thumb down")
+                                                    : _("Right thumb up");
+            case 5: return _("Right trigger");
+            case 6: return (ad == Input::AD_POSITIVE) ? _("DPad right") 
+                                                      : _("DPad left");
+            case 7: return (ad == Input::AD_POSITIVE) ? _("DPad down")
+                                                      : _("DPad up");
+            }   // switch
         }   // stickmotion
     }   // xbox (original)
     if(m_type==GP_XBOX360 || m_type==GP_XBOX_ORIGINAL)
