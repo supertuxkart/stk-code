@@ -557,6 +557,7 @@ bool CIrrDeviceSDL::activateJoysticks(core::array<SJoystickInfo> & joystickInfo)
 		SJoystickInfo info;
 
 		info.Joystick = joystick;
+        info.HasNonDefaultName = true;
 		info.Axes = SDL_JoystickNumAxes(Joysticks[joystick]);
 		info.Buttons = SDL_JoystickNumButtons(Joysticks[joystick]);
 		info.Name = SDL_JoystickName(joystick);
