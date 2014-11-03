@@ -163,8 +163,6 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
         {
             switch(id)
             {
-            case 0: return "A";
-            case 1: return "B";
                 // I18N: Name of the black button on xbox controller
             case 2: return _("Black");
             case 3: return "X";
@@ -204,36 +202,29 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
             case 5: return _("Right bumper");
             case 6: return _("Back");
             case 7: return _("Start");
-            case 8: return _("Left stick button");
-            case 9: return _("Right stick button");
+            case 8: return _("Left thumb button");
+            case 9: return _("Right thumb button");
             default: return DeviceConfig::getBindingAsString(action);
             }   // switch
         }   // if IT_STICKBUTTON
         if(it==Input::IT_STICKMOTION)
         {
-            if(id==2)
-                return ad==Input::AD_POSITIVE ? _("Left trigger")
-                                              : _("Right trigger");
-            if (id == Input::HAT_H_ID)
-            {
-                return (ad == Input::AD_POSITIVE) ? _("DPad up") 
-                                                  : _("DPad down");
-            }
-            else if (id == Input::HAT_V_ID)
-            {
-                return (ad == Input::AD_POSITIVE) ? _("DPad right")
-                                                  : _("DPad left");
-            }
             switch(id)
             {
             case 0: return (ad==Input::AD_POSITIVE) ? _("Left thumb right")
                                                     : _("Left thumb left");
             case 1: return (ad==Input::AD_POSITIVE) ? _("Left thumb down")
                                                     : _("Left thumb up");
+            case 2: return (ad==Input::AD_POSITIVE) ? _("Left trigger")
+                                                    : _("Right trigger");
             case 3: return (ad==Input::AD_POSITIVE) ? _("Right thumb down")
                                                     : _("Right thumb up");
             case 4: return (ad==Input::AD_POSITIVE) ? _("Right thumb right")
                                                     : _("Right thumb left");
+            case Input::HAT_H_ID: return (ad == Input::AD_POSITIVE) ? _("DPad up") 
+                                                                    : _("DPad down");
+            case Input::HAT_V_ID: return (ad == Input::AD_POSITIVE) ? _("DPad right")
+                                                                    : _("DPad left");
             }   // switch
         }
     }   // xbox
