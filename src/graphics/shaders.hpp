@@ -377,9 +377,10 @@ public:
     BloomBlendShader();
 };
 
-class ToneMapShader : public ShaderHelperSingleton<ToneMapShader>, public TextureRead<Nearest_Filtered>
+class ToneMapShader : public ShaderHelperSingleton<ToneMapShader, float>, public TextureRead<Nearest_Filtered>
 {
 public:
+
     ToneMapShader();
 };
 
