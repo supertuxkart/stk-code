@@ -8,7 +8,7 @@
         <spacer width="10" height="10"/>
 
         <div height="fit" width="100%" layout="horizontal-row" align="center">
-            <textbox id="search_box" height="fit" proportion="1" height="100%"/>
+            <textbox id="search_box" height="fit" proportion="1"/>
             <spacer width="10" height="10"/>
             <button id="search_button" height="100%" width="fit" text="Search" />
         </div>
