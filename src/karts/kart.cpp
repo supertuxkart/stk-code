@@ -1329,7 +1329,7 @@ void Kart::update(float dt)
     // is rescued isOnGround might still be true, since the kart rigid
     // body was removed from the physics, but still retain the old
     // values for the raycasts).
-    if (!isOnGround())
+    if (!isOnGround() && !getKartAnimation())
     {
         const Material *m      = getMaterial();
         const Material *last_m = getLastMaterial();
@@ -1359,11 +1359,15 @@ void Kart::update(float dt)
     {
         // Kart touched ground again
         m_is_jumping = false;
-        HitEffect *effect =  new Explosion(getXYZ(), "jump",
-                                          "jump_explosion.xml");
-        projectile_manager->addHitEffect(effect);
         m_kart_model->setAnimation(KartModel::AF_DEFAULT);
         m_jump_time = 0;
+
+        if (!getKartAnimation())
+        {
+            HitEffect *effect =  new Explosion(getXYZ(), "jump",
+                                              "jump_explosion.xml");
+            projectile_manager->addHitEffect(effect);
+        }
     }
 
     //const bool dyn_shadows = World::getWorld()->getTrack()->hasShadows() &&
