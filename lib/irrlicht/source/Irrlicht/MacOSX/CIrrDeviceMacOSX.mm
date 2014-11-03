@@ -1709,7 +1709,7 @@ bool CIrrDeviceMacOSX::activateJoysticks(core::array<SJoystickInfo> & joystickIn
 
 				SJoystickInfo returnInfo;
 				returnInfo.Joystick = jindex;
-                returnInfo..HasGenericName = false;
+                returnInfo.HasGenericName = false;
 				returnInfo.Axes = info.axes;
 				//returnInfo.Hats = info.hats;
 				returnInfo.Buttons = info.buttons;
