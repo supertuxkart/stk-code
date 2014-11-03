@@ -302,6 +302,9 @@ public:
     /** Lowest coordinate on up axis */
     float getLowestPoint           () const { return m_kart_lowest_point;  }
     // ------------------------------------------------------------------------
+    /** Returns information about currently played animation */
+    AnimationFrameType getAnimation() { return m_current_animation; }
+    // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
     void  setAnimation(AnimationFrameType type);
     // ------------------------------------------------------------------------

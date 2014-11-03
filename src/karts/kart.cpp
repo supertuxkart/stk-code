@@ -127,7 +127,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_flying               = false;
     m_sky_particles_emitter= NULL;
     m_stars_effect         = NULL;
-    m_jump_time            = 0;
     m_is_jumping           = false;
     m_min_nitro_time       = 0.0f;
     m_fire_clicked         = 0;
@@ -1336,10 +1335,11 @@ void Kart::update(float dt)
 
         // A jump starts only the kart isn't already jumping, is on a new
         // (or no) texture.
-        if(!m_is_jumping && last_m && last_m!=m )
+        if (!m_is_jumping && last_m && last_m != m && 
+            m_kart_model->getAnimation() == KartModel::AF_DEFAULT)
         {
             float v = getVelocity().getY();
-            float force = World::getWorld()->getTrack()->getGravity();;
+            float force = World::getWorld()->getTrack()->getGravity();
             // Velocity / force is the time it takes to reach the peak
             // of the jump (i.e. when vertical speed becomes 0). Assuming
             // that jump start height and end height are the same, it will
@@ -1348,19 +1348,20 @@ void Kart::update(float dt)
 
             // Jump if either the jump is estimated to be long enough, or
             // the texture has the jump property set.
-            if(t>getKartProperties()->getJumpAnimationTime()  ||
-                last_m->isJumpTexture()                         )
+            if (t > getKartProperties()->getJumpAnimationTime() ||
+                last_m->isJumpTexture())
+            {
                 m_kart_model->setAnimation(KartModel::AF_JUMP_START);
+            }
+
             m_is_jumping = true;
         }
-        m_jump_time+=dt;
     }
     else if (m_is_jumping)
     {
         // Kart touched ground again
         m_is_jumping = false;
         m_kart_model->setAnimation(KartModel::AF_DEFAULT);
-        m_jump_time = 0;
 
         if (!getKartAnimation())
         {

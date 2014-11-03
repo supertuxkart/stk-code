@@ -166,8 +166,6 @@ private:
 
     // Graphical effects
     // -----------------
-    /** Time a kart is jumping. */
-    float            m_jump_time;
 
     /** Is time flying activated */
     bool             m_is_jumping;
