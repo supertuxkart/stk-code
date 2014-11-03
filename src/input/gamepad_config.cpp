@@ -106,7 +106,9 @@ void GamepadConfig::detectType()
 
     std::string lower = StringUtils::toLowerCase(getName());
 
-    if(lower.find("xbox")!=std::string::npos)
+    // xbox appears to be xbox 360, x-box the previous gamepad
+    if(lower.find("xbox")!=std::string::npos ||
+       lower.find("x-box")!=std::string::npos    )
     {
         m_type = GP_XBOX;
         return;
