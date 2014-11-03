@@ -161,8 +161,17 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
         // will 'fall trough' to the xbox 360 code below
         if(it==Input::IT_STICKBUTTON)
         {
-            if(id==3) return "X";
-            if(id==4) return "Y";
+            switch(id)
+            {
+            case 0: return "A";
+            case 1: return "B";
+                // I18N: Name of the black button on xbox controller
+            case 2: return _("Black");
+            case 3: return "X";
+            case 4: return "Y";
+                // I18N: Name of the white button on xbox controller
+            case 5: return _("White");
+            }
         }
         if(it==Input::IT_STICKMOTION)
         {
@@ -196,7 +205,7 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
             case 6: return _("Back");
             case 7: return _("Start");
             case 8: return _("Left stick button");
-            case 9: return _("Return stick button");
+            case 9: return _("Right stick button");
             default: return DeviceConfig::getBindingAsString(action);
             }   // switch
         }   // if IT_STICKBUTTON
