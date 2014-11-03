@@ -513,6 +513,7 @@ void IrrDriver::initDevice()
     hasDrawIndirect = false;
     hasComputeShaders = false;
     hasTextureStorage = false;
+    hasTextureView = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
 #if !defined(__APPLE__)
     if (!ProfileWorld::isNoGraphics())
@@ -540,6 +541,10 @@ void IrrDriver::initDevice()
         if (hasGLExtension("GL_ARB_texture_storage")) {
             hasTextureStorage = true;
             Log::info("GLDriver", "ARB Texture Storage enabled");
+        }
+        if (hasGLExtension("GL_ARB_texture_view")) {
+            hasTextureView = true;
+            Log::info("GLDriver", "ARB Texture View enabled");
         }
     }
 #endif

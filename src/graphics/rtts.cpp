@@ -24,13 +24,13 @@
 #include "utils/log.hpp"
 #include <ISceneManager.h>
 
-static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type)
+static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type, unsigned mipmaplevel = 1)
 {
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(target, result);
     if (irr_driver->hasARBTextureStorage())
-        glTexStorage3D(target, 1, internalFormat, w, h, d);
+        glTexStorage3D(target, mipmaplevel, internalFormat, w, h, d);
     else
         glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
     return result;
@@ -223,8 +223,8 @@ RTT::RTT(size_t width, size_t height)
 
     if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
     {
-        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R32F, GL_RED, GL_FLOAT);
-        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R32F, GL_RED, GL_FLOAT, 1);
+        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1);
 
         somevector.clear();
         somevector.push_back(shadowColorTex);

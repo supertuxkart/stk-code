@@ -165,7 +165,7 @@ unsigned GPUTimer::elapsedTimeus()
 FrameBuffer::FrameBuffer() {}
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h, bool layered) :
-    RenderTargets(RTTs), DepthTexture(0), width(w), height(h)
+RenderTargets(RTTs), DepthTexture(0), width(w), height(h), fbolayer(0)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -184,7 +184,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h, bo
 }
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered) :
-    RenderTargets(RTTs), DepthTexture(DS), width(w), height(h)
+RenderTargets(RTTs), DepthTexture(DS), width(w), height(h), fbolayer(0)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -202,16 +202,30 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w, s
     }
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+    if (layered)
+        glGenFramebuffers(1, &fbolayer);
 }
 
 FrameBuffer::~FrameBuffer()
 {
     glDeleteFramebuffers(1, &fbo);
+    if (fbolayer)
+        glDeleteFramebuffers(1, &fbolayer);
 }
 
 void FrameBuffer::Bind()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glViewport(0, 0, (int)width, (int)height);
+    GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers((int)RenderTargets.size(), bufs);
+}
+
+void FrameBuffer::BindLayer(unsigned i)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, fbolayer);
+    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, RenderTargets[0], 0, i);
+    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, DepthTexture, 0, i);
     glViewport(0, 0, (int)width, (int)height);
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers((int)RenderTargets.size(), bufs);

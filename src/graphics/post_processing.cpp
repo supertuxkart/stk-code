@@ -314,6 +314,25 @@ void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
     }
 }
 
+void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo)
+{
+
+    for (unsigned i = 0; i < 4; i++)
+    {
+        // Used as temp
+        irr_driver->getFBO(FBO_BLOOM_1024).Bind();
+        GLuint LayerTex;
+        glGenTextures(1, &LayerTex);
+        glTextureView(LayerTex, GL_TEXTURE_2D, in_fbo.getRTT()[0], GL_R32F, 0, 1, i, 1);
+        FullScreenShader::Gaussian6VBlurShader::getInstance()->SetTextureUnits(LayerTex);
+        DrawFullScreenEffect<FullScreenShader::Gaussian6VBlurShader>(core::vector2df(1. / 1024., 1. / 1024.));
+        in_fbo.BindLayer(i);
+        FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(irr_driver->getFBO(FBO_BLOOM_1024).getRTT()[0]);
+        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(1. / 1024., 1. / 1024.));
+        glDeleteTextures(1, &LayerTex);
+    }
+}
+
 void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary)
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
