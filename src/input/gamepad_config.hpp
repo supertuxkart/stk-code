@@ -57,7 +57,7 @@ private:
 
     /** A type to keep track if the gamepad has been identified (which is
      *  used to display better button names and better defaults). */
-    enum {GP_UNIDENTIFIED, GP_XBOX} m_type;
+    enum {GP_UNIDENTIFIED, GP_XBOX360, GP_XBOX_ORIGINAL} m_type;
 
     void detectType();
 public:

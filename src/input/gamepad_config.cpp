@@ -106,11 +106,16 @@ void GamepadConfig::detectType()
 
     std::string lower = StringUtils::toLowerCase(getName());
 
-    // xbox appears to be xbox 360, x-box the previous gamepad
-    if(lower.find("xbox")!=std::string::npos ||
-       lower.find("x-box")!=std::string::npos    )
+    // xbox appears to be xbox 360
+    if(lower.find("xbox")!=std::string::npos)
     {
-        m_type = GP_XBOX;
+        m_type = GP_XBOX360;
+        return;
+    }
+    // The original xbox gamepad
+    if(lower.find("x-box")!=std::string::npos)
+    {
+        m_type = GP_XBOX_ORIGINAL;
         return;
     }
 }   // detectType
@@ -148,9 +153,29 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
     Input::AxisDirection ad = b.getDirection();
     Input::InputType it = b.getType();
 
-    // XBOX controller
-    // ---------------
-    if(m_type==GP_XBOX)
+    // XBOX-360 controller
+    // -------------------
+    if(m_type==GP_XBOX_ORIGINAL)
+    {
+        // Handle only the differences to the xbox 360 controller, the rest
+        // will 'fall trough' to the xbox 360 code below
+        if(it==Input::IT_STICKBUTTON)
+        {
+            if(id==3) return "X";
+            if(id==4) return "Y";
+        }
+        if(it==Input::IT_STICKMOTION)
+        {
+            // right and left trigger are on different axis
+            if(id==5) return _("Right trigger");
+            if(id==2) return _("Left trigger");
+            if (id == 6) return (ad == Input::AD_POSITIVE) ? _("DPad up") 
+                                                           : _("DPad down");
+            if (id == 7) return (ad == Input::AD_POSITIVE) ? _("DPad right")
+                                                           : _("DPad left");
+        }   // stickmotion
+    }   // xbox (original)
+    if(m_type==GP_XBOX360 || m_type==GP_XBOX_ORIGINAL)
     {
         if(it==Input::IT_STICKBUTTON)
         {
