@@ -106,6 +106,9 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
             // Ignore no-racing tracks:
             if(!track->isRaceTrack())
                 continue;
+                
+            if (PlayerManager::getCurrentPlayer()->isLocked(track->getIdent()))
+                continue;
 
             // Only add tracks that are not already picked.
             if(std::find(m_tracks.begin(), m_tracks.end(), track->getIdent())==
@@ -129,6 +132,9 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
 
             const Track *track = track_manager->getTrack(track_index);
             std::string id = track->getIdent();
+            
+            if (PlayerManager::getCurrentPlayer()->isLocked(track->getIdent()))
+                continue;
 
             m_tracks.push_back(id);
             m_laps.push_back(track->getDefaultNumberOfLaps());
