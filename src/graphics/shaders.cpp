@@ -1561,6 +1561,16 @@ namespace FullScreenShader
 
         AssignSamplerNames(Program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
     }
+	
+	LensBlendShader::LensBlendShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/lensblend.frag").c_str());
+        AssignUniforms();
+
+        AssignSamplerNames(Program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
+    }
 
     ToneMapShader::ToneMapShader()
     {
@@ -1698,6 +1708,16 @@ namespace FullScreenShader
     }
 
     Gaussian6HBlurShader::Gaussian6HBlurShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6h.frag").c_str());
+        AssignUniforms("pixel");
+
+        AssignSamplerNames(Program, 0, "tex");
+    }
+	
+	HorizontalBlurShader::HorizontalBlurShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
