@@ -135,10 +135,24 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
             
             if (PlayerManager::getCurrentPlayer()->isLocked(track->getIdent()))
                 continue;
+            
+            bool is_already_added = false;
+            for (unsigned int i = 0; i < m_tracks.size(); i++)
+            {
+                if (m_tracks[i] == id)
+                {
+                    is_already_added = true;
+                    break;
+                }
+            }
+            
+            if (!is_already_added)
+            {
+                m_tracks.push_back(id);
+                m_laps.push_back(track->getDefaultNumberOfLaps());
+                m_reversed.push_back(false); // This will be changed later in the code
+            }
 
-            m_tracks.push_back(id);
-            m_laps.push_back(track->getDefaultNumberOfLaps());
-            m_reversed.push_back(false); // This will be changed later in the code
             track_indices.erase(track_indices.begin()+index);
         }
     }
