@@ -26,11 +26,11 @@ Hope you enjoy the game.
 ##Compiling SuperTuxKart
 
 ###Windows
-1. Install VS 2012 or later. The free express versions work fine.
+1. Install VS 2013 (or later). The free express versions work fine.
 2. Download and install a source package - either a released package or from our [git/svn repositories](http://supertuxkart.sourceforge.net/Source_control)
 3. Download the latest dependency package depdendencies_for_0.8.2.zip from [here](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart%20Dependencies/Windows/). Unzip it in the root directory, so that the dependencies directory is next to the src and data directory (if you are updating from a previous dependency package, you can delete the .dll files in the root directory, they are not needed anymore).
 4. Download cmake and install it. Then start cmake-gui and select the STK root directory as 'Where is the source code', and a new directory in the root directory (next to src, data etc) as build directory (for now I assume that this directory is called bld).
-5. Click on configure. You will be asked to create the directory (yes), then for your VS version. Make sure to select the right version (be aware of the easy to confuse version numbers: VS 2012 = version 11; VS 2013 = version 12). Click on configure, then generate. This will create the directory 'bld', and a VS solution in that directory.
+5. Click on configure. You will be asked to create the directory (yes), then for your VS version. Make sure to select the right version (be aware of the easy to confuse version numbers: VS 2013 = version 12). Click on configure, then generate. This will create the directory 'bld', and a VS solution in that directory.
 6. In Visual Studio open the project file generated in the 'bld' folder
 7. Right click on the supertuxkart project in the solution explorer, and select "Set as StartUp Project".
 8. Select Build->Build Solution (or press F7) to compile.
