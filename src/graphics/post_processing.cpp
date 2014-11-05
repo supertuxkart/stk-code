@@ -535,11 +535,11 @@ static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-static void toneMap(FrameBuffer &fbo, GLuint rtt)
+static void toneMap(FrameBuffer &fbo, GLuint rtt, float vignette_weight)
 {
     fbo.Bind();
     FullScreenShader::ToneMapShader::getInstance()->SetTextureUnits(rtt);
-    DrawFullScreenEffect<FullScreenShader::ToneMapShader>();
+    DrawFullScreenEffect<FullScreenShader::ToneMapShader>(vignette_weight);
 }
 
 static void renderDoF(FrameBuffer &fbo, GLuint rtt)
@@ -737,7 +737,15 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
     {
         PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
-        toneMap(*out_fbo, in_fbo->getRTT()[0]);
+		// only enable vignette during race
+		if(isRace)
+		{
+			toneMap(*out_fbo, in_fbo->getRTT()[0], 1.0);
+		}
+		else
+		{
+			toneMap(*out_fbo, in_fbo->getRTT()[0], 0.0);
+		}
         std::swap(in_fbo, out_fbo);
         PROFILER_POP_CPU_MARKER();
     }

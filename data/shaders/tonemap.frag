@@ -4,7 +4,7 @@ uniform sampler2D tex;
 uniform sampler2D logluminancetex;
 uniform float exposure = .09;
 uniform float Lwhite = 1.;
-uniform float vignette_weight = 0.;
+uniform float vignette_weight;
 
 out vec4 FragColor;
 
