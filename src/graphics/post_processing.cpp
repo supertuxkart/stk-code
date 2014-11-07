@@ -282,6 +282,8 @@ void PostProcessing::renderSunlight()
   DrawFullScreenEffect<FullScreenShader::SunLightShader>(cb->getPosition(), video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
 }
 
+extern float shadowSplit[5];
+
 void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, GLuint depthtex)
 {
     SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
@@ -292,7 +294,7 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
     glBlendEquation(GL_FUNC_ADD);
 
     FullScreenShader::ShadowedSunLightShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), depthtex);
-    DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShader>(cb->getPosition(), video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
+    DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShader>(shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4], cb->getPosition(), video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
 }
 
 
@@ -492,6 +494,7 @@ void PostProcessing::renderSSAO()
 
     DrawFullScreenEffect<FullScreenShader::SSAOShader>(irr_driver->getSSAORadius(), irr_driver->getSSAOK(), irr_driver->getSSAOSigma());
 }
+
 
 void PostProcessing::renderFog()
 {

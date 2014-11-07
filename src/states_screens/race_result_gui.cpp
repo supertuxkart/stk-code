@@ -261,6 +261,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 StateManager::get()->getActivePlayer(playerID)->setKart(NULL);
                 World::deleteWorld();
 
+                CutsceneWorld::setUseDuration(true);
                 StateManager::get()->enterGameState();
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
                 race_manager->setNumKarts( 0 );

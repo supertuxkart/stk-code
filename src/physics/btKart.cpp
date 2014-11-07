@@ -420,7 +420,7 @@ void btKart::updateVehicle( btScalar step )
         if(-v_down.getY() > max_compensate_speed)
         {
             btVector3 impulse = down * (-v_down.getY() - max_compensate_speed) 
-                              / m_chassisBody->getInvMass();
+                              / m_chassisBody->getInvMass()*0.5f;
             //float v_old = m_chassisBody->getLinearVelocity().getY();
             //float x = m_wheelInfo[0].m_raycastInfo.m_isInContact ?    m_wheelInfo[0].m_raycastInfo.m_contactPointWS.getY() : -100;
             m_chassisBody->applyCentralImpulse(impulse);

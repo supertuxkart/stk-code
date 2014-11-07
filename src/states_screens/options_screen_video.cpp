@@ -97,7 +97,7 @@ static GFXPreset GFX_PRESETS[] =
     {
         true /* light */, 2 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
-        true /* animatedScenery */, 2 /* animatedCharacters */, 8 /* anisotropy */,
+        true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
         true /* depth of field */, true /* global illumination */
     }
 };

@@ -53,6 +53,12 @@ private:
 
     /** The currently selected group name. */
     std::string m_group_name;
+    
+    /** Number of available tracks */
+    int m_max_num_tracks;
+    
+    /** Get number of available tracks for random GPs */
+    int getMaxNumTracks(std::string group);
 
 protected: // Necessary for RandomGPInfoScreen
     GUIEngine::IconButtonWidget* m_screenshot_widget;

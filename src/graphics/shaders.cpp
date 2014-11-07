@@ -1629,7 +1629,7 @@ namespace FullScreenShader
 
         // Use 8 to circumvent a catalyst bug when binding sampler
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
-        AssignUniforms("direction", "col");
+        AssignUniforms("split0", "split1", "split2", "splitmax", "direction", "col");
     }
 
     RadianceHintsConstructionShader::RadianceHintsConstructionShader()
@@ -1807,6 +1807,29 @@ namespace FullScreenShader
         AssignUniforms("zn", "zf");
 
         AssignSamplerNames(Program, 0, "texture");
+    }
+
+
+    LightspaceBoundingBoxShader::LightspaceBoundingBoxShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/Lightspaceboundingbox.comp").c_str(),
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str());
+        AssignSamplerNames(Program, 0, "depth");
+        AssignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
+        GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
+        glShaderStorageBlockBinding(Program, block_idx, 2);
+    }
+
+    DepthHistogramShader::DepthHistogramShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/depthhistogram.comp").c_str(),
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str());
+        AssignSamplerNames(Program, 0, "depth");
+
+        GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "Histogram");
+        glShaderStorageBlockBinding(Program, block_idx, 1);
     }
 
     GlowShader::GlowShader()
