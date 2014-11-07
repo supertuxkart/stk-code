@@ -15,5 +15,5 @@ void main()
     //final = final * 2;
     vec3 blue = vec3(final * 0.1, final * 0.2, final);
     
-    FragColor = vec4(col.rgb, 1.);
+    FragColor = vec4(blue, 1.);
 }
