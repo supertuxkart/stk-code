@@ -186,8 +186,6 @@ private:
 
     void setupCamera();
     void smoothMoveCamera(float dt);
-    void computeNormalCameraPosition(Vec3 *wanted_position,
-                                     Vec3 *wanted_target);
     void handleEndCamera(float dt);
     void getCameraSettings(float *above_kart, float *cam_angle,
                            float *side_way, float *distance,
