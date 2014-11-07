@@ -1,0 +1,55 @@
+uniform sampler2D depth;
+
+layout (local_size_x = 32, local_size_y = 32) in;
+
+layout (std430) buffer Histogram
+{
+    int bin[1024];
+    int mindepth;
+    int maxdepth;
+    int count;
+};
+
+vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+
+shared int sbin[1024];
+shared int smindepth;
+shared int smaxdepth;
+shared int scount;
+
+void main()
+{
+    int x = int(gl_GlobalInvocationID.x), y = int(gl_GlobalInvocationID.y);
+    vec2 uv = vec2(x, y) / screen;
+    float z = texture(depth, uv).x;
+    vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
+
+    int lineardepth = int(xpos.z * 4);
+
+
+    sbin[gl_LocalInvocationIndex] = 0;
+    if (gl_LocalInvocationIndex == 0) {
+        smindepth = 1000;
+        smaxdepth = 0;
+        scount = 0;
+    }
+
+    barrier();
+
+    if (lineardepth < 1000) {
+        atomicAdd(sbin[lineardepth], 1);
+        atomicAdd(scount, 1);
+        atomicMin(smindepth, lineardepth);
+        atomicMax(smaxdepth, lineardepth);
+     }
+
+    barrier();
+
+    atomicAdd(bin[gl_LocalInvocationIndex], sbin[gl_LocalInvocationIndex]);
+    if (gl_LocalInvocationIndex == 0) {
+        atomicAdd(count, scount);
+        atomicMin(mindepth, smindepth);
+        atomicMax(maxdepth, smaxdepth);
+    }
+}
+
