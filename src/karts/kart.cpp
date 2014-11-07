@@ -118,6 +118,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_squash_time          = 0.0f;
     m_shadow_enabled       = false;
 
+    m_wheel_box            = NULL;
     m_shadow               = NULL;
     m_collision_particles  = NULL;
     m_slipstream           = NULL;
@@ -261,6 +262,9 @@ Kart::~Kart()
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
     if(m_attachment)             delete m_attachment;
     if(m_stars_effect)          delete m_stars_effect;
+
+    if (m_wheel_box)
+        m_wheel_box->remove();
 
     delete m_shadow;
 
@@ -1100,6 +1104,15 @@ void Kart::update(float dt)
         if(m_squash_time<=0)
         {
             m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+            if (m_vehicle->getNumWheels() > 0)
+            {
+                scene::ISceneNode **wheels = m_kart_model->getWheelNodes();
+                for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); ++i)
+                {
+                     if (wheels[i])
+                         wheels[i]->setParent(m_node);
+                }
+            }
         }
     }   // if squashed
 
@@ -1417,6 +1430,18 @@ void Kart::setSquash(float time, float slowdown)
     {
         ExplosionAnimation::create(this);
         return;
+    }
+    if (m_vehicle->getNumWheels() > 0)
+    {
+        if (!m_wheel_box)
+            m_wheel_box = irr_driver->getSceneManager()->addDummyTransformationSceneNode(m_node);
+        scene::ISceneNode **wheels = m_kart_model->getWheelNodes();
+        for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); ++i)
+        {
+            if (wheels[i])
+            wheels[i]->setParent(m_wheel_box);
+        }
+        m_wheel_box->getRelativeTransformationMatrix().setScale(core::vector3df(1.0f, 2.0f, 1.0f));
     }
     m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
     m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown,
