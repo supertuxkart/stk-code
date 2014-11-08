@@ -4,7 +4,7 @@
 
     <div x="1%" y="1%" width="98%" height="96%" layout="vertical-row" >
 
-        <header width="80%" I18N="Section in track selection screen" text="Grand Prix"
+        <header width="80%" I18N="In the track selection screen" text="Grand Prix"
                 align="center" text_align="center" />
 
         <box width="100%" height="195" padding="0">
@@ -12,7 +12,7 @@
                                 square_items="true" child_width="175" child_height="120" />
         </box>
 
-        <header width="100%" I18N="Section in track selection screen" text="All Tracks"
+        <header width="100%" I18N="In the track selection screen" text="All Tracks"
                 align="center" text_align="center" />
 
         <box proportion="1" width="100%" layout="vertical-row" padding="1">

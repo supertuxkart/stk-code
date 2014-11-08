@@ -10,28 +10,28 @@
 
         <div layout="horizontal-row" width="fit" height="35" align="left">
             <bright proportion="1" height="100%"
-                    I18N="In soccer setup menu" text="Number of goals to win" text_align="left" />
+                    I18N="In soccer setup screen" text="Number of goals to win" text_align="left" />
             <spacer width="50" height="25"/>
             <spinner id="goalamount" width="200" height="90%" min_value="1" max_value="10"/>
         </div>
 
         <div layout="horizontal-row" width="fit" height="35" align="left">
             <bright proportion="1" height="100%"
-                    I18N="In soccer setup menu" text="Maximum time (min.)" text_align="left" />
+                    I18N="In soccer setup screen" text="Maximum time (min.)" text_align="left" />
             <spacer width="50" height ="25"/>
             <spinner id="timeamount" width="200" height="90%" min_value="1" max_value="15"/>
         </div>
 
         <div layout="horizontal-row" width="fit" height="35" align="left">
             <bright proportion="1" height="100%"
-                    I18N="In soccer setup menu" text="Game type (Goals limit / Time limit)" text_align="left" />
+                    I18N="In soccer setup screen" text="Game type (Goals limit / Time limit)" text_align="left" />
             <spacer width="50" height="25"/>
             <checkbox id="time_enabled"/>
         </div>
 
         <spacer height="40" width="25"/>
 
-        <bright height="15" width="25" I18N="In soccer setup menu" text="Use left/right to choose your team and press fire" text_align="center" align="center" />
+        <bright height="15" width="25" I18N="In soccer setup screen" text="Use left/right to choose your team and press fire" text_align="center" align="center" />
 
         <div id="central_div" layout="horizontal-row" width="100%" proportion="1" align="center">
             <roundedbox y="5%" width="100%" layout="horizontal-row" height="100%">
