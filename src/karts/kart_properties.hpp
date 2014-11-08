@@ -208,6 +208,9 @@ private:
      *  chassis. Useful for karts that don't have enough space for suspension
      *  compression. */
     float       m_graphical_y_offset;
+    /** A hard flag that moves the graphical chassis higher if it's insde
+      * the track. Might cause stuttering. */
+    bool        m_prevent_chassis_in_terrain;
     /** If the kart is supposed to have random wheel rotation at start. */
     bool        m_has_rand_wheels;
     /** Max. length of plunger rubber band. */
@@ -577,6 +580,13 @@ public:
      *  chassis. Useful for karts that don't have enough space for suspension
      *  compression. */
     float getGraphicalYOffset() const {return m_graphical_y_offset; }
+    // ------------------------------------------------------------------------
+    /** A hard flag that moves the graphical chassis higher if it's insde
+      * the track. Might cause stuttering. */
+    bool getPreventChassisInTerrain() const
+    {
+        return m_prevent_chassis_in_terrain;
+    }   // getPreventChassisInTerrain
     // ------------------------------------------------------------------------
     /** Returns parameters for the speed-weighted objects */
     const SpeedWeightedObject::Properties& getSpeedWeightedObjectProperties() const
