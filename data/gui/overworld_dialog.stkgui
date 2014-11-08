@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row" >
-
         <header id="title" width="100%" text_align="center" text="Paused" proportion="3" />
 
         <!-- FIXME: some play in proportions occur below because the text of an icon
                     button is added UNDER it and not within its allocated height -->
         <icon-button id="backbtn" align="center" icon="gui/back.png" extend_label="200"
-                     I18N="Race paused button" text="Back to Game" proportion="3"/>
+                     I18N="In the in-game dialog" text="Back to Game" proportion="3"/>
 
         <spacer width="20" height="50" />
 
         <buttonbar id="choiceribbon" proportion="4" width="100%" align="center">
 
             <icon-button id="selectkart" width="128" height="128" icon="gui/random_kart.png"
-                    I18N="Race paused button" text="Select kart" word_wrap="true"/>
+                    I18N="In the in-game dialog" text="Select kart" word_wrap="true"/>
 
             <icon-button id="options" width="128" height="128" icon="gui/main_options.png"
-                         I18N="Race paused button" text="Options" word_wrap="true"/>
+                         I18N="In the in-game dialog" text="Options" word_wrap="true"/>
 
             <icon-button id="help" width="128" height="128" icon="gui/main_help.png"
-                    I18N="Race paused button" text="Help" word_wrap="true"/>
+                    I18N="In the in-game dialog" text="Help" word_wrap="true"/>
 
             <icon-button id="exit" width="128" height="128" icon="gui/main_quit.png"
-                         I18N="Race paused button" text="Back to menu" word_wrap="true"/>
+                         I18N="In the in-game dialog" text="Back to menu" word_wrap="true"/>
 
         </buttonbar>
 

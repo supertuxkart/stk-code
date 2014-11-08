@@ -20,7 +20,7 @@
 
             <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
             <div width="75%" height="fit" layout="horizontal-row" id="outer_box" >
-                <label I18N="In the graphics settings" text="Graphical Effects Level" align="center"/>
+                <label I18N="In the video settings" text="Graphical Effects Level" align="center"/>
                 <spacer width="20" height="20"/>
 
                 <div layout="vertical-row" proportion="1" height="fit" id="inner_box">
@@ -44,7 +44,7 @@
 
             <!-- ************ RESOLUTION CHOICE ************ -->
             <spacer height="10" width="10"/>
-            <label width="100%" I18N="In the graphics settings" text="Resolution"/>
+            <label width="100%" I18N="In the video settings" text="Resolution"/>
 
             <scrollable_ribbon id="resolutions" proportion="1" label_location="each"
                                width="100%" square_items="false"
@@ -71,7 +71,7 @@
             <div width="100%" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="100%" />
                 <button id="apply_resolution"
-                    I18N="In the video settings menu" text="Apply new resolution" />
+                    I18N="In the video settings" text="Apply new resolution" />
             </div>
 
             <spacer height="15" width="4"/>

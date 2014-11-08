@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="0%" y="0%" width="100%" height="98%" layout="vertical-row" >
-
         <div x="0" y="0" width="100%" layout="horizontal-row" height="8%">
             <icon-button id="back"   height="100%" icon="gui/back.png"/>
             <header text_align="center" proportion="1" text="SuperTuxKart Addons" align="center"/>
@@ -14,7 +13,7 @@
                 <spacer width="10" />
                 <label text="Updated" align="center" I18N="In addons screen, in the filtering bar, to enable a filter that will show only recently updated items"/>
                 <spinner id="filter_date" proportion="8" align="center" min_value="0" wrap_around="true"/>
-                <label text="Rating >=" align="center" I18N="In addons screen, in the filtering bar, to enable a filter that will show only recently items with good rating"/>
+                <label text="Rating >=" align="center" I18N="In addons screen, in the filtering bar, to enable a filter that will show only items with good rating"/>
                 <spinner id="filter_rating" proportion="3" align="center" min_value="0" wrap_around="true"/>
                 <icon-button id="filter_search" height="100%" icon="gui/search.png"/>
             </div>
@@ -24,16 +23,15 @@
 
         <tabs id="category" height="10%" max_height="110" width="90%" align="center">
             <icon-button id="tab_kart" width="128" height="128" icon="gui/karts.png"
-                    I18N="Section in the addons menu" text="Karts"/>
+                    I18N="In the addons screen" text="Karts"/>
             <icon-button id="tab_track" width="128" height="128" icon="gui/mode_normal.png"
-                    I18N="Section in the addons menu" text="Tracks"/>
+                    I18N="In the addons screen" text="Tracks"/>
             <icon-button id="tab_arena" width="128" height="128" icon="gui/mode_normal.png"
-                    I18N="Section in the addons menu" text="Arenas"/>
+                    I18N="In the addons screen" text="Arenas"/>
         </tabs>
 
         <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
             <list id="list_addons" x="0" y="0" width="100%" height="100%"/>
         </box>
-
     </div>
 </stkgui>
