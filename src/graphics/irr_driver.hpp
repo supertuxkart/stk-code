@@ -408,6 +408,7 @@ private:
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
     void renderLights(unsigned pointlightCount, bool hasShadow);
+    void renderLightsScatter(unsigned pointlightCount);
     void renderShadowsDebug();
     void doScreenShot();
     void PrepareDrawCalls(scene::ICameraSceneNode *camnode);

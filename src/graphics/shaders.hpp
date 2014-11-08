@@ -328,6 +328,14 @@ namespace LightShader
         GLuint vao;
         PointLightShader();
     };
+
+    class PointLightScatterShader : public ShaderHelperSingleton<PointLightScatterShader, float, core::vector3df>, public TextureRead<Nearest_Filtered>
+    {
+    public:
+        GLuint vbo;
+        GLuint vao;
+        PointLightScatterShader();
+    };
 }
 
 namespace ParticleShader
