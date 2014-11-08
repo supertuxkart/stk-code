@@ -142,9 +142,8 @@ EventPropagation FocusDispatcher::focused(const int playerID)
         }
     }
 
-    //std::cerr << "[KartSelectionScreen] WARNING: the focus dispatcher can't
-    // find the widget for player " << playerID << "!\n";
-    //assert(false);
+    //Log::fatal("KartSelectionScreen", "The focus dispatcher can't"
+    //    "find the widget for player %d!", playerID);
     return GUIEngine::EVENT_LET;
 }   // focused
 
@@ -176,6 +175,13 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
         const int playerID)
 {
     assert(m_magic_number == 0xCAFEC001);
+
+    // Check if this player has a kart
+    if (m_parent->m_kart_widgets.size() <= playerID)
+    {
+        GUIEngine::focusNothingForPlayer(playerID);
+        return;
+    }
 
     // Don't allow changing the selection after confirming it
     if (m_parent->m_kart_widgets[playerID].isReady())
@@ -367,18 +373,21 @@ void KartSelectionScreen::init()
     }
     else */
     // For now this is what will happen
+    if (!m_multiplayer)
     {
-        joinPlayer( input_manager->getDeviceManager()->getLatestUsedDevice(),
-                    true );
+        joinPlayer(input_manager->getDeviceManager()->getLatestUsedDevice());
         w->updateItemDisplay();
-    }
 
-    // Player 0 select default kart
-    if (!w->setSelection(UserConfigParams::m_default_kart, 0, true))
-    {
-        // if kart from config not found, select the first instead
-        w->setSelection(0, 0, true);
-    }
+        // Player 0 select default kart
+        if (!w->setSelection(UserConfigParams::m_default_kart, 0, true))
+        {
+            // if kart from config not found, select the first instead
+            w->setSelection(0, 0, true);
+        }
+    } else
+        // Add multiplayer message
+        addMultiplayerMessage();
+
     // This flag will cause that a 'fire' event will be mapped to 'select' (if
     // 'fire' is not assigned to a GUI event). This is done to support the old
     // way of player joining by pressing 'fire' instead of 'select'.
@@ -402,12 +411,7 @@ void KartSelectionScreen::tearDown()
         m_removed_widget = NULL;
     }
 
-    if (m_multiplayer_message != NULL)
-    {
-        manualRemoveWidget(m_multiplayer_message);
-        delete m_multiplayer_message;
-        m_multiplayer_message = NULL;
-    }
+    removeMultiplayerMessage();
 
     Screen::tearDown();
     m_kart_widgets.clearAndDeleteAll();
@@ -426,10 +430,12 @@ void KartSelectionScreen::unloaded()
 
 // ----------------------------------------------------------------------------
 // Return true if event was handled successfully
-bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
+bool KartSelectionScreen::joinPlayer(InputDevice* device)
 {
+    bool first_player = m_kart_widgets.size() == 0;
+
     if (UserConfigParams::logGUI())
-        Log::info("[KartSelectionScreen]",  "joinPlayer() invoked");
+        Log::info("KartSelectionScreen",  "joinPlayer() invoked");
     if (!m_multiplayer && !first_player) return false;
 
     assert (g_dispatcher != NULL);
@@ -437,20 +443,20 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
-        Log::error("[KartSelectionScreen]", "joinPlayer(): Called outside of "
+        Log::error("KartSelectionScreen", "joinPlayer(): Called outside of "
                   "kart selection screen.");
         return false;
     }
     else if (device == NULL)
     {
-        Log::error("[KartSelectionScreen]", "joinPlayer(): Received null "
+        Log::error("KartSelectionScreen", "joinPlayer(): Received null "
                   "device pointer");
         return false;
     }
 
     if (StateManager::get()->activePlayerCount() >= MAX_PLAYER_COUNT)
     {
-        Log::error("[KartSelectionScreen]", "Maximum number of players "
+        Log::error("KartSelectionScreen", "Maximum number of players "
                   "reached");
         SFXManager::get()->quickSound( "anvil" );
         return false;
@@ -470,19 +476,11 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
         const int num_active_players = StateManager::get()->activePlayerCount();
         profile_to_use = PlayerManager::get()->getPlayer(num_active_players);
 
-        // Remove multiplayer message
-        if (m_multiplayer_message != NULL)
-        {
-            manualRemoveWidget(m_multiplayer_message);
-            m_multiplayer_message->getIrrlichtElement()->remove();
-            m_multiplayer_message->elementRemoved();
-            delete m_multiplayer_message;
-            m_multiplayer_message = NULL;
-        }
+        removeMultiplayerMessage();
     }
 
     const int new_player_id =
-        StateManager::get()->createActivePlayer( profile_to_use, device);
+        StateManager::get()->createActivePlayer(profile_to_use, device);
     StateManager::ActivePlayer* aplayer =
         StateManager::get()->getActivePlayer(new_player_id);
 
@@ -519,23 +517,10 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
     // in this special case, leave room for a message on the right
     if (m_multiplayer && first_player)
     {
+        addMultiplayerMessage();
         const int splitWidth = fullarea->m_w / 2;
-
         m_kart_widgets[0].move( fullarea->m_x, fullarea->m_y, splitWidth,
                                 fullarea->m_h );
-
-        m_multiplayer_message = new BubbleWidget();
-        m_multiplayer_message->m_properties[PROP_TEXT_ALIGN] = "center";
-        m_multiplayer_message->setText( _("Everyone:\nPress 'Select' now to "
-                                          "join the game!") );
-        m_multiplayer_message->m_x =
-            (int)(fullarea->m_x + splitWidth + splitWidth*0.2f);
-        m_multiplayer_message->m_y = (int)(fullarea->m_y + fullarea->m_h*0.3f);
-        m_multiplayer_message->m_w = (int)(splitWidth*0.6f);
-        m_multiplayer_message->m_h = (int)(fullarea->m_h*0.6f);
-        m_multiplayer_message->setFocusable(false);
-        m_multiplayer_message->add();
-        manualAddWidget(m_multiplayer_message);
     }
     else
     {
@@ -543,7 +528,7 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
 
         for (int n=0; n<amount; n++)
         {
-            m_kart_widgets[n].move( fullarea->m_x + splitWidth*n,
+            m_kart_widgets[n].move( fullarea->m_x + splitWidth * n,
                                     fullarea->m_y, splitWidth, fullarea->m_h);
         }
     }
@@ -562,7 +547,7 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
 
     if (!m_multiplayer)
     {
-        input_manager->getDeviceManager()->setSinglePlayer( StateManager::get()
+        input_manager->getDeviceManager()->setSinglePlayer(StateManager::get()
                                                          ->getActivePlayer(0));
     }
 
@@ -578,7 +563,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
-        Log::error("[KartSelectionScreen]", "ERROR: playerQuit() called "
+        Log::error("KartSelectionScreen", "playerQuit() called "
                   "outside of kart selection screen, "
                   "or the XML file for this screen was changed without "
                   "adapting the code accordingly");
@@ -586,7 +571,11 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     }
 
     // If last player quits, return to main menu
-    if (m_kart_widgets.size() <= 1) return false;
+    if (m_kart_widgets.size() <= 1)
+    {
+        StateManager::get()->escapePressed();
+        return true;
+    }
 
     std::map<PlayerKartWidget*, std::string> selections;
 
@@ -613,12 +602,12 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     }
     if (playerID == -1)
     {
-        Log::warn("[KartSelectionScreen]", " playerQuit cannot find "
+        Log::warn("KartSelectionScreen", "playerQuit cannot find "
                   "passed player");
         return false;
     }
     if(UserConfigParams::logGUI())
-        Log::info("[KartSelectionScreen]", "playerQuit(%s)",playerID);
+        Log::info("KartSelectionScreen", "playerQuit(%d)", playerID);
 
     // Just a cheap way to check if there is any discrepancy
     // between m_kart_widgets and the active player array
@@ -644,27 +633,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     // Tell the StateManager to remove this player
     StateManager::get()->removeActivePlayer(playerID);
 
-    if (m_kart_widgets.size() == 1)
-    {
-        // Add multiplayer message
-        if (m_multiplayer_message == NULL)
-        {
-            Widget* fullarea = getWidget("playerskarts");
-            const int splitWidth = fullarea->m_w / 2;
-            m_multiplayer_message = new BubbleWidget();
-            m_multiplayer_message->m_properties[PROP_TEXT_ALIGN] = "center";
-            m_multiplayer_message->setText( _("Everyone:\nPress 'Select' now to "
-                                          "join the game!") );
-            m_multiplayer_message->m_x =
-                (int)(fullarea->m_x + splitWidth + splitWidth*0.2f);
-            m_multiplayer_message->m_y = (int)(fullarea->m_y + fullarea->m_h*0.3f);
-            m_multiplayer_message->m_w = (int)(splitWidth*0.6f);
-            m_multiplayer_message->m_h = (int)(fullarea->m_h*0.6f);
-            m_multiplayer_message->setFocusable(false);
-            m_multiplayer_message->add();
-            manualAddWidget(m_multiplayer_message);
-        }
-    }
+    addMultiplayerMessage();
 
     // Karts count changed, maybe order too, so renumber them.
     renumberKarts();
@@ -689,7 +658,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
             const bool success = w->setSelection(selectedKart, n, true);
             if (!success)
             {
-                Log::warn("[KartSelectionScreen]",  "Failed to select kart %s"
+                Log::warn("KartSelectionScreen", "Failed to select kart %s"
                           " for player %u, what's going on??", selectedKart.c_str(),n);
             }
         }
@@ -788,7 +757,7 @@ void KartSelectionScreen::playerConfirm(const int playerID)
                 !will_need_duplicates)
         {
             if (UserConfigParams::logGUI())
-                Log::warn("[KartSelectionScreen]", "You can't select this identity "
+                Log::warn("KartSelectionScreen", "You can't select this identity "
                        "or kart, someone already took it!!");
 
             SFXManager::get()->quickSound( "anvil" );
@@ -939,6 +908,57 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
 
 // ----------------------------------------------------------------------------
 /**
+ * Adds a message to the screen which indicates that players must press fire to join.
+ */
+void KartSelectionScreen::addMultiplayerMessage()
+{
+    Widget* fullarea = getWidget("playerskarts");
+    const int splitWidth = fullarea->m_w / 2;
+    int message_x = 0;
+    if (m_kart_widgets.size() == 1)
+        message_x = (int) (fullarea->m_x + splitWidth + splitWidth * 0.2f);
+    else
+        message_x = (int) (fullarea->m_x + splitWidth / 2 + splitWidth * 0.2f);
+
+    if (m_kart_widgets.size() < 2 && m_multiplayer_message == NULL)
+    {
+        m_multiplayer_message = new BubbleWidget();
+        m_multiplayer_message->m_properties[PROP_TEXT_ALIGN] = "center";
+        m_multiplayer_message->setText( _("Everyone:\nPress 'Select' now to "
+                                          "join the game!") );
+        m_multiplayer_message->m_x = message_x;
+        m_multiplayer_message->m_y = (int) (fullarea->m_y + fullarea->m_h * 0.3f);
+        m_multiplayer_message->m_w = (int) (splitWidth * 0.6f);
+        m_multiplayer_message->m_h = (int) (fullarea->m_h * 0.6f);
+        m_multiplayer_message->setFocusable(false);
+        m_multiplayer_message->add();
+        manualAddWidget(m_multiplayer_message);
+    }
+    else if(m_multiplayer_message != NULL)
+    {
+        m_multiplayer_message->move(message_x, (int) (fullarea->m_y + fullarea->m_h * 0.3f),
+                                    (int) (splitWidth * 0.6f), (int) (fullarea->m_h * 0.6f));
+    }
+}   // addMultiplayerMessage
+
+// ----------------------------------------------------------------------------
+/**
+ * Remove the multiplayer message.
+ */
+void KartSelectionScreen::removeMultiplayerMessage()
+{
+    if (m_multiplayer_message != NULL)
+    {
+        manualRemoveWidget(m_multiplayer_message);
+        m_multiplayer_message->getIrrlichtElement()->remove();
+        m_multiplayer_message->elementRemoved();
+        delete m_multiplayer_message;
+        m_multiplayer_message = NULL;
+    }
+}   // removeMultiplayerMessage
+
+// ----------------------------------------------------------------------------
+/**
  * Callback handling events from the kart selection menu
  */
 void KartSelectionScreen::eventCallback(Widget* widget,
@@ -984,7 +1004,7 @@ void KartSelectionScreen::eventCallback(Widget* widget,
                     // if we get here, it means one player "lost" his kart in
                     // the tab switch
                     if (UserConfigParams::logGUI())
-                        Log::info("[KartSelectionScreen]", "Player %u"
+                        Log::info("KartSelectionScreen", "Player %u"
                                   " lost their selection when switching tabs!!!",n);
 
                     // Select a random kart in this case
@@ -1002,12 +1022,12 @@ void KartSelectionScreen::eventCallback(Widget* widget,
                             w->setSelection( randomID, n,
                                              n != PLAYER_ID_GAME_MASTER );
                         if (!success)
-                            Log::warn("[KartSelectionScreen]",
+                            Log::warn("KartSelectionScreen",
                                       "setting kart of player %u failed");
                     }
                     else
                     {
-                        Log::warn("[KartSelectionScreen]",  " 0 items "
+                        Log::warn("KartSelectionScreen",  " 0 items "
                                   "in the ribbon");
                     }
                 }
@@ -1016,21 +1036,12 @@ void KartSelectionScreen::eventCallback(Widget* widget,
     }
     else if (name == "karts")
     {
-        playerConfirm(playerID);
+        if (m_kart_widgets.size() > playerID)
+            playerConfirm(playerID);
     }
     else if (name == "back")
     {
-        m_go_to_overworld_next = false; // valid once
-        m_must_delete_on_back = true;
-        if (m_from_overworld)
-        {
-            m_from_overworld = false; // valid once
-            OverWorld::enterOverWorld();
-        }
-        else
-        {
-            StateManager::get()->escapePressed();
-        }
+        StateManager::get()->escapePressed();
     }
     else
     {
@@ -1101,11 +1112,11 @@ void KartSelectionScreen::allPlayersDone()
     // ---- Print selection (for debugging purposes)
     if(UserConfigParams::logGUI())
     {
-        Log::info("[KartSelectionScreen]", "players : %d",players.size());
+        Log::info("KartSelectionScreen", "players : %d",players.size());
 
         for (unsigned int n=0; n<players.size(); n++)
         {
-            Log::info("[KartSelectionScreen]", "     Player %u is %s on %s",n,
+            Log::info("KartSelectionScreen", "     Player %u is %s on %s",n,
                     core::stringc(
                           players[n].getConstProfile()->getName().c_str()).c_str(),
                     players[n].getDevice()->getName().c_str());
@@ -1181,11 +1192,10 @@ void KartSelectionScreen::allPlayersDone()
                 }
             }
         }
-        // std::cout << "selection=" << selection.c_str() << std::endl;
 
         race_manager->setLocalKartInfo(n, selected_kart);
+
         // Set per player difficulty if needed
-        const PlayerProfile* profile = StateManager::get()->getActivePlayerProfile(n);
         if (m_multiplayer && UserConfigParams::m_per_player_difficulty &&
             m_kart_widgets[n].isHandicapped())
             race_manager->setPlayerDifficulty(n, PLAYER_DIFFICULTY_HANDICAP);
@@ -1329,10 +1339,10 @@ bool KartSelectionScreen::validateKartChoices()
             {
                 if (UserConfigParams::logGUI())
                 {
-                    Log::warn("[KartSelectionScreen]", "Kart conflict!!");
-                    Log::warn("KartSelectionScreen]", "    Player %u chose %s",n,
+                    Log::warn("KartSelectionScreen", "Kart conflict!!");
+                    Log::warn("KartSelectionScreen", "    Player %u chose %s",n,
                               m_kart_widgets[n].getKartInternalName().c_str());
-                    Log::warn("[KartSelectionScreen]", "    Player %u chose %s",m,
+                    Log::warn("KartSelectionScreen", "    Player %u chose %s",m,
                               m_kart_widgets[m].getKartInternalName().c_str());
                 }
 
@@ -1341,7 +1351,7 @@ bool KartSelectionScreen::validateKartChoices()
                         m_kart_widgets[m].isReady())
                 {
                     if (UserConfigParams::logGUI())
-                       Log::info("[KartSelectionScreen]", "    --> Setting red badge on player %u", n);
+                       Log::info("KartSelectionScreen", "    --> Setting red badge on player %u", n);
 
                     // player m is ready, so player n should not choose
                     // this name
@@ -1351,7 +1361,7 @@ bool KartSelectionScreen::validateKartChoices()
                          !m_kart_widgets[m].isReady())
                 {
                     if (UserConfigParams::logGUI())
-                        Log::info("[KartSelectionScreen]", "    --> Setting red badge on player %u",m);
+                        Log::info("KartSelectionScreen", "    --> Setting red badge on player %u",m);
 
                     // player n is ready, so player m should not
                     // choose this name
