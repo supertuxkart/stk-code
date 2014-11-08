@@ -2581,6 +2581,45 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     float xx = fabsf(m_speed)* getKartProperties()->getDownwardImpulseFactor()*0.0006f;
     Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset()
                               + lean_height +m_graphical_y_offset+xx, 0);
+    
+    // Try to prevent the graphical chassis to be inside of the terrain:
+    if(m_kart_properties->getPreventChassisInTerrain())
+    {
+        // Get the shortest suspension length (=closest point to terrain).
+        float min_susp_len = 99.9f;
+        for (int i = 0; i < getVehicle()->getNumWheels(); i++)
+        {
+            float susp_len = getVehicle()->getWheelInfo(i).m_raycastInfo
+                                                          .m_suspensionLength;
+            if (susp_len < min_susp_len)
+                min_susp_len = susp_len;
+        }   // for i<num_wheels
+
+        const btWheelInfo &w = getVehicle()->getWheelInfo(0);
+        // Recompute the default average suspension length, see 
+        // kartIsInRestNow() how to get from y-offset to susp. len.
+        float av_sus_len = -m_graphical_y_offset
+                         + w.m_chassisConnectionPointCS.getY()
+                         - w.m_wheelsRadius;
+
+        float delta = av_sus_len - min_susp_len;
+        // If the suspension length is so short, that it is less than the 
+        // lowest point of the kart, it indicates that the graphical chassis
+        // would be inside of the track:
+        if (delta > m_kart_model->getLowestPoint())
+        {
+            center_shift.setY(center_shift.getY() + delta - m_kart_model->getLowestPoint());
+        }
+
+        // FIXME: for now, debug output in case we have to debug it
+        //Log::verbose("kart", "min %f y off %f overall off %f lowest %f delta %f asl %f",
+        //    min_susp_len, m_graphical_y_offset, center_shift.getY(),
+        //    m_kart_model->getLowestPoint(),
+        //    delta,
+        //    av_sus_len
+        //    );
+    }
+
     center_shift = getTrans().getBasis() * center_shift;
 
     Moveable::updateGraphics(dt, center_shift,

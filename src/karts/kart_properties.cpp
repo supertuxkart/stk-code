@@ -101,17 +101,18 @@ KartProperties::KartProperties(const std::string &filename)
     m_plunger_in_face_duration.resize(RaceManager::DIFFICULTY_COUNT,
                                       UNDEFINED);
 
-    m_terrain_impulse_type   = IMPULSE_NONE;
-    m_gravity_center_shift   = Vec3(UNDEFINED);
-    m_bevel_factor           = Vec3(UNDEFINED);
-    m_exp_spring_response    = false;
-    m_version                = 0;
-    m_color                  = video::SColor(255, 0, 0, 0);
-    m_shape                  = 32;  // close enough to a circle.
-    m_engine_sfx_type        = "engine_small";
-    m_kart_model             = NULL;
-    m_has_rand_wheels        = false;
-    m_nitro_min_consumption  = 0.53f;
+    m_terrain_impulse_type       = IMPULSE_NONE;
+    m_gravity_center_shift       = Vec3(UNDEFINED);
+    m_bevel_factor               = Vec3(UNDEFINED);
+    m_exp_spring_response        = false;
+    m_prevent_chassis_in_terrain = false;
+    m_version                    = 0;
+    m_color                      = video::SColor(255, 0, 0, 0);
+    m_shape                      = 32;  // close enough to a circle.
+    m_engine_sfx_type            = "engine_small";
+    m_kart_model                 = NULL;
+    m_has_rand_wheels            = false;
+    m_nitro_min_consumption      = 0.53f;
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
@@ -617,7 +618,9 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *graphics_node = root->getNode("graphics"))
     {
-        graphics_node->get("y-offset", &m_graphical_y_offset);
+        graphics_node->get("y-offset",          &m_graphical_y_offset);
+        graphics_node->get("prevent-chassis-in-terrain",
+                                                &m_prevent_chassis_in_terrain);
     }
 
     if(m_kart_model)
