@@ -62,7 +62,7 @@ ScriptEngine::ScriptEngine()
     }
 
     // The script compiler will write any compiler messages to the callback.
-    m_engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
+    //m_engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
 
     // Configure the script engine with all the functions, 
     // and variables that the script should be able to use.
