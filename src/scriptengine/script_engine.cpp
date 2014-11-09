@@ -36,6 +36,21 @@ using namespace Scripting;
 
 namespace Scripting
 {
+
+
+//Line Callback
+void MessageCallback(const asSMessageInfo *msg, void *param)
+{
+    const char *type = "ERR ";
+    if (msg->type == asMSGTYPE_WARNING)
+        type = "WARN";
+    else if (msg->type == asMSGTYPE_INFORMATION)
+        type = "INFO";
+
+    printf("%s (%d, %d) : %s : %s\n", msg->section, msg->row, msg->col, type, msg->message);
+}
+
+
 //Constructor, creates a new Scripting Engine using AngelScript
 ScriptEngine::ScriptEngine()
 {
@@ -45,6 +60,10 @@ ScriptEngine::ScriptEngine()
     {
         std::cout << "Failed to create script engine." << std::endl;
     }
+
+    // The script compiler will write any compiler messages to the callback.
+    m_engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
+
     // Configure the script engine with all the functions, 
     // and variables that the script should be able to use.
     configureEngine(m_engine);
@@ -55,6 +74,8 @@ ScriptEngine::~ScriptEngine()
     // Release the engine
     m_engine->Release();
 }
+
+
 
 /** Get Script By it's file name
 *  \param string scriptname = name of script to get
@@ -94,7 +115,7 @@ std::string getScript(std::string scriptName)
 */
 void ScriptEngine::runScript(std::string scriptName)
 {
-    //return; // Scripting disabled for now
+    return; // Scripting disabled for now
 
     // Create a context that will execute the script.
     asIScriptContext *ctx = m_engine->CreateContext();
