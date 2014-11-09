@@ -22,56 +22,91 @@
 #include "input/binding.hpp"
 #include "input/device_config.hpp"
 #include "input/input.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
 
 #include <iosfwd>
 #include <irrString.h>
 #include <string>
 
-//==== G A M E P A D C O N F I G ===============================================
+using namespace irr;
 
-/**
-  * \brief specialisation of DeviceConfig for gamepad type devices
-  * \ingroup config
-  */
+/** \brief specialisation of DeviceConfig for gamepad type devices
+ *  \ingroup config
+ */
 class GamepadConfig : public DeviceConfig
 {
 
 private:
     /** Number of axis this device has. */
-    int         m_axis_count;
+    int m_axis_count;
 
     /** Number of buttons this device has. */
-    int         m_button_count;
+    int m_button_count;
 
+    /** Deadzone of this gamepad. */
     int m_deadzone;
 
+    /** If this device has analog axis, steering etc. must be set immediately
+     *  from the input values, not having a delayed time (time-full-steer). */
+    bool m_is_analog;
+
+    /** If set to true, map any analog axis from x in [0,1] to x^x --> at
+     *  values close to 0 the joystick will react less sensitive. */
+    bool m_desensitize;
+
+    /** A type to keep track if the gamepad has been identified (which is
+     *  used to display better button names and better defaults). */
+    enum {GP_UNIDENTIFIED, GP_XBOX360, GP_XBOX_ORIGINAL} m_type;
+
+    void detectType();
 public:
 
-    irr::core::stringw toString     ();
+             GamepadConfig           ();
+             GamepadConfig(const std::string &name,
+                           const int          axis_count=0,
+                           const int          button_ount=0);
+    virtual ~GamepadConfig() {}
+
+    core::stringw toString();
 
     virtual void save(std::ofstream& stream);
     void        setDefaultBinds     ();
-    GamepadConfig           (const XMLNode *config);
-    GamepadConfig           (const std::string     &name,
-                             const int              axis_count=0,
-                             const int              button_ount=0);
-    virtual bool load(const XMLNode *config);
+    virtual core::stringw getBindingAsString(const PlayerAction action) const OVERRIDE;
+    virtual bool load(const XMLNode *config) OVERRIDE;
+    // ------------------------------------------------------------------------
+    /** Returns if this device uses analog axes. */
+    virtual bool isAnalog() const OVERRIDE { return m_is_analog; }
+
+    // ------------------------------------------------------------------------
+    /** Returns true if this device should desensitize its input at values
+     *  close to 0 (to avoid 'oversteering'). */
+    virtual bool desensitize() const { return m_desensitize;}
+
+    // ------------------------------------------------------------------------
+    /** Returns the number of buttons in this configuration. */
+    virtual int getNumberOfButtons() const OVERRIDE { return m_button_count; }
+
     // ------------------------------------------------------------------------
     /** Sets the number of buttons this device has. */
     void setNumberOfButtons(int count) { m_button_count = count; }
 
     // ------------------------------------------------------------------------
-    /** Sets the number of axis this device has. */
-    void setNumberOfAxis(int count) { m_axis_count = count; }
-    //        ~GamepadConfig();
+    /** Returns the number of axis of this configufation. */
+    virtual int getNumberOfAxes() const OVERRIDE { return m_axis_count; }
 
     // ------------------------------------------------------------------------
-    /** Returns the type of this configuration. */
-    virtual DeviceConfig::DeviceConfigType getType() const
-    {
-        return DeviceConfig::DEVICE_CONFIG_TYPE_GAMEPAD;
-    }   // getType
-};
+    /** Sets the number of axis this device has. */
+    void setNumberOfAxis(int count) { m_axis_count = count; }
+
+    // ------------------------------------------------------------------------
+    /** Return deadzone of this configuration. */
+    int getDeadzone() const { return m_deadzone; }
+    // ------------------------------------------------------------------------
+    virtual bool isGamePad()  const { return true; }
+    // ------------------------------------------------------------------------
+    virtual bool isKeyboard() const { return false; }
+
+};   // class GamepadConfig
 
 #endif

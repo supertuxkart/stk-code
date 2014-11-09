@@ -20,13 +20,14 @@
 #define HEADER_INPUT_DEVICE_HPP
 
 
-#include "input/device_config.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/no_copy.hpp"
 
 #include <string>
+
+class DeviceConfig;
 
 /**
   * \brief Input device type
@@ -62,20 +63,25 @@ public:
 
              InputDevice();
     virtual ~InputDevice();
-        bool processAndMapInput(PlayerAction* action, Input::InputType type,  int id, InputManager::InputDriverMode mode);
-
-    bool processAndMapInput(PlayerAction* action, Input::InputType type, const int id,
-                            int* value, InputManager::InputDriverMode mode);
-
-#ifdef NOTYET
-    virtual bool processAndMapInput(PlayerAction *action,
-                                    Input::InputType type, 
-
-                                    const int id,
-                                    int* value,
+    /** Invoked when this device it used. Verifies if the key/button that was
+     *  pressed is associated with a binding. If yes, sets action and returns
+     *  true; otherwise returns false. It can also modify the value used.
+     *  \param type Type of input (e.g. IT_STICKMOTION, ...).
+     *  \param id   ID of the key that was pressed or of the axis that was
+     *              triggered (depending on the value of the 'type' parameter).
+     *  \param mode Used to determine whether to map menu actions or 
+     *              game actions
+     * \param[out] action  The action associated to this input (only check
+     *                     this value if method returned true)
+     * \param[in,out] value The value associated with this type (typically
+     *                      how far a gamepad axis is moved).
+     *
+     * \return Whether the pressed key/button is bound with an action
+     */
+    virtual bool processAndMapInput(Input::InputType type,  const int id,
                                     InputManager::InputDriverMode mode,
-                                    PlayerAction* action) = 0;
-#endif
+                                    PlayerAction *action, int* value = NULL
+                                    ) = 0;
 
     // ------------------------------------------------------------------------
     /** Sets which players uses this device; or pass NULL to say no player 

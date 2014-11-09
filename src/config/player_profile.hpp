@@ -20,6 +20,7 @@
 #define HEADER_PLAYER_PROFILE_HPP
 
 #include "challenges/story_mode_status.hpp"
+#include "network/remote_kart_info.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
@@ -66,16 +67,16 @@ public:
 private:
     LEAK_CHECK()
 
+#ifdef DEBUG
+    unsigned int m_magic_number;
+#endif
+
     /** The name of the player (wide string, so it can be in native
      *  language). */
     core::stringw m_local_name;
 
     /** True if this account is a guest account. */
     bool m_is_guest_account;
-
-#ifdef DEBUG
-    unsigned int m_magic_number;
-#endif
 
     /** Counts how often this player was used (always -1 for guests). */
     int m_use_frequency;
@@ -111,8 +112,8 @@ private:
 
 public:
 
-         PlayerProfile(const core::stringw &name, bool is_guest = false);
-         PlayerProfile(const XMLNode *node);
+    PlayerProfile(const core::stringw &name, bool is_guest = false);
+    PlayerProfile(const XMLNode *node);
     virtual ~PlayerProfile();
     void save(UTFWriter &out);
     void loadRemainingData(const XMLNode *node);

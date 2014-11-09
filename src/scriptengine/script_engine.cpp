@@ -228,8 +228,6 @@ void ScriptEngine::runScript(std::string scriptName)
 */
 void ScriptEngine::configureEngine(asIScriptEngine *engine)
 {
-    int r;
-
     // Register the script string type
     RegisterStdString(engine); //register std::string
     RegisterVec3(engine);      //register Vec3

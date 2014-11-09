@@ -719,7 +719,7 @@ bool CIrrDeviceMacOSX::createWindow()
 					if (!CreationParams.WindowId)
 					{
 						[Window center];
-						[Window setDelegate:[NSApp delegate]];
+						[(NSFileManager *)Window setDelegate:[NSApp delegate]];
 
 						if(CreationParams.DriverType == video::EDT_OPENGL)
 							[OGLContext setView:[Window contentView]];
@@ -1709,6 +1709,7 @@ bool CIrrDeviceMacOSX::activateJoysticks(core::array<SJoystickInfo> & joystickIn
 
 				SJoystickInfo returnInfo;
 				returnInfo.Joystick = jindex;
+                returnInfo.HasGenericName = false;
 				returnInfo.Axes = info.axes;
 				//returnInfo.Hats = info.hats;
 				returnInfo.Buttons = info.buttons;

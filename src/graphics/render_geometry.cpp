@@ -978,14 +978,15 @@ void IrrDriver::renderShadows()
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    m_rtts->getShadowFBO().Bind();
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.5, 0.);
-    m_rtts->getShadowFBO().Bind();
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glDrawBuffer(GL_NONE);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
 
+    glClearColor(1., 1., 1., 1.);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glClearColor(0., 0., 0., 0.);
 
     for (unsigned cascade = 0; cascade < 4; cascade++)
     {
@@ -1024,7 +1025,11 @@ void IrrDriver::renderShadows()
     }
 
     glDisable(GL_POLYGON_OFFSET_FILL);
-    glCullFace(GL_BACK);
+
+    if (irr_driver->hasARBTextureView())
+        m_post_processing->renderGaussian6BlurLayer(m_rtts->getShadowFBO());
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_rtts->getShadowFBO().getRTT()[0]);
+    glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
 
 

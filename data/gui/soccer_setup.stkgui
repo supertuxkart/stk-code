@@ -18,7 +18,7 @@
         <div layout="horizontal-row" width="fit" height="35" align="left">
             <bright proportion="1" height="100%"
                     I18N="In soccer setup menu" text="Maximum time (min.)" text_align="left" />
-            <spacer width="50" height ="25">
+            <spacer width="50" height ="25"/>
             <spinner id="timeamount" width="200" height="90%" min_value="1" max_value="15"/>
         </div>
 

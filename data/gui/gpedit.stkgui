@@ -20,13 +20,13 @@
                 I18N="Menu item" text="Move up" />
             <icon-button id="down" width="128" height="128" icon="gui/down.png"
                 I18N="Menu item" text="Move down" />
-            <icon-button id="add" width="128" height="128" icon="gui/gp_add_track.png"
+            <icon-button id="add" width="128" height="128" icon="gui/blue_plus.png"
                 I18N="Menu item" text="Add" />
-            <icon-button id="edit" width="128" height="128" icon="gui/gp_edit_track.png"
+            <icon-button id="edit" width="128" height="128" icon="gui/edit.png"
                 I18N="Menu item" text="Edit" />
-            <icon-button id="remove" width="128" height="128" icon="gui/gp_remove_track.png"
+            <icon-button id="remove" width="128" height="128" icon="gui/remove.png"
                 I18N="Menu item" text="Remove" />
-            <icon-button id="save" width="128" height="128" icon="gui/gp_save.png"
+            <icon-button id="save" width="128" height="128" icon="gui/save.png"
                 I18N="Menu item" text="Save" />
         </buttonbar>
     </div>

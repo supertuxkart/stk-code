@@ -180,6 +180,8 @@ private:
     bool hasBuffserStorage;
     bool hasComputeShaders;
     bool hasTextureStorage;
+    bool hasTextureView;
+    bool m_support_sdsm;
     bool m_need_ubo_workaround;
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
@@ -266,6 +268,11 @@ public:
             return 120;
     }
 
+    bool supportsSDSM() const
+    {
+        return m_support_sdsm;
+    }
+
     bool needUBOWorkaround() const
     {
         return m_need_ubo_workaround;
@@ -309,6 +316,11 @@ public:
     bool hasARBTextureStorage() const
     {
         return hasTextureStorage;
+    }
+
+    bool hasARBTextureView() const
+    {
+        return hasTextureView;
     }
 
     video::SColorf getAmbientLight() const;
@@ -767,6 +779,7 @@ public:
 
     void renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadows, bool forceRTT);
     unsigned UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
+    void UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, size_t height);
     void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
 
     // --------------------- OLD RTT --------------------

@@ -352,9 +352,6 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
         break;
     case Input::IT_STICKMOTION:
         {
-        Log::info("InputManager::inputSensing", "Storing new axis binding, value = %d; "
-            "deviceID = %d; button = %d; axisDirection = %s", value, deviceID, button,
-            axisDirection == Input::AD_NEGATIVE ? "-" : "+");
         // We have to save the direction in which the axis was moved.
         // This is done by storing it as a sign (and since button can
         // be zero, we add one before changing the sign).
@@ -389,7 +386,10 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
             }
             else m_sensed_input_high_gamepad.insert(input_id);
         }
-        else if ( abs(value) < Input::MAX_VALUE/8.0f )
+        // At least with xbox controller they can come to a 'rest' with a value of 
+        // around 6000! So in order to detect that an axis was released, we need to
+        // test with a rather high deadzone value
+        else if ( abs(value) < Input::MAX_VALUE/3.0f )
         {
             if( id_was_high )
             {
@@ -639,8 +639,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                     GamePadDevice* gp =
                         getDeviceManager()->getGamePadFromIrrID(deviceID);
 
-                    if (gp != NULL &&
-                        abs(value)>gp->m_deadzone)
+                    // Check for deadzone
+                    if (gp != NULL && gp->moved(value))
                     {
                         //I18N: message shown when an input device is used but
                         // is not associated to any player
@@ -778,7 +778,7 @@ EventPropagation InputManager::input(const SEvent& event)
             return EVENT_BLOCK;
         }
 
-        for(int i=0; i<gp->m_button_count; i++)
+        for(int i=0; i<gp->getNumberOfButtons(); i++)
         {
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
 

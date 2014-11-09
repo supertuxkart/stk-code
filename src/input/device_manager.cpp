@@ -101,13 +101,15 @@ bool DeviceManager::initialize()
         // Some linux systems report a disk accelerometer as a gamepad, skip that
         if (name.find("LIS3LV02DL") != -1) continue;
 
-#ifdef WIN32
-        // On Windows, unless we use DirectInput, all gamepads are given the
-        // same name ('microsoft pc-joystick driver'). This makes configuration
-        // totally useless, so append an ID to the name. We can't test for the
-        // name, since the name is even translated.
-        name = name + " " + StringUtils::toString(id).c_str();
-#endif
+        if(m_irrlicht_gamepads[id].HasGenericName)
+        {
+            // On Windows all gamepads are given the same name ('microsoft
+            // pc-joystick driver'). Irrlicht now tries to get a better name
+            // from the registry, but in case this should fail we still have
+            // all gamepads with the same name shown in the GUI. This makes
+            // configuration totally useless, so append an ID to the name.
+            name = name + " " + StringUtils::toString(id).c_str();
+        }
 
         if (UserConfigParams::logMisc())
         {
@@ -115,7 +117,7 @@ bool DeviceManager::initialize()
         }
 
         // Returns true if new configuration was created
-        if (getConfigForGamepad(id, name, &gamepadConfig) == true)
+        if (getConfigForGamepad(id, name.c_str(), &gamepadConfig) == true)
         {
             if(UserConfigParams::logMisc())
                Log::info("Device manager","creating new configuration.");
@@ -184,7 +186,7 @@ GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
     const int count = m_gamepads.size();
     for (int i = 0; i < count; i++)
     {
-        if (m_gamepads[i].m_index == id)
+        if (m_gamepads[i].getIrrIndex()== id)
         {
 
             return m_gamepads.get(i);
@@ -200,7 +202,7 @@ GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
  *  otherwise false.
  */
 bool DeviceManager::getConfigForGamepad(const int irr_id,
-                                        const core::stringc& name,
+                                        const std::string& name,
                                         GamepadConfig **config)
 {
     bool found = false;
@@ -209,7 +211,7 @@ bool DeviceManager::getConfigForGamepad(const int irr_id,
     // Find appropriate configuration
     for(unsigned int n=0; n < m_gamepad_configs.size(); n++)
     {
-        if(m_gamepad_configs[n].getName() == name.c_str())
+        if(m_gamepad_configs[n].getName() == name)
         {
             *config = m_gamepad_configs.get(n);
             found = true;
@@ -221,7 +223,7 @@ bool DeviceManager::getConfigForGamepad(const int irr_id,
     {
         if(irr_id < (int)(m_irrlicht_gamepads.size()))
         {
-            *config = new GamepadConfig( name.c_str(),
+            *config = new GamepadConfig( name,
                                          m_irrlicht_gamepads[irr_id].Axes,
                                          m_irrlicht_gamepads[irr_id].Buttons );
         }
@@ -317,7 +319,7 @@ InputDevice* DeviceManager::mapKeyboardInput(int button_id,
     {
         KeyboardDevice *keyboard = m_keyboards.get(n);
 
-        if (keyboard->processAndMapInput(action, Input::IT_KEYBOARD, button_id, mode))
+        if (keyboard->processAndMapInput(Input::IT_KEYBOARD, button_id, mode, action))
         {
             if (m_single_player != NULL)
             {
@@ -363,7 +365,7 @@ InputDevice *DeviceManager::mapGamepadInput(Input::InputType type,
 
     if (gPad != NULL)
     {
-        if (gPad->processAndMapInput(action, type, button_id, mode, value))
+        if (gPad->processAndMapInput(type, button_id, mode, action, value))
         {
             if (m_single_player != NULL)
             {
@@ -504,28 +506,23 @@ bool DeviceManager::load()
     for(unsigned int i=0; i<input->getNumNodes(); i++)
     {
         const XMLNode *config = input->getNode(i);
-        if(config->getName()=="keyboard")
-        {
-            KeyboardConfig* keyboard_config = new KeyboardConfig();
-            if(!keyboard_config->load(config))
-            {
-                Log::error("Device manager",
-                    "Ignoring an ill-formed keyboard action in input config.");
-            }
-            m_keyboard_configs.push_back(keyboard_config);
-        }
-        else if (config->getName()=="gamepad")
-        {
-            GamepadConfig* gamepad_config = new GamepadConfig(config);
-            gamepad_config->load(config);
-            m_gamepad_configs.push_back(gamepad_config);
-        }
-        else
+        DeviceConfig *device_config = DeviceConfig::create(config);
+        if(!device_config)
         {
             Log::warn("DeviceManager",
                       "Invalid node '%s' in input.xml - ignored.",
                       config->getName().c_str());
             continue;
+        }
+        if(config->getName()=="keyboard")
+        {
+            KeyboardConfig *kc = static_cast<KeyboardConfig*>(device_config);
+            m_keyboard_configs.push_back(kc);
+        }
+        else if (config->getName()=="gamepad")
+        {
+            GamepadConfig *gc = static_cast<GamepadConfig*>(device_config);
+            m_gamepad_configs.push_back(gc);
         }
     }   // for i < getNumNodes
 

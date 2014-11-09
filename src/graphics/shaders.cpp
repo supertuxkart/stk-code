@@ -859,11 +859,13 @@ GLuint createShadowSampler()
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glSamplerParameterf(id, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-    glSamplerParameterf(id, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+    int aniso = UserConfigParams::m_anisotropic;
+    if (aniso == 0) aniso = 1;
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
     return id;
 #endif
 }
@@ -1185,14 +1187,14 @@ namespace MeshShader
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
         }
         else
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
         }
         AssignUniforms("layer", "ModelMatrix");
     }
@@ -1238,7 +1240,7 @@ namespace MeshShader
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
         }
         else
         {
@@ -1246,7 +1248,7 @@ namespace MeshShader
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/instanced_shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
         }
         AssignUniforms("layer");
     }
@@ -1260,14 +1262,14 @@ namespace MeshShader
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadowref.frag").c_str());
         }
         else
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadowref.frag").c_str());
         }
         AssignUniforms("layer", "ModelMatrix");
         AssignSamplerNames(Program, 0, "tex");
@@ -1567,7 +1569,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getRGBfromCIEXxy.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/tonemap.frag").c_str());
-        AssignUniforms();
+        AssignUniforms("vignette_weight");
 
         AssignSamplerNames(Program, 0, "text");
     }
@@ -1617,7 +1619,7 @@ namespace FullScreenShader
 
         // Use 8 to circumvent a catalyst bug when binding sampler
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
-        AssignUniforms("direction", "col");
+        AssignUniforms("split0", "split1", "split2", "splitmax", "direction", "col");
     }
 
     RadianceHintsConstructionShader::RadianceHintsConstructionShader()
@@ -1785,6 +1787,29 @@ namespace FullScreenShader
         AssignUniforms("zn", "zf");
 
         AssignSamplerNames(Program, 0, "texture");
+    }
+
+
+    LightspaceBoundingBoxShader::LightspaceBoundingBoxShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/Lightspaceboundingbox.comp").c_str(),
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str());
+        AssignSamplerNames(Program, 0, "depth");
+        AssignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
+        GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
+        glShaderStorageBlockBinding(Program, block_idx, 2);
+    }
+
+    DepthHistogramShader::DepthHistogramShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/depthhistogram.comp").c_str(),
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str());
+        AssignSamplerNames(Program, 0, "depth");
+
+        GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "Histogram");
+        glShaderStorageBlockBinding(Program, block_idx, 1);
     }
 
     GlowShader::GlowShader()

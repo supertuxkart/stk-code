@@ -59,6 +59,7 @@ GPInfoScreen::GPInfoScreen() : Screen("gp_info.stkgui")
     // Necessary to test if loadedFroMFile() was executed (in setGP)
     m_reverse_spinner   = NULL;
     m_screenshot_widget = NULL;
+    m_max_num_tracks = 0;
 }   // GPInfoScreen
 
 // ----------------------------------------------------------------------------
@@ -192,16 +193,12 @@ void GPInfoScreen::init()
         else
             m_group_name = stringc(m_group_spinner->getStringValue().c_str()).c_str();
 
-        // If there are more tracks selected atm as in the group (which can
-        // happen if the group has been changed since last time this screen
-        // was shown), adjust it:
-        int max_num_tracks = m_group_name=="all"
-                           ? track_manager->getNumberOfRaceTracks()
-                           : (int)track_manager->getTracksInGroup(m_group_name).size();
-        m_num_tracks_spinner->setMax(max_num_tracks);
-        if(m_num_tracks_spinner->getValue() > max_num_tracks)
+        m_max_num_tracks = getMaxNumTracks(m_group_name);
+        
+        m_num_tracks_spinner->setMax(m_max_num_tracks);
+        if(m_num_tracks_spinner->getValue() > m_max_num_tracks)
         {
-            m_num_tracks_spinner->setValue(max_num_tracks);
+            m_num_tracks_spinner->setValue(m_max_num_tracks);
         }
 
         // Now create the random GP:
@@ -330,16 +327,11 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     {
         m_group_name = stringc(m_group_spinner->getStringValue()).c_str();
 
-        // Update the maximum for the number of tracks since it's depending on
-        // the current track. The current value in the Number-of-tracks-spinner
-        // has to be updated, since otherwise the displayed (and used) value
-        // can be bigger than the maximum. (Might be a TODO to fix this)
-        int max_num_tracks = m_group_name=="all"
-                           ? track_manager->getNumberOfRaceTracks()
-                           : (int)track_manager->getTracksInGroup(m_group_name).size();
-        m_num_tracks_spinner->setMax(max_num_tracks);
-        if (m_num_tracks_spinner->getValue() > max_num_tracks)
-            m_num_tracks_spinner->setValue(max_num_tracks);
+        m_max_num_tracks = getMaxNumTracks(m_group_name);
+        
+        m_num_tracks_spinner->setMax(m_max_num_tracks);
+        if (m_num_tracks_spinner->getValue() > m_max_num_tracks)
+            m_num_tracks_spinner->setValue(m_max_num_tracks);
         // Create a new (i.e. with new tracks) random gp, since the old
         // tracks might not all belong to the newly selected group.
 
@@ -389,3 +381,41 @@ void GPInfoScreen::onUpdate(float dt)
     m_screenshot_widget->setImage(file, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     m_screenshot_widget->m_properties[PROP_ICON] = file;
 }   // onUpdate
+
+/** Get number of available tracks for random GPs 
+ */
+int GPInfoScreen::getMaxNumTracks(std::string group)
+{
+    int max_num_tracks = 0;
+
+    if (group == "all")
+    {
+        for (unsigned int i = 0; i < track_manager->getNumberOfTracks(); i++)
+        {
+            std::string id = track_manager->getTrack(i)->getIdent();
+    
+            if (!PlayerManager::getCurrentPlayer()->isLocked(id) &&
+                track_manager->getTrack(i)->isRaceTrack())
+            {
+                max_num_tracks++;
+            }
+        }
+    }
+    else
+    {
+        std::vector<int> tracks = track_manager->getTracksInGroup(group);
+        
+        for (unsigned int i = 0; i < tracks.size(); i++)
+        {
+            std::string id = track_manager->getTrack(tracks[i])->getIdent();
+            
+            if (!PlayerManager::getCurrentPlayer()->isLocked(id) &&
+                track_manager->getTrack(tracks[i])->isRaceTrack())
+            {
+                max_num_tracks++;
+            }               
+        }
+    }
+    
+    return max_num_tracks;
+}

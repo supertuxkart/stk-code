@@ -105,14 +105,15 @@ void ProfileWorld::setProfileModeLaps(int laps)
  */
 AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
                                        int local_player_id, int global_player_id,
-                                       RaceManager::KartType type)
+                                       RaceManager::KartType type,
+                                       const PlayerDifficulty *difficulty)
 {
     btTransform init_pos   = m_track->getStartTransform(index);
 
     Kart *new_kart         = new KartWithStats(kart_ident,
                                                /*world kart id*/ index,
                                                /*position*/ index+1,
-                                               init_pos);
+                                               init_pos, difficulty);
     new_kart->init(RaceManager::KT_AI);
     Controller *controller = loadAIController(new_kart);
     new_kart->setController(controller);
@@ -327,7 +328,7 @@ void ProfileWorld::enterRaceOverState()
             expl_count      += kart->getExplosionCount();
             off_track_count += kart->getOffTrackCount();
         }    // for i < m_karts.size
-        
+
         Log::verbose("profile", std::string(max_len+85, '-').c_str());
         ss.clear();
         ss.str("");

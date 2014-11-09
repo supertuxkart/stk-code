@@ -164,7 +164,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
         if (World::getWorld() && UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
-            m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
+            m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowFBO().getRTT()[0]);
         else
             m_post_processing->renderSunlight();
     }

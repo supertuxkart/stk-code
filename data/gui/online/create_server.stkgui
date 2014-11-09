@@ -12,7 +12,7 @@
                         <textbox proportion="1" id="name" I18N="In the create server screen"/>
                     </div>
 
-                    <spacer height="20" width="20">
+                    <spacer height="20" width="20"/>
 
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <label proportion="1" text_align="left" I18N="In the create server screen" text="Max. number of players"/>

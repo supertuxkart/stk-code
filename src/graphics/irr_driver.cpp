@@ -351,7 +351,7 @@ void IrrDriver::initDevice()
             UserConfigParams::m_height = (int)ssize.Height;
         }
 
-        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, 
+        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width,
                                                     UserConfigParams::m_height);
         
         if (UserConfigParams::m_fullscreen)
@@ -485,6 +485,7 @@ void IrrDriver::initDevice()
         m_need_ubo_workaround = false;
         m_need_rh_workaround = false;
         m_need_srgb_workaround = false;
+        m_support_sdsm = true;
 #ifdef WIN32
         // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
         if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL && (m_gl_major_version == 3 && m_gl_minor_version == 1))
@@ -492,7 +493,10 @@ void IrrDriver::initDevice()
 #endif
         // Fix for Nvidia and instanced RH
         if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
+        {
             m_need_rh_workaround = true;
+            m_support_sdsm = false;
+        }
 
         // Fix for AMD and bindless sRGB textures
         if (strstr((const char *)glGetString(GL_VENDOR), "ATI") != NULL)
@@ -513,6 +517,7 @@ void IrrDriver::initDevice()
     hasDrawIndirect = false;
     hasComputeShaders = false;
     hasTextureStorage = false;
+    hasTextureView = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
 #if !defined(__APPLE__)
     if (!ProfileWorld::isNoGraphics())
@@ -541,6 +546,11 @@ void IrrDriver::initDevice()
             hasTextureStorage = true;
             Log::info("GLDriver", "ARB Texture Storage enabled");
         }
+        if (hasGLExtension("GL_ARB_texture_view")) {
+            hasTextureView = true;
+            Log::info("GLDriver", "ARB Texture View enabled");
+        }
+        m_support_sdsm = m_support_sdsm && hasComputeShaders && hasBuffserStorage;
     }
 #endif
 

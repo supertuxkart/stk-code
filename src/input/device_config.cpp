@@ -19,6 +19,8 @@
 
 #include "input/device_config.hpp"
 
+#include "input/gamepad_config.hpp"
+#include "input/keyboard_config.hpp"
 #include "io/xml_node.hpp"
 #include "utils/log.hpp"
 
@@ -28,9 +30,42 @@
 
 using namespace irr;
 
-DeviceConfig::DeviceConfig(DeviceConfigType type)
+// ------------------------------------------------------------------------
+/** A simple factory that creates either a gamepad or a keyboard
+ *  configuration.
+ *  \param type "gamepad" or "keyboard".
+ *  \param config The XML node with additional configuration parameters.
+ */
+DeviceConfig* DeviceConfig::create(const XMLNode *config)
 {
-    m_type    = type;
+    DeviceConfig *device_config = NULL;
+    if(config->getName()=="keyboard")
+    {
+        device_config = new KeyboardConfig();
+    }
+    else if(config->getName()=="gamepad")
+    {
+        device_config = new GamepadConfig();
+    }
+    else
+    {
+        Log::error("DeviceConfig", "Incorrect type: '%s'.", 
+                   config->getName().c_str());
+        return NULL;
+    }
+    // A default keyboard etc is created without
+    if(config && !device_config->load(config))
+    {
+        delete device_config;
+        return NULL;
+    }
+    return device_config;
+}   // create
+
+// ------------------------------------------------------------------------
+DeviceConfig::DeviceConfig()
+{
+    m_name    = "";
     m_enabled = true;
     m_plugged = 0;
 }   // DeviceConfig
@@ -38,7 +73,7 @@ DeviceConfig::DeviceConfig(DeviceConfigType type)
 // ------------------------------------------------------------------------
 /** Get a user-readable string describing the bound action.
  */
-irr::core::stringw DeviceConfig::getBindingAsString (const PlayerAction action) const
+irr::core::stringw DeviceConfig::getBindingAsString(const PlayerAction action) const
 {
     irr::core::stringw return_string = "";
 
@@ -243,11 +278,16 @@ bool DeviceConfig::doGetAction(Input::InputType    type,
 }   // doGetAction
 
 //------------------------------------------------------------------------------
-/** Saves the configuration to a file.
+/** Saves the configuration to a file. The calling node must have written
+ *  the beginning of the xml node, so that this function can immediately
+ *  start writing attributes.
  *  \param stream The stream to save to.
  */
 void DeviceConfig::save (std::ofstream& stream)
 {
+    stream << "enabled=\""
+        << (m_enabled ? "true\">\n" : "false\">\n");
+
     for(int n = 0; n < PA_COUNT; n++) // Start at 0?
     {
         stream << "    "
@@ -265,6 +305,8 @@ void DeviceConfig::save (std::ofstream& stream)
  */
 bool DeviceConfig::load(const XMLNode *config)
 {
+    config->get("name", &m_name);
+    config->get("enabled", &m_enabled);
     bool error = false;
     for(unsigned int i=0; i<config->getNumNodes(); i++)
     {

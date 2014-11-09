@@ -103,13 +103,13 @@ namespace Online
      *  \param path The path to add to the server.(see API::USER_*)
      *  \param action The action to perform. eg: connect, pool
      */
-    void HTTPRequest::setApiURL(const std::string& path, 
+    void HTTPRequest::setApiURL(const std::string& path,
                                 const std::string &action)
     {
         // Old (0.8.1) API: send to client-user.php, and add action as a parameter
         if(UserConfigParams::m_server_version==1)
         {
-            setURL( (std::string)UserConfigParams::m_server_multiplayer + 
+            setURL( (std::string)UserConfigParams::m_server_multiplayer +
                     "client-user.php"                                      );
             if(action=="change-password")
                 addParameter("action", "change_password");

@@ -182,7 +182,7 @@ void BaseUserScreen::selectUser(int index)
     makeEntryFieldsVisible();
     getWidget<CheckBoxWidget>("remember-user")->setState(
         profile->rememberPassword());
-    if(profile->getLastOnlineName().size()>0)
+    if(profile->getLastOnlineName().size() > 0)
         m_username_tb->setDeactivated();
     else
         m_username_tb->setActivated();

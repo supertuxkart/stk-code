@@ -26,6 +26,7 @@
  * configuration file.
  */
 
+#include "network/remote_kart_info.hpp"
 #include "utils/no_copy.hpp"
 
 #include <vector>
@@ -33,6 +34,7 @@
 #include <map>
 
 class KartProperties;
+class PlayerDifficulty;
 class MusicInformation;
 class XMLNode;
 
@@ -47,8 +49,10 @@ class STKConfig : public NoCopy
 {
 protected:
     /** Default kart properties. */
-    KartProperties  *m_default_kart_properties;
+    KartProperties *m_default_kart_properties;
     std::map<std::string, KartProperties*> m_kart_properties;
+    /** Per-player difficulties. */
+    PlayerDifficulty* m_player_difficulties[PLAYER_DIFFICULTY_COUNT];
 
 public:
     /** What to do if a kart already has a powerup when it hits a bonus box:
@@ -175,6 +179,9 @@ public:
 
     const KartProperties &
          getKartProperties(std::string type) { return *m_kart_properties[type]; }
+
+    const PlayerDifficulty * getPlayerDifficulty(PerPlayerDifficulty difficulty)
+        { return m_player_difficulties[difficulty]; }
 }
 ;   // STKConfig
 

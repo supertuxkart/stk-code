@@ -23,19 +23,31 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
 
-GamePadDevice::GamePadDevice(const int irrIndex, const std::string name,
+/** Constructor for GamePadDevice from a connected gamepad for which no
+ *  configuration existed (defaults will be used)
+ *  \param irrIndex Index of stick as given by irrLicht.
+ */
+
+GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
                              const int axis_count, const int button_count,
                              GamepadConfig *configuration)
 {
     m_type                  = DT_GAMEPAD;
     m_prev_axis_directions  = NULL;
     m_configuration         = configuration;
-    m_axis_count            = axis_count;
+    GamepadConfig *config = static_cast<GamepadConfig*>(m_configuration);
+    if(m_configuration->getNumberOfButtons()<button_count)
+    {
+        static_cast<GamepadConfig*>(m_configuration)->setNumberOfButtons(button_count);
+    }
+    if(m_configuration->getNumberOfAxes()<axis_count)
+    {
+        static_cast<GamepadConfig*>(m_configuration)->setNumberOfAxis(axis_count);
+    }
     m_prev_axis_directions  = new Input::AxisDirection[axis_count];
     m_prev_axis_value       = new int[axis_count];
     m_axis_ok               = new bool[axis_count];
-    m_button_count          = button_count;
-    m_index                 = irrIndex;
+    m_irr_index             = irr_index;
     m_name                  = name;
 
     for (int i = 0; i < axis_count; i++)
@@ -62,7 +74,21 @@ GamePadDevice::~GamePadDevice()
 }   // ~GamePadDevice
 
 // ----------------------------------------------------------------------------
+/** Returns if the specified value is larger than the deadzone. */
+bool GamePadDevice::moved(int value) const
+{
+    int dz = static_cast<GamepadConfig*>(m_configuration)->getDeadzone();
+    return abs(value) > dz;
+}   // moved
 
+// ----------------------------------------------------------------------------
+/** Returns the number of buttons of this gamepad. */
+int GamePadDevice::getNumberOfButtons() const
+{
+    return m_configuration->getNumberOfButtons();
+}   // getNumberOfButtons
+
+// ----------------------------------------------------------------------------
 bool GamePadDevice::isButtonPressed(const int i)
 {
     return m_buttonPressed[i];
@@ -90,9 +116,9 @@ void GamePadDevice::resetAxisDirection(const int axis,
         return;
     }
 
-    for(int n=0; n<PA_COUNT; n++)
+    for(int n=PA_BEFORE_FIRST+1; n<PA_COUNT; n++)
     {
-        Binding& bind = m_configuration->getBinding(n);
+        const Binding& bind = m_configuration->getBinding(n);
         if(bind.getType() == Input::IT_STICKMOTION &&
            bind.getId() == axis &&
            bind.getDirection()== direction &&
@@ -107,13 +133,51 @@ void GamePadDevice::resetAxisDirection(const int axis,
 }   // resetAxisDirection
 
 // ----------------------------------------------------------------------------
+/** Invoked when this device it used. Verifies if the key/button that was
+ *  pressed is associated with a binding. If yes, sets action and returns
+ *  true; otherwise returns false. It can also modify the value used.
+ *  \param type Type of input (e.g. IT_STICKMOTION, ...).
+ *  \param id   ID of the key that was pressed or of the axis that was
+ *              triggered (depending on the value of the 'type' parameter).
+ *  \param mode Used to determine whether to map menu actions or
+ *              game actions
+ * \param[out] action  The action associated to this input (only check
+ *                     this value if method returned true)
+ * \param[in,out] value The value associated with this type (typically
+ *                      how far a gamepad axis is moved).
+ *
+ * \return Whether the pressed key/button is bound with an action
+ */
 
-bool GamePadDevice::processAndMapInput(PlayerAction* action /* out */,
-                                       Input::InputType type, const int id,
+bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
                                        InputManager::InputDriverMode mode,
-                                       int* value/* inout */)
+                                       PlayerAction* action /* out */,
+                                       int* value           /* inout */ )
 {
     if (!m_configuration->isEnabled()) return false;
+
+    // A digital input value is 32767 or -32768 (which then triggers 
+    // time-full-steer to be used to adjust actual steering values.
+    // To prevent this delay for analog gamesticks, make sure that
+    // 32767/-32768 are never used.
+    if(m_configuration->isAnalog())
+    {
+        if(*value==32767)
+            *value = 32766;
+        else if(*value==-32768)
+            *value = -32767;
+    }
+
+    // Desensitizing means to map an input in the range x in [0,1] to
+    // x^2. This results in changes close to 0 to have less impact
+    // (less sensitive).
+    if(m_configuration->desensitize())
+    {
+        // x/32767 is in [-1,1], (x/32767)^2 is in [0,1]. Take care of the
+        // sign and map this back to [0,32767] by multiplying by 32767.
+        // Which all in all results in:
+        *value = int( (*value / 32767.0f) * fabsf(float(*value)) );
+    }
 
     bool success = false;
     if(m_prev_axis_directions == NULL) return false; // device not open
@@ -121,7 +185,7 @@ bool GamePadDevice::processAndMapInput(PlayerAction* action /* out */,
     if (type == Input::IT_STICKMOTION)
     {
         // this gamepad doesn't even have that many axes
-        if (id >= m_axis_count) return false;
+        if (id >= m_configuration->getNumberOfAxes()) return false;
 
         if (getPlayer())
         {
@@ -157,8 +221,9 @@ bool GamePadDevice::processAndMapInput(PlayerAction* action /* out */,
             }
         }
 
+        int dz = static_cast<GamepadConfig*>(m_configuration)->getDeadzone();
         // check if within deadzone
-        if(*value > -m_deadzone && *value < m_deadzone && getPlayer())
+        if(*value > -dz && *value < dz && getPlayer())
         {
             // Axis stands still: This is reported once for digital axes and
             // can be called multipled times for analog ones. Uses the

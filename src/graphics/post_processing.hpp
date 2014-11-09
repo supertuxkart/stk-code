@@ -88,6 +88,7 @@ public:
     /** Blur the in texture */
     void renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
     void renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
+    void renderGaussian6BlurLayer(FrameBuffer &in_fbo);
     void renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
 
     /** Render tex. Used for blit/texture resize */

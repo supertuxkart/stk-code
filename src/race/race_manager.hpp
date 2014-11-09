@@ -271,16 +271,19 @@ public:
         /** In GPs, at the end, will hold the overall rank of this kart
          *  (0<=m_gp_rank < num_karts-1). */
         int         m_gp_rank;
+        /** The difficulty for this player. */
+        PerPlayerDifficulty m_difficulty;
 
         KartStatus(const std::string& ident, const int& prev_finish_pos,
                    int local_player_id, int global_player_id,
-                   int init_gp_rank, KartType kt) :
+                   int init_gp_rank, KartType kt,
+                   PerPlayerDifficulty difficulty) :
                    m_ident(ident), m_score(0), m_last_score(0),
                    m_overall_time(0.0f), m_last_time(0.0f),
                    m_kart_type(kt),
                    m_local_player_id(local_player_id),
                    m_global_player_id(global_player_id),
-                   m_gp_rank(init_gp_rank)
+                   m_gp_rank(init_gp_rank), m_difficulty(difficulty)
                 {}
 
     };   // KartStatus
@@ -373,6 +376,10 @@ public:
     /** Sets additional information for a player to indicate which soccer team it belong to
     */
     void setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team);
+
+    /** Sets the per-player difficulty for a player.
+     */
+    void setPlayerDifficulty(unsigned int player_id, PerPlayerDifficulty difficulty);
 
     /** Sets the number of local players playing on this computer (including
       * split screen).
@@ -574,6 +581,11 @@ public:
     KartType getKartType(int kart) const
     {
         return m_kart_status[kart].m_kart_type;
+    }
+    // ------------------------------------------------------------------------
+    PerPlayerDifficulty getPlayerDifficulty(int kart) const
+    {
+        return m_kart_status[kart].m_difficulty;
     }
     // ------------------------------------------------------------------------
     int getCoinTarget() const { return m_coin_target; }

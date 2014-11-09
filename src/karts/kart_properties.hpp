@@ -124,7 +124,7 @@ private:
     /** Weight of kart.  */
     float m_mass;
 
-    /** Maximum force from engine for eachdifficulty. */
+    /** Maximum force from engine for each difficulty. */
     std::vector<float> m_engine_power;
 
     /** Braking factor * engine_power braking force. */
@@ -151,8 +151,8 @@ private:
     Vec3  m_bevel_factor;
 
     /** The position of the physical wheel is a weighted average of the
-     *  two ends of the beveled shape. This determines the weight: 0 = 
-     *  a the widest end, 1 = at the narrowest front end. If the value is 
+     *  two ends of the beveled shape. This determines the weight: 0 =
+     *  a the widest end, 1 = at the narrowest front end. If the value is
      *  < 0, the old physics settings are used which places the raycast
      *  wheels outside of the chassis - but result in a more stable
      *  physics behaviour (which is therefore atm still the default).
@@ -208,6 +208,9 @@ private:
      *  chassis. Useful for karts that don't have enough space for suspension
      *  compression. */
     float       m_graphical_y_offset;
+    /** A hard flag that moves the graphical chassis higher if it's insde
+      * the track. Might cause stuttering. */
+    bool        m_prevent_chassis_in_terrain;
     /** If the kart is supposed to have random wheel rotation at start. */
     bool        m_has_rand_wheels;
     /** Max. length of plunger rubber band. */
@@ -528,7 +531,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the torque scaling factor used to keep the karts parallel to
      *  the ground when flying. */
-    float getSmoothFlyingImpulse() const 
+    float getSmoothFlyingImpulse() const
     {
         return m_smooth_flying_impulse;
     }   // getSmoothFlyingImpulse
@@ -577,6 +580,13 @@ public:
      *  chassis. Useful for karts that don't have enough space for suspension
      *  compression. */
     float getGraphicalYOffset() const {return m_graphical_y_offset; }
+    // ------------------------------------------------------------------------
+    /** A hard flag that moves the graphical chassis higher if it's insde
+      * the track. Might cause stuttering. */
+    bool getPreventChassisInTerrain() const
+    {
+        return m_prevent_chassis_in_terrain;
+    }   // getPreventChassisInTerrain
     // ------------------------------------------------------------------------
     /** Returns parameters for the speed-weighted objects */
     const SpeedWeightedObject::Properties& getSpeedWeightedObjectProperties() const
@@ -928,13 +938,13 @@ public:
     const Vec3 &getBevelFactor() const { return m_bevel_factor; }
     // ------------------------------------------------------------------------
     /** Returns position of the physical wheel is a weighted average of the
-     *  two ends of the beveled shape. This determines the weight: 0 = 
+     *  two ends of the beveled shape. This determines the weight: 0 =
      *  a the widest end, 1 = at the narrowest, front end. If the value is <0,
      *  the old physics position is picked, which placed the raycast wheels
      *  outside of the chassis, but gives more stable physics. */
-    const float getPhysicalWheelPosition() const 
+    const float getPhysicalWheelPosition() const
     {
-        return m_physical_wheel_position; 
+        return m_physical_wheel_position;
     }   // getPhysicalWheelPosition
 };   // KartProperties
 

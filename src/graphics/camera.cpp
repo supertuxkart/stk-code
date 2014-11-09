@@ -64,7 +64,10 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     setupCamera();
     if (kart != NULL)
     {
-        m_distance = kart->getKartProperties()->getCameraDistance();
+        if(UserConfigParams::m_camera_debug==2)
+            m_distance = kart->getKartModel()->getLength();
+        else
+            m_distance = kart->getKartProperties()->getCameraDistance();
         setKart(kart);
     }
     else
@@ -379,37 +382,6 @@ void Camera::smoothMoveCamera(float dt)
 }   // smoothMoveCamera
 
 //-----------------------------------------------------------------------------
-/** Computes the wanted camera position and target for normal camera mode.
- *  Besides being used in update(dt), it is also used when switching the
- *  camera from reverse mode to normal mode - in which case we don't want
- *  to have a smooth camera.
- *  \param wanted_position The position the camera should be.
- *  \param wanted_target The target position the camera should target.
- */
-void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
-                                         Vec3 *wanted_target)
-{
-    *wanted_target = m_kart->getXYZ();
-    wanted_target->setY(wanted_target->getY()+ 0.75f);
-
-    // This first line moves the camera around behind the kart, pointing it
-    // towards where the kart is turning (and turning even more while skidding).
-    // The skidding effect is dampened.
-    float steering = m_kart->getSteerPercent()
-                   * (1.0f + (m_kart->getSkidding()->getSkidFactor() - 1.0f)
-                             /2.3f );
-    // quadratically to dampen small variations (but keep sign)
-    float dampened_steer =  fabsf(steering) * steering;
-
-    float tan_up = tan(m_kart->getKartProperties()->getCameraForwardUpAngle());
-    Vec3 relative_position(-m_distance*m_rotation_range*dampened_steer*0.5f,
-                            m_distance*tan_up+0.75f,
-                           -m_distance);
-    *wanted_position = m_kart->getTrans()(relative_position);
-
-}   // computeNormalCameraPosition
-
-//-----------------------------------------------------------------------------
 /** Determine the camera settings for the current frame.
  *  \param above_kart How far above the camera should aim at.
  *  \param cam_angle  Angle above the kart plane for the camera.
@@ -549,7 +521,10 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getXYZ();
     if(UserConfigParams::m_camera_debug==2)
-        wanted_target.setY(m_kart->getVehicle()->getWheelInfo(2).m_raycastInfo.m_contactPointWS.getY());
+    {
+        const btWheelInfo &w = m_kart->getVehicle()->getWheelInfo(2);
+        wanted_target.setY(w.m_raycastInfo.m_contactPointWS.getY());
+    }
     else
         wanted_target.setY(wanted_target.getY()+above_kart);
     float tan_up = tan(cam_angle);
@@ -567,7 +542,7 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
     }
     wanted_position = t(relative_position);
 
-    if (smoothing)
+    if (smoothing && UserConfigParams::m_camera_debug==0)
     {
         smoothMoveCamera(dt);
     }
@@ -591,8 +566,8 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
         // Rotate the up vector (0,1,0) by the rotation ... which is just column 1
         Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
         float f = 0.04f;  // weight for new up vector to reduce shaking
-        m_camera->setUpVector(f      * up.toIrrVector() +
-            (1.0f - f) * m_camera->getUpVector());
+        m_camera->setUpVector(        f  * up.toIrrVector() +
+                              (1.0f - f) * m_camera->getUpVector());
     }   // kart && !flying
     else
         m_camera->setUpVector(core::vector3df(0, 1, 0));

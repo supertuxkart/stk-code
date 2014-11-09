@@ -43,7 +43,7 @@ public:
 class FrameBuffer
 {
 private:
-    GLuint fbo;
+    GLuint fbo, fbolayer;
     std::vector<GLuint> RenderTargets;
     GLuint DepthTexture;
     size_t width, height;
@@ -53,6 +53,7 @@ public:
     FrameBuffer(const std::vector <GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered = false);
     ~FrameBuffer();
     void Bind();
+    void BindLayer(unsigned);
     const std::vector<GLuint> &getRTT() const { return RenderTargets; }
     GLuint &getDepthTexture() { assert(DepthTexture); return DepthTexture; }
     size_t getWidth() const { return width; }

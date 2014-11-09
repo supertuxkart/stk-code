@@ -44,7 +44,6 @@ public:
     FrameBuffer &getShadowFBO() { return *m_shadow_FBO; }
     FrameBuffer &getRH() { return *m_RH_FBO; }
     FrameBuffer &getRSM() { return *m_RSM; }
-    unsigned getShadowDepthTex() const { return shadowDepthTex; }
 
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }

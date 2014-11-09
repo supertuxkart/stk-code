@@ -419,6 +419,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
         if (player->isFirstTime())
         {
+            CutsceneWorld::setUseDuration(true);
             StateManager::get()->enterGameState();
             race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
             race_manager->setNumKarts( 0 );

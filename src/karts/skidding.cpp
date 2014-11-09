@@ -77,6 +77,9 @@ void Skidding::reset()
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
     m_kart->getControls().m_skid = KartControl::SC_NONE;
+    
+    btVector3 rot(0, 0, 0);
+    m_kart->getVehicle()->setTimedRotation(0, rot);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -120,8 +123,8 @@ void Skidding::updateSteering(float steer, float dt)
         break;
     case SKID_BREAK:
         m_real_steering = steer;
-        if (m_visual_rotation > 0.05f) m_visual_rotation -= 0.05f;
-        else if (m_visual_rotation < -0.05f) m_visual_rotation += 0.05f;
+        if (m_visual_rotation > 0.1f) m_visual_rotation -= 0.1f;
+        else if (m_visual_rotation < -0.1f) m_visual_rotation += 0.1f;
         else
         {
             reset();
@@ -212,7 +215,7 @@ void Skidding::update(float dt, bool is_on_ground,
     }
 
     // No skidding backwards or while stopped
-    if(m_kart->getSpeed() < 0.001f &&
+    if(m_kart->getSpeed() < m_min_skid_speed &&
        m_skid_state != SKID_NONE && m_skid_state != SKID_BREAK)
     {
         m_skid_state = SKID_BREAK;
@@ -355,7 +358,6 @@ void Skidding::update(float dt, bool is_on_ground,
         }
     case SKID_BREAK:
         {
-            updateSteering(steering, dt);
             break;
         }
     case SKID_ACCUMULATE_LEFT:

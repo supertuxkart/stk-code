@@ -23,6 +23,7 @@
 #include "input/input.hpp"
 #include "utils/no_copy.hpp"
 
+#include <assert.h>
 #include <iosfwd>
 #include <irrString.h>
 #include <string>
@@ -39,30 +40,23 @@
   */
 class DeviceConfig : public NoCopy
 {
-public:
-    enum DeviceConfigType
-    {
-        DEVICE_CONFIG_TYPE_GAMEPAD,
-        DEVICE_CONFIG_TYPE_KEYBOARD
-    };
-protected:
 
-    Binding  m_bindings[PA_COUNT];
-
-    /** How many devices connected to the system which uses this config? */
-    int m_plugged; 
-
+private:
     /** If set to false, this device will be ignored. 
      *  Currently for gamepads only. */
     bool m_enabled;
 
+    /** How many devices connected to the system which uses this config? */
+    int m_plugged; 
+
     /** Name of this configuratiom. */
     std::string m_name;
 
-    /** Configuration type. */
-    DeviceConfigType m_type;
+protected:
 
-    DeviceConfig(DeviceConfigType type);
+    Binding  m_bindings[PA_COUNT];
+
+    DeviceConfig();
 
     bool doGetAction(Input::InputType    type,
                      const int           id,
@@ -78,8 +72,12 @@ protected:
                        const int              id,
                        int*                   value, /* inout */
                        PlayerAction*          action /* out */);
+
 public:
 
+    virtual ~DeviceConfig() {}
+
+    static DeviceConfig* create(const XMLNode *config);
     irr::core::stringw toString();
     bool hasBindingFor(const int buttonID) const;
     bool hasBindingFor(const int buttonID, PlayerAction from,
@@ -95,11 +93,41 @@ public:
                        int*                   value,
                        PlayerAction*          action /* out */);
     irr::core::stringw getMappingIdString (const PlayerAction action) const;
-    irr::core::stringw getBindingAsString(const PlayerAction action) const;
+    virtual irr::core::stringw getBindingAsString(const PlayerAction action) const;
+    virtual bool isGamePad()  const = 0;
+    virtual bool isKeyboard() const = 0;
 
-    virtual DeviceConfigType getType() const = 0;
     virtual void save(std::ofstream& stream);
     virtual bool load(const XMLNode *config);
+
+    // ------------------------------------------------------------------------
+    /** Returns true if this device has analog axis, so that steering values
+     *  will not be affected by time-full-steer delays. */
+    virtual bool isAnalog() const { return false;}
+    // ------------------------------------------------------------------------
+    /** Returns true if this device should desensitize its input at values
+     *  close to 0 (to avoid 'oversteering'). */
+    virtual bool desensitize() const { return false;}
+    // ------------------------------------------------------------------------
+    /** Should only be called for gamepads, which has its own implementation.
+     *  of this function. */
+    virtual int getNumberOfButtons() const
+    {
+        assert(false); return 0;
+    }   // getNumberOfButtons
+
+    // ------------------------------------------------------------------------
+    /** Should only be called for gamepads, which has its own implementation.
+     *  of this function. */
+    virtual int getNumberOfAxes() const
+    {
+        assert(false); return 0;
+    }   // getNumberOfAxes
+
+    // ------------------------------------------------------------------------
+    /** Sets the name of this device. */
+    void setName(const std::string &name) { m_name = name; }
+
     // ------------------------------------------------------------------------
     /** Returns the name for this device configuration. */
     const std::string& getName() const { return m_name; };
@@ -118,7 +146,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the binding of a given index. */
-    Binding& getBinding(int i) {return m_bindings[i];}
+    const Binding& getBinding(int i) const {return m_bindings[i];}
 
     // ------------------------------------------------------------------------
     /** At this time only relevant for gamepads, keyboards are always enabled */

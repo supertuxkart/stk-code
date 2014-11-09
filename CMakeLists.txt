@@ -78,10 +78,6 @@ if(USE_WIIUSE)
     include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
 endif()
 
-# Build the angelscript library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
-include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
-
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
 
@@ -100,6 +96,11 @@ if(APPLE)
 elseif(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")   # Enable multi-processor compilation (faster)
 endif()
+
+
+# Build the angelscript library
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
+include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
 
 # OpenAL
 if(APPLE)
@@ -400,4 +401,4 @@ install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/application
 install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32 RENAME supertuxkart.png)
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128 RENAME supertuxkart.png)
 install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
-install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
+install(FILES data/supertuxkart.appdata.xml DESTINATION share/appdata)
