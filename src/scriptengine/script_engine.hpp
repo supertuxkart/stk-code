@@ -68,12 +68,8 @@ namespace Scripting
         
     private:
         asIScriptEngine *m_engine;
-        std::vector <std::string> m_cache_index;
-        std::vector <asIScriptFunction*> m_function_cache;
-        bool m_use_cache;
+        std::map<std::string, asIScriptFunction*> m_script_cache;
 
-        int getCacheIndex(std::string scriptname);
-        bool isCacheMiss(std::string scriptname);
         void configureEngine(asIScriptEngine *engine);
         int  compileScript(asIScriptEngine *engine,std::string scriptName);
     };   // class ScriptEngine

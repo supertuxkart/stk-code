@@ -49,8 +49,6 @@ ScriptEngine::ScriptEngine()
     // and variables that the script should be able to use.
     configureEngine(m_engine);
 
-    //Cache options
-    m_use_cache = true;
 }
 ScriptEngine::~ScriptEngine()
 {
@@ -92,11 +90,11 @@ std::string getScript(std::string scriptName)
 }
 //-----------------------------------------------------------------------------
 /** runs the specified script
-*  \param ident scriptName = name of script to run
+*  \param string scriptName = name of script to run
 */
 void ScriptEngine::runScript(std::string scriptName)
 {
-    return; // Scripting disabled for now
+    //return; // Scripting disabled for now
 
     // Create a context that will execute the script.
     asIScriptContext *ctx = m_engine->CreateContext();
@@ -110,22 +108,20 @@ void ScriptEngine::runScript(std::string scriptName)
 
 
     asIScriptFunction *func;
-    if (m_use_cache && isCacheMiss(scriptName))
+    if (m_script_cache.find(scriptName) == m_script_cache.end())
     {
         // Compile the script code
         r = compileScript(m_engine, scriptName);
         if (r < 0)
         {
-            //m_engine->Release();
             return;
         }
 
-
+        //set line callback here soon
         if (r < 0)
         {
             std::cout << "Failed to set the line callback function." << std::endl;
             ctx->Release();
-            //m_engine->Release();
             return;
         }
 
@@ -158,15 +154,13 @@ void ScriptEngine::runScript(std::string scriptName)
         }
 
         //CACHE UPDATE
-        m_function_cache.push_back(func);
-        m_cache_index.push_back(scriptName);
+        m_script_cache[scriptName] = func;
     }
     else
     {
         //Script present in cache
-        int index = getCacheIndex(scriptName);
-        func = m_function_cache[index];
-        //std::cout << "FOUND CACHED : " << scriptName << std::endl;
+        func = m_script_cache[scriptName];
+        std::cout << "FOUND CACHED : " << scriptName << std::endl;
     }
     // Prepare the script context with the function we wish to execute. Prepare()
     // must be called on the context before each new script function that will be
@@ -295,31 +289,6 @@ int ScriptEngine::compileScript(asIScriptEngine *engine, std::string scriptName)
     return 0;
 }
 
-//-----------------------------------------------------------------------------
-/** Checks if the script has already been compiled/built before
-*  \param string scriptname = name of the script currently under consideration
-*/
-bool ScriptEngine::isCacheMiss(std::string scriptname)
-{
-    for (int i = 0; i < m_cache_index.size(); i++)
-    {
-        if (m_cache_index[i] == scriptname) return false;
-    }
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-/** Returns index of a script in the cache
-*  \param string scriptname = name of the script currently under consideration
-*/
-int ScriptEngine::getCacheIndex(std::string scriptname)
-{
-    for (int i = 0; i < m_cache_index.size(); i++)
-    {
-        if (m_cache_index[i] == scriptname) return i;
-    }
-    return -1;
-}
 
 
 }
