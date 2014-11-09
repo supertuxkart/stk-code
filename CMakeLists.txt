@@ -401,4 +401,4 @@ install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/application
 install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32 RENAME supertuxkart.png)
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128 RENAME supertuxkart.png)
 install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
-install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
+install(FILES data/supertuxkart.appdata.xml DESTINATION share/appdata)
