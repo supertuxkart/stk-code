@@ -42,6 +42,7 @@
 #include "graphics/water.hpp"
 #include "graphics/wind.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
@@ -863,7 +864,7 @@ void IrrDriver::applyResolutionSettings()
     // No need to reload cached track data (track_manager->cleanAllCachedData
     // above) - this happens dynamically when the tracks are loaded.
     GUIEngine::reshowCurrentScreen();
-
+    MessageQueue::updatePosition();
 }   // applyResolutionSettings
 
 // ----------------------------------------------------------------------------

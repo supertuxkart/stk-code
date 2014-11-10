@@ -2140,18 +2140,20 @@ void Kart::updateEngineSFX()
     if(isOnGround())
     {
         float max_speed = m_max_speed->getCurrentMaxSpeed();
+        assert(max_speed>0);
         // Engine noise is based half in total speed, half in fake gears:
         // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
         // ignoring the gear settings from stk_config, but providing a
         // good enough brrrBRRRbrrrBRRR sound effect. Speed factor makes
         // it a "staired sawtooth", so more acoustically rich.
-        float f = m_speed/max_speed;
+        float f = max_speed > 0 ? m_speed/max_speed : 1.0f;
         // Speed at this stage is not yet capped, so it can be > 1, which
         // results in odd engine sfx.
         if (f>1.0f) f=1.0f;
 
         float gears = 3.0f * fmod(f, 0.333334f);
-        m_engine_sound->setSpeed(0.6f + (f +gears)* 0.35f);
+        assert(!isnan(f));
+        m_engine_sound->setSpeed(0.6f + (f + gears) * 0.35f);
     }
     else
     {
