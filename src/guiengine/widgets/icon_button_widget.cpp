@@ -296,7 +296,8 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
 
     std::string name = texture->getName().getPath().c_str();
     name += "_disabled";
-    t = irr_driver->getTexture(name);
+    t = irr_driver->getTexture(name, /*premul*/false, /*prediv*/false, 
+                                     /*compain_if_not_found*/false);
     if (t == NULL)
     {
         SColor c;
