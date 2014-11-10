@@ -127,7 +127,7 @@ namespace video
 } // end namespace irr
 
 
-#if defined(_IRR_WINDOWS_API_)
+#if defined(_IRR_WINDOWS_API_) && !defined(_IRR_STATIC_LIB_)
 
 BOOL APIENTRY DllMain( HANDLE hModule,
                        DWORD  ul_reason_for_call,
