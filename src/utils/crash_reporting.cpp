@@ -20,7 +20,7 @@
 #include "log.hpp"
 #include <string.h>
 
-#if defined(WIN32) && !defined(DEBUG)
+#if defined(WIN32) && !defined(DEBUG) && !defined(__MINGW32__)
     // --------------------- Windows version -----------------
     #include <Windows.h>
     #include <DbgHelp.h>
@@ -76,7 +76,7 @@
         _In_ DWORD maxStringLength,
         _In_ DWORD flags
     );
-    
+
     namespace CrashReporting
     {
         void getCallStackWithContext(std::string& callstack, PCONTEXT pContext);
@@ -88,7 +88,7 @@
                 getCallStackWithContext(callstack, pContext);
             else
                 getCallStack(callstack);
-            
+
             std::string msg =   "SuperTuxKart crashed!\n"
                                 "Please hit Ctrl+C to copy to clipboard and signal the problem\n"
                                 "to the developers on our forum: http://forum.freegamedev.net/viewforum.php?f=16\n"
@@ -164,7 +164,7 @@
             FreeLibrary(hImageHlpDll);  \
             return; \
     }
-            
+
             GET_FUNC_PTR(SymCleanup                 )
             GET_FUNC_PTR(SymFunctionTableAccess64   )
             GET_FUNC_PTR(SymGetLineFromAddr64       )
@@ -302,7 +302,7 @@
             FreeLibrary(hImageHlpDll);
         }
 
-        
+
         void getCallStack(std::string& callstack)
         {
             // Get the current CONTEXT
