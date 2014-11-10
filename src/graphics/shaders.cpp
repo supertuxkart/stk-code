@@ -1702,7 +1702,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6h.frag").c_str());
-        AssignUniforms("pixel");
+        AssignUniforms("pixel", "sigma");
 
         AssignSamplerNames(Program, 0, "tex");
     }
@@ -1742,7 +1742,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6v.frag").c_str());
-        AssignUniforms("pixel");
+        AssignUniforms("pixel", "sigma");
 
         AssignSamplerNames(Program, 0, "tex");
     }
