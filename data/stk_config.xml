@@ -29,7 +29,7 @@
        time-per-kart Additional time added to the interval
        for each kart in the race. -->
   <follow-the-leader intervals="30 20 10"
-                     time-per-kart="1.5"  />
+                     time-per-kart="0"  />
 
   <!-- Startup information.
        Penalty: Penalty time if a kart accelerates before GO. -->
