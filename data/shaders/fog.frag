@@ -15,13 +15,11 @@ vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 void main()
 {
     vec2 uv = gl_FragCoord.xy / screen;
-	float z = texture(tex, uv).x;
-	vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
+    float z = texture(tex, uv).x;
+    vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
 
-	float dist = length(xpos.xyz);
-	float fog = smoothstep(start, end, dist);
+    float dist = length(xpos.xyz);
+    vec3 fog = col * (1. - exp(- fogmax * .01 * dist));
 
-	fog = min(fog, fogmax);
-
-	FragColor = vec4(col, fog);
+    FragColor = vec4(fog, 1.);
 }
