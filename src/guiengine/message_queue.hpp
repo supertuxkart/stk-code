@@ -37,6 +37,7 @@ namespace MessageQueue
     enum MessageType {MT_FRIEND, MT_ACHIEVEMENT};
 
     void add(MessageType mt, const core::stringw &message);
+    void updatePosition();
     void update(float dt);
 
 };   // namespace GUIEngine

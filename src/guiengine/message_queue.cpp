@@ -122,6 +122,16 @@ void createLabel(const Message *message)
 }   // createLabel
 
 // ----------------------------------------------------------------------------
+/** Called when the screen resolution is changed to compute the new
+ *  position of the message. */
+void updatePosition()
+{
+    if (g_all_messages.size() == 0) return;
+    Message *last = g_all_messages.top();
+    createLabel(last);
+}   // updatePosition
+
+// ----------------------------------------------------------------------------
 /** Adds a message to the message queue.
  *  \param mt The MessageType of the message.
  *  \param message The actual message.
