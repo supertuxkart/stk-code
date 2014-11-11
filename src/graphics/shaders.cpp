@@ -1842,7 +1842,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/fog.frag").c_str());
 
-        AssignUniforms("fogmax", "startH", "endH", "start", "end", "col");
+        AssignUniforms("density", "col");
         AssignSamplerNames(Program, 0, "tex");
     }
 
