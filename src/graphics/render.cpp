@@ -420,7 +420,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         World::getWorld()->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
-        m_post_processing->renderFog();
+        renderLightsScatter(pointlightcount);
         PROFILER_POP_CPU_MARKER();
     }
 

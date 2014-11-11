@@ -632,6 +632,10 @@ public:
 	{
 		if (m_inverseMass)
 		{
+            btAssert(!isnan(impulseMagnitude));
+            btAssert(!isnan(linearComponent.getX()));
+            btAssert(!isnan(linearComponent.getY()));
+            btAssert(!isnan(linearComponent.getZ()));
 			m_deltaLinearVelocity += linearComponent*impulseMagnitude;
 			m_deltaAngularVelocity += angularComponent*(impulseMagnitude*m_angularFactor);
 		}
