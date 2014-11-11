@@ -1,10 +1,6 @@
 uniform sampler2D tex;
 
-uniform float fogmax;
-uniform float startH;
-uniform float endH;
-uniform float start;
-uniform float end;
+uniform float density;
 uniform vec3 col;
 
 out vec4 FragColor;
@@ -19,7 +15,7 @@ void main()
     vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
 
     float dist = length(xpos.xyz);
-    vec3 fog = col * (1. - exp(- fogmax * .01 * dist));
+    vec3 fog = col * (1. - exp(- density * dist));
 
     FragColor = vec4(fog, 1.);
 }
