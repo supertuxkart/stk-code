@@ -356,8 +356,7 @@ void PlayerKartWidget::add()
             if (UserConfigParams::m_per_player_difficulty)
             {
                 // The second player is the same, but with handicap
-                label += L" ";
-                label += _(L"(handicapped)");
+                label = _("%s (handicapped)", label);
                 m_player_ident_spinner->addLabel(label);
             }
         }
