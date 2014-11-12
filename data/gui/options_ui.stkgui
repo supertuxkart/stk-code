@@ -37,9 +37,9 @@
                 <spacer height="4" width="10" />
 
                 <div layout="horizontal-row" proportion="1" height="fit">
-                    <checkbox id="perPlayerDifficulty"/>
+                    <checkbox id="show-login"/>
                     <spacer width="20" height="100%" />
-                    <label height="100%" I18N="In the ui settings" text="Enable handicaped users"/>
+                    <label height="100%" I18N="In the ui settings" text="Always show login screen"/>
                 </div>
             </div>
 
@@ -47,17 +47,18 @@
 
             <div layout="horizontal-row" width="100%" height="fit">
                 <div layout="horizontal-row" proportion="1" height="fit">
-                    <checkbox id="show-login"/>
+                    <checkbox id="enable-hw-report"/>
                     <spacer width="20" height="100%" />
-                    <label height="100%" I18N="In the ui settings" text="Always show login screen"/>
+                    <label height="100%" id="label-hw-report" I18N="In the ui settings"
+                           text="Send anonymous HW statistics"/>
                 </div>
 
                 <spacer height="4" width="10" />
 
                 <div layout="horizontal-row" proportion="1" height="fit">
-                    <checkbox id="aiHandicap"/>
+                    <checkbox id="perPlayerDifficulty"/>
                     <spacer width="20" height="100%" />
-                    <label height="100%" I18N="In the ui settings" text="Handicap AI karts"/>
+                    <label height="100%" I18N="In the ui settings" text="Enable handicaped users"/>
                 </div>
             </div>
 
@@ -72,12 +73,7 @@
 
                 <spacer height="4" width="10" />
 
-                <div layout="horizontal-row" proportion="1" height="fit">
-                    <checkbox id="enable-hw-report"/>
-                    <spacer width="20" height="100%" />
-                    <label height="100%" id="label-hw-report" I18N="In the ui settings"
-                           text="Send anonymous HW statistics"/>
-                </div>
+                <!-- Nothing here yet -->
             </div>
 
             <spacer height="18" width="4"/>
