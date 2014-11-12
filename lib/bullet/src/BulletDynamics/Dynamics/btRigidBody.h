@@ -303,6 +303,9 @@ public:
 
 	void	setInvInertiaDiagLocal(const btVector3& diagInvInertia)
 	{
+        btAssert(!isnan(diagInvInertia.getX()));
+        btAssert(!isnan(diagInvInertia.getY()));
+        btAssert(!isnan(diagInvInertia.getZ()));
 		m_invInertiaLocal = diagInvInertia;
 	}
 
