@@ -385,6 +385,13 @@ public:
     BloomBlendShader();
 };
 
+class LensBlendShader : public ShaderHelperSingleton<LensBlendShader>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
+{
+public:
+    LensBlendShader();
+};
+
+
 class ToneMapShader : public ShaderHelperSingleton<ToneMapShader, float>, public TextureRead<Nearest_Filtered>
 {
 public:
@@ -461,6 +468,12 @@ class Gaussian6HBlurShader : public ShaderHelperSingleton<Gaussian6HBlurShader, 
 {
 public:
     Gaussian6HBlurShader();
+};
+
+class HorizontalBlurShader : public ShaderHelperSingleton<HorizontalBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
+{
+public:
+    HorizontalBlurShader();
 };
 
 class Gaussian3HBlurShader : public ShaderHelperSingleton<Gaussian3HBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
