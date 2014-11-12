@@ -353,6 +353,24 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
     }
 }
 
+void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary)
+{
+    assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
+    float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
+    {
+        auxiliary.Bind();
+
+        FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(in_fbo.getRTT()[0]);
+        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0);
+    }
+    {
+        in_fbo.Bind();
+
+        FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(auxiliary.getRTT()[0]);
+        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0);
+    }
+}
+
 
 void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary)
 {
@@ -727,9 +745,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_TMP_256), 1., 1.);
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_TMP_128), 1., 1.);
 			
-			renderGaussian6Blur(irr_driver->getFBO(FBO_LENS_512), irr_driver->getFBO(FBO_TMP_512), 0.01, 10.);
-            renderGaussian6Blur(irr_driver->getFBO(FBO_LENS_256), irr_driver->getFBO(FBO_TMP_256), 0.01, 10.);
-            renderGaussian6Blur(irr_driver->getFBO(FBO_LENS_128), irr_driver->getFBO(FBO_TMP_128), 0.01, 10.);
+			renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_512), irr_driver->getFBO(FBO_TMP_512));
+            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_256), irr_driver->getFBO(FBO_TMP_256));
+            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_128), irr_driver->getFBO(FBO_TMP_128));
 
             // Additively blend on top of tmp1
             in_fbo->Bind();
