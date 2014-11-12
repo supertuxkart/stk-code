@@ -4,14 +4,14 @@
     <spreading angle="2"         />
     
     <velocity  x="0.0"
-               y="0.001"
-               z="0.000"         />
+               y="0.0"
+               z="-0.03"         />
     
     <material  file="nitro-particle.png"  />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="100"
-               max="200" />
+    <rate      min="1500"
+               max="1700"          />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
     <lifetime  min="10"
