@@ -1,3 +1,8 @@
+/*
+Lens flare blend
+based on bloomblend.frag
+author: samuncle
+*/
 uniform sampler2D tex_128;
 uniform sampler2D tex_256;
 uniform sampler2D tex_512;
