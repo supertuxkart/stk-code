@@ -477,7 +477,7 @@ void PostProcessing::renderFog()
 
 
     FullScreenShader::FogShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<FullScreenShader::FogShader>(1. / (40. * start), col);
+    DrawFullScreenEffect<FullScreenShader::FogShader>(1.f / (40.f * start), col);
 
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
