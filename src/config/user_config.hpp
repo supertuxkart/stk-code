@@ -681,11 +681,6 @@ namespace UserConfigParams
                             &m_handicap,
                             "If handicapped users can be selected") );
 
-    PARAM_PREFIX BoolUserConfigParam        m_ai_handicap
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "ai_handicap",
-                             &m_handicap,
-                            "If AIs are handicapped") );
-
     // ---- Internet related
 
     PARAM_PREFIX IntUserConfigParam        m_internet_status
