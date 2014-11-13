@@ -162,6 +162,8 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
         ParticleParams[i].PositionZ = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
         // Initial lifetime is random
         InitialValues[i].Lifetime = os::Randomizer::frand();
+        if (!m_randomize_initial_y)
+            InitialValues[i].Lifetime += 1.;
 
         memcpy(&(InitialValues[i].PositionX), &(ParticleParams[i].PositionX), 3 * sizeof(float));
         generateLifetimeSizeDirection(emitter, ParticleParams[i].Lifetime, ParticleParams[i].Size,
