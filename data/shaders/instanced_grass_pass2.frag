@@ -48,6 +48,6 @@ void main(void)
     float scattering = mix(fPowEdotL, fLdotNBack, .5);
 
 
-    vec3 LightFactor = color.xyz * (scattering * 0.3) + getLightFactor(color.xyz, vec3(1.), specmap);
+    vec3 LightFactor = color.xyz * (scattering * 0.1) + getLightFactor(color.xyz, vec3(1.), specmap);
     FragColor = vec4(LightFactor, 1.);
 }
