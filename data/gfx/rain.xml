@@ -1,27 +1,27 @@
 <?xml version="1.0"?>
 
 <!-- For sky particles, the size of the box is ignored -->
-<particles emitter="box">
+<particles emitter="box" randomize-initial-y="true">
 
     <spreading angle="3"           />
     
     <velocity  x="-0.00"
-               y="-0.05"
+               y="-0.03"
                z="-0.00"             />
     
     <material  file="rain.png" clampu="Y" clampv="Y" />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="2000"
-               max="3000"           />
+    <rate      min="100"
+               max="250"           />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
     <lifetime  min="10000"
                max="10000"          />
     
     <!-- Size of the particles -->
-    <size      min="0.20"
-               max="0.40"          />
+    <size      min="1.00"
+               max="1.50"          />
     
     <color     min="255 255 255"
                max="255 255 255"   />

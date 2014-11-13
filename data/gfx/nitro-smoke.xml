@@ -4,18 +4,18 @@
     <spreading angle="30"         />
     
     <velocity  x="0.0"
-               y="0.001"
-               z="-0.003"         />
+               y="0.0"
+               z="-0.03"         />
     
     <material  file="smoke_nitro.png"  />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="200"
-               max="300"          />
+    <rate      min="1500"
+               max="2000"          />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="400"
-               max="600"          />
+    <lifetime  min="30"
+               max="50"          />
     
     <!-- Size of the particles -->
     <size      min="0.20"
