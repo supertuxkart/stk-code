@@ -211,7 +211,7 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
     LightShader::PointLightScatterShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
     LightShader::PointLightScatterShader::getInstance()->setUniforms(1. / (40. * start), col);
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, pointlightcount);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, MIN2(pointlightcount, MAXLIGHT));
 
 // ***
 // That might be a performance issue but if disabled the quality is severly affected (the picture looks jagged)
