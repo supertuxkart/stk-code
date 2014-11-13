@@ -213,10 +213,10 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, pointlightcount);
 
-    glDisable(GL_BLEND);
-    m_post_processing->renderGaussian6Blur(getFBO(FBO_HALF1), getFBO(FBO_HALF2), 5., 5.);
+//    glDisable(GL_BLEND);
+//    m_post_processing->renderGaussian6Blur(getFBO(FBO_HALF1), getFBO(FBO_HALF2), 5., 5.);
 
-    glEnable(GL_BLEND);
+//    glEnable(GL_BLEND);
     getFBO(FBO_COLORS).Bind();
     m_post_processing->renderPassThrough(getRenderTargetTexture(RTT_HALF1));
 }
