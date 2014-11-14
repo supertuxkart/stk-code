@@ -23,6 +23,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/hardware_skinning.hpp"
 #include "graphics/lens_flare.hpp"
 #include "graphics/light.hpp"
@@ -474,6 +475,13 @@ void IrrDriver::initDevice()
     m_gl_major_version = 2;
     m_gl_minor_version = 1;
     // Call to glGetIntegerv should not be made if --no-graphics is used
+    if(!ProfileWorld::isNoGraphics())
+    {
+        std::string driver((char*)(glGetString(GL_VERSION)));
+        std::string card  ((char*)(glGetString(GL_RENDERER)));
+        std::vector<std::string> restrictions = 
+            GraphicsRestrictions::getRestrictions(driver, card);
+    }
     if(!ProfileWorld::isNoGraphics())
     {
         glGetIntegerv(GL_MAJOR_VERSION, &m_gl_major_version);
