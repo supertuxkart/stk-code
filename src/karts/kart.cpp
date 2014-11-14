@@ -131,6 +131,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_min_nitro_time       = 0.0f;
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
+    m_nitro_light          = NULL;
 
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
@@ -2367,6 +2368,10 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
     m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
+    m_nitro_light = irr_driver->addLight(core::vector3df(0.0f, 0.5f, m_kart_model->getLength()*-0.5f - 0.05f),
+        1.5f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
+    m_nitro_light->setVisible(false);
+
 #ifdef DEBUG
     m_node->setName( (getIdent()+"(lod-node)").c_str() );
 #endif
@@ -2500,6 +2505,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO2, f);
         m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, f);
         m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, f);
+        m_nitro_light->setVisible(true);
     }
     else
     {
@@ -2507,7 +2513,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO2, 0);
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
-
+        m_nitro_light->setVisible(false);
     }
     m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO1, getSpeed(), dt);
     m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO2, getSpeed(), dt);
