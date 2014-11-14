@@ -736,6 +736,9 @@ void Track::createPhysicsModel(unsigned int main_track_count)
  */
 void Track::convertTrackToBullet(scene::ISceneNode *node)
 {
+    if (node->getType() == scene::ESNT_TEXT)
+        return;
+
     if (node->getType() == scene::ESNT_LOD_NODE)
     {
         node = ((LODNode*)node)->getFirstNode();
