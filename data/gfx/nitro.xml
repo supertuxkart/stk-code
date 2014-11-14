@@ -10,12 +10,12 @@
     <material  file="nitro-particle.png"  />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="1500"
-               max="1700"          />
+    <rate      min="600"
+               max="800"          />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="15"
-               max="25"          />
+    <lifetime  min="85"
+               max="120"           />
     
     <!-- Size of the particles -->
     <size      min="0.1"
@@ -28,6 +28,6 @@
                max="255 255 255"  />
     
     <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="5"         />
+    <fadeout   time="50"         />
 
 </particles>
