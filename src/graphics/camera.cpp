@@ -335,13 +335,13 @@ void Camera::smoothMoveCamera(float dt)
                        1.1f * (1 + ratio / 2),
                        camera_distance * cos(skid_angle / 2));// defines how far camera should be from player kart.
     Vec3 m_kart_camera_position_with_offset = m_kart->getTrans()(camera_offset);
-    
-    
+
+
 
     core::vector3df current_target = m_kart->getXYZ().toIrrVector();// next target
     current_target.Y += 0.5f;
     core::vector3df wanted_position = m_kart_camera_position_with_offset.toIrrVector();// new required position of camera
-    
+
     if ((m_kart->getSpeed() > 5 ) || (m_kart->getSpeed() < 0 ))
     {
         current_position += ((wanted_position - current_position) * dt
@@ -480,12 +480,38 @@ void Camera::update(float dt)
         // - the kart should not be visible, but it works)
         m_camera->setNearValue(27.0);
     }
+    else if (UserConfigParams::m_camera_debug == 3)
+    {
+	    // Compute direction
+		core::vector3df direction(m_camera->getTarget() - m_camera->getPosition());
+		core::vector3df up(m_camera->getUpVector());
+		// There may be a more elegant way instead of converting
+		core::vector3df side(Vec3(Vec3(direction).cross(Vec3(up))).toIrrVector());
+		direction.normalize();
+		up.normalize();
+		side.normalize();
 
+		core::vector3df movement(direction * m_lin_velocity.Z +
+		              up * m_lin_velocity.Y +
+		              side * m_lin_velocity.X);
+
+        // Move camera
+        core::vector3df pos = m_camera->getPosition();
+        pos = pos + movement * dt;
+        m_camera->setPosition(pos);
+        pos = m_camera->getTarget();
+        pos = pos + movement * dt;
+        m_camera->setTarget(pos);
+
+		// Rotate camera
+		btQuaternion quat(Vec3(direction), m_angular_velocity * dt);
+		btTransform trans(quat);
+		m_camera->setUpVector(Vec3(trans(Vec3(up))).toIrrVector());
+    }
     else if (m_mode==CM_FINAL)
     {
         handleEndCamera(dt);
     }
-
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
     else if (dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation()))
