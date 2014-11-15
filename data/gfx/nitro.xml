@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
-<particles emitter="box" box_x="0.05" box_y="0.05" box_z="0.05">
+<particles emitter="box" box_x="0.05" box_y="0.05" box_z="0.60">
 
     <spreading angle="2"         />
     
     <velocity  x="0.0"
-               y="0.001"
-               z="0.000"         />
+               y="0.0"
+               z="-0.003"         />
     
     <material  file="nitro-particle.png"  />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="100"
-               max="200" />
+    <rate      min="600"
+               max="800"          />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="10"
-               max="20"          />
+    <lifetime  min="85"
+               max="120"           />
     
     <!-- Size of the particles -->
     <size      min="0.1"
@@ -28,6 +28,6 @@
                max="255 255 255"  />
     
     <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="5"         />
+    <fadeout   time="50"         />
 
 </particles>

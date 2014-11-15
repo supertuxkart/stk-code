@@ -28,6 +28,7 @@
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
 #include "graphics/callbacks.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/shaders.hpp"
@@ -37,7 +38,7 @@
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
-#include "graphics/glwrap.hpp"
+#include "utils/vs.hpp"
 
 #include <IMaterialRendererServices.h>
 #include <ISceneNode.h>
@@ -74,7 +75,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     node->get("clampv", &b);  if (b) m_clamp_tex |= VCLAMP; //blender 2.4 style
     node->get("clampV", &b);  if (b) m_clamp_tex |= VCLAMP; //blender 2.5 style
 
-    
+
     std::string s;
     //node->get("adjust-image",     &s                   );
     //if(s=="premultiply")
@@ -586,7 +587,7 @@ void Material::initParticlesEffect(const XMLNode *node)
     try
     {
         particles = pkm->getParticles(base.c_str());
-        
+
         if (particles == NULL)
         {
             Log::warn("Material::initParticlesEffect",
@@ -664,11 +665,13 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) con
     }
     if (speed > m_sfx_max_speed)
     {
+        assert(!isnan(m_sfx_max_speed));
         sfx->setSpeed(m_sfx_max_pitch);
         return;
     }
 
     float f = m_sfx_pitch_per_speed*(speed-m_sfx_min_speed) + m_sfx_min_pitch;
+    assert(!isnan(f));
     sfx->setSpeed(f);
 }   // setSFXSpeed
 

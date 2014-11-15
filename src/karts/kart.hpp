@@ -221,6 +221,8 @@ private:
     /** To prevent using nitro in too short bursts */
     float         m_min_nitro_time;
 
+    scene::ISceneNode* m_nitro_light;
+
     void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);
     void          handleMaterialGFX();

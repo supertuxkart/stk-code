@@ -349,8 +349,7 @@ void RaceManager::startNew(bool from_overworld)
     for(unsigned int i = 0; i < ai_kart_count; i++)
     {
         m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1,
-            init_gp_rank, KT_AI, UserConfigParams::m_ai_handicap ?
-            PLAYER_DIFFICULTY_HANDICAP : PLAYER_DIFFICULTY_NORMAL));
+            init_gp_rank, KT_AI, PLAYER_DIFFICULTY_NORMAL));
         init_gp_rank ++;
         if(UserConfigParams::m_ftl_debug)
         {

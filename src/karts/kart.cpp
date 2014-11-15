@@ -131,6 +131,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_min_nitro_time       = 0.0f;
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
+    m_nitro_light          = NULL;
 
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
@@ -2140,18 +2141,20 @@ void Kart::updateEngineSFX()
     if(isOnGround())
     {
         float max_speed = m_max_speed->getCurrentMaxSpeed();
+        assert(max_speed>0);
         // Engine noise is based half in total speed, half in fake gears:
         // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
         // ignoring the gear settings from stk_config, but providing a
         // good enough brrrBRRRbrrrBRRR sound effect. Speed factor makes
         // it a "staired sawtooth", so more acoustically rich.
-        float f = m_speed/max_speed;
+        float f = max_speed > 0 ? m_speed/max_speed : 1.0f;
         // Speed at this stage is not yet capped, so it can be > 1, which
         // results in odd engine sfx.
         if (f>1.0f) f=1.0f;
 
         float gears = 3.0f * fmod(f, 0.333334f);
-        m_engine_sound->setSpeed(0.6f + (f +gears)* 0.35f);
+        assert(!isnan(f));
+        m_engine_sound->setSpeed(0.6f + (f + gears) * 0.35f);
     }
     else
     {
@@ -2365,6 +2368,10 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
     m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
+    m_nitro_light = irr_driver->addLight(core::vector3df(0.0f, 0.5f, m_kart_model->getLength()*-0.5f - 0.05f),
+        1.5f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
+    m_nitro_light->setVisible(false);
+
 #ifdef DEBUG
     m_node->setName( (getIdent()+"(lod-node)").c_str() );
 #endif
@@ -2498,6 +2505,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO2, f);
         m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, f);
         m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, f);
+        m_nitro_light->setVisible(true);
     }
     else
     {
@@ -2505,7 +2513,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO2, 0);
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
-
+        m_nitro_light->setVisible(false);
     }
     m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO1, getSpeed(), dt);
     m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO2, getSpeed(), dt);
@@ -2581,6 +2589,45 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     float xx = fabsf(m_speed)* getKartProperties()->getDownwardImpulseFactor()*0.0006f;
     Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset()
                               + lean_height +m_graphical_y_offset+xx, 0);
+    
+    // Try to prevent the graphical chassis to be inside of the terrain:
+    if(m_kart_properties->getPreventChassisInTerrain())
+    {
+        // Get the shortest suspension length (=closest point to terrain).
+        float min_susp_len = 99.9f;
+        for (int i = 0; i < getVehicle()->getNumWheels(); i++)
+        {
+            float susp_len = getVehicle()->getWheelInfo(i).m_raycastInfo
+                                                          .m_suspensionLength;
+            if (susp_len < min_susp_len)
+                min_susp_len = susp_len;
+        }   // for i<num_wheels
+
+        const btWheelInfo &w = getVehicle()->getWheelInfo(0);
+        // Recompute the default average suspension length, see 
+        // kartIsInRestNow() how to get from y-offset to susp. len.
+        float av_sus_len = -m_graphical_y_offset
+                         + w.m_chassisConnectionPointCS.getY()
+                         - w.m_wheelsRadius;
+
+        float delta = av_sus_len - min_susp_len;
+        // If the suspension length is so short, that it is less than the 
+        // lowest point of the kart, it indicates that the graphical chassis
+        // would be inside of the track:
+        if (delta > m_kart_model->getLowestPoint())
+        {
+            center_shift.setY(center_shift.getY() + delta - m_kart_model->getLowestPoint());
+        }
+
+        // FIXME: for now, debug output in case we have to debug it
+        //Log::verbose("kart", "min %f y off %f overall off %f lowest %f delta %f asl %f",
+        //    min_susp_len, m_graphical_y_offset, center_shift.getY(),
+        //    m_kart_model->getLowestPoint(),
+        //    delta,
+        //    av_sus_len
+        //    );
+    }
+
     center_shift = getTrans().getBasis() * center_shift;
 
     Moveable::updateGraphics(dt, center_shift,

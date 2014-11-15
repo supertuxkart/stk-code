@@ -538,6 +538,7 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
     core::matrix4 transform = translate * scale;
     core::matrix4 invtransform;
     transform.getInverse(invtransform);
+    glDisable(GL_BLEND);
 
     glUseProgram(MeshShader::SkyboxShader::getInstance()->Program);
     MeshShader::SkyboxShader::getInstance()->setUniforms(transform);

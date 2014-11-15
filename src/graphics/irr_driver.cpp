@@ -23,6 +23,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/hardware_skinning.hpp"
 #include "graphics/lens_flare.hpp"
 #include "graphics/light.hpp"
@@ -42,6 +43,7 @@
 #include "graphics/water.hpp"
 #include "graphics/wind.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
@@ -318,6 +320,8 @@ void IrrDriver::createListOfVideoModes()
  */
 void IrrDriver::initDevice()
 {
+    GraphicsRestrictions::init();
+
     // If --no-graphics option was used, the null device can still be used.
     if (!ProfileWorld::isNoGraphics())
     {
@@ -475,6 +479,10 @@ void IrrDriver::initDevice()
     // Call to glGetIntegerv should not be made if --no-graphics is used
     if(!ProfileWorld::isNoGraphics())
     {
+
+    }
+    if(!ProfileWorld::isNoGraphics())
+    {
         glGetIntegerv(GL_MAJOR_VERSION, &m_gl_major_version);
         glGetIntegerv(GL_MINOR_VERSION, &m_gl_minor_version);
         Log::info("IrrDriver", "OpenGL version: %d.%d", m_gl_major_version, m_gl_minor_version);
@@ -485,7 +493,7 @@ void IrrDriver::initDevice()
         m_need_ubo_workaround = false;
         m_need_rh_workaround = false;
         m_need_srgb_workaround = false;
-        m_support_sdsm = false;
+        m_support_sdsm = true;
 #ifdef WIN32
         // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
         if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL && (m_gl_major_version == 3 && m_gl_minor_version == 1))
@@ -551,6 +559,20 @@ void IrrDriver::initDevice()
             Log::info("GLDriver", "ARB Texture View enabled");
         }
         m_support_sdsm = m_support_sdsm && hasComputeShaders && hasBuffserStorage;
+
+        std::string driver((char*)(glGetString(GL_VERSION)));
+        std::string card((char*)(glGetString(GL_RENDERER)));
+        std::vector<std::string> restrictions =
+            GraphicsRestrictions::getRestrictions(driver, card);
+
+        for (const std::string &restriction : restrictions)
+        {
+            if (!restriction.compare("BufferStorage"))
+            {
+                hasBuffserStorage = false;
+                Log::info("Graphics restrictions", "Buffer Storage disabled");
+            }
+        }
     }
 #endif
 
@@ -863,7 +885,7 @@ void IrrDriver::applyResolutionSettings()
     // No need to reload cached track data (track_manager->cleanAllCachedData
     // above) - this happens dynamically when the tracks are loaded.
     GUIEngine::reshowCurrentScreen();
-
+    MessageQueue::updatePosition();
 }   // applyResolutionSettings
 
 // ----------------------------------------------------------------------------

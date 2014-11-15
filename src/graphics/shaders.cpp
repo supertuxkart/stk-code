@@ -1468,6 +1468,41 @@ namespace LightShader
         glVertexAttribDivisorARB(attrib_Color, 1);
         glVertexAttribDivisorARB(attrib_Radius, 1);
     }
+
+    PointLightScatterShader::PointLightScatterShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlightscatter.frag").c_str());
+
+        AssignUniforms("density", "fogcol");
+        AssignSamplerNames(Program, 0, "dtex");
+
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, PointLightShader::getInstance()->vbo);
+
+        GLuint attrib_Position = glGetAttribLocation(Program, "Position");
+        GLuint attrib_Color = glGetAttribLocation(Program, "Color");
+        GLuint attrib_Energy = glGetAttribLocation(Program, "Energy");
+        GLuint attrib_Radius = glGetAttribLocation(Program, "Radius");
+
+        glEnableVertexAttribArray(attrib_Position);
+        glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), 0);
+        glEnableVertexAttribArray(attrib_Energy);
+        glVertexAttribPointer(attrib_Energy, 1, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(attrib_Color);
+        glVertexAttribPointer(attrib_Color, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(4 * sizeof(float)));
+        glEnableVertexAttribArray(attrib_Radius);
+        glVertexAttribPointer(attrib_Radius, 1, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(7 * sizeof(float)));
+
+        glVertexAttribDivisorARB(attrib_Position, 1);
+        glVertexAttribDivisorARB(attrib_Energy, 1);
+        glVertexAttribDivisorARB(attrib_Color, 1);
+        glVertexAttribDivisorARB(attrib_Radius, 1);
+    }
 }
 
 
@@ -1557,6 +1592,16 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloomblend.frag").c_str());
+        AssignUniforms();
+
+        AssignSamplerNames(Program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
+    }
+	
+	LensBlendShader::LensBlendShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/lensblend.frag").c_str());
         AssignUniforms();
 
         AssignSamplerNames(Program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
@@ -1697,7 +1742,27 @@ namespace FullScreenShader
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
 
+    ComputeGaussian6HBlurShader::ComputeGaussian6HBlurShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian6h.comp").c_str());
+        TU_dest = 1;
+        AssignUniforms("pixel", "sigma");
+        AssignSamplerNames(Program, 0, "source");
+        AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
+    }
+
     Gaussian6HBlurShader::Gaussian6HBlurShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6h.frag").c_str());
+        AssignUniforms("pixel", "sigma");
+
+        AssignSamplerNames(Program, 0, "tex");
+    }
+	
+	HorizontalBlurShader::HorizontalBlurShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
@@ -1737,12 +1802,22 @@ namespace FullScreenShader
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
 
+    ComputeGaussian6VBlurShader::ComputeGaussian6VBlurShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian6v.comp").c_str());
+        TU_dest = 1;
+        AssignUniforms("pixel", "sigma");
+        AssignSamplerNames(Program, 0, "source");
+        AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
+    }
+
     Gaussian6VBlurShader::Gaussian6VBlurShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6v.frag").c_str());
-        AssignUniforms("pixel");
+        AssignUniforms("pixel", "sigma");
 
         AssignSamplerNames(Program, 0, "tex");
     }
@@ -1842,7 +1917,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/fog.frag").c_str());
 
-        AssignUniforms("fogmax", "startH", "endH", "start", "end", "col");
+        AssignUniforms("density", "col");
         AssignSamplerNames(Program, 0, "tex");
     }
 

@@ -420,7 +420,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         World::getWorld()->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
-        m_post_processing->renderFog();
+        renderLightsScatter(pointlightcount);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -896,16 +896,17 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             core::matrix4 tmp_matrix;
 
             if (irr_driver->supportsSDSM()){
-                float left = CBB[currentCBB][i].xmin / 4 - 2;
-                float right = CBB[currentCBB][i].xmax / 4 + 2;
-                float up = CBB[currentCBB][i].ymin / 4 - 2;
-                float down = CBB[currentCBB][i].ymax / 4 + 2;
+                float left = float(CBB[currentCBB][i].xmin / 4 - 2);
+                float right = float(CBB[currentCBB][i].xmax / 4 + 2);
+                float up = float(CBB[currentCBB][i].ymin / 4 - 2);
+                float down = float(CBB[currentCBB][i].ymax / 4 + 2);
 
                 // Prevent Matrix without extend
                 if (left != right && up != down)
                     tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
                     down, up,
-                    CBB[currentCBB][i].zmin / 4 - 100, CBB[currentCBB][i].zmax / 4 + 2);
+                    float(CBB[currentCBB][i].zmin / 4 - 100),
+                    float(CBB[currentCBB][i].zmax / 4 + 2)      );
             }
             else
                 tmp_matrix = getTighestFitOrthoProj(SunCamViewMatrix, vectors);

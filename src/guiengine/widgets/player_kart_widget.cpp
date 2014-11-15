@@ -351,10 +351,14 @@ void PlayerKartWidget::add()
         for (int n=0; n<player_amount; n++)
         {
             core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
-            m_player_ident_spinner->addLabel(translations->fribidize(name));
+            core::stringw label = translations->fribidize(name);
+            m_player_ident_spinner->addLabel(label);
             if (UserConfigParams::m_per_player_difficulty)
+            {
                 // The second player is the same, but with handicap
-                m_player_ident_spinner->addLabel(translations->fribidize(name));
+                label = _("%s (handicapped)", label);
+                m_player_ident_spinner->addLabel(label);
+            }
         }
 
         // select the right player profile in the spinner
@@ -627,7 +631,11 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
     // -- sizes
     player_name_h = 40;
-    player_name_w = std::min(400, w);
+    // Set it a bit higher so there's space for "(handicapped)"
+    if(UserConfigParams::m_per_player_difficulty)
+        player_name_w = std::min(500, w);
+    else
+        player_name_w = std::min(400, w);
 
     kart_name_w = w;
     kart_name_h = 25;

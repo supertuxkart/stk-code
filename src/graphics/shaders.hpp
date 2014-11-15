@@ -328,6 +328,14 @@ namespace LightShader
         GLuint vao;
         PointLightShader();
     };
+
+    class PointLightScatterShader : public ShaderHelperSingleton<PointLightScatterShader, float, core::vector3df>, public TextureRead<Nearest_Filtered>
+    {
+    public:
+        GLuint vbo;
+        GLuint vao;
+        PointLightScatterShader();
+    };
 }
 
 namespace ParticleShader
@@ -376,6 +384,13 @@ class BloomBlendShader : public ShaderHelperSingleton<BloomBlendShader>, public 
 public:
     BloomBlendShader();
 };
+
+class LensBlendShader : public ShaderHelperSingleton<LensBlendShader>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
+{
+public:
+    LensBlendShader();
+};
+
 
 class ToneMapShader : public ShaderHelperSingleton<ToneMapShader, float>, public TextureRead<Nearest_Filtered>
 {
@@ -449,10 +464,23 @@ public:
     ComputeGaussian17TapHShader();
 };
 
-class Gaussian6HBlurShader : public ShaderHelperSingleton<Gaussian6HBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
+class ComputeGaussian6HBlurShader : public ShaderHelperSingleton<ComputeGaussian6HBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
+{
+public:
+    GLuint TU_dest;
+    ComputeGaussian6HBlurShader();
+};
+
+class Gaussian6HBlurShader : public ShaderHelperSingleton<Gaussian6HBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     Gaussian6HBlurShader();
+};
+
+class HorizontalBlurShader : public ShaderHelperSingleton<HorizontalBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
+{
+public:
+    HorizontalBlurShader();
 };
 
 class Gaussian3HBlurShader : public ShaderHelperSingleton<Gaussian3HBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
@@ -475,8 +503,14 @@ public:
     ComputeGaussian17TapVShader();
 };
 
+class ComputeGaussian6VBlurShader : public ShaderHelperSingleton<ComputeGaussian6VBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
+{
+public:
+    GLuint TU_dest;
+    ComputeGaussian6VBlurShader();
+};
 
-class Gaussian6VBlurShader : public ShaderHelperSingleton<Gaussian6VBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
+class Gaussian6VBlurShader : public ShaderHelperSingleton<Gaussian6VBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     Gaussian6VBlurShader();
@@ -537,7 +571,7 @@ public:
     SSAOShader();
 };
 
-class FogShader : public ShaderHelperSingleton<FogShader, float, float, float, float, float, core::vector3df>, public TextureRead<Nearest_Filtered>
+class FogShader : public ShaderHelperSingleton<FogShader, float, core::vector3df>, public TextureRead<Nearest_Filtered>
 {
 public:
     FogShader();

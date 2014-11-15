@@ -137,8 +137,11 @@ void RegisterScreen::makeEntryFieldsVisible(bool online)
     getWidget<LabelWidget  >("label_password_confirm")->setVisible(online);
     getWidget<TextBoxWidget>("email")->setVisible(online);
     getWidget<LabelWidget  >("label_email")->setVisible(online);
-    getWidget<TextBoxWidget>("email_confirm")->setVisible(online);
-    getWidget<LabelWidget  >("label_email_confirm")->setVisible(online);
+    if(getWidget<TextBoxWidget>("email_confirm"))
+    {
+        getWidget<TextBoxWidget>("email_confirm")->setVisible(online);
+        getWidget<LabelWidget  >("label_email_confirm")->setVisible(online);
+    }
 }   // makeEntryFieldsVisible
 
 // -----------------------------------------------------------------------------
@@ -208,9 +211,14 @@ void RegisterScreen::doRegister()
     stringw password_confirm =  getWidget<TextBoxWidget>("password_confirm")
                              ->getText().trim();
     stringw email = getWidget<TextBoxWidget>("email")->getText().trim();
-    stringw email_confirm = getWidget<TextBoxWidget>("email_confirm")
-                           ->getText().trim();
 
+    // If there is an email_confirm field, use it and check if the email
+    // address is correct. If there is no such field, set the confirm email
+    // address to email address (so the test below will be passed).
+    stringw email_confirm = getWidget<TextBoxWidget>("email_confirm") 
+                          ? getWidget<TextBoxWidget>("email_confirm")->getText()
+                          : getWidget<TextBoxWidget>("email")->getText();
+    email_confirm.trim();
     m_info_widget->setErrorColor();
 
     if (password != password_confirm)
@@ -224,6 +232,10 @@ void RegisterScreen::doRegister()
     else if (username.size() < 3 || username.size() > 30)
     {
         m_info_widget->setText(_("Online username has to be between 3 and 30 characters long!"), false);
+    }
+    else if (username[0]>='0' && username[0]<='9')
+    {
+        m_info_widget->setText(_("Online username must not start with a number!"), false);
     }
     else if (password.size() < 8 || password.size() > 30)
     {
@@ -306,6 +318,7 @@ void RegisterScreen::onUpdate(float dt)
             else
             {
                 // Error signing up, display error message
+                m_info_widget->setErrorColor();
                 m_info_widget->setText(m_signup_request->getInfo(), false);
             }
             delete m_signup_request;

@@ -36,6 +36,21 @@ using namespace Scripting;
 
 namespace Scripting
 {
+
+
+//Line Callback
+void MessageCallback(const asSMessageInfo *msg, void *param)
+{
+    const char *type = "ERR ";
+    if (msg->type == asMSGTYPE_WARNING)
+        type = "WARN";
+    else if (msg->type == asMSGTYPE_INFORMATION)
+        type = "INFO";
+
+    printf("%s (%d, %d) : %s : %s\n", msg->section, msg->row, msg->col, type, msg->message);
+}
+
+
 //Constructor, creates a new Scripting Engine using AngelScript
 ScriptEngine::ScriptEngine()
 {
@@ -45,15 +60,22 @@ ScriptEngine::ScriptEngine()
     {
         std::cout << "Failed to create script engine." << std::endl;
     }
+
+    // The script compiler will write any compiler messages to the callback.
+    //m_engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
+
     // Configure the script engine with all the functions, 
     // and variables that the script should be able to use.
     configureEngine(m_engine);
+
 }
 ScriptEngine::~ScriptEngine()
 {
     // Release the engine
     m_engine->Release();
 }
+
+
 
 /** Get Script By it's file name
 *  \param string scriptname = name of script to get
@@ -89,81 +111,89 @@ std::string getScript(std::string scriptName)
 }
 //-----------------------------------------------------------------------------
 /** runs the specified script
-*  \param ident scriptName = name of script to run
+*  \param string scriptName = name of script to run
 */
 void ScriptEngine::runScript(std::string scriptName)
 {
     return; // Scripting disabled for now
 
-    // TODO: this code seems to fetch the script from disk and compile it on every execution?
-    // A cache should be created.
-
-    int r;
-    // Compile the script code
-    r = compileScript(m_engine,scriptName);
-    if( r < 0 )
-    {
-        m_engine->Release();
-        return;
-    }
-
     // Create a context that will execute the script.
     asIScriptContext *ctx = m_engine->CreateContext();
-    if( ctx == 0 ) 
+    if (ctx == 0)
     {
         std::cout << "Failed to create the context." << std::endl;
-        m_engine->Release();
+        //m_engine->Release();
         return;
     }
+    int r; //int for error checking
 
-    if( r < 0 )
-    {
-        std::cout << "Failed to set the line callback function." << std::endl;
-        ctx->Release();
-        m_engine->Release();
-        return;
-    }
 
-    // Find the function for the function we want to execute.
-    //This is how you call a normal function with arguments
-    //asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void func(arg1Type, arg2Type)");
     asIScriptFunction *func;
-    if (scriptName =="collisions")
+    if (m_script_cache.find(scriptName) == m_script_cache.end())
     {
-        func = Scripting::Physics::registerScriptCallbacks(m_engine);
-    }
-    else if (scriptName == "update")
-    {
-        func = Scripting::Track::registerUpdateScriptCallbacks(m_engine);
-    }
-    else if (scriptName == "start")
-    {
-        func = Scripting::Track::registerStartScriptCallbacks(m_engine);
+        // Compile the script code
+        r = compileScript(m_engine, scriptName);
+        if (r < 0)
+        {
+            return;
+        }
+
+        //set line callback here soon
+        if (r < 0)
+        {
+            std::cout << "Failed to set the line callback function." << std::endl;
+            ctx->Release();
+            return;
+        }
+
+        // Find the function for the function we want to execute.
+        //This is how you call a normal function with arguments
+        //asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void func(arg1Type, arg2Type)");
+        if (scriptName == "collisions")
+        {
+            func = Scripting::Physics::registerScriptCallbacks(m_engine);
+        }
+        else if (scriptName == "update")
+        {
+            func = Scripting::Track::registerUpdateScriptCallbacks(m_engine);
+        }
+        else if (scriptName == "start")
+        {
+            func = Scripting::Track::registerStartScriptCallbacks(m_engine);
+        }
+        else
+        {
+            //trigger type can have different names
+            func = Scripting::Track::registerScriptCallbacks(m_engine, scriptName);
+        }
+        if (func == 0)
+        {
+            std::cout << "The required function was not found." << std::endl;
+            ctx->Release();
+            //m_engine->Release();
+            return;
+        }
+
+        //CACHE UPDATE
+        m_script_cache[scriptName] = func;
     }
     else
     {
-        //trigger type can have different names
-        func = Scripting::Track::registerScriptCallbacks(m_engine , scriptName);
+        //Script present in cache
+        func = m_script_cache[scriptName];
+        std::cout << "FOUND CACHED : " << scriptName << std::endl;
     }
-    if( func == 0 )
-    {
-        std::cout << "The required function was not found." << std::endl;
-        ctx->Release();
-        m_engine->Release();
-        return;
-    }
-
     // Prepare the script context with the function we wish to execute. Prepare()
     // must be called on the context before each new script function that will be
-    // executed. Note, that if you intend to execute the same function several 
-    // times, it might be a good idea to store the function returned by 
+    // executed. Note, that if because we intend to execute the same function 
+    // several times, we will store the function returned by 
     // GetFunctionByDecl(), so that this relatively slow call can be skipped.
     r = ctx->Prepare(func);
     if( r < 0 ) 
     {
         std::cout << "Failed to prepare the context." << std::endl;
         ctx->Release();
-        m_engine->Release();
+        //m_engine->Release();
         return;
     }
 
@@ -279,5 +309,7 @@ int ScriptEngine::compileScript(asIScriptEngine *engine, std::string scriptName)
 
     return 0;
 }
+
+
 
 }

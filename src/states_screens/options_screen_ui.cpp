@@ -152,9 +152,6 @@ void OptionsScreenUI::init()
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
     difficulty->setState( UserConfigParams::m_per_player_difficulty );
-    CheckBoxWidget* ai_handicap = getWidget<CheckBoxWidget>("aiHandicap");
-    assert( ai_handicap != NULL );
-    ai_handicap->setState( UserConfigParams::m_ai_handicap );
 
     CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
     assert( show_login!= NULL );
@@ -310,12 +307,6 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
         assert( difficulty != NULL );
         UserConfigParams::m_per_player_difficulty = difficulty->getState();
-    }
-    else if (name=="aiHandicap")
-    {
-        CheckBoxWidget* ai_handicap = getWidget<CheckBoxWidget>("aiHandicap");
-        assert( ai_handicap != NULL );
-        UserConfigParams::m_ai_handicap = ai_handicap->getState();
     }
     else if (name == "language")
     {

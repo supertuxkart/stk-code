@@ -106,7 +106,7 @@ void TrackInfoScreen::init()
 
     // ---- Track screenshot
     Widget* screenshot_div = getWidget("screenshot_div");
-    if(!m_screenshot)
+    if(!m_screenshot || !m_widgets.contains(m_screenshot))
     {
         m_screenshot =
             new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,

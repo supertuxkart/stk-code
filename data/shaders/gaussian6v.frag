@@ -1,7 +1,6 @@
 uniform sampler2D tex;
 uniform vec2 pixel;
-
-float sigma = 1.;
+uniform float sigma;
 
 // Gaussian separated blur with radius 6.
 

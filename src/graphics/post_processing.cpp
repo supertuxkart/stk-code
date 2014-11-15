@@ -327,31 +327,77 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo)
         glGenTextures(1, &LayerTex);
         glTextureView(LayerTex, GL_TEXTURE_2D, in_fbo.getRTT()[0], GL_R32F, 0, 1, i, 1);
         FullScreenShader::Gaussian6VBlurShader::getInstance()->SetTextureUnits(LayerTex);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6VBlurShader>(core::vector2df(1. / 1024., 1. / 1024.));
+        DrawFullScreenEffect<FullScreenShader::Gaussian6VBlurShader>(core::vector2df(1.f / 1024.f, 1.f / 1024.f), 1.f);
         in_fbo.BindLayer(i);
         FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(irr_driver->getFBO(FBO_BLOOM_1024).getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(1. / 1024., 1. / 1024.));
+        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(1.f / 1024.f, 1.f / 1024.f), 1.f);
         glDeleteTextures(1, &LayerTex);
     }
 }
 
-void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary)
+void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary, float sigmaV, float sigmaH)
+{
+    assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
+    float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
+    {
+        if (!irr_driver->hasARBComputeShaders())
+        {
+            auxiliary.Bind();
+
+            FullScreenShader::Gaussian6VBlurShader::getInstance()->SetTextureUnits(in_fbo.getRTT()[0]);
+            DrawFullScreenEffect<FullScreenShader::Gaussian6VBlurShader>(core::vector2df(inv_width, inv_height), sigmaV);
+        }
+        else
+        {
+            glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
+            glUseProgram(FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->Program);
+            FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->SetTextureUnits(in_fbo.getRTT()[0]);
+            glBindSampler(FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->TU_dest, 0);
+            glBindImageTexture(FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->TU_dest, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_RGBA16F);
+            FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height), sigmaV);
+            glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, (int)in_fbo.getHeight() / 8 + 1, 1);
+        }
+    }
+    {
+        if (!irr_driver->hasARBComputeShaders())
+        {
+            in_fbo.Bind();
+
+            FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(auxiliary.getRTT()[0]);
+            DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), sigmaH);
+        }
+        else
+        {
+            glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+            glUseProgram(FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->Program);
+            FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->SetTextureUnits(auxiliary.getRTT()[0]);
+            glBindSampler(FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->TU_dest, 0);
+            glBindImageTexture(FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->TU_dest, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_RGBA16F);
+            FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height), sigmaH);
+            glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, (int)in_fbo.getHeight() / 8 + 1, 1);
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+        }
+    }
+}
+
+void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary)
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
     {
         auxiliary.Bind();
 
-        FullScreenShader::Gaussian6VBlurShader::getInstance()->SetTextureUnits(in_fbo.getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6VBlurShader>(core::vector2df(inv_width, inv_height));
+        FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(in_fbo.getRTT()[0]);
+        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0);
     }
     {
         in_fbo.Bind();
 
         FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(auxiliary.getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height));
+        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0);
     }
 }
+
 
 void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary)
 {
@@ -473,11 +519,11 @@ void PostProcessing::renderFog()
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_ONE, GL_ONE);
 
 
     FullScreenShader::FogShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<FullScreenShader::FogShader>(fogmax, startH, endH, start, end, col);
+    DrawFullScreenEffect<FullScreenShader::FogShader>(1.f / (40.f * start), col);
 
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
@@ -713,13 +759,22 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             // Downsample
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_BLOOM_256), GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_BLOOM_128), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			
+			// Copy for lens flare
+			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_LENS_512), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_LENS_256), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_LENS_128), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			
 
             // Blur
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_TMP_512));
 
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_TMP_256));
-
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_TMP_128));
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_TMP_512), 1., 1.);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_TMP_256), 1., 1.);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_TMP_128), 1., 1.);
+			
+			renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_512), irr_driver->getFBO(FBO_TMP_512));
+            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_256), irr_driver->getFBO(FBO_TMP_256));
+            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_128), irr_driver->getFBO(FBO_TMP_128));
 
             // Additively blend on top of tmp1
             in_fbo->Bind();
@@ -729,6 +784,11 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             FullScreenShader::BloomBlendShader::getInstance()->SetTextureUnits(
                 irr_driver->getRenderTargetTexture(RTT_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
             DrawFullScreenEffect<FullScreenShader::BloomBlendShader>();
+
+
+			FullScreenShader::LensBlendShader::getInstance()->SetTextureUnits(
+                irr_driver->getRenderTargetTexture(RTT_LENS_128), irr_driver->getRenderTargetTexture(RTT_LENS_256), irr_driver->getRenderTargetTexture(RTT_LENS_512));
+            DrawFullScreenEffect<FullScreenShader::LensBlendShader>();
 
             glDisable(GL_BLEND);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);

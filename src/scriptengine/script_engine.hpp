@@ -68,7 +68,8 @@ namespace Scripting
         
     private:
         asIScriptEngine *m_engine;
-    
+        std::map<std::string, asIScriptFunction*> m_script_cache;
+
         void configureEngine(asIScriptEngine *engine);
         int  compileScript(asIScriptEngine *engine,std::string scriptName);
     };   // class ScriptEngine

@@ -58,6 +58,11 @@ public:
 
     virtual void updateNoGL() OVERRIDE;
 
+    virtual scene::ESCENE_NODE_TYPE getType() const OVERRIDE
+    {
+        return scene::ESNT_TEXT;
+    }
+
     virtual void collectChar(irr::video::ITexture* texture,
         const irr::core::rect<irr::s32>& destRect,
         const irr::core::rect<irr::s32>& sourceRect,

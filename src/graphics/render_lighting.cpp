@@ -185,3 +185,42 @@ void IrrDriver::renderSSAO()
     m_post_processing->renderGaussian17TapBlur(irr_driver->getFBO(FBO_HALF1_R), irr_driver->getFBO(FBO_HALF2_R));
 
 }
+
+void IrrDriver::renderLightsScatter(unsigned pointlightcount)
+{
+    getFBO(FBO_HALF1).Bind();
+    glClearColor(0., 0., 0., 0.);
+    glClear(GL_COLOR_BUFFER_BIT);
+    m_post_processing->renderFog();
+
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+
+    const Track * const track = World::getWorld()->getTrack();
+
+    const float start = track->getFogStart();
+    const video::SColor tmpcol = track->getFogColor();
+    core::vector3df col(1., 1., 1.);
+
+    glUseProgram(LightShader::PointLightScatterShader::getInstance()->Program);
+    glBindVertexArray(LightShader::PointLightScatterShader::getInstance()->vao);
+
+    LightShader::PointLightScatterShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
+    LightShader::PointLightScatterShader::getInstance()->setUniforms(1. / (40. * start), col);
+
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, MIN2(pointlightcount, MAXLIGHT));
+
+// ***
+// That might be a performance issue but if disabled the quality is severly affected (the picture looks jagged)
+// It should be an option if there is a gain in FPS
+    glDisable(GL_BLEND);
+    m_post_processing->renderGaussian6Blur(getFBO(FBO_HALF1), getFBO(FBO_HALF2), 5., 5.);
+    glEnable(GL_BLEND);
+// ***
+
+    getFBO(FBO_COLORS).Bind();
+    m_post_processing->renderPassThrough(getRenderTargetTexture(RTT_HALF1));
+}

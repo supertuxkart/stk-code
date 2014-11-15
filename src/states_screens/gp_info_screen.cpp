@@ -268,7 +268,7 @@ void GPInfoScreen::addScreenshot()
 {
     Widget* screenshot_div = getWidget("screenshot_div");
 
-    if(!m_screenshot_widget)
+    if(!m_screenshot_widget || !m_widgets.contains(m_screenshot_widget))
     {
         m_screenshot_widget = new IconButtonWidget(
             IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,

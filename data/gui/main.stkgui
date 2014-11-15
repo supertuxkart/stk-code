@@ -13,7 +13,7 @@
                          I18N="In the main screen"  text="Story Mode"/>
             <icon-button id="new" width="128" height="128"
                          icon="gui/menu_race.png" focus_icon="gui/menu_race_focus.png"
-                         I18N="In the main screen" text="Single-player"/>
+                         I18N="In the main screen" text="Singleplayer"/>
             <icon-button id="multiplayer" width="128" height="128"
                          icon="gui/menu_multi.png" focus_icon="gui/menu_multi_focus.png"
                          I18N="In the main screen" text="Multiplayer"/>

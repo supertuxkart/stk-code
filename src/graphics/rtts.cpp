@@ -125,10 +125,15 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_BLOOM_1024] = generateRTT(shadowsize0, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_BLOOM_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_TMP_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
+	RenderTargetTextures[RTT_LENS_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
+	
     RenderTargetTextures[RTT_BLOOM_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_TMP_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
+	RenderTargetTextures[RTT_LENS_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
+	
     RenderTargetTextures[RTT_BLOOM_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
+	RenderTargetTextures[RTT_LENS_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
 
     std::vector<GLuint> somevector;
     somevector.push_back(RenderTargetTextures[RTT_SSAO]);
@@ -208,17 +213,30 @@ RTT::RTT(size_t width, size_t height)
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_512]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
+	somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_LENS_512]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
+
+
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_256]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_256]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
+	somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_LENS_256]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
+
+
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_128]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_128]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
+	somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_LENS_128]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
 
     if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())

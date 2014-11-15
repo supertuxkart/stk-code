@@ -16,29 +16,21 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MESSAGE_QUEUE_HPP
-#define HEADER_MESSAGE_QUEUE_HPP
+#ifndef HEADER_GRAPHICS_RESTrICTIONS_HPP
+#define HEADER_GRAPHICS_RESTrICTIONS_HPP
 
-#include "guiengine/widgets/label_widget.hpp"
+/**
+ * \defgroup graphics
+ */
 
-#include "irrString.h"
-
-#include <queue>
+#include <string>
 #include <vector>
 
-using namespace irr;
-
-namespace MessageQueue
+namespace GraphicsRestrictions
 {
-    /** The various message type which can be shown (which might use a
-     *  different look. This type is used to sort the messages, so it is
-     *  important that messages that need to be shown as early as possible
-     *  will be listed last (i.e. have highest priority). */
-    enum MessageType {MT_FRIEND, MT_ACHIEVEMENT};
+    void init();
+    std::vector<std::string> getRestrictions(const std::string &driver_version,
+                                             const std::string &card_name);
+};   // HardwareStats
 
-    void add(MessageType mt, const core::stringw &message);
-    void updatePosition();
-    void update(float dt);
-
-};   // namespace GUIEngine
 #endif

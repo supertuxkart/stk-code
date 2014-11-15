@@ -299,7 +299,7 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
             if(w!=0 && num_karts > 4 &&
                  (type==POWERUP_PARACHUTE || type==POWERUP_SWITCH) )
             {
-                w = w / (num_karts-4);
+                w = w / (num_karts/4);
                 if(w==0) w=1;
             }
             for(unsigned int j=0; j<w; j++)
