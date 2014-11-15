@@ -123,6 +123,7 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_HALF2_R] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
 
     RenderTargetTextures[RTT_BLOOM_1024] = generateRTT(shadowsize0, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_SCALAR_1024] = generateRTT(shadowsize0, GL_R32F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_BLOOM_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_TMP_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
 	RenderTargetTextures[RTT_LENS_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
@@ -208,6 +209,9 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_1024]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 1024, 1024));
     somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_SCALAR_1024]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 1024, 1024));
+    somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_512]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
     somevector.clear();
@@ -241,7 +245,7 @@ RTT::RTT(size_t width, size_t height)
 
     if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
     {
-        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R32F, GL_RED, GL_FLOAT, 1);
+        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R32F, GL_RED, GL_FLOAT, 10);
         shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1);
 
         somevector.clear();
