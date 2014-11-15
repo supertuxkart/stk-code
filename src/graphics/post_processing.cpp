@@ -341,7 +341,7 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo)
             FullScreenShader::ComputeShadowBlurVShader::getInstance()->SetTextureUnits(LayerTex);
             glBindSampler(FullScreenShader::ComputeShadowBlurVShader::getInstance()->TU_dest, 0);
             glBindImageTexture(FullScreenShader::ComputeShadowBlurVShader::getInstance()->TU_dest, irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R32F);
-            FullScreenShader::ComputeShadowBlurVShader::getInstance()->setUniforms(core::vector2df(1.f / 1024.f, 1.f / 1024.f), 1.f);
+            FullScreenShader::ComputeShadowBlurVShader::getInstance()->setUniforms(core::vector2df(1.f / 1024.f, 1.f / 1024.f), 1.5f);
             glDispatchCompute((int)1024 / 8 + 1, (int)1024 / 8 + 1, 1);
 
             glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
@@ -349,7 +349,7 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo)
             FullScreenShader::ComputeShadowBlurHShader::getInstance()->SetTextureUnits(irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0]);
             glBindSampler(FullScreenShader::ComputeShadowBlurHShader::getInstance()->TU_dest, 0);
             glBindImageTexture(FullScreenShader::ComputeShadowBlurHShader::getInstance()->TU_dest, LayerTex, 0, false, 0, GL_WRITE_ONLY, GL_R32F);
-            FullScreenShader::ComputeShadowBlurHShader::getInstance()->setUniforms(core::vector2df(1.f / 1024.f, 1.f / 1024.f), 1.f);
+            FullScreenShader::ComputeShadowBlurHShader::getInstance()->setUniforms(core::vector2df(1.f / 1024.f, 1.f / 1024.f), 1.5f);
             glDispatchCompute((int)1024 / 8 + 1, (int)1024 / 8 + 1, 1);
             glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         }
