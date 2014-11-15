@@ -97,8 +97,6 @@ void MessageDialog::doInit(MessageDialogType type,
     }
     else if (type == MessageDialog::MESSAGE_DIALOG_YESNO)
     {
-        ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
-
         ButtonWidget* cancelbtn = getWidget<ButtonWidget>("cancel");
         cancelbtn->setText(_("No"));
 
