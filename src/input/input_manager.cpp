@@ -44,6 +44,7 @@
 #include "utils/string_utils.hpp"
 
 #include <ISceneManager.h>
+#include <ICameraSceneNode.h>
 #include <ISceneNode.h>
 
 #include <map>
@@ -66,7 +67,8 @@ using GUIEngine::EVENT_BLOCK;
 /** Initialise input
  */
 InputManager::InputManager() : m_mode(BOOTSTRAP),
-                               m_mouse_val_x(0), m_mouse_val_y(0)
+                               m_mouse_val_x(-1), m_mouse_val_y(-1),
+                               m_mouse_reset(0)
 {
     m_device_manager = new DeviceManager();
     m_device_manager->initialize();
@@ -107,6 +109,7 @@ void InputManager::handleStaticAction(int key, int value)
         world->onFirePressed(NULL);
     }
 
+
     switch (key)
     {
 #ifdef DEBUG
@@ -138,6 +141,7 @@ void InputManager::handleStaticAction(int key, int value)
             control_is_pressed = value!=0;
             break;
 
+        // Flying up and down
         case KEY_KEY_I:
         {
             if (!world || !UserConfigParams::m_artist_debug_mode) break;
@@ -158,6 +162,71 @@ void InputManager::handleStaticAction(int key, int value)
             kart->flyDown();
             break;
         }
+        // Moving the first person camera
+        case KEY_KEY_W:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *active_cam = Camera::getActiveCamera();
+            core::vector3df vel(active_cam->getLinearVelocity());
+            vel.Z = value ? 15 : 0;
+            active_cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_S:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *active_cam = Camera::getActiveCamera();
+            core::vector3df vel(active_cam->getLinearVelocity());
+            vel.Z = value ? -15 : 0;
+            active_cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_D:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *active_cam = Camera::getActiveCamera();
+            core::vector3df vel(active_cam->getLinearVelocity());
+            vel.X = value ? -15 : 0;
+            active_cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_A:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *active_cam = Camera::getActiveCamera();
+            core::vector3df vel(active_cam->getLinearVelocity());
+            vel.X = value ? 15 : 0;
+            active_cam->setLinearVelocity(vel);
+            break;
+        }
+        // Rotating the first person camera
+        case KEY_KEY_Q:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *active_cam = Camera::getActiveCamera();
+            active_cam->setAngularVelocity(value ? 1 : 0);
+            break;
+        }
+        case KEY_KEY_E:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *active_cam = Camera::getActiveCamera();
+            active_cam->setAngularVelocity(value ? -1 : 0);
+            break;
+        }
+
         case KEY_SNAPSHOT:
         case KEY_PRINT:
             // on windows we don't get a press event, only release.  So
@@ -170,12 +239,12 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-                
+
                 if (control_is_pressed)
                     kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
                 else
                     kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL, 10000);
-                    
+
 #ifdef FORCE_RESCUE_ON_FIRST_KART
                 // Can be useful for debugging places where the AI gets into
                 // a rescue loop: rescue, drive, crash, rescue to same place
@@ -187,7 +256,7 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-                
+
                 kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;
@@ -288,8 +357,7 @@ void InputManager::handleStaticAction(int key, int value)
         default:
             break;
     } // switch
-
-}
+}   // handleStaticAction
 
 //-----------------------------------------------------------------------------
 /**
@@ -386,7 +454,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
             }
             else m_sensed_input_high_gamepad.insert(input_id);
         }
-        // At least with xbox controller they can come to a 'rest' with a value of 
+        // At least with xbox controller they can come to a 'rest' with a value of
         // around 6000! So in order to detect that an axis was released, we need to
         // test with a rather high deadzone value
         else if ( abs(value) < Input::MAX_VALUE/3.0f )
@@ -585,8 +653,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getRunningInstance()->joinPlayer(device,
-                                                                       false );
+                        KartSelectionScreen::getRunningInstance()->joinPlayer(device);
                     }
                 }
                 return; // we're done here, ignore devices that aren't
@@ -620,7 +687,6 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         // ... when in menus
         else
         {
-
             // reset timer when released
             if (abs(value) == 0 &&  type == Input::IT_STICKBUTTON)
             {
@@ -818,8 +884,20 @@ EventPropagation InputManager::input(const SEvent& event)
             // escape is a little special
             if (key == KEY_ESCAPE)
             {
-                StateManager::get()->escapePressed();
-                return EVENT_BLOCK;
+                // Exit from first person view if activated
+                if (!GUIEngine::ModalDialog::isADialogActive() &&
+                    StateManager::get()->getGameState() == GUIEngine::GAME &&
+                    UserConfigParams::m_camera_debug == 3)
+                {
+                    UserConfigParams::m_camera_debug = 0;
+                    irr_driver->getDevice()->getCursorControl()->setVisible(true);
+                    return EVENT_BLOCK;
+                }
+                else
+                {
+                    StateManager::get()->escapePressed();
+                    return EVENT_BLOCK;
+                }
             }
             // 'backspace' in a text control must never be mapped, since user
             // can be in a text area trying to erase text (and if it's mapped
@@ -873,16 +951,83 @@ EventPropagation InputManager::input(const SEvent& event)
             return EVENT_BLOCK; // Don't propagate key up events
         }
     }
-#if 0 // in case we ever use mouse in-game...
-    else if(event.EventType == EET_MOUSE_INPUT_EVENT)
+    // Use the mouse to change the looking direction when first person view is activated
+    else if (event.EventType == EET_MOUSE_INPUT_EVENT)
     {
         const int type = event.MouseInput.Event;
 
-        if(type == EMIE_MOUSE_MOVED)
+        if (type == EMIE_MOUSE_MOVED)
         {
-            // m_mouse_x = event.MouseInput.X;
-            // m_mouse_y = event.MouseInput.Y;
-            //const int wheel = event.MouseInput.Wheel;
+            if (UserConfigParams::m_camera_debug == 3)
+            {
+                // Center of the screen
+                core::vector2df screen_size = irr_driver->getCurrentScreenSize();
+                int mid_x = (int) screen_size.X / 2;
+                int mid_y = (int) screen_size.Y / 2;
+                //const int wheel = event.MouseInput.Wheel;
+                // Relative mouse movement
+                int diff_x = event.MouseInput.X - m_mouse_val_x;
+                int diff_y = event.MouseInput.Y - m_mouse_val_y;
+                float mouse_x = ((float) diff_x) / 150;
+                float mouse_y = ((float) diff_y) / -150;
+                // No movement the first time it's used
+                // At the moment there's also a hard limit because the mouse
+                // gets reset to the middle of the screen and sometimes there
+                // are more events fired than expected.
+                if (m_mouse_val_x != -1 && m_mouse_reset <= 0)
+                {
+                    // Rotate camera
+                    scene::ICameraSceneNode *cam = Camera::getActiveCamera()
+                                                   ->getCameraSceneNode();
+                    Vec3 direction(cam->getTarget() - cam->getPosition());
+                    direction.normalize();
+                    Vec3 up(cam->getUpVector());
+                    up.normalize();
+                    btQuaternion quat(up, mouse_x);
+                    btTransform trans(quat);
+
+                    quat.setRotation(direction.cross(up), mouse_y);
+                    trans *= btTransform(quat);
+
+                    Vec3 target(trans(direction));
+                    cam->setTarget(target.toIrrVector() + cam->getPosition());
+                    /*Vec3 side(direction.cross(up));
+                    // Compute new up vector
+                    up = side.cross(direction);
+                    up.normalize();
+                    // Don't do that because it looks ugly and is bad to handle ;)
+                    cam->setUpVector(up.toIrrVector());*/
+
+                    // Reset mouse position to the middle of the screen when
+                    // the mouse is far away
+                    if (event.MouseInput.X < mid_x / 2 ||
+                        event.MouseInput.X > (mid_x + mid_x / 2) ||
+                        event.MouseInput.Y < mid_y / 2 ||
+                        event.MouseInput.Y > (mid_y + mid_y / 2))
+                    {
+                        irr_driver->getDevice()->getCursorControl()->setPosition(mid_x, mid_y);
+                        m_mouse_val_x = mid_x;
+                        m_mouse_val_y = mid_y;
+                        // Ignore the next 2 movements
+                        m_mouse_reset = 2;
+                    }
+                    else
+                    {
+                        m_mouse_val_x = event.MouseInput.X;
+                        m_mouse_val_y = event.MouseInput.Y;
+                    }
+                }
+                else
+                {
+                    m_mouse_val_x = event.MouseInput.X;
+                    m_mouse_val_y = event.MouseInput.Y;
+                    --m_mouse_reset;
+                }
+                return EVENT_BLOCK;
+            }
+            else
+                // Reset mouse position
+                m_mouse_val_x = m_mouse_val_y = -1;
         }
 
         /*
@@ -898,7 +1043,6 @@ EventPropagation InputManager::input(const SEvent& event)
                             how fast.
          */
     }
-#endif
 
     // block events in all modes but initial menus (except in text boxes to
     // allow typing, and except in modal dialogs in-game)
@@ -966,7 +1110,7 @@ void InputManager::setMode(InputDriverMode new_mode)
 
                     // Reset the helper values for the relative mouse movement
                     // supresses to the notification of them as an input.
-                    m_mouse_val_x = m_mouse_val_y = 0;
+                    m_mouse_val_x = m_mouse_val_y = -1;
 
                     //irr_driver->showPointer();
                     m_mode = MENU;
@@ -1042,7 +1186,7 @@ void InputManager::setMode(InputDriverMode new_mode)
 
             // Reset the helper values for the relative mouse movement
             // supresses to the notification of them as an input.
-            m_mouse_val_x = m_mouse_val_y = 0;
+            m_mouse_val_x = m_mouse_val_y = -1;
             m_mode        = new_mode;
 
             break;

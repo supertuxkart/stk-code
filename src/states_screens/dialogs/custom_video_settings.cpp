@@ -38,6 +38,7 @@ CustomVideoSettingsDialog::CustomVideoSettingsDialog(const float w, const float 
         ModalDialog(w, h)
 {
     loadFromFile("custom_video_settings.stkgui");
+    updateActivation();
 }
 
 // -----------------------------------------------------------------------------
@@ -190,10 +191,41 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         OptionsScreenVideo::getInstance()->updateGfxSlider();
         return GUIEngine::EVENT_BLOCK;
     }
+    else if (eventSource == "dynamiclight")
+    {
+        updateActivation();
+    }
 
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
 // -----------------------------------------------------------------------------
 
+void CustomVideoSettingsDialog::updateActivation()
+{
+    if(getWidget<CheckBoxWidget>("dynamiclight")->getState())
+    {
+        getWidget<CheckBoxWidget>("motionblur")->setActivated();
+        getWidget<CheckBoxWidget>("dof")->setActivated();
+        getWidget<SpinnerWidget>("shadows")->setActivated();
+        getWidget<CheckBoxWidget>("mlaa")->setActivated();
+        getWidget<CheckBoxWidget>("ssao")->setActivated();
+        getWidget<CheckBoxWidget>("lightshaft")->setActivated();
+        getWidget<CheckBoxWidget>("global_illumination")->setActivated();
+        getWidget<CheckBoxWidget>("glow")->setActivated();
+        getWidget<CheckBoxWidget>("bloom")->setActivated();
+    }
+    else
+    {
+        getWidget<CheckBoxWidget>("motionblur")->setDeactivated();
+        getWidget<CheckBoxWidget>("dof")->setDeactivated();
+        getWidget<SpinnerWidget>("shadows")->setDeactivated();
+        getWidget<CheckBoxWidget>("mlaa")->setDeactivated();
+        getWidget<CheckBoxWidget>("ssao")->setDeactivated();
+        getWidget<CheckBoxWidget>("lightshaft")->setDeactivated();
+        getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
+        getWidget<CheckBoxWidget>("glow")->setDeactivated();
+        getWidget<CheckBoxWidget>("bloom")->setDeactivated();
+    }
+}   // updateActivation
 

@@ -10,19 +10,19 @@
         <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
             <icon-button id="story" width="128" height="128"
                          icon="gui/menu_story.png" focus_icon="gui/menu_story_focus.png"
-                         I18N="Main menu button"  text="Story Mode"/>
+                         I18N="In the main screen"  text="Story Mode"/>
             <icon-button id="new" width="128" height="128"
                          icon="gui/menu_race.png" focus_icon="gui/menu_race_focus.png"
-                         I18N="Main menu button" text="Singleplayer"/>
+                         I18N="In the main screen" text="Singleplayer"/>
             <icon-button id="multiplayer" width="128" height="128"
                          icon="gui/menu_multi.png" focus_icon="gui/menu_multi_focus.png"
-                         I18N="Main menu button" text="Multiplayer"/>
+                         I18N="In the main screen" text="Multiplayer"/>
             <icon-button id="online" width="128" height="128"
                          icon="gui/menu_online.png" focus_icon="gui/menu_online_focus.png"
-                         I18N="Main menu button" text="Online"/>
+                         I18N="In the main screen" text="Online"/>
             <icon-button id="addons" width="128" height="128"
                          icon="gui/menu_addons.png" focus_icon="gui/menu_addons_focus.png"
-                         I18N="Main menu button"  text="Addons"/>
+                         I18N="In the main screen"  text="Addons"/>
         </buttonbar>
 
         <spacer width="10" height="7%"/>
@@ -48,17 +48,17 @@
                  <icon-button id="test_unlocked2" width="64" height="64" icon="gui/main_options.png" extend_label="50"
                              text="TEST: Unlocked 2" label_location="hover"/>      
                 <icon-button id="options" width="64" height="64" icon="gui/main_options.png" extend_label="50"
-                             I18N="Main menu button"  text="Options" label_location="hover"/>
+                             I18N="In the main screen"  text="Options" label_location="hover"/>
                 <icon-button id="help" width="64" height="64" icon="gui/main_help.png"  extend_label="50"
-                             I18N="Main menu button" text="Help" label_location="hover"/>
+                             I18N="In the main screen" text="Help" label_location="hover"/>
                 <icon-button id="startTutorial" width="64" height="64" icon="gui/tutorial.png" extend_label="150"
-                             I18N="Main menu button" text="Tutorial" label_location="hover"/>
+                             I18N="In the main screen" text="Tutorial" label_location="hover"/>
                 <icon-button id="gpEditor" width="64" height="64" icon="gui/gpeditor.png" extend_label="150"
-                             I18N="Main menu button" text="Grand Prix Editor" label_location="hover"/>
+                             I18N="In the main screen" text="Grand Prix Editor" label_location="hover"/>
                 <icon-button id="about" width="64" height="64" icon="gui/main_about.png"  extend_label="50"
-                             I18N="Main menu button" text="About" label_location="hover"/>
+                             I18N="In the main screen" text="About" label_location="hover"/>
                 <icon-button id="quit" width="64" height="64" icon="gui/main_quit.png"  extend_label="50"
-                             I18N="Main menu button" text="Quit" label_location="hover"/>
+                             I18N="In the main screen" text="Quit" label_location="hover"/>
             </buttonbar>
         </bottombar>
     </div>

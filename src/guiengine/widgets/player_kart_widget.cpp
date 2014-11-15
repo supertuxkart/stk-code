@@ -654,11 +654,11 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
     if (m_parent_screen->m_multiplayer)
     {
-        const int modelMaxHeight = (h - kart_name_h - player_name_h)/2;
+        const int modelMaxHeight = (h - kart_name_h - player_name_h) / 2;
         const int modelMaxWidth =  w;
         const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
         model_x = x + w/2 - (int)(bestSize/2);
-        model_y =  y + player_name_h;
+        model_y = y + player_name_h;
         model_w = bestSize;
         model_h = bestSize;
 

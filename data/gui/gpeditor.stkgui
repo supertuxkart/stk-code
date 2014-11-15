@@ -21,8 +21,7 @@
         <spacer height="20" />
 
         <box proportion="2" width="100%" layout="vertical-row">
-            <label id="gpname" text_align="center" width="100%"
-                I18N="In the grand prix editor screen" text="" />
+            <label id="gpname" text_align="center" width="100%" text="" />
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
                 label_location="each" align="left" max_rows="1"
                 child_width="160" child_height="120" />

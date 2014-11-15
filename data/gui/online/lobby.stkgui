@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
-
         <header text_align="center" width="80%" align="center" I18N="In networking lobby" text="Lobby"/>
         <spacer height="15" width="10"/>
         <div proportion="1" x="2%" width="96%" layout="vertical-row">
@@ -40,11 +39,9 @@
 
             <buttonbar id="menu_bottomrow" x="0" y="0" width="20%" height="100%" align="center">
                 <icon-button id="exit" width="64" height="64" icon="gui/main_quit.png"  extend_label="50"
-                             I18N="Main menu button" text="Exit" label_location="hover"/>
+                             I18N="In the networking lobby" text="Exit" label_location="hover"/>
             </buttonbar>
-
         </bottombar>
-
     </div>
 
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>

@@ -66,7 +66,11 @@ private:
     * values exceed the deadzone value the input is reported to the game. This
     * makes the mouse behave like an analog axis on a gamepad/joystick.
     */
-    int    m_mouse_val_x, m_mouse_val_y;
+    int m_mouse_val_x, m_mouse_val_y;
+    /** To detect mouse events that are not caused by the user but by resetting
+        the mouse position to the center of the screen.
+        If it's not 0, the movement is ignored and the value is decreased. */
+    int m_mouse_reset;
 
     void   dispatchInput(Input::InputType, int deviceID, int btnID,
                          Input::AxisDirection direction, int value);

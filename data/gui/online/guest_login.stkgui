@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
-
         <header align="center" width="80%" text="Login" text_align="center"/>
         <spacer height="15" width="10"/>
 
@@ -20,19 +19,17 @@
             <spacer height="15" width="10"/>
             <box proportion="4" width="90%" layout="vertical-row" align="center">
                 <div x="2%" y="2%" width="96%" height="80%" layout="vertical-row" id="outer_box" >
-                    <label I18N="In the online multiplayer screen" proportion="4" word_wrap="true" text=
-                    "Signing in as a guest allows you to participate in online races,
-    but it does not allow you to vote for addons,
-    or collect any achievements while being online."
-                           align="center"/>
+                    <label I18N="In the login dialog" proportion="4" word_wrap="true"
+                        text="Signing in as a guest allows you to participate in online races, but it does not allow you to vote for addons, or collect any achievements while being online."
+                         align="center"/>
                 </div>
             </box>
             <spacer height="15" width="10"/>
             <buttonbar id="options" width="90%" height="13%" align="bottom">
                 <icon-button id="sign_in" width="64" height="64" icon="gui/green_check.png"
-                             I18N="Login dialog"  text="Sign In" label_location="bottom"/>
+                             I18N="In the login dialog"  text="Sign In" label_location="bottom"/>
                 <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
-                             I18N="Login dialog" text="Close" label_location="bottom"/>
+                             I18N="In the login dialog="Close" label_location="bottom"/>
             </buttonbar>
             <spacer height="15" width="10"/>
         </box>

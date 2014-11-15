@@ -196,10 +196,8 @@ void PlayerController::action(PlayerAction action, int value)
         m_controls->m_rescue = (value!=0);
         break;
     case PA_FIRE:
-    {
         m_controls->m_fire = (value!=0);
         break;
-    }
     case PA_LOOK_BACK:
         m_controls->m_look_back = (value!=0);
         break;
@@ -207,12 +205,14 @@ void PlayerController::action(PlayerAction action, int value)
         if(value==0)
             m_controls->m_skid = KartControl::SC_NONE;
         else
+        {
             if(m_steer_val==0)
                 m_controls->m_skid = KartControl::SC_NO_DIRECTION;
             else
                 m_controls->m_skid = m_steer_val<0
                                    ? KartControl::SC_RIGHT
                                    : KartControl::SC_LEFT;
+        }
         break;
     case PA_PAUSE_RACE:
         if (value != 0) StateManager::get()->escapePressed();
