@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <graphical-restrictions>
   <card is="Intel(R) HD Graphics 3000" os="windows" version="<9.17.11"  disable="a b c"/>
-  <card contains="HD Graphics"         os="linux"  version="=9.17.10.3517"  disable="a b c"/>
+  <card contains="NVIDIA"         os="windows"  version="<344.65"  disable="BufferStorage"/>
+  <card contains="NVIDIA"         os="linux"  version="<343.22"  disable="BufferStorage"/>
   <card is="Intel(R) HD Graphics 3000" os="osx"    version="<=9.17.10" disable="a b c"/>
   <card is=""                          os="bsd"    version="<1.2.3"  disable="a b c"/>
 

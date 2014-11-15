@@ -479,10 +479,7 @@ void IrrDriver::initDevice()
     // Call to glGetIntegerv should not be made if --no-graphics is used
     if(!ProfileWorld::isNoGraphics())
     {
-        std::string driver((char*)(glGetString(GL_VERSION)));
-        std::string card  ((char*)(glGetString(GL_RENDERER)));
-        std::vector<std::string> restrictions = 
-            GraphicsRestrictions::getRestrictions(driver, card);
+
     }
     if(!ProfileWorld::isNoGraphics())
     {
@@ -562,6 +559,20 @@ void IrrDriver::initDevice()
             Log::info("GLDriver", "ARB Texture View enabled");
         }
         m_support_sdsm = m_support_sdsm && hasComputeShaders && hasBuffserStorage;
+
+        std::string driver((char*)(glGetString(GL_VERSION)));
+        std::string card((char*)(glGetString(GL_RENDERER)));
+        std::vector<std::string> restrictions =
+            GraphicsRestrictions::getRestrictions(driver, card);
+
+        for (const std::string &restriction : restrictions)
+        {
+            if (!restriction.compare("BufferStorage"))
+            {
+                hasBuffserStorage = false;
+                Log::info("Graphics restrictions", "Buffer Storage disabled");
+            }
+        }
     }
 #endif
 
