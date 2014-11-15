@@ -1,5 +1,5 @@
 uniform sampler2D source;
-uniform layout(rgba16f) restrict writeonly image2D dest;
+uniform layout(r32f) restrict writeonly image2D dest;
 uniform vec2 pixel;
 uniform float sigma;
 
@@ -27,7 +27,7 @@ void main()
     g0 = 1.0 / (sqrt(2.0 * 3.14) * sigma);
     g1 = exp(-0.5 / (sigma * sigma));
     g2 = g1 * g1;
-    floar sum = local_src[x][y + 6] * g0;
+    float sum = local_src[x][y + 6] * g0;
     g0 *= g1;
     g1 *= g2;
     for (int i = 1; i < 6; i++) {
