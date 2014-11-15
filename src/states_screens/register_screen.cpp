@@ -233,6 +233,10 @@ void RegisterScreen::doRegister()
     {
         m_info_widget->setText(_("Online username has to be between 3 and 30 characters long!"), false);
     }
+    else if (username[0]>='0' && username[0]<='9')
+    {
+        m_info_widget->setText(_("Online username must not start with a number!"), false);
+    }
     else if (password.size() < 8 || password.size() > 30)
     {
         m_info_widget->setText(_("Password has to be between 8 and 30 characters long!"), false);
