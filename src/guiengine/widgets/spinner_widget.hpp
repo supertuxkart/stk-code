@@ -186,7 +186,7 @@ namespace GUIEngine
         // --------------------------------------------------------------------
         /** Override method from base class Widget */
         virtual void setActivated();
-        
+
         /** Override method from base class Widget */
         virtual void setDeactivated();
 
