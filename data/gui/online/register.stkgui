@@ -16,7 +16,9 @@
                 <div width="100%" height="12%" layout="horizontal-row" >
                     <label    id="label_online" proportion="1" height="100%" text_align="left"
                               I18N="In the login screen" text="Create online account"/>
-                    <checkbox id="online" I18N="In the login screen" text_align="left"/>
+                    <div proportion="2" layout="horizontal-row" height="fit">
+                        <checkbox id="online" I18N="In the login screen" text_align="left"/>
+                    </div>
                 </div>
 
                 <div width="100%" height="12%" layout="horizontal-row" >
