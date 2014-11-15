@@ -7,19 +7,19 @@ uniform float sigma;
 
 layout (local_size_x = 8, local_size_y = 8) in;
 
-shared vec3 local_src[8][8 + 2 * 8];
+shared vec3 local_src[8][8 + 2 * 6];
 
 void main()
 {
     int x = int(gl_LocalInvocationID.x), y = int(gl_LocalInvocationID.y);
     ivec2 iuv = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
-    vec2 uv_m = (iuv - ivec2(0, 8)) * pixel;
+    vec2 uv_m = (iuv - ivec2(0, 6)) * pixel;
     vec2 uv = iuv * pixel;
-    vec2 uv_p = (iuv + ivec2(0, 8)) * pixel;
+    vec2 uv_p = (iuv + ivec2(0, 6)) * pixel;
 
     local_src[x][y] = texture(source, uv_m).rgb;
-    local_src[x][y + 8] = texture(source, uv).rgb;
-    local_src[x][y + 16] = texture(source, uv_p).rgb;
+    local_src[x][y + 6] = texture(source, uv).rgb;
+    local_src[x][y + 12] = texture(source, uv_p).rgb;
 
     barrier();
 
@@ -27,12 +27,12 @@ void main()
     g0 = 1.0 / (sqrt(2.0 * 3.14) * sigma);
     g1 = exp(-0.5 / (sigma * sigma));
     g2 = g1 * g1;
-    vec3 sum = local_src[x][y + 8] * g0;
+    vec3 sum = local_src[x][y + 6] * g0;
     g0 *= g1;
     g1 *= g2;
     for (int i = 1; i < 6; i++) {
-        sum += local_src[x][8 + y - i] * g0;
-        sum += local_src[x][8 + y + i] * g0;
+        sum += local_src[x][6 + y - i] * g0;
+        sum += local_src[x][6 + y + i] * g0;
         g0 *= g1;
         g1 *= g2;
     }
