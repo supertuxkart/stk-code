@@ -38,11 +38,11 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
     GamepadConfig *config = static_cast<GamepadConfig*>(m_configuration);
     if(m_configuration->getNumberOfButtons()<button_count)
     {
-        static_cast<GamepadConfig*>(m_configuration)->setNumberOfButtons(button_count);
+        config->setNumberOfButtons(button_count);
     }
     if(m_configuration->getNumberOfAxes()<axis_count)
     {
-        static_cast<GamepadConfig*>(m_configuration)->setNumberOfAxis(axis_count);
+        config->setNumberOfAxis(axis_count);
     }
     m_prev_axis_directions  = new Input::AxisDirection[axis_count];
     m_prev_axis_value       = new int[axis_count];
