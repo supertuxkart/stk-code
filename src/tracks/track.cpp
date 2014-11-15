@@ -461,7 +461,7 @@ void Track::loadTrackInfo()
     m_default_ambient_color = video::SColor(255, 120, 120, 120);
     m_sun_specular_color    = video::SColor(255, 255, 255, 255);
     m_sun_diffuse_color     = video::SColor(255, 255, 255, 255);
-    m_sun_position          = core::vector3df(0, 0, 0);
+    m_sun_position          = core::vector3df(0, 10, 10);
     irr_driver->setSSAORadius(1.);
     irr_driver->setSSAOK(1.5);
     irr_driver->setSSAOSigma(1.);
@@ -736,6 +736,9 @@ void Track::createPhysicsModel(unsigned int main_track_count)
  */
 void Track::convertTrackToBullet(scene::ISceneNode *node)
 {
+    if (node->getType() == scene::ESNT_TEXT)
+        return;
+
     if (node->getType() == scene::ESNT_LOD_NODE)
     {
         node = ((LODNode*)node)->getFirstNode();
