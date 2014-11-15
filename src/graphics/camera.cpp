@@ -85,6 +85,8 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     m_target_speed   = 10.0f;
     m_rotation_range = 0.4f;
     m_rotation_range = 0.0f;
+    m_lin_velocity = core::vector3df(0, 0, 0);
+    m_angular_velocity = 0;
     reset();
 }   // Camera
 

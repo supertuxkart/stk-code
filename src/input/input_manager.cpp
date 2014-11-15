@@ -991,12 +991,12 @@ EventPropagation InputManager::input(const SEvent& event)
 
                     Vec3 target(trans(direction));
                     cam->setTarget(target.toIrrVector() + cam->getPosition());
-                    Vec3 side(direction.cross(up));
+                    /*Vec3 side(direction.cross(up));
                     // Compute new up vector
                     up = side.cross(direction);
                     up.normalize();
                     // Don't do that because it looks ugly and is bad to handle ;)
-                    //cam->setUpVector(up.toIrrVector());
+                    cam->setUpVector(up.toIrrVector());*/
 
                     // Reset mouse position to the middle of the screen when
                     // the mouse is far away
