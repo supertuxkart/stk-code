@@ -28,6 +28,7 @@
 
 namespace GraphicsRestrictions
 {
+    void init();
     std::vector<std::string> getRestrictions(const std::string &driver_version,
                                              const std::string &card_name);
 };   // HardwareStats

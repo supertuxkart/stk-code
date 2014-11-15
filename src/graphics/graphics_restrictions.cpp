@@ -108,7 +108,7 @@ public:
      */
     bool operator== (const Version &other) const
     {
-        int min_n = std::min(m_version.size(), other.m_version.size());
+        unsigned int min_n = std::min(m_version.size(), other.m_version.size());
         for(unsigned int i=0; i<min_n; i++)
             if(other.m_version[i]!=m_version[i]) return false;
         return true;
@@ -116,7 +116,7 @@ public:
     // ------------------------------------------------------------------------
     bool operator< (const Version &other) const
     {
-        int min_n = std::min(m_version.size(), other.m_version.size());
+        unsigned int min_n = std::min(m_version.size(), other.m_version.size());
         for(unsigned int i=0; i<min_n; i++)
             if(other.m_version[i]>=m_version[i]) return false;
         return true;
@@ -289,8 +289,6 @@ void init()
 std::vector<std::string> getRestrictions(const std::string &driver_version,
                                          const std::string &card_name)
 {
-    init();
-
     std::vector<std::string> restrictions;
 
     Version version(driver_version, card_name);

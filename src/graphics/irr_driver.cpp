@@ -320,6 +320,8 @@ void IrrDriver::createListOfVideoModes()
  */
 void IrrDriver::initDevice()
 {
+    GraphicsRestrictions::init();
+
     // If --no-graphics option was used, the null device can still be used.
     if (!ProfileWorld::isNoGraphics())
     {
