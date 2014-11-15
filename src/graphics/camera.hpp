@@ -110,7 +110,11 @@ private:
     /** Aspect ratio for camera. */
     float           m_aspect;
 
-    /** Linear velocity of the camera, only used for end camera. */
+    /** The speed at which the up-vector rotates, only used for the first person camera. */
+    float m_angular_velocity;
+
+    /** Linear velocity of the camera, used for end and first person camera.
+        It's stored relative to the camera direction for the first person view. */
     core::vector3df m_lin_velocity;
 
     /** Velocity of the target of the camera, only used for end camera. */
@@ -246,6 +250,22 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the kart to which this camera is attached. */
     AbstractKart* getKart() { return m_kart; }
+
+    // ------------------------------------------------------------------------
+    /** Sets the angular velocity for this camera. */
+    void setAngularVelocity (float vel) { m_angular_velocity = vel; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the current angular velocity. */
+    const float getAngularVelocity () { return m_angular_velocity; }
+
+    // ------------------------------------------------------------------------
+    /** Sets the linear velocity for this camera. */
+    void setLinearVelocity (core::vector3df vel) { m_lin_velocity = vel; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the current linear velocity. */
+    const core::vector3df &getLinearVelocity () { return m_lin_velocity; }
 
     // ------------------------------------------------------------------------
     /** Sets the ambient light for this camera. */
