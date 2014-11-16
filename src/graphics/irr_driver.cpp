@@ -574,6 +574,8 @@ void IrrDriver::initDevice()
             }
         }
     }
+#else
+    m_support_sdsm = false;
 #endif
 
 
