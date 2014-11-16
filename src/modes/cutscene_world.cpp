@@ -90,8 +90,7 @@ void CutsceneWorld::init()
 
     // --- Build list of sounds to play at certain frames
     PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
-    TrackObject* curr;
-    for_in(curr, objects)
+    for (TrackObject* curr : objects)
     {
         if (curr->getType() == "particle-emitter" &&
             !curr->getPresentation<TrackObjectPresentationParticles>()->getTriggerCondition().empty())

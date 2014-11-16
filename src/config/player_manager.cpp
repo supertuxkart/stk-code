@@ -273,7 +273,7 @@ void PlayerManager::save()
         }
 
         // Save all non-guest players
-        for_var_in(PlayerProfile*, player, m_all_players)
+        for (PlayerProfile* player : m_all_players)
         {
             if(!player->isGuestAccount())
                 player->save(players_file);
@@ -322,9 +322,7 @@ void PlayerManager::deletePlayer(PlayerProfile *player)
 void PlayerManager::enforceCurrentPlayer()
 {
     if (m_current_player) return;
-    
-    PlayerProfile* player;
-    for_in(player, m_all_players)
+    for (PlayerProfile* player : m_all_players)
     {
         if (!player->isGuestAccount())
         {
@@ -338,7 +336,7 @@ void PlayerManager::enforceCurrentPlayer()
     // This shouldn't happen - but just in case: add the default players
     // again, and search again for a non-guest player.
     addDefaultPlayer();
-    for_in(player, m_all_players)
+    for (PlayerProfile* player : m_all_players)
     {
         if (!player->isGuestAccount())
         {
@@ -410,7 +408,7 @@ void PlayerManager::createGuestPlayers(int n)
 unsigned int PlayerManager::getNumNonGuestPlayers() const
 {
     unsigned int count=0;
-    for_var_in(const PlayerProfile*, player, m_all_players)
+    for (const PlayerProfile* player : m_all_players)
     {
         if(!player->isGuestAccount()) count ++;
     }
@@ -423,7 +421,7 @@ unsigned int PlayerManager::getNumNonGuestPlayers() const
 unsigned int PlayerManager::getUniqueId() const
 {
     unsigned int max_id=0;
-    for_var_in(const PlayerProfile*, player, m_all_players)
+    for (const PlayerProfile* player : m_all_players)
     {
         if(player->getUniqueID()>max_id)
             max_id = player->getUniqueID();
@@ -439,7 +437,7 @@ unsigned int PlayerManager::getUniqueId() const
  */
 const PlayerProfile *PlayerManager::getPlayerById(unsigned int id)
 {
-    for_var_in(const PlayerProfile*, player, m_all_players)
+    for (const PlayerProfile* player : m_all_players)
     {
         if(player->getUniqueID()==id)
             return player;
@@ -454,7 +452,7 @@ const PlayerProfile *PlayerManager::getPlayerById(unsigned int id)
  */
 PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
 {
-    for_var_in(PlayerProfile*, player, m_all_players)
+    for (PlayerProfile* player : m_all_players)
     {
         if(player->getName()==name)
             return player;

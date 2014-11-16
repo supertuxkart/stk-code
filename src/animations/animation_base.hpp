@@ -90,7 +90,7 @@ public:
     {
         float duration = -1;
 
-        for_var_in (const Ipo*, currIpo, m_all_ipos)
+        for (const Ipo* currIpo : m_all_ipos)
         {
             duration = std::max(duration, currIpo->getEndTime());
         }

@@ -84,8 +84,7 @@ void TrackObjectManager::init()
  */
 void TrackObjectManager::reset()
 {
-    TrackObject* curr;
-    for_in (curr, m_all_objects)
+    for (TrackObject* curr : m_all_objects)
     {
         curr->reset();
         if (!curr->isEnabled())
@@ -107,8 +106,7 @@ void TrackObjectManager::reset()
  */
 void TrackObjectManager::disable(std::string name)
 {
-     TrackObject* curr;
-     for_in (curr,m_all_objects)
+     for (TrackObject* curr : m_all_objects)
      {
         if (curr->getName() == (name) || curr->getID() == (name))
         {
@@ -128,8 +126,7 @@ void TrackObjectManager::disable(std::string name)
  */
 void TrackObjectManager::enable(std::string name)
 {
-    TrackObject* curr;
-    for_in (curr,m_all_objects)
+    for (TrackObject* curr : m_all_objects)
     {
         if (curr->getName() == (name) || curr->getID() == (name))
         {
@@ -151,8 +148,7 @@ void TrackObjectManager::enable(std::string name)
  */
 bool TrackObjectManager::getStatus(std::string name)
 {
-     TrackObject* curr;
-     for_in (curr,m_all_objects){
+     for (TrackObject* curr : m_all_objects){
             if (curr->getName() == (name)||curr->getID()==(name))
             {
 
@@ -170,8 +166,7 @@ bool TrackObjectManager::getStatus(std::string name)
  */
 TrackObject* TrackObjectManager::getTrackObject(std::string name)
 {
-    TrackObject* curr;
-    for_in(curr, m_all_objects)
+    for (TrackObject* curr : m_all_objects)
     {
         if (curr->getName() == (name) || curr->getID() == (name))
         {
@@ -248,8 +243,7 @@ void TrackObjectManager::castRay(const btVector3 &from,
     {
         distance = hit_point->distance(from);
     }
-    const TrackObject* curr;
-    for_in (curr, m_driveable_objects)
+    for_in(const TrackObject* curr : m_driveable_objects)
     {
         btVector3 new_hit_point;
         const Material *new_material;

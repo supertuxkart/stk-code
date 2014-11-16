@@ -425,7 +425,7 @@ void RibbonWidget::removeChildNamed(const char* name)
     // This method should only be called BEFORE a widget is added
     assert(m_element == NULL);
 
-    for_var_in(Widget*, child, m_children)
+    for (Widget* child : m_children)
     {
         if (child->m_properties[PROP_ID] == name)
         {
