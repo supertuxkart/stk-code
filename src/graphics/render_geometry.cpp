@@ -447,8 +447,11 @@ void renderInstancedMeshes1stPass(Args...args)
         GLMesh *mesh = meshes[i];
 #ifdef DEBUG
         if (mesh->VAOType != T::VertexType)
+        {
             Log::error("RenderGeometry", "Wrong instanced vertex format (hint : %s)", 
-                        mesh->textures[0]->getName().getPath().c_str());
+                mesh->textures[0]->getName().getPath().c_str());
+            continue;
+        }
 #endif
         TexExpander<typename T::InstancedFirstPassShader>::template ExpandTex(*mesh, T::FirstPassTextures);
 
