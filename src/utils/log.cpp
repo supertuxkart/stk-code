@@ -56,6 +56,7 @@ void Log::setTerminalColor(LogLevel level)
     char color;
     switch(level)
     {
+    default:
     case LL_VERBOSE: color = TERM_BLACK     << 4 | TERM_LIGHTGRAY; break;
     case LL_DEBUG:   color = TERM_BLACK     << 4 | TERM_LIGHTGRAY; break;
     case LL_INFO:    color = TERM_BLACK     << 4 | TERM_LIGHTGRAY; break;
