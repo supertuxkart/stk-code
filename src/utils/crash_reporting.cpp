@@ -222,7 +222,7 @@
             {
                 // Initialize the IMAGEHLP_SYMBOL64 structure
                 const size_t    MaxNameLength = 256;
-                IMAGEHLP_SYMBOL64*  sym = (IMAGEHLP_SYMBOL64*)alloca(sizeof(IMAGEHLP_SYMBOL64) + MaxNameLength);
+                IMAGEHLP_SYMBOL64*  sym = (IMAGEHLP_SYMBOL64*)malloca(sizeof(IMAGEHLP_SYMBOL64) + MaxNameLength);
                 sym->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL64);
                 sym->MaxNameLength = MaxNameLength;
 
