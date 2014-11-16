@@ -209,7 +209,7 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
     glBindVertexArray(LightShader::PointLightScatterShader::getInstance()->vao);
 
     LightShader::PointLightScatterShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
-    LightShader::PointLightScatterShader::getInstance()->setUniforms(1. / (40. * start), col);
+    LightShader::PointLightScatterShader::getInstance()->setUniforms(1.f / (40.f * start), col);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, MIN2(pointlightcount, MAXLIGHT));
 
