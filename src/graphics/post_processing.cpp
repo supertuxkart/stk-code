@@ -410,7 +410,7 @@ void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo, FrameBuffer &auxi
         auxiliary.Bind();
 
         FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(in_fbo.getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0);
+        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0f);
     }
     {
         in_fbo.Bind();
