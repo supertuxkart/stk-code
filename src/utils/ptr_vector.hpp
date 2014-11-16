@@ -39,9 +39,12 @@ enum VECTOR_TYPE
 
 
 template<typename TYPE, VECTOR_TYPE type=HOLD>
-class PtrVector : public AlignedArray<TYPE*>
+class PtrVector
 {
+
 public:
+    AlignedArray<TYPE*> m_contents_vector;
+
     PtrVector()
     {
     }   // PtrVector
@@ -54,30 +57,58 @@ public:
     }   // ~PtrVector
 
     // ------------------------------------------------------------------------
+
+    void push_back(TYPE* t)
+    {
+        m_contents_vector.push_back(t);
+    }   // push_back
+
+    // ------------------------------------------------------------------------
+    void swap(int ID1, int ID2)
+    {
+        assert(ID1 > -1);
+        assert((unsigned int)ID1 < m_contents_vector.size());
+        assert(ID2 > -1);
+        assert((unsigned int)ID2 < m_contents_vector.size());
+
+
+        TYPE* temp = m_contents_vector[ID2];
+
+        m_contents_vector[ID2] = m_contents_vector[ID1];
+        m_contents_vector[ID1] = temp;
+    }   // swap
+
+    // ------------------------------------------------------------------------
     TYPE* get(const int ID)
     {
         assert(ID > -1);
-        assert((unsigned int)ID < (unsigned int)size());
+        assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
 
-        return (*this)[ID];
+        return m_contents_vector[ID];
     }   // get
 
     // ------------------------------------------------------------------------
     const TYPE* get(const int ID) const
     {
         assert(ID > -1);
-        assert((unsigned int)ID < (unsigned int)size());
+        assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
 
-        return (*this)[ID];
+        return m_contents_vector[ID];
     }   // get
+
+    // ------------------------------------------------------------------------
+    unsigned int size() const
+    {
+        return (int) m_contents_vector.size();
+    }   // size
 
     // ------------------------------------------------------------------------
     void erase(const int ID)
     {
         assert(ID > -1);
-        assert((unsigned int)ID < (unsigned int)size());
+        assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
 
-        delete (TYPE *)(*this)[ID];
+        delete ( TYPE *) m_contents_vector[ID];
 #ifdef USE_ALIGNED
         const unsigned int amount = (unsigned int)m_contents_vector.size();
         for(unsigned int i=ID; i<amount-1; i++)
@@ -86,7 +117,7 @@ public:
         }
         m_contents_vector.pop_back();
 #else
-        AlignedArray<TYPE*>::erase(this->begin() + ID);
+        m_contents_vector.erase(m_contents_vector.begin()+ID);
 #endif
     }   // erase
 
@@ -94,9 +125,9 @@ public:
     TYPE* remove(const int ID)
     {
         assert(ID > -1);
-        assert((unsigned int)ID < (unsigned int)size());
+        assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
 
-        TYPE* out = (*this)[ID];
+        TYPE* out = m_contents_vector[ID];
 #ifdef USE_ALIGNED
         const unsigned int amount = (unsigned int)m_contents_vector.size();
         for(unsigned int i=ID; i<amount-1; i++)
@@ -105,31 +136,60 @@ public:
         }
         m_contents_vector.pop_back();
 #else
-        AlignedArray<TYPE*>::erase(this->begin() + ID);
+        m_contents_vector.erase(m_contents_vector.begin()+ID);
 #endif
         return out;
     }   // remove
 
     // ------------------------------------------------------------------------
+    bool contains( const TYPE* instance ) const
+    {
+        const unsigned int amount = (unsigned int)m_contents_vector.size();
+        for (unsigned int n=0; n<amount; n++)
+        {
+            const TYPE * pointer = m_contents_vector[n];
+            if (pointer == instance) return true;
+        }
+
+        return false;
+    }   // contains
+
+    // ------------------------------------------------------------------------
     void clearAndDeleteAll()
     {
-        for (unsigned int n=0; n<(unsigned int)size(); n++)
+        for (unsigned int n=0; n<(unsigned int)m_contents_vector.size(); n++)
         {
-            TYPE * pointer = (*this)[n];
+            TYPE * pointer = m_contents_vector[n];
             delete pointer;
-            (*this)[n] = (TYPE*)0xDEADBEEF;
+            m_contents_vector[n] = (TYPE*)0xDEADBEEF;
 
             // When deleting, it's important that the same pointer cannot be
             // twice in the vector, resulting in a double delete
             assert( !contains(pointer) );
         }
-        clear();
+        m_contents_vector.clear();
     }  // clearAndDeleteAll
+
+    // ------------------------------------------------------------------------
+    TYPE& operator[](const unsigned int ID)
+    {
+        assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
+
+        return *(m_contents_vector[ID]);
+    }   // operator[]
+
+    // ------------------------------------------------------------------------
+    const TYPE& operator[](const unsigned int ID) const
+    {
+        assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
+
+        return *(m_contents_vector[ID]);
+    }   // operator[]
 
     // ------------------------------------------------------------------------
     void clearWithoutDeleting()
     {
-        clear();
+        m_contents_vector.clear();
     }   // clearWithoutDeleting
 
     // ------------------------------------------------------------------------
@@ -138,10 +198,10 @@ public:
     */
     void remove(TYPE* obj)
     {
-        for(unsigned int n=0; n<(unsigned int)size(); n++)
+        for(unsigned int n=0; n<(unsigned int)m_contents_vector.size(); n++)
         {
 
-            TYPE * pointer = (*this)[n];
+            TYPE * pointer = m_contents_vector[n];
             if(pointer == obj)
             {
 #ifdef USE_ALIGNED
@@ -153,7 +213,7 @@ public:
                 }
                 m_contents_vector.pop_back();
 #else
-                AlignedArray<TYPE*>::erase(begin() + n);
+                m_contents_vector.erase(m_contents_vector.begin()+n);
 #endif
                 return;
             }
@@ -168,9 +228,9 @@ public:
     */
     bool erase(void* obj)
     {
-        for(unsigned int n=0; n<(unsigned int)size(); n++)
+        for(unsigned int n=0; n<(unsigned int)m_contents_vector.size(); n++)
         {
-            TYPE * pointer = (*this)[n];
+            TYPE * pointer = m_contents_vector[n];
             if((void*)pointer == obj)
             {
 #ifdef USE_ALIGNED
@@ -182,7 +242,7 @@ public:
                 }
                 m_contents_vector.pop_back();
 #else
-                AlignedArray<TYPE*>::erase(m_contents_vector.begin() + n);
+                m_contents_vector.erase(m_contents_vector.begin()+n);
 #endif
                 delete pointer;
                 return true;
