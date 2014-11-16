@@ -221,6 +221,26 @@ public:
 
     }   // remove
 
+    typename AlignedArray<TYPE*>::iterator begin()
+    {
+        return m_contents_vector.begin();
+    }
+
+    typename AlignedArray<TYPE*>::iterator end()
+    {
+        return m_contents_vector.end();
+    }
+
+    typename AlignedArray<TYPE*>::const_iterator begin() const
+    {
+        return m_contents_vector.begin();
+    }
+
+    typename AlignedArray<TYPE*>::const_iterator end() const
+    {
+        return m_contents_vector.end();
+    }
+
     // ------------------------------------------------------------------------
     /**
     * \brief Removes and deletes the given object.
