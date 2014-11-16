@@ -243,7 +243,8 @@ void TrackObjectManager::castRay(const btVector3 &from,
     {
         distance = hit_point->distance(from);
     }
-    for_in(const TrackObject* curr : m_driveable_objects)
+    const TrackObject* curr;
+    for_in(curr, m_driveable_objects)
     {
         btVector3 new_hit_point;
         const Material *new_material;
