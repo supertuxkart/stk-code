@@ -333,6 +333,7 @@ bool DeviceConfig::load(const XMLNode *config)
                       "DeviceConfig::deserializeAction : action '%s' is unknown.",
                       name.c_str());
             error=true;
+            continue;
         }
 
         if(!m_bindings[binding_id].load(action))
