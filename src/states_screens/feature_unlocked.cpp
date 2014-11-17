@@ -534,6 +534,7 @@ void FeatureUnlockedCutScene::addUnlockedTrack(const Track* track)
 void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
 {
     std::vector<ITexture*> images;
+    core::stringw gpname;
     if (gp == NULL)
     {
         Log::error("FeatureUnlockedCutScene::addUnlockedGP", "Unlocked GP does not exist");
@@ -560,9 +561,9 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
                                                           : file_manager->getAsset(FileManager::GUI,"main_help.png"));
             images.push_back(tex);
         }
+        gpname = gp->getName();
     }
 
-    core::stringw gpname = gp->getName();
     addUnlockedPictures(images, 4.0f, 3.0f, _("You unlocked grand prix %0", gpname));
 }
 
