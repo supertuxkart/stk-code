@@ -822,7 +822,7 @@ void DynamicRibbonWidget::propagateSelection()
         // set same selection in all ribbons
         for (RibbonWidget* ribbon : m_rows)
         {
-            if (ribbon != selected_ribbon)
+            if (ribbon && ribbon != selected_ribbon)
             {
                 ribbon->m_selection[p] = (int)roundf(where*(ribbon->m_children.size()-1));
                 ribbon->updateSelection();
