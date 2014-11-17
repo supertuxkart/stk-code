@@ -112,6 +112,12 @@ protected:
                 const std::string& selection,
                 const irr::core::stringw& selectionText);
 
+    /** Adds a message to the screen which indicates that players must press fire to join. */
+    void addMultiplayerMessage();
+
+    /** Remove the multiplayer message. */
+    void removeMultiplayerMessage();
+
     /** Stores a pointer to the current selection screen */
     static KartSelectionScreen* m_instance_ptr;
 public:
@@ -130,7 +136,7 @@ public:
 
     /** \brief Called when a player hits 'fire'/'select' on his device to
      *  join the game */
-    bool joinPlayer(InputDevice* device, bool first_player);
+    bool joinPlayer(InputDevice* device);
 
     /**
       * \brief Called when a player hits 'rescue'/'cancel' on his device

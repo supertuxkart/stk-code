@@ -333,7 +333,7 @@ void SpinnerWidget::setValue(const int new_value)
         std::string imagefile = file_manager->searchTexture(s);
         ((IGUIImage*)(m_children[1].m_element))->setImage(irr_driver->getTexture(imagefile));
     }
-    else if (m_labels.size() > 0 && m_children.size() > 0)
+    else if (m_labels.size() > 0 && m_children.size() > 0 && !m_deactivated)
     {
         assert(new_value >= 0);
         assert(new_value < (int)m_labels.size());
@@ -386,7 +386,8 @@ void SpinnerWidget::setValue(irr::core::stringw new_value)
         }
     }
 
-    Log::fatal("SpinnerWidget::setValue", "Cannot find element named '%s'", irr::core::stringc(new_value.c_str()).c_str());
+    Log::fatal("SpinnerWidget::setValue", "Cannot find element named '%s'",
+        irr::core::stringc(new_value.c_str()).c_str());
 }
 
 // -----------------------------------------------------------------------------

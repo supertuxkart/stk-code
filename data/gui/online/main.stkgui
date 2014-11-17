@@ -6,23 +6,22 @@
         <spacer height="15" width="10"/>
         <box proportion="4" width="90%" layout="vertical-row" align="center">
             <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" id="outer_box" >
-                <label I18N="In the online multiplayer screen" proportion="4" word_wrap="true" text=
-                "Here will come some information.. or statistics.. or whatever. Yet to be filled in! It will change depending on state. And I'd also like a close button at the right top.
-
-                " align="center"/>
+                <!-- TODO: Here will come some information.. or statistics.. or whatever. Yet to be filled in! It will change depending on state. And I'd also like a close button at the right top. -->
+                <label I18N="In the online multiplayer screen" proportion="4"
+                    word_wrap="true" text="" align="center"/>
             </div>
         </box>
 
         <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
             <icon-button id="quick_play" width="128" height="128"
                          icon="gui/online/menu_quick_play.png" focus_icon="gui/online/menu_quick_play_hover.png"
-                         I18N="Online menu button" text="Quick Play"/>
+                         I18N="In the online multiplayer screen" text="Quick Play"/>
             <icon-button id="find_server" width="128" height="128"
                          icon="gui/online/menu_find_server.png" focus_icon="gui/online/menu_find_server_hover.png"
-                         I18N="Online menu button" text="Find Server"/>
+                         I18N="In the online multiplayer screen" text="Find Server"/>
             <icon-button id="create_server" width="128" height="128"
                          icon="gui/online/menu_create_server.png" focus_icon="gui/online/menu_create_server_hover.png"
-                         I18N="Online menu button" text="Create Server"/>
+                         I18N="In the online multiplayer screen" text="Create Server"/>
         </buttonbar>
 
         <spacer width="10" height="7%"/>
@@ -34,9 +33,9 @@
 
             <buttonbar id="menu_bottomrow" x="0" y="0" width="12%" height="100%" align="center">
                 <icon-button id="profile" width="64" height="64" icon="gui/green_check.png"  extend_label="50"
-                             I18N="Online menu button" text="Profile" label_location="hover"/>
+                             I18N="In the online multiplayer screen" text="Profile" label_location="hover"/>
                 <icon-button id="sign_out" width="64" height="64" icon="gui/main_quit.png"  extend_label="70"
-                             I18N="Online menu button" text="Sign Out" label_location="hover"/>
+                             I18N="In the online multiplayer screen" text="Sign Out" label_location="hover"/>
             </buttonbar>
 
         </bottombar>

@@ -33,7 +33,7 @@
                 <spacer width="7" height="5"/>
                 <div height="100%" width="fit" layout="vertical-row">
                     <button id="delete"
-                            I18N="To delete a keyboard configuration"  text="Delete Configuration"/>
+                            I18N="In the input configuration screen"  text="Delete Configuration"/>
                     <spacer width="50" height="10" />
                     <button id="back_to_device_list" I18N="In the input configuration screen"  text="Back to device list"/>
 

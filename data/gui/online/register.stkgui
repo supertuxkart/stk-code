@@ -15,9 +15,9 @@
                 </div>
                 <div width="100%" height="12%" layout="horizontal-row" >
                     <label    id="label_online" proportion="1" height="100%" text_align="left"
-                              I18N="In the login screen" text="Create online account"/>
+                              I18N="In the registration dialog" text="Create online account"/>
                     <div proportion="2" layout="horizontal-row" height="fit">
-                        <checkbox id="online" I18N="In the login screen" text_align="left"/>
+                        <checkbox id="online" I18N="In the registration dialog" text_align="left"/>
                     </div>
                 </div>
 
@@ -59,9 +59,9 @@
 
             <buttonbar id="options" width="40%" height="15%" align="center">
                 <icon-button id="next" width="50%" height="90%" icon="gui/green_check.png"
-                    I18N="Registration dialog" text="OK" label_location="none"/>
+                    I18N="In the registration dialog" text="OK" label_location="none"/>
                 <icon-button id="cancel" width="50%" height="90%" icon="gui/main_quit.png"
-                    I18N="Registration dialog"  text="Cancel" label_location="none"/>
+                    I18N="In the registration dialog"  text="Cancel" label_location="none"/>
             </buttonbar>
         </box>
     </div>

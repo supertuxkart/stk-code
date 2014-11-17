@@ -585,8 +585,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getRunningInstance()->joinPlayer(device,
-                                                                       false );
+                        KartSelectionScreen::getRunningInstance()->joinPlayer(device);
                     }
                 }
                 return; // we're done here, ignore devices that aren't
@@ -620,7 +619,6 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         // ... when in menus
         else
         {
-
             // reset timer when released
             if (abs(value) == 0 &&  type == Input::IT_STICKBUTTON)
             {

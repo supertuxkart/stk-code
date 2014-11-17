@@ -615,12 +615,12 @@ void World::resetAllKarts()
 
         if (!kart_over_ground)
         {
-            Log::error("[World]",
+            Log::error("World",
                        "No valid starting position for kart %d on track %s.",
                         (int)(i-m_karts.begin()), m_track->getIdent().c_str());
             if (UserConfigParams::m_artist_debug_mode)
             {
-                Log::warn("[World]", "Activating fly mode.");
+                Log::warn("World", "Activating fly mode.");
                 (*i)->flyUp();
                 continue;
             }
@@ -672,14 +672,14 @@ void World::resetAllKarts()
                                                    &normal);
                 if(!material)
                 {
-                    Log::error("[World]",
+                    Log::error("World",
                                "No valid starting position for kart %d "
                                "on track %s.",
                                (int)(i-m_karts.begin()),
                                m_track->getIdent().c_str());
                     if (UserConfigParams::m_artist_debug_mode)
                     {
-                        Log::warn("[World]", "Activating fly mode.");
+                        Log::warn("World", "Activating fly mode.");
                         (*i)->flyUp();
                         continue;
                     }
