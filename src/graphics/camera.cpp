@@ -49,6 +49,7 @@ Camera* Camera::s_active_camera = NULL;
 // ============================================================================
 Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
 {
+    m_smooth        = false;
     m_mode          = CM_NORMAL;
     m_index         = camera_index;
     m_original_kart = kart;
@@ -85,6 +86,13 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     m_target_speed   = 10.0f;
     m_rotation_range = 0.4f;
     m_rotation_range = 0.0f;
+    m_lin_velocity = core::vector3df(0, 0, 0);
+    m_target_velocity = core::vector3df(0, 0, 0);
+    m_target_direction = core::vector3df(0, 0, 1);
+    m_target_up_vector = core::vector3df(0, 1, 0);
+    m_angular_velocity = 0;
+    m_target_angular_velocity = 0;
+    m_max_velocity = 15;
     reset();
 }   // Camera
 
@@ -335,13 +343,13 @@ void Camera::smoothMoveCamera(float dt)
                        1.1f * (1 + ratio / 2),
                        camera_distance * cos(skid_angle / 2));// defines how far camera should be from player kart.
     Vec3 m_kart_camera_position_with_offset = m_kart->getTrans()(camera_offset);
-    
-    
+
+
 
     core::vector3df current_target = m_kart->getXYZ().toIrrVector();// next target
     current_target.Y += 0.5f;
     core::vector3df wanted_position = m_kart_camera_position_with_offset.toIrrVector();// new required position of camera
-    
+
     if ((m_kart->getSpeed() > 5 ) || (m_kart->getSpeed() < 0 ))
     {
         current_position += ((wanted_position - current_position) * dt
@@ -480,12 +488,87 @@ void Camera::update(float dt)
         // - the kart should not be visible, but it works)
         m_camera->setNearValue(27.0);
     }
+    else if (UserConfigParams::m_camera_debug == 3)
+    {
+        core::vector3df direction(m_camera->getTarget() - m_camera->getPosition());
+        core::vector3df up(m_camera->getUpVector());
+        core::vector3df side(direction.crossProduct(up));
 
+        // Update smooth movement
+        if (m_smooth)
+        {
+            // Angular velocity
+            if (m_angular_velocity < m_target_angular_velocity)
+            {
+                m_angular_velocity += 0.02f;
+                if (m_angular_velocity > m_target_angular_velocity)
+                    m_angular_velocity = m_target_angular_velocity;
+            }
+            else if (m_angular_velocity > m_target_angular_velocity)
+            {
+                m_angular_velocity -= 0.02f;
+                if (m_angular_velocity < m_target_angular_velocity)
+                    m_angular_velocity = m_target_angular_velocity;
+            }
+
+            // Linear velocity
+            core::vector3df diff(m_target_velocity - m_lin_velocity);
+            if (diff.X != 0 || diff.Y != 0 || diff.Z != 0)
+            {
+                if (diff.getLengthSQ() > 1)
+                    diff.setLength(1);
+                m_lin_velocity += diff;
+            }
+
+            // Camera direction
+            diff = m_target_direction - direction;
+            if (diff.X != 0 || diff.Y != 0 || diff.Z != 0)
+            {
+                if (diff.getLengthSQ() > 0.02f * 0.02f)
+                    diff.setLength(0.02f);
+                direction += diff;
+            }
+
+            // Camera rotation
+            diff = m_target_up_vector - up;
+            if (diff.X != 0 || diff.Y != 0 || diff.Z != 0)
+            {
+                if (diff.getLengthSQ() > 0.02f * 0.02f)
+                    diff.setLength(0.02f);
+                up += diff;
+            }
+        }
+        else
+        {
+            direction = m_target_direction;
+            up = m_target_up_vector;
+            side = direction.crossProduct(up);
+        }
+
+        // Rotate camera
+        core::quaternion quat;
+        quat.fromAngleAxis(m_angular_velocity * dt, direction);
+        up = quat * up;
+        m_target_up_vector = quat * up;
+        direction.normalize();
+        up.normalize();
+        side.normalize();
+
+        // Move camera
+        core::vector3df movement(direction * m_lin_velocity.Z +
+            up * m_lin_velocity.Y + side * m_lin_velocity.X);
+        core::vector3df pos = m_camera->getPosition();
+        pos = pos + movement * dt;
+
+        // Set camera attributes
+        m_camera->setPosition(pos);
+        m_camera->setTarget(pos + direction);
+        m_camera->setUpVector(up);
+    }
     else if (m_mode==CM_FINAL)
     {
         handleEndCamera(dt);
     }
-
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
     else if (dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation()))
@@ -654,3 +737,42 @@ void Camera::activate()
 }   // activate
 
 // ----------------------------------------------------------------------------
+/** Sets the angular velocity for this camera. */
+void Camera::setAngularVelocity(float vel)
+{
+    if (m_smooth)
+        m_target_angular_velocity = vel;
+    else
+        m_angular_velocity = vel;
+}   // setAngularVelocity
+
+// ----------------------------------------------------------------------------
+/** Returns the current target angular velocity. */
+float Camera::getAngularVelocity()
+{
+    if (m_smooth)
+        return m_target_angular_velocity;
+    else
+        return m_angular_velocity;
+}   // getAngularVelocity
+
+// ----------------------------------------------------------------------------
+/** Sets the linear velocity for this camera. */
+void Camera::setLinearVelocity(core::vector3df vel)
+{
+    if (m_smooth)
+        m_target_velocity = vel;
+    else
+        m_lin_velocity = vel;
+}   // setLinearVelocity
+
+// ----------------------------------------------------------------------------
+/** Returns the current linear velocity. */
+const core::vector3df &Camera::getLinearVelocity()
+{
+    if (m_smooth)
+        return m_target_velocity;
+    else
+        return m_lin_velocity;
+}   // getLinearVelocity
+
