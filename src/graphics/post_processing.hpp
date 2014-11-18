@@ -91,7 +91,7 @@ public:
     void renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary, float sigmaV, float sigmaH);
 	void renderHorizontalBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
 
-    void renderGaussian6BlurLayer(FrameBuffer &in_fbo);
+    void renderGaussian6BlurLayer(FrameBuffer &in_fbo, size_t layer, float sigmaH, float sigmaV);
     void renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
 
     /** Render tex. Used for blit/texture resize */
