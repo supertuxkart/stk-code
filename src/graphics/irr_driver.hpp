@@ -378,6 +378,7 @@ private:
     class STKMeshSceneNode *m_sun_interposer;
     scene::CLensFlareSceneNode *m_lensflare;
     scene::ICameraSceneNode *m_suncam;
+    std::pair<float, float> m_shadow_scales[4];
     scene::ICameraSceneNode *m_shadow_camnodes[4];
     float m_shadows_cam[4][24];
 

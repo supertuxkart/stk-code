@@ -904,10 +904,13 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
                 // Prevent Matrix without extend
                 if (left != right && up != down)
+                {
                     tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
-                    down, up,
-                    float(CBB[currentCBB][i].zmin / 4 - 100),
-                    float(CBB[currentCBB][i].zmax / 4 + 2)      );
+                        down, up,
+                        float(CBB[currentCBB][i].zmin / 4 - 100),
+                        float(CBB[currentCBB][i].zmax / 4 + 2));
+                    m_shadow_scales[i] = std::make_pair(right - left, down - up);
+                }
             }
             else
                 tmp_matrix = getTighestFitOrthoProj(SunCamViewMatrix, vectors);
