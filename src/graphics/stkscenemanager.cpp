@@ -372,7 +372,16 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             if (irr_driver->hasARB_draw_indirect())
             {
                 for_in(mesh, node->MeshSolidMaterial[Mat])
-                    MeshForShadowPass[Mat][cascade][mesh->mb].emplace_back(mesh, Node);
+                {
+                    if (Mat != Material::SHADERTYPE_SPLATTING)
+                        MeshForShadowPass[Mat][cascade][mesh->mb].emplace_back(mesh, Node);
+                    else
+                    {
+                        core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
+                        ModelMatrix.getInverse(InvModelMatrix);
+                        ListMatSplatting::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix);
+                    }
+                }
             }
             else
             {
