@@ -25,6 +25,14 @@
 #include "karts/player_difficulty.hpp"
 #include "race/race_manager.hpp"
 
+namespace irr
+{
+    namespace scene
+    {
+        class IDummyTransformationSceneNode;
+    }
+}
+
 class AbstractKartAnimation;
 class Attachment;
 class btKart;
@@ -81,6 +89,8 @@ protected:
     /** A kart animation object to handle rescue, explosion etc. */
     AbstractKartAnimation *m_kart_animation;
 
+    /** Node between wheels and kart. Allows kart to be scaled independent of wheels, when being squashed.*/
+    irr::scene::IDummyTransformationSceneNode    *m_wheel_box;
 public:
                    AbstractKart(const std::string& ident,
                                 int world_kart_id,
