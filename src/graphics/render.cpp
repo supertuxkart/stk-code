@@ -605,8 +605,9 @@ void IrrDriver::renderParticles()
     transformed points between -1 and 1.
 *  \param transform a transform matrix.
 *  \param pointsInside a vector of point in 3d space.
+*  \param size returns the size (width, height) of shadowmap coverage
 */
-core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform, const std::vector<vector3df> &pointsInside)
+core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform, const std::vector<vector3df> &pointsInside, std::pair<float, float> &size)
 {
     float xmin = std::numeric_limits<float>::infinity();
     float xmax = -std::numeric_limits<float>::infinity();
@@ -631,6 +632,9 @@ core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform, const std::
     float right = xmax;
     float up = ymin;
     float down = ymax;
+
+    size.first = right - left;
+    size.second = down - up;
 
     core::matrix4 tmp_matrix;
     // Prevent Matrix without extend
@@ -913,7 +917,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
                 }
             }
             else
-                tmp_matrix = getTighestFitOrthoProj(SunCamViewMatrix, vectors);
+                tmp_matrix = getTighestFitOrthoProj(SunCamViewMatrix, vectors, m_shadow_scales[i]);
 
             m_shadow_camnodes[i]->setProjectionMatrix(tmp_matrix , true);
             m_shadow_camnodes[i]->render();
