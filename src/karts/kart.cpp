@@ -2369,7 +2369,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
     m_nitro_light = irr_driver->addLight(core::vector3df(0.0f, 0.5f, m_kart_model->getLength()*-0.5f - 0.05f),
-        1.5f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
+        0.6f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
     m_nitro_light->setVisible(false);
 
 #ifdef DEBUG
