@@ -168,10 +168,10 @@ void InputManager::handleStaticAction(int key, int value)
             if (!world || !UserConfigParams::m_artist_debug_mode ||
                 UserConfigParams::m_camera_debug != 3) break;
 
-            Camera *active_cam = Camera::getActiveCamera();
-            core::vector3df vel(active_cam->getLinearVelocity());
-            vel.Z = value ? 15 : 0;
-            active_cam->setLinearVelocity(vel);
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.Z = value ? cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
             break;
         }
         case KEY_KEY_S:
@@ -179,10 +179,10 @@ void InputManager::handleStaticAction(int key, int value)
             if (!world || !UserConfigParams::m_artist_debug_mode ||
                 UserConfigParams::m_camera_debug != 3) break;
 
-            Camera *active_cam = Camera::getActiveCamera();
-            core::vector3df vel(active_cam->getLinearVelocity());
-            vel.Z = value ? -15 : 0;
-            active_cam->setLinearVelocity(vel);
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.Z = value ? -cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
             break;
         }
         case KEY_KEY_D:
@@ -190,10 +190,10 @@ void InputManager::handleStaticAction(int key, int value)
             if (!world || !UserConfigParams::m_artist_debug_mode ||
                 UserConfigParams::m_camera_debug != 3) break;
 
-            Camera *active_cam = Camera::getActiveCamera();
-            core::vector3df vel(active_cam->getLinearVelocity());
-            vel.X = value ? -15 : 0;
-            active_cam->setLinearVelocity(vel);
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.X = value ? -cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
             break;
         }
         case KEY_KEY_A:
@@ -201,10 +201,10 @@ void InputManager::handleStaticAction(int key, int value)
             if (!world || !UserConfigParams::m_artist_debug_mode ||
                 UserConfigParams::m_camera_debug != 3) break;
 
-            Camera *active_cam = Camera::getActiveCamera();
-            core::vector3df vel(active_cam->getLinearVelocity());
-            vel.X = value ? 15 : 0;
-            active_cam->setLinearVelocity(vel);
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.X = value ? cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
             break;
         }
         // Rotating the first person camera
@@ -960,6 +960,7 @@ EventPropagation InputManager::input(const SEvent& event)
         {
             if (UserConfigParams::m_camera_debug == 3)
             {
+                Camera *cam = Camera::getActiveCamera();
                 // Center of the screen
                 core::vector2df screen_size = irr_driver->getCurrentScreenSize();
                 int mid_x = (int) screen_size.X / 2;
@@ -977,26 +978,27 @@ EventPropagation InputManager::input(const SEvent& event)
                 if (m_mouse_val_x != -1 && m_mouse_reset <= 0)
                 {
                     // Rotate camera
-                    scene::ICameraSceneNode *cam = Camera::getActiveCamera()
-                                                   ->getCameraSceneNode();
-                    Vec3 direction(cam->getTarget() - cam->getPosition());
+                    core::vector3df up(cam->getUpVector());
+                    core::vector3df direction(cam->getDirection());
+                    core::vector3df side(direction.crossProduct(up));
                     direction.normalize();
-                    Vec3 up(cam->getUpVector());
                     up.normalize();
-                    btQuaternion quat(up, mouse_x);
-                    btTransform trans(quat);
+                    core::quaternion quat;
+                    quat.fromAngleAxis(mouse_x, up);
 
-                    quat.setRotation(direction.cross(up), mouse_y);
-                    trans *= btTransform(quat);
+                    core::quaternion quat_y;
+                    quat_y.fromAngleAxis(mouse_y, side);
+                    quat *= quat_y;
 
-                    Vec3 target(trans(direction));
-                    cam->setTarget(target.toIrrVector() + cam->getPosition());
-                    /*Vec3 side(direction.cross(up));
+                    direction = quat * direction;
+                    cam->setDirection(direction);
+                    side = direction.crossProduct(up);
+
                     // Compute new up vector
-                    up = side.cross(direction);
+                    /*up = side.crossProduct(direction);
                     up.normalize();
                     // Don't do that because it looks ugly and is bad to handle ;)
-                    cam->setUpVector(up.toIrrVector());*/
+                    cam->setUpVector(up);*/
 
                     // Reset mouse position to the middle of the screen when
                     // the mouse is far away
@@ -1028,6 +1030,24 @@ EventPropagation InputManager::input(const SEvent& event)
             else
                 // Reset mouse position
                 m_mouse_val_x = m_mouse_val_y = -1;
+        }
+        else if (type == EMIE_MOUSE_WHEEL)
+        {
+            if (UserConfigParams::m_camera_debug == 3)
+            {
+                // Use scrolling to change the maximum speed
+                // Only test if it's more or less than 0 as it seems to be not
+                // reliable accross more platforms.
+                Camera *cam = Camera::getActiveCamera();
+                if (event.MouseInput.Wheel < 0)
+                {
+                    cam->setMaximumVelocity(cam->getMaximumVelocity() - 3);
+                }
+                else if (event.MouseInput.Wheel > 0)
+                {
+                    cam->setMaximumVelocity(cam->getMaximumVelocity() + 3);
+                }
+            }
         }
 
         /*

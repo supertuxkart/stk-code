@@ -19,6 +19,7 @@
 #include "debug.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
@@ -92,6 +93,7 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_TOP,
     DEBUG_GUI_CAM_WHEEL,
     DEBUG_GUI_CAM_NORMAL,
+    DEBUG_GUI_CAM_SMOOTH,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
@@ -209,6 +211,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Wheel view", DEBUG_GUI_CAM_WHEEL);
             sub->addItem(L"First person view", DEBUG_GUI_CAM_FREE);
             sub->addItem(L"Normal view", DEBUG_GUI_CAM_NORMAL);
+            sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 
@@ -481,6 +484,11 @@ bool onEvent(const SEvent &event)
                 {
                     UserConfigParams::m_camera_debug = 0;
                     irr_driver->getDevice()->getCursorControl()->setVisible(true);
+                }
+                else if (cmdID == DEBUG_GUI_CAM_SMOOTH)
+                {
+                    Camera *cam = Camera::getActiveCamera();
+                    cam->setSmoothMovement(!cam->getSmoothMovement());
                 }
                 else if (cmdID == DEBUG_PRINT_START_POS)
                 {

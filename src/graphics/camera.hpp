@@ -110,15 +110,30 @@ private:
     /** Aspect ratio for camera. */
     float           m_aspect;
 
+    /** Smooth acceleration with the first person camera. */
+    bool m_smooth;
+
     /** The speed at which the up-vector rotates, only used for the first person camera. */
     float m_angular_velocity;
+
+    /** Target angular velocity. Used for smooth movement in fps perpective. */
+    float m_target_angular_velocity;
+
+    /** Maximum velocity for fps camera. */
+    float m_max_velocity;
 
     /** Linear velocity of the camera, used for end and first person camera.
         It's stored relative to the camera direction for the first person view. */
     core::vector3df m_lin_velocity;
 
-    /** Velocity of the target of the camera, only used for end camera. */
+    /** Velocity of the target of the camera, used for end and first person camera. */
     core::vector3df m_target_velocity;
+
+    /** The target direction for the camera, only used for the first person camera. */
+    core::vector3df m_target_direction;
+
+    /** The up vector the camera should have, only used for the first person camera. */
+    core::vector3df m_target_up_vector;
 
     /** List of all cameras. */
     static std::vector<Camera*> m_all_cameras;
@@ -252,20 +267,52 @@ public:
     AbstractKart* getKart() { return m_kart; }
 
     // ------------------------------------------------------------------------
+    /** Sets if the first person camera should be moved smooth. */
+    void setSmoothMovement (bool value) { m_smooth = value; }
+
+    // ------------------------------------------------------------------------
+    /** If the first person camera should be moved smooth. */
+    bool getSmoothMovement () { return m_smooth; }
+
+    // ------------------------------------------------------------------------
     /** Sets the angular velocity for this camera. */
-    void setAngularVelocity (float vel) { m_angular_velocity = vel; }
+    void setMaximumVelocity (float vel) { m_max_velocity = vel; }
 
     // ------------------------------------------------------------------------
     /** Returns the current angular velocity. */
-    const float getAngularVelocity () { return m_angular_velocity; }
+    float getMaximumVelocity () { return m_max_velocity; }
+
+    // ------------------------------------------------------------------------
+    /** Sets the vector, the first person camera should look at. */
+    void setDirection (core::vector3df target) { m_target_direction = target; }
+
+    // ------------------------------------------------------------------------
+    /** Gets the vector, the first person camera should look at. */
+    const core::vector3df &getDirection () { return m_target_direction; }
+
+    // ------------------------------------------------------------------------
+    /** Sets the up vector, the first person camera should use. */
+    void setUpVector (core::vector3df target) { m_target_up_vector = target; }
+
+    // ------------------------------------------------------------------------
+    /** Gets the up vector, the first person camera should use. */
+    const core::vector3df &getUpVector () { return m_target_up_vector; }
+
+    // ------------------------------------------------------------------------
+    /** Sets the angular velocity for this camera. */
+    void setAngularVelocity (float vel);
+
+    // ------------------------------------------------------------------------
+    /** Returns the current target angular velocity. */
+    float getAngularVelocity ();
 
     // ------------------------------------------------------------------------
     /** Sets the linear velocity for this camera. */
-    void setLinearVelocity (core::vector3df vel) { m_lin_velocity = vel; }
+    void setLinearVelocity (core::vector3df vel);
 
     // ------------------------------------------------------------------------
     /** Returns the current linear velocity. */
-    const core::vector3df &getLinearVelocity () { return m_lin_velocity; }
+    const core::vector3df &getLinearVelocity ();
 
     // ------------------------------------------------------------------------
     /** Sets the ambient light for this camera. */
