@@ -471,7 +471,7 @@ public:
     ComputeGaussian6HBlurShader();
 };
 
-class ComputeShadowBlurHShader : public ShaderHelperSingleton<ComputeShadowBlurHShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
+class ComputeShadowBlurHShader : public ShaderHelperSingleton<ComputeShadowBlurHShader, core::vector2df, float>, public TextureRead<Neared_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
@@ -517,7 +517,7 @@ public:
     ComputeGaussian6VBlurShader();
 };
 
-class ComputeShadowBlurVShader : public ShaderHelperSingleton<ComputeShadowBlurVShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
+class ComputeShadowBlurVShader : public ShaderHelperSingleton<ComputeShadowBlurVShader, core::vector2df, float>, public TextureRead<Neared_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
