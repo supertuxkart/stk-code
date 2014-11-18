@@ -820,6 +820,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
 
+    m_suncam->render();
     const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
     for (unsigned i = 0; i < 4; i++)
     {
