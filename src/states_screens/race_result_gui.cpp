@@ -283,7 +283,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 race_manager->setNumKarts(0);
                 race_manager->setNumPlayers(0);
                 race_manager->setNumLocalPlayers(0);
-                race_manager->startSingleRace("featunlocked", 999, false);
+                race_manager->startSingleRace("featunlocked", 999, race_manager->raceWasStartedFromOverworld());
 
                 FeatureUnlockedCutScene* scene =
                     FeatureUnlockedCutScene::getInstance();

@@ -701,14 +701,14 @@ void RaceManager::exitRace(bool delete_world)
 
         if (someHumanPlayerWon)
         {
-            race_manager->startSingleRace("gpwin", 999, false);
+            race_manager->startSingleRace("gpwin", 999, race_manager->raceWasStartedFromOverworld());
             GrandPrixWin* scene = GrandPrixWin::getInstance();
             scene->push();
             scene->setKarts(winners);
         }
         else
         {
-            race_manager->startSingleRace("gplose", 999, false);
+            race_manager->startSingleRace("gplose", 999, race_manager->raceWasStartedFromOverworld());
             GrandPrixLose* scene = GrandPrixLose::getInstance();
             scene->push();
 
