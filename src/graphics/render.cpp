@@ -825,12 +825,21 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     memcpy(&tmp[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
 
     m_suncam->render();
-    const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
+    const core::vector3df &camdir = (camnode->getTarget() - camnode->getAbsolutePosition()).normalize();
+    const core::vector3df &sundir = (m_suncam->getTarget() - m_suncam->getAbsolutePosition()).normalize();
+    const core::vector3df &up = camdir.crossProduct(sundir).normalize();
+    if (up.getLength())
+        m_suncam->setUpVector(up);
+    m_suncam->render();
+
     for (unsigned i = 0; i < 4; i++)
     {
-        if (!m_shadow_camnodes[i])
-            m_shadow_camnodes[i] = (scene::ICameraSceneNode *) m_suncam->clone();
+        if (m_shadow_camnodes[i])
+            delete m_shadow_camnodes[i];
+        m_shadow_camnodes[i] = (scene::ICameraSceneNode *) m_suncam->clone();
     }
+    const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
+
     sun_ortho_matrix.clear();
 
     if (World::getWorld() && World::getWorld()->getTrack())
@@ -925,6 +934,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
         }
 
+        if (!m_rsm_matrix_initialized)
         {
             core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
                 core::vector3df(0, 30, 0));
@@ -942,6 +952,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
                 m_suncam->render();
             }
             rsm_matrix = getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW);
+            m_rsm_matrix_initialized = true;
         }
         rh_extend = core::vector3df(128, 64, 128);
         core::vector3df campos = camnode->getAbsolutePosition();

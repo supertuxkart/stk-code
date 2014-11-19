@@ -2546,6 +2546,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
             m_suncam->setPosition(pos);
             m_suncam->updateAbsolutePosition();
 
+            m_rsm_matrix_initialized = false;
+
             ((WaterShaderProvider *) m_shaders->m_callbacks[ES_WATER])->setSunPosition(pos);
         }
 
