@@ -219,6 +219,7 @@ private:
     core::matrix4      rh_matrix;
     core::matrix4      rsm_matrix;
     bool               m_rsm_matrix_initialized;
+    bool               m_rsm_map_available;
     core::vector2df    m_current_screen_size;
 
     /** Additional details to be shown in case that a texture is not found.

@@ -1121,6 +1121,8 @@ void multidrawRSM(Args...args)
 
 void IrrDriver::renderRSM()
 {
+    if (m_rsm_map_available)
+        return;
     ScopedGPUTimer Timer(getGPUTimer(Q_RSM));
     m_rtts->getRSM().Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1151,4 +1153,5 @@ void IrrDriver::renderRSM()
         renderRSMShadow<NormalMat>(rsm_matrix);
         renderRSMShadow<DetailMat>(rsm_matrix);
     }
+    m_rsm_map_available = true;
 }

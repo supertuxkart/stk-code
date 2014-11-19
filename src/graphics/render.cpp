@@ -953,6 +953,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             }
             rsm_matrix = getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW);
             m_rsm_matrix_initialized = true;
+            m_rsm_map_available = false;
         }
         rh_extend = core::vector3df(128, 64, 128);
         core::vector3df campos = camnode->getAbsolutePosition();
