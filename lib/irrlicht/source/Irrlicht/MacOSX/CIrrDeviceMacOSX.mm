@@ -811,6 +811,7 @@ bool CIrrDeviceMacOSX::createWindow()
 								kCGLPFASampleBuffers, (CGLPixelFormatAttribute)(CreationParams.AntiAlias?1:0),
 								kCGLPFASamples, (CGLPixelFormatAttribute)CreationParams.AntiAlias,
 								kCGLPFAStencilSize, (CGLPixelFormatAttribute)(CreationParams.Stencilbuffer?1:0),
+                                kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute)kCGLOGLPVersion_3_2_Core,
 								(CGLPixelFormatAttribute)NULL
 							};
 
