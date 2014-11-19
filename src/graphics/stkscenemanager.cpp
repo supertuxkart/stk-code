@@ -784,6 +784,7 @@ PROFILER_POP_CPU_MARKER();
             }
         }
 #pragma omp section
+        if (!m_rsm_map_available)
         {
             size_t offset = 0, current_cmd = 0;
             if (!irr_driver->hasBufferStorageExtension())
