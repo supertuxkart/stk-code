@@ -35,6 +35,7 @@ static const char* GPU_Phase[Q_LAST] =
     "Shadows Cascade 1",
     "Shadows Cascade 2",
     "Shadows Cascade 3",
+    "Shadows Postprocess",
     "Solid Pass 1",
     "RSM",
     "RH",
