@@ -557,18 +557,21 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
   
 	// create core 4.3 context
+    os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
     Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
 	// create core 3.3 context
+    os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
     Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
 	// create core 3.1 context (for older mesa)
+    os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
     Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
 	if (!XErrorSignaled)
 		return Context;
@@ -576,6 +579,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 	XErrorSignaled = false;
     irr::video::useCoreContext = false;
 	// fall back to legacy context
+    os::Printer::log("Creating legacy OpenGL 2.1 context...", ELL_INFORMATION);
 	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, legacyctx);
 	return Context;
 }
