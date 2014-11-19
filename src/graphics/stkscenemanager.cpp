@@ -199,7 +199,7 @@ bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode
 static void
 handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *ImmediateDraw,
     const scene::ICameraSceneNode *cam, scene::ICameraSceneNode *shadowcam[4], const scene::ICameraSceneNode *rsmcam,
-    bool &culledforcam, bool culledforshadowcam[4], bool &culledforrsm)
+    bool &culledforcam, bool culledforshadowcam[4], bool &culledforrsm, bool drawRSM)
 {
     STKMeshCommon *node = dynamic_cast<STKMeshCommon*>(Node);
     if (!node)
@@ -420,7 +420,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             }
         }
     }
-    if (!UserConfigParams::m_gi)
+    if (!UserConfigParams::m_gi || !drawRSM)
         return;
     if (!culledforrsm)
     {
@@ -485,7 +485,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
 static void
 parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::ISceneNode *> *ImmediateDraw,
     const scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadow_cam[4], const scene::ICameraSceneNode *rsmcam,
-    bool culledforcam, bool culledforshadowcam[4], bool culledforrsm)
+    bool culledforcam, bool culledforshadowcam[4], bool culledforrsm, bool drawRSM)
 {
     core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
     for (; I != E; ++I)
@@ -514,9 +514,9 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
         bool newculledforrsm = culledforrsm;
         bool newculledforshadowcam[4] = { culledforshadowcam[0], culledforshadowcam[1], culledforshadowcam[2], culledforshadowcam[3] };
 
-        handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm);
+        handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm, drawRSM);
 
-        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm);
+        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm, drawRSM);
     }
 }
 
@@ -582,7 +582,7 @@ PROFILER_PUSH_CPU_MARKER("- culling", 0xFF, 0xFF, 0x0);
 
     bool cam = false, rsmcam = false;
     bool shadowcam[4] = { false, false, false, false };
-    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam, cam, shadowcam, rsmcam);
+    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam, cam, shadowcam, rsmcam, !m_rsm_map_available);
 PROFILER_POP_CPU_MARKER();
 
     // Add a 1 s timeout
