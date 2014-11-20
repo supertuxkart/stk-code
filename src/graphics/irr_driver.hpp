@@ -380,6 +380,8 @@ private:
     class STKMeshSceneNode *m_sun_interposer;
     scene::CLensFlareSceneNode *m_lensflare;
     scene::ICameraSceneNode *m_suncam;
+    core::vector3df m_sundirection;
+    video::SColorf m_suncolor;
     std::pair<float, float> m_shadow_scales[4];
     scene::ICameraSceneNode *m_shadow_camnodes[4];
     float m_shadows_cam[4][24];
@@ -618,6 +620,25 @@ public:
     inline PostProcessing* getPostProcessing()  {return m_post_processing;}
     // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
+    // -----------------------------------------------------------------------
+    core::vector3df getSunDirection() const { return m_sundirection; };
+    // -----------------------------------------------------------------------
+    void setSunDirection(const core::vector3df &SunPos)
+    {
+        core::matrix4 m_view = getViewMatrix();
+        m_view.makeInverse();
+        m_view = m_view.getTransposed();
+        m_sundirection = SunPos;
+        m_view.transformVect(m_sundirection);
+        m_sundirection.normalize();
+    }
+    // -----------------------------------------------------------------------
+    video::SColorf getSunColor() const { return m_suncolor; }
+    // -----------------------------------------------------------------------
+    void setSunColor(const video::SColorf &col)
+    {
+        m_suncolor = col;
+    }
     // -----------------------------------------------------------------------
     inline video::E_MATERIAL_TYPE getShader(const ShaderType num)  {return m_shaders->getShader(num);}
     // -----------------------------------------------------------------------

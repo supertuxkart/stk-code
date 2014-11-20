@@ -115,7 +115,6 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         glDisable(GL_BLEND);
         m_rtts->getRH().Bind();
         glBindVertexArray(SharedObject::FullScreenQuadVAO);
-        SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
         if (irr_driver->needRHWorkaround())
         {
             glUseProgram(FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->Program);
@@ -123,7 +122,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
                 m_rtts->getRSM().getRTT()[0], m_rtts->getRSM().getRTT()[1], m_rtts->getRSM().getDepthTexture());
             for (unsigned i = 0; i < 32; i++)
             {
-                FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->setUniforms(rsm_matrix, rh_matrix, rh_extend, i, video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
+                FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->setUniforms(rsm_matrix, rh_matrix, rh_extend, i, irr_driver->getSunColor());
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             }
         }
@@ -135,7 +134,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
                     m_rtts->getRSM().getRTT()[1],
                     m_rtts->getRSM().getDepthTexture()
             );
-            FullScreenShader::RadianceHintsConstructionShader::getInstance()->setUniforms(rsm_matrix, rh_matrix, rh_extend, video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
+            FullScreenShader::RadianceHintsConstructionShader::getInstance()->setUniforms(rsm_matrix, rh_matrix, rh_extend, irr_driver->getSunColor());
             glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
         }
     }
@@ -162,13 +161,11 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
-        SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
-        const video::SColorf &col = video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue());
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
         if (World::getWorld() && UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround() && hasShadow)
-            m_post_processing->renderShadowedSunlight(cb->getPosition(), col, sun_ortho_matrix, m_rtts->getShadowFBO().getRTT()[0]);
+            m_post_processing->renderShadowedSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor(), sun_ortho_matrix, m_rtts->getShadowFBO().getRTT()[0]);
         else
-            m_post_processing->renderSunlight(cb->getPosition(), col);
+            m_post_processing->renderSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor());
     }
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_POINTLIGHTS));
