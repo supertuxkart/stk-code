@@ -1185,7 +1185,7 @@ scene::IMesh *IrrDriver::createQuadMesh(const video::SMaterial *material,
     {
         video::S3DVertex v;
         v.Pos    = core::vector3df(0,0,0);
-        v.Normal = core::vector3df(1/sqrt(2.0), 1/sqrt(2.0), 0);
+        v.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
 
         // Add the vertices
         // ----------------
