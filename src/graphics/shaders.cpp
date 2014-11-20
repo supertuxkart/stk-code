@@ -491,9 +491,6 @@ void Shaders::loadShaders()
     m_shaders[ES_MIPVIZ] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                    m_callbacks[ES_MIPVIZ], EMT_SOLID);
 
-    m_shaders[ES_COLORIZE] = glslmat(dir + "pass.vert", dir + "pass.frag",
-                                     m_callbacks[ES_COLORIZE], EMT_SOLID);
-
     m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
     m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
     m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
@@ -501,9 +498,6 @@ void Shaders::loadShaders()
 
     m_shaders[ES_DISPLACE] = glslmat(dir + "pass.vert", dir + "pass.frag",
         m_callbacks[ES_DISPLACE], EMT_TRANSPARENT_ALPHA_CHANNEL);
-
-    m_shaders[ES_PASSFAR] = glsl(dir + "pass.vert", dir + "pass.frag",
-                                 m_callbacks[ES_COLORIZE]);
 
     // Check that all successfully loaded
     for (s32 i = 0; i < ES_COUNT; i++) {
