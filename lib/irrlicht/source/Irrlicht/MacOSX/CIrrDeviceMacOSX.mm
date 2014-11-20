@@ -1291,6 +1291,9 @@ void CIrrDeviceMacOSX::storeMouseLocation()
 		x = (int)point.x;
 		y = (int)point.y;
 
+        if (CursorControl == NULL)
+            return;
+        
 		const core::position2di& curr = ((CCursorControl *)CursorControl)->getPosition();
 		if (curr.X != x || curr.Y != y)
 		{
@@ -1303,8 +1306,9 @@ void CIrrDeviceMacOSX::storeMouseLocation()
 			postEventFromUser(ievent);
 		}
 	}
-
-	((CCursorControl *)CursorControl)->updateInternalCursorPosition(x,y);
+    
+    if (CursorControl != NULL)
+        ((CCursorControl *)CursorControl)->updateInternalCursorPosition(x,y);
 }
 
 
