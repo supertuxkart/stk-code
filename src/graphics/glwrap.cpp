@@ -39,6 +39,24 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
         return;
 #endif
 
+    // suppress minor performance warnings (emitted mostly by nvidia drivers)
+    if ((severity == GL_DEBUG_SEVERITY_MEDIUM_ARB || severity == GL_DEBUG_SEVERITY_LOW_ARB) &&
+        type == GL_DEBUG_TYPE_PERFORMANCE_ARB)
+    {
+        return;
+    }
+
+    // Suppress warnings about GL_ARB_bindless_texture not being supported
+    // when we're not even using it
+    if (UserConfigParams::m_azdo == false &&
+        source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB && msg != NULL &&
+        std::string(msg).find("GL_ARB_bindless_texture") != std::string::npos)
+    {
+        Log::debug("GLWrap", "Suppressed warning: %s", msg);
+        return;
+    }
+
+
     switch(source)
     {
     case GL_DEBUG_SOURCE_API_ARB:
@@ -95,7 +113,7 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
         Log::warn("GLWrap", "    Severity : LOW");
         break;
     }
-
+    
     if (msg)
         Log::warn("GLWrap", "    Message : %s", msg);
 }
