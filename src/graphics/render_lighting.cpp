@@ -162,11 +162,13 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
+        SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
+        const video::SColorf &col = video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue());
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
         if (World::getWorld() && UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround() && hasShadow)
-            m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowFBO().getRTT()[0]);
+            m_post_processing->renderShadowedSunlight(cb->getPosition(), col, sun_ortho_matrix, m_rtts->getShadowFBO().getRTT()[0]);
         else
-            m_post_processing->renderSunlight();
+            m_post_processing->renderSunlight(cb->getPosition(), col);
     }
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_POINTLIGHTS));
