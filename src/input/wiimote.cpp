@@ -44,7 +44,7 @@ Wiimote::Wiimote(wiimote_t* wiimote_handle, int wiimote_id,
 
     gamepad_config->setPlugged();
     // Determine number of bits in the bit mask of all buttons.
-    int button_count = (int)( log((float)WIIMOTE_BUTTON_ALL) / log(2.0f))+1;
+    int button_count = (int)( log((float)WIIMOTE_BUTTON_ALL) / log((float)2.0f))+1;
 
     m_gamepad_device = new GamePadDevice(getIrrId(),
                                          gamepad_name.c_str(),
