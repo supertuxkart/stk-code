@@ -19,6 +19,16 @@ vec3 DecodeNormal(vec2 n);
 vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
+vec3 getMostRepresentativePoint(vec3 direction, vec3 R, float angularRadius)
+{
+    vec3 D = direction;
+    float d = cos(angularRadius);
+    float r = sin(angularRadius);
+    float DdotR = dot(D, R);
+    vec3 S = R - DdotR * D;
+    return (DdotR < d) ? normalize(d * D + normalize (S) * r) : R;
+}
+
 float getShadowFactor(vec3 pos, float bias, int index)
 {
 
@@ -52,16 +62,11 @@ void main() {
 
     float NdotL = max(0., dot(norm, L));
 
-    vec3 D = direction;
-    vec3 R = reflect(eyedir, norm);
-    float angle = 3.14 * sunangle / 180;
-    float d = cos(angle);
-    float r = sin(angle);
-    float DdotR = dot (D, R);
-    vec3 S = R - DdotR * D;
-    vec3 Lightdir = DdotR < d ? normalize (d * D + normalize (S) * r) : R;
+    float angle = 3.14 * sunangle / 180.;
+    vec3 R = reflect(-eyedir, norm);
+    vec3 Lightdir = getMostRepresentativePoint(direction, R, angle);
 
-    vec3 Specular = getSpecular(norm, eyedir, Lightdir, col, roughness) * dot(norm, Lightdir);
+    vec3 Specular = getSpecular(norm, eyedir, Lightdir, col, roughness) * NdotL;
 
 
 	vec3 outcol = NdotL * col;

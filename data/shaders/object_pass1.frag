@@ -19,5 +19,5 @@ void main(void)
 {
 	float glossmap = texture(tex, uv).x;
 	EncodedNormal.xy = 0.5 * EncodeNormal(normalize(nor)) + 0.5;
-	EncodedNormal.z = exp2(10. * glossmap + 1.);
+	EncodedNormal.z = exp2(20. * glossmap + 1.);
 }

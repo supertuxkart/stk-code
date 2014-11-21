@@ -49,7 +49,7 @@ void main(void)
     vec3 sampleDirection = reflect(-eyedir, normal);
     sampleDirection = (InverseViewMatrix * vec4(sampleDirection, 0.)).xyz;
 
-    float specval = pow(texture(ntex, uv).z, 2.);
+    float specval = texture(ntex, uv).z;
     // From http://graphics.cs.williams.edu/papers/EnvMipReport2013/
     int texSize = textureSize(tex, 0).x;
     float lodval = clamp(log2(texSize * sqrt(3.)) - .5 * log2(specval + 1.), 0., 10.);
