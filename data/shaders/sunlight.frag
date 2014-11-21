@@ -4,7 +4,8 @@ uniform sampler2D dtex;
 
 uniform vec3 direction;
 uniform vec3 col;
-uniform mat4 invproj;
+uniform float sunangle = .54;
+
 //uniform int hasclouds;
 //uniform vec2 wind;
 
@@ -37,7 +38,16 @@ void main() {
 
     float NdotL = max(0., dot(norm, L));
 
-    vec3 Specular = getSpecular(norm, eyedir, L, col, roughness) * NdotL;
+    vec3 D = direction;
+    vec3 R = reflect(eyedir, norm);
+    float angle = 3.14 * sunangle / 180;
+    float d = cos(angle);
+    float r = sin(angle);
+    float DdotR = dot (D, R);
+    vec3 S = R - DdotR * D;
+    vec3 Lightdir = DdotR < d ? normalize (d * D + normalize (S) * r) : R;
+
+    vec3 Specular = getSpecular(norm, eyedir, L, col, roughness) * dot(Lightdir, norm);
 
 	vec3 outcol = NdotL * col;
 
