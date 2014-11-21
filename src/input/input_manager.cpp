@@ -214,7 +214,8 @@ void InputManager::handleStaticAction(int key, int value)
                 UserConfigParams::m_camera_debug != 3) break;
 
             Camera *active_cam = Camera::getActiveCamera();
-            active_cam->setAngularVelocity(value ? 1 : 0);
+            active_cam->setAngularVelocity(value ?
+                UserConfigParams::m_fspcam_max_angular_velocity : 0);
             break;
         }
         case KEY_KEY_E:
@@ -223,7 +224,8 @@ void InputManager::handleStaticAction(int key, int value)
                 UserConfigParams::m_camera_debug != 3) break;
 
             Camera *active_cam = Camera::getActiveCamera();
-            active_cam->setAngularVelocity(value ? -1 : 0);
+            active_cam->setAngularVelocity(value ?
+                -UserConfigParams::m_fspcam_max_angular_velocity : 0);
             break;
         }
 
@@ -965,12 +967,13 @@ EventPropagation InputManager::input(const SEvent& event)
                 core::vector2df screen_size = irr_driver->getCurrentScreenSize();
                 int mid_x = (int) screen_size.X / 2;
                 int mid_y = (int) screen_size.Y / 2;
-                //const int wheel = event.MouseInput.Wheel;
                 // Relative mouse movement
                 int diff_x = event.MouseInput.X - m_mouse_val_x;
                 int diff_y = event.MouseInput.Y - m_mouse_val_y;
-                float mouse_x = ((float) diff_x) / 150;
-                float mouse_y = ((float) diff_y) / -150;
+                float mouse_x = ((float) diff_x) *
+                    UserConfigParams::m_fspcam_direction_speed;
+                float mouse_y = ((float) diff_y) *
+                    -UserConfigParams::m_fspcam_direction_speed;
                 // No movement the first time it's used
                 // At the moment there's also a hard limit because the mouse
                 // gets reset to the middle of the screen and sometimes there
