@@ -7,7 +7,7 @@ uniform float sigma;
 
 layout (local_size_x = 8, local_size_y = 8) in;
 
-shared vec3 local_src[8][8 + 2 * 6];
+shared vec4 local_src[8][8 + 2 * 6];
 
 void main()
 {
@@ -17,9 +17,9 @@ void main()
     vec2 uv = iuv * pixel;
     vec2 uv_p = (iuv + ivec2(0, 6)) * pixel;
 
-    local_src[x][y] = texture(source, uv_m).rgb;
-    local_src[x][y + 6] = texture(source, uv).rgb;
-    local_src[x][y + 12] = texture(source, uv_p).rgb;
+    local_src[x][y] = texture(source, uv_m);
+    local_src[x][y + 6] = texture(source, uv);
+    local_src[x][y + 12] = texture(source, uv_p);
 
     barrier();
 
@@ -27,7 +27,7 @@ void main()
     g0 = 1.0 / (sqrt(2.0 * 3.14) * sigma);
     g1 = exp(-0.5 / (sigma * sigma));
     g2 = g1 * g1;
-    vec3 sum = local_src[x][y + 6] * g0;
+    vec4 sum = local_src[x][y + 6] * g0;
     g0 *= g1;
     g1 *= g2;
     for (int i = 1; i < 6; i++) {
@@ -37,5 +37,5 @@ void main()
         g1 *= g2;
     }
 
-    imageStore(dest, iuv, vec4(sum, 0.));
+    imageStore(dest, iuv, sum);
 }

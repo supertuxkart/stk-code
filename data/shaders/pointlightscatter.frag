@@ -42,5 +42,5 @@ void main()
         xpos += stepsize * eyedir;
     }
 
-    Fog = vec4(fogcol * fog, 1.);
+    Fog = vec4(fogcol * fog, 0.);
 }

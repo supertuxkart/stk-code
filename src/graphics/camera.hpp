@@ -132,6 +132,9 @@ private:
     /** The target direction for the camera, only used for the first person camera. */
     core::vector3df m_target_direction;
 
+    /** The speed at which the direction changes, only used for the first person camera. */
+    core::vector3df m_direction_velocity;
+
     /** The up vector the camera should have, only used for the first person camera. */
     core::vector3df m_target_up_vector;
 
