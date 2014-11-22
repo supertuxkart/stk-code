@@ -8,12 +8,13 @@ uniform sampler2D SpecularMap;
 uniform sampler2D SSAO;
 #endif
 
-vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue)
+vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue)
 {
     vec2 tc = gl_FragCoord.xy / screen;
     vec3 DiffuseComponent = texture(DiffuseMap, tc).xyz;
     vec3 SpecularComponent = texture(SpecularMap, tc).xyz;
     float ao = texture(SSAO, tc).x;
     vec3 tmp = diffuseMatColor * DiffuseComponent * (1. - specMapValue) + specularMatColor * SpecularComponent * specMapValue;
-    return tmp * ao;
+    vec3 emitCol = diffuseMatColor.xyz * diffuseMatColor.xyz * diffuseMatColor.xyz * 15.;
+    return tmp * ao + (emitMapValue * emitCol);
 }

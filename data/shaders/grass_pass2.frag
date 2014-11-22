@@ -14,7 +14,7 @@ in vec3 nor;
 in vec2 uv;
 out vec4 FragColor;
 
-vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue);
+vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);
 
 void main(void)
 {
@@ -42,6 +42,6 @@ void main(void)
     float scattering = mix(fPowEdotL, fLdotNBack, .5);
     float specmap = texture(SpecMap, uv).g;
 
-    vec3 LightFactor = color.xyz * (scattering * 0.3) + getLightFactor(color.xyz, vec3(1.), specmap);
+    vec3 LightFactor = color.xyz * (scattering * 0.3) + getLightFactor(color.xyz, vec3(1.), specmap, 0.);
     FragColor = vec4(color.xyz * LightFactor, 1.);
 }

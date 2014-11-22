@@ -13,7 +13,7 @@ in vec2 uv;
 in vec2 uv_bis;
 out vec4 FragColor;
 
-vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue);
+vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);
 
 void main(void)
 {
@@ -30,5 +30,5 @@ void main(void)
     float specmap = texture(SpecMap, uv).g;
 #endif
     color *= detail;
-    FragColor = vec4(getLightFactor(color.xyz, vec3(1.), specmap), 1.);
+    FragColor = vec4(getLightFactor(color.xyz, vec3(1.), specmap, 0.), 1.);
 }

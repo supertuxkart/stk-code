@@ -12,7 +12,7 @@ out vec4 FragColor;
 
 
 vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
-vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue);
+vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);
 
 void main() {
     vec3 texc = gl_FragCoord.xyz / vec3(screen, 1.);
@@ -30,5 +30,5 @@ void main() {
     vec4 detail0 = texture(tex, r.xy / m + .5);
 #endif
 
-    FragColor = vec4(getLightFactor(detail0.xyz, vec3(1.), 0.), 1.);
+    FragColor = vec4(getLightFactor(detail0.xyz, vec3(1.), 0., 0.), 1.);
 }
