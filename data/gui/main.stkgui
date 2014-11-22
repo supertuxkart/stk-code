@@ -45,8 +45,12 @@
                              text="TEST: GPLose" label_location="hover"/>
                 <icon-button id="test_unlocked" width="64" height="64" icon="gui/main_options.png" extend_label="50"
                              text="TEST: Unlocked" label_location="hover"/>
-                 <icon-button id="test_unlocked2" width="64" height="64" icon="gui/main_options.png" extend_label="50"
-                             text="TEST: Unlocked 2" label_location="hover"/>      
+                <icon-button id="test_unlocked2" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                             text="TEST: Unlocked 2" label_location="hover"/>
+                <icon-button id="test_intro" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                             text="TEST: Intro" label_location="hover"/>
+                <icon-button id="test_outro" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                             text="TEST: Outro" label_location="hover"/>     
                 <icon-button id="options" width="64" height="64" icon="gui/main_options.png" extend_label="50"
                              I18N="In the main screen"  text="Options" label_location="hover"/>
                 <icon-button id="help" width="64" height="64" icon="gui/main_help.png"  extend_label="50"
