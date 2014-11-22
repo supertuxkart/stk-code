@@ -501,13 +501,13 @@ void Camera::update(float dt)
             // Angular velocity
             if (m_angular_velocity < m_target_angular_velocity)
             {
-                m_angular_velocity += UserConfigParams::m_fspcam_angular_velocity;
+                m_angular_velocity += UserConfigParams::m_fpscam_angular_velocity;
                 if (m_angular_velocity > m_target_angular_velocity)
                     m_angular_velocity = m_target_angular_velocity;
             }
             else if (m_angular_velocity > m_target_angular_velocity)
             {
-                m_angular_velocity -= UserConfigParams::m_fspcam_angular_velocity;
+                m_angular_velocity -= UserConfigParams::m_fpscam_angular_velocity;
                 if (m_angular_velocity < m_target_angular_velocity)
                     m_angular_velocity = m_target_angular_velocity;
             }
@@ -525,13 +525,13 @@ void Camera::update(float dt)
             diff = m_target_direction - direction;
             if (diff.X != 0 || diff.Y != 0 || diff.Z != 0)
             {
-                diff.setLength(UserConfigParams::m_fspcam_direction_speed);
+                diff.setLength(UserConfigParams::m_fpscam_direction_speed);
                 m_direction_velocity += diff;
                 if (m_direction_velocity.getLengthSQ() >
-                    UserConfigParams::m_fspcam_smooth_direction_max_speed *
-                    UserConfigParams::m_fspcam_smooth_direction_max_speed)
+                    UserConfigParams::m_fpscam_smooth_direction_max_speed *
+                    UserConfigParams::m_fpscam_smooth_direction_max_speed)
                     m_direction_velocity.setLength(
-                        UserConfigParams::m_fspcam_smooth_direction_max_speed);
+                        UserConfigParams::m_fpscam_smooth_direction_max_speed);
                 direction += m_direction_velocity;
                 m_target_direction = direction;
             }
@@ -541,9 +541,9 @@ void Camera::update(float dt)
             if (diff.X != 0 || diff.Y != 0 || diff.Z != 0)
             {
                 if (diff.getLengthSQ() >
-                    UserConfigParams::m_fspcam_angular_velocity *
-                    UserConfigParams::m_fspcam_angular_velocity)
-                    diff.setLength(UserConfigParams::m_fspcam_angular_velocity);
+                    UserConfigParams::m_fpscam_angular_velocity *
+                    UserConfigParams::m_fpscam_angular_velocity)
+                    diff.setLength(UserConfigParams::m_fpscam_angular_velocity);
                 up += diff;
             }
         }
