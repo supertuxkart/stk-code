@@ -215,7 +215,7 @@ void InputManager::handleStaticAction(int key, int value)
 
             Camera *active_cam = Camera::getActiveCamera();
             active_cam->setAngularVelocity(value ?
-                UserConfigParams::m_fspcam_max_angular_velocity : 0);
+                UserConfigParams::m_fspcam_max_angular_velocity : 0.0f);
             break;
         }
         case KEY_KEY_E:
