@@ -79,6 +79,10 @@ void TrackInfoScreen::loadedFromFile()
     m_highscore_entries[0] = getWidget<LabelWidget>("highscore1");
     m_highscore_entries[1] = getWidget<LabelWidget>("highscore2");
     m_highscore_entries[2] = getWidget<LabelWidget>("highscore3");
+    
+    GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
+    screenshot->setFocusable(false);
+    screenshot->m_tab_stop = false;
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------

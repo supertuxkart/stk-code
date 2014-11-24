@@ -83,6 +83,10 @@ void GPInfoScreen::loadedFromFile()
     m_num_tracks_spinner->setValue(1);
 
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
+    
+    GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
+    screenshot->setFocusable(false);
+    screenshot->m_tab_stop = false;
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
