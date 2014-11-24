@@ -61,7 +61,6 @@ private:
     int getMaxNumTracks(std::string group);
 
 protected: // Necessary for RandomGPInfoScreen
-    GUIEngine::IconButtonWidget* m_screenshot_widget;
     float m_curr_time;
 
     /** The grand prix data. */
