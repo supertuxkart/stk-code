@@ -52,9 +52,6 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
 
-    /** Screenshot widget. */
-    GUIEngine::IconButtonWidget *m_screenshot;
-
     /** Check box for reverse mode. */
     GUIEngine::CheckBoxWidget* m_reverse;
 

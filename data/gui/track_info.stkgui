@@ -10,8 +10,7 @@
         <box width="95%" height="40%" padding="10" layout="horizontal-row">
             <!-- Left pane -->
             <div proportion="1" height="100%" layout="vertical-row">
-                <placeholder proportion="1" width="100%" height="100%" id="screenshot_div">
-                </placeholder>
+                <icon-button proportion="1" width="100%" height="100%" id="screenshot" custom_ratio="1.33333"/>
             </div>
             <!-- Right pane -->
             <div proportion="1" height="100%" layout="vertical-row">

@@ -11,9 +11,8 @@
         <box width="95%" height="40%" padding="10" layout="horizontal-row">
             <spacer width="10" height="100%"/>
             <!-- Left pane -->
-            <div width="45%" height="95%" align="center" layout="vertical-row">
-                <placeholder proportion="1" width="100%" height="100%" id="screenshot_div">
-                </placeholder>
+            <div width="45%" height="100%" align="center" layout="vertical-row">
+                <icon-button proportion="1" width="100%" height="100%" id="screenshot" custom_ratio="1.33333"/>
             </div>
 
             <spacer width="5%" height="100%"/>
