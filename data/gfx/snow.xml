@@ -16,8 +16,8 @@
                max="1000"           />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="10000"
-               max="9000"          />
+    <lifetime  min="8500"
+               max="9500"          />
     
     <!-- Size of the particles -->
     <size      min="0.10"
