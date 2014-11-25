@@ -201,7 +201,6 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
     const Track * const track = World::getWorld()->getTrack();
 
     const float start = track->getFogStart();
-    const video::SColor tmpcol = track->getFogColor();
     core::vector3df col(1., 1., 1.);
 
     glUseProgram(LightShader::PointLightScatterShader::getInstance()->Program);

@@ -519,11 +519,7 @@ void PostProcessing::renderFog()
     const Track * const track = World::getWorld()->getTrack();
 
     // This function is only called once per frame - thus no need for setters.
-    const float fogmax = track->getFogMax();
-    const float startH = track->getFogStartHeight();
-    const float endH = track->getFogEndHeight();
     const float start = track->getFogStart();
-    const float end = track->getFogEnd();
     const SColor tmpcol = track->getFogColor();
 
     core::vector3df col( tmpcol.getRed() / 255.0f,

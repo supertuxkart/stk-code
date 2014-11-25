@@ -692,7 +692,6 @@ static void renderInstancedMeshNormals()
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        GLMesh *mesh = meshes[i];
         MeshShader::NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
     }
