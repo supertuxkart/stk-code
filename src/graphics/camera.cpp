@@ -736,13 +736,15 @@ void Camera::handleEndCamera(float dt)
 /** Sets viewport etc. for this camera. Called from irr_driver just before
  *  rendering the view for this kart.
  */
-void Camera::activate()
+void Camera::activate(bool alsoActivateInIrrlicht)
 {
     s_active_camera = this;
-    irr::scene::ISceneManager *sm = irr_driver->getSceneManager();
-    sm->setActiveCamera(m_camera);
-    irr_driver->getVideoDriver()->setViewPort(m_viewport);
-
+    if (alsoActivateInIrrlicht)
+    {
+        irr::scene::ISceneManager *sm = irr_driver->getSceneManager();
+        sm->setActiveCamera(m_camera);
+        irr_driver->getVideoDriver()->setViewPort(m_viewport);
+    }
 }   // activate
 
 // ----------------------------------------------------------------------------
