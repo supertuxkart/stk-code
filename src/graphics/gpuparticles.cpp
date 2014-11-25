@@ -131,16 +131,22 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
     ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * m_count);
     ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* m_count);
 
-    if(ParticleParamsTmp != NULL)     // In case memory allocation succeeded
+    if (ParticleParamsTmp != NULL)     // In case memory allocation succeeded
+    {
+        ParticleParams = ParticleParamsTmp;
+    }
+    else
     {
         Log::error("GPUParticles", "Not enough memory for %d from point particles.", m_count);
-        ParticleParams = ParticleParamsTmp;
         m_count = m_previous_count;
     }
-    if(InitialValuesTmp != NULL)
+    if (InitialValuesTmp != NULL)
+    {
+        InitialValues = InitialValuesTmp;
+    }
+    else
     {
         Log::fatal("GPUParticles", "Not enough memory for %d from point particles.", m_count);
-        InitialValues = InitialValuesTmp;
         m_count = m_previous_count;
     }
 
@@ -166,17 +172,23 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
     ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * m_count);
     ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* m_count);
 
-    if(ParticleParamsTmp != NULL)     // In case memory allocation succeeded
+    if (ParticleParamsTmp != NULL)     // In case memory allocation succeeded
     {
-        Log::error("GPUParticles", "Not enough memory for %d from box particles.", m_count);
         ParticleParams = ParticleParamsTmp;
-        m_count        = m_previous_count;
     }
-    if(InitialValuesTmp != NULL)
+    else
     {
         Log::error("GPUParticles", "Not enough memory for %d from box particles.", m_count);
+        m_count = m_previous_count;
+    }
+    if (InitialValuesTmp != NULL)
+    {
         InitialValues = InitialValuesTmp;
-        m_count       = m_previous_count;
+    }
+    else
+    {
+        Log::error("GPUParticles", "Not enough memory for %d from box particles.", m_count);
+        m_count = m_previous_count;
     }
 
     const core::vector3df& extent = emitter->getBox().getExtent();
