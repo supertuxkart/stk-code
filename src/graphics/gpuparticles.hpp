@@ -21,7 +21,12 @@ protected:
     bool m_randomize_initial_y;
 
     GLuint texture;
-    unsigned count;
+
+    /** Current count of particles. */
+    unsigned m_count;
+    /** Previous count - for error handling only. */
+    unsigned m_previous_count;
+
     static void CommonRenderingVAO(GLuint PositionBuffer);
     static void AppendQuaternionRenderingVAO(GLuint QuaternionBuffer);
     static void CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo);
