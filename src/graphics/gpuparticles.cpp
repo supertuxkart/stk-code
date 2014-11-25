@@ -128,15 +128,23 @@ void generateLifetimeSizeDirection(scene::IParticleEmitter *emitter, float &life
 
 void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePointEmitter *emitter)
 {
-    ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * count);
-    ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
+    ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * m_count);
+    ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* m_count);
 
     if(ParticleParamsTmp != NULL)     // In case memory allocation succeeded
+    {
+        Log::error("GPUParticles", "Not enough memory for %d from point particles.", m_count);
         ParticleParams = ParticleParamsTmp;
+        m_count = m_previous_count;
+    }
     if(InitialValuesTmp != NULL)
+    {
+        Log::fatal("GPUParticles", "Not enough memory for %d from point particles.", m_count);
         InitialValues = InitialValuesTmp;
+        m_count = m_previous_count;
+    }
 
-    for (unsigned i = 0; i < count; i++)
+    for (unsigned i = 0; i < m_count; i++)
     {
         ParticleParams[i].PositionX = 0;
         ParticleParams[i].PositionY = 0;
@@ -155,17 +163,25 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
 
 void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *emitter)
 {
-    ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * count);
-    ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
+    ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * m_count);
+    ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* m_count);
 
     if(ParticleParamsTmp != NULL)     // In case memory allocation succeeded
+    {
+        Log::error("GPUParticles", "Not enough memory for %d from box particles.", m_count);
         ParticleParams = ParticleParamsTmp;
+        m_count        = m_previous_count;
+    }
     if(InitialValuesTmp != NULL)
+    {
+        Log::error("GPUParticles", "Not enough memory for %d from box particles.", m_count);
         InitialValues = InitialValuesTmp;
+        m_count       = m_previous_count;
+    }
 
     const core::vector3df& extent = emitter->getBox().getExtent();
 
-    for (unsigned i = 0; i < count; i++)
+    for (unsigned i = 0; i < m_count; i++)
     {
         ParticleParams[i].PositionX = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
         ParticleParams[i].PositionY = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
@@ -187,15 +203,15 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 
 void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *emitter)
 {
-    ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * count);
-    ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
+    ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * m_count);
+    ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* m_count);
 
     if(ParticleParamsTmp != NULL)     // In case memory allocation succeeded
         ParticleParams = ParticleParamsTmp;
     if(InitialValuesTmp != NULL)
         InitialValues = InitialValuesTmp;
 
-    for (unsigned i = 0; i < count; i++) {
+    for (unsigned i = 0; i < m_count; i++) {
         // Random distance from center
         const f32 distance = os::Randomizer::frand() * emitter->getRadius();
 
@@ -242,7 +258,8 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
     flip = false;
     m_first_execution = true;
 
-    count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
+    m_previous_count = m_count;   // save to handle out of memory errors
+    m_count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
     switch (emitter->getType())
     {
     case scene::EPET_POINT:
@@ -355,7 +372,7 @@ void ParticleSystemProxy::simulate()
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
     glBeginTransformFeedback(GL_POINTS);
-    glDrawArrays(GL_POINTS, 0, count);
+    glDrawArrays(GL_POINTS, 0, m_count);
     glEndTransformFeedback();
     glBindVertexArray(0);
 
@@ -374,7 +391,7 @@ void ParticleSystemProxy::drawFlip()
     ParticleShader::FlipParticleRender::getInstance()->setUniforms();
 
     glBindVertexArray(current_rendering_vao);
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_count);
 }
 
 void ParticleSystemProxy::drawNotFlip()
@@ -392,7 +409,7 @@ void ParticleSystemProxy::drawNotFlip()
     ParticleShader::SimpleParticleRender::getInstance()->setUniforms(ColorFrom, ColorTo);
 
     glBindVertexArray(current_rendering_vao);
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_count);
 }
 
 void ParticleSystemProxy::draw()
@@ -408,12 +425,12 @@ void ParticleSystemProxy::generateVAOs()
     glBindVertexArray(0);
     glGenBuffers(1, &initial_values_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), ParticleParams, GL_STREAM_COPY);
+    glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(ParticleData), ParticleParams, GL_STREAM_COPY);
     glGenBuffers(2, tfb_buffers);
     glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), InitialValues, GL_STREAM_COPY);
+    glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(ParticleData), InitialValues, GL_STREAM_COPY);
     glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_COPY);
+    glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(ParticleData), 0, GL_STREAM_COPY);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGenVertexArrays(1, &current_rendering_vao);
@@ -430,8 +447,8 @@ void ParticleSystemProxy::generateVAOs()
     glBindVertexArray(0);
     if (flip)
     {
-        float *quaternions = new float[4 * count];
-        for (unsigned i = 0; i < count; i++)
+        float *quaternions = new float[4 * m_count];
+        for (unsigned i = 0; i < m_count; i++)
         {
             core::vector3df rotationdir(0., 1., 0.);
 
@@ -442,7 +459,7 @@ void ParticleSystemProxy::generateVAOs()
         }
         glGenBuffers(1, &quaternionsbuffer);
         glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
-        glBufferData(GL_ARRAY_BUFFER, 4 * count * sizeof(float), quaternions, GL_STREAM_COPY);
+        glBufferData(GL_ARRAY_BUFFER, 4 * m_count * sizeof(float), quaternions, GL_STREAM_COPY);
         delete[] quaternions;
     }
 
