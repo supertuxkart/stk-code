@@ -71,20 +71,20 @@ MusicInformation *MusicInformation::create(const std::string &filename)
 // ----------------------------------------------------------------------------
 MusicInformation::MusicInformation(const XMLNode *root,
                                    const std::string &filename):
-    m_title(),
-    m_mode(SOUND_NORMAL),
     m_composer(),
+    m_title(),
     //m_numLoops(LOOP_FOREVER),
     m_normal_filename(),
     m_fast_filename(),
-    m_normal_music(NULL),
-    m_fast_music(NULL),
-    m_enable_fast(false),
     m_music_waiting(false),
+    m_enable_fast(false),
+    m_gain(1.0f),
+    m_adjusted_gain(1.0f),
     m_faster_time(1.0f),
     m_max_pitch(0.1f),
-    m_gain(1.0f),
-    m_adjusted_gain(1.0f)
+    m_normal_music(NULL),
+    m_fast_music(NULL),
+    m_mode(SOUND_NORMAL)
 {
     // Otherwise read config file
     // --------------------------

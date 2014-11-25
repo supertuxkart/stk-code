@@ -96,12 +96,12 @@ void SpeedWeightedObject::Properties::checkAllSet()
  *  a mesh being deleted to early.
  */
 KartModel::KartModel(bool is_master):
-    m_is_master(is_master),
-    m_kart(NULL),
     m_mesh(NULL),
-    m_hat_name(),
     m_hat_node(NULL),
-    m_hat_offset(core::vector3df(0,0,0))
+    m_hat_offset(core::vector3df(0,0,0)),
+    m_hat_name(),
+    m_is_master(is_master),
+    m_kart(NULL)
 {
     for(unsigned int i=0; i<4; i++)
     {

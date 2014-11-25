@@ -115,21 +115,21 @@ private:
         Vec3        m_parameter;
         // --------------------------------------------------------------------
         SFXCommand(SFXCommands command, SFXBase *base):
-            m_command(command),
-            m_sfx(base)
+            m_sfx(base),
+            m_command(command)
         {
         }   // SFXCommand()
         // --------------------------------------------------------------------
         SFXCommand(SFXCommands command, SFXBase *base, float parameter):
-            m_command(command),
-            m_sfx(base)
+            m_sfx(base),
+            m_command(command)
         {
             m_parameter.setX(parameter);
         }   // SFXCommand(float)
         // --------------------------------------------------------------------
         SFXCommand(SFXCommands command, SFXBase *base, const Vec3 &parameter):
-            m_command(command),
             m_sfx(base),
+            m_command(command),
             m_parameter(parameter)
         {
         }   // SFXCommand(Vec3)

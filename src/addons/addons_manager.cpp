@@ -53,8 +53,8 @@ AddonsManager* addons_manager = 0;
  *  NewsManager::init()  ).
  */
 AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
-                                 m_state(STATE_INIT),
-                                 m_file_installed(file_manager->getAddonsFile("addons_installed.xml"))
+                                 m_file_installed(file_manager->getAddonsFile("addons_installed.xml")),
+                                 m_state(STATE_INIT)
 {
     // Load the addons list (even if internet is disabled)
     m_addons_list.lock();

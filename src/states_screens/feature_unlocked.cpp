@@ -68,10 +68,10 @@ DEFINE_SCREEN_SINGLETON( FeatureUnlockedCutScene );
 FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::string model,
                                                       irr::core::stringw msg):
     m_unlocked_kart(NULL),
-    m_unlock_message(msg),
     m_unlock_model(model),
     m_curr_image(-1),
-    m_scale(1.0f)
+    m_scale(1.0f),
+    m_unlock_message(msg)
 {
 }
 
@@ -81,9 +81,9 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::string model,
 FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(KartProperties* kart,
                                                       irr::core::stringw msg):
     m_unlocked_kart(kart),
-    m_unlock_message(msg),
     m_curr_image(-1),
-    m_scale(1.0f)
+    m_scale(1.0f),
+    m_unlock_message(msg)
 {
 }   // UnlockedThing::UnlockedThing
 
@@ -95,9 +95,9 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(irr::video::ITexture* pict
     m_unlocked_kart(NULL),
     m_w(w),
     m_h(h),
-    m_unlock_message(msg),
     m_curr_image(-1),
-    m_scale(1.0f)
+    m_scale(1.0f),
+    m_unlock_message(msg)
 {
     m_pictures.push_back(pict);
 }   // UnlockedThing::UnlockedThing
@@ -111,9 +111,9 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::vector<irr::video::IT
     m_pictures(picts),
     m_w(w),
     m_h(h),
-    m_unlock_message(msg),
     m_curr_image(0),
-    m_scale(1.0f)
+    m_scale(1.0f),
+    m_unlock_message(msg)
 {
 }   // UnlockedThing::UnlockedThing
 

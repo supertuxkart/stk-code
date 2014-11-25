@@ -398,8 +398,8 @@ Material::Material(const XMLNode *node, bool deprecated)
  */
 Material::Material(const std::string& fname, bool is_full_path,
                    bool complain_if_not_found, bool load_texture):
-    m_deprecated(false),
-    m_texname(fname)
+    m_texname(fname),
+    m_deprecated(false)
 {
     init();
 

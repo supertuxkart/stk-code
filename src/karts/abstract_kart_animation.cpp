@@ -26,9 +26,9 @@
 
 AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
                                              const std::string &name):
-    m_timer(0),
+    m_name(name),
     m_kart(kart),
-    m_name(name)
+    m_timer(0)
 {
     // Remove previous animation if there is one
 #ifndef DEBUG

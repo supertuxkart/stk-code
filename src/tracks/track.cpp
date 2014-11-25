@@ -86,8 +86,8 @@ Track::Track(const std::string &filename):
 #ifdef DEBUG
     m_magic_number(0x17AC3802),
 #endif
-    m_materials_loaded(false),
-    m_filename(filename)
+    m_filename(filename),
+    m_materials_loaded(false)
 {
     m_root                  =
         StringUtils::getPath(StringUtils::removeExtension(m_filename));

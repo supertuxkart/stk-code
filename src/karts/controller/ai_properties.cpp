@@ -27,24 +27,23 @@ float AIProperties::UNDEFINED = -99.9f;
 /** Constructor. Sets all properties to the special UNDEFINED value.
  */
 AIProperties::AIProperties(RaceManager::Difficulty difficulty):
-    m_ident(race_manager->getDifficultyAsString(difficulty)),
     m_max_item_angle(UNDEFINED),
     m_max_item_angle_high_speed(UNDEFINED),
-    m_time_full_steer(UNDEFINED),
     m_bad_item_closeness_2(UNDEFINED),
+    m_time_full_steer(UNDEFINED),
     m_straight_length_for_zipper(UNDEFINED),
-    m_skidding_threshold(UNDEFINED),
-    m_min_start_delay(UNDEFINED),
-    m_max_start_delay(UNDEFINED),
     m_shield_incoming_radius(UNDEFINED),
     m_false_start_probability(UNDEFINED),
+    m_min_start_delay(UNDEFINED),
+    m_max_start_delay(UNDEFINED),
     m_make_use_of_slipstream(false),
+    m_disable_slipstream_usage(false),
     m_collect_avoid_items(false),
     m_handle_bomb(false),
     m_item_usage_non_random(false),
-    m_disable_slipstream_usage(false),
-    m_nitro_usage(NITRO_NONE)
-
+    m_nitro_usage(NITRO_NONE),
+    m_skidding_threshold(UNDEFINED),
+    m_ident(race_manager->getDifficultyAsString(difficulty))
 {
 }   // AIProperties
 
