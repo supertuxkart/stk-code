@@ -128,8 +128,13 @@ void generateLifetimeSizeDirection(scene::IParticleEmitter *emitter, float &life
 
 void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePointEmitter *emitter)
 {
-    ParticleParams = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * count);
-    InitialValues = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
+    ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * count);
+    ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
+
+    if(ParticleParamsTmp != NULL)     // In case memory allocation succeeded
+        ParticleParams = ParticleParamsTmp;
+    if(InitialValuesTmp != NULL)
+        InitialValues = InitialValuesTmp;
 
     for (unsigned i = 0; i < count; i++)
     {
@@ -150,8 +155,13 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
 
 void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *emitter)
 {
-    ParticleParams = (ParticleData *)realloc(ParticleParams, sizeof(ParticleData)* count);
-    InitialValues = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
+    ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * count);
+    ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
+
+    if(ParticleParamsTmp != NULL)     // In case memory allocation succeeded
+        ParticleParams = ParticleParamsTmp;
+    if(InitialValuesTmp != NULL)
+        InitialValues = InitialValuesTmp;
 
     const core::vector3df& extent = emitter->getBox().getExtent();
 
@@ -177,8 +187,13 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 
 void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *emitter)
 {
-    ParticleParams = (ParticleData *)realloc(ParticleParams, sizeof(ParticleData)* count);
-    InitialValues = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
+    ParticleData* ParticleParamsTmp = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * count);
+    ParticleData* InitialValuesTmp = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
+
+    if(ParticleParamsTmp != NULL)     // In case memory allocation succeeded
+        ParticleParams = ParticleParamsTmp;
+    if(InitialValuesTmp != NULL)
+        InitialValues = InitialValuesTmp;
 
     for (unsigned i = 0; i < count; i++) {
         // Random distance from center

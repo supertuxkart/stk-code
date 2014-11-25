@@ -253,7 +253,7 @@ void History::Load()
         Log::fatal("History", "Could not read history.dat.");
 
     unsigned int num_karts;
-    if(sscanf(s, "numkarts: %d",&num_karts)!=1)
+    if(sscanf(s, "numkarts: %d",(int*) &num_karts)!=1)
         Log::fatal("History", "No number of karts found in history file.");
     race_manager->setNumKarts(num_karts);
 
