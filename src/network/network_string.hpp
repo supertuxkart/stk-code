@@ -49,8 +49,11 @@ class NetworkString
     public:
         NetworkString() { }
         NetworkString(const uint8_t& value) { m_string.push_back(value); }
-        NetworkString(NetworkString const& copy) { m_string = copy.m_string; }
-        NetworkString(const std::string & value) { m_string = std::vector<uint8_t>(value.begin(), value.end()); }
+        NetworkString(NetworkString const& copy): m_string(copy.m_string) { }
+        NetworkString(const std::string & value):
+            m_string(std::vector<uint8_t>(value.begin(), value.end()))
+        {
+        }
 
         NetworkString& removeFront(int size)
         {

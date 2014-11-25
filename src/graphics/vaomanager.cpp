@@ -32,7 +32,7 @@ VAOManager::VAOManager()
 void VAOManager::cleanInstanceVAOs()
 {
     std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint>::iterator It = InstanceVAO.begin(), E = InstanceVAO.end();
-    for (; It != E; It++)
+    for (; It != E; ++It)
         glDeleteVertexArrays(1, &(It->second));
     InstanceVAO.clear();
 }

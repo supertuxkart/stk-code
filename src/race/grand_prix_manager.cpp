@@ -74,7 +74,7 @@ void GrandPrixManager::loadDir(const std::string& dir, enum GrandPrixData::GPGro
     // Find out which grand prix are available and load them
     std::set<std::string> result;
     file_manager->listFiles(result, dir);
-    for(std::set<std::string>::iterator i = result.begin(); i != result.end(); i++)
+    for(std::set<std::string>::iterator i = result.begin(); i != result.end(); ++i)
     {
         if (StringUtils::hasSuffix(*i, SUFFIX))
             load(dir + *i, group);

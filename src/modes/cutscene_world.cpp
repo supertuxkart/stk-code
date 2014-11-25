@@ -328,7 +328,7 @@ void CutsceneWorld::update(float dt)
         }
         else
         {
-            it++;
+            ++it;
         }
      }
 
@@ -346,7 +346,7 @@ void CutsceneWorld::update(float dt)
         }
         else
         {
-            it++;
+            ++it;
         }
      }
 
@@ -363,7 +363,7 @@ void CutsceneWorld::update(float dt)
         }
         else
         {
-            it++;
+            ++it;
         }
     }
 

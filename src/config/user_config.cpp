@@ -460,11 +460,11 @@ void TimeUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 // ============================================================================
 StringUserConfigParam::StringUserConfigParam(const char* default_value,
                                              const char* param_name,
-                                             const char* comment)
+                                             const char* comment):
+    m_value(default_value),
+    m_default_value(default_value)
 {
-    m_value         = default_value;
-    m_default_value = default_value;
-    m_param_name    = param_name;
+    m_param_name = param_name;
     all_params.push_back(this);
     if(comment != NULL) m_comment = comment;
 }   // StringUserConfigParam
@@ -473,10 +473,10 @@ StringUserConfigParam::StringUserConfigParam(const char* default_value,
 StringUserConfigParam::StringUserConfigParam(const char* default_value,
                                              const char* param_name,
                                              GroupUserConfigParam* group,
-                                             const char* comment)
+                                             const char* comment):
+    m_value(default_value),
+    m_default_value(default_value)
 {
-    m_value         = default_value;
-    m_default_value = default_value;
     m_param_name = param_name;
     group->addChild(this);
     if(comment != NULL) m_comment = comment;
@@ -661,10 +661,10 @@ core::stringc FloatUserConfigParam::toString() const
 
 UserConfig *user_config;
 
-UserConfig::UserConfig()
+UserConfig::UserConfig():
+    m_filename("config.xml"),
+    m_warning()
 {
-    m_filename = "config.xml";
-    m_warning  = "";
     //m_blacklist_res.clear();
 
 }   // UserConfig

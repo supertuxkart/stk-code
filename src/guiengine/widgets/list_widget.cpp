@@ -456,7 +456,7 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
 }
 
 // -----------------------------------------------------------------------------
-int ListWidget::getItemID(const std::string internalName) const
+int ListWidget::getItemID(const std::string& internalName) const
 {
     const CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);

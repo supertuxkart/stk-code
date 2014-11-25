@@ -125,7 +125,7 @@ void KartPropertiesManager::removeKart(const std::string &ident)
     // greater than index were moved one position further to the beginning
     std::map<std::string, std::vector<int> >::iterator it_gr;
     for(it_gr=m_groups_2_indices.begin(); it_gr != m_groups_2_indices.end();
-        it_gr++)
+        ++it_gr)
     {
         for(unsigned int i=0; i<(*it_gr).second.size(); i++)
         {
@@ -148,7 +148,7 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
 {
     m_all_kart_dirs.clear();
     std::vector<std::string>::const_iterator dir;
-    for(dir = m_kart_search_path.begin(); dir!=m_kart_search_path.end(); dir++)
+    for(dir = m_kart_search_path.begin(); dir!=m_kart_search_path.end(); ++dir)
     {
         // First check if there is a kart in the current directory
         // -------------------------------------------------------
@@ -159,7 +159,7 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
         std::set<std::string> result;
         file_manager->listFiles(result, *dir);
         for(std::set<std::string>::const_iterator subdir=result.begin();
-            subdir!=result.end(); subdir++)
+            subdir!=result.end(); ++subdir)
         {
             const bool loaded = loadKart(*dir+*subdir);
 
@@ -349,7 +349,7 @@ bool KartPropertiesManager::kartAvailable(int kartid)
     if(kartid<0 || kartid>=(int)m_kart_available.size()) return false;
     if(!m_kart_available[kartid]) return false;
     std::vector<int>::iterator it;
-    for (it = m_selected_karts.begin(); it < m_selected_karts.end(); it++)
+    for (it = m_selected_karts.begin(); it < m_selected_karts.end(); ++it)
     {
         if ( kartid == *it) return false;
     }

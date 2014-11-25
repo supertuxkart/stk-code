@@ -397,11 +397,10 @@ Material::Material(const XMLNode *node, bool deprecated)
  *  \param is_full_path If the fname contains the full path.
  */
 Material::Material(const std::string& fname, bool is_full_path,
-                   bool complain_if_not_found, bool load_texture)
+                   bool complain_if_not_found, bool load_texture):
+    m_deprecated(false),
+    m_texname(fname)
 {
-    m_deprecated = false;
-
-    m_texname = fname;
     init();
 
     if (load_texture)

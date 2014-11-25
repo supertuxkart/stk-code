@@ -105,7 +105,7 @@ irr::core::stringw AchievementInfo::toString() const
     {
     case AC_ALL_AT_LEAST:
         // If all values need to be reached, add up all goal values
-        for (iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++)
+        for (iter = m_goal_values.begin(); iter != m_goal_values.end(); ++iter)
         {
             count += iter->second;
         }
@@ -130,7 +130,7 @@ bool AchievementInfo::checkCompletion(Achievement * achievement) const
     switch (m_check_type)
     {
     case AC_ALL_AT_LEAST:
-        for (iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++)
+        for (iter = m_goal_values.begin(); iter != m_goal_values.end(); ++iter)
         {
             if (achievement->getValue(iter->first) < iter->second)
                 return false;
@@ -140,7 +140,7 @@ bool AchievementInfo::checkCompletion(Achievement * achievement) const
     {
         // Test all progress values the kart has.
         const std::map<std::string, int> &progress = achievement->getProgress();
-        for (iter = progress.begin(); iter != progress.end(); iter++)
+        for (iter = progress.begin(); iter != progress.end(); ++iter)
         {
             // A one-at-least achievement has only one goal, so use it
             if (iter->second >= m_goal_values.begin()->second)

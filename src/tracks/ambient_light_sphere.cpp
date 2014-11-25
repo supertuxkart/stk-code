@@ -33,10 +33,10 @@
  */
 AmbientLightSphere::AmbientLightSphere(const XMLNode &node,
                                        unsigned int index)
-                  : CheckSphere(node, index)
+                  : CheckSphere(node, index),
+    m_ambient_color(video::SColor(255, 0, 255, 0)),   // green
+    m_inner_radius2(1)
 {
-    m_ambient_color = video::SColor(255, 0, 255, 0);   // green
-    m_inner_radius2 = 1;
     node.get("inner-radius", &m_inner_radius2);
     m_inner_radius2 *= m_inner_radius2;   // store the squared value
     node.get("color", &m_ambient_color);

@@ -52,27 +52,26 @@ Vec3          Flyable::m_st_extend      [PowerupManager::POWERUP_MAX];
 
 Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
                  float mass)
-       : Moveable(), TerrainInfo()
-{
+       : Moveable(), TerrainInfo(),
     // get the appropriate data from the static fields
-    m_speed                        = m_st_speed[type];
-    m_extend                       = m_st_extend[type];
-    m_max_height                   = m_st_max_height[type];
-    m_min_height                   = m_st_min_height[type];
-    m_average_height               = (m_min_height+m_max_height)/2.0f;
-    m_force_updown                 = m_st_force_updown[type];
-    m_owner                        = kart;
-    m_type                         = type;
-    m_has_hit_something            = false;
-    m_shape                        = NULL;
-    m_mass                         = mass;
-    m_adjust_up_velocity           = true;
-    m_time_since_thrown            = 0;
-    m_position_offset              = Vec3(0,0,0);
-    m_owner_has_temporary_immunity = true;
-    m_do_terrain_info              = true;
-    m_max_lifespan = -1;
-
+    m_speed(m_st_speed[type]),
+    m_extend(m_st_extend[type]),
+    m_max_height(m_st_max_height[type]),
+    m_min_height(m_st_min_height[type]),
+    m_average_height( (m_min_height+m_max_height)/2.0f ),
+    m_force_updown(m_st_force_updown[type]),
+    m_owner(kart),
+    m_type(type),
+    m_has_hit_something(false),
+    m_shape(NULL),
+    m_mass(mass),
+    m_adjust_up_velocity(true),
+    m_time_since_thrown(0),
+    m_position_offset(Vec3(0,0,0)),
+    m_owner_has_temporary_immunity(true),
+    m_do_terrain_info(true),
+    m_max_lifespan(-1)
+{
     // Add the graphical model
     setNode(irr_driver->addMesh(m_st_model[type], StringUtils::insertValues("flyable_%i", (int)type)));
     irr_driver->applyObjectPassShader(getNode());

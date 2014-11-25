@@ -96,7 +96,7 @@ MusicManager::~MusicManager()
     stopMusic();
 
     for(std::map<std::string,MusicInformation*>::iterator
-        i=m_all_music.begin(); i!=m_all_music.end(); i++)
+        i=m_all_music.begin(); i!=m_all_music.end(); ++i)
     {
         delete i->second;
         i->second = NULL;
@@ -123,7 +123,7 @@ void MusicManager::loadMusicInformation()
     // SUPERTUXKART_MUSIC_PATH
     std::vector<std::string> allMusicDirs=file_manager->getMusicDirs();
     for(std::vector<std::string>::iterator dir=allMusicDirs.begin();
-                                           dir!=allMusicDirs.end(); dir++)
+                                           dir!=allMusicDirs.end(); ++dir)
     {
         loadMusicFromOneDir(*dir);
     }   // for dir
@@ -149,7 +149,7 @@ void MusicManager::loadMusicFromOneDir(const std::string& dir)
 void MusicManager::addMusicToTracks()
 {
     for(std::map<std::string,MusicInformation*>::iterator
-        i=m_all_music.begin(); i!=m_all_music.end(); i++)
+        i=m_all_music.begin(); i!=m_all_music.end(); ++i)
     {
         if(!i->second)
         {

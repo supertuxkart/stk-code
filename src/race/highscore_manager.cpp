@@ -44,7 +44,7 @@ HighscoreManager::~HighscoreManager()
 {
     saveHighscores();
     for(type_all_scores::iterator i  = m_all_scores.begin();
-                                  i != m_all_scores.end();  i++)
+                                  i != m_all_scores.end();  ++i)
         delete *i;
 }   // ~HighscoreManager
 
@@ -175,10 +175,10 @@ void HighscoreManager::saveHighscores()
  * Returns the high scores entry for a specific type of race.
  * Creates one if none exists yet.
  */
-Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType highscore_type,
+Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType& highscore_type,
                                             int num_karts,
                                             const RaceManager::Difficulty difficulty,
-                                            const std::string trackName,
+                                            const std::string& trackName,
                                             const int number_of_laps,
                                             const bool reverse)
 {
@@ -186,7 +186,7 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType high
 
     // See if we already have a record for this type
     for(type_all_scores::iterator i  = m_all_scores.begin();
-                                  i != m_all_scores.end();  i++)
+                                  i != m_all_scores.end();  ++i)
     {
         if((*i)->matches(highscore_type, num_karts, difficulty, trackName,
                          number_of_laps, reverse) )

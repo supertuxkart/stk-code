@@ -80,7 +80,7 @@ private:
         /** Tests if two collision pairs involve the same objects. This test
          *  is simplified (i.e. no test if p.b==a and p.a==b) since the
          *  elements are sorted. */
-        bool operator==(const CollisionPair p)
+        bool operator==(const CollisionPair& p)
         {
             return (p.m_up[0]==m_up[0] && p.m_up[1]==m_up[1]);
         }   // operator==
@@ -108,7 +108,7 @@ private:
     private:
         void push_back(CollisionPair p) {
             // only add a pair if it's not already in there
-            for(iterator i=begin(); i!=end(); i++) {
+            for(iterator i=begin(); i!=end(); ++i) {
                 if((*i)==p) return;
             }
             std::vector<CollisionPair>::push_back(p);

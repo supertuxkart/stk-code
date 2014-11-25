@@ -21,10 +21,10 @@
 #include "race/race_manager.hpp"
 
 // -----------------------------------------------------------------------------
-ReplayBase::ReplayBase()
+ReplayBase::ReplayBase():
+    m_filename("")
 {
-    m_filename = "";
-}   // ReplayBaese
+}   // ReplayBase
 // -----------------------------------------------------------------------------
 /** Opens a replay file (depending on the track name, which is taken from
  *  the race manager).
@@ -43,4 +43,4 @@ FILE* ReplayBase::openReplayFile(bool writeable)
     }
     return fd;
 
-}   // openReplayFilen
+}   // openReplayFile

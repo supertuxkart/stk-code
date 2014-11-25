@@ -82,14 +82,13 @@ using namespace irr;
 const float Track::NOHIT           = -99999.9f;
 
 // ----------------------------------------------------------------------------
-Track::Track(const std::string &filename)
-{
+Track::Track(const std::string &filename):
 #ifdef DEBUG
-    m_magic_number          = 0x17AC3802;
+    m_magic_number(0x17AC3802),
 #endif
-
-    m_materials_loaded      = false;
-    m_filename              = filename;
+    m_materials_loaded(false),
+    m_filename(filename)
+{
     m_root                  =
         StringUtils::getPath(StringUtils::removeExtension(m_filename));
     m_ident                 = StringUtils::getBasename(m_root);

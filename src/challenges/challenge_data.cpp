@@ -31,17 +31,16 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 
-ChallengeData::ChallengeData(const std::string& filename)
+ChallengeData::ChallengeData(const std::string& filename):
+    m_filename(filename),
+    m_mode(CM_SINGLE_RACE),
+    m_minor(RaceManager::MINOR_MODE_NORMAL_RACE),
+    m_num_laps(-1),
+    m_track_id(),
+    m_gp_id(),
+    m_version(0),
+    m_num_trophies(0)
 {
-    m_filename     = filename;
-    m_mode         = CM_SINGLE_RACE;
-    m_minor        = RaceManager::MINOR_MODE_NORMAL_RACE;
-    m_num_laps     = -1;
-    m_track_id     = "";
-    m_gp_id        = "";
-    m_version      = 0;
-    m_num_trophies = 0;
-
     for (int d=0; d<RaceManager::DIFFICULTY_COUNT; d++)
     {
         m_num_karts[d] = -1;

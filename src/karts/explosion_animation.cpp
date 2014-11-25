@@ -73,10 +73,10 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
 ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
                                        const Vec3 &explosion_position,
                                        bool direct_hit)
-                  : AbstractKartAnimation(kart, "ExplosionAnimation")
+                  : AbstractKartAnimation(kart, "ExplosionAnimation"),
+    m_xyz(m_kart->getXYZ()),
+    m_orig_y(m_xyz.getY())
  {
-    m_xyz = m_kart->getXYZ();
-    m_orig_y = m_xyz.getY();
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
     m_timer = m_kart->getKartProperties()->getExplosionTime() *
               m_kart->getPlayerDifficulty()->getExplosionTime();

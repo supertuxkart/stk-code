@@ -47,19 +47,17 @@ SFXBuffer::SFXBuffer(const std::string& file,
                      bool  positional,
                      float rolloff,
                      float max_dist,
-                     float gain)
-{
-    m_buffer      = 0;
-    m_gain        = 1.0f;
-    m_rolloff     = 0.1f;
-    m_loaded      = false;
-    m_max_dist    = max_dist;
-    m_duration    = -1.0f;
-    m_file        = file;
+                     float gain):
+    m_buffer(0),
+    m_loaded(false),
+    m_max_dist(max_dist),
+    m_duration(-1.0f),
+    m_file(file),
 
-    m_rolloff     = rolloff;
-    m_positional  = positional;
-    m_gain        = gain;
+    m_rolloff(rolloff),
+    m_positional(positional),
+    m_gain(gain)
+{
 }   // SFXBuffer
 
 //----------------------------------------------------------------------------
@@ -68,17 +66,16 @@ SFXBuffer::SFXBuffer(const std::string& file,
  *  \param node XML Node with the data for this sfx.
  */
 SFXBuffer::SFXBuffer(const std::string& file,
-                     const XMLNode* node)
+                     const XMLNode* node):
+    m_buffer(0),
+    m_gain(1.0f),
+    m_rolloff(0.1f),
+    m_max_dist(300.0f),
+    m_duration(-1.0f),
+    m_positional(false),
+    m_loaded(false),
+    m_file(file)
 {
-    m_buffer      = 0;
-    m_gain        = 1.0f;
-    m_rolloff     = 0.1f;
-    m_max_dist    = 300.0f;
-    m_duration    = -1.0f;
-    m_positional  = false;
-    m_loaded      = false;
-    m_file        = file;
-
     node->get("rolloff",     &m_rolloff    );
     node->get("positional",  &m_positional );
     node->get("volume",      &m_gain       );

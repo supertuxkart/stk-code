@@ -24,10 +24,9 @@
 
 #include <stdexcept>
 
-XMLNode::XMLNode(io::IXMLReader *xml)
+XMLNode::XMLNode(io::IXMLReader *xml):
+    m_file_name("[unknown]")
 {
-    m_file_name = "[unknown]";
-
     while(xml->getNodeType()!=io::EXN_ELEMENT && xml->read());
     readXML(xml);
 }   // XMLNode
@@ -36,10 +35,9 @@ XMLNode::XMLNode(io::IXMLReader *xml)
 /** Reads a XML file and convert it into a XMLNode tree.
  *  \param filename Name of the XML file to read.
  */
-XMLNode::XMLNode(const std::string &filename)
+XMLNode::XMLNode(const std::string &filename):
+    m_file_name(filename)
 {
-    m_file_name = filename;
-
     io::IXMLReader *xml = file_manager->createXMLReader(filename);
     
     if (xml == NULL)
@@ -174,7 +172,7 @@ const void XMLNode::getNodes(const std::string &s, std::vector<XMLNode*>& out) c
 */
 int XMLNode::get(const std::string &attribute, std::string *value) const
 {
-    if(m_attributes.size()==0) return 0;
+    if(m_attributes.empty()) return 0;
     std::map<std::string, core::stringw>::const_iterator o;
     o = m_attributes.find(attribute);
     if(o==m_attributes.end()) return 0;
@@ -184,7 +182,7 @@ int XMLNode::get(const std::string &attribute, std::string *value) const
 // ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, core::stringw *value) const
 {
-    if(m_attributes.size()==0) return 0;
+    if(m_attributes.empty()) return 0;
     std::map<std::string, core::stringw>::const_iterator o;
     o = m_attributes.find(attribute);
     if(o==m_attributes.end()) return 0;

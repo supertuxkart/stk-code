@@ -54,18 +54,16 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
                          const core::vector3df& scale, const char* interaction,
                          TrackObjectPresentation* presentation,
                          bool is_dynamic,
-                         const PhysicalObject::Settings* physics_settings)
+                         const PhysicalObject::Settings* physics_settings):
+    m_init_xyz(xyz),
+    m_init_hpr(hpr),
+    m_init_scale(scale),
+    m_enabled(true),
+    m_animator(NULL),
+    m_physical_object(NULL),
+    m_interaction(interaction),
+    m_presentation(presentation)
 {
-    m_init_xyz        = xyz;
-    m_init_hpr        = hpr;
-    m_init_scale      = scale;
-    m_enabled         = true;
-    m_presentation    = NULL;
-    m_animator        = NULL;
-    m_physical_object = NULL;
-    m_interaction     = interaction;
-    m_presentation    = presentation;
-
     if (m_interaction != "ghost" && m_interaction != "none" &&
         physics_settings )
     {

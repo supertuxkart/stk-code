@@ -25,12 +25,11 @@
 #include "physics/physics.hpp"
 
 AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
-                                             const std::string &name)
+                                             const std::string &name):
+    m_timer(0),
+    m_kart(kart),
+    m_name(name)
 {
-    m_timer = 0;
-    m_kart  = kart;
-    m_name  = name;
-
     // Remove previous animation if there is one
 #ifndef DEBUG
     // Use this code in non-debug mode to avoid a memory leak (and messed

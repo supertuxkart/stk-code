@@ -56,7 +56,7 @@ private:
         std::string s = version;
         std::string::iterator p = s.begin();
         while(p !=s.end() && (*p<'0') || (*p>'9') )
-            p++;
+            ++p;
         s.erase(s.begin(), p);
         m_version = StringUtils::splitToUInt(s, '.');
     }   // convertVersionString
