@@ -663,24 +663,24 @@ namespace UserConfigParams
             "If the kart is driving backwards faster than this value,\n"
             "switch automatically to reverse camera (set to 0 to disable).") );
 
-    PARAM_PREFIX FloatUserConfigParam       m_fspcam_direction_speed
-            PARAM_DEFAULT(  FloatUserConfigParam(0.003f, "fspcam_rotation_speed",
+    PARAM_PREFIX FloatUserConfigParam       m_fpscam_direction_speed
+            PARAM_DEFAULT(  FloatUserConfigParam(0.003f, "fpscam_rotation_speed",
             &m_camera,
             "How fast the first person camera's direction speed changes when\n"
             "moving the mouse (means acceleration).") );
 
-    PARAM_PREFIX FloatUserConfigParam       m_fspcam_smooth_direction_max_speed
-            PARAM_DEFAULT(  FloatUserConfigParam(0.04f, "fspcam_smooth_rotation_max_speed",
+    PARAM_PREFIX FloatUserConfigParam       m_fpscam_smooth_direction_max_speed
+            PARAM_DEFAULT(  FloatUserConfigParam(0.04f, "fpscam_smooth_rotation_max_speed",
             &m_camera,
             "How fast the first person camera's direction can change.") );
 
-    PARAM_PREFIX FloatUserConfigParam       m_fspcam_angular_velocity
-            PARAM_DEFAULT(  FloatUserConfigParam(0.02f, "fspcam_angular_velocity",
+    PARAM_PREFIX FloatUserConfigParam       m_fpscam_angular_velocity
+            PARAM_DEFAULT(  FloatUserConfigParam(0.02f, "fpscam_angular_velocity",
             &m_camera,
             "How fast the first person camera's rotation speed changes.") );
 
-    PARAM_PREFIX FloatUserConfigParam       m_fspcam_max_angular_velocity
-            PARAM_DEFAULT(  FloatUserConfigParam(1.0f, "fspcam_max_angular_velocity",
+    PARAM_PREFIX FloatUserConfigParam       m_fpscam_max_angular_velocity
+            PARAM_DEFAULT(  FloatUserConfigParam(1.0f, "fpscam_max_angular_velocity",
             &m_camera,
             "How fast the first person camera can rotate.") );
 

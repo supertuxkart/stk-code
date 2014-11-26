@@ -215,7 +215,7 @@ void InputManager::handleStaticAction(int key, int value)
 
             Camera *active_cam = Camera::getActiveCamera();
             active_cam->setAngularVelocity(value ?
-                UserConfigParams::m_fspcam_max_angular_velocity : 0.0f);
+                UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
             break;
         }
         case KEY_KEY_E:
@@ -225,7 +225,7 @@ void InputManager::handleStaticAction(int key, int value)
 
             Camera *active_cam = Camera::getActiveCamera();
             active_cam->setAngularVelocity(value ?
-                -UserConfigParams::m_fspcam_max_angular_velocity : 0);
+                -UserConfigParams::m_fpscam_max_angular_velocity : 0);
             break;
         }
 
@@ -971,9 +971,9 @@ EventPropagation InputManager::input(const SEvent& event)
                 int diff_x = event.MouseInput.X - m_mouse_val_x;
                 int diff_y = event.MouseInput.Y - m_mouse_val_y;
                 float mouse_x = ((float) diff_x) *
-                    UserConfigParams::m_fspcam_direction_speed;
+                    UserConfigParams::m_fpscam_direction_speed;
                 float mouse_y = ((float) diff_y) *
-                    -UserConfigParams::m_fspcam_direction_speed;
+                    -UserConfigParams::m_fpscam_direction_speed;
                 // No movement the first time it's used
                 // At the moment there's also a hard limit because the mouse
                 // gets reset to the middle of the screen and sometimes there
@@ -1044,7 +1044,10 @@ EventPropagation InputManager::input(const SEvent& event)
                 Camera *cam = Camera::getActiveCamera();
                 if (event.MouseInput.Wheel < 0)
                 {
-                    cam->setMaximumVelocity(cam->getMaximumVelocity() - 3);
+                    float vel = cam->getMaximumVelocity() - 3;
+                    if (vel < 0.0f)
+                        vel = 0.0f;
+                    cam->setMaximumVelocity(vel);
                 }
                 else if (event.MouseInput.Wheel > 0)
                 {
