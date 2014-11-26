@@ -1044,7 +1044,10 @@ EventPropagation InputManager::input(const SEvent& event)
                 Camera *cam = Camera::getActiveCamera();
                 if (event.MouseInput.Wheel < 0)
                 {
-                    cam->setMaximumVelocity(cam->getMaximumVelocity() - 3);
+                    float vel = cam->getMaximumVelocity() - 3;
+                    if (vel < 0.0f)
+                        vel = 0.0f;
+                    cam->setMaximumVelocity(vel);
                 }
                 else if (event.MouseInput.Wheel > 0)
                 {
