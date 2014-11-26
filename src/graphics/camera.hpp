@@ -257,7 +257,7 @@ public:
     int  getIndex() const  {return m_index;}
     void reset             ();
     void setInitialTransform();
-    void activate();
+    void activate(bool alsoActivateInIrrlicht=true);
     void update            (float dt);
     void setKart           (AbstractKart *new_kart);
 

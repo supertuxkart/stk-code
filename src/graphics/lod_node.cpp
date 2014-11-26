@@ -75,7 +75,6 @@ int LODNode::getLevel()
     if(m_forced_lod>-1)
         return m_forced_lod;
 
-    scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
     Camera* camera = Camera::getActiveCamera();
     if (camera == NULL)
         return (int)m_detail.size() - 1;

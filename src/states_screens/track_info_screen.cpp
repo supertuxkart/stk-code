@@ -59,7 +59,6 @@ DEFINE_SCREEN_SINGLETON( TrackInfoScreen );
 TrackInfoScreen::TrackInfoScreen()
           : Screen("track_info.stkgui")
 {
-    m_screenshot = NULL;
 }   // TrackInfoScreen
 
 // ----------------------------------------------------------------------------
@@ -80,6 +79,10 @@ void TrackInfoScreen::loadedFromFile()
     m_highscore_entries[0] = getWidget<LabelWidget>("highscore1");
     m_highscore_entries[1] = getWidget<LabelWidget>("highscore2");
     m_highscore_entries[2] = getWidget<LabelWidget>("highscore3");
+    
+    GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
+    screenshot->setFocusable(false);
+    screenshot->m_tab_stop = false;
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -105,37 +108,24 @@ void TrackInfoScreen::init()
                                                false );
 
     // ---- Track screenshot
-    Widget* screenshot_div = getWidget("screenshot_div");
-    if(!m_screenshot || !m_widgets.contains(m_screenshot))
-    {
-        m_screenshot =
-            new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
-                                 false /* tab stop */, false /* focusable */);
-        m_screenshot->setCustomAspectRatio(4.0f / 3.0f);
+    GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
 
-        m_screenshot->m_x = screenshot_div->m_x;
-        m_screenshot->m_y = screenshot_div->m_y;
-        m_screenshot->m_w = screenshot_div->m_w;
-        m_screenshot->m_h = screenshot_div->m_h;
-        m_screenshot->add();
-        m_widgets.push_back(m_screenshot);
-    }
     // images are saved squared, but must be stretched to 4:
 
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
-    m_screenshot->m_properties[PROP_ICON] = "gui/main_help.png";
+    screenshot->m_properties[PROP_ICON] = "gui/main_help.png";
 
-    ITexture* screenshot = irr_driver->getTexture(m_track->getScreenshotFile(),
+    ITexture* image = irr_driver->getTexture(m_track->getScreenshotFile(),
                                     "While loading screenshot for track '%s':",
                                            m_track->getFilename()            );
-    if(!screenshot)
+    if(!image)
     {
-        screenshot = irr_driver->getTexture("main_help.png",
+        image = irr_driver->getTexture("main_help.png",
                                     "While loading screenshot for track '%s':",
                                     m_track->getFilename());
     }
-    if (screenshot != NULL)
-        m_screenshot->setImage(screenshot);
+    if (image != NULL)
+        screenshot->setImage(image);
 
     // Lap count m_lap_spinner
     // -----------------------

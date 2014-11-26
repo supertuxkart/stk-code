@@ -44,6 +44,7 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_texture = NULL;
     m_deactivated_texture = NULL;
     m_highlight_texture = NULL;
+    
     m_custom_aspect_ratio = 1.0f;
 
     m_texture_w = 0;
@@ -103,6 +104,12 @@ void IconButtonWidget::add()
     // irrlicht widgets don't support scaling while keeping aspect ratio
     // so, happily, let's implement it ourselves
     float useAspectRatio = -1.0f;
+    
+    if (m_properties[PROP_CUSTOM_RATIO] != "")
+    {
+        m_custom_aspect_ratio = atof(m_properties[PROP_CUSTOM_RATIO].c_str());
+        m_scale_mode = SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO;
+    }
 
     if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO)
     {

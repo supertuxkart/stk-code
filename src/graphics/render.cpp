@@ -166,8 +166,7 @@ void IrrDriver::renderGLSL(float dt)
         oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-        if (!UserConfigParams::m_dynamic_lights)
-            camera->activate();
+        camera->activate(!UserConfigParams::m_dynamic_lights);
         rg->preRenderCallback(camera);   // adjusts start referee
         m_scene_manager->setActiveCamera(camnode);
 

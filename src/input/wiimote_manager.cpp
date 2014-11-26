@@ -164,7 +164,7 @@ void WiimoteManager::launchDetection(int timeout)
 
     device_manager->getConfigForGamepad(WIIMOTE_START_IRR_ID, "Wiimote",
                                         &gamepad_config);
-    int num_buttons = (int)( log((float)WIIMOTE_BUTTON_ALL) / log(2.0f))+1;
+    int num_buttons = (int)( log((float)WIIMOTE_BUTTON_ALL) / log((float)2.0f))+1;
     gamepad_config->setNumberOfButtons(num_buttons);
     gamepad_config->setNumberOfAxis(1);
 
@@ -213,7 +213,7 @@ void WiimoteManager::launchDetection(int timeout)
  */
 int getButton(int n)
 {
-    return (int)(log((float)n)/log(2.0f));
+    return (int)(log((float)n)/log((float)2.0f));
 }   // getButton
 
 // ----------------------------------------------------------------------------

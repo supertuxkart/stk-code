@@ -209,7 +209,8 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 void SFXManager::queueCommand(SFXCommand *command)
 {
     m_sfx_commands.lock();
-    if(m_sfx_commands.getData().size() > 20*race_manager->getNumberOfKarts()+20)
+    if(m_sfx_commands.getData().size() > 20*race_manager->getNumberOfKarts()+20 &&
+        race_manager->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
     {
         if(command->m_command==SFX_POSITION || command->m_command==SFX_LOOP ||
             command->m_command==SFX_PLAY   || command->m_command==SFX_SPEED    )

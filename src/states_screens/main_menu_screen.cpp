@@ -89,6 +89,8 @@ void MainMenuScreen::loadedFromFile()
     rw->removeChildNamed("test_gplose");
     rw->removeChildNamed("test_unlocked");
     rw->removeChildNamed("test_unlocked2");
+    rw->removeChildNamed("test_intro");
+    rw->removeChildNamed("test_outro");
 #endif
 }   // loadedFromFile
 
@@ -346,6 +348,37 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             scene->push();
         }
     }
+    else if (selection == "test_intro")
+    {
+        CutsceneWorld::setUseDuration(true);
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts(0);
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLocalPlayers(0);
+        race_manager->startSingleRace("introcutscene", 999, false);
+
+        std::vector<std::string> parts;
+        parts.push_back("introcutscene");
+        parts.push_back("introcutscene2");
+        ((CutsceneWorld*)World::getWorld())->setParts(parts);
+        //race_manager->startSingleRace("introcutscene2", 999, false);
+        return;
+    }
+    else if (selection == "test_outro")
+    {
+        CutsceneWorld::setUseDuration(true);
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts(0);
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLocalPlayers(0);
+        race_manager->startSingleRace("endcutscene", 999, false);
+
+        std::vector<std::string> parts;
+        parts.push_back("endcutscene");
+        ((CutsceneWorld*)World::getWorld())->setParts(parts);
+    }
     else
 #endif
     if (selection == "new")
@@ -463,7 +496,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             // For 0.8.2 disable the server menu, instead go to online profile
             //OnlineScreen::getInstance()->push();
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-            OnlineProfileAchievements::getInstance()->push();
+            TabOnlineProfileAchievements::getInstance()->push();
         }
         else
         {
@@ -488,6 +521,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == "gpEditor")
     {
         GrandPrixEditorScreen::getInstance()->push();
+    }
+    else if (selection == "achievements")
+    {
+        OnlineProfileAchievements::getInstance()->push();
     }
 }   // eventCallback
 
