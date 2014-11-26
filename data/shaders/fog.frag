@@ -15,7 +15,9 @@ void main()
     vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
 
     float dist = length(xpos.xyz);
-    vec3 fog = col * (1. - exp(- density * dist));
+    float factor = (1. - exp(- density * dist));
+    vec3 fog = col * factor;
 
-    FragColor = vec4(fog, 1.);
+    // fog is scattering component, factor is the beer lambert absorption
+    FragColor = vec4(fog, factor);
 }

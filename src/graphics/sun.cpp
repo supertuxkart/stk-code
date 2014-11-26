@@ -49,11 +49,10 @@ SunNode::~SunNode()
 
 void SunNode::render()
 {
-    SunLightProvider * const cb = (SunLightProvider *) irr_driver->getCallback(ES_SUNLIGHT);
-    cb->setColor(m_color[0], m_color[1], m_color[2]);
+    irr_driver->setSunColor(video::SColorf(m_color[0], m_color[1], m_color[2]));
 
     vector3df pos = getPosition();
-    cb->setPosition(pos.X, pos.Y, pos.Z);
+    irr_driver->setSunDirection(pos);
     return;
 
 /*    array<IRenderTarget> mrt;

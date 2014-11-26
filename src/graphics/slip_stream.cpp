@@ -19,9 +19,10 @@
 #include "graphics/slip_stream.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
@@ -100,7 +101,13 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
         {
             vertices[i].Pos   = p[i].toIrrVector();
             vertices[i].Color = red;
+            vertices[i].TCoords = core::vector2df(0, 0);
         }
+        video::SMaterial &mat = buffer->getMaterial();
+        // Meshes need a texture, otherwise stk crashes.
+        video::ITexture *red_texture = getUnicolorTexture(red);
+        mat.setTexture(0, red_texture);
+
         buffer->recalculateBoundingBox();
         m_mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_node = irr_driver->addMesh(m_debug_mesh, "splistream_debug", m_kart->getNode());
@@ -340,6 +347,8 @@ void SlipStream::updateSlipstreamPower()
 void SlipStream::setDebugColor(const video::SColor &color)
 {
     if(!UserConfigParams::m_slipstream_debug) return;
+    // FIXME: Does not work anymore - the colour is changed, but
+    // visually there is no change.
     scene::IMeshBuffer *buffer = m_debug_mesh->getMeshBuffer(0);
     irr::video::S3DVertex* vertices =
         (video::S3DVertex*)buffer->getVertices();

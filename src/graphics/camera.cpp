@@ -90,6 +90,7 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     m_target_velocity = core::vector3df(0, 0, 0);
     m_target_direction = core::vector3df(0, 0, 1);
     m_target_up_vector = core::vector3df(0, 1, 0);
+    m_direction_velocity = core::vector3df(0, 0, 0);
     m_angular_velocity = 0;
     m_target_angular_velocity = 0;
     m_max_velocity = 15;
@@ -500,13 +501,13 @@ void Camera::update(float dt)
             // Angular velocity
             if (m_angular_velocity < m_target_angular_velocity)
             {
-                m_angular_velocity += 0.02f;
+                m_angular_velocity += UserConfigParams::m_fspcam_angular_velocity;
                 if (m_angular_velocity > m_target_angular_velocity)
                     m_angular_velocity = m_target_angular_velocity;
             }
             else if (m_angular_velocity > m_target_angular_velocity)
             {
-                m_angular_velocity -= 0.02f;
+                m_angular_velocity -= UserConfigParams::m_fspcam_angular_velocity;
                 if (m_angular_velocity < m_target_angular_velocity)
                     m_angular_velocity = m_target_angular_velocity;
             }
@@ -524,17 +525,25 @@ void Camera::update(float dt)
             diff = m_target_direction - direction;
             if (diff.X != 0 || diff.Y != 0 || diff.Z != 0)
             {
-                if (diff.getLengthSQ() > 0.02f * 0.02f)
-                    diff.setLength(0.02f);
-                direction += diff;
+                diff.setLength(UserConfigParams::m_fspcam_direction_speed);
+                m_direction_velocity += diff;
+                if (m_direction_velocity.getLengthSQ() >
+                    UserConfigParams::m_fspcam_smooth_direction_max_speed *
+                    UserConfigParams::m_fspcam_smooth_direction_max_speed)
+                    m_direction_velocity.setLength(
+                        UserConfigParams::m_fspcam_smooth_direction_max_speed);
+                direction += m_direction_velocity;
+                m_target_direction = direction;
             }
 
             // Camera rotation
             diff = m_target_up_vector - up;
             if (diff.X != 0 || diff.Y != 0 || diff.Z != 0)
             {
-                if (diff.getLengthSQ() > 0.02f * 0.02f)
-                    diff.setLength(0.02f);
+                if (diff.getLengthSQ() >
+                    UserConfigParams::m_fspcam_angular_velocity *
+                    UserConfigParams::m_fspcam_angular_velocity)
+                    diff.setLength(UserConfigParams::m_fspcam_angular_velocity);
                 up += diff;
             }
         }
@@ -727,13 +736,15 @@ void Camera::handleEndCamera(float dt)
 /** Sets viewport etc. for this camera. Called from irr_driver just before
  *  rendering the view for this kart.
  */
-void Camera::activate()
+void Camera::activate(bool alsoActivateInIrrlicht)
 {
     s_active_camera = this;
-    irr::scene::ISceneManager *sm = irr_driver->getSceneManager();
-    sm->setActiveCamera(m_camera);
-    irr_driver->getVideoDriver()->setViewPort(m_viewport);
-
+    if (alsoActivateInIrrlicht)
+    {
+        irr::scene::ISceneManager *sm = irr_driver->getSceneManager();
+        sm->setActiveCamera(m_camera);
+        irr_driver->getVideoDriver()->setViewPort(m_viewport);
+    }
 }   // activate
 
 // ----------------------------------------------------------------------------

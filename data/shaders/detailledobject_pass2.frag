@@ -18,7 +18,7 @@ varying vec2 uv_bis;
 #define FragColor gl_FragColor
 #endif
 
-vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue);
+vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);
 
 void main(void)
 {
@@ -31,5 +31,5 @@ void main(void)
     vec4 detail = texture(Detail, uv_bis);
     color *= detail;
     float specmap = texture(SpecMap, uv).g;
-    FragColor = vec4(getLightFactor(color.xyz, vec3(1.), specmap), 1.);
+    FragColor = vec4(getLightFactor(color.xyz, vec3(1.), specmap, 0.), 1.);
 }

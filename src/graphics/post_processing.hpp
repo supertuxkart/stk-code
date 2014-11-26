@@ -76,8 +76,8 @@ public:
     void         update(float dt);
 
     /** Generate diffuse and specular map */
-    void         renderSunlight();
-    void         renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, unsigned depthtex);
+    void         renderSunlight(const core::vector3df &direction, const video::SColorf &col);
+    void         renderShadowedSunlight(const core::vector3df &direction, const video::SColorf &col, const std::vector<core::matrix4> &sun_ortho_matrix, unsigned depthtex);
 
     void renderFog();
     void renderSSAO();

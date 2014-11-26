@@ -58,7 +58,6 @@ GPInfoScreen::GPInfoScreen() : Screen("gp_info.stkgui")
     m_curr_time = 0.0f;
     // Necessary to test if loadedFroMFile() was executed (in setGP)
     m_reverse_spinner   = NULL;
-    m_screenshot_widget = NULL;
     m_max_num_tracks = 0;
 }   // GPInfoScreen
 
@@ -84,6 +83,10 @@ void GPInfoScreen::loadedFromFile()
     m_num_tracks_spinner->setValue(1);
 
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
+    
+    GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
+    screenshot->setFocusable(false);
+    screenshot->m_tab_stop = false;
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -266,34 +269,18 @@ void GPInfoScreen::addTracks()
  */
 void GPInfoScreen::addScreenshot()
 {
-    Widget* screenshot_div = getWidget("screenshot_div");
-
-    if(!m_screenshot_widget || !m_widgets.contains(m_screenshot_widget))
-    {
-        m_screenshot_widget = new IconButtonWidget(
-            IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
-            false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-        m_widgets.push_back(m_screenshot_widget);
-    }
-    // images are saved squared, but must be stretched to 4:3
-    m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
-    m_screenshot_widget->m_x = screenshot_div->m_x;
-    m_screenshot_widget->m_y = screenshot_div->m_y;
-    m_screenshot_widget->m_w = screenshot_div->m_w;
-    m_screenshot_widget->m_h = screenshot_div->m_h;
-
+    GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
 
     // Temporary icon, will replace it just after
     // (but it will be shown if the given icon is not found)
-    m_screenshot_widget->m_properties[PROP_ICON] = "gui/main_help.png";
-    m_screenshot_widget->add();
+    screenshot->m_properties[PROP_ICON] = "gui/main_help.png";
 
     const Track *track = track_manager->getTrack(m_gp.getTrackId(0));
-    video::ITexture* screenshot = irr_driver->getTexture(track->getScreenshotFile(),
+    video::ITexture* image = irr_driver->getTexture(track->getScreenshotFile(),
                                     "While loading screenshot for track '%s':",
                                            track->getFilename()            );
-    if (screenshot != NULL)
-        m_screenshot_widget->setImage(screenshot);
+    if (image != NULL)
+        screenshot->setImage(image);
 }   // addScreenShot
 
 // ----------------------------------------------------------------------------
@@ -378,8 +365,9 @@ void GPInfoScreen::onUpdate(float dt)
 
     Track* track = track_manager->getTrack(tracks[frame_after]);
     std::string file = track->getScreenshotFile();
-    m_screenshot_widget->setImage(file, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    m_screenshot_widget->m_properties[PROP_ICON] = file;
+    GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
+    screenshot->setImage(file, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    screenshot->m_properties[PROP_ICON] = file;
 }   // onUpdate
 
 /** Get number of available tracks for random GPs 

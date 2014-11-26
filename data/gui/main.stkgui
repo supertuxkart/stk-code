@@ -45,14 +45,20 @@
                              text="TEST: GPLose" label_location="hover"/>
                 <icon-button id="test_unlocked" width="64" height="64" icon="gui/main_options.png" extend_label="50"
                              text="TEST: Unlocked" label_location="hover"/>
-                 <icon-button id="test_unlocked2" width="64" height="64" icon="gui/main_options.png" extend_label="50"
-                             text="TEST: Unlocked 2" label_location="hover"/>      
+                <icon-button id="test_unlocked2" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                             text="TEST: Unlocked 2" label_location="hover"/>
+                <icon-button id="test_intro" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                             text="TEST: Intro" label_location="hover"/>
+                <icon-button id="test_outro" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                             text="TEST: Outro" label_location="hover"/>     
                 <icon-button id="options" width="64" height="64" icon="gui/main_options.png" extend_label="50"
                              I18N="In the main screen"  text="Options" label_location="hover"/>
                 <icon-button id="help" width="64" height="64" icon="gui/main_help.png"  extend_label="50"
                              I18N="In the main screen" text="Help" label_location="hover"/>
                 <icon-button id="startTutorial" width="64" height="64" icon="gui/tutorial.png" extend_label="150"
                              I18N="In the main screen" text="Tutorial" label_location="hover"/>
+                <icon-button id="achievements" width="64" height="64" icon="gui/gp_copy.png" extend_label="150"
+                             I18N="In the main screen" text="Achievements" label_location="hover"/>
                 <icon-button id="gpEditor" width="64" height="64" icon="gui/gpeditor.png" extend_label="150"
                              I18N="In the main screen" text="Grand Prix Editor" label_location="hover"/>
                 <icon-button id="about" width="64" height="64" icon="gui/main_about.png"  extend_label="50"

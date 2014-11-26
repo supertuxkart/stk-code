@@ -208,9 +208,6 @@ void STKAnimatedMesh::updateGL()
 
 void STKAnimatedMesh::render()
 {
-    bool isTransparentPass =
-        SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
-
     ++PassCount;
 
     updateNoGL();

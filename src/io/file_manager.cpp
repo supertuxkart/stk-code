@@ -1284,7 +1284,12 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
 
     const int BUFFER_SIZE=32768;
     char *buffer = new char[BUFFER_SIZE];
-    if(!buffer) return false;
+    if(!buffer)
+    {
+        fclose(f_source);
+        fclose(f_dest);
+        return false;
+    }
     size_t n;
     while((n=fread(buffer, 1, BUFFER_SIZE, f_source))>0)
     {

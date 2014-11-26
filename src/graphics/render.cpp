@@ -166,8 +166,7 @@ void IrrDriver::renderGLSL(float dt)
         oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-        if (!UserConfigParams::m_dynamic_lights)
-            camera->activate();
+        camera->activate(!UserConfigParams::m_dynamic_lights);
         rg->preRenderCallback(camera);   // adjusts start referee
         m_scene_manager->setActiveCamera(camnode);
 
@@ -420,13 +419,17 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         World::getWorld()->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(getGPUTimer(Q_FOG));
         renderLightsScatter(pointlightcount);
         PROFILER_POP_CPU_MARKER();
     }
 
-    PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-    renderSkybox(camnode);
-    PROFILER_POP_CPU_MARKER();
+    {
+        PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
+        ScopedGPUTimer Timer(getGPUTimer(Q_SKYBOX));
+        renderSkybox(camnode);
+        PROFILER_POP_CPU_MARKER();
+    }
 
     if (getRH())
     {
@@ -444,6 +447,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     // Render anything glowing.
     if (!m_mipviz && !m_wireframe && UserConfigParams::m_glow)
     {
+        ScopedGPUTimer Timer(getGPUTimer(Q_GLOW));
         irr_driver->setPhase(GLOW_PASS);
         renderGlow(glows);
     } // end glow

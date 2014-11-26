@@ -652,10 +652,37 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(
             CONSOLE_DEFAULT, "log_errors", "Enable logging to console.") );
 
+    // ---- Camera
+    PARAM_PREFIX GroupUserConfigParam        m_camera
+            PARAM_DEFAULT( GroupUserConfigParam("camera",
+                                                "(Debug) camera settings.") );
+
     PARAM_PREFIX IntUserConfigParam         m_reverse_look_threshold
             PARAM_DEFAULT(  IntUserConfigParam(0, "reverse_look_threshold",
+            &m_camera,
             "If the kart is driving backwards faster than this value,\n"
             "switch automatically to reverse camera (set to 0 to disable).") );
+
+    PARAM_PREFIX FloatUserConfigParam       m_fspcam_direction_speed
+            PARAM_DEFAULT(  FloatUserConfigParam(0.003f, "fspcam_rotation_speed",
+            &m_camera,
+            "How fast the first person camera's direction speed changes when\n"
+            "moving the mouse (means acceleration).") );
+
+    PARAM_PREFIX FloatUserConfigParam       m_fspcam_smooth_direction_max_speed
+            PARAM_DEFAULT(  FloatUserConfigParam(0.04f, "fspcam_smooth_rotation_max_speed",
+            &m_camera,
+            "How fast the first person camera's direction can change.") );
+
+    PARAM_PREFIX FloatUserConfigParam       m_fspcam_angular_velocity
+            PARAM_DEFAULT(  FloatUserConfigParam(0.02f, "fspcam_angular_velocity",
+            &m_camera,
+            "How fast the first person camera's rotation speed changes.") );
+
+    PARAM_PREFIX FloatUserConfigParam       m_fspcam_max_angular_velocity
+            PARAM_DEFAULT(  FloatUserConfigParam(1.0f, "fspcam_max_angular_velocity",
+            &m_camera,
+            "How fast the first person camera can rotate.") );
 
     PARAM_PREFIX StringUserConfigParam      m_item_style
             PARAM_DEFAULT(  StringUserConfigParam("items", "item_style",
@@ -672,6 +699,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file",
                                                   "Name of the skin to use") );
 
+    // ---- Handicap
     PARAM_PREFIX GroupUserConfigParam       m_handicap
             PARAM_DEFAULT( GroupUserConfigParam("Handicap",
                                           "Everything related to handicaps.") );

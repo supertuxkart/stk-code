@@ -269,32 +269,28 @@ void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3
     DrawFullScreenEffect<FullScreenShader::GlobalIlluminationReconstructionShader>(RHMatrix, InvRHMatrix, rh_extend);
 }
 
-void PostProcessing::renderSunlight()
+void PostProcessing::renderSunlight(const core::vector3df &direction, const video::SColorf &col)
 {
-  SunLightProvider * const cb = (SunLightProvider *) irr_driver->getCallback(ES_SUNLIGHT);
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBlendEquation(GL_FUNC_ADD);
 
-  glEnable(GL_BLEND);
-  glDisable(GL_DEPTH_TEST);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBlendEquation(GL_FUNC_ADD);
-
-  FullScreenShader::SunLightShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture());
-  DrawFullScreenEffect<FullScreenShader::SunLightShader>(cb->getPosition(), video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
+    FullScreenShader::SunLightShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture());
+    DrawFullScreenEffect<FullScreenShader::SunLightShader>(direction, col);
 }
 
 extern float shadowSplit[5];
 
-void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, GLuint depthtex)
+void PostProcessing::renderShadowedSunlight(const core::vector3df &direction, const video::SColorf &col, const std::vector<core::matrix4> &sun_ortho_matrix, GLuint depthtex)
 {
-    SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
-
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_ONE, GL_ONE);
     glBlendEquation(GL_FUNC_ADD);
 
     FullScreenShader::ShadowedSunLightShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), depthtex);
-    DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShader>(shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4], cb->getPosition(), video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
+    DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShader>(shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4], direction, col);
 }
 
 
@@ -412,7 +408,7 @@ void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo, FrameBuffer &auxi
         in_fbo.Bind();
 
         FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(auxiliary.getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0);
+        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0f);
     }
 }
 
@@ -523,11 +519,7 @@ void PostProcessing::renderFog()
     const Track * const track = World::getWorld()->getTrack();
 
     // This function is only called once per frame - thus no need for setters.
-    const float fogmax = track->getFogMax();
-    const float startH = track->getFogStartHeight();
-    const float endH = track->getFogEndHeight();
     const float start = track->getFogStart();
-    const float end = track->getFogEnd();
     const SColor tmpcol = track->getFogColor();
 
     core::vector3df col( tmpcol.getRed() / 255.0f,

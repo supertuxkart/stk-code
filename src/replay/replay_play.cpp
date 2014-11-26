@@ -100,7 +100,7 @@ void ReplayPlay::Load()
         Log::fatal("Replay", "Could not read '%s'.", getReplayFilename().c_str());
 
     unsigned int version;
-    if (sscanf(s,"Version: %d", &version) != 1)
+    if (sscanf(s,"Version: %u", &version) != 1)
         Log::fatal("Replay", "No Version information found in replay file (bogus replay file).");
 
     if (version != getReplayVersion())
@@ -130,7 +130,7 @@ void ReplayPlay::Load()
 
     unsigned int num_laps;
     fgets(s, 1023, fd);
-    if(sscanf(s, "Laps: %d", &num_laps) != 1)
+    if(sscanf(s, "Laps: %u", &num_laps) != 1)
         Log::fatal("Replay", "No number of laps found in replay file.");
 
     race_manager->setNumLaps(num_laps);
@@ -164,7 +164,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
 
     fgets(s, 1023, fd);
     unsigned int size;
-    if(sscanf(s,"size: %d",&size)!=1)
+    if(sscanf(s,"size: %u",&size)!=1)
         Log::fatal("Replay", "Number of records not found in replay file "
             "for kart %d.",
             m_ghost_karts.size()-1);
@@ -198,7 +198,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
     }   // for i
     fgets(s, 1023, fd);
     unsigned int num_events;
-    if(sscanf(s,"events: %d",&num_events)!=1)
+    if(sscanf(s,"events: %u",&num_events)!=1)
         Log::warn("Replay", "Number of events not found in replay file "
                 "for kart %d.", m_ghost_karts.size()-1);
 

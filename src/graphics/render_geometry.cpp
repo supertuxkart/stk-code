@@ -644,14 +644,13 @@ void IrrDriver::renderSolidSecondPass()
 
             // template does not work with template due to extra depth texture
             {
-                SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
                 glUseProgram(GrassMat::InstancedSecondPassShader::getInstance()->Program);
                 glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(GrassMat::VertexType, GrassMat::Instance));
                 uint64_t nulltex[10] = {};
                 if (SolidPassCmd::getInstance()->Size[GrassMat::MaterialType])
                 {
                     HandleExpander<GrassMat::InstancedSecondPassShader>::Expand(nulltex, GrassMat::SecondPassTextures, DiffuseHandle, SpecularHandle, SSAOHandle, DepthHandle);
-                    GrassMat::InstancedSecondPassShader::getInstance()->setUniforms(windDir, cb->getPosition());
+                    GrassMat::InstancedSecondPassShader::getInstance()->setUniforms(windDir, irr_driver->getSunDirection());
                     glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
                         (const void*)(SolidPassCmd::getInstance()->Offset[GrassMat::MaterialType] * sizeof(DrawElementsIndirectCommand)),
                         (int)SolidPassCmd::getInstance()->Size[GrassMat::MaterialType],
@@ -670,7 +669,6 @@ void IrrDriver::renderSolidSecondPass()
 
             // template does not work with template due to extra depth texture
             {
-                SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
                 std::vector<GLMesh *> &meshes = GrassMat::InstancedList::getInstance()->SolidPass;
                 glUseProgram(GrassMat::InstancedSecondPassShader::getInstance()->Program);
                 glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(GrassMat::VertexType, GrassMat::Instance));
@@ -678,7 +676,7 @@ void IrrDriver::renderSolidSecondPass()
                 {
                     GLMesh *mesh = meshes[i];
                     TexExpander<GrassMat::InstancedSecondPassShader>::ExpandTex(*mesh, GrassMat::SecondPassTextures, DiffSpecSSAOTex[0], DiffSpecSSAOTex[1], DiffSpecSSAOTex[2], irr_driver->getDepthStencilTexture());
-                    GrassMat::InstancedSecondPassShader::getInstance()->setUniforms(windDir, cb->getPosition());
+                    GrassMat::InstancedSecondPassShader::getInstance()->setUniforms(windDir, irr_driver->getSunDirection());
                     glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((SolidPassCmd::getInstance()->Offset[GrassMat::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
                 }
             }
@@ -694,7 +692,6 @@ static void renderInstancedMeshNormals()
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        GLMesh *mesh = meshes[i];
         MeshShader::NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
     }

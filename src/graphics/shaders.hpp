@@ -690,14 +690,11 @@ public:
     ACT(ES_GAUSSIAN3H) \
     ACT(ES_GAUSSIAN3V) \
     ACT(ES_MIPVIZ) \
-    ACT(ES_COLORIZE) \
     ACT(ES_OBJECT_UNLIT) \
     ACT(ES_OBJECTPASS) \
     ACT(ES_OBJECTPASS_REF) \
-    ACT(ES_SUNLIGHT) \
     ACT(ES_OBJECTPASS_RIMLIT) \
     ACT(ES_DISPLACE) \
-    ACT(ES_PASSFAR) \
 
 #define ENUM(a) a,
 #define STR(a) #a,
