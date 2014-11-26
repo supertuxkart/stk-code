@@ -107,7 +107,8 @@ void IconButtonWidget::add()
     
     if (m_properties[PROP_CUSTOM_RATIO] != "")
     {
-        m_custom_aspect_ratio = atof(m_properties[PROP_CUSTOM_RATIO].c_str());
+        StringUtils::fromString(m_properties[PROP_CUSTOM_RATIO],
+                                m_custom_aspect_ratio);
         m_scale_mode = SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO;
     }
 

@@ -37,7 +37,7 @@ namespace GUIEngine { class Widget; }
 class OnlineProfileBase : public GUIEngine::Screen
 {
 protected:
-    OnlineProfileBase(const char* filename);
+    OnlineProfileBase(const std::string &filename);
 
     /** Pointer to the various widgets on the screen. */
     GUIEngine::LabelWidget * m_header;

@@ -515,7 +515,8 @@ void IrrDriver::initDevice()
 #else
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
 #endif
-    initGL();
+    if (!ProfileWorld::isNoGraphics())
+        initGL();
     m_sync = 0;
 
     // Parse extensions

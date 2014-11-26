@@ -533,17 +533,13 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device)
         }
     }
 
+    // select something (anything) in the ribbon; by default, only the
+    // game master has something selected. Thus, when a new player joins,
+    // we need to select something for them
+    w->setSelection(new_player_id, new_player_id, true);
 
-    if (!first_player)
-    {
-        // select something (anything) in the ribbon; by default, only the
-        // game master has something selected. Thus, when a new player joins,
-        // we need to select something for them
-        w->setSelection(new_player_id, new_player_id, true);
-
-        newPlayerWidget->m_player_ident_spinner
-                       ->setFocusForPlayer(new_player_id);
-    }
+    newPlayerWidget->m_player_ident_spinner
+                   ->setFocusForPlayer(new_player_id);
 
     if (!m_multiplayer)
     {

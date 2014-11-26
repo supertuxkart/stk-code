@@ -496,7 +496,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             // For 0.8.2 disable the server menu, instead go to online profile
             //OnlineScreen::getInstance()->push();
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-            OnlineProfileAchievements::getInstance()->push();
+            TabOnlineProfileAchievements::getInstance()->push();
         }
         else
         {
@@ -521,6 +521,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == "gpEditor")
     {
         GrandPrixEditorScreen::getInstance()->push();
+    }
+    else if (selection == "achievements")
+    {
+        OnlineProfileAchievements::getInstance()->push();
     }
 }   // eventCallback
 

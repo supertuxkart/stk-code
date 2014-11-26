@@ -62,7 +62,7 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
 // -----------------------------------------------------------------------------
 DynamicRibbonWidget::~DynamicRibbonWidget()
 {
-    delete m_font;
+    m_font->drop();
     if (m_animated_contents)
     {
         GUIEngine::needsUpdate.remove(this);
