@@ -97,6 +97,9 @@ public:
     {
         ScalableFont* out = new ScalableFont(*this);
         out->m_is_hollow_copy = true;
+        //FIXME: test only. Reset the reference counter of the copy to 1
+        while (out->getReferenceCount() > 1)
+            out->drop();
         return out;
     }
 
