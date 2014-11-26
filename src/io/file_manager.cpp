@@ -423,6 +423,7 @@ XMLNode *FileManager::createXMLTreeFromString(const std::string & content)
     try
     {
         char *b = new char[content.size()];
+        assert(b);
         memcpy(b, content.c_str(), content.size());
         io::IReadFile * ireadfile =
             m_file_system->createMemoryReadFile(b, (int)content.size(),
