@@ -280,6 +280,13 @@ void IrrDriver::renderGLSL(float dt)
         PROFILER_POP_CPU_MARKER();
     }   // for i<world->getNumKarts()
 
+    // Use full screen size
+    float tmp[2];
+    tmp[0] = float(UserConfigParams::m_width);
+    tmp[1] = float(UserConfigParams::m_height);
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float), 2 * sizeof(float), tmp);
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
