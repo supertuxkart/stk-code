@@ -800,30 +800,47 @@ bool CIrrDeviceMacOSX::createWindow()
 						{
 							CGLPixelFormatAttribute	fullattribs[] =
 							{
-								kCGLPFAFullScreen,
-								kCGLPFADisplayMask, (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(display),
+                                kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute)kCGLOGLPVersion_3_2_Core,
+								//kCGLPFAFullScreen,
+								//kCGLPFADisplayMask, (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(display),
 								kCGLPFADoubleBuffer,
-								kCGLPFANoRecovery,
-								kCGLPFAAccelerated,
+								//kCGLPFANoRecovery,
+								//kCGLPFAAccelerated,
 								kCGLPFADepthSize, (CGLPixelFormatAttribute)depthSize,
 								kCGLPFAColorSize, (CGLPixelFormatAttribute)CreationParams.Bits,
-								kCGLPFAAlphaSize, (CGLPixelFormatAttribute)alphaSize,
-								kCGLPFASampleBuffers, (CGLPixelFormatAttribute)(CreationParams.AntiAlias?1:0),
-								kCGLPFASamples, (CGLPixelFormatAttribute)CreationParams.AntiAlias,
-								kCGLPFAStencilSize, (CGLPixelFormatAttribute)(CreationParams.Stencilbuffer?1:0),
-                                kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute)kCGLOGLPVersion_3_2_Core,
+								//kCGLPFAAlphaSize, (CGLPixelFormatAttribute)alphaSize,
+								//kCGLPFASampleBuffers, (CGLPixelFormatAttribute)(CreationParams.AntiAlias?1:0),
+								//kCGLPFASamples, (CGLPixelFormatAttribute)CreationParams.AntiAlias,
+								//kCGLPFAStencilSize, (CGLPixelFormatAttribute)(CreationParams.Stencilbuffer?1:0),
 								(CGLPixelFormatAttribute)NULL
 							};
 
+                            printf("Creating OpenGL device with flags: kCGLPFAColorSize : %i | kCGLPFADepthSize : %i ",
+                                   (int)CreationParams.Bits,
+                                   (int)depthSize
+                                   );
+                            
 							pixelFormat = NULL;
 							numPixelFormats = 0;
-							CGLChoosePixelFormat(fullattribs,&pixelFormat,&numPixelFormats);
+							CGLError error = CGLChoosePixelFormat(fullattribs,&pixelFormat,&numPixelFormats);
 
+                            if (error != kCGErrorSuccess)
+                            {
+                                os::Printer::log("CGLChoosePixelFormat returned error", ELL_WARNING);
+                                printf("OSX DEBUG: CGLChoosePixelFormat returned error %i (%s)\n",
+                                       (int)error, CGLErrorString (error));
+                            }
+                            
 							if (pixelFormat != NULL)
 							{
+                                printf("OSX DEBUG: pixelFormat != NULL\n");
 								CGLCreateContext(pixelFormat,NULL,&CGLContext);
 								CGLDestroyPixelFormat(pixelFormat);
 							}
+                            else
+                            {
+                                os::Printer::log("CGLChoosePixelFormat returned NULL pixelFormat", ELL_WARNING);
+                            }
 
 							if (CGLContext != NULL)
 							{
@@ -838,6 +855,10 @@ bool CIrrDeviceMacOSX::createWindow()
 								CreationParams.WindowSize.set(ScreenWidth, ScreenHeight);
 								result = true;
 							}
+                            else
+                            {
+                                os::Printer::log("CGLContext is null", ELL_WARNING);
+                            }
 						}
 						else
 						{
