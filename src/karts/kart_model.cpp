@@ -29,6 +29,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
 #include "utils/constants.hpp"
@@ -780,16 +781,20 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
     for(unsigned int i=0; i<4; i++)
     {
         if(!m_wheel_node[i]) continue;
-        const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
-#ifdef DEBUG
-        if(UserConfigParams::m_physics_debug && m_kart)
+        float rel_suspension = 0;
+        if (!dynamic_cast<GhostKart*>(m_kart))
         {
-            // Make wheels that are not touching the ground invisible
-            m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
-        }
+            const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+#ifdef DEBUG
+            if (UserConfigParams::m_physics_debug && m_kart)
+            {
+                // Make wheels that are not touching the ground invisible
+                m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
+            }
 #endif
-        float rel_suspension = wi.m_raycastInfo.m_suspensionLength
-                             - m_default_physics_suspension[i];
+            rel_suspension = wi.m_raycastInfo.m_suspensionLength
+                           - m_default_physics_suspension[i];
+        }
         // If the suspension is too compressed
         if(rel_suspension< m_min_suspension[i])
             rel_suspension = m_min_suspension[i];
