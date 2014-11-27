@@ -55,8 +55,8 @@ void ReplayRecorder::init()
     m_transform_events.resize(race_manager->getNumberOfKarts());
     m_skid_control.resize(race_manager->getNumberOfKarts());
     m_kart_replay_event.resize(race_manager->getNumberOfKarts());
-    unsigned int max_frames = unsigned int(  stk_config->m_replay_max_time
-                                           / stk_config->m_replay_dt);
+    unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time
+                                             / stk_config->m_replay_dt);
     for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
         m_transform_events[i].resize(max_frames);
@@ -173,8 +173,8 @@ void ReplayRecorder::Save()
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
     fprintf(fd, "Laps: %d\n",       race_manager->getNumLaps());
 
-    unsigned int max_frames = unsigned int(  stk_config->m_replay_max_time 
-                                           / stk_config->m_replay_dt     );
+    unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time 
+                                             / stk_config->m_replay_dt      );
     for(unsigned int k=0; k<num_karts; k++)
     {
         fprintf(fd, "model: %s\n", world->getKart(k)->getIdent().c_str());
