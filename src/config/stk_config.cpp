@@ -133,7 +133,6 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
     CHECK_NEG(m_bubblegum_shield_time,     "bubblegum shield-time"      );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
-    CHECK_NEG(m_max_history,               "max-history"                );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
     CHECK_NEG(m_min_kart_version,          "<kart-version min...>"      );
     CHECK_NEG(m_max_kart_version,          "<kart-version max=...>"     );
@@ -146,6 +145,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_leader_time_per_kart,      "leader time-per-kart"       );
     CHECK_NEG(m_penalty_time,              "penalty-time"               );
     CHECK_NEG(m_max_display_news,          "max-display-news"           );
+    CHECK_NEG(m_replay_max_time,           "replay max-time"            );
     CHECK_NEG(m_replay_delta_angle,        "replay delta-angle"         );
     CHECK_NEG(m_replay_delta_pos2,         "replay delta-position"      );
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
@@ -177,13 +177,13 @@ void STKConfig::init_defaults()
     m_bubblegum_shield_time      = -100;
     m_shield_restrict_weapos     = false;
     m_max_karts                  = -100;
-    m_max_history                = -100;
     m_max_skidmarks              = -100;
     m_min_kart_version           = -100;
     m_max_kart_version           = -100;
     m_min_track_version          = -100;
     m_max_track_version          = -100;
     m_max_display_news           = -100;
+    m_replay_max_time            = -100;
     m_replay_delta_angle         = -100;
     m_replay_delta_pos2          = -100;
     m_replay_dt                  = -100;
@@ -286,9 +286,6 @@ void STKConfig::getAllData(const XMLNode * root)
             Log::error("StkConfig", "Cannot load title music : %s", title_music.c_str());
     }
 
-    if(const XMLNode *history_node = root->getNode("history"))
-        history_node->get("max-frames", &m_max_history);
-
     if(const XMLNode *skidmarks_node = root->getNode("skid-marks"))
     {
         skidmarks_node->get("max-number",   &m_max_skidmarks    );
@@ -376,6 +373,8 @@ void STKConfig::getAllData(const XMLNode * root)
         replay_node->get("delta-angle", &m_replay_delta_angle);
         replay_node->get("delta-pos",   &m_replay_delta_pos2 );
         replay_node->get("delta-t",     &m_replay_dt         );
+        replay_node->get("max-time",    &m_replay_max_time   );
+
     }
 
     // Get the default KartProperties
