@@ -96,8 +96,6 @@ public:
     float m_music_credit_time;         /**<Time the music credits are
                                            displayed.                          */
     int   m_max_karts;                 /**<Maximum number of karts.            */
-    int   m_max_history;               /**<Maximum number of frames to save in
-                                           a history files.                    */
     bool  m_smooth_normals;            /**< If normals for raycasts for wheels
                                            should be interpolated.             */
     /** If the angle between a normal on a vertex and the normal of the
@@ -144,6 +142,9 @@ public:
 
     /** Filename of the title music to play.*/
     MusicInformation *m_title_music;
+
+    /** Maximum time of a replay. */
+    int m_replay_max_time;
 
     /** Minimum time between consecutive saved tranform events.  */
     float m_replay_dt;

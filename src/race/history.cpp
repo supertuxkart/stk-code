@@ -52,7 +52,9 @@ void History::startReplay()
  */
 void History::initRecording()
 {
-    allocateMemory(stk_config->m_max_history);
+    unsigned int max_frames = unsigned int(  stk_config->m_replay_max_time
+                                           / stk_config->m_replay_dt      );
+    allocateMemory(max_frames);
     m_current = -1;
     m_wrapped = false;
     m_size    = 0;
