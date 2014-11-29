@@ -283,7 +283,7 @@ public:
 
     bool supportsSDSM() const
     {
-        return m_support_sdsm;
+        return m_support_sdsm && UserConfigParams::m_sdsm;
     }
 
     bool usesTextureCompression() const

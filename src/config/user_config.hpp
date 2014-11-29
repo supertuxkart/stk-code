@@ -467,6 +467,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_azdo
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_azdo",
         &m_video_group, "Enable 'Approaching Zero Driver Overhead' mode (very experimental !)"));
+    PARAM_PREFIX BoolUserConfigParam        m_sdsm
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_sdsm",
+        &m_video_group, "Enable Sampled Distribued Shadow Map (buggy atm)"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
