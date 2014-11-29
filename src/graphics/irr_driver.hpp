@@ -192,6 +192,7 @@ private:
     bool hasTextureStorage;
     bool hasTextureView;
     bool m_support_sdsm;
+    bool m_support_texture_compression;
     bool m_need_ubo_workaround;
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
@@ -283,6 +284,11 @@ public:
     bool supportsSDSM() const
     {
         return m_support_sdsm;
+    }
+
+    bool usesTextureCompression() const
+    {
+        return UserConfigParams::m_texture_compression && m_support_texture_compression;
     }
 
     bool needUBOWorkaround() const

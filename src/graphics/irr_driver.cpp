@@ -494,10 +494,16 @@ void IrrDriver::initDevice()
         m_need_rh_workaround = false;
         m_need_srgb_workaround = false;
         m_support_sdsm = true;
+        m_support_texture_compression = true;
 #ifdef WIN32
-        // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
-        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL && (m_gl_major_version == 3 && m_gl_minor_version == 1))
-            m_need_ubo_workaround = true;
+        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL)
+        {
+            // Intel on windows doesnt support srgb compressed textures properly
+            m_support_texture_compression = false;
+            // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
+            if (m_gl_major_version == 3 && m_gl_minor_version == 1)
+                m_need_ubo_workaround = true;
+        }
 #endif
         // Fix for Nvidia and instanced RH
         if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)

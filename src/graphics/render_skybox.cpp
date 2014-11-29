@@ -414,7 +414,7 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, result);
-        if (UserConfigParams::m_texture_compression)
+        if (irr_driver->usesTextureCompression())
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, size, size, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
         else
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, size, size, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
