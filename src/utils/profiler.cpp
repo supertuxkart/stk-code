@@ -212,7 +212,7 @@ void Profiler::synchronizeFrame()
 
     // For each thread:
     ThreadInfoList::iterator it_end = m_thread_infos.end();
-    for(ThreadInfoList::iterator it = m_thread_infos.begin() ; it != it_end ; it++)
+    for(ThreadInfoList::iterator it = m_thread_infos.begin() ; it != it_end ; ++it)
     {
         // Get the thread information
         ThreadInfo& ti = *it;
@@ -291,7 +291,7 @@ void Profiler::draw()
         MarkerList& markers = m_thread_infos[i].markers_done[read_id];
 
         MarkerList::const_iterator it_end = markers.end();
-        for (MarkerList::const_iterator it = markers.begin(); it != it_end; it++)
+        for (MarkerList::const_iterator it = markers.begin(); it != it_end; ++it)
         {
             const Marker& m = *it;
 
@@ -326,7 +326,7 @@ void Profiler::draw()
                 m_capture_report_buffer->getStdStream() << i << ";";
         }
         MarkerList::const_iterator it_end = markers.end();
-        for (MarkerList::const_iterator it = markers.begin(); it != it_end; it++)
+        for (MarkerList::const_iterator it = markers.begin(); it != it_end; ++it)
         {
             const Marker&    m = *it;
             assert(m.end >= 0.0);
@@ -382,7 +382,7 @@ void Profiler::draw()
         video::SColor(255, 0, 255, 255)
     };
 
-    if (hovered_markers.size() == 0)
+    if (hovered_markers.empty())
     {
         float curr_val = 0;
         for (unsigned i = 0; i < Q_LAST; i++)

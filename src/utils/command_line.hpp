@@ -66,7 +66,7 @@ private:
 
         std::string equal=option+"="+format;
         std::vector<std::string>::iterator i;
-        for(i=m_argv.begin(); i<m_argv.end(); i++)
+        for(i=m_argv.begin(); i<m_argv.end(); ++i)
         {
             if(sscanf(i->c_str(), equal.c_str(), t)==1)
             {

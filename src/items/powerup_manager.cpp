@@ -238,7 +238,7 @@ void PowerupManager::loadWeights(const XMLNode &root,
             i=next;
         }
         else
-            i++;
+            ++i;
     }
     // Fill missing entries with 0s
     while(weight_list.size()<2*(int)POWERUP_LAST)

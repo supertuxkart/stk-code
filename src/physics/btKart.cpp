@@ -232,8 +232,6 @@ btScalar btKart::rayCast(unsigned int index)
 
     updateWheelTransformsWS( wheel,false);
 
-    btScalar depth = -1;
-
     btScalar max_susp_len = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius
                           + wheel.m_maxSuspensionTravelCm*0.01f;
 
@@ -255,7 +253,7 @@ btScalar btKart::rayCast(unsigned int index)
 
     wheel.m_raycastInfo.m_groundObject = 0;
 
-    depth = raylen * rayResults.m_distFraction;
+    btScalar depth = raylen * rayResults.m_distFraction;
     if (object &&  depth < max_susp_len)
     {
         wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
@@ -718,9 +716,6 @@ struct btWheelContactPoint
 // ----------------------------------------------------------------------------
 btScalar btKart::calcRollingFriction(btWheelContactPoint& contactPoint)
 {
-
-    btScalar j1=0.f;
-
     const btVector3& contactPosWorld = contactPoint.m_frictionPositionWorld;
 
     btVector3 rel_pos1 = contactPosWorld
@@ -737,7 +732,7 @@ btScalar btKart::calcRollingFriction(btWheelContactPoint& contactPoint)
     btScalar vrel = contactPoint.m_frictionDirectionWorld.dot(vel);
 
     // calculate j that moves us to zero relative velocity
-    j1 = -vrel * contactPoint.m_jacDiagABInv;
+    btScalar j1 = -vrel * contactPoint.m_jacDiagABInv;
     btSetMin(j1, maxImpulse);
     btSetMax(j1, -maxImpulse);
 

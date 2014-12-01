@@ -334,7 +334,7 @@ void OptionsScreenInput::onUpdate(float dt)
         }
         else
         {
-            it++;
+            ++it;
         }
     }
     //m_highlights[internal_name]

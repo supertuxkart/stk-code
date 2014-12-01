@@ -49,9 +49,9 @@ public:
 
     // ------------------------------------------------------------------------
     /** Initialise the data and the mutex. */
-    Synchronised(const TYPE &v)
+    Synchronised(const TYPE &v):
+        m_data(v)
     {
-        m_data = v;
         pthread_mutex_init(&m_mutex, NULL);
     }   // Synchronised
 

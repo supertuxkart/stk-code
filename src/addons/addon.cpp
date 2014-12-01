@@ -30,29 +30,28 @@
 
 Addon::SortOrder Addon::m_sort_order=Addon::SO_DEFAULT;
 
-Addon::Addon(const XMLNode &xml)
+Addon::Addon(const XMLNode &xml):
+    m_name(),
+    m_id(),
+    m_designer(),
+    m_revision(0),
+    m_installed_revision(0),
+    m_icon_revision(0),
+    m_status(0),
+    m_still_exists(false),
+    m_date(0),
+    m_description(),
+    m_icon_url(),
+    m_icon_basename(),
+    m_icon_ready(false),
+    m_zip_file(),
+    m_installed(false),
+    m_size(0),
+    m_rating(0.0f),
+    m_min_include_ver(),
+    m_max_include_ver(),
+    m_type(xml.getName())
 {
-    m_name               = "";
-    m_id                 = "";
-    m_designer           = "";
-    m_status             = 0;
-    m_installed          = false;
-    m_installed_revision = 0;
-    m_revision           = 0 ;
-    m_zip_file           = "";
-    m_description        = "";
-    m_icon_url           = "";
-    m_icon_basename      = "";
-    m_icon_revision      = 0;
-    m_size               = 0;
-    m_date               = 0;
-    m_min_include_ver    = "";
-    m_max_include_ver    = "";
-    m_rating             = 0.0f;
-    m_icon_ready         = false;
-    m_still_exists       = false;
-    m_type               = xml.getName();
-
     // FIXME: temporarily till the web page is updated.
     if(m_type=="track")
     {

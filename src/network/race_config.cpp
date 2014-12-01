@@ -15,7 +15,7 @@ S getHighestInHistogram(std::map<S,int>* histogram)
     S best_item;
     uint8_t highest_count = histogram->begin()->second;
     for (typename std::map<S, int>::iterator it = histogram->begin();
-        it != histogram->end(); it++)
+        it != histogram->end(); ++it)
     {
         if (it->second > highest_count)
         {

@@ -78,7 +78,7 @@ void OptionsScreenUI::loadedFromFile()
     file_manager->listFiles(skinFiles /* out */, file_manager->getAsset(FileManager::SKIN,""),
                             true /* make full path */ );
 
-    for (std::set<std::string>::iterator it = skinFiles.begin(); it != skinFiles.end(); it++)
+    for (std::set<std::string>::iterator it = skinFiles.begin(); it != skinFiles.end(); ++it)
     {
         if(StringUtils::getExtension(*it)=="stkskin")
         {

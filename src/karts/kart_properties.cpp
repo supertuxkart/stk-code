@@ -47,18 +47,17 @@ float KartProperties::UNDEFINED = -99.9f;
  *  Otherwise the defaults are taken from STKConfig (and since they are all
  *  defined, it is guaranteed that each kart has well defined physics values).
  */
-KartProperties::KartProperties(const std::string &filename)
+KartProperties::KartProperties(const std::string &filename):
+    m_icon_material(NULL),
+    m_minimap_icon(NULL),
+    m_name("NONAME"),
+    m_ident("NONAME"),
+    m_icon_file(""),
+    m_shadow_file(""),
+    m_shadow_scale(1.0f),
+    m_shadow_x_offset(0.0f),
+    m_shadow_z_offset(0.0f)
 {
-    m_icon_material = NULL;
-    m_minimap_icon  = NULL;
-    m_name          = "NONAME";
-    m_ident         = "NONAME";
-    m_icon_file     = "";
-    m_shadow_file   = "";
-    m_shadow_scale    = 1.0f;
-    m_shadow_x_offset = 0.0f;
-    m_shadow_z_offset = 0.0f;
-
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
 

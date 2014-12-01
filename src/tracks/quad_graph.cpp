@@ -48,7 +48,7 @@ QuadGraph *QuadGraph::m_quad_graph = NULL;
  *  \param graph_file_name Name of the file describing the actual graph
  */
 QuadGraph::QuadGraph(const std::string &quad_file_name,
-                     const std::string graph_file_name,
+                     const std::string &graph_file_name,
                      const bool reverse) : m_reverse(reverse)
 {
     m_node                 = NULL;

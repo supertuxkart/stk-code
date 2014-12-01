@@ -70,21 +70,20 @@ namespace Online
 
     // ========================================================================
     OnlinePlayerProfile::OnlinePlayerProfile(const XMLNode *player)
-               : PlayerProfile(player)
+               : PlayerProfile(player),
+        m_token(),
+        m_profile(NULL),
+        m_online_state(OS_SIGNED_OUT)
     {
-        m_online_state = OS_SIGNED_OUT;
-        m_token        = "";
-        m_profile      = NULL;
     }   // OnlinePlayerProfile
 
     // ------------------------------------------------------------------------
     OnlinePlayerProfile::OnlinePlayerProfile(const core::stringw &name, bool is_guest)
-        : PlayerProfile(name, is_guest)
+        : PlayerProfile(name, is_guest),
+        m_token(),
+        m_profile(NULL),
+        m_online_state(OS_SIGNED_OUT)
     {
-        m_online_state = OS_SIGNED_OUT;
-        m_token        = "";
-        m_profile      = NULL;
-
     }   // OnlinePlayerProfile
 
     // ------------------------------------------------------------------------

@@ -105,7 +105,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         g_language_list.push_back("en");
 
         std::set<std::string>::iterator it;
-        for ( it=flist.begin() ; it != flist.end(); it++ )
+        for ( it=flist.begin() ; it != flist.end(); ++it )
         {
             if (StringUtils::hasSuffix(*it, "po"))
             {

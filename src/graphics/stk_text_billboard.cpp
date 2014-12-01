@@ -138,7 +138,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
     }
 
     for (std::map<video::ITexture*, scene::SMeshBuffer*>::iterator map_itr = buffers.begin();
-        map_itr != buffers.end(); map_itr++)
+        map_itr != buffers.end(); ++map_itr)
     {
         ((scene::SMesh*)Mesh)->addMeshBuffer(map_itr->second);
 

@@ -79,7 +79,7 @@ void IrrDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
 
 void IrrDebugDrawer::beginNextFrame()
 {
-    for (std::map<video::SColor, std::vector<float> >::iterator it = m_lines.begin(); it != m_lines.end(); it++)
+    for (std::map<video::SColor, std::vector<float> >::iterator it = m_lines.begin(); it != m_lines.end(); ++it)
     {
         it->second.clear();
     }

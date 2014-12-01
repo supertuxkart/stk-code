@@ -56,12 +56,12 @@ struct ModelDefinition
         m_xml = NULL;
     }
 
-    ModelDefinition(const XMLNode* xml, int distance, std::string& model, bool tangent)
+    ModelDefinition(const XMLNode* xml, int distance, std::string& model, bool tangent):
+        m_model_file(model),
+        m_tangent(tangent),
+        m_xml(xml),
+        m_distance(distance)
     {
-        m_model_file = model;
-        m_tangent = tangent;
-        m_xml = xml;
-        m_distance = distance;
     }
 
     ~ModelDefinition()

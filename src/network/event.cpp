@@ -74,13 +74,13 @@ Event::Event(ENetEvent* event)
     }
 }
 
-Event::Event(const Event& event)
-{
-    m_packet = NULL;
-    m_data = event.m_data;
+Event::Event(const Event& event):
+    type(event.type),
     // copy the peer
-    peer = event.peer;
-    type = event.type;
+    peer(event.peer),
+    m_data(event.m_data),
+    m_packet(NULL)
+{
 }
 
 Event::~Event()

@@ -45,12 +45,11 @@ using namespace irr::gui;
 */
 
 AddonsLoading::AddonsLoading(const std::string &id)
-             : ModalDialog(0.8f, 0.8f)
+             : ModalDialog(0.8f, 0.8f),
+    m_addon(*(addons_manager->getAddon(id))),
+    m_icon_shown(false),
+    m_download_request(NULL)
 {
-    m_addon            = *(addons_manager->getAddon(id));
-    m_icon_shown       = false;
-    m_download_request = NULL;
-
     loadFromFile("addons_loading.stkgui");
 
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
@@ -348,10 +347,9 @@ void AddonsLoading::doInstall()
 {
     delete m_download_request;
     m_download_request = NULL;
-    bool error=false;
 
     assert(!m_addon.isInstalled() || m_addon.needsUpdate());
-    error = !addons_manager->install(m_addon);
+    bool error = !addons_manager->install(m_addon);
     if(error)
     {
         core::stringw msg = StringUtils::insertValues(
@@ -386,9 +384,8 @@ void AddonsLoading::doUninstall()
 {
     delete m_download_request;
     m_download_request = NULL;
-    bool error=false;
 
-    error = !addons_manager->uninstall(m_addon);
+    bool error = !addons_manager->uninstall(m_addon);
     if(error)
     {
         Log::warn("Addons", "Directory '%s' can not be removed.",

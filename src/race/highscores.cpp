@@ -26,10 +26,10 @@
 #include <fstream>
 
 // -----------------------------------------------------------------------------
-Highscores::Highscores(const HighscoreType highscore_type,
+Highscores::Highscores(const HighscoreType& highscore_type,
                        int num_karts,
-                       const RaceManager::Difficulty difficulty,
-                       const std::string trackName,
+                       const RaceManager::Difficulty& difficulty,
+                       const std::string& trackName,
                        const int number_of_laps,
                        const bool reverse)
 {
@@ -48,15 +48,14 @@ Highscores::Highscores(const HighscoreType highscore_type,
     }
 }
 // -----------------------------------------------------------------------------
-Highscores::Highscores(const XMLNode &node)
+Highscores::Highscores(const XMLNode &node):
+    m_track(""),
+    m_highscore_type("HST_UNDEFINED"),
+    m_number_of_karts(-1),
+    m_difficulty(-1),
+    m_number_of_laps(-1),
+    m_reverse(false)
 {
-    m_track           = "";
-    m_highscore_type  = "HST_UNDEFINED";
-    m_number_of_karts = -1;
-    m_difficulty      = -1;
-    m_number_of_laps  = -1;
-    m_reverse         = false;
-
     for(int i=0; i<HIGHSCORE_LEN; i++)
     {
         m_name[i]      = "";
@@ -136,8 +135,8 @@ void Highscores::writeEntry(UTFWriter &writer)
 
 // -----------------------------------------------------------------------------
 int Highscores::matches(HighscoreType highscore_type,
-                            int num_karts, RaceManager::Difficulty difficulty,
-                            const std::string track, const int number_of_laps,
+                            int num_karts, const RaceManager::Difficulty& difficulty,
+                            const std::string& track, const int number_of_laps,
                             const bool reverse)
 {
     return (m_highscore_type  == highscore_type   &&

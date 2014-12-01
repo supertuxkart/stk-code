@@ -28,12 +28,12 @@ namespace scene
     public:
         // constructor
         SFlareData(const E_FLARE_TYPE type, const float position,
-                   const float scale, const video::SColor &color)
+                   const float scale, const video::SColor &color):
+            Type(type),
+            Position(position),
+            Scale(scale),
+            Color(color)
         {
-            Type = type;
-            Position = position;
-            Scale = scale;
-            Color = color;
         }
 
         // flare type

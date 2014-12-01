@@ -373,7 +373,7 @@ void RibbonWidget::add()
 
 // ----------------------------------------------------------------------------
 
-void RibbonWidget::addTextChild(const wchar_t* text, const std::string id)
+void RibbonWidget::addTextChild(const wchar_t* text, const std::string& id)
 {
     // This method should only be called BEFORE a widget is added
     assert(m_element == NULL);

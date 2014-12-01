@@ -183,7 +183,7 @@ unsigned GPUTimer::elapsedTimeus()
 FrameBuffer::FrameBuffer() {}
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h, bool layered) :
-RenderTargets(RTTs), DepthTexture(0), width(w), height(h), fbolayer(0)
+fbolayer(0), RenderTargets(RTTs), DepthTexture(0), width(w), height(h)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -202,7 +202,7 @@ RenderTargets(RTTs), DepthTexture(0), width(w), height(h), fbolayer(0)
 }
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered) :
-RenderTargets(RTTs), DepthTexture(DS), width(w), height(h), fbolayer(0)
+fbolayer(0), RenderTargets(RTTs), DepthTexture(DS), width(w), height(h)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);

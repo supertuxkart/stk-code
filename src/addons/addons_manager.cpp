@@ -53,10 +53,9 @@ AddonsManager* addons_manager = 0;
  *  NewsManager::init()  ).
  */
 AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
+                                 m_file_installed(file_manager->getAddonsFile("addons_installed.xml")),
                                  m_state(STATE_INIT)
 {
-    m_file_installed = file_manager->getAddonsFile("addons_installed.xml");
-
     // Load the addons list (even if internet is disabled)
     m_addons_list.lock();
     // Clear the list in case that a reinit is being done.
@@ -466,7 +465,6 @@ bool AddonsManager::anyAddonsInstalled() const
  */
 bool AddonsManager::install(const Addon &addon)
 {
-    bool success=true;
     file_manager->checkAndCreateDirForAddons(addon.getDataDir());
 
     //extract the zip in the addons folder called like the addons name
@@ -474,7 +472,7 @@ bool AddonsManager::install(const Addon &addon)
     std::string from      = file_manager->getAddonsFile("tmp/"+base_name);
     std::string to        = addon.getDataDir();
 
-    success = extract_zip(from, to);
+    bool success = extract_zip(from, to);
     if (!success)
     {
         // TODO: show a message in the interface

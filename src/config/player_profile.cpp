@@ -66,18 +66,17 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
  *  loadRemainingData later in the initialisation process.
  *  \param node The XML node representing this player.
 */
-PlayerProfile::PlayerProfile(const XMLNode* node)
+PlayerProfile::PlayerProfile(const XMLNode* node):
+    m_icon_filename(),
+    m_saved_session(false),
+    m_saved_user_id(0),
+    m_saved_token(),
+    m_last_online_name(),
+    m_last_was_online(false),
+    m_remember_password(false),
+    m_story_mode_status(NULL),
+    m_achievements_status(NULL)
 {
-    m_saved_session       = false;
-    m_saved_token         = "";
-    m_saved_user_id       = 0;
-    m_last_online_name    = "";
-    m_last_was_online     = false;
-    m_remember_password   = false;
-    m_story_mode_status   = NULL;
-    m_achievements_status = NULL;
-    m_icon_filename       = "";
-
     node->get("name",              &m_local_name       );
     node->get("guest",             &m_is_guest_account );
     node->get("use-frequency",     &m_use_frequency    );

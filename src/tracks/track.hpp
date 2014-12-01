@@ -94,11 +94,11 @@ public:
     core::vector3df m_position;
     std::string m_challenge_id;
 
-    OverworldChallenge(core::vector3df position, std::string challenge_id)
+    OverworldChallenge(core::vector3df position, std::string challenge_id):
+        m_force_field_set(false),
+        m_position(position),
+        m_challenge_id(challenge_id)
     {
-        m_position = position;
-        m_challenge_id = challenge_id;
-        m_force_field_set = false;
     }
 
     void setForceField(OverworldForceField f)

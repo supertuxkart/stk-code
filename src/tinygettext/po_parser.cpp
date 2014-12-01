@@ -223,7 +223,7 @@ next:
   return out.str();
 }
 
-static bool has_prefix(const std::string& lhs, const std::string rhs)
+static bool has_prefix(const std::string& lhs, const std::string& rhs)
 {
   if (lhs.length() < rhs.length())
     return false;

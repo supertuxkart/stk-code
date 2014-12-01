@@ -306,7 +306,7 @@ FileManager::~FileManager()
     std::string tmp=getAddonsFile("tmp");
     listFiles(allfiles, tmp);
     for(std::set<std::string>::iterator i=allfiles.begin();
-        i!=allfiles.end(); i++)
+        i!=allfiles.end(); ++i)
     {
         if((*i)=="." || (*i)=="..") continue;
         // For now there should be only zip files or .part files
@@ -1240,7 +1240,7 @@ bool FileManager::removeDirectory(const std::string &name) const
 {
     std::set<std::string> files;
     listFiles(files, name, /*is full path*/ true);
-    for(std::set<std::string>::iterator i=files.begin(); i!=files.end(); i++)
+    for(std::set<std::string>::iterator i=files.begin(); i!=files.end(); ++i)
     {
         if((*i)=="." || (*i)=="..") continue;
         if(UserConfigParams::logMisc())

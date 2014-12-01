@@ -29,10 +29,10 @@
 #include "utils/log.hpp"
 
 ClientLobbyRoomProtocol::ClientLobbyRoomProtocol(const TransportAddress& server_address)
-    : LobbyRoomProtocol(NULL)
+    : LobbyRoomProtocol(NULL),
+    m_server_address(server_address),
+    m_server(NULL)
 {
-    m_server_address = server_address;
-    m_server = NULL;
 }
 
 //-----------------------------------------------------------------------------

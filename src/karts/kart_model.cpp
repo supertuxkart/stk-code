@@ -96,15 +96,14 @@ void SpeedWeightedObject::Properties::checkAllSet()
  *  in the kart_properties_manager is always kept, there is no risk of
  *  a mesh being deleted to early.
  */
-KartModel::KartModel(bool is_master)
+KartModel::KartModel(bool is_master):
+    m_mesh(NULL),
+    m_hat_node(NULL),
+    m_hat_offset(core::vector3df(0,0,0)),
+    m_hat_name(),
+    m_is_master(is_master),
+    m_kart(NULL)
 {
-    m_is_master  = is_master;
-    m_kart       = NULL;
-    m_mesh       = NULL;
-    m_hat_name   = "";
-    m_hat_node   = NULL;
-    m_hat_offset = core::vector3df(0,0,0);
-
     for(unsigned int i=0; i<4; i++)
     {
         m_wheel_graphics_position[i] = Vec3(UNDEFINED);

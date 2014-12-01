@@ -97,14 +97,14 @@ private:
         TimedMessage(const irr::core::stringw &message,
                      const AbstractKart *kart, float time,
                      const video::SColor &color, const bool important,
-                     bool big_font)
+                     bool big_font):
+            m_message(message),
+            m_remaining_time(( time < 0.0f ) ? -1.0f : time),
+            m_color(color),
+            m_kart(kart),
+            m_important(important),
+            m_big_font(big_font)
         {
-            m_message        = message;
-            m_kart           = kart;
-            m_remaining_time = ( time < 0.0f ) ? -1.0f : time;
-            m_color          = color;
-            m_important      = important;
-            m_big_font       = big_font;
         }   // TimedMessage
         // -----------------------------------------------------
         // in follow leader the clock counts backwards

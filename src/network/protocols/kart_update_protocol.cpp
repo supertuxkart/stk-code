@@ -7,9 +7,9 @@
 #include "utils/time.hpp"
 
 KartUpdateProtocol::KartUpdateProtocol()
-    : Protocol(NULL, PROTOCOL_KART_UPDATE)
+    : Protocol(NULL, PROTOCOL_KART_UPDATE),
+    m_karts(World::getWorld()->getKarts())
 {
-    m_karts = World::getWorld()->getKarts();
     for (unsigned int i = 0; i < m_karts.size(); i++)
     {
         //if (m_karts[i]->getWorldKartId())
