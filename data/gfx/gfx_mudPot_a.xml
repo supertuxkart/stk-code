@@ -20,8 +20,8 @@
                max="1000"          />
     
     <!-- Size of the particles -->
-    <size      min="0.5"
-               max="0.3"         
+    <size      min="0.3"
+               max="0.5"         
                x-increase-factor="2.6"
                y-increase-factor="2.6" />
     
