@@ -51,39 +51,39 @@ CustomVideoSettingsDialog::~CustomVideoSettingsDialog()
 
 void CustomVideoSettingsDialog::beforeAddingWidgets()
 {
-    getWidget<CheckBoxWidget>("anim_gfx")->setState( UserConfigParams::m_graphical_effects );
-    getWidget<CheckBoxWidget>("weather_gfx")->setState( UserConfigParams::m_weather_effects );
+    getWidget<CheckBoxWidget>("anim_gfx")->setState(UserConfigParams::m_graphical_effects);
+    getWidget<CheckBoxWidget>("weather_gfx")->setState(UserConfigParams::m_weather_effects);
     getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
     getWidget<CheckBoxWidget>("hd-textures")->setState(UserConfigParams::m_high_definition_textures);
 
     SpinnerWidget* kart_anim = getWidget<SpinnerWidget>("steering_animations");
-    kart_anim->addLabel( _("Disabled") ); // 0
+    kart_anim->addLabel(_("Disabled")); // 0
     //I18N: animations setting (only karts with human players are animated)
-    kart_anim->addLabel( _("Human players only") ); // 1
+    kart_anim->addLabel(_("Human players only")); // 1
     //I18N: animations setting (all karts are animated)
-    kart_anim->addLabel( _("Enabled for all") ); // 2
-    kart_anim->setValue( UserConfigParams::m_show_steering_animations );
+    kart_anim->addLabel(_("Enabled for all")); // 2
+    kart_anim->setValue(UserConfigParams::m_show_steering_animations);
 
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("filtering");
     int value = 0;
-    if      (UserConfigParams::m_anisotropic == 2)  value = 2;
+    if (UserConfigParams::m_anisotropic == 2)  value = 2;
     else if (UserConfigParams::m_anisotropic == 4)  value = 3;
     else if (UserConfigParams::m_anisotropic == 8)  value = 4;
     else if (UserConfigParams::m_anisotropic == 16) value = 5;
     else if (UserConfigParams::m_trilinear)         value = 1;
-    filtering->addLabel( _("Bilinear") );        // 0
-    filtering->addLabel( _("Trilinear") );       // 1
-    filtering->addLabel( _("Anisotropic x2") );  // 2
-    filtering->addLabel( _("Anisotropic x4") );  // 3
-    filtering->addLabel( _("Anisotropic x8") );  // 4
-    filtering->addLabel( _("Anisotropic x16") ); // 5
+    filtering->addLabel(_("Bilinear"));        // 0
+    filtering->addLabel(_("Trilinear"));       // 1
+    filtering->addLabel(_("Anisotropic x2"));  // 2
+    filtering->addLabel(_("Anisotropic x4"));  // 3
+    filtering->addLabel(_("Anisotropic x8"));  // 4
+    filtering->addLabel(_("Anisotropic x16")); // 5
 
-    filtering->setValue( value );
+    filtering->setValue(value);
 
     SpinnerWidget* shadows = getWidget<SpinnerWidget>("shadows");
-    shadows->addLabel( _("Disabled") );   // 0
-    shadows->addLabel( _("low") );        // 1
-    shadows->addLabel( _("high") );       // 2
+    shadows->addLabel(_("Disabled"));   // 0
+    shadows->addLabel(_("low"));        // 1
+    shadows->addLabel(_("high"));       // 2
     if (!irr_driver->needUBOWorkaround())
         shadows->setValue(UserConfigParams::m_shadows);
     else
@@ -96,7 +96,16 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("glow")->setState(UserConfigParams::m_glow);
     getWidget<CheckBoxWidget>("ssao")->setState(UserConfigParams::m_ssao);
     getWidget<CheckBoxWidget>("bloom")->setState(UserConfigParams::m_bloom);
-    getWidget<CheckBoxWidget>("texture_compression")->setState(UserConfigParams::m_texture_compression);
+    if (irr_driver->supportTextureCompression())
+    {
+        getWidget<CheckBoxWidget>("texture_compression")->setState(UserConfigParams::m_texture_compression);
+    }
+    else
+    {
+        CheckBoxWidget* cb_tex_cmp = getWidget<CheckBoxWidget>("texture_compression");
+        cb_tex_cmp->setState(false);
+        cb_tex_cmp->setDeactivated();
+    }
 }
 
 // -----------------------------------------------------------------------------
