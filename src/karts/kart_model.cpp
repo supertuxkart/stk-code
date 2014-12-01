@@ -280,7 +280,7 @@ KartModel* KartModel::makeCopy()
     km->m_kart_height       = m_kart_height;
     km->m_kart_highest_point= m_kart_highest_point;
     km->m_kart_lowest_point = m_kart_lowest_point;
-    km->m_mesh              = m_mesh;
+    km->m_mesh              = irr_driver->copyAnimatedMesh(m_mesh);
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
     km->m_current_animation = AF_DEFAULT;
@@ -894,7 +894,8 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
     m_animated_node->setCurrentFrame(frame);
 }   // update
 //-----------------------------------------------------------------------------
-void KartModel::attachHat(){
+void KartModel::attachHat()
+{
     m_hat_node = NULL;
     if(m_hat_name.size()>0)
     {

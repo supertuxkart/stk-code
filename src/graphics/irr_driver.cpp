@@ -67,6 +67,7 @@
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
+#include "../lib/irrlicht/source/Irrlicht/CSkinnedMesh.h"
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.
@@ -999,6 +1000,63 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
     }
     return am->getMesh(0);
 }   // getMesh
+
+// ----------------------------------------------------------------------------
+/** Create a skinned mesh which has copied all meshbuffers and joints of the
+ *  original mesh. Note, that this will not copy any other information like
+ *   joints data.
+ *  \param mesh Original mesh
+ *  \return Newly created skinned mesh. You should call drop() when you don't
+ *          need it anymore. 
+ */
+scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
+{
+    using namespace scene;
+    CSkinnedMesh *mesh = dynamic_cast<CSkinnedMesh*>(orig);
+    if (!mesh)
+    {
+        Log::error("copyAnimatedMesh", "Given mesh was not a skinned mesh.");
+        return NULL;
+    }
+
+    ISkinnedMesh* skinned_mesh = m_scene_manager->createSkinnedMesh();
+
+    for (u32 i = 0; i < mesh->getMeshBuffers().size(); i++)
+    {
+        SSkinMeshBuffer * buffer = skinned_mesh->addMeshBuffer();
+        *buffer = *(mesh->getMeshBuffers()[i]);
+    }
+
+    for (u32 j = 0; j < mesh->getAllJoints().size(); ++j)
+    {
+        ISkinnedMesh::SJoint *joint = skinned_mesh->addJoint();
+        *joint = *(mesh->getAllJoints()[j]);
+    }
+
+    // fix children pointers (they still have old pointers)
+    core::array<ISkinnedMesh::SJoint*> & new_joints = skinned_mesh->getAllJoints();
+    core::array<ISkinnedMesh::SJoint*> & old_joints = mesh->getAllJoints();
+    for (u32 i = 0; i < new_joints.size(); ++i)
+    {
+        ISkinnedMesh::SJoint * joint = new_joints[i];
+        for (u32 c = 0; c < joint->Children.size(); ++c)
+        {
+            // the child is one of the oldJoints and must be replaced by the newjoint on the same index
+            for (u32 k = 0; k < old_joints.size(); ++k)
+            {
+                if (joint->Children[c] == old_joints[k])
+                {
+                    joint->Children[c] = new_joints[k];
+                    break;
+                }
+            }   // k < old_joints.size
+        }   // c < joint->Children.size()
+    }   // i < new_joints.size()
+
+    skinned_mesh->finalize();
+
+    return skinned_mesh;
+}   // copyAnimatedMesh
 
 // ----------------------------------------------------------------------------
 /** Sets the material flags in this mesh depending on the settings in
