@@ -836,13 +836,6 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     memcpy(&tmp[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
 
     m_suncam->render();
-    const core::vector3df &camdir = (camnode->getTarget() - camnode->getAbsolutePosition()).normalize();
-    const core::vector3df &sundir = (m_suncam->getTarget() - m_suncam->getAbsolutePosition()).normalize();
-    const core::vector3df &up = camdir.crossProduct(sundir).normalize();
-    if (up.getLength())
-        m_suncam->setUpVector(up);
-    m_suncam->render();
-
     for (unsigned i = 0; i < 4; i++)
     {
         if (m_shadow_camnodes[i])
