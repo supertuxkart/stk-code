@@ -286,6 +286,11 @@ public:
         return m_support_sdsm && UserConfigParams::m_sdsm;
     }
 
+    bool supportTextureCompression() const
+    {
+        return m_support_texture_compression;
+    }
+
     bool usesTextureCompression() const
     {
         return UserConfigParams::m_texture_compression && m_support_texture_compression;
