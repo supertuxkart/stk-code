@@ -576,29 +576,6 @@ void IrrDriver::computeSunVisibility()
     {
         hasgodrays = World::getWorld()->getTrack()->hasGodRays();
     }
-
-    if (UserConfigParams::m_light_shaft && hasgodrays)
-    {
-        GLuint res = 0;
-        if (m_query_issued)
-            glGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
-        m_post_processing->setSunPixels(res);
-
-        // Prepare the query for the next frame.
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        glBeginQuery(GL_SAMPLES_PASSED_ARB, m_lensflare_query);
-        m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
-        m_scene_manager->drawAll(scene::ESNRP_CAMERA);
-        irr_driver->setPhase(GLOW_PASS);
-        m_sun_interposer->render();
-        glEndQuery(GL_SAMPLES_PASSED_ARB);
-        m_query_issued = true;
-
-        m_lensflare->setStrength(res / 4000.0f);
-
-        // Make sure the color mask is reset
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    }
 }
 
 void IrrDriver::renderParticles()
