@@ -211,7 +211,7 @@ void RaceSetupScreen::init()
 
     if (PlayerManager::getCurrentPlayer()->isLocked(IDENT_FTL))
     {
-        w2->addItem( _("Locked : solve active challenges to gain access to more!"),
+        w2->addItem( _("Solve challenges to unlock"),
                     "locked", RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), true);
     }
     else

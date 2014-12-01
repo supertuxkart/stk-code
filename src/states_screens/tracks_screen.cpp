@@ -279,7 +279,7 @@ void TracksScreen::buildTrackList()
         if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
         {
             tracks_widget->addItem(
-                _("Locked : solve active challenges to gain access to more!"),
+                _("Solve challenges to unlock"),
                 "locked", curr->getScreenshotFile(), LOCKED_BADGE,
                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
