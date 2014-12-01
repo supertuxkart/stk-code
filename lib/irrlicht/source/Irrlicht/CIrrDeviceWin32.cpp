@@ -1574,29 +1574,12 @@ void CIrrDeviceWin32::getWindowsVersion(core::stringc& out)
 				else
 					out.append("Microsoft Windows Server 2008 ");
 			}
-			else
-			if (osvi.dwMinorVersion == 1)
+			else if (osvi.dwMinorVersion == 1)
 			{
 				if (osvi.wProductType == VER_NT_WORKSTATION)
 					out.append("Microsoft Windows 7 ");
 				else
 					out.append("Microsoft Windows Server 2008 R2 ");
-			}
-			else
-			if (osvi.dwMinorVersion == 2)
-			{
-				if (osvi.wProductType == VER_NT_WORKSTATION)
-					out.append("Microsoft Windows 8 ");
-				else
-					out.append("Microsoft Windows Server 2012 ");
-			}
-			else
-			if (osvi.dwMinorVersion == 3)
-			{
-				if (osvi.wProductType == VER_NT_WORKSTATION)
-					out.append("Microsoft Windows 8.1 ");
-				else
-					out.append("Microsoft Windows Server 2012 R2 ");
 			}
 		}
 

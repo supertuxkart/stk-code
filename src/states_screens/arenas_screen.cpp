@@ -234,7 +234,7 @@ void ArenasScreen::buildTrackList()
 
             if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
-                w->addItem( _("Solve Challenges to unlock"),
+                w->addItem( _("Locked : solve active challenges to gain access to more!"),
                            "locked", curr->getScreenshotFile(), LOCKED_BADGE );
             }
             else
@@ -264,7 +264,7 @@ void ArenasScreen::buildTrackList()
 
             if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
-                w->addItem( _("Solve challenges to unlock"),
+                w->addItem( _("Locked : solve active challenges to gain access to more!"),
                            "locked", curr->getScreenshotFile(), LOCKED_BADGE );
             }
             else
