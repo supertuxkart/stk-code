@@ -43,4 +43,4 @@ FILE* ReplayBase::openReplayFile(bool writeable)
     }
     return fd;
 
-}   // openReplayFilen
+}   // openReplayFile

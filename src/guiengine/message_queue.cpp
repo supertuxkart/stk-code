@@ -126,7 +126,7 @@ void createLabel(const Message *message)
  *  position of the message. */
 void updatePosition()
 {
-    if (g_all_messages.size() == 0) return;
+    if (g_all_messages.empty()) return;
     Message *last = g_all_messages.top();
     createLabel(last);
 }   // updatePosition
@@ -139,7 +139,7 @@ void updatePosition()
 void add(MessageType mt, const irr::core::stringw &message)
 {
     Message *m = new Message(mt, message);
-    if(g_all_messages.size()==0)
+    if(g_all_messages.empty())
     {
         // Indicate that there is a new message, which should
         // which needs a new label etc. to be computed.
@@ -157,7 +157,7 @@ void add(MessageType mt, const irr::core::stringw &message)
  */
 void update(float dt)
 {
-    if(g_all_messages.size()==0) return;
+    if(g_all_messages.empty()) return;
 
     g_current_display_time += dt;
     if(g_current_display_time > g_max_display_time)
@@ -165,7 +165,7 @@ void update(float dt)
         Message *last = g_all_messages.top();
         g_all_messages.pop();
         delete last;
-        if(g_all_messages.size()==0) return;
+        if(g_all_messages.empty()) return;
         g_current_display_time = -1.0f;
     }
 

@@ -466,7 +466,6 @@ bool AddonsManager::anyAddonsInstalled() const
  */
 bool AddonsManager::install(const Addon &addon)
 {
-    bool success=true;
     file_manager->checkAndCreateDirForAddons(addon.getDataDir());
 
     //extract the zip in the addons folder called like the addons name
@@ -474,7 +473,7 @@ bool AddonsManager::install(const Addon &addon)
     std::string from      = file_manager->getAddonsFile("tmp/"+base_name);
     std::string to        = addon.getDataDir();
 
-    success = extract_zip(from, to);
+    bool success = extract_zip(from, to);
     if (!success)
     {
         // TODO: show a message in the interface

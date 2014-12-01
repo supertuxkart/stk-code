@@ -113,7 +113,7 @@ public:
       * @param file Name of the file to load (no full path)
       * @throw std::runtime_error If the file cannot be found or is heavily malformed
       */
-    ParticleKind(const std::string file);
+    ParticleKind(const std::string &file);
     virtual     ~ParticleKind() {}
 
 
@@ -172,7 +172,7 @@ public:
 
     bool      randomizeInitialY() const { return m_randomize_initial_y; }
 
-    std::string getName() const { return m_name; }
+    const std::string& getName() const { return m_name; }
 };
 
 #endif

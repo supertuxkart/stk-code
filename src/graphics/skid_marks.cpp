@@ -146,12 +146,11 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         delta.normalize();
         delta *= m_width*0.5f;
 
-        float distance = 0.0f;
         Vec3 start = m_left[m_current]->getCenterStart();
         Vec3 newPoint = (raycast_left + raycast_right)/2;
         // this linear distance does not account for the kart turning, it's true,
         // but it produces good enough results
-        distance = (newPoint - start).length();
+        float distance = (newPoint - start).length();
 
         m_left [m_current]->add(raycast_left-delta, raycast_left+delta,
                                 distance);

@@ -837,12 +837,11 @@ void RaceGUI::drawLap(const AbstractKart* kart,
                             - m_lap_width - 10;
     pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
 
-    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
     static video::SColor color = video::SColor(255, 255, 255, 255);
     std::ostringstream out;
     out << lap + 1 << "/" << race_manager->getNumLaps();
 
-    font = GUIEngine::getHighresDigitFont();
+    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
     font->setScale(scaling.Y < 1.0f ? 0.5f: 1.0f);
     font->draw(out.str().c_str(), pos, color);
     font->setScale(1.0f);

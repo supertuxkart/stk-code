@@ -1,0 +1,199 @@
+bced8cdb src/guiengine/scalable_font.hpp (hikerstk        2013-12-02 04:27:55 +0000   1) // Copyright (C) 2002-2013 Nikolaus Gebhardt
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000   2) // This file is part of the "Irrlicht Engine".
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000   3) // For conditions of distribution and use, see copyright notice in irrlicht.h
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000   4) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000   5) #ifndef __C_GUI_FONT_H_INCLUDED__
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000   6) #define __C_GUI_FONT_H_INCLUDED__
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000   7) 
+e1a75067 src/guiengine/scalable_font.hpp (hiker           2014-06-15 22:01:52 +1000   8) #include "utils/leak_check.hpp"
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000   9) 
+e1a75067 src/guiengine/scalable_font.hpp (hiker           2014-06-15 22:01:52 +1000  10) #include "IrrCompileConfig.h"
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  11) #include "IGUIFontBitmap.h"
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  12) #include "irrString.h"
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  13) #include "irrMap.h"
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  14) #include "IXMLReader.h"
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  15) #include "IReadFile.h"
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  16) #include "irrArray.h"
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  17) 
+e1a75067 src/guiengine/scalable_font.hpp (hiker           2014-06-15 22:01:52 +1000  18) 
+e1a75067 src/guiengine/scalable_font.hpp (hiker           2014-06-15 22:01:52 +1000  19) #include <map>
+e1a75067 src/guiengine/scalable_font.hpp (hiker           2014-06-15 22:01:52 +1000  20) #include <string>
+978bb546 src/guiengine/scalable_font.hpp (auria           2011-09-22 18:24:28 +0000  21) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  22) namespace irr
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  23) {
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  24) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  25) namespace video
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  26) {
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000  27)     class IVideoDriver;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000  28)     class IImage;
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400  29)     class ITexture;
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  30) }
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  31) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  32) namespace gui
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  33) {
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  34) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000  35)     class IGUIEnvironment;
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  36) 
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400  37) class FontCharCollector
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400  38) {
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400  39) public:
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400  40) 
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400  41)     virtual void collectChar(video::ITexture* texture, const core::rect<s32>& destRect,
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400  42)         const core::rect<s32>& sourceRect, const video::SColor* const colors) = 0;
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400  43) };
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400  44) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  45) class ScalableFont : public IGUIFontBitmap
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  46) {
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  47)     float m_scale;
+f3f98293 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:47:33 +0000  48)     bool m_shadow;
+8e48d227 src/guiengine/CGUIFont.h        (hikerstk        2010-07-20 22:39:54 +0000  49)     /** True if digits should be mono spaced. */
+8e48d227 src/guiengine/CGUIFont.h        (hikerstk        2010-07-20 22:39:54 +0000  50) 
+8e48d227 src/guiengine/CGUIFont.h        (hikerstk        2010-07-20 22:39:54 +0000  51)     bool m_mono_space_digits;
+f3f98293 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:47:33 +0000  52)     irr::video::SColor m_shadow_color;
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000  53) 
+11d999f8 src/guiengine/CGUIFont.h        (auria           2010-01-23 19:55:19 +0000  54)     struct TextureInfo
+11d999f8 src/guiengine/CGUIFont.h        (auria           2010-01-23 19:55:19 +0000  55)     {
+11d999f8 src/guiengine/CGUIFont.h        (auria           2010-01-23 19:55:19 +0000  56)         irr::core::stringc m_file_name;
+11d999f8 src/guiengine/CGUIFont.h        (auria           2010-01-23 19:55:19 +0000  57)         bool m_has_alpha;
+b256e43a src/guiengine/CGUIFont.h        (auria           2010-01-29 00:19:17 +0000  58)         float m_scale;
+47b5a604 src/guiengine/scalable_font.hpp (auria           2013-01-06 00:36:20 +0000  59)         bool m_exclude_from_max_height_calculation;
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000  60) 
+b256e43a src/guiengine/CGUIFont.h        (auria           2010-01-29 00:19:17 +0000  61)         TextureInfo()
+b256e43a src/guiengine/CGUIFont.h        (auria           2010-01-29 00:19:17 +0000  62)         {
+b256e43a src/guiengine/CGUIFont.h        (auria           2010-01-29 00:19:17 +0000  63)             m_has_alpha = false;
+b256e43a src/guiengine/CGUIFont.h        (auria           2010-01-29 00:19:17 +0000  64)             m_scale = 1.0f;
+b256e43a src/guiengine/CGUIFont.h        (auria           2010-01-29 00:19:17 +0000  65)         }
+11d999f8 src/guiengine/CGUIFont.h        (auria           2010-01-23 19:55:19 +0000  66)     };
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000  67) 
+11d999f8 src/guiengine/CGUIFont.h        (auria           2010-01-23 19:55:19 +0000  68)     std::map<int /* texture file ID */, TextureInfo> m_texture_files;
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000  69) 
+e79025b0 src/guiengine/scalable_font.hpp (auria           2010-08-29 19:28:57 +0000  70)     void doReadXmlFile(io::IXMLReader* xml);
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000  71) 
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  72)     bool m_is_hollow_copy;
+a2825c4b src/guiengine/CGUIFont.h        (auria           2010-05-30 19:11:39 +0000  73)     bool m_rtl;
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000  74) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  75) public:
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  76) 
+978bb546 src/guiengine/scalable_font.hpp (auria           2011-09-22 18:24:28 +0000  77)     LEAK_CHECK()
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000  78) 
+3920dfe1 src/guiengine/CGUIFont.h        (auria           2010-01-24 16:48:13 +0000  79)     bool m_black_border;
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000  80) 
+f2e2a374 src/guiengine/CGUIFont.h        (auria           2010-01-24 16:26:31 +0000  81)     ScalableFont* m_fallback_font;
+f2e2a374 src/guiengine/CGUIFont.h        (auria           2010-01-24 16:26:31 +0000  82)     float         m_fallback_font_scale;
+f2e2a374 src/guiengine/CGUIFont.h        (auria           2010-01-24 16:26:31 +0000  83)     int           m_fallback_kerning_width;
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000  84) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000  85)     //! constructor
+02b0cfd0 src/guiengine/scalable_font.hpp (hiker           2014-06-09 22:38:19 +1000  86)     ScalableFont(IGUIEnvironment* env, const std::string &filename);
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000  87) 
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  88)     /** Creates a hollow copy of this font; i.e. the underlying font data is the *same* for
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  89)       * both fonts. The advantage of doing this is that you can change "view" parameters
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  90)       * in the copy, for example kerning or scale.
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  91)       * The object returned by this method is 'new'ed and must be deleted. Deleting it will
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  92)       * not delete the data of the original. Do *not* delete the original as long as this
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  93)       * hollow copy is still used, since they share their data (and the original is the one
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  94)       * that "owns" it).
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  95)       */
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  96)     ScalableFont* getHollowCopy() const
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  97)     {
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  98)         ScalableFont* out = new ScalableFont(*this);
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000  99)         out->m_is_hollow_copy = true;
+7c7fb68e src/guiengine/scalable_font.hpp (hiker           2014-11-26 23:40:50 +1100 100)         //FIXME: test only. Reset the reference counter of the copy to 1
+7c7fb68e src/guiengine/scalable_font.hpp (hiker           2014-11-26 23:40:50 +1100 101)         while (out->getReferenceCount() > 1)
+7c7fb68e src/guiengine/scalable_font.hpp (hiker           2014-11-26 23:40:50 +1100 102)             out->drop();
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000 103)         return out;
+4340cccd src/guiengine/CGUIFont.h        (auria           2010-03-07 02:03:39 +0000 104)     }
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000 105) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 106)     //! destructor
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 107)     virtual ~ScalableFont();
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 108) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 109)     //! loads a font from an XML file
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 110)     bool load(io::IXMLReader* xml);
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 111) 
+973a7cd4 src/guiengine/scalable_font.hpp (auria           2012-01-30 00:27:53 +0000 112)     void lazyLoadTexture(int texID);
+973a7cd4 src/guiengine/scalable_font.hpp (auria           2012-01-30 00:27:53 +0000 113) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 114)     //! draws an text and clips it to the specified rectangle if wanted
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 115)     virtual void draw(const core::stringw& text, const core::rect<s32>& position,
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400 116)         video::SColor color, bool hcenter = false,
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400 117)         bool vcenter = false, const core::rect<s32>* clip = 0);
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 118) 
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400 119)     void draw(const core::stringw& text, const core::rect<s32>& position,
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400 120)         video::SColor color, bool hcenter,
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400 121)         bool vcenter, const core::rect<s32>* clip, bool ignoreRTL);
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400 122) 
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400 123)     void doDraw(const core::stringw& text, const core::rect<s32>& position,
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400 124)               video::SColor color, bool hcenter,
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400 125)               bool vcenter, const core::rect<s32>* clip,
+f803b01d src/guiengine/scalable_font.hpp (Marianne Gagnon 2014-07-28 19:17:59 -0400 126)               FontCharCollector* charCollector = NULL);
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000 127) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 128)     //! returns the dimension of a text
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 129)     virtual core::dimension2d<u32> getDimension(const wchar_t* text) const;
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 130) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 131)     //! Calculates the index of the character in the text which is on a specific position.
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 132)     virtual s32 getCharacterFromPos(const wchar_t* text, s32 pixel_x) const;
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 133) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 134)     //! Returns the type of this font
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 135)     virtual EGUI_FONT_TYPE getType() const { return EGFT_BITMAP; }
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 136) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 137)     //! set an Pixel Offset on Drawing ( scale position on width )
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 138)     virtual void setKerningWidth (s32 kerning);
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 139)     virtual void setKerningHeight (s32 kerning);
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 140) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 141)     //! set an Pixel Offset on Drawing ( scale position on width )
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 142)     virtual s32 getKerningWidth(const wchar_t* thisLetter=0, const wchar_t* previousLetter=0) const;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 143)     virtual s32 getKerningHeight() const;
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 144) 
+8e48d227 src/guiengine/CGUIFont.h        (hikerstk        2010-07-20 22:39:54 +0000 145)     /** Sets if digits are to be mono-spaced. */
+8e48d227 src/guiengine/CGUIFont.h        (hikerstk        2010-07-20 22:39:54 +0000 146)     void    setMonospaceDigits(bool mono) {m_mono_space_digits = mono; }
+8e48d227 src/guiengine/CGUIFont.h        (hikerstk        2010-07-20 22:39:54 +0000 147)     bool    getMonospaceDigits() const { return m_mono_space_digits;   }
+d00f587d src/guiengine/scalable_font.hpp (hikerstk        2011-03-29 22:59:32 +0000 148)     void    setShadow(const irr::video::SColor &col);
+d00f587d src/guiengine/scalable_font.hpp (hikerstk        2011-03-29 22:59:32 +0000 149)     void    disableShadow() {m_shadow = false;}
+f3f98293 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:47:33 +0000 150) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 151)     //! gets the sprite bank
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 152)     virtual IGUISpriteBank* getSpriteBank() const;
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 153) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 154)     //! returns the sprite number from a given character
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 155)     virtual u32 getSpriteNoFromChar(const wchar_t *c) const;
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 156) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 157)     virtual void setInvisibleCharacters( const wchar_t *s );
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 158) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 159)     void setScale(const float scale);
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 160)     float getScale() const { return m_scale; }
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000 161) 
+8b9a9677 src/guiengine/scalable_font.hpp (auria           2011-02-06 02:11:57 +0000 162)     void updateRTL();
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000 163) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 164) private:
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 165) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 166)     struct SFontArea
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 167)     {
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 168)         SFontArea() : underhang(0), overhang(0), width(0), spriteno(0) {}
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 169)         s32             underhang;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 170)         s32             overhang;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 171)         s32             width;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 172)         u32             spriteno;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 173)     };
+57c3cbae src/guiengine/scalable_font.hpp (curaga          2013-05-30 19:47:39 +0000 174) 
+b256e43a src/guiengine/CGUIFont.h        (auria           2010-01-29 00:19:17 +0000 175)     int getCharWidth(const SFontArea& area, const bool fallback) const;
+8e48d227 src/guiengine/CGUIFont.h        (hikerstk        2010-07-20 22:39:54 +0000 176)     s32 getAreaIDFromCharacter(const wchar_t c, bool* fallback_font) const;
+8e48d227 src/guiengine/CGUIFont.h        (hikerstk        2010-07-20 22:39:54 +0000 177)     const SFontArea &getAreaFromCharacter(const wchar_t c, bool* fallback_font) const;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 178)     void setMaxHeight();
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 179) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 180)     core::array<SFontArea>      Areas;
+8e48d227 src/guiengine/CGUIFont.h        (hikerstk        2010-07-20 22:39:54 +0000 181)     /** The maximum values of all digits, used in monospace_digits. */
+8e48d227 src/guiengine/CGUIFont.h        (hikerstk        2010-07-20 22:39:54 +0000 182)     mutable SFontArea           m_max_digit_area;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 183)     std::map<wchar_t, s32>      CharacterMap;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 184)     video::IVideoDriver*        Driver;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 185)     IGUISpriteBank*         SpriteBank;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 186)     IGUIEnvironment*        Environment;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 187)     u32             WrongCharacter;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 188)     s32             MaxHeight;
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 189)     s32             GlobalKerningWidth, GlobalKerningHeight;
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 190) 
+03c65002 src/guiengine/CGUIFont.h        (hikerstk        2010-07-19 03:36:59 +0000 191)     core::stringw Invisible;
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 192) };
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 193) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 194) } // end namespace gui
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 195) } // end namespace irr
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 196) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 197) 
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 198) #endif // __C_GUI_FONT_H_INCLUDED__
+d9f6abd5 src/guiengine/CGUIFont.h        (auria           2009-12-05 23:15:15 +0000 199) 

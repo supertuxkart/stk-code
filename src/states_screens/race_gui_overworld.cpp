@@ -219,11 +219,9 @@ void RaceGUIOverworld::drawTrophyPoints()
     core::rect<s32> pos(UserConfigParams::m_width - dist_from_right, 10,
                         UserConfigParams::m_width                  , 50);
 
-    bool vcenter = false;
-
     gui::ScalableFont* font = GUIEngine::getFont();
 
-    vcenter = true;
+    bool vcenter = true;
 
     const int size = UserConfigParams::m_width/20;
     core::rect<s32> dest(size, pos.UpperLeftCorner.Y,

@@ -94,7 +94,7 @@ private:
                     const video::SColor *lap_color=NULL);
     unsigned int getStartNode() const;
          QuadGraph     (const std::string &quad_file_name,
-                        const std::string graph_file_name,
+                        const std::string &graph_file_name,
                         const bool reverse);
         ~QuadGraph     ();
 public:
@@ -139,7 +139,7 @@ public:
     // ----------------------------------------------------------------------==
     /** Creates a QuadGraph instance. */
     static void create(const std::string &quad_file_name,
-                       const std::string graph_file_name,
+                       const std::string &graph_file_name,
                        const bool reverse)
     {
         assert(m_quad_graph==NULL);

@@ -69,7 +69,7 @@ class STKHost
          *  \param incoming : True if the packet comes from a peer.
          *  False if it's sent to a peer.
          */
-        static void logPacket(const NetworkString ns, bool incoming);
+        static void logPacket(const NetworkString &ns, bool incoming);
 
         /*! \brief Thread function checking if data is received.
          *  This function tries to get data from network low-level functions as
