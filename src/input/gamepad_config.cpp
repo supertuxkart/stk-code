@@ -163,11 +163,11 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
         {
             switch(id)
             {
-                // I18N: Name of the black button on xbox controller
+                    // I18N: Name of the black button on xbox controller
             case 2: return _("Black");
             case 3: return "X";
             case 4: return "Y";
-                // I18N: Name of the white button on xbox controller
+                    // I18N: Name of the white button on xbox controller
             case 5: return _("White");
             }
         }
@@ -175,15 +175,25 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
         {
             switch(id)
             {
+                    // I18N: name of buttons on gamepads
             case 2: return _("Left trigger");
-            case 3: return (ad==Input::AD_POSITIVE) ? _("Right thumb right")
-                                                    : _("Right thumb left");
-            case 4: return (ad==Input::AD_POSITIVE) ? _("Right thumb down")
-                                                    : _("Right thumb up");
+                                                      // I18N: name of buttons on gamepads
+            case 3: return (ad == Input::AD_POSITIVE) ? _("Right thumb right")
+                                                      // I18N: name of buttons on gamepads
+                                                      : _("Right thumb left");
+            case                                      // I18N: name of buttons on gamepads
+                4: return (ad == Input::AD_POSITIVE)  ? _("Right thumb down")
+                                                      // I18N: name of buttons on gamepads
+                                                      : _("Right thumb up");
+                    // I18N: name of buttons on gamepads
             case 5: return _("Right trigger");
-            case 6: return (ad == Input::AD_POSITIVE) ? _("DPad right") 
+                                                      // I18N: name of buttons on gamepads
+            case 6: return (ad == Input::AD_POSITIVE) ? _("DPad right")
+                                                      // I18N: name of buttons on gamepads
                                                       : _("DPad left");
+                                                      // I18N: name of buttons on gamepads
             case 7: return (ad == Input::AD_POSITIVE) ? _("DPad down")
+                                                      // I18N: name of buttons on gamepads
                                                       : _("DPad up");
             }   // switch
         }   // stickmotion
@@ -198,11 +208,17 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
             case 1: return "B";
             case 2: return "X";
             case 3: return "Y";
+                    // I18N: name of buttons on gamepads
             case 4: return _("Left bumper");
+                    // I18N: name of buttons on gamepads                
             case 5: return _("Right bumper");
+                    // I18N: name of buttons on gamepads
             case 6: return _("Back");
+                    // I18N: name of buttons on gamepads
             case 7: return _("Start");
+                    // I18N: name of buttons on gamepads
             case 8: return _("Left thumb button");
+                    // I18N: name of buttons on gamepads
             case 9: return _("Right thumb button");
             default: return DeviceConfig::getBindingAsString(action);
             }   // switch
@@ -211,19 +227,33 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
         {
             switch(id)
             {
+                                                    // I18N: name of stick on gamepads
             case 0: return (ad==Input::AD_POSITIVE) ? _("Left thumb right")
+                                                    // I18N: name of stick on gamepads
                                                     : _("Left thumb left");
+                                                    // I18N: name of stick on gamepads
             case 1: return (ad==Input::AD_POSITIVE) ? _("Left thumb down")
+                                                    // I18N: name of stick on gamepads
                                                     : _("Left thumb up");
+                                                    // I18N: name of stick on gamepads
             case 2: return (ad==Input::AD_POSITIVE) ? _("Left trigger")
+                                                    // I18N: name of stick on gamepads
                                                     : _("Right trigger");
+                                                    // I18N: name of stick on gamepads
             case 3: return (ad==Input::AD_POSITIVE) ? _("Right thumb down")
+                                                    // I18N: name of stick on gamepads
                                                     : _("Right thumb up");
+                                                    // I18N: name of stick on gamepads
             case 4: return (ad==Input::AD_POSITIVE) ? _("Right thumb right")
+                                                    // I18N: name of stick on gamepads
                                                     : _("Right thumb left");
+                                                    // I18N: name of buttons on gamepads
             case Input::HAT_H_ID: return (ad == Input::AD_POSITIVE) ? _("DPad up") 
+                                                    // I18N: name of buttons on gamepads
                                                                     : _("DPad down");
+                                                    // I18N: name of buttons on gamepads
             case Input::HAT_V_ID: return (ad == Input::AD_POSITIVE) ? _("DPad right")
+                                                    // I18N: name of buttons on gamepads
                                                                     : _("DPad left");
             }   // switch
         }
