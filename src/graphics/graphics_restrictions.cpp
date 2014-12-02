@@ -84,7 +84,9 @@ public:
     Version(const std::string &driver_version, const std::string &card_name)
     {
         m_version.clear();
+
         // Intel card: driver version = "3.1.0 - Build 9.17.10.3517"
+        // ---------------------------------------------------------
         if (StringUtils::startsWith(card_name, "Intel"))
         {
             std::vector<std::string> s = StringUtils::split(driver_version, '-');
@@ -93,6 +95,19 @@ public:
                 convertVersionString(s[1]);
                 return;
             }
+        }
+
+        // Nvidia: driver_version = "4.3.0 NVIDIA 340.58"
+        // ----------------------------------------------
+        if (driver_version.find("NVIDIA") != std::string::npos)
+        {
+            std::vector<std::string> s = StringUtils::split(driver_version, ' ');
+            if (s.size() == 3)
+            {
+                convertVersionString(s[2]);
+                return;
+            }
+
         }
 
         Log::warn("Graphics", "Can not find version for '%s' '%s' - ignored.",
