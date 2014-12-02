@@ -155,7 +155,7 @@ void UserInfoDialog::sendFriendRequest()
                                                              true, false);
                 ProfileManager::get()->getProfileByID(id)->setRelationInfo(info);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();
-                info_text = _("Friend request send!");
+                info_text = _("Friend request sent!");
             }
             else
             {
