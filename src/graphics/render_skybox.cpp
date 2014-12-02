@@ -280,6 +280,7 @@ void IrrDriver::generateSkyboxCubemap()
 
     assert(SkyboxTextures.size() == 6);
     SkyboxCubeMap = generateCubeMapFromTextures(SkyboxTextures);
+    SkyboxSpecularProbe = generateSpecularCubemap(SkyboxCubeMap);
 }
 
 void IrrDriver::generateDiffuseCoefficients()
@@ -322,8 +323,8 @@ void IrrDriver::generateDiffuseCoefficients()
     }
     else
     {
-        int sh_w = 16;
-        int sh_h = 16;
+        sh_w = 16;
+        sh_h = 16;
 
         video::SColor ambient = m_scene_manager->getAmbientLight().toSColor();
 

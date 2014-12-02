@@ -50,9 +50,8 @@ void main(void)
     sampleDirection = (InverseViewMatrix * vec4(sampleDirection, 0.)).xyz;
 
     float specval = texture(ntex, uv).z;
-    // From http://graphics.cs.williams.edu/papers/EnvMipReport2013/
-    int texSize = textureSize(tex, 0).x;
-    float lodval = clamp(log2(texSize * sqrt(3.)) - (5. * specval + 1.), 0., 10.);
+     // Assume 8 level of lod (ie 256x256 texture)
+    float lodval = 8. * (1. - specval);
     vec4 specular = textureLod(tex, sampleDirection, lodval);
     Spec = max(specular, vec4(0.));
 }

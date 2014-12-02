@@ -1,6 +1,8 @@
 #ifndef IBL_HPP
 #define IBL_HPP
 
+#include "gl_headers.hpp"
+
 struct Color
 {
     float Red;
@@ -14,4 +16,6 @@ using the cubemap provided by CubemapFace.
 *  \param row/columns count of textures.
 */
 void SphericalHarmonics(Color *CubemapFace[6], size_t edge_size, float *blueSHCoeff, float *greenSHCoeff, float *redSHCoeff);
+
+GLuint generateSpecularCubemap(GLuint probe);
 #endif

@@ -889,6 +889,18 @@ unsigned getGLSLVersion()
     return irr_driver->getGLSLVersion();
 }
 
+namespace UtilShader
+{
+    SpecularIBLGenerator::SpecularIBLGenerator()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/importance_sampling_specular.frag").c_str());
+        AssignUniforms("PermutationMatrix", "samples[0]", "ViewportSize");
+        AssignSamplerNames(Program, 0, "tex");
+    }
+}
+
 namespace MeshShader
 {
     // Solid Normal and depth pass shaders
