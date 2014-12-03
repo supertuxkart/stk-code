@@ -482,7 +482,7 @@ void UserInfoDialog::onUpdate(float dt)
         bool enter_profile = m_enter_profile;
         ModalDialog::dismiss();
         if (enter_profile)
-            StateManager::get()->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
+            StateManager::get()->replaceTopMostScreen(TabOnlineProfileAchievements::getInstance());
         return;
     }
 }   // onUpdate
