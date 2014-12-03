@@ -50,17 +50,6 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
 
     scene::IMeshBuffer* buffer = m_mesh->getMeshBuffer(0);
     material->setMaterialProperties(&buffer->getMaterial(), buffer);
-    material->setMaterialProperties(&m_node->getMaterial(0), buffer);
-
-    buffer->getMaterial().setFlag(video::EMF_BACK_FACE_CULLING, false);
-    buffer->getMaterial().setFlag(video::EMF_COLOR_MATERIAL, true);
-    buffer->getMaterial().ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
-    buffer->getMaterial().MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
-
-    m_node->getMaterial(0).setFlag(video::EMF_BACK_FACE_CULLING, false);
-    m_node->getMaterial(0).setFlag(video::EMF_COLOR_MATERIAL, true);
-    m_node->getMaterial(0).ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
-    m_node->getMaterial(0).MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
 
     STKMeshSceneNode* stk_node = dynamic_cast<STKMeshSceneNode*>(m_node);
     if (stk_node != NULL)
@@ -208,7 +197,7 @@ void SlipStream::createMesh(Material* material)
     const unsigned int  last_segment   = 14;
     const float         f              = 2*M_PI/float(num_segments);
     scene::SMeshBuffer *buffer         = new scene::SMeshBuffer();
-
+    buffer->getMaterial().TextureLayer[0].Texture = material->getTexture();
     for(unsigned int j=0; j<num_circles; j++)
     {
         float curr_distance = distance[j]-distance[0];
@@ -244,6 +233,15 @@ void SlipStream::createMesh(Material* material)
             buffer->Indices.push_back((j+1)*diff_segments+i+1);
         }
     }   // for j<num_circles-1
+
+    material->setMaterialProperties(&buffer->getMaterial(), buffer);
+    if (!irr_driver->isGLSL())
+    {
+        buffer->Material.setFlag(video::EMF_BACK_FACE_CULLING, false);
+        buffer->Material.setFlag(video::EMF_COLOR_MATERIAL, true);
+        buffer->Material.ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
+        //buffer->Material.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+    }
 
     scene::SMesh *mesh = new scene::SMesh();
     mesh->addMeshBuffer(buffer);
