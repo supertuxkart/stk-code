@@ -23,6 +23,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
@@ -42,21 +43,28 @@
  */
 SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
 {
-    video::SMaterial m;
-    m.BackfaceCulling = false;
-    m.MaterialType    = video::EMT_SOLID;
-
     Material *material = material_manager->getMaterial("slipstream.png");
-    m.setTexture(0, material->getTexture());
-    m.setFlag(video::EMF_BACK_FACE_CULLING, false);
-    m.setFlag(video::EMF_COLOR_MATERIAL, true);
 
-    m.ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
-
-    m.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
-
-    createMesh(m);
+    createMesh(material);
     m_node = irr_driver->addMesh(m_mesh, "splistream");
+
+    scene::IMeshBuffer* buffer = m_mesh->getMeshBuffer(0);
+    material->setMaterialProperties(&buffer->getMaterial(), buffer);
+    material->setMaterialProperties(&m_node->getMaterial(0), buffer);
+
+    buffer->getMaterial().setFlag(video::EMF_BACK_FACE_CULLING, false);
+    buffer->getMaterial().setFlag(video::EMF_COLOR_MATERIAL, true);
+    buffer->getMaterial().ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
+    buffer->getMaterial().MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+
+    m_node->getMaterial(0).setFlag(video::EMF_BACK_FACE_CULLING, false);
+    m_node->getMaterial(0).setFlag(video::EMF_COLOR_MATERIAL, true);
+    m_node->getMaterial(0).ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
+    m_node->getMaterial(0).MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+
+    STKMeshSceneNode* stk_node = dynamic_cast<STKMeshSceneNode*>(m_node);
+    if (stk_node != NULL)
+        stk_node->setReloadEachFrame(true);
     m_mesh->drop();
 
 #ifdef DEBUG
@@ -155,7 +163,7 @@ void SlipStream::reset()
  *  texture coordniates.
  *  \param material  The material to use.
  */
-void SlipStream::createMesh(const video::SMaterial &material)
+void SlipStream::createMesh(Material* material)
 {
     // All radius, starting with the one closest to the kart (and
     // widest) to the one furthest away. A 0 indicates the end of the list
@@ -200,7 +208,7 @@ void SlipStream::createMesh(const video::SMaterial &material)
     const unsigned int  last_segment   = 14;
     const float         f              = 2*M_PI/float(num_segments);
     scene::SMeshBuffer *buffer         = new scene::SMeshBuffer();
-    buffer->Material                   = material;
+
     for(unsigned int j=0; j<num_circles; j++)
     {
         float curr_distance = distance[j]-distance[0];
