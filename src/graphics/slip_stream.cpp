@@ -392,7 +392,7 @@ void SlipStream::update(float dt)
     // --------------------------------------------------------------------
     // Define this to get slipstream effect shown even when the karts are
     // not moving. This is useful for debugging the graphics of SS-ing.
-#undef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
+//#define DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
     if(m_kart->getSpeed()<m_kart->getKartProperties()->getSlipstreamMinSpeed() *
                           m_kart->getPlayerDifficulty()->getSlipstreamMinSpeed())
