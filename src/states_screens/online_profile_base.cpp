@@ -105,7 +105,7 @@ void OnlineProfileBase::init()
             m_header->setText(_("Your profile"), false);
         else if (m_visiting_profile)
         {
-            m_header->setText(m_visiting_profile->getUserName() + _("'s profile"), false);
+            m_header->setText(_("%s's profile", m_visiting_profile->getUserName()), false);
         }
         else
             Log::error("OnlineProfileBase", "No visting profile");
