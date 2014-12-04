@@ -1,6 +1,5 @@
-
-
-vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness)
+// Blinn Phong with emulated fresnel factor
+vec3 SpecularBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness)
 {
     float exponentroughness = exp2(10. * roughness + 1.);
     // Half Light View direction

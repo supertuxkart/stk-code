@@ -411,10 +411,10 @@ public:
     SunLightShader();
 };
 
-class EnvMapShader : public ShaderHelperSingleton<EnvMapShader, core::matrix4, std::vector<float>, std::vector<float>, std::vector<float> >, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_cubemap>
+class IBLShader : public ShaderHelperSingleton<IBLShader, core::matrix4, std::vector<float>, std::vector<float>, std::vector<float> >, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_cubemap>
 {
 public:
-    EnvMapShader();
+    IBLShader();
 };
 
 class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShader, float, float, float, float, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>

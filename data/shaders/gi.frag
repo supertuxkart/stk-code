@@ -9,7 +9,6 @@ uniform sampler3D SHR;
 uniform sampler3D SHG;
 uniform sampler3D SHB;
 
-uniform float R_wcs = 10.;
 uniform vec3 extents;
 uniform mat4 RHMatrix;
 uniform mat4 InvRHMatrix;

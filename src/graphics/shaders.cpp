@@ -1426,7 +1426,7 @@ namespace LightShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlight.frag").c_str());
 
@@ -1625,7 +1625,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
 
@@ -1633,13 +1633,13 @@ namespace FullScreenShader
         AssignUniforms("direction", "col");
     }
 
-    EnvMapShader::EnvMapShader()
+    IBLShader::IBLShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/IBL.frag").c_str());
         AssignUniforms("TransposeViewMatrix", "blueLmn[0]", "greenLmn[0]", "redLmn[0]");
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "tex");
     }
@@ -1649,7 +1649,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
 
