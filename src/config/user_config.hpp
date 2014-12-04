@@ -762,7 +762,7 @@ namespace UserConfigParams
                                                     "The server used for online multiplayer."));
 
     PARAM_PREFIX IntUserConfigParam        m_server_version
-            PARAM_DEFAULT( IntUserConfigParam(   1,
+            PARAM_DEFAULT( IntUserConfigParam(   2,
                                                  "server-version",
                                                  &m_online_group,
                                                     "Version of the server API to use."));
