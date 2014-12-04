@@ -177,8 +177,15 @@ namespace Online
             struct curl_slist *chunk = NULL;
             chunk = curl_slist_append(chunk, "Host: api.stkaddons.net");
             curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, chunk);
-            curl_easy_setopt(m_curl_session, CURLOPT_CAINFO,
-                file_manager->getAsset("web.tuxfamily.org.pem").c_str());
+            CURLcode error = curl_easy_setopt(m_curl_session, CURLOPT_CAINFO,
+                       file_manager->getAsset("web.tuxfamily.org.pem").c_str());
+            if (error != CURLE_OK)
+            {
+                Log::error("HTTPRequest", "Error setting CAINFO to '%s'",
+                      file_manager->getAsset("web.tuxfamily.org.pem").c_str());
+                Log::error("HTTPRequest", "Error %d: '%s'.", error,
+                           curl_easy_strerror(error));
+            }
             curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
             curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 0L);
         }
