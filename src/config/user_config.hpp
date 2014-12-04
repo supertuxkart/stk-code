@@ -752,11 +752,11 @@ namespace UserConfigParams
     // ---- Online gameplay related
 
     PARAM_PREFIX GroupUserConfigParam       m_online_group
-            PARAM_DEFAULT( GroupUserConfigParam("OnlinePlay",
+            PARAM_DEFAULT( GroupUserConfigParam("OnlineServer",
                                           "Everything related to online play.") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
-            PARAM_DEFAULT( StringUserConfigParam(   "https://api.stkaddons.net/",
+            PARAM_DEFAULT( StringUserConfigParam(   "https://104.131.193.44/stkaddons/api/",
                                                      "server_multiplayer",
                                                      &m_online_group,
                                                     "The server used for online multiplayer."));
@@ -769,11 +769,11 @@ namespace UserConfigParams
 
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
-            PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews",
+            PARAM_DEFAULT( GroupUserConfigParam("AddonServer",
                                           "Addon and news related settings") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_addons
-            PARAM_DEFAULT( StringUserConfigParam("http://stkaddons.net/dl/xml",
+            PARAM_DEFAULT( StringUserConfigParam("http://104.131.193.44/stkaddons/dl/xml",
                                                  "server_addons",
                                                  &m_addon_group,
                                                 "The server used for addon."));
