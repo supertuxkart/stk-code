@@ -60,7 +60,7 @@ void main() {
 	// Normalized on the cpu
     vec3 L = direction;
 
-    float NdotL = max(0., dot(norm, L));
+    float NdotL = clamp(dot(norm, L), 0., 1.);
 
     float angle = 3.14 * sunangle / 180.;
     vec3 R = reflect(-eyedir, norm);

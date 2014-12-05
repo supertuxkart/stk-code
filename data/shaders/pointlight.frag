@@ -35,7 +35,7 @@ void main()
     // Light Direction
     vec3 L = -normalize(xpos.xyz - light_pos);
 
-    float NdotL = max(0., dot(norm, L));
+    float NdotL = clamp(dot(norm, L), 0., 1.);
 
     Diffuse = vec4(NdotL * light_col * att, 1.);
     Specular = vec4(SpecularBRDF(norm, eyedir, L, light_col, roughness) * NdotL * att, 1.);
