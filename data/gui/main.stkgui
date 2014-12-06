@@ -40,17 +40,17 @@
 
             <buttonbar id="menu_bottomrow" x="0" y="0" width="38%" height="100%" align="center">
                 <icon-button id="test_gpwin" width="64" height="64" icon="gui/main_options.png" extend_label="50"
-                             text="TEST: GPWin" label_location="hover"/>
+                             raw_text="TEST: GPWin" label_location="hover"/>
                 <icon-button id="test_gplose" width="64" height="64" icon="gui/main_options.png" extend_label="50"
-                             text="TEST: GPLose" label_location="hover"/>
+                             raw_text="TEST: GPLose" label_location="hover"/>
                 <icon-button id="test_unlocked" width="64" height="64" icon="gui/main_options.png" extend_label="50"
-                             text="TEST: Unlocked" label_location="hover"/>
+                             raw_text="TEST: Unlocked" label_location="hover"/>
                 <icon-button id="test_unlocked2" width="64" height="64" icon="gui/main_options.png" extend_label="50"
-                             text="TEST: Unlocked 2" label_location="hover"/>
+                             raw_text="TEST: Unlocked 2" label_location="hover"/>
                 <icon-button id="test_intro" width="64" height="64" icon="gui/main_options.png" extend_label="50"
-                             text="TEST: Intro" label_location="hover"/>
+                             raw_text="TEST: Intro" label_location="hover"/>
                 <icon-button id="test_outro" width="64" height="64" icon="gui/main_options.png" extend_label="50"
-                             text="TEST: Outro" label_location="hover"/>     
+                             raw_text="TEST: Outro" label_location="hover"/>     
                 <icon-button id="options" width="64" height="64" icon="gui/main_options.png" extend_label="50"
                              I18N="In the main screen"  text="Options" label_location="hover"/>
                 <icon-button id="help" width="64" height="64" icon="gui/main_help.png"  extend_label="50"
