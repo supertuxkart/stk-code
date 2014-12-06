@@ -64,6 +64,8 @@ public:
     enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM,
                              MESSAGE_DIALOG_OK_CANCEL, MESSAGE_DIALOG_YESNO };
     
+    MessageDialogType m_type;
+
 private:
     
     IConfirmDialogListener* m_listener;
@@ -96,6 +98,8 @@ public:
     virtual void load();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+
+    virtual void loadedFromFile();
 };
 
 
