@@ -46,18 +46,19 @@ static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
 }
 
 
-static void getYml(GLenum face, size_t width, size_t height,
+static void getYml(GLenum face, size_t edge_size,
     float *Y00,
     float *Y1minus1, float *Y10, float *Y11,
     float *Y2minus2, float *Y2minus1, float *Y20, float *Y21, float *Y22)
 {
-    for (unsigned i = 0; i < width; i++)
+#pragma omp parallel for
+    for (int i = 0; i < int(edge_size); i++)
     {
-        for (unsigned j = 0; j < height; j++)
+        for (unsigned j = 0; j < edge_size; j++)
         {
             float x, y, z;
             float fi = float(i), fj = float(j);
-            fi /= width, fj /= height;
+            fi /= edge_size, fj /= edge_size;
             fi = 2 * fi - 1, fj = 2 * fj - 1;
             getXYZ(face, fi, fj, x, y, z);
 
@@ -72,7 +73,7 @@ static void getYml(GLenum face, size_t width, size_t height,
             float c20 = 0.315392f;
             float c22 = 0.546274f;
 
-            size_t idx = i * height + j;
+            size_t idx = i * edge_size + j;
 
             Y00[idx] = c00;
             Y1minus1[idx] = c1minus1 * y;
@@ -105,11 +106,12 @@ static void projectSH(Color *CubemapFace[6], size_t edge_size,
     float wh = float(edge_size * edge_size);
     for (unsigned face = 0; face < 6; face++)
     {
-        for (unsigned i = 0; i < edge_size; i++)
+#pragma omp parallel for
+        for (int i = 0; i < int(edge_size); i++)
         {
             for (unsigned j = 0; j < edge_size; j++)
             {
-                size_t idx = i * edge_size + j;
+                int idx = i * edge_size + j;
                 float fi = float(i), fj = float(j);
                 fi /= edge_size, fj /= edge_size;
                 fi = 2 * fi - 1, fj = 2 * fj - 1;
@@ -183,7 +185,7 @@ void SphericalHarmonics(Color *CubemapFace[6], size_t edge_size, float *blueSHCo
         Y21[face] = new float[edge_size * edge_size];
         Y22[face] = new float[edge_size * edge_size];
 
-        getYml(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, edge_size, edge_size, Y00[face], Y1minus1[face], Y10[face], Y11[face], Y2minus2[face], Y2minus1[face], Y20[face], Y21[face], Y22[face]);
+        getYml(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, edge_size, Y00[face], Y1minus1[face], Y10[face], Y11[face], Y2minus2[face], Y2minus1[face], Y20[face], Y21[face], Y22[face]);
     }
 
     projectSH(CubemapFace, edge_size,
@@ -284,8 +286,8 @@ GLuint generateSpecularCubemap(GLuint probe)
     {
         // Blinn Phong can be approximated by Phong with 4x the specular coefficient
         // See http://seblagarde.wordpress.com/2012/03/29/relationship-between-phong-and-blinn-lighting-model/
-        float roughness = (8 - level) * 4 * pow(2., 10.) / 8.;
-        float viewportSize = 1 << (8 - level);
+        float roughness = (8 - level) * 4 * pow(2.f, 10.f) / 8.f;
+        float viewportSize = float(1 << (8 - level));
 
         std::vector<float> Samples;
         for (unsigned i = 0; i < 1024; i++)

@@ -332,7 +332,7 @@ void IrrDriver::generateDiffuseCoefficients()
         {
             sh_rgba[i] = new unsigned char[sh_w * sh_h * 4];
 
-            for (int j = 0; j < sh_w * sh_h * 4; j += 4)
+            for (unsigned j = 0; j < sh_w * sh_h * 4; j += 4)
             {
                 sh_rgba[i][j] = ambient.getBlue();
                 sh_rgba[i][j + 1] = ambient.getGreen();

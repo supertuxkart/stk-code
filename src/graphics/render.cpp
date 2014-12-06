@@ -440,12 +440,14 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
 
     if (getRH())
     {
+        glDisable(GL_BLEND);
         m_rtts->getFBO(FBO_COLORS).Bind();
         m_post_processing->renderRHDebug(m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2], rh_matrix, rh_extend);
     }
 
     if (getGI())
     {
+        glDisable(GL_BLEND);
         m_rtts->getFBO(FBO_COLORS).Bind();
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
     }
