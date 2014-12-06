@@ -21,6 +21,7 @@ protected:
     bool isMaterialInitialized;
     bool isGLInitialized;
     bool immediate_draw;
+    bool additive;
     bool update_each_frame;
     bool isDisplacement;
     bool isGlow;

@@ -142,6 +142,8 @@ void STKMeshSceneNode::updateNoGL()
                 TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam, material);
                 if (!immediate_draw)
                     TransparentMesh[TranspMat].push_back(&mesh);
+                else
+                    additive = (TranspMat == TM_ADDITIVE);
             }
             else
             {
@@ -370,7 +372,10 @@ void STKMeshSceneNode::render()
         {
             if (update_each_frame)
                 updatevbo();
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            if (additive)
+                glBlendFunc(GL_ONE, GL_ONE);
+            else
+                glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
             if (World::getWorld() && World::getWorld()->isFogEnabled())
             {
