@@ -1,3 +1,7 @@
+// From "An Efficient Representation for Irradiance Environment Maps" article
+// See http://graphics.stanford.edu/papers/envmap/
+
+// Coefficients are calculated in IBL.cpp
 uniform float blueLmn[9];
 uniform float greenLmn[9];
 uniform float redLmn[9];
