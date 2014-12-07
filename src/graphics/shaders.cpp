@@ -1649,9 +1649,11 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/IBL.frag").c_str());
         AssignUniforms("TransposeViewMatrix", "blueLmn[0]", "greenLmn[0]", "redLmn[0]");
-        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "tex");
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
     ShadowedSunLightShader::ShadowedSunLightShader()
