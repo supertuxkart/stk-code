@@ -45,13 +45,13 @@ void ModelDefinitionLoader::addModelDefinition(const XMLNode* xml)
     std::string lodgroup;
     xml->get("lod_group", &lodgroup);
 
-    bool tangent = false;
-    xml->get("tangents", &tangent);
+    bool skeletal_animation = false;
+    xml->get("skeletal-animation", &skeletal_animation);
 
     std::string model_name;
     xml->get("model", &model_name);
 
-    m_lod_groups[lodgroup].push_back(ModelDefinition(xml, (int)lod_distance, model_name, tangent));
+    m_lod_groups[lodgroup].push_back(ModelDefinition(xml, (int)lod_distance, model_name, false, skeletal_animation));
 }
 
 // ----------------------------------------------------------------------------
@@ -72,28 +72,51 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
         lod_node->updateAbsolutePosition();
         for (unsigned int m=0; m<group.size(); m++)
         {
-            // TODO: check whether the mesh contains animations or not?
-            scene::IMesh* a_mesh = irr_driver->getMesh(group[m].m_model_file);
-
-            if (!a_mesh)
+            if (group[m].m_skeletal_animation)
             {
-                Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
-                          group[m].m_model_file.c_str());
-                continue;
+                scene::IAnimatedMesh* a_mesh = irr_driver->getAnimatedMesh(group[m].m_model_file);
+                if (!a_mesh)
+                {
+                    Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
+                        group[m].m_model_file.c_str());
+                    continue;
+                }
+
+                irr_driver->setAllMaterialFlags(a_mesh);
+
+                a_mesh->grab();
+                //cache.push_back(a_mesh);
+                irr_driver->grabAllTextures(a_mesh);
+                m_track->addCachedMesh(a_mesh);
+                scene::IAnimatedMeshSceneNode* scene_node = irr_driver->addAnimatedMesh(a_mesh, group[m].m_model_file);
+
+                m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
+
+                lod_node->add(group[m].m_distance, scene_node, true);
             }
+            else
+            {
+                scene::IMesh* a_mesh = irr_driver->getMesh(group[m].m_model_file);
+                if (!a_mesh)
+                {
+                    Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
+                        group[m].m_model_file.c_str());
+                    continue;
+                }
 
-            a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
-            irr_driver->setAllMaterialFlags(a_mesh);
+                a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
+                irr_driver->setAllMaterialFlags(a_mesh);
 
-            a_mesh->grab();
-            //cache.push_back(a_mesh);
-            irr_driver->grabAllTextures(a_mesh);
-            m_track->addCachedMesh(a_mesh);
-            scene::IMeshSceneNode* scene_node = irr_driver->addMesh(a_mesh, group[m].m_model_file);
+                a_mesh->grab();
+                //cache.push_back(a_mesh);
+                irr_driver->grabAllTextures(a_mesh);
+                m_track->addCachedMesh(a_mesh);
+                scene::IMeshSceneNode* scene_node = irr_driver->addMesh(a_mesh, group[m].m_model_file);
 
-            m_track->handleAnimatedTextures( scene_node, *group[m].m_xml );
+                m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
 
-            lod_node->add( group[m].m_distance, scene_node, true );
+                lod_node->add(group[m].m_distance, scene_node, true);
+            }
         }
 
 #ifdef DEBUG
