@@ -49,7 +49,7 @@ NewsManager::~NewsManager()
 
 // ---------------------------------------------------------------------------
 /** This function initialises the data for the news manager. It starts a
- *  separate thread to execute downloadNews() - which (if necessary) downaloads
+ *  separate thread to execute downloadNews() - which (if necessary) downloads
  *  the news.xml file and updates the list of news messages. It also
  *  initialises the addons manager (which can trigger another download of
  *  news.xml).
@@ -458,7 +458,7 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
         // ==============================
         else if(cond[1]=="not" && cond[2]=="installed")
         {
-            // The addons_manager can not be access, since it's
+            // The addons_manager cannot be accessed, since it's
             // being initialised after the news manager. So a simple
             // test is made to see if the directory exists. It is
             // necessary to check for karts and tracks separately,
