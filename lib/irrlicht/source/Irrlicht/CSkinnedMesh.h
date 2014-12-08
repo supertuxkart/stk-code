@@ -159,7 +159,7 @@ namespace scene
 		void addJoints(core::array<IBoneSceneNode*> &jointChildSceneNodes,
 				IAnimatedMeshSceneNode* node,
 				ISceneManager* smgr);
-
+        CSkinnedMesh *clone();
 private:
 		void checkForAnimation();
 
