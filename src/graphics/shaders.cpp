@@ -894,8 +894,10 @@ namespace UtilShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/importance_sampling_specular.frag").c_str());
-        AssignUniforms("PermutationMatrix", "samples[0]", "ViewportSize");
+        AssignUniforms("PermutationMatrix", "ViewportSize");
+        TU_Samples = 1;
         AssignSamplerNames(Program, 0, "tex");
+        AssignTextureUnit(Program, TexUnit(TU_Samples, "samples"));
     }
 }
 

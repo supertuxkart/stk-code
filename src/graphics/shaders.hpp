@@ -49,9 +49,10 @@ public:
     static void setUniforms(const irr::video::SColor &);
 };
 
-class SpecularIBLGenerator : public ShaderHelperSingleton<SpecularIBLGenerator, core::matrix4, std::vector<float>, float >, public TextureRead<Trilinear_cubemap>
+class SpecularIBLGenerator : public ShaderHelperSingleton<SpecularIBLGenerator, core::matrix4, float >, public TextureRead<Trilinear_cubemap>
 {
 public:
+    GLuint TU_Samples;
     SpecularIBLGenerator();
 };
 }

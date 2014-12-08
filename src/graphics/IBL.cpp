@@ -289,24 +289,39 @@ GLuint generateSpecularCubemap(GLuint probe)
         float roughness = (8 - level) * 4 * pow(2.f, 10.f) / 8.f;
         float viewportSize = float(1 << (8 - level));
 
-        std::vector<float> Samples;
+        float *tmp = new float[2048];
         for (unsigned i = 0; i < 1024; i++)
         {
             std::pair<float, float> sample = ImportanceSamplingPhong(HammersleySequence(i, 1024), roughness);
-            Samples.push_back(sample.first);
-            Samples.push_back(sample.second);
+            tmp[2 * i] = sample.first;
+            tmp[2 * i + 1] = sample.second;
         }
+
+        glActiveTexture(GL_TEXTURE0 + UtilShader::SpecularIBLGenerator::getInstance()->TU_Samples);
+        GLuint sampleTex, sampleBuffer;
+        glGenBuffers(1, &sampleBuffer);
+        glBindBuffer(GL_TEXTURE_BUFFER, sampleBuffer);
+        glBufferData(GL_TEXTURE_BUFFER, 2048 * sizeof(float), tmp, GL_STATIC_DRAW);
+        glGenTextures(1, &sampleTex);
+        glBindTexture(GL_TEXTURE_BUFFER, sampleTex);
+        glTexBuffer(GL_TEXTURE_BUFFER, GL_RG32F, sampleBuffer);
 
         for (unsigned face = 0; face < 6; face++)
         {
+
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, cubemap_texture, level);
             GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
             assert(status == GL_FRAMEBUFFER_COMPLETE);
 
             UtilShader::SpecularIBLGenerator::getInstance()->SetTextureUnits(probe);
-            UtilShader::SpecularIBLGenerator::getInstance()->setUniforms(M[face], Samples, viewportSize);
+            UtilShader::SpecularIBLGenerator::getInstance()->setUniforms(M[face], viewportSize);
+
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
+
+        delete[] tmp;
+        glDeleteTextures(1, &sampleTex);
+        glDeleteBuffers(1, &sampleBuffer);
     }
 
     glDeleteFramebuffers(1, &fbo);
