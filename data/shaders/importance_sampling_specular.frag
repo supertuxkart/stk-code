@@ -20,8 +20,8 @@ void main(void)
 
     for (int i = 0; i < 1024; i++)
     {
-        float Theta = texelFetch(samples, 2 * i).r;
-        float Phi = texelFetch(samples, 2 * i).g;
+        float Theta = texelFetch(samples, i).r;
+        float Phi = texelFetch(samples, i).g;
 
         vec3 L = cos(Theta) * RayDir + sin(Theta) * cos(Phi) * Tangent + sin(Theta) * sin(Phi) * Bitangent;
         float NdotL = clamp(dot(RayDir, L), 0., 1.);
