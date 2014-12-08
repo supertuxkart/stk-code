@@ -241,18 +241,22 @@ KartModel::~KartModel()
         }
     }
 
-    if(m_is_master && m_mesh)
+    // In case of the master, the mesh must be dropped. A non-master KartModel
+    // has a copy of the master's mesh, so it needs to be dropped, too.
+    if (m_mesh)
     {
         m_mesh->drop();
-        // If there is only one copy left, it's the copy in irrlicht's
-        // mesh cache, so it can be remove.
-        if(m_mesh && m_mesh->getReferenceCount()==1)
+        if (m_is_master)
         {
-            irr_driver->dropAllTextures(m_mesh);
-            irr_driver->removeMeshFromCache(m_mesh);
+            // If there is only one copy left, it's the copy in irrlicht's
+            // mesh cache, so it can be removed. 
+            if (m_mesh && m_mesh->getReferenceCount() == 1)
+            {
+                irr_driver->dropAllTextures(m_mesh);
+                irr_driver->removeMeshFromCache(m_mesh);
+            }
         }
     }
-
 #ifdef DEBUG
 #if SKELETON_DEBUG
     irr_driver->clearDebugMeshes();
