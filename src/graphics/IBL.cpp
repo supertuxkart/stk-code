@@ -286,7 +286,8 @@ GLuint generateSpecularCubemap(GLuint probe)
     {
         // Blinn Phong can be approximated by Phong with 4x the specular coefficient
         // See http://seblagarde.wordpress.com/2012/03/29/relationship-between-phong-and-blinn-lighting-model/
-        float roughness = (8 - level) * 4 * pow(2.f, 10.f) / 8.f;
+        // NOTE : Removed because it makes too sharp reflexion
+        float roughness = (8 - level) * pow(2.f, 10.f) / 8.f;
         float viewportSize = float(1 << (8 - level));
 
         float *tmp = new float[2048];

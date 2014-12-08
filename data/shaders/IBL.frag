@@ -22,5 +22,5 @@ void main(void)
     vec3 eyedir = -normalize(xpos.xyz);
     float specval = texture(ntex, uv).z;
 
-    Spec = vec4(SpecularIBL(normal, eyedir, specval), 1.);
+    Spec = vec4(.25 * SpecularIBL(normal, eyedir, specval), 1.);
 }
