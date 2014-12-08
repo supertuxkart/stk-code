@@ -794,6 +794,7 @@ void CSkinnedMesh::checkForAnimation()
 				AllJoints[i]->UseAnimationFrom->RotationKeys.size() )
 			{
 				HasAnimation = true;
+                break;
 			}
 		}
 	}
@@ -803,8 +804,11 @@ void CSkinnedMesh::checkForAnimation()
 	{
 		for(i=0;i<AllJoints.size();++i)
 		{
-			if (AllJoints[i]->Weights.size())
-				HasAnimation = true;
+            if (AllJoints[i]->Weights.size())
+            {
+                HasAnimation = true;
+                break;
+            }
 		}
 	}
 
