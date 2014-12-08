@@ -267,7 +267,6 @@ GLuint generateSpecularCubemap(GLuint probe)
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, bufs);
     glUseProgram(UtilShader::SpecularIBLGenerator::getInstance()->Program);
-    glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -298,6 +297,7 @@ GLuint generateSpecularCubemap(GLuint probe)
             tmp[2 * i + 1] = sample.second;
         }
 
+        glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0 + UtilShader::SpecularIBLGenerator::getInstance()->TU_Samples);
         GLuint sampleTex, sampleBuffer;
         glGenBuffers(1, &sampleBuffer);
@@ -306,6 +306,7 @@ GLuint generateSpecularCubemap(GLuint probe)
         glGenTextures(1, &sampleTex);
         glBindTexture(GL_TEXTURE_BUFFER, sampleTex);
         glTexBuffer(GL_TEXTURE_BUFFER, GL_RG32F, sampleBuffer);
+        glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
         for (unsigned face = 0; face < 6; face++)
         {
@@ -319,12 +320,15 @@ GLuint generateSpecularCubemap(GLuint probe)
 
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
+        glActiveTexture(GL_TEXTURE0 + UtilShader::SpecularIBLGenerator::getInstance()->TU_Samples);
+        glBindBuffer(GL_TEXTURE_BUFFER, 0);
+        glBindTexture(GL_TEXTURE_BUFFER, 0);
 
         delete[] tmp;
         glDeleteTextures(1, &sampleTex);
         glDeleteBuffers(1, &sampleBuffer);
     }
-
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
     return cubemap_texture;
 }
