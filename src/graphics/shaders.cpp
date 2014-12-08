@@ -1864,7 +1864,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
 
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "texture");
+        AssignSamplerNames(Program, 0, "tex");
         vao = createVAO(Program);
     }
 
