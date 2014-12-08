@@ -254,6 +254,7 @@ private:
 
 public:
     GLuint SkyboxCubeMap;
+    GLuint SkyboxSpecularProbe;
     /** A simple class to store video resolutions. */
     class VideoMode
     {
@@ -386,10 +387,7 @@ private:
     unsigned             object_count[PASS_COUNT];
     unsigned             poly_count[PASS_COUNT];
     u32                  m_renderpass;
-    u32                  m_lensflare_query;
-    bool                 m_query_issued;
     class STKMeshSceneNode *m_sun_interposer;
-    scene::CLensFlareSceneNode *m_lensflare;
     scene::ICameraSceneNode *m_suncam;
     core::vector3df m_sundirection;
     video::SColorf m_suncolor;

@@ -25,5 +25,5 @@ void main()
 
     vec3 FragmentNormal = TS_normal.x * Frag_tangent + TS_normal.y * Frag_bitangent - TS_normal.z * Frag_normal;
     EncodedNormal.xy = 0.5 * EncodeNormal(normalize(FragmentNormal)) + 0.5;
-    EncodedNormal.z = exp2(10. * (1. - alpha) + 1.);
+    EncodedNormal.z = 1. - alpha;
 }

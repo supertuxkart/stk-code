@@ -57,7 +57,7 @@ const char* inet_ntop(int af, const void* src, char* dst, int cnt)
 FILE* STKHost::m_log_file = NULL;
 pthread_mutex_t STKHost::m_log_mutex;
 
-void STKHost::logPacket(const NetworkString ns, bool incoming)
+void STKHost::logPacket(const NetworkString &ns, bool incoming)
 {
     if (m_log_file == NULL)
         return;

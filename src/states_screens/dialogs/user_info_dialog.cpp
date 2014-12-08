@@ -155,7 +155,7 @@ void UserInfoDialog::sendFriendRequest()
                                                              true, false);
                 ProfileManager::get()->getProfileByID(id)->setRelationInfo(info);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();
-                info_text = _("Friend request send!");
+                info_text = _("Friend request sent!");
             }
             else
             {
@@ -482,7 +482,7 @@ void UserInfoDialog::onUpdate(float dt)
         bool enter_profile = m_enter_profile;
         ModalDialog::dismiss();
         if (enter_profile)
-            StateManager::get()->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
+            StateManager::get()->replaceTopMostScreen(TabOnlineProfileAchievements::getInstance());
         return;
     }
 }   // onUpdate

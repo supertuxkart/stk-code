@@ -166,7 +166,7 @@ namespace GUIEngine
           * \pre only valid for ribbons that take text-only contents
           *       (e.g. tab bars)
           */
-        void addTextChild(const wchar_t* text, const std::string id);
+        void addTextChild(const wchar_t* text, const std::string &id);
         
         
         /** \brief Dynamically (at runtime) add an icon item to this ribbon.

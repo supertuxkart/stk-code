@@ -235,6 +235,7 @@ void determineOSVersion()
     case 0x0600: m_os_version="Windows Vista"; break;
     case 0x0601: m_os_version="Windows 7";     break;
     case 0x0602: m_os_version="Windows 8";     break;
+    case 0x0603: m_os_version="Windows 8_1";   break;
     default: {
                  m_os_version = StringUtils::insertValues("Windows %d",
                                                           windows_version);

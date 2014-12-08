@@ -34,11 +34,7 @@ TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE typ
 {
     if (type == irr_driver->getShader(ES_DISPLACE))
         return TM_DISPLACEMENT;
-    video::E_BLEND_FACTOR srcFact, DstFact;
-    video::E_MODULATE_FUNC mod;
-    u32 alpha;
-    unpack_textureBlendFunc(srcFact, DstFact, mod, alpha, MaterialTypeParam);
-    if (DstFact == video::EBF_ONE || type == video::EMT_TRANSPARENT_ADD_COLOR)
+    if (material->getShaderType() == Material::SHADERTYPE_ADDITIVE)
         return TM_ADDITIVE;
     return TM_DEFAULT;
 }

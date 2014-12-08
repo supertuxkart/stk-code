@@ -27,8 +27,9 @@
 
 #include <stdexcept>
 
-ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,255,255),
-    m_max_start_color(255,255,255,255), m_name(file)
+ParticleKind::ParticleKind(const std::string &file) 
+            : m_min_start_color(255,255,255,255),
+              m_max_start_color(255,255,255,255), m_name(file)
 {
     // ---- Initial values to prevent readin uninitialized values
     m_max_size       = 0.5f;
@@ -52,7 +53,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_fade_away_end    = -1.0f;
     m_force_lost_to_gravity_time = 1000;
     m_emission_decay_rate = 0;
-    m_has_scale_affector = NULL;
+    m_has_scale_affector = false;
     m_scale_affector_factor_x = 0.0f;
     m_scale_affector_factor_y = 0.0f;
     m_wind_speed = 0;

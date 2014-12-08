@@ -440,12 +440,14 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
 
     if (getRH())
     {
+        glDisable(GL_BLEND);
         m_rtts->getFBO(FBO_COLORS).Bind();
         m_post_processing->renderRHDebug(m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2], rh_matrix, rh_extend);
     }
 
     if (getGI())
     {
+        glDisable(GL_BLEND);
         m_rtts->getFBO(FBO_COLORS).Bind();
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
     }
@@ -575,29 +577,6 @@ void IrrDriver::computeSunVisibility()
     if (World::getWorld() != NULL)
     {
         hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-    }
-
-    if (UserConfigParams::m_light_shaft && hasgodrays)
-    {
-        GLuint res = 0;
-        if (m_query_issued)
-            glGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
-        m_post_processing->setSunPixels(res);
-
-        // Prepare the query for the next frame.
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        glBeginQuery(GL_SAMPLES_PASSED_ARB, m_lensflare_query);
-        m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
-        m_scene_manager->drawAll(scene::ESNRP_CAMERA);
-        irr_driver->setPhase(GLOW_PASS);
-        m_sun_interposer->render();
-        glEndQuery(GL_SAMPLES_PASSED_ARB);
-        m_query_issued = true;
-
-        m_lensflare->setStrength(res / 4000.0f);
-
-        // Make sure the color mask is reset
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
 }
 
@@ -836,13 +815,6 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     memcpy(&tmp[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
 
     m_suncam->render();
-    const core::vector3df &camdir = (camnode->getTarget() - camnode->getAbsolutePosition()).normalize();
-    const core::vector3df &sundir = (m_suncam->getTarget() - m_suncam->getAbsolutePosition()).normalize();
-    const core::vector3df &up = camdir.crossProduct(sundir).normalize();
-    if (up.getLength())
-        m_suncam->setUpVector(up);
-    m_suncam->render();
-
     for (unsigned i = 0; i < 4; i++)
     {
         if (m_shadow_camnodes[i])

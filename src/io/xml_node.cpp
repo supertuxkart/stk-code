@@ -174,7 +174,7 @@ const void XMLNode::getNodes(const std::string &s, std::vector<XMLNode*>& out) c
 */
 int XMLNode::get(const std::string &attribute, std::string *value) const
 {
-    if(m_attributes.size()==0) return 0;
+    if(m_attributes.empty()) return 0;
     std::map<std::string, core::stringw>::const_iterator o;
     o = m_attributes.find(attribute);
     if(o==m_attributes.end()) return 0;
@@ -184,7 +184,7 @@ int XMLNode::get(const std::string &attribute, std::string *value) const
 // ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, core::stringw *value) const
 {
-    if(m_attributes.size()==0) return 0;
+    if(m_attributes.empty()) return 0;
     std::map<std::string, core::stringw>::const_iterator o;
     o = m_attributes.find(attribute);
     if(o==m_attributes.end()) return 0;

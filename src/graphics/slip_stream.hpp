@@ -32,6 +32,7 @@ using namespace irr;
 
 class AbstractKart;
 class Quad;
+class Material;
 
 /**
   * \ingroup graphics
@@ -80,7 +81,7 @@ private:
      ** overtake the right kart. */
     AbstractKart* m_target_kart;
 
-    void         createMesh(const video::SMaterial &m);
+    void         createMesh(Material* material);
     void         setDebugColor(const video::SColor &color);
 public:
                  SlipStream  (AbstractKart* kart);

@@ -898,8 +898,11 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
+        irr::core::stringw back = config->getBindingAsString(PA_LOOK_BACK);
 
-        new TutorialMessageDialog(_("Press <B> to look behind, to fire the weapon with <%s> while pressing <B> to to fire behind!", fire),
+    new TutorialMessageDialog(
+           _("Press <%s> to look behind, and fire the weapon with <%s> while "
+             "pressing <%s> to fire behind!", back, fire, back),
             true);
     }
     else if (m_action == "tutorial_nitro_collect")

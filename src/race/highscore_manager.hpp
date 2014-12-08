@@ -49,10 +49,10 @@ public:
                 HighscoreManager();
                ~HighscoreManager();
     void        saveHighscores();
-    Highscores *getHighscores(const Highscores::HighscoreType highscore_type,
+    Highscores *getHighscores(const Highscores::HighscoreType &highscore_type,
                               int num_karts,
                               const RaceManager::Difficulty difficulty,
-                              const std::string trackName,
+                              const std::string &trackName,
                               const int number_of_laps,
                               const bool reverse);
 };   // HighscoreManager

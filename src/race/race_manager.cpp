@@ -798,7 +798,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
                                   bool from_overworld)
 {
     StateManager::get()->enterGameState();
-    setTrack(track_ident.c_str());
+    setTrack(track_ident);
 
     if (num_laps != -1) setNumLaps( num_laps );
 

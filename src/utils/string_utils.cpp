@@ -34,7 +34,7 @@
 
 namespace StringUtils
 {
-    bool hasSuffix(const std::string& lhs, const std::string rhs)
+    bool hasSuffix(const std::string& lhs, const std::string &rhs)
     {
         if (lhs.length() < rhs.length())
             return false;

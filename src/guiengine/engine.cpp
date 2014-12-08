@@ -288,7 +288,7 @@ namespace GUIEngine
 
  \n
  \subsection prop2 PROP_TEXT
- <em> Name in XML files: </em> \c "text"
+ <em> Name in XML files: </em> \c "text" or "raw_text" ("text" is translated, "raw_text" is not)
 
  gives text (a label) to the widget where supported. Ribbon-grids give a
  special meaning to this parameter, see ribbon-grid docs above.

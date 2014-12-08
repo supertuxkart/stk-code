@@ -62,8 +62,6 @@ private:
 
     video::ITexture *m_areamap;
 
-    u32 m_sunpixels;
-
     void setMotionBlurCenterY(const u32 num, const float y);
 
 public:
@@ -107,8 +105,6 @@ public:
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);
-
-    void         setSunPixels(const u32 in) { m_sunpixels = in; }
 };
 
 #endif // HEADER_POST_PROCESSING_HPP

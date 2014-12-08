@@ -382,7 +382,7 @@ void Profiler::draw()
         video::SColor(255, 0, 255, 255)
     };
 
-    if (hovered_markers.size() == 0)
+    if (hovered_markers.empty())
     {
         float curr_val = 0;
         for (unsigned i = 0; i < Q_LAST; i++)

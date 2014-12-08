@@ -147,8 +147,6 @@ GLuint LoadShader(const char * file, unsigned type)
     char versionString[20];
     sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
     std::string Code = versionString;
-    if (irr_driver->hasVSLayerExtension())
-        Code += "#extension GL_AMD_vertex_shader_layer : enable\n";
     if (UserConfigParams::m_azdo)
         Code += "#extension GL_ARB_bindless_texture : enable\n";
     else
@@ -889,6 +887,20 @@ unsigned getGLSLVersion()
     return irr_driver->getGLSLVersion();
 }
 
+namespace UtilShader
+{
+    SpecularIBLGenerator::SpecularIBLGenerator()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/importance_sampling_specular.frag").c_str());
+        AssignUniforms("PermutationMatrix", "ViewportSize");
+        TU_Samples = 1;
+        AssignSamplerNames(Program, 0, "tex");
+        AssignTextureUnit(Program, TexUnit(TU_Samples, "samples"));
+    }
+}
+
 namespace MeshShader
 {
     // Solid Normal and depth pass shaders
@@ -1426,7 +1438,7 @@ namespace LightShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlight.frag").c_str());
 
@@ -1625,7 +1637,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
 
@@ -1633,15 +1645,17 @@ namespace FullScreenShader
         AssignUniforms("direction", "col");
     }
 
-    EnvMapShader::EnvMapShader()
+    IBLShader::IBLShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/IBL.frag").c_str());
         AssignUniforms("TransposeViewMatrix", "blueLmn[0]", "greenLmn[0]", "redLmn[0]");
-        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "tex");
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
     ShadowedSunLightShader::ShadowedSunLightShader()
@@ -1649,7 +1663,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
 

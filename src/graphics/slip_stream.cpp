@@ -23,6 +23,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
@@ -42,21 +43,17 @@
  */
 SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
 {
-    video::SMaterial m;
-    m.BackfaceCulling = false;
-    m.MaterialType    = video::EMT_SOLID;
-
     Material *material = material_manager->getMaterial("slipstream.png");
-    m.setTexture(0, material->getTexture());
-    m.setFlag(video::EMF_BACK_FACE_CULLING, false);
-    m.setFlag(video::EMF_COLOR_MATERIAL, true);
 
-    m.ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
-
-    m.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
-
-    createMesh(m);
+    createMesh(material);
     m_node = irr_driver->addMesh(m_mesh, "splistream");
+
+    scene::IMeshBuffer* buffer = m_mesh->getMeshBuffer(0);
+    material->setMaterialProperties(&buffer->getMaterial(), buffer);
+
+    STKMeshSceneNode* stk_node = dynamic_cast<STKMeshSceneNode*>(m_node);
+    if (stk_node != NULL)
+        stk_node->setReloadEachFrame(true);
     m_mesh->drop();
 
 #ifdef DEBUG
@@ -155,7 +152,7 @@ void SlipStream::reset()
  *  texture coordniates.
  *  \param material  The material to use.
  */
-void SlipStream::createMesh(const video::SMaterial &material)
+void SlipStream::createMesh(Material* material)
 {
     // All radius, starting with the one closest to the kart (and
     // widest) to the one furthest away. A 0 indicates the end of the list
@@ -200,7 +197,7 @@ void SlipStream::createMesh(const video::SMaterial &material)
     const unsigned int  last_segment   = 14;
     const float         f              = 2*M_PI/float(num_segments);
     scene::SMeshBuffer *buffer         = new scene::SMeshBuffer();
-    buffer->Material                   = material;
+    buffer->getMaterial().TextureLayer[0].Texture = material->getTexture();
     for(unsigned int j=0; j<num_circles; j++)
     {
         float curr_distance = distance[j]-distance[0];
@@ -236,6 +233,15 @@ void SlipStream::createMesh(const video::SMaterial &material)
             buffer->Indices.push_back((j+1)*diff_segments+i+1);
         }
     }   // for j<num_circles-1
+
+    material->setMaterialProperties(&buffer->getMaterial(), buffer);
+    if (!irr_driver->isGLSL())
+    {
+        buffer->Material.setFlag(video::EMF_BACK_FACE_CULLING, false);
+        buffer->Material.setFlag(video::EMF_COLOR_MATERIAL, true);
+        buffer->Material.ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
+        //buffer->Material.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+    }
 
     scene::SMesh *mesh = new scene::SMesh();
     mesh->addMeshBuffer(buffer);
@@ -386,7 +392,7 @@ void SlipStream::update(float dt)
     // --------------------------------------------------------------------
     // Define this to get slipstream effect shown even when the karts are
     // not moving. This is useful for debugging the graphics of SS-ing.
-#undef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
+//#define DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
     if(m_kart->getSpeed()<m_kart->getKartProperties()->getSlipstreamMinSpeed() *
                           m_kart->getPlayerDifficulty()->getSlipstreamMinSpeed())

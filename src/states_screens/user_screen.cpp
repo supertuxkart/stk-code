@@ -111,8 +111,14 @@ void BaseUserScreen::init()
 
     // Select the current player. That can only be done after
     // updateItemDisplay is called.
-    if(current_player_index != -1)
-        selectUser(current_player_index);
+    if (current_player_index != -1)
+    {
+        // Only set focus in case of non-tabbed version (so that keyboard
+        // or gamepad navigation with tabs works as expected, i.e. you can
+        // select the next tab without having to go up to the tab list first.
+        if(!getWidget<RibbonWidget>("options_choice"))
+            selectUser(current_player_index);
+    }
     // no current player found
     // The first player is the most frequently used, so select it
     else if (PlayerManager::get()->getNumPlayers() > 0)
@@ -586,8 +592,8 @@ void BaseUserScreen::unloaded()
  */
 void TabbedUserScreen::init()
 {
-    RibbonWidget* tab_bar = this->getWidget<RibbonWidget>("options_choice");
-    if (tab_bar != NULL) tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
+    RibbonWidget* tab_bar = getWidget<RibbonWidget>("options_choice");
+    if (tab_bar) tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
     tab_bar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tab_bar->getRibbonChildren()[1].setTooltip( _("Audio") );
     tab_bar->getRibbonChildren()[2].setTooltip(_("User Interface"));

@@ -610,9 +610,6 @@ void IrrDriver::initDevice()
         m_mrt.clear();
         m_mrt.reallocate(2);
 
-        glGenQueries(1, &m_lensflare_query);
-        m_query_issued = false;
-
         scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
         for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
         {
@@ -634,13 +631,6 @@ void IrrDriver::initDevice()
         m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
 
         sphere->drop();
-
-        m_lensflare = new scene::CLensFlareSceneNode(NULL, m_scene_manager, -1);
-        video::ITexture * const tex = getTexture(FileManager::TEXTURE,
-                                                 "lensflare.png"      );
-        if (!tex) Log::fatal("irr_driver", "Cannot find lens flare texture");
-        m_lensflare->setMaterialTexture(0, tex);
-        m_lensflare->setAutomaticCulling(scene::EAC_OFF);
 
         m_suncam = m_scene_manager->addCameraSceneNode(0, vector3df(0), vector3df(0), -1, false);
         m_suncam->grab();
@@ -1396,6 +1386,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     SkyboxTextures = texture;
     SphericalHarmonicsTextures = sphericalHarmonics;
     SkyboxCubeMap = 0;
+    SkyboxSpecularProbe = 0;
     m_SH_dirty = true;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
@@ -1408,8 +1399,12 @@ void IrrDriver::suppressSkyBox()
     SphericalHarmonicsTextures.clear();
     m_SH_dirty = true;
     if ((SkyboxCubeMap) && (!ProfileWorld::isNoGraphics()))
+    {
         glDeleteTextures(1, &SkyboxCubeMap);
+        glDeleteTextures(1, &SkyboxSpecularProbe);
+    }
     SkyboxCubeMap = 0;
+    SkyboxSpecularProbe = 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -2567,9 +2562,6 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
         {
             //m_sun_interposer->setPosition(pos);
             //m_sun_interposer->updateAbsolutePosition();
-
-            m_lensflare->setPosition(pos);
-            m_lensflare->updateAbsolutePosition();
 
             m_suncam->setPosition(pos);
             m_suncam->updateAbsolutePosition();

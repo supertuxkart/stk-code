@@ -13,7 +13,7 @@ out vec4 Diff;
 out vec4 Spec;
 
 vec3 DecodeNormal(vec2 n);
-vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
+vec3 SpecularBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
 vec3 getMostRepresentativePoint(vec3 direction, vec3 R, float angularRadius)
@@ -46,13 +46,13 @@ void main() {
 	// Normalized on the cpu
     vec3 L = direction;
 
-    float NdotL = max(0., dot(norm, L));
+    float NdotL = clamp(dot(norm, L), 0., 1.);
 
     float angle = 3.14 * sunangle / 180.;
     vec3 R = reflect(-eyedir, norm);
     vec3 Lightdir = getMostRepresentativePoint(direction, R, angle);
 
-    vec3 Specular = getSpecular(norm, eyedir, Lightdir, col, roughness) * NdotL;
+    vec3 Specular = SpecularBRDF(norm, eyedir, Lightdir, col, roughness) * NdotL;
 
 	vec3 outcol = NdotL * col;
 
