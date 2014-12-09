@@ -1031,7 +1031,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
         glUseProgram(MeshShader::InstancedColorizeShader::getInstance()->Program);
 
         glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeGlow));
-        if (UserConfigParams::m_azdo)
+        if (irr_driver->useAZDO())
         {
             if (GlowPassCmd::getInstance()->Size)
             {

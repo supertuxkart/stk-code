@@ -286,7 +286,7 @@ SetTexture(GLMesh &mesh, unsigned i, bool isSrgb, const std::string &matname)
         return;
     }
     compressTexture(mesh.textures[i], isSrgb);
-    if (UserConfigParams::m_azdo)
+    if (irr_driver->useAZDO())
     {
         if (!mesh.TextureHandles[i])
             mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[i]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
@@ -359,7 +359,7 @@ void InitTexturesTransparent(GLMesh &mesh)
         return;
     }
     compressTexture(mesh.textures[0], true);
-    if (UserConfigParams::m_azdo)
+    if (irr_driver->useAZDO())
     {
         if (!mesh.TextureHandles[0])
             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);

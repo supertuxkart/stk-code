@@ -147,9 +147,9 @@ GLuint LoadShader(const char * file, unsigned type)
     char versionString[20];
     sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
     std::string Code = versionString;
-    if (UserConfigParams::m_azdo)
+    if (irr_driver->useAZDO())
         Code += "#extension GL_ARB_bindless_texture : enable\n";
-    else
+    else if (irr_driver->hasARBBindlessTexture())
     {
         Code += "#extension GL_ARB_bindless_texture : disable\n";
         Code += "#undef GL_ARB_bindless_texture\n";

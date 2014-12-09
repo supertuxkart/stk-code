@@ -269,7 +269,7 @@ void STKMeshSceneNode::render()
             size_t count = mesh.IndexCount;
 
             compressTexture(mesh.textures[0], true);
-            if (UserConfigParams::m_azdo)
+            if (irr_driver->useAZDO())
             {
                 if (!mesh.TextureHandles[0])
                     mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
@@ -307,7 +307,7 @@ void STKMeshSceneNode::render()
             GLenum itype = mesh.IndexType;
             size_t count = mesh.IndexCount;
 
-            if (UserConfigParams::m_azdo)
+            if (irr_driver->useAZDO())
             {
                 GLuint64 DiffuseHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
                 if (!glIsTextureHandleResidentARB(DiffuseHandle))
@@ -403,7 +403,7 @@ void STKMeshSceneNode::render()
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
-                    if (UserConfigParams::m_azdo)
+                    if (irr_driver->useAZDO())
                     {
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
@@ -433,7 +433,7 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
-                    if (UserConfigParams::m_azdo)
+                    if (irr_driver->useAZDO())
                     {
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentShader::getInstance()->SamplersId[0]);
