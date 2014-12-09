@@ -1752,7 +1752,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian6h.comp").c_str());
         TU_dest = 1;
-        AssignUniforms("pixel", "sigma");
+        AssignUniforms("pixel", "weights");
         AssignSamplerNames(Program, 0, "source");
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
@@ -1822,7 +1822,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian6v.comp").c_str());
         TU_dest = 1;
-        AssignUniforms("pixel", "sigma");
+        AssignUniforms("pixel", "weights");
         AssignSamplerNames(Program, 0, "source");
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
