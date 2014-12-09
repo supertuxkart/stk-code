@@ -67,6 +67,7 @@
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
+#include "../lib/irrlicht/source/Irrlicht/CSkinnedMesh.h"
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.
@@ -989,6 +990,26 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
     }
     return am->getMesh(0);
 }   // getMesh
+
+// ----------------------------------------------------------------------------
+/** Create a skinned mesh which has copied all meshbuffers and joints of the
+ *  original mesh. Note, that this will not copy any other information like
+ *   joints data.
+ *  \param mesh Original mesh
+ *  \return Newly created skinned mesh. You should call drop() when you don't
+ *          need it anymore. 
+ */
+scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
+{
+    using namespace scene;
+    CSkinnedMesh *mesh = dynamic_cast<CSkinnedMesh*>(orig);
+    if (!mesh)
+    {
+        Log::error("copyAnimatedMesh", "Given mesh was not a skinned mesh.");
+        return NULL;
+    }
+    return mesh->clone();
+}   // copyAnimatedMesh
 
 // ----------------------------------------------------------------------------
 /** Sets the material flags in this mesh depending on the settings in

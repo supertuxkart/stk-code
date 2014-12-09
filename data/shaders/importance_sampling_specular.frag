@@ -1,5 +1,5 @@
 uniform samplerCube tex;
-uniform float samples[2048];
+uniform samplerBuffer samples;
 uniform float ViewportSize;
 
 uniform mat4 PermutationMatrix;
@@ -16,15 +16,18 @@ void main(void)
     vec3 up = (RayDir.y < .99) ? vec3(0., 1., 0.) : vec3(0., 0., 1.);
     vec3 Tangent = normalize(cross(up, RayDir));
     vec3 Bitangent = cross(RayDir, Tangent);
+    float weight = 0.;
 
     for (int i = 0; i < 1024; i++)
     {
-        float Theta = samples[2 * i];
-        float Phi = samples[2 * i + 1];
+        float Theta = texelFetch(samples, i).r;
+        float Phi = texelFetch(samples, i).g;
 
-        vec3 sampleDir = cos(Theta) * RayDir + sin(Theta) * cos(Phi) * Tangent + sin(Theta) * sin(Phi) * Bitangent;
-        FinalColor += textureLod(tex, sampleDir, 0.);
+        vec3 L = cos(Theta) * RayDir + sin(Theta) * cos(Phi) * Tangent + sin(Theta) * sin(Phi) * Bitangent;
+        float NdotL = clamp(dot(RayDir, L), 0., 1.);
+        FinalColor += textureLod(tex, L, 0.) * NdotL;
+        weight += NdotL;
     }
 
-    FragColor = FinalColor / 1024.;
+    FragColor = FinalColor / weight;
 }

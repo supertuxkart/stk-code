@@ -267,7 +267,6 @@ GLuint generateSpecularCubemap(GLuint probe)
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, bufs);
     glUseProgram(UtilShader::SpecularIBLGenerator::getInstance()->Program);
-    glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -286,29 +285,50 @@ GLuint generateSpecularCubemap(GLuint probe)
     {
         // Blinn Phong can be approximated by Phong with 4x the specular coefficient
         // See http://seblagarde.wordpress.com/2012/03/29/relationship-between-phong-and-blinn-lighting-model/
-        float roughness = (8 - level) * 4 * pow(2.f, 10.f) / 8.f;
+        // NOTE : Removed because it makes too sharp reflexion
+        float roughness = (8 - level) * pow(2.f, 10.f) / 8.f;
         float viewportSize = float(1 << (8 - level));
 
-        std::vector<float> Samples;
+        float *tmp = new float[2048];
         for (unsigned i = 0; i < 1024; i++)
         {
             std::pair<float, float> sample = ImportanceSamplingPhong(HammersleySequence(i, 1024), roughness);
-            Samples.push_back(sample.first);
-            Samples.push_back(sample.second);
+            tmp[2 * i] = sample.first;
+            tmp[2 * i + 1] = sample.second;
         }
+
+        glBindVertexArray(0);
+        glActiveTexture(GL_TEXTURE0 + UtilShader::SpecularIBLGenerator::getInstance()->TU_Samples);
+        GLuint sampleTex, sampleBuffer;
+        glGenBuffers(1, &sampleBuffer);
+        glBindBuffer(GL_TEXTURE_BUFFER, sampleBuffer);
+        glBufferData(GL_TEXTURE_BUFFER, 2048 * sizeof(float), tmp, GL_STATIC_DRAW);
+        glGenTextures(1, &sampleTex);
+        glBindTexture(GL_TEXTURE_BUFFER, sampleTex);
+        glTexBuffer(GL_TEXTURE_BUFFER, GL_RG32F, sampleBuffer);
+        glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
         for (unsigned face = 0; face < 6; face++)
         {
+
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, cubemap_texture, level);
             GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
             assert(status == GL_FRAMEBUFFER_COMPLETE);
 
             UtilShader::SpecularIBLGenerator::getInstance()->SetTextureUnits(probe);
-            UtilShader::SpecularIBLGenerator::getInstance()->setUniforms(M[face], Samples, viewportSize);
+            UtilShader::SpecularIBLGenerator::getInstance()->setUniforms(M[face], viewportSize);
+
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
-    }
+        glActiveTexture(GL_TEXTURE0 + UtilShader::SpecularIBLGenerator::getInstance()->TU_Samples);
+        glBindBuffer(GL_TEXTURE_BUFFER, 0);
+        glBindTexture(GL_TEXTURE_BUFFER, 0);
 
+        delete[] tmp;
+        glDeleteTextures(1, &sampleTex);
+        glDeleteBuffers(1, &sampleBuffer);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
     return cubemap_texture;
 }
