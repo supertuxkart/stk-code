@@ -194,7 +194,11 @@ namespace Online
             else
                 curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 0L);
 
+#ifdef __APPLE__
+            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 0L);
+#else
             curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 1L);
+#endif
         }
     }   // prepareOperation
 
