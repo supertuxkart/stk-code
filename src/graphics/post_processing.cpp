@@ -867,7 +867,10 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
-        if (isRace && UserConfigParams::m_motionblur && World::getWorld() != NULL) // motion blur
+        MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
+            getCallback(ES_MOTIONBLUR);
+
+        if (isRace && UserConfigParams::m_motionblur && World::getWorld() != NULL && cb->getBoostTime(0) > 0.) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo);
             std::swap(in_fbo, out_fbo);
