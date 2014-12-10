@@ -41,7 +41,7 @@ void main(void)
     vec3 eyedir = normalize(xpos.xyz);
 
     // Inspired from http://http.developer.nvidia.com/GPUGems3/gpugems3_ch16.html
-    float fEdotL = max(0., dot(SunDir, eyedir));
+    float fEdotL = clamp(dot(SunDir, eyedir), 0., 1.);
     float fPowEdotL = pow(fEdotL, 4.);
 
     float fLdotNBack  = max(0., - dot(nor, SunDir) * 0.6 + 0.4);

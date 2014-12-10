@@ -749,8 +749,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_always_show_login_screen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "always_show_login_screen",
           "Always show the login screen even if last player's session was saved."));
-    // ---- Online gameplay related
 
+
+    // ---- Online gameplay related
     PARAM_PREFIX GroupUserConfigParam       m_online_group
             PARAM_DEFAULT( GroupUserConfigParam("OnlineServer",
                                           "Everything related to online play.") );
@@ -766,6 +767,12 @@ namespace UserConfigParams
                                                  "server-version",
                                                  &m_online_group,
                                                     "Version of the server API to use."));
+
+    PARAM_PREFIX BoolUserConfigParam        m_verify_peer
+            PARAM_DEFAULT(BoolUserConfigParam(1, "verify-peer", &m_online_group,
+                   "If curl should check peer address. Should always be enabled,"
+                   "unless there are authentication problems."));
+
 
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group

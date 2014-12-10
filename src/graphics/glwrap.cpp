@@ -46,17 +46,6 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
         return;
     }
 
-    // Suppress warnings about GL_ARB_bindless_texture not being supported
-    // when we're not even using it
-    if (UserConfigParams::m_azdo == false &&
-        source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB && msg != NULL &&
-        std::string(msg).find("GL_ARB_bindless_texture") != std::string::npos)
-    {
-        Log::debug("GLWrap", "Suppressed warning: %s", msg);
-        return;
-    }
-
-
     switch(source)
     {
     case GL_DEBUG_SOURCE_API_ARB:

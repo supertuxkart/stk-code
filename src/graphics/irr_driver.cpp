@@ -67,6 +67,7 @@
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
+#include "../lib/irrlicht/source/Irrlicht/CSkinnedMesh.h"
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.
@@ -533,6 +534,7 @@ void IrrDriver::initDevice()
     hasComputeShaders = false;
     hasTextureStorage = false;
     hasTextureView = false;
+    hasBindlessTexture = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
 #if !defined(__APPLE__)
     if (!ProfileWorld::isNoGraphics())
@@ -564,6 +566,10 @@ void IrrDriver::initDevice()
         if (hasGLExtension("GL_ARB_texture_view")) {
             hasTextureView = true;
             Log::info("GLDriver", "ARB Texture View enabled");
+        }
+        if (hasGLExtension("GL_ARB_bindless_texture")) {
+            hasBindlessTexture = true;
+            Log::info("GLDriver", "ARB Bindless Texture enabled");
         }
         m_support_sdsm = m_support_sdsm && hasComputeShaders && hasBuffserStorage;
 
@@ -991,6 +997,26 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
 }   // getMesh
 
 // ----------------------------------------------------------------------------
+/** Create a skinned mesh which has copied all meshbuffers and joints of the
+ *  original mesh. Note, that this will not copy any other information like
+ *   joints data.
+ *  \param mesh Original mesh
+ *  \return Newly created skinned mesh. You should call drop() when you don't
+ *          need it anymore. 
+ */
+scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
+{
+    using namespace scene;
+    CSkinnedMesh *mesh = dynamic_cast<CSkinnedMesh*>(orig);
+    if (!mesh)
+    {
+        Log::error("copyAnimatedMesh", "Given mesh was not a skinned mesh.");
+        return NULL;
+    }
+    return mesh->clone();
+}   // copyAnimatedMesh
+
+// ----------------------------------------------------------------------------
 /** Sets the material flags in this mesh depending on the settings in
  *  material_manager.
  *  \param mesh  The mesh to change the settings in.
@@ -1365,6 +1391,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     SkyboxTextures = texture;
     SphericalHarmonicsTextures = sphericalHarmonics;
     SkyboxCubeMap = 0;
+    SkyboxSpecularProbe = 0;
     m_SH_dirty = true;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
@@ -1377,8 +1404,12 @@ void IrrDriver::suppressSkyBox()
     SphericalHarmonicsTextures.clear();
     m_SH_dirty = true;
     if ((SkyboxCubeMap) && (!ProfileWorld::isNoGraphics()))
+    {
         glDeleteTextures(1, &SkyboxCubeMap);
+        glDeleteTextures(1, &SkyboxSpecularProbe);
+    }
     SkyboxCubeMap = 0;
+    SkyboxSpecularProbe = 0;
 }
 
 // ----------------------------------------------------------------------------

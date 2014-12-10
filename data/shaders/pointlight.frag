@@ -10,7 +10,7 @@ out vec4 Diffuse;
 out vec4 Specular;
 
 vec3 DecodeNormal(vec2 n);
-vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
+vec3 SpecularBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
 void main()
@@ -35,8 +35,8 @@ void main()
     // Light Direction
     vec3 L = -normalize(xpos.xyz - light_pos);
 
-    float NdotL = max(0., dot(norm, L));
+    float NdotL = clamp(dot(norm, L), 0., 1.);
 
     Diffuse = vec4(NdotL * light_col * att, 1.);
-    Specular = vec4(getSpecular(norm, eyedir, L, light_col, roughness) * NdotL * att, 1.);
+    Specular = vec4(SpecularBRDF(norm, eyedir, L, light_col, roughness) * NdotL * att, 1.);
 }

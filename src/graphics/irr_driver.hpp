@@ -191,6 +191,7 @@ private:
     bool hasComputeShaders;
     bool hasTextureStorage;
     bool hasTextureView;
+    bool hasBindlessTexture;
     bool m_support_sdsm;
     bool m_support_texture_compression;
     bool m_need_ubo_workaround;
@@ -254,6 +255,7 @@ private:
 
 public:
     GLuint SkyboxCubeMap;
+    GLuint SkyboxSpecularProbe;
     /** A simple class to store video resolutions. */
     class VideoMode
     {
@@ -294,6 +296,11 @@ public:
     bool usesTextureCompression() const
     {
         return UserConfigParams::m_texture_compression && m_support_texture_compression;
+    }
+
+    bool useAZDO() const
+    {
+        return hasBindlessTexture && UserConfigParams::m_azdo;
     }
 
     bool needUBOWorkaround() const
@@ -344,6 +351,11 @@ public:
     bool hasARBTextureView() const
     {
         return hasTextureView;
+    }
+
+    bool hasARBBindlessTexture() const
+    {
+        return hasBindlessTexture;
     }
 
     video::SColorf getAmbientLight() const;
@@ -459,6 +471,7 @@ public:
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
+    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig);
     video::ITexture      *applyMask(video::ITexture* texture,
                                     const std::string& mask_path);
     void displayFPS();

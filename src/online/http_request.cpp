@@ -186,7 +186,14 @@ namespace Online
                 Log::error("HTTPRequest", "Error %d: '%s'.", error,
                            curl_easy_strerror(error));
             }
-            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
+            // In case that there are authentication problems (e.g. on osx)
+            // disable peer verification. Not ideal, but still better than
+            // no encryption.
+            if (UserConfigParams::m_verify_peer)
+                curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
+            else
+                curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 0L);
+
             curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 1L);
         }
     }   // prepareOperation

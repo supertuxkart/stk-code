@@ -1,7 +1,7 @@
 uniform sampler2D source;
 uniform layout(rgba16f) restrict writeonly image2D dest;
 uniform vec2 pixel;
-uniform float sigma;
+uniform float weights[7];
 
 // Gaussian separated blur with radius 6.
 
@@ -23,18 +23,10 @@ void main()
 
     barrier();
 
-    float g0, g1, g2;
-    g0 = 1.0 / (sqrt(2.0 * 3.14) * sigma);
-    g1 = exp(-0.5 / (sigma * sigma));
-    g2 = g1 * g1;
-    vec4 sum = local_src[x + 6][y] * g0;
-    g0 *= g1;
-    g1 *= g2;
+    vec4 sum = local_src[x + 6][y] * weights[0];
     for (int i = 1; i < 6; i++) {
-        sum += local_src[6 + x - i][y] * g0;
-        sum += local_src[6 + x + i][y] * g0;
-        g0 *= g1;
-        g1 *= g2;
+        sum += local_src[6 + x - i][y] * weights[i];
+        sum += local_src[6 + x + i][y] * weights[i];
     }
 
     imageStore(dest, iuv, sum);

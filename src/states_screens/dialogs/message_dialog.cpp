@@ -68,25 +68,28 @@ MessageDialog::~MessageDialog()
 // ------------------------------------------------------------------------------------------------------
 
 void MessageDialog::doInit(MessageDialogType type,
-                           IConfirmDialogListener* listener, bool own_listener)
+    IConfirmDialogListener* listener, bool own_listener)
 {
     if (StateManager::get()->getGameState() == GUIEngine::GAME)
     {
         World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
     }
 
-
-    loadFromFile("confirm_dialog.stkgui");
-
+    m_type = type;
     m_listener = listener;
     m_own_listener = own_listener;
 
+    loadFromFile("confirm_dialog.stkgui");
+}
+
+void MessageDialog::loadedFromFile()
+{
     LabelWidget* message = getWidget<LabelWidget>("title");
     message->setText( m_msg.c_str(), false );
 
     // If the dialog is a simple 'OK' dialog, then hide the "Yes" button and
     // change "Cancel" to "OK"
-    if (type == MessageDialog::MESSAGE_DIALOG_OK)
+    if (m_type == MessageDialog::MESSAGE_DIALOG_OK)
     {
         ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
         yesbtn->setVisible(false);
@@ -95,20 +98,19 @@ void MessageDialog::doInit(MessageDialogType type,
         cancelbtn->setText(_("OK"));
         cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
-    else if (type == MessageDialog::MESSAGE_DIALOG_YESNO)
+    else if (m_type == MessageDialog::MESSAGE_DIALOG_YESNO)
     {
         ButtonWidget* cancelbtn = getWidget<ButtonWidget>("cancel");
         cancelbtn->setText(_("No"));
 
     }
-    else if (type == MessageDialog::MESSAGE_DIALOG_OK_CANCEL)
+    else if (m_type == MessageDialog::MESSAGE_DIALOG_OK_CANCEL)
     {
         // In case of a OK_CANCEL dialog, change the text from 'Yes' to 'Ok'
         ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
         yesbtn->setText(_("OK"));
     }
 }
-
 
 // ------------------------------------------------------------------------------------------------------
 

@@ -147,11 +147,9 @@ GLuint LoadShader(const char * file, unsigned type)
     char versionString[20];
     sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
     std::string Code = versionString;
-    if (irr_driver->hasVSLayerExtension())
-        Code += "#extension GL_AMD_vertex_shader_layer : enable\n";
-    if (UserConfigParams::m_azdo)
+    if (irr_driver->useAZDO())
         Code += "#extension GL_ARB_bindless_texture : enable\n";
-    else
+    else if (irr_driver->hasARBBindlessTexture())
     {
         Code += "#extension GL_ARB_bindless_texture : disable\n";
         Code += "#undef GL_ARB_bindless_texture\n";
@@ -851,8 +849,8 @@ GLuint createShadowSampler()
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     int aniso = UserConfigParams::m_anisotropic;
     if (aniso == 0) aniso = 1;
@@ -867,8 +865,8 @@ void BindTextureShadow(GLuint TU, GLuint tex)
     glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 }
@@ -887,6 +885,20 @@ void BindTextureVolume(GLuint TU, GLuint tex)
 unsigned getGLSLVersion()
 {
     return irr_driver->getGLSLVersion();
+}
+
+namespace UtilShader
+{
+    SpecularIBLGenerator::SpecularIBLGenerator()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/importance_sampling_specular.frag").c_str());
+        AssignUniforms("PermutationMatrix", "ViewportSize");
+        TU_Samples = 1;
+        AssignSamplerNames(Program, 0, "tex");
+        AssignTextureUnit(Program, TexUnit(TU_Samples, "samples"));
+    }
 }
 
 namespace MeshShader
@@ -1426,7 +1438,7 @@ namespace LightShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlight.frag").c_str());
 
@@ -1625,7 +1637,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
 
@@ -1633,15 +1645,17 @@ namespace FullScreenShader
         AssignUniforms("direction", "col");
     }
 
-    EnvMapShader::EnvMapShader()
+    IBLShader::IBLShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/IBL.frag").c_str());
         AssignUniforms("TransposeViewMatrix", "blueLmn[0]", "greenLmn[0]", "redLmn[0]");
-        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "tex");
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
     ShadowedSunLightShader::ShadowedSunLightShader()
@@ -1649,7 +1663,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
 
@@ -1738,7 +1752,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian6h.comp").c_str());
         TU_dest = 1;
-        AssignUniforms("pixel", "sigma");
+        AssignUniforms("pixel", "weights");
         AssignSamplerNames(Program, 0, "source");
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
@@ -1748,7 +1762,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/blurshadowH.comp").c_str());
         TU_dest = 1;
-        AssignUniforms("pixel", "sigma");
+        AssignUniforms("pixel", "weights");
         AssignSamplerNames(Program, 0, "source");
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
@@ -1808,7 +1822,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian6v.comp").c_str());
         TU_dest = 1;
-        AssignUniforms("pixel", "sigma");
+        AssignUniforms("pixel", "weights");
         AssignSamplerNames(Program, 0, "source");
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
@@ -1818,7 +1832,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/blurshadowV.comp").c_str());
         TU_dest = 1;
-        AssignUniforms("pixel", "sigma");
+        AssignUniforms("pixel", "weights");
         AssignSamplerNames(Program, 0, "source");
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
@@ -1850,7 +1864,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
 
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "texture");
+        AssignSamplerNames(Program, 0, "tex");
         vao = createVAO(Program);
     }
 

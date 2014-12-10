@@ -241,18 +241,22 @@ KartModel::~KartModel()
         }
     }
 
-    if(m_is_master && m_mesh)
+    // In case of the master, the mesh must be dropped. A non-master KartModel
+    // has a copy of the master's mesh, so it needs to be dropped, too.
+    if (m_mesh)
     {
         m_mesh->drop();
-        // If there is only one copy left, it's the copy in irrlicht's
-        // mesh cache, so it can be remove.
-        if(m_mesh && m_mesh->getReferenceCount()==1)
+        if (m_is_master)
         {
-            irr_driver->dropAllTextures(m_mesh);
-            irr_driver->removeMeshFromCache(m_mesh);
+            // If there is only one copy left, it's the copy in irrlicht's
+            // mesh cache, so it can be removed. 
+            if (m_mesh && m_mesh->getReferenceCount() == 1)
+            {
+                irr_driver->dropAllTextures(m_mesh);
+                irr_driver->removeMeshFromCache(m_mesh);
+            }
         }
     }
-
 #ifdef DEBUG
 #if SKELETON_DEBUG
     irr_driver->clearDebugMeshes();
@@ -280,7 +284,7 @@ KartModel* KartModel::makeCopy()
     km->m_kart_height       = m_kart_height;
     km->m_kart_highest_point= m_kart_highest_point;
     km->m_kart_lowest_point = m_kart_lowest_point;
-    km->m_mesh              = m_mesh;
+    km->m_mesh              = irr_driver->copyAnimatedMesh(m_mesh);
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
     km->m_current_animation = AF_DEFAULT;
@@ -894,7 +898,8 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
     m_animated_node->setCurrentFrame(frame);
 }   // update
 //-----------------------------------------------------------------------------
-void KartModel::attachHat(){
+void KartModel::attachHat()
+{
     m_hat_node = NULL;
     if(m_hat_name.size()>0)
     {

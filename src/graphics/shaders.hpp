@@ -48,6 +48,13 @@ public:
     static void init();
     static void setUniforms(const irr::video::SColor &);
 };
+
+class SpecularIBLGenerator : public ShaderHelperSingleton<SpecularIBLGenerator, core::matrix4, float >, public TextureRead<Trilinear_cubemap>
+{
+public:
+    GLuint TU_Samples;
+    SpecularIBLGenerator();
+};
 }
 
 
@@ -411,10 +418,10 @@ public:
     SunLightShader();
 };
 
-class EnvMapShader : public ShaderHelperSingleton<EnvMapShader, core::matrix4, std::vector<float>, std::vector<float>, std::vector<float> >, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_cubemap>
+class IBLShader : public ShaderHelperSingleton<IBLShader, core::matrix4, std::vector<float>, std::vector<float>, std::vector<float> >, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_cubemap>
 {
 public:
-    EnvMapShader();
+    IBLShader();
 };
 
 class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShader, float, float, float, float, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
@@ -464,14 +471,14 @@ public:
     ComputeGaussian17TapHShader();
 };
 
-class ComputeGaussian6HBlurShader : public ShaderHelperSingleton<ComputeGaussian6HBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
+class ComputeGaussian6HBlurShader : public ShaderHelperSingleton<ComputeGaussian6HBlurShader, core::vector2df, std::vector<float> >, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
     ComputeGaussian6HBlurShader();
 };
 
-class ComputeShadowBlurHShader : public ShaderHelperSingleton<ComputeShadowBlurHShader, core::vector2df, float>, public TextureRead<Neared_Clamped_Filtered>
+class ComputeShadowBlurHShader : public ShaderHelperSingleton<ComputeShadowBlurHShader, core::vector2df, std::vector<float> >, public TextureRead<Neared_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
@@ -510,14 +517,14 @@ public:
     ComputeGaussian17TapVShader();
 };
 
-class ComputeGaussian6VBlurShader : public ShaderHelperSingleton<ComputeGaussian6VBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
+class ComputeGaussian6VBlurShader : public ShaderHelperSingleton<ComputeGaussian6VBlurShader, core::vector2df, std::vector<float> >, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
     ComputeGaussian6VBlurShader();
 };
 
-class ComputeShadowBlurVShader : public ShaderHelperSingleton<ComputeShadowBlurVShader, core::vector2df, float>, public TextureRead<Neared_Clamped_Filtered>
+class ComputeShadowBlurVShader : public ShaderHelperSingleton<ComputeShadowBlurVShader, core::vector2df, std::vector<float> >, public TextureRead<Neared_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
