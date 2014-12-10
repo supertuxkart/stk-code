@@ -733,7 +733,7 @@ namespace UserConfigParams
                                                   "A random number to avoid duplicated reports.") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_hw_report
-            PARAM_DEFAULT( StringUserConfigParam(   "http://104.131.193.44:8080",
+            PARAM_DEFAULT( StringUserConfigParam(   "http://addons.supertuxkart.net:8080",
                                                      "hw-report-server",
                                                      &m_hw_report_group,
                                                     "The server used for reporting statistics to."));
@@ -757,7 +757,7 @@ namespace UserConfigParams
                                           "Everything related to online play.") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
-            PARAM_DEFAULT( StringUserConfigParam(   "https://104.131.193.44/api/",
+            PARAM_DEFAULT( StringUserConfigParam(   "https://addons.supertuxkart.net/api/",
                                                      "server_multiplayer",
                                                      &m_online_group,
                                                     "The server used for online multiplayer."));
@@ -775,7 +775,7 @@ namespace UserConfigParams
                                           "Addon and news related settings") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_addons
-            PARAM_DEFAULT( StringUserConfigParam("http://104.131.193.44/dl/xml",
+            PARAM_DEFAULT( StringUserConfigParam("http://addons.supertuxkart.net/dl/xml",
                                                  "server_addons",
                                                  &m_addon_group,
                                                 "The server used for addon."));
