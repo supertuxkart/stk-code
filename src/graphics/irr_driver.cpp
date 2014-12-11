@@ -534,6 +534,7 @@ void IrrDriver::initDevice()
     hasComputeShaders = false;
     hasTextureStorage = false;
     hasTextureView = false;
+    hasBindlessTexture = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
 #if !defined(__APPLE__)
     if (!ProfileWorld::isNoGraphics())
@@ -565,6 +566,10 @@ void IrrDriver::initDevice()
         if (hasGLExtension("GL_ARB_texture_view")) {
             hasTextureView = true;
             Log::info("GLDriver", "ARB Texture View enabled");
+        }
+        if (hasGLExtension("GL_ARB_bindless_texture")) {
+            hasBindlessTexture = true;
+            Log::info("GLDriver", "ARB Bindless Texture enabled");
         }
         m_support_sdsm = m_support_sdsm && hasComputeShaders && hasBuffserStorage;
 

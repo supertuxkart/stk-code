@@ -740,14 +740,11 @@ void LinearWorld::updateRacePosition()
 #endif
 
         // Switch on faster music if not already done so, if the
-        // first kart is doing its last lap, and if the estimated
-        // remaining time is less than 30 seconds.
+        // first kart is doing its last lap.
         if(!m_faster_music_active                                  &&
-           kart_info.m_race_lap == race_manager->getNumLaps()-1    &&
-           p==1                                                    &&
-           useFastMusicNearEnd()                                   &&
-           kart_info.m_estimated_finish > 0                        &&
-           kart_info.m_estimated_finish - getTime() < 30.0f              )
+            p == 1                                                 &&
+            kart_info.m_race_lap == race_manager->getNumLaps() - 1 &&
+            useFastMusicNearEnd()                                       )
         {
             music_manager->switchToFastMusic();
             m_faster_music_active=true;

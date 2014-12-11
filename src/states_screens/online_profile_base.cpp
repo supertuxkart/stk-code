@@ -144,7 +144,7 @@ void OnlineProfileBase::eventCallback(Widget* widget, const std::string& name,
         if (selection == m_friends_tab->m_properties[PROP_ID])
             sm->replaceTopMostScreen(OnlineProfileFriends::getInstance());
         else if (selection == m_achievements_tab->m_properties[PROP_ID])
-            sm->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
+            sm->replaceTopMostScreen(TabOnlineProfileAchievements::getInstance());
         else if (selection == m_settings_tab->m_properties[PROP_ID])
             sm->replaceTopMostScreen(OnlineProfileSettings::getInstance());
     }

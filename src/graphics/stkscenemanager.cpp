@@ -143,7 +143,7 @@ void FillInstances(const std::unordered_map<scene::IMeshBuffer *, std::vector<st
     for (; It != E; ++It)
     {
         FillInstances_impl<T>(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, Polycount);
-        if (!UserConfigParams::m_azdo)
+        if (!irr_driver->useAZDO())
             InstancedList.push_back(It->second.front().first);
     }
 }
@@ -527,7 +527,7 @@ GenDrawCalls(unsigned cascade, std::vector<GLMesh *> &InstancedList,
     if (irr_driver->hasARB_draw_indirect())
         ShadowPassCmd::getInstance()->Offset[cascade][Mat] = CommandBufferOffset; // Store command buffer offset
     FillInstances<T>(MeshForShadowPass[Mat][cascade], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, PolyCount);
-    if (UserConfigParams::m_azdo)
+    if (irr_driver->useAZDO())
         ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
 }
 
@@ -734,11 +734,11 @@ PROFILER_POP_CPU_MARKER();
             {
                 size_t Polycnt = 0;
                 FillInstances_impl<GlowInstanceData>(It->second, GlowInstanceBuffer, GlowCmdBuffer, offset, current_cmd, Polycnt);
-                if (!UserConfigParams::m_azdo)
+                if (!irr_driver->useAZDO())
                     ListInstancedGlow::getInstance()->push_back(It->second.front().first);
             }
 
-            if (UserConfigParams::m_azdo)
+            if (irr_driver->useAZDO())
                 GlowPassCmd::getInstance()->Size = current_cmd - GlowPassCmd::getInstance()->Offset;
 
             if (!irr_driver->hasBufferStorageExtension())

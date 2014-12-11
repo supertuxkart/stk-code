@@ -191,6 +191,7 @@ private:
     bool hasComputeShaders;
     bool hasTextureStorage;
     bool hasTextureView;
+    bool hasBindlessTexture;
     bool m_support_sdsm;
     bool m_support_texture_compression;
     bool m_need_ubo_workaround;
@@ -297,6 +298,11 @@ public:
         return UserConfigParams::m_texture_compression && m_support_texture_compression;
     }
 
+    bool useAZDO() const
+    {
+        return hasBindlessTexture && UserConfigParams::m_azdo;
+    }
+
     bool needUBOWorkaround() const
     {
         return m_need_ubo_workaround;
@@ -345,6 +351,11 @@ public:
     bool hasARBTextureView() const
     {
         return hasTextureView;
+    }
+
+    bool hasARBBindlessTexture() const
+    {
+        return hasBindlessTexture;
     }
 
     video::SColorf getAmbientLight() const;
