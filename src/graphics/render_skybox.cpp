@@ -274,20 +274,20 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
     return result;
 }
 
-void IrrDriver::generateSkyboxCubemap()
+void IrrDriver::prepareSkybox()
 {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-    assert(SkyboxTextures.size() == 6);
-    SkyboxCubeMap = generateCubeMapFromTextures(SkyboxTextures);
-    SkyboxSpecularProbe = generateSpecularCubemap(SkyboxCubeMap);
+    generateDiffuseCoefficients();
+    if (!SkyboxTextures.empty())
+    {
+        SkyboxCubeMap = generateCubeMapFromTextures(SkyboxTextures);
+        SkyboxSpecularProbe = generateSpecularCubemap(SkyboxCubeMap);
+    }
 }
 
 void IrrDriver::generateDiffuseCoefficients()
 {
-    if (!m_SH_dirty)
-        return;
-    m_SH_dirty = false;
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
 
     unsigned sh_w = 0, sh_h = 0;
@@ -379,8 +379,6 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 {
     if (SkyboxTextures.empty())
         return;
-    if (!SkyboxCubeMap)
-        generateSkyboxCubemap();
     glBindVertexArray(MeshShader::SkyboxShader::getInstance()->cubevao);
     glDisable(GL_CULL_FACE);
     assert(SkyboxTextures.size() == 6);

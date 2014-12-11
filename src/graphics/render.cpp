@@ -176,7 +176,11 @@ void IrrDriver::renderGLSL(float dt)
             irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
         // TODO: put this outside of the rendering loop
-        generateDiffuseCoefficients();
+        if (!m_skybox_ready)
+        {
+            prepareSkybox();
+            m_skybox_ready = true;
+        }
         if (!UserConfigParams::m_dynamic_lights)
             glEnable(GL_FRAMEBUFFER_SRGB);
 

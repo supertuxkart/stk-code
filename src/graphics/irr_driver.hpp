@@ -236,7 +236,7 @@ private:
 
     std::vector<video::ITexture *> SkyboxTextures;
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
-    bool m_SH_dirty;
+    bool m_skybox_ready;
 
     float blueSHCoeff[9];
     float greenSHCoeff[9];
@@ -455,7 +455,7 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void generateSkyboxCubemap();
+    void prepareSkybox();
     void generateDiffuseCoefficients();
     void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
