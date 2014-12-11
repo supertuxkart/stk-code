@@ -528,7 +528,6 @@ void Shaders::loadShaders()
     initFrustrumVBO();
     initShadowVPMUBO();
     initParticleQuadVBO();
-    UtilShader::ColoredLine::init();
 }
 
 void Shaders::killShaders()
@@ -579,33 +578,23 @@ void bypassUBO(GLuint Program)
 
 namespace UtilShader
 {
-    GLuint ColoredLine::Program;
-    GLuint ColoredLine::uniform_color;
-    GLuint ColoredLine::vao;
-    GLuint ColoredLine::vbo;
-
-    void ColoredLine::init()
+    ColoredLine::ColoredLine()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
+
+        AssignUniforms("color");
+
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, 6 * 1024 * sizeof(float), 0, GL_DYNAMIC_DRAW);
-        GLuint attrib_position = glGetAttribLocation(Program, "Position");
-        glEnableVertexAttribArray(attrib_position);
-        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-        uniform_color = glGetUniformLocation(Program, "color");
-    }
-
-    void ColoredLine::setUniforms(const irr::video::SColor &col)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniform4i(uniform_color, col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
-        glUniformMatrix4fv(glGetUniformLocation(Program, "ModelMatrix"), 1, GL_FALSE, core::IdentityMatrix.pointer());
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     struct TexUnit

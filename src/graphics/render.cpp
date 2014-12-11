@@ -191,10 +191,10 @@ void IrrDriver::renderGLSL(float dt)
         // Render bounding boxes
         if (irr_driver->getBoundingBoxesViz())
         {
-            glUseProgram(UtilShader::ColoredLine::Program);
-            glBindVertexArray(UtilShader::ColoredLine::vao);
-            glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
-            UtilShader::ColoredLine::setUniforms(SColor(255, 255, 0, 0));
+            glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
+            glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
+            glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
+            UtilShader::ColoredLine::getInstance()->setUniforms(SColor(255, 255, 0, 0));
             const float *tmp = BoundingBoxes.data();
             for (unsigned int i = 0; i < BoundingBoxes.size(); i += 1024 * 6)
             {
@@ -220,13 +220,12 @@ void IrrDriver::renderGLSL(float dt)
                 const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
                 std::map<video::SColor, std::vector<float> >::const_iterator it;
 
-
-                glUseProgram(UtilShader::ColoredLine::Program);
-                glBindVertexArray(UtilShader::ColoredLine::vao);
-                glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
+                glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
+                glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
+                glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
                 for (it = lines.begin(); it != lines.end(); it++)
                 {
-                    UtilShader::ColoredLine::setUniforms(it->first);
+                    UtilShader::ColoredLine::getInstance()->setUniforms(it->first);
                     const std::vector<float> &vertex = it->second;
                     const float *tmp = vertex.data();
                     for (unsigned int i = 0; i < vertex.size(); i += 1024 * 6)

@@ -38,15 +38,12 @@ public:
 
 namespace UtilShader
 {
-class ColoredLine
+class ColoredLine : public ShaderHelperSingleton<ColoredLine, video::SColor>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_color;
-    static GLuint vao, vbo;
+    GLuint vao, vbo;
 
-    static void init();
-    static void setUniforms(const irr::video::SColor &);
+    ColoredLine();
 };
 
 class SpecularIBLGenerator : public ShaderHelperSingleton<SpecularIBLGenerator, core::matrix4, float >, public TextureRead<Trilinear_cubemap>
