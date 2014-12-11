@@ -12,12 +12,9 @@
 
         <spacer height="20" width="20" />
         
-        <div width="100%" height="60" layout="horizontal-row">
         <button id="accept" I18N="In the 'add new grand prix' dialog" text="Create" align="center" proportion="1"/>
         <spacer height="15" width="20" />
         <button id="cancel" I18N="In the 'add new grand prix' dialog" text="Cancel" align="center" proportion="1"/>
-        <spacer height="15" width="20" />
-        </div>
-        
+
     </div>
 </stkgui>
