@@ -248,7 +248,7 @@ void LayoutManager::readCoords(Widget* self)
             child_max_height += padding*2;
             total_height += padding*2;
             total_width += padding*2;
-            child_max_width = padding*2;
+            child_max_width += padding*2;
         }
 
         if (self->m_properties[PROP_WIDTH] == "fit")
