@@ -297,16 +297,12 @@ public:
     NormalVisualizer();
 };
 
-class ViewFrustrumShader
+class ViewFrustrumShader : public ShaderHelperSingleton<ViewFrustrumShader, video::SColor, int>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position;
-    static GLuint uniform_color, uniform_idx;
-    static GLuint frustrumvao;
+    GLuint frustrumvao;
 
-    static void init();
-    static void setUniforms(const video::SColor &color, unsigned idx);
+    ViewFrustrumShader();
 };
 
 }

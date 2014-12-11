@@ -964,12 +964,12 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
 static void renderWireFrameFrustrum(float *tmp, unsigned i)
 {
-    glUseProgram(MeshShader::ViewFrustrumShader::Program);
-    glBindVertexArray(MeshShader::ViewFrustrumShader::frustrumvao);
+    glUseProgram(MeshShader::ViewFrustrumShader::getInstance()->Program);
+    glBindVertexArray(MeshShader::ViewFrustrumShader::getInstance()->frustrumvao);
     glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), (void *)tmp);
-    MeshShader::ViewFrustrumShader::setUniforms(video::SColor(255, 0, 255, 0), i);
+    MeshShader::ViewFrustrumShader::getInstance()->setUniforms(video::SColor(255, 0, 255, 0), i);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 }
 
