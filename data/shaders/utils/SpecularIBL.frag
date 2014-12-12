@@ -7,5 +7,5 @@ vec3 SpecularIBL(vec3 normal, vec3 V, float roughness)
 
      // Assume 8 level of lod (ie 256x256 texture)
     float lodval = 8. * (1. - roughness);
-    return max(textureLod(probe, sampleDirection, lodval).rgb, vec3(0.));
+    return clamp(  textureLod(probe, sampleDirection, lodval).rgb, 0., 1.);
 }

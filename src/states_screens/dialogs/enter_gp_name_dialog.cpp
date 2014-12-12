@@ -62,6 +62,10 @@ GUIEngine::EventPropagation EnterGPNameDialog::processEvent(const std::string& e
         dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
+    else if (eventSource == "accept")
+    {
+        validateName();
+    }
     return GUIEngine::EVENT_LET;
 }
 
@@ -77,7 +81,39 @@ void EnterGPNameDialog::onEnterPressedInternal()
         return;
     }
 
-    //Otherwise, see if we can accept the new name
+    //Otherwise, see if we can accept the new name and create the grand prix
+    validateName();
+}
+
+// -----------------------------------------------------------------------------
+void EnterGPNameDialog::onUpdate(float dt)
+{
+    // It's unsafe to delete from inside the event handler so we do it here
+    if (m_self_destroy)
+    {
+        TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
+        stringw name = textCtrl->getText().trim();
+
+        // irrLicht is too stupid to remove focus from deleted widgets
+        // so do it by hand
+        GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
+        GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
+
+        // we will destroy the dialog before notifying the listener to be safer.
+        // but in order not to crash we must make a local copy of the listern
+        // otherwise we will crash
+        INewGPListener* listener = m_listener;
+
+        ModalDialog::dismiss();
+
+        if (listener != NULL)
+            listener->onNewGPWithName(name);
+    }
+}
+
+// ----------------------------------------------------------------------------
+void EnterGPNameDialog::validateName()
+{
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     assert(textCtrl != NULL);
     LabelWidget* label = getWidget<LabelWidget>("title");
@@ -106,30 +142,5 @@ void EnterGPNameDialog::onEnterPressedInternal()
         // in onUpdate (which checks for m_self_destroy)
         m_self_destroy = true;
     }
-}
 
-// -----------------------------------------------------------------------------
-void EnterGPNameDialog::onUpdate(float dt)
-{
-    // It's unsafe to delete from inside the event handler so we do it here
-    if (m_self_destroy)
-    {
-        TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-        stringw name = textCtrl->getText().trim();
-
-        // irrLicht is too stupid to remove focus from deleted widgets
-        // so do it by hand
-        GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
-        GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
-
-        // we will destroy the dialog before notifying the listener to be safer.
-        // but in order not to crash we must make a local copy of the listern
-        // otherwise we will crash
-        INewGPListener* listener = m_listener;
-
-        ModalDialog::dismiss();
-
-        if (listener != NULL)
-            listener->onNewGPWithName(name);
-    }
 }

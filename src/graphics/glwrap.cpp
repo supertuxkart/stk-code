@@ -275,12 +275,12 @@ void draw3DLine(const core::vector3df& start,
         end.X, end.Y, end.Z
     };
 
-    glBindVertexArray(UtilShader::ColoredLine::vao);
-    glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
+    glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
+    glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * sizeof(float), vertex);
 
-    glUseProgram(UtilShader::ColoredLine::Program);
-    UtilShader::ColoredLine::setUniforms(color);
+    glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
+    UtilShader::ColoredLine::getInstance()->setUniforms(color);
     glDrawArrays(GL_LINES, 0, 2);
 
     glGetError();

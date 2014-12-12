@@ -528,8 +528,6 @@ void Shaders::loadShaders()
     initFrustrumVBO();
     initShadowVPMUBO();
     initParticleQuadVBO();
-    MeshShader::ViewFrustrumShader::init();
-    UtilShader::ColoredLine::init();
 }
 
 void Shaders::killShaders()
@@ -580,33 +578,23 @@ void bypassUBO(GLuint Program)
 
 namespace UtilShader
 {
-    GLuint ColoredLine::Program;
-    GLuint ColoredLine::uniform_color;
-    GLuint ColoredLine::vao;
-    GLuint ColoredLine::vbo;
-
-    void ColoredLine::init()
+    ColoredLine::ColoredLine()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
+
+        AssignUniforms("color");
+
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, 6 * 1024 * sizeof(float), 0, GL_DYNAMIC_DRAW);
-        GLuint attrib_position = glGetAttribLocation(Program, "Position");
-        glEnableVertexAttribArray(attrib_position);
-        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-        uniform_color = glGetUniformLocation(Program, "color");
-    }
-
-    void ColoredLine::setUniforms(const irr::video::SColor &col)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniform4i(uniform_color, col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
-        glUniformMatrix4fv(glGetUniformLocation(Program, "ModelMatrix"), 1, GL_FALSE, core::IdentityMatrix.pointer());
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     struct TexUnit
@@ -1399,35 +1387,21 @@ namespace MeshShader
         AssignUniforms("color");
     }
 
-    GLuint ViewFrustrumShader::Program;
-    GLuint ViewFrustrumShader::attrib_position;
-    GLuint ViewFrustrumShader::uniform_color;
-    GLuint ViewFrustrumShader::uniform_idx;
-    GLuint ViewFrustrumShader::frustrumvao;
-
-    void ViewFrustrumShader::init()
+    ViewFrustrumShader::ViewFrustrumShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/frustrum.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
 
-        uniform_color = glGetUniformLocation(Program, "color");
-        uniform_idx = glGetUniformLocation(Program, "idx");
+        AssignUniforms("color", "idx");
 
         glGenVertexArrays(1, &frustrumvao);
         glBindVertexArray(frustrumvao);
         glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
-        glEnableVertexAttribArray(attrib_position);
-        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::frustrumindexes);
         glBindVertexArray(0);
-    }
-
-    void ViewFrustrumShader::setUniforms(const video::SColor &color, unsigned idx)
-    {
-        glUniform4i(uniform_color, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-        glUniform1i(uniform_idx, idx);
     }
 }
 

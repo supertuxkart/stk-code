@@ -106,6 +106,12 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         cb_tex_cmp->setState(false);
         cb_tex_cmp->setDeactivated();
     }
+
+    if (!irr_driver->supportGeometryShader())
+    {
+        shadows->setDeactivated();
+        getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -123,7 +129,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_motionblur      =
             advanced_pipeline && getWidget<CheckBoxWidget>("motionblur")->getState();
 
-        if (advanced_pipeline)
+        if (advanced_pipeline && irr_driver->supportGeometryShader())
         {
             UserConfigParams::m_shadows =
                 getWidget<SpinnerWidget>("shadows")->getValue();
@@ -143,7 +149,8 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             advanced_pipeline && getWidget<CheckBoxWidget>("lightshaft")->getState();
 
         UserConfigParams::m_gi =
-            advanced_pipeline && getWidget<CheckBoxWidget>("global_illumination")->getState();
+            advanced_pipeline && irr_driver->supportGeometryShader() &&
+            getWidget<CheckBoxWidget>("global_illumination")->getState();
 
         UserConfigParams::m_glow =
             advanced_pipeline && getWidget<CheckBoxWidget>("glow")->getState();
@@ -235,6 +242,12 @@ void CustomVideoSettingsDialog::updateActivation()
         getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
         getWidget<CheckBoxWidget>("glow")->setDeactivated();
         getWidget<CheckBoxWidget>("bloom")->setDeactivated();
+    }
+
+    if (!irr_driver->supportGeometryShader())
+    {
+        getWidget<SpinnerWidget>("shadows")->setDeactivated();
+        getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
     }
 }   // updateActivation
 
