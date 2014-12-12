@@ -298,6 +298,16 @@ public:
         return getGLSLVersion() >= 330;
     }
 
+    bool usesShadows() const
+    {
+        return supportGeometryShader() && UserConfigParams::m_shadows && !needUBOWorkaround();
+    }
+
+    bool usesGI() const
+    {
+        return supportGeometryShader() && UserConfigParams::m_gi && !needUBOWorkaround();
+    }
+
     bool usesTextureCompression() const
     {
         return UserConfigParams::m_texture_compression && m_support_texture_compression;

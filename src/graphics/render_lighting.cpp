@@ -145,7 +145,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_rtts->getFBO(FBO_DIFFUSE).Bind();
-    if (UserConfigParams::m_gi && UserConfigParams::m_shadows && hasShadow)
+    if (irr_driver->usesGI() && hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
@@ -162,7 +162,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
-        if (World::getWorld() && UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround() && hasShadow)
+        if (World::getWorld() && irr_driver->usesShadows() && hasShadow)
             m_post_processing->renderShadowedSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor(), sun_ortho_matrix, m_rtts->getShadowFBO().getRTT()[0]);
         else
             m_post_processing->renderSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor());

@@ -352,12 +352,12 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         // To avoid wrong culling, use the largest view possible
         m_scene_manager->setActiveCamera(m_suncam);
         if (UserConfigParams::m_dynamic_lights &&
-            UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround() && hasShadow)
+            UserConfigParams::m_shadows && irr_driver->usesShadows() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
             renderShadows();
             PROFILER_POP_CPU_MARKER();
-            if (UserConfigParams::m_gi)
+            if (irr_driver->usesGI())
             {
                 PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
                 renderRSM();
