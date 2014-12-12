@@ -293,6 +293,11 @@ public:
         return m_support_texture_compression;
     }
 
+    bool supportGeometryShader() const
+    {
+        return getGLSLVersion() >= 330;
+    }
+
     bool usesTextureCompression() const
     {
         return UserConfigParams::m_texture_compression && m_support_texture_compression;
