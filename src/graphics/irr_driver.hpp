@@ -300,7 +300,7 @@ public:
 
     bool usesShadows() const
     {
-        return supportGeometryShader() && UserConfigParams::m_shadows;
+        return supportGeometryShader() && UserConfigParams::m_shadows && !needUBOWorkaround();
     }
 
     bool usesGI() const
