@@ -1112,8 +1112,11 @@ void initRest()
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
     race_manager->setDifficulty(
                  (RaceManager::Difficulty)(int)UserConfigParams::m_difficulty);
-    if(track_manager->getTrack(UserConfigParams::m_last_track))
-        race_manager->setTrack(UserConfigParams::m_last_track);
+
+    if (!track_manager->getTrack(UserConfigParams::m_last_track))
+        UserConfigParams::m_last_track.revertToDefaults();
+        
+    race_manager->setTrack(UserConfigParams::m_last_track);
 
 }   // initRest
 
