@@ -232,8 +232,7 @@ void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, 
     glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
     FullScreenShader::IBLShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox);
-    core::matrix4 TVM = irr_driver->getViewMatrix().getTransposed();
-    FullScreenShader::IBLShader::getInstance()->setUniforms(TVM, std::vector<float>(bSHCoeff, bSHCoeff + 9), std::vector<float>(gSHCoeff, gSHCoeff + 9), std::vector<float>(rSHCoeff, rSHCoeff + 9));
+    FullScreenShader::IBLShader::getInstance()->setUniforms(std::vector<float>(bSHCoeff, bSHCoeff + 9), std::vector<float>(gSHCoeff, gSHCoeff + 9), std::vector<float>(rSHCoeff, rSHCoeff + 9));
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);

@@ -5,7 +5,6 @@
 uniform float blueLmn[9];
 uniform float greenLmn[9];
 uniform float redLmn[9];
-uniform mat4 TransposeViewMatrix;
 
 mat4 getMatrix(float L[9])
 {
@@ -22,7 +21,7 @@ mat4 getMatrix(float L[9])
 vec3 DiffuseIBL(vec3 normal)
 {
     // Convert normal in world space (where SH coordinates were computed)
-    vec4 extendednormal = TransposeViewMatrix * vec4(normal, 0.);
+    vec4 extendednormal = transpose(ViewMatrix) * vec4(normal, 0.);
     extendednormal.w = 1.;
     mat4 rmat = getMatrix(redLmn);
     mat4 gmat = getMatrix(greenLmn);
