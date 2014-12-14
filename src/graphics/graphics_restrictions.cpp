@@ -292,6 +292,7 @@ void init()
         }
         m_all_rules.push_back(new Rule(rule));
     }
+    delete rules;
 }   // init
 
 // ----------------------------------------------------------------------------
