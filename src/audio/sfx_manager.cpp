@@ -274,7 +274,10 @@ void* SFXManager::mainLoop(void *obj)
         me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
 
         if (current->m_command == SFX_EXIT)
+        {
+            delete current;
             break;
+        }
         me->m_sfx_commands.unlock();
         switch(current->m_command)
         {
