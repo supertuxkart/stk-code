@@ -140,7 +140,7 @@ void OnlineProfile::fetchAchievements()
     class AchievementsRequest : public XMLRequest
     {
     public:
-        AchievementsRequest() : XMLRequest(0, true) {}
+        AchievementsRequest() : XMLRequest(true, true) {}
         virtual void callback()
         {
             uint32_t user_id = 0;
