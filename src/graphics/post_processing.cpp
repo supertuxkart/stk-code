@@ -205,15 +205,6 @@ void PostProcessing::update(float dt)
     }
 }   // update
 
-template<typename T,typename... Args>
-static void DrawFullScreenEffect(Args...args)
-{
-    glUseProgram(T::getInstance()->Program);
-    glBindVertexArray(SharedObject::FullScreenQuadVAO);
-    T::getInstance()->setUniforms(args...);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-
 static
 void renderBloom(GLuint in)
 {
