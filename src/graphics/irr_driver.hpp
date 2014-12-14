@@ -238,9 +238,11 @@ private:
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
     bool m_skybox_ready;
 
+public:
     float blueSHCoeff[9];
     float greenSHCoeff[9];
     float redSHCoeff[9];
+private:
 
     /** Keep a trace of the origin file name of a texture. */
     std::map<video::ITexture*, std::string> m_texturesFileName;

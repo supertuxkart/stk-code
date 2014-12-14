@@ -171,6 +171,9 @@ protected:
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         if (uniform_ViewProjectionMatrixesUBO != GL_INVALID_INDEX)
             glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+        GLuint uniform_LightingUBO = glGetUniformBlockIndex(Program, "LightingData");
+        if (uniform_LightingUBO != GL_INVALID_INDEX)
+            glUniformBlockBinding(Program, uniform_LightingUBO, 1);
     }
 
     template<typename... U>

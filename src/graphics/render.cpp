@@ -342,6 +342,7 @@ void IrrDriver::renderGLSL(float dt)
 void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedObject::LightingDataUBO);
     m_scene_manager->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
@@ -961,6 +962,14 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     tmp[145] = float(height);
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float), tmp);
+
+    float Lighting[27];
+    memcpy(Lighting, blueSHCoeff, 9 * sizeof(float));
+    memcpy(&Lighting[9], greenSHCoeff, 9 * sizeof(float));
+    memcpy(&Lighting[18], redSHCoeff, 9 * sizeof(float));
+
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 27 * sizeof(float), Lighting);
 }
 
 

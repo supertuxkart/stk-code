@@ -427,6 +427,16 @@ static void initShadowVPMUBO()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+GLuint SharedObject::LightingDataUBO;
+
+static void initLightingDataUBO()
+{
+    glGenBuffers(1, &SharedObject::LightingDataUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
+    glBufferData(GL_UNIFORM_BUFFER, 27 * sizeof(float), 0, GL_STREAM_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
 GLuint SharedObject::ParticleQuadVBO = 0;
 
 static void initParticleQuadVBO()
@@ -527,6 +537,7 @@ void Shaders::loadShaders()
     initCubeVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
+    initLightingDataUBO();
     initParticleQuadVBO();
 }
 
@@ -574,6 +585,12 @@ void bypassUBO(GLuint Program)
     glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
     GLint Screen = glGetUniformLocation(Program, "screen");
     glUniform2f(Screen, irr_driver->getCurrentScreenSize().X, irr_driver->getCurrentScreenSize().Y);
+    GLint bLmn = glGetUniformLocation(Program, "blueLmn[0]");
+    glUniform1fv(bLmn, 9, irr_driver->blueSHCoeff);
+    GLint gLmn = glGetUniformLocation(Program, "greenLmn[0]");
+    glUniform1fv(gLmn, 9, irr_driver->greenSHCoeff);
+    GLint rLmn = glGetUniformLocation(Program, "redLmn[0]");
+    glUniform1fv(rLmn, 9, irr_driver->redSHCoeff);
 }
 
 namespace UtilShader
