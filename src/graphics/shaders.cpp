@@ -1647,7 +1647,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/IBL.frag").c_str());
-        AssignUniforms("blueLmn[0]", "greenLmn[0]", "redLmn[0]");
+        AssignUniforms();
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
