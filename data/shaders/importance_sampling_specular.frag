@@ -29,5 +29,5 @@ void main(void)
         weight += NdotL;
     }
 
-    FragColor = FinalColor / weight;
+    FragColor = FinalColor / max(weight, 1.);
 }
