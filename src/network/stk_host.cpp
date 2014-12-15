@@ -31,6 +31,7 @@
 #else
 #  include <arpa/inet.h>
 #  include <errno.h>
+#  include <sys/socket.h>
 #endif
 #include <pthread.h>
 #include <signal.h>
