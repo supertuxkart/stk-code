@@ -72,6 +72,14 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
 # (at least on VS) irrlicht will find wiiuse io.h file because
 # of the added include directory.
 if(USE_WIIUSE)
+    if(UNIX)
+        include(FindPkgConfig)
+        pkg_check_modules(BLUETOOTH bluez)
+        if(NOT BLUETOOTH_FOUND)
+            message(FATAL_ERROR "Bluetooth library not found. "
+                "Either install libbluetooth or disable wiiuse support with -DUSE_WIIUSE=0")
+        endif()
+    endif()
     if(WIIUSE_BUILD)
         add_subdirectory("${PROJECT_SOURCE_DIR}/lib/wiiuse")
     endif()
