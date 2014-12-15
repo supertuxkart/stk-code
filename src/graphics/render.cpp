@@ -963,13 +963,21 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float), tmp);
 
-    float Lighting[27];
-    memcpy(Lighting, blueSHCoeff, 9 * sizeof(float));
-    memcpy(&Lighting[9], greenSHCoeff, 9 * sizeof(float));
-    memcpy(&Lighting[18], redSHCoeff, 9 * sizeof(float));
+    float Lighting[36];
+    Lighting[0] = m_sundirection.X;
+    Lighting[1] = m_sundirection.Y;
+    Lighting[2] = m_sundirection.Z;
+    Lighting[4] = m_suncolor.getRed();
+    Lighting[5] = m_suncolor.getGreen();
+    Lighting[6] = m_suncolor.getBlue();
+    Lighting[7] = 0.54f;
+
+    memcpy(&Lighting[8], blueSHCoeff, 9 * sizeof(float));
+    memcpy(&Lighting[17], greenSHCoeff, 9 * sizeof(float));
+    memcpy(&Lighting[26], redSHCoeff, 9 * sizeof(float));
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 27 * sizeof(float), Lighting);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 36 * sizeof(float), Lighting);
 }
 
 

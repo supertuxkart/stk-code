@@ -7,10 +7,6 @@ uniform float split1;
 uniform float split2;
 uniform float splitmax;
 
-uniform vec3 direction;
-uniform vec3 col;
-uniform float sunangle = .54;
-
 in vec2 uv;
 out vec4 Diff;
 out vec4 Spec;
@@ -50,13 +46,12 @@ void main() {
     float roughness =texture(ntex, uv).z;
     vec3 eyedir = -normalize(xpos.xyz);
 
-    // Normalized on the cpu
-    vec3 L = direction;
+    vec3 L = normalize((transpose(InverseViewMatrix) * vec4(sun_direction, 0.)).xyz);
     float NdotL = clamp(dot(norm, L), 0., 1.);
 
-    float angle = 3.14 * sunangle / 180.;
+    float angle = 3.14 * sun_angle / 180.;
     vec3 R = reflect(-eyedir, norm);
-    vec3 Lightdir = getMostRepresentativePoint(direction, R, angle);
+    vec3 Lightdir = getMostRepresentativePoint(L, R, angle);
 
     vec3 Specular = SpecularBRDF(norm, eyedir, Lightdir, vec3(1.), roughness);
     vec3 Diffuse = DiffuseBRDF(norm, eyedir, Lightdir, vec3(1.), roughness);
@@ -74,6 +69,6 @@ void main() {
     else
         factor = 1.;
 
-    Diff = vec4(factor * NdotL * Diffuse * col, 1.);
-    Spec = vec4(factor * NdotL * Specular * col, 1.);
+    Diff = vec4(factor * NdotL * Diffuse * sun_col, 1.);
+    Spec = vec4(factor * NdotL * Specular * sun_col, 1.);
 }

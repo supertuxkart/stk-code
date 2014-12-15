@@ -1022,6 +1022,7 @@ void initUserConfig()
     file_manager            = new FileManager();
     user_config             = new UserConfig();     // needs file_manager
     user_config->loadConfig();
+    file_manager->discoverPaths();
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
