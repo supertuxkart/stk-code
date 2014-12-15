@@ -6,9 +6,13 @@ uniform mat4 InverseProjectionMatrix;
 uniform mat4 ProjectionViewMatrix;
 uniform vec2 screen;
 
+uniform vec3 sun_direction;
+uniform vec3 sun_col;
+uniform float sun_angle;
 uniform float blueLmn[9];
 uniform float greenLmn[9];
 uniform float redLmn[9];
+
 #else
 layout (std140) uniform MatrixesData
 {
@@ -24,6 +28,9 @@ layout (std140) uniform MatrixesData
 // Expand because of catalyst (14.12) not correctly associating array in UBO
 layout (std140) uniform LightingData
 {
+    vec3 sun_direction;
+    vec3 sun_col;
+    float sun_angle;
     float bL00;
     float bL1m1;
     float bL10;

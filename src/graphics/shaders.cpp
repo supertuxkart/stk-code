@@ -433,7 +433,7 @@ static void initLightingDataUBO()
 {
     glGenBuffers(1, &SharedObject::LightingDataUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
-    glBufferData(GL_UNIFORM_BUFFER, 27 * sizeof(float), 0, GL_STREAM_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, 36 * sizeof(float), 0, GL_STREAM_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -591,6 +591,12 @@ void bypassUBO(GLuint Program)
     glUniform1fv(gLmn, 9, irr_driver->greenSHCoeff);
     GLint rLmn = glGetUniformLocation(Program, "redLmn[0]");
     glUniform1fv(rLmn, 9, irr_driver->redSHCoeff);
+    GLint sundir = glGetUniformLocation(Program, "sun_direction");
+    glUniform3f(sundir, irr_driver->getSunDirection().X, irr_driver->getSunDirection().Y, irr_driver->getSunDirection().Z);
+    GLint suncol = glGetUniformLocation(Program, "sun_col");
+    glUniform3f(suncol, irr_driver->getSunColor().getRed(), irr_driver->getSunColor().getGreen(), irr_driver->getSunColor().getBlue());
+    GLint sunangle = glGetUniformLocation(Program, "sun_angle");
+    glUniform1f(sunangle, 0.54f);
 }
 
 namespace UtilShader

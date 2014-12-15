@@ -663,12 +663,7 @@ public:
     // -----------------------------------------------------------------------
     void setSunDirection(const core::vector3df &SunPos)
     {
-        core::matrix4 m_view = getViewMatrix();
-        m_view.makeInverse();
-        m_view = m_view.getTransposed();
         m_sundirection = SunPos;
-        m_view.transformVect(m_sundirection);
-        m_sundirection.normalize();
     }
     // -----------------------------------------------------------------------
     video::SColorf getSunColor() const { return m_suncolor; }
