@@ -72,8 +72,16 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
 # Build the ENet UDP network library
-find_package(ENet REQUIRED)
-include_directories(${ENet_INCLUDE_DIRS})
+find_package(ENet)
+if(ENET_FOUND)
+    message("Using system ENet")
+    include_directories(${ENet_INCLUDE_DIRS})
+else()
+    message("Using bundled ENet")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+    set(ENet_LIBRARIES "enet")
+endif()
 
 # Build glew library
 if(NOT USE_GLES2)
