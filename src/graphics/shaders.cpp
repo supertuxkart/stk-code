@@ -427,6 +427,16 @@ static void initShadowVPMUBO()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+GLuint SharedObject::LightingDataUBO;
+
+static void initLightingDataUBO()
+{
+    glGenBuffers(1, &SharedObject::LightingDataUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
+    glBufferData(GL_UNIFORM_BUFFER, 27 * sizeof(float), 0, GL_STREAM_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
 GLuint SharedObject::ParticleQuadVBO = 0;
 
 static void initParticleQuadVBO()
@@ -527,9 +537,8 @@ void Shaders::loadShaders()
     initCubeVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
+    initLightingDataUBO();
     initParticleQuadVBO();
-    MeshShader::ViewFrustrumShader::init();
-    UtilShader::ColoredLine::init();
 }
 
 void Shaders::killShaders()
@@ -576,37 +585,33 @@ void bypassUBO(GLuint Program)
     glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
     GLint Screen = glGetUniformLocation(Program, "screen");
     glUniform2f(Screen, irr_driver->getCurrentScreenSize().X, irr_driver->getCurrentScreenSize().Y);
+    GLint bLmn = glGetUniformLocation(Program, "blueLmn[0]");
+    glUniform1fv(bLmn, 9, irr_driver->blueSHCoeff);
+    GLint gLmn = glGetUniformLocation(Program, "greenLmn[0]");
+    glUniform1fv(gLmn, 9, irr_driver->greenSHCoeff);
+    GLint rLmn = glGetUniformLocation(Program, "redLmn[0]");
+    glUniform1fv(rLmn, 9, irr_driver->redSHCoeff);
 }
 
 namespace UtilShader
 {
-    GLuint ColoredLine::Program;
-    GLuint ColoredLine::uniform_color;
-    GLuint ColoredLine::vao;
-    GLuint ColoredLine::vbo;
-
-    void ColoredLine::init()
+    ColoredLine::ColoredLine()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
+
+        AssignUniforms("color");
+
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, 6 * 1024 * sizeof(float), 0, GL_DYNAMIC_DRAW);
-        GLuint attrib_position = glGetAttribLocation(Program, "Position");
-        glEnableVertexAttribArray(attrib_position);
-        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-        uniform_color = glGetUniformLocation(Program, "color");
-    }
-
-    void ColoredLine::setUniforms(const irr::video::SColor &col)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniform4i(uniform_color, col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
-        glUniformMatrix4fv(glGetUniformLocation(Program, "ModelMatrix"), 1, GL_FALSE, core::IdentityMatrix.pointer());
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     struct TexUnit
@@ -1399,35 +1404,21 @@ namespace MeshShader
         AssignUniforms("color");
     }
 
-    GLuint ViewFrustrumShader::Program;
-    GLuint ViewFrustrumShader::attrib_position;
-    GLuint ViewFrustrumShader::uniform_color;
-    GLuint ViewFrustrumShader::uniform_idx;
-    GLuint ViewFrustrumShader::frustrumvao;
-
-    void ViewFrustrumShader::init()
+    ViewFrustrumShader::ViewFrustrumShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/frustrum.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
 
-        uniform_color = glGetUniformLocation(Program, "color");
-        uniform_idx = glGetUniformLocation(Program, "idx");
+        AssignUniforms("color", "idx");
 
         glGenVertexArrays(1, &frustrumvao);
         glBindVertexArray(frustrumvao);
         glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
-        glEnableVertexAttribArray(attrib_position);
-        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::frustrumindexes);
         glBindVertexArray(0);
-    }
-
-    void ViewFrustrumShader::setUniforms(const video::SColor &color, unsigned idx)
-    {
-        glUniform4i(uniform_color, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-        glUniform1i(uniform_idx, idx);
     }
 }
 
@@ -1439,6 +1430,7 @@ namespace LightShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlight.frag").c_str());
 
@@ -1638,6 +1630,7 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
 
@@ -1654,7 +1647,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/IBL.frag").c_str());
-        AssignUniforms("TransposeViewMatrix", "blueLmn[0]", "greenLmn[0]", "redLmn[0]");
+        AssignUniforms();
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
@@ -1664,6 +1657,7 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
 

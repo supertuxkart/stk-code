@@ -31,22 +31,19 @@ class SharedObject
 public:
     static GLuint billboardvbo;
     static GLuint cubevbo, cubeindexes, frustrumvbo, frustrumindexes, ParticleQuadVBO;
-    static GLuint ViewProjectionMatrixesUBO;
+    static GLuint ViewProjectionMatrixesUBO, LightingDataUBO;
     static GLuint FullScreenQuadVAO;
     static GLuint UIVAO;
 };
 
 namespace UtilShader
 {
-class ColoredLine
+class ColoredLine : public ShaderHelperSingleton<ColoredLine, video::SColor>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_color;
-    static GLuint vao, vbo;
+    GLuint vao, vbo;
 
-    static void init();
-    static void setUniforms(const irr::video::SColor &);
+    ColoredLine();
 };
 
 class SpecularIBLGenerator : public ShaderHelperSingleton<SpecularIBLGenerator, core::matrix4, float >, public TextureRead<Trilinear_cubemap>
@@ -297,16 +294,12 @@ public:
     NormalVisualizer();
 };
 
-class ViewFrustrumShader
+class ViewFrustrumShader : public ShaderHelperSingleton<ViewFrustrumShader, video::SColor, int>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position;
-    static GLuint uniform_color, uniform_idx;
-    static GLuint frustrumvao;
+    GLuint frustrumvao;
 
-    static void init();
-    static void setUniforms(const video::SColor &color, unsigned idx);
+    ViewFrustrumShader();
 };
 
 }
@@ -377,6 +370,15 @@ public:
 };
 }
 
+template<typename T, typename... Args>
+static void DrawFullScreenEffect(Args...args)
+{
+    glUseProgram(T::getInstance()->Program);
+    glBindVertexArray(SharedObject::FullScreenQuadVAO);
+    T::getInstance()->setUniforms(args...);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
 namespace FullScreenShader
 {
 
@@ -418,7 +420,7 @@ public:
     SunLightShader();
 };
 
-class IBLShader : public ShaderHelperSingleton<IBLShader, core::matrix4, std::vector<float>, std::vector<float>, std::vector<float> >, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_cubemap>
+class IBLShader : public ShaderHelperSingleton<IBLShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_cubemap>
 {
 public:
     IBLShader();

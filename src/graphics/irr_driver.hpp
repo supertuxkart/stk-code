@@ -236,11 +236,13 @@ private:
 
     std::vector<video::ITexture *> SkyboxTextures;
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
-    bool m_SH_dirty;
+    bool m_skybox_ready;
 
+public:
     float blueSHCoeff[9];
     float greenSHCoeff[9];
     float redSHCoeff[9];
+private:
 
     /** Keep a trace of the origin file name of a texture. */
     std::map<video::ITexture*, std::string> m_texturesFileName;
@@ -291,6 +293,21 @@ public:
     bool supportTextureCompression() const
     {
         return m_support_texture_compression;
+    }
+
+    bool supportGeometryShader() const
+    {
+        return getGLSLVersion() >= 330;
+    }
+
+    bool usesShadows() const
+    {
+        return supportGeometryShader() && UserConfigParams::m_shadows && !needUBOWorkaround();
+    }
+
+    bool usesGI() const
+    {
+        return supportGeometryShader() && UserConfigParams::m_gi && !needUBOWorkaround();
     }
 
     bool usesTextureCompression() const
@@ -455,7 +472,7 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void generateSkyboxCubemap();
+    void prepareSkybox();
     void generateDiffuseCoefficients();
     void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);

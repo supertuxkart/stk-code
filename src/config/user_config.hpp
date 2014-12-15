@@ -733,7 +733,7 @@ namespace UserConfigParams
                                                   "A random number to avoid duplicated reports.") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_hw_report
-            PARAM_DEFAULT( StringUserConfigParam(   "http://104.131.193.44:8080",
+            PARAM_DEFAULT( StringUserConfigParam(   "http://addons.supertuxkart.net:8080",
                                                      "hw-report-server",
                                                      &m_hw_report_group,
                                                     "The server used for reporting statistics to."));
@@ -753,34 +753,29 @@ namespace UserConfigParams
 
     // ---- Online gameplay related
     PARAM_PREFIX GroupUserConfigParam       m_online_group
-            PARAM_DEFAULT( GroupUserConfigParam("OnlinePlay",
+            PARAM_DEFAULT( GroupUserConfigParam("OnlineServer",
                                           "Everything related to online play.") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
-            PARAM_DEFAULT( StringUserConfigParam(   "https://api.stkaddons.net/",
+            PARAM_DEFAULT( StringUserConfigParam(   "https://addons.supertuxkart.net/api/",
                                                      "server_multiplayer",
                                                      &m_online_group,
                                                     "The server used for online multiplayer."));
 
     PARAM_PREFIX IntUserConfigParam        m_server_version
-            PARAM_DEFAULT( IntUserConfigParam(   1,
+            PARAM_DEFAULT( IntUserConfigParam(   2,
                                                  "server-version",
                                                  &m_online_group,
                                                     "Version of the server API to use."));
 
-    PARAM_PREFIX BoolUserConfigParam        m_verify_peer
-            PARAM_DEFAULT(BoolUserConfigParam(1, "verify-peer", &m_online_group,
-                   "If curl should check peer address. Should always be enabled,"
-                   "unless there are authentication problems."));
-
 
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
-            PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews",
+            PARAM_DEFAULT( GroupUserConfigParam("AddonServer",
                                           "Addon and news related settings") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_addons
-            PARAM_DEFAULT( StringUserConfigParam("http://stkaddons.net/dl/xml",
+            PARAM_DEFAULT( StringUserConfigParam("http://addons.supertuxkart.net/dl/xml",
                                                  "server_addons",
                                                  &m_addon_group,
                                                 "The server used for addon."));

@@ -1,6 +1,6 @@
 uniform int idx;
 
-in vec3 Position;
+layout(location = 0) in vec3 Position;
 
 void main(void)
 {

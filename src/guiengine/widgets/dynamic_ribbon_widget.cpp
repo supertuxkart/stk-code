@@ -985,6 +985,8 @@ void DynamicRibbonWidget::updateItemDisplay()
                     icon->setImage( "textures/transparence.png", IconButtonWidget::ICON_PATH_TYPE_RELATIVE );
                     icon->resetAllBadges();
                     icon->m_properties[PROP_ID] = RibbonWidget::NO_ITEM_ID;
+                    icon->setLabel(L"");
+                    icon->m_text = L"";
                     //std::cout << "    item " << i << " is a FILLER\n";
                 }
             }
@@ -1006,14 +1008,10 @@ void DynamicRibbonWidget::update(float dt)
         {
             int col_scroll = i + m_scroll_offset;
             int item_id = (col_scroll)*row_amount + n;
-            if (item_id >= (int)m_items.size()) item_id -= (int)m_items.size();
 
             assert(item_id >= 0);
-            assert(item_id < (int)m_items.size());
 
-            //m_items[icon_id].
-
-            if (m_items[item_id].m_animated)
+            if (item_id < (int)m_items.size() && m_items[item_id].m_animated)
             {
                 const int frameBefore = (int)(m_items[item_id].m_curr_time / m_items[item_id].m_time_per_frame);
 

@@ -239,6 +239,18 @@ void LayoutManager::readCoords(Widget* self)
             }
         }
 
+        //Add padding to <box> elements
+        if (self->getType() == WTYPE_DIV && self->m_show_bounding_box)
+        {
+            int padding = 15;
+            if (self->m_properties[PROP_DIV_PADDING].length() > 0)
+                padding = atoi(self->m_properties[PROP_DIV_PADDING].c_str());
+            child_max_height += padding * 2;
+            total_height += padding * 2;
+            total_width += padding * 2;
+            child_max_width += padding * 2;
+        }
+
         if (self->m_properties[PROP_WIDTH] == "fit")
         {
             self->m_absolute_w = (is_horizontal_row ? total_width : child_max_width);

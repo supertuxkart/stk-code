@@ -107,6 +107,7 @@ public:
                       FileManager();
                      ~FileManager();
     void              reInit();
+    void              discoverPaths();
     void              dropFileSystem();
     static void       addRootDirs(const std::string &roots);
     io::IXMLReader   *createXMLReader(const std::string &filename);

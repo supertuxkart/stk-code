@@ -5,6 +5,10 @@ uniform mat4 InverseViewMatrix;
 uniform mat4 InverseProjectionMatrix;
 uniform mat4 ProjectionViewMatrix;
 uniform vec2 screen;
+
+uniform float blueLmn[9];
+uniform float greenLmn[9];
+uniform float redLmn[9];
 #else
 layout (std140) uniform MatrixesData
 {
@@ -15,5 +19,39 @@ layout (std140) uniform MatrixesData
     mat4 ProjectionViewMatrix;
     mat4 ShadowViewProjMatrixes[4];
     vec2 screen;
+};
+
+// Expand because of catalyst (14.12) not correctly associating array in UBO
+layout (std140) uniform LightingData
+{
+    float bL00;
+    float bL1m1;
+    float bL10;
+    float bL11;
+    float bL2m2;
+    float bL2m1;
+    float bL20;
+    float bL21;
+    float bL22;
+
+    float gL00;
+    float gL1m1;
+    float gL10;
+    float gL11;
+    float gL2m2;
+    float gL2m1;
+    float gL20;
+    float gL21;
+    float gL22;
+
+    float rL00;
+    float rL1m1;
+    float rL10;
+    float rL11;
+    float rL2m2;
+    float rL2m1;
+    float rL20;
+    float rL21;
+    float rL22;
 };
 #endif

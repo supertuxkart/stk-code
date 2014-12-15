@@ -722,7 +722,8 @@ void KartSelectionScreen::playerConfirm(const int player_id)
         UserConfigParams::m_default_kart = selection;
     }
 
-    if (m_kart_widgets[player_id].getKartInternalName().size() == 0)
+    if (m_kart_widgets[player_id].getKartInternalName().size() == 0 ||
+        m_kart_widgets[player_id].getKartInternalName() == RibbonWidget::NO_ITEM_ID)
     {
         SFXManager::get()->quickSound( "anvil" );
         return;

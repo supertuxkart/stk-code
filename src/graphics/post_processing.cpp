@@ -205,15 +205,6 @@ void PostProcessing::update(float dt)
     }
 }   // update
 
-template<typename T,typename... Args>
-static void DrawFullScreenEffect(Args...args)
-{
-    glUseProgram(T::getInstance()->Program);
-    glBindVertexArray(SharedObject::FullScreenQuadVAO);
-    T::getInstance()->setUniforms(args...);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-
 static
 void renderBloom(GLuint in)
 {
@@ -232,8 +223,7 @@ void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, 
     glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
     FullScreenShader::IBLShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox);
-    core::matrix4 TVM = irr_driver->getViewMatrix().getTransposed();
-    FullScreenShader::IBLShader::getInstance()->setUniforms(TVM, std::vector<float>(bSHCoeff, bSHCoeff + 9), std::vector<float>(gSHCoeff, gSHCoeff + 9), std::vector<float>(rSHCoeff, rSHCoeff + 9));
+    FullScreenShader::IBLShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
@@ -867,7 +857,10 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
-        if (isRace && UserConfigParams::m_motionblur && World::getWorld() != NULL) // motion blur
+        MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
+            getCallback(ES_MOTIONBLUR);
+
+        if (isRace && UserConfigParams::m_motionblur && World::getWorld() != NULL && cb->getBoostTime(0) > 0.) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo);
             std::swap(in_fbo, out_fbo);

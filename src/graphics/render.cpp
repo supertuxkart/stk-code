@@ -176,7 +176,11 @@ void IrrDriver::renderGLSL(float dt)
             irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
         // TODO: put this outside of the rendering loop
-        generateDiffuseCoefficients();
+        if (!m_skybox_ready)
+        {
+            prepareSkybox();
+            m_skybox_ready = true;
+        }
         if (!UserConfigParams::m_dynamic_lights)
             glEnable(GL_FRAMEBUFFER_SRGB);
 
@@ -191,10 +195,10 @@ void IrrDriver::renderGLSL(float dt)
         // Render bounding boxes
         if (irr_driver->getBoundingBoxesViz())
         {
-            glUseProgram(UtilShader::ColoredLine::Program);
-            glBindVertexArray(UtilShader::ColoredLine::vao);
-            glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
-            UtilShader::ColoredLine::setUniforms(SColor(255, 255, 0, 0));
+            glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
+            glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
+            glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
+            UtilShader::ColoredLine::getInstance()->setUniforms(SColor(255, 255, 0, 0));
             const float *tmp = BoundingBoxes.data();
             for (unsigned int i = 0; i < BoundingBoxes.size(); i += 1024 * 6)
             {
@@ -220,13 +224,12 @@ void IrrDriver::renderGLSL(float dt)
                 const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
                 std::map<video::SColor, std::vector<float> >::const_iterator it;
 
-
-                glUseProgram(UtilShader::ColoredLine::Program);
-                glBindVertexArray(UtilShader::ColoredLine::vao);
-                glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
+                glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
+                glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
+                glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
                 for (it = lines.begin(); it != lines.end(); it++)
                 {
-                    UtilShader::ColoredLine::setUniforms(it->first);
+                    UtilShader::ColoredLine::getInstance()->setUniforms(it->first);
                     const std::vector<float> &vertex = it->second;
                     const float *tmp = vertex.data();
                     for (unsigned int i = 0; i < vertex.size(); i += 1024 * 6)
@@ -339,6 +342,7 @@ void IrrDriver::renderGLSL(float dt)
 void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedObject::LightingDataUBO);
     m_scene_manager->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
@@ -349,12 +353,12 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         // To avoid wrong culling, use the largest view possible
         m_scene_manager->setActiveCamera(m_suncam);
         if (UserConfigParams::m_dynamic_lights &&
-            UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround() && hasShadow)
+            UserConfigParams::m_shadows && irr_driver->usesShadows() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
             renderShadows();
             PROFILER_POP_CPU_MARKER();
-            if (UserConfigParams::m_gi)
+            if (irr_driver->usesGI())
             {
                 PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
                 renderRSM();
@@ -958,18 +962,26 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     tmp[145] = float(height);
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float), tmp);
+
+    float Lighting[27];
+    memcpy(Lighting, blueSHCoeff, 9 * sizeof(float));
+    memcpy(&Lighting[9], greenSHCoeff, 9 * sizeof(float));
+    memcpy(&Lighting[18], redSHCoeff, 9 * sizeof(float));
+
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 27 * sizeof(float), Lighting);
 }
 
 
 
 static void renderWireFrameFrustrum(float *tmp, unsigned i)
 {
-    glUseProgram(MeshShader::ViewFrustrumShader::Program);
-    glBindVertexArray(MeshShader::ViewFrustrumShader::frustrumvao);
+    glUseProgram(MeshShader::ViewFrustrumShader::getInstance()->Program);
+    glBindVertexArray(MeshShader::ViewFrustrumShader::getInstance()->frustrumvao);
     glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), (void *)tmp);
-    MeshShader::ViewFrustrumShader::setUniforms(video::SColor(255, 0, 255, 0), i);
+    MeshShader::ViewFrustrumShader::getInstance()->setUniforms(video::SColor(255, 0, 255, 0), i);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 }
 
