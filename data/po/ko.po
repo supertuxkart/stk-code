@@ -1,20 +1,20 @@
-# Greek translation for stk
-# Copyright (c) 2011 Rosetta Contributors and Canonical Ltd 2011
+# Korean translation for stk
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
 # This file is distributed under the same license as the stk package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2014-12-05 19:20-0500\n"
-"PO-Revision-Date: 2014-11-26 01:05+0000\n"
-"Last-Translator: jean manuel clemençon <samuncle06@gmail.com>\n"
-"Language-Team: Greek <el@li.org>\n"
+"PO-Revision-Date: 2014-12-13 10:04+0000\n"
+"Last-Translator: Dynamicwork <dynamicwork@dynamicwork.org>\n"
+"Language-Team: Korean <ko@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-12-16 01:48+0000\n"
+"X-Launchpad-Export-Date: 2014-12-16 01:49+0000\n"
 "X-Generator: Launchpad (build 17286)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
@@ -55,14 +55,14 @@ msgstr ""
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
-msgstr "%s από τον %s"
+msgstr "%s 제작자: %s"
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #: src/modes/linear_world.cpp:355
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
-msgstr "%s από τον %s"
+msgstr "%s - %s"
 
 #: src/online/online_player_profile.cpp:392
 #, c-format
@@ -72,7 +72,7 @@ msgstr ""
 #: src/guiengine/widgets/player_kart_widget.cpp:419
 #, c-format
 msgid "%s is ready"
-msgstr "Ο %s είναι έτοιμος"
+msgstr "%s이(가) 준비가 되었습니다."
 
 #: src/states_screens/online_profile_base.cpp:108
 #, c-format
@@ -92,34 +92,33 @@ msgstr ""
 #: src/modes/world.cpp:1149
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr "Ο «%s» αποκλείστηκε."
+msgstr "'%s'이(가) 탈락했습니다."
 
 #. I18N: for empty highscores entries
 #. I18N: ./data/gui/track_info.stkgui
 #: src/states_screens/track_info_screen.cpp:252 data/po/gui_strings.h:17
 #: data/po/gui_strings.h:20 data/po/gui_strings.h:23
 msgid "(Empty)"
-msgstr "(Κενό)"
+msgstr "(비어 있음)"
 
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:954
 msgid "(network play is not yet available)"
-msgstr "(το δικτυακό παιχνίδι δεν είναι ακόμα διαθέσιμο)"
+msgstr "(온라인 멀티플레이는 아직 지원되지 않습니다.)"
 
 #: src/states_screens/options_screen_input2.cpp:372
 msgid "* A blue item means a conflict with another configuration"
-msgstr "* Ένα μπλε στοιχείο σημαίνει ασυμβατότητα με μια άλλη ρύθμιση"
+msgstr "파란색 항목은 다른 키 설정과 충돌하는 항목입니다."
 
 #: src/states_screens/options_screen_input2.cpp:377
 msgid "* A red item means a conflict in the current configuration"
-msgstr ""
+msgstr "빨간색 항목은 현재 키 설정과 충돌하는 항목입니다."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
 #: data/po/gui_strings.h:929
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr ""
-"* Οι συνδυασμοί πλήκτρων μπορούν να προβληθούν/αλλαχθούν στο μενού Επιλογές"
+msgstr "현재 키보드 설정은 [메뉴] - [설정]에서 나중에 변경할 수 있습니다."
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -130,17 +129,12 @@ msgid ""
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
 msgstr ""
-"* Οι περισσότεροι τρόποι παιχνιδιού μπορούν να παιχτούν με τον τρόπο του "
-"Grand Prix: αντί να παίξετε ένα μόνο αγώνα, μπορείτε να παίξετε πολλούς στην "
-"σειρά. Όσο πιο ψηλή θέση στην κατάταξη πάρετε, τόσους περισσότερους βαθμούς "
-"παίρνετε. Στο τέλος, ο παίκτης με τους περισσότερους βαθμούς κερδίζει το "
-"κύπελο."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 #: data/po/gui_strings.h:826
 msgid "* Restart STK to apply new settings"
-msgstr ""
+msgstr "* SuperTuxKart를 재시작해야 변경된 설정이 적용됩니다"
 
 #. I18N: ./data/gui/options_input.stkgui
 #: data/po/gui_strings.h:1054
@@ -162,28 +156,28 @@ msgstr ""
 
 #: src/states_screens/addons_screen.cpp:52
 msgid "1 month"
-msgstr "1 μήνας"
+msgstr "1개월"
 
 #: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
-msgstr "1 εβδομάδα"
+msgstr "1주"
 
 #: src/states_screens/addons_screen.cpp:56
 msgid "1 year"
-msgstr "1 έτος"
+msgstr "1년"
 
 #: src/states_screens/addons_screen.cpp:51
 msgid "2 weeks"
-msgstr "2 εβδομάδες"
+msgstr "2주"
 
 #: src/states_screens/addons_screen.cpp:57
 msgid "2 years"
-msgstr "2 έτη"
+msgstr "2년"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:182
 msgid "3 Strikes Battle"
-msgstr "Μάχη 3 χτυπημάτων"
+msgstr "배틀 모드"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -191,26 +185,24 @@ msgstr "Μάχη 3 χτυπημάτων"
 msgid ""
 "3 Strikes Battle: Only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
-msgstr ""
-"Μάχη 3 χτυπημάτων: Μόνο σε παιχνίδια πολλαπλών παικτών. Χτυπήστε με τα όπλα "
-"τους άλλους, μέχρι να χάσουν όλες τις ζωές τους."
+msgstr "삼연벙: 멀티플레이어 전용 모드입니다. 아이템들을 사용하여 상대 플레이어들을 격추시키세요."
 
 #: src/states_screens/addons_screen.cpp:53
 msgid "3 months"
-msgstr "3 μήνες"
+msgstr "3개월"
 
 #: src/states_screens/addons_screen.cpp:54
 msgid "6 months"
-msgstr "6 μήνες"
+msgstr "6개월"
 
 #: src/states_screens/addons_screen.cpp:55
 msgid "9 months"
-msgstr "9 μήνες"
+msgstr "9개월"
 
 #. I18N: ./data/gui/track_info.stkgui
 #: data/po/gui_strings.h:14
 msgid "= Highscores ="
-msgstr "=Υψηλότερες βαθμολογίες="
+msgstr "= 최고 기록 ="
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -220,33 +212,30 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:178
 msgid "Abort Grand Prix"
-msgstr "Ματαίωση του Grand Prix"
+msgstr "그랑프리 취소"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 #: data/po/gui_strings.h:139
 msgid "About"
-msgstr "Σχετικά"
+msgstr "정보"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:236
 msgid "Accelerate"
-msgstr "Επιτάχυνση"
+msgstr "가속"
 
 #: src/tracks/track_object_presentation.cpp:945
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
-msgstr ""
-"Επιτάχυνε και πάτα το πλήκτρο <%s> καθώς στρίβεις για να γλυστρίσεις. Το "
-"γλύστριμα για σύντομο διάστημα μπορεί να σε βοηθήσει να στρίβεις γρηγορότερα "
-"και να παίρνεις κλειστές στροφές."
+msgstr "선회하는 중에 <%s>키를 눌러 드리프트를 할 수 있습니다."
 
 #: src/tracks/track_object_presentation.cpp:875
 #, c-format
 msgid "Accelerate with <%s> and steer with <%s> and <%s>"
-msgstr "Επιτάψυνε με το <%s> και στρίψε με το <%s> και το <%s>"
+msgstr "<%s> 키로 가속, <%s> 키와 <%s> 키로 선회합니다."
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -268,7 +257,7 @@ msgstr ""
 #. I18N: Section in the profile screen
 #: src/states_screens/online_profile_base.cpp:101 data/po/gui_strings.h:690
 msgid "Account Settings"
-msgstr ""
+msgstr "계정 설정"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -277,45 +266,45 @@ msgstr ""
 #: src/states_screens/online_profile_base.cpp:100 data/po/gui_strings.h:131
 #: data/po/gui_strings.h:730
 msgid "Achievements"
-msgstr ""
+msgstr "도전 과제"
 
 #: src/states_screens/options_screen_input2.cpp:71
 msgid "Action"
-msgstr ""
+msgstr "동작"
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
 #: data/po/gui_strings.h:1125
 msgid "Add"
-msgstr ""
+msgstr "추가"
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #: data/po/gui_strings.h:500
 msgid "Add Friend"
-msgstr ""
+msgstr "친구 추가"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:111
 msgid "Add Keyboard Configuration"
-msgstr "Προσθήκη διαμόρφωσης πληκτρολογίου"
+msgstr "키보드 설정 추가"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
 #: data/po/gui_strings.h:317
 msgid "Add Player"
-msgstr "Προσθήκη παίκτη"
+msgstr "플레이어 추가"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:90
 msgid "Add Wiimote"
-msgstr "Προσθήκη Wiimote"
+msgstr "Wii 컨트롤러 추가"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:1051
 msgid "Add a device"
-msgstr "Προσθήκη συσκευής"
+msgstr "장치 추가"
 
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
@@ -323,7 +312,7 @@ msgstr "Προσθήκη συσκευής"
 #. I18N: In the user screen
 #: data/po/gui_strings.h:198 data/po/gui_strings.h:287
 msgid "Add user"
-msgstr ""
+msgstr "사용자 추가"
 
 #. I18N: track group name
 #. I18N: kart group name
@@ -340,17 +329,17 @@ msgstr ""
 #: src/states_screens/easter_egg_screen.cpp:145 data/po/gui_strings.h:1225
 #: data/po/gui_strings.h:1261
 msgid "Add-Ons"
-msgstr "Πρόσθετα"
+msgstr "부가 기능"
 
 #: src/states_screens/addons_screen.cpp:110
 msgid "Add-on name"
-msgstr "Όνομα πρόσθετου"
+msgstr "이름"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 #: data/po/gui_strings.h:115
 msgid "Addons"
-msgstr "Πρόσθετα"
+msgstr "부가 기능"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -379,7 +368,7 @@ msgstr ""
 #: src/states_screens/gp_info_screen.cpp:76 data/po/gui_strings.h:1229
 #: data/po/gui_strings.h:1265
 msgid "All"
-msgstr "Όλες"
+msgstr "전체"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: In the track selection screen
@@ -387,13 +376,11 @@ msgstr "Όλες"
 #. I18N: Section in easter egg tracks selection screen
 #: data/po/gui_strings.h:375 data/po/gui_strings.h:1253
 msgid "All Tracks"
-msgstr "Όλες οι πίστες"
+msgstr "모든 트랙"
 
 #: src/states_screens/race_setup_screen.cpp:202
 msgid "All blows allowed, so catch weapons and make clever use of them!"
-msgstr ""
-"Όλα τα χτηπήματα επιτρέπονται, οπότε πιάστε όπλα και χρησιμοποιήστε τα "
-"έξυπνα!"
+msgstr "아이템 상자에서 여러 아이템을 얻을 수 있습니다."
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -415,30 +402,30 @@ msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:323
 msgid "An error occurred while trying to save your grand prix."
-msgstr ""
+msgstr "그랑프리를 저장하는 중 오류가 발생했습니다."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:358
 msgid "Anchor - slows down greatly the kart in the first position."
-msgstr "Άγκυρα - επιβραδύνει πολύ το καρτ που βρίσκεται στην πρώτη θέση."
+msgstr "닻: 상대편 카트의 속도를 잠시 동안 늦춥니다."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 #: data/po/gui_strings.h:818
 msgid "Animated Characters"
-msgstr "Κινούμενοι χαρακτήρες"
+msgstr "캐릭터 애니메이션"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:428
 #, c-format
 msgid "Animated Characters : %s"
-msgstr "Κινούμενοι χαρακτήρες : %s"
+msgstr "캐릭터 애니메이션: %s"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 #: data/po/gui_strings.h:806
 msgid "Animated Scenery"
-msgstr "Κινούμενο τοπίο"
+msgstr "장면 애니메이션"
 
 #. I18N: in graphical options
 #. tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
@@ -447,61 +434,61 @@ msgstr "Κινούμενο τοπίο"
 #: src/states_screens/options_screen_video.cpp:422
 #, c-format
 msgid "Animated Scenery : %s"
-msgstr "Κινούμενο τοπίο: %s"
+msgstr "장면 애니메이션: %s"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:79
 msgid "Anisotropic x16"
-msgstr "Anisotropic x16"
+msgstr "이방성 x16"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:76
 msgid "Anisotropic x2"
-msgstr "Anisotropic x2"
+msgstr "이방성 x2"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:77
 msgid "Anisotropic x4"
-msgstr "Anisotropic x4"
+msgstr "이방성 x4"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:78
 msgid "Anisotropic x8"
-msgstr "Anisotropic x8"
+msgstr "이방성 x8"
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:95
 msgid "Another grand prix with this name already exists."
-msgstr ""
+msgstr "같은 이름의 그랑프리가 이미 존재합니다."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 #: data/po/gui_strings.h:790
 msgid "Anti-aliasing"
-msgstr ""
+msgstr "안티앨리어싱"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:439
 #, c-format
 msgid "Anti-aliasing : %s"
-msgstr ""
+msgstr "안티앨리어싱: %s"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #: data/po/gui_strings.h:829
 msgid "Apply"
-msgstr ""
+msgstr "적용"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:1213
 msgid "Apply new resolution"
-msgstr "Εφαρμογή νέας ανάλυσης"
+msgstr "새 해상도 적용"
 
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options_screen_input2.cpp:575
 msgid "Are you sure you want to permanently delete this configuration?"
-msgstr "Είστε βέβαιοι ότι θέλετε να διαγράψετε οριστικά αυτήν τη ρύθμιση;"
+msgstr "이 설정을 삭제하시겠습니까?"
 
 #: src/states_screens/edit_gp_screen.cpp:123
 #: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
-msgstr ""
+msgstr "'%s'을(를) 제거하시겠습니까?"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
@@ -509,7 +496,7 @@ msgstr ""
 #. I18N: In the addons screen
 #: data/po/gui_strings.h:1217 data/po/gui_strings.h:1288
 msgid "Arenas"
-msgstr "Αρένες"
+msgstr ""
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -521,12 +508,12 @@ msgstr ""
 #. I18N: When configuring input
 #: data/po/gui_strings.h:1092
 msgid "Assign to ESC key"
-msgstr "Αντιστοίχιση του πλήκτρου ESC"
+msgstr "ESC 키로 설정하기"
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
 #: data/po/gui_strings.h:2 data/po/gui_strings.h:1291
 msgid "At World's End"
-msgstr "Στο τέλος του κόσμου"
+msgstr "세상의 끝에서"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -536,31 +523,31 @@ msgstr "Στο τέλος του κόσμου"
 #: src/states_screens/options_screen_input.cpp:139
 #: src/states_screens/options_screen_ui.cpp:119 data/po/gui_strings.h:221
 msgid "Audio"
-msgstr "Ήχος"
+msgstr "오디오"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: src/tracks/track_object_presentation.cpp:883 data/po/gui_strings.h:913
 msgid "Avoid bananas!"
-msgstr "Αποφύγετε τις μπανάνες!"
+msgstr "바나나를 피하세요!"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:284
 #, c-format
 msgid "Axis %d"
-msgstr "Άξονας %d"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:272
 #, c-format
 msgid "Axis %d %s"
-msgstr "Άξονας %d %s"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:279
 #, c-format
 msgid "Axis %d inverted"
-msgstr "Άξονας %d ανεστραμμένος"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #. I18N: ./data/gui/addons_loading.stkgui
@@ -568,53 +555,51 @@ msgstr "Άξονας %d ανεστραμμένος"
 #: src/states_screens/dialogs/addons_loading.cpp:284
 #: src/input/gamepad_config.cpp:216 data/po/gui_strings.h:1245
 msgid "Back"
-msgstr "Πίσω"
+msgstr "뒤로"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 #: data/po/gui_strings.h:836
 msgid "Back to Game"
-msgstr "Πίσω στο παιχνίδι"
+msgstr "게임 계속하기"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: data/po/gui_strings.h:859
 msgid "Back to Race"
-msgstr "Πίσω στον αγώνα"
+msgstr "게임 계속하기"
 
 #: src/states_screens/race_result_gui.cpp:194
 msgid "Back to challenge selection"
-msgstr "Πίσω στην επιλογή πρόκλησης"
+msgstr ""
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:1152
 msgid "Back to device list"
-msgstr "Πίσω στην λίστα συσκευών"
+msgstr "장치 목록으로 돌아가기"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 #: data/po/gui_strings.h:852
 msgid "Back to menu"
-msgstr "Πίσω στο μενού"
+msgstr "메뉴로 돌아가기"
 
 #: src/states_screens/race_result_gui.cpp:200
 msgid "Back to the menu"
-msgstr "Πίσω στο μενού"
+msgstr "메뉴로 돌아가기"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:364
 msgid ""
 "Basket Ball - bounces after the leader, and might squash and slow down karts "
 "down on the way."
-msgstr ""
-"Μπάλα μπάσκετ - αναπηδά προς τον ηγέτη, και μπορεί να τσαλαπατήσει και να "
-"καθυστερήσει τα καρτ που θα βρεθούν στον δρόμο της."
+msgstr "농구공: 현재 1등 플레이어와 주변 플레이어들을 공격할 수 있습니다."
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:163
 msgid "Better luck next time!"
-msgstr "Καλύτερη τύχη την επόμενη φορά!"
+msgstr "다시 도전해 보세요!"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:74
 msgid "Bilinear"
@@ -639,42 +624,36 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:959
 msgid "Blue Team Wins"
-msgstr "Κέρδισε η μπλε ομάδα"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:352
 msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
 "backwards."
-msgstr ""
-"Μπάλα του μποουλινγκ - αναπηδά στους τοίχους. Αν κοιτάζετε πίσω, θα ριχτεί "
-"προς τα πίσω."
+msgstr "볼링공: 벽에 부딛히면 튕겨지며, 뒤를 보는 상태에서 던지면 뒤로 던질 수 있습니다."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:239
 msgid "Brake"
-msgstr "Φρένο"
+msgstr "브레이크"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:343
 msgid ""
 "BubbleGum - protect yourself with a shield, or use while looking back to "
 "leave a sticky pink puddle behind you."
-msgstr ""
-"Τσιχλόφουσκα - προστάτεψε τον εαυτό σου με μια ασπίδα, ή χρησιμοποίησε την "
-"καθώς κοιτάς πίσω για να αφήσεις μία κολώδη ροζ λακούβα πίσω σου."
+msgstr "풍선껌: 상대 플레이어의 공격을 1회 방어할 수 있습니다. 또는 트랙 위에 붙여놓을 수 있습니다."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:346
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
-msgstr ""
-"Κέικ - ρίχνεται στον κοντινότερο αντίπαλο, το καλύτερο σε κοντινές "
-"αποστάσεις και μακριές ευθείες."
+msgstr "케이크: 가까운 상대 플레이어에게 발사하여 공격합니다."
 
 #: src/addons/news_manager.cpp:315 src/addons/addons_manager.cpp:97
 msgid "Can't access stkaddons server..."
-msgstr "Δεν υπάρχει πρόσβαση στον εξυπηρετητή πρόσθετων του STK"
+msgstr "모드 서버에 연결하는 데 실패했습니다."
 
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: ./data/gui/confirm_dialog.stkgui
@@ -706,31 +685,31 @@ msgstr "Δεν υπάρχει πρόσβαση στον εξυπηρετητή �
 #: data/po/gui_strings.h:607 data/po/gui_strings.h:647
 #: data/po/gui_strings.h:663 data/po/gui_strings.h:1178
 msgid "Cancel"
-msgstr "Άκυρο"
+msgstr "취소"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:277
 msgid "Cancel/Back"
-msgstr "Άκυρο/Πίσω"
+msgstr "취소/뒤로 가기"
 
 #: src/states_screens/feature_unlocked.cpp:492
 msgid "Challenge Completed"
-msgstr "Η πρόκληση ολοκληρώθηκε"
+msgstr "미션 완료"
 
 #: src/states_screens/race_gui.cpp:313 src/states_screens/race_gui.cpp:315
 msgid "Challenge Failed"
-msgstr "Η πρόκληση απέτυχε"
+msgstr "미션 실패"
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
 #: data/po/gui_strings.h:43
 msgid "Challenges : Trophy Room"
-msgstr "Προκλήσεις : Δωμάτιο τροπαίου"
+msgstr "도전 모드 : 수상 실적"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #: data/po/gui_strings.h:697
 msgid "Change"
-msgstr ""
+msgstr "변경"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -738,12 +717,12 @@ msgstr ""
 #. I18N: In the kart selection (player setup) screen
 #: data/po/gui_strings.h:1233 data/po/gui_strings.h:1249
 msgid "Choose a Kart"
-msgstr "Επιλέξτε  ένα Καρτ"
+msgstr "카트 선택"
 
 #. I18N: ./data/gui/help1.stkgui
 #: data/po/gui_strings.h:905
 msgid "Click here to play the tutorial"
-msgstr "Κάντε κλικ εδώ για εκμάθηση"
+msgstr "튜토리얼 플레이"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -761,29 +740,27 @@ msgstr "Κάντε κλικ εδώ για εκμάθηση"
 #: data/po/gui_strings.h:563 data/po/gui_strings.h:587
 #: data/po/gui_strings.h:671 data/po/gui_strings.h:723
 msgid "Close"
-msgstr "Κλείσιμο"
+msgstr "닫기"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:909
 msgid "Collect blue boxes : they will give you weapons or other powerups"
-msgstr "Συλλογή μπλε κουτιών: θα σας δώσουν όπλα και άλλα ενισχυτικά"
+msgstr "아이템 상자: 특수 아이템들이 들어 있습니다."
 
 #: src/tracks/track_object_presentation.cpp:892
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
 msgstr ""
-"Συλλέξτε κουτιά δώρων και ρίξτε το όπλο με <%s> για να ρίξετε μακριά αυτά τα "
-"κουτιά!"
 
 #: src/tracks/track_object_presentation.cpp:912
 msgid "Collect nitro bottles (we will use them after the curve)"
-msgstr "Συλλέξτε μπουκάλια νίτρου (θα τα χρησιμοποιήσουμε μετά την στροφή)"
+msgstr ""
 
 #: src/states_screens/race_gui_base.cpp:650
 msgid "Collect nitro!"
-msgstr "Συλλέξτε νίτρο!"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -792,10 +769,7 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the "
 "bar at the right of the game screen."
-msgstr ""
-"Συλλέγοντας nitro σας επιτρέπει να αυξάνετε την ταχύτητα σας όποτε θέλετε "
-"πατώντας το κατάλληλο πλήκτρο. Μπορείτε να δείτε το τρέχον επίπεδο του nitro "
-"στην στήλη δεξιά στην οθόνη του παιχνιδιού."
+msgstr "부스터: 가속 키를 누르고 있는 동안 속도를 올려줍니다. 현재 부스터 게이지는 화면 오른쪽에 표시되어 있습니다."
 
 #: src/tracks/track_object_presentation.cpp:859
 msgid "Complete all challenges to unlock the big door!"
@@ -812,32 +786,30 @@ msgstr ""
 #. I18N: In the registration dialog
 #: data/po/gui_strings.h:447 data/po/gui_strings.h:631
 msgid "Confirm"
-msgstr ""
+msgstr "확인"
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:81
 #, c-format
 msgid "Confirm resolution within %i seconds"
-msgstr "Επιβεβαίωση ανάλυσης μέσα σε %i δευτερόλεπτα"
+msgstr "현재 해상도를 유지하려면 %i초 내에 확인을 눌러주세요"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:1085
 msgid "Connect to the Internet"
-msgstr ""
+msgstr "인터넷 연결"
 
 #: src/input/wiimote_manager.cpp:387
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed "
 "instructions at supertuxkart.net/Wiimote"
 msgstr ""
-"Συνδέστε το wiimote σας στο διαχειριστή Bluetooth και κάντε κλικ στο ΟΚ. "
-"Λεπτομερείς οδηγίες στο supertuxcart.net/Wiimote"
+"Wii 컨트롤러를 블루투스로 연결 후 확인을 눌러주세요. 자세한 설정 방법은 supertuxkart.net/Wiimote 를 참고해보세요."
 
 #: src/states_screens/race_setup_screen.cpp:209
 msgid "Contains no powerups, so only your driving skills matter!"
-msgstr ""
-"Δεν περιέχει ενισχυτικά, έτσι παίζουν ρόλο μόνο οι οδηγικές σας ικανότητες!"
+msgstr "특수 아이템 없이 운전 스킬로만 대결합니다."
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -851,17 +823,17 @@ msgstr ""
 #: data/po/gui_strings.h:214 data/po/gui_strings.h:1103
 #: data/po/gui_strings.h:1109 data/po/gui_strings.h:1155
 msgid "Continue"
-msgstr "Συνέχεια"
+msgstr "계속"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 #: src/states_screens/gp_info_screen.cpp:142 data/po/gui_strings.h:167
 msgid "Continue saved GP"
-msgstr ""
+msgstr "저장된 그랑프리 계속하기"
 
 #: src/states_screens/race_result_gui.cpp:145
 msgid "Continue."
-msgstr ""
+msgstr "계속"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Section in the settings menu
@@ -873,82 +845,82 @@ msgstr ""
 #: src/states_screens/options_screen_ui.cpp:121 data/po/gui_strings.h:1043
 #: data/po/gui_strings.h:1144
 msgid "Controls"
-msgstr "Στοιχεία ελέγχου"
+msgstr "컨트롤"
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
 #: data/po/gui_strings.h:1024
 msgid "Copy"
-msgstr ""
+msgstr "복사"
 
 #: src/states_screens/register_screen.cpp:178
 #: src/states_screens/register_screen.cpp:185
 #, c-format
 msgid "Could not create player '%s'."
-msgstr ""
+msgstr "플레이어 '%s'를 만들 수 없습니다."
 
 #: src/input/wiimote_manager.cpp:422
 msgid "Could not detect any wiimote :/"
-msgstr "Δεν ανιχνεύθηκε κάποιο wiimote :/"
+msgstr "감지된 Wii 컨트롤러가 없습니다. :("
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 #: data/po/gui_strings.h:603
 msgid "Create"
-msgstr ""
+msgstr "만들기"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 #: data/po/gui_strings.h:423
 msgid "Create Server"
-msgstr ""
+msgstr "새 서버 만들기"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 #: data/po/gui_strings.h:611
 msgid "Create User"
-msgstr ""
+msgstr "새 사용자 만들기"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 #: data/po/gui_strings.h:619
 msgid "Create online account"
-msgstr ""
+msgstr "새 온라인 계정 만들기"
 
 #: src/states_screens/create_server_screen.cpp:117
 msgid "Creating server"
-msgstr ""
+msgstr "새 서버 만들기"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
 #: data/po/gui_strings.h:73
 msgid "Credits"
-msgstr "Συντελεστές"
+msgstr "제작자"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 #: data/po/gui_strings.h:439
 msgid "Current Password"
-msgstr ""
+msgstr "현재 암호"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:134
 msgid "Current password invalid."
-msgstr ""
+msgstr "현재 암호가 올바르지 않습니다."
 
 #: src/config/player_manager.cpp:91
 msgid "Currently not signed in"
-msgstr ""
+msgstr "현재 로그인되어 있지 않습니다"
 
 #. I18N: custom video settings
 #: src/states_screens/options_screen_video.cpp:389
 msgid "Custom"
-msgstr "Προσαρμογή"
+msgstr "사용자 설정"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:1193
 msgid "Custom settings..."
-msgstr "Προσαρμοσμένες ρυθμίσεις..."
+msgstr "사용자 설정"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:195 src/input/gamepad_config.cpp:253
@@ -978,7 +950,7 @@ msgstr ""
 
 #: src/states_screens/gp_info_screen.cpp:74
 msgid "Default"
-msgstr ""
+msgstr "기본값"
 
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
@@ -986,13 +958,13 @@ msgstr ""
 #. I18N: In the user screen
 #: data/po/gui_strings.h:202 data/po/gui_strings.h:291
 msgid "Delete"
-msgstr ""
+msgstr "삭제"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
 #: src/states_screens/options_screen_input2.cpp:111 data/po/gui_strings.h:1148
 msgid "Delete Configuration"
-msgstr "Διαγραφή διαμόρφωσης"
+msgstr "설정 삭제"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -1010,7 +982,7 @@ msgstr ""
 #: src/states_screens/options_screen_input2.cpp:96
 #: src/states_screens/options_screen_input2.cpp:587
 msgid "Disable Device"
-msgstr "Απενεργοποίηση συσκευής"
+msgstr "장치 비활성"
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
@@ -1018,37 +990,37 @@ msgstr "Απενεργοποίηση συσκευής"
 #: src/states_screens/dialogs/custom_video_settings.cpp:84
 #: src/states_screens/options_screen_video.cpp:410
 msgid "Disabled"
-msgstr "Απενεργοποιημένο"
+msgstr "없음"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:1069
 msgid "Display FPS"
-msgstr "Εμφάνιση FPS"
+msgstr "FPS 표시"
 
 #: src/states_screens/race_result_gui.cpp:342
 msgid "Do you really want to abort the Grand Prix?"
-msgstr "Θέλετα πραγματικά να εγκαταλείψετε το Grand Prix;"
+msgstr "그랑프리를 취소하시겠습니까?"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/user_screen.cpp:528
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr "Θέλετε πραγματικά να διαγράψετε τον παίκτη  '%s' ;"
+msgstr "정말 '%s\"을 (를) 삭제하시겠습니까?"
 
 #: src/states_screens/edit_gp_screen.cpp:140
 msgid "Do you want to save your changes?"
-msgstr ""
+msgstr "변경 사항을 저장하시겠습니까?"
 
 #: src/karts/controller/player_controller.cpp:340
 #: src/karts/controller/network_player_controller.cpp:283
 msgid "Don't accelerate before go"
-msgstr "Μην επιταχύνεις πριν το Πάμε"
+msgstr "잠시 동안 출발할 수 없습니다."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:265
 msgid "Down"
-msgstr "Κάτω"
+msgstr "아래"
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
@@ -1068,34 +1040,34 @@ msgstr ""
 #. I18N: Menu item
 #: data/po/gui_strings.h:1028 data/po/gui_strings.h:1129
 msgid "Edit"
-msgstr ""
+msgstr "편집"
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Title in edit grand prix screen
 #: data/po/gui_strings.h:1113
 msgid "Edit Grand Prix"
-msgstr ""
+msgstr "그랑프리 편집"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:184
 msgid "Egg Hunt"
-msgstr "Κυνήγι αυγού"
+msgstr "달걀 모으기"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:1008
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr "Κυνήγι αυγού: Εξερευνήστε πίστες για να βρείτε όλα τα κρυμένα αυγά."
+msgstr "달걀 모으기: 트랙에 숨겨져 있는 모든 달걀을 찾으세요."
 
 #: src/modes/easter_egg_hunt.cpp:202
 #, c-format
 msgid "Eggs: %d / %d"
-msgstr "Αυγά: %d / %d"
+msgstr "달걀 수: %d개 / %d개"
 
 #: src/states_screens/race_result_gui.cpp:462
 #: src/states_screens/race_result_gui.cpp:823
 msgid "Eliminated"
-msgstr "Αποκλείστηκε"
+msgstr ""
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
@@ -1103,31 +1075,31 @@ msgstr "Αποκλείστηκε"
 #. I18N: In the registration dialog
 #: data/po/gui_strings.h:470 data/po/gui_strings.h:635
 msgid "Email"
-msgstr ""
+msgstr "이메일"
 
 #: src/states_screens/register_screen.cpp:246
 msgid "Email has to be between 4 and 50 characters long!"
-msgstr ""
+msgstr "이메일 주소는 4자 이상 50자 이하여야 합니다."
 
 #: src/states_screens/register_screen.cpp:252
 msgid "Email is invalid!"
-msgstr ""
+msgstr "이메일 주소가 올바르지 않습니다."
 
 #: src/states_screens/register_screen.cpp:230
 msgid "Emails don't match!"
-msgstr ""
+msgstr "이메일 주소가 일치하지 않습니다."
 
 #. I18N: button to enable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:98
 #: src/states_screens/options_screen_input2.cpp:588
 msgid "Enable Device"
-msgstr "Ενεργοποίηση συσκευής"
+msgstr "장치 활성화"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:1081
 msgid "Enable handicaped users"
-msgstr ""
+msgstr "유저 너프 활성화"
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
@@ -1136,47 +1108,47 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:407 data/po/gui_strings.h:229
 #: data/po/gui_strings.h:241
 msgid "Enabled"
-msgstr "Ενεργοποιημένο"
+msgstr "활성화됨"
 
 #. I18N: animations setting (all karts are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:64
 msgid "Enabled for all"
-msgstr "Ενεργοποιημένο για όλα"
+msgstr "모두"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
 #: data/po/gui_strings.h:1170
 msgid "Enter the new player's name"
-msgstr "Πληκτρολογήστε το όνομα του νέου παίκτη"
+msgstr "새 플레이어의 이름을 입력하세요"
 
 #: src/addons/news_manager.cpp:172
 #, c-format
 msgid "Error downloading news: '%s'."
-msgstr ""
+msgstr "새 소식을 받는 중 오류가 발생했습니다: '%s'."
 
 #: src/states_screens/kart_selection.cpp:922
 msgid ""
 "Everyone:\n"
 "Press 'Select' now to join the game!"
 msgstr ""
-"Όλοι:\n"
-"Πατήστε 'Επιλογή' τώρα για να συμμετέχετε στο παιχνίδι!"
+"모두에게: \n"
+"'선택'을 눌러 게임에 참여하세요."
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In the networking lobby
 #: data/po/gui_strings.h:532
 msgid "Exit"
-msgstr ""
+msgstr "끝"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: data/po/gui_strings.h:883
 msgid "Exit Race"
-msgstr "Έξοδος από τον αγώνα"
+msgstr "레이스 포기"
 
 #: src/states_screens/user_screen.cpp:82
 msgid "Exit game"
-msgstr ""
+msgstr "끝"
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
@@ -1184,11 +1156,11 @@ msgstr ""
 #. I18N: Difficulty
 #: data/po/gui_strings.h:394 data/po/gui_strings.h:748
 msgid "Expert"
-msgstr "Ειδήμονας"
+msgstr "어려움"
 
 #: src/states_screens/race_setup_screen.cpp:252
 msgid "Explore tracks to find all hidden eggs"
-msgstr "Εξερευνήστε  πίστες για να βρείτε όλα τα κρυμένα αυγά"
+msgstr "트랙에 숨겨진 모든 달걀을 찾으세요"
 
 #: src/graphics/irr_driver.cpp:1839
 #, c-format
@@ -1203,43 +1175,43 @@ msgstr ""
 #: src/states_screens/online_profile_achievements.cpp:128
 #: src/states_screens/online_profile_achievements.cpp:168
 msgid "Fetching achievements"
-msgstr ""
+msgstr "도전 과제 가져오는 중"
 
 #: src/states_screens/online_profile_friends.cpp:88
 #: src/states_screens/online_profile_friends.cpp:174
 msgid "Fetching friends"
-msgstr ""
+msgstr "친구 목록 가져오는 중"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:171
 msgid "Fetching last vote"
-msgstr ""
+msgstr "투표 가져오는 중"
 
 #: src/states_screens/server_selection.cpp:67
 #: src/states_screens/server_selection.cpp:210
 msgid "Fetching servers"
-msgstr ""
+msgstr "서버 목록 가져오는 중"
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #: data/po/gui_strings.h:462
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
 "able to reset your password."
-msgstr ""
+msgstr "암호 변경을 위해 계정을 만들 때 사용했던 사용자 이름과 이메일 주소를 입력해 주세요."
 
 #: src/modes/linear_world.cpp:277
 msgid "Final lap!"
-msgstr "Τελευταίος γύρος!"
+msgstr "파이널 랩"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 #: data/po/gui_strings.h:419
 msgid "Find Server"
-msgstr ""
+msgstr "서버 찾기"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:242
 msgid "Fire"
-msgstr "Πυρ"
+msgstr "아이템 사용"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -1252,22 +1224,15 @@ msgid ""
 "in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
 msgstr ""
-"Πρώτα θα χρειαστείτε αρκετές συσκευές εισόδου (το να έχετε πολλαπλά gamepad "
-"ή joystick είναι ο καλύτερος τρόπος για να παίξετε με πολλούς ανθρώπους). "
-"Πηγαίνετε στην οθόνη διαμόρφωσης εισόδου και ρυθμίστε τα gamepad. Είναι "
-"επίσης δυνατό να παίξετε με πληκτρολόγιο(α), πάντως κάθε παίκτης θα "
-"χρειαστεί διαφορετικό σύνολο πλήκτρων, και να έχετε υπ'όψιν ότι τα "
-"περισσότερα πληκτρολόγια δεν είναι κατάλληλα για παιχνίδι πολλαπλών παικτών "
-"γιατί δεν υποστηρίζουν μεγάλο αριθμό από ταυτόχρονα πατήματα πλήκτρων."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:180
 msgid "Follow the Leader"
-msgstr "Ακολούθησε τον ηγέτη"
+msgstr "대장 꼬리잡기 모드"
 
 #: src/states_screens/race_gui_base.cpp:652
 msgid "Follow the leader!"
-msgstr "Ακολούθησε τον ηγέτη!"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -1277,56 +1242,53 @@ msgid ""
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
 msgstr ""
-"Ακολούθησε τον ηγέτη: Τρέξε για την δεύτερη θέση, καθώς το τελευταίο καρτ θα "
-"αποκλείεται κάθε φορά που ο μετρητής θα φτάνει στο μηδέν. Προσοχή: αν πας "
-"μπροστά από τον ηγέτη, επίσης θα αποκλειστείς!"
 
 #: src/input/wiimote_manager.cpp:414
 #, c-format
 msgid "Found %d wiimote(s)"
-msgstr "Βρέθηκαν %d wiimote"
+msgstr "%d개의 Wii 컨트롤러를 찾았습니다."
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:313
 msgid "Friend removed!"
-msgstr ""
+msgstr "친구를 삭제했습니다."
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:215
 msgid "Friend request accepted!"
-msgstr ""
+msgstr "친구 추가 요청이 승인되었습니다."
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:364
 msgid "Friend request cancelled!"
-msgstr ""
+msgstr "친구 추가 요청이 취소되었습니다."
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:267
 msgid "Friend request declined!"
-msgstr ""
+msgstr "친구 추가 요청이 거부되었습니다."
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:158
 msgid "Friend request sent!"
-msgstr ""
+msgstr "친구 추가 요청을 보냈습니다."
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: Section in the profile screen
 #: src/states_screens/online_profile_base.cpp:99 data/po/gui_strings.h:704
 msgid "Friends"
-msgstr ""
+msgstr "친구"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:1205
 msgid "Fullscreen"
-msgstr "Πλήρης οθόνη"
+msgstr "전체 화면"
 
 #. I18N: Shown when a goal is scored
 #: src/states_screens/race_gui_base.cpp:70
 msgid "GOAL!"
-msgstr "ΓΚΟΛ!"
+msgstr ""
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:144
 msgid "Game Keys"
-msgstr "Πλήκτρα παιχνιδιού"
+msgstr "게임 키 설정"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -1339,7 +1301,7 @@ msgstr "Πλήκτρα παιχνιδιού"
 #: data/po/gui_strings.h:332 data/po/gui_strings.h:898
 #: data/po/gui_strings.h:944 data/po/gui_strings.h:977
 msgid "Game Modes"
-msgstr "Τρόποι παιχνιδιού"
+msgstr "게임 모드"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -1351,13 +1313,13 @@ msgstr ""
 #: src/input/binding.cpp:292
 #, c-format
 msgid "Gamepad button %d"
-msgstr "Πλήκτρο gamepad %d"
+msgstr "게임패드 버튼 %d"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/binding.cpp:260 src/input/binding.cpp:265
 #, c-format
 msgid "Gamepad hat %d"
-msgstr "Gamepad hat %d"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -1370,13 +1332,13 @@ msgstr "Gamepad hat %d"
 #: data/po/gui_strings.h:324 data/po/gui_strings.h:890
 #: data/po/gui_strings.h:936 data/po/gui_strings.h:969
 msgid "General"
-msgstr "Γενικά"
+msgstr "일반"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: data/po/gui_strings.h:871
 msgid "Give Up Race"
-msgstr "Παραίτηση από τον αγώνα"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -1394,47 +1356,47 @@ msgstr ""
 #. I18N: Video settings
 #: data/po/gui_strings.h:786
 msgid "Glow (outlines)"
-msgstr ""
+msgstr "부드러운 윤곽선"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:453
 #, c-format
 msgid "Glow (outlines) : %s"
-msgstr ""
+msgstr "부드러운 윤곽선: %s"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:68
 msgid "Go!"
-msgstr "Πάμε!"
+msgstr "출발!"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: In the track selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:145
 #: data/po/gui_strings.h:371
 msgid "Grand Prix"
-msgstr "Grand Prix"
+msgstr "그랑프리"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 #: data/po/gui_strings.h:135
 msgid "Grand Prix Editor"
-msgstr ""
+msgstr "그랑프리 설정"
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Title in grand prix editor screen
 #: data/po/gui_strings.h:1016
 msgid "Grand Prix editor"
-msgstr ""
+msgstr "그랑프리 설정"
 
 #: src/states_screens/race_result_gui.cpp:1204
 msgid "Grand Prix progress:"
-msgstr "Πρόοδος του Grand Prix:"
+msgstr "그랑프리 진행 상황:"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:1189
 msgid "Graphical Effects Level"
-msgstr "Επίπεδο εφέ γραφικών"
+msgstr "그래픽 효과 레벨"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
@@ -1444,29 +1406,29 @@ msgstr "Επίπεδο εφέ γραφικών"
 #: src/states_screens/options_screen_input.cpp:138
 #: src/states_screens/options_screen_ui.cpp:118 data/po/gui_strings.h:1185
 msgid "Graphics"
-msgstr "Γραφικά"
+msgstr "그래픽"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #: data/po/gui_strings.h:758
 msgid "Graphics Settings"
-msgstr "Ρυθμίσεις γραφικών"
+msgstr "그래픽 설정"
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:392
 msgid "Guest"
-msgstr "Επισκέπτης"
+msgstr "게스트 플레이어"
 
 #. I18N: Name of further guest players, with a 1, 2, ... attached
 #: src/config/player_manager.cpp:397
 #, c-format
 msgid "Guest %d"
-msgstr ""
+msgstr "게스트 플레이어 %d"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
 #: data/po/gui_strings.h:551
 msgid "Guest Sign in"
-msgstr ""
+msgstr "게스트 플레이어 로그인"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -1477,30 +1439,28 @@ msgstr ""
 #: data/po/gui_strings.h:123 data/po/gui_strings.h:848
 #: data/po/gui_strings.h:879
 msgid "Help"
-msgstr "Βοήθεια"
+msgstr "도움말"
 
 #: src/states_screens/race_result_gui.cpp:1242
 msgid "Highscores"
-msgstr "Υψηλές βαθμολογίες"
+msgstr "최고 기록"
 
 #: src/states_screens/race_setup_screen.cpp:231
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
-msgstr ""
-"Χτύπα τους άλλους με τα όπλα, μέχρι να χάσουν όλες τις ζωές τους. (Μόνο σε "
-"παιχνίδι με πολλαπλούς παίκτες)"
+msgstr "특수 아이템을 사용하여 상대 플레이어의 체력을 소진시키세요. (멀티플레이에서만 가능합니다.)"
 
 #. I18N: animations setting (only karts with human players are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:62
 msgid "Human players only"
-msgstr "Παίκτες μόνο άνθρωποι"
+msgstr "사용자 플레이어만"
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 #: data/po/gui_strings.h:571
 msgid "I agree to the above terms and am 13 years or older. "
-msgstr ""
+msgstr "약관에 동의하며 13세 이상입니다. "
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -1508,20 +1468,18 @@ msgstr ""
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr ""
-"Αν δεις ένα πλήκτρο με μία κλειδαριά σαν αυτό, χρειάζεται να ολοκληρώσεις "
-"μία πρόκληση για να το ξεκλειδώσεις."
+msgstr "잠겨 있는 항목은 이전 도전 과제를 완료하여 열 수 있습니다."
 
 #: src/input/input_manager.cpp:716
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
-msgstr "Αγνόηση του '%s', χρειαζόταν να συνδεθείς νωρίτερα για να παίξεις!"
+msgstr "'%s'는 참여할 수 없습니다ㅜ 게임에 좀더 일찍 참여하셨여야 했어요!"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
 #: data/po/gui_strings.h:1237
 msgid "Install"
-msgstr "Εγκατάσταση"
+msgstr "설치"
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
@@ -1529,62 +1487,62 @@ msgstr "Εγκατάσταση"
 #. I18N: Difficulty
 #: data/po/gui_strings.h:390 data/po/gui_strings.h:744
 msgid "Intermediate"
-msgstr "Ενδιάμεσος"
+msgstr "보통"
 
 #: src/states_screens/user_screen.cpp:277
 #: src/states_screens/register_screen.cpp:347
 msgid "Internet access is disabled, please enable it in the options"
-msgstr ""
+msgstr "인터넷 연결이 비활성화되어 있습니다. 환경 설정에서 활성화시켜 주세요."
 
 #: src/states_screens/race_result_gui.cpp:964
 msgid "It's a draw"
-msgstr "Είναι ισοπαλία"
+msgstr "무승부"
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
 #: data/po/gui_strings.h:659
 msgid "Join"
-msgstr ""
+msgstr "참가"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:155
 msgid "Joining server"
-msgstr ""
+msgstr "서버에 연결 중"
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In the addons screen
 #: data/po/gui_strings.h:1280
 msgid "Karts"
-msgstr "Καρτ"
+msgstr "카트"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #: data/po/gui_strings.h:256
 msgid "Keep this resolution"
-msgstr "Κράτα αυτή την ανάλυση"
+msgstr "이 해상도 유지"
 
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:222
 msgid "Keep up with the leader kart but don't overtake it!"
-msgstr "Μείνετε με το ηγετικό καρτ αλλά μην το προσπεράσετε!"
+msgstr "대장을 따라가되 추월해서는 안 됩니다."
 
 #: src/states_screens/options_screen_input2.cpp:72
 msgid "Key binding"
-msgstr ""
+msgstr "키 조합"
 
 #: src/states_screens/options_screen_input.cpp:97
 #, c-format
 msgid "Keyboard %i"
-msgstr "Πληκτρολόγιο %i"
+msgstr "키보드 %i"
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/race_gui_overworld.cpp:108
 msgid "Lap"
-msgstr "Γύρος"
+msgstr ""
 
 #: src/modes/linear_world.cpp:304
 #, c-format
 msgid "Lap %i"
-msgstr "Γύρος %i"
+msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:67
 msgid "Laps"
@@ -1594,46 +1552,46 @@ msgstr ""
 #: src/challenges/challenge_data.cpp:249
 #, c-format
 msgid "Laps : %i"
-msgstr "Γύροι : %i"
+msgstr ""
 
 #: src/modes/follow_the_leader.cpp:57 src/modes/follow_the_leader.cpp:252
 msgid "Leader"
-msgstr "Ηγέτης"
+msgstr "대장"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:268
 msgid "Left"
-msgstr "Αριστερά"
+msgstr "왼쪽"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:212
 msgid "Left bumper"
-msgstr ""
+msgstr "왼쪽 범퍼"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:220
 msgid "Left thumb button"
-msgstr ""
+msgstr "왼쪽 엄지 버튼"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:235
 msgid "Left thumb down"
-msgstr ""
+msgstr "왼쪽 엄지 아래쪽"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:233
 msgid "Left thumb left"
-msgstr ""
+msgstr "왼쪽 엄지 왼쪽"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:231
 msgid "Left thumb right"
-msgstr ""
+msgstr "왼쪽 엄지 오른쪽"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:237
 msgid "Left thumb up"
-msgstr ""
+msgstr "왼쪽 엄지 위쪽"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
@@ -1655,29 +1613,29 @@ msgstr ""
 
 #: src/guiengine/engine.cpp:1324
 msgid "Loading"
-msgstr "Φόρτωση"
+msgstr "불러오는 중"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In networking lobby
 #: data/po/gui_strings.h:520
 msgid "Lobby"
-msgstr ""
+msgstr "초기화면"
 
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
 #: data/po/gui_strings.h:675
 msgid "Lobby Settings"
-msgstr ""
+msgstr "초기화면 설정"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 #: data/po/gui_strings.h:615
 msgid "Local Username"
-msgstr ""
+msgstr "로컬 사용자 이름"
 
 #: src/states_screens/kart_selection.cpp:852
 msgid "Locked"
-msgstr "Κλειδωμένο"
+msgstr "잠김"
 
 #: src/states_screens/tracks_screen.cpp:282
 #: src/states_screens/race_setup_screen.cpp:214
@@ -1688,13 +1646,11 @@ msgstr "Κλειδωμένο"
 #: src/states_screens/easter_egg_screen.cpp:225
 #: src/states_screens/easter_egg_screen.cpp:256
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr ""
-"Κλειδωμένο: λύστε ενεργές προκλήσεις για να κερδίσετε πρόσβαση σε "
-"περισσότερες!"
+msgstr "잠김: 사용 가능한 이전 맵을 클리어한 후 다시 시도해 보세요."
 
 #: src/states_screens/tracks_screen.cpp:200
 msgid "Locked!"
-msgstr "Κλειδωμένο!"
+msgstr "잠김"
 
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: ./data/gui/online/guest_login.stkgui
@@ -1702,18 +1658,18 @@ msgstr "Κλειδωμένο!"
 #: src/states_screens/main_menu_screen.cpp:186 data/po/gui_strings.h:263
 #: data/po/gui_strings.h:535
 msgid "Login"
-msgstr ""
+msgstr "로그인"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:251
 msgid "Look Back"
-msgstr "Κοίταγμα πίσω"
+msgstr "후방 카메라"
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: In the profile screen
 #: data/po/gui_strings.h:708
 msgid "Look for more friends:"
-msgstr ""
+msgstr "친구 찾기"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1721,23 +1677,23 @@ msgstr ""
 #. I18N: In the lobby settings screen
 #: data/po/gui_strings.h:599 data/po/gui_strings.h:683
 msgid "Max. number of players"
-msgstr ""
+msgstr "최대 플레이어 수"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #: data/po/gui_strings.h:54
 msgid "Maximum time (min.)"
-msgstr ""
+msgstr "제한 시간(분)"
 
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:414
 msgid "Me Only"
-msgstr "Εμένα μόνο"
+msgstr "나만"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:158
 msgid "Menu Keys"
-msgstr "Πλήκτρα μενού"
+msgstr "메뉴 키"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -1755,13 +1711,13 @@ msgstr ""
 #: src/input/binding.cpp:299
 #, c-format
 msgid "Mouse axis %d %s"
-msgstr "Άξονας ποντικιού %d%s"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/binding.cpp:295
 #, c-format
 msgid "Mouse button %d"
-msgstr "Πλήκτρο ποντικιού %d"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
@@ -1779,7 +1735,7 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:107
 msgid "Multiplayer"
-msgstr "Πολλαπλοί παίκτες"
+msgstr "멀티플레이"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -1792,13 +1748,13 @@ msgstr "Πολλαπλοί παίκτες"
 #: data/po/gui_strings.h:336 data/po/gui_strings.h:902
 #: data/po/gui_strings.h:948 data/po/gui_strings.h:981
 msgid "Multi­player"
-msgstr "Πολλαπλοί παίκτες"
+msgstr "멀티플레이"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
 #: data/po/gui_strings.h:225
 msgid "Music"
-msgstr "Μουσική"
+msgstr "배경음악"
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -1808,19 +1764,19 @@ msgstr "Μουσική"
 #: src/states_screens/online_profile_achievements.cpp:73
 #: data/po/gui_strings.h:492 data/po/gui_strings.h:655
 msgid "Name"
-msgstr ""
+msgstr "이름"
 
 #: src/states_screens/create_server_screen.cpp:132
 msgid "Name has to be between 4 and 30 characters long!"
-msgstr ""
+msgstr "이름은 4자 이상 30자 이하여야 합니다."
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:89
 msgid "Name is empty."
-msgstr ""
+msgstr "이름을 입력하세요."
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:100
 msgid "Name is too long."
-msgstr ""
+msgstr "이름이 너무 깁니다."
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1828,24 +1784,24 @@ msgstr ""
 #. I18N: In the lobby settings screen
 #: data/po/gui_strings.h:595 data/po/gui_strings.h:679
 msgid "Name of the server"
-msgstr ""
+msgstr "서버 이름"
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
 #: data/po/gui_strings.h:1020
 msgid "New"
-msgstr ""
+msgstr "새로 만들기"
 
 #: src/challenges/challenge_data.cpp:502
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr "Το νέο Grand Prix '%s' είναι διαθέσιμο"
+msgstr "새 그랑프리 '%s'를 사용할 수 있습니다."
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 #: data/po/gui_strings.h:443
 msgid "New Password"
-msgstr ""
+msgstr "새 암호"
 
 #: src/states_screens/online_profile_friends.cpp:145
 msgid "New Request"
@@ -1854,35 +1810,35 @@ msgstr ""
 #: src/challenges/challenge_data.cpp:506
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr "Η νέα δυσκολία '%s' είναι τώρα διαθέσιμη"
+msgstr "새 난이도 '%s'를 사용할 수 있습니다."
 
 #: src/modes/linear_world.cpp:361
 msgid "New fastest lap"
-msgstr "Νέος ταχύτερος γύρος"
+msgstr "최고 기록"
 
 #: src/challenges/challenge_data.cpp:492
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr "Ο νέος τρόπος παιχνιδιού '%s' είναι τώρα διαθέσιμος"
+msgstr "새 게임 모드 '%s'를 사용할 수 있습니다."
 
 #: src/challenges/challenge_data.cpp:516
 #, c-format
 msgid "New kart '%s' now available"
-msgstr "Το νέο καρτ '%s' είναι τώρα διαθέσιμο"
+msgstr "새 카트 '%s'를 사용할 수 있습니다."
 
 #: src/challenges/challenge_data.cpp:486
 #, c-format
 msgid "New track '%s' now available"
-msgstr "Η νέα πίστα '%s' είναι τώρα διαθέσιμη"
+msgstr "새 트랙 '%s'를 사용할 수 있습니다."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:245
 msgid "Nitro"
-msgstr "Νίτρο"
+msgstr "부스터"
 
 #: src/states_screens/dialogs/select_challenge.cpp:147
 msgid "Nitro challenge"
-msgstr "Πρόκληση νίτρο"
+msgstr "스피드전"
 
 #: src/states_screens/edit_gp_screen.cpp:253
 #: src/states_screens/dialogs/message_dialog.cpp:101
@@ -1893,20 +1849,18 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:416
 #: src/states_screens/gp_info_screen.cpp:75
 msgid "None"
-msgstr "Κανένα"
+msgstr "없음"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:176
 msgid "Normal Race"
-msgstr "Κανονικός αγώνας"
+msgstr "일반 모드"
 
 #: src/tracks/track_object_presentation.cpp:953
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
 msgstr ""
-"Σημειώστε ότι αν καταφέρετε να γλυστίσετε για αρκετά δευτερόλεπτα, θα λάβετε "
-"ωε ανταμοιβή ένα δώρο επιτάχυνσης!"
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
@@ -1914,24 +1868,24 @@ msgstr ""
 #. I18N: Difficulty
 #: data/po/gui_strings.h:386 data/po/gui_strings.h:740
 msgid "Novice"
-msgstr "Αρχάριος"
+msgstr "쉬움"
 
 #: src/states_screens/dialogs/select_challenge.cpp:68
 #, c-format
 msgid "Number of AI Karts : %i"
-msgstr "Αριθμός καρτ με τεχνητή ευφυΐα : %i"
+msgstr "AI 카트 수: %i"
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 #: data/po/gui_strings.h:31
 msgid "Number of AI karts"
-msgstr "Αριθμός καρτ με τεχνητή ευφυΐα"
+msgstr "AI 카트 수"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #: data/po/gui_strings.h:50
 msgid "Number of goals to win"
-msgstr "Αριθμός γκολ για νίκη"
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
@@ -1959,16 +1913,16 @@ msgstr ""
 #: data/po/gui_strings.h:194 data/po/gui_strings.h:283
 #: data/po/gui_strings.h:643 data/po/gui_strings.h:1174
 msgid "OK"
-msgstr "Εντάξει"
+msgstr "확인"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
 #: data/po/gui_strings.h:8 data/po/gui_strings.h:1297
 msgid "Off the beaten track"
-msgstr "Εκτός πεπατημένης"
+msgstr ""
 
 #: src/states_screens/online_profile_friends.cpp:150
 msgid "Offline"
-msgstr ""
+msgstr "오프라인"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -1981,36 +1935,36 @@ msgstr ""
 #: src/states_screens/main_menu_screen.cpp:185 data/po/gui_strings.h:111
 #: data/po/gui_strings.h:178 data/po/gui_strings.h:267
 msgid "Online"
-msgstr ""
+msgstr "온라인"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 #: data/po/gui_strings.h:411
 msgid "Online Multiplayer"
-msgstr ""
+msgstr "온라인 멀티플레이"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 #: data/po/gui_strings.h:623
 msgid "Online Username"
-msgstr ""
+msgstr "온라인 사용자 이름"
 
 #: src/states_screens/register_screen.cpp:234
 msgid "Online username has to be between 3 and 30 characters long!"
-msgstr ""
+msgstr "온라인 사용자 이름은 3자 이상 30자 이하여야 합니다."
 
 #: src/states_screens/register_screen.cpp:238
 msgid "Online username must not start with a number!"
-msgstr ""
+msgstr "온라인 사용자 이름은 숫자로 시작할 수 없습니다."
 
 #: src/input/input_manager.cpp:746
 msgid "Only the Game Master may act at this point!"
-msgstr "Μόνο το αφεντικό του παιχνιδιού μπορεί να δράσει σε αυτό το σημείο!"
+msgstr ""
 
 #: src/tracks/track_object_presentation.cpp:932
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
-msgstr "Ουπς! Όταν είσαι σε μπελάδες πάτα το <%s> για να διασωθείς"
+msgstr "장에물에 갇힌 경우 <%s> 키로 빠져나올 수 있습니다."
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -2021,19 +1975,18 @@ msgstr "Ουπς! Όταν είσαι σε μπελάδες πάτα το <%s> �
 #: data/po/gui_strings.h:119 data/po/gui_strings.h:844
 #: data/po/gui_strings.h:875
 msgid "Options"
-msgstr "Επιλογές"
+msgstr "환경 설정"
 
 #. I18N: ./data/gui/online/profile_overview.stkgui
 #. I18N: Section in the profile screen
 #: data/po/gui_strings.h:407
 msgid "Overview"
-msgstr ""
+msgstr "개요"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:355
 msgid "Parachute - slows down all karts in a better position."
-msgstr ""
-"Αλεξίπτωτο - επιβραδύνει όλα τα καρτ που βρίσκονται σε καλύτερη θέση."
+msgstr "낙하산: 모든 상대편 카트들의 속도를 늦춰줍니다."
 
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the registration dialog
@@ -2044,58 +1997,58 @@ msgstr ""
 #: data/po/gui_strings.h:190 data/po/gui_strings.h:279
 #: data/po/gui_strings.h:627
 msgid "Password"
-msgstr ""
+msgstr "암호"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 #: data/po/gui_strings.h:694
 msgid "Password :"
-msgstr ""
+msgstr "암호:"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 #: data/po/gui_strings.h:435
 msgid "Password Change"
-msgstr ""
+msgstr "암호 변경"
 
 #: src/states_screens/register_screen.cpp:242
 #: src/states_screens/dialogs/change_password_dialog.cpp:140
 msgid "Password has to be between 8 and 30 characters long!"
-msgstr ""
+msgstr "암호는 8자 이상 30자 이상이어야 합니다."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:210
 msgid "Password successfully changed."
-msgstr ""
+msgstr "암호가 변경되었습니다."
 
 #: src/states_screens/register_screen.cpp:226
 #: src/states_screens/dialogs/change_password_dialog.cpp:147
 msgid "Passwords don't match!"
-msgstr ""
+msgstr "암호가 일치하지 않습니다."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:257
 msgid "Pause Game"
-msgstr "Παύση παιχνιδιού"
+msgstr "일시 정지"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #: data/po/gui_strings.h:832 data/po/gui_strings.h:855
 msgid "Paused"
-msgstr "Σε παύση"
+msgstr "일시 정지"
 
 #: src/karts/controller/player_controller.cpp:338
 #: src/karts/controller/network_player_controller.cpp:281
 msgid "Penalty time!!"
-msgstr "Ποινή χρόνου!"
+msgstr "부정 출발 경고!"
 
 #: src/states_screens/online_profile_friends.cpp:146
 msgid "Pending"
-msgstr ""
+msgstr "대기중"
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 #: data/po/gui_strings.h:5 data/po/gui_strings.h:1294
 msgid "Penguin Playground"
-msgstr "Παιχνιδότοπος πιγκουίνου"
+msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:247
 msgid "Performing vote"
@@ -2104,7 +2057,7 @@ msgstr ""
 #. I18N: ./data/gui/tutorial.stkgui
 #: data/po/gui_strings.h:252
 msgid "Play all"
-msgstr "Παίξε όλα"
+msgstr ""
 
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
@@ -2118,7 +2071,7 @@ msgstr "Παίξε όλα"
 #: src/states_screens/options_screen_ui.cpp:120 data/po/gui_strings.h:174
 #: data/po/gui_strings.h:306
 msgid "Players"
-msgstr "Παίκτες"
+msgstr ""
 
 #. I18N: ./data/gui/enter_gp_name_dialog.stkgui
 #. I18N: In the 'add new grand prix' dialog
@@ -2129,24 +2082,22 @@ msgstr ""
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:500
 msgid "Please re-configure your key bindings."
-msgstr "Παρακαλώ επαναδιαμορφώστε τους συνδυασμούς πλήκτρων."
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:437
 msgid "Please wait while addons are updated"
-msgstr "Παρακαλώ περιμένετε καθώς ενημερώνονται τα πρόσθετα"
+msgstr "모드를 업데이트하는 중입니다. 잠시만 기다려주세요.."
 
 #: src/states_screens/main_menu_screen.cpp:557
 msgid "Please wait while the add-ons are loading"
-msgstr "Παρακαλώ περιμένετε καθώς φορτώνονται τα πρόσθετα"
+msgstr "모드를 불러오고 있습니다. 잠시만 기다려주세요.."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:349
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight."
-msgstr ""
-"Βεντούζα - ρίξτε ευθεία για να τραβήξετε ένα αντίπαλο πίσω, ή ρίξτε καθώς "
-"κοιτάτε πίσω για να κάνετε κάποιον να χάσει την ορατότητα του."
+msgstr "뚜러뻥: 상대편 카트 뒤에 발사하여 속도를 높이거나, 상대편 카트 앞에서 발사하여 시야를 가립니다."
 
 #: src/tracks/track_object_presentation.cpp:904
 #, c-format
@@ -2161,89 +2112,86 @@ msgstr ""
 #. I18N: In the 'add new grand prix' dialog
 #: data/po/gui_strings.h:1100 data/po/gui_strings.h:1166
 msgid "Press ESC to cancel"
-msgstr "Πίεσε το πλήκτρο ESC για ακύρωση"
+msgstr "취소(ESC)"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #: data/po/gui_strings.h:1088
 msgid "Press a key"
-msgstr "Πιέστε ένα πλήκτρο"
+msgstr "설정할 키 누르기"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:1047
 msgid "Press enter or double-click on a device to configure it"
-msgstr "Πάτα enter ή κάντε διπλό κλικ σε μία συσκευή για να την διαμορφώσεις"
+msgstr "마우스 더블 클릭 또는 Enter를 눌러 장치를 설정합니다."
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
 #: data/po/gui_strings.h:313
 msgid "Press enter or double-click on a player to edit him/her"
-msgstr "Πάτα enter ή κάνε διπλό κλικ σε ένα παίκτη για να τον επεξεργαστείς"
+msgstr "마우스 더블 클릭 또는 Enter를 눌러 플레이어를 편집합니다."
 
 #: src/states_screens/race_gui_overworld.cpp:462
 msgid "Press fire to play the tutorial"
-msgstr "Πάτα πυρ για εκμάθηση"
+msgstr "아이템 버튼으로 튜토리얼을 시작합니다."
 
 #: src/states_screens/race_gui_overworld.cpp:532
 msgid "Press fire to start the challenge"
-msgstr "Πάτα πυρ για να αρχίσει η πρόκληση."
+msgstr "아이템 버튼으로 레이스를 시작합니다."
 
 #: src/input/wiimote_manager.cpp:390
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
 msgstr ""
-"Πάτα τα πλήκτρα 1+2 ταυτόχρονα στο wiimote σου, για να το θέσεις σε "
-"κατάσταση ανακάλυψης και μετά πάτα στο Εντάξει. Λεπτομερείς οδηγίες στο "
-"supertuxkart.net/Wiimote"
+"Wii 컨트롤러를 검색 모드로 설정하고 확인 버튼을 눌러주세요. 자세한 설정 방법은 supertuxkart.net/Wiimote에서 보실 "
+"수 있습니다."
 
 #: src/states_screens/dialogs/addons_loading.cpp:357
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr "Προβλήματα κατά την εγκατάσταση του πρόσθετου '%s'."
+msgstr "부가 기능 '%s'를 설치하는 도중 문제가 발생했습니다."
 
 #: src/states_screens/dialogs/addons_loading.cpp:394
 #, c-format
 msgid "Problems removing the addon '%s'."
-msgstr "Προβλήματα κατά την αφαίρεση του πρόσθετου '%s'."
+msgstr "부가 기능 '%s'를 제거하는 도중 문제가 발생했습니다."
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:474
 msgid "Processing"
-msgstr ""
+msgstr "처리 중"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 #: data/po/gui_strings.h:427
 msgid "Profile"
-msgstr ""
+msgstr "프로파일"
 
 #: src/states_screens/online_profile_achievements.cpp:79
 msgid "Progress"
-msgstr ""
+msgstr "진행률"
 
 #: src/states_screens/race_setup_screen.cpp:240
 msgid ""
 "Push the ball to the opposite cage to score goals. (Only in multiplayer "
 "games)"
 msgstr ""
-"Σπρώξτε την μπάλα στην απέναντι εστία για να βάλετε γκολ. (Μόνο σε παιχνίδι "
-"πολλαπλών παικτών)"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 #: data/po/gui_strings.h:415
 msgid "Quick Play"
-msgstr ""
+msgstr "빠른 게임"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 #: data/po/gui_strings.h:143
 msgid "Quit"
-msgstr "Έξοδος"
+msgstr "끝"
 
 #: src/states_screens/race_result_gui.cpp:148
 msgid "Quit the server."
-msgstr ""
+msgstr "서버 연결 끊기"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: ./data/gui/select_challenge.stkgui
@@ -2251,48 +2199,48 @@ msgstr ""
 #: data/po/gui_strings.h:46 data/po/gui_strings.h:378
 #: data/po/gui_strings.h:733
 msgid "Race Setup"
-msgstr "Ρύθμιση αγώνα"
+msgstr "레이스 설정"
 
 #: src/states_screens/gp_info_screen.cpp:77
 msgid "Random"
-msgstr ""
+msgstr "랜덤"
 
 #: src/states_screens/arenas_screen.cpp:277
 msgid "Random Arena"
-msgstr "Τυχαία αρένα"
+msgstr ""
 
 #: src/states_screens/gp_info_screen.cpp:175
 msgid "Random Grand Prix"
-msgstr ""
+msgstr "랜덤 그랑프리"
 
 #: src/states_screens/kart_selection.cpp:838
 #: src/states_screens/kart_selection.cpp:1466
 msgid "Random Kart"
-msgstr "Τυχαίο καρτ"
+msgstr "랜덤 카트"
 
 #: src/states_screens/tracks_screen.cpp:296
 #: src/states_screens/easter_egg_screen.cpp:270
 msgid "Random Track"
-msgstr "Τυχαία πίστα"
+msgstr "랜덤 트랙"
 
 #: src/states_screens/race_gui_overworld.cpp:109
 msgid "Rank"
-msgstr "Κατάταξη"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will show only items with good rating
 #: data/po/gui_strings.h:1276
 msgid "Rating >="
-msgstr "Αξιολόγηση >="
+msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:64
 msgid "Ready!"
-msgstr "Λάβετε θέσεις!"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:955
 msgid "Red Team Wins"
-msgstr "Κέρδισε η κόκκινη ομάδα"
+msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
@@ -2306,9 +2254,7 @@ msgstr ""
 msgid ""
 "Regular Race: All blows allowed, so catch weapons and make clever use of "
 "them!"
-msgstr ""
-"Κανονικός αγώνας: Όλα τα χτυπήματα επιτρέπονται, οπότε πιάστε όπλα και "
-"χρησιμοποιήστε τα έξυπνα!"
+msgstr "일반 모드: 아이템 상자에서 여러 아이템을 얻을 수 있습니다."
 
 #: src/states_screens/gp_info_screen.cpp:149
 #: src/states_screens/gp_info_screen.cpp:174
@@ -2327,7 +2273,7 @@ msgstr ""
 #. I18N: In the video settings
 #: data/po/gui_strings.h:1209
 msgid "Remember window location"
-msgstr "Απομνημόνευση θέσης παραθύρου"
+msgstr ""
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -2338,7 +2284,7 @@ msgstr "Απομνημόνευση θέσης παραθύρου"
 #: data/po/gui_strings.h:496 data/po/gui_strings.h:1032
 #: data/po/gui_strings.h:1133
 msgid "Remove"
-msgstr "Αφαίρεση"
+msgstr ""
 
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
@@ -2349,49 +2295,49 @@ msgstr "Αφαίρεση"
 #: data/po/gui_strings.h:206 data/po/gui_strings.h:295
 #: data/po/gui_strings.h:1036
 msgid "Rename"
-msgstr "Μετονομασία"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:64
 #, c-format
 msgid "Required Nitro Points : %i"
-msgstr "Απαιτούμενοι βαθμοί νίτρου : %i"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:53
 #, c-format
 msgid "Required Rank : %i"
-msgstr "Απαιτούμενη κατάταξη : %i"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:58
 #, c-format
 msgid "Required Time : %i"
-msgstr "Απαιτούμενος χρόνος : %i"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:254
 msgid "Rescue"
-msgstr "Διάσωση"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:1201
 msgid "Resolution"
-msgstr "Ανάλυση"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:188
 msgid "Restart"
-msgstr "Επανεκκίνηση"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: data/po/gui_strings.h:867
 msgid "Restart Race"
-msgstr "Επανεκκίνηση αγώνα"
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 #: data/po/gui_strings.h:151
 msgid "Reverse"
-msgstr "Αντίστροφα"
+msgstr ""
 
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: In the edit track screen
@@ -2406,7 +2352,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:271
 msgid "Right"
-msgstr "Δεξιά"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:214
@@ -2474,7 +2420,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:274
 msgid "Select"
-msgstr "Επιλογή"
+msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:736
@@ -2484,7 +2430,7 @@ msgstr ""
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:755
 msgid "Select a game mode"
-msgstr "Επιλογή τρόπου παιχνιδιού"
+msgstr ""
 
 #: src/states_screens/edit_track_screen.cpp:238
 msgid "Select a track"
@@ -2494,7 +2440,7 @@ msgstr ""
 #. I18N: In the in-game dialog
 #: data/po/gui_strings.h:840
 msgid "Select kart"
-msgstr "Επιλογή καρτ"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2532,13 +2478,13 @@ msgstr ""
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:66
 msgid "Set!"
-msgstr "Έτοιμοι!"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: src/states_screens/race_result_gui.cpp:198 data/po/gui_strings.h:863
 msgid "Setup New Race"
-msgstr "Νέος αγώνας"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -2617,23 +2563,23 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:177
 #, c-format
 msgid "Size: %s"
-msgstr "Mέγεθος: %s"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:248
 msgid "Skidding"
-msgstr "Ολίσθηση"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:1065
 msgid "Skin"
-msgstr "Θέμα"
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:186
 msgid "Soccer"
-msgstr "Ποδόσφαιρο"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -2642,8 +2588,6 @@ msgid ""
 "Soccer: Only in multiplayer games. Use your kart to push the ball into the "
 "goal."
 msgstr ""
-"Ποδόσφαιρο: Μόνο σε παιχνίδι πολλαπλών παικτών. Χρησιμοποίησε το καρτ σου "
-"για να σπρώξεις την μπάλα στην εστία."
 
 #: src/states_screens/main_menu_screen.cpp:550
 #: src/states_screens/addons_screen.cpp:514
@@ -2652,19 +2596,16 @@ msgid ""
 "are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
 msgstr ""
-"Λυπάμαι , ένα σφάλμα συνέβη κατά την επικοινωνία με τον ιστοτόπο των "
-"πρόσθετων. Σιγουρέψου ότι είσαι συνδεδεμένος στο Internet και ότι το "
-"SuperTuxKart δεν είναι μπλοκαρισμένο από ένα firewall."
 
 #: src/states_screens/dialogs/addons_loading.cpp:279
 msgid "Sorry, downloading the add-on failed"
-msgstr "Λυπούμαστε,το κατέβασμα του πρόσθετου απέτυχε."
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
 #: data/po/gui_strings.h:237
 msgid "Sound Effects"
-msgstr "Ηχητικά εφέ"
+msgstr ""
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
@@ -2673,7 +2614,7 @@ msgstr "Ηχητικά εφέ"
 #: src/states_screens/grand_prix_editor_screen.cpp:334
 #: data/po/gui_strings.h:1221 data/po/gui_strings.h:1257
 msgid "Standard"
-msgstr "Τυπικό"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:218
@@ -2682,7 +2623,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:209
 msgid "Start Grand Prix"
-msgstr "Έναρξη Grand Prix"
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
@@ -2690,7 +2631,7 @@ msgstr "Έναρξη Grand Prix"
 #. I18N: In the grand prix info screen
 #: data/po/gui_strings.h:39 data/po/gui_strings.h:163
 msgid "Start Race"
-msgstr "Έναρξη αγώνα"
+msgstr ""
 
 #: src/states_screens/online_profile_friends.cpp:71
 msgid "Status"
@@ -2699,18 +2640,18 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:230
 msgid "Steer Left"
-msgstr "Στρίψιμο αριστερά"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:233
 msgid "Steer Right"
-msgstr "Στρίψιμο δεξιά"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 #: data/po/gui_strings.h:99
 msgid "Story Mode"
-msgstr "Κατάσταση αφήγησης"
+msgstr ""
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -2724,12 +2665,12 @@ msgstr ""
 #. I18N: Difficulty
 #: data/po/gui_strings.h:752
 msgid "SuperTux"
-msgstr "SuperTux"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #: data/po/gui_strings.h:1268
 msgid "SuperTuxKart Addons"
-msgstr "Πρόσθετα SuperTuxKart"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help1.stkgui
@@ -2738,7 +2679,7 @@ msgstr "Πρόσθετα SuperTuxKart"
 #: data/po/gui_strings.h:320 data/po/gui_strings.h:886
 #: data/po/gui_strings.h:932 data/po/gui_strings.h:965
 msgid "SuperTuxKart Help"
-msgstr "Βοήθεια SuperTuxKart"
+msgstr ""
 
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: ./data/gui/options_audio.stkgui
@@ -2752,19 +2693,17 @@ msgstr "Βοήθεια SuperTuxKart"
 #: data/po/gui_strings.h:1057 data/po/gui_strings.h:1140
 #: data/po/gui_strings.h:1181
 msgid "SuperTuxKart Options"
-msgstr "Ρυμίσεις SuperTuxKart"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:951
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
 msgstr ""
-"Το SuperTuxKart μπορεί να παιχτεί σε κατάσταση πολλαπλών παικτών στον ίδιο "
-"υπολογιστή"
 
 #. I18N: ./data/gui/help3.stkgui
 #: data/po/gui_strings.h:984
 msgid "SuperTuxKart features several game modes"
-msgstr "Το SuperTuxKart έχει αρκετούς τρόπους παιχνιδιού"
+msgstr ""
 
 #: src/main.cpp:1154
 msgid ""
@@ -2782,19 +2721,16 @@ msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short "
 "time."
 msgstr ""
-"Αντικαταστάτης - τα κουτιά δώρων μεταμορφώνονται σε μπανάνες και αντίστροφα, "
-"για σύντομο χρόνο."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:367
 msgid "Swatter - will squash karts close by, slowing them down."
 msgstr ""
-"Ρακέτα - θα χτυπήσει τα καρτ που βρίσκονται κοντά, επιβραδύνοντας τα."
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:186
 msgid "System Language"
-msgstr "Γλώσσα συστήματος"
+msgstr ""
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -2812,27 +2748,23 @@ msgstr ""
 #. I18N: Video settings
 #: data/po/gui_strings.h:822
 msgid "Texture filtering"
-msgstr "Φιλτράρισμα υφής"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
 #: data/po/gui_strings.h:925
 msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
 msgstr ""
-"Το κουμπί της ολίσθησης σου επιτρέπει να γλιστράς σε απότομες στροφές και να "
-"παίρνεις ώθηση."
 
 #: src/states_screens/main_menu_screen.cpp:545
 msgid "The add-ons module is currently disabled in the Options screen"
-msgstr "Τα πρόσθετα είναι προς το παρόν απενεργοποιημένα στην οθόνη Επιλογές"
+msgstr ""
 
 #: src/race/highscore_manager.cpp:101
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
 msgstr ""
-"Το αρχείο με τις υψηλότερες βαθμολογίες ήταν πολύ παλιό,\n"
-"όλες οι υψηλότερες βαθμολογίες έχουν διαγραφεί."
 
 #: src/states_screens/create_server_screen.cpp:136
 msgid "The maxinum number of players has to be between 2 and 12."
@@ -2841,15 +2773,13 @@ msgstr ""
 #. I18N: Game mode
 #: src/race/race_manager.hpp:178
 msgid "Time Trial"
-msgstr "Χρονική δοκιμασία"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:992
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr ""
-"Χρονική δοκιμασία: Δεν περιέχει ενισχυτικά,  παίζουν ρόλο μόνο οι οδηγικές "
-"ικανότητες!"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
@@ -2862,29 +2792,17 @@ msgid ""
 "connect multiple keyboards to the computer. Remember that everyone still "
 "needs different keybindings in this case.)"
 msgstr ""
-"Για να προσθέσεις μία νέα συσκευή Gamepad/Joystick, απλά ξεκίνα το "
-"SuperTuxKart με τη συσκευή συνδεμένη, και θα εμφανιστεί στη λίστα.\n"
-"\n"
-"Για να προσθέσεις μια διαμόρφωση πληκτρολογίου, μπορείς να χρησιμοποιήσεις "
-"το πλήκτρο παρακάτω, ΩΣΤΟΣΟ παρακαλώ να θυμάσαι ότι τα περισσότερα "
-"πληκτρολόγια υποστηρίζουν περιορισμένο αριθμό από ταυτόχρονα πατήματα "
-"πλήκτρων και έτσι είναι ακατάλληλα για παιχνίδι με πολλαπλούς παίκτες. "
-"(Μπορείς, πάντως, να συνδέσεις πολλαπλά πληκτρολόγια στον υπολογιστή. "
-"Θυμίσου ότι σε αυτή την περίπτωση ο καθένας χρειάζεται διαφορετικούς "
-"συνδυασμούς πλήκτρων.)"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:340
 msgid "To help you win, there are some powerups you can collect :"
 msgstr ""
-"Για να βοηθηθείς να κερδίσεις, υπάρχουν μερικά ενισχυτικά που μπορείς να "
-"συλλέξεις:"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
 #: data/po/gui_strings.h:11 data/po/gui_strings.h:1300
 msgid "To the moon and back"
-msgstr "Στο φεγγάρι και πίσω"
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:154
 #: src/states_screens/dialogs/user_info_dialog.cpp:211
@@ -2895,7 +2813,7 @@ msgstr ""
 #: src/states_screens/race_gui_base.cpp:103
 #, c-format
 msgid "Top %i"
-msgstr "Κορυφαίοι %i"
+msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:66
 msgid "Track"
@@ -2911,7 +2829,7 @@ msgstr ""
 #: src/states_screens/track_info_screen.cpp:107
 #, c-format
 msgid "Track by %s"
-msgstr "Πίστα από τον %s"
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -2925,7 +2843,7 @@ msgstr ""
 #. I18N: In the addons screen
 #: data/po/gui_strings.h:155 data/po/gui_strings.h:1284
 msgid "Tracks"
-msgstr "Πίστες"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 msgid "Trilinear"
@@ -2934,25 +2852,25 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:369
 #: src/states_screens/dialogs/addons_loading.cpp:406
 msgid "Try again"
-msgstr "Προσπαθήστε ξανά"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 #: src/states_screens/race_gui_overworld.cpp:455 data/po/gui_strings.h:127
 msgid "Tutorial"
-msgstr "Εκμάθηση"
+msgstr ""
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
 #: data/po/gui_strings.h:249
 msgid "Tutorial : Selection Room"
-msgstr "Εκμάθηση: Επιλογή δωματίου"
+msgstr ""
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
 #: data/po/gui_strings.h:382
 msgid "Type :"
-msgstr "Είδος :"
+msgstr ""
 
 #: src/states_screens/race_gui_overworld.cpp:502
 msgid "Type: Grand Prix"
@@ -2968,26 +2886,26 @@ msgstr ""
 #. I18N: Add-on screen action
 #: data/po/gui_strings.h:1241
 msgid "Uninstall"
-msgstr "Απεγκατάσταση"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:262
 msgid "Up"
-msgstr "Επάνω"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
-msgstr "Ενημέρωση"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will show only recently updated items
 #: data/po/gui_strings.h:1272
 msgid "Updated"
-msgstr "Ενημερωμένα"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:111
 msgid "Updated date"
-msgstr "Ημερομηνία ενημέρωσης"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -3004,7 +2922,7 @@ msgstr ""
 #: src/tracks/track_object_presentation.cpp:922
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
-msgstr "Χρησιμοποίησε το νίτρο που μάζεψες πατώντας  <%s>!"
+msgstr ""
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog' dialog
@@ -3020,7 +2938,7 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:137
 #: src/states_screens/options_screen_input.cpp:140 data/po/gui_strings.h:1061
 msgid "User Interface"
-msgstr "Διεπαφή χρήστη"
+msgstr ""
 
 #: src/states_screens/grand_prix_editor_screen.cpp:335
 msgid "User defined"
@@ -3050,7 +2968,7 @@ msgstr ""
 #. I18N: ./data/gui/soccer_setup.stkgui
 #: data/po/gui_strings.h:65
 msgid "VS"
-msgstr "εναντίον"
+msgstr ""
 
 #: src/states_screens/register_screen.cpp:302
 #: src/states_screens/dialogs/change_password_dialog.cpp:235
@@ -3061,13 +2979,13 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:108
 #, c-format
 msgid "Version: %d"
-msgstr "Έκδοση: %d"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:1197
 msgid "Vertical Sync (requires restart)"
-msgstr "Κατακόρυφος συγχρονισμός (απαιτεί επανεκκίνηση)"
+msgstr ""
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -3081,7 +2999,7 @@ msgstr ""
 #. I18N: In the audio options screen
 #: data/po/gui_strings.h:233 data/po/gui_strings.h:245
 msgid "Volume"
-msgstr "Ένταση"
+msgstr ""
 
 #. I18N: ./data/gui/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -3095,7 +3013,7 @@ msgstr ""
 
 #: src/modes/linear_world.cpp:883
 msgid "WRONG WAY!"
-msgstr "ΛΑΘΟΣ ΚΑΤΕΥΘΥΝΣΗ!"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:479
 msgid ""
@@ -3103,9 +3021,6 @@ msgid ""
 "keys that contain a character that is different in upper-case will stop "
 "working."
 msgstr ""
-"Προσοχή, το 'Shift' δεν είναι συνιστώμενο πλήκτρο: όταν το shift πιέζεται "
-"κάτω, όλα τα πλήκτρα που περιέχουν χαρακτήρα διαφορετικό από κεφαλαίο, θα "
-"σταματήσουν να δουλεύουν."
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -3118,19 +3033,19 @@ msgstr ""
 #: data/po/gui_strings.h:328 data/po/gui_strings.h:894
 #: data/po/gui_strings.h:940 data/po/gui_strings.h:973
 msgid "Weapons"
-msgstr "Όπλα"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 #: data/po/gui_strings.h:802
 msgid "Weather Effects"
-msgstr "Εφέ καιρού"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:425
 #, c-format
 msgid "Weather Effects : %s"
-msgstr "Εφέ καιρού : %s"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -3143,13 +3058,6 @@ msgid ""
 "game continues when everyone selected their kart. Note that the mouse may "
 "not be used for this operation."
 msgstr ""
-"Όταν οι συσκευές εισαγωγής διαμορφωθούν, είσαι έτοιμος να παίξεις. Επέλεξε "
-"'Αγώνας πολλαπλών παικτών' στο κύριο μενού. Όταν έρθει η ώρα επιλογής καρτ, "
-"κάθε παίκτης μπορεί να πατήσει το πλήκτρο 'fire' του gamepad ή πληκτρολογίου "
-"για να συνδεθεί στο παιχνίδι. Κάθε παίκτης μπορεί να χρησιμοποιήσει την "
-"συσκευή εισαγωγής του για να επιλέξει το καρτ του. Το παιχνίδι συνεχίζεται "
-"όταν όλοι έχουν επιλέξει το καρτ τους. Σημειώστε ότι το ποντίκι δεν μπορεί "
-"να χρησιμοποιηθεί για αυτή την λειτουργία."
 
 #. I18N: Name of the white button on xbox controller
 #: src/input/gamepad_config.cpp:171
@@ -3160,16 +3068,16 @@ msgstr ""
 #. I18N: In a 'are you sure?' dialog
 #: src/states_screens/edit_gp_screen.cpp:253 data/po/gui_strings.h:91
 msgid "Yes"
-msgstr "Ναι"
+msgstr ""
 
 #: src/tracks/track_object_presentation.cpp:961
 msgid "You are now ready to race. Good luck!"
-msgstr "Τώρα είσαι έτοιμος για τον αγώνα. Καλή τύχη!"
+msgstr ""
 
 #. I18N: ./data/gui/options_players.stkgui
 #: data/po/gui_strings.h:309
 msgid "You are playing as"
-msgstr "Παίζεις ως"
+msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:190
 msgid "You can adapt your previous rating by clicking the stars beneath."
@@ -3203,15 +3111,15 @@ msgstr ""
 #: src/states_screens/race_result_gui.cpp:164
 #: src/states_screens/grand_prix_win.cpp:125
 msgid "You completed a challenge!"
-msgstr "Ολοκλήρωσες την πρόκληση!"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:165
 msgid "You completed challenges!"
-msgstr "Ολοκλήρωσες τις προκλήσεις!"
+msgstr ""
 
 #: src/states_screens/grand_prix_win.cpp:280
 msgid "You completed the Grand Prix!"
-msgstr "Ολοκλήρωσες το Grand Prix!"
+msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:208
 #, c-format
@@ -3232,7 +3140,7 @@ msgstr ""
 
 #: src/karts/kart.cpp:855
 msgid "You finished the race!"
-msgstr "Έχεις τελειώσει την κούρσα!"
+msgstr ""
 
 #: src/online/online_player_profile.cpp:442
 #, c-format
@@ -3245,7 +3153,7 @@ msgstr ""
 
 #: src/modes/world.cpp:1146
 msgid "You have been eliminated!"
-msgstr "Έχεις νικηθεί!"
+msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:195
 msgid ""
@@ -3267,11 +3175,11 @@ msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:567
 msgid "You unlocked grand prix %0"
-msgstr "Ξεκλείδωσες το grand prix %0"
+msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:529
 msgid "You unlocked track %0"
-msgstr "Ξεκλείδωσες την πίστα %0"
+msgstr ""
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -3289,28 +3197,23 @@ msgstr ""
 
 #: src/karts/kart.cpp:855 src/karts/kart.cpp:874
 msgid "You won the race!"
-msgstr "Κέρδισες τον αγώνα!"
+msgstr "경기에서 승리했어요!!"
 
 #: src/config/user_config.cpp:700
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr ""
-"Το αρχείο διαμόρφωσης ήταν κακόμορφο, έτσι διαγράφηκε και ένα νέο θα "
-"δημιουργηθεί."
+msgstr "설정 파일이 손상된 것 같습니다. 새 설정 파일을 생성합니다."
 
 #: src/config/user_config.cpp:711
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr ""
-"Το αρχείο διαμόρφωσης ήταν πολύ παλιό, έτσι διαγράφηκε και ένα νέο θα "
-"δημιουργηθεί."
+msgstr "설정 파일이 현재 버전과 호환되지 않습니다. 새 설정 파일을 생성합니다."
 
 #: src/input/device_manager.cpp:501
 msgid "Your input config file is not compatible with this version of STK."
 msgstr ""
-"Το αρχείο διαμόρφωσης εισαγωγής δεν είναι συμβατό με αυτή την έκδοση του STK"
 
 #: src/states_screens/online_profile_base.cpp:105
 #: src/states_screens/online_profile_base.cpp:115
@@ -3320,7 +3223,7 @@ msgstr ""
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:90
 msgid "[none]"
-msgstr "[κανένα]"
+msgstr "[없음]"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In networking lobby
@@ -3331,11 +3234,11 @@ msgstr ""
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
 #: src/states_screens/race_gui_base.cpp:542
 msgid "by"
-msgstr "από τον"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:139
 msgid "featured"
-msgstr "προτεινόμενο"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
 msgid "high"
@@ -3354,15 +3257,12 @@ msgstr ""
 #: src/states_screens/arenas_screen.cpp:81
 #: src/states_screens/easter_egg_screen.cpp:143
 msgid "standard"
-msgstr "βασικό"
+msgstr ""
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Konstantinos Thermos https://launchpad.net/~subdee\n"
-"  Nefeli Stylla https://launchpad.net/~nefeli-st\n"
-"  STK-team https://launchpad.net/~stk\n"
-"  Vangelis Skarmoutsos https://launchpad.net/~skarmoutsosv\n"
-"  Yannis Kaskamanidis https://launchpad.net/~ttnfy17\n"
-"  tzem https://launchpad.net/~athmakrigiannis"
+"  Dynamicwork https://launchpad.net/~dynamicwork\n"
+"  JJ https://launchpad.net/~jjemin1\n"
+"  Tae-Wong SEO https://launchpad.net/~seotaewong40"
