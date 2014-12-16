@@ -6,8 +6,6 @@ uniform sampler2D SpecMap;
 uniform sampler2D dtex;
 #endif
 
-uniform vec3 SunDir;
-
 #ifdef GL_ARB_bindless_texture
 flat in sampler2D handle;
 flat in sampler2D secondhandle;
@@ -41,10 +39,11 @@ void main(void)
     vec3 eyedir = normalize(xpos.xyz);
 
     // Inspired from http://http.developer.nvidia.com/GPUGems3/gpugems3_ch16.html
-    float fEdotL = clamp(dot(SunDir, eyedir), 0., 1.);
+    vec3 L = normalize((transpose(InverseViewMatrix) * vec4(sun_direction, 0.)).xyz);
+    float fEdotL = clamp(dot(L, eyedir), 0., 1.);
     float fPowEdotL = pow(fEdotL, 4.);
 
-    float fLdotNBack  = max(0., - dot(nor, SunDir) * 0.6 + 0.4);
+    float fLdotNBack  = max(0., - dot(nor, L) * 0.6 + 0.4);
     float scattering = mix(fPowEdotL, fLdotNBack, .5);
 
 
