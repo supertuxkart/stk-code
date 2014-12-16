@@ -277,10 +277,21 @@ void SkiddingAI::update(float dt)
             }
 
             // also give him some free nitro
-            if (m_kart->getPosition() > 1)
-                m_kart->setEnergy(m_kart->getEnergy() + 7);
-            else
-                m_kart->setEnergy(m_kart->getEnergy() + 4);
+            if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM)
+            {
+                if (m_kart->getPosition() > 1)
+                    m_kart->setEnergy(m_kart->getEnergy() + 2);
+                else
+                    m_kart->setEnergy(m_kart->getEnergy() + 1);
+            }
+            else if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
+                race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST)
+            {
+                if (m_kart->getPosition() > 1)
+                    m_kart->setEnergy(m_kart->getEnergy() + 7);
+                else
+                    m_kart->setEnergy(m_kart->getEnergy() + 4);
+            }
         }
     }
 

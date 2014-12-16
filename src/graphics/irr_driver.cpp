@@ -1263,22 +1263,25 @@ scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material
     v1.Pos    = core::vector3df(-w_2,-h_2,0);
     v1.Normal = core::vector3df(0, 0, -1.0f);
     v1.TCoords = core::vector2d<f32>(1,1);
+    v1.Color = video::SColor(255, 255, 255, 255);
 
     video::S3DVertex v2;
     v2.Pos    = core::vector3df(w_2,-h_2,0);
     v2.Normal = core::vector3df(0, 0, -1.0f);
     v2.TCoords = core::vector2d<f32>(0,1);
+    v1.Color = video::SColor(255, 255, 255, 255);
 
     video::S3DVertex v3;
     v3.Pos    = core::vector3df(w_2,h_2,0);
     v3.Normal = core::vector3df(0, 0, -1.0f);
     v3.TCoords = core::vector2d<f32>(0,0);
+    v3.Color = video::SColor(255, 255, 255, 255);
 
     video::S3DVertex v4;
     v4.Pos    = core::vector3df(-w_2,h_2,0);
     v4.Normal = core::vector3df(0, 0, -1.0f);
     v4.TCoords = core::vector2d<f32>(1,0);
-
+    v4.Color = video::SColor(255, 255, 255, 255);
 
     // Add the vertices
     // ----------------
