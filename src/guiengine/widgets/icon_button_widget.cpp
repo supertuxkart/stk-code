@@ -300,6 +300,7 @@ const video::ITexture* IconButtonWidget::getTexture()
 // -----------------------------------------------------------------------------
 video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
 {
+#ifdef DO_NOT_USE_IT_CAUSES_BUG_1780_FONT_CORRUPTION
     video::ITexture* t;
 
     std::string name = texture->getName().getPath().c_str();
@@ -332,6 +333,8 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
     }
 
     return t;
+#endif
+    return texture;
 }
 
 // -----------------------------------------------------------------------------
