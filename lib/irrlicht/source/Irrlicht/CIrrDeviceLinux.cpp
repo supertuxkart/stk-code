@@ -580,7 +580,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
     irr::video::useCoreContext = false;
 	// fall back to legacy context
     os::Printer::log("Creating legacy OpenGL 2.1 context...", ELL_INFORMATION);
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, legacyctx);
+    Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
 
