@@ -544,32 +544,6 @@ void PostProcessing::renderSSAO()
     DrawFullScreenEffect<FullScreenShader::SSAOShader>(irr_driver->getSSAORadius(), irr_driver->getSSAOK(), irr_driver->getSSAOSigma());
 }
 
-
-void PostProcessing::renderFog()
-{
-    const Track * const track = World::getWorld()->getTrack();
-
-    // This function is only called once per frame - thus no need for setters.
-    const float start = track->getFogStart();
-    const SColor tmpcol = track->getFogColor();
-
-    core::vector3df col( tmpcol.getRed() / 255.0f,
-        tmpcol.getGreen() / 255.0f,
-        tmpcol.getBlue() / 255.0f );
-
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE);
-
-
-    FullScreenShader::FogShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<FullScreenShader::FogShader>(1.f / (40.f * start), col);
-
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-}
-
 void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBuffer &out_fbo)
 {
     MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->

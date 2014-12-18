@@ -380,6 +380,7 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
     if (SkyboxTextures.empty())
         return;
     glBindVertexArray(MeshShader::SkyboxShader::getInstance()->cubevao);
+    glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     assert(SkyboxTextures.size() == 6);
 
