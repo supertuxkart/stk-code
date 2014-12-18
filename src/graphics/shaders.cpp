@@ -150,11 +150,9 @@ GLuint LoadShader(const char * file, unsigned type)
     if (irr_driver->hasVSLayerExtension())
         Code += "#extension GL_AMD_vertex_shader_layer : enable\n";
     if (irr_driver->useAZDO())
-        Code += "#extension GL_ARB_bindless_texture : enable\n";
-    else if (irr_driver->hasARBBindlessTexture())
     {
-        Code += "#extension GL_ARB_bindless_texture : disable\n";
-        Code += "#undef GL_ARB_bindless_texture\n";
+        Code += "#extension GL_ARB_bindless_texture : enable\n";
+        Code += "#define Use_Bindless_Texture\n";
     }
     std::ifstream Stream(file, std::ios::in);
     Code += "//" + std::string(file) + "\n";

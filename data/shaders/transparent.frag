@@ -1,4 +1,4 @@
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 layout(bindless_sampler) uniform sampler2D tex;
 #else
 uniform sampler2D tex;
@@ -12,7 +12,7 @@ out vec4 FragColor;
 void main()
 {
     vec4 Color = texture(tex, uv);
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     Color.xyz = pow(Color.xyz, vec3(2.2));
 #endif
     Color.xyz *= pow(color.xyz, vec3(2.2));
