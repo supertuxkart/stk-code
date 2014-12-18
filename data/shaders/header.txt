@@ -1,3 +1,5 @@
+#ifndef HEADER_TXT
+#define HEADER_TXT
 #ifdef UBO_DISABLED
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
@@ -62,3 +64,4 @@ layout (std140) uniform LightingData
     float rL22;
 };
 #endif
+#endif // HEADER_TXT
