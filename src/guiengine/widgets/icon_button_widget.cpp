@@ -107,7 +107,8 @@ void IconButtonWidget::add()
     
     if (m_properties[PROP_CUSTOM_RATIO] != "")
     {
-        m_custom_aspect_ratio = atof(m_properties[PROP_CUSTOM_RATIO].c_str());
+        StringUtils::fromString(m_properties[PROP_CUSTOM_RATIO],
+                                m_custom_aspect_ratio);
         m_scale_mode = SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO;
     }
 
@@ -299,6 +300,7 @@ const video::ITexture* IconButtonWidget::getTexture()
 // -----------------------------------------------------------------------------
 video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
 {
+#ifdef DO_NOT_USE_IT_CAUSES_BUG_1780_FONT_CORRUPTION
     video::ITexture* t;
 
     std::string name = texture->getName().getPath().c_str();
@@ -331,6 +333,8 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
     }
 
     return t;
+#endif
+    return texture;
 }
 
 // -----------------------------------------------------------------------------

@@ -29,6 +29,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
 #include "utils/constants.hpp"
@@ -240,18 +241,22 @@ KartModel::~KartModel()
         }
     }
 
-    if(m_is_master && m_mesh)
+    // In case of the master, the mesh must be dropped. A non-master KartModel
+    // has a copy of the master's mesh, so it needs to be dropped, too.
+    if (m_mesh)
     {
         m_mesh->drop();
-        // If there is only one copy left, it's the copy in irrlicht's
-        // mesh cache, so it can be remove.
-        if(m_mesh && m_mesh->getReferenceCount()==1)
+        if (m_is_master)
         {
-            irr_driver->dropAllTextures(m_mesh);
-            irr_driver->removeMeshFromCache(m_mesh);
+            // If there is only one copy left, it's the copy in irrlicht's
+            // mesh cache, so it can be removed. 
+            if (m_mesh && m_mesh->getReferenceCount() == 1)
+            {
+                irr_driver->dropAllTextures(m_mesh);
+                irr_driver->removeMeshFromCache(m_mesh);
+            }
         }
     }
-
 #ifdef DEBUG
 #if SKELETON_DEBUG
     irr_driver->clearDebugMeshes();
@@ -279,7 +284,7 @@ KartModel* KartModel::makeCopy()
     km->m_kart_height       = m_kart_height;
     km->m_kart_highest_point= m_kart_highest_point;
     km->m_kart_lowest_point = m_kart_lowest_point;
-    km->m_mesh              = m_mesh;
+    km->m_mesh              = irr_driver->copyAnimatedMesh(m_mesh);
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
     km->m_current_animation = AF_DEFAULT;
@@ -779,17 +784,21 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
 
     for(unsigned int i=0; i<4; i++)
     {
-        if(!m_wheel_node[i]) continue;
-        const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
-#ifdef DEBUG
-        if(UserConfigParams::m_physics_debug && m_kart)
+        if(!m_kart || !m_wheel_node[i]) continue;
+        float rel_suspension = 0;
+        if (!dynamic_cast<GhostKart*>(m_kart))
         {
-            // Make wheels that are not touching the ground invisible
-            m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
-        }
+            const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+#ifdef DEBUG
+            if (UserConfigParams::m_physics_debug && m_kart)
+            {
+                // Make wheels that are not touching the ground invisible
+                m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
+            }
 #endif
-        float rel_suspension = wi.m_raycastInfo.m_suspensionLength
-                             - m_default_physics_suspension[i];
+            rel_suspension = wi.m_raycastInfo.m_suspensionLength
+                           - m_default_physics_suspension[i];
+        }
         // If the suspension is too compressed
         if(rel_suspension< m_min_suspension[i])
             rel_suspension = m_min_suspension[i];
@@ -816,54 +825,57 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
     if (m_animated_node == NULL) return;
 
     // Update the speed-weighted objects' animations
-    for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
+    if (m_kart != NULL)
     {
-        SpeedWeightedObject&    obj = m_speed_weighted_objects[i];
+        for (size_t i = 0; i < m_speed_weighted_objects.size(); i++)
+        {
+            SpeedWeightedObject&    obj = m_speed_weighted_objects[i];
 
 #define GET_VALUE(obj, value_name)   \
     obj.m_properties.value_name > SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED ? obj.m_properties.value_name : \
     m_kart->getKartProperties()->getSpeedWeightedObjectProperties().value_name
 
-        // Animation strength
-        float strength = 1.0f;
-        const float strength_factor =   GET_VALUE(obj, m_strength_factor);
-        if(strength_factor >= 0.0f)
-        {
-            strength = speed * strength_factor;
-            btClamp<float>(strength, 0.0f, 1.0f);
-        }
-        
-        // Animation speed
-        const float speed_factor =   GET_VALUE(obj, m_speed_factor);
-        if(speed_factor >= 0.0f)
-        {
-            float anim_speed = speed * speed_factor;
-            obj.m_node->setAnimationSpeed(anim_speed);
-        }
-
-        // Texture animation
-        core::vector2df tex_speed;
-        tex_speed.X = GET_VALUE(obj, m_texture_speed.X);
-        tex_speed.Y = GET_VALUE(obj, m_texture_speed.Y);
-        if(tex_speed != core::vector2df(0.0f, 0.0f))
-        {
-            obj.m_texture_cur_offset += speed * tex_speed * dt;
-            if(obj.m_texture_cur_offset.X > 1.0f) obj.m_texture_cur_offset.X = fmod(obj.m_texture_cur_offset.X, 1.0f);
-            if(obj.m_texture_cur_offset.Y > 1.0f) obj.m_texture_cur_offset.Y = fmod(obj.m_texture_cur_offset.Y, 1.0f);
-            
-            for(unsigned int i=0; i<obj.m_node->getMaterialCount(); i++)
+            // Animation strength
+            float strength = 1.0f;
+            const float strength_factor = GET_VALUE(obj, m_strength_factor);
+            if (strength_factor >= 0.0f)
             {
-                video::SMaterial &irrMaterial=obj.m_node->getMaterial(i);
-                for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+                strength = speed * strength_factor;
+                btClamp<float>(strength, 0.0f, 1.0f);
+            }
+
+            // Animation speed
+            const float speed_factor = GET_VALUE(obj, m_speed_factor);
+            if (speed_factor >= 0.0f)
+            {
+                float anim_speed = speed * speed_factor;
+                obj.m_node->setAnimationSpeed(anim_speed);
+            }
+
+            // Texture animation
+            core::vector2df tex_speed;
+            tex_speed.X = GET_VALUE(obj, m_texture_speed.X);
+            tex_speed.Y = GET_VALUE(obj, m_texture_speed.Y);
+            if (tex_speed != core::vector2df(0.0f, 0.0f))
+            {
+                obj.m_texture_cur_offset += speed * tex_speed * dt;
+                if (obj.m_texture_cur_offset.X > 1.0f) obj.m_texture_cur_offset.X = fmod(obj.m_texture_cur_offset.X, 1.0f);
+                if (obj.m_texture_cur_offset.Y > 1.0f) obj.m_texture_cur_offset.Y = fmod(obj.m_texture_cur_offset.Y, 1.0f);
+
+                for (unsigned int i = 0; i < obj.m_node->getMaterialCount(); i++)
                 {
-                    video::ITexture* t=irrMaterial.getTexture(j);
-                    if(!t) continue;
-                    core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
-                    m->setTextureTranslate(obj.m_texture_cur_offset.X, obj.m_texture_cur_offset.Y);
-                }   // for j<MATERIAL_MAX_TEXTURES
-            }   // for i<getMaterialCount
-        }
+                    video::SMaterial &irrMaterial = obj.m_node->getMaterial(i);
+                    for (unsigned int j = 0; j < video::MATERIAL_MAX_TEXTURES; j++)
+                    {
+                        video::ITexture* t = irrMaterial.getTexture(j);
+                        if (!t) continue;
+                        core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
+                        m->setTextureTranslate(obj.m_texture_cur_offset.X, obj.m_texture_cur_offset.Y);
+                    }   // for j<MATERIAL_MAX_TEXTURES
+                }   // for i<getMaterialCount
+            }
 #undef GET_VALUE
+        }
     }
 
     // Check if the end animation is being played, if so, don't
@@ -886,7 +898,8 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
     m_animated_node->setCurrentFrame(frame);
 }   // update
 //-----------------------------------------------------------------------------
-void KartModel::attachHat(){
+void KartModel::attachHat()
+{
     m_hat_node = NULL;
     if(m_hat_name.size()>0)
     {

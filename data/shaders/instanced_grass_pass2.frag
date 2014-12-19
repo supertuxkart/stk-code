@@ -1,4 +1,4 @@
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 layout(bindless_sampler) uniform sampler2D dtex;
 #else
 uniform sampler2D Albedo;
@@ -6,9 +6,7 @@ uniform sampler2D SpecMap;
 uniform sampler2D dtex;
 #endif
 
-uniform vec3 SunDir;
-
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 flat in sampler2D handle;
 flat in sampler2D secondhandle;
 #endif
@@ -20,7 +18,7 @@ vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapVa
 
 void main(void)
 {
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     vec4 color = texture(handle, uv);
     float specmap = texture(secondhandle, uv).g;
 #ifdef SRGBBindlessFix
@@ -41,10 +39,11 @@ void main(void)
     vec3 eyedir = normalize(xpos.xyz);
 
     // Inspired from http://http.developer.nvidia.com/GPUGems3/gpugems3_ch16.html
-    float fEdotL = max(0., dot(SunDir, eyedir));
+    vec3 L = normalize((transpose(InverseViewMatrix) * vec4(sun_direction, 0.)).xyz);
+    float fEdotL = clamp(dot(L, eyedir), 0., 1.);
     float fPowEdotL = pow(fEdotL, 4.);
 
-    float fLdotNBack  = max(0., - dot(nor, SunDir) * 0.6 + 0.4);
+    float fLdotNBack  = max(0., - dot(nor, L) * 0.6 + 0.4);
     float scattering = mix(fPowEdotL, fLdotNBack, .5);
 
 

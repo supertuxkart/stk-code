@@ -11,10 +11,10 @@
         <textbox id="textfield" width="75%" I18N="In the 'add new grand prix' dialog" align="center"/>
 
         <spacer height="20" width="20" />
-
-        <button id="cancel" I18N="In the 'add new grand prix' dialog" text="Press ESC to cancel" align="center"/>
-
+        
+        <button id="accept" I18N="In the 'add new grand prix' dialog" text="Create" align="center" proportion="1"/>
         <spacer height="15" width="20" />
-
+        <button id="cancel" I18N="In the 'add new grand prix' dialog" text="Cancel" align="center" proportion="1"/>
+        
     </div>
 </stkgui>

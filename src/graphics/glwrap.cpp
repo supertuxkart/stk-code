@@ -46,17 +46,6 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
         return;
     }
 
-    // Suppress warnings about GL_ARB_bindless_texture not being supported
-    // when we're not even using it
-    if (UserConfigParams::m_azdo == false &&
-        source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB && msg != NULL &&
-        std::string(msg).find("GL_ARB_bindless_texture") != std::string::npos)
-    {
-        Log::debug("GLWrap", "Suppressed warning: %s", msg);
-        return;
-    }
-
-
     switch(source)
     {
     case GL_DEBUG_SOURCE_API_ARB:
@@ -182,8 +171,10 @@ unsigned GPUTimer::elapsedTimeus()
 
 FrameBuffer::FrameBuffer() {}
 
-FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h, bool layered) :
-RenderTargets(RTTs), DepthTexture(0), width(w), height(h), fbolayer(0)
+FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
+                         bool layered)
+           : fbolayer(0), RenderTargets(RTTs), DepthTexture(0), 
+             width(w), height(h)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -201,8 +192,10 @@ RenderTargets(RTTs), DepthTexture(0), width(w), height(h), fbolayer(0)
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
 }
 
-FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered) :
-RenderTargets(RTTs), DepthTexture(DS), width(w), height(h), fbolayer(0)
+FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
+                         size_t h, bool layered) 
+           : fbolayer(0), RenderTargets(RTTs), DepthTexture(DS), width(w), 
+             height(h)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -282,12 +275,12 @@ void draw3DLine(const core::vector3df& start,
         end.X, end.Y, end.Z
     };
 
-    glBindVertexArray(UtilShader::ColoredLine::vao);
-    glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
+    glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
+    glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * sizeof(float), vertex);
 
-    glUseProgram(UtilShader::ColoredLine::Program);
-    UtilShader::ColoredLine::setUniforms(color);
+    glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
+    UtilShader::ColoredLine::getInstance()->setUniforms(color);
     glDrawArrays(GL_LINES, 0, 2);
 
     glGetError();

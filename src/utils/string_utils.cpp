@@ -34,7 +34,7 @@
 
 namespace StringUtils
 {
-    bool hasSuffix(const std::string& lhs, const std::string rhs)
+    bool hasSuffix(const std::string& lhs, const std::string &rhs)
     {
         if (lhs.length() < rhs.length())
             return false;
@@ -696,10 +696,10 @@ namespace StringUtils
      */
     int versionToInt(const std::string &version_string)
     {
-        // Special case: SVN
-        if(version_string=="SVN" || version_string=="svn")
+        // Special case: GIT
+        if(version_string=="GIT" || version_string=="git")
         {
-            // SVN version will be version 99.99.99i-rcJ
+            // GIT version will be version 99.99.99i-rcJ
             return 1000000*99
                     +  10000*99
                     +    100*99

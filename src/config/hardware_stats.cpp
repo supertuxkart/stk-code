@@ -16,6 +16,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifdef __MINGW32__
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
+
 #include "config/hardware_stats.hpp"
 
 #include "config/user_config.hpp"
@@ -230,6 +235,7 @@ void determineOSVersion()
     case 0x0600: m_os_version="Windows Vista"; break;
     case 0x0601: m_os_version="Windows 7";     break;
     case 0x0602: m_os_version="Windows 8";     break;
+    case 0x0603: m_os_version="Windows 8_1";   break;
     default: {
                  m_os_version = StringUtils::insertValues("Windows %d",
                                                           windows_version);

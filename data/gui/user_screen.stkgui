@@ -56,7 +56,7 @@
                              I18N="In the user screen" text="Add user" label_location="bottom"/>
                 <icon-button id="delete" width="64" height="64" icon="gui/remove.png"
                              I18N="In the user screen" text="Delete" label_location="bottom"/>
-                <icon-button id="rename" width="64" height="64" icon="gui/gp_rename.png"
+                <icon-button id="rename" width="64" height="64" icon="gui/rename.png"
                              I18N="In the user screen" text="Rename" label_location="bottom"/>
                 <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
                              I18N="In the user screen" text="Cancel" label_location="bottom"/>

@@ -55,11 +55,13 @@ void ReplayRecorder::init()
     m_transform_events.resize(race_manager->getNumberOfKarts());
     m_skid_control.resize(race_manager->getNumberOfKarts());
     m_kart_replay_event.resize(race_manager->getNumberOfKarts());
+    unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time
+                                             / stk_config->m_replay_dt);
     for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
-        m_transform_events[i].resize(stk_config->m_max_history);
+        m_transform_events[i].resize(max_frames);
         // Rather arbitraritly sized, it will be added with push_back
-        m_kart_replay_event[i].reserve(100);
+        m_kart_replay_event[i].reserve(500);
     }
     m_count_transforms.clear();
     m_count_transforms.resize(race_manager->getNumberOfKarts(), 0);
@@ -124,7 +126,7 @@ void ReplayRecorder::update(float dt)
 #endif
             continue;
         }
-
+        m_last_saved_time[i] = time;
         m_count_transforms[i]++;
         if(m_count_transforms[i]>=m_transform_events[i].size())
         {
@@ -171,14 +173,15 @@ void ReplayRecorder::Save()
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
     fprintf(fd, "Laps: %d\n",       race_manager->getNumLaps());
 
+    unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time 
+                                             / stk_config->m_replay_dt      );
     for(unsigned int k=0; k<num_karts; k++)
     {
         fprintf(fd, "model: %s\n", world->getKart(k)->getIdent().c_str());
         fprintf(fd, "size:     %d\n", m_count_transforms[k]);
 
-        unsigned int num_transforms =
-            std::min((unsigned int)stk_config->m_max_history,
-                      m_count_transforms[k]                   );
+        unsigned int num_transforms = std::min(max_frames,
+                                               m_count_transforms[k]);
         for(unsigned int i=0; i<num_transforms; i++)
         {
             const TransformEvent *p=&(m_transform_events[k][i]);

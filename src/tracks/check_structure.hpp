@@ -98,7 +98,7 @@ private:
 
     enum ChangeState {CS_DEACTIVATE, CS_ACTIVATE, CS_TOGGLE};
 
-    void changeStatus(const std::vector<int> indices, int kart_index,
+    void changeStatus(const std::vector<int> &indices, int kart_index,
                       ChangeState change_state);
 
 public:

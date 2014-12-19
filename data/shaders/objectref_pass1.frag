@@ -1,4 +1,4 @@
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 layout(bindless_sampler) uniform sampler2D tex;
 layout(bindless_sampler) uniform sampler2D glosstex;
 #else
@@ -24,6 +24,6 @@ void main() {
 		discard;
 	float glossmap = texture(glosstex, uv).x;
 	EncodedNormal.xy = 0.5 * EncodeNormal(normalize(nor)) + 0.5;
-	EncodedNormal.z = exp2(10. * glossmap + 1.);
+	EncodedNormal.z = glossmap;
 }
 

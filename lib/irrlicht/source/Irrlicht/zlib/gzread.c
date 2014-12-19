@@ -27,7 +27,11 @@ local int gz_load(state, buf, len, have)
 
     *have = 0;
     do {
+#ifdef _WIN32
+        ret = _read(state->fd, buf + *have, len - *have);
+#else
         ret = read(state->fd, buf + *have, len - *have);
+#endif
         if (ret <= 0)
             break;
         *have += ret;
@@ -583,7 +587,11 @@ int ZEXPORT gzclose_r(file)
     err = state->err == Z_BUF_ERROR ? Z_BUF_ERROR : Z_OK;
     gz_error(state, Z_OK, NULL);
     free(state->path);
+#ifdef _WIN32
+    ret = _close(state->fd);
+#else
     ret = close(state->fd);
+#endif
     free(state);
     return ret ? Z_ERRNO : err;
 }

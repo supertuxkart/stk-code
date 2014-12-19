@@ -97,6 +97,7 @@ public:
     {
         ScalableFont* out = new ScalableFont(*this);
         out->m_is_hollow_copy = true;
+        out->setReferenceCount(1);
         return out;
     }
 

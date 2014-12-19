@@ -1,4 +1,4 @@
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 layout(bindless_sampler) uniform sampler2D DiffuseMap;
 layout(bindless_sampler) uniform sampler2D SpecularMap;
 layout(bindless_sampler) uniform sampler2D SSAO;

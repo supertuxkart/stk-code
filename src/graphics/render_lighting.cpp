@@ -145,7 +145,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_rtts->getFBO(FBO_DIFFUSE).Bind();
-    if (UserConfigParams::m_gi && UserConfigParams::m_shadows && hasShadow)
+    if (irr_driver->usesGI() && hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
@@ -155,14 +155,14 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
-        m_post_processing->renderEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff, SkyboxCubeMap);
+        m_post_processing->renderEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff, SkyboxSpecularProbe);
     }
 
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
-        if (World::getWorld() && UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround() && hasShadow)
+        if (World::getWorld() && irr_driver->usesShadows() && hasShadow)
             m_post_processing->renderShadowedSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor(), sun_ortho_matrix, m_rtts->getShadowFBO().getRTT()[0]);
         else
             m_post_processing->renderSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor());
@@ -190,35 +190,42 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
     getFBO(FBO_HALF1).Bind();
     glClearColor(0., 0., 0., 0.);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_post_processing->renderFog();
-
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);
 
     const Track * const track = World::getWorld()->getTrack();
 
-    const float start = track->getFogStart();
-    core::vector3df col(1., 1., 1.);
+    // This function is only called once per frame - thus no need for setters.
+    float start = track->getFogStart() + .001;
+    const video::SColor tmpcol = track->getFogColor();
+
+    core::vector3df col(tmpcol.getRed() / 255.0f,
+        tmpcol.getGreen() / 255.0f,
+        tmpcol.getBlue() / 255.0f);
+
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    FullScreenShader::FogShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
+    DrawFullScreenEffect<FullScreenShader::FogShader>(1.f / (40.f * start), col);
+
+    glEnable(GL_DEPTH_TEST);
+    core::vector3df col2(1., 1., 1.);
 
     glUseProgram(LightShader::PointLightScatterShader::getInstance()->Program);
     glBindVertexArray(LightShader::PointLightScatterShader::getInstance()->vao);
 
     LightShader::PointLightScatterShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
-    LightShader::PointLightScatterShader::getInstance()->setUniforms(1.f / (40.f * start), col);
+    LightShader::PointLightScatterShader::getInstance()->setUniforms(1.f / (40.f * start), col2);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, MIN2(pointlightcount, MAXLIGHT));
 
-// ***
-// That might be a performance issue but if disabled the quality is severly affected (the picture looks jagged)
-// It should be an option if there is a gain in FPS
     glDisable(GL_BLEND);
     m_post_processing->renderGaussian6Blur(getFBO(FBO_HALF1), getFBO(FBO_HALF2), 5., 5.);
     glEnable(GL_BLEND);
-// ***
 
+    glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     getFBO(FBO_COLORS).Bind();
     m_post_processing->renderPassThrough(getRenderTargetTexture(RTT_HALF1));

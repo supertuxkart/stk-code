@@ -122,7 +122,7 @@ void CheckStructure::update(float dt)
  *  \param int kart_index For which the status should be changed.
  *  \param change_state How to change the state (active, deactivate, toggle).
  */
-void CheckStructure::changeStatus(const std::vector<int> indices,
+void CheckStructure::changeStatus(const std::vector<int> &indices,
                                   int kart_index,
                                   ChangeState change_state)
 {

@@ -55,7 +55,7 @@ private:
     {
         std::string s = version;
         std::string::iterator p = s.begin();
-        while(p !=s.end() && (*p<'0') || (*p>'9') )
+        while( (p !=s.end()) && ((*p<'0') || (*p>'9')) )
             p++;
         s.erase(s.begin(), p);
         m_version = StringUtils::splitToUInt(s, '.');
@@ -84,7 +84,9 @@ public:
     Version(const std::string &driver_version, const std::string &card_name)
     {
         m_version.clear();
+
         // Intel card: driver version = "3.1.0 - Build 9.17.10.3517"
+        // ---------------------------------------------------------
         if (StringUtils::startsWith(card_name, "Intel"))
         {
             std::vector<std::string> s = StringUtils::split(driver_version, '-');
@@ -93,6 +95,19 @@ public:
                 convertVersionString(s[1]);
                 return;
             }
+        }
+
+        // Nvidia: driver_version = "4.3.0 NVIDIA 340.58"
+        // ----------------------------------------------
+        if (driver_version.find("NVIDIA") != std::string::npos)
+        {
+            std::vector<std::string> s = StringUtils::split(driver_version, ' ');
+            if (s.size() == 3)
+            {
+                convertVersionString(s[2]);
+                return;
+            }
+
         }
 
         Log::warn("Graphics", "Can not find version for '%s' '%s' - ignored.",
@@ -119,6 +134,14 @@ public:
         unsigned int min_n = std::min(m_version.size(), other.m_version.size());
         for(unsigned int i=0; i<min_n; i++)
             if(other.m_version[i]>=m_version[i]) return false;
+        return true;
+    }   // operator>
+    // ------------------------------------------------------------------------
+    bool operator<= (const Version &other) const
+    {
+        unsigned int min_n = std::min(m_version.size(), other.m_version.size());
+        for(unsigned int i=0; i<min_n; i++)
+            if(other.m_version[i]>m_version[i]) return false;
         return true;
     }   // operator>
 
@@ -232,10 +255,13 @@ public:
             break;
         case VERSION_LESS_EQUAL:
             if(m_driver_version < version) return false;
+        case VERSION_LESS:
+            if(m_driver_version <= version) return false;
         }   // switch m_version_test
         return true;
         // -----------------------------------------------
-    }
+    }   // applies
+
     // ------------------------------------------------------------------------
     /** Returns a list of options to disable. */
     const std::vector<std::string>& getRestrictions() const
@@ -277,6 +303,7 @@ void init()
         }
         m_all_rules.push_back(new Rule(rule));
     }
+    delete rules;
 }   // init
 
 // ----------------------------------------------------------------------------

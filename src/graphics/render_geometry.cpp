@@ -427,7 +427,7 @@ void renderMeshes1stPass()
             continue;
         }
 
-        if (UserConfigParams::m_azdo)
+        if (irr_driver->useAZDO())
             HandleExpander<typename T::FirstPassShader>::template Expand(mesh.TextureHandles, T::FirstPassTextures);
         else
             TexExpander<typename T::FirstPassShader>::template ExpandTex(mesh, T::FirstPassTextures);
@@ -500,7 +500,7 @@ void IrrDriver::renderSolidFirstPass()
         renderMeshes1stPass<SphereMap, 2, 1>();
         renderMeshes1stPass<DetailMat, 2, 1>();
 
-        if (UserConfigParams::m_azdo)
+        if (irr_driver->useAZDO())
         {
             multidraw1stPass<DefaultMaterial>();
             multidraw1stPass<AlphaRef>();
@@ -546,7 +546,7 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
             continue;
         }
 
-        if (UserConfigParams::m_azdo)
+        if (irr_driver->useAZDO())
             HandleExpander<typename T::SecondPassShader>::template Expand(mesh.TextureHandles, T::SecondPassTextures, Prefilled_Handle[0], Prefilled_Handle[1], Prefilled_Handle[2]);
         else
             TexExpander<typename T::SecondPassShader>::template ExpandTex(mesh, T::SecondPassTextures, Prefilled_Tex[0], Prefilled_Tex[1], Prefilled_Tex[2]);
@@ -595,7 +595,7 @@ void IrrDriver::renderSolidSecondPass()
 
     uint64_t DiffuseHandle = 0, SpecularHandle = 0, SSAOHandle = 0, DepthHandle = 0;
 
-    if (UserConfigParams::m_azdo)
+    if (irr_driver->useAZDO())
     {
         DiffuseHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
         if (!glIsTextureHandleResidentARB(DiffuseHandle))
@@ -633,7 +633,7 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<GrassMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<NormalMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
 
-        if (UserConfigParams::m_azdo)
+        if (irr_driver->useAZDO())
         {
             multidraw2ndPass<DefaultMaterial>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
             multidraw2ndPass<AlphaRef>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
@@ -714,7 +714,7 @@ static void renderMultiMeshNormals()
 
 void IrrDriver::renderNormalsVisualisation()
 {
-    if (UserConfigParams::m_azdo) {
+    if (irr_driver->useAZDO()) {
         renderMultiMeshNormals<DefaultMaterial>();
         renderMultiMeshNormals<AlphaRef>();
         renderMultiMeshNormals<UnlitMat>();
@@ -752,7 +752,7 @@ void renderTransparenPass(const std::vector<TexUnit> &TexUnits, std::vector<STK:
             continue;
         }
 
-        if (UserConfigParams::m_azdo)
+        if (irr_driver->useAZDO())
             Shader::getInstance()->SetTextureHandles(mesh.TextureHandles[0]);
         else
             Shader::getInstance()->SetTextureUnits(getTextureGLuint(mesh.textures[0]));
@@ -932,7 +932,7 @@ void renderShadow(unsigned cascade)
         GLMesh *mesh = STK::tuple_get<0>(t.at(i));
         if (!irr_driver->hasARB_base_instance())
             glBindVertexArray(mesh->vao);
-        if (UserConfigParams::m_azdo)
+        if (irr_driver->useAZDO())
             HandleExpander<typename T::ShadowPassShader>::template Expand(mesh->TextureHandles, T::ShadowTextures);
         else
             TexExpander<typename T::ShadowPassShader>::template ExpandTex(*mesh, T::ShadowTextures);
@@ -1004,7 +1004,7 @@ void IrrDriver::renderShadows()
         if (irr_driver->hasARB_draw_indirect())
             glBindBuffer(GL_DRAW_INDIRECT_BUFFER, ShadowPassCmd::getInstance()->drawindirectcmd);
 
-        if (UserConfigParams::m_azdo)
+        if (irr_driver->useAZDO())
         {
             multidrawShadow<DefaultMaterial>(cascade);
             multidrawShadow<DetailMat>(cascade);
@@ -1081,7 +1081,7 @@ void drawRSM(const core::matrix4 & rsm_matrix)
         GLMesh *mesh = STK::tuple_get<0>(t.at(i));
         if (!irr_driver->hasARB_base_instance())
             glBindVertexArray(mesh->vao);
-        if (UserConfigParams::m_azdo)
+        if (irr_driver->useAZDO())
             HandleExpander<typename T::RSMShader>::template Expand(mesh->TextureHandles, T::RSMTextures);
         else
             TexExpander<typename T::RSMShader>::template ExpandTex(*mesh, T::RSMTextures);
@@ -1138,7 +1138,7 @@ void IrrDriver::renderRSM()
     if (irr_driver->hasARB_draw_indirect())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, RSMPassCmd::getInstance()->drawindirectcmd);
 
-    if (UserConfigParams::m_azdo)
+    if (irr_driver->useAZDO())
     {
         multidrawRSM<DefaultMaterial>(rsm_matrix);
         multidrawRSM<NormalMat>(rsm_matrix);

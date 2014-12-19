@@ -152,7 +152,9 @@ void PlayerProfile::addIcon()
     if (m_icon_filename.size() > 0 || isGuestAccount())
         return;
 
-    int n = m_unique_id % kart_properties_manager->getNumberOfKarts();
+    int n = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
+          % kart_properties_manager->getNumberOfKarts();
+
     std::string source = kart_properties_manager->getKartById(n)
                                                 ->getAbsoluteIconFile();
     // Create the filename for the icon of this player: the unique id

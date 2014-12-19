@@ -8,7 +8,7 @@ layout(location = 4) in vec2 SecondTexcoord;
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 layout(location = 10) in uvec2 Handle;
 #endif
 
@@ -16,7 +16,7 @@ out vec3 nor;
 out vec2 uv;
 out vec2 uv_bis;
 out vec4 color;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 flat out uvec2 handle;
 #endif
 
@@ -33,7 +33,7 @@ void main(void)
     nor = (TransposeInverseModel * vec4(Normal, 0.)).xyz;
     uv = Texcoord;
     color = Color.zyxw;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     handle = Handle;
 #endif
 }

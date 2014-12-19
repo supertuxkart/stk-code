@@ -1,9 +1,9 @@
-#ifndef GL_ARB_bindless_texture
+#ifndef Use_Bindless_Texture
 uniform sampler2D Albedo;
 uniform sampler2D SpecMap;
 #endif
 
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 flat in sampler2D handle;
 flat in sampler2D secondhandle;
 #endif
@@ -15,7 +15,7 @@ vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapVa
 
 void main(void)
 {
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     vec4 col = texture(handle, uv);
     float specmap = texture(secondhandle, uv).g;
     float emitmap = texture(secondhandle, uv).b;

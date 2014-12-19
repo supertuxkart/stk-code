@@ -207,7 +207,10 @@ namespace Online
             me->m_request_queue.getData().pop();
 
             if (me->m_current_request->getType() == Request::RT_QUIT)
+            {
+                delete me->m_current_request;
                 break;
+            }
 
             me->m_request_queue.unlock();
             me->m_current_request->execute();

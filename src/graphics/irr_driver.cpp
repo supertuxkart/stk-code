@@ -67,6 +67,7 @@
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
+#include "../lib/irrlicht/source/Irrlicht/CSkinnedMesh.h"
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.
@@ -494,10 +495,16 @@ void IrrDriver::initDevice()
         m_need_rh_workaround = false;
         m_need_srgb_workaround = false;
         m_support_sdsm = true;
+        m_support_texture_compression = true;
 #ifdef WIN32
-        // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
-        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL && (m_gl_major_version == 3 && m_gl_minor_version == 1))
-            m_need_ubo_workaround = true;
+        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL)
+        {
+            // Intel on windows doesnt support srgb compressed textures properly
+            m_support_texture_compression = false;
+            // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
+            if (m_gl_major_version == 3 && m_gl_minor_version == 1)
+                m_need_ubo_workaround = true;
+        }
 #endif
         // Fix for Nvidia and instanced RH
         if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
@@ -527,6 +534,7 @@ void IrrDriver::initDevice()
     hasComputeShaders = false;
     hasTextureStorage = false;
     hasTextureView = false;
+    hasBindlessTexture = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
 #if !defined(__APPLE__)
     if (!ProfileWorld::isNoGraphics())
@@ -558,6 +566,10 @@ void IrrDriver::initDevice()
         if (hasGLExtension("GL_ARB_texture_view")) {
             hasTextureView = true;
             Log::info("GLDriver", "ARB Texture View enabled");
+        }
+        if (hasGLExtension("GL_ARB_bindless_texture")) {
+            hasBindlessTexture = true;
+            Log::info("GLDriver", "ARB Bindless Texture enabled");
         }
         m_support_sdsm = m_support_sdsm && hasComputeShaders && hasBuffserStorage;
 
@@ -595,6 +607,14 @@ void IrrDriver::initDevice()
     {
         Log::info("irr_driver", "GLSL supported.");
     }
+
+    if (!supportGeometryShader())
+    {
+        // these options require geometry shaders
+        UserConfigParams::m_shadows = 0;
+        UserConfigParams::m_gi = false;
+    }
+
     // m_glsl might be reset in rtt if an error occurs.
     if(m_glsl)
     {
@@ -602,9 +622,6 @@ void IrrDriver::initDevice()
 
         m_mrt.clear();
         m_mrt.reallocate(2);
-
-        glGenQueries(1, &m_lensflare_query);
-        m_query_issued = false;
 
         scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
         for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
@@ -627,13 +644,6 @@ void IrrDriver::initDevice()
         m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
 
         sphere->drop();
-
-        m_lensflare = new scene::CLensFlareSceneNode(NULL, m_scene_manager, -1);
-        video::ITexture * const tex = getTexture(FileManager::TEXTURE,
-                                                 "lensflare.png"      );
-        if (!tex) Log::fatal("irr_driver", "Cannot find lens flare texture");
-        m_lensflare->setMaterialTexture(0, tex);
-        m_lensflare->setAutomaticCulling(scene::EAC_OFF);
 
         m_suncam = m_scene_manager->addCameraSceneNode(0, vector3df(0), vector3df(0), -1, false);
         m_suncam->grab();
@@ -995,6 +1005,26 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
 }   // getMesh
 
 // ----------------------------------------------------------------------------
+/** Create a skinned mesh which has copied all meshbuffers and joints of the
+ *  original mesh. Note, that this will not copy any other information like
+ *   joints data.
+ *  \param mesh Original mesh
+ *  \return Newly created skinned mesh. You should call drop() when you don't
+ *          need it anymore. 
+ */
+scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
+{
+    using namespace scene;
+    CSkinnedMesh *mesh = dynamic_cast<CSkinnedMesh*>(orig);
+    if (!mesh)
+    {
+        Log::error("copyAnimatedMesh", "Given mesh was not a skinned mesh.");
+        return NULL;
+    }
+    return mesh->clone();
+}   // copyAnimatedMesh
+
+// ----------------------------------------------------------------------------
 /** Sets the material flags in this mesh depending on the settings in
  *  material_manager.
  *  \param mesh  The mesh to change the settings in.
@@ -1233,22 +1263,25 @@ scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material
     v1.Pos    = core::vector3df(-w_2,-h_2,0);
     v1.Normal = core::vector3df(0, 0, -1.0f);
     v1.TCoords = core::vector2d<f32>(1,1);
+    v1.Color = video::SColor(255, 255, 255, 255);
 
     video::S3DVertex v2;
     v2.Pos    = core::vector3df(w_2,-h_2,0);
     v2.Normal = core::vector3df(0, 0, -1.0f);
     v2.TCoords = core::vector2d<f32>(0,1);
+    v1.Color = video::SColor(255, 255, 255, 255);
 
     video::S3DVertex v3;
     v3.Pos    = core::vector3df(w_2,h_2,0);
     v3.Normal = core::vector3df(0, 0, -1.0f);
     v3.TCoords = core::vector2d<f32>(0,0);
+    v3.Color = video::SColor(255, 255, 255, 255);
 
     video::S3DVertex v4;
     v4.Pos    = core::vector3df(-w_2,h_2,0);
     v4.Normal = core::vector3df(0, 0, -1.0f);
     v4.TCoords = core::vector2d<f32>(1,0);
-
+    v4.Color = video::SColor(255, 255, 255, 255);
 
     // Add the vertices
     // ----------------
@@ -1369,7 +1402,8 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     SkyboxTextures = texture;
     SphericalHarmonicsTextures = sphericalHarmonics;
     SkyboxCubeMap = 0;
-    m_SH_dirty = true;
+    SkyboxSpecularProbe = 0;
+    m_skybox_ready = false;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
@@ -1379,10 +1413,14 @@ void IrrDriver::suppressSkyBox()
 {
     SkyboxTextures.clear();
     SphericalHarmonicsTextures.clear();
-    m_SH_dirty = true;
+    m_skybox_ready = false;
     if ((SkyboxCubeMap) && (!ProfileWorld::isNoGraphics()))
+    {
         glDeleteTextures(1, &SkyboxCubeMap);
+        glDeleteTextures(1, &SkyboxSpecularProbe);
+    }
     SkyboxCubeMap = 0;
+    SkyboxSpecularProbe = 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -1761,7 +1799,7 @@ void IrrDriver::onUnloadWorld()
 void IrrDriver::setAmbientLight(const video::SColorf &light)
 {
     m_scene_manager->setAmbientLight(light);
-    m_SH_dirty = true;
+    m_skybox_ready = false;
 }   // setAmbientLight
 
 video::SColorf IrrDriver::getAmbientLight() const
@@ -2540,9 +2578,6 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
         {
             //m_sun_interposer->setPosition(pos);
             //m_sun_interposer->updateAbsolutePosition();
-
-            m_lensflare->setPosition(pos);
-            m_lensflare->updateAbsolutePosition();
 
             m_suncam->setPosition(pos);
             m_suncam->updateAbsolutePosition();

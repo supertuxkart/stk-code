@@ -722,7 +722,8 @@ void KartSelectionScreen::playerConfirm(const int player_id)
         UserConfigParams::m_default_kart = selection;
     }
 
-    if (m_kart_widgets[player_id].getKartInternalName().size() == 0)
+    if (m_kart_widgets[player_id].getKartInternalName().size() == 0 ||
+        m_kart_widgets[player_id].getKartInternalName() == RibbonWidget::NO_ITEM_ID)
     {
         SFXManager::get()->quickSound( "anvil" );
         return;
@@ -854,8 +855,7 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
         else
         {
             m_kart_widgets[widget_id].m_kart_name
-            ->setText(_("Locked : solve active challenges to gain "
-                        "access to more!"), false );
+            ->setText(_("Locked : solve active challenges to gain access to more!"), false );
         }
     }
     else
@@ -1446,8 +1446,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         const KartProperties* prop = karts.get(i);
         if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()))
         {
-            w->addItem(_("Locked : solve active challenges to gain access "
-                         "to more!"),
+            w->addItem(_("Locked : solve active challenges to gain access to more!"),
                        ID_LOCKED + prop->getIdent(),
                        prop->getAbsoluteIconFile(), LOCKED_BADGE,
                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);

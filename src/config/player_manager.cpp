@@ -326,7 +326,7 @@ void PlayerManager::enforceCurrentPlayer()
     {
         if (!player->isGuestAccount())
         {
-            Log::info("PlayerManager", "Enfocring current player '%ls'.",
+            Log::info("PlayerManager", "Enforcing current player '%ls'.",
                       player->getName().c_str()           );
             m_current_player = player;
             return;
@@ -340,7 +340,7 @@ void PlayerManager::enforceCurrentPlayer()
     {
         if (!player->isGuestAccount())
         {
-            Log::info("PlayerManager", "Enfocring current player '%s'.",
+            Log::info("PlayerManager", "Enforcing current player '%s'.",
                        player->getName().c_str());
             m_current_player = player;
             return;
@@ -353,8 +353,8 @@ void PlayerManager::enforceCurrentPlayer()
 
 // ----------------------------------------------------------------------------
 /** Called when no player profiles exists. It creates two players: one
- *  guest player, and one non-guest player for whic hit tries to guess a
- *  mame based on environment variables.
+ *  guest player, and one non-guest player for which it tries to guess a
+ *  name based on environment variables.
  */
 void PlayerManager::addDefaultPlayer()
 {

@@ -105,7 +105,7 @@ void OnlineProfileBase::init()
             m_header->setText(_("Your profile"), false);
         else if (m_visiting_profile)
         {
-            m_header->setText(m_visiting_profile->getUserName() + _("'s profile"), false);
+            m_header->setText(_("%s's profile", m_visiting_profile->getUserName()), false);
         }
         else
             Log::error("OnlineProfileBase", "No visting profile");
@@ -144,7 +144,7 @@ void OnlineProfileBase::eventCallback(Widget* widget, const std::string& name,
         if (selection == m_friends_tab->m_properties[PROP_ID])
             sm->replaceTopMostScreen(OnlineProfileFriends::getInstance());
         else if (selection == m_achievements_tab->m_properties[PROP_ID])
-            sm->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
+            sm->replaceTopMostScreen(TabOnlineProfileAchievements::getInstance());
         else if (selection == m_settings_tab->m_properties[PROP_ID])
             sm->replaceTopMostScreen(OnlineProfileSettings::getInstance());
     }

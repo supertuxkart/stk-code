@@ -20,7 +20,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef HEADER_SKIDDING_AI_HPP
-#define HEADER_SKIDDING_AI__HPP
+#define HEADER_SKIDDING_AI_HPP
 
 #include "karts/controller/ai_base_controller.hpp"
 #include "race/race_manager.hpp"
@@ -124,10 +124,10 @@ private:
 
     /** The actual start delay used. */
     float m_start_delay;
-  
+
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
-  
+
     float m_time_since_stuck;
 
     /** Direction of crash: -1 = left, 1 = right, 0 = no crash. */

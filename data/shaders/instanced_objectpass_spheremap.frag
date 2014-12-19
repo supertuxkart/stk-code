@@ -1,10 +1,10 @@
 // See http://www.ozone3d.net/tutorials/glsl_texturing_p04.php for ref
 
-#ifndef GL_ARB_bindless_texture
+#ifndef Use_Bindless_Texture
 uniform sampler2D tex;
 #endif
 
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 flat in sampler2D handle;
 #endif
 in vec3 nor;
@@ -21,7 +21,7 @@ void main() {
 
     float m = 2.0 * sqrt(r.x * r.x + r.y * r.y + (r.z + 1.0) * (r.z + 1.0));
     r.y = - r.y;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     vec4 detail0 = texture(handle, r.xy / m + .5);
 #ifdef SRGBBindlessFix
     detail0.xyz = pow(detail0.xyz, vec3(2.2));

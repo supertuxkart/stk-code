@@ -467,6 +467,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_azdo
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_azdo",
         &m_video_group, "Enable 'Approaching Zero Driver Overhead' mode (very experimental !)"));
+    PARAM_PREFIX BoolUserConfigParam        m_sdsm
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_sdsm",
+        &m_video_group, "Enable Sampled Distribued Shadow Map (buggy atm)"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -730,7 +733,7 @@ namespace UserConfigParams
                                                   "A random number to avoid duplicated reports.") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_hw_report
-            PARAM_DEFAULT( StringUserConfigParam(   "http://104.131.193.44:8080",
+            PARAM_DEFAULT( StringUserConfigParam(   "http://addons.supertuxkart.net:8080",
                                                      "hw-report-server",
                                                      &m_hw_report_group,
                                                     "The server used for reporting statistics to."));
@@ -746,31 +749,33 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_always_show_login_screen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "always_show_login_screen",
           "Always show the login screen even if last player's session was saved."));
-    // ---- Online gameplay related
 
+
+    // ---- Online gameplay related
     PARAM_PREFIX GroupUserConfigParam       m_online_group
-            PARAM_DEFAULT( GroupUserConfigParam("OnlinePlay",
+            PARAM_DEFAULT( GroupUserConfigParam("OnlineServer",
                                           "Everything related to online play.") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
-            PARAM_DEFAULT( StringUserConfigParam(   "https://api.stkaddons.net/",
+            PARAM_DEFAULT( StringUserConfigParam(   "https://addons.supertuxkart.net/api/",
                                                      "server_multiplayer",
                                                      &m_online_group,
                                                     "The server used for online multiplayer."));
 
     PARAM_PREFIX IntUserConfigParam        m_server_version
-            PARAM_DEFAULT( IntUserConfigParam(   1,
+            PARAM_DEFAULT( IntUserConfigParam(   2,
                                                  "server-version",
                                                  &m_online_group,
                                                     "Version of the server API to use."));
 
+
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
-            PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews",
+            PARAM_DEFAULT( GroupUserConfigParam("AddonServer",
                                           "Addon and news related settings") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_addons
-            PARAM_DEFAULT( StringUserConfigParam("http://stkaddons.net/dl/xml",
+            PARAM_DEFAULT( StringUserConfigParam("http://addons.supertuxkart.net/dl/xml",
                                                  "server_addons",
                                                  &m_addon_group,
                                                 "The server used for addon."));

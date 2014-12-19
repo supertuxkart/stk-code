@@ -200,7 +200,13 @@ FileManager::FileManager()
     checkAndCreateGPDir();
 
     redirectOutput();
+}   // FileManager
 
+// ----------------------------------------------------------------------------
+/** Detects where the assets are stored.
+ */
+void FileManager::discoverPaths()
+{
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
     for(unsigned int i=0; i<m_root_dirs.size(); i++)
@@ -226,6 +232,16 @@ FileManager::FileManager()
             TrackManager::addTrackSearchDir(m_root_dirs[i]+"tracks/");
         if(fileExists(m_root_dirs[i]+"karts/"))
             KartPropertiesManager::addKartSearchDir(m_root_dirs[i]+"karts/");
+
+        // If artist debug mode is enabled, add
+        // work-in-progress tracks and karts
+        if (UserConfigParams::m_artist_debug_mode)
+        {
+            if(fileExists(m_root_dirs[i] + "wip-tracks/"))
+                TrackManager::addTrackSearchDir(m_root_dirs[i] + "wip-tracks/");
+            if(fileExists(m_root_dirs[i] + "wip-karts/"))
+                KartPropertiesManager::addKartSearchDir(m_root_dirs[i] + "wip-karts/");
+        }
         for(unsigned int j=ASSET_MIN; j<=ASSET_MAX; j++)
         {
             if(!dir_found[j] && fileExists(m_root_dirs[i]+m_subdir_name[j]))
@@ -253,7 +269,7 @@ FileManager::FileManager()
         Log::fatal("[FileManager]", "Not all assets found - aborting.");
 
 
-}  // FileManager
+}  // discoverPaths
 
  //-----------------------------------------------------------------------------
 /** Remove the dummy file system (which is called from IrrDriver before
@@ -274,8 +290,8 @@ void FileManager::reInit()
     m_file_system->grab();
 
     // Note that we can't push the texture search path in the constructor
-    // since this also adds a file archive to te file system - and
-    // m_file_system is deleted (in irr_driver) after
+    // since this also adds a file archive to the file system - and
+    // m_file_system is deleted (in irr_driver)
     pushTextureSearchPath(m_subdir_name[TEXTURE]);
     if(fileExists(m_subdir_name[TEXTURE]+"deprecated/"))
         pushTextureSearchPath(m_subdir_name[TEXTURE]+"deprecated/");
@@ -423,6 +439,7 @@ XMLNode *FileManager::createXMLTreeFromString(const std::string & content)
     try
     {
         char *b = new char[content.size()];
+        assert(b);
         memcpy(b, content.c_str(), content.size());
         io::IReadFile * ireadfile =
             m_file_system->createMemoryReadFile(b, (int)content.size(),

@@ -175,10 +175,10 @@ void HighscoreManager::saveHighscores()
  * Returns the high scores entry for a specific type of race.
  * Creates one if none exists yet.
  */
-Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType highscore_type,
+Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType &highscore_type,
                                             int num_karts,
                                             const RaceManager::Difficulty difficulty,
-                                            const std::string trackName,
+                                            const std::string &trackName,
                                             const int number_of_laps,
                                             const bool reverse)
 {

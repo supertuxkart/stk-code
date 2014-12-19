@@ -191,7 +191,9 @@ private:
     bool hasComputeShaders;
     bool hasTextureStorage;
     bool hasTextureView;
+    bool hasBindlessTexture;
     bool m_support_sdsm;
+    bool m_support_texture_compression;
     bool m_need_ubo_workaround;
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
@@ -234,11 +236,13 @@ private:
 
     std::vector<video::ITexture *> SkyboxTextures;
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
-    bool m_SH_dirty;
+    bool m_skybox_ready;
 
+public:
     float blueSHCoeff[9];
     float greenSHCoeff[9];
     float redSHCoeff[9];
+private:
 
     /** Keep a trace of the origin file name of a texture. */
     std::map<video::ITexture*, std::string> m_texturesFileName;
@@ -253,6 +257,7 @@ private:
 
 public:
     GLuint SkyboxCubeMap;
+    GLuint SkyboxSpecularProbe;
     /** A simple class to store video resolutions. */
     class VideoMode
     {
@@ -282,7 +287,37 @@ public:
 
     bool supportsSDSM() const
     {
-        return m_support_sdsm;
+        return m_support_sdsm && UserConfigParams::m_sdsm;
+    }
+
+    bool supportTextureCompression() const
+    {
+        return m_support_texture_compression;
+    }
+
+    bool supportGeometryShader() const
+    {
+        return getGLSLVersion() >= 330;
+    }
+
+    bool usesShadows() const
+    {
+        return supportGeometryShader() && UserConfigParams::m_shadows && !needUBOWorkaround();
+    }
+
+    bool usesGI() const
+    {
+        return supportGeometryShader() && UserConfigParams::m_gi && !needUBOWorkaround();
+    }
+
+    bool usesTextureCompression() const
+    {
+        return UserConfigParams::m_texture_compression && m_support_texture_compression;
+    }
+
+    bool useAZDO() const
+    {
+        return hasBindlessTexture && UserConfigParams::m_azdo;
     }
 
     bool needUBOWorkaround() const
@@ -335,6 +370,11 @@ public:
         return hasTextureView;
     }
 
+    bool hasARBBindlessTexture() const
+    {
+        return hasBindlessTexture;
+    }
+
     video::SColorf getAmbientLight() const;
 
     struct GlowData {
@@ -375,10 +415,7 @@ private:
     unsigned             object_count[PASS_COUNT];
     unsigned             poly_count[PASS_COUNT];
     u32                  m_renderpass;
-    u32                  m_lensflare_query;
-    bool                 m_query_issued;
     class STKMeshSceneNode *m_sun_interposer;
-    scene::CLensFlareSceneNode *m_lensflare;
     scene::ICameraSceneNode *m_suncam;
     core::vector3df m_sundirection;
     video::SColorf m_suncolor;
@@ -435,7 +472,7 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void generateSkyboxCubemap();
+    void prepareSkybox();
     void generateDiffuseCoefficients();
     void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
@@ -451,6 +488,7 @@ public:
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
+    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig);
     video::ITexture      *applyMask(video::ITexture* texture,
                                     const std::string& mask_path);
     void displayFPS();
@@ -625,12 +663,7 @@ public:
     // -----------------------------------------------------------------------
     void setSunDirection(const core::vector3df &SunPos)
     {
-        core::matrix4 m_view = getViewMatrix();
-        m_view.makeInverse();
-        m_view = m_view.getTransposed();
         m_sundirection = SunPos;
-        m_view.transformVect(m_sundirection);
-        m_sundirection.normalize();
     }
     // -----------------------------------------------------------------------
     video::SColorf getSunColor() const { return m_suncolor; }

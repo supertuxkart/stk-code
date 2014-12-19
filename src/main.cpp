@@ -730,41 +730,26 @@ int handleCmdLine()
 
     if(CommandLine::has("--kart", &s))
     {
-        const PlayerProfile *player = PlayerManager::getCurrentPlayer();
-
-        if(player && !player->isLocked(s))
+        const KartProperties *prop = kart_properties_manager->getKart(s);
+        if (prop)
         {
-            const KartProperties *prop =
-                kart_properties_manager->getKart(s);
-            if(prop)
-            {
-                UserConfigParams::m_default_kart = s;
+            UserConfigParams::m_default_kart = s;
 
-                // if a player was added with -N, change its kart.
-                // Otherwise, nothing to do, kart choice will be picked
-                // up upon player creation.
-                if (StateManager::get()->activePlayerCount() > 0)
-                {
-                    race_manager->setLocalKartInfo(0, s);
-                }
-                Log::verbose("main", "You chose to use kart '%s'.",
-                             s.c_str() ) ;
-            }
-            else
+            // if a player was added with -N, change its kart.
+            // Otherwise, nothing to do, kart choice will be picked
+            // up upon player creation.
+            if (StateManager::get()->activePlayerCount() > 0)
             {
-                Log::warn("main", "Kart '%s' not found, ignored.",
-                          s.c_str());
+                race_manager->setLocalKartInfo(0, s);
             }
+            Log::verbose("main", "You chose to use kart '%s'.",
+                         s.c_str());
         }
-        else   // kart locked
+        else
         {
-            if (player)
-                Log::warn("main", "Kart '%s' has not been unlocked yet.",
-                          s.c_str());
-            else
-                Log::warn("main",
-                        "A default player must exist in order to use --kart.");
-        }   // if kart locked
+            Log::warn("main", "Kart '%s' not found, ignored.",
+                      s.c_str());
+        }
     }   // if --kart
 
     if(CommandLine::has("--ai", &s))
@@ -802,48 +787,34 @@ int handleCmdLine()
 
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
-        const PlayerProfile *player = PlayerManager::getCurrentPlayer();
-        if (player && !player->isLocked(s))
-        {
-            race_manager->setTrack(s);
-            Log::verbose("main", "You choose to start in track '%s'.",
-                         s.c_str());
+        race_manager->setTrack(s);
+        Log::verbose("main", "You choose to start in track '%s'.",
+                     s.c_str());
 
-            Track* t = track_manager->getTrack(s);
-            if (!t)
-            {
-                Log::warn("main", "Can't find track named '%s'.", s.c_str());
-            }
-            else if (t->isArena())
-            {
-                //if it's arena, don't create ai karts
-                const std::vector<std::string> l;
-                race_manager->setDefaultAIKartList(l);
-                // Add 1 for the player kart
-                race_manager->setNumKarts(1);
-                race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
-            }
-            else if(t->isSoccer())
-            {
-                //if it's soccer, don't create ai karts
-                const std::vector<std::string> l;
-                race_manager->setDefaultAIKartList(l);
-                // Add 1 for the player kart
-                race_manager->setNumKarts(1);
-                race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
-            }
-        }
-        else
+        Track* t = track_manager->getTrack(s);
+        if (!t)
         {
-            if (player)
-                Log::warn("main", "Track '%s' has not been unlocked yet.",
-                          s.c_str());
-            else
-                Log::warn("main",
-                       "A default player must exist in order to use --track.");
+            Log::warn("main", "Can't find track named '%s'.", s.c_str());
+        }
+        else if (t->isArena())
+        {
+            //if it's arena, don't create ai karts
+            const std::vector<std::string> l;
+            race_manager->setDefaultAIKartList(l);
+            // Add 1 for the player kart
+            race_manager->setNumKarts(1);
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+        }
+        else if (t->isSoccer())
+        {
+            //if it's soccer, don't create ai karts
+            const std::vector<std::string> l;
+            race_manager->setDefaultAIKartList(l);
+            // Add 1 for the player kart
+            race_manager->setNumKarts(1);
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
         }
     }   // --track
-
 
     if(CommandLine::has("--gp", &s))
     {
@@ -1022,6 +993,7 @@ void initUserConfig()
     file_manager            = new FileManager();
     user_config             = new UserConfig();     // needs file_manager
     user_config->loadConfig();
+    file_manager->discoverPaths();
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -1112,8 +1084,11 @@ void initRest()
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
     race_manager->setDifficulty(
                  (RaceManager::Difficulty)(int)UserConfigParams::m_difficulty);
-    if(track_manager->getTrack(UserConfigParams::m_last_track))
-        race_manager->setTrack(UserConfigParams::m_last_track);
+
+    if (!track_manager->getTrack(UserConfigParams::m_last_track))
+        UserConfigParams::m_last_track.revertToDefaults();
+        
+    race_manager->setTrack(UserConfigParams::m_last_track);
 
 }   // initRest
 

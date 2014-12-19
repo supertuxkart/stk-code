@@ -149,12 +149,10 @@ GLuint LoadShader(const char * file, unsigned type)
     std::string Code = versionString;
     if (irr_driver->hasVSLayerExtension())
         Code += "#extension GL_AMD_vertex_shader_layer : enable\n";
-    if (UserConfigParams::m_azdo)
-        Code += "#extension GL_ARB_bindless_texture : enable\n";
-    else
+    if (irr_driver->useAZDO())
     {
-        Code += "#extension GL_ARB_bindless_texture : disable\n";
-        Code += "#undef GL_ARB_bindless_texture\n";
+        Code += "#extension GL_ARB_bindless_texture : enable\n";
+        Code += "#define Use_Bindless_Texture\n";
     }
     std::ifstream Stream(file, std::ios::in);
     Code += "//" + std::string(file) + "\n";
@@ -429,6 +427,16 @@ static void initShadowVPMUBO()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+GLuint SharedObject::LightingDataUBO;
+
+static void initLightingDataUBO()
+{
+    glGenBuffers(1, &SharedObject::LightingDataUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
+    glBufferData(GL_UNIFORM_BUFFER, 36 * sizeof(float), 0, GL_STREAM_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
 GLuint SharedObject::ParticleQuadVBO = 0;
 
 static void initParticleQuadVBO()
@@ -529,9 +537,8 @@ void Shaders::loadShaders()
     initCubeVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
+    initLightingDataUBO();
     initParticleQuadVBO();
-    MeshShader::ViewFrustrumShader::init();
-    UtilShader::ColoredLine::init();
 }
 
 void Shaders::killShaders()
@@ -578,37 +585,39 @@ void bypassUBO(GLuint Program)
     glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
     GLint Screen = glGetUniformLocation(Program, "screen");
     glUniform2f(Screen, irr_driver->getCurrentScreenSize().X, irr_driver->getCurrentScreenSize().Y);
+    GLint bLmn = glGetUniformLocation(Program, "blueLmn[0]");
+    glUniform1fv(bLmn, 9, irr_driver->blueSHCoeff);
+    GLint gLmn = glGetUniformLocation(Program, "greenLmn[0]");
+    glUniform1fv(gLmn, 9, irr_driver->greenSHCoeff);
+    GLint rLmn = glGetUniformLocation(Program, "redLmn[0]");
+    glUniform1fv(rLmn, 9, irr_driver->redSHCoeff);
+    GLint sundir = glGetUniformLocation(Program, "sun_direction");
+    glUniform3f(sundir, irr_driver->getSunDirection().X, irr_driver->getSunDirection().Y, irr_driver->getSunDirection().Z);
+    GLint suncol = glGetUniformLocation(Program, "sun_col");
+    glUniform3f(suncol, irr_driver->getSunColor().getRed(), irr_driver->getSunColor().getGreen(), irr_driver->getSunColor().getBlue());
+    GLint sunangle = glGetUniformLocation(Program, "sun_angle");
+    glUniform1f(sunangle, 0.54f);
 }
 
 namespace UtilShader
 {
-    GLuint ColoredLine::Program;
-    GLuint ColoredLine::uniform_color;
-    GLuint ColoredLine::vao;
-    GLuint ColoredLine::vbo;
-
-    void ColoredLine::init()
+    ColoredLine::ColoredLine()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
+
+        AssignUniforms("color");
+
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, 6 * 1024 * sizeof(float), 0, GL_DYNAMIC_DRAW);
-        GLuint attrib_position = glGetAttribLocation(Program, "Position");
-        glEnableVertexAttribArray(attrib_position);
-        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-        uniform_color = glGetUniformLocation(Program, "color");
-    }
-
-    void ColoredLine::setUniforms(const irr::video::SColor &col)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniform4i(uniform_color, col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
-        glUniformMatrix4fv(glGetUniformLocation(Program, "ModelMatrix"), 1, GL_FALSE, core::IdentityMatrix.pointer());
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     struct TexUnit
@@ -851,8 +860,8 @@ GLuint createShadowSampler()
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     int aniso = UserConfigParams::m_anisotropic;
     if (aniso == 0) aniso = 1;
@@ -867,8 +876,8 @@ void BindTextureShadow(GLuint TU, GLuint tex)
     glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 }
@@ -887,6 +896,20 @@ void BindTextureVolume(GLuint TU, GLuint tex)
 unsigned getGLSLVersion()
 {
     return irr_driver->getGLSLVersion();
+}
+
+namespace UtilShader
+{
+    SpecularIBLGenerator::SpecularIBLGenerator()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/importance_sampling_specular.frag").c_str());
+        AssignUniforms("PermutationMatrix", "ViewportSize");
+        TU_Samples = 1;
+        AssignSamplerNames(Program, 0, "tex");
+        AssignTextureUnit(Program, TexUnit(TU_Samples, "samples"));
+    }
 }
 
 namespace MeshShader
@@ -1387,35 +1410,21 @@ namespace MeshShader
         AssignUniforms("color");
     }
 
-    GLuint ViewFrustrumShader::Program;
-    GLuint ViewFrustrumShader::attrib_position;
-    GLuint ViewFrustrumShader::uniform_color;
-    GLuint ViewFrustrumShader::uniform_idx;
-    GLuint ViewFrustrumShader::frustrumvao;
-
-    void ViewFrustrumShader::init()
+    ViewFrustrumShader::ViewFrustrumShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/frustrum.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
 
-        uniform_color = glGetUniformLocation(Program, "color");
-        uniform_idx = glGetUniformLocation(Program, "idx");
+        AssignUniforms("color", "idx");
 
         glGenVertexArrays(1, &frustrumvao);
         glBindVertexArray(frustrumvao);
         glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
-        glEnableVertexAttribArray(attrib_position);
-        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::frustrumindexes);
         glBindVertexArray(0);
-    }
-
-    void ViewFrustrumShader::setUniforms(const video::SColor &color, unsigned idx)
-    {
-        glUniform4i(uniform_color, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-        glUniform1i(uniform_idx, idx);
     }
 }
 
@@ -1426,7 +1435,8 @@ namespace LightShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlight.frag").c_str());
 
@@ -1625,7 +1635,8 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
 
@@ -1633,15 +1644,17 @@ namespace FullScreenShader
         AssignUniforms("direction", "col");
     }
 
-    EnvMapShader::EnvMapShader()
+    IBLShader::IBLShader()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
-        AssignUniforms("TransposeViewMatrix", "blueLmn[0]", "greenLmn[0]", "redLmn[0]");
-        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "tex");
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/IBL.frag").c_str());
+        AssignUniforms();
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
     ShadowedSunLightShader::ShadowedSunLightShader()
@@ -1649,7 +1662,8 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
 
@@ -1738,7 +1752,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian6h.comp").c_str());
         TU_dest = 1;
-        AssignUniforms("pixel", "sigma");
+        AssignUniforms("pixel", "weights");
         AssignSamplerNames(Program, 0, "source");
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
@@ -1748,7 +1762,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/blurshadowH.comp").c_str());
         TU_dest = 1;
-        AssignUniforms("pixel", "sigma");
+        AssignUniforms("pixel", "weights");
         AssignSamplerNames(Program, 0, "source");
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
@@ -1808,7 +1822,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian6v.comp").c_str());
         TU_dest = 1;
-        AssignUniforms("pixel", "sigma");
+        AssignUniforms("pixel", "weights");
         AssignSamplerNames(Program, 0, "source");
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
@@ -1818,7 +1832,7 @@ namespace FullScreenShader
         Program = LoadProgram(OBJECT,
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/blurshadowV.comp").c_str());
         TU_dest = 1;
-        AssignUniforms("pixel", "sigma");
+        AssignUniforms("pixel", "weights");
         AssignSamplerNames(Program, 0, "source");
         AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
     }
@@ -1850,7 +1864,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
 
         AssignUniforms();
-        AssignSamplerNames(Program, 0, "texture");
+        AssignSamplerNames(Program, 0, "tex");
         vao = createVAO(Program);
     }
 
