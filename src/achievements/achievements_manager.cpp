@@ -46,8 +46,6 @@ AchievementsManager::AchievementsManager()
     for (unsigned int i = 0; i < num_nodes; i++)
     {
         const XMLNode *node = root->getNode(i);
-        std::string type("");
-        node->get("type", &type);
         AchievementInfo * achievement_info = new AchievementInfo(node);
         m_achievements_info[achievement_info->getID()] = achievement_info;
     }
