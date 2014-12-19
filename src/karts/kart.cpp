@@ -2163,7 +2163,7 @@ void Kart::updateEngineSFX()
     if(isOnGround())
     {
         float max_speed = m_max_speed->getCurrentMaxSpeed();
-        assert(max_speed>0);
+
         // Engine noise is based half in total speed, half in fake gears:
         // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
         // ignoring the gear settings from stk_config, but providing a
