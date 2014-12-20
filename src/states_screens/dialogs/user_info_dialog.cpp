@@ -53,7 +53,7 @@ void UserInfoDialog::load()
     m_name_widget->setText(m_online_profile->getUserName(),false);
     m_info_widget->setText(m_info, false);
     if(m_remove_widget->isVisible() && !m_online_profile->isFriend())
-        m_remove_widget->setLabel("Cancel Request");
+        m_remove_widget->setLabel(_("Cancel Request"));
 }   // load
 
 // ----------------------------------------------------------------------------
