@@ -1,8 +1,8 @@
-#ifndef GL_ARB_bindless_texture
+#ifndef Use_Bindless_Texture
 uniform sampler2D tex;
 #endif
 
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 flat in uvec2 handle;
 #endif
 in vec2 uv;
@@ -11,7 +11,7 @@ out vec4 FragColor;
 
 void main(void)
 {
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     vec4 col = texture(sampler2D(handle), uv);
 #else
     vec4 col = texture(tex, uv);

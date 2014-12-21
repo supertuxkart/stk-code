@@ -1,9 +1,9 @@
-#ifndef GL_ARB_bindless_texture
+#ifndef Use_Bindless_Texture
 uniform sampler2D normalMap;
 uniform sampler2D glossMap;
 #endif
 
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 flat in sampler2D secondhandle;
 flat in sampler2D thirdhandle;
 #endif
@@ -17,7 +17,7 @@ vec2 EncodeNormal(vec3 n);
 void main()
 {
     // normal in Tangent Space
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     vec3 TS_normal = 2.0 * texture(thirdhandle, uv).rgb - 1.0;
     float gloss = texture(secondhandle, uv).x;
 #else

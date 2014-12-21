@@ -1,4 +1,4 @@
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 layout(bindless_sampler) uniform sampler2D Albedo;
 layout(bindless_sampler) uniform sampler2D SpecMap;
 #else
@@ -14,7 +14,7 @@ vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapVa
 
 void main(void)
 {
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     vec4 col = texture(Albedo, uv);
 #ifdef SRGBBindlessFix
     col.xyz = pow(col.xyz, vec3(2.2));

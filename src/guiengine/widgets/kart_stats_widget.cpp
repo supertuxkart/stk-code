@@ -82,15 +82,15 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
     }
 
     m_skills[SKILL_MASS]->setValue((int)(props->getMass()/5));
-    m_skills[SKILL_MASS]->setLabel("WEIGHT");
+    m_skills[SKILL_MASS]->setLabel(_("WEIGHT"));
     m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
 
     m_skills[SKILL_SPEED]->setValue((int)((props->getAbsMaxSpeed()-20)*9));
-    m_skills[SKILL_SPEED]->setLabel("SPEED");
+    m_skills[SKILL_SPEED]->setLabel(_("SPEED"));
     m_skills[SKILL_SPEED]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
 
     m_skills[SKILL_POWER]->setValue((int)(props->getAvgPower()));
-    m_skills[SKILL_POWER]->setLabel("POWER");
+    m_skills[SKILL_POWER]->setLabel(_("POWER"));
     m_skills[SKILL_POWER]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_power", m_player_id);
 
     move(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,

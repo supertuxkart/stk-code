@@ -1,8 +1,8 @@
-#ifndef GL_ARB_bindless_texture
+#ifndef Use_Bindless_Texture
 uniform sampler2D glosstex;
 #endif
 
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 flat in sampler2D secondhandle;
 #endif
 in vec3 nor;
@@ -13,7 +13,7 @@ vec2 EncodeNormal(vec3 n);
 
 void main(void)
 {
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     float glossmap = texture(secondhandle, uv).x;
 #else
     float glossmap = texture(glosstex, uv).x;
