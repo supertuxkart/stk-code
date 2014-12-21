@@ -586,7 +586,7 @@ void Material::initParticlesEffect(const XMLNode *node)
     ParticleKind* particles = NULL;
     try
     {
-        particles = pkm->getParticles(base.c_str());
+        particles = pkm->getParticles(base);
 
         if (particles == NULL)
         {
