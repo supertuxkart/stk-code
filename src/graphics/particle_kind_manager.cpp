@@ -76,7 +76,6 @@ void ParticleKindManager::cleanUpTrackSpecificGfx()
 
 ParticleKind* ParticleKindManager::getParticles(const std::string &name)
 {
-    Track* t = track_manager->getTrack(race_manager->getTrackName());
     std::map<std::string, ParticleKind*>::iterator i;
     i = m_per_track_kinds.find(name);
     if (i != m_per_track_kinds.end())
@@ -87,9 +86,13 @@ ParticleKind* ParticleKindManager::getParticles(const std::string &name)
     {
         try
         {
-            ParticleKind* newkind = new ParticleKind(t->getTrackFile(name));
-            m_per_track_kinds[name] = newkind;
-            return newkind;
+            Track* t = track_manager->getTrack(race_manager->getTrackName());
+            if (t)
+            {
+                ParticleKind* newkind = new ParticleKind(t->getTrackFile(name));
+                m_per_track_kinds[name] = newkind;
+                return newkind;
+            }
         }
         catch (std::runtime_error& e)
         {
