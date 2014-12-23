@@ -488,7 +488,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             new MessageDialog(_("You can not play online without internet access. "
                                 "If you want to play online, go to options, select "
                                 " tab 'User Interface', and edit "
-                                "\"Allow STK to connect to the Internet\"."));
+                                "\"Connect to the Internet\"."));
             return;
         }
         if (PlayerManager::getCurrentOnlineId())
@@ -513,7 +513,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             new MessageDialog(_("You can not download addons without internet access. "
                                 "If you want to download addons, go to options, select "
                                 " tab 'User Interface', and edit "
-                                "\"Allow STK to connect to the Internet\"."));
+                                "\"Connect to the Internet\"."));
             return;
         }
         AddonsScreen::getInstance()->push();

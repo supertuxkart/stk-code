@@ -403,7 +403,7 @@ namespace Online
                     }
                     else if(to_notify.size() > 3)
                     {
-                        message = _("%d friends are now online.",
+                        message = ngettext("%d friends are now online.", to_notify.size(),
                                     (int)to_notify.size());
                     }
                     MessageQueue::add(MessageQueue::MT_FRIEND, message);
