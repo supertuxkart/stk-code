@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/particle_emitter.hpp"
-
+#include "graphics/central_settings.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind.hpp"
@@ -298,7 +298,7 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_particle_type       = NULL;
     m_parent              = parent;
     m_emission_decay_rate = 0;
-    m_is_glsl = irr_driver->isGLSL();
+    m_is_glsl = CVS->isGLSL();
     m_randomize_initial_y = randomize_initial_y;
 
 

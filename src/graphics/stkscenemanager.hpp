@@ -5,6 +5,7 @@
 #define HEADER_STKSCENEMANAGER_HPP
 
 #include "utils/singleton.hpp"
+#include "central_settings.hpp"
 #include "gl_headers.hpp"
 #include "stkmesh.hpp"
 #include "gpuparticles.hpp"
@@ -20,7 +21,7 @@ public:
     {
         glGenBuffers(1, &drawindirectcmd);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
-        if (irr_driver->hasBufferStorageExtension())
+        if (CVS->isARBBufferStorageUsable())
         {
             glBufferStorage(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
             Ptr = (DrawElementsIndirectCommand *)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);

@@ -1,3 +1,4 @@
+#include "central_settings.hpp"
 #include "texturemanager.hpp"
 #include <fstream>
 #include <sstream>
@@ -34,7 +35,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
 
     std::string cached_file;
-    if (irr_driver->usesTextureCompression())
+    if (CVS->isTextureCompressionEnabled())
     {
         // Try to retrieve the compressed texture in cache
         std::string tex_name = irr_driver->getTextureName(tex);
@@ -70,7 +71,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
         }
     }
 
-    if (!irr_driver->usesTextureCompression())
+    if (!CVS->isTextureCompressionEnabled())
     {
         if (srgb)
             internalFormat = (tex->hasAlpha()) ? GL_SRGB_ALPHA : GL_SRGB;
@@ -88,7 +89,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
     glGenerateMipmap(GL_TEXTURE_2D);
     delete[] data;
 
-    if (irr_driver->usesTextureCompression() && !cached_file.empty())
+    if (CVS->isTextureCompressionEnabled() && !cached_file.empty())
     {
         // Save the compressed texture in the cache for later use.
         saveCompressedTexture(cached_file);

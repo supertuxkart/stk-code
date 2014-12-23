@@ -183,20 +183,6 @@ enum TypeRTT
 class IrrDriver : public IEventReceiver, public NoCopy
 {
 private:
-    int m_gl_major_version, m_gl_minor_version;
-    bool hasVSLayer;
-    bool hasBaseInstance;
-    bool hasDrawIndirect;
-    bool hasBuffserStorage;
-    bool hasComputeShaders;
-    bool hasTextureStorage;
-    bool hasTextureView;
-    bool hasBindlessTexture;
-    bool m_support_sdsm;
-    bool m_support_texture_compression;
-    bool m_need_ubo_workaround;
-    bool m_need_rh_workaround;
-    bool m_need_srgb_workaround;
     GLsync m_sync;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
@@ -275,106 +261,6 @@ public:
         float power;
     };
 
-    unsigned getGLSLVersion() const
-    {
-        if (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version == 3))
-            return m_gl_major_version * 100 + m_gl_minor_version * 10;
-        else if (m_gl_major_version == 3)
-            return 100 + (m_gl_minor_version + 3) * 10;
-        else
-            return 120;
-    }
-
-    bool supportsSDSM() const
-    {
-        return m_support_sdsm && UserConfigParams::m_sdsm;
-    }
-
-    bool supportTextureCompression() const
-    {
-        return m_support_texture_compression;
-    }
-
-    bool supportGeometryShader() const
-    {
-        return getGLSLVersion() >= 330;
-    }
-
-    bool usesShadows() const
-    {
-        return supportGeometryShader() && UserConfigParams::m_shadows && !needUBOWorkaround();
-    }
-
-    bool usesGI() const
-    {
-        return supportGeometryShader() && UserConfigParams::m_gi && !needUBOWorkaround();
-    }
-
-    bool usesTextureCompression() const
-    {
-        return UserConfigParams::m_texture_compression && m_support_texture_compression;
-    }
-
-    bool useAZDO() const
-    {
-        return hasBindlessTexture && UserConfigParams::m_azdo;
-    }
-
-    bool needUBOWorkaround() const
-    {
-        return m_need_ubo_workaround;
-    }
-
-    bool needRHWorkaround() const
-    {
-        return m_need_rh_workaround;
-    }
-
-    bool needsRGBBindlessWorkaround() const
-    {
-        return m_need_srgb_workaround;
-    }
-
-    bool hasARB_base_instance() const
-    {
-        return hasBaseInstance;
-    }
-
-    bool hasARB_draw_indirect() const
-    {
-        return hasDrawIndirect;
-    }
-
-    bool hasVSLayerExtension() const
-    {
-        return hasVSLayer;
-    }
-
-    bool hasBufferStorageExtension() const
-    {
-        return hasBuffserStorage;
-    }
-
-    bool hasARBComputeShaders() const
-    {
-        return hasComputeShaders;
-    }
-
-    bool hasARBTextureStorage() const
-    {
-        return hasTextureStorage;
-    }
-
-    bool hasARBTextureView() const
-    {
-        return hasTextureView;
-    }
-
-    bool hasARBBindlessTexture() const
-    {
-        return hasBindlessTexture;
-    }
-
     video::SColorf getAmbientLight() const;
 
     struct GlowData {
@@ -389,9 +275,6 @@ private:
 
     /** Whether the mouse cursor is currently shown */
     bool                  m_pointer_shown;
-
-    /** Supports GLSL */
-    bool                  m_glsl;
 
     /** Internal method that applies the resolution in user settings. */
     void                 applyResolutionSettings();
@@ -685,12 +568,6 @@ public:
     GLuint getRenderTargetTexture(TypeRTT which);
     FrameBuffer& getFBO(TypeFBO which);
     GLuint getDepthStencilTexture();
-    // ------------------------------------------------------------------------
-    inline bool isGLSL() const { return m_glsl; }
-    // ------------------------------------------------------------------------
-    /** Called when the driver pretends to support it, but fails at some
-     *  operations. */
-    void disableGLSL() { m_glsl = false; }
     // ------------------------------------------------------------------------
     void resetDebugModes()
     {

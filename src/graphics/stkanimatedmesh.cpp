@@ -1,3 +1,4 @@
+#include "central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/stkanimatedmesh.hpp"
 #include <ISceneManager.h>
@@ -155,7 +156,7 @@ void STKAnimatedMesh::updateGL()
             else
                 InitTexturesTransparent(mesh);
 
-            if (irr_driver->hasARB_base_instance())
+            if (CVS->isARBBaseInstanceUsable())
             {
                 std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
                 mesh.vaoBaseVertex = p.first;
@@ -180,7 +181,7 @@ void STKAnimatedMesh::updateGL()
 
             size_t size = mb->getVertexCount() * GLmeshes[i].Stride, offset = GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride;
             void *buf;
-            if (irr_driver->hasBufferStorageExtension())
+            if (CVS->isARBBufferStorageUsable())
             {
                 buf = VAOManager::getInstance()->getVBOPtr(mb->getVertexType());
                 buf = (char *)buf + offset;
@@ -188,7 +189,7 @@ void STKAnimatedMesh::updateGL()
             else
             {
                 glBindVertexArray(0);
-                if (irr_driver->hasARB_base_instance())
+                if (CVS->isARBBaseInstanceUsable())
                     glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getVBO(mb->getVertexType()));
                 else
                     glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
@@ -196,7 +197,7 @@ void STKAnimatedMesh::updateGL()
                 buf = glMapBufferRange(GL_ARRAY_BUFFER, offset, size, bitfield);
             }
             memcpy(buf, mb->getVertices(), size);
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->isARBBufferStorageUsable())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -1,5 +1,5 @@
 #include "graphics/irr_driver.hpp"
-
+#include "central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/light.hpp"
@@ -115,7 +115,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         glDisable(GL_BLEND);
         m_rtts->getRH().Bind();
         glBindVertexArray(SharedObject::FullScreenQuadVAO);
-        if (irr_driver->needRHWorkaround())
+        if (CVS->needRHWorkaround())
         {
             glUseProgram(FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->Program);
             FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->SetTextureUnits(
@@ -145,7 +145,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_rtts->getFBO(FBO_DIFFUSE).Bind();
-    if (irr_driver->usesGI() && hasShadow)
+    if (CVS->isGlobalIlluminationEnabled() && hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
@@ -162,7 +162,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
-        if (World::getWorld() && irr_driver->usesShadows() && hasShadow)
+        if (World::getWorld() && CVS->isShadowEnabled() && hasShadow)
             m_post_processing->renderShadowedSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor(), sun_ortho_matrix, m_rtts->getShadowFBO().getRTT()[0]);
         else
             m_post_processing->renderSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor());

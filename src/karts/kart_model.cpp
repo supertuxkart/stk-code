@@ -23,6 +23,7 @@
 
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -343,7 +344,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
 
         node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh");
         // as animated mesh are not cheap to render use frustum box culling
-        if (irr_driver->isGLSL())
+        if (CVS->isGLSL())
             node->setAutomaticCulling(scene::EAC_OFF);
         else
             node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);

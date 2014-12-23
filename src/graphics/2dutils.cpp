@@ -1,4 +1,5 @@
 #include "2dutils.hpp"
+#include "central_settings.hpp"
 #include "glwrap.hpp"
 #include "utils/cpp2011.hpp"
 
@@ -104,7 +105,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
     const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
     const video::SColor &colors, bool useAlphaChannelOfTexture)
 {
-    if (!irr_driver->isGLSL()) {
+    if (!CVS->isGLSL()) {
         video::SColor duplicatedArray[4] = {
             colors, colors, colors, colors
         };
@@ -195,7 +196,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
     const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
     const video::SColor* const colors, bool useAlphaChannelOfTexture)
 {
-    if (!irr_driver->isGLSL())
+    if (!CVS->isGLSL())
     {
         irr_driver->getVideoDriver()->draw2DImage(texture, destRect, sourceRect, clipRect, colors, useAlphaChannelOfTexture);
         return;
@@ -246,7 +247,7 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
     u32 vertexCount, const void* indexList, u32 primitiveCount,
     video::E_VERTEX_TYPE vType, scene::E_PRIMITIVE_TYPE pType, video::E_INDEX_TYPE iType)
 {
-    if (!irr_driver->isGLSL())
+    if (!CVS->isGLSL())
     {
         irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, vertexCount, indexList, primitiveCount, vType, pType, iType);
         return;
@@ -281,7 +282,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
     const core::rect<s32>* clip)
 {
 
-    if (!irr_driver->isGLSL())
+    if (!CVS->isGLSL())
     {
         irr_driver->getVideoDriver()->draw2DRectangle(color, position, clip);
         return;

@@ -1,3 +1,4 @@
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 
 #include "config/user_config.hpp"
@@ -265,7 +266,7 @@ void FrameBuffer::BlitToDefault(size_t x0, size_t y0, size_t x1, size_t y1)
 void draw3DLine(const core::vector3df& start,
                 const core::vector3df& end, irr::video::SColor color)
 {
-    if (!irr_driver->isGLSL()) {
+    if (!CVS->isGLSL()) {
         irr_driver->getVideoDriver()->draw3DLine(start, end, color);
         return;
     }

@@ -2,6 +2,7 @@
 #include "irr_driver.hpp"
 #include "stkmesh.hpp"
 #include "glwrap.hpp"
+#include "central_settings.hpp"
 
 VAOManager::VAOManager()
 {
@@ -17,7 +18,7 @@ VAOManager::VAOManager()
     {
         glGenBuffers(1, &instance_vbo[i]);
         glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[i]);
-        if (irr_driver->hasBufferStorageExtension())
+        if (CVS->isARBBufferStorageUsable())
         {
             glBufferStorage(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceDataDualTex), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
             Ptr[i] = glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
@@ -67,7 +68,7 @@ void VAOManager::regenerateBuffer(enum VTXTYPE tp, size_t newlastvertex, size_t 
         GLuint newVBO;
         glGenBuffers(1, &newVBO);
         glBindBuffer(GL_ARRAY_BUFFER, newVBO);
-        if (irr_driver->hasBufferStorageExtension())
+        if (CVS->isARBBufferStorageUsable())
         {
             glBufferStorage(GL_ARRAY_BUFFER, RealVBOSize[tp] * getVertexPitch(tp), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
             VBOPtr[tp] = glMapBufferRange(GL_ARRAY_BUFFER, 0, RealVBOSize[tp] * getVertexPitch(tp), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
@@ -94,7 +95,7 @@ void VAOManager::regenerateBuffer(enum VTXTYPE tp, size_t newlastvertex, size_t 
         GLuint newIBO;
         glGenBuffers(1, &newIBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIBO);
-        if (irr_driver->hasBufferStorageExtension())
+        if (CVS->isARBBufferStorageUsable())
         {
             glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, RealIBOSize[tp] * sizeof(u16), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
             IBOPtr[tp] = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, RealIBOSize[tp] * sizeof(u16), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
@@ -287,7 +288,7 @@ void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
     size_t old_idx_cnt = last_index[tp];
 
     regenerateBuffer(tp, old_vtx_cnt + mb->getVertexCount(), old_idx_cnt + mb->getIndexCount());
-    if (irr_driver->hasBufferStorageExtension())
+    if (CVS->isARBBufferStorageUsable())
     {
         void *tmp = (char*)VBOPtr[tp] + old_vtx_cnt * getVertexPitch(tp);
         memcpy(tmp, mb->getVertices(), mb->getVertexCount() * getVertexPitch(tp));
@@ -297,7 +298,7 @@ void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
         glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
         glBufferSubData(GL_ARRAY_BUFFER, old_vtx_cnt * getVertexPitch(tp), mb->getVertexCount() * getVertexPitch(tp), mb->getVertices());
     }
-    if (irr_driver->hasBufferStorageExtension())
+    if (CVS->isARBBufferStorageUsable())
     {
         void *tmp = (char*)IBOPtr[tp] + old_idx_cnt * sizeof(u16);
         memcpy(tmp, mb->getIndices(), mb->getIndexCount() * sizeof(u16));

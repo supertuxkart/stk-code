@@ -22,6 +22,7 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "utils/translation.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 
 #include <IGUIEnvironment.h>
@@ -84,7 +85,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel(_("Disabled"));   // 0
     shadows->addLabel(_("low"));        // 1
     shadows->addLabel(_("high"));       // 2
-    if (!irr_driver->needUBOWorkaround())
+    if (CVS->supportsShadows())
         shadows->setValue(UserConfigParams::m_shadows);
     else
         shadows->setValue(0);
@@ -96,7 +97,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("glow")->setState(UserConfigParams::m_glow);
     getWidget<CheckBoxWidget>("ssao")->setState(UserConfigParams::m_ssao);
     getWidget<CheckBoxWidget>("bloom")->setState(UserConfigParams::m_bloom);
-    if (irr_driver->supportTextureCompression())
+    if (CVS->isEXTTextureCompressionS3TCUsable())
     {
         getWidget<CheckBoxWidget>("texture_compression")->setState(UserConfigParams::m_texture_compression);
     }
@@ -107,7 +108,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         cb_tex_cmp->setDeactivated();
     }
 
-    if (!irr_driver->supportGeometryShader())
+    if (!CVS->supportsGlobalIllumination())
     {
         shadows->setDeactivated();
         getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
@@ -129,7 +130,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_motionblur      =
             advanced_pipeline && getWidget<CheckBoxWidget>("motionblur")->getState();
 
-        if (advanced_pipeline && irr_driver->supportGeometryShader())
+        if (advanced_pipeline && CVS->supportsShadows())
         {
             UserConfigParams::m_shadows =
                 getWidget<SpinnerWidget>("shadows")->getValue();
@@ -149,7 +150,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             advanced_pipeline && getWidget<CheckBoxWidget>("lightshaft")->getState();
 
         UserConfigParams::m_gi =
-            advanced_pipeline && irr_driver->supportGeometryShader() &&
+            advanced_pipeline && CVS->supportsGlobalIllumination() &&
             getWidget<CheckBoxWidget>("global_illumination")->getState();
 
         UserConfigParams::m_glow =
@@ -244,7 +245,7 @@ void CustomVideoSettingsDialog::updateActivation()
         getWidget<CheckBoxWidget>("bloom")->setDeactivated();
     }
 
-    if (!irr_driver->supportGeometryShader())
+    if (!CVS->supportsShadows() && !CVS->supportsGlobalIllumination())
     {
         getWidget<SpinnerWidget>("shadows")->setDeactivated();
         getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();

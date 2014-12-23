@@ -1,3 +1,4 @@
+#include "central_settings.hpp"
 #include "graphics/IBL.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
@@ -263,7 +264,7 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, result);
-        if (irr_driver->usesTextureCompression())
+        if (CVS->isTextureCompressionEnabled())
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, size, size, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
         else
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, size, size, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);

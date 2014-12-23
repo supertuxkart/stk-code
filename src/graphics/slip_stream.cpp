@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/slip_stream.hpp"
-
+#include "graphics/central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
@@ -235,7 +235,7 @@ void SlipStream::createMesh(Material* material)
     }   // for j<num_circles-1
 
     material->setMaterialProperties(&buffer->getMaterial(), buffer);
-    if (!irr_driver->isGLSL())
+    if (!CVS->isGLSL())
     {
         buffer->Material.setFlag(video::EMF_BACK_FACE_CULLING, false);
         buffer->Material.setFlag(video::EMF_COLOR_MATERIAL, true);

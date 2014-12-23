@@ -1,3 +1,4 @@
+#include "central_settings.hpp"
 #include "stkmeshscenenode.hpp"
 #include "stkmesh.hpp"
 #include "graphics/irr_driver.hpp"
@@ -197,7 +198,7 @@ void STKMeshSceneNode::updateGL()
         else if (!immediate_draw)
             InitTexturesTransparent(mesh);
 
-        if (!immediate_draw && irr_driver->hasARB_base_instance())
+        if (!immediate_draw && CVS->isARBBaseInstanceUsable())
         {
             std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
             mesh.vaoBaseVertex = p.first;
@@ -269,7 +270,7 @@ void STKMeshSceneNode::render()
             size_t count = mesh.IndexCount;
 
             compressTexture(mesh.textures[0], true);
-            if (irr_driver->useAZDO())
+            if (CVS->isAZDOEnabled())
             {
                 if (!mesh.TextureHandles[0])
                     mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
@@ -307,7 +308,7 @@ void STKMeshSceneNode::render()
             GLenum itype = mesh.IndexType;
             size_t count = mesh.IndexCount;
 
-            if (irr_driver->useAZDO())
+            if (CVS->isAZDOEnabled())
             {
                 GLuint64 DiffuseHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
                 if (!glIsTextureHandleResidentARB(DiffuseHandle))
@@ -356,7 +357,7 @@ void STKMeshSceneNode::render()
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
             if (!mb)
                 continue;
-            if (irr_driver->hasARB_base_instance())
+            if (CVS->isARBBaseInstanceUsable())
                 glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
             else
                 glBindVertexArray(GLmeshes[i].vao);
@@ -403,7 +404,7 @@ void STKMeshSceneNode::render()
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
-                    if (irr_driver->useAZDO())
+                    if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
@@ -433,7 +434,7 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
-                    if (irr_driver->useAZDO())
+                    if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentShader::getInstance()->SamplersId[0]);

@@ -2,6 +2,7 @@
 #include "graphics/stkscenemanager.hpp"
 #include "graphics/stkmesh.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/central_settings.hpp"
 #include "stkanimatedmesh.hpp"
 #include "stkmeshscenenode.hpp"
 #include "utils/ptr_vector.hpp"
@@ -143,7 +144,7 @@ void FillInstances(const std::unordered_map<scene::IMeshBuffer *, std::vector<st
     for (; It != E; ++It)
     {
         FillInstances_impl<T>(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, Polycount);
-        if (!irr_driver->useAZDO())
+        if (!CVS->isAZDOEnabled())
             InstancedList.push_back(It->second.front().first);
     }
 }
@@ -292,7 +293,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     {
         for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
-            if (irr_driver->hasARB_draw_indirect())
+            if (CVS->supportsIndirectInstancingRendering())
             {
                 for_in(mesh, node->MeshSolidMaterial[Mat])
                 {
@@ -369,7 +370,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             continue;
         for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
-            if (irr_driver->hasARB_draw_indirect())
+            if (CVS->supportsIndirectInstancingRendering())
             {
                 for_in(mesh, node->MeshSolidMaterial[Mat])
                 {
@@ -426,7 +427,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     {
         for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
-            if (irr_driver->hasARB_draw_indirect())
+            if (CVS->supportsIndirectInstancingRendering())
             {
                 if (Mat == Material::SHADERTYPE_SPLATTING)
                     for_in(mesh, node->MeshSolidMaterial[Mat])
@@ -524,10 +525,10 @@ template<Material::ShaderType Mat, typename T> static void
 GenDrawCalls(unsigned cascade, std::vector<GLMesh *> &InstancedList,
     T *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &PolyCount)
 {
-    if (irr_driver->hasARB_draw_indirect())
+    if (CVS->supportsIndirectInstancingRendering())
         ShadowPassCmd::getInstance()->Offset[cascade][Mat] = CommandBufferOffset; // Store command buffer offset
     FillInstances<T>(MeshForShadowPass[Mat][cascade], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, PolyCount);
-    if (irr_driver->useAZDO())
+    if (CVS->isAZDOEnabled())
         ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
 }
 
@@ -613,7 +614,7 @@ PROFILER_POP_CPU_MARKER();
         DeferredUpdate[i]->updateGL();
     PROFILER_POP_CPU_MARKER();
 
-    if (!irr_driver->hasARB_draw_indirect())
+    if (!CVS->supportsIndirectInstancingRendering())
         return;
 
     InstanceDataDualTex *InstanceBufferDualTex;
@@ -626,7 +627,7 @@ PROFILER_POP_CPU_MARKER();
     DrawElementsIndirectCommand *RSMCmdBuffer;
     DrawElementsIndirectCommand *GlowCmdBuffer;
 
-    if (irr_driver->hasBufferStorageExtension())
+    if (CVS->isARBBufferStorageUsable())
     {
         InstanceBufferDualTex = (InstanceDataDualTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeDualTex);
         InstanceBufferThreeTex = (InstanceDataThreeTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeThreeTex);
@@ -659,7 +660,7 @@ PROFILER_POP_CPU_MARKER();
 #pragma omp section
         {
             size_t offset = 0, current_cmd = 0;
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->isARBBufferStorageUsable())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeDualTex));
                 InstanceBufferDualTex = (InstanceDataDualTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
@@ -689,7 +690,7 @@ PROFILER_POP_CPU_MARKER();
             FillInstances(MeshForSolidPass[Material::SHADERTYPE_VEGETATION], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_VEGETATION] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_VEGETATION];
 
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->isARBBufferStorageUsable())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeThreeTex));
@@ -707,7 +708,7 @@ PROFILER_POP_CPU_MARKER();
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_NORMAL_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP];
 
 
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->isARBBufferStorageUsable())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -717,7 +718,7 @@ PROFILER_POP_CPU_MARKER();
         {
             size_t offset = 0, current_cmd = 0;
 
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->isARBBufferStorageUsable())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeGlow));
                 GlowInstanceBuffer = (GlowInstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
@@ -726,7 +727,7 @@ PROFILER_POP_CPU_MARKER();
             }
 
             // Glow
-            if (irr_driver->hasARB_draw_indirect())
+            if (CVS->supportsIndirectInstancingRendering())
                 GlowPassCmd::getInstance()->Offset = offset; // Store command buffer offset
 
             auto It = MeshForGlowPass.begin(), E = MeshForGlowPass.end();
@@ -734,14 +735,14 @@ PROFILER_POP_CPU_MARKER();
             {
                 size_t Polycnt = 0;
                 FillInstances_impl<GlowInstanceData>(It->second, GlowInstanceBuffer, GlowCmdBuffer, offset, current_cmd, Polycnt);
-                if (!irr_driver->useAZDO())
+                if (!CVS->isAZDOEnabled())
                     ListInstancedGlow::getInstance()->push_back(It->second.front().first);
             }
 
-            if (irr_driver->useAZDO())
+            if (CVS->isAZDOEnabled())
                 GlowPassCmd::getInstance()->Size = current_cmd - GlowPassCmd::getInstance()->Offset;
 
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->isARBBufferStorageUsable())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -752,7 +753,7 @@ PROFILER_POP_CPU_MARKER();
             irr_driver->setPhase(SHADOW_PASS);
 
             size_t offset = 0, current_cmd = 0;
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->isARBBufferStorageUsable())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeShadow));
                 ShadowInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
@@ -777,7 +778,7 @@ PROFILER_POP_CPU_MARKER();
                 // Mat Grass
                 GenDrawCalls<Material::SHADERTYPE_VEGETATION>(i, ListInstancedMatGrass::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
             }
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->isARBBufferStorageUsable())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -787,7 +788,7 @@ PROFILER_POP_CPU_MARKER();
         if (!m_rsm_map_available)
         {
             size_t offset = 0, current_cmd = 0;
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->isARBBufferStorageUsable())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeRSM));
                 RSMInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
@@ -816,7 +817,7 @@ PROFILER_POP_CPU_MARKER();
             FillInstances(MeshForRSM[Material::SHADERTYPE_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_NORMAL_MAP] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP];
 
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->isARBBufferStorageUsable())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -827,6 +828,6 @@ PROFILER_POP_CPU_MARKER();
     poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += SolidPoly;
     poly_count[SHADOW_PASS] += ShadowPoly;
 
-    if (irr_driver->hasBufferStorageExtension())
+    if (CVS->isARBBufferStorageUsable())
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 }

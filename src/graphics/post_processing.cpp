@@ -19,6 +19,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
+#include "central_settings.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
@@ -169,7 +170,7 @@ void PostProcessing::begin()
 /** Set the boost amount according to the speed of the camera */
 void PostProcessing::giveBoost(unsigned int camera_index)
 {
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
     {
         m_boost_time[camera_index] = 0.75f;
 
@@ -185,7 +186,7 @@ void PostProcessing::giveBoost(unsigned int camera_index)
  */
 void PostProcessing::update(float dt)
 {
-    if (!irr_driver->isGLSL())
+    if (!CVS->isGLSL())
         return;
 
     MotionBlurProvider* const cb =
@@ -307,7 +308,7 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo, size_t layer,
     GLuint LayerTex;
     glGenTextures(1, &LayerTex);
     glTextureView(LayerTex, GL_TEXTURE_2D, in_fbo.getRTT()[0], GL_R32F, 0, 1, layer, 1);
-    if (!irr_driver->hasARBComputeShaders())
+    if (!CVS->supportsComputeShadersFiltering())
     {
         // Used as temp
         irr_driver->getFBO(FBO_SCALAR_1024).Bind();
@@ -367,7 +368,7 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
     assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
 
-    if (!irr_driver->hasARBComputeShaders())
+    if (!CVS->supportsComputeShadersFiltering())
     {
         auxiliary.Bind();
 
@@ -447,11 +448,11 @@ void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo, FrameBuffer &auxi
 void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary)
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
-    if (irr_driver->hasARBComputeShaders())
+    if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
     float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
     {
-        if (!irr_driver->hasARBComputeShaders())
+        if (!CVS->supportsComputeShadersFiltering())
         {
             auxiliary.Bind();
             FullScreenShader::Gaussian17TapHShader::getInstance()->SetTextureUnits(in_fbo.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
@@ -467,10 +468,10 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, (int)in_fbo.getHeight() / 8 + 1, 1);
         }
     }
-    if (irr_driver->hasARBComputeShaders())
+    if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     {
-        if (!irr_driver->hasARBComputeShaders())
+        if (!CVS->supportsComputeShadersFiltering())
         {
             in_fbo.Bind();
 
@@ -487,7 +488,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, (int)in_fbo.getHeight() / 8 + 1, 1);
         }
     }
-    if (irr_driver->hasARBComputeShaders())
+    if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
@@ -843,7 +844,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
     }
 
     // Workaround a bug with srgb fbo on sandy bridge windows
-    if (irr_driver->needUBOWorkaround())
+    if (!CVS->isARBUniformBufferObjectUsable())
         return in_fbo;
 
     glEnable(GL_FRAMEBUFFER_SRGB);
