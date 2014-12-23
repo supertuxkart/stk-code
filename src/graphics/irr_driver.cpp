@@ -25,7 +25,6 @@
 #include "graphics/2dutils.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/hardware_skinning.hpp"
-#include "graphics/lens_flare.hpp"
 #include "graphics/light.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
