@@ -67,7 +67,7 @@ void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
 {
     m_filename = "Random GP - Not loaded from a file!";
     m_id       = "random";
-    m_name     = "Random Grand Prix";
+    m_name     = _("Random Grand Prix");
     m_editable = false;
     m_group    = GP_NONE;
     m_reverse_type = use_reverse;
