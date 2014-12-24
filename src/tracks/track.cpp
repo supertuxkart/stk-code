@@ -352,8 +352,7 @@ void Track::cleanup()
     }
     if (m_new_rtt_mini_map)
     {
-        delete m_new_rtt_mini_map;
-        m_new_rtt_mini_map = NULL;
+        m_new_rtt_mini_map = NULL; // already deleted by QuadGraph::~QuadGraph
     }
 
     for(unsigned int i=0; i<m_sky_textures.size(); i++)

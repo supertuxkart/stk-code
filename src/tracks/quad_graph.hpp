@@ -37,6 +37,7 @@ namespace irr
 using namespace irr;
 
 class CheckLine;
+class RTT;
 class FrameBuffer;
 
 /**
@@ -54,6 +55,8 @@ class QuadGraph : public NoCopy
 
 private:
     static QuadGraph        *m_quad_graph;
+
+    RTT* m_new_rtt;
 
     /** The actual graph data structure. */
     std::vector<GraphNode*>  m_all_nodes;

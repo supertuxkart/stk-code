@@ -55,6 +55,7 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
+    m_new_rtt              = NULL;
     QuadSet::create();
     QuadSet::get()->init(quad_file_name);
     m_quad_filename        = quad_file_name;
@@ -72,6 +73,8 @@ QuadGraph::~QuadGraph()
     }
     if(UserConfigParams::m_track_debug)
         cleanupDebugMesh();
+    if (m_new_rtt != NULL)
+        delete m_new_rtt;
 }   // ~QuadGraph
 
 // -----------------------------------------------------------------------------
@@ -991,7 +994,7 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     IrrDriver::RTTProvider* oldRttProvider = NULL;
     if (irr_driver->isGLSL())
     {
-        newRttProvider = new RTT(dimension.Width, dimension.Height);
+        m_new_rtt = newRttProvider = new RTT(dimension.Width, dimension.Height);
     }
     else
     {
@@ -1079,9 +1082,6 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     if (irr_driver->isGLSL())
     {
         frame_buffer = newRttProvider->render(camera, GUIEngine::getLatestDt());
-
-        // TODO: leak
-        //delete newRttProvider;
     }
     else
     {
