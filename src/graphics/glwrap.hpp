@@ -61,7 +61,7 @@ public:
     static void Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST);
     void BlitToDefault(size_t, size_t, size_t, size_t);
 
-    LEAK_CHECK(FrameBuffer);
+    LEAK_CHECK();
 };
 
 class VertexUtils
