@@ -8,7 +8,7 @@
 
         <spacer width="1" height="5%"/>
 
-        <box width="95%" height="40%" padding="10" layout="horizontal-row">
+        <box width="100%" height="40%" padding="10" layout="horizontal-row">
             <spacer width="10" height="100%"/>
             <!-- Left pane -->
             <div width="45%" height="100%" align="center" layout="vertical-row">
@@ -24,33 +24,27 @@
 
         </box>
         <spacer width="1" height="5%"/>
-        <box width="95%" height="25%" padding="10" layout="horizontal-row">
+        <box width="100%" height="25%" padding="10" layout="horizontal-row">
             <spacer width="1" height="5%"/>
-            <div width="50%" height="100%" layout="vertical-row">
-
+            <div width="100%" height="100%" layout="vertical-row">
                 <div width="100%" height="20%" layout="horizontal-row" >
-                    <label id="ai-text" height="100%" width="50%" I18N="In the grand prix info screen" text="AI karts"/>
-                    <spinner id="ai-spinner" width="50%" min_value="1" max_value="20" align="center"
-                             wrap_around="true" />
+                    <label   id="ai-text"         width="50%" height="100%" I18N="In the grand prix info screen" text="AI karts"/>
+                    <spinner id="ai-spinner"      width="30%" min_value="1" max_value="20" align="center" wrap_around="true" />
                 </div>
                 <spacer height="5%" />
                 <div width="100%" height="20%" layout="horizontal-row" >
-                    <label id="reverse-text"      width="50%" height="100%" I18N="In the grand prix info screen" text="Reverse"/>
-                    <spinner id="reverse-spinner" width="50%" align="center" wrap_around="true" />
+                    <label   id="reverse-text"    width="50%" height="100%" I18N="In the grand prix info screen" text="Reverse"/>
+                    <spinner id="reverse-spinner" width="30%" align="center" wrap_around="true" />
                 </div>
                 <spacer height="5%" />
                 <div width="100%" height="20%" layout="horizontal-row">
-                    <label id="track-text" width="50%" height="100%" text="Tracks"
-                           I18N="In the grand prix info screen"/>
-                    <spinner id="track-spinner" width="50%" min_value="1" max_value="20" align="center"
-                             wrap_around="true" />
-                    <spacer height="1%" />
+                    <label   id="track-text"      width="50%" height="100%" I18N="In the grand prix info screen" text="Tracks"/>
+                    <spinner id="track-spinner"   width="30%" min_value="1" max_value="20" align="center" wrap_around="true" />
                 </div>
                 <spacer height="5%" />
                 <div width="100%" height="20%" layout="horizontal-row" >
-                    <label   id="group-text"    width="50%" height="100%" I18N="In the grand prix info screen" text="Track group"/>
-                    <spinner id="group-spinner" width="50%" align="center" wrap_around="true" />
-                    <spacer proportion="1" height="2" />
+                    <label   id="group-text"      width="50%" height="100%" I18N="In the grand prix info screen" text="Track group"/>
+                    <spinner id="group-spinner"   width="30%" align="center" wrap_around="true" />
                 </div>
             </div>
         </box>
