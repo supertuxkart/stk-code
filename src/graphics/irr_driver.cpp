@@ -2109,7 +2109,7 @@ void IrrDriver::doScreenShot()
         {
             base->addMessage(
                       core::stringw(("Screenshot saved to\n" + path).c_str()),
-                      NULL, 2.0f, video::SColor(255,255,255,255), true, false);
+                      NULL, -2.0f, video::SColor(255,255,255,255), true, false);
         }   // if base
     }
     else
@@ -2120,7 +2120,7 @@ void IrrDriver::doScreenShot()
             base->addMessage(
                 core::stringw(("FAILED saving screenshot to\n" + path +
                               "\n:(").c_str()),
-                NULL, 2.0f, video::SColor(255,255,255,255),
+                NULL, -2.0f, video::SColor(255,255,255,255),
                 true, false);
         }   // if base
     }   // if failed writing screenshot file
