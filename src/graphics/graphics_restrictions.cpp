@@ -85,6 +85,19 @@ public:
     {
         m_version.clear();
 
+        // Mesa needs to be tested first, otherwise (if testing for card name
+        // further down) it would be detected as a non-mesa driver.
+        if (driver_version.find("Mesa") != std::string::npos)
+        {
+            std::vector<std::string> l = StringUtils::split(driver_version, ' ');
+            if (l.size() > 0)
+            {
+                convertVersionString(l.back());
+                return;
+            }
+
+        }
+
         // Intel card: driver version = "3.1.0 - Build 9.17.10.3517"
         // ---------------------------------------------------------
         if (StringUtils::startsWith(card_name, "Intel"))

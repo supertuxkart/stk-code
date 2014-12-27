@@ -21,11 +21,11 @@
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/hardware_skinning.hpp"
-#include "graphics/lens_flare.hpp"
 #include "graphics/light.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
@@ -158,7 +158,7 @@ IrrDriver::~IrrDriver()
  */
 void IrrDriver::reset()
 {
-    if (m_glsl) m_post_processing->reset();
+    if (CVS->isGLSL()) m_post_processing->reset();
 }   // reset
 
 void IrrDriver::setPhase(STKRenderingPass p)
@@ -474,122 +474,8 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
-
-    m_gl_major_version = 2;
-    m_gl_minor_version = 1;
-    // Call to glGetIntegerv should not be made if --no-graphics is used
-    if(!ProfileWorld::isNoGraphics())
-    {
-
-    }
-    if(!ProfileWorld::isNoGraphics())
-    {
-        glGetIntegerv(GL_MAJOR_VERSION, &m_gl_major_version);
-        glGetIntegerv(GL_MINOR_VERSION, &m_gl_minor_version);
-        Log::info("IrrDriver", "OpenGL version: %d.%d", m_gl_major_version, m_gl_minor_version);
-        Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
-        Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
-        Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
-
-        m_need_ubo_workaround = false;
-        m_need_rh_workaround = false;
-        m_need_srgb_workaround = false;
-        m_support_sdsm = true;
-        m_support_texture_compression = true;
-#ifdef WIN32
-        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL)
-        {
-            // Intel on windows doesnt support srgb compressed textures properly
-            m_support_texture_compression = false;
-            // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
-            if (m_gl_major_version == 3 && m_gl_minor_version == 1)
-                m_need_ubo_workaround = true;
-        }
-#endif
-        // Fix for Nvidia and instanced RH
-        if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
-        {
-            m_need_rh_workaround = true;
-            m_support_sdsm = false;
-        }
-
-        // Fix for AMD and bindless sRGB textures
-        if (strstr((const char *)glGetString(GL_VENDOR), "ATI") != NULL)
-            m_need_srgb_workaround = true;
-    }
-#ifdef WIN32
-    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
-#else
-    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
-#endif
-    if (!ProfileWorld::isNoGraphics())
-        initGL();
     m_sync = 0;
-
-    // Parse extensions
-    hasVSLayer = false;
-    hasBaseInstance = false;
-    hasBuffserStorage = false;
-    hasDrawIndirect = false;
-    hasComputeShaders = false;
-    hasTextureStorage = false;
-    hasTextureView = false;
-    hasBindlessTexture = false;
-    // Default false value for hasVSLayer if --no-graphics argument is used
-#if !defined(__APPLE__)
-    if (!ProfileWorld::isNoGraphics())
-    {
-        if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
-            hasVSLayer = true;
-            Log::info("GLDriver", "AMD Vertex Shader Layer enabled");
-        }
-        if (hasGLExtension("GL_ARB_buffer_storage")) {
-            hasBuffserStorage = true;
-            Log::info("GLDriver", "ARB Buffer Storage enabled");
-        }
-        if (hasGLExtension("GL_ARB_base_instance")) {
-            hasBaseInstance = true;
-            Log::info("GLDriver", "ARB Base Instance enabled");
-        }
-        if (hasGLExtension("GL_ARB_draw_indirect")) {
-            hasDrawIndirect = true;
-            Log::info("GLDriver", "ARB Draw Indirect enabled");
-        }
-        if (hasGLExtension("GL_ARB_compute_shader")) {
-            hasComputeShaders = true;
-            Log::info("GLDriver", "ARB Compute Shader enabled");
-        }
-        if (hasGLExtension("GL_ARB_texture_storage")) {
-            hasTextureStorage = true;
-            Log::info("GLDriver", "ARB Texture Storage enabled");
-        }
-        if (hasGLExtension("GL_ARB_texture_view")) {
-            hasTextureView = true;
-            Log::info("GLDriver", "ARB Texture View enabled");
-        }
-        if (hasGLExtension("GL_ARB_bindless_texture")) {
-            hasBindlessTexture = true;
-            Log::info("GLDriver", "ARB Bindless Texture enabled");
-        }
-        m_support_sdsm = m_support_sdsm && hasComputeShaders && hasBuffserStorage;
-
-        std::string driver((char*)(glGetString(GL_VERSION)));
-        std::string card((char*)(glGetString(GL_RENDERER)));
-        std::vector<std::string> restrictions =
-            GraphicsRestrictions::getRestrictions(driver, card);
-
-        for (const std::string &restriction : restrictions)
-        {
-            if (!restriction.compare("BufferStorage"))
-            {
-                hasBuffserStorage = false;
-                Log::info("Graphics restrictions", "Buffer Storage disabled");
-            }
-        }
-    }
-#else
-    m_support_sdsm = false;
-#endif
+    CVS->init();
 
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
@@ -603,20 +489,20 @@ void IrrDriver::initDevice()
     file_manager->reInit();
 
 
-    if (m_glsl)
+    if (CVS->isGLSL())
     {
         Log::info("irr_driver", "GLSL supported.");
     }
 
-    if (!supportGeometryShader())
+/*    if (!supportGeometryShader())
     {
         // these options require geometry shaders
         UserConfigParams::m_shadows = 0;
         UserConfigParams::m_gi = false;
-    }
+    }*/
 
     // m_glsl might be reset in rtt if an error occurs.
-    if(m_glsl)
+    if (CVS->isGLSL())
     {
         m_shaders = new Shaders();
 
@@ -1154,7 +1040,7 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                           const std::string& debug_name,
                                           scene::ISceneNode *parent)
 {
-    if (!isGLSL())
+    if (!CVS->isGLSL())
         return m_scene_manager->addMeshSceneNode(mesh, parent);
 
     if (!parent)
@@ -1186,7 +1072,7 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
                                            scene::ISceneNode* parent, bool alphaTesting)
 {
     scene::IBillboardSceneNode* node;
-    if (isGLSL())
+    if (CVS->isGLSL())
     {
         if (!parent)
             parent = m_scene_manager->getRootSceneNode();
@@ -1342,7 +1228,7 @@ void IrrDriver::removeTexture(video::ITexture *t)
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh,
     const std::string& debug_name, scene::ISceneNode* parent)
 {
-    if (!isGLSL())
+    if (!CVS->isGLSL())
     {
         return m_scene_manager->addAnimatedMeshSceneNode(mesh, parent, -1,
             core::vector3df(0, 0, 0),
@@ -1777,7 +1663,7 @@ void IrrDriver::setRTT(RTT* rtt)
 // ----------------------------------------------------------------------------
 void IrrDriver::onLoadWorld()
 {
-    if (m_glsl)
+    if (CVS->isGLSL())
     {
         const core::recti &viewport = Camera::getCamera(0)->getViewport();
         size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
@@ -2172,7 +2058,7 @@ void IrrDriver::update(float dt)
         //                           video::SColor(0,0,0,255));
         //m_scene_manager->drawAll();
 
-        if (m_glsl)
+        if (CVS->isGLSL())
             renderGLSL(dt);
         else
             renderFixed(dt);
@@ -2192,7 +2078,7 @@ void IrrDriver::update(float dt)
         return;
     }
 
-    if (m_glsl)
+    if (CVS->isGLSL())
         renderGLSL(dt);
     else
         renderFixed(dt);
@@ -2258,7 +2144,7 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 
 bool IrrDriver::supportsSplatting()
 {
-    return m_glsl;
+    return CVS->isGLSL();
 }
 
 // ----------------------------------------------------------------------------
@@ -2401,7 +2287,7 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera =  irr_driver->getSceneManager()->addCameraSceneNode();
 
     m_camera->setPosition( core::vector3df(0.0, 20.0f, 70.0f) );
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
         m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     else
         m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
@@ -2478,7 +2364,7 @@ video::ITexture* IrrDriver::RTTProvider::renderToTexture(float angle,
 
 void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimlit)
 {
-    if (!m_glsl)
+    if (!CVS->isGLSL())
         return;
 
     // Don't override sky
@@ -2546,7 +2432,7 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
 
 void IrrDriver::applyObjectPassShader()
 {
-    if (!m_glsl)
+    if (!CVS->isGLSL())
         return;
 
     applyObjectPassShader(m_scene_manager->getRootSceneNode());
@@ -2557,7 +2443,7 @@ void IrrDriver::applyObjectPassShader()
 scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy, float radius,
     float r, float g, float b, bool sun, scene::ISceneNode* parent)
 {
-    if (m_glsl)
+    if (CVS->isGLSL())
     {
         if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
         LightNode *light = NULL;

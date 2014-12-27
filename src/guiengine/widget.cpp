@@ -134,6 +134,7 @@ void Widget::elementRemoved()
     assert(m_magic_number == 0xCAFEC001);
 
     m_element = NULL;
+    m_is_visible = true;
 
     // If any player focused this widget, unset that focus
     for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)

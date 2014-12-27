@@ -9,7 +9,7 @@ layout(location = 3) in vec2 Texcoord;
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 layout(location = 10) in sampler2D Handle;
 layout(location = 11) in sampler2D SecondHandle;
 #endif
@@ -27,7 +27,7 @@ in vec3 Scale;
 
 out vec3 nor;
 out vec2 uv;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 flat out sampler2D handle;
 flat out sampler2D secondhandle;
 #endif
@@ -42,7 +42,7 @@ void main()
     gl_Position = ProjectionViewMatrix *  ModelMatrix * vec4(Position, 1.);
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     uv = Texcoord;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     handle = Handle;
     secondhandle = SecondHandle;
 #endif

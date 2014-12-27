@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/kart.hpp"
-
+#include "graphics/central_settings.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
@@ -2163,7 +2163,7 @@ void Kart::updateEngineSFX()
     if(isOnGround())
     {
         float max_speed = m_max_speed->getCurrentMaxSpeed();
-        assert(max_speed>0);
+
         // Engine noise is based half in total speed, half in fake gears:
         // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
         // ignoring the gear settings from stk_config, but providing a
@@ -2705,7 +2705,7 @@ void Kart::setOnScreenText(const wchar_t *text)
     // is started without splash screen (since "Loading" is shown even in this
     // case). A smaller font would be better
 
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
     {
         gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont() : GUIEngine::getTitleFont();
         new STKTextBillboard(text, font,

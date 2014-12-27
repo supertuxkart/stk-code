@@ -92,6 +92,7 @@
 #define SHADER_NAMES
 
 #include "graphics/callbacks.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/gpuparticles.hpp"
 #include "graphics/shaders.hpp"
@@ -145,22 +146,22 @@ GLuint LoadShader(const char * file, unsigned type)
 {
     GLuint Id = glCreateShader(type);
     char versionString[20];
-    sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
+    sprintf(versionString, "#version %d\n", CVS->getGLSLVersion());
     std::string Code = versionString;
-    if (irr_driver->useAZDO())
-        Code += "#extension GL_ARB_bindless_texture : enable\n";
-    else if (irr_driver->hasARBBindlessTexture())
+    if (CVS->isAMDVertexShaderLayerUsable())
+        Code += "#extension GL_AMD_vertex_shader_layer : enable\n";
+    if (CVS->isAZDOEnabled())
     {
-        Code += "#extension GL_ARB_bindless_texture : disable\n";
-        Code += "#undef GL_ARB_bindless_texture\n";
+        Code += "#extension GL_ARB_bindless_texture : enable\n";
+        Code += "#define Use_Bindless_Texture\n";
     }
     std::ifstream Stream(file, std::ios::in);
     Code += "//" + std::string(file) + "\n";
-    if (irr_driver->needUBOWorkaround())
+    if (!CVS->isARBUniformBufferObjectUsable())
         Code += "#define UBO_DISABLED\n";
-    if (irr_driver->hasVSLayerExtension())
+    if (CVS->isAMDVertexShaderLayerUsable())
         Code += "#define VSLayer\n";
-    if (irr_driver->needsRGBBindlessWorkaround())
+    if (CVS->needsRGBBindlessWorkaround())
         Code += "#define SRGBBindlessFix\n";
     Code += LoadHeader();
     if (Stream.is_open())
@@ -237,7 +238,7 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
 {
     GLuint Program = glCreateProgram();
     loadAndAttach(Program, GL_VERTEX_SHADER, vertex_file_path);
-    if (irr_driver->getGLSLVersion() < 330)
+    if (CVS->getGLSLVersion() < 330)
         setAttribute(PARTICLES_SIM, Program);
     glTransformFeedbackVaryings(Program, varyingscount, varyings, GL_INTERLEAVED_ATTRIBS);
     glLinkProgram(Program);
@@ -695,7 +696,7 @@ using namespace UtilShader;
 
 bool needsUBO()
 {
-    return irr_driver->needUBOWorkaround();
+    return !CVS->isARBUniformBufferObjectUsable();
 }
 
 void setTextureSampler(GLenum tp, GLuint texunit, GLuint tid, GLuint sid)
@@ -895,7 +896,7 @@ void BindTextureVolume(GLuint TU, GLuint tex)
 
 unsigned getGLSLVersion()
 {
-    return irr_driver->getGLSLVersion();
+    return CVS->getGLSLVersion();
 }
 
 namespace UtilShader
@@ -1195,9 +1196,9 @@ namespace MeshShader
     ShadowShader::ShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
@@ -1247,9 +1248,9 @@ namespace MeshShader
     InstancedShadowShader::InstancedShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
@@ -1270,9 +1271,9 @@ namespace MeshShader
     RefShadowShader::RefShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
@@ -1292,9 +1293,9 @@ namespace MeshShader
     InstancedRefShadowShader::InstancedRefShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
@@ -1316,9 +1317,9 @@ namespace MeshShader
     GrassShadowShader::GrassShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow_grass.vert").c_str(),
@@ -1338,9 +1339,9 @@ namespace MeshShader
     InstancedGrassShadowShader::InstancedGrassShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
@@ -1638,6 +1639,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SunMRP.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
 
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex");
@@ -1665,6 +1667,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SunMRP.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
 
         // Use 8 to circumvent a catalyst bug when binding sampler
@@ -1674,7 +1677,7 @@ namespace FullScreenShader
 
     RadianceHintsConstructionShader::RadianceHintsConstructionShader()
     {
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/slicedscreenquad.vert").c_str(),

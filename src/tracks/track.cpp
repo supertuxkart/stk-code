@@ -28,6 +28,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/CBatchingMesh.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
@@ -352,8 +353,7 @@ void Track::cleanup()
     }
     if (m_new_rtt_mini_map)
     {
-        delete m_new_rtt_mini_map;
-        m_new_rtt_mini_map = NULL;
+        m_new_rtt_mini_map = NULL; // already deleted by QuadGraph::~QuadGraph
     }
 
     for(unsigned int i=0; i<m_sky_textures.size(); i++)
@@ -1130,7 +1130,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             assert(GUIEngine::getHighresDigitFont() != NULL);
 
-            if (irr_driver->isGLSL())
+            if (CVS->isGLSL())
             {
                 gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
                 STKTextBillboard* tb = new STKTextBillboard(msg.c_str(), font,
@@ -1766,7 +1766,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // It's important to execute this BEFORE the code that creates the skycube,
     // otherwise the skycube node could be modified to have fog enabled, which
     // we don't want
-    if (m_use_fog && !UserConfigParams::m_camera_debug && !irr_driver->isGLSL())
+    if (m_use_fog && !UserConfigParams::m_camera_debug && !CVS->isGLSL())
     {
         /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
            and end do not matter */
@@ -1840,7 +1840,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     const video::SColorf tmpf(m_sun_diffuse_color);
     m_sun = irr_driver->addLight(m_sun_position, 0., 0., tmpf.r, tmpf.g, tmpf.b, true);
 
-    if (!irr_driver->isGLSL())
+    if (!CVS->isGLSL())
     {
         scene::ILightSceneNode *sun = (scene::ILightSceneNode *) m_sun;
 

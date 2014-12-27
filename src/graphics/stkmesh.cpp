@@ -1,3 +1,4 @@
+#include "central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stkmesh.hpp"
@@ -286,7 +287,7 @@ SetTexture(GLMesh &mesh, unsigned i, bool isSrgb, const std::string &matname)
         return;
     }
     compressTexture(mesh.textures[i], isSrgb);
-    if (irr_driver->useAZDO())
+    if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[i])
             mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[i]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
@@ -359,7 +360,7 @@ void InitTexturesTransparent(GLMesh &mesh)
         return;
     }
     compressTexture(mesh.textures[0], true);
-    if (irr_driver->useAZDO())
+    if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[0])
             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);

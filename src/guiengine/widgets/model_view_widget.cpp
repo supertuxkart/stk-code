@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "graphics/irr_driver.hpp"
@@ -155,7 +156,7 @@ void ModelViewWidget::update(float delta)
         if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
     
-    if (!irr_driver->isGLSL())
+    if (!CVS->isGLSL())
         return;
     
     if (m_rtt_provider == NULL)

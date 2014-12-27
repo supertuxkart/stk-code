@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tracks/track_object_presentation.hpp"
-
+#include "graphics/central_settings.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_buffer.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -777,7 +777,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(const XMLNode& xml_no
     m_distance = 20.f * m_energy;
     xml_node.get("distance", &m_distance);
 
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
     {
         m_node = irr_driver->addLight(m_init_xyz, m_energy, m_distance, colorf.r, colorf.g, colorf.b, false, parent);
     }

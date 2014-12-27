@@ -28,6 +28,7 @@
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
 #include "graphics/callbacks.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
@@ -586,7 +587,7 @@ void Material::initParticlesEffect(const XMLNode *node)
     ParticleKind* particles = NULL;
     try
     {
-        particles = pkm->getParticles(base.c_str());
+        particles = pkm->getParticles(base);
 
         if (particles == NULL)
         {
@@ -689,7 +690,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                   m_texname.c_str());
     }
 
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
     {
         ITexture *tex;
         ITexture *glossytex;
@@ -952,7 +953,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
                             bool use_fog) const
 {
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
     {
         // to disable fog in the new pipeline, we slightly abuse the steps :
         // moving an object into the transparent pass will make it rendered
@@ -982,7 +983,7 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
 /** Callback from LOD nodes to create some effects */
 void Material::onMadeVisible(scene::IMeshBuffer* who)
 {
-    if (!irr_driver->isGLSL()) return;
+    if (!CVS->isGLSL()) return;
 }
 
 //-----------------------------------------------------------------------------
@@ -990,14 +991,14 @@ void Material::onMadeVisible(scene::IMeshBuffer* who)
 /** Callback from LOD nodes to create some effects */
 void Material::onHidden(scene::IMeshBuffer* who)
 {
-    if (!irr_driver->isGLSL()) return;
+    if (!CVS->isGLSL()) return;
 }
 
 //-----------------------------------------------------------------------------
 
 void Material::isInitiallyHidden(scene::IMeshBuffer* who)
 {
-    if (!irr_driver->isGLSL()) return;
+    if (!CVS->isGLSL()) return;
 }
 
 //-----------------------------------------------------------------------------

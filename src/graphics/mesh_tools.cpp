@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/mesh_tools.hpp"
+#include "graphics/central_settings.hpp"
 #include <irrlicht.h>
 #include <IMesh.h>
 #include <IMeshBuffer.h>
@@ -325,7 +326,7 @@ void recalculateTangents(scene::IMesh* mesh, bool recalculateNormals, bool smoot
 
 bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
 {
-    if (!irr_driver->isGLSL())
+    if (!CVS->isGLSL())
         return false;
     return (mb->getMaterial().MaterialType == irr_driver->getShader(ES_NORMAL_MAP) &&
         mb->getVertexType() != video::EVT_TANGENTS);

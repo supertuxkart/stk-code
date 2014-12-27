@@ -24,6 +24,7 @@
 #include "config/hardware_stats.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "online/http_request.hpp"
@@ -303,7 +304,7 @@ void reportHardwareStats()
 
     json.add("os_version", getOSVersion());
 
-    unsigned int ogl_version = irr_driver->getGLSLVersion();
+    unsigned int ogl_version = CVS->getGLSLVersion();
     unsigned int major = ogl_version/100;
     unsigned int minor = ogl_version - 100*major;
     std::string version =

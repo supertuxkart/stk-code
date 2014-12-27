@@ -20,8 +20,8 @@
 
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
+#include "central_settings.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/lens_flare.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
@@ -353,12 +353,12 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         // To avoid wrong culling, use the largest view possible
         m_scene_manager->setActiveCamera(m_suncam);
         if (UserConfigParams::m_dynamic_lights &&
-            UserConfigParams::m_shadows && irr_driver->usesShadows() && hasShadow)
+            UserConfigParams::m_shadows && CVS->isShadowEnabled() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
             renderShadows();
             PROFILER_POP_CPU_MARKER();
-            if (irr_driver->usesGI())
+            if (CVS->isGlobalIlluminationEnabled())
             {
                 PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
                 renderRSM();
@@ -783,7 +783,7 @@ void IrrDriver::UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, si
 
 void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
-    if (irr_driver->supportsSDSM())
+    if (CVS->isSDSMEnabled())
         UpdateSplitAndLightcoordRangeFromComputeShaders(width, height);
     static_cast<scene::CSceneManager *>(m_scene_manager)->OnAnimate(os::Timer::getTime());
     camnode->render();
@@ -841,7 +841,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         // Build the 3 ortho projection (for the 3 shadow resolution levels)
         for (unsigned i = 0; i < 4; i++)
         {
-            if (!irr_driver->supportsSDSM())
+            if (!CVS->isSDSMEnabled())
             {
                 camnode->setFarValue(FarValues[i]);
                 camnode->setNearValue(NearValues[i]);
@@ -896,7 +896,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
             core::matrix4 tmp_matrix;
 
-            if (irr_driver->supportsSDSM()){
+            if (CVS->isSDSMEnabled()){
                 float left = float(CBB[currentCBB][i].xmin / 4 - 2);
                 float right = float(CBB[currentCBB][i].xmax / 4 + 2);
                 float up = float(CBB[currentCBB][i].ymin / 4 - 2);
@@ -1032,7 +1032,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glDepthMask(GL_FALSE);
     glDisable(GL_BLEND);
 
-    if (irr_driver->hasARB_base_instance())
+    if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_STANDARD));
     for (u32 i = 0; i < glowcount; i++)
     {
@@ -1041,17 +1041,17 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
 
         STKMeshSceneNode *node = static_cast<STKMeshSceneNode *>(cur);
         node->setGlowColors(SColor(0, (unsigned) (dat.b * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.r * 255.f)));
-        if (!irr_driver->hasARB_draw_indirect())
+        if (!CVS->supportsIndirectInstancingRendering())
             node->render();
     }
 
-    if (irr_driver->hasARB_draw_indirect())
+    if (CVS->supportsIndirectInstancingRendering())
     {
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
         glUseProgram(MeshShader::InstancedColorizeShader::getInstance()->Program);
 
         glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeGlow));
-        if (irr_driver->useAZDO())
+        if (CVS->isAZDOEnabled())
         {
             if (GlowPassCmd::getInstance()->Size)
             {

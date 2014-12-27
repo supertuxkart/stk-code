@@ -9,7 +9,7 @@ layout(location = 3) in vec2 Texcoord;
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 layout(location = 10) in uvec2 Handle;
 #endif
 
@@ -25,13 +25,13 @@ in vec3 Scale;
 
 #ifdef VSLayer
 out vec2 uv;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 flat out uvec2 handle;
 #endif
 #else
 out vec2 tc;
 out int layerId;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
 flat out uvec2 hdle;
 #endif
 #endif
@@ -46,14 +46,14 @@ void main(void)
     gl_Layer = layer;
     gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
     uv = Texcoord;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     handle = Handle;
 #endif
 #else
     layerId = layer;
     gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
     tc = Texcoord;
-#ifdef GL_ARB_bindless_texture
+#ifdef Use_Bindless_Texture
     hdle = Handle;
 #endif
 #endif

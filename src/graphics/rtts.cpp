@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/rtts.hpp"
-
+#include "central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
@@ -29,7 +29,7 @@ static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint i
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(target, result);
-    if (irr_driver->hasARBTextureStorage())
+    if (CVS->isARBTextureStorageUsable())
         glTexStorage3D(target, mipmaplevel, internalFormat, w, h, d);
     else
         glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
@@ -41,7 +41,7 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(GL_TEXTURE_2D, result);
-    if (irr_driver->hasARBTextureStorage())
+    if (CVS->isARBTextureStorageUsable())
         glTexStorage2D(GL_TEXTURE_2D, mipmaplevel, internalFormat, res.Width, res.Height);
     else
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
@@ -243,7 +243,7 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_LENS_128]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
 
-    if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
+    if (CVS->isShadowEnabled())
     {
         shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R32F, GL_RED, GL_FLOAT, 10);
         shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1);
@@ -253,7 +253,7 @@ RTT::RTT(size_t width, size_t height)
         m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
     }
 
-    if (UserConfigParams::m_gi)
+    if (CVS->isGlobalIlluminationEnabled())
     {
         //Todo : use "normal" shadowtex
         RSM_Color = generateRTT(shadowsize0, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE);
@@ -291,13 +291,13 @@ RTT::~RTT()
 {
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
-    if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
+    if (CVS->isShadowEnabled())
     {
         delete m_shadow_FBO;
         glDeleteTextures(1, &shadowColorTex);
         glDeleteTextures(1, &shadowDepthTex);
     }
-    if (UserConfigParams::m_gi)
+    if (CVS->isGlobalIlluminationEnabled())
     {
         delete m_RH_FBO;
         delete m_RSM;
