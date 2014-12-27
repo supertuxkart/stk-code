@@ -1131,8 +1131,8 @@ void askForInternetPermission()
             "anonymous hardware statistics to help with the development of STK. "
             "Would you like this feature to be enabled? (To change this setting "
             "at a later time, go to options, select tab "
-            "'User Interface', and edit \"Allow STK to connect to the "
-            "Internet\" and \"Allow STK to send anonymous HW statistics\")."),
+            "'User Interface', and edit \"Connect to the "
+            "Internet\" and \"Send anonymous HW statistics\")."),
             MessageDialog::MESSAGE_DIALOG_YESNO,
             new ConfirmServer(), true);
     }
