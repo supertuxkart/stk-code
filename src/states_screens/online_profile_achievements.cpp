@@ -107,7 +107,7 @@ void BaseOnlineProfileAchievements::init()
             const Achievement *a = it->second;
             if(a->getInfo()->isSecret() && !a->isAchieved())
                 continue;
-            ListWidget::ListCell title(a->getInfo()->getTitle(), -1, 2);
+            ListWidget::ListCell title(a->getInfo()->getName(), -1, 2);
             ListWidget::ListCell progress(a->getProgressAsString(), -1, 1);
             row.push_back(title);
             row.push_back(progress);
@@ -177,7 +177,7 @@ void BaseOnlineProfileAchievements::onUpdate(float delta)
         AchievementInfo *info =
                           AchievementsManager::get()->getAchievementInfo(a[i]);
         m_achievements_list_widget->addItem(StringUtils::toString(info->getID()),
-                                            info->getTitle()                   );
+                                            info->getName()                   );
     }
     m_waiting_for_achievements = false;
 

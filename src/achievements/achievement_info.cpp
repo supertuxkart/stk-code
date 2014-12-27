@@ -33,19 +33,19 @@ AchievementInfo::AchievementInfo(const XMLNode * input)
 {
     m_reset_type       = NEVER;
     m_id               = 0;
-    m_title            = "";
+    m_name            = "";
     m_description      = "";
     m_is_secret        = false;
     bool all;
     all = input->get("id",               &m_id              ) &&
-          input->get("title",            &m_title           ) &&
+          input->get("name ",            &m_name            ) &&
           input->get("description",      &m_description     );
     if (!all)
     {
         Log::error("AchievementInfo",
                    "Not all necessary values for achievement defined.");
         Log::error("AchievementInfo",
-                   "ID %d title '%s' description '%s'", m_id, m_title.c_str(),
+                   "ID %d title '%s' description '%s'", m_id, m_name.c_str(),
                                                         m_description.c_str());
     }
 

@@ -80,7 +80,7 @@ private:
     uint32_t           m_id;
 
     /** The title of this achievement. */
-    irr::core::stringw m_title;
+    irr::core::stringw m_name;
 
     /** The description of this achievement. */
     irr::core::stringw m_description;
@@ -112,8 +112,8 @@ public:
     /** Returns the description of this achievement. */
     irr::core::stringw getDescription() const { return m_description; }
     // ------------------------------------------------------------------------
-    /** Returns the title of this achievement. */
-    irr::core::stringw getTitle() const { return m_title; }
+    /** Returns the name of this achievement. */
+    irr::core::stringw getName() const { return m_name; }
     // ------------------------------------------------------------------------
     bool needsResetAfterRace() const { return m_reset_type == AFTER_RACE; }
     // ------------------------------------------------------------------------
