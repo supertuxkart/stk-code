@@ -95,7 +95,7 @@ void GPInfoScreen::loadedFromFile()
  */
 void GPInfoScreen::setGP(const std::string &gp_ident)
 {
-    if(gp_ident!="random")
+    if(gp_ident!=GrandPrixData::getRandomGPID())
         m_gp = *grand_prix_manager->getGrandPrix(gp_ident);
     else
     {
@@ -172,7 +172,6 @@ void GPInfoScreen::init()
     {
         RibbonWidget *rb = getWidget<RibbonWidget>("buttons");
         rb->setLabel(1,_(L"Reload") );
-        getWidget<LabelWidget>("name")->setText(_("Random Grand Prix"), false);
         std::string restart = file_manager->getAsset(FileManager::GUI, "restart.png");
 
         // We have to recreate the group spinner, but a new group might have
@@ -211,6 +210,8 @@ void GPInfoScreen::init()
         // Now create the random GP:
         m_gp.createRandomGP(m_num_tracks_spinner->getValue(),
                             m_group_name, getReverse(), true);
+
+        getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
     }
     else
     {
