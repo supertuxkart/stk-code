@@ -125,7 +125,8 @@ void EnterGPNameDialog::validateName()
         label->setText(_("Name is empty."), false);
         SFXManager::get()->quickSound("anvil");
     }
-    else if (grand_prix_manager->existsName(name) || name == _("Random Grand Prix"))
+    else if (grand_prix_manager->existsName(name) ||
+        name == GrandPrixData::getRandomGPName())
     {
         // check for duplicate names
         label->setText(_("Another grand prix with this name already exists."), false);
