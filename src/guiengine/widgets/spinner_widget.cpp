@@ -400,7 +400,7 @@ void SpinnerWidget::setActivated()
     setText(L"");
     if (m_customText.empty())
     {
-        setValue(getValue()); // Update the display
+        setValue( getValue() ); // Update the display
     }
     else
     {
@@ -414,10 +414,10 @@ void SpinnerWidget::setDeactivated()
 {
     Widget::setDeactivated();
 
-    // Save it temporarary because setValue(which is uses for update in this case) overwrite it
-    core::stringw customText = customText; 
+    // Save it temporary because setValue(which is uses for update in this case) overwrites it
+    core::stringw customText = m_customText; 
     setText(L"-");
-    setValue(getValue()); // Update the display
+    setValue( getValue() ); // Update the display
     m_customText = customText;
 }
 
