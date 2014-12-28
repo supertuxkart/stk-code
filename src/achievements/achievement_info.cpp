@@ -18,9 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "achievements/achievement_info.hpp"
-
 #include "utils/log.hpp"
-#include "utils/translation.hpp"
 
 #include <sstream>
 #include <stdlib.h>

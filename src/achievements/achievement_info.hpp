@@ -21,10 +21,10 @@
 #ifndef HEADER_ACHIEVEMENT_INFO_HPP
 #define HEADER_ACHIEVEMENT_INFO_HPP
 
-#include "utils/types.hpp"
-
-#include "io/xml_node.hpp"
 #include "achievements/achievement.hpp"
+#include "io/xml_node.hpp"
+#include "utils/translation.hpp"
+#include "utils/types.hpp"
 
 #include <irrString.h>
 #include <string>
@@ -110,10 +110,10 @@ public:
     uint32_t getID() const { return m_id; }
     // ------------------------------------------------------------------------
     /** Returns the description of this achievement. */
-    irr::core::stringw getDescription() const { return m_description; }
+    irr::core::stringw getDescription() const { return _(m_description.c_str()); }
     // ------------------------------------------------------------------------
     /** Returns the name of this achievement. */
-    irr::core::stringw getName() const { return m_name; }
+    irr::core::stringw getName() const { return _(m_name.c_str()); }
     // ------------------------------------------------------------------------
     bool needsResetAfterRace() const { return m_reset_type == AFTER_RACE; }
     // ------------------------------------------------------------------------
