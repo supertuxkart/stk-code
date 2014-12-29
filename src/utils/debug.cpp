@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/light.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
@@ -38,6 +39,8 @@
 
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
+
+#include <cmath>
 
 using namespace irr;
 using namespace gui;
@@ -98,10 +101,11 @@ enum DebugMenuCommand
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
+    DEBUG_LIGHT_SETTINGS,
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
-// Add powerup selected from debug menu for all player karts
+/** Add powerup selected from debug menu for all player karts */
 void addPowerup(PowerupManager::PowerupType powerup)
 {
     World* world = World::getWorld();
@@ -144,8 +148,60 @@ void addAttachment(Attachment::AttachmentType type)
 
 }   // addAttachment
 
+// ----------------------------------------------------------------------------
+/** Computes the distance between two points represented by one vector3df each */
+float distance(core::vector3df one, core::vector3df two)
+{
+    return sqrt(pow(one.X - two.X, 2) + pow(one.Y - two.Y, 2) + pow(one.Z- two.Z, 2));
+}
+
 // -----------------------------------------------------------------------------
-// Debug menu handling
+/** returns the light node with the lowest distance to the player kart (excluding
+ * nitro emitters)
+ */
+LightNode* findNearestLight()
+{
+    World* world = World::getWorld();
+    if (!world) return NULL;
+
+    AbstractKart* player_kart = NULL;
+    for (unsigned int i = 0; i < world->getNumKarts(); i++)
+    {
+        AbstractKart *kart = world->getKart(i);
+        if (kart->getController()->isPlayerController())
+            player_kart = kart;
+    }
+
+    if (!player_kart)
+    {
+        Log::error("Debug", "No player kart found.");
+        return NULL;
+    }
+
+    core::vector3df kart_pos = player_kart->getNode()->getAbsolutePosition();
+    LightNode* nearest = 0;
+    float nearest_dist = 1000000.0; // big enough
+    for (unsigned int i = 0; i < irr_driver->getLights().size(); i++)
+    {
+        LightNode* light = irr_driver->getLights()[i];
+
+        // Avoid modifying the nitro emitter or another invisible light
+        if (std::string(light->getName()).find("nitro emitter") == 0 || !light->isVisible())
+            continue;
+
+        core::vector3df light_pos = light->getAbsolutePosition();
+        if ( distance(kart_pos, light_pos) < nearest_dist)
+        {
+            nearest      = irr_driver->getLights()[i];
+            nearest_dist = distance(kart_pos, light_pos);
+        }
+    }
+
+    return nearest;
+}
+
+// -----------------------------------------------------------------------------
+/** Debug menu handling */
 bool onEvent(const SEvent &event)
 {
     // Only activated in artist debug mode
@@ -215,15 +271,16 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 
-            mnu->addItem(L"Profiler",DEBUG_PROFILER);
+            mnu->addItem(L"Profiler", DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
                 mnu->addItem(L"Toggle capture profiler report",
                              DEBUG_PROFILER_GENERATE_REPORT);
             mnu->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
-            mnu->addItem(L"FPS",DEBUG_FPS);
+            mnu->addItem(L"FPS", DEBUG_FPS);
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
             mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
+            mnu->addItem(L"Debug Light Setting", DEBUG_LIGHT_SETTINGS);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();
@@ -507,7 +564,7 @@ bool onEvent(const SEvent &event)
                 {
 #if !defined(__APPLE__)
                     DebugSliderDialog *dsd = new DebugSliderDialog();
-                    dsd->setSliderHook( "red_slider", 0, 255,
+                    dsd->setSliderHook("red_slider", 0, 255,
                         [](){ return int(irr_driver->getAmbientLight().r * 255.f); },
                         [](int v){
                             video::SColorf ambient = irr_driver->getAmbientLight();
@@ -541,6 +598,46 @@ bool onEvent(const SEvent &event)
                         [](int v){irr_driver->setSSAOSigma(v / 10.f); }
                     );
 #endif
+                }
+                else if (cmdID == DEBUG_LIGHT_SETTINGS)
+                {
+                    DebugSliderDialog *dsd = new DebugSliderDialog();
+                    dsd->setSliderHook("red_slider", 0, 255,
+                        []()
+                        {
+                            return findNearestLight()->getColor().X;
+                        },
+                        [](int intensity)
+                        {
+                            LightNode* nearest = findNearestLight();
+                            core::vector3df color = nearest->getColor();
+                            nearest->setColor(intensity, color.Y, color.Z);
+                        }
+                    );
+                    dsd->setSliderHook("green_slider", 0, 255,
+                        []()
+                        {
+                            return findNearestLight()->getColor().Y;
+                        },
+                        [](int intensity)
+                        {
+                            LightNode* nearest = findNearestLight();
+                            core::vector3df color = nearest->getColor();
+                            nearest->setColor(color.X, intensity, color.Z);
+                        }
+                    );
+                    dsd->setSliderHook("blue_slider", 0, 255,
+                        []()
+                        {
+                            return findNearestLight()->getColor().Z;
+                        },
+                        [](int intensity)
+                        {
+                            LightNode* nearest = findNearestLight();
+                            core::vector3df color = nearest->getColor();
+                            nearest->setColor(color.X, color.Y, intensity);
+                        }
+                    );
                 }
             }
 
