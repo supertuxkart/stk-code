@@ -32,7 +32,7 @@ typedef GUIEngine::ButtonWidget Button;
 /** A Button to save the GP if it was a random GP */
 void GrandPrixCutscene::saveGPButton()
 {
-    if (race_manager->getGrandPrix().getId() != GrandPrixData::getRandomGPID())
+    if (race_manager->getGrandPrix().getId() != "random")
         getWidget<Button>("save")->setVisible(false);
 }   // saveGPButton
 

@@ -23,8 +23,6 @@
 #include "guiengine/screen.hpp"
 #include "race/grand_prix_data.hpp"
 
-#include <vector>
-
 class GrandPrixData;
 
 namespace GUIEngine
@@ -49,19 +47,16 @@ private:
 
     /** Spinner for number of tracks (in case of random GP). */
     GUIEngine::SpinnerWidget *m_num_tracks_spinner;
-
+    
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
 
     /** The currently selected group name. */
     std::string m_group_name;
-
-    /** The untranslated group names, used as internal IDs */
-    std::vector<std::string> m_group_names;
-
+    
     /** Number of available tracks */
     int m_max_num_tracks;
-
+    
     /** Get number of available tracks for random GPs */
     int getMaxNumTracks(std::string group);
 

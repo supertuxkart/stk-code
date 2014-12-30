@@ -95,7 +95,7 @@ void GPInfoScreen::loadedFromFile()
  */
 void GPInfoScreen::setGP(const std::string &gp_ident)
 {
-    if(gp_ident!=GrandPrixData::getRandomGPID())
+    if(gp_ident!="random")
         m_gp = *grand_prix_manager->getGrandPrix(gp_ident);
     else
     {
@@ -172,21 +172,19 @@ void GPInfoScreen::init()
     {
         RibbonWidget *rb = getWidget<RibbonWidget>("buttons");
         rb->setLabel(1,_(L"Reload") );
+        getWidget<LabelWidget>("name")->setText(_("Random Grand Prix"), false);
         std::string restart = file_manager->getAsset(FileManager::GUI, "restart.png");
 
         // We have to recreate the group spinner, but a new group might have
         // been added or deleted since the last time this screen was shown.
-        const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
-        m_group_names.clear();
-        m_group_names.push_back("all");
-        for (unsigned int i = 0; i < groups.size(); i++)
-            m_group_names.push_back(groups[i]);
         m_group_spinner->clearLabels();
+        m_group_spinner->addLabel("all");
         int index_standard=0;
-        for (unsigned int i = 0; i < m_group_names.size(); i++)
+        const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
+        for (unsigned int i = 0; i < groups.size(); i++)
         {
-            m_group_spinner->addLabel(_(m_group_names[i].c_str()));
-            if (m_group_names[i] == "standard")
+            m_group_spinner->addLabel(stringw(groups[i].c_str()));
+            if (groups[i] == "standard")
                 index_standard = i + 1;
         }
         // Try to keep a previously selected group value
@@ -196,13 +194,12 @@ void GPInfoScreen::init()
             m_group_name = "standard";
         }
         else
-            m_group_name = stringc(m_group_names[m_group_spinner->getValue()].c_str()).c_str();
+            m_group_name = stringc(m_group_spinner->getStringValue().c_str()).c_str();
 
         m_max_num_tracks = getMaxNumTracks(m_group_name);
-
+        
         m_num_tracks_spinner->setMax(m_max_num_tracks);
-        if(m_num_tracks_spinner->getValue() > m_max_num_tracks ||
-            m_num_tracks_spinner->getValue() < 1)
+        if(m_num_tracks_spinner->getValue() > m_max_num_tracks)
         {
             m_num_tracks_spinner->setValue(m_max_num_tracks);
         }
@@ -210,8 +207,6 @@ void GPInfoScreen::init()
         // Now create the random GP:
         m_gp.createRandomGP(m_num_tracks_spinner->getValue(),
                             m_group_name, getReverse(), true);
-
-        getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
     }
     else
     {
@@ -317,10 +312,10 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     }   // name=="buttons"
     else if (name=="group-spinner")
     {
-        m_group_name = stringc(m_group_names[m_group_spinner->getValue()].c_str()).c_str();
+        m_group_name = stringc(m_group_spinner->getStringValue()).c_str();
 
         m_max_num_tracks = getMaxNumTracks(m_group_name);
-
+        
         m_num_tracks_spinner->setMax(m_max_num_tracks);
         if (m_num_tracks_spinner->getValue() > m_max_num_tracks)
             m_num_tracks_spinner->setValue(m_max_num_tracks);
