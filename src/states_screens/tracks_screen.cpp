@@ -112,8 +112,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         else
         {
             GPInfoScreen *gpis = GPInfoScreen::getInstance();
-            gpis->setGP( selection == "Random Grand Prix" ? "random" 
-                                                          : selection);
+            gpis->setGP( selection );
             gpis->push();
         }
     }
@@ -143,11 +142,13 @@ void TracksScreen::beforeAddingWidget()
     if (group_amount > 1)
     {
         //I18N: name of the tab that will show tracks from all groups
-        tabs->addTextChild( _("All"), ALL_TRACK_GROUPS_ID );
+        tabs->addTextChild( _(ALL_TRACK_GROUPS_ID), ALL_TRACK_GROUPS_ID );
     }
 
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
+    //I18N: track group name
+    FOR_GETTEXT_ONLY( _("all") )
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("standard") )
     //I18N: track group name
@@ -214,8 +215,8 @@ void TracksScreen::init()
     // Random GP
     std::vector<std::string> screenshots;
     screenshots.push_back(file_manager->getAsset(FileManager::GUI, "main_help.png"));
-    gps_widget->addAnimatedItem(translations->fribidize("Random Grand Prix"),
-                                "Random Grand Prix",
+    gps_widget->addAnimatedItem(translations->fribidize(GrandPrixData::getRandomGPName()),
+                                GrandPrixData::getRandomGPID(),
                                 screenshots, 1.5f, 0,
                                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 
