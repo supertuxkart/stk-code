@@ -142,7 +142,7 @@ void TracksScreen::beforeAddingWidget()
     if (group_amount > 1)
     {
         //I18N: name of the tab that will show tracks from all groups
-        tabs->addTextChild( _(ALL_TRACK_GROUPS_ID), ALL_TRACK_GROUPS_ID );
+        tabs->addTextChild( _("All"), ALL_TRACK_GROUPS_ID );
     }
 
     // Make group names being picked up by gettext
