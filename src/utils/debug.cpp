@@ -602,40 +602,40 @@ bool onEvent(const SEvent &event)
                 else if (cmdID == DEBUG_LIGHT_SETTINGS)
                 {
                     DebugSliderDialog *dsd = new DebugSliderDialog();
-                    dsd->setSliderHook("red_slider", 0, 255,
+                    dsd->setSliderHook("red_slider", 0, 100,
                         []()
                         {
-                            return findNearestLight()->getColor().X;
+                            return findNearestLight()->getColor().X*100;
                         },
                         [](int intensity)
                         {
                             LightNode* nearest = findNearestLight();
                             core::vector3df color = nearest->getColor();
-                            nearest->setColor(intensity, color.Y, color.Z);
+                            nearest->setColor(intensity/100.0, color.Y, color.Z);
                         }
                     );
-                    dsd->setSliderHook("green_slider", 0, 255,
+                    dsd->setSliderHook("green_slider", 0, 100,
                         []()
                         {
-                            return findNearestLight()->getColor().Y;
+                            return findNearestLight()->getColor().Y*100;
                         },
                         [](int intensity)
                         {
                             LightNode* nearest = findNearestLight();
                             core::vector3df color = nearest->getColor();
-                            nearest->setColor(color.X, intensity, color.Z);
+                            nearest->setColor(color.X, intensity/100.0, color.Z);
                         }
                     );
-                    dsd->setSliderHook("blue_slider", 0, 255,
+                    dsd->setSliderHook("blue_slider", 0, 100,
                         []()
                         {
-                            return findNearestLight()->getColor().Z;
+                            return findNearestLight()->getColor().Z*100;
                         },
                         [](int intensity)
                         {
                             LightNode* nearest = findNearestLight();
                             core::vector3df color = nearest->getColor();
-                            nearest->setColor(color.X, color.Y, intensity);
+                            nearest->setColor(color.X, color.Y, intensity/100.0);
                         }
                     );
                 }
