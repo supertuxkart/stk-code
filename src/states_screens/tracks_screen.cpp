@@ -152,8 +152,6 @@ void TracksScreen::beforeAddingWidget()
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("standard") )
     //I18N: track group name
-    FOR_GETTEXT_ONLY( _("nextgen") )
-    //I18N: track group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
 
     // add behind the other categories
