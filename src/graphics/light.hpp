@@ -62,7 +62,11 @@ public:
     void setColor(float r, float g, float b) { m_color[0] = r; m_color[1] = g; m_color[2] = b; }
 
     float getEnergyMultiplier() const { return m_energy_multiplier; }
-    void setEnergyMultiplier(float newval) { m_energy_multiplier = newval; }
+    void  setEnergyMultiplier(float newval) { m_energy_multiplier = newval; }
+
+    // For the debug menu
+    void setEnergy(float energy) { m_energy = energy; }
+    void setRadius(float radius) { m_radius = radius; }
 
 protected:
     static core::aabbox3df box;
