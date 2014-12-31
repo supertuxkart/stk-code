@@ -213,7 +213,13 @@ void IrrDriver::UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, si
 
 }
 
-void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
+/** Generate View, Projection, Inverse View, Inverse Projection, ViewProjection and InverseProjection matrixes
+and matrixes and cameras for the four shadow cascade and RSM.
+*   \param camnode point of view used
+*   \param width of the rendering viewport
+*   \param height of the rendering viewport
+*/
+void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
     if (CVS->isSDSMEnabled())
         UpdateSplitAndLightcoordRangeFromComputeShaders(width, height);
@@ -377,22 +383,6 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     tmp[145] = float(height);
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float), tmp);
-
-    float Lighting[36];
-    Lighting[0] = m_sundirection.X;
-    Lighting[1] = m_sundirection.Y;
-    Lighting[2] = m_sundirection.Z;
-    Lighting[4] = m_suncolor.getRed();
-    Lighting[5] = m_suncolor.getGreen();
-    Lighting[6] = m_suncolor.getBlue();
-    Lighting[7] = 0.54f;
-
-    memcpy(&Lighting[8], blueSHCoeff, 9 * sizeof(float));
-    memcpy(&Lighting[17], greenSHCoeff, 9 * sizeof(float));
-    memcpy(&Lighting[26], redSHCoeff, 9 * sizeof(float));
-
-    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 36 * sizeof(float), Lighting);
 }
 
 

@@ -106,6 +106,27 @@ unsigned IrrDriver::UpdateLightsInfo(scene::ICameraSceneNode * const camnode, fl
     return lightnum;
 }
 
+/** Upload lighting info to the dedicated uniform buffer
+*/
+void IrrDriver::uploadLightingData()
+{
+    float Lighting[36];
+    Lighting[0] = m_sundirection.X;
+    Lighting[1] = m_sundirection.Y;
+    Lighting[2] = m_sundirection.Z;
+    Lighting[4] = m_suncolor.getRed();
+    Lighting[5] = m_suncolor.getGreen();
+    Lighting[6] = m_suncolor.getBlue();
+    Lighting[7] = 0.54f;
+
+    memcpy(&Lighting[8], blueSHCoeff, 9 * sizeof(float));
+    memcpy(&Lighting[17], greenSHCoeff, 9 * sizeof(float));
+    memcpy(&Lighting[26], redSHCoeff, 9 * sizeof(float));
+
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 36 * sizeof(float), Lighting);
+}
+
 void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 {
     //RH

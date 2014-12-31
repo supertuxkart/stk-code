@@ -182,8 +182,9 @@ void IrrDriver::renderGLSL(float dt)
         PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
         unsigned plc = UpdateLightsInfo(camnode, dt);
         PROFILER_POP_CPU_MARKER();
-        PROFILER_PUSH_CPU_MARKER("Compute camera matrix", 0x0, 0xFF, 0x0);
-        computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
+        PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
+        computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
+        uploadLightingData();
         PROFILER_POP_CPU_MARKER();
         renderScene(camnode, plc, glows, dt, track->hasShadows(), false);
 
