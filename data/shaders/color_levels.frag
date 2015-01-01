@@ -8,13 +8,8 @@ uniform vec3 inlevel;
 uniform vec2 outlevel;
 uniform mat4 invprojm;
 
-#if __VERSION__ >= 130
 in vec2 uv;
 out vec4 FragColor;
-#else
-varying vec2 uv;
-#define FragColor gl_FragColor
-#endif
 
 #define PI  3.14159265
 

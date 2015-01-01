@@ -271,19 +271,6 @@ void PostProcessing::renderSunlight(const core::vector3df &direction, const vide
     DrawFullScreenEffect<FullScreenShader::SunLightShader>(direction, col);
 }
 
-extern float shadowSplit[5];
-
-void PostProcessing::renderShadowedSunlight(const core::vector3df &direction, const video::SColorf &col, const std::vector<core::matrix4> &sun_ortho_matrix, GLuint depthtex)
-{
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glBlendEquation(GL_FUNC_ADD);
-
-    FullScreenShader::ShadowedSunLightShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), depthtex);
-    DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShader>(shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4], direction, col);
-}
-
 static
 std::vector<float> getGaussianWeight(float sigma, size_t count)
 {

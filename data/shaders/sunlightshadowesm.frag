@@ -1,6 +1,6 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
-uniform sampler2DArrayShadow shadowtex;
+uniform sampler2DArray shadowtex;
 
 uniform float split0;
 uniform float split1;
@@ -22,17 +22,10 @@ float getShadowFactor(vec3 pos, int index)
     vec4 shadowcoord = (ShadowViewProjMatrixes[index] * InverseViewMatrix * vec4(pos, 1.0));
     shadowcoord.xy /= shadowcoord.w;
     vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-    float d = .5 * shadowcoord.z + .5;
 
-    float result = 0.;
-
-    for (float i = -1.; i <= 1.; i += 1.)
-    {
-        for (float j = -1.; j <= 1.; j += 1.)
-            result += texture(shadowtex, vec4(shadowtexcoord + vec2(i,j) / 1024., float(index), d));
-    }
-
-    return result / 9.;
+    float z = texture(shadowtex, vec3(shadowtexcoord, float(index))).x;
+    float d = shadowcoord.z;
+    return min(pow(exp(-32. * d) * z, 8.), 1.);
 }
 
 void main() {

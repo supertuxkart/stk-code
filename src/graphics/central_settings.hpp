@@ -65,6 +65,7 @@ public:
     bool isTextureCompressionEnabled() const;
     bool isSDSMEnabled() const;
     bool isAZDOEnabled() const;
+    bool isESMEnabled() const;
 };
 
 extern CentralVideoSettings* CVS;

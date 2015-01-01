@@ -4,14 +4,9 @@ layout(bindless_sampler) uniform sampler2D tex;
 uniform sampler2D tex;
 #endif
 
-#if __VERSION__ >= 130
 in vec3 nor;
 in vec2 uv;
 out vec3 EncodedNormal;
-#else
-varying vec3 nor;
-#define EncodedNormal gl_FragColor.xy
-#endif
 
 vec2 EncodeNormal(vec3 n);
 

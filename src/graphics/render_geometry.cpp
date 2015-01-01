@@ -979,8 +979,12 @@ void IrrDriver::renderShadows()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
     m_rtts->getShadowFBO().Bind();
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.5, 0.);
+    if (!CVS->isESMEnabled())
+    {
+        glDrawBuffer(GL_NONE);
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.5, 0.);
+    }
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
 
@@ -1026,6 +1030,7 @@ void IrrDriver::renderShadows()
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
+    if (CVS->isESMEnabled())
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SHADOW_POSTPROCESS));
 
@@ -1039,8 +1044,8 @@ void IrrDriver::renderShadows()
             }
         }
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_rtts->getShadowFBO().getRTT()[0]);
+        glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
     }
-    glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
 
 
