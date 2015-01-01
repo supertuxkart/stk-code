@@ -6,15 +6,9 @@ uniform sampler2D tex;
 uniform sampler2D glosstex;
 #endif
 
-#if __VERSION__ >= 130
 in vec3 nor;
 in vec2 uv;
 out vec3 EncodedNormal;
-#else
-varying vec3 nor;
-varying vec2 uv;
-#define EncodedNormal gl_FragColor.xy
-#endif
 
 vec2 EncodeNormal(vec3 n);
 

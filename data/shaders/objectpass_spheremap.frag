@@ -6,13 +6,8 @@ layout(bindless_sampler) uniform sampler2D tex;
 uniform sampler2D tex;
 #endif
 
-#if __VERSION__ >= 130
 in vec3 nor;
 out vec4 FragColor;
-#else
-varying vec3 nor;
-#define FragColor gl_FragColor
-#endif
 
 vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);

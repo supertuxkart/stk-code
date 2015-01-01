@@ -12,15 +12,9 @@ uniform sampler2D tex_detail2;
 uniform sampler2D tex_detail3;
 #endif
 
-#if __VERSION__ >= 130
 in vec2 uv;
 in vec2 uv_bis;
 out vec4 FragColor;
-#else
-varying vec2 uv;
-varying vec2 uv_bis;
-#define FragColor gl_FragColor
-#endif
 
 vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);
 
