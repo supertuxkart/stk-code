@@ -863,10 +863,8 @@ GLuint createShadowSampler()
     glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    int aniso = UserConfigParams::m_anisotropic;
-    if (aniso == 0) aniso = 1;
-    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
+    glSamplerParameterf(id, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glSamplerParameterf(id, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     return id;
 #endif
 }
@@ -881,6 +879,38 @@ void BindTextureShadow(GLuint TU, GLuint tex)
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+}
+
+
+GLuint createTrilinearClampedArray()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    int aniso = UserConfigParams::m_anisotropic;
+    if (aniso == 0) aniso = 1;
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
+    return id;
+#endif
+}
+
+void BindTrilinearClampedArrayTexture(unsigned TU, unsigned tex)
+{
+    glActiveTexture(GL_TEXTURE0 + TU);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    int aniso = UserConfigParams::m_anisotropic;
+    if (aniso == 0) aniso = 1;
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
 }
 
 void BindTextureVolume(GLuint TU, GLuint tex)
@@ -1659,7 +1689,7 @@ namespace FullScreenShader
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
-    ShadowedSunLightShader::ShadowedSunLightShader()
+    ShadowedSunLightShaderPCF::ShadowedSunLightShaderPCF()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
@@ -1669,6 +1699,22 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SunMRP.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
+
+        // Use 8 to circumvent a catalyst bug when binding sampler
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
+        AssignUniforms("split0", "split1", "split2", "splitmax", "direction", "col");
+    }
+
+    ShadowedSunLightShaderESM::ShadowedSunLightShaderESM()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SunMRP.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadowesm.frag").c_str());
 
         // Use 8 to circumvent a catalyst bug when binding sampler
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");

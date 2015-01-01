@@ -221,6 +221,7 @@ enum SamplerType {
     Shadow_Sampler,
     Volume_Linear_Filtered,
     Trilinear_cubemap,
+    Trilinear_Clamped_Array2D,
 };
 
 void setTextureSampler(GLenum, GLuint, GLuint, GLuint);
@@ -485,6 +486,33 @@ struct BindTexture<Shadow_Sampler, tp...>
         BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
+
+GLuint createTrilinearClampedArray();
+
+template<SamplerType...tp>
+struct CreateSamplers<Trilinear_Clamped_Array2D, tp...>
+{
+    static void exec(std::vector<unsigned> &v, std::vector<GLenum> &e)
+    {
+        v.push_back(createTrilinearClampedArray());
+        e.push_back(GL_TEXTURE_2D_ARRAY);
+        CreateSamplers<tp...>::exec(v, e);
+    }
+};
+
+void BindTrilinearClampedArrayTexture(unsigned TU, unsigned tex);
+
+template<SamplerType...tp>
+struct BindTexture<Trilinear_Clamped_Array2D, tp...>
+{
+    template <int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
+    {
+        BindTrilinearClampedArrayTexture(TU[N], TexId);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
+    }
+};
+
 
 template<SamplerType...tp>
 class TextureRead

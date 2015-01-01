@@ -470,6 +470,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_sdsm
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_sdsm",
         &m_video_group, "Enable Sampled Distribued Shadow Map (buggy atm)"));
+    PARAM_PREFIX BoolUserConfigParam        m_esm
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_esm",
+        &m_video_group, "Enable Exponential Shadow Map (better but slower)"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */

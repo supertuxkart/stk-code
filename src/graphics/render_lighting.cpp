@@ -127,6 +127,8 @@ void IrrDriver::uploadLightingData()
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 36 * sizeof(float), Lighting);
 }
 
+extern float shadowSplit[5];
+
 void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 {
     //RH
@@ -184,7 +186,23 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
         if (World::getWorld() && CVS->isShadowEnabled() && hasShadow)
-            m_post_processing->renderShadowedSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor(), sun_ortho_matrix, m_rtts->getShadowFBO().getRTT()[0]);
+        {
+            glEnable(GL_BLEND);
+            glDisable(GL_DEPTH_TEST);
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
+
+            if (CVS->isESMEnabled())
+            {
+                FullScreenShader::ShadowedSunLightShaderESM::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), m_rtts->getShadowFBO().getRTT()[0]);
+                DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShaderESM>(shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4], irr_driver->getSunDirection(), irr_driver->getSunColor());
+            }
+            else
+            {
+                FullScreenShader::ShadowedSunLightShaderPCF::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), m_rtts->getShadowFBO().getDepthTexture());
+                DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShaderPCF>(shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4], irr_driver->getSunDirection(), irr_driver->getSunColor());
+            }
+        }
         else
             m_post_processing->renderSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor());
     }

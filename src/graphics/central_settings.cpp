@@ -310,3 +310,9 @@ bool CentralVideoSettings::isAZDOEnabled() const
 {
     return supportsIndirectInstancingRendering() && isARBBindlessTextureUsable() && isARBMultiDrawIndirectUsable() && UserConfigParams::m_azdo;
 }
+
+// Switch between Exponential Shadow Map (better but slower filtering) and Percentage Closer Filtering (faster but with some stability issue)
+bool CentralVideoSettings::isESMEnabled() const
+{
+    return UserConfigParams::m_esm;
+}

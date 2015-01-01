@@ -75,7 +75,6 @@ public:
 
     /** Generate diffuse and specular map */
     void         renderSunlight(const core::vector3df &direction, const video::SColorf &col);
-    void         renderShadowedSunlight(const core::vector3df &direction, const video::SColorf &col, const std::vector<core::matrix4> &sun_ortho_matrix, unsigned depthtex);
 
     void renderSSAO();
     void renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff, unsigned skycubemap);
