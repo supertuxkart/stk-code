@@ -4651,7 +4651,7 @@ IImage* COpenGLDriver::createScreenShot(video::ECOLOR_FORMAT format, video::E_RE
 		pixels = static_cast<u8*>(newImage->lock());
 	if (pixels)
 	{
-		GLenum tgt=GL_FRONT;
+		GLenum tgt=GL_BACK;
 		switch (target)
 		{
 		case video::ERT_FRAME_BUFFER:
