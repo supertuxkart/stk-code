@@ -416,9 +416,9 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 {
     const core::recti &viewport = camera->getViewport();
 
+#if 0
     if (m_lightning > 0.0f)
     {
-#ifndef ANDROID
         GLint glviewport[4];
         glviewport[0] = viewport.UpperLeftCorner.X;
         glviewport[1] = viewport.UpperLeftCorner.Y;
@@ -445,9 +445,7 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
         if (!irr::video::useCoreContext)
             glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-#endif
     }
-#if 0 // Rainy look, off, TODO: needs to be settable per track
     else
     {
         GLint glviewport[4];
