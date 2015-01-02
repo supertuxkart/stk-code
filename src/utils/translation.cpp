@@ -352,10 +352,10 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 }
 
 /**
-  * \param original Message to translate
-  * \param context  Optional, can be set to differentiate 2 strings that are identical
-  *                 in English but could be different in other languages
-  */
+ * \param original Message to translate
+ * \param context  Optional, can be set to differentiate 2 strings that are identical
+ *                 in English but could be different in other languages
+ */
 const wchar_t* Translations::w_gettext(const wchar_t* original, const char* context)
 {
     return w_gettext( wide_to_utf8(original), context );
@@ -403,6 +403,40 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     return out_ptr;
 }
 
+/**
+ * \param singular Message to translate in singular form
+ * \param plural   Message to translate in plural form (can be the same as the singular form)
+ * \param num      Count used to obtain the correct plural form.
+ * \param context  Optional, can be set to differentiate 2 strings that are identical
+ *                 in English but could be different in other languages
+ */
+const wchar_t* Translations::w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context)
+{
+    return w_ngettext( wide_to_utf8(singular), wide_to_utf8(plural), num, context);
+}
+
+/**
+ * \param singular Message to translate in singular form
+ * \param plural   Message to translate in plural form (can be the same as the singular form)
+ * \param num      Count used to obtain the correct plural form.
+ * \param context  Optional, can be set to differentiate 2 strings that are identical
+ *                 in English but could be different in other languages
+ */
+const wchar_t* Translations::w_ngettext(const char* singular, const char* plural, int num, const char* context)
+{
+    const std::string& res = (context == NULL ?
+                              m_dictionary.translate_plural(singular, plural, num) :
+                              m_dictionary.translate_ctxt_plural(context, singular, plural, num));
+
+    wchar_t* out_ptr = utf8_to_wide(res.c_str());
+    if (REMOVE_BOM) out_ptr++;
+
+#if TRANSLATE_VERBOSE
+    std::wcout << L"  translation : " << out_ptr << std::endl;
+#endif
+
+    return out_ptr;
+}
 
 
 bool Translations::isRTLLanguage() const

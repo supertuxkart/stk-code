@@ -38,7 +38,8 @@ echo "    Generating .pot file..."
 
 # C++ Files
 xgettext    -d supertuxkart -s --keyword=_ --keyword=N_ --keyword=_LTR \
-                               --keyword=_C:1c,2 --add-comments="I18N:" \
+                               --keyword=_C:1c,2 --keyword=_P:1,2 \
+                               --keyword=_CP:1c,2,3 --add-comments="I18N:" \
                                -p ./data/po -o supertuxkart.pot $CPP_FILE_LIST \
                                --package-name=supertuxkart
 
