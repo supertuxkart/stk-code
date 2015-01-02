@@ -222,8 +222,6 @@ void STKMeshSceneNode::OnRegisterSceneNode()
         CMeshSceneNode::OnRegisterSceneNode();
 }
 
-static video::ITexture *spareWhiteTex = 0;
-
 void STKMeshSceneNode::render()
 {
     irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
@@ -236,7 +234,7 @@ void STKMeshSceneNode::render()
     updateNoGL();
     updateGL();
 
-    bool isTransparent;
+    bool isTransparent = false;
 
     for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
     {

@@ -444,7 +444,7 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predic
     {
         scene::IMeshBuffer* mb = clone->getMeshBuffer(i);
 
-        for (int t = 0; t < video::MATERIAL_MAX_TEXTURES; t++)
+        for (u32 t = 0; t < video::MATERIAL_MAX_TEXTURES; t++)
         {
             video::ITexture* texture = mb->getMaterial().TextureLayer[t].Texture;
             if (texture != NULL)

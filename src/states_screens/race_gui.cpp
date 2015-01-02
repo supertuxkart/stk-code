@@ -235,7 +235,7 @@ void RaceGUI::drawScores()
                                                             "soccer_ball_red.png");
     irr::video::ITexture *blue_team = irr_driver->getTexture(FileManager::GUI,
                                                              "soccer_ball_blue.png");
-    irr::video::ITexture *team_icon;
+    irr::video::ITexture *team_icon = red_team;
 
     int numLeader = 1;
     for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++)
@@ -259,12 +259,10 @@ void RaceGUI::drawScores()
                         position.LowerRightCorner.Y + string_height);
 
         font->draw(score.c_str(),pos,color);
-        
-        switch(numLeader)
+
+        if (numLeader == 2)
         {
-            case 1: team_icon = red_team; break;
-            case 2: team_icon = blue_team; break;
-            default: break;
+            team_icon = blue_team;
         }
         core::rect<s32> indicatorPos(offsetX, offsetY,
                                      offsetX + (int)(m_minimap_player_size/1.25f),
