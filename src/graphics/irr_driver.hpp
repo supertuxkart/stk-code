@@ -436,7 +436,7 @@ public:
   /** Call this to roll back to the previous resolution if a resolution switch attempt goes bad */
     void                  cancelResChange();
 
-    bool                  moveWindow(const int x, const int y);
+    bool                  moveWindow(int x, int y);
 
     void                  showPointer();
     void                  hidePointer();

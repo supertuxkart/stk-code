@@ -650,7 +650,7 @@ core::position2di IrrDriver::getMouseLocation()
  *  \return true on success, false on failure
  *          (always true on Linux at the moment)
  */
-bool IrrDriver::moveWindow(const int x, const int y)
+bool IrrDriver::moveWindow(int x, int y)
 {
 #ifdef WIN32
     const video::SExposedVideoData& videoData =
@@ -678,13 +678,16 @@ bool IrrDriver::moveWindow(const int x, const int y)
     int screen_w = DisplayWidth(display, screen);
     int screen_h = DisplayHeight(display, screen);
 
-    if ((x + UserConfigParams::m_width > screen_w) || 
-        (y + UserConfigParams::m_height > screen_h))
+    if (x + UserConfigParams::m_width > screen_w)
     {
-        Log::warn("irr_driver", "Could not set window location\n");
-        return false;        
+        x = screen_w - UserConfigParams::m_width;
     }
-        
+    
+    if (y + UserConfigParams::m_height > screen_h)
+    {
+        y = screen_h - UserConfigParams::m_height;
+    }
+
     // TODO: Actually handle possible failure
     XMoveWindow(display, videoData.OpenGLLinux.X11Window, x, y);
 #endif
