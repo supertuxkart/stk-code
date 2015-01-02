@@ -2078,7 +2078,8 @@ void IrrDriver::drawJoint(bool drawline, bool drawname,
 void IrrDriver::doScreenShot()
 {
     m_request_screenshot = false;
-
+    RaceGUIBase* base;
+    base->clearAllMessages();
     video::IImage* image = m_video_driver->createScreenShot();
     if(!image)
     {
@@ -2102,14 +2103,14 @@ void IrrDriver::doScreenShot()
 
     if (irr_driver->getVideoDriver()->writeImageToFile(image, path.c_str(), 0))
     {
-        RaceGUIBase* base = World::getWorld()
+        base = World::getWorld()
                           ? World::getWorld()->getRaceGUI()
                           : NULL;
         if (base)
         {
             base->addMessage(
                       core::stringw(("Screenshot saved to\n" + path).c_str()),
-                      NULL, -2.0f, video::SColor(255,255,255,255), true, false);
+                      NULL, 1.5f, video::SColor(255,255,255,255), true, false);
         }   // if base
     }
     else
@@ -2120,7 +2121,7 @@ void IrrDriver::doScreenShot()
             base->addMessage(
                 core::stringw(("FAILED saving screenshot to\n" + path +
                               "\n:(").c_str()),
-                NULL, -2.0f, video::SColor(255,255,255,255),
+                NULL, 1.5f, video::SColor(255,255,255,255),
                 true, false);
         }   // if base
     }   // if failed writing screenshot file
