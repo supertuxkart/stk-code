@@ -403,8 +403,10 @@ namespace Online
                     }
                     else if(to_notify.size() > 3)
                     {
-                        message = _("%d friends are now online.",
-                                    (int)to_notify.size());
+                        //I18N: Only used for count > 3
+                        message = _P("%d friend is now online.",
+                                     "%d friends are now online.",
+                                     (int)to_notify.size());
                     }
                     MessageQueue::add(MessageQueue::MT_FRIEND, message);
                 }
