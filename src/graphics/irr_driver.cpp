@@ -358,13 +358,13 @@ void IrrDriver::initDevice()
 
         core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width,
                                                     UserConfigParams::m_height);
-        
+
         if (UserConfigParams::m_fullscreen)
         {
             if (modes->getVideoModeCount() > 0)
             {
                 res = modes->getVideoModeResolution(res, res);
-    
+
                 UserConfigParams::m_width = res.Width;
                 UserConfigParams::m_height = res.Height;
             }
@@ -896,7 +896,7 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
  *   joints data.
  *  \param mesh Original mesh
  *  \return Newly created skinned mesh. You should call drop() when you don't
- *          need it anymore. 
+ *          need it anymore.
  */
 scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
 {
@@ -950,7 +950,7 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
                 material_manager->setAllUntexturedMaterialFlags(mb);
             }
         }
-        
+
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags
 

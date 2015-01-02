@@ -102,15 +102,15 @@ enum TypeFBO
     FBO_SCALAR_1024,
     FBO_BLOOM_512,
     FBO_TMP_512,
-	FBO_LENS_512,
+    FBO_LENS_512,
 
     FBO_BLOOM_256,
-	FBO_TMP_256,
-	FBO_LENS_256,
-	
+    FBO_TMP_256,
+    FBO_LENS_256,
+
     FBO_BLOOM_128,
     FBO_TMP_128,
-	FBO_LENS_128,
+    FBO_LENS_128,
     FBO_COUNT
 };
 
@@ -164,13 +164,13 @@ enum TypeRTT
     RTT_SCALAR_1024,
     RTT_BLOOM_512,
     RTT_TMP_512,
-	RTT_LENS_512,
+    RTT_LENS_512,
     RTT_BLOOM_256,
     RTT_TMP_256,
-	RTT_LENS_256,
+    RTT_LENS_256,
     RTT_BLOOM_128,
     RTT_TMP_128,
-	RTT_LENS_128,
+    RTT_LENS_128,
 
     RTT_COUNT
 };
@@ -625,6 +625,8 @@ public:
     bool getBoundingBoxesViz() { return m_boundingboxesviz; }
     // ------------------------------------------------------------------------
     u32 getRenderPass() { return m_renderpass; }
+    // ------------------------------------------------------------------------
+    std::vector<LightNode *> getLights() { return m_lights; }
     // ------------------------------------------------------------------------
     void addGlowingNode(scene::ISceneNode *n, float r = 1.0f, float g = 1.0f, float b = 1.0f)
     {

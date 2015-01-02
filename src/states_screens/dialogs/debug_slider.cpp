@@ -51,12 +51,9 @@ void DebugSliderDialog::setSliderHook(std::string id, unsigned min, unsigned max
 
 // ------------------------------------------------------------------------------------------------------
 
-DebugSliderDialog::~DebugSliderDialog()
+void DebugSliderDialog::changeLabel(std::string id, std::string new_label)
 {
-    //if (StateManager::get()->getGameState() == GUIEngine::GAME)
-    //{
-    //    World::getWorld()->scheduleUnpause();
-    //}
+    getWidget<LabelWidget>(id.c_str())->setText(stringw(new_label.c_str()), true);
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -71,13 +68,14 @@ GUIEngine::EventPropagation DebugSliderDialog::processEvent(const std::string& e
 {
 #if !defined(__APPLE__)
     if (Setters.find(eventSource) == Setters.end())
-#endif
         return GUIEngine::EVENT_LET;
-#if !defined(__APPLE__)
+
     int value = getWidget<SpinnerWidget>(eventSource.c_str())->getValue();
     Log::info("DebugSlider", "Value for <%s> : %i", eventSource.c_str(), value);
     Setters[eventSource](value);
     return GUIEngine::EVENT_BLOCK;
+#else
+    return GUIEngine::EVENT_LET;
 #endif
 }
 

@@ -589,7 +589,7 @@ void Kart::createPhysics()
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
     Vec3 wheel_pos[4];
     assert(bevel.getX() || bevel.getY() || bevel.getZ());
-    
+
     Vec3 orig_factor(1, 1, 1 - bevel.getZ());
     Vec3 bevel_factor(1.0f - bevel.getX(), 1.0f - bevel.getY(), 1.0f);
     btConvexHullShape *hull = new btConvexHullShape();
@@ -1346,7 +1346,7 @@ void Kart::update(float dt)
 
         // A jump starts only the kart isn't already jumping, is on a new
         // (or no) texture.
-        if (!m_is_jumping && last_m && last_m != m && 
+        if (!m_is_jumping && last_m && last_m != m &&
             m_kart_model->getAnimation() == KartModel::AF_DEFAULT)
         {
             float v = getVelocity().getY();
@@ -1477,7 +1477,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // In multiplayer mode sounds are NOT positional, because we have
         // multiple listeners. This would make the sounds of all AIs be
         // audible at all times. So silence AI karts.
-        if (s.size()!=0 && (race_manager->getNumPlayers()==1 || 
+        if (s.size()!=0 && (race_manager->getNumPlayers()==1 ||
                             m_controller->isPlayerController()  ) )
         {
             m_terrain_sound = SFXManager::get()->createSoundSource(s);
@@ -1899,10 +1899,10 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                                       "to enter this challenge!\n"
                                       "Check the minimap for\n"
                                       "available challenges.");
-                std::vector<core::stringw> parts = 
+                std::vector<core::stringw> parts =
                     StringUtils::split(msg, '\n', false);
 
-                // For now, until we have scripting, special-case 
+                // For now, until we have scripting, special-case
                 // the overworld... (TODO)
                 if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
                 {
@@ -2393,6 +2393,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     m_nitro_light = irr_driver->addLight(core::vector3df(0.0f, 0.5f, m_kart_model->getLength()*-0.5f - 0.05f),
         0.6f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
     m_nitro_light->setVisible(false);
+    m_nitro_light->setName( ("nitro emitter (" + getIdent() + ")").c_str() );
 
 #ifdef DEBUG
     m_node->setName( (getIdent()+"(lod-node)").c_str() );
@@ -2611,7 +2612,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     float xx = fabsf(m_speed)* getKartProperties()->getDownwardImpulseFactor()*0.0006f;
     Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset()
                               + lean_height +m_graphical_y_offset+xx, 0);
-    
+
     // Try to prevent the graphical chassis to be inside of the terrain:
     if(m_kart_properties->getPreventChassisInTerrain())
     {
@@ -2626,14 +2627,14 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         }   // for i<num_wheels
 
         const btWheelInfo &w = getVehicle()->getWheelInfo(0);
-        // Recompute the default average suspension length, see 
+        // Recompute the default average suspension length, see
         // kartIsInRestNow() how to get from y-offset to susp. len.
         float av_sus_len = -m_graphical_y_offset
                          + w.m_chassisConnectionPointCS.getY()
                          - w.m_wheelsRadius;
 
         float delta = av_sus_len - min_susp_len;
-        // If the suspension length is so short, that it is less than the 
+        // If the suspension length is so short, that it is less than the
         // lowest point of the kart, it indicates that the graphical chassis
         // would be inside of the track:
         if (delta > m_kart_model->getLowestPoint())
