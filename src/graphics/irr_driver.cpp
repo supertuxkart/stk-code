@@ -672,10 +672,21 @@ bool IrrDriver::moveWindow(const int x, const int y)
     }
 #elif defined(__linux__) && !defined(ANDROID)
     const video::SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
+    
+    Display* display = (Display*)videoData.OpenGLLinux.X11Display;
+    int screen = DefaultScreen(display);
+    int screen_w = DisplayWidth(display, screen);
+    int screen_h = DisplayHeight(display, screen);
+
+    if ((x + UserConfigParams::m_width > screen_w) || 
+        (y + UserConfigParams::m_height > screen_h))
+    {
+        Log::warn("irr_driver", "Could not set window location\n");
+        return false;        
+    }
+        
     // TODO: Actually handle possible failure
-    XMoveWindow((Display*)videoData.OpenGLLinux.X11Display,
-                videoData.OpenGLLinux.X11Window,
-                x, y);
+    XMoveWindow(display, videoData.OpenGLLinux.X11Window, x, y);
 #endif
     return true;
 }
