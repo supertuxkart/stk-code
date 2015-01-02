@@ -148,13 +148,6 @@ void addAttachment(Attachment::AttachmentType type)
 
 }   // addAttachment
 
-// ----------------------------------------------------------------------------
-/** Computes the distance between two points represented by one vector3df each */
-float distance(core::vector3df one, core::vector3df two)
-{
-    return sqrt(pow(one.X - two.X, 2) + pow(one.Y - two.Y, 2) + pow(one.Z- two.Z, 2));
-}
-
 // -----------------------------------------------------------------------------
 /** returns the light node with the lowest distance to the player kart (excluding
  * nitro emitters) */
@@ -189,10 +182,10 @@ LightNode* findNearestLight()
             continue;
 
         core::vector3df light_pos = light->getAbsolutePosition();
-        if ( distance(kart_pos, light_pos) < nearest_dist)
+        if ( kart_pos.getDistanceFrom(light_pos) < nearest_dist)
         {
             nearest      = irr_driver->getLights()[i];
-            nearest_dist = distance(kart_pos, light_pos);
+            nearest_dist = kart_pos.getDistanceFrom(light_pos);
         }
     }
 
@@ -275,7 +268,7 @@ bool onEvent(const SEvent &event)
                 mnu->addItem(L"Toggle capture profiler report",
                              DEBUG_PROFILER_GENERATE_REPORT);
             mnu->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
-            mnu->addItem(L"Show FPS", DEBUG_FPS);
+            mnu->addItem(L"Toggle FPS", DEBUG_FPS);
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
             mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
