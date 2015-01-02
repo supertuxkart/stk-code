@@ -42,6 +42,7 @@ unsigned int plural3_sk(int n) { return static_cast<unsigned int>( (n==1) ? 0 : 
 unsigned int plural3_pl(int n) { return static_cast<unsigned int>(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2); }
 unsigned int plural3_sl(int n) { return static_cast<unsigned int>(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3); }
 unsigned int plural4_ar(int n) { return static_cast<unsigned int>( n==1 ? 0 : n==2 ? 1 : n>=3 && n<=10 ? 2 : 3 ); }
+unsigned int plural4_gd(int n) { return static_cast<unsigned int>( n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : (n > 2 && n < 20) ? 2 : 3; }
 
 typedef std::map<std::string, class PluralForms> tPluralForms;
 
@@ -67,6 +68,7 @@ PluralForms::from_string(const std::string& str)
     plural_forms["Plural-Forms:nplurals=3;plural=(n%100==1?0:n%100==2?1:n%100==3||n%100==4?2:3);"] = PluralForms(3, plural3_sl);
 
     plural_forms["Plural-Forms:nplurals=4;plural=n==1?0:n==2?1:n>=3&&n<=10?2:3;"]=PluralForms(4, plural4_ar);
+    plural_forms["Plural-Forms:nplurals=4;plural=(n==1||n==11)?0:(n==2||n==12)?1:(n>2&&n<20)?2:3;"]=PluralForms(4, plural4_gd);
   }
 
   // Remove spaces from string before lookup
