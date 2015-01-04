@@ -607,7 +607,7 @@ bool onEvent(const SEvent &event)
                         {
                             LightNode* nearest = findNearestLight();
                             core::vector3df color = nearest->getColor();
-                            nearest->setColor(intensity / 100.0, color.Y, color.Z);
+                            nearest->setColor(intensity / 100.0f, color.Y, color.Z);
                         }
                     );
                     dsd->changeLabel("Green", "Green (x10)");
@@ -620,7 +620,7 @@ bool onEvent(const SEvent &event)
                         {
                             LightNode* nearest = findNearestLight();
                             core::vector3df color = nearest->getColor();
-                            nearest->setColor(color.X, intensity / 100.0, color.Z);
+                            nearest->setColor(color.X, intensity / 100.0f, color.Z);
                         }
                     );
                     dsd->changeLabel("Blue", "Blue (x10)");
@@ -633,13 +633,13 @@ bool onEvent(const SEvent &event)
                         {
                             LightNode* nearest = findNearestLight();
                             core::vector3df color = nearest->getColor();
-                            nearest->setColor(color.X, color.Y, intensity / 100.0);
+                            nearest->setColor(color.X, color.Y, intensity / 100.0f);
                         }
                     );
                     dsd->changeLabel("SSAO radius", "energy (x10)");
                     dsd->setSliderHook("ssao_radius", 0, 100,
                         []()     { return findNearestLight()->getEnergy() * 10;  },
-                        [](int v){        findNearestLight()->setEnergy(v / 10.0); }
+                        [](int v){        findNearestLight()->setEnergy(v / 10.0f); }
                     );
                     dsd->changeLabel("SSAO k", "radius");
                     dsd->setSliderHook("ssao_k", 0, 100,

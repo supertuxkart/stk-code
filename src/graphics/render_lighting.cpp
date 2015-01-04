@@ -233,7 +233,7 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
     const Track * const track = World::getWorld()->getTrack();
 
     // This function is only called once per frame - thus no need for setters.
-    float start = track->getFogStart() + .001;
+    float start = track->getFogStart() + .001f;
     const video::SColor tmpcol = track->getFogColor();
 
     core::vector3df col(tmpcol.getRed() / 255.0f,
