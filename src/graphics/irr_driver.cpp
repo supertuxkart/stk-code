@@ -2078,8 +2078,13 @@ void IrrDriver::drawJoint(bool drawline, bool drawname,
 void IrrDriver::doScreenShot()
 {
     m_request_screenshot = false;
-    RaceGUIBase* base;
-    base->clearAllMessages();
+    RaceGUIBase* base = World::getWorld()
+                          ? World::getWorld()->getRaceGUI()
+                          : NULL;
+    if (base)
+    {
+        base->clearAllMessages();
+    }    
     video::IImage* image = m_video_driver->createScreenShot();
     if(!image)
     {
@@ -2103,9 +2108,7 @@ void IrrDriver::doScreenShot()
 
     if (irr_driver->getVideoDriver()->writeImageToFile(image, path.c_str(), 0))
     {
-        base = World::getWorld()
-                          ? World::getWorld()->getRaceGUI()
-                          : NULL;
+        
         if (base)
         {
             base->addMessage(
@@ -2115,7 +2118,7 @@ void IrrDriver::doScreenShot()
     }
     else
     {
-        RaceGUIBase* base = World::getWorld()->getRaceGUI();
+        
         if (base)
         {
             base->addMessage(
