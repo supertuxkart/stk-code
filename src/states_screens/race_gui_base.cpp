@@ -1063,3 +1063,20 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
                                               NULL /* color */,
                                               true /* alpha */     );
 }   // drawPlungerInFace
+
+//-----------------------------------------------------------------------------
+/** Returns true if the message queue already contains the specified message
+*   for this kart.
+*/
+bool RaceGUIBase::containsMessage(const core::stringw &msg, const AbstractKart *kart)
+{
+    bool isFound = false;
+    for (unsigned int i = 0; i < m_messages.size() && !isFound; i++)
+    {
+        if (m_messages[i].m_message.equals_ignore_case(msg) && m_messages[i].m_kart == kart)
+        {
+            isFound = true;
+        }
+    }
+    return isFound;
+}

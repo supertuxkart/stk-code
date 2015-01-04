@@ -247,6 +247,8 @@ public:
 
     void drawGlobalPlayerIcons(int bottom_margin);
 
+    bool containsMessage(const core::stringw &msg, const AbstractKart *kart);
+
 };   // RaceGUIBase
 
 #endif
