@@ -1899,23 +1899,22 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                                       "to enter this challenge!\n"
                                       "Check the minimap for\n"
                                       "available challenges.");
-                std::vector<core::stringw> parts =
-                    StringUtils::split(msg, '\n', false);
 
                 // For now, until we have scripting, special-case
                 // the overworld... (TODO)
                 if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
                 {
+                    RaceGUIBase *base = World::getWorld()->getRaceGUI();
+
                     SFXManager::get()->quickSound("forcefield");
                     World::getWorld()->getRaceGUI()->clearAllMessages();
 
-                    for (unsigned int n = 0; n < parts.size(); n++)
+                    if (!base->containsMessage(msg,NULL))
                     {
-                        World::getWorld()->getRaceGUI()
-                                         ->addMessage(parts[n], NULL, 4.0f,
-                                                      video::SColor(255, 255,255,255),
-                                                       true, true);
-                    }   // for n<parts.size()
+                        base->addMessage(msg, NULL, 4.0f,
+                                         video::SColor(255, 255,255,255),
+                                         true, true);
+                    }   // if msg isn't duplicate
                 }   // if world exist
             }   // if m_bounce_back_time <= 0.2f
         }   // if (m->getCollisionReaction() == Material::PUSH_BACK)
