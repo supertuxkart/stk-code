@@ -1907,6 +1907,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                 if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
                 {
                     SFXManager::get()->quickSound("forcefield");
+                    World::getWorld()->getRaceGUI()->clearAllMessages();
 
                     for (unsigned int n = 0; n < parts.size(); n++)
                     {
