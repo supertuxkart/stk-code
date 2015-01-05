@@ -329,7 +329,8 @@ namespace irr
 		bool fullscreen = false,
 		bool stencilbuffer = false,
 		bool vsync = false,
-		IEventReceiver* receiver = 0);
+		IEventReceiver* receiver = 0,
+        io::IFileSystem *file_system = NULL);
 
 	//! typedef for Function Pointer
 	typedef IrrlichtDevice* (IRRCALLCONV *funcptr_createDevice )(

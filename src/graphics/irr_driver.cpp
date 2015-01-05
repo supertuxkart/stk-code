@@ -109,8 +109,14 @@ IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
-    m_device              = createDevice(video::EDT_NULL);
-    m_request_screenshot  = false;
+    m_device              = createDevice(video::EDT_NULL,
+                                         irr::core::dimension2d<u32>(640, 480),
+                                         /*bits*/16U, /**fullscreen*/ false, 
+                                         /*stencilBuffer*/ false,
+                                         /*vsync*/false,
+                                         /*event receiver*/ NULL,
+                                         file_manager->getFileSystem());
+    m_request_screenshot = false;
     m_shaders             = NULL;
     m_rtts                = NULL;
     m_post_processing     = NULL;
@@ -390,8 +396,6 @@ void IrrDriver::initDevice()
         // the problem for now.
         m_device->clearSystemMessages();
         m_device->run();
-        // Clear the pointer stored in the file manager
-        file_manager->dropFileSystem();
         m_device->drop();
         m_device  = NULL;
 
@@ -410,6 +414,7 @@ void IrrDriver::initDevice()
             params.EventReceiver = this;
             params.Fullscreen    = UserConfigParams::m_fullscreen;
             params.Vsync         = UserConfigParams::m_vsync;
+            params.FileSystem    = file_manager->getFileSystem();
             params.WindowSize    =
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
@@ -456,7 +461,8 @@ void IrrDriver::initDevice()
                                     UserConfigParams::m_fullscreen,
                                     false,  // stencil buffers
                                     false,  // vsync
-                                    this    // event receiver
+                                    this,   // event receiver
+                                    file_manager->getFileSystem()
                                     );
             if (m_device)
             {
@@ -484,10 +490,6 @@ void IrrDriver::initDevice()
     // Immediate clear to black for a nicer user loading experience
     m_video_driver->beginScene(/*backBuffer clear*/true, /* Z */ false);
     m_video_driver->endScene();
-
-    // Stores the new file system pointer.
-    file_manager->reInit();
-
 
     if (CVS->isGLSL())
     {

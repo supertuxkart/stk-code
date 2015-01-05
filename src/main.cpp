@@ -989,11 +989,13 @@ int handleCmdLine()
  */
 void initUserConfig()
 {
-    irr_driver              = new IrrDriver();
-    file_manager            = new FileManager();
+    file_manager = new FileManager();
     user_config             = new UserConfig();     // needs file_manager
     user_config->loadConfig();
-    file_manager->discoverPaths();
+    // Some parts of the file manager needs user config (paths for models
+    // depend on artist debug flag). So init the rest of the file manager
+    // after reading the user config file.
+    file_manager->init();
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -1008,13 +1010,14 @@ void initUserConfig()
     translations            = new Translations();   // needs file_manager
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
-
 }   // initUserConfig
 
 //=============================================================================
 void initRest()
 {
     stk_config->load(file_manager->getAsset("stk_config.xml"));
+
+    irr_driver = new IrrDriver();
 
     // Now create the actual non-null device in the irrlicht driver
     irr_driver->initDevice();
@@ -1409,6 +1412,8 @@ int main(int argc, char *argv[] )
     }
 #endif
 
+    delete file_manager;
+
     return 0 ;
 }   // main
 
@@ -1509,6 +1514,6 @@ static void cleanUserConfig()
         delete user_config;
     }
 
-    if(file_manager)            delete file_manager;
     if(irr_driver)              delete irr_driver;
-}
+}   // cleanUserConfig
+
