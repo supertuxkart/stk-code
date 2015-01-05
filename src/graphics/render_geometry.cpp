@@ -983,7 +983,7 @@ void IrrDriver::renderShadows()
     {
         glDrawBuffer(GL_NONE);
         glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(1.5, 0.);
+        glPolygonOffset(1.5, 50.);
     }
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
