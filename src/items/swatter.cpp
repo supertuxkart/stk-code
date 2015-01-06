@@ -25,10 +25,11 @@
 // TODO: move some constants to KartProperties, use all constants from KartProperties
 
 #include "items/swatter.hpp"
-
+#include "achievements/achievement_info.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
@@ -295,6 +296,15 @@ void Swatter::squashThingsAround()
 
         kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
             kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
+
+        //Handle achievement if the swatter is used by the current player
+        const StateManager::ActivePlayer *const ap = m_kart->getController()
+            ->getPlayer();
+        if (ap && ap->getConstProfile() == PlayerManager::getCurrentPlayer())
+        {
+            PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MOSQUITO,
+                "swatter", 1);
+        }
 
         if (kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
         {   // make bomb explode
