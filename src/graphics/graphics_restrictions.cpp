@@ -41,7 +41,7 @@ namespace GraphicsRestrictions
 
         char *m_names_of_restrictions[] = {
             "UniformBufferObject",
-            "GeometryShader4"
+            "GeometryShader4",
             "DrawIndirect",
             "TextureView",
             "TextureStorage",
