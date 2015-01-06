@@ -152,6 +152,7 @@
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/hardware_skinning.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -1282,6 +1283,11 @@ int main(int argc, char *argv[] )
                 }
             }
         }
+
+//#define UNIT_TEST
+#ifdef UNIT_TEST
+        GraphicsRestrictions::unitTesting();
+#endif
 
         // Note that on the very first run of STK internet status is set to
         // "not asked", so the report will only be sent in the next run.

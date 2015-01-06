@@ -54,14 +54,16 @@ void CentralVideoSettings::init()
     {
         std::string driver((char*)(glGetString(GL_VERSION)));
         std::string card((char*)(glGetString(GL_RENDERER)));
-        std::vector<std::string> restrictions =
-            GraphicsRestrictions::getRestrictions(driver, card);
+        GraphicsRestrictions::init(driver, card);
 
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
             hasVSLayer = true;
             Log::info("GLDriver", "AMD Vertex Shader Layer Present");
         }
-        if (hasGLExtension("GL_ARB_buffer_storage")) {
+
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BUFFER_STORAGE) &&
+            hasGLExtension("GL_ARB_buffer_storage")  )
+        {
             hasBuffserStorage = true;
             Log::info("GLDriver", "ARB Buffer Storage Present");
         }

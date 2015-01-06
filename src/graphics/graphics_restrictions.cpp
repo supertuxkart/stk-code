@@ -33,10 +33,33 @@ namespace GraphicsRestrictions
     class Rule;
     namespace Private
     {
+        /** List of all rules. */
         std::vector<Rule*> m_all_rules;
 
+        /** Stores for each grpahics restriction if it's enabled or not. */
+        std::vector<bool> m_all_graphics_restriction;
+
+        /** The list of names used in the XML file for the graphics
+         *  restriction types. They must be in the same order as the types. */
+        char *m_names_of_restrictions[] = { "BufferStorage",
+                                            "GlobalIllumination",
+                                            NULL}; 
     }   // namespace Private
     using namespace Private;
+
+    /** Returns the graphics restrictions type for a string, or
+     *  GR_COUNT if the name is not found. */
+GraphicsRestrictionsType getTypeForName(const std::string &name)
+{
+    unsigned int i = 0;
+    while (m_names_of_restrictions[i] != NULL)
+    {
+        if (name == m_names_of_restrictions[i])
+            return (GraphicsRestrictionsType)i;
+        i++;
+    }
+    return GR_COUNT;
+}   // getTypeForName
 
 // ============================================================================
 /** A small utility class to manage and compare version tuples.
@@ -130,31 +153,44 @@ public:
 
     // ------------------------------------------------------------------------
     /** Compares two version numbers. Equal returns true if the elements are
-     *  identical up to the minimum number of elements, e.g.: [1.2.3] = [1.2].
-     *  This allows so e.g. disable a feature for all minor versions by just
-     *  specifying the major version.
+     *  identical.
      */
     bool operator== (const Version &other) const
     {
-        unsigned int min_n = std::min(m_version.size(), other.m_version.size());
-        for(unsigned int i=0; i<min_n; i++)
+        if (m_version.size() != other.m_version.size()) return false;
+        for(unsigned int i=0; i<m_version.size(); i++)
             if(other.m_version[i]!=m_version[i]) return false;
         return true;
     }   // operator ==
     // ------------------------------------------------------------------------
+    /** Compares two version numbers. Equal returns true if the elements are
+    *  identical.
+    */
+    bool operator!= (const Version &other) const
+    {
+        return !this->operator==(other);
+    }   // operator!=
+        // ------------------------------------------------------------------------
+    /** If *this < other. */
     bool operator< (const Version &other) const
     {
         unsigned int min_n = std::min(m_version.size(), other.m_version.size());
-        for(unsigned int i=0; i<min_n; i++)
-            if(other.m_version[i]>=m_version[i]) return false;
+        for (unsigned int i = 0; i<min_n; i++)
+        {
+            if (m_version[i] > other.m_version[i]) return false;
+        }
         return true;
     }   // operator>
     // ------------------------------------------------------------------------
+    /** If *this <= other. */
     bool operator<= (const Version &other) const
     {
         unsigned int min_n = std::min(m_version.size(), other.m_version.size());
-        for(unsigned int i=0; i<min_n; i++)
-            if(other.m_version[i]>m_version[i]) return false;
+        for (unsigned int i = 0; i<min_n; i++)
+        {
+            if (m_version[i] > other.m_version[i]) return false;
+            if (m_version[i] < other.m_version[i]) return true;
+        }
         return true;
     }   // operator>
 
@@ -267,9 +303,11 @@ public:
         case VERSION_EQUAL: if(!(version==m_driver_version)) return false;
             break;
         case VERSION_LESS_EQUAL:
-            if(m_driver_version < version) return false;
+            if (!(version <= m_driver_version)) return false;
+            break;
         case VERSION_LESS:
-            if(m_driver_version <= version) return false;
+            if (!(version < m_driver_version )) return false;
+            break;
         }   // switch m_version_test
         return true;
         // -----------------------------------------------
@@ -285,62 +323,105 @@ public:
 };   // class Rule
 
 // ============================================================================
-
-void init()
+/** Very rudimentary and brute unit testing. Better than nothing :P
+ */
+void unitTesting()
 {
-    std::string filename = 
-        file_manager->getUserConfigFile("graphical_restrictions.xml");
-    if(!file_manager->fileExists(filename))
-        filename = file_manager->getAsset("graphical_restrictions.xml");
-    const XMLNode *rules = file_manager->createXMLTree(filename);
-    if(!rules)
-    {
-        Log::warn("Graphics", "Could not find graphical_restrictions.xm");
-        return;
-    }
-    if(rules->getName()!="graphical-restrictions")
-    {
-        delete rules;
-        Log::warn("Graphics", "'%s' did not contain graphical-restrictions tag",
-                  filename.c_str());
-        return;
-    }
-    for(unsigned int i=0; i<rules->getNumNodes(); i++)
-    {
-        const XMLNode *rule = rules->getNode(i);
-        if(rule->getName()!="card")
-        {
-            Log::warn("Graphics", "Incorrect node '%s' found in '%s' - ignored.",
-                      rule->getName().c_str(), filename.c_str());
-            continue;
-        }
-        m_all_rules.push_back(new Rule(rule));
-    }
-    delete rules;
-}   // init
+    assert(Version("1") == Version("1"));
+    assert(Version("1") != Version("2"));
+    assert(Version("1") <= Version("2"));
+    assert(Version("1")     <  Version("2"));
+    assert(Version("1.2.3") <  Version("2"));
+    assert(Version("1.2.3") <  Version("1.3"));
+    assert(Version("1.2.3") <  Version("1.2.4"));
+    assert(Version("1.2.3") <  Version("1.2.3.1"));
+    assert(Version("1.2.3") <= Version("2"));
+    assert(Version("1.2.3") <= Version("1.3"));
+    assert(Version("1.2.3") <= Version("1.2.4"));
+    assert(Version("1.2.3") <= Version("1.2.3.1"));
+    assert(Version("1.2.3") <= Version("1.2.3"));
+    assert(Version("1.2.3") == Version("1.2.3"));
+}   // unitTesting
 
 // ----------------------------------------------------------------------------
-/** Returns a list of graphical features that need to be disabled for the
- *  specified driver and graphics card (and OS).
- *  \paaram driver_version The GL_VERSION string (i.e. opengl and version
- *          number).
+/** Determines graphical features that need to be disabled for the
+ *  specified driver, graphics card and OS.
+ *  \param driver_version The GL_VERSION string (i.e. opengl and version
+ *         number).
  *  \param card_name The GL_RENDERER string (i.e. graphics card).
  */
-std::vector<std::string> getRestrictions(const std::string &driver_version,
-                                         const std::string &card_name)
+void determineRestrictions(const std::string &driver_version,
+                           const std::string &card_name)
 {
-    std::vector<std::string> restrictions;
-
     Version version(driver_version, card_name);
     for(unsigned int i=0; i<m_all_rules.size(); i++)
     {
         if(m_all_rules[i]->applies(card_name, version))
         {
-            std::vector<std::string> r = m_all_rules[i]->getRestrictions();
-            restrictions.insert(restrictions.end(), r.begin(), r.end());
-        }
+            std::vector<std::string> rules = m_all_rules[i]->getRestrictions();
+            std::vector<std::string>::iterator p;
+            for (p = rules.begin(); p != rules.end(); p++)
+            {
+                GraphicsRestrictionsType t = getTypeForName(*p);
+                if (t != GR_COUNT)
+                    m_all_graphics_restriction[t] = true;
+            }   // for p in rules
+        }   // if m_all_rules[i].applies()
+    }   // for i in m_all_rules
+}   // determineRestrictions
+
+// ----------------------------------------------------------------------------
+/** Reads in the graphical restriction file.
+ *  \param driver_version The GL_VERSION string (i.e. opengl and version
+ *         number).
+ *  \param card_name The GL_RENDERER string (i.e. graphics card).
+ */
+void init(const std::string &driver_version,
+          const std::string &card_name)
+{
+    for (unsigned int i = 0; i < GR_COUNT; i++)
+        m_all_graphics_restriction.push_back(false);
+
+    std::string filename =
+        file_manager->getUserConfigFile("graphical_restrictions.xml");
+    if (!file_manager->fileExists(filename))
+        filename = file_manager->getAsset("graphical_restrictions.xml");
+    const XMLNode *rules = file_manager->createXMLTree(filename);
+    if (!rules)
+    {
+        Log::warn("Graphics", "Could not find graphical_restrictions.xm");
+        return;
     }
-    return restrictions;
-}   // getRestrictions
+    if (rules->getName() != "graphical-restrictions")
+    {
+        delete rules;
+        Log::warn("Graphics", "'%s' did not contain graphical-restrictions tag",
+            filename.c_str());
+        return;
+    }
+    for (unsigned int i = 0; i<rules->getNumNodes(); i++)
+    {
+        const XMLNode *rule = rules->getNode(i);
+        if (rule->getName() != "card")
+        {
+            Log::warn("Graphics", "Incorrect node '%s' found in '%s' - ignored.",
+                rule->getName().c_str(), filename.c_str());
+            continue;
+        }
+        m_all_rules.push_back(new Rule(rule));
+    }
+    delete rules;
+
+    determineRestrictions(driver_version, card_name);
+}   // init
+
+// ----------------------------------------------------------------------------
+/** Returns if the specified graphics restriction is defined.
+ *  \param type The graphical restriction to tes.t
+ */
+bool isDisabled(GraphicsRestrictionsType type)
+{
+    return m_all_graphics_restriction[type];
+}   // isDisabled
 
 }   // namespace HardwareStats

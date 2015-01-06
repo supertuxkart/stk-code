@@ -28,9 +28,22 @@
 
 namespace GraphicsRestrictions
 {
-    void init();
-    std::vector<std::string> getRestrictions(const std::string &driver_version,
-                                             const std::string &card_name);
+    /** Which graphical restrictions can be defined. Note that
+     *  the variable m_names_of_restrictions in the cpp file contains the
+     *  string representation used in the XML files. Any change to this
+     *  type declaration needs a change in that variable as well. */
+    enum GraphicsRestrictionsType 
+    {
+        GR_BUFFER_STORAGE,
+        GR_GLOBAL_ILLUMINATION,
+        GR_COUNT  /** MUST be last entry. */
+    } ;
+
+    void init(const std::string &driver_version,
+              const std::string &card_name       );
+    bool isDisabled(GraphicsRestrictionsType type);
+
+    void unitTesting();
 };   // HardwareStats
 
 #endif
