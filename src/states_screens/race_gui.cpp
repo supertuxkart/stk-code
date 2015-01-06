@@ -292,6 +292,8 @@ void RaceGUI::drawGlobalTimer()
     video::SColor time_color = video::SColor(255, 255, 255, 255);
     int dist_from_right = 10 + m_timer_width;
 
+    bool use_digit_font = true;
+
     float elapsed_time = World::getWorld()->getTime();
     if (!race_manager->hasTimeTarget())
     {
@@ -313,6 +315,7 @@ void RaceGUI::drawGlobalTimer()
                 GUIEngine::getFont()->getDimension(_("Challenge Failed")).Width;
             dist_from_right = 10 + string_width;
             time_color = video::SColor(255,255,0,0);
+            use_digit_font = false;
         }
     }
 
@@ -325,7 +328,7 @@ void RaceGUI::drawGlobalTimer()
         pos += core::vector2d<s32>(0, UserConfigParams::m_height/2);
     }
 
-    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+    gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());
     font->setShadow(video::SColor(255, 128, 0, 0));
     font->setScale(1.0f);
     font->draw(sw.c_str(), pos, time_color, false, false, NULL,
