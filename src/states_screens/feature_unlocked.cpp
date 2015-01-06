@@ -276,6 +276,7 @@ void FeatureUnlockedCutScene::addUnlockedPictures(std::vector<irr::video::ITextu
 void FeatureUnlockedCutScene::init()
 {
     m_global_time = 0.0f;
+    CutsceneWorld::setUseDuration(false);
 
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
