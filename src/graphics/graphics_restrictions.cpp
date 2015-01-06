@@ -38,9 +38,24 @@ namespace GraphicsRestrictions
 
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
-        char *m_names_of_restrictions[] = { "BufferStorage",
-                                            "GlobalIllumination",
-                                            NULL}; 
+
+        char *m_names_of_restrictions[] = {
+            "UniformBufferObject",
+            "GeometryShader4"
+            "DrawIndirect",
+            "TextureView",
+            "TextureStorage",
+            "ImageLoadStore",
+            "BaseInstance",
+            "ComputeShader",
+            "ShaderStorageBufferObject",
+            "MultiDrawIndirect",
+            "ShaderAtomicCounters",
+            "BufferStorage",
+            "BindlessTexture",
+            "TextureCompressionS3TC",
+            "AMDVertexShaderLayer"
+        };
     }   // namespace Private
     using namespace Private;
 

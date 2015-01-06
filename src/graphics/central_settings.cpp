@@ -67,100 +67,84 @@ void CentralVideoSettings::init()
             hasBuffserStorage = true;
             Log::info("GLDriver", "ARB Buffer Storage Present");
         }
-        if (hasGLExtension("GL_ARB_base_instance")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BASE_INSTANCE) &&
+            hasGLExtension("GL_ARB_base_instance")) {
             hasBaseInstance = true;
             Log::info("GLDriver", "ARB Base Instance Present");
         }
-        if (hasGLExtension("GL_ARB_draw_indirect")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRAW_INDIRECT) &&
+            hasGLExtension("GL_ARB_draw_indirect")) {
             hasDrawIndirect = true;
             Log::info("GLDriver", "ARB Draw Indirect Present");
         }
-        if (hasGLExtension("GL_ARB_compute_shader")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_COMPUTE_SHADER) &&
+            hasGLExtension("GL_ARB_compute_shader")) {
             hasComputeShaders = true;
             Log::info("GLDriver", "ARB Compute Shader Present");
         }
-        if (hasGLExtension("GL_ARB_texture_storage")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_STORAGE) &&
+            hasGLExtension("GL_ARB_texture_storage")) {
             hasTextureStorage = true;
             Log::info("GLDriver", "ARB Texture Storage Present");
         }
-        if (hasGLExtension("GL_ARB_texture_view")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_VIEW) &&
+            hasGLExtension("GL_ARB_texture_view")) {
             hasTextureView = true;
             Log::info("GLDriver", "ARB Texture View Present");
         }
-        if (hasGLExtension("GL_ARB_bindless_texture")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BINDLESS_TEXTURE) &&
+            hasGLExtension("GL_ARB_bindless_texture")) {
             hasBindlessTexture = true;
             Log::info("GLDriver", "ARB Bindless Texture Present");
         }
-        if (hasGLExtension("GL_ARB_shader_image_load_store")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_IMAGE_LOAD_STORE) &&
+            hasGLExtension("GL_ARB_shader_image_load_store")) {
             hasImageLoadStore = true;
             Log::info("GLDriver", "ARB Image Load Store Present");
         }
-        if (hasGLExtension("GL_ARB_shader_atomic_counters")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_SHADER_ATOMIC_COUNTERS) &&
+            hasGLExtension("GL_ARB_shader_atomic_counters")) {
             hasAtomics = true;
             Log::info("GLDriver", "ARB Shader Atomic Counters Present");
         }
-        if (hasGLExtension("GL_ARB_shader_storage_buffer_object")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_SHADER_STORAGE_BUFFER_OBJECT) &&
+            hasGLExtension("GL_ARB_shader_storage_buffer_object")) {
             hasSSBO = true;
             Log::info("GLDriver", "ARB Shader Storage Buffer Object Present");
         }
-        if (hasGLExtension("GL_ARB_multi_draw_indirect")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_MULTI_DRAW_INDIRECT) &&
+            hasGLExtension("GL_ARB_multi_draw_indirect")) {
             hasMultiDrawIndirect = true;
             Log::info("GLDriver", "ARB Multi Draw Indirect Present");
         }
-        if (hasGLExtension("GL_EXT_texture_compression_s3tc")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXT_TEXTURE_COMPRESSION_S3TC) &&
+            hasGLExtension("GL_EXT_texture_compression_s3tc")) {
             hasTextureCompression = true;
             Log::info("GLDriver", "EXT Texture Compression S3TC Present");
         }
-        if (hasGLExtension("GL_ARB_uniform_buffer_object")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_UNIFORM_BUFFER_OBJECT) &&
+            hasGLExtension("GL_ARB_uniform_buffer_object")) {
             hasUBO = true;
             Log::info("GLDriver", "ARB Uniform Buffer Object Present");
         }
-        if (hasGLExtension("GL_ARB_geometry_shader4")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER4) &&
+            hasGLExtension("GL_ARB_geometry_shader4")) {
             hasGS = true;
             Log::info("GLDriver", "ARB Geometry Shader 4 Present");
         }
-        
 
         // Specific disablement
-        // (should use graphic restriction system)
-        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL)
-        {
-            // Intel doesnt support sRGB compressed textures on some chip/OS
-            // TODO: Have a more precise list
-            // Sandy Bridge on Windows
-            hasTextureCompression = false;
-#ifdef WIN32
-            // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
-            // Works with Haswell and latest drivers
-            // Status unknown on Ivy Bridge
-            // Status unknown on older driver for Haswell
-            if (m_gl_major_version == 3 && m_gl_minor_version == 1)
-                hasUBO = false;
-#endif
-        }
-
         if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
         {
             // Fix for Nvidia and instanced RH
             // Compiler crashes with a big loop in RH or GI shaders
             m_need_rh_workaround = true;
-            // Atomic counters make the driver crash on windows and linux
-            hasAtomics = false;
         }
 
         if (strstr((const char *)glGetString(GL_VENDOR), "ATI") != NULL)
         {
             // Bindless textures are all treated RGB even sRGB one
             m_need_srgb_workaround = true;
-        }
-
-        // Mesa
-        if (strstr((const char *)glGetString(GL_VENDOR), "Intel Open Source Technology Center") != NULL ||
-            strstr((const char *)glGetString(GL_VENDOR), "Gallium") != NULL)
-        {
-            // Needs a patched Mesa (current 10.4) to use array texture fbo
-            // Technically GS works but array texture fbo interacts with GS.
-            hasGS = false;
         }
     }
 #endif
