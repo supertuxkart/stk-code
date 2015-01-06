@@ -51,5 +51,8 @@
   <achievement id="10" secret="yes" check-type="all-at-least" reset-type="race"
                name="It's secret" description="Really ... a secret.">
   </achievement>
-
+  <achievement id="11" check-type="all-at-least" reset-type="race"
+               name="Mosquito Hunter" description="Take your opponents for mosquitos! With the swatter, squash at least 5 of them in a race.">
+    <swatter goal="5"/>
+  </achievement>
 </achievements>

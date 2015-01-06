@@ -51,7 +51,8 @@ public:
            ACHIEVE_GOLD_DRIVER   = 6,
            ACHIEVE_POWERUP_LOVER = 7,
            ACHIEVE_UNSTOPPABLE   = 8,
-           ACHIEVE_BANANA        = 9
+           ACHIEVE_BANANA        = 9,
+           ACHIEVE_MOSQUITO      = 11
     };
 
     /** Achievement check type:
