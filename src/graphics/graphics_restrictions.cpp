@@ -33,9 +33,6 @@ namespace GraphicsRestrictions
     class Rule;
     namespace Private
     {
-        /** List of all rules. */
-        std::vector<Rule*> m_all_rules;
-
         /** Stores for each grpahics restriction if it's enabled or not. */
         std::vector<bool> m_all_graphics_restriction;
 
@@ -344,33 +341,6 @@ void unitTesting()
 }   // unitTesting
 
 // ----------------------------------------------------------------------------
-/** Determines graphical features that need to be disabled for the
- *  specified driver, graphics card and OS.
- *  \param driver_version The GL_VERSION string (i.e. opengl and version
- *         number).
- *  \param card_name The GL_RENDERER string (i.e. graphics card).
- */
-void determineRestrictions(const std::string &driver_version,
-                           const std::string &card_name)
-{
-    Version version(driver_version, card_name);
-    for(unsigned int i=0; i<m_all_rules.size(); i++)
-    {
-        if(m_all_rules[i]->applies(card_name, version))
-        {
-            std::vector<std::string> rules = m_all_rules[i]->getRestrictions();
-            std::vector<std::string>::iterator p;
-            for (p = rules.begin(); p != rules.end(); p++)
-            {
-                GraphicsRestrictionsType t = getTypeForName(*p);
-                if (t != GR_COUNT)
-                    m_all_graphics_restriction[t] = true;
-            }   // for p in rules
-        }   // if m_all_rules[i].applies()
-    }   // for i in m_all_rules
-}   // determineRestrictions
-
-// ----------------------------------------------------------------------------
 /** Reads in the graphical restriction file.
  *  \param driver_version The GL_VERSION string (i.e. opengl and version
  *         number).
@@ -399,20 +369,31 @@ void init(const std::string &driver_version,
             filename.c_str());
         return;
     }
+
+    Version version(driver_version, card_name);
     for (unsigned int i = 0; i<rules->getNumNodes(); i++)
     {
-        const XMLNode *rule = rules->getNode(i);
-        if (rule->getName() != "card")
+        const XMLNode *xml_rule = rules->getNode(i);
+        if (xml_rule->getName() != "card")
         {
             Log::warn("Graphics", "Incorrect node '%s' found in '%s' - ignored.",
-                rule->getName().c_str(), filename.c_str());
+                      xml_rule->getName().c_str(), filename.c_str());
             continue;
         }
-        m_all_rules.push_back(new Rule(rule));
+        Rule rule(xml_rule);
+        if (rule.applies(card_name, version))
+        {
+            std::vector<std::string> restrictions = rule.getRestrictions();
+            std::vector<std::string>::iterator p;
+            for (p = restrictions.begin(); p != restrictions.end(); p++)
+            {
+                GraphicsRestrictionsType t = getTypeForName(*p);
+                if (t != GR_COUNT)
+                    m_all_graphics_restriction[t] = true;
+            }   // for p in rules
+        }   // if m_all_rules[i].applies()
     }
     delete rules;
-
-    determineRestrictions(driver_version, card_name);
 }   // init
 
 // ----------------------------------------------------------------------------
