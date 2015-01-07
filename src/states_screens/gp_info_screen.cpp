@@ -135,10 +135,12 @@ void GPInfoScreen::beforeAddingWidget()
             StateManager::get()->getActivePlayerProfile(0)->getUniqueID(),
             m_gp.getId(),
             race_manager->getNumLocalPlayers());
+            
+        bool continue_visible = saved_gp && saved_gp->getNextTrack() > 0;
 
         RibbonWidget* ribbonButtons = getWidget<RibbonWidget>("buttons");
         int id_continue_button = ribbonButtons->findItemNamed("continue");
-        ribbonButtons->setItemVisible(id_continue_button, saved_gp != NULL);
+        ribbonButtons->setItemVisible(id_continue_button, continue_visible);
         ribbonButtons->setLabel(id_continue_button, _("Continue saved GP"));
     }
     else

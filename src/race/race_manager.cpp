@@ -376,6 +376,7 @@ void RaceManager::startNew(bool from_overworld)
         init_gp_rank ++;
     }
 
+    m_track_number = 0;
     if (m_major_mode == MAJOR_MODE_GRAND_PRIX)
     {
         if (m_continue_saved_gp)
@@ -385,7 +386,6 @@ void RaceManager::startNew(bool from_overworld)
         }
         else 
         {
-            m_track_number = 0;
             while (m_saved_gp != NULL)
             {
                 m_saved_gp->remove();
@@ -538,7 +538,7 @@ void RaceManager::next()
 void RaceManager::saveGP()
 {
     // If Player 1 has already saved a GP, we adapt it
-    if(m_saved_gp != NULL)
+    if (m_saved_gp != NULL)
     {
         m_saved_gp->setKarts(m_kart_status);
         m_saved_gp->setNextTrack(m_track_number);
