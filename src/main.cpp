@@ -659,7 +659,9 @@ int handleCmdLine()
 
     if(CommandLine::has("--gamepad-debug"))
         UserConfigParams::m_gamepad_debug=true;
-    if(CommandLine::has("--wiimote-debug"))
+    if (CommandLine::has("--keyboard-debug"))
+        UserConfigParams::m_keyboard_debug = true;
+    if (CommandLine::has("--wiimote-debug"))
         UserConfigParams::m_wiimote_debug = true;
     if(CommandLine::has("--tutorial-debug"))
             UserConfigParams::m_tutorial_debug = true;
