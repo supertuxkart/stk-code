@@ -395,7 +395,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 
 void RaceResultGUI::onConfirm()
 {
-    race_manager->saveGP(); // Save the aborted GP
+    //race_manager->saveGP(); // Save the aborted GP
     GUIEngine::ModalDialog::dismiss();
     cleanupGPProgress();
     StateManager::get()->popMenu();
