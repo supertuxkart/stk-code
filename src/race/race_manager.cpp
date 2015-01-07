@@ -376,18 +376,26 @@ void RaceManager::startNew(bool from_overworld)
         init_gp_rank ++;
     }
 
-    m_track_number = 0;
     if (m_major_mode == MAJOR_MODE_GRAND_PRIX)
     {
         if (m_continue_saved_gp)
         {
-            m_track_number  = m_saved_gp->getNextTrack();
+            m_track_number = m_saved_gp->getNextTrack();
             m_saved_gp->loadKarts(m_kart_status);
         }
-        else if (m_saved_gp != NULL)
+        else 
         {
-            m_saved_gp->remove();
-            m_saved_gp = NULL;
+            m_track_number = 0;
+            while (m_saved_gp != NULL)
+            {
+                m_saved_gp->remove();
+                m_saved_gp = SavedGrandPrix::getSavedGP(
+                                             StateManager::get()
+                                             ->getActivePlayerProfile(0)
+                                             ->getUniqueID(),
+                                             m_grand_prix.getId(),
+                                             m_player_karts.size());
+            }
         }
     }
 
