@@ -555,6 +555,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
          if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
         {
              GamePadDevice *gPad = m_device_manager->getGamePadFromIrrID(deviceID);
+             // This can happen in case of automatically ignored accelerator
+             // devices, which are not part of stk's gamepad mapping.
+             if (!gPad) return;
              DeviceConfig *conf = gPad->getConfiguration();
              if (!conf->isEnabled())
                  return;
