@@ -136,7 +136,9 @@ void GPInfoScreen::beforeAddingWidget()
             m_gp.getId(),
             race_manager->getNumLocalPlayers());
             
-        bool continue_visible = saved_gp && saved_gp->getNextTrack() > 0;
+        int tracks = m_gp.getTrackNames().size();
+        bool continue_visible = saved_gp && saved_gp->getNextTrack() > 0 &&
+                                            saved_gp->getNextTrack() < tracks;
 
         RibbonWidget* ribbonButtons = getWidget<RibbonWidget>("buttons");
         int id_continue_button = ribbonButtons->findItemNamed("continue");
