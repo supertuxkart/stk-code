@@ -158,6 +158,19 @@ public:
 
         }
 
+        // AMD: driver_version = "4.3.13283 Core Profile/Debug Context 14.501.1003.0"
+        // ----------------------------------------------
+        if (card_name.find("AMD") != std::string::npos)
+        {
+            std::vector<std::string> s = StringUtils::split(driver_version, ' ');
+            if (s.size() == 5)
+            {
+                convertVersionString(s[4]);
+                return;
+            }
+
+        }
+
         Log::warn("Graphics", "Can not find version for '%s' '%s' - ignored.",
             driver_version.c_str(), card_name.c_str());
 
