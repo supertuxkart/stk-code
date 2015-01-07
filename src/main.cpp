@@ -657,7 +657,9 @@ int handleCmdLine()
     bool try_login = false;
     irr::core::stringw login, password;
 
-    if(CommandLine::has("--gamepad-debug"))
+    if (CommandLine::has("--unit-testing"))
+        UserConfigParams::m_unit_testing = true;
+    if (CommandLine::has("--gamepad-debug"))
         UserConfigParams::m_gamepad_debug=true;
     if (CommandLine::has("--keyboard-debug"))
         UserConfigParams::m_keyboard_debug = true;
@@ -1286,10 +1288,11 @@ int main(int argc, char *argv[] )
             }
         }
 
-//#define UNIT_TEST
-#ifdef UNIT_TEST
-        GraphicsRestrictions::unitTesting();
-#endif
+        if(UserConfigParams::m_unit_testing)
+        {
+            GraphicsRestrictions::unitTesting();
+            exit(0);
+        }
 
         // Note that on the very first run of STK internet status is set to
         // "not asked", so the report will only be sent in the next run.

@@ -352,9 +352,9 @@ public:
  */
 void unitTesting()
 {
-    assert(Version("1") == Version("1"));
-    assert(Version("1") != Version("2"));
-    assert(Version("1") <= Version("2"));
+    assert(Version("1")     == Version("1"));
+    assert(Version("1")     != Version("2"));
+    assert(Version("1")     <= Version("2"));
     assert(Version("1")     <  Version("2"));
     assert(Version("1.2.3") <  Version("2"));
     assert(Version("1.2.3") <  Version("1.3"));
