@@ -50,6 +50,22 @@ RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")
 // -----------------------------------------------------------------------------
 void RegisterScreen::init()
 {
+    RibbonWidget* ribbon = getWidget<RibbonWidget>("mode_tabs");
+    assert(ribbon);
+    if (UserConfigParams::m_internet_status !=
+        Online::RequestManager::IPERM_NOT_ALLOWED)
+    {
+        m_account_mode = ACCOUNT_NEW_ONLINE;
+        ribbon->select("tab_new_online", PLAYER_ID_GAME_MASTER);
+    }
+    else
+    {
+        m_account_mode = ACCOUNT_OFFLINE;
+        ribbon->select("tab_offline", PLAYER_ID_GAME_MASTER);
+    }
+
+    // Hide the tabs in case of a rename
+    ribbon->setVisible(m_existing_player == NULL);
     Screen::init();
 
     // If there is no player (i.e. first start of STK), try to pick
@@ -85,13 +101,8 @@ void RegisterScreen::init()
     m_signup_request = NULL;
     m_info_message_shown = false;
 
-    getWidget<CheckBoxWidget>("online")->setVisible(true);
-    getWidget<LabelWidget>("label_online")->setVisible(true);
     onDialogClose();
-    bool online =    UserConfigParams::m_internet_status
-                  != Online::RequestManager::IPERM_NOT_ALLOWED;
-    getWidget<CheckBoxWidget>("online")->setState(online);
-    makeEntryFieldsVisible(online);
+    makeEntryFieldsVisible();
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -109,8 +120,8 @@ void RegisterScreen::onDialogClose()
 {
     bool online =    UserConfigParams::m_internet_status
                   != Online::RequestManager::IPERM_NOT_ALLOWED;
-    getWidget<CheckBoxWidget>("online")->setState(online);
-    makeEntryFieldsVisible(online);
+    m_account_mode = online ? ACCOUNT_NEW_ONLINE : ACCOUNT_OFFLINE;
+    makeEntryFieldsVisible();
 }   // onDialogClose
 
 // -----------------------------------------------------------------------------
@@ -118,29 +129,30 @@ void RegisterScreen::onDialogClose()
  *  online mode.
  *  \param online True if an online account should be created.
  */
-void RegisterScreen::makeEntryFieldsVisible(bool online)
+void RegisterScreen::makeEntryFieldsVisible()
 {
     // In case of a rename, hide all other fields.
     if(m_existing_player)
     {
         m_info_widget->setVisible(false);
-        getWidget<CheckBoxWidget>("online")->setVisible(false);
-        getWidget<LabelWidget>("label_online")->setVisible(false);
-        online = false;
+        m_account_mode = ACCOUNT_OFFLINE;
     }
 
+    bool online = m_account_mode != ACCOUNT_OFFLINE;
     getWidget<TextBoxWidget>("username")->setVisible(online);
     getWidget<LabelWidget  >("label_username")->setVisible(online);
     getWidget<TextBoxWidget>("password")->setVisible(online);
     getWidget<LabelWidget  >("label_password")->setVisible(online);
-    getWidget<TextBoxWidget>("password_confirm")->setVisible(online);
-    getWidget<LabelWidget  >("label_password_confirm")->setVisible(online);
-    getWidget<TextBoxWidget>("email")->setVisible(online);
-    getWidget<LabelWidget  >("label_email")->setVisible(online);
+
+    bool new_account = online && (m_account_mode == ACCOUNT_NEW_ONLINE);
+    getWidget<TextBoxWidget>("password_confirm")->setVisible(new_account);
+    getWidget<LabelWidget  >("label_password_confirm")->setVisible(new_account);
+    getWidget<TextBoxWidget>("email")->setVisible(new_account);
+    getWidget<LabelWidget  >("label_email")->setVisible(new_account);
     if(getWidget<TextBoxWidget>("email_confirm"))
     {
-        getWidget<TextBoxWidget>("email_confirm")->setVisible(online);
-        getWidget<LabelWidget  >("label_email_confirm")->setVisible(online);
+        getWidget<TextBoxWidget>("email_confirm")->setVisible(new_account);
+        getWidget<LabelWidget  >("label_email_confirm")->setVisible(new_account);
     }
 }   // makeEntryFieldsVisible
 
@@ -199,7 +211,7 @@ void RegisterScreen::doRegister()
     handleLocalName(local_name);
 
     // If no online account is requested, don't register
-    if(!getWidget<CheckBoxWidget>("online")->getState() || m_existing_player)
+    if(m_account_mode!=ACCOUNT_NEW_ONLINE|| m_existing_player)
     {
         StateManager::get()->popMenu();
         m_existing_player = NULL;
@@ -339,16 +351,25 @@ void RegisterScreen::onUpdate(float dt)
 void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
                                 const int playerID)
 {
-    if (name == "online")
+    if (name == "mode_tabs")
     {
-        if (UserConfigParams::m_internet_status == Online::RequestManager::IPERM_NOT_ALLOWED)
+        RibbonWidget *ribbon = static_cast<RibbonWidget*>(widget);
+        std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        if ( (selection == "tab_new_online" || selection == "tab_existing_online")
+            && (UserConfigParams::m_internet_status == Online::RequestManager::IPERM_NOT_ALLOWED) )
         {
             m_info_widget->setErrorColor();
             m_info_widget->setText(_("Internet access is disabled, please enable it in the options"), false);
-            getWidget<CheckBoxWidget>("online")->setState(false);
+            return;
         }
-        else
-            makeEntryFieldsVisible(getWidget<CheckBoxWidget>("online")->getState());
+        if (selection == "tab_new_online")
+            m_account_mode = ACCOUNT_NEW_ONLINE;
+        else if (selection == "tab_existing_online")
+            m_account_mode = ACCOUNT_EXISTING_ONLINE;
+        else if (selection == "tab_offline")
+            m_account_mode = ACCOUNT_OFFLINE;
+
+        makeEntryFieldsVisible();
     }
     else if (name=="options")
     {

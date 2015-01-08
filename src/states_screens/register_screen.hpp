@@ -36,7 +36,7 @@ class RegisterScreen : public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<RegisterScreen>;
 
-    void makeEntryFieldsVisible(bool online);
+    void makeEntryFieldsVisible();
     void handleLocalName(const irr::core::stringw &local_name);
     void doRegister();
     void init();
@@ -57,6 +57,12 @@ private:
 
     /** True if the info message (email was sent...) is shown. */
     bool m_info_message_shown;
+
+    /** Which kind of account to create: new online account, new account
+     *  using an existing online account, offline account. */
+    enum { ACCOUNT_NEW_ONLINE, 
+           ACCOUNT_EXISTING_ONLINE, 
+           ACCOUNT_OFFLINE } m_account_mode;
 
 public:
 
