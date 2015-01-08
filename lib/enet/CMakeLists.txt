@@ -22,7 +22,7 @@ add_library(enet STATIC
 )
 
 if(MINGW)
-  target_link_libraries(enet wsock32 ws2_32 Winmm)
+  target_link_libraries(enet wsock32 ws2_32 winmm)
 endif()
 
 #if(WIN32)

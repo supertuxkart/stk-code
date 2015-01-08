@@ -82,7 +82,7 @@
 using namespace irr;
 
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 #if defined(__linux__) && !defined(ANDROID)
 #include <X11/Xlib.h>
