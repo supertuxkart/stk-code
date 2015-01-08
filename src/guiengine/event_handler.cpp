@@ -181,6 +181,13 @@ bool EventHandler::OnEvent (const SEvent &event)
             World::getWorld()->onMouseClick(event.MouseInput.X, event.MouseInput.Y);
         }
 
+        if (UserConfigParams::m_keyboard_debug)
+        {
+            Log::verbose("keyboard", "char %d key %d ctrl %d down %d shift %d",
+                event.KeyInput.Char, event.KeyInput.Key,
+                event.KeyInput.Control, event.KeyInput.PressedDown, 
+                event.KeyInput.Shift);
+        }
         // FIXME? it may be a bit unclean that all input events go trough
         // the gui module
         const EventPropagation blockPropagation = input_manager->input(event);

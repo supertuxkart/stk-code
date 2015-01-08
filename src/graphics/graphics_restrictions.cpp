@@ -38,9 +38,24 @@ namespace GraphicsRestrictions
 
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
-        char *m_names_of_restrictions[] = { "BufferStorage",
-                                            "GlobalIllumination",
-                                            NULL}; 
+
+        char *m_names_of_restrictions[] = {
+            "UniformBufferObject",
+            "GeometryShader4",
+            "DrawIndirect",
+            "TextureView",
+            "TextureStorage",
+            "ImageLoadStore",
+            "BaseInstance",
+            "ComputeShader",
+            "ShaderStorageBufferObject",
+            "MultiDrawIndirect",
+            "ShaderAtomicCounters",
+            "BufferStorage",
+            "BindlessTexture",
+            "TextureCompressionS3TC",
+            "AMDVertexShaderLayer"
+        };
     }   // namespace Private
     using namespace Private;
 
@@ -138,6 +153,19 @@ public:
             if (s.size() == 3)
             {
                 convertVersionString(s[2]);
+                return;
+            }
+
+        }
+
+        // AMD: driver_version = "4.3.13283 Core Profile/Debug Context 14.501.1003.0"
+        // ----------------------------------------------
+        if (card_name.find("AMD") != std::string::npos)
+        {
+            std::vector<std::string> s = StringUtils::split(driver_version, ' ');
+            if (s.size() == 5)
+            {
+                convertVersionString(s[4]);
                 return;
             }
 
@@ -324,9 +352,9 @@ public:
  */
 void unitTesting()
 {
-    assert(Version("1") == Version("1"));
-    assert(Version("1") != Version("2"));
-    assert(Version("1") <= Version("2"));
+    assert(Version("1")     == Version("1"));
+    assert(Version("1")     != Version("2"));
+    assert(Version("1")     <= Version("2"));
     assert(Version("1")     <  Version("2"));
     assert(Version("1.2.3") <  Version("2"));
     assert(Version("1.2.3") <  Version("1.3"));

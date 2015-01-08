@@ -34,8 +34,21 @@ namespace GraphicsRestrictions
      *  type declaration needs a change in that variable as well. */
     enum GraphicsRestrictionsType 
     {
+        GR_UNIFORM_BUFFER_OBJECT,
+        GR_GEOMETRY_SHADER4,
+        GR_DRAW_INDIRECT,
+        GR_TEXTURE_VIEW,
+        GR_TEXTURE_STORAGE,
+        GR_IMAGE_LOAD_STORE,
+        GR_BASE_INSTANCE,
+        GR_COMPUTE_SHADER,
+        GR_SHADER_STORAGE_BUFFER_OBJECT,
+        GR_MULTI_DRAW_INDIRECT,
+        GR_SHADER_ATOMIC_COUNTERS,
         GR_BUFFER_STORAGE,
-        GR_GLOBAL_ILLUMINATION,
+        GR_BINDLESS_TEXTURE,
+        GR_EXT_TEXTURE_COMPRESSION_S3TC,
+        GR_AMD_VERTEX_SHADER_LAYER,
         GR_COUNT  /** MUST be last entry. */
     } ;
 

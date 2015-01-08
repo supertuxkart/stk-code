@@ -431,10 +431,10 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
             }
         }
 
+        GamePadDevice *gpad = input_manager->getDeviceManager()
+                            ->getGamePadFromIrrID(sensed_input.m_device_id);
 
-        std::string gamepad_name = input_manager->getDeviceManager()
-                                 ->getGamePadFromIrrID(sensed_input.m_device_id)
-                                 ->getName();
+        std::string gamepad_name = gpad ? gpad->getName() : "UNKNOWN DEVICE";
         if (m_config->getName() == gamepad_name)
         {
             GamepadConfig* config =  (GamepadConfig*)m_config;
