@@ -246,7 +246,7 @@ namespace Online
                 m_player = player;
                 m_player->setUserDetails(this,
                     m_player->rememberPassword() ? "client-quit"
-                                       : "disconnect");
+                                                 : "disconnect");
                 setAbortable(false);
             }   // SignOutRequest
         };   // SignOutRequest
@@ -274,7 +274,7 @@ namespace Online
         if (!success)
         {
             Log::warn("OnlinePlayerProfile::signOut",
-                      "There were some connection issues while signing out. "
+                      "There were some connection issues while logging out. "
                       "Report a bug if this caused issues.");
             Log::warn("OnlinePlayerProfile::signOut", core::stringc(info.c_str()).c_str());
             if (user_screen)

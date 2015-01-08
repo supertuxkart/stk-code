@@ -136,7 +136,7 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    core::stringw m = _("Signed in as: %s.",
+    core::stringw m = _("Logged in as: %s.",
                         PlayerManager::getCurrentOnlineUserName());
     m_online_status_widget->setText(m, false);
 }   // init
@@ -152,12 +152,12 @@ void OnlineScreen::onUpdate(float delta)
 
     if (m_recorded_state == PlayerProfile::OS_SIGNING_IN)
     {
-        m_online_status_widget->setText(StringUtils::loadingDots(_("Signing in")),
+        m_online_status_widget->setText(StringUtils::loadingDots(_("Logging in")),
                                         false                                   );
     }
     else if (m_recorded_state == PlayerProfile::OS_SIGNING_OUT)
     {
-        m_online_status_widget->setText(StringUtils::loadingDots(_("Signing out")),
+        m_online_status_widget->setText(StringUtils::loadingDots(_("Logging out")),
                                         false                                    );
     }
 }   // onUpdate

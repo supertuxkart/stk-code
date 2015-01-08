@@ -441,8 +441,8 @@ void BaseUserScreen::onUpdate(float dt)
     if (!m_options_widget->isActivated())
     {
         core::stringw message = (m_state & STATE_LOGOUT)
-                              ? _(L"Signing out '%s'",m_sign_out_name.c_str())
-                              : _(L"Signing in '%s'", m_sign_in_name.c_str());
+                              ? _(L"Logging out '%s'",m_sign_out_name.c_str())
+                              : _(L"Logging in '%s'", m_sign_in_name.c_str());
         m_info_widget->setText(StringUtils::loadingDots(message.c_str()),
                                false                                      );
     }

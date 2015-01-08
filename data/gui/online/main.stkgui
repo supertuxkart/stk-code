@@ -35,7 +35,7 @@
                 <icon-button id="profile" width="64" height="64" icon="gui/green_check.png"  extend_label="50"
                              I18N="In the online multiplayer screen" text="Profile" label_location="hover"/>
                 <icon-button id="sign_out" width="64" height="64" icon="gui/main_quit.png"  extend_label="70"
-                             I18N="In the online multiplayer screen" text="Sign Out" label_location="hover"/>
+                             I18N="In the online multiplayer screen" text="Log Out" label_location="hover"/>
             </buttonbar>
 
         </bottombar>
