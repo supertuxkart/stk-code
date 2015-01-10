@@ -296,7 +296,6 @@ source/Irrlicht/CFileSystem.h
 source/Irrlicht/CSceneNodeAnimatorRotation.h
 source/Irrlicht/CGUISkin.h
 source/Irrlicht/CNPKReader.h
-source/Irrlicht/IDepthBuffer.h
 source/Irrlicht/S4DVertex.h
 source/Irrlicht/CGUIMenu.h
 source/Irrlicht/CBlit.h
