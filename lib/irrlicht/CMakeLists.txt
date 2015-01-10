@@ -73,7 +73,6 @@ source/Irrlicht/CBoneSceneNode.cpp
 source/Irrlicht/CNPKReader.cpp
 source/Irrlicht/COpenGLSLMaterialRenderer.cpp
 source/Irrlicht/CParticleRotationAffector.cpp
-source/Irrlicht/CDepthBuffer.cpp
 source/Irrlicht/CImageLoaderPSD.cpp
 source/Irrlicht/CTriangleBBSelector.cpp
 source/Irrlicht/CGUIComboBox.cpp
@@ -290,7 +289,6 @@ source/Irrlicht/CImageLoaderJPG.h
 source/Irrlicht/CBillboardSceneNode.h
 source/Irrlicht/CIrrDeviceSDL.h
 source/Irrlicht/CSkyDomeSceneNode.h
-source/Irrlicht/CDepthBuffer.h
 source/Irrlicht/CGUIInOutFader.h
 source/Irrlicht/CGUIFont.h
 source/Irrlicht/CGUIImageList.h
