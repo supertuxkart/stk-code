@@ -25,10 +25,6 @@ namespace irr
 #include "COpenGLExtensionHandler.h"
 #include "COpenGLTexture.h"
 
-#ifdef _IRR_COMPILE_WITH_CG_
-#include "Cg/cg.h"
-#endif
-
 namespace irr
 {
 
@@ -411,11 +407,6 @@ namespace video
 		//! sets the needed renderstates
 		void setRenderStates3DMode();
 
-		//! Get Cg context
-		#ifdef _IRR_COMPILE_WITH_CG_
-		const CGcontext& getCgContext();
-		#endif
-
 	private:
 
 		//! clears the zbuffer and color buffer
@@ -599,9 +590,6 @@ namespace video
 		#endif
 		#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
 			CIrrDeviceSDL *SDLDevice;
-		#endif
-		#ifdef _IRR_COMPILE_WITH_CG_
-		CGcontext CgContext;
 		#endif
 
 		E_DEVICE_TYPE DeviceType;
