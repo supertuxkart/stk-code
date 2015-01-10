@@ -6,6 +6,7 @@ uniform float split0;
 uniform float split1;
 uniform float split2;
 uniform float splitmax;
+uniform float shadow_res;
 
 in vec2 uv;
 out vec4 Diff;
@@ -29,7 +30,7 @@ float getShadowFactor(vec3 pos, int index)
     for (float i = -1.; i <= 1.; i += 1.)
     {
         for (float j = -1.; j <= 1.; j += 1.)
-            result += texture(shadowtex, vec4(shadowtexcoord + vec2(i,j) / 1024., float(index), d));
+            result += texture(shadowtex, vec4(shadowtexcoord + vec2(i,j) / shadow_res, float(index), d));
     }
 
     return result / 9.;

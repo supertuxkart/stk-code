@@ -1702,7 +1702,7 @@ namespace FullScreenShader
 
         // Use 8 to circumvent a catalyst bug when binding sampler
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
-        AssignUniforms("split0", "split1", "split2", "splitmax", "direction", "col");
+        AssignUniforms("split0", "split1", "split2", "splitmax", "shadow_res");
     }
 
     ShadowedSunLightShaderESM::ShadowedSunLightShaderESM()
@@ -1718,7 +1718,7 @@ namespace FullScreenShader
 
         // Use 8 to circumvent a catalyst bug when binding sampler
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
-        AssignUniforms("split0", "split1", "split2", "splitmax", "direction", "col");
+        AssignUniforms("split0", "split1", "split2", "splitmax");
     }
 
     RadianceHintsConstructionShader::RadianceHintsConstructionShader()

@@ -272,7 +272,7 @@ bool CentralVideoSettings::supportsComputeShadersFiltering() const
 
 bool CentralVideoSettings::isShadowEnabled() const
 {
-    return supportsShadows() && UserConfigParams::m_shadows;
+    return supportsShadows() && (UserConfigParams::m_shadows_resolution > 0);
 }
 
 bool CentralVideoSettings::isGlobalIlluminationEnabled() const
