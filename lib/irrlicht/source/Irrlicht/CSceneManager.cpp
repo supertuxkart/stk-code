@@ -52,10 +52,6 @@
 #include "CXMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_OCT_LOADER_
-#include "COCTLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_CSM_LOADER_
 #include "CCSMLoader.h"
 #endif
@@ -219,9 +215,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 
 	#ifdef _IRR_COMPILE_WITH_STL_LOADER_
 	MeshLoaderList.push_back(new CSTLMeshFileLoader());
-	#endif
-	#ifdef _IRR_COMPILE_WITH_OCT_LOADER_
-	MeshLoaderList.push_back(new COCTLoader(this, FileSystem));
 	#endif
 	#ifdef _IRR_COMPILE_WITH_CSM_LOADER_
 	MeshLoaderList.push_back(new CCSMLoader(this, FileSystem));

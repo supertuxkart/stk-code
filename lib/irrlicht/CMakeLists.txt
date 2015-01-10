@@ -154,7 +154,6 @@ source/Irrlicht/CMD3MeshFileLoader.cpp
 source/Irrlicht/COpenGLExtensionHandler.cpp
 source/Irrlicht/CImageLoaderWAL.cpp
 source/Irrlicht/CXMLWriter.cpp
-source/Irrlicht/COCTLoader.cpp
 source/Irrlicht/COBJMeshFileLoader.cpp
 source/Irrlicht/CSceneNodeAnimatorCameraFPS.cpp
 source/Irrlicht/CImageLoaderPPM.cpp
@@ -293,7 +292,6 @@ source/Irrlicht/CIrrDeviceWin32.h
 source/Irrlicht/CGUIEditBox.h
 source/Irrlicht/CGUISpriteBank.h
 source/Irrlicht/CSceneNodeAnimatorFlyStraight.h
-source/Irrlicht/COCTLoader.h
 source/Irrlicht/COpenGLExtensionHandler.h
 source/Irrlicht/CImageWriterPSD.h
 source/Irrlicht/CGUIScrollBar.h
