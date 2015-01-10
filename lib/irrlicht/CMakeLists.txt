@@ -170,7 +170,6 @@ source/Irrlicht/CSceneNodeAnimatorDelete.cpp
 source/Irrlicht/CImageWriterBMP.cpp
 source/Irrlicht/CParticleMeshEmitter.cpp
 source/Irrlicht/CSceneNodeAnimatorRotation.cpp
-source/Irrlicht/COpenGLNormalMapRenderer.cpp
 source/Irrlicht/glext.h
 source/Irrlicht/CB3DMeshFileLoader.h
 source/Irrlicht/CIrrDeviceLinux.h
@@ -208,7 +207,6 @@ source/Irrlicht/CGUITable.h
 source/Irrlicht/CGUIColorSelectDialog.h
 source/Irrlicht/CCubeSceneNode.h
 source/Irrlicht/resource.h
-source/Irrlicht/COpenGLNormalMapRenderer.h
 source/Irrlicht/CSceneNodeAnimatorCameraMaya.h
 source/Irrlicht/SoftwareDriver2_helper.h
 source/Irrlicht/CGUIWindow.h
