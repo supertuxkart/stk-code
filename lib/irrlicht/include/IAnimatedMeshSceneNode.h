@@ -7,7 +7,8 @@
 
 #include "ISceneNode.h"
 #include "IBoneSceneNode.h"
-#include "IAnimatedMeshMD2.h"
+#include "IMesh.h"
+#include "IAnimatedMesh.h"
 
 namespace irr
 {
@@ -138,31 +139,6 @@ namespace scene
 		//! Gets joint count.
 		/** \return Amount of joints in the mesh. */
 		virtual u32 getJointCount() const = 0;
-
-		//! Starts a default MD2 animation.
-		/** With this method it is easily possible to start a Run,
-		Attack, Die or whatever animation, if the mesh contained in
-		this scene node is an md2 mesh. Otherwise, nothing happens.
-		\param anim: An MD2 animation type, which should be played, for
-		example EMAT_STAND for the standing animation.
-		\return True if successful, and false if not, for example if
-		the mesh in the scene node is not a md2 mesh. */
-		virtual bool setMD2Animation(EMD2_ANIMATION_TYPE anim) = 0;
-
-		//! Starts a special MD2 animation.
-		/** With this method it is easily possible to start a Run,
-		Attack, Die or whatever animation, if the mesh contained in
-		this scene node is an md2 mesh. Otherwise, nothing happens.
-		This method uses a character string to identify the animation.
-		If the animation is a standard md2 animation, you might want to
-		start this animation with the EMD2_ANIMATION_TYPE enumeration
-		instead.
-		\param animationName: Name of the animation which should be
-		played.
-		\return Returns true if successful, and false if not, for
-		example if the mesh in the scene node is not an md2 mesh, or no
-		animation with this name could be found. */
-		virtual bool setMD2Animation(const c8* animationName) = 0;
 
 		//! Returns the currently displayed frame number.
 		virtual f32 getFrameNr() const = 0;

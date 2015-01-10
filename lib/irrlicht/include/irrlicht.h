@@ -54,7 +54,6 @@
 #include "fast_atof.h"
 #include "heapsort.h"
 #include "IAnimatedMesh.h"
-#include "IAnimatedMeshMD2.h"
 #include "IAnimatedMeshSceneNode.h"
 #include "IAttributeExchangingObject.h"
 #include "IAttributes.h"

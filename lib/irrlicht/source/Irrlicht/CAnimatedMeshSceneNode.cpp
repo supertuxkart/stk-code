@@ -669,42 +669,6 @@ bool CAnimatedMeshSceneNode::removeChild(ISceneNode* child)
 	return false;
 }
 
-
-//! Starts a MD2 animation.
-bool CAnimatedMeshSceneNode::setMD2Animation(EMD2_ANIMATION_TYPE anim)
-{
-	if (!Mesh || Mesh->getMeshType() != EAMT_MD2)
-		return false;
-
-	IAnimatedMeshMD2* md = (IAnimatedMeshMD2*)Mesh;
-
-	s32 begin, end, speed;
-	md->getFrameLoop(anim, begin, end, speed);
-
-	setAnimationSpeed( f32(speed) );
-	setFrameLoop(begin, end);
-	return true;
-}
-
-
-//! Starts a special MD2 animation.
-bool CAnimatedMeshSceneNode::setMD2Animation(const c8* animationName)
-{
-	if (!Mesh || Mesh->getMeshType() != EAMT_MD2)
-		return false;
-
-	IAnimatedMeshMD2* md = (IAnimatedMeshMD2*)Mesh;
-
-	s32 begin, end, speed;
-	if (!md->getFrameLoop(animationName, begin, end, speed))
-		return false;
-
-	setAnimationSpeed( (f32)speed );
-	setFrameLoop(begin, end);
-	return true;
-}
-
-
 //! Sets looping mode which is on by default. If set to false,
 //! animations will not be looped.
 void CAnimatedMeshSceneNode::setLoopMode(bool playAnimationLooped)

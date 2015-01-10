@@ -503,7 +503,6 @@ include/IGUITable.h
 include/IGUIButton.h
 include/EMaterialFlags.h
 include/EDeviceTypes.h
-include/IAnimatedMeshMD2.h
 include/IGUIWindow.h
 include/EAttributes.h
 include/S3DVertex.h
