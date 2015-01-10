@@ -81,7 +81,6 @@ source/Irrlicht/CSceneNodeAnimatorTexture.cpp
 source/Irrlicht/COpenGLTexture.cpp
 source/Irrlicht/COctreeSceneNode.cpp
 source/Irrlicht/CWaterSurfaceSceneNode.cpp
-source/Irrlicht/CQuake3ShaderSceneNode.cpp
 source/Irrlicht/CWADReader.cpp
 source/Irrlicht/CParticleAttractionAffector.cpp
 source/Irrlicht/CMeshSceneNode.cpp
@@ -96,7 +95,6 @@ source/Irrlicht/CTextSceneNode.cpp
 source/Irrlicht/COpenGLCgMaterialRenderer.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
-source/Irrlicht/CQ3LevelMesh.cpp
 source/Irrlicht/CImageWriterPCX.cpp
 source/Irrlicht/CGUIInOutFader.cpp
 source/Irrlicht/CGUITreeView.cpp
@@ -302,7 +300,6 @@ source/Irrlicht/CGUIInOutFader.h
 source/Irrlicht/CGUIFont.h
 source/Irrlicht/CGUIImageList.h
 source/Irrlicht/CFileSystem.h
-source/Irrlicht/CQ3LevelMesh.h
 source/Irrlicht/CSceneNodeAnimatorRotation.h
 source/Irrlicht/CGUISkin.h
 source/Irrlicht/CNPKReader.h
@@ -318,7 +315,6 @@ source/Irrlicht/CNullDriver.h
 source/Irrlicht/CImageLoaderRGB.h
 source/Irrlicht/CWriteFile.h
 source/Irrlicht/CSceneNodeAnimatorFollowSpline.h
-source/Irrlicht/CQuake3ShaderSceneNode.h
 source/Irrlicht/glxext.h
 source/Irrlicht/CMetaTriangleSelector.h
 source/Irrlicht/CTarReader.h
@@ -432,7 +428,6 @@ include/IParticleMeshEmitter.h
 include/IGUIColorSelectDialog.h
 include/IGUIImage.h
 include/IGUIListBox.h
-include/IQ3LevelMesh.h
 include/vector2d.h
 include/CIndexBuffer.h
 include/IAnimatedMesh.h
@@ -462,7 +457,6 @@ include/heapsort.h
 include/IGUIComboBox.h
 include/Keycodes.h
 include/SParticle.h
-include/IQ3Shader.h
 include/EDriverTypes.h
 include/IFileSystem.h
 include/SMesh.h

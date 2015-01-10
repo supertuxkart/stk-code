@@ -113,8 +113,6 @@
 #include "IMetaTriangleSelector.h"
 #include "IOSOperator.h"
 #include "IParticleSystemSceneNode.h" // also includes all emitters and attractors
-#include "IQ3LevelMesh.h"
-#include "IQ3Shader.h"
 #include "IReadFile.h"
 #include "IReferenceCounted.h"
 #include "irrArray.h"

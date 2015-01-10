@@ -44,7 +44,6 @@
 #include "CTerrainSceneNode.h"
 #include "CEmptySceneNode.h"
 #include "CTextSceneNode.h"
-#include "CQuake3ShaderSceneNode.h"
 #include "CVolumeLightSceneNode.h"
 
 #include "CDefaultSceneNodeFactory.h"
@@ -346,16 +345,6 @@ IBillboardTextSceneNode* CSceneManager::addBillboardTextSceneNode(gui::IGUIFont*
 	return node;
 
 }
-
-
-//! Adds a scene node, which can render a quake3 shader
-IMeshSceneNode* CSceneManager::addQuake3SceneNode(const IMeshBuffer* meshBuffer,
-					const quake3::IShader * shader,
-					ISceneNode* parent, s32 id )
-{
-	return 0;
-}
-
 
 //! adds Volume Lighting Scene Node.
 //! the returned pointer must not be dropped.
