@@ -120,6 +120,7 @@ source/Irrlicht/CPakReader.cpp
 source/Irrlicht/CImage.cpp
 source/Irrlicht/CTarReader.cpp
 source/Irrlicht/CGUIButton.cpp
+source/Irrlicht/COpenGLParallaxMapRenderer.cpp
 source/Irrlicht/CGUIEditBox.cpp
 source/Irrlicht/CLogger.cpp
 source/Irrlicht/CMeshManipulator.cpp
@@ -185,6 +186,7 @@ source/Irrlicht/CImageLoaderWAL.h
 source/Irrlicht/CSceneLoaderIrr.h
 source/Irrlicht/CImageLoaderBMP.h
 source/Irrlicht/CSkinnedMesh.h
+source/Irrlicht/COpenGLParallaxMapRenderer.h
 source/Irrlicht/CParticleRingEmitter.h
 source/Irrlicht/COpenGLShaderMaterialRenderer.h
 source/Irrlicht/CImageWriterTGA.h
