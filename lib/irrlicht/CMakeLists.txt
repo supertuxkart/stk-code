@@ -86,7 +86,6 @@ source/Irrlicht/CTriangleBBSelector.cpp
 source/Irrlicht/CAnimatedMeshMD3.cpp
 source/Irrlicht/CGUIComboBox.cpp
 source/Irrlicht/CSceneNodeAnimatorTexture.cpp
-source/Irrlicht/CColladaMeshWriter.cpp
 source/Irrlicht/COpenGLTexture.cpp
 source/Irrlicht/COctreeSceneNode.cpp
 source/Irrlicht/CWaterSurfaceSceneNode.cpp
@@ -182,7 +181,6 @@ source/Irrlicht/CNullDriver.cpp
 source/Irrlicht/CCameraSceneNode.cpp
 source/Irrlicht/CGUISpinBox.cpp
 source/Irrlicht/CReadFile.cpp
-source/Irrlicht/CColladaFileLoader.cpp
 source/Irrlicht/CParticleRingEmitter.cpp
 source/Irrlicht/CMetaTriangleSelector.cpp
 source/Irrlicht/CShadowVolumeSceneNode.cpp
@@ -256,7 +254,6 @@ source/Irrlicht/wglext.h
 source/Irrlicht/CTimer.h
 source/Irrlicht/CCSMLoader.h
 source/Irrlicht/CWADReader.h
-source/Irrlicht/CColladaMeshWriter.h
 source/Irrlicht/CSceneNodeAnimatorCameraFPS.h
 source/Irrlicht/CParticleFadeOutAffector.h
 source/Irrlicht/COpenGLSLMaterialRenderer.h
@@ -322,7 +319,6 @@ source/Irrlicht/CWaterSurfaceSceneNode.h
 source/Irrlicht/SoftwareDriver2_compile_config.h
 source/Irrlicht/CSceneNodeAnimatorTexture.h
 source/Irrlicht/CXMLReader.h
-source/Irrlicht/CColladaFileLoader.h
 source/Irrlicht/CEmptySceneNode.h
 source/Irrlicht/CCgMaterialRenderer.h
 source/Irrlicht/CParticleSystemSceneNode.h
@@ -434,7 +430,6 @@ include/ITimer.h
 include/IImage.h
 include/position2d.h
 include/IGUIToolbar.h
-include/IColladaMeshWriter.h
 include/IGUISpinBox.h
 include/IGUITabControl.h
 include/IBillboardTextSceneNode.h

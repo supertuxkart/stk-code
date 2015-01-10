@@ -68,10 +68,6 @@
 #include "CMY3DMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_COLLADA_LOADER_
-#include "CColladaFileLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_DMF_LOADER_
 #include "CDMFLoader.h"
 #endif
@@ -277,9 +273,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 	#endif
 	#ifdef _IRR_COMPILE_WITH_BSP_LOADER_
 	MeshLoaderList.push_back(new CBSPMeshFileLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_COLLADA_LOADER_
-	MeshLoaderList.push_back(new CColladaFileLoader(this, FileSystem));
 	#endif
 	#ifdef _IRR_COMPILE_WITH_3DS_LOADER_
 	MeshLoaderList.push_back(new C3DSMeshFileLoader(this, FileSystem));
