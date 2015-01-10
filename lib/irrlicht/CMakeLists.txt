@@ -78,7 +78,6 @@ source/Irrlicht/CParticleGravityAffector.cpp
 source/Irrlicht/CGUISkin.cpp
 source/Irrlicht/CBoneSceneNode.cpp
 source/Irrlicht/CNPKReader.cpp
-source/Irrlicht/CIrrMeshFileLoader.cpp
 source/Irrlicht/COpenGLSLMaterialRenderer.cpp
 source/Irrlicht/CParticleRotationAffector.cpp
 source/Irrlicht/CDepthBuffer.cpp
@@ -156,7 +155,6 @@ source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/COSOperator.cpp
 source/Irrlicht/CImageLoaderJPG.cpp
 source/Irrlicht/CMD3MeshFileLoader.cpp
-source/Irrlicht/CIrrMeshWriter.cpp
 source/Irrlicht/COpenGLExtensionHandler.cpp
 source/Irrlicht/CImageLoaderWAL.cpp
 source/Irrlicht/CXMLWriter.cpp
@@ -212,7 +210,6 @@ source/Irrlicht/CIrrDeviceConsole.h
 source/Irrlicht/CTerrainSceneNode.h
 source/Irrlicht/CSceneNodeAnimatorCollisionResponse.h
 source/Irrlicht/CImageLoaderWAL.h
-source/Irrlicht/CIrrMeshFileLoader.h
 source/Irrlicht/CSceneLoaderIrr.h
 source/Irrlicht/CImageLoaderBMP.h
 source/Irrlicht/CSkinnedMesh.h
@@ -344,7 +341,6 @@ source/Irrlicht/CGUIInOutFader.h
 source/Irrlicht/CGUIFont.h
 source/Irrlicht/CGUIImageList.h
 source/Irrlicht/CAnimatedMeshMD2.h
-source/Irrlicht/CIrrMeshWriter.h
 source/Irrlicht/COBJMeshFileLoader.h
 source/Irrlicht/CFileSystem.h
 source/Irrlicht/CQ3LevelMesh.h

@@ -307,11 +307,6 @@ B3D, MS3D or X meshes */
 #endif
 #endif	// _IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_
 
-//! Define _IRR_COMPILE_WITH_IRR_MESH_LOADER_ if you want to load Irrlicht Engine .irrmesh files
-#define _IRR_COMPILE_WITH_IRR_MESH_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_IRR_MESH_LOADER_
-#undef _IRR_COMPILE_WITH_IRR_MESH_LOADER_
-#endif
 //! Define _IRR_COMPILE_WITH_MD2_LOADER_ if you want to load Quake 2 animated files
 #define _IRR_COMPILE_WITH_MD2_LOADER_
 #ifdef NO_IRR_COMPILE_WITH_MD2_LOADER_
@@ -383,16 +378,6 @@ B3D, MS3D or X meshes */
 #undef _IRR_COMPILE_WITH_SMF_LOADER_
 #endif
 
-//! Define _IRR_COMPILE_WITH_IRR_WRITER_ if you want to write static .irrMesh files
-//#define _IRR_COMPILE_WITH_IRR_WRITER_
-#ifdef NO_IRR_COMPILE_WITH_IRR_WRITER_
-#undef _IRR_COMPILE_WITH_IRR_WRITER_
-#endif
-//! Define _IRR_COMPILE_WITH_COLLADA_WRITER_ if you want to write Collada files
-//#define _IRR_COMPILE_WITH_COLLADA_WRITER_
-#ifdef NO_IRR_COMPILE_WITH_COLLADA_WRITER_
-#undef _IRR_COMPILE_WITH_COLLADA_WRITER_
-#endif
 //! Define _IRR_COMPILE_WITH_STL_WRITER_ if you want to write .stl files
 //#define _IRR_COMPILE_WITH_STL_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_STL_WRITER_
