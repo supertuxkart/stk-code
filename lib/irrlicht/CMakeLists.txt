@@ -92,7 +92,6 @@ source/Irrlicht/CGUIFont.cpp
 source/Irrlicht/CTriangleSelector.cpp
 source/Irrlicht/CParticlePointEmitter.cpp
 source/Irrlicht/CTextSceneNode.cpp
-source/Irrlicht/COpenGLCgMaterialRenderer.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
 source/Irrlicht/CImageWriterPCX.cpp
@@ -337,7 +336,6 @@ source/Irrlicht/CGUIContextMenu.h
 source/Irrlicht/CFileList.h
 source/Irrlicht/CPakReader.h
 source/Irrlicht/CLimitReadFile.h
-source/Irrlicht/COpenGLCgMaterialRenderer.h
 source/Irrlicht/CGUISpinBox.h
 source/Irrlicht/CGUIButton.h
 source/Irrlicht/CGUIListBox.h
