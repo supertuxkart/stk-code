@@ -113,7 +113,6 @@ source/Irrlicht/CGUITreeView.cpp
 source/Irrlicht/CAnimatedMeshSceneNode.cpp
 source/Irrlicht/CGUICheckBox.cpp
 source/Irrlicht/CGUIWindow.cpp
-source/Irrlicht/CPLYMeshFileLoader.cpp
 source/Irrlicht/CSceneNodeAnimatorCameraMaya.cpp
 source/Irrlicht/CSceneNodeAnimatorFlyCircle.cpp
 source/Irrlicht/CColorConverter.cpp
@@ -187,7 +186,6 @@ source/Irrlicht/CGUIImage.cpp
 source/Irrlicht/CGUIEnvironment.cpp
 source/Irrlicht/CParticleScaleAffector.cpp
 source/Irrlicht/CSceneNodeAnimatorDelete.cpp
-source/Irrlicht/CPLYMeshWriter.cpp
 source/Irrlicht/CImageWriterBMP.cpp
 source/Irrlicht/CParticleMeshEmitter.cpp
 source/Irrlicht/CSceneNodeAnimatorRotation.cpp
@@ -264,7 +262,6 @@ source/Irrlicht/CSceneManager.h
 source/Irrlicht/CImageLoaderPSD.h
 source/Irrlicht/COpenGLDriver.h
 source/Irrlicht/CGUIComboBox.h
-source/Irrlicht/CPLYMeshFileLoader.h
 source/Irrlicht/CVolumeLightSceneNode.h
 source/Irrlicht/CSceneCollisionManager.h
 source/Irrlicht/ISceneNodeAnimatorFinishing.h
@@ -329,7 +326,6 @@ source/Irrlicht/CImageLoaderJPG.h
 source/Irrlicht/CBillboardSceneNode.h
 source/Irrlicht/CIrrDeviceSDL.h
 source/Irrlicht/CSkyDomeSceneNode.h
-source/Irrlicht/CPLYMeshWriter.h
 source/Irrlicht/CDepthBuffer.h
 source/Irrlicht/CGUIInOutFader.h
 source/Irrlicht/CGUIFont.h
