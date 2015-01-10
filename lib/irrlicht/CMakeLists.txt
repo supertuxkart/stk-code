@@ -111,7 +111,6 @@ source/Irrlicht/CBillboardSceneNode.cpp
 source/Irrlicht/CGUIImageList.cpp
 source/Irrlicht/CSceneCollisionManager.cpp
 source/Irrlicht/CIrrDeviceWin32.cpp
-source/Irrlicht/CSceneLoaderIrr.cpp
 source/Irrlicht/CEmptySceneNode.cpp
 source/Irrlicht/CParticleBoxEmitter.cpp
 source/Irrlicht/CParticleSystemSceneNode.cpp
@@ -183,7 +182,6 @@ source/Irrlicht/CIrrDeviceConsole.h
 source/Irrlicht/CTerrainSceneNode.h
 source/Irrlicht/CSceneNodeAnimatorCollisionResponse.h
 source/Irrlicht/CImageLoaderWAL.h
-source/Irrlicht/CSceneLoaderIrr.h
 source/Irrlicht/CImageLoaderBMP.h
 source/Irrlicht/CSkinnedMesh.h
 source/Irrlicht/COpenGLParallaxMapRenderer.h
