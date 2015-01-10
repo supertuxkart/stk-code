@@ -93,7 +93,6 @@ source/Irrlicht/CQuake3ShaderSceneNode.cpp
 source/Irrlicht/CWADReader.cpp
 source/Irrlicht/CParticleAttractionAffector.cpp
 source/Irrlicht/CMeshSceneNode.cpp
-source/Irrlicht/CCSMLoader.cpp
 source/Irrlicht/COBJMeshWriter.cpp
 source/Irrlicht/CGUIScrollBar.cpp
 source/Irrlicht/CAttributes.cpp
@@ -247,7 +246,6 @@ source/Irrlicht/CAnimatedMeshSceneNode.h
 source/Irrlicht/CGUIStaticText.h
 source/Irrlicht/wglext.h
 source/Irrlicht/CTimer.h
-source/Irrlicht/CCSMLoader.h
 source/Irrlicht/CWADReader.h
 source/Irrlicht/CSceneNodeAnimatorCameraFPS.h
 source/Irrlicht/CParticleFadeOutAffector.h
