@@ -153,7 +153,6 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/graphics_restrictions.hpp"
-#include "graphics/hardware_skinning.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
