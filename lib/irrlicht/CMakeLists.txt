@@ -117,7 +117,6 @@ source/Irrlicht/CMeshCache.cpp
 source/Irrlicht/CIrrDeviceFB.cpp
 source/Irrlicht/CMemoryFile.cpp
 source/Irrlicht/CImageWriterPPM.cpp
-source/Irrlicht/CSTLMeshFileLoader.cpp
 source/Irrlicht/CMountPointReader.cpp
 source/Irrlicht/CBillboardSceneNode.cpp
 source/Irrlicht/CGUIImageList.cpp
@@ -140,7 +139,6 @@ source/Irrlicht/CLightSceneNode.cpp
 source/Irrlicht/CImageLoaderDDS.cpp
 source/Irrlicht/CSkyBoxSceneNode.cpp
 source/Irrlicht/CWriteFile.cpp
-source/Irrlicht/CSTLMeshWriter.cpp
 source/Irrlicht/COctreeTriangleSelector.cpp
 source/Irrlicht/CFileList.cpp
 source/Irrlicht/CImageLoaderPCX.cpp
@@ -229,7 +227,6 @@ source/Irrlicht/SoftwareDriver2_helper.h
 source/Irrlicht/CGUIWindow.h
 source/Irrlicht/CMD2MeshFileLoader.h
 source/Irrlicht/dmfsupport.h
-source/Irrlicht/CSTLMeshFileLoader.h
 source/Irrlicht/CGUICheckBox.h
 source/Irrlicht/CMeshManipulator.h
 source/Irrlicht/IImagePresenter.h
@@ -347,7 +344,6 @@ source/Irrlicht/CXMLWriter.h
 source/Irrlicht/CParticleCylinderEmitter.h
 source/Irrlicht/ITriangleRenderer.h
 source/Irrlicht/CSceneNodeAnimatorDelete.h
-source/Irrlicht/CSTLMeshWriter.h
 source/Irrlicht/CIrrDeviceFB.h
 source/Irrlicht/CGUIEnvironment.h
 source/Irrlicht/CTerrainTriangleSelector.h

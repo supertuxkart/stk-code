@@ -68,10 +68,6 @@
 #include "CB3DMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_STL_LOADER_
-#include "CSTLMeshFileLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_IRR_SCENE_LOADER_
 #include "CSceneLoaderIrr.h"
 #endif
@@ -197,9 +193,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 	// TODO: now that we have multiple scene managers, these should be
 	// shallow copies from the previous manager if there is one.
 
-	#ifdef _IRR_COMPILE_WITH_STL_LOADER_
-	MeshLoaderList.push_back(new CSTLMeshFileLoader());
-	#endif
 	#ifdef _IRR_COMPILE_WITH_OGRE_LOADER_
 	MeshLoaderList.push_back(new COgreMeshFileLoader(FileSystem, Driver));
 	#endif
