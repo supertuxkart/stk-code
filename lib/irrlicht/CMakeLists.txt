@@ -61,7 +61,6 @@ source/Irrlicht/CGUIFileOpenDialog.cpp
 source/Irrlicht/CGUISpriteBank.cpp
 source/Irrlicht/CParticleFadeOutAffector.cpp
 source/Irrlicht/CGUIMenu.cpp
-source/Irrlicht/CCgMaterialRenderer.cpp
 source/Irrlicht/CImageWriterPSD.cpp
 source/Irrlicht/CSphereSceneNode.cpp
 source/Irrlicht/CImageWriterTGA.cpp
@@ -290,7 +289,6 @@ source/Irrlicht/SoftwareDriver2_compile_config.h
 source/Irrlicht/CSceneNodeAnimatorTexture.h
 source/Irrlicht/CXMLReader.h
 source/Irrlicht/CEmptySceneNode.h
-source/Irrlicht/CCgMaterialRenderer.h
 source/Irrlicht/CParticleSystemSceneNode.h
 source/Irrlicht/CImageWriterPNG.h
 source/Irrlicht/CParticleScaleAffector.h
