@@ -55,7 +55,6 @@ source/Irrlicht/CAnimatedMeshMD2.cpp
 source/Irrlicht/CZipReader.cpp
 source/Irrlicht/CImageLoaderPNG.cpp
 source/Irrlicht/CImageLoaderBMP.cpp
-source/Irrlicht/CIrrDeviceWinCE.cpp
 source/Irrlicht/CVolumeLightSceneNode.cpp
 source/Irrlicht/CDefaultSceneNodeAnimatorFactory.cpp
 source/Irrlicht/CSkyDomeSceneNode.cpp
@@ -284,7 +283,6 @@ source/Irrlicht/CTriangleSelector.h
 source/Irrlicht/CParticleGravityAffector.h
 source/Irrlicht/CGUIModalScreen.h
 source/Irrlicht/CDefaultSceneNodeFactory.h
-source/Irrlicht/CIrrDeviceWinCE.h
 source/Irrlicht/CImageLoaderPPM.h
 source/Irrlicht/CXMLReaderImpl.h
 source/Irrlicht/COpenGLMaterialRenderer.h
