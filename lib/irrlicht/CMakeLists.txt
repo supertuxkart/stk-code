@@ -68,7 +68,6 @@ source/Irrlicht/CCgMaterialRenderer.cpp
 source/Irrlicht/CMD2MeshFileLoader.cpp
 source/Irrlicht/CImageWriterPSD.cpp
 source/Irrlicht/CSphereSceneNode.cpp
-source/Irrlicht/CLMTSMeshFileLoader.cpp
 source/Irrlicht/CImageWriterTGA.cpp
 source/Irrlicht/CImageWriterPNG.cpp
 source/Irrlicht/CSceneNodeAnimatorFollowSpline.cpp
@@ -339,7 +338,6 @@ source/Irrlicht/IAttribute.h
 source/Irrlicht/CNullDriver.h
 source/Irrlicht/CImageLoaderRGB.h
 source/Irrlicht/CWriteFile.h
-source/Irrlicht/CLMTSMeshFileLoader.h
 source/Irrlicht/CSceneNodeAnimatorFollowSpline.h
 source/Irrlicht/CQuake3ShaderSceneNode.h
 source/Irrlicht/glxext.h

@@ -52,10 +52,6 @@
 #include "CXMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_LMTS_LOADER_
-#include "CLMTSMeshFileLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_OGRE_LOADER_
 #include "COgreMeshFileLoader.h"
 #endif
