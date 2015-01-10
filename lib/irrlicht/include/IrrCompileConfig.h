@@ -327,11 +327,6 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_BSP_LOADER_
 #undef _IRR_COMPILE_WITH_BSP_LOADER_
 #endif
-//! Define _IRR_COMPILE_WITH_DMF_LOADER_ if you want to load DeleD files
-#define _IRR_COMPILE_WITH_DMF_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_DMF_LOADER_
-#undef _IRR_COMPILE_WITH_DMF_LOADER_
-#endif
 //! Define _IRR_COMPILE_WITH_LMTS_LOADER_ if you want to load LMTools files
 #define _IRR_COMPILE_WITH_LMTS_LOADER_
 #ifdef NO_IRR_COMPILE_WITH_LMTS_LOADER_

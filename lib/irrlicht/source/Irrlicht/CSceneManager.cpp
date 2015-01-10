@@ -68,10 +68,6 @@
 #include "CMY3DMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_DMF_LOADER_
-#include "CDMFLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_OGRE_LOADER_
 #include "COgreMeshFileLoader.h"
 #endif
@@ -249,9 +245,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 	#endif
 	#ifdef _IRR_COMPILE_WITH_MY3D_LOADER_
 	MeshLoaderList.push_back(new CMY3DMeshFileLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_DMF_LOADER_
-	MeshLoaderList.push_back(new CDMFLoader(this, FileSystem));
 	#endif
 	#ifdef _IRR_COMPILE_WITH_OGRE_LOADER_
 	MeshLoaderList.push_back(new COgreMeshFileLoader(FileSystem, Driver));

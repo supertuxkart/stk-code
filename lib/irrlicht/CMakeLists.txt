@@ -107,7 +107,6 @@ source/Irrlicht/COpenGLCgMaterialRenderer.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
 source/Irrlicht/CQ3LevelMesh.cpp
-source/Irrlicht/CDMFLoader.cpp
 source/Irrlicht/CImageWriterPCX.cpp
 source/Irrlicht/CGUIInOutFader.cpp
 source/Irrlicht/CGUITreeView.cpp
@@ -351,7 +350,6 @@ source/Irrlicht/CZipReader.h
 source/Irrlicht/CGUIToolBar.h
 source/Irrlicht/CImageWriterJPG.h
 source/Irrlicht/IAttribute.h
-source/Irrlicht/CDMFLoader.h
 source/Irrlicht/CNullDriver.h
 source/Irrlicht/CImageLoaderRGB.h
 source/Irrlicht/CWriteFile.h
