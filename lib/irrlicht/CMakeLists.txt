@@ -90,7 +90,6 @@ source/Irrlicht/CQuake3ShaderSceneNode.cpp
 source/Irrlicht/CWADReader.cpp
 source/Irrlicht/CParticleAttractionAffector.cpp
 source/Irrlicht/CMeshSceneNode.cpp
-source/Irrlicht/COBJMeshWriter.cpp
 source/Irrlicht/CGUIScrollBar.cpp
 source/Irrlicht/CAttributes.cpp
 source/Irrlicht/CGUIStaticText.cpp
@@ -148,7 +147,6 @@ source/Irrlicht/CMD3MeshFileLoader.cpp
 source/Irrlicht/COpenGLExtensionHandler.cpp
 source/Irrlicht/CImageLoaderWAL.cpp
 source/Irrlicht/CXMLWriter.cpp
-source/Irrlicht/COBJMeshFileLoader.cpp
 source/Irrlicht/CSceneNodeAnimatorCameraFPS.cpp
 source/Irrlicht/CImageLoaderPPM.cpp
 source/Irrlicht/CGUIColorSelectDialog.cpp
@@ -260,7 +258,6 @@ source/Irrlicht/aesGladman/aes.h
 source/Irrlicht/aesGladman/sha1.h
 source/Irrlicht/aesGladman/prng.h
 source/Irrlicht/aesGladman/aesopt.h
-source/Irrlicht/COBJMeshWriter.h
 source/Irrlicht/CGUITabControl.h
 source/Irrlicht/CSphereSceneNode.h
 source/Irrlicht/CIrrDeviceStub.h
@@ -316,7 +313,6 @@ source/Irrlicht/CGUIInOutFader.h
 source/Irrlicht/CGUIFont.h
 source/Irrlicht/CGUIImageList.h
 source/Irrlicht/CAnimatedMeshMD2.h
-source/Irrlicht/COBJMeshFileLoader.h
 source/Irrlicht/CFileSystem.h
 source/Irrlicht/CQ3LevelMesh.h
 source/Irrlicht/CSceneNodeAnimatorRotation.h

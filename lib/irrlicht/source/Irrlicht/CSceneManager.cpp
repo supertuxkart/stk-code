@@ -52,10 +52,6 @@
 #include "COgreMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_OBJ_LOADER_
-#include "COBJMeshFileLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_MD3_LOADER_
 #include "CMD3MeshFileLoader.h"
 #endif
@@ -78,10 +74,6 @@
 
 #ifdef _IRR_COMPILE_WITH_STL_WRITER_
 #include "CSTLMeshWriter.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_OBJ_WRITER_
-#include "COBJMeshWriter.h"
 #endif
 
 #ifdef _IRR_COMPILE_WITH_PLY_WRITER_
@@ -212,9 +204,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 	#endif
 	#ifdef _IRR_COMPILE_WITH_MS3D_LOADER_
 	MeshLoaderList.push_back(new CMS3DMeshFileLoader(Driver));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_OBJ_LOADER_
-	MeshLoaderList.push_back(new COBJMeshFileLoader(this, FileSystem));
 	#endif
 	#ifdef _IRR_COMPILE_WITH_B3D_LOADER_
 	MeshLoaderList.push_back(new CB3DMeshFileLoader(this));
@@ -2426,11 +2415,6 @@ IMeshWriter* CSceneManager::createMeshWriter(EMESH_WRITER_TYPE type)
 		return 0;
 #endif
 	case EMWT_OBJ:
-#ifdef _IRR_COMPILE_WITH_OBJ_WRITER_
-		return new COBJMeshWriter(this, FileSystem);
-#else
-		return 0;
-#endif
 
 	case EMWT_PLY:
 #ifdef _IRR_COMPILE_WITH_PLY_WRITER_

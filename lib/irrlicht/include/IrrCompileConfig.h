@@ -317,17 +317,6 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_MD3_LOADER_
 #undef _IRR_COMPILE_WITH_MD3_LOADER_
 #endif
-//! Define _IRR_COMPILE_WITH_OBJ_LOADER_ if you want to load Wavefront OBJ files
-#define _IRR_COMPILE_WITH_OBJ_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_OBJ_LOADER_
-#undef _IRR_COMPILE_WITH_OBJ_LOADER_
-#endif
-
-//! Define _IRR_COMPILE_WITH_OBJ_WRITER_ if you want to write .obj files
-//#define _IRR_COMPILE_WITH_OBJ_WRITER_
-#ifdef NO_IRR_COMPILE_WITH_OBJ_WRITER_
-#undef _IRR_COMPILE_WITH_OBJ_WRITER_
-#endif
 
 //! Define _IRR_COMPILE_WITH_BMP_LOADER_ if you want to load .bmp files
 //! Disabling this loader will also disable the built-in font
