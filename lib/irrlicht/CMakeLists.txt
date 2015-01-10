@@ -51,7 +51,6 @@ source/Irrlicht/os.cpp
 source/Irrlicht/CFPSCounter.cpp
 source/Irrlicht/CGUIContextMenu.cpp
 source/Irrlicht/CImageWriterJPG.cpp
-source/Irrlicht/CAnimatedMeshMD2.cpp
 source/Irrlicht/CZipReader.cpp
 source/Irrlicht/CImageLoaderPNG.cpp
 source/Irrlicht/CImageLoaderBMP.cpp
@@ -63,7 +62,6 @@ source/Irrlicht/CGUISpriteBank.cpp
 source/Irrlicht/CParticleFadeOutAffector.cpp
 source/Irrlicht/CGUIMenu.cpp
 source/Irrlicht/CCgMaterialRenderer.cpp
-source/Irrlicht/CMD2MeshFileLoader.cpp
 source/Irrlicht/CImageWriterPSD.cpp
 source/Irrlicht/CSphereSceneNode.cpp
 source/Irrlicht/CImageWriterTGA.cpp
@@ -218,7 +216,6 @@ source/Irrlicht/COpenGLNormalMapRenderer.h
 source/Irrlicht/CSceneNodeAnimatorCameraMaya.h
 source/Irrlicht/SoftwareDriver2_helper.h
 source/Irrlicht/CGUIWindow.h
-source/Irrlicht/CMD2MeshFileLoader.h
 source/Irrlicht/dmfsupport.h
 source/Irrlicht/CGUICheckBox.h
 source/Irrlicht/CMeshManipulator.h
@@ -306,7 +303,6 @@ source/Irrlicht/CDepthBuffer.h
 source/Irrlicht/CGUIInOutFader.h
 source/Irrlicht/CGUIFont.h
 source/Irrlicht/CGUIImageList.h
-source/Irrlicht/CAnimatedMeshMD2.h
 source/Irrlicht/CFileSystem.h
 source/Irrlicht/CQ3LevelMesh.h
 source/Irrlicht/CSceneNodeAnimatorRotation.h

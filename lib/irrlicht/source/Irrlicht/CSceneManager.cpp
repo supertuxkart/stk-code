@@ -28,10 +28,6 @@
 #include "CIrrMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_MD2_LOADER_
-#include "CMD2MeshFileLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_HALFLIFE_LOADER_
 #include "CAnimatedMeshHalfLife.h"
 #endif
@@ -182,9 +178,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 	#endif
 	#ifdef _IRR_COMPILE_WITH_HALFLIFE_LOADER_
 	MeshLoaderList.push_back(new CHalflifeMDLMeshFileLoader( this ));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_MD2_LOADER_
-	MeshLoaderList.push_back(new CMD2MeshFileLoader());
 	#endif
 	#ifdef _IRR_COMPILE_WITH_IRR_MESH_LOADER_
 	MeshLoaderList.push_back(new CIrrMeshFileLoader(this, FileSystem));
