@@ -96,10 +96,6 @@
 #include "CPLYMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_SMF_LOADER_
-#include "CSMFMeshFileLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_IRR_SCENE_LOADER_
 #include "CSceneLoaderIrr.h"
 #endif
@@ -230,9 +226,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 	#endif
 	#ifdef _IRR_COMPILE_WITH_PLY_LOADER_
 	MeshLoaderList.push_back(new CPLYMeshFileLoader(this));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_SMF_LOADER_
-	MeshLoaderList.push_back(new CSMFMeshFileLoader(Driver));
 	#endif
 	#ifdef _IRR_COMPILE_WITH_OCT_LOADER_
 	MeshLoaderList.push_back(new COCTLoader(this, FileSystem));

@@ -146,7 +146,6 @@ source/Irrlicht/CSkyBoxSceneNode.cpp
 source/Irrlicht/CWriteFile.cpp
 source/Irrlicht/CSTLMeshWriter.cpp
 source/Irrlicht/COctreeTriangleSelector.cpp
-source/Irrlicht/CSMFMeshFileLoader.cpp
 source/Irrlicht/CFileList.cpp
 source/Irrlicht/CImageLoaderPCX.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
@@ -367,7 +366,6 @@ source/Irrlicht/CSTLMeshWriter.h
 source/Irrlicht/CIrrDeviceFB.h
 source/Irrlicht/CGUIEnvironment.h
 source/Irrlicht/CTerrainTriangleSelector.h
-source/Irrlicht/CSMFMeshFileLoader.h
 source/Irrlicht/CAttributeImpl.h
 source/Irrlicht/CAnimatedMeshMD3.h
 source/Irrlicht/CGeometryCreator.h
