@@ -155,7 +155,6 @@ source/Irrlicht/CXMLWriter.cpp
 source/Irrlicht/COBJMeshFileLoader.cpp
 source/Irrlicht/CSceneNodeAnimatorCameraFPS.cpp
 source/Irrlicht/CImageLoaderPPM.cpp
-source/Irrlicht/CMY3DMeshFileLoader.cpp
 source/Irrlicht/CGUIColorSelectDialog.cpp
 source/Irrlicht/CSceneManager.cpp
 source/Irrlicht/Irrlicht.cpp
@@ -249,7 +248,6 @@ source/Irrlicht/CSceneNodeAnimatorCameraFPS.h
 source/Irrlicht/CParticleFadeOutAffector.h
 source/Irrlicht/COpenGLSLMaterialRenderer.h
 source/Irrlicht/CParticleAttractionAffector.h
-source/Irrlicht/CMY3DMeshFileLoader.h
 source/Irrlicht/MacOSX/AppDelegate.h
 source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h
 source/Irrlicht/MacOSX/OSXClipboard.h
@@ -277,7 +275,6 @@ source/Irrlicht/CParticleBoxEmitter.h
 source/Irrlicht/CShadowVolumeSceneNode.h
 source/Irrlicht/COctreeSceneNode.h
 source/Irrlicht/CReadFile.h
-source/Irrlicht/CMY3DHelper.h
 source/Irrlicht/CImageLoaderDDS.h
 source/Irrlicht/COSOperator.h
 source/Irrlicht/CLightSceneNode.h

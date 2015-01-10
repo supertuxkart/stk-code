@@ -327,11 +327,6 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_LMTS_LOADER_
 #undef _IRR_COMPILE_WITH_LMTS_LOADER_
 #endif
-//! Define _IRR_COMPILE_WITH_MY3D_LOADER_ if you want to load MY3D files
-#define _IRR_COMPILE_WITH_MY3D_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_MY3D_LOADER_
-#undef _IRR_COMPILE_WITH_MY3D_LOADER_
-#endif
 //! Define _IRR_COMPILE_WITH_OBJ_LOADER_ if you want to load Wavefront OBJ files
 #define _IRR_COMPILE_WITH_OBJ_LOADER_
 #ifdef NO_IRR_COMPILE_WITH_OBJ_LOADER_
