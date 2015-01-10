@@ -456,7 +456,6 @@ include/ITriangleSelector.h
 include/coreutil.h
 include/SMeshBufferTangents.h
 include/ILightSceneNode.h
-include/IAnimatedMeshMD3.h
 include/dimension2d.h
 include/ISceneCollisionManager.h
 include/heapsort.h

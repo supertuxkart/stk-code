@@ -8,7 +8,6 @@
 #include "ISceneNode.h"
 #include "IBoneSceneNode.h"
 #include "IAnimatedMeshMD2.h"
-#include "IAnimatedMeshMD3.h"
 
 namespace irr
 {
@@ -200,9 +199,6 @@ namespace scene
 
 		//! Returns the current mesh
 		virtual IAnimatedMesh* getMesh(void) = 0;
-
-		//! Get the absolute transformation for a special MD3 Tag if the mesh is a md3 mesh, or the absolutetransformation if it's a normal scenenode
-		virtual const SMD3QuaternionTag* getMD3TagTransformation( const core::stringc & tagname) = 0;
 
 		//! Set how the joints should be updated on render
 		virtual void setJointMode(E_JOINT_UPDATE_ON_RENDER mode)=0;

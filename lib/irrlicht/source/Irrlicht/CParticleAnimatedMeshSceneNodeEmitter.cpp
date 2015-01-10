@@ -5,6 +5,7 @@
 #include "CParticleAnimatedMeshSceneNodeEmitter.h"
 #include "IAnimatedMeshSceneNode.h"
 #include "IMesh.h"
+#include "IMeshBuffer.h"
 #include "os.h"
 
 namespace irr
