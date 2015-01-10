@@ -79,7 +79,6 @@ source/Irrlicht/CParticleRotationAffector.cpp
 source/Irrlicht/CDepthBuffer.cpp
 source/Irrlicht/CImageLoaderPSD.cpp
 source/Irrlicht/CTriangleBBSelector.cpp
-source/Irrlicht/CAnimatedMeshMD3.cpp
 source/Irrlicht/CGUIComboBox.cpp
 source/Irrlicht/CSceneNodeAnimatorTexture.cpp
 source/Irrlicht/COpenGLTexture.cpp
@@ -142,7 +141,6 @@ source/Irrlicht/CImageLoaderPCX.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/COSOperator.cpp
 source/Irrlicht/CImageLoaderJPG.cpp
-source/Irrlicht/CMD3MeshFileLoader.cpp
 source/Irrlicht/COpenGLExtensionHandler.cpp
 source/Irrlicht/CImageLoaderWAL.cpp
 source/Irrlicht/CXMLWriter.cpp
@@ -300,8 +298,6 @@ source/Irrlicht/CParticleSystemSceneNode.h
 source/Irrlicht/CImageWriterPNG.h
 source/Irrlicht/CParticleScaleAffector.h
 source/Irrlicht/CImageWriterPCX.h
-source/Irrlicht/CLogger.h
-source/Irrlicht/CMD3MeshFileLoader.h
 source/Irrlicht/CImageLoaderJPG.h
 source/Irrlicht/CBillboardSceneNode.h
 source/Irrlicht/CIrrDeviceSDL.h
@@ -340,7 +336,6 @@ source/Irrlicht/CIrrDeviceFB.h
 source/Irrlicht/CGUIEnvironment.h
 source/Irrlicht/CTerrainTriangleSelector.h
 source/Irrlicht/CAttributeImpl.h
-source/Irrlicht/CAnimatedMeshMD3.h
 source/Irrlicht/CGeometryCreator.h
 source/Irrlicht/CSkyBoxSceneNode.h
 source/Irrlicht/CImageWriterBMP.h

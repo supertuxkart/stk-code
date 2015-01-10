@@ -52,10 +52,6 @@
 #include "COgreMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_MD3_LOADER_
-#include "CMD3MeshFileLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_B3D_LOADER_
 #include "CB3DMeshFileLoader.h"
 #endif
@@ -186,9 +182,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 	#endif
 	#ifdef _IRR_COMPILE_WITH_HALFLIFE_LOADER_
 	MeshLoaderList.push_back(new CHalflifeMDLMeshFileLoader( this ));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_MD3_LOADER_
-	MeshLoaderList.push_back(new CMD3MeshFileLoader( this));
 	#endif
 	#ifdef _IRR_COMPILE_WITH_MD2_LOADER_
 	MeshLoaderList.push_back(new CMD2MeshFileLoader());

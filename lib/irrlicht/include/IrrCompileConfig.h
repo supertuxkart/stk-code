@@ -312,11 +312,6 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_MD2_LOADER_
 #undef _IRR_COMPILE_WITH_MD2_LOADER_
 #endif
-//! Define _IRR_COMPILE_WITH_MD3_LOADER_ if you want to load Quake 3 animated files
-#define _IRR_COMPILE_WITH_MD3_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_MD3_LOADER_
-#undef _IRR_COMPILE_WITH_MD3_LOADER_
-#endif
 
 //! Define _IRR_COMPILE_WITH_BMP_LOADER_ if you want to load .bmp files
 //! Disabling this loader will also disable the built-in font
