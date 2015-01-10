@@ -258,38 +258,8 @@ the engine will no longer read .png images. */
 tool <http://developer.nvidia.com/object/nvperfhud_home.html>. */
 #undef _IRR_USE_NVIDIA_PERFHUD_
 
-//! Define one of the three setting for Burning's Video Software Rasterizer
-/** So if we were marketing guys we could say Irrlicht has 4 Software-Rasterizers.
-	In a Nutshell:
-		All Burnings Rasterizers use 32 Bit Backbuffer, 32Bit Texture & 32 Bit Z or WBuffer,
-		16 Bit/32 Bit can be adjusted on a global flag.
-
-		BURNINGVIDEO_RENDERER_BEAUTIFUL
-			32 Bit + Vertexcolor + Lighting + Per Pixel Perspective Correct + SubPixel/SubTexel Correct +
-			Bilinear Texturefiltering + WBuffer
-
-		BURNINGVIDEO_RENDERER_FAST
-			32 Bit + Per Pixel Perspective Correct + SubPixel/SubTexel Correct + WBuffer +
-			Bilinear Dithering TextureFiltering + WBuffer
-
-		BURNINGVIDEO_RENDERER_ULTRA_FAST
-			16Bit + SubPixel/SubTexel Correct + ZBuffer
-*/
-
-#define BURNINGVIDEO_RENDERER_BEAUTIFUL
-//#define BURNINGVIDEO_RENDERER_FAST
-//#define BURNINGVIDEO_RENDERER_ULTRA_FAST
-//#define BURNINGVIDEO_RENDERER_CE
-
 //! Uncomment the following line if you want to ignore the deprecated warnings
 //#define IGNORE_DEPRECATED_WARNING
-
-//! Define _IRR_COMPILE_WITH_IRR_SCENE_LOADER_ if you want to be able to load
-/** .irr scenes using ISceneManager::loadScene */
-#define _IRR_COMPILE_WITH_IRR_SCENE_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_IRR_SCENE_LOADER_
-#undef _IRR_COMPILE_WITH_IRR_SCENE_LOADER_
-#endif
 
 //! Define _IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_ if you want to use bone based
 /** animated meshes. If you compile without this, you will be unable to load
