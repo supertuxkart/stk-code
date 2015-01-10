@@ -337,11 +337,6 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_OBJ_LOADER_
 #undef _IRR_COMPILE_WITH_OBJ_LOADER_
 #endif
-//! Define _IRR_COMPILE_WITH_LWO_LOADER_ if you want to load Lightwave3D files
-#define _IRR_COMPILE_WITH_LWO_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_LWO_LOADER_
-#undef _IRR_COMPILE_WITH_LWO_LOADER_
-#endif
 //! Define _IRR_COMPILE_WITH_STL_LOADER_ if you want to load stereolithography files
 #define _IRR_COMPILE_WITH_STL_LOADER_
 #ifdef NO_IRR_COMPILE_WITH_STL_LOADER_

@@ -76,10 +76,6 @@
 #include "CB3DMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_LWO_LOADER_
-#include "CLWOMeshFileLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_STL_LOADER_
 #include "CSTLMeshFileLoader.h"
 #endif
@@ -223,9 +219,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 	#endif
 	#ifdef _IRR_COMPILE_WITH_MD3_LOADER_
 	MeshLoaderList.push_back(new CMD3MeshFileLoader( this));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_LWO_LOADER_
-	MeshLoaderList.push_back(new CLWOMeshFileLoader(this, FileSystem));
 	#endif
 	#ifdef _IRR_COMPILE_WITH_MD2_LOADER_
 	MeshLoaderList.push_back(new CMD2MeshFileLoader());

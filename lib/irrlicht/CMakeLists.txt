@@ -67,7 +67,6 @@ source/Irrlicht/CGUIMenu.cpp
 source/Irrlicht/CCgMaterialRenderer.cpp
 source/Irrlicht/CMD2MeshFileLoader.cpp
 source/Irrlicht/CImageWriterPSD.cpp
-source/Irrlicht/CLWOMeshFileLoader.cpp
 source/Irrlicht/CSphereSceneNode.cpp
 source/Irrlicht/CLMTSMeshFileLoader.cpp
 source/Irrlicht/CImageWriterTGA.cpp
@@ -206,7 +205,6 @@ source/Irrlicht/CSceneLoaderIrr.h
 source/Irrlicht/CImageLoaderBMP.h
 source/Irrlicht/CSkinnedMesh.h
 source/Irrlicht/COpenGLParallaxMapRenderer.h
-source/Irrlicht/CLWOMeshFileLoader.h
 source/Irrlicht/CParticleRingEmitter.h
 source/Irrlicht/COpenGLShaderMaterialRenderer.h
 source/Irrlicht/CImageWriterTGA.h
