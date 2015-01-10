@@ -28,10 +28,6 @@
 #include "CIrrMeshFileLoader.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_BSP_LOADER_
-#include "CBSPMeshFileLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_MD2_LOADER_
 #include "CMD2MeshFileLoader.h"
 #endif
@@ -207,9 +203,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 	#endif
 	#ifdef _IRR_COMPILE_WITH_IRR_MESH_LOADER_
 	MeshLoaderList.push_back(new CIrrMeshFileLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_BSP_LOADER_
-	MeshLoaderList.push_back(new CBSPMeshFileLoader(this, FileSystem));
 	#endif
 	#ifdef _IRR_COMPILE_WITH_3DS_LOADER_
 	MeshLoaderList.push_back(new C3DSMeshFileLoader(this, FileSystem));
@@ -456,22 +449,7 @@ IMeshSceneNode* CSceneManager::addQuake3SceneNode(const IMeshBuffer* meshBuffer,
 					const quake3::IShader * shader,
 					ISceneNode* parent, s32 id )
 {
-#ifdef _IRR_COMPILE_WITH_BSP_LOADER_
-	if (!shader)
-		return 0;
-
-	if (!parent)
-		parent = this;
-
-	CQuake3ShaderSceneNode* node = new CQuake3ShaderSceneNode( parent,
-		this, id, FileSystem,
-		meshBuffer, shader );
-	node->drop();
-
-	return node;
-#else
 	return 0;
-#endif
 }
 
 

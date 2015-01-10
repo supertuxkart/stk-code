@@ -40,7 +40,6 @@ source/Irrlicht/CVideoModeList.cpp
 source/Irrlicht/CDefaultGUIElementFactory.cpp
 source/Irrlicht/CCubeSceneNode.cpp
 source/Irrlicht/CGUIMeshViewer.cpp
-source/Irrlicht/CBSPMeshFileLoader.cpp
 source/Irrlicht/CParticleSphereEmitter.cpp
 source/Irrlicht/CParticleAnimatedMeshSceneNodeEmitter.cpp
 source/Irrlicht/CGUITabControl.cpp
@@ -211,7 +210,6 @@ source/Irrlicht/Octree.h
 source/Irrlicht/os.h
 source/Irrlicht/CDefaultGUIElementFactory.h
 source/Irrlicht/CSceneNodeAnimatorFlyCircle.h
-source/Irrlicht/CBSPMeshFileLoader.h
 source/Irrlicht/CTriangleBBSelector.h
 source/Irrlicht/S2DVertex.h
 source/Irrlicht/CDefaultSceneNodeAnimatorFactory.h
