@@ -89,6 +89,11 @@ private:
     /** The dynamic ribbon containing all players. */
     GUIEngine::DynamicRibbonWidget* m_players;
 
+    /** Set to indicate when the sceen is initialised that new data from a
+     *  registration are available, and therefore entry fields are not
+     *  all cleared. */
+    bool m_new_registered_data;
+
     void selectUser(int index);
     void makeEntryFieldsVisible();
     void login();
@@ -115,6 +120,8 @@ public:
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
 
+    void setNewAccountData(bool online, const core::stringw &online_name="",
+                           const core::stringw &password="");
     void loginSuccessful();
     void loginError(const irr::core::stringw &error_message);
     void logoutSuccessful();

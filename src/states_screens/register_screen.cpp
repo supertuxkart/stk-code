@@ -45,11 +45,20 @@ DEFINE_SCREEN_SINGLETON( RegisterScreen );
 RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")
 {
     m_existing_player = NULL;
+    m_account_mode = ACCOUNT_OFFLINE;
 }   // RegisterScreen
 
 // -----------------------------------------------------------------------------
 void RegisterScreen::init()
 {
+    m_info_widget = getWidget<LabelWidget>("info");
+    assert(m_info_widget);
+    m_info_widget->setDefaultColor();
+    m_options_widget = getWidget<RibbonWidget>("options");
+    assert(m_options_widget);
+    m_password_widget = getWidget<TextBoxWidget>("password");
+    assert(m_password_widget);
+
     RibbonWidget* ribbon = getWidget<RibbonWidget>("mode_tabs");
     assert(ribbon);
     if (UserConfigParams::m_internet_status !=
@@ -87,16 +96,8 @@ void RegisterScreen::init()
 
     getWidget<TextBoxWidget>("local_username")->setText(username);
 
-    TextBoxWidget *password_widget = getWidget<TextBoxWidget>("password");
-    password_widget->setPasswordBox(true, L'*');
-    password_widget = getWidget<TextBoxWidget>("password_confirm");
-    password_widget->setPasswordBox(true, L'*');
-
-    m_info_widget = getWidget<LabelWidget>("info");
-    assert(m_info_widget);
-    m_info_widget->setDefaultColor();
-    m_options_widget = getWidget<RibbonWidget>("options");
-    assert(m_options_widget);
+    m_password_widget->setPasswordBox(true, L'*');
+    getWidget<TextBoxWidget>("password_confirm")->setPasswordBox(true, L'*');
 
     m_signup_request = NULL;
     m_info_message_shown = false;
@@ -141,7 +142,7 @@ void RegisterScreen::makeEntryFieldsVisible()
     bool online = m_account_mode != ACCOUNT_OFFLINE;
     getWidget<TextBoxWidget>("username")->setVisible(online);
     getWidget<LabelWidget  >("label_username")->setVisible(online);
-    getWidget<TextBoxWidget>("password")->setVisible(online);
+    m_password_widget->setVisible(online);
     getWidget<LabelWidget  >("label_password")->setVisible(online);
 
     bool new_account = online && (m_account_mode == ACCOUNT_NEW_ONLINE);
@@ -213,13 +214,20 @@ void RegisterScreen::doRegister()
     // If no online account is requested, don't register
     if(m_account_mode!=ACCOUNT_NEW_ONLINE|| m_existing_player)
     {
-        StateManager::get()->popMenu();
+        bool online = m_account_mode == ACCOUNT_EXISTING_ONLINE;
+        core::stringw password = online ? m_password_widget->getText() : "";
+        core::stringw online_name = 
+            online ? getWidget<TextBoxWidget>("username")->getText().trim() 
+                   : "";
+        //m_parent_screen->setNewAccountData(online, online_name, password);
+        m_parent_screen->setNewAccountData(true, "online", "password");
         m_existing_player = NULL;
+        StateManager::get()->popMenu();
         return;
     }
 
     stringw username = getWidget<TextBoxWidget>("username")->getText().trim();
-    stringw password = getWidget<TextBoxWidget>("password")->getText().trim();
+    stringw password = m_password_widget->getText().trim();
     stringw password_confirm =  getWidget<TextBoxWidget>("password_confirm")
                              ->getText().trim();
     stringw email = getWidget<TextBoxWidget>("email")->getText().trim();
@@ -272,6 +280,10 @@ void RegisterScreen::doRegister()
             PlayerProfile *player = PlayerManager::get()->getPlayer(local_name);
             if (player)
             {
+                core::stringw online_name = getWidget<TextBoxWidget>("username")->getText().trim();
+                m_parent_screen->setNewAccountData(/*online*/true, 
+                                                   username, password);
+
                 player->setLastOnlineName(username);
                 player->setWasOnlineLastTime(true);
             }
@@ -290,7 +302,7 @@ void RegisterScreen::acceptTerms()
     m_options_widget->setDeactivated();
 
     core::stringw username = getWidget<TextBoxWidget>("username")->getText().trim();
-    core::stringw password = getWidget<TextBoxWidget>("password")->getText().trim();
+    core::stringw password = m_password_widget->getText().trim();
     core::stringw password_confirm= getWidget<TextBoxWidget>("password_confirm")->getText().trim();
     core::stringw email = getWidget<TextBoxWidget>("email")->getText().trim();
 

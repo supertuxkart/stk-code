@@ -46,18 +46,13 @@ DEFINE_SCREEN_SINGLETON( TabbedUserScreen );
 
 BaseUserScreen::BaseUserScreen(const std::string &name) : Screen(name.c_str())
 {
+    m_online_cb           = NULL;
+    m_new_registered_data = false;
 }   // BaseUserScreen
 
 // ----------------------------------------------------------------------------
 
 void BaseUserScreen::loadedFromFile()
-{
-
-}   // loadedFromFile
-
-// ----------------------------------------------------------------------------
-
-void BaseUserScreen::init()
 {
     m_online_cb = getWidget<CheckBoxWidget>("online");
     assert(m_online_cb);
@@ -65,13 +60,31 @@ void BaseUserScreen::init()
     assert(m_username_tb);
     m_password_tb = getWidget<TextBoxWidget >("password");
     assert(m_password_tb);
-    m_password_tb->setPasswordBox(true, L'*');
     m_players = getWidget<DynamicRibbonWidget>("players");
     assert(m_players);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget);
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
+
+}   // loadedFromFile
+
+// ----------------------------------------------------------------------------
+void BaseUserScreen::setNewAccountData(bool online, 
+                                       const core::stringw &online_name,
+                                       const core::stringw &password)
+{
+    // Indicate for init that new user data is available.
+    m_new_registered_data = true;
+    m_online_cb->setState(online);
+    m_username_tb->setText(online_name);
+    m_password_tb->setText(password);
+}   // setOnline
+
+// ----------------------------------------------------------------------------
+void BaseUserScreen::init()
+{
+    m_password_tb->setPasswordBox(true, L'*');
 
     // The behaviour of the screen is slightly different at startup, i.e.
     // when it is the first screen: cancel will exit the game, and in
@@ -139,6 +152,7 @@ void BaseUserScreen::init()
         getWidget<IconButtonWidget>("rename")->setActivated();
         getWidget<IconButtonWidget>("delete")->setActivated();
     }
+    m_new_registered_data = false;
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -170,15 +184,21 @@ void BaseUserScreen::selectUser(int index)
     m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
                             /*focusIt*/ true);
     
-    m_username_tb->setText(profile->getLastOnlineName());
-    // Delete a password that might have been typed for another user
-    m_password_tb->setText("");
+    if (!m_new_registered_data)
+        m_username_tb->setText(profile->getLastOnlineName());
+
+    if (!m_new_registered_data)
+    {
+        // Delete a password that might have been typed for another user
+        m_password_tb->setText("");
+    }
 
     // Last game was not online, so make the offline settings the default
     // (i.e. unckeck online checkbox, and make entry fields invisible).
     if (!profile->wasOnlineLastTime() || profile->getLastOnlineName() == "")
     {
-        m_online_cb->setState(false);
+        if (!m_new_registered_data)
+            m_online_cb->setState(false);
         makeEntryFieldsVisible();
         return;
     }
@@ -299,6 +319,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
         else if (button == "new_user")
         {
             RegisterScreen::getInstance()->push();
+            RegisterScreen::getInstance()->setParent(this);
             // Make sure the new user will have an empty online name field
             // that can also be edited.
             m_username_tb->setText("");
@@ -318,6 +339,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
             PlayerProfile *cp = getSelectedPlayer();
             RegisterScreen::getInstance()->setRename(cp);
             RegisterScreen::getInstance()->push();
+            m_new_registered_data = false;
             // Init will automatically be called, which
             // refreshes the player list
         }

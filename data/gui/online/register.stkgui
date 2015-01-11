@@ -18,7 +18,7 @@
             <div width="90%" align="center" layout="vertical-row" height="80%">
                 <div width="100%" height="12%" layout="horizontal-row" >
                     <label   proportion="1" height="100%" text_align="left"
-                             I18N="In the registration dialog" text="Local Username"/>
+                             I18N="In the registration dialog" text="Name"/>
                     <textbox id="local_username" proportion="2" height="fit" I18N="In the registration dialog"/>
                 </div>
 

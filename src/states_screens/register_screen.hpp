@@ -20,11 +20,12 @@
 
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine { class Widget; class LabelWidget;
-                      class RibbonWidget;              }
+namespace GUIEngine { class Widget;       class LabelWidget;
+                      class RibbonWidget; class TextBoxWidget; }
 namespace Online    { class XMLRequest;                }
 
 class PlayerProfile;
+class BaseUserScreen;
 
 /**
   * \brief Screen to register an online account.
@@ -48,6 +49,9 @@ private:
     /** Save the pointer to the options widget, it is widely used. */
     GUIEngine::RibbonWidget *m_options_widget;
 
+    /** Save the pointer to the options widget, it is widely used. */
+    GUIEngine::TextBoxWidget *m_password_widget;
+
     /** The XML request to the server. */
     Online::XMLRequest *m_signup_request;
 
@@ -64,6 +68,10 @@ private:
            ACCOUNT_EXISTING_ONLINE, 
            ACCOUNT_OFFLINE } m_account_mode;
 
+    /** A pointer to the parent UserScreen, in order to allow this screen
+     *  to pass information back. */
+    BaseUserScreen *m_parent_screen;
+
 public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
@@ -79,6 +87,9 @@ public:
                                const std::string& name,
                                const int playerID) OVERRIDE;
 
+    // ------------------------------------------------------------------------
+    /** Set the parent screen. */
+    void setParent(BaseUserScreen *us) { m_parent_screen = us; }
 };   // class RegisterScreen
 
 #endif
