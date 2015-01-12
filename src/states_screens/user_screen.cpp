@@ -141,13 +141,7 @@ void BaseUserScreen::init()
     // Select the current player. That can only be done after
     // updateItemDisplay is called.
     if (current_player_index != -1)
-    {
-        // Only set focus in case of non-tabbed version (so that keyboard
-        // or gamepad navigation with tabs works as expected, i.e. you can
-        // select the next tab without having to go up to the tab list first.
-        if(!getWidget<RibbonWidget>("options_choice"))
-            selectUser(current_player_index);
-    }
+        selectUser(current_player_index);
     // no current player found
     // The first player is the most frequently used, so select it
     else if (PlayerManager::get()->getNumPlayers() > 0)
@@ -197,15 +191,19 @@ void BaseUserScreen::tearDown()
 
 // ----------------------------------------------------------------------------
 /** Called when a user is selected. It updates the online checkbox and
- *  entrye fields.
+ *  entry fields.
  */
 void BaseUserScreen::selectUser(int index)
 {
     PlayerProfile *profile = PlayerManager::get()->getPlayer(index);
     assert(profile);
 
-    m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
-                            /*focusIt*/ true);
+    // Only set focus in case of non-tabbed version (so that keyboard
+    // or gamepad navigation with tabs works as expected, i.e. you can
+    // select the next tab without having to go up to the tab list first.
+    if(!getWidget<RibbonWidget>("options_choice"))
+        m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
+                                /*focusIt*/ true);
     
     if (!m_new_registered_data)
         m_username_tb->setText(profile->getLastOnlineName());
@@ -642,7 +640,7 @@ void TabbedUserScreen::init()
     if (tab_bar) tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
     tab_bar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tab_bar->getRibbonChildren()[1].setTooltip( _("Audio") );
-    tab_bar->getRibbonChildren()[2].setTooltip(_("User Interface"));
+    tab_bar->getRibbonChildren()[2].setTooltip( _("User Interface") );
     tab_bar->getRibbonChildren()[4].setTooltip( _("Controls") );
     BaseUserScreen::init();
 }   // init
