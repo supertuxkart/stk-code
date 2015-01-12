@@ -3,7 +3,7 @@
 
 vec3 getRGBFromCIEXxy(vec3 YxyColor)
 {
-    float Yovery = YxyColor.x / YxyColor.z;
+    float Yovery = YxyColor.x / max(YxyColor.z, 0.1);
     vec3 XYZ = vec3(YxyColor.y * Yovery, YxyColor.x, (1. - YxyColor.y - YxyColor.z) * Yovery);
 
     mat3 XYZ2RGB = transpose(mat3(
