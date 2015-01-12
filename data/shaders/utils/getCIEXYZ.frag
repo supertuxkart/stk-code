@@ -9,6 +9,6 @@ vec3 getCIEYxy(vec3 rgbColor)
         vec3(.1805, .0722, .9505)));
 
     vec3 xYz = RGB2XYZ * rgbColor;
-    float tmp = xYz.x + xYz.y + xYz.z;
+    float tmp = max(xYz.x + xYz.y + xYz.z, 0.1);
     return vec3(xYz.y, xYz.xy / tmp);
 }
