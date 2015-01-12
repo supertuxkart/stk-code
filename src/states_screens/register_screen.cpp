@@ -219,8 +219,7 @@ void RegisterScreen::doRegister()
         core::stringw online_name = 
             online ? getWidget<TextBoxWidget>("username")->getText().trim() 
                    : "";
-        //m_parent_screen->setNewAccountData(online, online_name, password);
-        m_parent_screen->setNewAccountData(true, "online", "password");
+        m_parent_screen->setNewAccountData(online, online_name, password);
         m_existing_player = NULL;
         StateManager::get()->popMenu();
         return;
