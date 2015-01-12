@@ -62,5 +62,5 @@ void main(void)
         bl += max(0, dot(vi, norm) - FragPos.z * beta) / (dot(vi, vi) + epsilon);
     }
 
-    AO = max(pow(1.0 - min(2. * sigma * bl * invSamples, 0.99), k), 0.1);
+    AO = max(pow(1.0 - min(2. * sigma * bl * invSamples, 0.99), k), 0.);
 }
