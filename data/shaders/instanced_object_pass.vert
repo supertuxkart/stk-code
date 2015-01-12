@@ -50,9 +50,11 @@ void main(void)
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
     mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * InverseViewMatrix);
     gl_Position = ProjectionViewMatrix *  ModelMatrix * vec4(Position, 1.);
+    // Keep orthogonality
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
-    tangent = (TransposeInverseModelView * vec4(Tangent, 0.)).xyz;
-    bitangent = (TransposeInverseModelView * vec4(Bitangent, 0.)).xyz;
+    // Keep direction
+    tangent = (ViewMatrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
+    bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
     uv = Texcoord;
     uv_bis = SecondTexcoord;
     color = Color.zyxw;
