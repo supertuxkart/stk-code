@@ -283,8 +283,9 @@ SetTexture(GLMesh &mesh, unsigned i, bool isSrgb, const std::string &matname)
 {
     if (!mesh.textures[i])
     {
-        Log::fatal("STKMesh", "Missing texture %d for material %s", i, matname.c_str());
-        return;
+        Log::error("STKMesh", "Missing texture %d for material %s", i, matname.c_str());
+        // use unicolor texture to replace missing texture
+        mesh.textures[i] = getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
     compressTexture(mesh.textures[i], isSrgb);
     if (CVS->isAZDOEnabled())

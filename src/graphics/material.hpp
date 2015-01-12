@@ -85,6 +85,8 @@ private:
     /** Name of the texture. */
     std::string      m_texname;
 
+    std::string      m_full_path;
+
     /** If true, the texture will not automatically be loaded and bound
      *  at load time, it must be loaded elsewhere. This is used to store
      *  material settings for font textures, without loading fonts for
@@ -288,6 +290,9 @@ public:
     // ------------------------------------------------------------------------
     const std::string&
           getTexFname        () const { return m_texname;            }
+    // ------------------------------------------------------------------------
+    const std::string&
+          getTexFullPath     () const { return m_full_path;          }
 
     // ------------------------------------------------------------------------
     bool  isTransparent      () const
