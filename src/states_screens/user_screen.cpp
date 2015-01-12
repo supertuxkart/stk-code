@@ -48,6 +48,7 @@ BaseUserScreen::BaseUserScreen(const std::string &name) : Screen(name.c_str())
 {
     m_online_cb           = NULL;
     m_new_registered_data = false;
+    m_auto_login          = false;
 }   // BaseUserScreen
 
 // ----------------------------------------------------------------------------
@@ -70,18 +71,33 @@ void BaseUserScreen::loadedFromFile()
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
-void BaseUserScreen::setNewAccountData(bool online, 
+/** Stores information from the register screen. It allows this screen to 
+ *  use the entered user name and password to prefill fields so that the user
+ *  does not have to enter them again.
+ *  \param online If the user created an online account.
+ *  \param auto-login If the user should be automatically logged in online.
+ *         This can not be done for newly created online accounts, since they
+ *         need to be confirmed first.
+ * \param online_name The online account name.
+ *  \param password The password for the online account.
+ */
+void BaseUserScreen::setNewAccountData(bool online, bool auto_login,
                                        const core::stringw &online_name,
                                        const core::stringw &password)
 {
     // Indicate for init that new user data is available.
     m_new_registered_data = true;
+    m_auto_login          = auto_login;
     m_online_cb->setState(online);
     m_username_tb->setText(online_name);
     m_password_tb->setText(password);
 }   // setOnline
 
 // ----------------------------------------------------------------------------
+/** Initialises the user screen. Searches for all players to fill the 
+ *  list of users with their icons, and initialises all widgets for the
+ *  current user (e.g. the online flag etc).
+ */
 void BaseUserScreen::init()
 {
     m_password_tb->setPasswordBox(true, L'*');
@@ -153,6 +169,13 @@ void BaseUserScreen::init()
         getWidget<IconButtonWidget>("delete")->setActivated();
     }
     m_new_registered_data = false;
+    if (m_auto_login)
+    {
+        login();
+        m_auto_login = false;
+        return;
+    }
+    m_auto_login = false;
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -340,6 +363,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
             RegisterScreen::getInstance()->setRename(cp);
             RegisterScreen::getInstance()->push();
             m_new_registered_data = false;
+            m_auto_login          = false;
             // Init will automatically be called, which
             // refreshes the player list
         }
