@@ -245,12 +245,12 @@ RTT::RTT(size_t width, size_t height)
 
     if (CVS->isShadowEnabled())
     {
-        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R32F, GL_RED, GL_FLOAT, 10);
-        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1);
+        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, 4, GL_R32F, GL_RED, GL_FLOAT, 10);
+        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1);
 
         somevector.clear();
         somevector.push_back(shadowColorTex);
-        m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
+        m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, true);
     }
 
     if (CVS->isGlobalIlluminationEnabled())

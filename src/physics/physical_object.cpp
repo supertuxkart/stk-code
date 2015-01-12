@@ -37,6 +37,7 @@ using namespace irr;
 
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
+#include <ITexture.h>
 
 /** Creates a physical Settings object with the given type, radius and mass.
  */

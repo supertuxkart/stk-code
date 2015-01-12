@@ -426,13 +426,13 @@ public:
     IBLShader();
 };
 
-class ShadowedSunLightShaderPCF : public ShaderHelperSingleton<ShadowedSunLightShaderPCF, float, float, float, float, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
+class ShadowedSunLightShaderPCF : public ShaderHelperSingleton<ShadowedSunLightShaderPCF, float, float, float, float, float>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
 {
 public:
     ShadowedSunLightShaderPCF();
 };
 
-class ShadowedSunLightShaderESM : public ShaderHelperSingleton<ShadowedSunLightShaderESM, float, float, float, float, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_Clamped_Array2D>
+class ShadowedSunLightShaderESM : public ShaderHelperSingleton<ShadowedSunLightShaderESM, float, float, float, float>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_Clamped_Array2D>
 {
 public:
     ShadowedSunLightShaderESM();

@@ -86,7 +86,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel(_("low"));        // 1
     shadows->addLabel(_("high"));       // 2
     if (CVS->supportsShadows())
-        shadows->setValue(UserConfigParams::m_shadows);
+        shadows->setValue(UserConfigParams::m_shadows_resolution / 512);
     else
         shadows->setValue(0);
     getWidget<CheckBoxWidget>("dynamiclight")->setState(UserConfigParams::m_dynamic_lights);
@@ -132,12 +132,12 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
         if (advanced_pipeline && CVS->supportsShadows())
         {
-            UserConfigParams::m_shadows =
-                getWidget<SpinnerWidget>("shadows")->getValue();
+            UserConfigParams::m_shadows_resolution =
+                getWidget<SpinnerWidget>("shadows")->getValue() * 512;
         }
         else
         {
-            UserConfigParams::m_shadows = 0;
+            UserConfigParams::m_shadows_resolution = 0;
         }
 
         UserConfigParams::m_mlaa =

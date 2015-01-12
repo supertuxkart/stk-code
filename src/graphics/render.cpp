@@ -349,7 +349,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         // To avoid wrong culling, use the largest view possible
         m_scene_manager->setActiveCamera(m_suncam);
         if (UserConfigParams::m_dynamic_lights &&
-            UserConfigParams::m_shadows && CVS->isShadowEnabled() && hasShadow)
+            CVS->isShadowEnabled() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
             renderShadows();

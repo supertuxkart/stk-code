@@ -362,7 +362,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             }
         }
     }
-    if (!UserConfigParams::m_shadows)
+    if (!CVS->isShadowEnabled())
         return;
     for (unsigned cascade = 0; cascade < 4; ++cascade)
     {

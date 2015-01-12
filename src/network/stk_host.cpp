@@ -26,7 +26,7 @@
 
 #include <string.h>
 #if defined(WIN32)
-#  include "Ws2tcpip.h"
+#  include "ws2tcpip.h"
 #  define inet_ntop InetNtop
 #else
 #  include <arpa/inet.h>

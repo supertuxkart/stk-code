@@ -53,7 +53,7 @@ namespace irr {
 #  include <unistd.h>
 #else
 #  include <direct.h>
-#  include <Windows.h>
+#  include <windows.h>
 #  include <stdio.h>
 #  if !defined(__CYGWIN__ ) && !defined(__MINGW32__)
      /*Needed by the remove directory function */

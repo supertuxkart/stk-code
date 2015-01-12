@@ -195,11 +195,6 @@ namespace scene
 			const core::vector3df& position = core::vector3df(0,0,0), s32 id=-1,
 			video::SColor colorTop = 0xFFFFFFFF, video::SColor colorBottom = 0xFFFFFFFF);
 
-		//! Adds a scene node, which can render a quake3 shader
-		virtual IMeshSceneNode* addQuake3SceneNode(const IMeshBuffer* meshBuffer, const quake3::IShader * shader,
-												ISceneNode* parent=0, s32 id=-1
-												);
-
 
 		//! Adds a Hill Plane mesh to the mesh pool. The mesh is
 		//! generated on the fly and looks like a plane with some hills

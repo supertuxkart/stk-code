@@ -24,112 +24,8 @@
 #include "CSkinnedMesh.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_IRR_MESH_LOADER_
-#include "CIrrMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_BSP_LOADER_
-#include "CBSPMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_MD2_LOADER_
-#include "CMD2MeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_HALFLIFE_LOADER_
-#include "CAnimatedMeshHalfLife.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_MS3D_LOADER_
-#include "CMS3DMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_3DS_LOADER_
-#include "C3DSMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_X_LOADER_
-#include "CXMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_OCT_LOADER_
-#include "COCTLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_CSM_LOADER_
-#include "CCSMLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_LMTS_LOADER_
-#include "CLMTSMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_MY3D_LOADER_
-#include "CMY3DMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_COLLADA_LOADER_
-#include "CColladaFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_DMF_LOADER_
-#include "CDMFLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_OGRE_LOADER_
-#include "COgreMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_OBJ_LOADER_
-#include "COBJMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_MD3_LOADER_
-#include "CMD3MeshFileLoader.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_B3D_LOADER_
 #include "CB3DMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_LWO_LOADER_
-#include "CLWOMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_STL_LOADER_
-#include "CSTLMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_PLY_LOADER_
-#include "CPLYMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_SMF_LOADER_
-#include "CSMFMeshFileLoader.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_IRR_SCENE_LOADER_
-#include "CSceneLoaderIrr.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_COLLADA_WRITER_
-#include "CColladaMeshWriter.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_IRR_WRITER_
-#include "CIrrMeshWriter.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_STL_WRITER_
-#include "CSTLMeshWriter.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_OBJ_WRITER_
-#include "COBJMeshWriter.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_PLY_WRITER_
-#include "CPLYMeshWriter.h"
 #endif
 
 #include "CCubeSceneNode.h"
@@ -148,7 +44,6 @@
 #include "CTerrainSceneNode.h"
 #include "CEmptySceneNode.h"
 #include "CTextSceneNode.h"
-#include "CQuake3ShaderSceneNode.h"
 #include "CVolumeLightSceneNode.h"
 
 #include "CDefaultSceneNodeFactory.h"
@@ -229,77 +124,8 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 
 	// add file format loaders. add the least commonly used ones first,
 	// as these are checked last
-
-	// TODO: now that we have multiple scene managers, these should be
-	// shallow copies from the previous manager if there is one.
-
-	#ifdef _IRR_COMPILE_WITH_STL_LOADER_
-	MeshLoaderList.push_back(new CSTLMeshFileLoader());
-	#endif
-	#ifdef _IRR_COMPILE_WITH_PLY_LOADER_
-	MeshLoaderList.push_back(new CPLYMeshFileLoader(this));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_SMF_LOADER_
-	MeshLoaderList.push_back(new CSMFMeshFileLoader(Driver));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_OCT_LOADER_
-	MeshLoaderList.push_back(new COCTLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_CSM_LOADER_
-	MeshLoaderList.push_back(new CCSMLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_LMTS_LOADER_
-	MeshLoaderList.push_back(new CLMTSMeshFileLoader(FileSystem, Driver, &Parameters));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_MY3D_LOADER_
-	MeshLoaderList.push_back(new CMY3DMeshFileLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_DMF_LOADER_
-	MeshLoaderList.push_back(new CDMFLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_OGRE_LOADER_
-	MeshLoaderList.push_back(new COgreMeshFileLoader(FileSystem, Driver));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_HALFLIFE_LOADER_
-	MeshLoaderList.push_back(new CHalflifeMDLMeshFileLoader( this ));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_MD3_LOADER_
-	MeshLoaderList.push_back(new CMD3MeshFileLoader( this));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_LWO_LOADER_
-	MeshLoaderList.push_back(new CLWOMeshFileLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_MD2_LOADER_
-	MeshLoaderList.push_back(new CMD2MeshFileLoader());
-	#endif
-	#ifdef _IRR_COMPILE_WITH_IRR_MESH_LOADER_
-	MeshLoaderList.push_back(new CIrrMeshFileLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_BSP_LOADER_
-	MeshLoaderList.push_back(new CBSPMeshFileLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_COLLADA_LOADER_
-	MeshLoaderList.push_back(new CColladaFileLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_3DS_LOADER_
-	MeshLoaderList.push_back(new C3DSMeshFileLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_X_LOADER_
-	MeshLoaderList.push_back(new CXMeshFileLoader(this, FileSystem));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_MS3D_LOADER_
-	MeshLoaderList.push_back(new CMS3DMeshFileLoader(Driver));
-	#endif
-	#ifdef _IRR_COMPILE_WITH_OBJ_LOADER_
-	MeshLoaderList.push_back(new COBJMeshFileLoader(this, FileSystem));
-	#endif
 	#ifdef _IRR_COMPILE_WITH_B3D_LOADER_
 	MeshLoaderList.push_back(new CB3DMeshFileLoader(this));
-	#endif
-
-	// scene loaders
-	#ifdef _IRR_COMPILE_WITH_IRR_SCENE_LOADER_
-	SceneLoaderList.push_back(new CSceneLoaderIrr(this, FileSystem));
 	#endif
 
 
@@ -519,31 +345,6 @@ IBillboardTextSceneNode* CSceneManager::addBillboardTextSceneNode(gui::IGUIFont*
 	return node;
 
 }
-
-
-//! Adds a scene node, which can render a quake3 shader
-IMeshSceneNode* CSceneManager::addQuake3SceneNode(const IMeshBuffer* meshBuffer,
-					const quake3::IShader * shader,
-					ISceneNode* parent, s32 id )
-{
-#ifdef _IRR_COMPILE_WITH_BSP_LOADER_
-	if (!shader)
-		return 0;
-
-	if (!parent)
-		parent = this;
-
-	CQuake3ShaderSceneNode* node = new CQuake3ShaderSceneNode( parent,
-		this, id, FileSystem,
-		meshBuffer, shader );
-	node->drop();
-
-	return node;
-#else
-	return 0;
-#endif
-}
-
 
 //! adds Volume Lighting Scene Node.
 //! the returned pointer must not be dropped.
@@ -2500,36 +2301,10 @@ IMeshWriter* CSceneManager::createMeshWriter(EMESH_WRITER_TYPE type)
 	switch(type)
 	{
 	case EMWT_IRR_MESH:
-#ifdef _IRR_COMPILE_WITH_IRR_WRITER_
-		return new CIrrMeshWriter(Driver, FileSystem);
-#else
-		return 0;
-#endif
 	case EMWT_COLLADA:
-#ifdef _IRR_COMPILE_WITH_COLLADA_WRITER_
-		return new CColladaMeshWriter(this, Driver, FileSystem);
-#else
-		return 0;
-#endif
 	case EMWT_STL:
-#ifdef _IRR_COMPILE_WITH_STL_WRITER_
-		return new CSTLMeshWriter(this);
-#else
-		return 0;
-#endif
 	case EMWT_OBJ:
-#ifdef _IRR_COMPILE_WITH_OBJ_WRITER_
-		return new COBJMeshWriter(this, FileSystem);
-#else
 		return 0;
-#endif
-
-	case EMWT_PLY:
-#ifdef _IRR_COMPILE_WITH_PLY_WRITER_
-		return new CPLYMeshWriter();
-#else
-		return 0;
-#endif
 	}
 
 	return 0;

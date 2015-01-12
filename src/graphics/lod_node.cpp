@@ -19,7 +19,6 @@
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include "graphics/hardware_skinning.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
 #include "config/user_config.hpp"
@@ -284,9 +283,6 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     m_nodes.push_back(node);
     m_nodes_set.insert(node);
     node->setParent(this);
-
-    if(UserConfigParams::m_hw_skinning_enabled && node->getType() == scene::ESNT_ANIMATED_MESH)
-        HardwareSkinning::prepareNode((scene::IAnimatedMeshSceneNode*)node);
 
     if (node->getType() == scene::ESNT_ANIMATED_MESH)
         ((scene::IAnimatedMeshSceneNode *) node)->setReadOnlyMaterials(true);

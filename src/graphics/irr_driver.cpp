@@ -25,7 +25,6 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/graphics_restrictions.hpp"
-#include "graphics/hardware_skinning.hpp"
 #include "graphics/light.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
@@ -82,7 +81,7 @@
 using namespace irr;
 
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 #if defined(__linux__) && !defined(ANDROID)
 #include <X11/Xlib.h>

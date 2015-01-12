@@ -14,8 +14,6 @@ extern bool GLContextDebugBit;
 #include "COpenGLMaterialRenderer.h"
 #include "COpenGLShaderMaterialRenderer.h"
 #include "COpenGLSLMaterialRenderer.h"
-#include "COpenGLCgMaterialRenderer.h"
-#include "COpenGLNormalMapRenderer.h"
 #include "COpenGLParallaxMapRenderer.h"
 #include "os.h"
 
@@ -49,10 +47,6 @@ COpenGLDriver::COpenGLDriver(const irr::SIrrlichtCreationParameters& params,
 {
 	#ifdef _DEBUG
 	setDebugName("COpenGLDriver");
-	#endif
-
-	#ifdef _IRR_COMPILE_WITH_CG_
-	CgContext = 0;
 	#endif
 }
 
@@ -585,10 +579,6 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 	setDebugName("COpenGLDriver");
 	#endif
 
-	#ifdef _IRR_COMPILE_WITH_CG_
-	CgContext = 0;
-	#endif
-
 	genericDriverInit();
 }
 
@@ -610,10 +600,6 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 {
 	#ifdef _DEBUG
 	setDebugName("COpenGLDriver");
-	#endif
-
-	#ifdef _IRR_COMPILE_WITH_CG_
-	CgContext = 0;
 	#endif
 }
 
@@ -705,10 +691,6 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 	setDebugName("COpenGLDriver");
 	#endif
 
-	#ifdef _IRR_COMPILE_WITH_CG_
-	CgContext = 0;
-	#endif
-
 	genericDriverInit();
 }
 
@@ -718,11 +700,6 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 //! destructor
 COpenGLDriver::~COpenGLDriver()
 {
-	#ifdef _IRR_COMPILE_WITH_CG_
-	if (CgContext)
-		cgDestroyContext(CgContext);
-	#endif
-
 	RequestedLights.clear();
 
 	deleteMaterialRenders();
@@ -868,10 +845,6 @@ bool COpenGLDriver::genericDriverInit()
 	// This fixes problems with intermediate changes to the material during texture load.
 	ResetRenderStates = true;
 
-	#ifdef _IRR_COMPILE_WITH_CG_
-	CgContext = cgCreateContext();
-	#endif
-
 	return true;
 }
 
@@ -907,12 +880,6 @@ void COpenGLDriver::createMaterialRenderers()
 	// add normal map renderers
 	s32 tmp = 0;
 	video::IMaterialRenderer* renderer = 0;
-	renderer = new COpenGLNormalMapRenderer(this, tmp, MaterialRenderers[EMT_SOLID].Renderer);
-	renderer->drop();
-	renderer = new COpenGLNormalMapRenderer(this, tmp, MaterialRenderers[EMT_TRANSPARENT_ADD_COLOR].Renderer);
-	renderer->drop();
-	renderer = new COpenGLNormalMapRenderer(this, tmp, MaterialRenderers[EMT_TRANSPARENT_VERTEX_ALPHA].Renderer);
-	renderer->drop();
 
 	// add parallax map renderers
 	renderer = new COpenGLParallaxMapRenderer(this, tmp, MaterialRenderers[EMT_SOLID].Renderer);
@@ -4091,21 +4058,6 @@ s32 COpenGLDriver::addHighLevelShaderMaterial(
 {
 	s32 nr = -1;
 
-	#ifdef _IRR_COMPILE_WITH_CG_
-	if (shadingLang == EGSL_CG)
-	{
-		COpenGLCgMaterialRenderer* r = new COpenGLCgMaterialRenderer(
-			this, nr,
-			vertexShaderProgram, vertexShaderEntryPointName, vsCompileTarget,
-			pixelShaderProgram, pixelShaderEntryPointName, psCompileTarget,
-			geometryShaderProgram, geometryShaderEntryPointName, gsCompileTarget,
-			inType, outType, verticesOut,
-			callback,getMaterialRenderer(baseMaterial), userData);
-
-		r->drop();
-	}
-	else
-	#endif
 	{
 		COpenGLSLMaterialRenderer* r = new COpenGLSLMaterialRenderer(
 			this, nr,
@@ -4877,13 +4829,6 @@ GLenum COpenGLDriver::getZBufferBits() const
 	}
 	return bits;
 }
-
-#ifdef _IRR_COMPILE_WITH_CG_
-const CGcontext& COpenGLDriver::getCgContext()
-{
-	return CgContext;
-}
-#endif
 
 
 } // end namespace

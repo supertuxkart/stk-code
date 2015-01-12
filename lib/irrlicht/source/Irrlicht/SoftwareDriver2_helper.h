@@ -12,7 +12,6 @@
 
 #include "SoftwareDriver2_compile_config.h"
 #include "irrMath.h"
-#include "CSoftwareTexture2.h"
 #include "SMaterial.h"
 
 
@@ -711,7 +710,7 @@ struct sInternalTexture
 	u32 pitchlog2;
 	void *data;
 
-	video::CSoftwareTexture2 *Texture;
+//	video::CSoftwareTexture2 *Texture;
 	s32 lodLevel;
 };
 

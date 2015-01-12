@@ -371,7 +371,7 @@ void OptionsScreenVideo::updateGfxSlider()
             GFX_PRESETS[l].mlaa == UserConfigParams::m_mlaa &&
             GFX_PRESETS[l].motionblur == UserConfigParams::m_motionblur &&
             //GFX_PRESETS[l].shaders == UserConfigParams::m_pixel_shaders
-            GFX_PRESETS[l].shadows == UserConfigParams::m_shadows &&
+            GFX_PRESETS[l].shadows == UserConfigParams::m_shadows_resolution &&
             GFX_PRESETS[l].ssao == UserConfigParams::m_ssao &&
             GFX_PRESETS[l].weather == UserConfigParams::m_weather_effects &&
             GFX_PRESETS[l].dof == UserConfigParams::m_dof &&
@@ -443,7 +443,7 @@ void OptionsScreenVideo::updateTooltip()
         UserConfigParams::m_ssao ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Shadows: %s",
-        UserConfigParams::m_shadows == 1 ? "low" : UserConfigParams::m_shadows == 2 ?
+        UserConfigParams::m_shadows_resolution == 1 ? "low" : UserConfigParams::m_shadows_resolution == 2 ?
                                     "high" : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Bloom : %s",
@@ -540,7 +540,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_mlaa = GFX_PRESETS[level].mlaa;
         UserConfigParams::m_motionblur = GFX_PRESETS[level].motionblur;
         //UserConfigParams::m_pixel_shaders = GFX_PRESETS[level].shaders;
-        UserConfigParams::m_shadows = GFX_PRESETS[level].shadows;
+        UserConfigParams::m_shadows_resolution = GFX_PRESETS[level].shadows;
         UserConfigParams::m_ssao = GFX_PRESETS[level].ssao;
         UserConfigParams::m_weather_effects = GFX_PRESETS[level].weather;
         UserConfigParams::m_dof = GFX_PRESETS[level].dof;

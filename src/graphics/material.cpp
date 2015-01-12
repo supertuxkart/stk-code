@@ -65,6 +65,8 @@ Material::Material(const XMLNode *node, bool deprecated)
         throw std::runtime_error("[Material] No texture name specified "
                                  "in file\n");
     }
+    m_full_path = file_manager->getFileSystem()->getAbsolutePath(
+        file_manager->searchTexture(m_texname).c_str()).c_str();
     init();
 
     node->get("lazy-load", &m_lazy_load);
@@ -404,6 +406,8 @@ Material::Material(const std::string& fname, bool is_full_path,
 
     m_texname = fname;
     init();
+    m_full_path = file_manager->getFileSystem()->getAbsolutePath(
+        file_manager->searchTexture(m_texname).c_str()).c_str();
 
     if (load_texture)
         install(is_full_path, complain_if_not_found);

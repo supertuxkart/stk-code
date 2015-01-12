@@ -640,10 +640,10 @@ namespace UserConfigParams
             PARAM_DEFAULT(BoolUserConfigParam(false,
                            "ssao", &m_graphics_quality,
                            "Enable Screen Space Ambient Occlusion") );
-    PARAM_PREFIX IntUserConfigParam          m_shadows
+    PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
             PARAM_DEFAULT( IntUserConfigParam(0,
-                           "shadows", &m_graphics_quality,
-                           "Whether shadows are enabled (0 = disabled, 1 = low, 2 = high") );
+                           "shadows_resoltion", &m_graphics_quality,
+                           "Shadow resolution (0 = disabled") );
 
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_cache_overworld

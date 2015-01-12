@@ -69,8 +69,17 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
     if (t == NULL)
         return m_default_material;
 
-    const std::string image = StringUtils::getBasename(core::stringc(t->getName()).c_str());
+    core::stringc img_path = core::stringc(t->getName());
+    const std::string image = StringUtils::getBasename(img_path.c_str());
     // Search backward so that temporary (track) textures are found first
+    for (int i = (int)m_materials.size() - 1; i >= 0; i--)
+    {
+        std::string full_path = m_materials[i]->getTexFullPath();
+        if (m_materials[i]->getTexFullPath() == img_path.c_str())
+        {
+            return m_materials[i];
+        }
+    }
     for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {
         if (m_materials[i]->getTexFname()==image)
