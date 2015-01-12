@@ -38,7 +38,7 @@ void main(void)
     float r = radius / FragPos.z;
     float phi = 3. * (x ^ y) + x * y;
     float bl = 0.0;
-    float m = log2(r) + 6 + log2(invSamples);
+    float m = max(log2(r) + 6 + log2(invSamples), 0.);
 
     float theta = 2. * 3.14 * tau * .5 * invSamples + phi;
     vec2 rotations = vec2(cos(theta), sin(theta)) * screen;
@@ -62,5 +62,5 @@ void main(void)
         bl += max(0, dot(vi, norm) - FragPos.z * beta) / (dot(vi, vi) + epsilon);
     }
 
-    AO = max(pow(1.0 - 2. * sigma * bl * invSamples, k), 0.);
+    AO = max(pow(1.0 - min(2. * sigma * bl * invSamples, 0.99), k), 0.1);
 }
