@@ -201,9 +201,9 @@ void BaseUserScreen::selectUser(int index)
     // Only set focus in case of non-tabbed version (so that keyboard
     // or gamepad navigation with tabs works as expected, i.e. you can
     // select the next tab without having to go up to the tab list first.
-    if(!getWidget<RibbonWidget>("options_choice"))
-        m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
-                                /*focusIt*/ true);
+    bool focus_it = !getWidget<RibbonWidget>("options_choice");
+    m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
+                            focus_it);
     
     if (!m_new_registered_data)
         m_username_tb->setText(profile->getLastOnlineName());
