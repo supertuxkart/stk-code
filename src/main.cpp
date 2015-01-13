@@ -1102,47 +1102,48 @@ void initRest()
 //=============================================================================
 void askForInternetPermission()
 {
-    if (UserConfigParams::m_internet_status ==
+    if (UserConfigParams::m_internet_status !=
         Online::RequestManager::IPERM_NOT_ASKED)
-    {
-        class ConfirmServer :
-            public MessageDialog::IConfirmDialogListener
-        {
-        public:
-            virtual void onConfirm()
-            {
-                // Typically internet is disabled here (just better safe
-                // than sorry). If internet should be allowed, the news
-                // manager needs to be started (which in turn activates
-                // the addons manager).
-                bool need_to_start_news_manager = 
-                     UserConfigParams::m_internet_status!=
-                                       Online::RequestManager::IPERM_ALLOWED;
-                UserConfigParams::m_internet_status =
-                    Online::RequestManager::IPERM_ALLOWED;
-                if(need_to_start_news_manager)
-                    NewsManager::get()->init(false);
-                GUIEngine::ModalDialog::dismiss();
-            }   // onConfirm
-            // --------------------------------------------------------
-            virtual void onCancel()
-            {
-                UserConfigParams::m_internet_status =
-                    Online::RequestManager::IPERM_NOT_ALLOWED;
-                GUIEngine::ModalDialog::dismiss();
-            }   // onCancel
-        };   // ConfirmServer
+        return;
 
-        new MessageDialog(_("SuperTuxKart may connect to a server "
-            "to download add-ons and notify you of updates. We also collect "
-            "anonymous hardware statistics to help with the development of STK. "
-            "Would you like this feature to be enabled? (To change this setting "
-            "at a later time, go to options, select tab "
-            "'User Interface', and edit \"Connect to the "
-            "Internet\" and \"Send anonymous HW statistics\")."),
-            MessageDialog::MESSAGE_DIALOG_YESNO,
-            new ConfirmServer(), true);
-    }
+    class ConfirmServer :
+          public MessageDialog::IConfirmDialogListener
+    {
+    public:
+        virtual void onConfirm()
+        {
+            // Typically internet is disabled here (just better safe
+            // than sorry). If internet should be allowed, the news
+            // manager needs to be started (which in turn activates
+            // the addons manager).
+            bool need_to_start_news_manager =
+                UserConfigParams::m_internet_status !=
+                                  Online::RequestManager::IPERM_ALLOWED;
+            UserConfigParams::m_internet_status =
+                                  Online::RequestManager::IPERM_ALLOWED;
+            if (need_to_start_news_manager)
+                NewsManager::get()->init(false);
+            GUIEngine::ModalDialog::dismiss();
+        }   // onConfirm
+        // --------------------------------------------------------
+        virtual void onCancel()
+        {
+            UserConfigParams::m_internet_status =
+                Online::RequestManager::IPERM_NOT_ALLOWED;
+            GUIEngine::ModalDialog::dismiss();
+        }   // onCancel
+    };   // ConfirmServer
+
+    GUIEngine::ModalDialog *dialog = 
+    new MessageDialog(_("SuperTuxKart may connect to a server "
+        "to download add-ons and notify you of updates. We also collect "
+        "anonymous hardware statistics to help with the development of STK. "
+        "Would you like this feature to be enabled? (To change this setting "
+        "at a later time, go to options, select tab "
+        "'User Interface', and edit \"Connect to the "
+        "Internet\" and \"Send anonymous HW statistics\")."),
+        MessageDialog::MESSAGE_DIALOG_YESNO,
+        new ConfirmServer(), true);
 
 }   // askForInternetPermission
 
