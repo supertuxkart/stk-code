@@ -124,13 +124,21 @@ public:
         // further down) it would be detected as a non-mesa driver.
         if (driver_version.find("Mesa") != std::string::npos)
         {
-            std::vector<std::string> l = StringUtils::split(driver_version, ' ');
-            if (l.size() > 0)
+            std::string driver;
+            // Try to force the driver name to be in a standard way by removing
+            // optional strings
+            driver = StringUtils::replace(driver_version, "-devel",         "");
+            driver = StringUtils::replace(driver,         "(Core Profile) ", "");
+            std::vector<std::string> l = StringUtils::split(driver, ' ');
+            if (l.size() > 2)
             {
-                convertVersionString(l.back());
+                // driver can be: "1.4 (3.0 Mesa 10.1.0)" --> l[3] must be used
+                if (l[2] != "Mesa")
+                    convertVersionString(l[2]);
+                else
+                    convertVersionString(l[3]);
                 return;
             }
-
         }
 
         // Intel card: driver version = "3.1.0 - Build 9.17.10.3517"
@@ -366,6 +374,25 @@ void unitTesting()
     assert(Version("1.2.3") <= Version("1.2.3.1"));
     assert(Version("1.2.3") <= Version("1.2.3"));
     assert(Version("1.2.3") == Version("1.2.3"));
+    assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1", 
+                   "NVIDIA GeForce GTX 680MX OpenGL Engine")
+           == Version("310.90.10.5")                                    );
+    assert(Version("3.1 (Core Profile) Mesa 10.3.0",
+                  "Mesa DRI Mobile Intel\u00ae GM45 Express Chipset")
+           == Version("10.3.0")                                         );
+    assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel", 
+                   "Gallium 0.4 on NVC1")
+           == Version("10.5.0")                                         );
+    assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel",
+                   "Mesa DRI Intel(R) Sandybridge Mobile")
+           == Version("10.5.0")                                         );
+    assert(Version("2.1 Mesa 10.5.0-devel (git-82e919d)",
+                   "Gallium 0.4 on i915 (chipse)")
+           == Version("10.5.0")                                         );
+    assert(Version("1.4 (3.0 Mesa 10.1.0)",
+                   "Mesa DRI Intel(R) Ivybridge Mobile")
+           == Version("10.1.0"));
+
 }   // unitTesting
 
 // ----------------------------------------------------------------------------
