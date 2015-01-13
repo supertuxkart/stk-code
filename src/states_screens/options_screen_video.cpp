@@ -95,7 +95,7 @@ static GFXPreset GFX_PRESETS[] =
     },
 
     {
-        true /* light */, 2 /* shadow */, true /* bloom */, true /* motionblur */,
+        true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
         true /* depth of field */, true /* global illumination */
@@ -442,9 +442,11 @@ void OptionsScreenVideo::updateTooltip()
     tooltip = tooltip + L"\n" + _("Ambient occlusion : %s",
         UserConfigParams::m_ssao ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Shadows: %s",
-        UserConfigParams::m_shadows_resolution == 1 ? "low" : UserConfigParams::m_shadows_resolution == 2 ?
-                                    "high" : disabled);
+    if (UserConfigParams::m_shadows_resolution == 0)
+        tooltip = tooltip + L"\n" + _("Shadows: %s", disabled);
+    else
+        tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
+
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Bloom : %s",
         UserConfigParams::m_bloom ? enabled : disabled);

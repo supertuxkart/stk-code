@@ -481,6 +481,15 @@ void IrrDriver::initDevice()
     CVS->init();
 
 
+    if (UserConfigParams::m_shadows_resolution != 0 &&
+        (UserConfigParams::m_shadows_resolution < 512 ||
+         UserConfigParams::m_shadows_resolution > 2048))
+    {
+        Log::warn("IrrDriver", "Invalid value for UserConfigParams::m_shadows_resolution : %i",
+            (int)UserConfigParams::m_shadows_resolution);
+        UserConfigParams::m_shadows_resolution = 0;
+    }
+
     // This remaps the window, so it has to be done before the clear to avoid flicker
     m_device->setResizable(false);
 
