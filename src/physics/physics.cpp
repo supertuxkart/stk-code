@@ -37,6 +37,7 @@
 #include "physics/physical_object.hpp"
 #include "physics/stk_dynamics_world.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "race/race_manager.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
@@ -208,7 +209,8 @@ void Physics::update(float dt)
                 kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
                     kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
             }
-            else if(obj->isSoccerBall())
+            else if(obj->isSoccerBall() && 
+                    race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 int kartId = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
@@ -266,7 +268,8 @@ void Physics::update(float dt)
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
 
-            if(obj->isSoccerBall())
+            if (obj->isSoccerBall() && 
+                race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
