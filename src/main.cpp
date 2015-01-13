@@ -1318,8 +1318,11 @@ int main(int argc, char *argv[] )
                 // If there is no player, push the RegisterScreen on top of
                 // the login screen. This way on first start players are
                 // forced to create a player.
-                if(PlayerManager::get()->getNumPlayers()==0)
+                if (PlayerManager::get()->getNumPlayers() == 0)
+                {
                     RegisterScreen::getInstance()->push();
+                    RegisterScreen::getInstance()->setParent(UserScreen::getInstance());
+                }
             }
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */
