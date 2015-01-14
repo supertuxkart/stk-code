@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tracks/track_manager.hpp"
+#include "graphics/irr_driver.hpp"
 
 #include <stdio.h>
 #include <stdexcept>
@@ -207,6 +208,10 @@ bool TrackManager::loadTrack(const std::string& dirname)
     m_tracks.push_back(track);
     m_track_avail.push_back(true);
     updateGroups(track);
+
+    //Populate the texture cache with track screenshots
+    irr_driver->getTexture(track->getScreenshotFile());
+
     return true;
 }   // loadTrack
 

@@ -65,7 +65,11 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_physical_object = NULL;
     m_interaction     = interaction;
     m_presentation    = presentation;
-    m_soccer_ball = false;
+    m_is_driveable    = false;
+    m_soccer_ball     = false;
+    m_garage          = false;
+    m_distance        = 0;
+    m_type            = "";
 
     if (m_interaction != "ghost" && m_interaction != "none" &&
         physics_settings )
