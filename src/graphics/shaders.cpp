@@ -336,66 +336,19 @@ static void initBillboardVBO()
     glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad, GL_STATIC_DRAW);
 }
 
-GLuint SharedObject::cubevbo = 0;
-GLuint SharedObject::cubeindexes = 0;
+GLuint SharedObject::skytrivbo = 0;
 
-static void initCubeVBO()
+static void initSkyTriVBO()
 {
-    // From CSkyBoxSceneNode
-    float corners[] =
-        {
-            // top side
-            1., 1., -1.,
-            1., 1., 1.,
-            -1., 1., 1.,
-            -1., 1., -1.,
+  const float tri_vertex[] = {
+      -1., -1., 1.,
+      -1., 3., 1.,
+      3., -1., 1.,
+  };
 
-            // Bottom side
-            1., -1., 1.,
-            1., -1., -1.,
-            -1., -1., -1.,
-            -1., -1., 1.,
-
-            // right side
-            1., -1, -1,
-            1., -1, 1,
-            1., 1., 1.,
-            1., 1., -1.,
-
-            // left side
-            -1., -1., 1.,
-            -1., -1., -1.,
-            -1., 1., -1.,
-            -1., 1., 1.,
-
-            // back side
-            -1., -1., -1.,
-            1., -1, -1.,
-            1, 1, -1.,
-            -1, 1, -1.,
-
-            // front side
-            1., -1., 1.,
-            -1., -1., 1.,
-            -1, 1., 1.,
-            1., 1., 1.,
-        };
-    int indices[] = {
-        0, 1, 2, 2, 3, 0,
-        4, 5, 6, 6, 7, 4,
-        8, 9, 10, 10, 11, 8,
-        12, 13, 14, 14, 15, 12,
-        16, 17, 18, 18, 19, 16,
-        20, 21, 22, 22, 23, 20
-    };
-
-    glGenBuffers(1, &SharedObject::cubevbo);
-    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::cubevbo);
-    glBufferData(GL_ARRAY_BUFFER, 6 * 4 * 3 * sizeof(float), corners, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &SharedObject::cubeindexes);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::cubeindexes);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
+    glGenBuffers(1, &SharedObject::skytrivbo);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::skytrivbo);
+    glBufferData(GL_ARRAY_BUFFER, 3 * 3 * sizeof(float), tri_vertex, GL_STATIC_DRAW);
 }
 
 GLuint SharedObject::frustrumvbo = 0;
@@ -535,7 +488,7 @@ void Shaders::loadShaders()
     initQuadVBO();
     initQuadBuffer();
     initBillboardVBO();
-    initCubeVBO();
+    initSkyTriVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
     initLightingDataUBO();
@@ -1417,17 +1370,16 @@ namespace MeshShader
     SkyboxShader::SkyboxShader()
     {
         Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/sky.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sky.frag").c_str());
-        AssignUniforms("ModelMatrix");
+        AssignUniforms();
         AssignSamplerNames(Program, 0, "tex");
 
-        glGenVertexArrays(1, &cubevao);
-        glBindVertexArray(cubevao);
-        glBindBuffer(GL_ARRAY_BUFFER, SharedObject::cubevbo);
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, SharedObject::skytrivbo);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::cubeindexes);
         glBindVertexArray(0);
     }
 
