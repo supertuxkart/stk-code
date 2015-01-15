@@ -289,11 +289,6 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_PNG_LOADER_
 #undef _IRR_COMPILE_WITH_PNG_LOADER_
 #endif
-//! Define _IRR_COMPILE_WITH_PPM_LOADER_ if you want to load .ppm/.pgm/.pbm files
-//#define _IRR_COMPILE_WITH_PPM_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_PPM_LOADER_
-#undef _IRR_COMPILE_WITH_PPM_LOADER_
-#endif
 //! Define _IRR_COMPILE_WITH_PSD_LOADER_ if you want to load .psd files
 //#define _IRR_COMPILE_WITH_PSD_LOADER_
 #ifdef NO_IRR_COMPILE_WITH_PSD_LOADER_
@@ -349,11 +344,6 @@ B3D, MS3D or X meshes */
 #define _IRR_COMPILE_WITH_PNG_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_PNG_WRITER_
 #undef _IRR_COMPILE_WITH_PNG_WRITER_
-#endif
-//! Define _IRR_COMPILE_WITH_PPM_WRITER_ if you want to write .ppm files
-//#define _IRR_COMPILE_WITH_PPM_WRITER_
-#ifdef NO_IRR_COMPILE_WITH_PPM_WRITER_
-#undef _IRR_COMPILE_WITH_PPM_WRITER_
 #endif
 //! Define _IRR_COMPILE_WITH_PSD_WRITER_ if you want to write .psd files
 //#define _IRR_COMPILE_WITH_PSD_WRITER_

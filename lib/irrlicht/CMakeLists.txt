@@ -105,7 +105,6 @@ source/Irrlicht/CColorConverter.cpp
 source/Irrlicht/CMeshCache.cpp
 source/Irrlicht/CIrrDeviceFB.cpp
 source/Irrlicht/CMemoryFile.cpp
-source/Irrlicht/CImageWriterPPM.cpp
 source/Irrlicht/CMountPointReader.cpp
 source/Irrlicht/CBillboardSceneNode.cpp
 source/Irrlicht/CGUIImageList.cpp
@@ -137,7 +136,6 @@ source/Irrlicht/COpenGLExtensionHandler.cpp
 source/Irrlicht/CImageLoaderWAL.cpp
 source/Irrlicht/CXMLWriter.cpp
 source/Irrlicht/CSceneNodeAnimatorCameraFPS.cpp
-source/Irrlicht/CImageLoaderPPM.cpp
 source/Irrlicht/CGUIColorSelectDialog.cpp
 source/Irrlicht/CSceneManager.cpp
 source/Irrlicht/Irrlicht.cpp
@@ -174,7 +172,6 @@ source/Irrlicht/CIrrDeviceLinux.h
 source/Irrlicht/CMeshCache.h
 source/Irrlicht/CAttributes.h
 source/Irrlicht/CParticleMeshEmitter.h
-source/Irrlicht/CImageWriterPPM.h
 source/Irrlicht/CParticlePointEmitter.h
 source/Irrlicht/CParticleRotationAffector.h
 source/Irrlicht/CMountPointReader.h
@@ -269,7 +266,6 @@ source/Irrlicht/CTriangleSelector.h
 source/Irrlicht/CParticleGravityAffector.h
 source/Irrlicht/CGUIModalScreen.h
 source/Irrlicht/CDefaultSceneNodeFactory.h
-source/Irrlicht/CImageLoaderPPM.h
 source/Irrlicht/CXMLReaderImpl.h
 source/Irrlicht/COpenGLMaterialRenderer.h
 source/Irrlicht/CVideoModeList.h
