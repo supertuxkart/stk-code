@@ -104,9 +104,12 @@ static void projectSH(Color *CubemapFace[6], size_t edge_size,
     }
 
     float wh = float(edge_size * edge_size);
+    float b0 = 0., b1 = 0., b2 = 0., b3 = 0., b4 = 0., b5 = 0., b6 = 0., b7 = 0., b8 = 0.;
+    float r0 = 0., r1 = 0., r2 = 0., r3 = 0., r4 = 0., r5 = 0., r6 = 0., r7 = 0., r8 = 0.;
+    float g0 = 0., g1 = 0., g2 = 0., g3 = 0., g4 = 0., g5 = 0., g6 = 0., g7 = 0., g8 = 0.;
     for (unsigned face = 0; face < 6; face++)
     {
-#pragma omp parallel for
+#pragma omp parallel for reduction(+ : b0, b1, b2, b3, b4, b5, b6, b7, b8, r0, r1, r2, r3, r4, r5, r6, r7, r8, g0, g1, g2, g3, g4, g5, g6, g7, g8)
         for (int i = 0; i < int(edge_size); i++)
         {
             for (unsigned j = 0; j < edge_size; j++)
@@ -126,39 +129,69 @@ static void projectSH(Color *CubemapFace[6], size_t edge_size,
                 float g = CubemapFace[face][edge_size * i + j].Green;
                 float r = CubemapFace[face][edge_size * i + j].Red;
 
-                blueSHCoeff[0] += b * Y00[face][idx] * solidangle;
-                blueSHCoeff[1] += b * Y1minus1[face][idx] * solidangle;
-                blueSHCoeff[2] += b * Y10[face][idx] * solidangle;
-                blueSHCoeff[3] += b * Y11[face][idx] * solidangle;
-                blueSHCoeff[4] += b * Y2minus2[face][idx] * solidangle;
-                blueSHCoeff[5] += b * Y2minus1[face][idx] * solidangle;
-                blueSHCoeff[6] += b * Y20[face][idx] * solidangle;
-                blueSHCoeff[7] += b * Y21[face][idx] * solidangle;
-                blueSHCoeff[8] += b * Y22[face][idx] * solidangle;
+                b0 += b * Y00[face][idx] * solidangle;
+                b1 += b * Y1minus1[face][idx] * solidangle;
+                b2 += b * Y10[face][idx] * solidangle;
+                b3 += b * Y11[face][idx] * solidangle;
+                b4 += b * Y2minus2[face][idx] * solidangle;
+                b5 += b * Y2minus1[face][idx] * solidangle;
+                b6 += b * Y20[face][idx] * solidangle;
+                b7 += b * Y21[face][idx] * solidangle;
+                b8 += b * Y22[face][idx] * solidangle;
 
-                greenSHCoeff[0] += g * Y00[face][idx] * solidangle;
-                greenSHCoeff[1] += g * Y1minus1[face][idx] * solidangle;
-                greenSHCoeff[2] += g * Y10[face][idx] * solidangle;
-                greenSHCoeff[3] += g * Y11[face][idx] * solidangle;
-                greenSHCoeff[4] += g * Y2minus2[face][idx] * solidangle;
-                greenSHCoeff[5] += g * Y2minus1[face][idx] * solidangle;
-                greenSHCoeff[6] += g * Y20[face][idx] * solidangle;
-                greenSHCoeff[7] += g * Y21[face][idx] * solidangle;
-                greenSHCoeff[8] += g * Y22[face][idx] * solidangle;
+                g0 += g * Y00[face][idx] * solidangle;
+                g1 += g * Y1minus1[face][idx] * solidangle;
+                g2 += g * Y10[face][idx] * solidangle;
+                g3 += g * Y11[face][idx] * solidangle;
+                g4 += g * Y2minus2[face][idx] * solidangle;
+                g5 += g * Y2minus1[face][idx] * solidangle;
+                g6 += g * Y20[face][idx] * solidangle;
+                g7 += g * Y21[face][idx] * solidangle;
+                g8 += g * Y22[face][idx] * solidangle;
 
 
-                redSHCoeff[0] += r * Y00[face][idx] * solidangle;
-                redSHCoeff[1] += r * Y1minus1[face][idx] * solidangle;
-                redSHCoeff[2] += r * Y10[face][idx] * solidangle;
-                redSHCoeff[3] += r * Y11[face][idx] * solidangle;
-                redSHCoeff[4] += r * Y2minus2[face][idx] * solidangle;
-                redSHCoeff[5] += r * Y2minus1[face][idx] * solidangle;
-                redSHCoeff[6] += r * Y20[face][idx] * solidangle;
-                redSHCoeff[7] += r * Y21[face][idx] * solidangle;
-                redSHCoeff[8] += r * Y22[face][idx] * solidangle;
+                r0 += r * Y00[face][idx] * solidangle;
+                r1 += r * Y1minus1[face][idx] * solidangle;
+                r2 += r * Y10[face][idx] * solidangle;
+                r3 += r * Y11[face][idx] * solidangle;
+                r4 += r * Y2minus2[face][idx] * solidangle;
+                r5 += r * Y2minus1[face][idx] * solidangle;
+                r6 += r * Y20[face][idx] * solidangle;
+                r7 += r * Y21[face][idx] * solidangle;
+                r8 += r * Y22[face][idx] * solidangle;
             }
         }
     }
+
+    blueSHCoeff[0] = b0;
+    blueSHCoeff[1] = b1;
+    blueSHCoeff[2] = b2;
+    blueSHCoeff[3] = b3;
+    blueSHCoeff[4] = b4;
+    blueSHCoeff[5] = b5;
+    blueSHCoeff[6] = b6;
+    blueSHCoeff[7] = b7;
+    blueSHCoeff[8] = b8;
+
+    redSHCoeff[0] = r0;
+    redSHCoeff[1] = r1;
+    redSHCoeff[2] = r2;
+    redSHCoeff[3] = r3;
+    redSHCoeff[4] = r4;
+    redSHCoeff[5] = r5;
+    redSHCoeff[6] = r6;
+    redSHCoeff[7] = r7;
+    redSHCoeff[8] = r8;
+
+    greenSHCoeff[0] = g0;
+    greenSHCoeff[1] = g1;
+    greenSHCoeff[2] = g2;
+    greenSHCoeff[3] = g3;
+    greenSHCoeff[4] = g4;
+    greenSHCoeff[5] = g5;
+    greenSHCoeff[6] = g6;
+    greenSHCoeff[7] = g7;
+    greenSHCoeff[8] = g8;
 }
 
 void SphericalHarmonics(Color *CubemapFace[6], size_t edge_size, float *blueSHCoeff, float *greenSHCoeff, float *redSHCoeff)
