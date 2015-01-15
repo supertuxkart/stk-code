@@ -279,11 +279,6 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_JPG_LOADER_
 #undef _IRR_COMPILE_WITH_JPG_LOADER_
 #endif
-//! Define _IRR_COMPILE_WITH_PCX_LOADER_ if you want to load .pcx files
-//#define _IRR_COMPILE_WITH_PCX_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_PCX_LOADER_
-#undef _IRR_COMPILE_WITH_PCX_LOADER_
-#endif
 //! Define _IRR_COMPILE_WITH_PNG_LOADER_ if you want to load .png files
 #define _IRR_COMPILE_WITH_PNG_LOADER_
 #ifdef NO_IRR_COMPILE_WITH_PNG_LOADER_
@@ -329,11 +324,6 @@ B3D, MS3D or X meshes */
 #define _IRR_COMPILE_WITH_JPG_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_JPG_WRITER_
 #undef _IRR_COMPILE_WITH_JPG_WRITER_
-#endif
-//! Define _IRR_COMPILE_WITH_PCX_WRITER_ if you want to write .pcx files
-//#define _IRR_COMPILE_WITH_PCX_WRITER_
-#ifdef NO_IRR_COMPILE_WITH_PCX_WRITER_
-#undef _IRR_COMPILE_WITH_PCX_WRITER_
 #endif
 //! Define _IRR_COMPILE_WITH_PNG_WRITER_ if you want to write .png files
 #define _IRR_COMPILE_WITH_PNG_WRITER_

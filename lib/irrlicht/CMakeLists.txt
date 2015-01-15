@@ -91,7 +91,6 @@ source/Irrlicht/CParticlePointEmitter.cpp
 source/Irrlicht/CTextSceneNode.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
-source/Irrlicht/CImageWriterPCX.cpp
 source/Irrlicht/CGUIInOutFader.cpp
 source/Irrlicht/CGUITreeView.cpp
 source/Irrlicht/CAnimatedMeshSceneNode.cpp
@@ -126,7 +125,6 @@ source/Irrlicht/CSkyBoxSceneNode.cpp
 source/Irrlicht/CWriteFile.cpp
 source/Irrlicht/COctreeTriangleSelector.cpp
 source/Irrlicht/CFileList.cpp
-source/Irrlicht/CImageLoaderPCX.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/COSOperator.cpp
 source/Irrlicht/CImageLoaderJPG.cpp
@@ -257,7 +255,6 @@ source/Irrlicht/CGUISpriteBank.h
 source/Irrlicht/CSceneNodeAnimatorFlyStraight.h
 source/Irrlicht/COpenGLExtensionHandler.h
 source/Irrlicht/CGUIScrollBar.h
-source/Irrlicht/CImageLoaderPCX.h
 source/Irrlicht/CTriangleSelector.h
 source/Irrlicht/CParticleGravityAffector.h
 source/Irrlicht/CGUIModalScreen.h
@@ -276,7 +273,6 @@ source/Irrlicht/CEmptySceneNode.h
 source/Irrlicht/CParticleSystemSceneNode.h
 source/Irrlicht/CImageWriterPNG.h
 source/Irrlicht/CParticleScaleAffector.h
-source/Irrlicht/CImageWriterPCX.h
 source/Irrlicht/CImageLoaderJPG.h
 source/Irrlicht/CBillboardSceneNode.h
 source/Irrlicht/CIrrDeviceSDL.h
