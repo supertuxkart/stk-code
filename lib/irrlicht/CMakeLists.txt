@@ -61,7 +61,6 @@ source/Irrlicht/CGUIFileOpenDialog.cpp
 source/Irrlicht/CGUISpriteBank.cpp
 source/Irrlicht/CParticleFadeOutAffector.cpp
 source/Irrlicht/CGUIMenu.cpp
-source/Irrlicht/CImageWriterPSD.cpp
 source/Irrlicht/CSphereSceneNode.cpp
 source/Irrlicht/CImageWriterTGA.cpp
 source/Irrlicht/CImageWriterPNG.cpp
@@ -73,7 +72,6 @@ source/Irrlicht/CBoneSceneNode.cpp
 source/Irrlicht/CNPKReader.cpp
 source/Irrlicht/COpenGLSLMaterialRenderer.cpp
 source/Irrlicht/CParticleRotationAffector.cpp
-source/Irrlicht/CImageLoaderPSD.cpp
 source/Irrlicht/CTriangleBBSelector.cpp
 source/Irrlicht/CGUIComboBox.cpp
 source/Irrlicht/CSceneNodeAnimatorTexture.cpp
@@ -226,7 +224,6 @@ source/Irrlicht/MacOSX/AppDelegate.h
 source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h
 source/Irrlicht/MacOSX/OSXClipboard.h
 source/Irrlicht/CSceneManager.h
-source/Irrlicht/CImageLoaderPSD.h
 source/Irrlicht/COpenGLDriver.h
 source/Irrlicht/CGUIComboBox.h
 source/Irrlicht/CVolumeLightSceneNode.h
@@ -259,7 +256,6 @@ source/Irrlicht/CGUIEditBox.h
 source/Irrlicht/CGUISpriteBank.h
 source/Irrlicht/CSceneNodeAnimatorFlyStraight.h
 source/Irrlicht/COpenGLExtensionHandler.h
-source/Irrlicht/CImageWriterPSD.h
 source/Irrlicht/CGUIScrollBar.h
 source/Irrlicht/CImageLoaderPCX.h
 source/Irrlicht/CTriangleSelector.h

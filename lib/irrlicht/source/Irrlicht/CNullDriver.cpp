@@ -133,9 +133,6 @@ CNullDriver::CNullDriver(io::IFileSystem* io, const core::dimension2d<u32>& scre
 #ifdef _IRR_COMPILE_WITH_RGB_LOADER_
 	SurfaceLoader.push_back(video::createImageLoaderRGB());
 #endif
-#ifdef _IRR_COMPILE_WITH_PSD_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderPSD());
-#endif
 #ifdef _IRR_COMPILE_WITH_DDS_LOADER_
 	SurfaceLoader.push_back(video::createImageLoaderDDS());
 #endif
@@ -156,9 +153,6 @@ CNullDriver::CNullDriver(io::IFileSystem* io, const core::dimension2d<u32>& scre
 #endif
 #ifdef _IRR_COMPILE_WITH_PCX_WRITER_
 	SurfaceWriter.push_back(video::createImageWriterPCX());
-#endif
-#ifdef _IRR_COMPILE_WITH_PSD_WRITER_
-	SurfaceWriter.push_back(video::createImageWriterPSD());
 #endif
 #ifdef _IRR_COMPILE_WITH_TGA_WRITER_
 	SurfaceWriter.push_back(video::createImageWriterTGA());
