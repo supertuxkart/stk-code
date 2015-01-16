@@ -269,7 +269,8 @@ void Widget::setFocusForPlayer(const int playerID)
     this->focused(playerID);
 
     Screen* screen = GUIEngine::getCurrentScreen();
-    screen->onFocusChanged(previous_focus, this, playerID);
+    if(screen)
+        screen->onFocusChanged(previous_focus, this, playerID);
 }
 
 // -----------------------------------------------------------------------------
