@@ -310,6 +310,9 @@ void Track::cleanup()
     delete m_gfx_effect_mesh;
     m_gfx_effect_mesh = NULL;
 
+    if (CVS->isGLSL())
+        irr_driver->cleanSunInterposer();
+
 
     // The m_all_cached_mesh contains each mesh loaded from a file, which
     // means that the mesh is stored in irrlichts mesh cache. To clean
@@ -1851,12 +1854,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         if (m_sun_position.getLengthSQ() < 0.03f)
             // Backward compatibility: if no sun is specified, use the
             // old hardcoded default angle
-            m_sun->setRotation( core::vector3df(180, 45, 45) );
+            m_sun->setRotation(core::vector3df(180, 45, 45));
         else
             m_sun->setRotation((-m_sun_position).getHorizontalAngle());
 
         sun->getLightData().SpecularColor = m_sun_specular_color;
     }
+    else
+        irr_driver->createSunInterposer();
 
 
     createPhysicsModel(main_track_count);

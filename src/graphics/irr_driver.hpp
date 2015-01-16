@@ -667,6 +667,8 @@ public:
     void clearLights();
     // ------------------------------------------------------------------------
     class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
+    void cleanSunInterposer();
+    void createSunInterposer();
     // ------------------------------------------------------------------------
     void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; matrix.getInverse(m_InvViewMatrix); }
     const core::matrix4 &getViewMatrix() const { return m_ViewMatrix; }

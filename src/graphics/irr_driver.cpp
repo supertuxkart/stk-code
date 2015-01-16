@@ -517,28 +517,6 @@ void IrrDriver::initDevice()
         m_mrt.clear();
         m_mrt.reallocate(2);
 
-        scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
-        for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
-        {
-            scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
-            if (!mb)
-                continue;
-            mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
-            mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-        }
-        m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1, "sun_interposer");
-
-        m_sun_interposer->grab();
-        m_sun_interposer->setParent(NULL);
-        m_sun_interposer->setScale(core::vector3df(20));
-
-        m_sun_interposer->getMaterial(0).Lighting = false;
-        m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
-        m_sun_interposer->getMaterial(0).ZWriteEnable = false;
-        m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
-
-        sphere->drop();
-
         m_suncam = m_scene_manager->addCameraSceneNode(0, vector3df(0), vector3df(0), -1, false);
         m_suncam->grab();
         m_suncam->setParent(NULL);
@@ -609,6 +587,35 @@ void IrrDriver::initDevice()
     m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
 }   // initDevice
+
+void IrrDriver::cleanSunInterposer()
+{
+    delete m_sun_interposer;
+}
+void IrrDriver::createSunInterposer()
+{
+    scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
+    for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
+    {
+        scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
+        if (!mb)
+            continue;
+        mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+        mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    }
+    m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1, "sun_interposer");
+
+    m_sun_interposer->grab();
+    m_sun_interposer->setParent(NULL);
+    m_sun_interposer->setScale(core::vector3df(20));
+
+    m_sun_interposer->getMaterial(0).Lighting = false;
+    m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
+    m_sun_interposer->getMaterial(0).ZWriteEnable = false;
+    m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
+
+    sphere->drop();
+}
 
 //-----------------------------------------------------------------------------
 void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
