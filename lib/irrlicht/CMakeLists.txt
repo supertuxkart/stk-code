@@ -62,7 +62,6 @@ source/Irrlicht/CGUISpriteBank.cpp
 source/Irrlicht/CParticleFadeOutAffector.cpp
 source/Irrlicht/CGUIMenu.cpp
 source/Irrlicht/CSphereSceneNode.cpp
-source/Irrlicht/CImageWriterTGA.cpp
 source/Irrlicht/CImageWriterPNG.cpp
 source/Irrlicht/CSceneNodeAnimatorFollowSpline.cpp
 source/Irrlicht/CGUIMessageBox.cpp
@@ -136,7 +135,6 @@ source/Irrlicht/CGUIColorSelectDialog.cpp
 source/Irrlicht/CSceneManager.cpp
 source/Irrlicht/Irrlicht.cpp
 source/Irrlicht/COpenGLShaderMaterialRenderer.cpp
-source/Irrlicht/CImageLoaderTGA.cpp
 source/Irrlicht/COpenGLDriver.cpp
 source/Irrlicht/CSceneNodeAnimatorFlyStraight.cpp
 source/Irrlicht/irrXML.cpp
@@ -180,7 +178,6 @@ source/Irrlicht/CSkinnedMesh.h
 source/Irrlicht/COpenGLParallaxMapRenderer.h
 source/Irrlicht/CParticleRingEmitter.h
 source/Irrlicht/COpenGLShaderMaterialRenderer.h
-source/Irrlicht/CImageWriterTGA.h
 source/Irrlicht/CImageLoaderPNG.h
 source/Irrlicht/COctreeTriangleSelector.h
 source/Irrlicht/COpenGLTexture.h
@@ -263,7 +260,6 @@ source/Irrlicht/CXMLReaderImpl.h
 source/Irrlicht/COpenGLMaterialRenderer.h
 source/Irrlicht/CVideoModeList.h
 source/Irrlicht/CParticleAnimatedMeshSceneNodeEmitter.h
-source/Irrlicht/CImageLoaderTGA.h
 source/Irrlicht/CColorConverter.h
 source/Irrlicht/CWaterSurfaceSceneNode.h
 source/Irrlicht/SoftwareDriver2_compile_config.h
