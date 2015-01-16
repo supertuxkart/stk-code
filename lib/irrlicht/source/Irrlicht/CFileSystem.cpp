@@ -10,7 +10,6 @@
 #include "CZipReader.h"
 #include "CMountPointReader.h"
 #include "CTarReader.h"
-#include "CWADReader.h"
 #include "CFileList.h"
 #include "CXMLReader.h"
 #include "CXMLWriter.h"
@@ -58,10 +57,6 @@ CFileSystem::CFileSystem()
 
 #ifdef __IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
 	ArchiveLoader.push_back(new CArchiveLoaderTAR(this));
-#endif
-
-#ifdef __IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
-	ArchiveLoader.push_back(new CArchiveLoaderWAD(this));
 #endif
 
 #ifdef __IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_

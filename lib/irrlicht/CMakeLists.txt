@@ -75,7 +75,6 @@ source/Irrlicht/CSceneNodeAnimatorTexture.cpp
 source/Irrlicht/COpenGLTexture.cpp
 source/Irrlicht/COctreeSceneNode.cpp
 source/Irrlicht/CWaterSurfaceSceneNode.cpp
-source/Irrlicht/CWADReader.cpp
 source/Irrlicht/CParticleAttractionAffector.cpp
 source/Irrlicht/CMeshSceneNode.cpp
 source/Irrlicht/CGUIScrollBar.cpp
@@ -202,7 +201,6 @@ source/Irrlicht/CAnimatedMeshSceneNode.h
 source/Irrlicht/CGUIStaticText.h
 source/Irrlicht/wglext.h
 source/Irrlicht/CTimer.h
-source/Irrlicht/CWADReader.h
 source/Irrlicht/CSceneNodeAnimatorCameraFPS.h
 source/Irrlicht/CParticleFadeOutAffector.h
 source/Irrlicht/COpenGLSLMaterialRenderer.h
