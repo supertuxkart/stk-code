@@ -54,7 +54,7 @@
 -->
                 <label id="info" height="20%" width="100%" align="center" text_align="center" word_wrap="true"
                    I18N="In the registration dialog" 
-                       text="You can play without creating an online account by unchecking the online checkbox, though then you can not connect to friends, vote for addons etc. Please read our privacy statement at http://privacy.supertuxkart.net"/>
+                       text="You can play without creating an online account by selecting an offline account. Though then you can not connect to friends, vote for addons etc. Please read our privacy statement at http://privacy.supertuxkart.net"/>
             </div>
 
             <buttonbar id="options" width="40%" height="15%" align="center">

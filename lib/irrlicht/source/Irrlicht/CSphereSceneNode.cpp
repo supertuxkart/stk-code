@@ -7,7 +7,6 @@
 #include "ISceneManager.h"
 #include "S3DVertex.h"
 #include "os.h"
-#include "CShadowVolumeSceneNode.h"
 
 namespace irr
 {
@@ -17,7 +16,7 @@ namespace scene
 //! constructor
 CSphereSceneNode::CSphereSceneNode(f32 radius, u32 polyCountX, u32 polyCountY, ISceneNode* parent, ISceneManager* mgr, s32 id,
 			const core::vector3df& position, const core::vector3df& rotation, const core::vector3df& scale)
-: IMeshSceneNode(parent, mgr, id, position, rotation, scale), Mesh(0), Shadow(0),
+: IMeshSceneNode(parent, mgr, id, position, rotation, scale), Mesh(0),
 	Radius(radius), PolyCountX(polyCountX), PolyCountY(polyCountY)
 {
 	#ifdef _DEBUG
@@ -32,8 +31,6 @@ CSphereSceneNode::CSphereSceneNode(f32 radius, u32 polyCountX, u32 polyCountY, I
 //! destructor
 CSphereSceneNode::~CSphereSceneNode()
 {
-	if (Shadow)
-		Shadow->drop();
 	if (Mesh)
 		Mesh->drop();
 }
@@ -48,8 +45,6 @@ void CSphereSceneNode::render()
 	{
 		driver->setMaterial(Mesh->getMeshBuffer(0)->getMaterial());
 		driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
-		if (Shadow)
-			Shadow->updateShadowVolumes();
 
 		driver->drawMeshBuffer(Mesh->getMeshBuffer(0));
 		if ( DebugDataVisible & scene::EDS_BBOX )
@@ -68,32 +63,7 @@ void CSphereSceneNode::render()
 //! or to remove attached childs.
 bool CSphereSceneNode::removeChild(ISceneNode* child)
 {
-	if (child && Shadow == child)
-	{
-		Shadow->drop();
-		Shadow = 0;
-	}
-
 	return ISceneNode::removeChild(child);
-}
-
-
-//! Creates shadow volume scene node as child of this node
-//! and returns a pointer to it.
-IShadowVolumeSceneNode* CSphereSceneNode::addShadowVolumeSceneNode(
-		const IMesh* shadowMesh, s32 id, bool zfailmethod, f32 infinity)
-{
-	if (!SceneManager->getVideoDriver()->queryFeature(video::EVDF_STENCIL_BUFFER))
-		return 0;
-
-	if (!shadowMesh)
-		shadowMesh = Mesh; // if null is given, use the mesh of node
-
-	if (Shadow)
-		Shadow->drop();
-
-	Shadow = new CShadowVolumeSceneNode(shadowMesh, this, SceneManager, id,  zfailmethod, infinity);
-	return Shadow;
 }
 
 
@@ -185,8 +155,6 @@ ISceneNode* CSphereSceneNode::clone(ISceneNode* newParent, ISceneManager* newMan
 
 	nb->cloneMembers(this, newManager);
 	nb->getMaterial(0) = Mesh->getMeshBuffer(0)->getMaterial();
-	nb->Shadow = Shadow;
-	nb->Shadow->grab();
 
 	if ( newParent )
 		nb->drop();

@@ -8,7 +8,6 @@
 #include "S3DVertex.h"
 #include "SMeshBuffer.h"
 #include "os.h"
-#include "CShadowVolumeSceneNode.h"
 
 namespace irr
 {
@@ -33,7 +32,7 @@ CCubeSceneNode::CCubeSceneNode(f32 size, ISceneNode* parent, ISceneManager* mgr,
 		s32 id, const core::vector3df& position,
 		const core::vector3df& rotation, const core::vector3df& scale)
 	: IMeshSceneNode(parent, mgr, id, position, rotation, scale),
-	Mesh(0), Shadow(0), Size(size)
+	Mesh(0), Size(size)
 {
 	#ifdef _DEBUG
 	setDebugName("CCubeSceneNode");
@@ -45,8 +44,6 @@ CCubeSceneNode::CCubeSceneNode(f32 size, ISceneNode* parent, ISceneManager* mgr,
 
 CCubeSceneNode::~CCubeSceneNode()
 {
-	if (Shadow)
-		Shadow->drop();
 	if (Mesh)
 		Mesh->drop();
 }
@@ -65,9 +62,6 @@ void CCubeSceneNode::render()
 {
 	video::IVideoDriver* driver = SceneManager->getVideoDriver();
 	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
-
-	if (Shadow)
-		Shadow->updateShadowVolumes();
 
 	// for debug purposes only:
 	video::SMaterial mat = Mesh->getMeshBuffer(0)->getMaterial();
@@ -132,32 +126,7 @@ const core::aabbox3d<f32>& CCubeSceneNode::getBoundingBox() const
 //! or to remove attached childs.
 bool CCubeSceneNode::removeChild(ISceneNode* child)
 {
-	if (child && Shadow == child)
-	{
-		Shadow->drop();
-		Shadow = 0;
-	}
-
 	return ISceneNode::removeChild(child);
-}
-
-
-//! Creates shadow volume scene node as child of this node
-//! and returns a pointer to it.
-IShadowVolumeSceneNode* CCubeSceneNode::addShadowVolumeSceneNode(
-		const IMesh* shadowMesh, s32 id, bool zfailmethod, f32 infinity)
-{
-	if (!SceneManager->getVideoDriver()->queryFeature(video::EVDF_STENCIL_BUFFER))
-		return 0;
-
-	if (!shadowMesh)
-		shadowMesh = Mesh; // if null is given, use the mesh of node
-
-	if (Shadow)
-		Shadow->drop();
-
-	Shadow = new CShadowVolumeSceneNode(shadowMesh, this, SceneManager, id,  zfailmethod, infinity);
-	return Shadow;
 }
 
 
@@ -220,8 +189,6 @@ ISceneNode* CCubeSceneNode::clone(ISceneNode* newParent, ISceneManager* newManag
 
 	nb->cloneMembers(this, newManager);
 	nb->getMaterial(0) = getMaterial(0);
-	nb->Shadow = Shadow;
-	nb->Shadow->grab();
 
 	if ( newParent )
 		nb->drop();

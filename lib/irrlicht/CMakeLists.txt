@@ -54,7 +54,6 @@ source/Irrlicht/CImageWriterJPG.cpp
 source/Irrlicht/CZipReader.cpp
 source/Irrlicht/CImageLoaderPNG.cpp
 source/Irrlicht/CImageLoaderBMP.cpp
-source/Irrlicht/CVolumeLightSceneNode.cpp
 source/Irrlicht/CDefaultSceneNodeAnimatorFactory.cpp
 source/Irrlicht/CSkyDomeSceneNode.cpp
 source/Irrlicht/CGUIFileOpenDialog.cpp
@@ -148,7 +147,6 @@ source/Irrlicht/CGUISpinBox.cpp
 source/Irrlicht/CReadFile.cpp
 source/Irrlicht/CParticleRingEmitter.cpp
 source/Irrlicht/CMetaTriangleSelector.cpp
-source/Irrlicht/CShadowVolumeSceneNode.cpp
 source/Irrlicht/CDefaultSceneNodeFactory.cpp
 source/Irrlicht/CGUIImage.cpp
 source/Irrlicht/CGUIEnvironment.cpp
@@ -217,7 +215,6 @@ source/Irrlicht/MacOSX/OSXClipboard.h
 source/Irrlicht/CSceneManager.h
 source/Irrlicht/COpenGLDriver.h
 source/Irrlicht/CGUIComboBox.h
-source/Irrlicht/CVolumeLightSceneNode.h
 source/Irrlicht/CSceneCollisionManager.h
 source/Irrlicht/ISceneNodeAnimatorFinishing.h
 source/Irrlicht/aesGladman/pwd2key.h
@@ -233,7 +230,6 @@ source/Irrlicht/CSphereSceneNode.h
 source/Irrlicht/CIrrDeviceStub.h
 source/Irrlicht/CDummyTransformationSceneNode.h
 source/Irrlicht/CParticleBoxEmitter.h
-source/Irrlicht/CShadowVolumeSceneNode.h
 source/Irrlicht/COctreeSceneNode.h
 source/Irrlicht/CReadFile.h
 source/Irrlicht/COSOperator.h
@@ -321,7 +317,6 @@ include/EMessageBoxFlags.h
 include/IParticleSphereEmitter.h
 include/IParticleFadeOutAffector.h
 include/IGeometryCreator.h
-include/IVolumeLightSceneNode.h
 include/IGUIEnvironment.h
 include/irrunpack.h
 include/IParticleRingEmitter.h
@@ -443,7 +438,6 @@ include/IMeshManipulator.h
 include/CVertexBuffer.h
 include/SSharedMeshBuffer.h
 include/vector3d.h
-include/IShadowVolumeSceneNode.h
 include/ISceneNodeAnimatorCameraFPS.h
 include/IGUIMeshViewer.h
 include/triangle3d.h

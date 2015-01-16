@@ -44,7 +44,6 @@
 #include "CTerrainSceneNode.h"
 #include "CEmptySceneNode.h"
 #include "CTextSceneNode.h"
-#include "CVolumeLightSceneNode.h"
 
 #include "CDefaultSceneNodeFactory.h"
 
@@ -344,23 +343,6 @@ IBillboardTextSceneNode* CSceneManager::addBillboardTextSceneNode(gui::IGUIFont*
 
 	return node;
 
-}
-
-//! adds Volume Lighting Scene Node.
-//! the returned pointer must not be dropped.
-IVolumeLightSceneNode* CSceneManager::addVolumeLightSceneNode(
-		ISceneNode* parent, s32 id,
-		const u32 subdivU, const u32 subdivV,
-		const video::SColor foot, const video::SColor tail,
-		const core::vector3df& position, const core::vector3df& rotation, const core::vector3df& scale)
-{
-	if (!parent)
-		parent = this;
-
-	IVolumeLightSceneNode* node = new CVolumeLightSceneNode(parent, this, id, subdivU, subdivV, foot, tail, position, rotation, scale);
-	node->drop();
-
-	return node;
 }
 
 
