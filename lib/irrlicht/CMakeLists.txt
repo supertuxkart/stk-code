@@ -119,7 +119,6 @@ source/Irrlicht/CGUIEditBox.cpp
 source/Irrlicht/CLogger.cpp
 source/Irrlicht/CMeshManipulator.cpp
 source/Irrlicht/CLightSceneNode.cpp
-source/Irrlicht/CImageLoaderDDS.cpp
 source/Irrlicht/CSkyBoxSceneNode.cpp
 source/Irrlicht/CWriteFile.cpp
 source/Irrlicht/COctreeTriangleSelector.cpp
@@ -240,7 +239,6 @@ source/Irrlicht/CParticleBoxEmitter.h
 source/Irrlicht/CShadowVolumeSceneNode.h
 source/Irrlicht/COctreeSceneNode.h
 source/Irrlicht/CReadFile.h
-source/Irrlicht/CImageLoaderDDS.h
 source/Irrlicht/COSOperator.h
 source/Irrlicht/CLightSceneNode.h
 source/Irrlicht/CParticleSphereEmitter.h
