@@ -317,7 +317,6 @@ include/EMessageBoxFlags.h
 include/IParticleSphereEmitter.h
 include/IParticleFadeOutAffector.h
 include/IGeometryCreator.h
-include/IVolumeLightSceneNode.h
 include/IGUIEnvironment.h
 include/irrunpack.h
 include/IParticleRingEmitter.h
@@ -439,7 +438,6 @@ include/IMeshManipulator.h
 include/CVertexBuffer.h
 include/SSharedMeshBuffer.h
 include/vector3d.h
-include/IShadowVolumeSceneNode.h
 include/ISceneNodeAnimatorCameraFPS.h
 include/IGUIMeshViewer.h
 include/triangle3d.h
