@@ -148,7 +148,6 @@ source/Irrlicht/CGUISpinBox.cpp
 source/Irrlicht/CReadFile.cpp
 source/Irrlicht/CParticleRingEmitter.cpp
 source/Irrlicht/CMetaTriangleSelector.cpp
-source/Irrlicht/CShadowVolumeSceneNode.cpp
 source/Irrlicht/CDefaultSceneNodeFactory.cpp
 source/Irrlicht/CGUIImage.cpp
 source/Irrlicht/CGUIEnvironment.cpp
@@ -233,7 +232,6 @@ source/Irrlicht/CSphereSceneNode.h
 source/Irrlicht/CIrrDeviceStub.h
 source/Irrlicht/CDummyTransformationSceneNode.h
 source/Irrlicht/CParticleBoxEmitter.h
-source/Irrlicht/CShadowVolumeSceneNode.h
 source/Irrlicht/COctreeSceneNode.h
 source/Irrlicht/CReadFile.h
 source/Irrlicht/COSOperator.h

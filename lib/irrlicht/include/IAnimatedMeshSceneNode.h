@@ -94,27 +94,6 @@ namespace scene
 		/** \return The importance of the animation: 1.f keeps the original animation, 0.f is no animation. */
 		virtual f32 getAnimationStrength() const =0;
 
-		//! Creates shadow volume scene node as child of this node.
-		/** The shadow can be rendered using the ZPass or the zfail
-		method. ZPass is a little bit faster because the shadow volume
-		creation is easier, but with this method there occur ugly
-		looking artifacs when the camera is inside the shadow volume.
-		These error do not occur with the ZFail method.
-		\param shadowMesh: Optional custom mesh for shadow volume.
-		\param id: Id of the shadow scene node. This id can be used to
-		identify the node later.
-		\param zfailmethod: If set to true, the shadow will use the
-		zfail method, if not, zpass is used.
-		\param infinity: Value used by the shadow volume algorithm to
-		scale the shadow volume (for zfail shadow volume we support only
-		finite shadows, so camera zfar must be larger than shadow back cap,
-		which is depend on infinity parameter).
-		\return Pointer to the created shadow scene node. This pointer
-		should not be dropped. See IReferenceCounted::drop() for more
-		information. */
-		virtual IShadowVolumeSceneNode* addShadowVolumeSceneNode(const IMesh* shadowMesh=0,
-			s32 id=-1, bool zfailmethod=true, f32 infinity=1000.0f) = 0;
-
 
 		//! Get a pointer to a joint in the mesh (if the mesh is a bone based mesh).
 		/** With this method it is possible to attach scene nodes to

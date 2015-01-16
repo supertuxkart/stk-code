@@ -66,11 +66,6 @@ namespace scene
 		//! Check if the scene node should not copy the materials of the mesh but use them in a read only style
 		virtual bool isReadOnlyMaterials() const;
 
-		//! Creates shadow volume scene node as child of this node
-		//! and returns a pointer to it.
-		virtual IShadowVolumeSceneNode* addShadowVolumeSceneNode(const IMesh* shadowMesh,
-			s32 id, bool zfailmethod=true, f32 infinity=10000.0f);
-
 		//! Removes a child from this scene node.
 		//! Implemented here, to be able to remove the shadow properly, if there is one,
 		//! or to remove attached childs.
@@ -99,7 +94,6 @@ namespace scene
 		s32 PassCount;
 
 		IMesh * Mesh;
-		IShadowVolumeSceneNode* Shadow;
 		//! use VBOs for rendering where possible
 		bool UseVBOs;
 		//! use visibility information together with VBOs
