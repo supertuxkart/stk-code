@@ -329,22 +329,6 @@ defined. */
 #ifdef NO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_
 #undef _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
 #endif
-//! Define _IRR_COMPILE_WITH_BZIP2_ if you want to support bzip2 compressed zip archives
-/** bzip2 is superior to the original zip file compression modes, but requires
-a certain amount of memory for decompression and adds several files to the
-library. */
-#define _IRR_COMPILE_WITH_BZIP2_
-#ifdef NO_IRR_COMPILE_WITH_BZIP2_
-#undef _IRR_COMPILE_WITH_BZIP2_
-#endif
-//! Define _IRR_USE_NON_SYSTEM_BZLIB_ to let irrlicht use the bzlib which comes with irrlicht.
-/** If this is commented out, Irrlicht will try to compile using the bzlib
-installed on the system. This is only used when _IRR_COMPILE_WITH_BZLIB_ is
-defined. */
-#define _IRR_USE_NON_SYSTEM_BZLIB_
-#ifdef NO_IRR_USE_NON_SYSTEM_BZLIB_
-#undef _IRR_USE_NON_SYSTEM_BZLIB_
-#endif
 //! Define _IRR_COMPILE_WITH_LZMA_ if you want to use LZMA compressed zip files.
 /** LZMA is a very efficient compression code, known from 7zip. Irrlicht
 currently only supports zip archives, though. */
