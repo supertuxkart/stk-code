@@ -136,7 +136,6 @@ source/Irrlicht/COpenGLShaderMaterialRenderer.cpp
 source/Irrlicht/COpenGLDriver.cpp
 source/Irrlicht/CSceneNodeAnimatorFlyStraight.cpp
 source/Irrlicht/irrXML.cpp
-source/Irrlicht/CImageLoaderRGB.cpp
 source/Irrlicht/CSkinnedMesh.cpp
 source/Irrlicht/CXMLReader.cpp
 source/Irrlicht/CDummyTransformationSceneNode.cpp
@@ -284,7 +283,6 @@ source/Irrlicht/CGUIToolBar.h
 source/Irrlicht/CImageWriterJPG.h
 source/Irrlicht/IAttribute.h
 source/Irrlicht/CNullDriver.h
-source/Irrlicht/CImageLoaderRGB.h
 source/Irrlicht/CWriteFile.h
 source/Irrlicht/CSceneNodeAnimatorFollowSpline.h
 source/Irrlicht/glxext.h
