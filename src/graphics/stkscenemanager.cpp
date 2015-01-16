@@ -255,7 +255,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         culledforshadowcam[i] = culledforshadowcam[i] || isCulledPrecise(shadowcam[i], Node);
 
     // Transparent
-    GLMesh *mesh;
+
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
         const Track * const track = World::getWorld()->getTrack();
@@ -272,21 +272,21 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             tmpcol.getGreen() / 255.0f,
             tmpcol.getBlue() / 255.0f);
 
-        for_in(mesh, node->TransparentMesh[TM_DEFAULT])
+        for (GLMesh *mesh : node->TransparentMesh[TM_DEFAULT])
             pushVector(ListBlendTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
             fogmax, startH, endH, start, end, col);
-        for_in(mesh, node->TransparentMesh[TM_ADDITIVE])
+        for (GLMesh *mesh : node->TransparentMesh[TM_ADDITIVE])
             pushVector(ListAdditiveTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
             fogmax, startH, endH, start, end, col);
     }
     else
     {
-        for_in(mesh, node->TransparentMesh[TM_DEFAULT])
+        for (GLMesh *mesh : node->TransparentMesh[TM_DEFAULT])
             pushVector(ListBlendTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
-        for_in(mesh, node->TransparentMesh[TM_ADDITIVE])
+        for (GLMesh *mesh : node->TransparentMesh[TM_ADDITIVE])
             pushVector(ListAdditiveTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
     }
-    for_in(mesh, node->TransparentMesh[TM_DISPLACEMENT])
+    for (GLMesh *mesh : node->TransparentMesh[TM_DISPLACEMENT])
         pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
 
     if (!culledforcam)
@@ -295,7 +295,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         {
             if (CVS->supportsIndirectInstancingRendering())
             {
-                for_in(mesh, node->MeshSolidMaterial[Mat])
+                for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
                     if (node->glow())
                         MeshForGlowPass[mesh->mb].emplace_back(mesh, Node);
@@ -329,7 +329,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                 ModelMatrix.getInverse(InvModelMatrix);
 
-                for_in(mesh, node->MeshSolidMaterial[Mat])
+                for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
                     switch (Mat)
                     {
@@ -372,7 +372,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         {
             if (CVS->supportsIndirectInstancingRendering())
             {
-                for_in(mesh, node->MeshSolidMaterial[Mat])
+                for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
                     if (Mat != Material::SHADERTYPE_SPLATTING)
                         MeshForShadowPass[Mat][cascade][mesh->mb].emplace_back(mesh, Node);
@@ -389,7 +389,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                 ModelMatrix.getInverse(InvModelMatrix);
 
-                for_in(mesh, node->MeshSolidMaterial[Mat])
+                for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
                     switch (Mat)
                     {
@@ -430,7 +430,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             if (CVS->supportsIndirectInstancingRendering())
             {
                 if (Mat == Material::SHADERTYPE_SPLATTING)
-                    for_in(mesh, node->MeshSolidMaterial[Mat])
+                    for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                     {
                         core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                         ModelMatrix.getInverse(InvModelMatrix);
@@ -438,7 +438,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                      }
                 else
                 {
-                    for_in(mesh, node->MeshSolidMaterial[Mat])
+                    for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                         MeshForRSM[Mat][mesh->mb].emplace_back(mesh, Node);
                 }
             }
@@ -448,7 +448,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                 ModelMatrix.getInverse(InvModelMatrix);
 
-                for_in(mesh, node->MeshSolidMaterial[Mat])
+                for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
                     switch (Mat)
                     {
