@@ -2040,7 +2040,7 @@ void IrrDriver::doScreenShot()
         }   // if base
     }   // if failed writing screenshot file
     image->drop();
-}   // doScreenShot
+}    // doScreenShot
 
 // ----------------------------------------------------------------------------
 /** Update, called once per frame.
@@ -2137,6 +2137,13 @@ void IrrDriver::update(float dt)
 
 void IrrDriver::requestScreenshot()
 {
+    RaceGUIBase* base = World::getWorld()
+                          ? World::getWorld()->getRaceGUI()
+                          : NULL;
+    if (base)
+    {
+        base->clearAllMessages();
+    }
     m_request_screenshot = true;
 }
 
