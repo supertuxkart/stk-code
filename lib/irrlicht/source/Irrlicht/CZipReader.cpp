@@ -25,13 +25,6 @@ extern "C" void bz_internal_error(int errorCode)
 	#else
 	#include "zlib/zlib.h"
 	#endif
-
-	#ifdef _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
-	#include "aesGladman/fileenc.h"
-	#endif
-	#ifdef _IRR_COMPILE_WITH_LZMA_
-	#include "lzma/LzmaDec.h"
-	#endif
 #endif
 
 namespace irr
@@ -316,46 +309,6 @@ bool CZipReader::scanZipHeader(bool ignoreGPBits)
 		delete [] tmp;
 	}
 
-#ifdef _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
-	// AES encryption
-	if ((entry.header.GeneralBitFlag & ZIP_FILE_ENCRYPTED) && (entry.header.CompressionMethod == 99))
-	{
-		s16 restSize = entry.header.ExtraFieldLength;
-		SZipFileExtraHeader extraHeader;
-		while (restSize)
-		{
-			File->read(&extraHeader, sizeof(extraHeader));
-#ifdef __BIG_ENDIAN__
-			extraHeader.ID = os::Byteswap::byteswap(extraHeader.ID);
-			extraHeader.Size = os::Byteswap::byteswap(extraHeader.Size);
-#endif
-			restSize -= sizeof(extraHeader);
-			if (extraHeader.ID==(s16)0x9901)
-			{
-				SZipFileAESExtraData data;
-				File->read(&data, sizeof(data));
-#ifdef __BIG_ENDIAN__
-				data.Version = os::Byteswap::byteswap(data.Version);
-				data.CompressionMode = os::Byteswap::byteswap(data.CompressionMode);
-#endif
-				restSize -= sizeof(data);
-				if (data.Vendor[0]=='A' && data.Vendor[1]=='E')
-				{
-					// encode values into Sig
-					// AE-Version | Strength | ActualMode
-					entry.header.Sig =
-						((data.Version & 0xff) << 24) |
-						(data.EncryptionStrength << 16) |
-						(data.CompressionMode);
-					File->seek(restSize, true);
-					break;
-				}
-			}
-		}
-	}
-	// move forward length of extra field.
-	else
-#endif
 	if (entry.header.ExtraFieldLength)
 		File->seek(entry.header.ExtraFieldLength, true);
 
@@ -481,16 +434,6 @@ IReadFile* CZipReader::createAndOpenFile(const io::path& filename)
 	return 0;
 }
 
-#ifdef _IRR_COMPILE_WITH_LZMA_
-//! Used for LZMA decompression. The lib has no default memory management
-namespace
-{
-	void *SzAlloc(void *p, size_t size) { p = p; return malloc(size); }
-	void SzFree(void *p, void *address) { p = p; free(address); }
-	ISzAlloc lzmaAlloc = { SzAlloc, SzFree };
-}
-#endif
-
 //! opens a file by index
 IReadFile* CZipReader::createAndOpenFile(u32 index)
 {
@@ -519,83 +462,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 	IReadFile* decrypted=0;
 	u8* decryptedBuf=0;
 	u32 decryptedSize=e.header.DataDescriptor.CompressedSize;
-#ifdef _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
-	if ((e.header.GeneralBitFlag & ZIP_FILE_ENCRYPTED) && (e.header.CompressionMethod == 99))
-	{
-		os::Printer::log("Reading encrypted file.");
-		u8 salt[16]={0};
-		const u16 saltSize = (((e.header.Sig & 0x00ff0000) >>16)+1)*4;
-		File->seek(e.Offset);
-		File->read(salt, saltSize);
-		char pwVerification[2];
-		char pwVerificationFile[2];
-		File->read(pwVerification, 2);
-		fcrypt_ctx zctx; // the encryption context
-		int rc = fcrypt_init(
-			(e.header.Sig & 0x00ff0000) >>16,
-			(const unsigned char*)Password.c_str(), // the password
-			Password.size(), // number of bytes in password
-			salt, // the salt
-			(unsigned char*)pwVerificationFile, // on return contains password verifier
-			&zctx); // encryption context
-		if (strncmp(pwVerificationFile, pwVerification, 2))
-		{
-			os::Printer::log("Wrong password");
-			return 0;
-		}
-		decryptedSize= e.header.DataDescriptor.CompressedSize-saltSize-12;
-		decryptedBuf= new u8[decryptedSize];
-		u32 c = 0;
-		while ((c+32768)<=decryptedSize)
-		{
-			File->read(decryptedBuf+c, 32768);
-			fcrypt_decrypt(
-				decryptedBuf+c, // pointer to the data to decrypt
-				32768,   // how many bytes to decrypt
-				&zctx); // decryption context
-			c+=32768;
-		}
-		File->read(decryptedBuf+c, decryptedSize-c);
-		fcrypt_decrypt(
-			decryptedBuf+c, // pointer to the data to decrypt
-			decryptedSize-c,   // how many bytes to decrypt
-			&zctx); // decryption context
 
-		char fileMAC[10];
-		char resMAC[10];
-		rc = fcrypt_end(
-			(unsigned char*)resMAC, // on return contains the authentication code
-			&zctx); // encryption context
-		if (rc != 10)
-		{
-			os::Printer::log("Error on encryption closing");
-			delete [] decryptedBuf;
-			return 0;
-		}
-		File->read(fileMAC, 10);
-		if (strncmp(fileMAC, resMAC, 10))
-		{
-			os::Printer::log("Error on encryption check");
-			delete [] decryptedBuf;
-			return 0;
-		}
-		decrypted = io::createMemoryReadFile(decryptedBuf, decryptedSize, Files[index].FullName, true);
-		actualCompressionMethod = (e.header.Sig & 0xffff);
-#if 0
-		if ((e.header.Sig & 0xff000000)==0x01000000)
-		{
-		}
-		else if ((e.header.Sig & 0xff000000)==0x02000000)
-		{
-		}
-		else
-		{
-			os::Printer::log("Unknown encryption method");
-			return 0;
-		}
-#endif
-	}
-#endif
 	switch(actualCompressionMethod)
 	{
 	case 0: // no compression
@@ -686,66 +553,8 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 		}
 	case 14:
 		{
-  			#ifdef _IRR_COMPILE_WITH_LZMA_
-
-			u32 uncompressedSize = e.header.DataDescriptor.UncompressedSize;
-			c8* pBuf = new c8[ uncompressedSize ];
-			if (!pBuf)
-			{
-				swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
-				os::Printer::log( buf, ELL_ERROR);
-				if (decrypted)
-					decrypted->drop();
-				return 0;
-			}
-
-			u8 *pcData = decryptedBuf;
-			if (!pcData)
-			{
-				pcData = new u8[decryptedSize];
-				if (!pcData)
-				{
-					swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
-					os::Printer::log( buf, ELL_ERROR);
-					delete [] pBuf;
-					return 0;
-				}
-
-				//memset(pcData, 0, decryptedSize);
-				File->seek(e.Offset);
-				File->read(pcData, decryptedSize);
-			}
-
-			ELzmaStatus status;
-			SizeT tmpDstSize = uncompressedSize;
-			SizeT tmpSrcSize = decryptedSize;
-
-			unsigned int propSize = (pcData[3]<<8)+pcData[2];
-			int err = LzmaDecode((Byte*)pBuf, &tmpDstSize,
-					pcData+4+propSize, &tmpSrcSize,
-					pcData+4, propSize,
-					e.header.GeneralBitFlag&0x1?LZMA_FINISH_END:LZMA_FINISH_ANY, &status,
-					&lzmaAlloc);
-			uncompressedSize = tmpDstSize; // may be different to expected value
-
-			if (decrypted)
-				decrypted->drop();
-			else
-				delete[] pcData;
-
-			if (err != SZ_OK)
-			{
-				os::Printer::log( "Error decompressing", Files[index].FullName, ELL_ERROR);
-				delete [] pBuf;
-				return 0;
-			}
-			else
-				return io::createMemoryReadFile(pBuf, uncompressedSize, Files[index].FullName, true);
-
-			#else
 			os::Printer::log("lzma decompression not supported. File cannot be read.", ELL_ERROR);
 			return 0;
-			#endif
 		}
 	case 99:
 		// If we come here with an encrypted file, decryption support is missing
