@@ -284,16 +284,6 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_PNG_LOADER_
 #undef _IRR_COMPILE_WITH_PNG_LOADER_
 #endif
-//! Define _IRR_COMPILE_WITH_WAL_LOADER_ if you want to load .wal files
-#define _IRR_COMPILE_WITH_WAL_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_WAL_LOADER_
-#undef _IRR_COMPILE_WITH_WAL_LOADER_
-#endif
-//! Define _IRR_COMPILE_WITH_LMP_LOADER_ if you want to load .lmp files
-#define _IRR_COMPILE_WITH_LMP_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_LMP_LOADER_
-#undef _IRR_COMPILE_WITH_LMP_LOADER_
-#endif
 //! Define _IRR_COMPILE_WITH_RGB_LOADER_ if you want to load Silicon Graphics .rgb/.rgba/.sgi/.int/.inta/.bw files
 #define _IRR_COMPILE_WITH_RGB_LOADER_
 #ifdef NO_IRR_COMPILE_WITH_RGB_LOADER_

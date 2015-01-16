@@ -127,7 +127,6 @@ source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/COSOperator.cpp
 source/Irrlicht/CImageLoaderJPG.cpp
 source/Irrlicht/COpenGLExtensionHandler.cpp
-source/Irrlicht/CImageLoaderWAL.cpp
 source/Irrlicht/CXMLWriter.cpp
 source/Irrlicht/CSceneNodeAnimatorCameraFPS.cpp
 source/Irrlicht/CGUIColorSelectDialog.cpp
@@ -171,7 +170,6 @@ source/Irrlicht/CMountPointReader.h
 source/Irrlicht/CIrrDeviceConsole.h
 source/Irrlicht/CTerrainSceneNode.h
 source/Irrlicht/CSceneNodeAnimatorCollisionResponse.h
-source/Irrlicht/CImageLoaderWAL.h
 source/Irrlicht/CImageLoaderBMP.h
 source/Irrlicht/CSkinnedMesh.h
 source/Irrlicht/COpenGLParallaxMapRenderer.h

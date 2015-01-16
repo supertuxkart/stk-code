@@ -124,12 +124,6 @@ CNullDriver::CNullDriver(io::IFileSystem* io, const core::dimension2d<u32>& scre
 #ifdef _IRR_COMPILE_WITH_HALFLIFE_LOADER_
 	SurfaceLoader.push_back(video::createImageLoaderHalfLife());
 #endif
-#ifdef _IRR_COMPILE_WITH_WAL_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderWAL());
-#endif
-#ifdef _IRR_COMPILE_WITH_LMP_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderLMP());
-#endif
 #ifdef _IRR_COMPILE_WITH_RGB_LOADER_
 	SurfaceLoader.push_back(video::createImageLoaderRGB());
 #endif
