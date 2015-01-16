@@ -202,7 +202,7 @@ private:
     /** (max_pitch-min_pitch) / (max_speed - min_speed). Used to adjust
      *  the pitch of a sfx depending on speed of the kart.
      */
-    float            m_sfx_pitch_per_speed = 0.0f;
+    float            m_sfx_pitch_per_speed;
     /** Additional speed allowed on top of the kart-specific maximum kart speed
      *  if a zipper is used. If this value is <0 the kart specific value will
      *  be used. */

@@ -441,6 +441,7 @@ void Material::init()
     m_sfx_max_speed             = 30;
     m_sfx_min_pitch             = 1.0f;
     m_sfx_max_pitch             = 1.0f;
+    m_sfx_pitch_per_speed       = 0.0f;
     m_zipper                    = false;
     m_zipper_duration           = -1.0f;
     m_zipper_fade_out_time      = -1.0f;
