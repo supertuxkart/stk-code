@@ -279,55 +279,10 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_JPG_LOADER_
 #undef _IRR_COMPILE_WITH_JPG_LOADER_
 #endif
-//! Define _IRR_COMPILE_WITH_PCX_LOADER_ if you want to load .pcx files
-//#define _IRR_COMPILE_WITH_PCX_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_PCX_LOADER_
-#undef _IRR_COMPILE_WITH_PCX_LOADER_
-#endif
 //! Define _IRR_COMPILE_WITH_PNG_LOADER_ if you want to load .png files
 #define _IRR_COMPILE_WITH_PNG_LOADER_
 #ifdef NO_IRR_COMPILE_WITH_PNG_LOADER_
 #undef _IRR_COMPILE_WITH_PNG_LOADER_
-#endif
-//! Define _IRR_COMPILE_WITH_PPM_LOADER_ if you want to load .ppm/.pgm/.pbm files
-//#define _IRR_COMPILE_WITH_PPM_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_PPM_LOADER_
-#undef _IRR_COMPILE_WITH_PPM_LOADER_
-#endif
-//! Define _IRR_COMPILE_WITH_PSD_LOADER_ if you want to load .psd files
-//#define _IRR_COMPILE_WITH_PSD_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_PSD_LOADER_
-#undef _IRR_COMPILE_WITH_PSD_LOADER_
-#endif
-//! Define _IRR_COMPILE_WITH_DDS_LOADER_ if you want to load .dds files
-// Outcommented because
-// a) it doesn't compile on 64-bit currently
-// b) anyone enabling it should be aware that S3TC compression algorithm which might be used in that loader
-// is patented in the US by S3 and they do collect license fees when it's used in applications.
-// So if you are unfortunate enough to develop applications for US market and their broken patent system be careful.
-// #define _IRR_COMPILE_WITH_DDS_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_DDS_LOADER_
-#undef _IRR_COMPILE_WITH_DDS_LOADER_
-#endif
-//! Define _IRR_COMPILE_WITH_TGA_LOADER_ if you want to load .tga files
-#define _IRR_COMPILE_WITH_TGA_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_TGA_LOADER_
-#undef _IRR_COMPILE_WITH_TGA_LOADER_
-#endif
-//! Define _IRR_COMPILE_WITH_WAL_LOADER_ if you want to load .wal files
-#define _IRR_COMPILE_WITH_WAL_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_WAL_LOADER_
-#undef _IRR_COMPILE_WITH_WAL_LOADER_
-#endif
-//! Define _IRR_COMPILE_WITH_LMP_LOADER_ if you want to load .lmp files
-#define _IRR_COMPILE_WITH_LMP_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_LMP_LOADER_
-#undef _IRR_COMPILE_WITH_LMP_LOADER_
-#endif
-//! Define _IRR_COMPILE_WITH_RGB_LOADER_ if you want to load Silicon Graphics .rgb/.rgba/.sgi/.int/.inta/.bw files
-#define _IRR_COMPILE_WITH_RGB_LOADER_
-#ifdef NO_IRR_COMPILE_WITH_RGB_LOADER_
-#undef _IRR_COMPILE_WITH_RGB_LOADER_
 #endif
 
 //! Define _IRR_COMPILE_WITH_BMP_WRITER_ if you want to write .bmp files
@@ -340,30 +295,10 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_JPG_WRITER_
 #undef _IRR_COMPILE_WITH_JPG_WRITER_
 #endif
-//! Define _IRR_COMPILE_WITH_PCX_WRITER_ if you want to write .pcx files
-//#define _IRR_COMPILE_WITH_PCX_WRITER_
-#ifdef NO_IRR_COMPILE_WITH_PCX_WRITER_
-#undef _IRR_COMPILE_WITH_PCX_WRITER_
-#endif
 //! Define _IRR_COMPILE_WITH_PNG_WRITER_ if you want to write .png files
 #define _IRR_COMPILE_WITH_PNG_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_PNG_WRITER_
 #undef _IRR_COMPILE_WITH_PNG_WRITER_
-#endif
-//! Define _IRR_COMPILE_WITH_PPM_WRITER_ if you want to write .ppm files
-//#define _IRR_COMPILE_WITH_PPM_WRITER_
-#ifdef NO_IRR_COMPILE_WITH_PPM_WRITER_
-#undef _IRR_COMPILE_WITH_PPM_WRITER_
-#endif
-//! Define _IRR_COMPILE_WITH_PSD_WRITER_ if you want to write .psd files
-//#define _IRR_COMPILE_WITH_PSD_WRITER_
-#ifdef NO_IRR_COMPILE_WITH_PSD_WRITER_
-#undef _IRR_COMPILE_WITH_PSD_WRITER_
-#endif
-//! Define _IRR_COMPILE_WITH_TGA_WRITER_ if you want to write .tga files
-//#define _IRR_COMPILE_WITH_TGA_WRITER_
-#ifdef NO_IRR_COMPILE_WITH_TGA_WRITER_
-#undef _IRR_COMPILE_WITH_TGA_WRITER_
 #endif
 
 //! Define __IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_ if you want to open ZIP and GZIP archives

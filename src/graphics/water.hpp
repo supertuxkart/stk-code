@@ -55,8 +55,6 @@ public:
     virtual scene::IMesh *getMesh() OVERRIDE { return m_mesh; }
     virtual void setReadOnlyMaterials(bool) OVERRIDE {}
     virtual bool isReadOnlyMaterials() const OVERRIDE { return false; }
-    virtual scene::IShadowVolumeSceneNode* addShadowVolumeSceneNode
-                            (const scene::IMesh*, int, bool, f32) OVERRIDE { return NULL; }
 
 protected:
     video::SMaterial m_mat;

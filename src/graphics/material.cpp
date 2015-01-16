@@ -553,8 +553,15 @@ void Material::initCustomSFX(const XMLNode *sfx)
     sfx->get("max-pitch", &m_sfx_max_pitch); // 2.4 style
     sfx->get("max_pitch", &m_sfx_max_pitch); // 2.5 style
 
-    m_sfx_pitch_per_speed = (m_sfx_max_pitch - m_sfx_min_pitch)
-                          / (m_sfx_max_speed - m_sfx_min_speed);
+    if (m_sfx_max_speed == m_sfx_min_speed)
+    {
+        m_sfx_pitch_per_speed = 0.0f;
+    }
+    else
+    {
+        m_sfx_pitch_per_speed = (m_sfx_max_pitch - m_sfx_min_pitch)
+            / (m_sfx_max_speed - m_sfx_min_speed);
+    }
 
     if(!SFXManager::get()->soundExist(m_sfx_name))
     {
@@ -674,6 +681,8 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) con
         sfx->setSpeed(m_sfx_max_pitch);
         return;
     }
+
+    assert(!isnan(speed));
 
     float f = m_sfx_pitch_per_speed*(speed-m_sfx_min_speed) + m_sfx_min_pitch;
     assert(!isnan(f));

@@ -380,27 +380,18 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 {
     if (SkyboxTextures.empty())
         return;
-    glBindVertexArray(MeshShader::SkyboxShader::getInstance()->cubevao);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     assert(SkyboxTextures.size() == 6);
 
-    core::matrix4 translate;
-    translate.setTranslation(camera->getAbsolutePosition());
-
-    // Draw the sky box between the near and far clip plane
-    const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
-    core::matrix4 scale;
-    scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
-    core::matrix4 transform = translate * scale;
-    core::matrix4 invtransform;
-    transform.getInverse(invtransform);
     glDisable(GL_BLEND);
 
     glUseProgram(MeshShader::SkyboxShader::getInstance()->Program);
-    MeshShader::SkyboxShader::getInstance()->setUniforms(transform);
+    glBindVertexArray(MeshShader::SkyboxShader::getInstance()->vao);
+    MeshShader::SkyboxShader::getInstance()->setUniforms();
+
     MeshShader::SkyboxShader::getInstance()->SetTextureUnits(SkyboxCubeMap);
 
-    glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
 }

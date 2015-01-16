@@ -121,33 +121,6 @@ CNullDriver::CNullDriver(io::IFileSystem* io, const core::dimension2d<u32>& scre
 
 	// create surface loader
 
-#ifdef _IRR_COMPILE_WITH_HALFLIFE_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderHalfLife());
-#endif
-#ifdef _IRR_COMPILE_WITH_WAL_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderWAL());
-#endif
-#ifdef _IRR_COMPILE_WITH_LMP_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderLMP());
-#endif
-#ifdef _IRR_COMPILE_WITH_PPM_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderPPM());
-#endif
-#ifdef _IRR_COMPILE_WITH_RGB_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderRGB());
-#endif
-#ifdef _IRR_COMPILE_WITH_PSD_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderPSD());
-#endif
-#ifdef _IRR_COMPILE_WITH_DDS_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderDDS());
-#endif
-#ifdef _IRR_COMPILE_WITH_PCX_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderPCX());
-#endif
-#ifdef _IRR_COMPILE_WITH_TGA_LOADER_
-	SurfaceLoader.push_back(video::createImageLoaderTGA());
-#endif
 #ifdef _IRR_COMPILE_WITH_PNG_LOADER_
 	SurfaceLoader.push_back(video::createImageLoaderPNG());
 #endif
@@ -156,20 +129,6 @@ CNullDriver::CNullDriver(io::IFileSystem* io, const core::dimension2d<u32>& scre
 #endif
 #ifdef _IRR_COMPILE_WITH_BMP_LOADER_
 	SurfaceLoader.push_back(video::createImageLoaderBMP());
-#endif
-
-
-#ifdef _IRR_COMPILE_WITH_PPM_WRITER_
-	SurfaceWriter.push_back(video::createImageWriterPPM());
-#endif
-#ifdef _IRR_COMPILE_WITH_PCX_WRITER_
-	SurfaceWriter.push_back(video::createImageWriterPCX());
-#endif
-#ifdef _IRR_COMPILE_WITH_PSD_WRITER_
-	SurfaceWriter.push_back(video::createImageWriterPSD());
-#endif
-#ifdef _IRR_COMPILE_WITH_TGA_WRITER_
-	SurfaceWriter.push_back(video::createImageWriterTGA());
 #endif
 #ifdef _IRR_COMPILE_WITH_JPG_WRITER_
 	SurfaceWriter.push_back(video::createImageWriterJPG());
