@@ -255,10 +255,11 @@ void Widget::setFocusForPlayer(const int playerID)
     assert(m_magic_number == 0xCAFEC001);
 
     // Unset focus flag on previous widget that had focus
-    if (GUIEngine::getFocusForPlayer(playerID) != NULL)
+    Widget* previous_focus = GUIEngine::getFocusForPlayer(playerID);
+    if (previous_focus != NULL)
     {
-        GUIEngine::getFocusForPlayer(playerID)->unfocused(playerID, this);
-        GUIEngine::getFocusForPlayer(playerID)->m_player_focus[playerID] = false;
+        previous_focus->unfocused(playerID, this);
+        previous_focus->m_player_focus[playerID] = false;
     }
 
     m_player_focus[playerID] = true;
@@ -266,6 +267,9 @@ void Widget::setFocusForPlayer(const int playerID)
 
     // Callback
     this->focused(playerID);
+
+    Screen* screen = GUIEngine::getCurrentScreen();
+    screen->onFocusChanged(previous_focus, this, playerID);
 }
 
 // -----------------------------------------------------------------------------
