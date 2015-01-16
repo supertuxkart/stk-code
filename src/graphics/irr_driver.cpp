@@ -2137,6 +2137,14 @@ void IrrDriver::update(float dt)
 
 void IrrDriver::requestScreenshot()
 {
+    RaceGUIBase* base = World::getWorld()
+                         ? World::getWorld()->getRaceGUI()
+                         : NULL;
+    if (base)
+    {
+        base->clearAllMessages();
+    }
+
     m_request_screenshot = true;
 }
 
