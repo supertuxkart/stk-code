@@ -29,13 +29,6 @@ extern "C" void bz_internal_error(int errorCode)
 	#ifdef _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
 	#include "aesGladman/fileenc.h"
 	#endif
-	#ifdef _IRR_COMPILE_WITH_BZIP2_
-	#ifndef _IRR_USE_NON_SYSTEM_BZLIB_
-	#include <bzlib.h>
-	#else
-	#include "bzip2/bzlib.h"
-	#endif
-	#endif
 	#ifdef _IRR_COMPILE_WITH_LZMA_
 	#include "lzma/LzmaDec.h"
 	#endif
@@ -688,75 +681,8 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 		}
 	case 12:
 		{
-  			#ifdef _IRR_COMPILE_WITH_BZIP2_
-
-			const u32 uncompressedSize = e.header.DataDescriptor.UncompressedSize;
-			c8* pBuf = new c8[ uncompressedSize ];
-			if (!pBuf)
-			{
-				swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
-				os::Printer::log( buf, ELL_ERROR);
-				if (decrypted)
-					decrypted->drop();
-				return 0;
-			}
-
-			u8 *pcData = decryptedBuf;
-			if (!pcData)
-			{
-				pcData = new u8[decryptedSize];
-				if (!pcData)
-				{
-					swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
-					os::Printer::log( buf, ELL_ERROR);
-					delete [] pBuf;
-					return 0;
-				}
-
-				//memset(pcData, 0, decryptedSize);
-				File->seek(e.Offset);
-				File->read(pcData, decryptedSize);
-			}
-
-			bz_stream bz_ctx={0};
-			/* use BZIP2's default memory allocation
-			bz_ctx->bzalloc = NULL;
-			bz_ctx->bzfree  = NULL;
-			bz_ctx->opaque  = NULL;
-			*/
-			int err = BZ2_bzDecompressInit(&bz_ctx, 0, 0); /* decompression */
-			if(err != BZ_OK)
-			{
-				os::Printer::log("bzip2 decompression failed. File cannot be read.", ELL_ERROR);
-				return 0;
-			}
-			bz_ctx.next_in = (char*)pcData;
-			bz_ctx.avail_in = decryptedSize;
-			/* pass all input to decompressor */
-			bz_ctx.next_out = pBuf;
-			bz_ctx.avail_out = uncompressedSize;
-			err = BZ2_bzDecompress(&bz_ctx);
-			err = BZ2_bzDecompressEnd(&bz_ctx);
-
-			if (decrypted)
-				decrypted->drop();
-			else
-				delete[] pcData;
-
-			if (err != BZ_OK)
-			{
-				swprintf ( buf, 64, L"Error decompressing %s", Files[index].FullName.c_str() );
-				os::Printer::log( buf, ELL_ERROR);
-				delete [] pBuf;
-				return 0;
-			}
-			else
-				return io::createMemoryReadFile(pBuf, uncompressedSize, Files[index].FullName, true);
-
-			#else
 			os::Printer::log("bzip2 decompression not supported. File cannot be read.", ELL_ERROR);
 			return 0;
-			#endif
 		}
 	case 14:
 		{
