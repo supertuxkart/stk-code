@@ -423,28 +423,6 @@ namespace scene
 		This pointer should not be dropped. See IReferenceCounted::drop() for more information. */
 		virtual io::IFileSystem* getFileSystem() = 0;
 
-		//! adds Volume Lighting Scene Node.
-		/** Example Usage:
-			scene::IVolumeLightSceneNode * n = smgr->addVolumeLightSceneNode(0, -1,
-						32, 32, //Subdivide U/V
-						video::SColor(0, 180, 180, 180), //foot color
-						video::SColor(0, 0, 0, 0) //tail color
-						);
-			if (n)
-			{
-				n->setScale(core::vector3df(46.0f, 45.0f, 46.0f));
-				n->getMaterial(0).setTexture(0, smgr->getVideoDriver()->getTexture("lightFalloff.png"));
-			}
-		\return Pointer to the volumeLight if successful, otherwise NULL.
-		This pointer should not be dropped. See IReferenceCounted::drop() for more information. */
-		virtual IVolumeLightSceneNode* addVolumeLightSceneNode(ISceneNode* parent=0, s32 id=-1,
-			const u32 subdivU = 32, const u32 subdivV = 32,
-			const video::SColor foot = video::SColor(51, 0, 230, 180),
-			const video::SColor tail = video::SColor(0, 0, 0, 0),
-			const core::vector3df& position = core::vector3df(0,0,0),
-			const core::vector3df& rotation = core::vector3df(0,0,0),
-			const core::vector3df& scale = core::vector3df(1.0f, 1.0f, 1.0f)) = 0;
-
 		//! Adds a cube scene node
 		/** \param size: Size of the cube, uniformly in each dimension.
 		\param parent: Parent of the scene node. Can be 0 if no parent.

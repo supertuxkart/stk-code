@@ -54,7 +54,6 @@ source/Irrlicht/CImageWriterJPG.cpp
 source/Irrlicht/CZipReader.cpp
 source/Irrlicht/CImageLoaderPNG.cpp
 source/Irrlicht/CImageLoaderBMP.cpp
-source/Irrlicht/CVolumeLightSceneNode.cpp
 source/Irrlicht/CDefaultSceneNodeAnimatorFactory.cpp
 source/Irrlicht/CSkyDomeSceneNode.cpp
 source/Irrlicht/CGUIFileOpenDialog.cpp
@@ -216,7 +215,6 @@ source/Irrlicht/MacOSX/OSXClipboard.h
 source/Irrlicht/CSceneManager.h
 source/Irrlicht/COpenGLDriver.h
 source/Irrlicht/CGUIComboBox.h
-source/Irrlicht/CVolumeLightSceneNode.h
 source/Irrlicht/CSceneCollisionManager.h
 source/Irrlicht/ISceneNodeAnimatorFinishing.h
 source/Irrlicht/aesGladman/pwd2key.h
