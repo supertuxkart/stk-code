@@ -67,7 +67,6 @@ source/Irrlicht/CGUIMessageBox.cpp
 source/Irrlicht/CParticleGravityAffector.cpp
 source/Irrlicht/CGUISkin.cpp
 source/Irrlicht/CBoneSceneNode.cpp
-source/Irrlicht/CNPKReader.cpp
 source/Irrlicht/COpenGLSLMaterialRenderer.cpp
 source/Irrlicht/CParticleRotationAffector.cpp
 source/Irrlicht/CTriangleBBSelector.cpp
@@ -109,7 +108,6 @@ source/Irrlicht/CEmptySceneNode.cpp
 source/Irrlicht/CParticleBoxEmitter.cpp
 source/Irrlicht/CParticleSystemSceneNode.cpp
 source/Irrlicht/CIrrDeviceConsole.cpp
-source/Irrlicht/CPakReader.cpp
 source/Irrlicht/CImage.cpp
 source/Irrlicht/CTarReader.cpp
 source/Irrlicht/CGUIButton.cpp
@@ -217,14 +215,6 @@ source/Irrlicht/COpenGLDriver.h
 source/Irrlicht/CGUIComboBox.h
 source/Irrlicht/CSceneCollisionManager.h
 source/Irrlicht/ISceneNodeAnimatorFinishing.h
-source/Irrlicht/aesGladman/pwd2key.h
-source/Irrlicht/aesGladman/sha2.h
-source/Irrlicht/aesGladman/hmac.h
-source/Irrlicht/aesGladman/fileenc.h
-source/Irrlicht/aesGladman/aes.h
-source/Irrlicht/aesGladman/sha1.h
-source/Irrlicht/aesGladman/prng.h
-source/Irrlicht/aesGladman/aesopt.h
 source/Irrlicht/CGUITabControl.h
 source/Irrlicht/CSphereSceneNode.h
 source/Irrlicht/CIrrDeviceStub.h
@@ -270,7 +260,6 @@ source/Irrlicht/CGUIImageList.h
 source/Irrlicht/CFileSystem.h
 source/Irrlicht/CSceneNodeAnimatorRotation.h
 source/Irrlicht/CGUISkin.h
-source/Irrlicht/CNPKReader.h
 source/Irrlicht/S4DVertex.h
 source/Irrlicht/CGUIMenu.h
 source/Irrlicht/CBlit.h
@@ -301,7 +290,6 @@ source/Irrlicht/CFPSCounter.h
 source/Irrlicht/CGUITreeView.h
 source/Irrlicht/CGUIContextMenu.h
 source/Irrlicht/CFileList.h
-source/Irrlicht/CPakReader.h
 source/Irrlicht/CLimitReadFile.h
 source/Irrlicht/CGUISpinBox.h
 source/Irrlicht/CGUIButton.h
