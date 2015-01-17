@@ -1,10 +1,13 @@
 # CMakeLists.txt for Irrlicht in STK
+project(stkirrlicht)
+find_package(PNG REQUIRED)
+find_package(JPEG REQUIRED)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/jpeglib"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/libpng"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/zlib"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/bzip2")
+                    "${JPEG_INCLUDE_DIR}"
+                    "${PNG_INCLUDE_DIRS}"
+                    "${ZLIB_INCLUDE_DIR}"
+                    "${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
 
 if(APPLE)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX" "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht")
@@ -470,108 +473,6 @@ include/IGUIFileOpenDialog.h
 include/IBoneSceneNode.h
 include/IShaderConstantSetCallBack.h
 include/ITexture.h
-
-
-source/Irrlicht/zlib/infback.c
-source/Irrlicht/zlib/deflate.c
-source/Irrlicht/zlib/zutil.c
-source/Irrlicht/zlib/crc32.c
-source/Irrlicht/zlib/gzread.c
-source/Irrlicht/zlib/inffast.c
-source/Irrlicht/zlib/uncompr.c
-source/Irrlicht/zlib/inftrees.c
-source/Irrlicht/zlib/inflate.c
-source/Irrlicht/zlib/compress.c
-source/Irrlicht/zlib/adler32.c
-source/Irrlicht/zlib/gzwrite.c
-source/Irrlicht/zlib/trees.c
-source/Irrlicht/zlib/gzlib.c
-source/Irrlicht/zlib/gzclose.c
-source/Irrlicht/zlib/inffixed.h
-source/Irrlicht/zlib/inffast.h
-source/Irrlicht/zlib/zconf.h
-source/Irrlicht/zlib/zutil.h
-source/Irrlicht/zlib/inftrees.h
-source/Irrlicht/zlib/deflate.h
-source/Irrlicht/zlib/zlib.h
-source/Irrlicht/zlib/inflate.h
-source/Irrlicht/zlib/trees.h
-source/Irrlicht/zlib/gzguts.h
-source/Irrlicht/zlib/crc32.h
-
-
-source/Irrlicht/jpeglib/jaricom.c
-source/Irrlicht/jpeglib/jcapimin.c
-source/Irrlicht/jpeglib/jcapistd.c
-source/Irrlicht/jpeglib/jcarith.c
-source/Irrlicht/jpeglib/jccoefct.c
-source/Irrlicht/jpeglib/jccolor.c
-source/Irrlicht/jpeglib/jcdctmgr.c
-source/Irrlicht/jpeglib/jchuff.c
-source/Irrlicht/jpeglib/jcinit.c
-source/Irrlicht/jpeglib/jcmainct.c
-source/Irrlicht/jpeglib/jcmarker.c
-source/Irrlicht/jpeglib/jcmaster.c
-source/Irrlicht/jpeglib/jcomapi.c
-source/Irrlicht/jpeglib/jcparam.c
-source/Irrlicht/jpeglib/jcprepct.c
-source/Irrlicht/jpeglib/jcsample.c
-source/Irrlicht/jpeglib/jctrans.c
-source/Irrlicht/jpeglib/jdapimin.c
-source/Irrlicht/jpeglib/jdapistd.c
-source/Irrlicht/jpeglib/jdarith.c
-source/Irrlicht/jpeglib/jdatadst.c
-source/Irrlicht/jpeglib/jdatasrc.c
-source/Irrlicht/jpeglib/jdcoefct.c
-source/Irrlicht/jpeglib/jdcolor.c
-source/Irrlicht/jpeglib/jddctmgr.c
-source/Irrlicht/jpeglib/jdhuff.c
-source/Irrlicht/jpeglib/jdinput.c
-source/Irrlicht/jpeglib/jdmainct.c
-source/Irrlicht/jpeglib/jdmarker.c
-source/Irrlicht/jpeglib/jdmaster.c
-source/Irrlicht/jpeglib/jdmerge.c
-source/Irrlicht/jpeglib/jdpostct.c
-source/Irrlicht/jpeglib/jdsample.c
-source/Irrlicht/jpeglib/jdtrans.c
-source/Irrlicht/jpeglib/jerror.c
-source/Irrlicht/jpeglib/jfdctflt.c
-source/Irrlicht/jpeglib/jfdctfst.c
-source/Irrlicht/jpeglib/jfdctint.c
-source/Irrlicht/jpeglib/jidctflt.c
-source/Irrlicht/jpeglib/jidctfst.c
-source/Irrlicht/jpeglib/jidctint.c
-source/Irrlicht/jpeglib/jmemmgr.c
-source/Irrlicht/jpeglib/jmemnobs.c
-source/Irrlicht/jpeglib/jquant1.c
-source/Irrlicht/jpeglib/jquant2.c
-source/Irrlicht/jpeglib/jutils.c
-
-
-source/Irrlicht/libpng/pngwutil.c
-source/Irrlicht/libpng/pngget.c
-source/Irrlicht/libpng/pngrtran.c
-source/Irrlicht/libpng/pngrutil.c
-source/Irrlicht/libpng/pngerror.c
-source/Irrlicht/libpng/pngset.c
-source/Irrlicht/libpng/pngtest.c
-source/Irrlicht/libpng/pngmem.c
-source/Irrlicht/libpng/pngpread.c
-source/Irrlicht/libpng/png.c
-source/Irrlicht/libpng/pngread.c
-source/Irrlicht/libpng/pngwio.c
-source/Irrlicht/libpng/pngtrans.c
-source/Irrlicht/libpng/pngwrite.c
-source/Irrlicht/libpng/pngwtran.c
-source/Irrlicht/libpng/example.c
-source/Irrlicht/libpng/pngrio.c
-source/Irrlicht/libpng/png.h
-source/Irrlicht/libpng/pngdebug.h
-source/Irrlicht/libpng/pngconf.h
-source/Irrlicht/libpng/pngpriv.h
-source/Irrlicht/libpng/pnginfo.h
-source/Irrlicht/libpng/pnglibconf.h
-source/Irrlicht/libpng/pngstruct.h
 )
 
 if(APPLE)
@@ -594,5 +495,12 @@ if(APPLE)
     set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES LANGUAGE C)
 endif()
 
+if(MSVC)
 add_library(stkirrlicht ${IRRLICHT_SOURCES})
+else()
+add_library(stkirrlicht SHARED ${IRRLICHT_SOURCES})
+endif()
+target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY})
+
+
 

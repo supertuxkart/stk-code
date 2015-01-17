@@ -63,6 +63,31 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
 include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
 
+if(WIN32)
+# Build zlib library
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
+include_directories("${PROJECT_SOURCE_DIR}/lib/zlib")
+
+set(ZLIB_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/zlib" "${PROJECT_BINARY_DIR}/lib/zlib/")
+set(ZLIB_LIBRARY zlibstatic)
+
+# Build png library
+set (SKIP_INSTALL_ALL TRUE)
+set (PNG_STATIC TRUE)
+set (PNG_TESTS FALSE)
+set (PNG_SHARED FALSE)
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
+include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
+
+#build jpeg library
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+
+set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
+set(PNG_LIBRARY png15_static)
+set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
+set(JPEG_LIBRARY jpeglib)
+endif()
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
