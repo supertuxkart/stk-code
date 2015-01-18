@@ -38,6 +38,7 @@
 #  include <fribidi/fribidi.h>
 #endif
 
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
@@ -234,13 +235,20 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         }
         else
         {
-            Log::verbose("translation", "Language '%s'.",
-                          Language::from_env(language).get_name().c_str());
-
-            m_current_language_name = Language::from_env(language).get_name() ;
-
-            m_dictionary = m_dictionary_manager.get_dictionary(
-                                                Language::from_env(language) );
+            Language& tgtLang = Language::from_env(language);
+            if (!tgtLang)
+            {
+                Log::warn("Translation", "Unsupported langage '%s'", language.c_str());
+                UserConfigParams::m_language = "system";
+                m_current_language_name = "Default language";
+                m_dictionary = m_dictionary_manager.get_dictionary();
+            }
+            else
+            {
+                m_current_language_name = tgtLang.get_name();
+                Log::verbose("translation", "Language '%s'.", m_current_language_name.c_str());
+                m_dictionary = m_dictionary_manager.get_dictionary(tgtLang);
+            }
         }
     }
     else
