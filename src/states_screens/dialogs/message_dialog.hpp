@@ -71,8 +71,7 @@ private:
     IConfirmDialogListener* m_listener;
     bool m_own_listener;
     irr::core::stringw m_msg;
-    void doInit(MessageDialogType type, IConfirmDialogListener* listener,
-                bool own_listener);
+    void doInit(bool from_queue);
 
 public:
 
@@ -83,7 +82,8 @@ public:
       *        along with the dialog.
       */
     MessageDialog(const irr::core::stringw &msg, MessageDialogType type,
-                  IConfirmDialogListener* listener, bool delete_listener);
+                  IConfirmDialogListener* listener, bool delete_listener,
+                  bool from_queue=false);
     
     /**
       * Variant of MessageDialog where cancelling is not possible (i.e. just shows a message box with OK)
