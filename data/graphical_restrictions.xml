@@ -8,10 +8,9 @@
   <card contains="Mesa"           os="linux"    version="<10.3"    disable="BufferStorage"/>
   <card contains="Mesa"           os="linux"    version="<10.6"    disable="GeometryShader4"/>
 
-<!-- 
+<!--    
   <card is="Intel(R) HD Graphics 3000" os="windows" disable="DriverRecentEnough"/>
   <card is="Intel(R) HD Graphics 3000" os="osx"    version="<=9.17.10" disable="a b c"/>
-  <card is=""                          os="bsd"    version="<1.2.3"  disable="a b c"/>
 -->
 </graphical-restrictions>
 
