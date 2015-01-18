@@ -462,10 +462,6 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     } // end glow
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0x00, 0xFF, 0xFF);
-    computeSunVisibility();
-    PROFILER_POP_CPU_MARKER();
-
     // Render transparent
     {
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
@@ -568,17 +564,6 @@ void IrrDriver::renderFixed(float dt)
 }
 
 // ----------------------------------------------------------------------------
-
-void IrrDriver::computeSunVisibility()
-{
-    // Is the lens flare enabled & visible? Check last frame's query.
-    bool hasgodrays = false;
-
-    if (World::getWorld() != NULL)
-    {
-        hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-    }
-}
 
 void IrrDriver::renderParticles()
 {

@@ -337,7 +337,6 @@ private:
     void renderNormalsVisualisation();
     void renderTransparent();
     void renderParticles();
-    void computeSunVisibility();
     void renderShadows();
     void renderRSM();
     void renderGlow(std::vector<GlowData>& glows);
