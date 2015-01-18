@@ -235,7 +235,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         }
         else
         {
-            Language& tgtLang = Language::from_env(language);
+            const Language& tgtLang = Language::from_env(language);
             if (!tgtLang)
             {
                 Log::warn("Translation", "Unsupported langage '%s'", language.c_str());
