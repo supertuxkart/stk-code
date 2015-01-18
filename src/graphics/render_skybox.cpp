@@ -8,7 +8,7 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
-static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height, float *Coeff, float *Y00, float *Y1minus1, float *Y10, float *Y11,
+/*static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height, float *Coeff, float *Y00, float *Y1minus1, float *Y10, float *Y11,
     float *Y2minus2, float * Y2minus1, float * Y20, float *Y21, float *Y22)
 {
     float solidangle = 1.;
@@ -18,9 +18,9 @@ static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height, 
     reconstructedVal += Y2minus2[idx] * Coeff[4] + Y2minus1[idx] * Coeff[5] + Y20[idx] * Coeff[6] + Y21[idx] * Coeff[7] + Y22[idx] * Coeff[8];
     reconstructedVal /= solidangle;
     return MAX2(255.0f * reconstructedVal, 0.f);
-}
+}*/
 
-static void unprojectSH(float *output[], size_t width, size_t height,
+/*static void unprojectSH(float *output[], size_t width, size_t height,
     float *Y00[],
     float *Y1minus1[], float *Y10[], float *Y11[],
     float *Y2minus2[], float *Y2minus1[], float * Y20[], float *Y21[], float *Y22[],
@@ -48,15 +48,15 @@ static void unprojectSH(float *output[], size_t width, size_t height,
             }
         }
     }
-}
+}*/
 
 
-static void displayCoeff(float *SHCoeff)
+/*static void displayCoeff(float *SHCoeff)
 {
     printf("L00:%f\n", SHCoeff[0]);
     printf("L1-1:%f, L10:%f, L11:%f\n", SHCoeff[1], SHCoeff[2], SHCoeff[3]);
     printf("L2-2:%f, L2-1:%f, L20:%f, L21:%f, L22:%f\n", SHCoeff[4], SHCoeff[5], SHCoeff[6], SHCoeff[7], SHCoeff[8]);
-}
+}*/
 
 // Only for 9 coefficients
 /*static void testSH(unsigned char *color[6], size_t width, size_t height,

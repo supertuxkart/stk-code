@@ -1268,6 +1268,12 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
             params=&SkinConfig::m_render_params["spinner3::neutral"];
         else if(player_id==3)
             params=&SkinConfig::m_render_params["spinner4::neutral"];
+        else
+        {
+            Log::fatal("Skin::drawSpinnerBody", "Unknown playerID (more than 4 players?)");
+            // Silence compiler warning
+            params = NULL;
+        }
     }
     else if (widget->m_deactivated)
     {

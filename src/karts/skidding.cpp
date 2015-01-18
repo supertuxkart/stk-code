@@ -447,6 +447,8 @@ void Skidding::update(float dt, bool is_on_ground,
                   ->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
             m_skid_state = SKID_NONE;
         }
+    case SKID_OLD:
+        break;
     }   // switch
     updateSteering(steering, dt);
 }   // update

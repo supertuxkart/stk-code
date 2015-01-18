@@ -792,6 +792,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->MaterialType = irr_driver->getShader(ES_GRASS_REF);
             m->setTexture(1, glossytex);
             return;
+        default:
+            break;
         }
 
         if (!m->getTexture(0))

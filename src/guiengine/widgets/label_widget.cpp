@@ -111,14 +111,14 @@ void LabelWidget::add()
 
     if (m_scroll_speed > 0)
     {
-        IGUIFont* font = m_title_font ? GUIEngine::getTitleFont()
+        /*IGUIFont* font = m_title_font ? GUIEngine::getTitleFont()
                                       : GUIEngine::getFont();
         core::dimension2du r = font->getDimension(getText().c_str());
 
-        //m_scroll_offset = (float)r.Width;
+        m_scroll_offset = (float)r.Width;
 
         // start scrolled off
-        m_scroll_offset = -999;
+        m_scroll_offset = -999;*/
     }
     else
     {

@@ -1134,7 +1134,6 @@ void askForInternetPermission()
         }   // onCancel
     };   // ConfirmServer
 
-    GUIEngine::ModalDialog *dialog = 
     new MessageDialog(_("SuperTuxKart may connect to a server "
         "to download add-ons and notify you of updates. We also collect "
         "anonymous hardware statistics to help with the development of STK. "

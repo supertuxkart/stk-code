@@ -12,7 +12,7 @@
 template<typename S>
 S getHighestInHistogram(std::map<S,int>* histogram)
 {
-    S best_item;
+    S best_item = histogram->begin()->first;
     uint8_t highest_count = histogram->begin()->second;
     for (typename std::map<S, int>::iterator it = histogram->begin();
         it != histogram->end(); it++)
