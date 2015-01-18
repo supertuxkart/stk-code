@@ -313,9 +313,6 @@ void reportHardwareStats()
 
     std::string vendor, renderer, full_version;
     irr_driver->getOpenGLData(&vendor, &renderer, &full_version);
-    json.add("GL_VENDOR",   vendor          );
-    json.add("GL_RENDERER", renderer        );
-    json.add("GL_VERSION",  full_version    );
     json.add("gfx_drv_ver", "OpenGL "+vendor);
 
     std::string card_name = vendor;
