@@ -1143,8 +1143,8 @@ void askForInternetPermission()
         "'User Interface', and edit \"Connect to the "
         "Internet\" and \"Send anonymous HW statistics\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
-        new ConfirmServer(), true);
-
+        new ConfirmServer(), true, true);
+    GUIEngine::DialogQueue::get()->pushDialog(dialog, false);
 }   // askForInternetPermission
 
 //=============================================================================
@@ -1292,6 +1292,15 @@ int main(int argc, char *argv[] )
         {
             GraphicsRestrictions::unitTesting();
             exit(0);
+        }
+
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+        {
+            MessageDialog *dialog =
+                new MessageDialog(_("Your driver version is too old. Please install "
+                "the latest video drivers."),
+                /*from queue*/ true);
+            GUIEngine::DialogQueue::get()->pushDialog(dialog);
         }
 
         // Note that on the very first run of STK internet status is set to
