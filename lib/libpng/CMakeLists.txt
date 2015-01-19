@@ -30,7 +30,6 @@ if(UNIX AND NOT DEFINED CMAKE_BUILD_TYPE)
   endif()
 endif()
 
-project(libpng C)
 enable_testing()
 
 set(PNGLIB_MAJOR 1)
@@ -211,7 +210,7 @@ endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 # we use the same files like ./configure, so we have to set its vars
 # Only do this on Windows for Cygwin - the files don't make much sense outside
 # a UNIX look alike
-if(NOT WIN32 OR CYGWIN OR MINGW) 
+if(NOT WIN32 OR CYGWIN OR MINGW)
   set(prefix      ${CMAKE_INSTALL_PREFIX})
   set(exec_prefix ${CMAKE_INSTALL_PREFIX})
   set(libdir      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})

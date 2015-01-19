@@ -1,5 +1,4 @@
 # CMakeLists.txt for Irrlicht in STK
-project(stkirrlicht)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 
