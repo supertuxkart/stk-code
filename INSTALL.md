@@ -18,6 +18,9 @@ First, make sure that you have the following packages installed:
   * Vorbis (libvorbis-dev)
   * libcurl (libcurl-devel)
   * libbluetooth (bluez-devel)
+  * libpng (libpng-devel)
+  * zlib (zlib-devel)
+  * jpeg (libjpeg-turbo-devel)
 
 Ubuntu command:
 
