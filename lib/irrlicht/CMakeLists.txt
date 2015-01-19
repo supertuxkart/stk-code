@@ -495,12 +495,8 @@ if(APPLE)
     set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES LANGUAGE C)
 endif()
 
-if(MSVC)
 add_library(stkirrlicht ${IRRLICHT_SOURCES})
-else()
-add_library(stkirrlicht SHARED ${IRRLICHT_SOURCES})
-endif()
-target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY})
+target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
 
 
 
