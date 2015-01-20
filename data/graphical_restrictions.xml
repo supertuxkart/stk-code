@@ -6,6 +6,7 @@
   <card contains="NVIDIA"         os="linux"    version="<343.22"  disable="BufferStorage"/>
   <card contains="NVIDIA"                                          disable="ShaderAtomicCounters"/>
   <card contains="Mesa"           os="linux"    version="<10.3"    disable="BufferStorage"/>
+  <card contains="Mesa"           os="linux"    version="<10.3"    disable="DriverRecentEnough"/>
   <card contains="Mesa"           os="linux"    version="<10.6"    disable="GeometryShader4"/>
   <card contains="Radeon"                          version="<14.300"   disable="DriverRecentEnough"/>
 </graphical-restrictions>
