@@ -109,11 +109,12 @@ void IrrDriver::UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, si
 {
     // Value that should be kept between multiple calls
     static GLuint ssbo[2];
-    //static Histogram *Hist[2];
     static GLsync LightcoordBBFence = 0;
+    static float tmpshadowSplit[5] = { 1., 5., 20., 50., 150. };
+    // Currently unused code, that will be used later so please DON'T remove
+    //static Histogram *Hist[2];
     //static size_t currentHist = 0;
     //static GLuint ssboSplit[2];
-    static float tmpshadowSplit[5] = { 1., 5., 20., 50., 150. };
 
     if (!LightcoordBBFence)
     {

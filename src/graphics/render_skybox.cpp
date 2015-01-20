@@ -8,6 +8,10 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
+//***************************************************************************
+// Currently unused functions, they will be used later so please DON'T remove
+//***************************************************************************
+
 /*static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height, float *Coeff, float *Y00, float *Y1minus1, float *Y10, float *Y11,
     float *Y2minus2, float * Y2minus1, float * Y20, float *Y21, float *Y22)
 {
