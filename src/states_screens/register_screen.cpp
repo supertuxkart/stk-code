@@ -122,6 +122,18 @@ void RegisterScreen::onDialogClose()
     bool online =    UserConfigParams::m_internet_status
                   != Online::RequestManager::IPERM_NOT_ALLOWED;
     m_account_mode = online ? ACCOUNT_NEW_ONLINE : ACCOUNT_OFFLINE;
+
+    RibbonWidget* ribbon = getWidget<RibbonWidget>("mode_tabs");
+    assert(ribbon);
+    if (m_account_mode == ACCOUNT_NEW_ONLINE)
+    {
+        ribbon->select("tab_new_online", PLAYER_ID_GAME_MASTER);
+    }
+    else
+    {
+        m_account_mode = ACCOUNT_OFFLINE;
+        ribbon->select("tab_offline", PLAYER_ID_GAME_MASTER);
+    }
     makeEntryFieldsVisible();
 }   // onDialogClose
 
