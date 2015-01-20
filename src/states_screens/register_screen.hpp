@@ -79,6 +79,9 @@ public:
     virtual void onUpdate(float dt) OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
     virtual void onDialogClose() OVERRIDE;
+    virtual void onFocusChanged(GUIEngine::Widget *previous, 
+                                GUIEngine::Widget *focus,
+                                int playerID);
     void setRename(PlayerProfile *player);
 
     void acceptTerms();
