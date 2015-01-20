@@ -54,7 +54,7 @@ void CentralVideoSettings::init()
         std::string driver((char*)(glGetString(GL_VERSION)));
         std::string card((char*)(glGetString(GL_RENDERER)));
         GraphicsRestrictions::init(driver, card);
-#if !defined(__APPLE__)
+
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
             hasVSLayer = true;
             Log::info("GLDriver", "AMD Vertex Shader Layer Present");
@@ -145,7 +145,6 @@ void CentralVideoSettings::init()
             // Bindless textures are all treated RGB even sRGB one
             m_need_srgb_workaround = true;
         }
-#endif
     }
 }
 
