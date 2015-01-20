@@ -132,6 +132,11 @@ void CentralVideoSettings::init()
             Log::info("GLDriver", "ARB Geometry Shader 4 Present");
         }
 
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES))
+        {
+            UserConfigParams::m_high_definition_textures = false;
+        }
+
         // Specific disablement
         if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
         {

@@ -50,6 +50,7 @@ namespace GraphicsRestrictions
         GR_EXT_TEXTURE_COMPRESSION_S3TC,
         GR_AMD_VERTEX_SHADER_LAYER,
         GR_DRIVER_RECENT_ENOUGH,
+        GR_HIGHDEFINITION_TEXTURES,
         GR_COUNT  /** MUST be last entry. */
     } ;
 
