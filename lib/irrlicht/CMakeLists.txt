@@ -8,6 +8,9 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                     "${ZLIB_INCLUDE_DIR}"
                     "${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
 
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
+
 if(APPLE)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX" "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
