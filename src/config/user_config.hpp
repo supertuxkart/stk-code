@@ -456,7 +456,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_light_shaft",
         &m_video_group, "Enable Light Shafts"));
     PARAM_PREFIX BoolUserConfigParam        m_dynamic_lights
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dynamic_lights",
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_dynamic_lights",
         &m_video_group, "Enable Dynamic Lights"));
     PARAM_PREFIX BoolUserConfigParam        m_dof
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dof",
