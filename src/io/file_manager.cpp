@@ -1089,7 +1089,7 @@ std::string FileManager::getTextureCacheLocation(const std::string& filename)
         parent_dir = parent_dir.substr(0, parent_dir.size() - 1);
     parent_dir = StringUtils::getBasename(parent_dir);
 
-    std::string cache_subdir = UserConfigParams::m_high_definition_textures
+    std::string cache_subdir = (UserConfigParams::m_high_definition_textures & 0x01) == 0x01
                                ? "hd/"
                                : "resized/";
     std::string cached_file =

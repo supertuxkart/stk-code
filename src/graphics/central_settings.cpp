@@ -132,9 +132,12 @@ void CentralVideoSettings::init()
             Log::info("GLDriver", "ARB Geometry Shader 4 Present");
         }
 
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES))
+        // Only unset the high def textures if they are set as default. If the
+        // user has enabled them (bit 1 set), then leave them enabled.
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES) &&
+            (UserConfigParams::m_high_definition_textures & 0x02) == 0)
         {
-            UserConfigParams::m_high_definition_textures = false;
+            UserConfigParams::m_high_definition_textures = 0x00;
         }
 
         // Specific disablement
