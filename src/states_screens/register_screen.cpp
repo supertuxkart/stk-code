@@ -138,6 +138,19 @@ void RegisterScreen::onDialogClose()
 }   // onDialogClose
 
 // -----------------------------------------------------------------------------
+void RegisterScreen::onFocusChanged(GUIEngine::Widget* previous, 
+                                    GUIEngine::Widget* focus,  int playerID)
+{
+    TextBoxWidget *online_name = getWidget<TextBoxWidget>("username");
+    if (focus == online_name)
+    {
+        TextBoxWidget *local_name = getWidget<TextBoxWidget>("local_username");
+        if (online_name->getText() == "")
+            online_name->setText(local_name->getText());
+    }
+}   // onFocusChanged
+
+// -----------------------------------------------------------------------------
 /** Shows or hides the entry fields for online registration, depending on
  *  online mode.
  *  \param online True if an online account should be created.
