@@ -961,7 +961,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     scene::IMesh *mesh;
     // If the hd texture option is disabled, we generate smaller textures
     // and configure the path to them before loading the mesh.
-    if (!UserConfigParams::m_high_definition_textures)
+    if ( (UserConfigParams::m_high_definition_textures & 0x01) == 0x00)
     {
         std::string cached_textures_dir =
             irr_driver->generateSmallerTextures(m_root);
@@ -1639,7 +1639,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // If the hd texture option is disabled, we generate smaller textures
     // and we also add the cache directory to the texture search path
-    if (!UserConfigParams::m_high_definition_textures)
+    if ( (UserConfigParams::m_high_definition_textures & 0x01) == 0x00)
     {
         std::string cached_textures_dir =
             irr_driver->generateSmallerTextures(m_root);
