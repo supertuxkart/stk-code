@@ -200,7 +200,11 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
             else
             {
                 FullScreenShader::ShadowedSunLightShaderPCF::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), m_rtts->getShadowFBO().getDepthTexture());
-                DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShaderPCF>(shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4], UserConfigParams::m_shadows_resolution);
+                DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShaderPCF>(shadowSplit[1],
+                                                                                  shadowSplit[2],
+                                                                                  shadowSplit[3],
+                                                                                  shadowSplit[4],
+                                                                                  float(UserConfigParams::m_shadows_resolution));
             }
         }
         else
