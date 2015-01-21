@@ -55,7 +55,8 @@ namespace GraphicsRestrictions
             "BindlessTexture",
             "TextureCompressionS3TC",
             "AMDVertexShaderLayer",
-            "DriverRecentEnough"
+            "DriverRecentEnough",
+            "HighDefinitionTextures"
         };
     }   // namespace Private
     using namespace Private;
