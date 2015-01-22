@@ -85,7 +85,7 @@ namespace GUIEngine
         virtual EventPropagation rightPressed(const int playerID);
         
         /**\brief implementing method from base class Widget*/
-        virtual EventPropagation widgetBody(const int playerID);
+        virtual EventPropagation widBody(const int playerID);
         
         /** \brief implementing method from base class Widget */
         virtual EventPropagation leftPressed(const int playerID);
