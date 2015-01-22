@@ -361,11 +361,9 @@ namespace Online
     {
         HTTPRequest *request = (HTTPRequest *)clientp;
 
-        RequestManager* request_manager = RequestManager::get();
-
         // Check if we are asked to abort the download. If so, signal this
         // back to libcurl by returning a non-zero status.
-        if ((request_manager->getAbort() || request->isCancelled()) &&
+        if ((RequestManager::get()->getAbort() || request->isCancelled()) &&
              request->isAbortable()                                     )
         {
             // Indicates to abort the current download, which means that this
