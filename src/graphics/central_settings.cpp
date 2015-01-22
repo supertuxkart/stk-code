@@ -308,3 +308,8 @@ bool CentralVideoSettings::isESMEnabled() const
 {
     return UserConfigParams::m_esm;
 }
+
+bool CentralVideoSettings::isDefferedEnabled() const
+{
+    return UserConfigParams::m_dynamic_lights;
+}
