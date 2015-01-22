@@ -403,7 +403,6 @@ namespace Online
                     }
                     else if(to_notify.size() > 3)
                     {
-                        //I18N: Only used for count > 3
                         message = _P("%d friend is now online.",
                                      "%d friends are now online.",
                                      (int)to_notify.size());
@@ -441,8 +440,9 @@ namespace Online
             core::stringw message("");
             if (friend_request_count > 1)
             {
-                message = _("You have %d new friend requests!",
-                            friend_request_count);
+                message = _P("You have %d new friend request!",
+                             "You have %d new friend requests!",
+                             friend_request_count);
             }
             else
             {
