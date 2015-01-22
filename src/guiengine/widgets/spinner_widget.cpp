@@ -248,7 +248,7 @@ EventPropagation SpinnerWidget::rightPressed(const int playerID)
 
 // -----------------------------------------------------------------------------
 
-EventPropagation SpinnerWidget::widgetBody(const int playerID)
+EventPropagation SpinnerWidget::widBody(const int playerID)
 {
     // if widget is deactivated, do nothing
     if (m_deactivated) return EVENT_BLOCK;
@@ -311,7 +311,7 @@ EventPropagation SpinnerWidget::transmitEvent(Widget* w,
     }
     else if (originator == "spinnerbody" || originator == m_properties[PROP_ID])
     {
-        widgetBody(playerID);
+        widBody(playerID);
         
         if (m_listener != NULL)
         {
