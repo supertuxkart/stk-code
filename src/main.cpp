@@ -1094,7 +1094,7 @@ void initRest()
 
     if (!track_manager->getTrack(UserConfigParams::m_last_track))
         UserConfigParams::m_last_track.revertToDefaults();
-        
+
     race_manager->setTrack(UserConfigParams::m_last_track);
 
 }   // initRest
@@ -1134,7 +1134,7 @@ void askForInternetPermission()
         }   // onCancel
     };   // ConfirmServer
 
-    GUIEngine::ModalDialog *dialog = 
+    GUIEngine::ModalDialog *dialog =
     new MessageDialog(_("SuperTuxKart may connect to a server "
         "to download add-ons and notify you of updates. We also collect "
         "anonymous hardware statistics to help with the development of STK. "
@@ -1201,7 +1201,7 @@ int main(int argc, char *argv[] )
         material_manager->addSharedMaterial(
                    file_manager->getAsset(FileManager::FONT,"materials.xml"));
         file_manager->popTextureSearchPath();
-        
+
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
@@ -1462,7 +1462,6 @@ static void cleanSuperTuxKart()
 
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
-
     SFXManager::get()->stopThread();
     irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
