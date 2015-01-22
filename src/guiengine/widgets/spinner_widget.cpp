@@ -248,6 +248,28 @@ EventPropagation SpinnerWidget::rightPressed(const int playerID)
 
 // -----------------------------------------------------------------------------
 
+EventPropagation SpinnerWidget::widgetBody(const int playerID)
+{
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return EVENT_BLOCK;
+    
+    if(m_value+3<=m_max)
+    {
+        setValue(m_value+3);
+    }
+	
+    else if(m_wrap_around)
+    {
+        setValue(m_min);
+    }
+	
+	//GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
+	
+	return EVENT_LET;
+}
+
+// -----------------------------------------------------------------------------
+
 EventPropagation SpinnerWidget::leftPressed(const int playerID)
 {
     // if widget is deactivated, do nothing
@@ -289,6 +311,8 @@ EventPropagation SpinnerWidget::transmitEvent(Widget* w,
     }
     else if (originator == "spinnerbody" || originator == m_properties[PROP_ID])
     {
+        widgetBody(playerID);
+        
         if (m_listener != NULL)
         {
             if (m_listener->onSpinnerConfirmed() == EVENT_BLOCK)
