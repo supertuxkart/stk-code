@@ -182,6 +182,15 @@ namespace GUIEngine
           * the event propagate to the user's event handler.
           */
         virtual EventPropagation rightPressed(const int playerID) { return EVENT_BLOCK; }
+        
+        /**
+         * called when left key is pressed and focus is widget.
+         * Returns 'EVENT_LET' if user's event handler should be notified of a change.
+         * Called when user clicks on the widget's body.
+         */
+        
+        virtual EventPropagation widgetBody(const int playerID) { return EVENT_BLOCK; }
+        
 
         /**
          * called when left key is pressed and focus is on widget.
