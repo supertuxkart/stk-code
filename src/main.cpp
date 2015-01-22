@@ -1142,8 +1142,8 @@ void askForInternetPermission()
         "'User Interface', and edit \"Connect to the "
         "Internet\" and \"Send anonymous HW statistics\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
-        new ConfirmServer(), true);
-
+        new ConfirmServer(), true, true);
+    GUIEngine::DialogQueue::get()->pushDialog(dialog, false);
 }   // askForInternetPermission
 
 //=============================================================================
@@ -1196,9 +1196,11 @@ int main(int argc, char *argv[] )
         // Load the font textures - they are all lazily loaded
         // so no need to push a texture search path. They will actually
         // be loaded from ScalableFont.
+        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::FONT, ""));
         material_manager->addSharedMaterial(
                    file_manager->getAsset(FileManager::FONT,"materials.xml"));
-
+        file_manager->popTextureSearchPath();
+        
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
@@ -1291,6 +1293,15 @@ int main(int argc, char *argv[] )
         {
             GraphicsRestrictions::unitTesting();
             exit(0);
+        }
+
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+        {
+            MessageDialog *dialog =
+                new MessageDialog(_("Your driver version is too old. Please install "
+                "the latest video drivers."),
+                /*from queue*/ true);
+            GUIEngine::DialogQueue::get()->pushDialog(dialog);
         }
 
         // Note that on the very first run of STK internet status is set to

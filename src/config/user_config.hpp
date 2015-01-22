@@ -443,9 +443,14 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_texture_compression
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
         &m_video_group, "Enable Texture Compression"));
-    PARAM_PREFIX BoolUserConfigParam        m_high_definition_textures
-        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_high_definition_textures",
-        &m_video_group, "Enable high definition textures"));
+    /** This is a bit flag: bit 0: enabled (1) or disabled(0). 
+     *  Bit 1: setting done by default(0), or by user choice (2). This allows
+     *  to e.g. disable h.d. textures on hd3000 as default, but still allow the
+     *  user to enable it. */
+    PARAM_PREFIX IntUserConfigParam        m_high_definition_textures
+        PARAM_DEFAULT(IntUserConfigParam(1, "enable_high_definition_textures",
+        &m_video_group, "Enable high definition textures. Bit flag: "
+                        "bit 0 = enabled/disabled; bit 1 = set by user/set as default"));
     PARAM_PREFIX BoolUserConfigParam        m_glow
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_glow",
         &m_video_group, "Enable Glow"));
@@ -456,7 +461,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_light_shaft",
         &m_video_group, "Enable Light Shafts"));
     PARAM_PREFIX BoolUserConfigParam        m_dynamic_lights
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dynamic_lights",
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_dynamic_lights",
         &m_video_group, "Enable Dynamic Lights"));
     PARAM_PREFIX BoolUserConfigParam        m_dof
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dof",

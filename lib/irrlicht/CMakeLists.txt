@@ -1,5 +1,4 @@
 # CMakeLists.txt for Irrlicht in STK
-project(stkirrlicht)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 
@@ -8,6 +7,9 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                     "${PNG_INCLUDE_DIRS}"
                     "${ZLIB_INCLUDE_DIR}"
                     "${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
+
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
 
 if(APPLE)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX" "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht")
@@ -495,12 +497,8 @@ if(APPLE)
     set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES LANGUAGE C)
 endif()
 
-if(MSVC)
 add_library(stkirrlicht ${IRRLICHT_SOURCES})
-else()
-add_library(stkirrlicht SHARED ${IRRLICHT_SOURCES})
-endif()
-target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY})
+target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
 
 
 

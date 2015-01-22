@@ -65,13 +65,17 @@ Material::Material(const XMLNode *node, bool deprecated)
         throw std::runtime_error("[Material] No texture name specified "
                                  "in file\n");
     }
-    m_full_path = file_manager->getFileSystem()->getAbsolutePath(
-        file_manager->searchTexture(m_texname).c_str()).c_str();
+
+    std::string relativePath = file_manager->searchTexture(m_texname);
+    if (relativePath.size() == 0)
+        Log::warn("Material", "Cannot determine texture full path : <%s>", m_texname.c_str());
+    else
+        m_full_path = file_manager->getFileSystem()->getAbsolutePath(relativePath.c_str()).c_str();
     init();
 
     node->get("lazy-load", &m_lazy_load);
     bool b = false;
-
+    
     node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.4 style
     node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.5 style
     b = false;

@@ -49,7 +49,6 @@ void CentralVideoSettings::init()
     if (!ProfileWorld::isNoGraphics())
         initGL();
 
-#if !defined(__APPLE__)
     if (!ProfileWorld::isNoGraphics())
     {
         std::string driver((char*)(glGetString(GL_VERSION)));
@@ -133,6 +132,14 @@ void CentralVideoSettings::init()
             Log::info("GLDriver", "ARB Geometry Shader 4 Present");
         }
 
+        // Only unset the high def textures if they are set as default. If the
+        // user has enabled them (bit 1 set), then leave them enabled.
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES) &&
+            (UserConfigParams::m_high_definition_textures & 0x02) == 0)
+        {
+            UserConfigParams::m_high_definition_textures = 0x00;
+        }
+
         // Specific disablement
         if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
         {
@@ -147,7 +154,6 @@ void CentralVideoSettings::init()
             m_need_srgb_workaround = true;
         }
     }
-#endif
 }
 
 unsigned CentralVideoSettings::getGLSLVersion() const

@@ -54,7 +54,9 @@ namespace GraphicsRestrictions
             "BufferStorage",
             "BindlessTexture",
             "TextureCompressionS3TC",
-            "AMDVertexShaderLayer"
+            "AMDVertexShaderLayer",
+            "DriverRecentEnough",
+            "HighDefinitionTextures"
         };
     }   // namespace Private
     using namespace Private;
@@ -166,6 +168,18 @@ public:
 
         }
 
+        // ATI: some drivers use e.g.: "4.1 ATI-1.24.38"
+        if (driver_version.find("ATI-") != std::string::npos)
+        {
+            std::string driver;
+            // Try to force the driver name to be in a standard way by removing
+            // optional strings
+            driver = StringUtils::replace(driver_version, "ATI-", "");
+            std::vector<std::string> s = StringUtils::split(driver, ' ');
+            convertVersionString(s[1]);
+            return;
+        }
+
         // AMD: driver_version = "4.3.13283 Core Profile/Debug Context 14.501.1003.0"
         // ----------------------------------------------
         if (card_name.find("AMD") != std::string::npos)
@@ -177,6 +191,14 @@ public:
                 return;
             }
 
+        }
+
+        // ATI: other drivers use "4.0.10188 Core Profile Context"
+        if (card_name.find("ATI") != std::string::npos)
+        {
+            std::vector<std::string> s = StringUtils::split(driver_version, ' ');
+            convertVersionString(s[0]);
+            return;
         }
 
         Log::warn("Graphics", "Can not find version for '%s' '%s' - ignored.",
@@ -392,6 +414,14 @@ void unitTesting()
     assert(Version("1.4 (3.0 Mesa 10.1.0)",
                    "Mesa DRI Intel(R) Ivybridge Mobile")
            == Version("10.1.0"));
+    assert(Version("4.3.13283 Core Profile Context 14.501.1003.0",
+                   "AMD Radeon R9 200 Series")
+        == Version("14.501.1003.0"));
+    assert(Version("4.0.10188 Core Profile Context",
+                   "ATI Radeon HD 5400 Series")
+        == Version("4.0.10188"));
+    assert(Version("4.1 ATI-1.24.38", "AMD Radeon HD 6970M OpenGL Engine") 
+        == Version("1.24.38"));
 
 }   // unitTesting
 

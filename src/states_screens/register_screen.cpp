@@ -122,8 +122,33 @@ void RegisterScreen::onDialogClose()
     bool online =    UserConfigParams::m_internet_status
                   != Online::RequestManager::IPERM_NOT_ALLOWED;
     m_account_mode = online ? ACCOUNT_NEW_ONLINE : ACCOUNT_OFFLINE;
+
+    RibbonWidget* ribbon = getWidget<RibbonWidget>("mode_tabs");
+    assert(ribbon);
+    if (m_account_mode == ACCOUNT_NEW_ONLINE)
+    {
+        ribbon->select("tab_new_online", PLAYER_ID_GAME_MASTER);
+    }
+    else
+    {
+        m_account_mode = ACCOUNT_OFFLINE;
+        ribbon->select("tab_offline", PLAYER_ID_GAME_MASTER);
+    }
     makeEntryFieldsVisible();
 }   // onDialogClose
+
+// -----------------------------------------------------------------------------
+void RegisterScreen::onFocusChanged(GUIEngine::Widget* previous, 
+                                    GUIEngine::Widget* focus,  int playerID)
+{
+    TextBoxWidget *online_name = getWidget<TextBoxWidget>("username");
+    if (focus == online_name)
+    {
+        TextBoxWidget *local_name = getWidget<TextBoxWidget>("local_username");
+        if (online_name->getText() == "")
+            online_name->setText(local_name->getText());
+    }
+}   // onFocusChanged
 
 // -----------------------------------------------------------------------------
 /** Shows or hides the entry fields for online registration, depending on
