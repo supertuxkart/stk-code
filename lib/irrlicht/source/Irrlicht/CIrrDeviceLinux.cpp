@@ -1,5 +1,5 @@
 // Copyright (C) 2002-2012 Nikolaus Gebhardt
-// Copyright (C) 2014 Dawid Gan
+// Copyright (C) 2014-2015 Dawid Gan
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
@@ -2218,47 +2218,59 @@ bool CIrrDeviceLinux::getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &bright
 const c8* CIrrDeviceLinux::getTextFromClipboard() const
 {
 #if defined(_IRR_COMPILE_WITH_X11_)
-	Window ownerWindow = XGetSelectionOwner (display, X_ATOM_CLIPBOARD);
-	if ( ownerWindow ==  window )
+    if (X_ATOM_CLIPBOARD == None) 
+    {
+		os::Printer::log("Couldn't access X clipboard", ELL_WARNING);
+        return 0;
+    }
+    
+	Window ownerWindow = XGetSelectionOwner(display, X_ATOM_CLIPBOARD);
+	if (ownerWindow == window)
 	{
 		return Clipboard.c_str();
 	}
+
 	Clipboard = "";
-	if (ownerWindow != None )
+
+	if (ownerWindow == None)
+		return 0;
+
+	Atom selection = XInternAtom(display, "IRR_SELECTION", False);
+	XConvertSelection(display, X_ATOM_CLIPBOARD, XA_STRING, selection, window, CurrentTime);
+	
+	const int SELECTION_RETRIES = 500;
+	int i = 0;
+	for (i = 0; i < SELECTION_RETRIES; i++)
 	{
-		XConvertSelection (display, X_ATOM_CLIPBOARD, XA_STRING, None, ownerWindow, CurrentTime);
-		XFlush (display);
+		XEvent xevent;
+		bool res = XCheckTypedWindowEvent(display, window, SelectionNotify, &xevent);
+		
+		if (res && xevent.xselection.selection == X_ATOM_CLIPBOARD) 
+			break;
 
-		// check for data
-		Atom type;
-		int format;
-		unsigned long numItems, bytesLeft, dummy;
-		unsigned char *data;
-		XGetWindowProperty (display, ownerWindow,
-				XA_STRING, // property name
-				0, // offset
-				0, // length (we only check for data, so 0)
-				0, // Delete 0==false
-				AnyPropertyType, // AnyPropertyType or property identifier
-				&type, // return type
-				&format, // return format
-				&numItems, // number items
-				&bytesLeft, // remaining bytes for partial reads
-				&data); // data
-		if ( bytesLeft > 0 )
-		{
-			// there is some data to get
-			int result = XGetWindowProperty (display, ownerWindow, XA_STRING, 0,
-										bytesLeft, 0, AnyPropertyType, &type, &format,
-										&numItems, &dummy, &data);
-			if (result == Success)
-				Clipboard = (irr::c8*)data;
-			XFree (data);
-		}
+		usleep(1000);
 	}
+	
+	if (i == SELECTION_RETRIES)
+	{
+		os::Printer::log("Timed out waiting for SelectionNotify event", ELL_WARNING);
+		return 0;
+	}
+	
+	Atom type;
+	int format;
+	unsigned long numItems, dummy;
+	unsigned char *data;
 
+	int result = XGetWindowProperty(display, window, selection, 0, INT_MAX/4, 
+									False, AnyPropertyType, &type, &format, 
+									&numItems, &dummy, &data);
+
+	if (result == Success)
+		Clipboard = (irr::c8*)data;
+		
+	XFree (data);
 	return Clipboard.c_str();
-
 #else
 	return 0;
 #endif
