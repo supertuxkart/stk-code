@@ -189,7 +189,7 @@ namespace GUIEngine
          * Called when user clicks on the widget's body.
          */
         
-        virtual EventPropagation widgetBody(const int playerID) { return EVENT_BLOCK; }
+        virtual EventPropagation widBody(const int playerID) { return EVENT_BLOCK; }
         
 
         /**
