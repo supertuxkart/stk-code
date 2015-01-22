@@ -601,7 +601,7 @@ bool onEvent(const SEvent &event)
                     dsd->setSliderHook("red_slider", 0, 100,
                         []()
                         {
-                            return findNearestLight()->getColor().X * 100;
+                            return int(findNearestLight()->getColor().X * 100);
                         },
                         [](int intensity)
                         {
@@ -614,7 +614,7 @@ bool onEvent(const SEvent &event)
                     dsd->setSliderHook("green_slider", 0, 100,
                         []()
                         {
-                            return findNearestLight()->getColor().Y * 100;
+                            return int(findNearestLight()->getColor().Y * 100);
                         },
                         [](int intensity)
                         {
@@ -627,7 +627,7 @@ bool onEvent(const SEvent &event)
                     dsd->setSliderHook("blue_slider", 0, 100,
                         []()
                         {
-                            return findNearestLight()->getColor().Z * 100;
+                            return int(findNearestLight()->getColor().Z * 100);
                         },
                         [](int intensity)
                         {
@@ -638,13 +638,13 @@ bool onEvent(const SEvent &event)
                     );
                     dsd->changeLabel("SSAO radius", "energy (x10)");
                     dsd->setSliderHook("ssao_radius", 0, 100,
-                        []()     { return findNearestLight()->getEnergy() * 10;  },
+                        []()     { return int(findNearestLight()->getEnergy() * 10);  },
                         [](int v){        findNearestLight()->setEnergy(v / 10.0f); }
                     );
                     dsd->changeLabel("SSAO k", "radius");
                     dsd->setSliderHook("ssao_k", 0, 100,
-                        []()     { return findNearestLight()->getRadius();  },
-                        [](int v){        findNearestLight()->setRadius(v); }
+                        []()     { return int(findNearestLight()->getRadius());  },
+                        [](int v){        findNearestLight()->setRadius(float(v)); }
                     );
                     dsd->changeLabel("SSAO Sigma", "[None]");
 #endif
