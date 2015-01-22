@@ -1197,9 +1197,11 @@ int main(int argc, char *argv[] )
         // Load the font textures - they are all lazily loaded
         // so no need to push a texture search path. They will actually
         // be loaded from ScalableFont.
+        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::FONT, ""));
         material_manager->addSharedMaterial(
                    file_manager->getAsset(FileManager::FONT,"materials.xml"));
-
+        file_manager->popTextureSearchPath();
+        
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
