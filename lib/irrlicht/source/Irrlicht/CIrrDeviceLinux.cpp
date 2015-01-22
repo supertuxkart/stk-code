@@ -58,7 +58,7 @@ namespace irr
 {
 	namespace video
 	{
-        extern bool useCoreContext;
+		extern bool useCoreContext;
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
 	}
@@ -500,7 +500,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 {
 	GLXContext Context;
-    irr::video::useCoreContext = true;
+	irr::video::useCoreContext = true;
 	int core43ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
@@ -509,13 +509,13 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
-    int core43ctx[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-        None
-    };
+	int core43ctx[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		None
+	};
 	int core33ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
@@ -524,21 +524,21 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
-    int core33ctx[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-        None
-    };
-    int core31ctxdebug[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 1,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-        GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-        None
-    };
+	int core33ctx[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		None
+	};
+	int core31ctxdebug[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+		None
+	};
 	int core31ctx[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
@@ -557,30 +557,30 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
   
 	// create core 4.3 context
-    os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
+	os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
 	// create core 3.3 context
-    os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
+	os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
 	// create core 3.1 context (for older mesa)
-    os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
+	os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
-    irr::video::useCoreContext = false;
+	irr::video::useCoreContext = false;
 	// fall back to legacy context
-    os::Printer::log("Creating legacy OpenGL 2.1 context...", ELL_INFORMATION);
-    Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
+	os::Printer::log("Creating legacy OpenGL 2.1 context...", ELL_INFORMATION);
+	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
 
@@ -2042,7 +2042,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 
 		ActiveJoysticks.push_back(info);
 
-        returnInfo.HasGenericName = false;
+		returnInfo.HasGenericName = false;
 		returnInfo.Joystick = joystick;
 		returnInfo.PovHat = SJoystickInfo::POV_HAT_UNKNOWN;
 		returnInfo.Axes = info.axes;
@@ -2218,12 +2218,12 @@ bool CIrrDeviceLinux::getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &bright
 const c8* CIrrDeviceLinux::getTextFromClipboard() const
 {
 #if defined(_IRR_COMPILE_WITH_X11_)
-    if (X_ATOM_CLIPBOARD == None) 
-    {
+	if (X_ATOM_CLIPBOARD == None) 
+	{
 		os::Printer::log("Couldn't access X clipboard", ELL_WARNING);
-        return 0;
-    }
-    
+		return 0;
+	}
+	
 	Window ownerWindow = XGetSelectionOwner(display, X_ATOM_CLIPBOARD);
 	if (ownerWindow == window)
 	{
