@@ -311,5 +311,5 @@ bool CentralVideoSettings::isESMEnabled() const
 
 bool CentralVideoSettings::isDefferedEnabled() const
 {
-    return UserConfigParams::m_dynamic_lights;
+    return UserConfigParams::m_dynamic_lights && !GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_ADVANCED_PIPELINE);
 }
