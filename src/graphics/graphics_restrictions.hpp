@@ -51,6 +51,7 @@ namespace GraphicsRestrictions
         GR_AMD_VERTEX_SHADER_LAYER,
         GR_DRIVER_RECENT_ENOUGH,
         GR_HIGHDEFINITION_TEXTURES,
+        GR_ADVANCED_PIPELINE,
         GR_COUNT  /** MUST be last entry. */
     } ;
 

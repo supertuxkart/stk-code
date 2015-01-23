@@ -3,6 +3,7 @@
 #include "shaders.hpp"
 #include <cmath>
 #include <set>
+#include "central_settings.hpp"
 
 static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
 {
@@ -293,7 +294,7 @@ GLuint generateSpecularCubemap(GLuint probe)
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F, cubemap_size, cubemap_size, 0, GL_BGRA, GL_FLOAT, 0);
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-    if (!UserConfigParams::m_dynamic_lights)
+    if (!CVS->isDefferedEnabled())
         return cubemap_texture;
 
     GLuint fbo;

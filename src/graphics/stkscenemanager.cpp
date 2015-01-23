@@ -484,7 +484,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
 }
 
 static void
-parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::ISceneNode *> *ImmediateDraw,
+parseSceneManager(core::list<scene::ISceneNode*> &List, std::vector<scene::ISceneNode *> *ImmediateDraw,
     const scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadow_cam[4], const scene::ICameraSceneNode *rsmcam,
     bool culledforcam, bool culledforshadowcam[4], bool culledforrsm, bool drawRSM)
 {
@@ -517,7 +517,7 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
 
         handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm, drawRSM);
 
-        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm, drawRSM);
+        parseSceneManager(const_cast<core::list<scene::ISceneNode*>& >((*I)->getChildren()), ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm, drawRSM);
     }
 }
 
