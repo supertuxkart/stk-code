@@ -800,7 +800,7 @@ void IrrDriver::renderTransparent()
     for (unsigned i = 0; i < BillBoardList::getInstance()->size(); i++)
         BillBoardList::getInstance()->at(i)->render();
 
-    if (!UserConfigParams::m_dynamic_lights)
+    if (!CVS->isDefferedEnabled())
         return;
 
     // Render displacement nodes

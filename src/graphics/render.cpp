@@ -138,7 +138,7 @@ void IrrDriver::renderGLSL(float dt)
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
 
-    if (!UserConfigParams::m_dynamic_lights)
+    if (!CVS->isDefferedEnabled())
     {
         SColor clearColor(0, 150, 150, 150);
         if (World::getWorld() != NULL)
@@ -161,7 +161,7 @@ void IrrDriver::renderGLSL(float dt)
         oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-        camera->activate(!UserConfigParams::m_dynamic_lights);
+        camera->activate(!CVS->isDefferedEnabled());
         rg->preRenderCallback(camera);   // adjusts start referee
         m_scene_manager->setActiveCamera(camnode);
 
@@ -176,7 +176,7 @@ void IrrDriver::renderGLSL(float dt)
             prepareSkybox();
             m_skybox_ready = true;
         }
-        if (!UserConfigParams::m_dynamic_lights)
+        if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);
 
         PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
@@ -242,7 +242,7 @@ void IrrDriver::renderGLSL(float dt)
         }
 
         // Render the post-processed scene
-        if (UserConfigParams::m_dynamic_lights)
+        if (CVS->isDefferedEnabled())
         {
             bool isRace = StateManager::get()->getGameState() == GUIEngine::GAME;
             FrameBuffer *fbo = m_post_processing->render(camnode, isRace);
@@ -269,7 +269,7 @@ void IrrDriver::renderGLSL(float dt)
             {
                 glEnable(GL_FRAMEBUFFER_SRGB);
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                if (UserConfigParams::m_dynamic_lights)
+                if (CVS->isDefferedEnabled())
                     camera->activate();
                 m_post_processing->renderPassThrough(fbo->getRTT()[0]);
                 glDisable(GL_FRAMEBUFFER_SRGB);
@@ -348,7 +348,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     {
         // To avoid wrong culling, use the largest view possible
         m_scene_manager->setActiveCamera(m_suncam);
-        if (UserConfigParams::m_dynamic_lights &&
+        if (CVS->isDefferedEnabled() &&
             CVS->isShadowEnabled() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
@@ -371,7 +371,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
-    if (UserConfigParams::m_dynamic_lights || forceRTT)
+    if (CVS->isDefferedEnabled() || forceRTT)
     {
         m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
         glClearColor(0., 0., 0., 0.);
@@ -385,7 +385,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     // Lights
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
-        if (UserConfigParams::m_dynamic_lights)
+        if (CVS->isDefferedEnabled())
             renderLights(pointlightcount, hasShadow);
         PROFILER_POP_CPU_MARKER();
     }
@@ -400,7 +400,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     }
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
-    if (UserConfigParams::m_dynamic_lights || forceRTT)
+    if (CVS->isDefferedEnabled() || forceRTT)
     {
         m_rtts->getFBO(FBO_COLORS).Bind();
         SColor clearColor(0, 150, 150, 150);
@@ -422,7 +422,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         m_rtts->getFBO(FBO_COLORS).Bind();
     }
 
-    if (UserConfigParams::m_dynamic_lights && World::getWorld() != NULL &&
+    if (CVS->isDefferedEnabled() && World::getWorld() != NULL &&
         World::getWorld()->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
@@ -483,7 +483,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         renderParticles();
         PROFILER_POP_CPU_MARKER();
     }
-    if (!UserConfigParams::m_dynamic_lights && !forceRTT)
+    if (!CVS->isDefferedEnabled() && !forceRTT)
     {
         glDisable(GL_FRAMEBUFFER_SRGB);
         glDisable(GL_DEPTH_TEST);

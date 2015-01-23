@@ -56,7 +56,8 @@ namespace GraphicsRestrictions
             "TextureCompressionS3TC",
             "AMDVertexShaderLayer",
             "DriverRecentEnough",
-            "HighDefinitionTextures"
+            "HighDefinitionTextures",
+            "AdvancedPipeline"
         };
     }   // namespace Private
     using namespace Private;
