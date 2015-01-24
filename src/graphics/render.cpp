@@ -422,12 +422,13 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         m_rtts->getFBO(FBO_COLORS).Bind();
     }
 
+    // Render ambient scattering
     if (CVS->isDefferedEnabled() && World::getWorld() != NULL &&
         World::getWorld()->isFogEnabled())
     {
-        PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("- Ambient scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(getGPUTimer(Q_FOG));
-        renderLightsScatter(pointlightcount);
+        renderAmbientScatter();
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -435,6 +436,16 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
         ScopedGPUTimer Timer(getGPUTimer(Q_SKYBOX));
         renderSkybox(camnode);
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    // Render discrete lights scattering
+    if (CVS->isDefferedEnabled() && World::getWorld() != NULL &&
+        World::getWorld()->isFogEnabled())
+    {
+        PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(getGPUTimer(Q_FOG));
+        renderLightsScatter(pointlightcount);
         PROFILER_POP_CPU_MARKER();
     }
 

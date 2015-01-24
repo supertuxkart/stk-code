@@ -343,6 +343,7 @@ private:
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
     void renderLights(unsigned pointlightCount, bool hasShadow);
+    void renderAmbientScatter();
     void renderLightsScatter(unsigned pointlightCount);
     void renderShadowsDebug();
     void doScreenShot();
