@@ -217,7 +217,7 @@ public:
         for(unsigned int i=0; i<m_version.size(); i++)
             if(other.m_version[i]!=m_version[i]) return false;
         return true;
-    }   // operator ==
+    }   // operator==
     // ------------------------------------------------------------------------
     /** Compares two version numbers. Equal returns true if the elements are
     *  identical.
@@ -234,9 +234,13 @@ public:
         for (unsigned int i = 0; i<min_n; i++)
         {
             if (m_version[i] > other.m_version[i]) return false;
+            if (m_version[i] < other.m_version[i]) return true;
         }
-        return true;
-    }   // operator>
+        if (m_version.size() >= other.m_version.size())
+            return false;
+        else
+            return true;
+    }   // operator<
     // ------------------------------------------------------------------------
     /** If *this <= other. */
     bool operator<= (const Version &other) const
@@ -247,8 +251,11 @@ public:
             if (m_version[i] > other.m_version[i]) return false;
             if (m_version[i] < other.m_version[i]) return true;
         }
-        return true;
-    }   // operator>
+        if (m_version.size() > other.m_version.size())
+            return false;
+        else
+            return true;
+    }   // operator<=
 
 };   // class Version
 // ============================================================================
