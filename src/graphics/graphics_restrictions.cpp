@@ -404,6 +404,10 @@ void unitTesting()
     assert(Version("1.2.3") <= Version("1.2.3.1"));
     assert(Version("1.2.3") <= Version("1.2.3"));
     assert(Version("1.2.3") == Version("1.2.3"));
+    assert(Version("10.3")  <  Version("10.3.2"));
+    assert(Version("10.3") <=  Version("10.3.2"));
+    assert(!(Version("10.3.2") <  Version("10.3")));
+    assert(!(Version("10.3.2") <= Version("10.3")));
     assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1", 
                    "NVIDIA GeForce GTX 680MX OpenGL Engine")
            == Version("310.90.10.5")                                    );
