@@ -181,7 +181,7 @@ void STKAnimatedMesh::updateGL()
 
             size_t size = mb->getVertexCount() * GLmeshes[i].Stride, offset = GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride;
             void *buf;
-            if (CVS->isARBBufferStorageUsable())
+            if (CVS->supportsAsyncInstanceUpload())
             {
                 buf = VAOManager::getInstance()->getVBOPtr(mb->getVertexType());
                 buf = (char *)buf + offset;
@@ -197,7 +197,7 @@ void STKAnimatedMesh::updateGL()
                 buf = glMapBufferRange(GL_ARRAY_BUFFER, offset, size, bitfield);
             }
             memcpy(buf, mb->getVertices(), size);
-            if (!CVS->isARBBufferStorageUsable())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glBindBuffer(GL_ARRAY_BUFFER, 0);

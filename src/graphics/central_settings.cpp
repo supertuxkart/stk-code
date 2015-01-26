@@ -273,6 +273,11 @@ bool CentralVideoSettings::supportsIndirectInstancingRendering() const
 
 bool CentralVideoSettings::supportsComputeShadersFiltering() const
 {
+    return isARBBufferStorageUsable() && isARBImageLoadStoreUsable() && isARBComputeShaderUsable();
+}
+
+bool CentralVideoSettings::supportsAsyncInstanceUpload() const
+{
     return isARBBufferStorageUsable() && isARBImageLoadStoreUsable();
 }
 

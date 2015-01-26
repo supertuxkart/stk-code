@@ -21,7 +21,7 @@ public:
     {
         glGenBuffers(1, &drawindirectcmd);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
-        if (CVS->isARBBufferStorageUsable())
+        if (CVS->supportsAsyncInstanceUpload())
         {
             glBufferStorage(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
             Ptr = (DrawElementsIndirectCommand *)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);

@@ -58,6 +58,7 @@ public:
     bool supportsGlobalIllumination() const;
     bool supportsIndirectInstancingRendering() const;
     bool supportsComputeShadersFiltering() const;
+    bool supportsAsyncInstanceUpload() const;
 
     // "Macro" around feature support and user config
     bool isShadowEnabled() const;
