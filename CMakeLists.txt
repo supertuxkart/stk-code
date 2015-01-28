@@ -71,13 +71,15 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
 include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
 
-if(WIN32 AND NOT MINGW)
+if((WIN32 AND NOT MINGW) OR APPLE)
+    if (NOT APPLE)
     # Build zlib library
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
     include_directories("${PROJECT_SOURCE_DIR}/lib/zlib")
 
     set(ZLIB_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/zlib" "${PROJECT_BINARY_DIR}/lib/zlib/")
     set(ZLIB_LIBRARY zlibstatic)
+    endif()
 
     # Build png library
     set (SKIP_INSTALL_ALL TRUE)
