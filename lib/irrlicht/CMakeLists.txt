@@ -91,7 +91,6 @@ source/Irrlicht/CTriangleSelector.cpp
 source/Irrlicht/CParticlePointEmitter.cpp
 source/Irrlicht/CTextSceneNode.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
-source/Irrlicht/cirrdevicewayland.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
 source/Irrlicht/CGUIInOutFader.cpp
 source/Irrlicht/CGUITreeView.cpp
@@ -161,7 +160,6 @@ source/Irrlicht/CSceneNodeAnimatorRotation.cpp
 source/Irrlicht/glext.h
 source/Irrlicht/CB3DMeshFileLoader.h
 source/Irrlicht/CIrrDeviceLinux.h
-source/Irrlicht/cirrdevicewayland.h
 source/Irrlicht/CMeshCache.h
 source/Irrlicht/CAttributes.h
 source/Irrlicht/CParticleMeshEmitter.h

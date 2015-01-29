@@ -84,11 +84,6 @@ namespace irr
 			dev = new CIrrDeviceWinCE(params);
 #endif
 
-#ifdef _IRR_COMPILE_WITH_WAYLAND
-		if (params.DeviceType == EIDT_WAYLAND || (!dev && params.DeviceType == EIDT_BEST))
-			dev = new CIrrDeviceWayland(params);
-#endif
-
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
 		if (params.DeviceType == EIDT_X11 || (!dev && params.DeviceType == EIDT_BEST))
 			dev = new CIrrDeviceLinux(params);
