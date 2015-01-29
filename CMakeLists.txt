@@ -175,7 +175,7 @@ endif()
 
 if(UNIX OR MINGW)
 #    if(USE_CPP2011)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x -lwayland-client -lwayland-egl -lEGL -lxkbcommon")
 #    endif()
 endif()
 

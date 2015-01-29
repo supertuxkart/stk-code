@@ -367,7 +367,6 @@ void IrrDriver::initDevice()
             if (modes->getVideoModeCount() > 0)
             {
                 res = modes->getVideoModeResolution(res, res);
-
                 UserConfigParams::m_width = res.Width;
                 UserConfigParams::m_height = res.Height;
             }
@@ -529,7 +528,7 @@ void IrrDriver::initDevice()
     // Only change video driver settings if we are showing graphics
     if (!ProfileWorld::isNoGraphics())
     {
-#if defined(__linux__) && !defined(ANDROID)
+#if 0//defined(__linux__) && !defined(ANDROID)
         // Set class hints on Linux, used by Window Managers.
         const video::SExposedVideoData& videoData = m_video_driver
                                                 ->getExposedVideoData();
@@ -584,7 +583,7 @@ void IrrDriver::initDevice()
 
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
-    m_device->getCursorControl()->setVisible(true);
+    //m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
 }   // initDevice
 
@@ -632,7 +631,7 @@ void IrrDriver::showPointer()
     if (!m_pointer_shown)
     {
         m_pointer_shown = true;
-        this->getDevice()->getCursorControl()->setVisible(true);
+//        this->getDevice()->getCursorControl()->setVisible(true);
     }
 }   // showPointer
 
@@ -642,14 +641,14 @@ void IrrDriver::hidePointer()
     // always visible in artist debug mode, to be able to use the context menu
     if (UserConfigParams::m_artist_debug_mode)
     {
-        this->getDevice()->getCursorControl()->setVisible(true);
+//        this->getDevice()->getCursorControl()->setVisible(true);
         return;
     }
 
     if (m_pointer_shown)
     {
         m_pointer_shown = false;
-        this->getDevice()->getCursorControl()->setVisible(false);
+//        this->getDevice()->getCursorControl()->setVisible(false);
     }
 }   // hidePointer
 

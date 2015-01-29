@@ -25,6 +25,10 @@ extern bool GLContextDebugBit;
 #include "MacOSX/CIrrDeviceMacOSX.h"
 #endif
 
+#ifdef _IRR_COMPILE_WITH_WAYLAND
+#include "cirrdevicewayland.h"
+#endif
+
 namespace irr
 {
 namespace video
@@ -674,6 +678,53 @@ bool COpenGLDriver::initDriver(CIrrDeviceLinux* device)
 
 
 // -----------------------------------------------------------------------
+// Wayland CONSTRUCTOR
+// -----------------------------------------------------------------------
+#ifdef _IRR_COMPILE_WITH_WAYLAND
+//! Linux constructor and init code
+COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
+		io::IFileSystem* io, CIrrDeviceWayland* device)
+: CNullDriver(io, params.WindowSize), COpenGLExtensionHandler(),
+	CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
+	Transformation3DChanged(true), AntiAlias(params.AntiAlias),
+	RenderTargetTexture(0), CurrentRendertargetSize(0, 0), ColorFormat(ECF_R8G8B8),
+	CurrentTarget(ERT_FRAME_BUFFER), Params(params),
+	wl_device(device), DeviceType(EIDT_WAYLAND)
+{
+	#ifdef _DEBUG
+	setDebugName("COpenGLDriver");
+	#endif
+		genericDriverInit();
+}
+
+
+bool COpenGLDriver::changeRenderContext(const SExposedVideoData& videoData, CIrrDeviceWayland* device)
+{
+	return true;
+}
+
+
+//! inits the open gl driver
+bool COpenGLDriver::initDriver(CIrrDeviceWayland* device)
+{
+/*	ExposedData.OpenGLLinux.X11Context = glXGetCurrentContext();
+	ExposedData.OpenGLLinux.X11Display = glXGetCurrentDisplay();
+	ExposedData.OpenGLLinux.X11Window = (unsigned long)Params.WindowId;
+	Drawable = glXGetCurrentDrawable();
+	X11Display = (Display*)ExposedData.OpenGLLinux.X11Display;*/
+
+	genericDriverInit();
+
+	// set vsync
+//	extGlSwapInterval(Params.Vsync ? 1 : 0);
+	return true;
+}
+
+#endif // _IRR_COMPILE_WITH_X11_DEVICE_
+
+
+
+// -----------------------------------------------------------------------
 // SDL CONSTRUCTOR
 // -----------------------------------------------------------------------
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
@@ -910,6 +961,16 @@ bool COpenGLDriver::endScene()
 	if (DeviceType == EIDT_X11)
 	{
 		glXSwapBuffers(X11Display, Drawable);
+		return true;
+	}
+#endif
+
+#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
+	if (DeviceType == EIDT_WAYLAND)
+	{
+		wl_display_dispatch_pending(wl_device->display);
+		eglSwapBuffers(wl_device->egl_display, wl_device->egl_surface);
+
 		return true;
 	}
 #endif
@@ -4898,6 +4959,25 @@ IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 #endif //  _IRR_COMPILE_WITH_OPENGL_
 }
 #endif // _IRR_COMPILE_WITH_X11_DEVICE_
+
+
+// -----------------------------------
+// Wayland VERSION
+// -----------------------------------
+#ifdef _IRR_COMPILE_WITH_WAYLAND
+IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
+		io::IFileSystem* io, CIrrDeviceWayland* device)
+{
+	COpenGLDriver* ogl =  new COpenGLDriver(params, io, device);
+	if (!ogl->initDriver(device))
+	{
+		ogl->drop();
+		ogl = 0;
+	}
+	return ogl;
+
+}
+#endif // _IRR_COMPILE_WITH_WAYLAND
 
 
 // -----------------------------------
