@@ -199,8 +199,8 @@ void Achievement::check()
     if(m_achievement_info->checkCompletion(this))
     {
         //show achievement
-        core::stringw s = StringUtils::insertValues(_("Completed achievement \"%s\"."),
-                                                    m_achievement_info->getName());
+        core::stringw s = _("Completed achievement \"%s\".", 
+                            m_achievement_info->getName().c_str());
         MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, s);
 
         // Sends a confirmation to the server that an achievement has been
