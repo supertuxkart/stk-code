@@ -77,6 +77,20 @@ public:
 	{
 		CIrrDeviceWayland *dev = static_cast<CIrrDeviceWayland *>(data);
 		dev->getCursorControl()->setPosition(sx, sy);
+		SEvent irrevent;
+		irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
+		irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
+		irrevent.MouseInput.X = dev->getCursorControl()->getPosition().X;
+		irrevent.MouseInput.Y = dev->getCursorControl()->getPosition().Y;
+//		irrevent.MouseInput.Control = (event.xkey.state & ControlMask) != 0;
+//		irrevent.MouseInput.Shift = (event.xkey.state & ShiftMask) != 0;
+
+		// mouse button states
+		irrevent.MouseInput.ButtonStates = 0;//(event.xbutton.state & Button1Mask) ? irr::EMBSM_LEFT : 0;
+		irrevent.MouseInput.ButtonStates |= 0;//(event.xbutton.state & Button3Mask) ? irr::EMBSM_RIGHT : 0;
+		irrevent.MouseInput.ButtonStates |= 0;//(event.xbutton.state & Button2Mask) ? irr::EMBSM_MIDDLE : 0;
+
+		dev->signalEvent(irrevent);
 	}
 
 	static void
@@ -104,7 +118,6 @@ public:
 	//		irrevent.MouseInput.ButtonStates |= (event.xbutton.state & Button2Mask) ? irr::EMBSM_MIDDLE : 0;
 
 			irrevent.MouseInput.Event = irr::EMIE_COUNT;
-
 			switch(button)
 			{
 			case 272: // Left button
@@ -112,6 +125,15 @@ public:
 					(state == WL_POINTER_BUTTON_STATE_PRESSED) ? irr::EMIE_LMOUSE_PRESSED_DOWN : irr::EMIE_LMOUSE_LEFT_UP;
 				irrevent.MouseInput.ButtonStates ^= irr::EMBSM_LEFT;
 				break;
+			case 273: // Right button
+				irrevent.MouseInput.Event =
+					(state == WL_POINTER_BUTTON_STATE_PRESSED) ? irr::EMIE_RMOUSE_PRESSED_DOWN : irr::EMIE_RMOUSE_LEFT_UP;
+				irrevent.MouseInput.ButtonStates ^= irr::EMBSM_RIGHT;
+				break;
+			case 274: // Middle button
+				irrevent.MouseInput.Event =
+					(state == WL_POINTER_BUTTON_STATE_PRESSED) ? irr::EMIE_MMOUSE_PRESSED_DOWN : irr::EMIE_MMOUSE_LEFT_UP;
+				irrevent.MouseInput.ButtonStates ^= irr::EMBSM_MIDDLE;
 			default:
 				break;
 			}
