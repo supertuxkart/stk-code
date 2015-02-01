@@ -614,6 +614,9 @@ void IrrDriver::renderSolidSecondPass()
             glMakeTextureHandleResidentARB(DepthHandle);
     }
 
+    if (CVS->supportsIndirectInstancingRendering())
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
+
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS2));
 
