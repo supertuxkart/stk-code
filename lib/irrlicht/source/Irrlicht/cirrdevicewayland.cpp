@@ -608,6 +608,7 @@ void CIrrDeviceWayland::initEGL()
 		os::Printer::log("eglMakeCurrent() error", "", ELL_ERROR);
 	}
 	video::useCoreContext = true;
+	eglSwapInterval(egl_display, CreationParams.Vsync ? 1 : 0);
 }
 
 bool CIrrDeviceWayland::createWindow()

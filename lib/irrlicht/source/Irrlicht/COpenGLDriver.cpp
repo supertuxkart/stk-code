@@ -715,8 +715,6 @@ bool COpenGLDriver::initDriver(CIrrDeviceWayland* device)
 
 	genericDriverInit();
 
-	// set vsync
-//	extGlSwapInterval(Params.Vsync ? 1 : 0);
 	return true;
 }
 
