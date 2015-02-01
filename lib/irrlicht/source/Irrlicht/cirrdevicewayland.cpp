@@ -493,7 +493,6 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 
 	wl_seat_add_listener(seat, &WaylandCallbacks::seat_listener, this);
 	wl_output_add_listener(output, &WaylandCallbacks::output_listener, this);
-	wl_display_dispatch(display);
 
 	// create keymap
 	createKeyMap();
@@ -512,10 +511,11 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 	// create driver
 	createDriver();
 
-	if (!VideoDriver)
-		return;
+	if (VideoDriver)
+		createGUIAndScene();
 
-	createGUIAndScene();
+	// Sync everything wayland before leaving
+	wl_display_dispatch(display);
 }
 
 
