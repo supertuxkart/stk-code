@@ -84,26 +84,38 @@ public:
 #endif
                       ~MusicInformation ();
     static MusicInformation *create(const std::string &filename);
-    const stringw&     getComposer      () const {return m_composer;        }
-    const stringw&     getTitle         () const {return m_title;           }
-    const std::string& getNormalFilename() const {return m_normal_filename; }
-    const std::string& getFastFilename  () const {return m_fast_filename;   }
-    //int              getNumLoops      () const {return m_numLoops;        }
-    float              getFasterTime    () const {return m_faster_time;     }
-    float              getMaxPitch      () const {return m_max_pitch;       }
-    void               setMusicWaiting  () {m_music_waiting = true;}
-    void               addMusicToTracks ();
-    void               update           (float dt);
-    void               startMusic       ();
-    void               stopMusic        ();
-    void               pauseMusic       ();
-    void               resumeMusic      ();
-    void               volumeMusic      (float gain);
-
+    void               addMusicToTracks();
+    void               update(float dt);
+    void               startMusic();
+    void               stopMusic();
+    void               pauseMusic();
+    void               resumeMusic();
+    void               volumeMusic(float gain);
     void               setTemporaryVolume(float gain);
-    void               resetTemporaryVolume() { volumeMusic(m_adjusted_gain); }
-
     void               switchToFastMusic();
     bool               isPlaying() const;
+
+    // ------------------------------------------------------------------------
+    /** Returns the composer of the music. */
+    const stringw& getComposer() const { return m_composer; }
+    // ------------------------------------------------------------------------
+    /** Returns the title of the music. */
+    const stringw& getTitle() const { return m_title; }
+    // ------------------------------------------------------------------------
+    /** Returns the filename of the normal speed music. */
+    const std::string& getNormalFilename() const { return m_normal_filename; }
+    // ------------------------------------------------------------------------
+    /** If available, returns the file name of the faster/last-lap music. */
+    const std::string& getFastFilename() const { return m_fast_filename; }
+    // ------------------------------------------------------------------------
+    float getMaxPitch() const { return m_max_pitch; }
+    // ------------------------------------------------------------------------
+    /** Sets the music to be waiting, i.e. startMusic still needs to be
+     *  called. Used to pre-load track music during track loading time. */
+    void setMusicWaiting  () {m_music_waiting = true;}
+    // ------------------------------------------------------------------------
+    /** Resets a temporary volume change. */
+    void resetTemporaryVolume() { volumeMusic(m_adjusted_gain); }
+
 };   // MusicInformation
 #endif

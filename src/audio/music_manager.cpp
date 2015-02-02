@@ -162,7 +162,11 @@ void MusicManager::addMusicToTracks()
 }   // addMusicToTracks
 
 //-----------------------------------------------------------------------------
-void MusicManager::startMusic(MusicInformation* mi, bool startRightNow)
+/** Schedules the indicated music to be played next.
+ *  \param mi Music information of the music to be played.
+ *  \param start_right_now 
+ */
+void MusicManager::startMusic(MusicInformation* mi, bool start_right_now)
 {
     // If this music is already playing, ignore this call.
     if (m_current_music != NULL &&
@@ -181,8 +185,10 @@ void MusicManager::startMusic(MusicInformation* mi, bool startRightNow)
     if(!mi || !UserConfigParams::m_music || !m_initialized) return;
 
     mi->volumeMusic(m_masterGain);
-    if (startRightNow) mi->startMusic();
-    else mi->setMusicWaiting();
+    if (start_right_now)
+        mi->startMusic();
+    else
+        mi->setMusicWaiting();
 }   // startMusic
 
 //-----------------------------------------------------------------------------

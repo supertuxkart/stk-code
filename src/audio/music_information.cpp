@@ -137,6 +137,8 @@ void MusicInformation::addMusicToTracks()
 }   // addMusicToTracks
 
 //-----------------------------------------------------------------------------
+/** Starts the music.
+ */
 void MusicInformation::startMusic()
 {
     m_time_since_faster  = 0.0f;
@@ -153,7 +155,7 @@ void MusicInformation::startMusic()
         return;
     }
 
-    if (m_normal_music != NULL) delete m_normal_music;
+    if (m_normal_music) delete m_normal_music;
 
 #if HAVE_OGGVORBIS
     m_normal_music = new MusicOggStream();
@@ -175,7 +177,7 @@ void MusicInformation::startMusic()
 
     // Then (if available) load the music for the last track
     // -----------------------------------------------------
-    if (m_fast_music != NULL) delete m_fast_music;
+    if (m_fast_music) delete m_fast_music;
     if (m_fast_filename == "")
     {
         m_fast_music = NULL;
@@ -246,14 +248,12 @@ void MusicInformation::update(float dt)
         break;
                        }
     case SOUND_NORMAL:
-        if ( m_normal_music == NULL ) break;
-
-        m_normal_music->update();
+        if ( m_normal_music ) 
+            m_normal_music->update();
         break;
     case SOUND_FAST:
-        if ( m_fast_music == NULL ) break;
-
-        m_fast_music->update();
+        if ( m_fast_music ) 
+            m_fast_music->update();
         break;
     }   // switch
 

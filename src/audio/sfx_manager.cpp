@@ -597,7 +597,7 @@ void SFXManager::deleteSFXMapping(const std::string &name)
 }   // deleteSFXMapping
 
 //----------------------------------------------------------------------------
-/** Make sures that the sfx thread is started at least one per frame. It also
+/** Make sure that the sfx thread is started at least once per frame. It also
  *  adds an update command for the music manager.
  *  \param dt Time step size.
  */
@@ -610,7 +610,8 @@ void SFXManager::update(float dt)
 
 //----------------------------------------------------------------------------
 /** Updates the status of all playing sfx (to test if they are finished).
- * This function is executed once per thread (triggered by the 
+ *  This function is executed once per frame (triggered by the audio thread).
+ *  \param current The sfx command - used to get timestep information.
 */
 void SFXManager::reallyUpdateNow(SFXCommand *current)
 {
