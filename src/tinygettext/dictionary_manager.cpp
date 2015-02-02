@@ -121,7 +121,7 @@ DictionaryManager::get_dictionary(const Language& language)
     {
       std::vector<std::string> files = filesystem->open_directory(*p);
 
-      std::string best_filename;
+      std::string best_filename = "";
       int best_score = 0;
 
       for(std::vector<std::string>::iterator filename = files.begin(); filename != files.end(); filename++)
@@ -130,7 +130,7 @@ DictionaryManager::get_dictionary(const Language& language)
         if (has_suffix(*filename, ".po"))
         { // ignore anything that isn't a .po file
 
-            Language po_language = Language::from_env(convertFilename2Language(*filename));
+          Language po_language = Language::from_env(convertFilename2Language(*filename));
 
           if (!po_language)
           {
@@ -194,7 +194,12 @@ DictionaryManager::get_languages()
     {
       if (has_suffix(*file, ".po"))
       {
-        languages.insert(Language::from_env(file->substr(0, file->size()-3)));
+        Language po_language = Language::from_env(file->substr(0, file->size()-3));
+
+        if (po_language)
+        {
+          languages.insert(po_language);
+        }
       }
     }
   }

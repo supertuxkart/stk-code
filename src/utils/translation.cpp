@@ -95,27 +95,22 @@ wchar_t* utf8_to_wide(const char* input)
 // ----------------------------------------------------------------------------
 Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
-
+    m_dictionary_manager.add_directory(
+                        file_manager->getAsset(FileManager::TRANSLATION,""));
+                        
     if (g_language_list.size() == 0)
     {
-        std::set<std::string> flist;
-        file_manager->listFiles(flist,
-                                file_manager->getAsset(FileManager::TRANSLATION,""));
-
+        std::set<Language> languages = m_dictionary_manager.get_languages();      
+        
         // English is always there but won't be found on file system
         g_language_list.push_back("en");
-
-        std::set<std::string>::iterator it;
-        for ( it=flist.begin() ; it != flist.end(); it++ )
+    
+        std::set<Language>::iterator it;
+        for (it = languages.begin(); it != languages.end(); it++)
         {
-            if (StringUtils::hasSuffix(*it, "po"))
-            {
-                g_language_list.push_back
-                    (m_dictionary_manager.convertFilename2Language(*it) );
-                // printf("Lang : <%s>\n", (*it).c_str());
-            }
-        }   // for it in flist
-    }   // if (g_language_list.size() == 0)
+            g_language_list.push_back((*it).str());
+        }
+    }
 
     // LC_ALL does not work, sscanf will then not always be able
     // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
@@ -148,9 +143,6 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
     textdomain (PACKAGE);
     */
-
-    m_dictionary_manager.add_directory(
-                        file_manager->getAsset(FileManager::TRANSLATION,""));
 
     /*
     const std::set<Language>& languages = m_dictionary_manager.get_languages();
