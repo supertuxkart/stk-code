@@ -57,8 +57,6 @@ public:
                                        bool start_right_now=true);
     void                    stopMusic();
     bool                    initialized() const { return m_initialized; }
-    void                    update(float dt)    {if(m_current_music)
-                                                     m_current_music->update(dt);      }
     void                    pauseMusic()        {if(m_current_music)
                                                      m_current_music->pauseMusic();    }
     void                    resumeMusic()       {if(m_current_music)
