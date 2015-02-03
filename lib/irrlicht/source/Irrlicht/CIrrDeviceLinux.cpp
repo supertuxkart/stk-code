@@ -11,6 +11,7 @@ extern bool GLContextDebugBit;
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/utsname.h>
 #include <time.h>
 #include "IEventReceiver.h"
