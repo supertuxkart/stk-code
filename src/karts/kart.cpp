@@ -19,7 +19,6 @@
 
 #include "karts/kart.hpp"
 #include "graphics/central_settings.hpp"
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/challenge_status.hpp"

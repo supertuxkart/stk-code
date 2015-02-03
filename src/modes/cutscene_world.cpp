@@ -19,7 +19,6 @@
 
 #include "animations/animation_base.hpp"
 #include "animations/three_d_animation.hpp"
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"

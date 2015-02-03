@@ -18,7 +18,6 @@
 
 #include "states_screens/grand_prix_win.hpp"
 
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"

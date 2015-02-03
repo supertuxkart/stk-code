@@ -21,7 +21,7 @@
 
 #include <math.h>
 
-#include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
