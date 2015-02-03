@@ -85,7 +85,9 @@ private:
     ALenum nb_channels;
 
     bool m_pausedMusic;
-    static const int m_buffer_size = 11025*4;//one full second of audio at 44100 samples per second
+
+    //one full second of audio at 44100 samples per second
+    static const int m_buffer_size = 11025*4;
 };
 
 #endif

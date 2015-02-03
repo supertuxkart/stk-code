@@ -19,6 +19,7 @@
 #ifndef HEADER_SFX_MANAGER_HPP
 #define HEADER_SFX_MANAGER_HPP
 
+#include "utils/can_be_deleted.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/synchronised.hpp"
@@ -38,7 +39,7 @@
   typedef unsigned int ALuint;
 #endif
 
-
+class MusicInformation;
 class SFXBase;
 class SFXBuffer;
 class XMLNode;
@@ -50,7 +51,7 @@ class XMLNode;
  *  on of the (shared) buffers from the sound manager.
  * \ingroup audio
  */
-class SFXManager : public NoCopy
+class SFXManager : public NoCopy, public CanBeDeleted
 {
 private:
     /** Singleton pointer. */
@@ -76,6 +77,10 @@ public:
         SFX_LOOP,
         SFX_LISTENER,
         SFX_UPDATE,
+        SFX_MUSIC_START,
+        SFX_MUSIC_STOP,
+        SFX_MUSIC_UPDATE,
+        SFX_MUSIC_WAITING,
         SFX_EXIT,
     };   // SFXCommands
 
@@ -108,10 +113,15 @@ private:
         LEAK_CHECK()
     public:
         /** The sound effect for which the command should be executed. */
-        SFXBase    *m_sfx;
+        SFXBase *m_sfx;
+
+        /** Stores music information for music commands. */
+        MusicInformation *m_music_information;
+
         /** The command to execute. */
         SFXCommands m_command;
-        /** Optional parameter for commands that need more input. */
+        /** Optional parameter for commands that need more input. Single
+         *  floating point values are stored in the X component. */
         Vec3        m_parameter;
         // --------------------------------------------------------------------
         SFXCommand(SFXCommands command, SFXBase *base)
@@ -119,6 +129,13 @@ private:
             m_command   = command;
             m_sfx       = base;
         }   // SFXCommand()
+        // --------------------------------------------------------------------
+        /** Constructor for music information commands. */
+        SFXCommand(SFXCommands command, MusicInformation *mi)
+        {
+            m_command           = command;
+            m_music_information = mi;
+        }   // SFXCommnd
         // --------------------------------------------------------------------
         SFXCommand(SFXCommands command, SFXBase *base, float parameter)
         {
@@ -187,6 +204,7 @@ public:
     void queue(SFXCommands command,  SFXBase *sfx=NULL);
     void queue(SFXCommands command,  SFXBase *sfx, float f);
     void queue(SFXCommands command,  SFXBase *sfx, const Vec3 &p);
+    void queue(SFXCommands command,  MusicInformation *mi);
     // ------------------------------------------------------------------------
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()

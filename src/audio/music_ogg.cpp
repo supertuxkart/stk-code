@@ -61,12 +61,14 @@ bool MusicOggStream::load(const std::string& filename)
 
     if(!m_oggFile)
     {
-        Log::error("MusicOgg", "Loading Music: %s failed (fopen returned NULL)\n", m_fileName.c_str());
+        Log::error("MusicOgg", "Loading Music: %s failed (fopen returned NULL)",
+                   m_fileName.c_str());
         return false;
     }
 
 #if defined( WIN32 ) || defined( WIN64 )
-    const int result = ov_open_callbacks((void *)m_oggFile, &m_oggStream, NULL, 0, OV_CALLBACKS_DEFAULT);
+    const int result = ov_open_callbacks((void *)m_oggFile, &m_oggStream, NULL,
+                                         0, OV_CALLBACKS_DEFAULT             );
 #else
     const int result = ov_open(m_oggFile, &m_oggStream, NULL, 0);
 #endif
@@ -98,7 +100,8 @@ bool MusicOggStream::load(const std::string& filename)
                 errorMessage = "Unknown Error";
         }
 
-        Log::error("MusicOgg", "Loading Music: %s failed : ov_open returned error code %i (%s)\n",
+        Log::error("MusicOgg", "Loading Music: %s failed : "
+                               "ov_open returned error code %i (%s)",
                m_fileName.c_str(), result, errorMessage);
         return false;
     }
@@ -359,7 +362,8 @@ bool MusicOggStream::check(const char* what)
 
     if (error != AL_NO_ERROR)
     {
-        Log::error("MusicOgg", "[MusicOggStream] OpenAL error at %s : %s (%i)\n", what, SFXManager::getErrorString(error).c_str(), error);
+        Log::error("MusicOgg", "OpenAL error at %s : %s (%i)", what,
+                  SFXManager::getErrorString(error).c_str(), error);
         return false;
     }
 

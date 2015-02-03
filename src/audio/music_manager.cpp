@@ -93,8 +93,6 @@ MusicManager::MusicManager()
 //-----------------------------------------------------------------------------
 MusicManager::~MusicManager()
 {
-    stopMusic();
-
     for(std::map<std::string,MusicInformation*>::iterator
         i=m_all_music.begin(); i!=m_all_music.end(); i++)
     {
@@ -185,16 +183,18 @@ void MusicManager::startMusic(MusicInformation* mi, bool start_right_now)
     if(!mi || !UserConfigParams::m_music || !m_initialized) return;
 
     mi->volumeMusic(m_masterGain);
-    if (start_right_now)
-        mi->startMusic();
-    else
-        mi->setMusicWaiting();
+    SFXManager::get()->queue(start_right_now ? SFXManager::SFX_MUSIC_START
+                                             : SFXManager::SFX_MUSIC_WAITING,
+                             mi);
 }   // startMusic
 
 //-----------------------------------------------------------------------------
+/** Queues a stop current music event for the audio thread.
+ */
 void MusicManager::stopMusic()
 {
-    if(m_current_music) m_current_music->stopMusic();
+    if (m_current_music)
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_STOP, m_current_music);
 }   // stopMusic
 
 //-----------------------------------------------------------------------------

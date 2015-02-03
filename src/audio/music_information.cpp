@@ -187,7 +187,7 @@ void MusicInformation::startMusic()
     if(StringUtils::getExtension(m_fast_filename)!="ogg")
     {
         Log::warn(
-                "Music file %s format not recognized, fast music is ignored\n",
+                "Music file %s format not recognized, fast music is ignored",
                 m_fast_filename.c_str());
         return;
     }
@@ -334,7 +334,8 @@ void MusicInformation::switchToFastMusic()
 
 bool MusicInformation::isPlaying() const
 {
-    return (m_normal_music != NULL && m_normal_music->isPlaying()) || (m_fast_music != NULL && m_fast_music->isPlaying());
+    return (m_normal_music != NULL && m_normal_music->isPlaying())  ||
+           (m_fast_music   != NULL && m_fast_music->isPlaying());
 }
 
 //-----------------------------------------------------------------------------

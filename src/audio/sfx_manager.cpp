@@ -202,6 +202,13 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 }   // queue (Vec3)
 
 //----------------------------------------------------------------------------
+void SFXManager::queue(SFXCommands command, MusicInformation *mi)
+{
+    SFXCommand *sfx_command = new SFXCommand(command, mi);
+    queueCommand(sfx_command);
+}   // queue(MusicInformation)
+
+//----------------------------------------------------------------------------
 /** Enqueues a command to the sfx queue threadsafe. Then signal the
  *  sfx manager to wake up.
  *  \param command Pointer to the command to queue up.
@@ -213,7 +220,7 @@ void SFXManager::queueCommand(SFXCommand *command)
         race_manager->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
     {
         if(command->m_command==SFX_POSITION || command->m_command==SFX_LOOP ||
-            command->m_command==SFX_PLAY   || command->m_command==SFX_SPEED    )
+           command->m_command==SFX_SPEED                                       )
         {
             delete command;
             static int count_messages = 0;
@@ -303,6 +310,12 @@ void* SFXManager::mainLoop(void *obj)
         case SFX_RESUME_ALL: me->reallyResumeAllNow();          break;
         case SFX_LISTENER:   me->reallyPositionListenerNow();   break;
         case SFX_UPDATE:     me->reallyUpdateNow(current);      break;
+        case SFX_MUSIC_START:
+                    current->m_music_information->startMusic(); break;
+        case SFX_MUSIC_STOP:
+                     current->m_music_information->stopMusic(); break;
+        case SFX_MUSIC_WAITING: 
+               current->m_music_information->setMusicWaiting(); break;
         default: assert("Not yet supported.");
         }
         delete current;
@@ -310,6 +323,11 @@ void* SFXManager::mainLoop(void *obj)
         me->m_sfx_commands.lock();
 
     }   // while
+
+    // Signal that the sfx manager can now be deleted.
+    // We signal this even before cleaning up memory, since there is no
+    // need to keep the user waiting for STK to exit.
+    me->setCanBeDeleted();
 
     // Clean up memory to avoid leak detection
     while(!me->m_sfx_commands.getData().empty())
@@ -449,7 +467,8 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
                                     const bool         load)
 {
 
-    SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, max_width, gain);
+    SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, 
+                                      max_width, gain);
 
     m_all_sfx_types[sfx_name] = buffer;
 
@@ -617,7 +636,7 @@ void SFXManager::reallyUpdateNow(SFXCommand *current)
 {
     assert(current->m_command==SFX_UPDATE);
     float dt = current->m_parameter.getX();
-    music_manager->update(dt);
+    music_manager->getCurrentMusic()->update(dt);
     m_all_sfx.lock();
     for (std::vector<SFXBase*>::iterator i =  m_all_sfx.getData().begin();
                                          i != m_all_sfx.getData().end(); i++)

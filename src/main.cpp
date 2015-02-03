@@ -1462,6 +1462,10 @@ static void cleanSuperTuxKart()
 
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
+
+    // Stop music (this request will go into the sfx manager queue, so it needs
+    // to be done before stopping the thread).
+    music_manager->stopMusic();
     SFXManager::get()->stopThread();
     irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
@@ -1479,8 +1483,6 @@ static void cleanSuperTuxKart()
     if(material_manager)        delete material_manager;
     if(history)                 delete history;
     ReplayRecorder::destroy();
-    SFXManager::destroy();
-    if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();
     PlayerManager::destroy();
     if(unlock_manager)          delete unlock_manager;
@@ -1506,6 +1508,16 @@ static void cleanSuperTuxKart()
         Log::info("Thread", "Request Manager not aborting in time, aborting.");
     }
     Online::RequestManager::deallocate();
+
+    if (!SFXManager::get()->waitForReadyToDeleted(2.0f))
+    {
+        Log::info("Thread", "SFXManager not stopping, exiting anyway.");
+    }
+    SFXManager::destroy();
+
+    // Music manager can not be deleted before the sfx thread is stopped
+    // (since sfx commands can contain music information).
+    delete music_manager;
 
     // The addons manager might still be called from a currenty running request
     // in the request manager, so it can not be deleted earlier.

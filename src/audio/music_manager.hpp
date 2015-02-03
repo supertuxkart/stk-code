@@ -56,7 +56,7 @@ public:
     void                    startMusic(MusicInformation* mi,
                                        bool start_right_now=true);
     void                    stopMusic();
-    bool                    initialized() const {return m_initialized;                 }
+    bool                    initialized() const { return m_initialized; }
     void                    update(float dt)    {if(m_current_music)
                                                      m_current_music->update(dt);      }
     void                    pauseMusic()        {if(m_current_music)
