@@ -22,6 +22,7 @@
 #include "audio/sfx_buffer.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "modes/world.hpp"
 #include "race/race_manager.hpp"
 
 #include <pthread.h>
@@ -230,7 +231,8 @@ void SFXManager::queue(SFXCommands command, MusicInformation *mi, float f)
 void SFXManager::queueCommand(SFXCommand *command)
 {
     m_sfx_commands.lock();
-    if(m_sfx_commands.getData().size() > 20*race_manager->getNumberOfKarts()+20 &&
+    if(World::getWorld() && 
+        m_sfx_commands.getData().size() > 20*race_manager->getNumberOfKarts()+20 &&
         race_manager->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
     {
         if(command->m_command==SFX_POSITION || command->m_command==SFX_LOOP ||
@@ -263,6 +265,7 @@ void SFXManager::stopThread()
     pthread_cond_signal(&m_cond_request);
 }   // stopThread
 
+#include "audio/sfx_openal.hpp"
 //----------------------------------------------------------------------------
 /** This loops runs in a different threads, and starts sfx to be played.
  *  This can sometimes take up to 5 ms, so it needs to be handled in a thread
@@ -323,7 +326,11 @@ void* SFXManager::mainLoop(void *obj)
         case SFX_LISTENER:   me->reallyPositionListenerNow();     break;
         case SFX_UPDATE:     me->reallyUpdateNow(current);        break;
         case SFX_MUSIC_START:
+        {
+            float gain = music_manager->getMasterMusicVolume();
+            current->m_music_information->volumeMusic(gain);
             current->m_music_information->startMusic();           break;
+        }
         case SFX_MUSIC_STOP:
             current->m_music_information->stopMusic();            break;
         case SFX_MUSIC_PAUSE:
@@ -344,13 +351,15 @@ void* SFXManager::mainLoop(void *obj)
         }
         case SFX_MUSIC_WAITING:
                current->m_music_information->setMusicWaiting();   break;
+        case SFX_MUSIC_VOLUME:
+        {
+            float gain = music_manager->getMasterMusicVolume();
+            current->m_music_information->volumeMusic(gain);
+        }
         default: assert("Not yet supported.");
         }
-        static SFXCommand *prev = NULL;
-        delete prev;
-        prev = current;
-        //delete current;
-        //current = NULL;
+        delete current;
+        current = NULL;
         me->m_sfx_commands.lock();
 
     }   // while

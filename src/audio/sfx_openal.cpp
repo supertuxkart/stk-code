@@ -174,6 +174,7 @@ void SFXOpenAL::reallySetSpeed(float factor)
         factor = 0.5f;
     }
     alSourcef(m_sound_source,AL_PITCH,factor);
+    SFXManager::checkError("setting speed");
 }   // reallySetSpeed
 
 //-----------------------------------------------------------------------------
@@ -415,7 +416,7 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
     alSource3f(m_sound_source, AL_POSITION, position.getX(),
                position.getY(), -position.getZ());
 
-    if (SFXManager::get()->getListenerPos().distance(position) 
+    if (SFXManager::get()->getListenerPos().distance(position)
         > m_sound_buffer->getMaxDist())
     {
         alSourcef(m_sound_source, AL_GAIN, 0);

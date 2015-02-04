@@ -189,7 +189,7 @@ bool MusicOggStream::playMusic()
     alSourcePlay(m_soundSource);
     m_pausedMusic = false;
     m_playing = true;
-
+    check("playMusic");
     return true;
 }   // playMusic
 
@@ -253,6 +253,7 @@ void MusicOggStream::volumeMusic(float gain)
     if (gain < 0.0f) gain = 0.0f;
 
     alSourcef(m_soundSource, AL_GAIN, gain);
+    check("volume music");   // clear errors
 } // volumeMusic
 
 //-----------------------------------------------------------------------------

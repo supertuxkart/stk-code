@@ -78,11 +78,10 @@ private:
     MusicInformation (const XMLNode *root, const std::string &filename);
 
     // Declare the following functions private, but allow the SFXManager 
-    // and music manager to access them. This makes sure that only the sfx thread calls
-    // openal/vorbis etc, and so makes it all thread safe.
+    // to access them. This makes sure that only the sfx thread calls
+    // openal/vorbis etc, and so makes it is all thread safe.
 private:
     friend class SFXManager;
-    friend class MusicManager;
     void   update(float dt);
     void   startMusic();
     void   stopMusic();

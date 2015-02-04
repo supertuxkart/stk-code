@@ -192,7 +192,6 @@ void MusicManager::startMusic(MusicInformation* mi, bool start_right_now)
 
     if(!mi || !UserConfigParams::m_music || !m_initialized) return;
 
-    mi->volumeMusic(m_master_gain);
     SFXManager::get()->queue(start_right_now ? SFXManager::SFX_MUSIC_START
                                              : SFXManager::SFX_MUSIC_WAITING,
                              mi);
@@ -269,7 +268,12 @@ void MusicManager::setMasterMusicVolume(float gain)
         gain = 0.0f;
 
     m_master_gain = gain;
-    if(m_current_music) m_current_music->volumeMusic(m_master_gain);
+    if (m_current_music)
+    {
+        // Sets the music volume to m_master_gain
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_VOLUME,
+                                 m_current_music);
+    }
 
     UserConfigParams::m_music_volume = m_master_gain;
 }   // setMasterMusicVolume
@@ -292,7 +296,7 @@ MusicInformation* MusicManager::getMusicInformation(const std::string& filename)
         MusicInformation *mi = MusicInformation::create(filename);
         if(mi)
         {
-            mi->volumeMusic(m_master_gain);
+            SFXManager::get()->queue(SFXManager::SFX_MUSIC_VOLUME, mi);
             m_all_music[basename] = mi;
         }
         return mi;
