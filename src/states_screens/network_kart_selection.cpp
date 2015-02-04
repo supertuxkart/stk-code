@@ -14,7 +14,6 @@
 #include "network/network_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
-static const char RANDOM_KART_ID[] = "randomkart";
 static const char ID_LOCKED[] = "locked/";
 
 using namespace GUIEngine;

@@ -73,12 +73,12 @@ u32 CGUIContextMenu::getItemCount() const
 //! Adds a menu item.
 u32 CGUIContextMenu::addItem(const wchar_t* text, s32 commandId, bool enabled, bool hasSubMenu, bool checked, bool autoChecking)
 {
-    return insertItem(Items.size(), text, commandId, enabled, hasSubMenu, checked, autoChecking);
+	return insertItem(Items.size(), text, commandId, enabled, hasSubMenu, checked, autoChecking);
 }
 
 //! Insert a menu item at specified position.
 u32 CGUIContextMenu::insertItem(u32 idx, const wchar_t* text, s32 commandId, bool enabled,
-    bool hasSubMenu, bool checked, bool autoChecking)
+	bool hasSubMenu, bool checked, bool autoChecking)
 {
 	SItem s;
 	s.Enabled = enabled;
@@ -96,16 +96,16 @@ u32 CGUIContextMenu::insertItem(u32 idx, const wchar_t* text, s32 commandId, boo
 		s.SubMenu->setVisible(false);
 	}
 
-    u32 result = idx;
-    if ( idx < Items.size() )
-    {
-        Items.insert(s, idx);
-    }
-    else
-    {
-        Items.push_back(s);
-        result = Items.size() - 1;
-    }
+	u32 result = idx;
+	if ( idx < Items.size() )
+	{
+		Items.insert(s, idx);
+	}
+	else
+	{
+		Items.push_back(s);
+		result = Items.size() - 1;
+	}
 
 	recalculateSize();
 	return result;
@@ -129,8 +129,8 @@ void CGUIContextMenu::setSubMenu(u32 index, CGUIContextMenu* menu)
 	if (index >= Items.size())
 		return;
 
-    if (menu)
-        menu->grab();
+	if (menu)
+		menu->grab();
 	if (Items[index].SubMenu)
 		Items[index].SubMenu->drop();
 
@@ -522,8 +522,6 @@ void CGUIContextMenu::draw()
 		recalculateSize();
 	}
 
-	IGUISpriteBank* sprites = skin->getSpriteBank();
-
 	core::rect<s32> rect = AbsoluteRect;
 	core::rect<s32>* clip = 0;
 
@@ -583,12 +581,14 @@ void CGUIContextMenu::draw()
 				font->draw(Items[i].Text.c_str(), rect,
 					skin->getColor(c), false, true, clip);
 
+
 			// draw submenu symbol
+			//IGUISpriteBank* sprites = skin->getSpriteBank();
 			//if (Items[i].SubMenu && sprites)
 			//{
 			//	core::rect<s32> r = rect;
 			//	r.UpperLeftCorner.X = r.LowerRightCorner.X - 15;
-            //
+			//
 			//	sprites->draw2DSprite(skin->getIcon(EGDI_CURSOR_RIGHT),
 			//		r.getCenter(), clip, skin->getColor(c),
 			//		(i == HighLighted) ? ChangeTime : 0,
@@ -667,19 +667,19 @@ void CGUIContextMenu::recalculateSize()
 			const s32 w = Items[i].SubMenu->getAbsolutePosition().getWidth();
 			const s32 h = Items[i].SubMenu->getAbsolutePosition().getHeight();
 
-            core::rect<s32> subRect(width-5, Items[i].PosY, width+w-5, Items[i].PosY+h);
+			core::rect<s32> subRect(width-5, Items[i].PosY, width+w-5, Items[i].PosY+h);
 
-            // if it would be drawn beyond the right border, then add it to the left side
-            gui::IGUIElement * root = Environment->getRootGUIElement();
-            if ( root )
-            {
-                core::rect<s32> rectRoot( root->getAbsolutePosition() );
-                if ( getAbsolutePosition().UpperLeftCorner.X+subRect.LowerRightCorner.X > rectRoot.LowerRightCorner.X )
-                {
-                    subRect.UpperLeftCorner.X = -w;
-                    subRect.LowerRightCorner.X = 0;
-                }
-            }
+			// if it would be drawn beyond the right border, then add it to the left side
+			gui::IGUIElement * root = Environment->getRootGUIElement();
+			if ( root )
+			{
+				core::rect<s32> rectRoot( root->getAbsolutePosition() );
+				if ( getAbsolutePosition().UpperLeftCorner.X+subRect.LowerRightCorner.X > rectRoot.LowerRightCorner.X )
+				{
+					subRect.UpperLeftCorner.X = -w;
+					subRect.LowerRightCorner.X = 0;
+				}
+			}
 
 			Items[i].SubMenu->setRelativePosition(subRect);
 		}

@@ -227,7 +227,7 @@ public:
                   { assert(false); return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
-    virtual void renderPlayerView(const AbstractKart *kart) {}
+    virtual void renderPlayerView(const Camera *camera, float dt) {}
 
     virtual void onUpdate(float dt) OVERRIDE;
 
