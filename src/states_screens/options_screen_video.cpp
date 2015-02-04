@@ -126,6 +126,23 @@ void OptionsScreenVideo::loadedFromFile()
 
 // ----------------------------------------------------------------------------
 
+struct SortResolutions
+{
+    bool operator()(GUIEngine::ItemDescription i1, GUIEngine::ItemDescription i2)
+    {
+        int w1 = -1, w2 = -1, h1 = -1, h2 = -1;
+        if (sscanf(i1.m_code_name.c_str(), "%ix%i", &w1, &h1) != 2 || w1 == -1 || h1 == -1 ||
+            sscanf(i2.m_code_name.c_str(), "%ix%i", &w2, &h2) != 2 || w2 == -1 || h2 == -1)
+        {
+            Log::error("OptionsScreenVideo", "Failed to decode resolution %s or %s",
+                i1.m_code_name.c_str(), i2.m_code_name.c_str());
+            return false;
+        }
+        return w1 < w2 || (w1 == w2 && h1 < h2);
+    }
+} sortResolutions;
+// ----------------------------------------------------------------------------
+
 void OptionsScreenVideo::init()
 {
     Screen::init();
@@ -306,6 +323,9 @@ void OptionsScreenVideo::init()
         {
             res->addItem(L"1024\u00D7768", "1024x768", "/gui/screen43.png");
         }
+
+        // Sort resolutions by size
+        res->sortItems(sortResolutions);
 
     } // end if not inited
 

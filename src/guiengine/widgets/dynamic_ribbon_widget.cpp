@@ -518,6 +518,7 @@ void DynamicRibbonWidget::clearItems()
     m_scroll_offset = 0;
     m_max_label_width = 0;
 }
+
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::elementRemoved()
 {
