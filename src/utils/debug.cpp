@@ -153,24 +153,14 @@ void addAttachment(Attachment::AttachmentType type)
  * nitro emitters) */
 LightNode* findNearestLight()
 {
-    World* world = World::getWorld();
-    if (!world) return NULL;
 
-    AbstractKart* player_kart = NULL;
-    for (unsigned int i = 0; i < world->getNumKarts(); i++)
-    {
-        AbstractKart *kart = world->getKart(i);
-        if (kart->getController()->isPlayerController())
-            player_kart = kart;
-    }
-
-    if (!player_kart)
-    {
-        Log::error("Debug", "No player kart found.");
+    Camera* camera = Camera::getActiveCamera();
+    if (camera == NULL) {
+        Log::error("[Debug Menu]", "No camera found.");
         return NULL;
     }
 
-    core::vector3df kart_pos = player_kart->getNode()->getAbsolutePosition();
+    core::vector3df cam_pos = camera->getCameraSceneNode()->getAbsolutePosition();
     LightNode* nearest = 0;
     float nearest_dist = 1000000.0; // big enough
     for (unsigned int i = 0; i < irr_driver->getLights().size(); i++)
@@ -182,10 +172,10 @@ LightNode* findNearestLight()
             continue;
 
         core::vector3df light_pos = light->getAbsolutePosition();
-        if ( kart_pos.getDistanceFrom(light_pos) < nearest_dist)
+        if ( cam_pos.getDistanceFrom(light_pos) < nearest_dist)
         {
             nearest      = irr_driver->getLights()[i];
-            nearest_dist = kart_pos.getDistanceFrom(light_pos);
+            nearest_dist = cam_pos.getDistanceFrom(light_pos);
         }
     }
 
