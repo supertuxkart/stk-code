@@ -515,9 +515,7 @@ void RaceResultGUI::determineTableLayout()
     if(m_distance_between_rows * num_karts > height)
         m_distance_between_rows = height / num_karts;
 
-    m_width_icon = table_area->m_h<600
-                 ? 27
-                 : (int)(40*(table_area->m_w/800.0f));
+    m_width_icon = table_area->m_h / 18;
 
     m_width_column_space  = 10;
 
@@ -1250,6 +1248,10 @@ void RaceResultGUI::displayHighScores()
 
         // prevent excessive long name
         unsigned int max_characters = 15;
+        unsigned int max_width = (UserConfigParams::m_width / 2 - 200) / 10;
+        if (max_width < 15)
+            max_characters = max_width;
+
         float time;
         for (int i = 0; i < scores->getNumberEntries(); i++)
         {
@@ -1267,7 +1269,7 @@ void RaceResultGUI::displayHighScores()
             }
 
             int current_x = x;
-            int current_y = y+(i+1)*50;
+            int current_y = y + (int) ((i + 1) * m_distance_between_rows * 1.5f);
 
             const KartProperties* prop = kart_properties_manager->getKart(kart_name);
             if (prop != NULL)
@@ -1298,7 +1300,7 @@ void RaceResultGUI::displayHighScores()
                 text_color,
                 false, false, NULL, true /* ignoreRTL */);
 
-            current_x += 180;
+            current_x = (int) (UserConfigParams::m_width * 0.85f);
 
             // Finally draw the time
             std::string time_string = StringUtils::timeToString(time);
