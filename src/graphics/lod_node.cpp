@@ -77,12 +77,7 @@ int LODNode::getLevel()
     Camera* camera = Camera::getActiveCamera();
     if (camera == NULL)
         return (int)m_detail.size() - 1;
-    AbstractKart* kart = camera->getKart();
-    // use kart position and not camera position when a kart is available,
-    // because for some effects the camera will be moved to various locations
-    // (for instance shadows), so using camera position for LOD may result
-    // in objects being culled when they shouldn't
-    const Vec3 &pos = (kart != NULL ? kart->getFrontXYZ() : camera->getCameraSceneNode()->getAbsolutePosition());
+    const Vec3 &pos = camera->getCameraSceneNode()->getAbsolutePosition();
 
     const int dist =
         (int)((m_nodes[0]->getAbsolutePosition()).getDistanceFromSQ(pos.toIrrVector() ));
