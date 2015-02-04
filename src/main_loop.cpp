@@ -40,8 +40,7 @@
 MainLoop* main_loop = 0;
 
 MainLoop::MainLoop() :
-m_abort(false),
-m_frame_count(0)
+m_abort(false)
 {
     m_curr_time = 0;
     m_prev_time = 0;

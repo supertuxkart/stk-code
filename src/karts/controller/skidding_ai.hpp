@@ -199,7 +199,7 @@ private:
     enum {PSA_DEFAULT, PSA_FIXED, PSA_NEW}
           m_point_selection_algorithm;
 
-#ifdef DEBUG
+#ifdef AI_DEBUG
     /** For skidding debugging: shows the estimated turn shape. */
     ShowCurve **m_curve;
 

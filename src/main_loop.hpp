@@ -31,7 +31,6 @@ private:
     bool m_abort;
     bool m_throttle_fps;
 
-    int      m_frame_count;
     Uint32   m_curr_time;
     Uint32   m_prev_time;
     float    getLimitedDt();

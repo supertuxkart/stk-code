@@ -240,7 +240,8 @@ public:
                             float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
-                            bool important=true) { }
+                            bool important=true,
+                            bool big_font=false) { }
 
     /** Should not be called anymore. */
     virtual void clearAllMessages() {assert(false); }

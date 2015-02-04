@@ -2281,7 +2281,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
 
             // If not giving power (forward or reverse gear), and speed is low
             // we are "parking" the kart, so in battle mode we can ambush people
-            if(abs(m_speed) < 5.0f)
+            if(std::abs(m_speed) < 5.0f)
                 m_vehicle->setAllBrakes(20.0f);
         }   // !m_brake
     }   // not accelerating

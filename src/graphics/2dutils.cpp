@@ -267,7 +267,6 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
 
     glUseProgram(UIShader::Primitive2DList::getInstance()->Program);
     UIShader::Primitive2DList::getInstance()->setUniforms();
-    const video::SOverrideMaterial &m = irr_driver->getVideoDriver()->getOverrideMaterial();
     compressTexture(tex, false);
     UIShader::Primitive2DList::getInstance()->SetTextureUnits(getTextureGLuint(tex));
     glDrawElements(GL_TRIANGLE_FAN, primitiveCount, GL_UNSIGNED_SHORT, 0);

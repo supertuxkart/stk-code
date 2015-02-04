@@ -43,7 +43,10 @@ namespace GUIEngine
         
         /** Current scroll offset. */
         float              m_scroll_offset;
-        
+
+        // Hide overloaded methods
+        using Widget::setText;
+
     public:
         
         LEAK_CHECK()

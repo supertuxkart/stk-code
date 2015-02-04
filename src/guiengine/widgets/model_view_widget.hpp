@@ -50,8 +50,6 @@ namespace GUIEngine
         AlignedArray<Vec3> m_model_scale;
         std::vector<int> m_model_frames;
         
-        video::ITexture* m_texture;
-        
         RTT* m_rtt_provider;
         
         float angle;

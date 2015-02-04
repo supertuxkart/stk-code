@@ -50,9 +50,6 @@ private:
     /** The current time used in the IPOs. */
     float m_current_time;
 
-    /** For cyclic animations: duration of the cycle. */
-    float m_cycle_length;
-
     /** The inital position of this object. */
     Vec3 m_initial_xyz;
 

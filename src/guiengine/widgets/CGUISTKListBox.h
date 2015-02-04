@@ -182,7 +182,6 @@ namespace irr
             gui::IGUISpriteBank* IconBank;
             gui::IGUIScrollBar* ScrollBar;
             u32 selectTime;
-            u32 LastKeyTime;
             core::stringw KeyBuffer;
             bool Selecting;
             bool DrawBack;

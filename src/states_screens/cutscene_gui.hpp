@@ -53,6 +53,8 @@ public:
     void setSubtitle(const core::stringw& subtitle) { m_subtitle = subtitle; }
 
     virtual void renderGlobal(float dt);
+    // Take functions of base class
+    using RaceGUIBase::renderPlayerView;
     virtual void renderPlayerView(const AbstractKart *kart);
 
     virtual const core::dimension2du getMiniMapSize() const OVERRIDE
