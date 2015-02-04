@@ -569,7 +569,7 @@ int ZEXPORT gzclose_w(file)
 #ifdef _WIN32
     if (_close(state->fd) == -1)
 #else
-    if (_close(state->fd) == -1)
+    if (close(state->fd) == -1)
 #endif
             ret = Z_ERRNO;
     free(state);

@@ -150,7 +150,7 @@ Referee::Referee()
 
     irr_driver->applyObjectPassShader(m_scene_node);
 
-    if (CVS->isGLSL() && UserConfigParams::m_dynamic_lights)
+    if (CVS->isGLSL() && CVS->isDefferedEnabled())
     {
         m_light = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.6f), 0.7f, 2.0f,
             0.7f /* r */, 0.0 /* g */, 0.0f /* b */, false /* sun */, m_scene_node);

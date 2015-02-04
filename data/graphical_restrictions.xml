@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <graphical-restrictions>
-  <card is="Intel(R) HD Graphics 3000" os="windows" disable="UniformBufferObject"/>
+  <card is="Intel(R) HD Graphics 3000" os="windows"                disable="UniformBufferObject"/>
+  <card is="Intel(R) HD Graphics 3000" os="windows"                disable="AdvancedPipeline"/>
   <card contains="Intel"                                           disable="TextureCompressionS3TC"/>
   <card contains="Intel"          os="windows"                     disable="HighDefinitionTextures"/>
   <card contains="NVIDIA"         os="windows"  version="<344.65"  disable="BufferStorage"/>
@@ -9,6 +10,9 @@
   <card contains="Mesa"           os="linux"    version="<10.3"    disable="BufferStorage"/>
   <card contains="Mesa"           os="linux"    version="<10.3"    disable="DriverRecentEnough"/>
   <card contains="Mesa"           os="linux"    version="<10.6"    disable="GeometryShader4"/>
+  <card contains="Gallium"        os="linux"    version="<10.3"    disable="BufferStorage"/>
+  <card contains="Gallium"        os="linux"    version="<10.3"    disable="DriverRecentEnough"/>
+  <card contains="Gallium"        os="linux"    version="<10.6"    disable="GeometryShader4"/>
   <card contains="Radeon"                       version="<14.300"  disable="DriverRecentEnough"/>
 </graphical-restrictions>
 

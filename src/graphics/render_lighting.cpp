@@ -228,12 +228,8 @@ void IrrDriver::renderSSAO()
 
 }
 
-void IrrDriver::renderLightsScatter(unsigned pointlightcount)
+void IrrDriver::renderAmbientScatter()
 {
-    getFBO(FBO_HALF1).Bind();
-    glClearColor(0., 0., 0., 0.);
-    glClear(GL_COLOR_BUFFER_BIT);
-
     const Track * const track = World::getWorld()->getTrack();
 
     // This function is only called once per frame - thus no need for setters.
@@ -252,6 +248,28 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
 
     FullScreenShader::FogShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
     DrawFullScreenEffect<FullScreenShader::FogShader>(1.f / (40.f * start), col);
+}
+
+void IrrDriver::renderLightsScatter(unsigned pointlightcount)
+{
+    getFBO(FBO_HALF1).Bind();
+    glClearColor(0., 0., 0., 0.);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    const Track * const track = World::getWorld()->getTrack();
+
+    // This function is only called once per frame - thus no need for setters.
+    float start = track->getFogStart() + .001f;
+    const video::SColor tmpcol = track->getFogColor();
+
+    core::vector3df col(tmpcol.getRed() / 255.0f,
+        tmpcol.getGreen() / 255.0f,
+        tmpcol.getBlue() / 255.0f);
+
+    glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
 
     glEnable(GL_DEPTH_TEST);
     core::vector3df col2(1., 1., 1.);

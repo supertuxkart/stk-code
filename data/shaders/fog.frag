@@ -10,7 +10,7 @@ vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
 void main()
 {
-    vec2 uv = 2. * gl_FragCoord.xy / screen;
+    vec2 uv = gl_FragCoord.xy / screen;
     float z = texture(tex, uv).x;
     vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
 

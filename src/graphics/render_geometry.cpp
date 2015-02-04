@@ -614,6 +614,9 @@ void IrrDriver::renderSolidSecondPass()
             glMakeTextureHandleResidentARB(DepthHandle);
     }
 
+    if (CVS->supportsIndirectInstancingRendering())
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
+
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS2));
 
@@ -800,7 +803,7 @@ void IrrDriver::renderTransparent()
     for (unsigned i = 0; i < BillBoardList::getInstance()->size(); i++)
         BillBoardList::getInstance()->at(i)->render();
 
-    if (!UserConfigParams::m_dynamic_lights)
+    if (!CVS->isDefferedEnabled())
         return;
 
     // Render displacement nodes

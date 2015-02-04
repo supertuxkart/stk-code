@@ -273,6 +273,11 @@ bool CentralVideoSettings::supportsIndirectInstancingRendering() const
 
 bool CentralVideoSettings::supportsComputeShadersFiltering() const
 {
+    return isARBBufferStorageUsable() && isARBImageLoadStoreUsable() && isARBComputeShaderUsable();
+}
+
+bool CentralVideoSettings::supportsAsyncInstanceUpload() const
+{
     return isARBBufferStorageUsable() && isARBImageLoadStoreUsable();
 }
 
@@ -307,4 +312,9 @@ bool CentralVideoSettings::isAZDOEnabled() const
 bool CentralVideoSettings::isESMEnabled() const
 {
     return UserConfigParams::m_esm;
+}
+
+bool CentralVideoSettings::isDefferedEnabled() const
+{
+    return UserConfigParams::m_dynamic_lights && !GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_ADVANCED_PIPELINE);
 }

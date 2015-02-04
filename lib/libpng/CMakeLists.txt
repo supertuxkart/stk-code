@@ -38,6 +38,11 @@ set(PNGLIB_RELEASE 9)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
+if(APPLE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
+endif()
+
 # needed packages
 find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIR})

@@ -1,5 +1,5 @@
 // Copyright (C) 2002-2012 Nikolaus Gebhardt
-// Copyright (C) 2014 Dawid Gan
+// Copyright (C) 2014-2015 Dawid Gan
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
@@ -11,6 +11,7 @@ extern bool GLContextDebugBit;
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/utsname.h>
 #include <time.h>
 #include "IEventReceiver.h"
@@ -58,7 +59,7 @@ namespace irr
 {
 	namespace video
 	{
-        extern bool useCoreContext;
+		extern bool useCoreContext;
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
 	}
@@ -500,7 +501,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 {
 	GLXContext Context;
-    irr::video::useCoreContext = true;
+	irr::video::useCoreContext = true;
 	int core43ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
@@ -509,13 +510,13 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
-    int core43ctx[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-        None
-    };
+	int core43ctx[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		None
+	};
 	int core33ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
@@ -524,21 +525,21 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
-    int core33ctx[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-        None
-    };
-    int core31ctxdebug[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 1,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-        GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-        None
-    };
+	int core33ctx[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		None
+	};
+	int core31ctxdebug[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+		None
+	};
 	int core31ctx[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
@@ -557,30 +558,30 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
   
 	// create core 4.3 context
-    os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
+	os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
 	// create core 3.3 context
-    os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
+	os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
 	// create core 3.1 context (for older mesa)
-    os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
+	os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
 	if (!XErrorSignaled)
 		return Context;
 
 	XErrorSignaled = false;
-    irr::video::useCoreContext = false;
+	irr::video::useCoreContext = false;
 	// fall back to legacy context
-    os::Printer::log("Creating legacy OpenGL 2.1 context...", ELL_INFORMATION);
-    Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
+	os::Printer::log("Creating legacy OpenGL 2.1 context...", ELL_INFORMATION);
+	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
 
@@ -2042,7 +2043,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 
 		ActiveJoysticks.push_back(info);
 
-        returnInfo.HasGenericName = false;
+		returnInfo.HasGenericName = false;
 		returnInfo.Joystick = joystick;
 		returnInfo.PovHat = SJoystickInfo::POV_HAT_UNKNOWN;
 		returnInfo.Axes = info.axes;
@@ -2218,47 +2219,59 @@ bool CIrrDeviceLinux::getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &bright
 const c8* CIrrDeviceLinux::getTextFromClipboard() const
 {
 #if defined(_IRR_COMPILE_WITH_X11_)
-	Window ownerWindow = XGetSelectionOwner (display, X_ATOM_CLIPBOARD);
-	if ( ownerWindow ==  window )
+	if (X_ATOM_CLIPBOARD == None) 
+	{
+		os::Printer::log("Couldn't access X clipboard", ELL_WARNING);
+		return 0;
+	}
+	
+	Window ownerWindow = XGetSelectionOwner(display, X_ATOM_CLIPBOARD);
+	if (ownerWindow == window)
 	{
 		return Clipboard.c_str();
 	}
+
 	Clipboard = "";
-	if (ownerWindow != None )
+
+	if (ownerWindow == None)
+		return 0;
+
+	Atom selection = XInternAtom(display, "IRR_SELECTION", False);
+	XConvertSelection(display, X_ATOM_CLIPBOARD, XA_STRING, selection, window, CurrentTime);
+	
+	const int SELECTION_RETRIES = 500;
+	int i = 0;
+	for (i = 0; i < SELECTION_RETRIES; i++)
 	{
-		XConvertSelection (display, X_ATOM_CLIPBOARD, XA_STRING, None, ownerWindow, CurrentTime);
-		XFlush (display);
+		XEvent xevent;
+		bool res = XCheckTypedWindowEvent(display, window, SelectionNotify, &xevent);
+		
+		if (res && xevent.xselection.selection == X_ATOM_CLIPBOARD) 
+			break;
 
-		// check for data
-		Atom type;
-		int format;
-		unsigned long numItems, bytesLeft, dummy;
-		unsigned char *data;
-		XGetWindowProperty (display, ownerWindow,
-				XA_STRING, // property name
-				0, // offset
-				0, // length (we only check for data, so 0)
-				0, // Delete 0==false
-				AnyPropertyType, // AnyPropertyType or property identifier
-				&type, // return type
-				&format, // return format
-				&numItems, // number items
-				&bytesLeft, // remaining bytes for partial reads
-				&data); // data
-		if ( bytesLeft > 0 )
-		{
-			// there is some data to get
-			int result = XGetWindowProperty (display, ownerWindow, XA_STRING, 0,
-										bytesLeft, 0, AnyPropertyType, &type, &format,
-										&numItems, &dummy, &data);
-			if (result == Success)
-				Clipboard = (irr::c8*)data;
-			XFree (data);
-		}
+		usleep(1000);
 	}
+	
+	if (i == SELECTION_RETRIES)
+	{
+		os::Printer::log("Timed out waiting for SelectionNotify event", ELL_WARNING);
+		return 0;
+	}
+	
+	Atom type;
+	int format;
+	unsigned long numItems, dummy;
+	unsigned char *data;
 
+	int result = XGetWindowProperty(display, window, selection, 0, INT_MAX/4, 
+									False, AnyPropertyType, &type, &format, 
+									&numItems, &dummy, &data);
+
+	if (result == Success)
+		Clipboard = (irr::c8*)data;
+		
+	XFree (data);
 	return Clipboard.c_str();
-
 #else
 	return 0;
 #endif

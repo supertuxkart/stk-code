@@ -14,6 +14,7 @@
 #include "tracks/track.hpp"
 #include "lod_node.hpp"
 #include "utils/profiler.hpp"
+#include "utils/time.hpp"
 
 #include <ISceneManager.h>
 #include <ISceneNode.h>
@@ -484,7 +485,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
 }
 
 static void
-parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::ISceneNode *> *ImmediateDraw,
+parseSceneManager(core::list<scene::ISceneNode*> &List, std::vector<scene::ISceneNode *> *ImmediateDraw,
     const scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadow_cam[4], const scene::ICameraSceneNode *rsmcam,
     bool culledforcam, bool culledforshadowcam[4], bool culledforrsm, bool drawRSM)
 {
@@ -517,7 +518,7 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
 
         handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm, drawRSM);
 
-        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm, drawRSM);
+        parseSceneManager(const_cast<core::list<scene::ISceneNode*>& >((*I)->getChildren()), ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm, drawRSM);
     }
 }
 
@@ -590,8 +591,14 @@ PROFILER_POP_CPU_MARKER();
     if (!m_sync)
         m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     PROFILER_PUSH_CPU_MARKER("- Sync Stall", 0xFF, 0x0, 0x0);
-    GLenum reason;
-    do { reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0); if (reason == GL_WAIT_FAILED) break; } while (reason != GL_ALREADY_SIGNALED);
+    GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
+
+    while (reason != GL_ALREADY_SIGNALED)
+    {
+        if (reason == GL_WAIT_FAILED) break;
+        StkTime::sleep(1);
+        reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
+    }
     glDeleteSync(m_sync);
     PROFILER_POP_CPU_MARKER();
     /*    switch (reason)
@@ -627,7 +634,7 @@ PROFILER_POP_CPU_MARKER();
     DrawElementsIndirectCommand *RSMCmdBuffer;
     DrawElementsIndirectCommand *GlowCmdBuffer;
 
-    if (CVS->isARBBufferStorageUsable())
+    if (CVS->supportsAsyncInstanceUpload())
     {
         InstanceBufferDualTex = (InstanceDataDualTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeDualTex);
         InstanceBufferThreeTex = (InstanceDataThreeTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeThreeTex);
@@ -660,7 +667,7 @@ PROFILER_POP_CPU_MARKER();
 #pragma omp section
         {
             size_t offset = 0, current_cmd = 0;
-            if (!CVS->isARBBufferStorageUsable())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeDualTex));
                 InstanceBufferDualTex = (InstanceDataDualTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
@@ -690,7 +697,7 @@ PROFILER_POP_CPU_MARKER();
             FillInstances(MeshForSolidPass[Material::SHADERTYPE_VEGETATION], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_VEGETATION] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_VEGETATION];
 
-            if (!CVS->isARBBufferStorageUsable())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeThreeTex));
@@ -708,7 +715,7 @@ PROFILER_POP_CPU_MARKER();
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_NORMAL_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP];
 
 
-            if (!CVS->isARBBufferStorageUsable())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -718,7 +725,7 @@ PROFILER_POP_CPU_MARKER();
         {
             size_t offset = 0, current_cmd = 0;
 
-            if (!CVS->isARBBufferStorageUsable())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeGlow));
                 GlowInstanceBuffer = (GlowInstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
@@ -742,7 +749,7 @@ PROFILER_POP_CPU_MARKER();
             if (CVS->isAZDOEnabled())
                 GlowPassCmd::getInstance()->Size = current_cmd - GlowPassCmd::getInstance()->Offset;
 
-            if (!CVS->isARBBufferStorageUsable())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -753,7 +760,7 @@ PROFILER_POP_CPU_MARKER();
             irr_driver->setPhase(SHADOW_PASS);
 
             size_t offset = 0, current_cmd = 0;
-            if (!CVS->isARBBufferStorageUsable())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeShadow));
                 ShadowInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
@@ -778,7 +785,7 @@ PROFILER_POP_CPU_MARKER();
                 // Mat Grass
                 GenDrawCalls<Material::SHADERTYPE_VEGETATION>(i, ListInstancedMatGrass::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
             }
-            if (!CVS->isARBBufferStorageUsable())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -788,7 +795,7 @@ PROFILER_POP_CPU_MARKER();
         if (!m_rsm_map_available)
         {
             size_t offset = 0, current_cmd = 0;
-            if (!CVS->isARBBufferStorageUsable())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeRSM));
                 RSMInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
@@ -817,7 +824,7 @@ PROFILER_POP_CPU_MARKER();
             FillInstances(MeshForRSM[Material::SHADERTYPE_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_NORMAL_MAP] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP];
 
-            if (!CVS->isARBBufferStorageUsable())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -828,6 +835,6 @@ PROFILER_POP_CPU_MARKER();
     poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += SolidPoly;
     poly_count[SHADOW_PASS] += ShadowPoly;
 
-    if (CVS->isARBBufferStorageUsable())
+    if (CVS->supportsAsyncInstanceUpload())
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 }

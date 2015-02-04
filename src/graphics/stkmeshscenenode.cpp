@@ -294,7 +294,7 @@ void STKMeshSceneNode::render()
         AbsoluteTransformation.getInverse(invmodel);
 
         glDisable(GL_CULL_FACE);
-        if (update_each_frame && !UserConfigParams::m_dynamic_lights)
+        if (update_each_frame && !CVS->isDefferedEnabled())
             updatevbo();
         glUseProgram(MeshShader::ObjectPass2Shader::getInstance()->Program);
         // Only untextured

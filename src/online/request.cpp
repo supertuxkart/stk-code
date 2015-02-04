@@ -61,13 +61,13 @@ namespace Online
     {
         assert(isBusy());
         // Abort as early as possible if abort is requested
-        if(RequestManager::get()->getAbort()) return;
+        if (RequestManager::get()->getAbort() && isAbortable()) return;
         prepareOperation();
-        if(RequestManager::get()->getAbort()) return;
+        if (RequestManager::get()->getAbort() && isAbortable()) return;
         operation();
-        if(RequestManager::get()->getAbort()) return;
+        if (RequestManager::get()->getAbort() && isAbortable()) return;
         setExecuted();
-        if(RequestManager::get()->getAbort()) return;
+        if (RequestManager::get()->getAbort() && isAbortable()) return;
         afterOperation();
     }   // execute
 
