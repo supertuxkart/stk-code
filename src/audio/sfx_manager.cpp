@@ -202,9 +202,23 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 }   // queue (Vec3)
 
 //----------------------------------------------------------------------------
+/** Queues a command for the music manager.
+ *  \param mi The music for which the command is.
+ */
 void SFXManager::queue(SFXCommands command, MusicInformation *mi)
 {
     SFXCommand *sfx_command = new SFXCommand(command, mi);
+    queueCommand(sfx_command);
+}   // queue(MusicInformation)
+//----------------------------------------------------------------------------
+/** Queues a command for the music manager that takes a floating point value
+ *  (e.g. setTemporaryVolume).
+ *  \param mi The music for which the command is.
+ *  \param f The floating point parameter.
+ */
+void SFXManager::queue(SFXCommands command, MusicInformation *mi, float f)
+{
+    SFXCommand *sfx_command = new SFXCommand(command, mi, f);
     queueCommand(sfx_command);
 }   // queue(MusicInformation)
 
@@ -286,40 +300,57 @@ void* SFXManager::mainLoop(void *obj)
             break;
         }
         me->m_sfx_commands.unlock();
-        switch(current->m_command)
+        switch (current->m_command)
         {
-        case SFX_PLAY:     current->m_sfx->reallyPlayNow();     break;
-        case SFX_STOP:     current->m_sfx->reallyStopNow();     break;
-        case SFX_PAUSE:    current->m_sfx->reallyPauseNow();    break;
-        case SFX_RESUME:   current->m_sfx->reallyResumeNow();   break;
+        case SFX_PLAY:     current->m_sfx->reallyPlayNow();       break;
+        case SFX_STOP:     current->m_sfx->reallyStopNow();       break;
+        case SFX_PAUSE:    current->m_sfx->reallyPauseNow();      break;
+        case SFX_RESUME:   current->m_sfx->reallyResumeNow();     break;
         case SFX_SPEED:    current->m_sfx->reallySetSpeed(
-                                  current->m_parameter.getX()); break;
+            current->m_parameter.getX());   break;
         case SFX_POSITION: current->m_sfx->reallySetPosition(
-                                         current->m_parameter); break;
+            current->m_parameter);   break;
         case SFX_VOLUME:   current->m_sfx->reallySetVolume(
-                                  current->m_parameter.getX()); break;
-        case SFX_MASTER_VOLUME: 
-                           current->m_sfx->reallySetMasterVolumeNow(
-                                  current->m_parameter.getX()); break;
+            current->m_parameter.getX());   break;
+        case SFX_MASTER_VOLUME:
+            current->m_sfx->reallySetMasterVolumeNow(
+                current->m_parameter.getX());   break;
         case SFX_LOOP:     current->m_sfx->reallySetLoop(
-                               current->m_parameter.getX()!=0); break;
-        case SFX_DELETE:   {
-                              me->deleteSFX(current->m_sfx);    break;
-                           }
-        case SFX_PAUSE_ALL:  me->reallyPauseAllNow();           break;
-        case SFX_RESUME_ALL: me->reallyResumeAllNow();          break;
-        case SFX_LISTENER:   me->reallyPositionListenerNow();   break;
-        case SFX_UPDATE:     me->reallyUpdateNow(current);      break;
+            current->m_parameter.getX() != 0);   break;
+        case SFX_DELETE:     me->deleteSFX(current->m_sfx);       break;
+        case SFX_PAUSE_ALL:  me->reallyPauseAllNow();             break;
+        case SFX_RESUME_ALL: me->reallyResumeAllNow();            break;
+        case SFX_LISTENER:   me->reallyPositionListenerNow();     break;
+        case SFX_UPDATE:     me->reallyUpdateNow(current);        break;
         case SFX_MUSIC_START:
-                    current->m_music_information->startMusic(); break;
+            current->m_music_information->startMusic();           break;
         case SFX_MUSIC_STOP:
-                     current->m_music_information->stopMusic(); break;
-        case SFX_MUSIC_WAITING: 
-               current->m_music_information->setMusicWaiting(); break;
+            current->m_music_information->stopMusic();            break;
+        case SFX_MUSIC_PAUSE:
+            current->m_music_information->pauseMusic();           break;
+        case SFX_MUSIC_RESUME:
+            current->m_music_information->resumeMusic();          break;
+        case SFX_MUSIC_SWITCH_FAST:
+            current->m_music_information->switchToFastMusic();    break;
+        case SFX_MUSIC_SET_TMP_VOLUME:
+        {
+            MusicInformation *mi = current->m_music_information;
+            mi->setTemporaryVolume(current->m_parameter.getX());  break;
+        }
+        case SFX_MUSIC_RESET_TMP_VOLUME:
+        {
+            MusicInformation *mi = current->m_music_information;
+            mi->resetTemporaryVolume();                           break;
+        }
+        case SFX_MUSIC_WAITING:
+               current->m_music_information->setMusicWaiting();   break;
         default: assert("Not yet supported.");
         }
-        delete current;
-        current = NULL;
+        static SFXCommand *prev = NULL;
+        delete prev;
+        prev = current;
+        //delete current;
+        //current = NULL;
         me->m_sfx_commands.lock();
 
     }   // while
@@ -622,7 +653,7 @@ void SFXManager::deleteSFXMapping(const std::string &name)
  */
 void SFXManager::update(float dt)
 {
-    queue(SFX_UPDATE, NULL, dt);
+    queue(SFX_UPDATE, (SFXBase*)NULL, dt);
     // Wake up the sfx thread to handle all queued up audio commands.
     pthread_cond_signal(&m_cond_request);
 }   // update

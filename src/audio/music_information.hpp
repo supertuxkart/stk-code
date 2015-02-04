@@ -76,6 +76,30 @@ private:
     // The constructor is private so that the
     // static create function must be used.
     MusicInformation (const XMLNode *root, const std::string &filename);
+
+    // Declare the following functions private, but allow the SFXManager 
+    // and music manager to access them. This makes sure that only the sfx thread calls
+    // openal/vorbis etc, and so makes it all thread safe.
+private:
+    friend class SFXManager;
+    friend class MusicManager;
+    void   update(float dt);
+    void   startMusic();
+    void   stopMusic();
+    void   pauseMusic();
+    void   resumeMusic();
+    void   volumeMusic(float gain);
+    void   switchToFastMusic();
+    void   setTemporaryVolume(float gain);
+    // ------------------------------------------------------------------------
+    /** Resets a temporary volume change. */
+    void   resetTemporaryVolume() { volumeMusic(m_adjusted_gain); }
+    // ------------------------------------------------------------------------
+    /** Sets the music to be waiting, i.e. startMusic still needs to be
+    *  called. Used to pre-load track music during track loading time. */
+    void setMusicWaiting() { m_music_waiting = true; }
+    // ------------------------------------------------------------------------
+
 public:
     LEAK_CHECK()
 
@@ -85,14 +109,6 @@ public:
                       ~MusicInformation ();
     static MusicInformation *create(const std::string &filename);
     void               addMusicToTracks();
-    void               update(float dt);
-    void               startMusic();
-    void               stopMusic();
-    void               pauseMusic();
-    void               resumeMusic();
-    void               volumeMusic(float gain);
-    void               setTemporaryVolume(float gain);
-    void               switchToFastMusic();
     bool               isPlaying() const;
 
     // ------------------------------------------------------------------------
@@ -109,13 +125,6 @@ public:
     const std::string& getFastFilename() const { return m_fast_filename; }
     // ------------------------------------------------------------------------
     float getMaxPitch() const { return m_max_pitch; }
-    // ------------------------------------------------------------------------
-    /** Sets the music to be waiting, i.e. startMusic still needs to be
-     *  called. Used to pre-load track music during track loading time. */
-    void setMusicWaiting  () {m_music_waiting = true;}
-    // ------------------------------------------------------------------------
-    /** Resets a temporary volume change. */
-    void resetTemporaryVolume() { volumeMusic(m_adjusted_gain); }
 
 };   // MusicInformation
 #endif

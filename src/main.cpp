@@ -1516,7 +1516,8 @@ static void cleanSuperTuxKart()
     SFXManager::destroy();
 
     // Music manager can not be deleted before the sfx thread is stopped
-    // (since sfx commands can contain music information).
+    // (since sfx commands can contain music information, which are
+    // deleted by the music manager).
     delete music_manager;
 
     // The addons manager might still be called from a currenty running request

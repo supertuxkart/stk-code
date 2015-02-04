@@ -157,8 +157,7 @@ void LinearWorld::update(float dt)
     if (m_last_lap_sfx_playing &&
         m_last_lap_sfx->getStatus() != SFXBase::SFX_PLAYING)
     {
-        if(music_manager->getCurrentMusic())
-            music_manager->getCurrentMusic()->resetTemporaryVolume();
+        music_manager->resetTemporaryVolume();
         m_last_lap_sfx_playing = false;
     }
 
@@ -288,7 +287,7 @@ void LinearWorld::newLap(unsigned int kart_index)
                 if(music_manager->getCurrentMusic() &&
                     music_manager->getMasterMusicVolume() > 0.2f)
                 {
-                    music_manager->getCurrentMusic()->setTemporaryVolume(0.2f);
+                    music_manager->setTemporaryVolume(0.2f);
                 }
             }
             else

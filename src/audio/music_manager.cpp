@@ -160,6 +160,16 @@ void MusicManager::addMusicToTracks()
 }   // addMusicToTracks
 
 //-----------------------------------------------------------------------------
+/** Special shortcut vor overworld (which skips other phases where the music
+ *  would normally be started.
+ */
+void MusicManager::startMusic()
+{
+    if (m_current_music)
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_START, m_current_music);
+}   // startMusic
+
+//-----------------------------------------------------------------------------
 /** Schedules the indicated music to be played next.
  *  \param mi Music information of the music to be played.
  *  \param start_right_now 
@@ -182,7 +192,7 @@ void MusicManager::startMusic(MusicInformation* mi, bool start_right_now)
 
     if(!mi || !UserConfigParams::m_music || !m_initialized) return;
 
-    mi->volumeMusic(m_masterGain);
+    mi->volumeMusic(m_master_gain);
     SFXManager::get()->queue(start_right_now ? SFXManager::SFX_MUSIC_START
                                              : SFXManager::SFX_MUSIC_WAITING,
                              mi);
@@ -198,6 +208,59 @@ void MusicManager::stopMusic()
 }   // stopMusic
 
 //-----------------------------------------------------------------------------
+/** Insert a command into the sfx queue to pause the current music.
+ */
+void MusicManager::pauseMusic()
+{
+    if (m_current_music)
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_PAUSE, m_current_music);
+}   // pauseMusic
+
+//-----------------------------------------------------------------------------
+/** Inserts a resume current music event into the queue.
+ */
+void MusicManager::resumeMusic()
+{
+    if (m_current_music)
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_RESUME, m_current_music);
+}   // resumeMusic
+
+//-----------------------------------------------------------------------------
+/** Switches to fast (last lap ) music (if defined for the current music).
+ */
+void MusicManager::switchToFastMusic()
+{
+    if (m_current_music)
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_SWITCH_FAST,
+                                m_current_music);
+}   // switchToFastMusic
+
+//-----------------------------------------------------------------------------
+/** Queues a command to temporarily change the volume. This is used to make
+ *  the music a bit quieter while the 'last lap fanfare' is being played.
+ *  \param gain The temporary volume value.
+ */
+void MusicManager::setTemporaryVolume(float gain)
+{
+    if (m_current_music)
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_SET_TMP_VOLUME, 
+                                 m_current_music, gain);
+}   // setTemporaryVolume
+
+//-----------------------------------------------------------------------------
+/** Queues a command for the sfx manager to reset a temporary volume change.
+ */
+void MusicManager::resetTemporaryVolume()
+{
+    if (m_current_music)
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_RESET_TMP_VOLUME,
+                                 m_current_music);
+}   // resetTemporaryVolume
+
+//-----------------------------------------------------------------------------
+/** Sets the master music volume.
+ *  \param gain The volume.
+ */
 void MusicManager::setMasterMusicVolume(float gain)
 {
     if(gain > 1.0)
@@ -205,15 +268,15 @@ void MusicManager::setMasterMusicVolume(float gain)
     if(gain < 0.0f)
         gain = 0.0f;
 
-    m_masterGain = gain;
-    if(m_current_music) m_current_music->volumeMusic(m_masterGain);
+    m_master_gain = gain;
+    if(m_current_music) m_current_music->volumeMusic(m_master_gain);
 
-    UserConfigParams::m_music_volume = m_masterGain;
+    UserConfigParams::m_music_volume = m_master_gain;
 }   // setMasterMusicVolume
 
 //-----------------------------------------------------------------------------
-/**
- */
+/** @throw runtime_error if the music file could not be found/opened
+*/
 MusicInformation* MusicManager::getMusicInformation(const std::string& filename)
 {
     if(filename=="")
@@ -229,7 +292,7 @@ MusicInformation* MusicManager::getMusicInformation(const std::string& filename)
         MusicInformation *mi = MusicInformation::create(filename);
         if(mi)
         {
-            mi->volumeMusic(m_masterGain);
+            mi->volumeMusic(m_master_gain);
             m_all_music[basename] = mi;
         }
         return mi;

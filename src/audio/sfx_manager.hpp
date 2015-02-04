@@ -79,7 +79,11 @@ public:
         SFX_UPDATE,
         SFX_MUSIC_START,
         SFX_MUSIC_STOP,
-        SFX_MUSIC_UPDATE,
+        SFX_MUSIC_PAUSE,
+        SFX_MUSIC_RESUME,
+        SFX_MUSIC_SWITCH_FAST,
+        SFX_MUSIC_SET_TMP_VOLUME,
+        SFX_MUSIC_RESET_TMP_VOLUME,
         SFX_MUSIC_WAITING,
         SFX_EXIT,
     };   // SFXCommands
@@ -135,7 +139,16 @@ private:
         {
             m_command           = command;
             m_music_information = mi;
-        }   // SFXCommnd
+        }   // SFXCommnd(MusicInformation*)
+        // --------------------------------------------------------------------
+        /** Constructor for music information commands that take a floating
+         *  point parameter (which is stored in the X value of m_parameter). */
+        SFXCommand(SFXCommands command, MusicInformation *mi, float f)
+        {
+            m_command = command;
+            m_parameter.setX(f);
+            m_music_information = mi;
+        }   // SFXCommnd(MusicInformation *, float)
         // --------------------------------------------------------------------
         SFXCommand(SFXCommands command, SFXBase *base, float parameter)
         {
@@ -205,6 +218,7 @@ public:
     void queue(SFXCommands command,  SFXBase *sfx, float f);
     void queue(SFXCommands command,  SFXBase *sfx, const Vec3 &p);
     void queue(SFXCommands command,  MusicInformation *mi);
+    void queue(SFXCommands command, MusicInformation *mi, float f);
     // ------------------------------------------------------------------------
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()
