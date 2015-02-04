@@ -26,7 +26,6 @@ namespace irr
     namespace scene { class IMesh; }
 }
 
-#include "audio/sfx_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "utils/no_copy.hpp"
 
