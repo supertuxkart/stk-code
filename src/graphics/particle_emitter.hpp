@@ -76,6 +76,8 @@ private:
 
     bool m_randomize_initial_y;
 
+    bool m_important;
+
 public:
 
     LEAK_CHECK()
@@ -83,7 +85,8 @@ public:
     ParticleEmitter             (const ParticleKind* type,
                                  const Vec3 &position,
                                  scene::ISceneNode* parent = NULL,
-                                 bool randomize_initial_y =  false);
+                                 bool randomize_initial_y =  false,
+                                 bool important = false);
     virtual     ~ParticleEmitter();
     virtual void update         (float dt);
     void         setCreationRateAbsolute(float fraction);

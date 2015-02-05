@@ -217,6 +217,7 @@ private:
     SFXBase      *m_goo_sound;
     SFXBase      *m_boing_sound;
     float         m_time_last_crash;
+    RaceManager::KartType m_type;
 
     /** To prevent using nitro in too short bursts */
     float         m_min_nitro_time;
@@ -358,6 +359,8 @@ public:
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values) - non-const. */
     virtual Skidding *getSkidding() { return m_skidding; }
+    // ------------------------------------------------------------------------
+    virtual RaceManager::KartType getType() const { return m_type; }
     // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
     virtual btKart    *getVehicle() const {return m_vehicle;               }

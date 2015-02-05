@@ -288,7 +288,8 @@ public:
 ParticleEmitter::ParticleEmitter(const ParticleKind* type,
                                  const Vec3 &position,
                                  scene::ISceneNode* parent,
-                                 bool randomize_initial_y)
+                                 bool randomize_initial_y,
+                                 bool important)
                : m_position(position)
 {
     assert(type != NULL);
@@ -300,6 +301,7 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_emission_decay_rate = 0;
     m_is_glsl = CVS->isGLSL();
     m_randomize_initial_y = randomize_initial_y;
+    m_important = important;
 
 
     setParticleType(type);

@@ -132,6 +132,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
     m_nitro_light          = NULL;
+    m_type                 = RaceManager::KT_AI;
 
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
@@ -178,6 +179,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 */
 void Kart::init(RaceManager::KartType type)
 {
+    m_type = type;
+
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
     {
