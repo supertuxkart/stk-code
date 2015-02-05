@@ -301,8 +301,10 @@ void MusicInformation::resumeMusic()
 void MusicInformation::volumeMusic(float gain)
 {
     m_adjusted_gain = m_gain * gain;
-    if (m_normal_music != NULL) m_normal_music->volumeMusic(m_adjusted_gain);
-    if (m_fast_music   != NULL) m_fast_music->volumeMusic(m_adjusted_gain);
+    if (m_normal_music && m_normal_music->isPlaying())
+        m_normal_music->volumeMusic(m_adjusted_gain);
+    if (m_fast_music && m_fast_music->isPlaying())
+        m_fast_music->volumeMusic(m_adjusted_gain);
 } // volumeMusic
 
 //-----------------------------------------------------------------------------
