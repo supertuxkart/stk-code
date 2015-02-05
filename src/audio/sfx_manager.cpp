@@ -265,7 +265,6 @@ void SFXManager::stopThread()
     pthread_cond_signal(&m_cond_request);
 }   // stopThread
 
-#include "audio/sfx_openal.hpp"
 //----------------------------------------------------------------------------
 /** This loops runs in a different threads, and starts sfx to be played.
  *  This can sometimes take up to 5 ms, so it needs to be handled in a thread
