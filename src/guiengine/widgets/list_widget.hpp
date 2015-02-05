@@ -22,7 +22,7 @@
 
 #include <irrString.h>
 
-#include "guiengine/widgets/CGUISTKListBox.h"
+#include "guiengine/widgets/CGUISTKListBox.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "utils/leak_check.hpp"

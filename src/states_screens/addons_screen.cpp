@@ -20,7 +20,7 @@
 #include "addons/addons_manager.hpp"
 #include "addons/news_manager.hpp"
 #include "config/user_config.hpp"
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
