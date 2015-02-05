@@ -2286,6 +2286,7 @@ IMeshWriter* CSceneManager::createMeshWriter(EMESH_WRITER_TYPE type)
 	case EMWT_COLLADA:
 	case EMWT_STL:
 	case EMWT_OBJ:
+	case EMWT_PLY:
 		return 0;
 	}
 
