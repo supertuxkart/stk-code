@@ -352,11 +352,11 @@ void LinearWorld::newLap(unsigned int kart_index)
 
         // Store the temporary string because clang would mess this up
         // (remove the stringw before the wchar_t* is used).
-        core::stringw css = kart->getName();
+        core::stringw kartName = kart->getName();
 
         //I18N: as in "fastest lap: 60 seconds by Wilber"
         irr::core::stringw m_fastest_lap_message =
-            _C("fastest_lap", "%s by %s", s.c_str(), css.c_str());
+            _C("fastest_lap", "%s by %s", s.c_str(), kartName);
 
         m_race_gui->addMessage(m_fastest_lap_message, NULL,
                                3.0f, video::SColor(255, 255, 255, 255), false);
