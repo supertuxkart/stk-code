@@ -378,6 +378,13 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderSolidFirstPass();
     }
+    else
+    {
+      // We need a cleared depth buffer for some effect (eg particles depth blending)
+      m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+      glClear(GL_DEPTH_BUFFER_BIT);
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
     PROFILER_POP_CPU_MARKER();
 
 
