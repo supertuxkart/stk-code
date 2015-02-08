@@ -8,7 +8,7 @@ CPP_FILE_LIST="`find ./src              \
                      -name '*.hpp' -or  \
                      -name "*.h"        \
               `"
-XML_FILE_LIST="`find ./data ../stk-assets ../supertuxkart-assets \
+XML_FILE_LIST="`find ./data ../stk-assets/tracks ../stk-assets/karts \
                      -name 'achievements.xml' -or                \
                      -name 'kart.xml' -or                        \
                      -name 'track.xml' -or                       \
