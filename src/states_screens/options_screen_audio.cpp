@@ -156,7 +156,7 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         if(w->getState() == false)
             music_manager->stopMusic();
         else
-            music_manager->startMusic(music_manager->getCurrentMusic(), 0);
+            music_manager->startMusic(music_manager->getCurrentMusic(), true);
     }
     else if(name == "sfx_enabled")
     {
