@@ -20,13 +20,13 @@
 #ifndef HEADER_MUSICMANAGER_HPP
 #define HEADER_MUSICMANAGER_HPP
 
-#include <map>
-#include <vector>
-#include <string>
-
 #include "audio/music.hpp"
 #include "audio/music_information.hpp"
 #include "utils/no_copy.hpp"
+
+#include <map>
+#include <string>
+#include <vector>
 
 class Vec3;
 
