@@ -252,7 +252,7 @@ void MusicManager::setTemporaryVolume(float gain)
 void MusicManager::resetTemporaryVolume()
 {
     if (m_current_music)
-        SFXManager::get()->queue(SFXManager::SFX_MUSIC_RESET_TMP_VOLUME,
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_DEFAULT_VOLUME,
                                  m_current_music);
 }   // resetTemporaryVolume
 
@@ -271,7 +271,7 @@ void MusicManager::setMasterMusicVolume(float gain)
     if (m_current_music)
     {
         // Sets the music volume to m_master_gain
-        SFXManager::get()->queue(SFXManager::SFX_MUSIC_VOLUME,
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_DEFAULT_VOLUME,
                                  m_current_music);
     }
 
@@ -296,7 +296,7 @@ MusicInformation* MusicManager::getMusicInformation(const std::string& filename)
         MusicInformation *mi = MusicInformation::create(filename);
         if(mi)
         {
-            SFXManager::get()->queue(SFXManager::SFX_MUSIC_VOLUME, mi);
+            SFXManager::get()->queue(SFXManager::SFX_MUSIC_DEFAULT_VOLUME, mi);
             m_all_music[basename] = mi;
         }
         return mi;

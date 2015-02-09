@@ -57,7 +57,6 @@ private:
     bool                     m_enable_fast;
 
     float                    m_gain;
-    float                    m_adjusted_gain;
 
     /** Either time for fading faster music in, or time to change pitch. */
     float                    m_faster_time;
@@ -87,12 +86,9 @@ private:
     void   stopMusic();
     void   pauseMusic();
     void   resumeMusic();
-    void   volumeMusic(float gain);
+    void   setDefaultVolume();
     void   switchToFastMusic();
-    void   setTemporaryVolume(float gain);
-    // ------------------------------------------------------------------------
-    /** Resets a temporary volume change. */
-    void   resetTemporaryVolume() { volumeMusic(m_adjusted_gain); }
+    void   setTemporaryVolume(float volume);
     // ------------------------------------------------------------------------
     /** Sets the music to be waiting, i.e. startMusic still needs to be
     *  called. Used to pre-load track music during track loading time. */

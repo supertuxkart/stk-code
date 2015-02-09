@@ -247,14 +247,15 @@ bool MusicOggStream::resumeMusic()
 }   // resumeMusic
 
 //-----------------------------------------------------------------------------
-void MusicOggStream::volumeMusic(float gain)
+void MusicOggStream::setVolume(float volume)
 {
-    if (gain > 1.0f) gain = 1.0f;
-    if (gain < 0.0f) gain = 0.0f;
+    volume *= music_manager->getMasterMusicVolume();
+    if (volume > 1.0f) volume = 1.0f;
+    if (volume < 0.0f) volume = 0.0f;
 
-    alSourcef(m_soundSource, AL_GAIN, gain);
+    alSourcef(m_soundSource, AL_GAIN, volume);
     check("volume music");   // clear errors
-} // volumeMusic
+}   // setVolume
 
 //-----------------------------------------------------------------------------
 void MusicOggStream::updateFading(float percent)

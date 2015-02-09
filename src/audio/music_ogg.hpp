@@ -60,7 +60,7 @@ public:
     virtual bool stopMusic();
     virtual bool pauseMusic();
     virtual bool resumeMusic();
-    virtual void volumeMusic (float gain);
+    virtual void setVolume(float volume);
     virtual bool isPlaying();
 
 protected:

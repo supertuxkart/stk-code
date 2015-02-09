@@ -326,8 +326,7 @@ void* SFXManager::mainLoop(void *obj)
         case SFX_UPDATE:     me->reallyUpdateNow(current);        break;
         case SFX_MUSIC_START:
         {
-            float gain = music_manager->getMasterMusicVolume();
-            current->m_music_information->volumeMusic(gain);
+            current->m_music_information->setDefaultVolume();
             current->m_music_information->startMusic();           break;
         }
         case SFX_MUSIC_STOP:
@@ -335,7 +334,10 @@ void* SFXManager::mainLoop(void *obj)
         case SFX_MUSIC_PAUSE:
             current->m_music_information->pauseMusic();           break;
         case SFX_MUSIC_RESUME:
-            current->m_music_information->resumeMusic();          break;
+            current->m_music_information->resumeMusic();
+            // This might be necessasary if the volume was changed
+            // in the in-game menu
+            current->m_music_information->setDefaultVolume();     break;
         case SFX_MUSIC_SWITCH_FAST:
             current->m_music_information->switchToFastMusic();    break;
         case SFX_MUSIC_SET_TMP_VOLUME:
@@ -343,17 +345,11 @@ void* SFXManager::mainLoop(void *obj)
             MusicInformation *mi = current->m_music_information;
             mi->setTemporaryVolume(current->m_parameter.getX());  break;
         }
-        case SFX_MUSIC_RESET_TMP_VOLUME:
-        {
-            MusicInformation *mi = current->m_music_information;
-            mi->resetTemporaryVolume();                           break;
-        }
         case SFX_MUSIC_WAITING:
                current->m_music_information->setMusicWaiting();   break;
-        case SFX_MUSIC_VOLUME:
+        case SFX_MUSIC_DEFAULT_VOLUME:
         {
-            float gain = music_manager->getMasterMusicVolume();
-            current->m_music_information->volumeMusic(gain);
+            current->m_music_information->setDefaultVolume();
         }
         default: assert("Not yet supported.");
         }

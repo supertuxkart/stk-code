@@ -85,7 +85,6 @@ MusicInformation::MusicInformation(const XMLNode *root,
     m_faster_time     = 1.0f;
     m_max_pitch       = 0.1f;
     m_gain            = 1.0f;
-    m_adjusted_gain   = 1.0f;
 
 
     // Otherwise read config file
@@ -100,8 +99,6 @@ MusicInformation::MusicInformation(const XMLNode *root,
     root->get("tracks",        &m_all_tracks     );
     root->get("fast",          &m_enable_fast    );
     root->get("fast-filename", &m_fast_filename  );
-
-    m_adjusted_gain = m_gain;
 
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
@@ -172,7 +169,7 @@ void MusicInformation::startMusic()
                   m_normal_filename.c_str());
         return;
     }
-    m_normal_music->volumeMusic(m_adjusted_gain);
+    m_normal_music->setVolume(m_gain);
     m_normal_music->playMusic();
 
     // Then (if available) load the music for the last track
@@ -206,7 +203,7 @@ void MusicInformation::startMusic()
                   "supported or not found.\n", m_fast_filename.c_str());
         return;
     }
-    m_fast_music->volumeMusic(m_adjusted_gain);
+    m_fast_music->setVolume(m_gain);
 }   // startMusic
 
 //-----------------------------------------------------------------------------
@@ -298,21 +295,22 @@ void MusicInformation::resumeMusic()
 }   // resumeMusic
 
 //-----------------------------------------------------------------------------
-void MusicInformation::volumeMusic(float gain)
+void MusicInformation::setDefaultVolume()
 {
-    m_adjusted_gain = m_gain * gain;
     if (m_normal_music && m_normal_music->isPlaying())
-        m_normal_music->volumeMusic(m_adjusted_gain);
+        m_normal_music->setVolume(m_gain);
     if (m_fast_music && m_fast_music->isPlaying())
-        m_fast_music->volumeMusic(m_adjusted_gain);
-} // volumeMusic
+        m_fast_music->setVolume(m_gain);
+} // setVolume
 
 //-----------------------------------------------------------------------------
-
-void MusicInformation::setTemporaryVolume(float gain)
+/** Overwrites the current volume with a temporary value (used e.g. to fade
+ *  from normal music to last lap music).
+ */
+void MusicInformation::setTemporaryVolume(float volume)
 {
-    if (m_normal_music != NULL) m_normal_music->volumeMusic(gain);
-    if (m_fast_music   != NULL) m_fast_music->volumeMusic(gain);
+    if (m_normal_music != NULL) m_normal_music->setVolume(volume);
+    if (m_fast_music   != NULL) m_fast_music->setVolume(volume);
 }
 
 //-----------------------------------------------------------------------------

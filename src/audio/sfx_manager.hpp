@@ -83,9 +83,8 @@ public:
         SFX_MUSIC_RESUME,
         SFX_MUSIC_SWITCH_FAST,
         SFX_MUSIC_SET_TMP_VOLUME,
-        SFX_MUSIC_RESET_TMP_VOLUME,
         SFX_MUSIC_WAITING,
-        SFX_MUSIC_VOLUME,
+        SFX_MUSIC_DEFAULT_VOLUME,
         SFX_EXIT,
     };   // SFXCommands
 
