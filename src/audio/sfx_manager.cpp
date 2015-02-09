@@ -355,6 +355,15 @@ void* SFXManager::mainLoop(void *obj)
         }
         delete current;
         current = NULL;
+        // We access the size without lock, doesn't matter if we
+        // should get an incorrect value because of concurrent read/writes
+        if (me->m_sfx_commands.getData().size() == 0)
+        {
+            // Wait some time to let other threads run, then queue an
+            // update event to keep music playing.
+            StkTime::sleep(1);
+            me->queue(SFX_UPDATE, (SFXBase*)NULL, 0.01f);
+        }
         me->m_sfx_commands.lock();
 
     }   // while
