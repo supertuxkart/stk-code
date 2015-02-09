@@ -2756,24 +2756,8 @@ void Kart::setOnScreenText(const wchar_t *text)
 
 void Kart::activateSkidLight(unsigned int level)
 {
-    if (level > 0)
-    {
-        if (level == 1)
-        {
-            m_skidding_light_1->setVisible(true);
-            m_skidding_light_2->setVisible(false);
-        }
-        else
-        {
-            m_skidding_light_2->setVisible(true);
-            m_skidding_light_1->setVisible(false);
-        }
-    }
-    else
-    {
-        m_skidding_light_1->setVisible(false);
-        m_skidding_light_2->setVisible(false);
-    }
+    m_skidding_light_1->setVisible(level == 1);
+    m_skidding_light_2->setVisible(level > 1);
 }
 
 /* EOF */
