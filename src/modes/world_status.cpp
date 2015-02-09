@@ -58,14 +58,12 @@ void WorldStatus::reset()
     // other side effects.
     m_phase           = UserConfigParams::m_race_now ? MUSIC_PHASE : SETUP_PHASE;
 
+    // Parts of the initialisation-phase are skipped so do it here
     if (UserConfigParams::m_race_now)
     {
         // Setup music and sound
         if (World::getWorld()->getWeather() != NULL)
             World::getWorld()->getWeather()->playSound();
-
-        // Starting the music here doesn't work so it's done in the MUSIC_PHASE
-        World::getWorld()->getTrack()->startMusic();
 
         // Start engines
         for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
@@ -80,6 +78,9 @@ void WorldStatus::reset()
 
     if (device->getTimer()->isStopped())
         device->getTimer()->start();
+
+    // Set the right music
+    World::getWorld()->getTrack()->startMusic();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -227,8 +228,6 @@ void WorldStatus::update(const float dt)
                 {
                     m_start_sound->play();
                 }
-
-                World::getWorld()->getTrack()->startMusic();
 
                 // event
                 onGo();
