@@ -67,7 +67,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float volume,
  *  buffer. */
 SFXOpenAL::~SFXOpenAL()
 {
-    if (m_status!=SFX_UNKNOWN)
+    if (m_status!=SFX_UNKNOWN && m_status!=SFX_NOT_INITIALISED)
     {
         alDeleteSources(1, &m_sound_source);
     }

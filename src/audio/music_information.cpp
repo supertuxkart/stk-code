@@ -165,7 +165,7 @@ void MusicInformation::startMusic()
         delete m_normal_music;
         m_normal_music = NULL;
         Log::warn("MusicInformation", "Unable to load music %s, "
-                  "not supported or not found.\n",
+                  "not supported or not found.",
                   m_normal_filename.c_str());
         return;
     }
