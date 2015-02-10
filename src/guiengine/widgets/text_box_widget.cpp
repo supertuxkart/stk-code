@@ -19,7 +19,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 
-#include "guiengine/widgets/CGUIEditBox.h"
+#include "guiengine/widgets/CGUIEditBox.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
 
