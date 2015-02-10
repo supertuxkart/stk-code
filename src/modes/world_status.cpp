@@ -246,9 +246,10 @@ void WorldStatus::update(const float dt)
             return;
         case GO_PHASE  :
 
-            if (m_auxiliary_timer>2.5f && music_manager->getCurrentMusic())
+            if (m_auxiliary_timer>2.5f && music_manager->getCurrentMusic() &&
+                !music_manager->getCurrentMusic()->isPlaying())
             {
-                music_manager->startMusic(music_manager->getCurrentMusic());
+                music_manager->startMusic();
             }
 
             if (m_auxiliary_timer > 3.0f)    // how long to display the 'go' message
@@ -271,7 +272,7 @@ void WorldStatus::update(const float dt)
             // Start the music here when starting fast
             if (UserConfigParams::m_race_now)
             {
-                music_manager->startMusic(music_manager->getCurrentMusic());
+                music_manager->startMusic();
                 UserConfigParams::m_race_now = false;
             }
             // how long to display the 'music' message
