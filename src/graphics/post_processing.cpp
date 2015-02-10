@@ -510,10 +510,11 @@ void PostProcessing::renderSSAO()
     DrawFullScreenEffect<FullScreenShader::SSAOShader>(irr_driver->getSSAORadius(), irr_driver->getSSAOK(), irr_driver->getSSAOSigma());
 }
 
-void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBuffer &out_fbo)
+void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo, FrameBuffer &out_fbo)
 {
     MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
         getCallback(ES_MOTIONBLUR);
+    unsigned cam = Camera::getActiveCamera()->getIndex();
 
     scene::ICameraSceneNode * const camnode =
         Camera::getCamera(cam)->getCameraSceneNode();
@@ -540,8 +541,8 @@ void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBu
     DrawFullScreenEffect<FullScreenShader::MotionBlurShader>(
                                   // Todo : use a previousPVMatrix per cam, not global
                                   irr_driver->getPreviousPVMatrix(),
-                                  cb->getCenter(cam),
-                                  cb->getBoostTime(0) * 10, // Todo : should be framerate dependent
+                                  core::vector2df(0.5, 0.5),
+                                  cb->getBoostTime(Camera::getActiveCamera()->getIndex()) * 10, // Todo : should be framerate dependent
                                   0.15f);
 }
 
@@ -800,7 +801,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
         MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
             getCallback(ES_MOTIONBLUR);
 
-        if (isRace && UserConfigParams::m_motionblur && World::getWorld() != NULL && cb->getBoostTime(0) > 0.) // motion blur
+        if (isRace && UserConfigParams::m_motionblur && World::getWorld() != NULL && cb->getBoostTime(Camera::getActiveCamera()->getIndex()) > 0.) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo);
             std::swap(in_fbo, out_fbo);
