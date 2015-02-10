@@ -2522,8 +2522,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
-        float f = fabsf(getSpeed())/m_kart_properties->getMaxSpeed() *
-                  m_difficulty->getMaxSpeed();
+        float f = fabsf(getSpeed())/(m_kart_properties->getMaxSpeed() *
+                  m_difficulty->getMaxSpeed());
         // The speed of the kart can be higher (due to powerups) than
         // the normal maximum speed of the kart.
         if(f>1.0f) f = 1.0f;

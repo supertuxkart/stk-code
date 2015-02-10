@@ -56,7 +56,20 @@ void WorldStatus::reset()
     m_auxiliary_timer = 0.0f;
     // Using SETUP_PHASE will play the track into sfx first, and has no
     // other side effects.
-    m_phase           = UserConfigParams::m_race_now ? RACE_PHASE : SETUP_PHASE;
+    m_phase           = UserConfigParams::m_race_now ? MUSIC_PHASE : SETUP_PHASE;
+
+    // Parts of the initialisation-phase are skipped so do it here
+    if (UserConfigParams::m_race_now)
+    {
+        // Setup music and sound
+        if (World::getWorld()->getWeather() != NULL)
+            World::getWorld()->getWeather()->playSound();
+
+        // Start engines
+        for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
+            World::getWorld()->getKart(i)->startEngineSFX();
+    }
+
     m_previous_phase  = UNDEFINED_PHASE;
     // Just in case that the game is reset during the intro phase
     m_track_intro_sound->stop();
@@ -65,6 +78,9 @@ void WorldStatus::reset()
 
     if (device->getTimer()->isStopped())
         device->getTimer()->start();
+
+    // Set the right music
+    World::getWorld()->getTrack()->startMusic();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -140,7 +156,7 @@ void WorldStatus::update(const float dt)
 
             if (World::getWorld()->getWeather() != NULL)
             {
-                 World::getWorld()->getWeather()->playSound();
+                World::getWorld()->getWeather()->playSound();
             }
 
             return;
@@ -213,8 +229,6 @@ void WorldStatus::update(const float dt)
                     m_start_sound->play();
                 }
 
-                World::getWorld()->getTrack()->startMusic();
-
                 // event
                 onGo();
             }
@@ -254,6 +268,12 @@ void WorldStatus::update(const float dt)
 
             break;
         case MUSIC_PHASE:
+            // Start the music here when starting fast
+            if (UserConfigParams::m_race_now)
+            {
+                music_manager->startMusic(music_manager->getCurrentMusic());
+                UserConfigParams::m_race_now = false;
+            }
             // how long to display the 'music' message
             if (m_auxiliary_timer>stk_config->m_music_credit_time)
             {

@@ -1052,7 +1052,7 @@ void initRest()
     Online::RequestManager::get()->startNetworkThread();
     NewsManager::get();   // this will create the news manager
 
-    music_manager           = new MusicManager();
+    music_manager = new MusicManager();
     SFXManager::create();
     // The order here can be important, e.g. KartPropertiesManager needs
     // defaultKartProperties, which are defined in stk_config.
@@ -1238,7 +1238,7 @@ int main(int argc, char *argv[] )
             material_manager->addSharedMaterial(materials_file);
         }
         Referee::init();
-        powerup_manager         -> loadAllPowerups ();
+        powerup_manager->loadAllPowerups();
         ItemManager::loadDefaultItemMeshes();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
