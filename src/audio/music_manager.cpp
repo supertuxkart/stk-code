@@ -165,7 +165,7 @@ void MusicManager::addMusicToTracks()
  */
 void MusicManager::startMusic()
 {
-    if (m_current_music)
+    if (m_current_music && UserConfigParams::m_music)
         SFXManager::get()->queue(SFXManager::SFX_MUSIC_START, m_current_music);
 }   // startMusic
 
