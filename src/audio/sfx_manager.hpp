@@ -187,8 +187,9 @@ private:
     /** The list of sound effects to be played in the next update. */
     Synchronised< std::vector<SFXCommand*> > m_sfx_commands;
 
-    /** To play non-positional sounds without having to create a new object for each */
-    std::map<std::string, SFXBase*> m_quick_sounds;
+    /** To play non-positional sounds without having to create a
+     *  new object for each. */
+    Synchronised<std::map<std::string, SFXBase*> > m_quick_sounds;
 
     /** If the sfx manager has been initialised. */
     bool                      m_initialized;

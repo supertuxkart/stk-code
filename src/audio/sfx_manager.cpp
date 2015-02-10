@@ -135,16 +135,19 @@ SFXManager::~SFXManager()
     }
     m_all_sfx.getData().clear();
     m_all_sfx.unlock();
+
+    m_quick_sounds.lock();
     // ---- clear m_quick_sounds
     {
-        std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.begin();
-        for (; i != m_quick_sounds.end(); i++)
+        std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.getData().begin();
+        for (; i != m_quick_sounds.getData().end(); i++)
         {
             SFXBase* snd = (*i).second;
             delete snd;
         }
     }
-    m_quick_sounds.clear();
+    m_quick_sounds.getData().clear();
+    m_quick_sounds.unlock();
 
     // ---- clear m_all_sfx_types
     {
@@ -614,7 +617,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
 
 //----------------------------------------------------------------------------
 SFXBase* SFXManager::createSoundSource(const std::string &name,
-                                       const bool addToSFXList)
+                                       const bool add_to_SFXList)
 {
     std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.find(name);
     if ( i == m_all_sfx_types.end() )
@@ -625,7 +628,7 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
         return NULL;
     }
 
-    return createSoundSource( i->second, addToSFXList );
+    return createSoundSource( i->second, add_to_SFXList );
 }  // createSoundSource
 
 //----------------------------------------------------------------------------
@@ -689,6 +692,17 @@ void SFXManager::reallyUpdateNow(SFXCommand *current)
             (*i)->updatePlayingSFX(dt);
     }   // for i in m_all_sfx
     m_all_sfx.unlock();
+
+    // We need to lock the quick sounds during update, since adding more
+    // quick sounds by another thread could invalidate the iterator.
+    m_quick_sounds.lock();
+    std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.getData().begin();
+    for (; i != m_quick_sounds.getData().end(); i++)
+    {
+        if (i->second->getStatus() == SFXBase::SFX_PLAYING)
+            i->second->updatePlayingSFX(dt);
+    }   // for i in m_all_sfx
+    m_quick_sounds.unlock();
 
 }   // reallyUpdateNow
 
@@ -820,11 +834,13 @@ void SFXManager::setMasterSFXVolume(float gain)
 
     // quick SFX
     {
-        std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.begin();
-        for (; i != m_quick_sounds.end(); i++)
+        m_quick_sounds.lock();
+        std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.getData().begin();
+        for (; i != m_quick_sounds.getData().end(); i++)
         {
             (*i).second->setMasterVolume(m_master_gain);
         }
+        m_quick_sounds.unlock();
     }
 
 }   // setMasterSFXVolume
@@ -908,22 +924,29 @@ void SFXManager::reallyPositionListenerNow()
 SFXBase* SFXManager::quickSound(const std::string &sound_type)
 {
     if (!sfxAllowed()) return NULL;
-    std::map<std::string, SFXBase*>::iterator sound = m_quick_sounds.find(sound_type);
 
-    if (sound == m_quick_sounds.end())
+    m_quick_sounds.lock();
+    std::map<std::string, SFXBase*>::iterator sound = 
+                                     m_quick_sounds.getData().find(sound_type);
+
+    if (sound == m_quick_sounds.getData().end())
     {
         // sound not yet in our local list of quick sounds
-        SFXBase* newSound = SFXManager::get()->createSoundSource(sound_type, false);
-        if (newSound == NULL) return NULL;
-        newSound->play();
-        m_quick_sounds[sound_type] = newSound;
-        return newSound;
+        SFXBase* new_sound = createSoundSource(sound_type, false);
+        if (new_sound == NULL) return NULL;
+        new_sound->play();
+        m_quick_sounds.getData()[sound_type] = new_sound;
+        m_quick_sounds.unlock();
+        return new_sound;
     }
     else
     {
-        (*sound).second->play();
-        return (*sound).second;
+        SFXBase *base_sound = sound->second;
+        base_sound->play();
+        m_quick_sounds.unlock();
+        return base_sound;
     }
+
 }   // quickSound
 
 
