@@ -77,6 +77,7 @@ void Skidding::reset()
     m_jump_speed          = 0.0f;
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+    m_kart->activateSkidLight(0);
     m_kart->getControls().m_skid = KartControl::SC_NONE;
     
     btVector3 rot(0, 0, 0);
@@ -392,6 +393,7 @@ void Skidding::update(float dt, bool is_on_ground,
             {
                 m_skid_bonus_ready = true;
                 m_kart->getKartGFX()->setSkidLevel(level);
+                m_kart->activateSkidLight(level);
             }
             // If player stops skidding, trigger bonus, and change state to
             // SKID_SHOW_GFX_*
@@ -445,6 +447,7 @@ void Skidding::update(float dt, bool is_on_ground,
                   ->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
             m_kart->getKartGFX()
                   ->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+            m_kart->activateSkidLight(0);
             m_skid_state = SKID_NONE;
         }
     }   // switch

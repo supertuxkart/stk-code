@@ -132,6 +132,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
     m_nitro_light          = NULL;
+    m_skidding_light_1     = NULL;
+    m_skidding_light_2     = NULL;
     m_type                 = RaceManager::KT_AI;
 
     m_view_blocked_by_plunger = 0;
@@ -2393,10 +2395,23 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
     m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
+    // Create nitro light
     m_nitro_light = irr_driver->addLight(core::vector3df(0.0f, 0.5f, m_kart_model->getLength()*-0.5f - 0.05f),
-        0.6f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
+        0.4f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
     m_nitro_light->setVisible(false);
     m_nitro_light->setName( ("nitro emitter (" + getIdent() + ")").c_str() );
+
+    // Create skidding lights
+    // For the first skidding level
+    m_skidding_light_1 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
+        0.3f /* force */, 3.0f /* radius */, 1.0f, 0.6f, 0.0f, false, m_node);
+    m_skidding_light_1->setVisible(false);
+    m_skidding_light_1->setName( ("skidding emitter 1 (" + getIdent() + ")").c_str() );
+    // For the second skidding level
+    m_skidding_light_2 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
+        0.4f /* force */, 4.0f /* radius */, 1.0f, 0.0f, 0.0f, false, m_node);
+    m_skidding_light_2->setVisible(false);
+    m_skidding_light_2->setName( ("skidding emitter 2 (" + getIdent() + ")").c_str() );
 
 #ifdef DEBUG
     m_node->setName( (getIdent()+"(lod-node)").c_str() );
@@ -2738,5 +2753,11 @@ void Kart::setOnScreenText(const wchar_t *text)
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.
 }   // setOnScreenText
+
+void Kart::activateSkidLight(unsigned int level)
+{
+    m_skidding_light_1->setVisible(level == 1);
+    m_skidding_light_2->setVisible(level > 1);
+}
 
 /* EOF */
