@@ -1296,7 +1296,7 @@ int main(int argc, char *argv[] )
             exit(0);
         }
 
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+        if (!ProfileWorld::isNoGraphics() && GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
         {
             MessageDialog *dialog =
                 new MessageDialog(_("Your driver version is too old. Please install "
