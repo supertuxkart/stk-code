@@ -223,8 +223,8 @@ void MusicInformation::update(float dt)
             return;
         }
         float fraction=m_time_since_faster/m_faster_time;
-        m_normal_music->updateFading(1-fraction);
-        m_fast_music->updateFading(fraction);
+        m_normal_music->setVolume(1-fraction);
+        m_fast_music->setVolume(fraction);
         break;
                        }
     case SOUND_FASTER: {
@@ -322,6 +322,7 @@ void MusicInformation::switchToFastMusic()
     {
         m_mode = SOUND_FADING;
         m_fast_music->playMusic();
+        m_fast_music->setVolume(0);
     }
     else
     {

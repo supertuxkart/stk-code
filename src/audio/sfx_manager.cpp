@@ -889,7 +889,7 @@ void SFXManager::positionListener(const Vec3 &position, const Vec3 &front,
 void SFXManager::reallyPositionListenerNow()
 {
 #if HAVE_OGGVORBIS
-    if (!UserConfigParams::m_sfx || !m_initialized) return;
+    if (!sfxAllowed()) return;
 
     m_listener_position.lock();
     {
@@ -948,5 +948,4 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
     }
 
 }   // quickSound
-
 
