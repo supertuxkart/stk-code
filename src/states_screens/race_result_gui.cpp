@@ -62,6 +62,10 @@ DEFINE_SCREEN_SINGLETON( RaceResultGUI );
 RaceResultGUI::RaceResultGUI() : Screen("race_result.stkgui",
                                         /*pause race*/ false)
 {
+    std::string path = file_manager->getAsset(FileManager::MUSIC,
+                                              "race_summary.music");
+    m_race_over_music = music_manager->getMusicInformation(path);
+
 }   // RaceResultGUI
 
 //-----------------------------------------------------------------------------
@@ -83,6 +87,13 @@ void RaceResultGUI::init()
 
     music_manager->stopMusic();
     m_finish_sound = SFXManager::get()->quickSound("race_finish");
+    if (!m_finish_sound)
+    {
+        // If there is no finish sound (because sfx are disabled), start
+        // the race over music here (since the race over music is only started
+        // when the finish sound has been played).
+        music_manager->startMusic(m_race_over_music);
+    }
 
     // Calculate how many track screenshots can fit into the "result-table" widget
     GUIEngine::Widget* result_table = getWidget("result-table");
@@ -600,14 +611,14 @@ void RaceResultGUI::onUpdate(float dt)
 {
     renderGlobal(dt);
 
-    if (m_finish_sound != NULL &&
-        m_finish_sound->getStatus() != SFXBase::SFX_PLAYING)
+    // When the finish sound has been played, start the race over music.
+    if(m_finish_sound && m_finish_sound->getStatus() != SFXBase::SFX_PLAYING)
     {
         try
         {
-            std::string path = file_manager->getAsset(FileManager::MUSIC,
-                                                      "race_summary.music");
-            music_manager->startMusic(music_manager->getMusicInformation(path));
+            // This call is done once each frame, but startMusic() is cheap
+            // if the music is already playing.
+            music_manager->startMusic(m_race_over_music);
         }
         catch (std::exception& e)
         {
