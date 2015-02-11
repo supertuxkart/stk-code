@@ -45,7 +45,7 @@ MusicOggStream::MusicOggStream()
 MusicOggStream::~MusicOggStream()
 {
     if(stopMusic() == false)
-        Log::warn("MusicOgg", "problems while stopping music.\n");
+        Log::warn("MusicOgg", "problems while stopping music.");
 }   // ~MusicOggStream
 
 //-----------------------------------------------------------------------------
@@ -307,13 +307,19 @@ void MusicOggStream::update()
 
     if (active)
     {
+        // For debugging
+        SFXManager::checkError("before source state");
         // we have data, so we should be playing...
         ALenum state;
         alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
         if (state != AL_PLAYING)
         {
-            Log::warn("MusicOgg", "Music not playing when it should be. "
-                      "Source state: %d\n", state);
+            // Prevent flooding
+            static int count = 0;
+            count++;
+            if (count<10)
+                Log::warn("MusicOgg", "Music not playing when it should be. "
+                          "Source state: %d", state);
             alGetSourcei(m_soundSource, AL_BUFFERS_PROCESSED, &processed);
             alSourcePlay(m_soundSource);
         }
@@ -321,7 +327,7 @@ void MusicOggStream::update()
     else
     {
         Log::warn("MusicOgg", "Attempt to stream music into buffer failed "
-                              "twice in a row.\n");
+                              "twice in a row.");
     }
 }   // update
 
