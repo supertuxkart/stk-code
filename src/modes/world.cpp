@@ -404,7 +404,6 @@ World::~World()
     if(m_physics)
         delete m_physics;
 
-    music_manager->stopMusic();
     m_world = NULL;
 
     irr_driver->getSceneManager()->clear();
