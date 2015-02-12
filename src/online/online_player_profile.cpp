@@ -441,8 +441,9 @@ namespace Online
             core::stringw message("");
             if (friend_request_count > 1)
             {
-                message = _("You have %d new friend requests!",
-                            friend_request_count);
+                message = _P("You have %d new friend request!",
+                             "You have %d new friend requests!",
+                             friend_request_count);
             }
             else
             {
