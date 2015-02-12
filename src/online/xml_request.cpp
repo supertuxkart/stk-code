@@ -74,7 +74,8 @@ namespace Online
 
             if (!m_success)
             {
-                Log::debug("XMLRequest::afterOperation", "Request returned error: %ls", m_info.c_str());
+                Log::debug("XMLRequest::afterOperation",
+                           "Request returned error: %ls", m_info.c_str());
             }
         }
         else
