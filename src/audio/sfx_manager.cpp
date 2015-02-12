@@ -683,7 +683,8 @@ void SFXManager::reallyUpdateNow(SFXCommand *current)
 {
     assert(current->m_command==SFX_UPDATE);
     float dt = current->m_parameter.getX();
-    music_manager->getCurrentMusic()->update(dt);
+    if (music_manager->getCurrentMusic())
+        music_manager->getCurrentMusic()->update(dt);
     m_all_sfx.lock();
     for (std::vector<SFXBase*>::iterator i =  m_all_sfx.getData().begin();
                                          i != m_all_sfx.getData().end(); i++)
