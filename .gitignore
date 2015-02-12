@@ -41,6 +41,9 @@ src/html
 *~
 *.swp
 
+# Ignore QtCreator project file
+CMakeLists.txt.user
+
 packets_log.txt
 history.dat
 README.dependencies
