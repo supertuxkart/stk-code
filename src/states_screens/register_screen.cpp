@@ -45,7 +45,8 @@ DEFINE_SCREEN_SINGLETON( RegisterScreen );
 RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")
 {
     m_existing_player = NULL;
-    m_account_mode = ACCOUNT_OFFLINE;
+    m_account_mode    = ACCOUNT_OFFLINE;
+    m_parent_screen   = NULL;
 }   // RegisterScreen
 
 // -----------------------------------------------------------------------------
