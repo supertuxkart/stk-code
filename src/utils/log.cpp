@@ -154,7 +154,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     }
     __android_log_vprint(alp, "SuperTuxKart", format, args);
 #else
-    static const char *names[] = {"verbose", "debug  ", "info   ",
+    static const char *names[] = {"debug", "verbose  ", "info   ",
                                   "warn   ", "error  ", "fatal  "};
 
     // Using a va_list twice produces undefined results, ie crash.
