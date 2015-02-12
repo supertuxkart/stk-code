@@ -360,6 +360,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
             PlayerProfile *cp = getSelectedPlayer();
             RegisterScreen::getInstance()->setRename(cp);
             RegisterScreen::getInstance()->push();
+            RegisterScreen::getInstance()->setParent(this);
             m_new_registered_data = false;
             m_auto_login          = false;
             // Init will automatically be called, which
