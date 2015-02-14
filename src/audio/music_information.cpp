@@ -91,9 +91,9 @@ MusicInformation::MusicInformation(const XMLNode *root,
     // --------------------------
     std::string s;
     root->get("title",         &s                );
-    m_title = StringUtils::decodeFromHtmlEntities(s);
+    m_title = StringUtils::xmlDecode(s);
     root->get("composer",      &s                );
-    m_composer = StringUtils::decodeFromHtmlEntities(s);
+    m_composer = StringUtils::xmlDecode(s);
     root->get("file",          &m_normal_filename);
     root->get("gain",          &m_gain           );
     root->get("tracks",        &m_all_tracks     );

@@ -574,11 +574,11 @@ namespace StringUtils
     }
 
     // ------------------------------------------------------------------------
-    /** Converts ASCII text with HTML entities (e.g. &xE9;) to unicode strings
+    /** Converts ASCII text with XML entities (e.g. &x00;) to unicode strings
      *  \param input The input string which should be decoded.
      *  \return A irrlicht wide string with unicode characters.
      */
-    irr::core::stringw decodeFromHtmlEntities(const std::string& input)
+    irr::core::stringw xmlDecode(const std::string& input)
     {
         irr::core::stringw output;
         std::string entity;
@@ -659,35 +659,30 @@ namespace StringUtils
         }
 
         return output;
-    }   // decodeFromHtmlEntities
+    }   // xmlDecode
 
     // ------------------------------------------------------------------------
-    /** Converts a unicode string to plain ASCII using html-like & codes.
+    /** Converts a unicode string to plain ASCII using XML entites (e.g. &x00;)
      *  \param s The input string which should be encoded.
      *  \return A std:;string with ASCII characters.
      */
-    std::string encodeToHtmlEntities(const irr::core::stringw &s)
+    std::string xmlEncode(const irr::core::stringw &s)
     {
         std::ostringstream output;
         for(unsigned int i=0; i<s.size(); i++)
         {
-            if(s[i]=='&')
-                output<<"&amp;";
+            if (s[i] >= 128 || s[i] == '&' || s[i] == '<' || s[i] == '>' || s[i] == '\"')
+            {
+                output << "&#x" << std::hex << std::uppercase << s[i] << ";";
+            }
             else
             {
-                if(s[i]<128)
-                {
-                    irr::c8 c=(char)(s[i]);
-                    output<<c;
-                }
-                else
-                {
-                    output <<"&#x" << std::hex <<std::uppercase<< s[i]<<";";
-                }
+                irr::c8 c = (char)(s[i]);
+                output << c;
             }
         }
         return output.str();
-    }   // encodeToHtmlEntities
+    }   // xmlEncode
 
     // ------------------------------------------------------------------------
     /** Converts a version string (in the form of 'X.Y.Za-rcU' into an

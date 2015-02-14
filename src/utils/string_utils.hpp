@@ -59,9 +59,9 @@ namespace StringUtils
     std::vector<std::string>        splitPath(const std::string& path);
     std::string replace(const std::string& other, const std::string& from, const std::string& to);
 
-    irr::core::stringw decodeFromHtmlEntities(const std::string& input);
+    irr::core::stringw xmlDecode(const std::string& input);
 
-    std::string encodeToHtmlEntities(const irr::core::stringw &output);
+    std::string xmlEncode(const irr::core::stringw &output);
 
     // ------------------------------------------------------------------------
     template <class T>
