@@ -22,6 +22,8 @@
 
 #include <irrString.h>
 
+#include <algorithm>
+
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "utils/leak_check.hpp"
@@ -236,6 +238,13 @@ namespace GUIEngine
         /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
             'updateItemDisplay' to update the display. */
         void clearItems();
+
+        /** Sort the list of items with a given comparator. */
+        template<typename Compare>
+        void sortItems(Compare comp)
+        {
+            std::sort(m_items.begin(), m_items.end(), comp);
+        }
 
         /**
           * \brief Register a listener to be notified of selection changes within the ribbon.
