@@ -355,7 +355,8 @@ void PlayerKartWidget::add()
             m_player_ident_spinner->addLabel(label);
             if (UserConfigParams::m_per_player_difficulty)
             {
-                // The second player is the same, but with handicap
+                // I18N: 'handicapped' indicates that per-player handicaps are
+                //       activated for this kart (i.e. it will drive slower)
                 label = _("%s (handicapped)", label);
                 m_player_ident_spinner->addLabel(label);
             }
