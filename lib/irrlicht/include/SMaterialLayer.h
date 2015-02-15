@@ -72,8 +72,15 @@ namespace video
 		//! Destructor
 		~SMaterialLayer()
 		{
-			MatrixAllocator.destruct(TextureMatrix);
-			MatrixAllocator.deallocate(TextureMatrix); 
+#ifdef __APPLE__
+                        // Avoid a crash on osx, where one of the ReadOnlyMaterial
+                        // Texture matrices is -1 - for atm unknown reasons - see #1938
+                        if(TextureMatrix != (core::matrix4*)0xffffffff)
+#endif
+                        {
+			    MatrixAllocator.destruct(TextureMatrix);
+  			    MatrixAllocator.deallocate(TextureMatrix); 
+                        }
 		}
 
 		//! Assignment operator
@@ -219,6 +226,7 @@ namespace video
 		//! Texture Matrix
 		/** Do not access this element directly as the internal
 		ressource management has to cope with Null pointers etc. */
+public:
 		core::matrix4* TextureMatrix;
 	};
 
