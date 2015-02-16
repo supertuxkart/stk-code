@@ -712,7 +712,7 @@
                     time-full-steer ="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28"
                     time-reset-steer="0.1"/>
 
-              <engine power="400 475 550 575"  max-speed="14 19 22.0 25" brake-factor="11.0"
+              <engine power="375 450 525 550"  max-speed="14 19 22.0 25" brake-factor="11.0"
                   max-speed-reverse-ratio="0.4"/>
 
               <gear switch-ratio="0.30 0.7 1.0" power-increase="2.2 2.2 2.5"/>
