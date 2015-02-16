@@ -658,8 +658,11 @@ void KartModel::reset()
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
-    // Don't force any LOD
-    ((LODNode*)m_kart->getNode())->forceLevelOfDetail(-1);
+
+    // Don't force any LOD. Non-animated karts are not LOD nodes.
+    LODNode *lod = dynamic_cast<LODNode*>(m_kart->getNode());
+    if (lod)
+        lod->forceLevelOfDetail(-1);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -670,7 +673,9 @@ void KartModel::reset()
 void KartModel::finishedRace()
 {
     // Force the animated model, independent of actual camera distance.
-    ((LODNode*)m_kart->getNode())->forceLevelOfDetail(0);
+    LODNode *lod = dynamic_cast<LODNode*>(m_kart->getNode());
+    if (lod)
+        lod->forceLevelOfDetail(0);
 }   // finishedRace
 
 // ----------------------------------------------------------------------------
