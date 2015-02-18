@@ -141,7 +141,7 @@ void CentralVideoSettings::init()
             UserConfigParams::m_high_definition_textures = 0x00;
         }
 
-        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GI))
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GI))
         {
             m_GI_has_artifact = true;
         }
