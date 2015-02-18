@@ -27,6 +27,7 @@ void CentralVideoSettings::init()
     hasTextureCompression = false;
     hasUBO = false;
     hasGS = false;
+    m_GI_has_artifact = false;
 
     m_need_rh_workaround = false;
     m_need_srgb_workaround = false;
@@ -138,6 +139,11 @@ void CentralVideoSettings::init()
             (UserConfigParams::m_high_definition_textures & 0x02) == 0)
         {
             UserConfigParams::m_high_definition_textures = 0x00;
+        }
+
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GI))
+        {
+            m_GI_has_artifact = true;
         }
 
         // Specific disablement
@@ -263,7 +269,7 @@ bool CentralVideoSettings::supportsShadows() const
 
 bool CentralVideoSettings::supportsGlobalIllumination() const
 {
-    return isARBGeometryShader4Usable() && isARBUniformBufferObjectUsable();
+    return isARBGeometryShader4Usable() && isARBUniformBufferObjectUsable() && !m_GI_has_artifact;
 }
 
 bool CentralVideoSettings::supportsIndirectInstancingRendering() const
