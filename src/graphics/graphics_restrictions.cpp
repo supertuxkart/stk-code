@@ -57,7 +57,8 @@ namespace GraphicsRestrictions
             "AMDVertexShaderLayer",
             "DriverRecentEnough",
             "HighDefinitionTextures",
-            "AdvancedPipeline"
+            "AdvancedPipeline",
+            "FramebufferSRGBWorking",
         };
     }   // namespace Private
     using namespace Private;

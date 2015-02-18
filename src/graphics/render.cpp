@@ -22,6 +22,7 @@
 #include "graphics/callbacks.hpp"
 #include "central_settings.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
@@ -380,10 +381,14 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     }
     else
     {
-      // We need a cleared depth buffer for some effect (eg particles depth blending)
-      m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
-      glClear(GL_DEPTH_BUFFER_BIT);
-      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // We need a cleared depth buffer for some effect (eg particles depth blending)
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        glClear(GL_DEPTH_BUFFER_BIT);
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+            glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     PROFILER_POP_CPU_MARKER();
 
