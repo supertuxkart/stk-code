@@ -413,6 +413,11 @@ void unitTesting()
     assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1", 
                    "NVIDIA GeForce GTX 680MX OpenGL Engine")
            == Version("310.90.10.5")                                    );
+
+    assert(Version("4.1 NVIDIA-10.0.43 310.41.05f01",
+                    "NVIDIA GeForce GTX 780M OpenGL Engine")
+        == Version("310.41.05"));
+
     assert(Version("3.1 (Core Profile) Mesa 10.3.0",
                   "Mesa DRI Mobile Intel\u00ae GM45 Express Chipset")
            == Version("10.3.0")                                         );
