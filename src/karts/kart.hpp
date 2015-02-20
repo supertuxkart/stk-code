@@ -170,9 +170,6 @@ private:
     /** Is time flying activated */
     bool             m_is_jumping;
 
-    /** The shadow of a kart. */
-    Shadow          *m_shadow;
-
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool             m_shadow_enabled;

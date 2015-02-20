@@ -32,7 +32,6 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
 #include "graphics/stk_text_billboard.hpp"
@@ -117,7 +116,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_squash_time          = 0.0f;
     m_shadow_enabled       = false;
 
-    m_shadow               = NULL;
     m_wheel_box            = NULL;
     m_collision_particles  = NULL;
     m_slipstream           = NULL;
@@ -268,7 +266,6 @@ Kart::~Kart()
     if(m_attachment)             delete m_attachment;
     if(m_stars_effect)          delete m_stars_effect;
 
-    delete m_shadow;
     if (m_wheel_box) m_wheel_box->remove();
     if(m_skidmarks) delete m_skidmarks ;
 
@@ -1407,11 +1404,9 @@ void Kart::update(float dt)
     if((!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
-        m_shadow->disableShadow();
     }
     if(!m_shadow_enabled && isOnGround() && !emergency)
     {
-        m_shadow->enableShadow();
         m_shadow_enabled = true;
     }
 }   // update
@@ -2468,13 +2463,6 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
             track_manager->getTrack(race_manager->getTrackName())
                          ->isFogEnabled() );
     }
-
-    m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
-                          m_node,
-                          m_kart_properties->getShadowScale(),
-                          m_kart_properties->getShadowXOffset(),
-                          m_kart_properties->getGraphicalYOffset(),
-                          m_kart_properties->getShadowZOffset());
 
     World::getWorld()->kartAdded(this, m_node);
 }   // loadData
