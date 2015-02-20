@@ -108,109 +108,46 @@ struct Histogram
 void IrrDriver::UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, size_t height)
 {
     // Value that should be kept between multiple calls
-    static GLuint ssbo[2];
-    static Histogram *Hist[2];
-    static GLsync LightcoordBBFence = 0;
-    static size_t currentHist = 0;
-    static GLuint ssboSplit[2];
-    static float tmpshadowSplit[5] = { 1., 5., 20., 50., 150. };
+    static bool ssboInit = false;
+    static GLuint CBBssbo, tempShadowMatssbo;
+    CascadeBoundingBox InitialCBB[4];
 
-    if (!LightcoordBBFence)
-    {
-        glGenBuffers(2, ssbo);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[0]);
-        glBufferStorage(GL_SHADER_STORAGE_BUFFER, 4 * sizeof(CascadeBoundingBox), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
-        CBB[0] = (CascadeBoundingBox *)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, 4 * sizeof(CascadeBoundingBox), GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[1]);
-        glBufferStorage(GL_SHADER_STORAGE_BUFFER, 4 * sizeof(CascadeBoundingBox), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
-        CBB[1] = (CascadeBoundingBox *)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, 4 * sizeof(CascadeBoundingBox), GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
-
-        /*        glGenBuffers(2, ssboSplit);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboSplit[0]);
-        glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(Histogram), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
-        Hist[0] = (Histogram *)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Histogram), GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboSplit[1]);
-        glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(Histogram), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
-        Hist[1] = (Histogram *)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Histogram), GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);*/
-    }
-
-    // Use bounding boxes from last frame
-    if (LightcoordBBFence)
-    {
-        while (glClientWaitSync(LightcoordBBFence, GL_SYNC_FLUSH_COMMANDS_BIT, 0) != GL_ALREADY_SIGNALED);
-        glDeleteSync(LightcoordBBFence);
-    }
-
-    /*    {
-    memcpy(shadowSplit, tmpshadowSplit, 5 * sizeof(float));
-    unsigned numpix = Hist[currentHist]->count;
-    unsigned split = 0;
-    unsigned i;
-    for (i = 0; i < 1022; i++)
-    {
-    split += Hist[currentHist]->bin[i];
-    if (split > numpix / 2)
-    break;
-    }
-    tmpshadowSplit[1] = (float)++i / 4.;
-
-    for (; i < 1023; i++)
-    {
-    split += Hist[currentHist]->bin[i];
-    if (split > 3 * numpix / 4)
-    break;
-    }
-    tmpshadowSplit[2] = (float)++i / 4.;
-
-    for (; i < 1024; i++)
-    {
-    split += Hist[currentHist]->bin[i];
-    if (split > 7 * numpix / 8)
-    break;
-    }
-    tmpshadowSplit[3] = (float)++i / 4.;
-
-    for (; i < 1024; i++)
-    {
-    split += Hist[currentHist]->bin[i];
-    }
-
-    tmpshadowSplit[0] = (float)(Hist[currentHist]->bin[1024] - 1) / 4.;
-    tmpshadowSplit[4] = (float)(Hist[currentHist]->bin[1025] + 1) / 4.;
-    printf("numpix is %d\n", numpix);
-    printf("total : %d\n", split);
-    printf("split 0 : %f\n", tmpshadowSplit[1]);
-    printf("split 1 : %f\n", tmpshadowSplit[2]);
-    printf("split 2 : %f\n", tmpshadowSplit[3]);
-    printf("min %f max %f\n", tmpshadowSplit[0], tmpshadowSplit[4]);
-    currentHist = (currentHist + 1) % 2;
-    }*/
-
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssbo[currentCBB]);
-    //    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboSplit[currentHist]);
     for (unsigned i = 0; i < 4; i++)
     {
-        CBB[currentCBB][i].xmin = CBB[currentCBB][i].ymin = CBB[currentCBB][i].zmin = 1000;
-        CBB[currentCBB][i].xmax = CBB[currentCBB][i].ymax = CBB[currentCBB][i].zmax = -1000;
+        InitialCBB[i].xmin = InitialCBB[i].ymin = InitialCBB[i].zmin = 1000;
+        InitialCBB[i].xmax = InitialCBB[i].ymax = InitialCBB[i].zmax = -1000;
     }
-    //    memset(Hist[currentHist], 0, sizeof(Histogram));
-    //    Hist[currentHist]->mindepth = 3000;
-    glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
+
+    if (!ssboInit)
+    {
+        glGenBuffers(1, &CBBssbo);
+        glGenBuffers(1, &tempShadowMatssbo);
+        ssboInit = true;
+    }
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, CBBssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 4 * sizeof(CascadeBoundingBox), InitialCBB, GL_STATIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, CBBssbo);
+
     glUseProgram(FullScreenShader::LightspaceBoundingBoxShader::getInstance()->Program);
     FullScreenShader::LightspaceBoundingBoxShader::getInstance()->SetTextureUnits(getDepthStencilTexture());
-    FullScreenShader::LightspaceBoundingBoxShader::getInstance()->setUniforms(m_suncam->getViewMatrix(), tmpshadowSplit[1], tmpshadowSplit[2], tmpshadowSplit[3], tmpshadowSplit[4]);
+    FullScreenShader::LightspaceBoundingBoxShader::getInstance()->setUniforms(m_suncam->getViewMatrix(), shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4]);
     glDispatchCompute((int)width / 64, (int)height / 64, 1);
 
-    /*    glUseProgram(FullScreenShader::DepthHistogramShader::getInstance()->Program);
-    FullScreenShader::DepthHistogramShader::getInstance()->SetTextureUnits(getDepthStencilTexture());
-    FullScreenShader::DepthHistogramShader::getInstance()->setUniforms();
-    glDispatchCompute((int)width / 32, (int)height / 32, 1);*/
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, tempShadowMatssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 4 * 16 * sizeof(float), 0, GL_STATIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, tempShadowMatssbo);
+
+    glUseProgram(FullScreenShader::ShadowMatrixesGenerationShader::getInstance()->Program);
+    FullScreenShader::ShadowMatrixesGenerationShader::getInstance()->setUniforms(m_suncam->getViewMatrix());
+    glDispatchCompute(4, 1, 1);
 
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-    LightcoordBBFence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-
-    currentCBB = (currentCBB + 1) % 2;
-
+    glBindBuffer(GL_COPY_READ_BUFFER, tempShadowMatssbo);
+    glBindBuffer(GL_COPY_WRITE_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
+    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 80 * sizeof(float), 4 * 16 * sizeof(float));
 }
 
 /** Generate View, Projection, Inverse View, Inverse Projection, ViewProjection and InverseProjection matrixes
@@ -281,60 +218,42 @@ void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnod
         for (unsigned i = 0; i < 4; i++)
         {
             core::matrix4 tmp_matrix;
-            if (!CVS->isSDSMEnabled())
-            {
-                camnode->setFarValue(FarValues[i]);
-                camnode->setNearValue(NearValues[i]);
-                camnode->render();
-                const scene::SViewFrustum *frustrum = camnode->getViewFrustum();
-                float tmp[24] = {
-                    frustrum->getFarLeftDown().X,
-                    frustrum->getFarLeftDown().Y,
-                    frustrum->getFarLeftDown().Z,
-                    frustrum->getFarLeftUp().X,
-                    frustrum->getFarLeftUp().Y,
-                    frustrum->getFarLeftUp().Z,
-                    frustrum->getFarRightDown().X,
-                    frustrum->getFarRightDown().Y,
-                    frustrum->getFarRightDown().Z,
-                    frustrum->getFarRightUp().X,
-                    frustrum->getFarRightUp().Y,
-                    frustrum->getFarRightUp().Z,
-                    frustrum->getNearLeftDown().X,
-                    frustrum->getNearLeftDown().Y,
-                    frustrum->getNearLeftDown().Z,
-                    frustrum->getNearLeftUp().X,
-                    frustrum->getNearLeftUp().Y,
-                    frustrum->getNearLeftUp().Z,
-                    frustrum->getNearRightDown().X,
-                    frustrum->getNearRightDown().Y,
-                    frustrum->getNearRightDown().Z,
-                    frustrum->getNearRightUp().X,
-                    frustrum->getNearRightUp().Y,
-                    frustrum->getNearRightUp().Z,
-                };
-                memcpy(m_shadows_cam[i], tmp, 24 * sizeof(float));
 
-                std::vector<vector3df> vectors = getFrustrumVertex(*frustrum);
-                tmp_matrix = getTighestFitOrthoProj(SunCamViewMatrix, vectors, m_shadow_scales[i]);
-            }
-            else
-            {
-                float left = float(CBB[currentCBB][i].xmin / 4 - 2);
-                float right = float(CBB[currentCBB][i].xmax / 4 + 2);
-                float up = float(CBB[currentCBB][i].ymin / 4 - 2);
-                float down = float(CBB[currentCBB][i].ymax / 4 + 2);
+            camnode->setFarValue(FarValues[i]);
+            camnode->setNearValue(NearValues[i]);
+            camnode->render();
+            const scene::SViewFrustum *frustrum = camnode->getViewFrustum();
+            float tmp[24] = {
+                frustrum->getFarLeftDown().X,
+                frustrum->getFarLeftDown().Y,
+                frustrum->getFarLeftDown().Z,
+                frustrum->getFarLeftUp().X,
+                frustrum->getFarLeftUp().Y,
+                frustrum->getFarLeftUp().Z,
+                frustrum->getFarRightDown().X,
+                frustrum->getFarRightDown().Y,
+                frustrum->getFarRightDown().Z,
+                frustrum->getFarRightUp().X,
+                frustrum->getFarRightUp().Y,
+                frustrum->getFarRightUp().Z,
+                frustrum->getNearLeftDown().X,
+                frustrum->getNearLeftDown().Y,
+                frustrum->getNearLeftDown().Z,
+                frustrum->getNearLeftUp().X,
+                frustrum->getNearLeftUp().Y,
+                frustrum->getNearLeftUp().Z,
+                frustrum->getNearRightDown().X,
+                frustrum->getNearRightDown().Y,
+                frustrum->getNearRightDown().Z,
+                frustrum->getNearRightUp().X,
+                frustrum->getNearRightUp().Y,
+                frustrum->getNearRightUp().Z,
+            };
+            memcpy(m_shadows_cam[i], tmp, 24 * sizeof(float));
 
-                // Prevent Matrix without extend
-                if (left != right && up != down)
-                {
-                    tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
-                        down, up,
-                        float(CBB[currentCBB][i].zmin / 4 - 100),
-                        float(CBB[currentCBB][i].zmax / 4 + 2));
-                    m_shadow_scales[i] = std::make_pair(right - left, down - up);
-                }
-            }
+            std::vector<vector3df> vectors = getFrustrumVertex(*frustrum);
+            tmp_matrix = getTighestFitOrthoProj(SunCamViewMatrix, vectors, m_shadow_scales[i]);
+
 
             m_shadow_camnodes[i]->setProjectionMatrix(tmp_matrix, true);
             m_shadow_camnodes[i]->render();
@@ -382,7 +301,13 @@ void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnod
     tmp[144] = float(width);
     tmp[145] = float(height);
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float), tmp);
+    if (CVS->isSDSMEnabled())
+    {
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 5) * sizeof(float), tmp);
+        glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float), 2 * sizeof(float), &tmp[144]);
+    }
+    else
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float), tmp);
 }
 
 

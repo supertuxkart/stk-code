@@ -1,0 +1,52 @@
+uniform mat4 SunCamMatrix;
+
+layout (local_size_x = 4) in;
+
+struct CascadeBoundingBox
+{
+    int xmin;
+    int xmax;
+    int ymin;
+    int ymax;
+    int zmin;
+    int zmax;
+};
+
+layout (std430) buffer BoundingBoxes
+{
+    CascadeBoundingBox BB[4];
+};
+
+layout (std140) buffer NewMatrixData
+{
+    mat4 ShadowMatrixes[4];
+};
+
+mat4 buildProjectionMatrixOrthoLH(float left, float right, float up, float down, float zNear, float zFar)
+{
+    mat4 M;
+    M[0] = vec4(2. / (right - left), 0., 0., 0.);
+
+    M[1] = vec4(0., 2. / (up - down), 0., 0.);
+
+    M[2] = vec4(0., 0., 1. / (zFar - zNear), 0.);
+
+    M[3].x = - (right + left) / (right - left);
+    M[3].y = - (up + down) / (up - down);
+    M[3].z = zNear / (zNear - zFar);
+    M[3].w = 1.;
+
+    return M;
+}
+
+void main()
+{
+    if (gl_LocalInvocationIndex > 3)
+        return;
+
+    ShadowMatrixes[gl_LocalInvocationIndex] = buildProjectionMatrixOrthoLH(
+        BB[gl_LocalInvocationIndex].xmin / 4. - 1., BB[gl_LocalInvocationIndex].xmax / 4. + 1.,
+        BB[gl_LocalInvocationIndex].ymax / 4. + 1., BB[gl_LocalInvocationIndex].ymin / 4. - 1.,
+        BB[gl_LocalInvocationIndex].zmin / 4. - 100., BB[gl_LocalInvocationIndex].zmax / 4. + 1.) * SunCamMatrix;
+}
+

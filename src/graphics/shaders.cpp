@@ -1904,6 +1904,17 @@ namespace FullScreenShader
         glShaderStorageBlockBinding(Program, block_idx, 2);
     }
 
+    ShadowMatrixesGenerationShader::ShadowMatrixesGenerationShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/shadowmatrixgeneration.comp").c_str());
+        AssignUniforms("SunCamMatrix");
+        GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
+        glShaderStorageBlockBinding(Program, block_idx, 2);
+        block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "NewMatrixData");
+        glShaderStorageBlockBinding(Program, block_idx, 1);
+    }
+
     DepthHistogramShader::DepthHistogramShader()
     {
         Program = LoadProgram(OBJECT,
