@@ -206,6 +206,7 @@
 
 static void cleanSuperTuxKart();
 static void cleanUserConfig();
+void runUnitTests();
 
 // ============================================================================
 //                        gamepad visualisation screen
@@ -388,6 +389,66 @@ void handleXmasMode()
     if(xmas)
         kart_properties_manager->setHatMeshName("christmas_hat.b3d");
 }   // handleXmasMode
+// ============================================================================
+/** Determines if Easter Ears should be used
+ *  m_easter_ear_mode (0: use current date, 1: always on, 2: always off).
+ */
+bool isEasterMode(int day, int month, int year, int before_after_days)
+{
+    bool ears = false;
+    switch (UserConfigParams::m_easter_ear_mode)
+    {
+    case 0:
+    {
+        // Compute Easter date, based on wikipedia formula
+        // http://en.wikipedia.org/wiki/Computus
+        int a = year % 19;
+        int b = year >> 2;
+        int c = int(floor(b / 25)) + 1;
+        int d = (c * 3) >> 2;
+        int e = ((a * 19) - int(floor((c * 8 + 5) / 25)) + d + 15) % 30;
+        e += (29578 - a - e * 32) >> 10;
+        e -= ((year % 7) + b - d + e + 2) % 7;
+        d = e >> 5;
+        int easter_day = e - d * 31;
+        int easter_month = d + 3;
+
+        int easter_start_day = easter_day - before_after_days;
+        int easter_start_month = easter_month;
+        if (easter_start_day < 1)
+        {
+            easter_start_day += 31; // Month is April, going into March
+            easter_start_month--;
+        }
+        int easter_end_day = easter_day + before_after_days;
+        int easter_end_month = easter_month;
+        int month_length = easter_end_month == 3 ? 31 : 30;
+        if (easter_end_day > month_length)
+        {
+            easter_end_day -= month_length;
+            easter_end_month++;
+        }
+        return (month > easter_start_month || (month == easter_start_month && day >= easter_start_day)) &&
+               (month < easter_end_month   || (month == easter_end_month   && day <= easter_end_day));
+        break;
+    }
+    case 1:  return true;  break;
+    default: return false; break;
+    }   // switch m_xmas_mode
+
+}   // isEasterMode(day, month, year, before_after_days)
+
+// ============================================================================
+/** Wrapper around handleEasterEarMode(day, month, year, before_after_days).
+ */
+void handleEasterEarMode()
+{
+    int day, month, year;
+    StkTime::getDate(&day, &month, &year);
+    if (isEasterMode(day, month, year, /*before_after_days*/5))
+        kart_properties_manager->setHatMeshName("easter_ears.b3d");
+}   // handleEasterMode
+
 // ============================================================================
 /** This function sets up all data structure for an immediate race start.
  *  It is used when the -N or -R command line options are used.
@@ -637,6 +698,8 @@ int handleCmdLinePreliminary()
     int n;
     if(CommandLine::has("--xmas", &n))
         UserConfigParams::m_xmas_mode = n;
+    if (CommandLine::has("--easter", &n))
+        UserConfigParams::m_easter_ear_mode = n;
     if(CommandLine::has("--log", &n))
         Log::setLogLevel(n);
 
@@ -1206,6 +1269,7 @@ int main(int argc, char *argv[] )
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
         handleXmasMode();
+        handleEasterEarMode();
 
         // Needs the kart and track directories to load potential challenges
         // in those dirs, so it can only be created after reading tracks
@@ -1292,7 +1356,7 @@ int main(int argc, char *argv[] )
 
         if(UserConfigParams::m_unit_testing)
         {
-            GraphicsRestrictions::unitTesting();
+            runUnitTests();
             exit(0);
         }
 
@@ -1554,3 +1618,37 @@ static void cleanUserConfig()
     if(irr_driver)              delete irr_driver;
 }   // cleanUserConfig
 
+//=============================================================================
+void runUnitTests()
+{
+    GraphicsRestrictions::unitTesting();
+    // Test easter mode: in 2015 Easter is 5th of April - check with 0 days
+    // before and after
+    int saved_easter_mode = UserConfigParams::m_easter_ear_mode;
+    UserConfigParams::m_easter_ear_mode = 0;   // disable always on or off mode
+    assert( isEasterMode( 5, 4, 2015, 0));
+    assert(!isEasterMode( 4, 4, 2015, 0));
+    assert(!isEasterMode( 6, 4, 2015, 0));
+
+    assert( isEasterMode( 1, 4, 2018, 0));
+    assert( isEasterMode(27, 3, 2016, 0));
+
+    // Check days before/after
+    assert( isEasterMode( 2, 4, 2015, 3));
+    assert(!isEasterMode( 1, 4, 2015, 3));
+    assert( isEasterMode( 8, 4, 2015, 3));
+    assert(!isEasterMode( 9, 4, 2015, 3));
+
+    // Check if going to previous month is handled correctly: 1/4/2018
+    assert( isEasterMode(27, 3, 2018, 5));
+    assert(!isEasterMode(26, 3, 2018, 5));
+    assert( isEasterMode( 6, 4, 2018, 5));
+    assert(!isEasterMode( 7, 4, 2018, 5));
+
+    // Check if going to previous month is handled correctly: 1/4/2018
+    assert( isEasterMode( 1, 4, 2016, 5));
+    assert(!isEasterMode( 2, 4, 2016, 5));
+    assert( isEasterMode(22, 3, 2016, 5));
+    assert(!isEasterMode(21, 3, 2016, 5));
+    UserConfigParams::m_easter_ear_mode = saved_easter_mode;
+}   // unitTesting
