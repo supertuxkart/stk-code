@@ -668,9 +668,9 @@ void ScalableFont::doDraw(const core::stringw& text,
         if (fallback[n])
         {
             // TODO: don't hardcode colors?
-            static video::SColor orange(color.getAlpha(), 255, 100, 0);
-            static video::SColor yellow(color.getAlpha(), 255, 220, 15);
-            video::SColor title_colors[] = {yellow, orange, orange, yellow};
+            video::SColor orange(color.getAlpha(), 255, 100, 0);
+            video::SColor yellow(color.getAlpha(), 255, 220, 15);
+            video::SColor title_colors[] = {orange, yellow, orange, yellow};
 
             if (charCollector != NULL)
             {
