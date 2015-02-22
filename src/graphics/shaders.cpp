@@ -1641,6 +1641,19 @@ namespace FullScreenShader
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
+    DegradedIBLShader::DegradedIBLShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/degraded_ibl.frag").c_str());
+        AssignUniforms();
+        AssignSamplerNames(Program, 0, "ntex");
+    }
+
     ShadowedSunLightShaderPCF::ShadowedSunLightShaderPCF()
     {
         Program = LoadProgram(OBJECT,

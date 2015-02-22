@@ -654,6 +654,10 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows_resoltion", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
+    PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
+        PARAM_DEFAULT(BoolUserConfigParam(false,
+        "Degraded_IBL", &m_graphics_quality,
+        "Disable specular IBL"));
 
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_cache_overworld

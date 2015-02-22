@@ -220,11 +220,22 @@ void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, 
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    glUseProgram(FullScreenShader::IBLShader::getInstance()->Program);
-    glBindVertexArray(SharedObject::FullScreenQuadVAO);
+    if (UserConfigParams::m_degraded_IBL)
+    {
+        glUseProgram(FullScreenShader::DegradedIBLShader::getInstance()->Program);
+        glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
-    FullScreenShader::IBLShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox);
-    FullScreenShader::IBLShader::getInstance()->setUniforms();
+        FullScreenShader::DegradedIBLShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
+        FullScreenShader::DegradedIBLShader::getInstance()->setUniforms();
+    }
+    else
+    {
+        glUseProgram(FullScreenShader::IBLShader::getInstance()->Program);
+        glBindVertexArray(SharedObject::FullScreenQuadVAO);
+
+        FullScreenShader::IBLShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox);
+        FullScreenShader::IBLShader::getInstance()->setUniforms();
+    }
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);

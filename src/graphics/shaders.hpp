@@ -426,6 +426,12 @@ public:
     IBLShader();
 };
 
+class DegradedIBLShader : public ShaderHelperSingleton<DegradedIBLShader>, public TextureRead<Nearest_Filtered>
+{
+public:
+    DegradedIBLShader();
+};
+
 class ShadowedSunLightShaderPCF : public ShaderHelperSingleton<ShadowedSunLightShaderPCF, float, float, float, float, float>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
 {
 public:
