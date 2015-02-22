@@ -744,19 +744,37 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             glClear(GL_STENCIL_BUFFER_BIT);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 
-            FrameBuffer::Blit(*in_fbo, irr_driver->getFBO(FBO_BLOOM_1024), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            FrameBuffer::Blit(*in_fbo, irr_driver->getFBO(FBO_TMP_1024), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-            irr_driver->getFBO(FBO_BLOOM_512).Bind();
-            renderBloom(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024));
+            irr_driver->getFBO(FBO_BLOOM_1024).Bind();
+            renderBloom(irr_driver->getRenderTargetTexture(RTT_TMP_1024));
 
             // Downsample
+            FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_1024), irr_driver->getFBO(FBO_BLOOM_512), GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_BLOOM_256), GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_BLOOM_128), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
             // Blur
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_TMP_512), 1., 1.);
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_TMP_256), 1., 1.);
+            // The fbo sum chain is from https://software.intel.com/en-us/articles/compute-shader-hdr-and-bloom
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
+
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_TMP_128), 1., 1.);
+            glEnable(GL_BLEND);
+            irr_driver->getFBO(FBO_BLOOM_256).Bind();
+            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_128).getRTT()[0]);
+            glDisable(GL_BLEND);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_TMP_256), 2., 2.);
+            glEnable(GL_BLEND);
+            irr_driver->getFBO(FBO_BLOOM_512).Bind();
+            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_256).getRTT()[0]);
+            glDisable(GL_BLEND);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_TMP_512), 2., 2.);
+            glEnable(GL_BLEND);
+            irr_driver->getFBO(FBO_BLOOM_1024).Bind();
+            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_512).getRTT()[0]);
+            glDisable(GL_BLEND);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_1024), irr_driver->getFBO(FBO_TMP_1024), 2., 2.);
 
             // Additively blend on top of tmp1
             in_fbo->Bind();
@@ -766,6 +784,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             FullScreenShader::BloomBlendShader::getInstance()->SetTextureUnits(
                 irr_driver->getRenderTargetTexture(RTT_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
             DrawFullScreenEffect<FullScreenShader::BloomBlendShader>();
+
             glDisable(GL_BLEND);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         } // end if bloom
