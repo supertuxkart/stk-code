@@ -92,6 +92,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         shadows->setValue(0);
     getWidget<CheckBoxWidget>("dynamiclight")->setState(UserConfigParams::m_dynamic_lights);
     getWidget<CheckBoxWidget>("lightshaft")->setState(UserConfigParams::m_light_shaft);
+    getWidget<CheckBoxWidget>("ibl")->setState(!UserConfigParams::m_degraded_IBL);
     getWidget<CheckBoxWidget>("global_illumination")->setState(UserConfigParams::m_gi);
     getWidget<CheckBoxWidget>("motionblur")->setState(UserConfigParams::m_motionblur);
     getWidget<CheckBoxWidget>("mlaa")->setState(UserConfigParams::m_mlaa);
@@ -149,6 +150,9 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
         UserConfigParams::m_light_shaft =
             advanced_pipeline && getWidget<CheckBoxWidget>("lightshaft")->getState();
+
+        UserConfigParams::m_degraded_IBL =
+            !getWidget<CheckBoxWidget>("ibl")->getState();
 
         UserConfigParams::m_gi =
             advanced_pipeline && CVS->supportsGlobalIllumination() &&
@@ -231,6 +235,7 @@ void CustomVideoSettingsDialog::updateActivation()
         getWidget<CheckBoxWidget>("mlaa")->setActivated();
         getWidget<CheckBoxWidget>("ssao")->setActivated();
         getWidget<CheckBoxWidget>("lightshaft")->setActivated();
+        getWidget<CheckBoxWidget>("ibl")->setActivated();
         getWidget<CheckBoxWidget>("global_illumination")->setActivated();
         getWidget<CheckBoxWidget>("glow")->setActivated();
         getWidget<CheckBoxWidget>("bloom")->setActivated();
@@ -243,6 +248,7 @@ void CustomVideoSettingsDialog::updateActivation()
         getWidget<CheckBoxWidget>("mlaa")->setDeactivated();
         getWidget<CheckBoxWidget>("ssao")->setDeactivated();
         getWidget<CheckBoxWidget>("lightshaft")->setDeactivated();
+        getWidget<CheckBoxWidget>("ibl")->setDeactivated();
         getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
         getWidget<CheckBoxWidget>("glow")->setDeactivated();
         getWidget<CheckBoxWidget>("bloom")->setDeactivated();

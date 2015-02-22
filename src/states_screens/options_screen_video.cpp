@@ -61,6 +61,7 @@ struct GFXPreset
     /** Depth of field */
     bool dof;
     bool global_illumination;
+    bool degraded_ibl;
 };
 
 static GFXPreset GFX_PRESETS[] =
@@ -69,35 +70,35 @@ static GFXPreset GFX_PRESETS[] =
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
         false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */
     },
 
     {
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, true /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */, true /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 8 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, false /* degraded IBL */
     },
 
     {
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
-        true /* depth of field */, true /* global illumination */
+        true /* depth of field */, true /* global illumination */, false /* degraded IBL */
     }
 };
 
@@ -395,7 +396,8 @@ void OptionsScreenVideo::updateGfxSlider()
             GFX_PRESETS[l].ssao == UserConfigParams::m_ssao &&
             GFX_PRESETS[l].weather == UserConfigParams::m_weather_effects &&
             GFX_PRESETS[l].dof == UserConfigParams::m_dof &&
-            GFX_PRESETS[l].global_illumination == UserConfigParams::m_gi)
+            GFX_PRESETS[l].global_illumination == UserConfigParams::m_gi &&
+            GFX_PRESETS[l].degraded_ibl == UserConfigParams::m_degraded_IBL)
         {
             gfx->setValue(l + 1);
             found = true;
@@ -567,6 +569,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_weather_effects = GFX_PRESETS[level].weather;
         UserConfigParams::m_dof = GFX_PRESETS[level].dof;
         UserConfigParams::m_gi = GFX_PRESETS[level].global_illumination;
+        UserConfigParams::m_degraded_IBL = GFX_PRESETS[level].degraded_ibl;
 
         updateGfxSlider();
     }
