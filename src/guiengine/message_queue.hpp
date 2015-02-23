@@ -34,7 +34,7 @@ namespace MessageQueue
      *  different look. This type is used to sort the messages, so it is
      *  important that messages that need to be shown as early as possible
      *  will be listed last (i.e. have highest priority). */
-    enum MessageType {MT_FRIEND, MT_ACHIEVEMENT};
+    enum MessageType { MT_FRIEND, MT_ACHIEVEMENT, MT_ERROR};
 
     void add(MessageType mt, const core::stringw &message);
     void updatePosition();

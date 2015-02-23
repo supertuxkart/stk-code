@@ -26,6 +26,7 @@
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
 #include "online/servers_manager.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online_profile_friends.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/change_password_dialog.hpp"
@@ -141,7 +142,6 @@ namespace Online
     {
         PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
-        BaseUserScreen *login = dynamic_cast<BaseUserScreen*>(screen);
 
         // If the login is successful, reset any saved session of other
         // local players using the same online account (which are now invalid)
@@ -160,6 +160,8 @@ namespace Online
             }
         }
 
+        // Test if failure while showing user login screen
+        BaseUserScreen *login = dynamic_cast<BaseUserScreen*>(screen);
         if (login)
         {
             if(isSuccess())
@@ -167,6 +169,26 @@ namespace Online
             else
                 login->loginError(getInfo());
         }   // if dialog
+
+        // Check if failure happened during automatic (saved) signin.
+        else if (!isSuccess())
+        {
+            if (GUIEngine::getCurrentScreen() != MainMenuScreen::getInstance())
+            {
+                // User has already opened another menu, so use message queue
+                // to inform user that login failed.
+                MessageQueue::add(MessageQueue::MT_ERROR, getInfo());
+                return;
+            }
+
+            // User still at main menu screen, push user screen. Note that
+            // this function is called from the main thread, so we can 
+            // push screens without synchronisations.
+            UserScreen::getInstance()->push();
+            UserScreen::getInstance()->loginError(getInfo());
+        }
+
+
     }   // SignInRequest::callback
 
     // ------------------------------------------------------------------------
