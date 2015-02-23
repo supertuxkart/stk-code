@@ -883,7 +883,7 @@ void IrrDriver::renderTransparent()
 
     irr_driver->getFBO(FBO_COLORS).Bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
-    m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE));
+    m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE), irr_driver->getFBO(FBO_COLORS).getWidth(), irr_driver->getFBO(FBO_COLORS).getHeight());
     glDisable(GL_STENCIL_TEST);
 
 }

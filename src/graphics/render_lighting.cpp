@@ -289,5 +289,5 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     getFBO(FBO_COLORS).Bind();
-    m_post_processing->renderPassThrough(getRenderTargetTexture(RTT_HALF1));
+    m_post_processing->renderPassThrough(getRenderTargetTexture(RTT_HALF1), getFBO(FBO_COLORS).getWidth(), getFBO(FBO_COLORS).getHeight());
 }

@@ -557,11 +557,9 @@ public:
     Gaussian3VBlurShader();
 };
 
-class PassThroughShader : public ShaderHelperSingleton<PassThroughShader>, public TextureRead<Bilinear_Filtered>
+class PassThroughShader : public ShaderHelperSingleton<PassThroughShader, int, int>, public TextureRead<Bilinear_Filtered>
 {
 public:
-    GLuint vao;
-
     PassThroughShader();
 };
 

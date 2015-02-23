@@ -1875,11 +1875,10 @@ namespace FullScreenShader
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/passthrough.frag").c_str());
 
-        AssignUniforms();
+        AssignUniforms("width", "height");
         AssignSamplerNames(Program, 0, "tex");
-        vao = createVAO(Program);
     }
 
     LayerPassThroughShader::LayerPassThroughShader()

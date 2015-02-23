@@ -468,15 +468,10 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
-void PostProcessing::renderPassThrough(GLuint tex)
+void PostProcessing::renderPassThrough(GLuint tex, unsigned width, unsigned height)
 {
-    glUseProgram(FullScreenShader::PassThroughShader::getInstance()->Program);
-    glBindVertexArray(FullScreenShader::PassThroughShader::getInstance()->vao);
-
     FullScreenShader::PassThroughShader::getInstance()->SetTextureUnits(tex);
-    FullScreenShader::PassThroughShader::getInstance()->setUniforms();
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::PassThroughShader>(width, height);
 }
 
 void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
@@ -728,7 +723,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             glBlendEquation(GL_FUNC_ADD);
 
             in_fbo->Bind();
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER2));
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER2), in_fbo->getWidth(), in_fbo->getHeight());
             glDisable(GL_BLEND);
         }
         PROFILER_POP_CPU_MARKER();
@@ -762,17 +757,17 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_TMP_128), 1., 1.);
             glEnable(GL_BLEND);
             irr_driver->getFBO(FBO_BLOOM_256).Bind();
-            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_128).getRTT()[0]);
+            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_128).getRTT()[0], 256, 256);
             glDisable(GL_BLEND);
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_TMP_256), 2., 2.);
             glEnable(GL_BLEND);
             irr_driver->getFBO(FBO_BLOOM_512).Bind();
-            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_256).getRTT()[0]);
+            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_256).getRTT()[0], 512, 512);
             glDisable(GL_BLEND);
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_TMP_512), 2., 2.);
             glEnable(GL_BLEND);
             irr_driver->getFBO(FBO_BLOOM_1024).Bind();
-            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_512).getRTT()[0]);
+            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_512).getRTT()[0], 1024, 1024);
             glDisable(GL_BLEND);
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_1024), irr_driver->getFBO(FBO_TMP_1024), 2., 2.);
 
@@ -828,7 +823,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
 
     glEnable(GL_FRAMEBUFFER_SRGB);
     irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
-    renderPassThrough(in_fbo->getRTT()[0]);
+    renderPassThrough(in_fbo->getRTT()[0], irr_driver->getFBO(FBO_MLAA_COLORS).getWidth(), irr_driver->getFBO(FBO_MLAA_COLORS).getHeight());
     out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
 
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
