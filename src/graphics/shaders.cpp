@@ -1978,7 +1978,6 @@ namespace FullScreenShader
         AssignUniforms("col");
 
         AssignSamplerNames(Program, 0, "tex");
-        vao = createVAO(Program);
     }
 
     GodRayShader::GodRayShader()
@@ -1989,7 +1988,6 @@ namespace FullScreenShader
 
         AssignUniforms("sunpos");
         AssignSamplerNames(Program, 0, "tex");
-        vao = createVAO(Program);
     }
 
     MLAAColorEdgeDetectionSHader::MLAAColorEdgeDetectionSHader()

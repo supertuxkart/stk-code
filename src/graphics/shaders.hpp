@@ -619,16 +619,12 @@ public:
 class GodFadeShader : public ShaderHelperSingleton<GodFadeShader, video::SColorf>, public TextureRead<Bilinear_Filtered>
 {
 public:
-    GLuint vao;
-
     GodFadeShader();
 };
 
 class GodRayShader : public ShaderHelperSingleton<GodRayShader, core::vector2df>, public TextureRead<Bilinear_Filtered>
 {
 public:
-    GLuint vao;
-
     GodRayShader();
 };
 

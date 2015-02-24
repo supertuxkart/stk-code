@@ -554,22 +554,14 @@ void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo, FrameBuffe
 
 static void renderGodFade(GLuint tex, const SColor &col)
 {
-    glUseProgram(FullScreenShader::GodFadeShader::getInstance()->Program);
-    glBindVertexArray(FullScreenShader::GodFadeShader::getInstance()->vao);
     FullScreenShader::GodFadeShader::getInstance()->SetTextureUnits(tex);
-    FullScreenShader::GodFadeShader::getInstance()->setUniforms(col);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::GodFadeShader>(col);
 }
 
 static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
 {
-    glUseProgram(FullScreenShader::GodRayShader::getInstance()->Program);
-    glBindVertexArray(FullScreenShader::GodRayShader::getInstance()->vao);
     FullScreenShader::GodRayShader::getInstance()->SetTextureUnits(tex);
-    FullScreenShader::GodRayShader::getInstance()->setUniforms(sunpos);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::GodRayShader>(sunpos);
 }
 
 static void toneMap(FrameBuffer &fbo, GLuint rtt, float vignette_weight)
