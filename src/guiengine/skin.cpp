@@ -1609,6 +1609,12 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
                                              0 /* no clipping */, 0,
                                              true /* alpha */);
     }
+
+    if (focused && widget->hasTooltip())
+    {
+        m_tooltip_at_mouse.push_back(true);
+        m_tooltips.push_back(widget);
+    }
 }   // drawCheckBox
 
 // ----------------------------------------------------------------------------

@@ -151,6 +151,7 @@ void OptionsScreenUI::init()
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
     difficulty->setState( UserConfigParams::m_per_player_difficulty );
+    difficulty->setTooltip(_("Handicap stronger players in the kart selection"));
 
     CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
     assert( show_login!= NULL );
