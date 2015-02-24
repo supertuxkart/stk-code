@@ -600,10 +600,7 @@ void PostProcessing::applyMLAA()
     // Pass 1: color edge detection
     glUseProgram(FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->Program);
     FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS));
-    FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->setUniforms(PIXEL_SIZE);
-
-    glBindVertexArray(FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::MLAAColorEdgeDetectionSHader>(PIXEL_SIZE);
 
     glStencilFunc(GL_EQUAL, 1, ~0);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -614,10 +611,7 @@ void PostProcessing::applyMLAA()
 
     glUseProgram(FullScreenShader::MLAABlendWeightSHader::getInstance()->Program);
     FullScreenShader::MLAABlendWeightSHader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), getTextureGLuint(m_areamap));
-    FullScreenShader::MLAABlendWeightSHader::getInstance()->setUniforms(PIXEL_SIZE);
-
-    glBindVertexArray(FullScreenShader::MLAABlendWeightSHader::getInstance()->vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::MLAABlendWeightSHader>(PIXEL_SIZE);
 
     // Blit in to tmp1
     FrameBuffer::Blit(irr_driver->getFBO(FBO_MLAA_COLORS), irr_driver->getFBO(FBO_MLAA_TMP));
@@ -627,10 +621,7 @@ void PostProcessing::applyMLAA()
 
     glUseProgram(FullScreenShader::MLAAGatherSHader::getInstance()->Program);
     FullScreenShader::MLAAGatherSHader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND), irr_driver->getRenderTargetTexture(RTT_MLAA_TMP));
-    FullScreenShader::MLAAGatherSHader::getInstance()->setUniforms(PIXEL_SIZE);
-
-    glBindVertexArray(FullScreenShader::MLAAGatherSHader::getInstance()->vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::MLAAGatherSHader>(PIXEL_SIZE);
 
     // Done.
     glDisable(GL_STENCIL_TEST);

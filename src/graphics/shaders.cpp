@@ -1995,12 +1995,11 @@ namespace FullScreenShader
     MLAAColorEdgeDetectionSHader::MLAAColorEdgeDetectionSHader()
     {
         Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/mlaa_offset.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_color1.frag").c_str());
         AssignUniforms("PIXEL_SIZE");
 
         AssignSamplerNames(Program, 0, "colorMapG");
-        vao = createVAO(Program);
     }
 
     MLAABlendWeightSHader::MLAABlendWeightSHader()
@@ -2011,18 +2010,16 @@ namespace FullScreenShader
         AssignUniforms("PIXEL_SIZE");
 
         AssignSamplerNames(Program, 0, "edgesMap", 1, "areaMap");
-        vao = createVAO(Program);
     }
 
     MLAAGatherSHader::MLAAGatherSHader()
     {
         Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/mlaa_offset.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_neigh3.frag").c_str());
         AssignUniforms("PIXEL_SIZE");
 
         AssignSamplerNames(Program, 0, "blendMap", 1, "colorMap");
-        vao = createVAO(Program);
     }
 }
 

@@ -635,24 +635,18 @@ public:
 class MLAAColorEdgeDetectionSHader : public ShaderHelperSingleton<MLAAColorEdgeDetectionSHader, core::vector2df>, public TextureRead<Nearest_Filtered>
 {
 public:
-    GLuint vao;
-
     MLAAColorEdgeDetectionSHader();
 };
 
 class MLAABlendWeightSHader : public ShaderHelperSingleton<MLAABlendWeightSHader, core::vector2df>, public TextureRead<Bilinear_Filtered, Nearest_Filtered>
 {
 public:
-    GLuint vao;
-
     MLAABlendWeightSHader();
 };
 
 class MLAAGatherSHader : public ShaderHelperSingleton<MLAAGatherSHader, core::vector2df>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
 {
 public:
-    GLuint vao;
-
     MLAAGatherSHader();
 };
 
