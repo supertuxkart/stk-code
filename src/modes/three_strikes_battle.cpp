@@ -1,5 +1,3 @@
-
-
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
@@ -341,6 +339,10 @@ void ThreeStrikesBattle::update(float dt)
 
         TrackObjectPresentationMesh* tire_presentation =
             new TrackObjectPresentationMesh(tire, tire_xyz, tire_hpr, tire_scale);
+
+#ifdef DEBUG
+        tire_presentation->getNode()->setName("Tire on ground");
+#endif
 
         TrackObject* tire_obj = new TrackObject(tire_xyz, tire_hpr, tire_scale,
                                                 "movable", tire_presentation,
