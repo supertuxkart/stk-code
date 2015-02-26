@@ -13,7 +13,7 @@ void main()
 {
     int x = int(gl_LocalInvocationID.x), y = int(gl_LocalInvocationID.y);
     ivec2 iuv = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
-    vec2 guv = gl_GlobalInvocationID.xy + .5;
+    vec2 guv = gl_GlobalInvocationID.xy + vec2(0.5);
     vec2 uv_m = (guv - vec2(0, 6)) * pixel;
     vec2 uv = guv * pixel;
     vec2 uv_p = (guv + vec2(0, 6)) * pixel;
