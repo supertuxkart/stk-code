@@ -280,6 +280,10 @@ void BaseUserScreen::makeEntryFieldsVisible()
     {
         getWidget<LabelWidget>("label_password")->setVisible(online);
         m_password_tb->setVisible(online);
+        // Is user has no online name, make sure the user can enter one
+        if (player->getLastOnlineName().empty())
+            m_username_tb->setActivated();
+
     }
 }   // makeEntryFieldsVisible
 
