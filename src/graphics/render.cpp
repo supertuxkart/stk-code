@@ -385,6 +385,12 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
             glDisable(GL_FRAMEBUFFER_SRGB);
         m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        // Bind() modifies the viewport. In order not to affect anything else,
+        // the viewport is just reset here and not removed in Bind().
+        const core::recti &vp = Camera::getActiveCamera()->getViewport();
+        glViewport(vp.UpperLeftCorner.X, vp.UpperLeftCorner.Y,
+                   vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
+                   vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
         glClear(GL_DEPTH_BUFFER_BIT);
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
             glEnable(GL_FRAMEBUFFER_SRGB);
