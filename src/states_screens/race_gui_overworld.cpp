@@ -459,7 +459,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                      UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
                                      UserConfigParams::m_width,
                                      UserConfigParams::m_height);
-                GUIEngine::getFont()->draw(_("Press fire to play the tutorial"), pos2,
+                GUIEngine::getOutlineFont()->draw(_("Press fire to play the tutorial"), pos2,
                                            video::SColor(255,255,150,60),
                                            true, true /* vcenter */, NULL);
                 continue;
@@ -529,7 +529,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                  UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
                                  UserConfigParams::m_width,
                                  UserConfigParams::m_height);
-            GUIEngine::getFont()->draw(_("Press fire to start the challenge"), pos2,
+            GUIEngine::getOutlineFont()->draw(_("Press fire to start the challenge"), pos2,
                                        video::SColor(255,255,150,60),
                                        true, true /* vcenter */, NULL);
         }
