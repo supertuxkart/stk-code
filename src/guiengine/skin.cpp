@@ -1849,7 +1849,7 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
     if (atMouse)
     {
         pos = irr_driver->getDevice()->getCursorControl()->getPosition()
-            + core::position2di(15, 15);
+            + core::position2di(10 - size.Width / 2, 20);
     }
 
     core::recti r(pos, size);
