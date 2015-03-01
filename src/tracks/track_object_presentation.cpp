@@ -300,6 +300,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     TrackObjectPresentationSceneNode(xyz, hpr, scale)
 {
     m_is_looped = false;
+    m_is_in_skybox = false;
     m_mesh = NULL;
     m_node = NULL;
 
@@ -315,6 +316,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_is_looped  = false;
     m_mesh       = NULL;
     m_node       = NULL;
+    m_is_in_skybox = false;
 
     bool animated = (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
