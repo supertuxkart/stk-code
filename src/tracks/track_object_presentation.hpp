@@ -20,32 +20,33 @@
 #ifndef HEADER_TRACK_OBJECT_PRESENTATION_HPP
 #define HEADER_TRACK_OBJECT_PRESENTATION_HPP
 
-#include <vector3d.h>
-#include <IAnimatedMeshSceneNode.h>
-namespace irr
-{
-    namespace scene { class IAnimatedMesh; class IMeshSceneNode; class ISceneNode; }
-}
-using namespace irr;
-
 #include "graphics/lod_node.hpp"
 #include "items/item.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
+
+#include <vector3d.h>
+#include <IAnimatedMeshSceneNode.h>
+
 #include <string>
 
-class XMLNode;
 class SFXBase;
 class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
 class ModelDefinitionLoader;
 class STKInstancedSceneNode;
+class XMLNode;
 
-/**
- * \ingroup tracks
- * Base class for all track object presentation classes
+namespace irr
+{
+    namespace scene { class IAnimatedMesh; class IMeshSceneNode; class ISceneNode; }
+}
+using namespace irr;
+
+/** \ingroup tracks
+ *  Base class for all track object presentation classes.
  */
 class TrackObjectPresentation
 {
@@ -64,21 +65,18 @@ public:
 
     TrackObjectPresentation(const XMLNode& xml_node);
 
-    TrackObjectPresentation(
-        const core::vector3df& xyz,
-        const core::vector3df& hpr,
-        const core::vector3df& scale)
+    TrackObjectPresentation(const core::vector3df& xyz,
+                            const core::vector3df& hpr = core::vector3df(0,0,0),
+                            const core::vector3df& scale = core::vector3df(0,0,0))
     {
         m_init_xyz = xyz;
         m_init_hpr = hpr;
         m_init_scale = scale;
-    }
-    TrackObjectPresentation(const core::vector3df& xyz)
-    {
-        m_init_xyz = xyz;
-    }
+    }   // TrackObjectPresentation
 
+    // ------------------------------------------------------------------------
     virtual ~TrackObjectPresentation() {}
+    // ------------------------------------------------------------------------
 
     virtual void reset() {}
     virtual void setEnable(bool enabled) {}
@@ -86,50 +84,56 @@ public:
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
                       const core::vector3df& scale) {}
 
+    // ------------------------------------------------------------------------
+    /** Returns the position of this TrackObjectPresentation. */
     virtual const core::vector3df& getPosition() const { return m_init_xyz; }
-    virtual const core::vector3df  getAbsolutePosition() const { return m_init_xyz; }
+    // ------------------------------------------------------------------------
+    /** Returns a copy of the initial position. Note this function does not
+     *  return a const reference, since some classes overwrite it this way. */
+    virtual const core::vector3df getAbsolutePosition() const
+    { 
+        return m_init_xyz;
+    }   // getAbsolutePosition
+    // ------------------------------------------------------------------------
+    /** Returns the initial rotation. */
     virtual const core::vector3df& getRotation() const { return m_init_hpr; }
+    // ------------------------------------------------------------------------
+    /** Returns the initial scale. */
     virtual const core::vector3df& getScale() const { return m_init_scale; }
 
     LEAK_CHECK()
 };
 
-/**
- * \ingroup tracks
- * Base class for all track object presentation classes using a scene node
- * as presentation
+// ============================================================================
+/** \ingroup tracks
+ *  Base class for all track object presentation classes using a scene node
+ *  as presentation
  */
 class TrackObjectPresentationSceneNode : public TrackObjectPresentation
 {
 protected:
+    /** A pointer to the scene node of this object. */
     scene::ISceneNode* m_node;
 public:
 
+    /** Constructor based on data from xml. */
     TrackObjectPresentationSceneNode(const XMLNode& xml_node) :
         TrackObjectPresentation(xml_node)
     {
         m_node = NULL;
-    }
-
-    TrackObjectPresentationSceneNode(
-        const core::vector3df& xyz,
-        const core::vector3df& hpr,
-        const core::vector3df& scale) :
-        TrackObjectPresentation(xyz, hpr, scale)
-    {
-        m_node = NULL;
-    }
-
-    TrackObjectPresentationSceneNode(
-        scene::ISceneNode* node,
-        const core::vector3df& xyz,
-        const core::vector3df& hpr,
-        const core::vector3df& scale) :
+    }   // TrackObjectPresentationSceneNode
+    // ------------------------------------------------------------------------
+    /** Constructor based on a transform. */
+    TrackObjectPresentationSceneNode(const core::vector3df& xyz,
+                                     const core::vector3df& hpr,
+                                     const core::vector3df& scale,
+                                     scene::ISceneNode* node = NULL) :
         TrackObjectPresentation(xyz, hpr, scale)
     {
         m_node = node;
-    }
+    }   // TrackObjectPresentationSceneNode
 
+    // ------------------------------------------------------------------------
     virtual const core::vector3df& getPosition() const OVERRIDE;
     virtual const core::vector3df  getAbsolutePosition() const OVERRIDE;
     virtual const core::vector3df& getRotation() const OVERRIDE;
@@ -139,39 +143,41 @@ public:
     virtual void setEnable(bool enabled) OVERRIDE;
     virtual void reset() OVERRIDE;
 
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the scene node. */
     scene::ISceneNode* getNode() { return m_node; }
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the scene node, const version. */
     const scene::ISceneNode* getNode() const { return m_node; }
-};
+};   // class TrackObjectPresentationSceneNode
 
-/**
- * \ingroup tracks
- * A track object representation that is invisible and only consists of a
- * location, rotation and scale.
+// ============================================================================
+/** \ingroup tracks
+ *  A track object representation that is invisible and only consists of a
+ *  location, rotation and scale.
  */
 class TrackObjectPresentationEmpty : public TrackObjectPresentationSceneNode
 {
 public:
-
     TrackObjectPresentationEmpty(const XMLNode& xml_node);
     virtual ~TrackObjectPresentationEmpty();
-};
+};   // class TrackObjectPresentationEmpty
 
-/**
-* \ingroup tracks
-* A track object representation that is a library node
-*/
+// ============================================================================
+/** \ingroup tracks
+ *  A track object representation that is a library node
+ */
 class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNode
 {
 public:
-
     TrackObjectPresentationLibraryNode(const XMLNode& xml_node,
         ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLibraryNode();
-};
+};   // TrackObjectPresentationLibraryNode
 
-/**
- * \ingroup tracks
- * A track object representation that consists of a level-of-detail scene node
+// ============================================================================
+/** \ingroup tracks
+ *  A track object representation that consists of a level-of-detail scene node
  */
 class TrackObjectPresentationLOD : public TrackObjectPresentationSceneNode
 {
@@ -183,9 +189,9 @@ public:
     virtual ~TrackObjectPresentationLOD();
 };
 
-/**
- * \ingroup tracks
- * A track object representation that consists of a mesh scene node.
+// ============================================================================
+/** \ingroup tracks
+ *  A track object representation that consists of a mesh scene node.
  */
 class TrackObjectPresentationMesh : public TrackObjectPresentationSceneNode
 {
@@ -211,38 +217,38 @@ private:
     void init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled);
 
 public:
-    TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled, scene::ISceneNode* parent);
+    TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled,
+                                scene::ISceneNode* parent);
 
-    TrackObjectPresentationMesh(
-        const std::string& model_file, const core::vector3df& xyz,
-        const core::vector3df& hpr, const core::vector3df& scale);
-    TrackObjectPresentationMesh(
-        scene::IAnimatedMesh* mesh, const core::vector3df& xyz,
-        const core::vector3df& hpr, const core::vector3df& scale);
-
-    void setLoop(int start, int end); //set custom loops, as well as pause by scripts
-
-    void setCurrentFrame(int frame);
-
-    int getCurrentFrame();
-
+    TrackObjectPresentationMesh(const std::string& model_file,
+                                const core::vector3df& xyz,
+                                const core::vector3df& hpr, 
+                                const core::vector3df& scale);
+    TrackObjectPresentationMesh(scene::IAnimatedMesh* mesh, 
+                                const core::vector3df& xyz,
+                                const core::vector3df& hpr,
+                                const core::vector3df& scale);
     virtual ~TrackObjectPresentationMesh();
-
+    void setLoop(int start, int end);
+    void setCurrentFrame(int frame);
+    int getCurrentFrame();
     virtual void reset() OVERRIDE;
-
+    // ------------------------------------------------------------------------
+    /** Returns the mode file name. */
     const std::string& getModelFile() const { return m_model_file; }
-};
+};   // class TrackObjectPresentationMesh
 
-/**
- * \ingroup tracks
- * A track object representation that consists of a sound emitter
+// ============================================================================
+/** \ingroup tracks
+ *  A track object representation that consists of a sound emitter
  */
 class TrackObjectPresentationSound : public TrackObjectPresentation,
                                      public TriggerItemListener
 {
 private:
 
-    /** If a sound is attached to this object and/or this is a sound emitter object */
+    /** If a sound is attached to this object and/or this is a sound emitter
+     *  object */
     SFXBase* m_sound;
 
     /** Currently used for sound effects only, in cutscenes only atm */
@@ -252,43 +258,45 @@ private:
 
 public:
 
-    TrackObjectPresentationSound(const XMLNode& xml_node, scene::ISceneNode* parent);
+    TrackObjectPresentationSound(const XMLNode& xml_node,
+                                 scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationSound();
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
     virtual void update(float dt) OVERRIDE;
+    virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
+                      const core::vector3df& scale) OVERRIDE;
     void triggerSound(bool loop);
     void stopSound();
 
+    // ------------------------------------------------------------------------
     /** Currently used for sound effects only, in cutscenes only atm */
     const std::string& getTriggerCondition() const { return m_trigger_condition; }
+};   // TrackObjectPresentationSound
 
-    virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
-                      const core::vector3df& scale) OVERRIDE;
-};
-
-/**
- * \ingroup tracks
- * A track object representation that consists of a billboard scene node.
+// ============================================================================
+/** \ingroup tracks
+ *  A track object representation that consists of a billboard scene node.
  */
 class TrackObjectPresentationBillboard : public TrackObjectPresentationSceneNode
 {
-    /** To make the billboard disappear when close to the camera. Useful for light halos :
-     *  instead of "colliding" with the camera and suddenly disappearing when clipped by
-     *  frustum culling, it will gently fade out.
+    /** To make the billboard disappear when close to the camera. Useful for
+     *  light halos: instead of "colliding" with the camera and suddenly
+     *  disappearing when clipped by frustum culling, it will gently fade out.
      */
     bool m_fade_out_when_close;
     float m_fade_out_start;
     float m_fade_out_end;
 public:
-    TrackObjectPresentationBillboard(const XMLNode& xml_node, scene::ISceneNode* parent);
+    TrackObjectPresentationBillboard(const XMLNode& xml_node,
+                                     scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationBillboard();
     virtual void update(float dt) OVERRIDE;
-};
+};   // TrackObjectPresentationBillboard
 
 
-/**
- * \ingroup tracks
- * A track object representation that consists of a particle emitter
+// ============================================================================
+/** \ingroup tracks
+ *  A track object representation that consists of a particle emitter
  */
 class TrackObjectPresentationParticles : public TrackObjectPresentationSceneNode
 {
@@ -298,20 +306,21 @@ private:
     std::string m_trigger_condition;
 
 public:
-    TrackObjectPresentationParticles(const XMLNode& xml_node, scene::ISceneNode* parent);
+    TrackObjectPresentationParticles(const XMLNode& xml_node,
+                                     scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationParticles();
 
     virtual void update(float dt) OVERRIDE;
-
-    std::string& getTriggerCondition() { return m_trigger_condition; }
-
     void triggerParticles();
-};
+    // ------------------------------------------------------------------------
+    /** Returns the trigger condition for this object. */
+    std::string& getTriggerCondition() { return m_trigger_condition; }
+};   // TrackObjectPresentationParticles
 
-/**
-* \ingroup tracks
-* A track object representation that consists of a light emitter
-*/
+// ============================================================================
+/** \ingroup tracks
+ *  A track object representation that consists of a light emitter
+ */
 class TrackObjectPresentationLight : public TrackObjectPresentationSceneNode
 {
 private:
@@ -320,40 +329,40 @@ private:
     float m_energy;
 
 public:
-    TrackObjectPresentationLight(const XMLNode& xml_node, scene::ISceneNode* parent);
+    TrackObjectPresentationLight(const XMLNode& xml_node,
+                                 scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationLight();
-};
+};   // TrackObjectPresentationLight
 
-
-/**
- * \ingroup tracks
- * A track object representation that consists of an action trigger
+// ============================================================================
+/** \ingroup tracks
+ *  A track object representation that consists of an action trigger
  */
 class TrackObjectPresentationActionTrigger : public TrackObjectPresentation,
                                              public TriggerItemListener
 {
 private:
-
     /** For action trigger objects */
     std::string m_action;
 
     bool m_action_active;
 
-
 public:
-
-
     TrackObjectPresentationActionTrigger(const XMLNode& xml_node);
-    TrackObjectPresentationActionTrigger(const core::vector3df& xyz,std::string scriptname, float distance);
+    TrackObjectPresentationActionTrigger(const core::vector3df& xyz,
+                                         const std::string& scriptname,
+                                         float distance);
 
     virtual ~TrackObjectPresentationActionTrigger() {}
 
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
-
+    // ------------------------------------------------------------------------
+    /** Reset the trigger (i.e. sets it to active again). */
     virtual void reset() OVERRIDE { m_action_active = true; }
-
+    // ------------------------------------------------------------------------
+    /** Sets the trigger to be enabled or disabled. */
     virtual void setEnable(bool status) OVERRIDE{ m_action_active = status; }
-};
+};   // class TrackObjectPresentationActionTrigger
 
 
 #endif // TRACKOBJECTPRESENTATION_HPP

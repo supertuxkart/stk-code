@@ -313,9 +313,11 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         core::vector3df kart_rot(0, 0, 0);
         core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
 
-        //FIXME: it's not ideal that both the track object and the presentation know the initial coordinates of the object
-        TrackObjectPresentationSceneNode* presentation = new TrackObjectPresentationSceneNode(
-            kart_main_node, kart_pos, kart_rot, kart_scale);
+        //FIXME: it's not ideal that both the track object and the presentation
+        // know the initial coordinates of the object
+        TrackObjectPresentationSceneNode* presentation = 
+            new TrackObjectPresentationSceneNode(kart_pos, kart_rot, kart_scale,
+                                                 kart_main_node);
         TrackObject* tobj = new TrackObject(kart_pos, kart_rot, kart_scale,
             "ghost", presentation, false /* isDynamic */, NULL /* physics settings */);
         tobjman->insertObject(tobj);
