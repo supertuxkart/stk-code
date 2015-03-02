@@ -379,6 +379,15 @@ if(MSVC OR MINGW)
   add_custom_target(stkshaders SOURCES ${STK_SHADERS})
 endif()
 
+if(MINGW)
+    find_library(LIBGCC NAMES libgcc_s_dw2-1.dll libgcc_s_sjlj-1.dll)
+    find_library(LIBSTDCPP NAMES libstdc++-6.dll)
+    if(OPENMP_FOUND)
+        find_library(LIBOPENMP NAMES libgomp-1.dll)
+    endif()
+    file(COPY ${LIBGCC} ${LIBSTDCPP} ${PTHREAD_LIBRARY} ${LIBOPENMP} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
+endif()
+
 # Optional tools
 add_subdirectory(tools/font_tool)
 
@@ -441,3 +450,8 @@ install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32/app
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
 install(FILES data/supertuxkart.appdata.xml DESTINATION share/appdata)
+
+if(MINGW)
+    install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION ${STK_INSTALL_BINARY_DIR}
+            FILES_MATCHING PATTERN "*.dll")
+endif()
