@@ -731,11 +731,22 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_1024), irr_driver->getFBO(FBO_BLOOM_512), GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_BLOOM_256), GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_BLOOM_128), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			
+			// Copy for lens flare
+			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_LENS_512), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_LENS_256), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_LENS_128), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			
 
             // Blur
+
             // The fbo sum chain is from https://software.intel.com/en-us/articles/compute-shader-hdr-and-bloom
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
+			
+			renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_512), irr_driver->getFBO(FBO_TMP_512));
+            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_256), irr_driver->getFBO(FBO_TMP_256));
+            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_128), irr_driver->getFBO(FBO_TMP_128));
 
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_TMP_128), 2., 2.);
             glEnable(GL_BLEND);
@@ -760,6 +771,12 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
             renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024), in_fbo->getWidth(), in_fbo->getHeight());
+
+
+			FullScreenShader::LensBlendShader::getInstance()->SetTextureUnits(
+                irr_driver->getRenderTargetTexture(RTT_LENS_128), irr_driver->getRenderTargetTexture(RTT_LENS_256), irr_driver->getRenderTargetTexture(RTT_LENS_512));
+            DrawFullScreenEffect<FullScreenShader::LensBlendShader>();
+
             glDisable(GL_BLEND);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         } // end if bloom
