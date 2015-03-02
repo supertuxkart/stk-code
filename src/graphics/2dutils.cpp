@@ -65,10 +65,9 @@ float &tex_width, float &tex_height,
 float &tex_center_pos_x, float &tex_center_pos_y
 )
 {
-    core::dimension2d<u32> frame_size =
-        irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+    core::dimension2d<u32> frame_size = irr_driver->getActualScreenSize();
     const int screen_w = frame_size.Width;
-    const int screen_h = frame_size.Height;
+    const int screen_h =  frame_size.Height;
     center_pos_x = float(destRect.UpperLeftCorner.X + destRect.LowerRightCorner.X);
     center_pos_x /= screen_w;
     center_pos_x -= 1.;
@@ -137,7 +136,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
             return;
 
         glEnable(GL_SCISSOR_TEST);
-        const core::dimension2d<u32>& renderTargetSize = irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+        const core::dimension2d<u32>& renderTargetSize = irr_driver->getActualScreenSize();
         glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height - clipRect->LowerRightCorner.Y,
             clipRect->getWidth(), clipRect->getHeight());
     }
@@ -226,7 +225,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
             return;
 
         glEnable(GL_SCISSOR_TEST);
-        const core::dimension2d<u32>& renderTargetSize = irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+        const core::dimension2d<u32>& renderTargetSize = irr_driver->getActualScreenSize();
         glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height - clipRect->LowerRightCorner.Y,
             clipRect->getWidth(), clipRect->getHeight());
     }
@@ -288,8 +287,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
         return;
     }
 
-    core::dimension2d<u32> frame_size =
-        irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+    core::dimension2d<u32> frame_size = irr_driver->getActualScreenSize();
     const int screen_w = frame_size.Width;
     const int screen_h = frame_size.Height;
     float center_pos_x = float(position.UpperLeftCorner.X + position.LowerRightCorner.X);
@@ -319,7 +317,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
             return;
 
         glEnable(GL_SCISSOR_TEST);
-        const core::dimension2d<u32>& renderTargetSize = irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+        const core::dimension2d<u32>& renderTargetSize = irr_driver->getActualScreenSize();
         glScissor(clip->UpperLeftCorner.X, renderTargetSize.Height - clip->LowerRightCorner.Y,
             clip->getWidth(), clip->getHeight());
     }

@@ -211,6 +211,7 @@ private:
     bool               m_rsm_matrix_initialized;
     bool               m_rsm_map_available;
     core::vector2df    m_current_screen_size;
+    core::dimension2du m_actual_screen_size;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */
@@ -684,6 +685,7 @@ public:
     const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
     const core::matrix4 &getInvProjViewMatrix() const { return m_InvProjViewMatrix; }
     const core::vector2df &getCurrentScreenSize() const { return m_current_screen_size; }
+    const core::dimension2du getActualScreenSize() const { return m_actual_screen_size; }
     // ------------------------------------------------------------------------
     float getSSAORadius() const
     {

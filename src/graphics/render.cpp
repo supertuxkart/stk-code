@@ -282,8 +282,8 @@ void IrrDriver::renderGLSL(float dt)
 
     // Use full screen size
     float tmp[2];
-    tmp[0] = float(UserConfigParams::m_width);
-    tmp[1] = float(UserConfigParams::m_height);
+    tmp[0] = float(m_actual_screen_size.Width);
+    tmp[1] = float(m_actual_screen_size.Height);
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float), 2 * sizeof(float), tmp);
 
@@ -294,8 +294,8 @@ void IrrDriver::renderGLSL(float dt)
 
     // Set the viewport back to the full screen for race gui
     m_video_driver->setViewPort(core::recti(0, 0,
-                                            UserConfigParams::m_width,
-                                            UserConfigParams::m_height));
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height));
 
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
