@@ -39,27 +39,15 @@ RegistrationDialog::RegistrationDialog() :
     loadFromFile("online/registration_terms.stkgui");
     LabelWidget* terms_widget = getWidget<LabelWidget>("terms");
 
-    core::stringw orig_terms = L"Please read the terms and conditions "
+    core::stringw terms = _(L"Please read the terms and conditions "
         L"for SuperTuxKart at '%s'. You must agree "
         L"to these terms in order to register an account for STK. "
         L"By checking the box below, you are confirming that you understand "
         L"these terms. If you have any questions or comments regarding these "
         L"terms, one of the members of the development team would gladly "
-        L"assist you.";
-
-    core::stringw url = L"http://supertuxkart.net/terms";
-    core::stringw translation = _(orig_terms.c_str(), url.c_str());
-
-    // Make sure the translation contains the right URL. If not, this
-    // translation is really messed up, and we better show the original.
-    if (translation.find(url.c_str()) == -1)
-    {
-        translation = StringUtils::insertValues(orig_terms, url);
-        Log::warn("Terms", "Translated terms do not contain right URL, "
-                           "using English terms");
-    }
-
-    terms_widget->setText(translation, false);
+        L"assist you.",
+        L"http://supertuxkart.net/terms");
+    terms_widget->setText(terms, false);
 
    // showRegistrationTerms();
 }
