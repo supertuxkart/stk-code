@@ -518,7 +518,7 @@ public:
     btTransform        getStartTransform (unsigned int index) const
     {
         if (index >= m_start_transforms.size())
-            Log::fatal("Tracj", "No start position for kart %i.", index);
+            Log::fatal("Track", "No start position for kart %i.", index);
         return m_start_transforms[index];
     }
     // ------------------------------------------------------------------------
