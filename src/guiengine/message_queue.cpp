@@ -53,7 +53,7 @@ public:
         if(mt==MessageQueue::MT_ACHIEVEMENT)
             m_render_type = "achievement-message::neutral";
         else if (mt==MessageQueue::MT_ERROR)
-            m_render_type = "achievement-message::neutral";
+            m_render_type = "error-message::neutral";
         else
             m_render_type = "friend-message::neutral";
     }   // Message
