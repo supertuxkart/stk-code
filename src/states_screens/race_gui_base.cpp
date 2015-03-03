@@ -542,24 +542,24 @@ void RaceGUIBase::drawGlobalMusicDescription()
         thetext_composer += mi->getComposer().c_str();
         textWidth2 = font->getDimension(thetext_composer.c_str()).Width;
     }
-    const int max_text_size = (int)(UserConfigParams::m_width*2.0f/3.0f);
+    const int max_text_size = (int)(irr_driver->getActualScreenSize().Width*2.0f/3.0f);
     if (textWidth  > max_text_size) textWidth  = max_text_size;
     if (textWidth2 > max_text_size) textWidth2 = max_text_size;
 
     const int ICON_SIZE = 64;
-    const int y         = UserConfigParams::m_height - 80;
+    const int y         = irr_driver->getActualScreenSize().Height - 80;
     // the 20 is an arbitrary space left between the note icon and the text
-    const int noteX     = (UserConfigParams::m_width / 2)
+    const int noteX     = (irr_driver->getActualScreenSize().Width / 2)
                         - std::max(textWidth, textWidth2)/2 - ICON_SIZE/2 - 20;
     const int noteY     = y;
     // the 20 is an arbitrary space left between the note icon and the text
-    const int textXFrom = (UserConfigParams::m_width / 2)
+    const int textXFrom = (irr_driver->getActualScreenSize().Width / 2)
                         - std::max(textWidth, textWidth2)/2 + 20;
-    const int textXTo   = (UserConfigParams::m_width / 2)
+    const int textXTo   = (irr_driver->getActualScreenSize().Width / 2)
                         + std::max(textWidth, textWidth2)/2 + 20;
 
     // ---- Draw "by" text
-    const int text_y = (int)(UserConfigParams::m_height - 80*(resize3)
+    const int text_y = (int)(irr_driver->getActualScreenSize().Height - 80*(resize3)
                      + 40*(1-resize));
 
     static const video::SColor white = video::SColor(255, 255, 255, 255);
@@ -598,10 +598,10 @@ void RaceGUIBase::drawGlobalMusicDescription()
 void RaceGUIBase::drawGlobalGoal()
 {
     static video::SColor color = video::SColor(255, 255, 255, 255);
-    core::rect<s32> pos(UserConfigParams::m_width>>1,
-                        UserConfigParams::m_height>>1,
-                        UserConfigParams::m_width>>1,
-                        UserConfigParams::m_height>>1);
+    core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
+                        irr_driver->getActualScreenSize().Height>>1,
+                        irr_driver->getActualScreenSize().Width>>1,
+                        irr_driver->getActualScreenSize().Height>>1);
     gui::IGUIFont* font = GUIEngine::getTitleFont();
     font->draw(m_string_goal.c_str(), pos, color, true, true);
 }
@@ -615,10 +615,10 @@ void RaceGUIBase::drawGlobalReadySetGo()
     case WorldStatus::READY_PHASE:
         {
             static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(UserConfigParams::m_width>>1,
-                                UserConfigParams::m_height>>1,
-                                UserConfigParams::m_width>>1,
-                                UserConfigParams::m_height>>1);
+            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
+                                irr_driver->getActualScreenSize().Height>>1,
+                                irr_driver->getActualScreenSize().Width>>1,
+                                irr_driver->getActualScreenSize().Height>>1);
             gui::IGUIFont* font = GUIEngine::getTitleFont();
             font->draw(m_string_ready.c_str(), pos, color, true, true);
         }
@@ -626,10 +626,10 @@ void RaceGUIBase::drawGlobalReadySetGo()
     case WorldStatus::SET_PHASE:
         {
             static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(UserConfigParams::m_width>>1,
-                                UserConfigParams::m_height>>1,
-                                UserConfigParams::m_width>>1,
-                                UserConfigParams::m_height>>1);
+            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
+                                irr_driver->getActualScreenSize().Height>>1,
+                                irr_driver->getActualScreenSize().Width>>1,
+                                irr_driver->getActualScreenSize().Height>>1);
             gui::IGUIFont* font = GUIEngine::getTitleFont();
             font->draw(m_string_set.c_str(), pos, color, true, true);
         }
@@ -637,10 +637,10 @@ void RaceGUIBase::drawGlobalReadySetGo()
     case WorldStatus::GO_PHASE:
         {
             static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(UserConfigParams::m_width>>1,
-                                UserConfigParams::m_height>>1,
-                                UserConfigParams::m_width>>1,
-                                UserConfigParams::m_height>>1);
+            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
+                                irr_driver->getActualScreenSize().Height>>1,
+                                irr_driver->getActualScreenSize().Width>>1,
+                                irr_driver->getActualScreenSize().Height>>1);
             //gui::IGUIFont* font = irr_driver->getRaceFont();
             gui::IGUIFont* font = GUIEngine::getTitleFont();
             
@@ -670,20 +670,20 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 
     int x_base = 10;
     int y_base = 20;
-    unsigned int y_space = UserConfigParams::m_height - bottom_margin - y_base;
+    unsigned int y_space = irr_driver->getActualScreenSize().Height - bottom_margin - y_base;
     // Special case : when 3 players play, use 4th window to display such stuff
     if (race_manager->getNumLocalPlayers() == 3)
     {
-        x_base = UserConfigParams::m_width/2 + x_base;
-        y_base = UserConfigParams::m_height/2 + y_base;
-        y_space = UserConfigParams::m_height - y_base;
+        x_base = irr_driver->getActualScreenSize().Width/2 + x_base;
+        y_base = irr_driver->getActualScreenSize().Height/2 + y_base;
+        y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 
     // -2 because that's the spacing further on
     int ICON_PLAYER_WIDTH = y_space / race_manager->getNumberOfKarts() - 2;
 
-    int icon_width_max = (int)(50*(UserConfigParams::m_width/800.0f));
-    int icon_width_min = (int)(35*(UserConfigParams::m_height/600.0f));
+    int icon_width_max = (int)(50*(irr_driver->getActualScreenSize().Width/800.0f));
+    int icon_width_min = (int)(35*(irr_driver->getActualScreenSize().Height/600.0f));
     if (icon_width_min > icon_width_max)
     {
         int icon_width_tmp = icon_width_max;
@@ -696,7 +696,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     if (ICON_PLAYER_WIDTH < icon_width_min) ICON_PLAYER_WIDTH = icon_width_min;
 
     // TODO: Is this absolute treshold necessary?
-    if(UserConfigParams::m_height<600)
+    if(irr_driver->getActualScreenSize().Height<600)
     {
         ICON_PLAYER_WIDTH = 35;
     }
@@ -730,9 +730,9 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     const unsigned int kart_amount = world->getNumKarts();
 
     //where is the limit to hide last icons
-    int y_icons_limit=UserConfigParams::m_height-bottom_margin-ICON_PLAYER_WIDTH;
+    int y_icons_limit=irr_driver->getActualScreenSize().Height-bottom_margin-ICON_PLAYER_WIDTH;
     if (race_manager->getNumLocalPlayers() == 3)
-        y_icons_limit=UserConfigParams::m_height-ICON_WIDTH;
+        y_icons_limit=irr_driver->getActualScreenSize().Height-ICON_WIDTH;
 
     world->getKartsDisplayInfo(&m_kart_display_infos);
 

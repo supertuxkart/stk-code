@@ -310,7 +310,9 @@ FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
     FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
 
     // reset
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    glViewport(0, 0,
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height);
     irr_driver->setRTT(NULL);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
