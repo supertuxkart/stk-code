@@ -171,7 +171,7 @@ namespace Online
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
         //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
-        if (m_filename.size() == 0)
+        if (m_url.substr(0, 8) == "https://")
         {
             // https, load certificate info
             struct curl_slist *chunk = NULL;
