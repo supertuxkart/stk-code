@@ -246,6 +246,10 @@ void PhysicalObject::init()
     {
         Log::fatal("PhysicalObject", "Unknown node type");
     }
+
+    max = max * Vec3(m_init_scale);
+    min = min * Vec3(m_init_scale);
+
     Vec3 extend = max-min;
     // Adjust the mesth of the graphical object so that its center is where it
     // is in bullet (usually at (0,0,0)). It can be changed in the case clause
@@ -503,10 +507,8 @@ void PhysicalObject::update(float dt)
     hpr.setHPR(t.getRotation());
     //m_node->setRotation(hpr.toIrrHPR());
 
-    core::vector3df scale(1,1,1);
     m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE,
-                   scale, false);
-    return;
+                   m_init_scale, false);
 }   // update
 
 // ----------------------------------------------------------------------------
