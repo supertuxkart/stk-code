@@ -80,9 +80,12 @@ void IconButtonWidget::add()
 
     if (m_texture == NULL)
     {
-        Log::error("icon_button",
-                    "add() : error, cannot find texture '%s'.",
-                   m_properties[PROP_ICON].c_str());
+        if (m_properties[PROP_ICON].size() > 0)
+        {
+            Log::error("icon_button",
+                "add() : error, cannot find texture '%s' in iconbutton '%s'.",
+                m_properties[PROP_ICON].c_str(), m_properties[PROP_ID].c_str());
+        }
         std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
         setTexture(irr_driver->getTexture(file));
         if(!m_texture)
