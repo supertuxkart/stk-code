@@ -59,6 +59,7 @@ namespace GUIEngine
         
         int m_spinner_widget_player_id;
         bool m_use_background_color;
+        bool m_allow_mouse_change;
         
         /** If each value the spinner can take has an associated text, this vector will be non-empty */
         std::vector<irr::core::stringw> m_labels;
@@ -91,6 +92,9 @@ namespace GUIEngine
         
         /** \brief implementing method from base class Widget */
         virtual EventPropagation leftPressed(const int playerID);
+
+        /** \brief implementing method from base class Widget */
+        virtual void onClick();
         
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
@@ -197,6 +201,10 @@ namespace GUIEngine
 
         /** Display custom text in spinner */
         void setCustomText(const core::stringw& text);
+
+        /** Set m_value based on mouse position */
+        void setValuesByMouse(const core::position2di & mouse_position,
+                              const core::recti & body_rect);
     };
 
 }

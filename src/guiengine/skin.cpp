@@ -1378,6 +1378,20 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
                                             0 /* no clipping */, 0,
                                             true /* alpha */);
 
+        // ---- Set value by mouse position
+        const float max_value = (float)(w->getMax() - w->getMin()) /
+                                       (w->getMax() - w->getMin());
+
+        const core::recti mouse_area(rect.UpperLeftCorner.X + handle_size,
+                                    rect.UpperLeftCorner.Y,
+                                    rect.UpperLeftCorner.X + handle_size +
+                                           (int)((widget->m_w
+                                                  - 2*handle_size)*max_value),
+                                    rect.UpperLeftCorner.Y + widget->m_h);
+
+        const core::position2di mouse_position
+            = irr_driver->getDevice()->getCursorControl()->getPosition();
+        q->setValuesByMouse(mouse_position, mouse_area);
     }
 
     if (focused && widget->hasTooltip())
