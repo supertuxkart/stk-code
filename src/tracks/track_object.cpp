@@ -27,7 +27,7 @@
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
 #include "utils/helpers.hpp"
-
+#include <ISceneManager.h>
 
 /** A track object: any additional object on the track. This object implements
  *  a graphics-only representation, i.e. there is no physical representation.
@@ -191,7 +191,21 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
             m_presentation = new TrackObjectPresentationMesh(xml_node,
                                                              m_enabled,
                                                              parent);
-            glownode = ((TrackObjectPresentationMesh *) m_presentation)->getNode();
+            scene::ISceneNode* node = ((TrackObjectPresentationMesh *)m_presentation)->getNode();
+            if (type == "movable" && parent != NULL)
+            {
+                // HACK: unparent movables from their parent library object if any,
+                // because bullet provides absolute transforms, not transforms relative
+                // to the parent object
+                node->updateAbsolutePosition();
+                core::matrix4 absTransform = node->getAbsoluteTransformation();
+                node->setParent(irr_driver->getSceneManager()->getRootSceneNode());
+                node->setPosition(absTransform.getTranslation());
+                node->setRotation(absTransform.getRotationDegrees());
+                node->setScale(absTransform.getScale());
+            }
+
+            glownode = node;
         }
 
         std::string render_pass;
