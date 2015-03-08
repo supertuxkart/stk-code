@@ -50,6 +50,7 @@ Camera* Camera::s_active_camera = NULL;
 Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
 {
     m_smooth        = false;
+    m_attached      = false;
     m_mode          = CM_NORMAL;
     m_index         = camera_index;
     m_original_kart = kart;
@@ -91,6 +92,11 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     m_target_direction = core::vector3df(0, 0, 1);
     m_target_up_vector = core::vector3df(0, 1, 0);
     m_direction_velocity = core::vector3df(0, 0, 0);
+
+    m_local_position = core::vector3df(0, 0, 0);
+    m_local_direction = core::vector3df(0, 0, 1);
+    m_local_up = core::vector3df(0, 1, 0);
+
     m_angular_velocity = 0;
     m_target_angular_velocity = 0;
     m_max_velocity = 15;
@@ -107,6 +113,42 @@ Camera::~Camera()
     if (s_active_camera == this)
         s_active_camera = NULL;
 }   // ~Camera
+
+//-----------------------------------------------------------------------------
+/** Applies mouse movement to the first person camera.
+ *  \param x The horizontal difference of the mouse position.
+ *  \param y The vertical difference of the mouse position.
+ */
+void Camera::applyMouseMovement (float x, float y)
+{
+    core::vector3df direction(m_target_direction);
+    core::vector3df up(m_camera->getUpVector());
+
+    // Set local values if the camera is attached to the kart
+    if (m_attached)
+        up = m_local_up;
+
+    core::vector3df side(direction.crossProduct(up));
+
+    direction.normalize();
+    up.normalize();
+    core::quaternion quat;
+    quat.fromAngleAxis(x, up);
+
+    core::quaternion quat_y;
+    quat_y.fromAngleAxis(y, side);
+    quat *= quat_y;
+
+    direction = quat * direction;
+    m_target_direction = direction;
+
+    // Don't do that because it looks ugly and is bad to handle ;)
+    /*side = direction.crossProduct(up);
+    // Compute new up vector
+    up = side.crossProduct(direction);
+    up.normalize();
+    cam->setUpVector(up);*/
+}
 
 //-----------------------------------------------------------------------------
 /** Changes the owner of this camera to the new kart.
@@ -495,6 +537,15 @@ void Camera::update(float dt)
         core::vector3df direction(m_camera->getTarget() - m_camera->getPosition());
         core::vector3df up(m_camera->getUpVector());
         core::vector3df side(direction.crossProduct(up));
+        core::vector3df pos = m_camera->getPosition();
+
+        // Set local values if the camera is attached to the kart
+        if (m_attached)
+        {
+            direction = m_local_direction;
+            up = m_local_up;
+            pos = m_local_position;
+        }
 
         // Update smooth movement
         if (m_smooth)
@@ -567,8 +618,32 @@ void Camera::update(float dt)
         // Move camera
         core::vector3df movement(direction * m_lin_velocity.Z +
             up * m_lin_velocity.Y + side * m_lin_velocity.X);
-        core::vector3df pos = m_camera->getPosition();
         pos = pos + movement * dt;
+
+        if (m_attached)
+        {
+            // Save current values
+            m_local_position = pos;
+            m_local_direction = direction;
+            m_local_up = up;
+
+            // Move the camera with the kart
+            btTransform t = m_kart->getTrans();
+            if (stk_config->m_camera_follow_skid &&
+                m_kart->getSkidding()->getVisualSkidRotation() != 0)
+            {
+                // If the camera should follow the graphical skid, add the
+                // visual rotation to the relative vector:
+                btQuaternion q(m_kart->getSkidding()->getVisualSkidRotation(), 0, 0);
+                t.setBasis(t.getBasis() * btMatrix3x3(q));
+            }
+            pos = Vec3(t(Vec3(pos))).toIrrVector();
+
+            btQuaternion q = t.getRotation();
+            btMatrix3x3 mat(q);
+            direction = Vec3(mat * Vec3(direction)).toIrrVector();
+            up = Vec3(mat * Vec3(up)).toIrrVector();
+        }
 
         // Set camera attributes
         m_camera->setPosition(pos);

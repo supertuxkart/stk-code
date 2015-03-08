@@ -97,6 +97,7 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_WHEEL,
     DEBUG_GUI_CAM_NORMAL,
     DEBUG_GUI_CAM_SMOOTH,
+    DEBUG_GUI_CAM_ATTACH,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
@@ -260,6 +261,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"First person view", DEBUG_GUI_CAM_FREE);
             sub->addItem(L"Normal view", DEBUG_GUI_CAM_NORMAL);
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
+            sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 
@@ -538,6 +540,11 @@ bool onEvent(const SEvent &event)
                 {
                     Camera *cam = Camera::getActiveCamera();
                     cam->setSmoothMovement(!cam->getSmoothMovement());
+                }
+                else if (cmdID == DEBUG_GUI_CAM_ATTACH)
+                {
+                    Camera *cam = Camera::getActiveCamera();
+                    cam->setAttachedFpsCam(!cam->getAttachedFpsCam());
                 }
                 else if (cmdID == DEBUG_PRINT_START_POS)
                 {

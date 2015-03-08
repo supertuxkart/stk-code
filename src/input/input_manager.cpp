@@ -985,27 +985,7 @@ EventPropagation InputManager::input(const SEvent& event)
                    (diff_x + diff_y) < 100 && (diff_x + diff_y) > -100)
                 {
                     // Rotate camera
-                    core::vector3df up(cam->getUpVector());
-                    core::vector3df direction(cam->getDirection());
-                    core::vector3df side(direction.crossProduct(up));
-                    direction.normalize();
-                    up.normalize();
-                    core::quaternion quat;
-                    quat.fromAngleAxis(mouse_x, up);
-
-                    core::quaternion quat_y;
-                    quat_y.fromAngleAxis(mouse_y, side);
-                    quat *= quat_y;
-
-                    direction = quat * direction;
-                    cam->setDirection(direction);
-                    side = direction.crossProduct(up);
-
-                    // Compute new up vector
-                    /*up = side.crossProduct(direction);
-                    up.normalize();
-                    // Don't do that because it looks ugly and is bad to handle ;)
-                    cam->setUpVector(up);*/
+                    cam->applyMouseMovement(mouse_x, mouse_y);
 
                     // Reset mouse position to the middle of the screen when
                     // the mouse is far away
