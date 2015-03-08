@@ -388,12 +388,6 @@ public:
     BloomShader();
 };
 
-class BloomBlendShader : public ShaderHelperSingleton<BloomBlendShader>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
-{
-public:
-    BloomBlendShader();
-};
-
 class LensBlendShader : public ShaderHelperSingleton<LensBlendShader>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
 {
 public:
@@ -424,6 +418,12 @@ class IBLShader : public ShaderHelperSingleton<IBLShader>, public TextureRead<Ne
 {
 public:
     IBLShader();
+};
+
+class DegradedIBLShader : public ShaderHelperSingleton<DegradedIBLShader>, public TextureRead<Nearest_Filtered>
+{
+public:
+    DegradedIBLShader();
 };
 
 class ShadowedSunLightShaderPCF : public ShaderHelperSingleton<ShadowedSunLightShaderPCF, float, float, float, float, float>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
@@ -551,11 +551,9 @@ public:
     Gaussian3VBlurShader();
 };
 
-class PassThroughShader : public ShaderHelperSingleton<PassThroughShader>, public TextureRead<Bilinear_Filtered>
+class PassThroughShader : public ShaderHelperSingleton<PassThroughShader, int, int>, public TextureRead<Bilinear_Filtered>
 {
 public:
-    GLuint vao;
-
     PassThroughShader();
 };
 
@@ -578,6 +576,12 @@ class LightspaceBoundingBoxShader : public ShaderHelperSingleton<LightspaceBound
 {
 public:
     LightspaceBoundingBoxShader();
+};
+
+class ShadowMatrixesGenerationShader : public ShaderHelperSingleton <ShadowMatrixesGenerationShader, core::matrix4>
+{
+public:
+    ShadowMatrixesGenerationShader();
 };
 
 class DepthHistogramShader : public ShaderHelperSingleton<DepthHistogramShader>, public TextureRead <Nearest_Filtered>
@@ -615,40 +619,30 @@ public:
 class GodFadeShader : public ShaderHelperSingleton<GodFadeShader, video::SColorf>, public TextureRead<Bilinear_Filtered>
 {
 public:
-    GLuint vao;
-
     GodFadeShader();
 };
 
 class GodRayShader : public ShaderHelperSingleton<GodRayShader, core::vector2df>, public TextureRead<Bilinear_Filtered>
 {
 public:
-    GLuint vao;
-
     GodRayShader();
 };
 
 class MLAAColorEdgeDetectionSHader : public ShaderHelperSingleton<MLAAColorEdgeDetectionSHader, core::vector2df>, public TextureRead<Nearest_Filtered>
 {
 public:
-    GLuint vao;
-
     MLAAColorEdgeDetectionSHader();
 };
 
 class MLAABlendWeightSHader : public ShaderHelperSingleton<MLAABlendWeightSHader, core::vector2df>, public TextureRead<Bilinear_Filtered, Nearest_Filtered>
 {
 public:
-    GLuint vao;
-
     MLAABlendWeightSHader();
 };
 
 class MLAAGatherSHader : public ShaderHelperSingleton<MLAAGatherSHader, core::vector2df>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
 {
 public:
-    GLuint vao;
-
     MLAAGatherSHader();
 };
 

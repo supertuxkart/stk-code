@@ -85,23 +85,20 @@ MusicInformation::MusicInformation(const XMLNode *root,
     m_faster_time     = 1.0f;
     m_max_pitch       = 0.1f;
     m_gain            = 1.0f;
-    m_adjusted_gain   = 1.0f;
 
 
     // Otherwise read config file
     // --------------------------
     std::string s;
     root->get("title",         &s                );
-    m_title = StringUtils::decodeFromHtmlEntities(s);
+    m_title = StringUtils::xmlDecode(s);
     root->get("composer",      &s                );
-    m_composer = StringUtils::decodeFromHtmlEntities(s);
+    m_composer = StringUtils::xmlDecode(s);
     root->get("file",          &m_normal_filename);
     root->get("gain",          &m_gain           );
     root->get("tracks",        &m_all_tracks     );
     root->get("fast",          &m_enable_fast    );
     root->get("fast-filename", &m_fast_filename  );
-
-    m_adjusted_gain = m_gain;
 
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
@@ -137,6 +134,8 @@ void MusicInformation::addMusicToTracks()
 }   // addMusicToTracks
 
 //-----------------------------------------------------------------------------
+/** Starts the music.
+ */
 void MusicInformation::startMusic()
 {
     m_time_since_faster  = 0.0f;
@@ -153,7 +152,7 @@ void MusicInformation::startMusic()
         return;
     }
 
-    if (m_normal_music != NULL) delete m_normal_music;
+    if (m_normal_music) delete m_normal_music;
 
 #if HAVE_OGGVORBIS
     m_normal_music = new MusicOggStream();
@@ -166,16 +165,16 @@ void MusicInformation::startMusic()
         delete m_normal_music;
         m_normal_music = NULL;
         Log::warn("MusicInformation", "Unable to load music %s, "
-                  "not supported or not found.\n",
+                  "not supported or not found.",
                   m_normal_filename.c_str());
         return;
     }
-    m_normal_music->volumeMusic(m_adjusted_gain);
+    m_normal_music->setVolume(m_gain);
     m_normal_music->playMusic();
 
     // Then (if available) load the music for the last track
     // -----------------------------------------------------
-    if (m_fast_music != NULL) delete m_fast_music;
+    if (m_fast_music) delete m_fast_music;
     if (m_fast_filename == "")
     {
         m_fast_music = NULL;
@@ -185,7 +184,7 @@ void MusicInformation::startMusic()
     if(StringUtils::getExtension(m_fast_filename)!="ogg")
     {
         Log::warn(
-                "Music file %s format not recognized, fast music is ignored\n",
+                "Music file %s format not recognized, fast music is ignored",
                 m_fast_filename.c_str());
         return;
     }
@@ -204,7 +203,7 @@ void MusicInformation::startMusic()
                   "supported or not found.\n", m_fast_filename.c_str());
         return;
     }
-    m_fast_music->volumeMusic(m_adjusted_gain);
+    m_fast_music->setVolume(m_gain);
 }   // startMusic
 
 //-----------------------------------------------------------------------------
@@ -224,8 +223,8 @@ void MusicInformation::update(float dt)
             return;
         }
         float fraction=m_time_since_faster/m_faster_time;
-        m_normal_music->updateFading(1-fraction);
-        m_fast_music->updateFading(fraction);
+        m_normal_music->setVolume(1-fraction);
+        m_fast_music->setVolume(fraction);
         break;
                        }
     case SOUND_FASTER: {
@@ -246,14 +245,12 @@ void MusicInformation::update(float dt)
         break;
                        }
     case SOUND_NORMAL:
-        if ( m_normal_music == NULL ) break;
-
-        m_normal_music->update();
+        if ( m_normal_music ) 
+            m_normal_music->update();
         break;
     case SOUND_FAST:
-        if ( m_fast_music == NULL ) break;
-
-        m_fast_music->update();
+        if ( m_fast_music ) 
+            m_fast_music->update();
         break;
     }   // switch
 
@@ -298,19 +295,22 @@ void MusicInformation::resumeMusic()
 }   // resumeMusic
 
 //-----------------------------------------------------------------------------
-void MusicInformation::volumeMusic(float gain)
+void MusicInformation::setDefaultVolume()
 {
-    m_adjusted_gain = m_gain * gain;
-    if (m_normal_music != NULL) m_normal_music->volumeMusic(m_adjusted_gain);
-    if (m_fast_music   != NULL) m_fast_music->volumeMusic(m_adjusted_gain);
-} // volumeMusic
+    if (m_normal_music && m_normal_music->isPlaying())
+        m_normal_music->setVolume(m_gain);
+    if (m_fast_music && m_fast_music->isPlaying())
+        m_fast_music->setVolume(m_gain);
+} // setVolume
 
 //-----------------------------------------------------------------------------
-
-void MusicInformation::setTemporaryVolume(float gain)
+/** Overwrites the current volume with a temporary value (used e.g. to fade
+ *  from normal music to last lap music).
+ */
+void MusicInformation::setTemporaryVolume(float volume)
 {
-    if (m_normal_music != NULL) m_normal_music->volumeMusic(gain);
-    if (m_fast_music   != NULL) m_fast_music->volumeMusic(gain);
+    if (m_normal_music != NULL) m_normal_music->setVolume(volume);
+    if (m_fast_music   != NULL) m_fast_music->setVolume(volume);
 }
 
 //-----------------------------------------------------------------------------
@@ -322,6 +322,7 @@ void MusicInformation::switchToFastMusic()
     {
         m_mode = SOUND_FADING;
         m_fast_music->playMusic();
+        m_fast_music->setVolume(0);
     }
     else
     {
@@ -334,7 +335,8 @@ void MusicInformation::switchToFastMusic()
 
 bool MusicInformation::isPlaying() const
 {
-    return (m_normal_music != NULL && m_normal_music->isPlaying()) || (m_fast_music != NULL && m_fast_music->isPlaying());
+    return (m_normal_music != NULL && m_normal_music->isPlaying())  ||
+           (m_fast_music   != NULL && m_fast_music->isPlaying());
 }
 
 //-----------------------------------------------------------------------------

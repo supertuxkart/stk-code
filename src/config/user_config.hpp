@@ -606,6 +606,11 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "christmas-mode",
                             &m_graphics_quality, "Christmas hats: 0 use current date, 1 always on, 2 always off") );
 
+    // This saves the actual user preference.
+    PARAM_PREFIX IntUserConfigParam        m_easter_ear_mode
+        PARAM_DEFAULT(IntUserConfigParam(0, "easter-ear-mode",
+        &m_graphics_quality, "Easter Bunny Ears: 0 use current date, 1 always on, 2 always off"));
+
     PARAM_PREFIX BoolUserConfigParam        m_weather_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",
                                      &m_graphics_quality, "Weather effects") );
@@ -649,6 +654,10 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows_resoltion", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
+    PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
+        PARAM_DEFAULT(BoolUserConfigParam(false,
+        "Degraded_IBL", &m_graphics_quality,
+        "Disable specular IBL"));
 
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_cache_overworld

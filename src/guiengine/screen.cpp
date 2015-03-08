@@ -19,6 +19,7 @@
 #include "guiengine/screen.hpp"
 
 #include "io/file_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/layout_manager.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -234,16 +235,14 @@ void Screen::manualRemoveWidget(Widget* w)
 /** \brief Implementing method from AbstractTopLevelContainer */
 int Screen::getWidth()
 {
-    core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-    return frame_size.Width;
+    return irr_driver->getActualScreenSize().Width;
 }
 
 // -----------------------------------------------------------------------------
 /** \brief Implementing method from AbstractTopLevelContainer */
 int Screen::getHeight()
 {
-    core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-    return frame_size.Height;
+    return irr_driver->getActualScreenSize().Height;
 }
 
 // -----------------------------------------------------------------------------

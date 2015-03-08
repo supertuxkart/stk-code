@@ -58,7 +58,7 @@
                 <div layout="horizontal-row" proportion="1" height="fit">
                     <checkbox id="perPlayerDifficulty"/>
                     <spacer width="20" height="100%" />
-                    <label height="100%" I18N="In the ui settings" text="Enable handicapped users"/>
+                    <label height="100%" I18N="In the ui settings" text="Enable per-player handicaps"/>
                 </div>
             </div>
 

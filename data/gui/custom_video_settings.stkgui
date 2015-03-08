@@ -25,9 +25,20 @@
 
         <div layout="horizontal-row" width="100%" proportion="1">
             <spacer width="70" height="10" />
-            <label text="Shadows" I18N="Video settings"/>
-            <spacer width="10" height="10"/>
-            <gauge id="shadows" min_value="0" max_value="2" width="50%"/>
+            
+            <div layout="horizontal-row" proportion="1" height="fit">
+                <label text="Shadows" I18N="Video settings"/>
+                <spacer width="10" height="10"/>
+                <gauge id="shadows" min_value="0" max_value="2" proportion="1"/>
+            </div>
+            
+            <spacer height="4" width="10" />
+            
+            <div layout="horizontal-row" proportion="1" height="fit">
+                <checkbox id="ibl"/>
+                <spacer width="10" height="10"/>
+                <label text="Image-based lighting" I18N="Video settings"/>
+            </div>
         </div>
 
         <spacer height="4" width="10" />

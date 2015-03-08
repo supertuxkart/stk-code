@@ -114,9 +114,8 @@ void OverWorld::update(float dt)
         // so we have to start music 'manually', since we skip all phases.
         World::getWorld()->getTrack()->startMusic();
 
-        if (music_manager->getCurrentMusic() != NULL &&
-            UserConfigParams::m_music)
-            music_manager->getCurrentMusic()->startMusic();
+        if (UserConfigParams::m_music)
+            music_manager->startMusic();
         m_karts[0]->startEngineSFX();
     }
     WorldWithRank::update(dt);

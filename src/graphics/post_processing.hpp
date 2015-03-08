@@ -91,7 +91,7 @@ public:
     void renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
 
     /** Render tex. Used for blit/texture resize */
-    void renderPassThrough(unsigned tex);
+    void renderPassThrough(unsigned tex, unsigned width, unsigned height);
     void renderTextureLayer(unsigned tex, unsigned layer);
     void applyMLAA();
 

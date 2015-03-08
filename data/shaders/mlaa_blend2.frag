@@ -4,8 +4,6 @@ uniform sampler2D areaMap;
 #define MAX_SEARCH_STEPS 8.0
 #define MAX_DISTANCE 33.0
 
-in vec2 uv;
-
 out vec4 FragColor;
 
 /**
@@ -75,6 +73,7 @@ vec2 Area(vec2 distance, float e1, float e2) {
 
 void main() {
 	vec4 areas = vec4(0.0);
+	vec2 uv = gl_FragCoord.xy / screen;
 
 	vec2 e = texture(edgesMap, uv).rg;
 

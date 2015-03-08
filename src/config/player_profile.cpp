@@ -78,7 +78,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_achievements_status = NULL;
     m_icon_filename       = "";
 
-    node->get("name",              &m_local_name       );
+    node->getAndDecode("name",     &m_local_name);
     node->get("guest",             &m_is_guest_account );
     node->get("use-frequency",     &m_use_frequency    );
     node->get("unique-id",         &m_unique_id        );
@@ -196,7 +196,7 @@ const std::string PlayerProfile::getIconFilename() const
  */
 void PlayerProfile::save(UTFWriter &out)
 {
-    out << L"    <player name=\"" << m_local_name
+    out << L"    <player name=\"" << StringUtils::xmlEncode(m_local_name)
         << L"\" guest=\""         << m_is_guest_account
         << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
 

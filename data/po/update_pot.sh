@@ -8,7 +8,7 @@ CPP_FILE_LIST="`find ./src              \
                      -name '*.hpp' -or  \
                      -name "*.h"        \
               `"
-XML_FILE_LIST="`find ./data ../stk-assets ../supertuxkart-assets \
+XML_FILE_LIST="`find ./data ../stk-assets/tracks ../stk-assets/karts \
                      -name 'achievements.xml' -or                \
                      -name 'kart.xml' -or                        \
                      -name 'track.xml' -or                       \
@@ -36,18 +36,20 @@ python ./data/po/extract_strings_from_XML.py $XML_FILE_LIST
 echo "---------------------------"
 echo "    Generating .pot file..."
 
+# XML Files
+xgettext  -d supertuxkart -s --keyword=_ --add-comments="I18N:" \
+                               -p ./data/po -o supertuxkart.pot \
+                               --no-location --from-code=UTF-8 ./data/po/gui_strings.h \
+                               --package-name=supertuxkart
+
 # C++ Files
-xgettext    -d supertuxkart -s --keyword=_ --keyword=N_ --keyword=_LTR \
+xgettext  -j  -d supertuxkart -s --keyword=_ --keyword=N_ --keyword=_LTR \
                                --keyword=_C:1c,2 --keyword=_P:1,2 \
                                --keyword=_CP:1c,2,3 --add-comments="I18N:" \
                                -p ./data/po -o supertuxkart.pot $CPP_FILE_LIST \
                                --package-name=supertuxkart
 
-# XML Files
-xgettext -j -d supertuxkart -s --keyword=_ --add-comments="I18N:" \
-                               -p ./data/po -o supertuxkart.pot \
-                               --from-code=UTF-8 ./data/po/gui_strings.h \
-                               --package-name=supertuxkart
+
 
 echo "    Done"
 echo "---------------------------"

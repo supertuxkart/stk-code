@@ -192,6 +192,17 @@ int XMLNode::get(const std::string &attribute, core::stringw *value) const
     return 1;
 }   // get
 // ----------------------------------------------------------------------------
+int XMLNode::getAndDecode(const std::string &attribute, core::stringw *value) const
+{
+    if (m_attributes.empty()) return 0;
+    std::map<std::string, core::stringw>::const_iterator o;
+    o = m_attributes.find(attribute);
+    if (o == m_attributes.end()) return 0;
+    std::string raw_value = core::stringc(o->second).c_str();
+    *value = StringUtils::xmlDecode(raw_value);
+    return 1;
+}   // get
+// ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, core::vector2df *value) const
 {
     std::string s = "";

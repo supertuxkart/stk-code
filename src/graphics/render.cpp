@@ -22,6 +22,7 @@
 #include "graphics/callbacks.hpp"
 #include "central_settings.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
@@ -253,13 +254,13 @@ void IrrDriver::renderGLSL(float dt)
             {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
-                m_post_processing->renderPassThrough(m_rtts->getFBO(FBO_HALF1_R).getRTT()[0]);
+                m_post_processing->renderPassThrough(m_rtts->getFBO(FBO_HALF1_R).getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
             }
             else if (irr_driver->getRSM())
             {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
-                m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0]);
+                m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
             }
             else if (irr_driver->getShadowViz())
             {
@@ -271,7 +272,7 @@ void IrrDriver::renderGLSL(float dt)
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 if (CVS->isDefferedEnabled())
                     camera->activate();
-                m_post_processing->renderPassThrough(fbo->getRTT()[0]);
+                m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
                 glDisable(GL_FRAMEBUFFER_SRGB);
             }
         }
@@ -281,8 +282,8 @@ void IrrDriver::renderGLSL(float dt)
 
     // Use full screen size
     float tmp[2];
-    tmp[0] = float(UserConfigParams::m_width);
-    tmp[1] = float(UserConfigParams::m_height);
+    tmp[0] = float(m_actual_screen_size.Width);
+    tmp[1] = float(m_actual_screen_size.Height);
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float), 2 * sizeof(float), tmp);
 
@@ -293,8 +294,8 @@ void IrrDriver::renderGLSL(float dt)
 
     // Set the viewport back to the full screen for race gui
     m_video_driver->setViewPort(core::recti(0, 0,
-                                            UserConfigParams::m_width,
-                                            UserConfigParams::m_height));
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height));
 
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
@@ -377,6 +378,23 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         glClearColor(0., 0., 0., 0.);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderSolidFirstPass();
+    }
+    else
+    {
+        // We need a cleared depth buffer for some effect (eg particles depth blending)
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        // Bind() modifies the viewport. In order not to affect anything else,
+        // the viewport is just reset here and not removed in Bind().
+        const core::recti &vp = Camera::getActiveCamera()->getViewport();
+        glViewport(vp.UpperLeftCorner.X, vp.UpperLeftCorner.Y,
+                   vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
+                   vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+            glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     PROFILER_POP_CPU_MARKER();
 

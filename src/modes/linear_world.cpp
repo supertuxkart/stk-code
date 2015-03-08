@@ -157,8 +157,7 @@ void LinearWorld::update(float dt)
     if (m_last_lap_sfx_playing &&
         m_last_lap_sfx->getStatus() != SFXBase::SFX_PLAYING)
     {
-        if(music_manager->getCurrentMusic())
-            music_manager->getCurrentMusic()->resetTemporaryVolume();
+        music_manager->resetTemporaryVolume();
         m_last_lap_sfx_playing = false;
     }
 
@@ -288,7 +287,7 @@ void LinearWorld::newLap(unsigned int kart_index)
                 if(music_manager->getCurrentMusic() &&
                     music_manager->getMasterMusicVolume() > 0.2f)
                 {
-                    music_manager->getCurrentMusic()->setTemporaryVolume(0.2f);
+                    music_manager->setTemporaryVolume(0.2f);
                 }
             }
             else
@@ -352,11 +351,11 @@ void LinearWorld::newLap(unsigned int kart_index)
 
         // Store the temporary string because clang would mess this up
         // (remove the stringw before the wchar_t* is used).
-        core::stringw css = kart->getName();
+        const core::stringw &kart_name = kart->getName();
 
         //I18N: as in "fastest lap: 60 seconds by Wilber"
         irr::core::stringw m_fastest_lap_message =
-            _C("fastest_lap", "%s by %s", s.c_str(), css.c_str());
+            _C("fastest_lap", "%s by %s", s.c_str(), kart_name);
 
         m_race_gui->addMessage(m_fastest_lap_message, NULL,
                                3.0f, video::SColor(255, 255, 255, 255), false);

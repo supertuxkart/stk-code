@@ -66,7 +66,7 @@ Addon::Addon(const XMLNode &xml)
     std::string designer;
 
     xml.get("name",               &name                );
-    m_name     = StringUtils::decodeFromHtmlEntities(name);
+    m_name     = StringUtils::xmlDecode(name);
     m_dir_name = StringUtils::toLowerCase(name);
     xml.get("id",                 &m_dir_name          );
     m_id = createAddonId(m_dir_name);
@@ -83,8 +83,8 @@ Addon::Addon(const XMLNode &xml)
     xml.get("file",               &m_zip_file          );
     xml.get("description",        &description         );
 
-    m_description = StringUtils::decodeFromHtmlEntities(description);
-    m_designer    = StringUtils::decodeFromHtmlEntities(designer);
+    m_description = StringUtils::xmlDecode(description);
+    m_designer = StringUtils::xmlDecode(designer);
 
     // resolve XML entities
     //m_description = StringUtils::replace(m_description, "&#10;", "\n");
@@ -144,10 +144,10 @@ void Addon::writeXML(std::ofstream *out_stream)
     // We write m_dir_name as 'id' to stay backwards compatible
     (*out_stream) << "  <"                       << m_type
                   << " name=\""
-                  << StringUtils::encodeToHtmlEntities(m_name)
+                  << StringUtils::xmlEncode(m_name)
                   << "\" id=\""                  << m_dir_name
                   << "\" designer=\""
-                  << StringUtils::encodeToHtmlEntities(m_designer)
+                  << StringUtils::xmlEncode(m_designer)
                   << "\" status=\""              << m_status
                   << "\" date=\""                << m_date
                   << "\" installed=\""

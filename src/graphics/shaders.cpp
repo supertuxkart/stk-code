@@ -1570,16 +1570,6 @@ namespace FullScreenShader
 
         AssignSamplerNames(Program, 0, "tex");
     }
-
-    BloomBlendShader::BloomBlendShader()
-    {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloomblend.frag").c_str());
-        AssignUniforms();
-
-        AssignSamplerNames(Program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
-    }
 	
 	LensBlendShader::LensBlendShader()
     {
@@ -1639,6 +1629,19 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/IBL.frag").c_str());
         AssignUniforms();
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
+    }
+
+    DegradedIBLShader::DegradedIBLShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/degraded_ibl.frag").c_str());
+        AssignUniforms();
+        AssignSamplerNames(Program, 0, "ntex");
     }
 
     ShadowedSunLightShaderPCF::ShadowedSunLightShaderPCF()
@@ -1862,11 +1865,10 @@ namespace FullScreenShader
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/passthrough.frag").c_str());
 
-        AssignUniforms();
+        AssignUniforms("width", "height");
         AssignSamplerNames(Program, 0, "tex");
-        vao = createVAO(Program);
     }
 
     LayerPassThroughShader::LayerPassThroughShader()
@@ -1900,6 +1902,17 @@ namespace FullScreenShader
         AssignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
         GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
         glShaderStorageBlockBinding(Program, block_idx, 2);
+    }
+
+    ShadowMatrixesGenerationShader::ShadowMatrixesGenerationShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/shadowmatrixgeneration.comp").c_str());
+        AssignUniforms("SunCamMatrix");
+        GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
+        glShaderStorageBlockBinding(Program, block_idx, 2);
+        block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "NewMatrixData");
+        glShaderStorageBlockBinding(Program, block_idx, 1);
     }
 
     DepthHistogramShader::DepthHistogramShader()
@@ -1965,7 +1978,6 @@ namespace FullScreenShader
         AssignUniforms("col");
 
         AssignSamplerNames(Program, 0, "tex");
-        vao = createVAO(Program);
     }
 
     GodRayShader::GodRayShader()
@@ -1976,18 +1988,16 @@ namespace FullScreenShader
 
         AssignUniforms("sunpos");
         AssignSamplerNames(Program, 0, "tex");
-        vao = createVAO(Program);
     }
 
     MLAAColorEdgeDetectionSHader::MLAAColorEdgeDetectionSHader()
     {
         Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/mlaa_offset.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_color1.frag").c_str());
         AssignUniforms("PIXEL_SIZE");
 
         AssignSamplerNames(Program, 0, "colorMapG");
-        vao = createVAO(Program);
     }
 
     MLAABlendWeightSHader::MLAABlendWeightSHader()
@@ -1998,18 +2008,16 @@ namespace FullScreenShader
         AssignUniforms("PIXEL_SIZE");
 
         AssignSamplerNames(Program, 0, "edgesMap", 1, "areaMap");
-        vao = createVAO(Program);
     }
 
     MLAAGatherSHader::MLAAGatherSHader()
     {
         Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/mlaa_offset.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_neigh3.frag").c_str());
         AssignUniforms("PIXEL_SIZE");
 
         AssignSamplerNames(Program, 0, "blendMap", 1, "colorMap");
-        vao = createVAO(Program);
     }
 }
 

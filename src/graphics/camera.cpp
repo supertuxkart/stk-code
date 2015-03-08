@@ -21,7 +21,7 @@
 
 #include <math.h>
 
-#include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
@@ -164,21 +164,21 @@ void Camera::readEndCamera(const XMLNode &root)
  */
 void Camera::setupCamera()
 {
-    m_aspect = (float)(UserConfigParams::m_width)/UserConfigParams::m_height;
+    m_aspect = (float)(irr_driver->getActualScreenSize().Width)/irr_driver->getActualScreenSize().Height;
     switch(race_manager->getNumLocalPlayers())
     {
     case 1: m_viewport = core::recti(0, 0,
-                                     UserConfigParams::m_width,
-                                     UserConfigParams::m_height);
+                                     irr_driver->getActualScreenSize().Width,
+                                     irr_driver->getActualScreenSize().Height);
             m_scaling  = core::vector2df(1.0f, 1.0f);
             m_fov      = DEGREE_TO_RAD*75.0f;
             break;
     case 2: m_viewport = core::recti(0,
                                      m_index==0 ? 0
-                                                : UserConfigParams::m_height>>1,
-                                     UserConfigParams::m_width,
-                                     m_index==0 ? UserConfigParams::m_height>>1
-                                                : UserConfigParams::m_height);
+                                                : irr_driver->getActualScreenSize().Height>>1,
+                                     irr_driver->getActualScreenSize().Width,
+                                     m_index==0 ? irr_driver->getActualScreenSize().Height>>1
+                                                : irr_driver->getActualScreenSize().Height);
             m_scaling  = core::vector2df(1.0f, 0.5f);
             m_aspect  *= 2.0f;
             m_fov      = DEGREE_TO_RAD*65.0f;
@@ -188,19 +188,19 @@ void Camera::setupCamera()
             if(m_index<2)
             {
                 m_viewport = core::recti(m_index==0 ? 0
-                                                    : UserConfigParams::m_width>>1,
+                                                    : irr_driver->getActualScreenSize().Width>>1,
                                          0,
-                                         m_index==0 ? UserConfigParams::m_width>>1
-                                                    : UserConfigParams::m_width,
-                                         UserConfigParams::m_height>>1);
+                                         m_index==0 ? irr_driver->getActualScreenSize().Width>>1
+                                                    : irr_driver->getActualScreenSize().Width,
+                                         irr_driver->getActualScreenSize().Height>>1);
                 m_scaling  = core::vector2df(0.5f, 0.5f);
                 m_fov      = DEGREE_TO_RAD*50.0f;
             }
             else
             {
-                m_viewport = core::recti(0, UserConfigParams::m_height>>1,
-                                         UserConfigParams::m_width,
-                                         UserConfigParams::m_height);
+                m_viewport = core::recti(0, irr_driver->getActualScreenSize().Height>>1,
+                                         irr_driver->getActualScreenSize().Width,
+                                         irr_driver->getActualScreenSize().Height);
                 m_scaling  = core::vector2df(1.0f, 0.5f);
                 m_fov      = DEGREE_TO_RAD*65.0f;
                 m_aspect  *= 2.0f;
@@ -208,10 +208,10 @@ void Camera::setupCamera()
             break;*/
     case 4:
             { // g++ 4.3 whines about the variables in switch/case if not {}-wrapped (???)
-            const int x1 = (m_index%2==0 ? 0 : UserConfigParams::m_width>>1);
-            const int y1 = (m_index<2    ? 0 : UserConfigParams::m_height>>1);
-            const int x2 = (m_index%2==0 ? UserConfigParams::m_width>>1  : UserConfigParams::m_width);
-            const int y2 = (m_index<2    ? UserConfigParams::m_height>>1 : UserConfigParams::m_height);
+            const int x1 = (m_index%2==0 ? 0 : irr_driver->getActualScreenSize().Width>>1);
+            const int y1 = (m_index<2    ? 0 : irr_driver->getActualScreenSize().Height>>1);
+            const int x2 = (m_index%2==0 ? irr_driver->getActualScreenSize().Width>>1  : irr_driver->getActualScreenSize().Width);
+            const int y2 = (m_index<2    ? irr_driver->getActualScreenSize().Height>>1 : irr_driver->getActualScreenSize().Height);
             m_viewport = core::recti(x1, y1, x2, y2);
             m_scaling  = core::vector2df(0.5f, 0.5f);
             m_fov      = DEGREE_TO_RAD*50.0f;
@@ -222,8 +222,8 @@ void Camera::setupCamera()
                 Log::warn("Camera", "Incorrect number of players: '%d' - assuming 1.",
                           race_manager->getNumLocalPlayers());
             m_viewport = core::recti(0, 0,
-                                     UserConfigParams::m_width,
-                                     UserConfigParams::m_height);
+                                     irr_driver->getActualScreenSize().Width,
+                                     irr_driver->getActualScreenSize().Height);
             m_scaling  = core::vector2df(1.0f, 1.0f);
             m_fov      = DEGREE_TO_RAD*75.0f;
             break;

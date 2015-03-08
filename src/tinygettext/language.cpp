@@ -17,6 +17,8 @@
 
 #include "language.hpp"
 
+#include "utils/string_utils.hpp"
+
 #include <map>
 #include <assert.h>
 #include <vector>
@@ -430,7 +432,9 @@ Language::from_env(const std::string& env)
 
   if (ln != std::string::npos && ln+1 < env.size()) // _
   {
-    country = env.substr(ln+1, (std::min(dt, at) == std::string::npos) ? std::string::npos : std::min(dt, at) - (ln+1));
+    country = env.substr(ln+1, (std::min(dt, at) == std::string::npos) 
+                            ? std::string::npos : std::min(dt, at) - (ln+1));
+    country = StringUtils::toUpperCase(country);
   }
 
   if (dt != std::string::npos && dt+1 < env.size()) // .

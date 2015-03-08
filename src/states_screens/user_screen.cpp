@@ -280,6 +280,10 @@ void BaseUserScreen::makeEntryFieldsVisible()
     {
         getWidget<LabelWidget>("label_password")->setVisible(online);
         m_password_tb->setVisible(online);
+        // Is user has no online name, make sure the user can enter one
+        if (player->getLastOnlineName().empty())
+            m_username_tb->setActivated();
+
     }
 }   // makeEntryFieldsVisible
 
@@ -360,6 +364,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
             PlayerProfile *cp = getSelectedPlayer();
             RegisterScreen::getInstance()->setRename(cp);
             RegisterScreen::getInstance()->push();
+            RegisterScreen::getInstance()->setParent(this);
             m_new_registered_data = false;
             m_auto_login          = false;
             // Init will automatically be called, which

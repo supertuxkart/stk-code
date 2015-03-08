@@ -76,7 +76,7 @@ private:
     float m_play_time;
 
 public:
-              SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
+              SFXOpenAL(SFXBuffer* buffer, bool positional, float volume,
                         bool owns_buffer = false);
     virtual  ~SFXOpenAL();
 
@@ -97,10 +97,10 @@ public:
     virtual void      reallySetSpeed(float factor);
     virtual void      setPosition(const Vec3 &position);
     virtual void      reallySetPosition(const Vec3 &p);
-    virtual void      setVolume(float gain);
-    virtual void      reallySetVolume(float gain);
-    virtual void      setMasterVolume(float gain);
-    virtual void      reallySetMasterVolumeNow(float gain);
+    virtual void      setVolume(float volume);
+    virtual void      reallySetVolume(float volume);
+    virtual void      setMasterVolume(float volume);
+    virtual void      reallySetMasterVolumeNow(float volue);
     virtual void      onSoundEnabledBack();
     virtual void      setRolloff(float rolloff);
     // ------------------------------------------------------------------------

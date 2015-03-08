@@ -70,7 +70,7 @@ private:
     int         m_wheel_toggle;
 
     void addEffect(KartGFXType type, const std::string &file_name,
-                   const Vec3 &position);
+                   const Vec3 &position, bool important);
 
 public:
          KartGFX(const AbstractKart *kart);

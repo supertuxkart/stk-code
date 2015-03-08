@@ -26,6 +26,7 @@ private:
 
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
+    bool m_GI_has_artifact;
 public:
     void init();
     bool isGLSL() const;

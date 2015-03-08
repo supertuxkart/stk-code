@@ -1,12 +1,14 @@
 bld*/
 build*/
 cmake_build/
+cmake_build*/
 dependencies/
 CMakeFiles/
 stk-editor/
 
 .config/
 supertuxkart-64
+make*.bat
 
 data/editor
 data/karts
@@ -16,6 +18,7 @@ data/music
 data/sfx
 data/textures
 data/tracks
+data/wip-tracks
 data/.svn
 
 # Ignore doxygen output
@@ -40,6 +43,9 @@ src/html
 *.vcxproj.user
 *~
 *.swp
+
+# Ignore QtCreator project file
+CMakeLists.txt.user
 
 packets_log.txt
 history.dat

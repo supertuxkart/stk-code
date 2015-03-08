@@ -52,6 +52,8 @@ public:
         m_message      = message;
         if(mt==MessageQueue::MT_ACHIEVEMENT)
             m_render_type = "achievement-message::neutral";
+        else if (mt==MessageQueue::MT_ERROR)
+            m_render_type = "error-message::neutral";
         else
             m_render_type = "friend-message::neutral";
     }   // Message
@@ -77,7 +79,7 @@ class CompareMessages
 public:
     /** Used to sort messages by priority in the priority queue. Achievement
      * messages (1) need to have a higher priority than friend messages
-     * (value 0). */
+     * (value 0), and errors (3) the highest priority. */
     bool operator() (const Message *a, const Message *b) const
     {
         return a->getMessageType() < b->getMessageType();

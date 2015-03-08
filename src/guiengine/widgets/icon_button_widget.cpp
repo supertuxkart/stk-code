@@ -68,16 +68,24 @@ void IconButtonWidget::add()
         }
         else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
         {
-            std::string file = file_manager->getAsset(m_properties[PROP_ICON]);
-            setTexture(irr_driver->getTexture(file));
+            // Avoid warning about missing texture in case of e.g.
+            // screenshot widget
+            if(m_properties[PROP_ICON] != "")
+            {
+                std::string file = file_manager->getAsset(m_properties[PROP_ICON]);
+                setTexture(irr_driver->getTexture(file));
+            }
         }
     }
 
     if (m_texture == NULL)
     {
-        Log::error("icon_button",
-                    "add() : error, cannot find texture '%s'.",
-                   m_properties[PROP_ICON].c_str());
+        if (m_properties[PROP_ICON].size() > 0)
+        {
+            Log::error("icon_button",
+                "add() : error, cannot find texture '%s' in iconbutton '%s'.",
+                m_properties[PROP_ICON].c_str(), m_properties[PROP_ID].c_str());
+        }
         std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
         setTexture(irr_driver->getTexture(file));
         if(!m_texture)

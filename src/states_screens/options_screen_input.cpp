@@ -18,7 +18,7 @@
 #include "states_screens/options_screen_input.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"

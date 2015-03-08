@@ -480,7 +480,7 @@ void Track::loadTrackInfo()
 
     std::string designer;
     root->get("designer",              &designer);
-    m_designer = StringUtils::decodeFromHtmlEntities(designer);
+    m_designer = StringUtils::xmlDecode(designer);
 
     root->get("version",               &m_version);
     std::vector<std::string> filenames;

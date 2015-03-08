@@ -346,8 +346,7 @@ void Skin::drawBgImage()
 
         source_area = core::recti(0, 0, texture_w, texture_h);
 
-        core::dimension2d<u32> frame_size =
-            GUIEngine::getDriver()->getCurrentRenderTargetSize();
+        core::dimension2d<u32> frame_size = irr_driver->getActualScreenSize();
         const int screen_w = frame_size.Width;
         const int screen_h = frame_size.Height;
 
@@ -971,7 +970,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         // automatically guess from position on-screen if tabs go up or down
         const bool vertical_flip =
             (unsigned int)rect.UpperLeftCorner.Y <
-              GUIEngine::getDriver()->getCurrentRenderTargetSize().Height/2;
+                irr_driver->getActualScreenSize().Height / 2;
         params->m_vertical_flip = vertical_flip;
 
         core::recti rect2 = rect;
@@ -2260,9 +2259,8 @@ void Skin::drawBGFadeColor()
     SColor color = SkinConfig::m_colors["dialog_background::neutral"];
     if (m_dialog_size < 1.0f)
         color.setAlpha( (unsigned int)(color.getAlpha()*m_dialog_size ));
-    GL32_draw2DRectangle(color,
-                                            core::recti(position2d< s32 >(0,0),
-                       GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
+    GL32_draw2DRectangle(color, core::recti(position2d< s32 >(0,0),
+                         irr_driver->getActualScreenSize()));
 }   // drawBGFadeColor
 
 // -----------------------------------------------------------------------------

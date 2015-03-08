@@ -84,7 +84,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_map_height             = (int)(250.0f * scaling);
 
     m_map_left   = 20;
-    m_map_bottom = UserConfigParams::m_height-10;
+    m_map_bottom = irr_driver->getActualScreenSize().Height-10;
 
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
@@ -95,7 +95,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getNumLocalPlayers() == 3)
     {
-        m_map_left = UserConfigParams::m_width - m_map_width;
+        m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
     }
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
@@ -146,10 +146,10 @@ void RaceGUIOverworld::renderGlobal(float dt)
     {
         static video::SColor black = video::SColor(255,0,0,0);
         GL32_draw2DRectangle(black,
-                          core::rect<s32>(UserConfigParams::m_width/2,
-                                          UserConfigParams::m_height/2,
-                                          UserConfigParams::m_width,
-                                          UserConfigParams::m_height));
+                          core::rect<s32>(irr_driver->getActualScreenSize().Width/2,
+                                          irr_driver->getActualScreenSize().Height/2,
+                                          irr_driver->getActualScreenSize().Width,
+                                          irr_driver->getActualScreenSize().Height));
     }
 
     World *world = World::getWorld();
@@ -216,14 +216,14 @@ void RaceGUIOverworld::drawTrophyPoints()
 
     int dist_from_right = 10 + m_trophy_points_width;
 
-    core::rect<s32> pos(UserConfigParams::m_width - dist_from_right, 10,
-                        UserConfigParams::m_width                  , 50);
+    core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right, 10,
+                        irr_driver->getActualScreenSize().Width                  , 50);
 
     gui::ScalableFont* font = GUIEngine::getFont();
 
     bool vcenter = true;
 
-    const int size = UserConfigParams::m_width/20;
+    const int size = irr_driver->getActualScreenSize().Width/20;
     core::rect<s32> dest(size, pos.UpperLeftCorner.Y,
                          size*2, pos.UpperLeftCorner.Y + size);
     core::rect<s32> source(core::position2di(0, 0), m_trophy3->getSize());
@@ -435,7 +435,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     // ---- Draw nearby challenge if any
     core::rect<s32> pos(15,
                         10,
-                        15 + UserConfigParams::m_width/2,
+                        15 + irr_driver->getActualScreenSize().Width/2,
                         10 + GUIEngine::getTitleFontHeight());
 
     m_close_to_a_challenge = false;
@@ -456,10 +456,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                            false, true /* vcenter */, NULL);
 
                 core::rect<s32> pos2(0,
-                                     UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
-                                     UserConfigParams::m_width,
-                                     UserConfigParams::m_height);
-                GUIEngine::getFont()->draw(_("Press fire to play the tutorial"), pos2,
+                                     irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
+                                     irr_driver->getActualScreenSize().Width,
+                                     irr_driver->getActualScreenSize().Height);
+                GUIEngine::getOutlineFont()->draw(_("Press fire to play the tutorial"), pos2,
                                            video::SColor(255,255,150,60),
                                            true, true /* vcenter */, NULL);
                 continue;
@@ -495,7 +495,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
                 core::rect<s32> pos(15,
                                     20 + GUIEngine::getTitleFontHeight(),
-                                    15 + UserConfigParams::m_width/2,
+                                    15 + irr_driver->getActualScreenSize().Width/2,
                                     20 + 2*GUIEngine::getTitleFontHeight());
 
                 //just below GP name
@@ -520,16 +520,16 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             }
 
             pos.UpperLeftCorner.Y += GUIEngine::getTitleFontHeight();
-            pos.LowerRightCorner.Y = UserConfigParams::m_height;
+            pos.LowerRightCorner.Y = irr_driver->getActualScreenSize().Height;
             GUIEngine::getFont()->draw(challenge->getChallengeDescription().c_str(),
                                        pos, video::SColor(255,255,255,255),
                                        false, false /* vcenter */, NULL);
 
             core::rect<s32> pos2(0,
-                                 UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
-                                 UserConfigParams::m_width,
-                                 UserConfigParams::m_height);
-            GUIEngine::getFont()->draw(_("Press fire to start the challenge"), pos2,
+                                 irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
+                                 irr_driver->getActualScreenSize().Width,
+                                 irr_driver->getActualScreenSize().Height);
+            GUIEngine::getOutlineFont()->draw(_("Press fire to start the challenge"), pos2,
                                        video::SColor(255,255,150,60),
                                        true, true /* vcenter */, NULL);
         }

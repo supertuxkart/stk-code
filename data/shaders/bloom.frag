@@ -7,7 +7,7 @@ vec3 getRGBFromCIEXxy(vec3 YxyColor);
 
 void main()
 {
-    vec2 uv = gl_FragCoord.xy / 512;
+    vec2 uv = gl_FragCoord.xy / 1024;
     vec3 col = texture(tex, uv).xyz;
     vec3 Yxy = getCIEYxy(col);
     vec3 WhiteYxy = getCIEYxy(vec3(1.));

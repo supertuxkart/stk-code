@@ -18,8 +18,6 @@
 
 #include "states_screens/grand_prix_lose.hpp"
 
-
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -189,9 +187,11 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
             core::vector3df kart_rot(0, 90.0f, 0);
             core::vector3df kart_scale(KART_SCALE, KART_SCALE, KART_SCALE);
 
-            //FIXME: it's not ideal that both the track object and the presentation know the initial coordinates of the object
-            TrackObjectPresentationSceneNode* presentation = new TrackObjectPresentationSceneNode(
-                kart_main_node, kart_pos, kart_rot, kart_scale);
+            //FIXME: it's not ideal that both the track object and the
+            // presentation know the initial coordinates of the object
+            TrackObjectPresentationSceneNode* presentation =
+                new TrackObjectPresentationSceneNode(kart_pos, kart_rot,
+                                                     kart_scale, kart_main_node);
             TrackObject* tobj = new TrackObject(kart_pos, kart_rot, kart_scale,
                 "ghost", presentation, false /* isDynamic */, NULL /* physics settings */);
             tobjman->insertObject(tobj);

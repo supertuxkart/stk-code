@@ -37,19 +37,17 @@ RegistrationDialog::RegistrationDialog() :
         ModalDialog(0.8f,0.9f)
 {
     loadFromFile("online/registration_terms.stkgui");
-    ListWidget * terms_widget = getWidget<ListWidget>("terms");
+    LabelWidget* terms_widget = getWidget<LabelWidget>("terms");
 
-
-    terms_widget->addItem("title", "=== STK Terms and Conditions ===", -1 , true );
-    terms_widget->addItem("par1", "You must agree to these terms in order to register an account for STK.", -1 , false );
-    terms_widget->addItem("par2",
-        "Still needs actual content. Preferably in an XML document which can then be parsed to be put here."
-        , -1 , false );
-    terms_widget->addItem("par3",
-        "By checking the box below, you are confirming that you understand these terms."
-        "If you have any questions or comments regarding these terms,"
-        "one of the members of the development team would gladly assist you."
-        , -1 , false );
+    core::stringw terms = _(L"Please read the terms and conditions "
+        L"for SuperTuxKart at '%s'. You must agree "
+        L"to these terms in order to register an account for STK. "
+        L"By checking the box below, you are confirming that you understand "
+        L"these terms. If you have any questions or comments regarding these "
+        L"terms, one of the members of the development team would gladly "
+        L"assist you.",
+        L"http://supertuxkart.net/terms");
+    terms_widget->setText(terms, false);
 
    // showRegistrationTerms();
 }

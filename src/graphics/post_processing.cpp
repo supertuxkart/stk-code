@@ -98,11 +98,11 @@ void PostProcessing::reset()
         const core::recti &vp = Camera::getCamera(i)->getViewport();
         // Map viewport to [-1,1] x [-1,1]. First define the coordinates
         // left, right, top, bottom:
-        float right  = vp.LowerRightCorner.X < UserConfigParams::m_width
+        float right = vp.LowerRightCorner.X < irr_driver->getActualScreenSize().Width
                      ? 0.0f : 1.0f;
         float left   = vp.UpperLeftCorner.X  > 0.0f ? 0.0f : -1.0f;
         float top    = vp.UpperLeftCorner.Y  > 0.0f ? 0.0f : 1.0f;
-        float bottom = vp.LowerRightCorner.Y < UserConfigParams::m_height
+        float bottom = vp.LowerRightCorner.Y < irr_driver->getActualScreenSize().Height
                      ? 0.0f : -1.0f;
 
         // Use left etc to define 4 vertices on which the rendered screen
@@ -220,11 +220,22 @@ void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, 
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    glUseProgram(FullScreenShader::IBLShader::getInstance()->Program);
-    glBindVertexArray(SharedObject::FullScreenQuadVAO);
+    if (UserConfigParams::m_degraded_IBL)
+    {
+        glUseProgram(FullScreenShader::DegradedIBLShader::getInstance()->Program);
+        glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
-    FullScreenShader::IBLShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox);
-    FullScreenShader::IBLShader::getInstance()->setUniforms();
+        FullScreenShader::DegradedIBLShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
+        FullScreenShader::DegradedIBLShader::getInstance()->setUniforms();
+    }
+    else
+    {
+        glUseProgram(FullScreenShader::IBLShader::getInstance()->Program);
+        glBindVertexArray(SharedObject::FullScreenQuadVAO);
+
+        FullScreenShader::IBLShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox);
+        FullScreenShader::IBLShader::getInstance()->setUniforms();
+    }
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
@@ -457,15 +468,10 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
-void PostProcessing::renderPassThrough(GLuint tex)
+void PostProcessing::renderPassThrough(GLuint tex, unsigned width, unsigned height)
 {
-    glUseProgram(FullScreenShader::PassThroughShader::getInstance()->Program);
-    glBindVertexArray(FullScreenShader::PassThroughShader::getInstance()->vao);
-
     FullScreenShader::PassThroughShader::getInstance()->SetTextureUnits(tex);
-    FullScreenShader::PassThroughShader::getInstance()->setUniforms();
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::PassThroughShader>(width, height);
 }
 
 void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
@@ -510,10 +516,11 @@ void PostProcessing::renderSSAO()
     DrawFullScreenEffect<FullScreenShader::SSAOShader>(irr_driver->getSSAORadius(), irr_driver->getSSAOK(), irr_driver->getSSAOSigma());
 }
 
-void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBuffer &out_fbo)
+void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo, FrameBuffer &out_fbo)
 {
     MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
         getCallback(ES_MOTIONBLUR);
+    unsigned cam = Camera::getActiveCamera()->getIndex();
 
     scene::ICameraSceneNode * const camnode =
         Camera::getCamera(cam)->getCameraSceneNode();
@@ -540,29 +547,21 @@ void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBu
     DrawFullScreenEffect<FullScreenShader::MotionBlurShader>(
                                   // Todo : use a previousPVMatrix per cam, not global
                                   irr_driver->getPreviousPVMatrix(),
-                                  cb->getCenter(cam),
-                                  cb->getBoostTime(0) * 10, // Todo : should be framerate dependent
+                                  core::vector2df(0.5, 0.5),
+                                  cb->getBoostTime(Camera::getActiveCamera()->getIndex()) * 10, // Todo : should be framerate dependent
                                   0.15f);
 }
 
 static void renderGodFade(GLuint tex, const SColor &col)
 {
-    glUseProgram(FullScreenShader::GodFadeShader::getInstance()->Program);
-    glBindVertexArray(FullScreenShader::GodFadeShader::getInstance()->vao);
     FullScreenShader::GodFadeShader::getInstance()->SetTextureUnits(tex);
-    FullScreenShader::GodFadeShader::getInstance()->setUniforms(col);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::GodFadeShader>(col);
 }
 
 static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
 {
-    glUseProgram(FullScreenShader::GodRayShader::getInstance()->Program);
-    glBindVertexArray(FullScreenShader::GodRayShader::getInstance()->vao);
     FullScreenShader::GodRayShader::getInstance()->SetTextureUnits(tex);
-    FullScreenShader::GodRayShader::getInstance()->setUniforms(sunpos);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::GodRayShader>(sunpos);
 }
 
 static void toneMap(FrameBuffer &fbo, GLuint rtt, float vignette_weight)
@@ -593,10 +592,7 @@ void PostProcessing::applyMLAA()
     // Pass 1: color edge detection
     glUseProgram(FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->Program);
     FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS));
-    FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->setUniforms(PIXEL_SIZE);
-
-    glBindVertexArray(FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::MLAAColorEdgeDetectionSHader>(PIXEL_SIZE);
 
     glStencilFunc(GL_EQUAL, 1, ~0);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -607,10 +603,7 @@ void PostProcessing::applyMLAA()
 
     glUseProgram(FullScreenShader::MLAABlendWeightSHader::getInstance()->Program);
     FullScreenShader::MLAABlendWeightSHader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), getTextureGLuint(m_areamap));
-    FullScreenShader::MLAABlendWeightSHader::getInstance()->setUniforms(PIXEL_SIZE);
-
-    glBindVertexArray(FullScreenShader::MLAABlendWeightSHader::getInstance()->vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::MLAABlendWeightSHader>(PIXEL_SIZE);
 
     // Blit in to tmp1
     FrameBuffer::Blit(irr_driver->getFBO(FBO_MLAA_COLORS), irr_driver->getFBO(FBO_MLAA_TMP));
@@ -620,10 +613,7 @@ void PostProcessing::applyMLAA()
 
     glUseProgram(FullScreenShader::MLAAGatherSHader::getInstance()->Program);
     FullScreenShader::MLAAGatherSHader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND), irr_driver->getRenderTargetTexture(RTT_MLAA_TMP));
-    FullScreenShader::MLAAGatherSHader::getInstance()->setUniforms(PIXEL_SIZE);
-
-    glBindVertexArray(FullScreenShader::MLAAGatherSHader::getInstance()->vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    DrawFullScreenEffect<FullScreenShader::MLAAGatherSHader>(PIXEL_SIZE);
 
     // Done.
     glDisable(GL_STENCIL_TEST);
@@ -682,7 +672,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
 
             // Fade to quarter
             irr_driver->getFBO(FBO_QUARTER1).Bind();
-            glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
+            glViewport(0, 0, irr_driver->getActualScreenSize().Width / 4, irr_driver->getActualScreenSize().Height / 4);
             renderGodFade(out_fbo->getRTT()[0], col);
 
             // Blur
@@ -716,7 +706,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             glBlendEquation(GL_FUNC_ADD);
 
             in_fbo->Bind();
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER2));
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER2), in_fbo->getWidth(), in_fbo->getHeight());
             glDisable(GL_BLEND);
         }
         PROFILER_POP_CPU_MARKER();
@@ -732,12 +722,13 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             glClear(GL_STENCIL_BUFFER_BIT);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 
-            FrameBuffer::Blit(*in_fbo, irr_driver->getFBO(FBO_BLOOM_1024), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            FrameBuffer::Blit(*in_fbo, irr_driver->getFBO(FBO_TMP_1024), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-            irr_driver->getFBO(FBO_BLOOM_512).Bind();
-            renderBloom(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024));
+            irr_driver->getFBO(FBO_BLOOM_1024).Bind();
+            renderBloom(irr_driver->getRenderTargetTexture(RTT_TMP_1024));
 
             // Downsample
+            FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_1024), irr_driver->getFBO(FBO_BLOOM_512), GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_BLOOM_256), GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_BLOOM_128), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 			
@@ -749,22 +740,37 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
 
             // Blur
 
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_TMP_512), 1., 1.);
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_TMP_256), 1., 1.);
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_TMP_128), 1., 1.);
+            // The fbo sum chain is from https://software.intel.com/en-us/articles/compute-shader-hdr-and-bloom
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
 			
 			renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_512), irr_driver->getFBO(FBO_TMP_512));
             renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_256), irr_driver->getFBO(FBO_TMP_256));
             renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_128), irr_driver->getFBO(FBO_TMP_128));
 
-            // Additively blend on top of tmp1
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_TMP_128), 2., 2.);
+            glEnable(GL_BLEND);
+            irr_driver->getFBO(FBO_BLOOM_256).Bind();
+            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_128).getRTT()[0], 256, 256);
+            glDisable(GL_BLEND);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_TMP_256), 2., 2.);
+            glEnable(GL_BLEND);
+            irr_driver->getFBO(FBO_BLOOM_512).Bind();
+            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_256).getRTT()[0], 512, 512);
+            glDisable(GL_BLEND);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_TMP_512), 2., 2.);
+            glEnable(GL_BLEND);
+            irr_driver->getFBO(FBO_BLOOM_1024).Bind();
+            renderPassThrough(irr_driver->getFBO(FBO_BLOOM_512).getRTT()[0], 1024, 1024);
+            glDisable(GL_BLEND);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_1024), irr_driver->getFBO(FBO_TMP_1024), 2., 2.);
+
+            // Additively blend
             in_fbo->Bind();
             glEnable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-            FullScreenShader::BloomBlendShader::getInstance()->SetTextureUnits(
-                irr_driver->getRenderTargetTexture(RTT_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
-            DrawFullScreenEffect<FullScreenShader::BloomBlendShader>();
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024), in_fbo->getWidth(), in_fbo->getHeight());
 
 
 			FullScreenShader::LensBlendShader::getInstance()->SetTextureUnits(
@@ -800,7 +806,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
         MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
             getCallback(ES_MOTIONBLUR);
 
-        if (isRace && UserConfigParams::m_motionblur && World::getWorld() != NULL && cb->getBoostTime(0) > 0.) // motion blur
+        if (isRace && UserConfigParams::m_motionblur && World::getWorld() != NULL && cb->getBoostTime(Camera::getActiveCamera()->getIndex()) > 0.) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo);
             std::swap(in_fbo, out_fbo);
@@ -814,7 +820,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
 
     glEnable(GL_FRAMEBUFFER_SRGB);
     irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
-    renderPassThrough(in_fbo->getRTT()[0]);
+    renderPassThrough(in_fbo->getRTT()[0], irr_driver->getFBO(FBO_MLAA_COLORS).getWidth(), irr_driver->getFBO(FBO_MLAA_COLORS).getHeight());
     out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
 
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.

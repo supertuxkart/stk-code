@@ -26,7 +26,6 @@
 
 #include "items/swatter.hpp"
 #include "achievements/achievement_info.hpp"
-#include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"

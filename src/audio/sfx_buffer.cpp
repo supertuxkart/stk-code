@@ -111,7 +111,8 @@ bool SFXBuffer::load()
 
     if (!loadVorbisBuffer(m_file, m_buffer))
     {
-        Log::error("SFXBuffer", "Could not load sound effect %s\n", m_file.c_str());
+        Log::error("SFXBuffer", "Could not load sound effect %s",
+                   m_file.c_str());
         // TODO: free al buffer here?
         return false;
     }
@@ -165,20 +166,22 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
 
     if(!file)
     {
-        Log::error("SFXBuffer", "[SFXBuffer] LoadVorbisBuffer() - couldn't open file!\n");
+        Log::error("SFXBuffer", "LoadVorbisBuffer() - couldn't open file!");
         return false;
     }
 
     if (ov_open_callbacks(file, &oggFile, NULL, 0,  OV_CALLBACKS_NOCLOSE) != 0)
     {
         fclose(file);
-        Log::error("SFXBuffer", "[SFXBuffer] LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?\n");
+        Log::error("SFXBuffer", "LoadVorbisBuffer() - ov_open_callbacks() failed, "
+                                "file isn't vorbis?");
         return false;
     }
 
     info = ov_info(&oggFile, -1);
 
-    long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;    // always 16 bit data
+    // always 16 bit data
+    long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;
 
     char *data = (char *) malloc(len);
     if(!data)
@@ -218,7 +221,8 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
         alGetBufferi(buffer, AL_FREQUENCY, &frequency      );
         alGetBufferi(buffer, AL_CHANNELS,  &channels       );
         alGetBufferi(buffer, AL_BITS,      &bits_per_sample);
-        m_duration = float(buffer_size) / (frequency*channels*(bits_per_sample / 8));
+        m_duration = float(buffer_size) 
+                   / (frequency*channels*(bits_per_sample / 8));
     }
     return success;
 #else

@@ -19,7 +19,6 @@
 
 #include "karts/kart.hpp"
 #include "graphics/central_settings.hpp"
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/challenge_status.hpp"
@@ -33,7 +32,6 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
 #include "graphics/stk_text_billboard.hpp"
@@ -118,7 +116,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_squash_time          = 0.0f;
     m_shadow_enabled       = false;
 
-    m_shadow               = NULL;
     m_wheel_box            = NULL;
     m_collision_particles  = NULL;
     m_slipstream           = NULL;
@@ -133,6 +130,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
     m_nitro_light          = NULL;
+    m_skidding_light_1     = NULL;
+    m_skidding_light_2     = NULL;
+    m_type                 = RaceManager::KT_AI;
 
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
@@ -179,6 +179,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 */
 void Kart::init(RaceManager::KartType type)
 {
+    m_type = type;
+
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
     {
@@ -264,7 +266,6 @@ Kart::~Kart()
     if(m_attachment)             delete m_attachment;
     if(m_stars_effect)          delete m_stars_effect;
 
-    delete m_shadow;
     if (m_wheel_box) m_wheel_box->remove();
     if(m_skidmarks) delete m_skidmarks ;
 
@@ -1089,6 +1090,19 @@ void Kart::eliminate()
  */
 void Kart::update(float dt)
 {
+#ifdef DEBUG_TO_COMPARE_KART_PHYSICS
+    // This information is useful when comparing kart physics, e.g. to
+    // see top speed, acceleration (i.e. time to top speed) etc.
+    Log::verbose("physics", "%s t %f xyz %f %f %f %f v %f %f %f %f maxv %f",
+        getIdent().c_str(),
+        World::getWorld()->getTime(),
+        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
+        getXYZ().length(),
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
+        getVelocity().length(),
+        m_max_speed->getCurrentMaxSpeed());
+#endif
+
     if ( UserConfigParams::m_graphical_effects )
     {
         // update star effect (call will do nothing if stars are not activated)
@@ -1390,11 +1404,9 @@ void Kart::update(float dt)
     if((!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
-        m_shadow->disableShadow();
     }
     if(!m_shadow_enabled && isOnGround() && !emergency)
     {
-        m_shadow->enableShadow();
         m_shadow_enabled = true;
     }
 }   // update
@@ -2391,10 +2403,23 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
     m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
+    // Create nitro light
     m_nitro_light = irr_driver->addLight(core::vector3df(0.0f, 0.5f, m_kart_model->getLength()*-0.5f - 0.05f),
-        0.6f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
+        0.4f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
     m_nitro_light->setVisible(false);
     m_nitro_light->setName( ("nitro emitter (" + getIdent() + ")").c_str() );
+
+    // Create skidding lights
+    // For the first skidding level
+    m_skidding_light_1 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
+        0.3f /* force */, 3.0f /* radius */, 1.0f, 0.6f, 0.0f, false, m_node);
+    m_skidding_light_1->setVisible(false);
+    m_skidding_light_1->setName( ("skidding emitter 1 (" + getIdent() + ")").c_str() );
+    // For the second skidding level
+    m_skidding_light_2 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
+        0.4f /* force */, 4.0f /* radius */, 1.0f, 0.0f, 0.0f, false, m_node);
+    m_skidding_light_2->setVisible(false);
+    m_skidding_light_2->setName( ("skidding emitter 2 (" + getIdent() + ")").c_str() );
 
 #ifdef DEBUG
     m_node->setName( (getIdent()+"(lod-node)").c_str() );
@@ -2438,13 +2463,6 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
             track_manager->getTrack(race_manager->getTrackName())
                          ->isFogEnabled() );
     }
-
-    m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
-                          m_node,
-                          m_kart_properties->getShadowScale(),
-                          m_kart_properties->getShadowXOffset(),
-                          m_kart_properties->getGraphicalYOffset(),
-                          m_kart_properties->getShadowZOffset());
 
     World::getWorld()->kartAdded(this, m_node);
 }   // loadData
@@ -2520,8 +2538,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
-        float f = fabsf(getSpeed())/m_kart_properties->getMaxSpeed() *
-                  m_difficulty->getMaxSpeed();
+        float f = fabsf(getSpeed())/(m_kart_properties->getMaxSpeed() *
+                  m_difficulty->getMaxSpeed());
         // The speed of the kart can be higher (due to powerups) than
         // the normal maximum speed of the kart.
         if(f>1.0f) f = 1.0f;
@@ -2736,5 +2754,11 @@ void Kart::setOnScreenText(const wchar_t *text)
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.
 }   // setOnScreenText
+
+void Kart::activateSkidLight(unsigned int level)
+{
+    m_skidding_light_1->setVisible(level == 1);
+    m_skidding_light_2->setVisible(level > 1);
+}
 
 /* EOF */

@@ -24,6 +24,8 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
@@ -33,12 +35,12 @@
 
 KartGFX::KartGFX(const AbstractKart *kart)
 {
-    if(!UserConfigParams::m_graphical_effects)
-    {
-        for(unsigned int i=0; i<KGFX_COUNT; i++)
-            m_all_emitters.push_back(NULL);
-        return;
-    }
+    //if(!UserConfigParams::m_graphical_effects)
+    //{
+    //    for(unsigned int i=0; i<KGFX_COUNT; i++)
+    //        m_all_emitters.push_back(NULL);
+    //    return;
+    //}
 
     m_kart = kart;
 
@@ -64,16 +66,16 @@ KartGFX::KartGFX(const AbstractKart *kart)
 
     // Create all effects. Note that they must be created
     // in the order of KartGFXType.
-    addEffect(KGFX_NITRO1,   "nitro.xml",   rear_nitro_right);
-    addEffect(KGFX_NITRO2,   "nitro.xml",   rear_nitro_left);
-    addEffect(KGFX_NITROSMOKE1,   "nitro-smoke.xml",   rear_nitro_left);
-    addEffect(KGFX_NITROSMOKE2,   "nitro-smoke.xml",   rear_nitro_right);
-    addEffect(KGFX_ZIPPER,  "zipper_fire.xml", rear_center);
-    addEffect(KGFX_TERRAIN, "smoke.xml",       Vec3(0,0,0));
-    addEffect(KGFX_SKID1L,   "skid1.xml",       rear_left);
-    addEffect(KGFX_SKID1R,   "skid1.xml",       rear_right);
-    addEffect(KGFX_SKID2L,   "skid2.xml",       rear_left);
-    addEffect(KGFX_SKID2R,   "skid2.xml",       rear_right);
+    addEffect(KGFX_NITRO1, "nitro.xml", rear_nitro_right, true);
+    addEffect(KGFX_NITRO2, "nitro.xml", rear_nitro_left, true);
+    addEffect(KGFX_NITROSMOKE1, "nitro-smoke.xml", rear_nitro_left, false);
+    addEffect(KGFX_NITROSMOKE2, "nitro-smoke.xml", rear_nitro_right, false);
+    addEffect(KGFX_ZIPPER, "zipper_fire.xml", rear_center, true);
+    addEffect(KGFX_TERRAIN, "smoke.xml", Vec3(0, 0, 0), false);
+    addEffect(KGFX_SKID1L, "skid1.xml", rear_left, true);
+    addEffect(KGFX_SKID1R, "skid1.xml", rear_right, true);
+    addEffect(KGFX_SKID2L, "skid2.xml", rear_left, true);
+    addEffect(KGFX_SKID2R, "skid2.xml", rear_right, true);
 }   // KartGFX
 
 // ----------------------------------------------------------------------------
@@ -97,8 +99,15 @@ KartGFX::~KartGFX()
  *  \param position Where on the kart the particles should be emitted.
  */
 void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
-                        const Vec3 &position)
+                        const Vec3 &position, bool important)
 {
+    if (!UserConfigParams::m_graphical_effects &&
+        (!important || m_kart->getType() == RaceManager::KT_AI))
+    {
+        m_all_emitters.push_back(NULL);
+        return;
+    }
+
     const ParticleKind *kind    = NULL;
     ParticleEmitter    *emitter = NULL;
     try
@@ -113,9 +122,9 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
         else if(type==KGFX_TERRAIN)
             // Terrain is NOT a child of the kart, since bullet returns the
             // raycast info in world coordinates
-            emitter = new ParticleEmitter(kind, position);
+            emitter = new ParticleEmitter(kind, position, NULL, false, important);
         else
-            emitter = new ParticleEmitter(kind, position, m_kart->getNode());
+            emitter = new ParticleEmitter(kind, position, m_kart->getNode(), false, important);
     }
     catch (std::runtime_error& e)
     {
@@ -293,8 +302,6 @@ void KartGFX::updateTerrain(const ParticleKind *pk)
  */
 void KartGFX::update(float dt)
 {
-    if(!UserConfigParams::m_graphical_effects) return;
-
     m_wheel_toggle = 1 - m_wheel_toggle;
 
     for(unsigned int i=0; i<m_all_emitters.size(); i++)

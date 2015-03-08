@@ -19,14 +19,15 @@
 #ifndef HEADER_RACE_RESULT_GUI_HPP
 #define HEADER_RACE_RESULT_GUI_HPP
 
+
+#include "guiengine/screen.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "states_screens/state_manager.hpp"
 
 #include <assert.h>
 #include <vector>
 
-#include "guiengine/screen.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
-#include "states_screens/state_manager.hpp"
 
 namespace irr
 {
@@ -36,6 +37,7 @@ namespace irr
     }
 }
 
+class MusicInformation;
 class SFXBase;
 
 /**
@@ -162,13 +164,17 @@ private:
     /** The previous monospace state of the font. */
     bool                       m_was_monospace;
 
-    SFXBase*                   m_finish_sound;
+    /** Sound effect at end of race. */
+    SFXBase                   *m_finish_sound;
+
+    /** Music to be played after race ended. */
+    MusicInformation          *m_race_over_music;
 
     /** For highscores */
     std::string m_highscore_who;
 
     /** For highscores */
-    StateManager::ActivePlayer* m_highscore_player;
+    StateManager::ActivePlayer *m_highscore_player;
 
     /** For highscores */
     int m_highscore_rank;

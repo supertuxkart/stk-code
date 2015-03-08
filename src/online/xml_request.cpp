@@ -71,6 +71,12 @@ namespace Online
         {
             m_success = (rec_success == "yes");
             m_xml_data->get("info", &m_info);
+
+            if (!m_success)
+            {
+                Log::debug("XMLRequest::afterOperation",
+                           "Request returned error: %ls", m_info.c_str());
+            }
         }
         else
         {

@@ -20,13 +20,13 @@
 #ifndef HEADER_MUSICMANAGER_HPP
 #define HEADER_MUSICMANAGER_HPP
 
-#include <map>
-#include <vector>
-#include <string>
-
 #include "audio/music.hpp"
 #include "audio/music_information.hpp"
 #include "utils/no_copy.hpp"
+
+#include <map>
+#include <string>
+#include <vector>
 
 class Vec3;
 
@@ -42,43 +42,44 @@ private:
     /** If the sound could not be initialized, e.g. if the player doesn't has
      *  a sound card, we want to avoid anything sound related so we crash the
      *  game. */
-    bool                     m_initialized;
-    std::map<std::string, MusicInformation*>
-                             m_all_music;
+    bool              m_initialized;
 
-    void                     loadMusicInformation();
-    float                    m_masterGain;
+    /** Stores all music information files (read from the .music files). */
+    std::map<std::string, MusicInformation*>
+                      m_all_music;
+    float             m_master_gain;
+
+    void              loadMusicInformation();
+    void              loadMusicFromOneDir(const std::string& dir);
 
 public:
-    MusicManager();
-    virtual ~MusicManager();
+                      MusicManager();
+    virtual          ~MusicManager();
+    MusicInformation* getMusicInformation(const std::string& filename);
+    void              addMusicToTracks();
 
-    void                    startMusic(MusicInformation* mi, bool startRightNow=true);
-    void                    stopMusic();
-    bool                    initialized() const {return m_initialized;                 }
-    void                    update(float dt)    {if(m_current_music)
-                                                     m_current_music->update(dt);      }
-    void                    pauseMusic()        {if(m_current_music)
-                                                     m_current_music->pauseMusic();    }
-    void                    resumeMusic()       {if(m_current_music)
-                                                     m_current_music->resumeMusic();   }
-    void                    switchToFastMusic() {if(m_current_music)
-                                                    m_current_music->switchToFastMusic();}
-
-    void                    setMasterMusicVolume(float gain);
-    float                   getMasterMusicVolume() const { return m_masterGain; }
-
-    MusicInformation       *getCurrentMusic() {return m_current_music; }
-
-    /**
-      * @throw runtime_error if the music file could not be found/opened
-      */
-    MusicInformation       *getMusicInformation(const std::string& filename);
-
-    void                    loadMusicFromOneDir(const std::string& dir);
-    void                    addMusicToTracks();
-
-    void                    clearCurrentMusic() { m_current_music = NULL; }
+    void              startMusic();
+    void              startMusic(MusicInformation* mi,
+                                 bool start_right_now=true);
+    void              stopMusic();
+    void              pauseMusic();
+    void              resumeMusic();
+    void              switchToFastMusic();
+    void              setMasterMusicVolume(float gain);
+    void              resetTemporaryVolume();
+    void              setTemporaryVolume(float gain);
+    // ------------------------------------------------------------------------
+    /** Returns the master volume. */
+    float getMasterMusicVolume() const { return m_master_gain; }
+    // ------------------------------------------------------------------------
+    /** Returns if the music system is initialised. */
+    bool initialized() const { return m_initialized; }
+    // ------------------------------------------------------------------------
+    /** Returns the information object of the current music. */
+    MusicInformation* getCurrentMusic() { return m_current_music; }
+    // ------------------------------------------------------------------------
+    /** Stops and removes the current music. */
+    void clearCurrentMusic() { m_current_music = NULL; }
 };
 
 extern MusicManager* music_manager;

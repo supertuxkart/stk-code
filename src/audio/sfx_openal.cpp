@@ -38,7 +38,7 @@
 #include <stdio.h>
 #include <string>
 
-SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, 
+SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float volume, 
                      bool owns_buffer) 
          : SFXBase()
 {
@@ -46,7 +46,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
     m_sound_source = 0;
     m_status       = SFX_NOT_INITIALISED;
     m_positional   = positional;
-    m_default_gain = gain;
+    m_default_gain = volume;
     m_loop         = false;
     m_gain         = -1.0f;
     m_master_gain  = 1.0f;
@@ -67,7 +67,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
  *  buffer. */
 SFXOpenAL::~SFXOpenAL()
 {
-    if (m_status!=SFX_UNKNOWN)
+    if (m_status!=SFX_UNKNOWN && m_status!=SFX_NOT_INITIALISED)
     {
         alDeleteSources(1, &m_sound_source);
     }
@@ -174,26 +174,27 @@ void SFXOpenAL::reallySetSpeed(float factor)
         factor = 0.5f;
     }
     alSourcef(m_sound_source,AL_PITCH,factor);
+    SFXManager::checkError("setting speed");
 }   // reallySetSpeed
 
 //-----------------------------------------------------------------------------
 /** Changes the volume of a sound effect.
- *  \param gain Volume adjustment between 0.0 (mute) and 1.0 (full volume).
+ *  \param volume Volume adjustment between 0.0 (mute) and 1.0 (full volume).
  */
-void SFXOpenAL::setVolume(float gain)
+void SFXOpenAL::setVolume(float volume)
 {
     if(m_status==SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
-    assert(!isnan(gain)) ;
-    SFXManager::get()->queue(SFXManager::SFX_VOLUME, this, gain);
+    assert(!isnan(volume)) ;
+    SFXManager::get()->queue(SFXManager::SFX_VOLUME, this, volume);
 }   // setVolume
 
 //-----------------------------------------------------------------------------
 /** Changes the volume of a sound effect.
- *  \param gain Volume adjustment between 0.0 (mute) and 1.0 (full volume).
+ *  \param volume Volume adjustment between 0.0 (mute) and 1.0 (full volume).
  */
-void SFXOpenAL::reallySetVolume(float gain)
+void SFXOpenAL::reallySetVolume(float volume)
 {
-    m_gain = m_default_gain * gain;
+    m_gain = m_default_gain * volume;
 
     if(m_status==SFX_UNKNOWN) return;
 
@@ -209,23 +210,23 @@ void SFXOpenAL::reallySetVolume(float gain)
 
 //-----------------------------------------------------------------------------
 /** Schedules setting of the master volume.
- *  \param gain Gain value.
+ *  \param volume Volume value.
  */
-void SFXOpenAL::setMasterVolume(float gain)
+void SFXOpenAL::setMasterVolume(float volume)
 {
     // This needs to be called even if sfx are disabled atm, so only exit
     // in case that the sfx could not be loaded in the first place.
     if(m_status==SFX_UNKNOWN) return;
-    SFXManager::get()->queue(SFXManager::SFX_MASTER_VOLUME, this, gain);
+    SFXManager::get()->queue(SFXManager::SFX_MASTER_VOLUME, this, volume);
 }   // setMasterVolume
 
 //-----------------------------------------------------------------------------
 /** Sets the master volume.
- *  \param gain Master volume.
+ *  \param volume Master volume.
  */
-void SFXOpenAL::reallySetMasterVolumeNow(float gain)
+void SFXOpenAL::reallySetMasterVolumeNow(float volume)
 {
-    m_master_gain = gain;
+    m_master_gain = volume;
     
     if(m_status==SFX_UNKNOWN || m_status == SFX_NOT_INITIALISED) return;
 
@@ -415,7 +416,7 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
     alSource3f(m_sound_source, AL_POSITION, position.getX(),
                position.getY(), -position.getZ());
 
-    if (SFXManager::get()->getListenerPos().distance(position) 
+    if (SFXManager::get()->getListenerPos().distance(position)
         > m_sound_buffer->getMaxDist())
     {
         alSourcef(m_sound_source, AL_GAIN, 0);

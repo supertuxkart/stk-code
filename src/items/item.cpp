@@ -19,9 +19,6 @@
 
 #include "items/item.hpp"
 
-#include <IMeshSceneNode.h>
-#include <ISceneManager.h>
-
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "karts/abstract_kart.hpp"
@@ -31,6 +28,9 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/vec3.hpp"
+
+#include <IMeshSceneNode.h>
+#include <ISceneManager.h>
 
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh)
@@ -48,12 +48,15 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     LODNode* lodnode    = new LODNode("item",
                                       irr_driver->getSceneManager()->getRootSceneNode(),
                                       irr_driver->getSceneManager());
-    scene::IMeshSceneNode* meshnode = irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
+    scene::IMeshSceneNode* meshnode = 
+        irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
 
     if (lowres_mesh != NULL)
     {
         lodnode->add(35, meshnode, true);
-        scene::IMeshSceneNode* meshnode = irr_driver->addMesh(lowres_mesh, StringUtils::insertValues("item_lo_%i", (int)type));
+        scene::IMeshSceneNode* meshnode = 
+            irr_driver->addMesh(lowres_mesh, 
+                                StringUtils::insertValues("item_lo_%i", (int)type));
         lodnode->add(100, meshnode, true);
     }
     else
