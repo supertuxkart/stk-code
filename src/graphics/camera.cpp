@@ -489,6 +489,7 @@ void Camera::update(float dt)
         // - the kart should not be visible, but it works)
         m_camera->setNearValue(27.0);
     }
+    // Update the first person camera
     else if (UserConfigParams::m_camera_debug == 3)
     {
         core::vector3df direction(m_camera->getTarget() - m_camera->getPosition());
