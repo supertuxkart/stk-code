@@ -885,6 +885,8 @@ EventPropagation InputManager::input(const SEvent& event)
     }
     else if (event.EventType == EET_KEY_INPUT_EVENT)
     {
+        m_shift_is_pressed = event.KeyInput.Shift;
+
         // On some systems (linux esp.) certain keys (e.g. [] ) have a 0
         // Key value, but do have a value defined in the Char field.
         // So to distinguish them (otherwise [] would both be mapped to
@@ -914,10 +916,6 @@ EventPropagation InputManager::input(const SEvent& event)
                     StateManager::get()->escapePressed();
                     return EVENT_BLOCK;
                 }
-            }
-            else if (key == KEY_LSHIFT)
-            {
-                m_shift_is_pressed = true;
             }
             // 'backspace' in a text control must never be mapped, since user
             // can be in a text area trying to erase text (and if it's mapped
@@ -950,10 +948,6 @@ EventPropagation InputManager::input(const SEvent& event)
         }
         else
         {
-            if (key == KEY_LSHIFT)
-            {
-                m_shift_is_pressed = false;
-            }
             // 'backspace' in a text control must never be mapped, since user
             // can be in a text area trying to erase text (and if it's mapped
             // to rescue that would dismiss the dialog instead of erasing a
