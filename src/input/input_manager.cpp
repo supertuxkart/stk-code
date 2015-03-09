@@ -544,7 +544,8 @@ int InputManager::getPlayerKeyboardID() const
  */
 void InputManager::dispatchInput(Input::InputType type, int deviceID,
                                  int button,
-                                 Input::AxisDirection axisDirection, int value)
+                                 Input::AxisDirection axisDirection, int value,
+                                 bool shift_mask)
 {
     // Act different in input sensing mode.
     if (m_mode == INPUT_SENSE_KEYBOARD ||
@@ -597,7 +598,17 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         else if (button == KEY_RIGHT)  action = PA_MENU_RIGHT;
         else if (button == KEY_SPACE)  action = PA_MENU_SELECT;
         else if (button == KEY_RETURN) action = PA_MENU_SELECT;
-        else if (button == KEY_TAB)    action = PA_MENU_DOWN;
+        else if (button == KEY_TAB)    
+        {
+            if (shift_mask)
+            {
+                action = PA_MENU_UP;
+            }
+            else
+            {
+                action = PA_MENU_DOWN;
+            }
+        }
 
         if (button == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
         {
@@ -922,7 +933,8 @@ EventPropagation InputManager::input(const SEvent& event)
             const bool wasInTextBox = GUIEngine::isWithinATextBox();
 
             dispatchInput(Input::IT_KEYBOARD, event.KeyInput.Char, key,
-                          Input::AD_POSITIVE, Input::MAX_VALUE);
+                          Input::AD_POSITIVE, Input::MAX_VALUE,
+                          event.KeyInput.Shift);
 
             // if this action took us into a text box, don't let event continue
             // (FIXME not the cleanest solution)
@@ -951,7 +963,7 @@ EventPropagation InputManager::input(const SEvent& event)
             }
 
             dispatchInput(Input::IT_KEYBOARD, event.KeyInput.Char, key,
-                          Input::AD_POSITIVE, 0);
+                          Input::AD_POSITIVE, 0, event.KeyInput.Shift);
             return EVENT_BLOCK; // Don't propagate key up events
         }
     }
