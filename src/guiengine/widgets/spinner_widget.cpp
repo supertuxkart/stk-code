@@ -46,7 +46,6 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_supports_multiplayer = true;
     m_value = -1;
     m_use_background_color=false;
-    m_allow_mouse_change = false;
     m_spinner_widget_player_id=-1;
     m_min = 0;
     m_max = 999;
@@ -435,40 +434,46 @@ void SpinnerWidget::setCustomText(const core::stringw& text)
 
 // -----------------------------------------------------------------------------
 
-void SpinnerWidget::setValuesByMouse(const core::position2di & mouse_position,
-                                     const core::recti & body_rect)
-{
-    if(body_rect.isPointInside(mouse_position))
-    {
-        if (m_allow_mouse_change)
-        {
-            float exact_hover = (float)((mouse_position.X -
-                body_rect.UpperLeftCorner.X) /
-                (float)body_rect.getWidth()) * (m_max-m_min) + 0.5f;
-
-            int new_value = ((exact_hover * (m_max-m_min)) / 
-                              (m_max-m_min))+m_min;
-            //Log::info("SpinnerWidget", "mouse_value: %d (%f)", 
-            //            mouse_value, exact_hover);
-
-            if (new_value > m_max) new_value = m_max;
-            if (new_value < m_min) new_value = m_min;
-
-            setValue(new_value);
-            EventHandler::get()->processGUIAction(
-                          PlayerAction::PA_MENU_SELECT,
-                          1, Input::MAX_VALUE,
-                          Input::IT_MOUSEBUTTON, false); //process the changes
-            m_allow_mouse_change = false;
-        }
-    }
-}
-
-// -----------------------------------------------------------------------------
-
 void SpinnerWidget::onClick()
 {
-    m_allow_mouse_change = true;
+    int x = m_x;
+    int y = m_y;
+
+    if (m_parent != NULL)
+    {
+        x += m_parent->getAbsolutePosition().UpperLeftCorner.X;
+        y += m_parent->getAbsolutePosition().UpperLeftCorner.Y;
+    }
+
+    if (m_children[1].m_deactivated) return;
+
+    if (m_children[1].m_properties[PROP_ID] != "spinnerbody" 
+        || !isGauge()) { return; }
+
+    const core::position2di mouse_position
+        = irr_driver->getDevice()->getCursorControl()->getPosition();
+
+    const int handle_size = m_h*110/128; //need params->m_left_border and params->getImage()->getSize().Height
+
+    rect<s32> body_rect = rect<s32>(x+handle_size, 
+                                    y, 
+                                    x+handle_size + (m_w-2*handle_size), 
+                                    y+handle_size);
+
+    if(body_rect.isPointInside(mouse_position))
+    {
+        float exact_hover = (float)((mouse_position.X -
+            body_rect.UpperLeftCorner.X) /
+            (float)body_rect.getWidth()) * (m_max-m_min) + 0.5f;
+
+        int new_value = ((exact_hover * (m_max-m_min)) / 
+                          (m_max-m_min))+m_min;
+
+        if (new_value > m_max) new_value = m_max;
+        if (new_value < m_min) new_value = m_min;
+
+        setValue(new_value);
+    }
 }
 
 // -----------------------------------------------------------------------------

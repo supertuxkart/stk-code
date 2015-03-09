@@ -59,7 +59,6 @@ namespace GUIEngine
         
         int m_spinner_widget_player_id;
         bool m_use_background_color;
-        bool m_allow_mouse_change;
         
         /** If each value the spinner can take has an associated text, this vector will be non-empty */
         std::vector<irr::core::stringw> m_labels;
@@ -201,10 +200,6 @@ namespace GUIEngine
 
         /** Display custom text in spinner */
         void setCustomText(const core::stringw& text);
-
-        /** Set m_value based on mouse position */
-        void setValuesByMouse(const core::position2di & mouse_position,
-                              const core::recti & body_rect);
     };
 
 }
