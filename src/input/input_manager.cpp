@@ -75,6 +75,7 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
 
     m_timer_in_use = false;
     m_master_player_only = false;
+    m_shift_is_pressed = false;
     m_timer = 0;
 
 }
@@ -598,7 +599,17 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         else if (button == KEY_RIGHT)  action = PA_MENU_RIGHT;
         else if (button == KEY_SPACE)  action = PA_MENU_SELECT;
         else if (button == KEY_RETURN) action = PA_MENU_SELECT;
-        else if (button == KEY_TAB)    action = PA_MENU_DOWN;
+        else if (button == KEY_TAB)
+        {
+            if (m_shift_is_pressed)
+            {
+                action = PA_MENU_UP;
+            }
+            else
+            {
+                action = PA_MENU_DOWN;
+            }
+        }
 
         if (button == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
         {
@@ -904,6 +915,10 @@ EventPropagation InputManager::input(const SEvent& event)
                     return EVENT_BLOCK;
                 }
             }
+            else if (key == KEY_LSHIFT)
+            {
+                m_shift_is_pressed = true;
+            }
             // 'backspace' in a text control must never be mapped, since user
             // can be in a text area trying to erase text (and if it's mapped
             // to rescue that would dismiss the dialog instead of erasing a
@@ -935,6 +950,10 @@ EventPropagation InputManager::input(const SEvent& event)
         }
         else
         {
+            if (key == KEY_LSHIFT)
+            {
+                m_shift_is_pressed = false;
+            }
             // 'backspace' in a text control must never be mapped, since user
             // can be in a text area trying to erase text (and if it's mapped
             // to rescue that would dismiss the dialog instead of erasing a
