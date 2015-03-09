@@ -61,6 +61,8 @@ private:
 
     /** When at true, only the master player can play with menus */
     bool m_master_player_only;
+    // to be able to tab upwards when holding shift
+    bool m_shift_is_pressed;
 
     /* Helper values to store and track the relative mouse movements. If these
     * values exceed the deadzone value the input is reported to the game. This

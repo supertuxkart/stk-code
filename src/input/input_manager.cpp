@@ -74,6 +74,7 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
 
     m_timer_in_use = false;
     m_master_player_only = false;
+    m_shift_is_pressed = false;
     m_timer = 0;
 
 }
@@ -597,7 +598,17 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         else if (button == KEY_RIGHT)  action = PA_MENU_RIGHT;
         else if (button == KEY_SPACE)  action = PA_MENU_SELECT;
         else if (button == KEY_RETURN) action = PA_MENU_SELECT;
-        else if (button == KEY_TAB)    action = PA_MENU_DOWN;
+        else if (button == KEY_TAB)
+        {
+            if (m_shift_is_pressed)
+            {
+                action = PA_MENU_UP;
+            }
+            else
+            {
+                action = PA_MENU_DOWN;
+            }
+        }
 
         if (button == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
         {
@@ -873,6 +884,8 @@ EventPropagation InputManager::input(const SEvent& event)
     }
     else if (event.EventType == EET_KEY_INPUT_EVENT)
     {
+        m_shift_is_pressed = event.KeyInput.Shift;
+
         // On some systems (linux esp.) certain keys (e.g. [] ) have a 0
         // Key value, but do have a value defined in the Char field.
         // So to distinguish them (otherwise [] would both be mapped to
