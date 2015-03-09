@@ -67,8 +67,7 @@ using GUIEngine::EVENT_BLOCK;
 /** Initialise input
  */
 InputManager::InputManager() : m_mode(BOOTSTRAP),
-                               m_mouse_val_x(-1), m_mouse_val_y(-1),
-                               m_mouse_reset(0)
+                               m_mouse_val_x(-1), m_mouse_val_y(-1)
 {
     m_device_manager = new DeviceManager();
     m_device_manager->initialize();
@@ -977,34 +976,16 @@ EventPropagation InputManager::input(const SEvent& event)
                     UserConfigParams::m_fpscam_direction_speed;
                 float mouse_y = ((float) diff_y) *
                     -UserConfigParams::m_fpscam_direction_speed;
+
                 // No movement the first time it's used
                 // At the moment there's also a hard limit because the mouse
                 // gets reset to the middle of the screen and sometimes there
                 // are more events fired than expected.
-                if (m_mouse_val_x != -1 && m_mouse_reset <= 0)
+                if (m_mouse_val_x != -1 &&
+                   (diff_x + diff_y) < 100 && (diff_x + diff_y) > -100)
                 {
                     // Rotate camera
-                    core::vector3df up(cam->getUpVector());
-                    core::vector3df direction(cam->getDirection());
-                    core::vector3df side(direction.crossProduct(up));
-                    direction.normalize();
-                    up.normalize();
-                    core::quaternion quat;
-                    quat.fromAngleAxis(mouse_x, up);
-
-                    core::quaternion quat_y;
-                    quat_y.fromAngleAxis(mouse_y, side);
-                    quat *= quat_y;
-
-                    direction = quat * direction;
-                    cam->setDirection(direction);
-                    side = direction.crossProduct(up);
-
-                    // Compute new up vector
-                    /*up = side.crossProduct(direction);
-                    up.normalize();
-                    // Don't do that because it looks ugly and is bad to handle ;)
-                    cam->setUpVector(up);*/
+                    cam->applyMouseMovement(mouse_x, mouse_y);
 
                     // Reset mouse position to the middle of the screen when
                     // the mouse is far away
@@ -1016,8 +997,6 @@ EventPropagation InputManager::input(const SEvent& event)
                         irr_driver->getDevice()->getCursorControl()->setPosition(mid_x, mid_y);
                         m_mouse_val_x = mid_x;
                         m_mouse_val_y = mid_y;
-                        // Ignore the next 2 movements
-                        m_mouse_reset = 2;
                     }
                     else
                     {
@@ -1029,7 +1008,6 @@ EventPropagation InputManager::input(const SEvent& event)
                 {
                     m_mouse_val_x = event.MouseInput.X;
                     m_mouse_val_y = event.MouseInput.Y;
-                    --m_mouse_reset;
                 }
                 return EVENT_BLOCK;
             }

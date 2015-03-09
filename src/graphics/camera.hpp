@@ -113,6 +113,10 @@ private:
     /** Smooth acceleration with the first person camera. */
     bool m_smooth;
 
+    /** Attache the first person camera to a kart.
+        That means moving the kart also moves the camera. */
+    bool m_attached;
+
     /** The speed at which the up-vector rotates, only used for the first person camera. */
     float m_angular_velocity;
 
@@ -137,6 +141,15 @@ private:
 
     /** The up vector the camera should have, only used for the first person camera. */
     core::vector3df m_target_up_vector;
+
+    /** Save the local position if the first person camera is attached to the kart. */
+    core::vector3df m_local_position;
+
+    /** Save the local direction if the first person camera is attached to the kart. */
+    core::vector3df m_local_direction;
+
+    /** Save the local up vector if the first person camera is attached to the kart. */
+    core::vector3df m_local_up;
 
     /** List of all cameras. */
     static std::vector<Camera*> m_all_cameras;
@@ -270,12 +283,24 @@ public:
     AbstractKart* getKart() { return m_kart; }
 
     // ------------------------------------------------------------------------
+    /** Applies mouse movement to the first person camera. */
+    void applyMouseMovement (float x, float y);
+
+    // ------------------------------------------------------------------------
     /** Sets if the first person camera should be moved smooth. */
     void setSmoothMovement (bool value) { m_smooth = value; }
 
     // ------------------------------------------------------------------------
     /** If the first person camera should be moved smooth. */
     bool getSmoothMovement () { return m_smooth; }
+
+    // ------------------------------------------------------------------------
+    /** Sets if the first person camera should be moved with the kart. */
+    void setAttachedFpsCam (bool value) { m_attached = value; }
+
+    // ------------------------------------------------------------------------
+    /** If the first person camera should be moved with the kart. */
+    bool getAttachedFpsCam () { return m_attached; }
 
     // ------------------------------------------------------------------------
     /** Sets the angular velocity for this camera. */
