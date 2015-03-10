@@ -1608,6 +1608,12 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
                                              0 /* no clipping */, 0,
                                              true /* alpha */);
     }
+
+    if (focused && widget->hasTooltip())
+    {
+        m_tooltip_at_mouse.push_back(true);
+        m_tooltips.push_back(widget);
+    }
 }   // drawCheckBox
 
 // ----------------------------------------------------------------------------
@@ -1842,7 +1848,7 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
     if (atMouse)
     {
         pos = irr_driver->getDevice()->getCursorControl()->getPosition()
-            + core::position2di(15, 15);
+            + core::position2di(10 - size.Width / 2, 20);
     }
 
     core::recti r(pos, size);
