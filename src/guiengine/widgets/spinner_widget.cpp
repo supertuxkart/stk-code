@@ -445,20 +445,18 @@ void SpinnerWidget::onClick()
         y += m_parent->getAbsolutePosition().UpperLeftCorner.Y;
     }
 
-    if (m_children[1].m_deactivated) return;
-
-    if (m_children[1].m_properties[PROP_ID] != "spinnerbody" 
-        || !isGauge()) { return; }
+    if (m_children[1].m_deactivated || 
+        m_children[1].m_properties[PROP_ID] != "spinnerbody"  || 
+        !isGauge()) 
+    { 
+        return; 
+    }
 
     const core::position2di mouse_position
         = irr_driver->getDevice()->getCursorControl()->getPosition();
 
-    const int handle_size = m_h*110/128; //need params->m_left_border and params->getImage()->getSize().Height
-
-    rect<s32> body_rect = rect<s32>(x+handle_size, 
-                                    y, 
-                                    x+handle_size + (m_w-2*handle_size), 
-                                    y+handle_size);
+    core::recti body_rect 
+        = m_children[1].getIrrlichtElement()->getAbsolutePosition();
 
     if(body_rect.isPointInside(mouse_position))
     {
