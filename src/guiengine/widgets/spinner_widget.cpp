@@ -432,3 +432,38 @@ void SpinnerWidget::setCustomText(const core::stringw& text)
     }
 }
 
+// -----------------------------------------------------------------------------
+
+void SpinnerWidget::onClick()
+{
+    if (m_children[1].m_deactivated || 
+        m_children[1].m_properties[PROP_ID] != "spinnerbody"  || 
+        !isGauge()) 
+    { 
+        return; 
+    }
+
+    const core::position2di mouse_position
+        = irr_driver->getDevice()->getCursorControl()->getPosition();
+
+    core::recti body_rect 
+        = m_children[1].getIrrlichtElement()->getAbsolutePosition();
+
+    if (body_rect.isPointInside(mouse_position))
+    {
+        float exact_hover = (float)((mouse_position.X -
+            body_rect.UpperLeftCorner.X) /
+            (float)body_rect.getWidth()) * (m_max-m_min);
+
+        float new_value_f = ((exact_hover * (m_max - m_min)) /
+            (m_max - m_min)) + m_min;
+        int new_value = (int)roundf(new_value_f);
+
+        if (new_value > m_max) new_value = m_max;
+        if (new_value < m_min) new_value = m_min;
+
+        setValue(new_value);
+    }
+}
+
+// -----------------------------------------------------------------------------
