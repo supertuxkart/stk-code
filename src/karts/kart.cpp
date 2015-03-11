@@ -1825,8 +1825,11 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
             impulse.normalize();
         else
             impulse = Vec3(0, 0, -1); // Arbitrary
-        // impulse depends of kart speed - and speed can be negative
-        impulse *= sqrt(fabsf(getSpeed()))
+        // Impulse depends of kart speed - and speed can be negative
+        // If the speed is too low, karts can still get stuck into a wall
+        // so make sure there is always enough impulse to avoid this
+        float abs_speed = fabsf(getSpeed());
+        impulse *= ( abs_speed<10 ? 10.0f : sqrt(abs_speed) )
                  * m_kart_properties->getCollisionTerrainImpulse();
         m_bounce_back_time = 0.2f;
         m_vehicle->setTimedCentralImpulse(0.1f, impulse);

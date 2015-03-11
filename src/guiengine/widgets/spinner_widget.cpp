@@ -436,15 +436,6 @@ void SpinnerWidget::setCustomText(const core::stringw& text)
 
 void SpinnerWidget::onClick()
 {
-    int x = m_x;
-    int y = m_y;
-
-    if (m_parent != NULL)
-    {
-        x += m_parent->getAbsolutePosition().UpperLeftCorner.X;
-        y += m_parent->getAbsolutePosition().UpperLeftCorner.Y;
-    }
-
     if (m_children[1].m_deactivated || 
         m_children[1].m_properties[PROP_ID] != "spinnerbody"  || 
         !isGauge()) 
@@ -458,14 +449,15 @@ void SpinnerWidget::onClick()
     core::recti body_rect 
         = m_children[1].getIrrlichtElement()->getAbsolutePosition();
 
-    if(body_rect.isPointInside(mouse_position))
+    if (body_rect.isPointInside(mouse_position))
     {
         float exact_hover = (float)((mouse_position.X -
             body_rect.UpperLeftCorner.X) /
-            (float)body_rect.getWidth()) * (m_max-m_min) + 0.5f;
+            (float)body_rect.getWidth()) * (m_max-m_min);
 
-        int new_value = ((exact_hover * (m_max-m_min)) / 
-                          (m_max-m_min))+m_min;
+        float new_value_f = ((exact_hover * (m_max - m_min)) /
+            (m_max - m_min)) + m_min;
+        int new_value = (int)roundf(new_value_f);
 
         if (new_value > m_max) new_value = m_max;
         if (new_value < m_min) new_value = m_min;
