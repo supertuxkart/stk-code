@@ -46,7 +46,7 @@ RegistrationDialog::RegistrationDialog() :
         L"these terms. If you have any questions or comments regarding these "
         L"terms, one of the members of the development team would gladly "
         L"assist you.",
-        L"http://supertuxkart.net/terms");
+        L"http://terms.supertuxkart.net");
     terms_widget->setText(terms, false);
 
    // showRegistrationTerms();

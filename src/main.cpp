@@ -395,7 +395,6 @@ void handleXmasMode()
  */
 bool isEasterMode(int day, int month, int year, int before_after_days)
 {
-    bool ears = false;
     switch (UserConfigParams::m_easter_ear_mode)
     {
     case 0:
@@ -1201,6 +1200,7 @@ void askForInternetPermission()
     new MessageDialog(_("SuperTuxKart may connect to a server "
         "to download add-ons and notify you of updates. We also collect "
         "anonymous hardware statistics to help with the development of STK. "
+        "Please read our privacy policy at http://privacy.supertuxkart.net. "
         "Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
         "'User Interface', and edit \"Connect to the "
