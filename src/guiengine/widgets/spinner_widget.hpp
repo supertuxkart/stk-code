@@ -91,6 +91,9 @@ namespace GUIEngine
         
         /** \brief implementing method from base class Widget */
         virtual EventPropagation leftPressed(const int playerID);
+
+        /** \brief implementing method from base class Widget */
+        virtual void onClick();
         
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
