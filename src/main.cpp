@@ -152,6 +152,7 @@
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -395,7 +396,6 @@ void handleXmasMode()
  */
 bool isEasterMode(int day, int month, int year, int before_after_days)
 {
-    bool ears = false;
     switch (UserConfigParams::m_easter_ear_mode)
     {
     case 0:
@@ -1201,6 +1201,7 @@ void askForInternetPermission()
     new MessageDialog(_("SuperTuxKart may connect to a server "
         "to download add-ons and notify you of updates. We also collect "
         "anonymous hardware statistics to help with the development of STK. "
+        "Please read our privacy policy at http://privacy.supertuxkart.net. "
         "Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
         "'User Interface', and edit \"Connect to the "
@@ -1365,6 +1366,14 @@ int main(int argc, char *argv[] )
             MessageDialog *dialog =
                 new MessageDialog(_("Your driver version is too old. Please install "
                 "the latest video drivers."),
+                /*from queue*/ true);
+            GUIEngine::DialogQueue::get()->pushDialog(dialog);
+        }
+        else if (!CVS->isGLSL())
+        {
+            MessageDialog *dialog =
+                new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
+                "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
                 /*from queue*/ true);
             GUIEngine::DialogQueue::get()->pushDialog(dialog);
         }

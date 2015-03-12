@@ -46,7 +46,8 @@ void CentralVideoSettings::init()
         Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
         Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
     }
-    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
+    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1))
+           && !UserConfigParams::m_force_legacy_device;
     if (!ProfileWorld::isNoGraphics())
         initGL();
 
