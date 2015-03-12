@@ -498,7 +498,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 }
 #endif
 
-static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
+static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
 {
 	GLXContext Context;
 	irr::video::useCoreContext = true;
@@ -557,25 +557,29 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
   
-	// create core 4.3 context
-	os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
-	if (!XErrorSignaled)
-		return Context;
+    if(!force_legacy_context)
+    {
+        // create core 4.3 context
+        os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
+        if (!XErrorSignaled)
+            return Context;
+        
+        XErrorSignaled = false;
+        // create core 3.3 context
+        os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
+        if (!XErrorSignaled)
+            return Context;
 
-	XErrorSignaled = false;
-	// create core 3.3 context
-	os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
-	if (!XErrorSignaled)
-		return Context;
+        XErrorSignaled = false;
+        // create core 3.1 context (for older mesa)
+        os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
+        if (!XErrorSignaled)
+            return Context;
 
-	XErrorSignaled = false;
-	// create core 3.1 context (for older mesa)
-	os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
-	if (!XErrorSignaled)
-		return Context;
+    }   // if(force_legacy_context)
 
 	XErrorSignaled = false;
 	irr::video::useCoreContext = false;
@@ -999,7 +1003,7 @@ bool CIrrDeviceLinux::createWindow()
 		glxWin=glXCreateWindow(display,glxFBConfig,window,NULL);
 		if (glxWin)
 		{
-			Context = getMeAGLContext(display, glxFBConfig);
+			Context = getMeAGLContext(display, glxFBConfig, CreationParams.ForceLegacyDevice);
 			if (Context)
 			{
 				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))
