@@ -152,6 +152,7 @@
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -1365,6 +1366,14 @@ int main(int argc, char *argv[] )
             MessageDialog *dialog =
                 new MessageDialog(_("Your driver version is too old. Please install "
                 "the latest video drivers."),
+                /*from queue*/ true);
+            GUIEngine::DialogQueue::get()->pushDialog(dialog);
+        }
+        else if (!CVS->isGLSL())
+        {
+            MessageDialog *dialog =
+                new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
+                "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
                 /*from queue*/ true);
             GUIEngine::DialogQueue::get()->pushDialog(dialog);
         }
