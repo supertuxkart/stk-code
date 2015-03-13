@@ -2758,10 +2758,11 @@ void Kart::setOnScreenText(const wchar_t *text)
     // when the parent is deleted.
 }   // setOnScreenText
 
+// ----------------------------------------------------------------------------
 void Kart::activateSkidLight(unsigned int level)
 {
     m_skidding_light_1->setVisible(level == 1);
     m_skidding_light_2->setVisible(level > 1);
-}
+}   // activateSkidLight
 
 /* EOF */

@@ -120,7 +120,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** True if the AI should have additional abbilities, e.g.
-     *  nolik will get special bubble gums in the final challenge. */
+     *  nolok will get special bubble gums in the final challenge. */
     enum AISuperPower
     {
         SUPERPOWER_NONE       = 0,

@@ -2,16 +2,26 @@
 <achievements>
   <achievement id="1" check-type="all-at-least" reset-type="never"
                name="Christoffel Columbus" description="Play every official track at least once." >
+      <city goal="1"/>
+      <cocoa_temple goal="1"/>
       <farm goal="1"/>
-      <scotland goal="1"/>
-      <lighthouse goal="1"/>
-      <sandtrack goal="1"/>
-      <olivermath goal="1"/>
-      <subsea goal="1"/>
-      <mansion goal="1"/>
-      <minigolf goal="1"/>
+      <fortmagma goal="1"/>
+      <gran_paradiso_island goal="1"/>
+      <greenvalley goal="1"/>
       <hacienda goal="1"/>
-      <jungle goal="1"/>      
+      <lighthouse goal="1"/>
+      <mansion goal="1"/>
+      <mines goal="1"/>
+      <minigolf goal="1"/>
+      <olivermath goal="1"/>
+      <sandtrack goal="1"/>
+      <scotland goal="1"/>
+      <snowmountain goal="1"/>
+      <snowtuxpeak goal="1"/>
+      <stk_enterprise goal="1"/>
+      <subsea goal="1"/>
+      <xr591 goal="1"/>
+      <zengarden goal="1"/>      
   </achievement>
   <achievement id="2" check-type="all-at-least" reset-type="never"
                name="Strike!" description="Hit 10 karts with a bowling-ball.">
