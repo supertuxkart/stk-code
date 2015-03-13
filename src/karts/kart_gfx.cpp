@@ -162,8 +162,8 @@ void KartGFX::reset()
 
 // ----------------------------------------------------------------------------
 /** Selects the correct skidding particle type depending on skid bonus level.
- *  \param type Must be either KGFX_SKID1 or KGFX_SKID2 - the particle type
- *         to use corresponding to the bonus level.
+ *  \param level Must be 1 (accumulated enough for level 1 bonus) or 2 
+ *         (accumulated enough for level 2 bonus).
  */
 void KartGFX::setSkidLevel(const unsigned int level)
 {
