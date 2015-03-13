@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <challenge version="2">
-    <track id="island" laps="3"/>
+    <track id="gran_paradiso_island" laps="3"/>
     <mode major="single" minor="quickrace"/>
     <requirements trophies="95"/>
     
