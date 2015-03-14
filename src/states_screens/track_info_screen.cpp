@@ -194,6 +194,7 @@ void TrackInfoScreen::init()
     RibbonWidget* bt_start = getWidget<GUIEngine::RibbonWidget>("buttons");
     bt_start->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
+    updateHighScores();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -322,6 +323,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         const int num_ai = m_ai_kart_spinner->getValue();
         race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
         UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() + num_ai;
+        updateHighScores();
     }
 }   // eventCallback
 
