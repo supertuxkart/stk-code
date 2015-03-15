@@ -742,7 +742,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_TMP_256), 1., 1.);
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getFBO(FBO_TMP_128), 1., 1.);
 
-            // Additively blend
+            // Additively blend on top of tmp1
             in_fbo->Bind();
             glEnable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ONE);
