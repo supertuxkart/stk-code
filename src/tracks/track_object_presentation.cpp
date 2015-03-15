@@ -40,6 +40,7 @@
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "tracks/track_object_manager.hpp"
 
 #include <IBillboardSceneNode.h>
@@ -168,12 +169,36 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     XMLNode* libroot;
     std::string lib_path =
         file_manager->getAsset(FileManager::LIBRARY, name) + "/";
+
     bool create_lod_definitions = true;
 
     if (!model_def_loader.containsLibraryNode(name))
     {
+        World* world = World::getWorld();
+        Track* track = NULL;
+        if (world != NULL)
+            track = world->getTrack();
+        std::string local_lib_node_path;
+        if (track != NULL)
+            local_lib_node_path = track->getTrackFile(name + "/node.xml");
         std::string lib_node_path = lib_path + "node.xml";
-        libroot = file_manager->createXMLTree(lib_node_path);
+
+        if (local_lib_node_path.size() > 0 && file_manager->fileExists(local_lib_node_path))
+        {
+            lib_path = track->getTrackFile(name);
+            libroot = file_manager->createXMLTree(local_lib_node_path);
+        }
+        else if (file_manager->fileExists(lib_node_path))
+        {
+            libroot = file_manager->createXMLTree(lib_node_path);
+        }
+        else
+        {
+            Log::error("TrackObjectPresentationLibraryNode",
+                "Cannot find library '%s'", lib_node_path.c_str());
+            return;
+        }
+
         if (libroot == NULL)
         {
             Log::error("TrackObjectPresentationLibraryNode",
