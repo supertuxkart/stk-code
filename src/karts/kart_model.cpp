@@ -629,19 +629,9 @@ void KartModel::loadWheelInfo(const XMLNode &node,
                               const std::string &wheel_name, int index)
 {
     const XMLNode *wheel_node = node.getNode(wheel_name);
-    if(!wheel_node)
-    {
-        // Only print the warning if a model filename is given. Otherwise the
-        // stk_config file is read (which has no model information).
-        if(m_model_filename!="")
-        {
-            Log::error("Kart_Model", "Missing wheel information '%s' for model "
-                       "'%s'.", wheel_name.c_str(), m_model_filename.c_str());
-            Log::error("Kart_Model", "This can be ignored, but the wheels will "
-                       "not rotate.");
-        }
-        return;
-    }
+    // Ignore in case of karts with missing wheels (e.g. Sara)
+    if(!wheel_node) return;
+
     wheel_node->get("model",            &m_wheel_filename[index]         );
     wheel_node->get("position",         &m_wheel_graphics_position[index]);
     wheel_node->get("min-suspension",   &m_min_suspension[index]         );
