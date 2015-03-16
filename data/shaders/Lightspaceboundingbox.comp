@@ -49,7 +49,7 @@ void main()
     ivec3 lmax3 = ivec3(-1000);
     ivec3 lmin3 = ivec3(1000);
 
-    vec2 start_xy = gl_LocalInvocationID.xy + gl_WorkGroupID.xy * gl_WorkGroupSize.xy * 8 + vec2(0.5);
+    vec2 start_xy = gl_LocalInvocationID.xy + gl_WorkGroupID.xy * gl_WorkGroupSize.xy * 8;
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
 

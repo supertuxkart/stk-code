@@ -388,6 +388,12 @@ public:
     BloomShader();
 };
 
+class BloomBlendShader : public ShaderHelperSingleton<BloomBlendShader>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
+{
+public:
+    BloomBlendShader();
+};
+
 class LensBlendShader : public ShaderHelperSingleton<LensBlendShader>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
 {
 public:

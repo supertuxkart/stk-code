@@ -1570,6 +1570,16 @@ namespace FullScreenShader
 
         AssignSamplerNames(Program, 0, "tex");
     }
+
+    BloomBlendShader::BloomBlendShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloomblend.frag").c_str());
+        AssignUniforms();
+
+        AssignSamplerNames(Program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
+    }
 	
 	LensBlendShader::LensBlendShader()
     {
