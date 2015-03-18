@@ -183,7 +183,21 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                 new TrackObjectPresentationLOD(xml_node, parent, model_def_loader);
             m_presentation = lod_node;
 
-            glownode = ((LODNode*)lod_node->getNode())->getAllNodes()[0];
+            LODNode* node = (LODNode*)lod_node->getNode();
+            if (type == "movable" && parent != NULL)
+            {
+                // HACK: unparent movables from their parent library object if any,
+                // because bullet provides absolute transforms, not transforms relative
+                // to the parent object
+                node->updateAbsolutePosition();
+                core::matrix4 absTransform = node->getAbsoluteTransformation();
+                node->setParent(irr_driver->getSceneManager()->getRootSceneNode());
+                node->setPosition(absTransform.getTranslation());
+                node->setRotation(absTransform.getRotationDegrees());
+                node->setScale(absTransform.getScale());
+            }
+
+            glownode = node->getAllNodes()[0];
         }
         else
         {
