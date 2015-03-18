@@ -180,12 +180,12 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
             track = world->getTrack();
         std::string local_lib_node_path;
         if (track != NULL)
-            local_lib_node_path = track->getTrackFile(name + "/node.xml");
+            local_lib_node_path = track->getTrackFile("library/" + name + "/node.xml");
         std::string lib_node_path = lib_path + "node.xml";
 
         if (local_lib_node_path.size() > 0 && file_manager->fileExists(local_lib_node_path))
         {
-            lib_path = track->getTrackFile(name);
+            lib_path = track->getTrackFile("library/" + name);
             libroot = file_manager->createXMLTree(local_lib_node_path);
         }
         else if (file_manager->fileExists(lib_node_path))
