@@ -750,6 +750,12 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             FullScreenShader::BloomBlendShader::getInstance()->SetTextureUnits(
                 irr_driver->getRenderTargetTexture(RTT_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
             DrawFullScreenEffect<FullScreenShader::BloomBlendShader>();
+
+            FullScreenShader::LensBlendShader::getInstance()->SetTextureUnits(
+                irr_driver->getRenderTargetTexture(RTT_LENS_128), irr_driver->getRenderTargetTexture(RTT_LENS_256), irr_driver->getRenderTargetTexture(RTT_LENS_512));
+            DrawFullScreenEffect<FullScreenShader::LensBlendShader>();
+
+
             glDisable(GL_BLEND);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         } // end if bloom
