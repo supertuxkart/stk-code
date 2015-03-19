@@ -105,7 +105,8 @@ public:
     virtual      ~TrackObject();
     virtual void update(float dt);
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
-              const core::vector3df& scale, bool updateRigidBody);
+              const core::vector3df& scale, bool updateRigidBody,
+              bool isAbsoluteCoord);
 
     virtual void reset();
     void setEnable(bool mode);

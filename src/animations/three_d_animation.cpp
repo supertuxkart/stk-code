@@ -108,7 +108,7 @@ void ThreeDAnimation::update(float dt)
 
         if (m_object)
         {
-            m_object->move(xyz.toIrrVector(), hpr, scale.toIrrVector(), true);
+            m_object->move(xyz.toIrrVector(), hpr, scale.toIrrVector(), true, false);
         }
     }
 }   // update

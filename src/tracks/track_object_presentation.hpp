@@ -82,7 +82,7 @@ public:
     virtual void setEnable(bool enabled) {}
     virtual void update(float dt) {}
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
-                      const core::vector3df& scale) {}
+        const core::vector3df& scale, bool isAbsoluteCoord) {}
 
     // ------------------------------------------------------------------------
     /** Returns the position of this TrackObjectPresentation. */
@@ -139,7 +139,7 @@ public:
     virtual const core::vector3df& getRotation() const OVERRIDE;
     virtual const core::vector3df& getScale() const OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
-                      const core::vector3df& scale) OVERRIDE;
+        const core::vector3df& scale, bool isAbsoluteCoord) OVERRIDE;
     virtual void setEnable(bool enabled) OVERRIDE;
     virtual void reset() OVERRIDE;
 
@@ -264,7 +264,7 @@ public:
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
     virtual void update(float dt) OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
-                      const core::vector3df& scale) OVERRIDE;
+        const core::vector3df& scale, bool isAbsoluteCoord) OVERRIDE;
     void triggerSound(bool loop);
     void stopSound();
 

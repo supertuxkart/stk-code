@@ -100,11 +100,12 @@ const core::vector3df& TrackObjectPresentationSceneNode::getScale() const
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz,
                                             const core::vector3df& hpr,
-                                            const core::vector3df& scale)
+                                            const core::vector3df& scale,
+                                            bool isAbsoluteCoord)
 {
     if (m_node == NULL) return;
 
-    if (m_node->getParent() != NULL)
+    if (m_node->getParent() != NULL && isAbsoluteCoord)
     {
         scene::ISceneNode* parent = m_node->getParent();
         m_node->setPosition((xyz - parent->getAbsolutePosition())
@@ -640,7 +641,8 @@ TrackObjectPresentationSound::~TrackObjectPresentationSound()
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::move(const core::vector3df& xyz, 
                                         const core::vector3df& hpr,
-                                        const core::vector3df& scale)
+                                        const core::vector3df& scale,
+                                        bool isAbsoluteCoord)
 {
     m_xyz = xyz;
     if (m_sound != NULL) m_sound->setPosition(xyz);

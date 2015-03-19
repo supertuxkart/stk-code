@@ -145,7 +145,7 @@ void GrandPrixLose::onUpdate(float dt)
                 core::vector3df kart_pos(m_kart_x + n*DISTANCE_BETWEEN_KARTS,
                     m_kart_y,
                     m_kart_z);
-                m_kart_node[n]->move(kart_pos, kart_rot, kart_scale, false);
+                m_kart_node[n]->move(kart_pos, kart_rot, kart_scale, false, true);
             }
         }
     }

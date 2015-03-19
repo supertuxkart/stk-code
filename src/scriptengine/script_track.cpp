@@ -86,7 +86,7 @@ namespace Scripting
             core::vector3df xyz = new_pos->toIrrVector();
             core::vector3df hpr = core::vector3df(0, 0, 0);
             core::vector3df scale = core::vector3df(1, 1, 1);
-            ((TrackObjectPresentation*)(memory))->move(xyz, hpr, scale);
+            ((TrackObjectPresentation*)(memory))->move(xyz, hpr, scale, false);
         }
         //stop a sound
         void stop(void *memory)

@@ -339,9 +339,12 @@ bool TrackObject::castRay(const btVector3 &from,
 // ----------------------------------------------------------------------------
 
 void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
-                       const core::vector3df& scale, bool update_rigid_body)
+                       const core::vector3df& scale, bool update_rigid_body,
+                       bool isAbsoluteCoord)
 {
-    if (m_presentation != NULL) m_presentation->move(xyz, hpr, scale);
+    if (m_presentation != NULL)
+        m_presentation->move(xyz, hpr, scale, isAbsoluteCoord);
+
     if (update_rigid_body && m_physical_object != NULL)
     {
         // If we set a bullet position from an irrlicht position, we need to

@@ -508,7 +508,7 @@ void PhysicalObject::update(float dt)
     //m_node->setRotation(hpr.toIrrHPR());
 
     m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE,
-                   m_init_scale, false);
+                   m_init_scale, false, true /* isAbsoluteCoord */);
 }   // update
 
 // ----------------------------------------------------------------------------
