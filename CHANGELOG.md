@@ -1,9 +1,9 @@
 ## SupertTuxKart 0.9 (April 2015)
-* Fully shader-based rendering
+* Fully shader-based rendering engine
 * New tracks Cocoa Temple and Gran Paradiso
 * Graphical improvements to many other tracks
 * New karts amanda and gavroche
-* New and improved tux kart
+* New and improved tux, adiumy, sara the wizard and the racer, xue kart
 * Online login which allows to:
 ** connect with friends and see when they are playing
 ** vote for addons
