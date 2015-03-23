@@ -520,6 +520,10 @@ bool onEvent(const SEvent &event)
                 {
                     UserConfigParams::m_camera_debug = 3;
                     irr_driver->getDevice()->getCursorControl()->setVisible(false);
+                    // Reset camera rotation
+                    Camera *cam = Camera::getActiveCamera();
+                    cam->setDirection(vector3df(0, 0, 1));
+                    cam->setUpVector(vector3df(0, 1, 0));
                 }
                 else if (cmdID == DEBUG_GUI_CAM_NORMAL)
                 {
