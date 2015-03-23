@@ -1,22 +1,23 @@
-# Cornish translation for stk
-# Copyright (c) 2014 Rosetta Contributors and Canonical Ltd 2014
-# This file is distributed under the same license as the stk package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
-#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014
+# Nicky Rowe <nickyrowe@gmail.com>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: stk\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-01-02 18:36-0500\n"
-"PO-Revision-Date: 2014-03-11 16:13+0000\n"
-"Last-Translator: kernow <Unknown>\n"
-"Language-Team: Cornish <kw@li.org>\n"
+"Project-Id-Version: SuperTuxKart\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-13 21:42-0400\n"
+"PO-Revision-Date: 2015-03-14 11:00+0000\n"
+"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"Language-Team: Cornish (http://www.transifex.com/projects/p/supertuxkart/language/kw/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n==3) ? 2 : 3;\n"
-"X-Launchpad-Export-Date: 2015-01-20 00:41+0000\n"
-"X-Generator: Launchpad (build 17304)\n"
+"Language: kw\n"
+"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n == 3) ? 2 : 3;\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
@@ -27,1537 +28,1411 @@ msgstr "   N"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:1484 data/po/gui_strings.h:1487
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
-msgstr ""
+msgstr "Mes ny yllowgh hwi bobbys vyghan truedhek nevra ow fetha vy - Myghtern an Kertow!"
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:407
+#: src/online/online_player_profile.cpp:429
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Yma %d goweth warlinen lemmyn."
+msgstr[1] "Yma %d goweth warlinen lemmyn."
+msgstr[2] "Yma %d koweth warlinen lemmyn."
+msgstr[3] "Yma %d koweth warlinen lemmyn."
 
-#: src/guiengine/widgets/player_kart_widget.cpp:359
+#. I18N: 'handicapped' indicates that per-player handicaps are
+#. activated for this kart (i.e. it will drive slower)
+#: src/guiengine/widgets/player_kart_widget.cpp:360
 #, c-format
 msgid "%s (handicapped)"
-msgstr ""
+msgstr "%s (handikappys)"
 
 #: src/states_screens/dialogs/addons_loading.cpp:172
 #: src/states_screens/dialogs/addons_loading.cpp:176
 #, c-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s KB"
 
 #: src/states_screens/dialogs/addons_loading.cpp:165
 #, c-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s MB"
 
-#: src/online/online_player_profile.cpp:396
+#: src/online/online_player_profile.cpp:418
 #, c-format
 msgid "%s and %s are now online."
-msgstr ""
+msgstr "Yma %s ha %s warlinen lemmyn."
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:306
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
-msgstr ""
+msgstr "%s gans %s"
 
-#. I18N: as in "fastest lap: 60 seconds by Wilber"
-#: src/modes/linear_world.cpp:355
+#: src/modes/linear_world.cpp:358
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
-msgstr ""
+msgstr "%s gans %s"
 
-#: src/online/online_player_profile.cpp:392
+#: src/online/online_player_profile.cpp:414
 #, c-format
 msgid "%s is now online."
-msgstr ""
+msgstr "Yma %s warlinen lemmyn."
 
-#: src/guiengine/widgets/player_kart_widget.cpp:419
+#: src/guiengine/widgets/player_kart_widget.cpp:420
 #, c-format
 msgid "%s is ready"
-msgstr ""
+msgstr "Parys yw %s"
 
 #: src/states_screens/online_profile_base.cpp:108
 #, c-format
 msgid "%s's profile"
-msgstr ""
+msgstr "Profil %s"
 
 #: src/states_screens/create_server_screen.cpp:60
 #, c-format
 msgid "%s's server"
-msgstr ""
+msgstr "Servyer %s"
 
-#: src/online/online_player_profile.cpp:401
+#: src/online/online_player_profile.cpp:423
 #, c-format
 msgid "%s, %s and %s are now online."
-msgstr ""
+msgstr "Yma %s, %s ha %s warlinen lemmyn."
 
-#: src/modes/world.cpp:1149
+#: src/modes/world.cpp:1147
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr ""
+msgstr "'%s' re beu diles."
 
-#. I18N: for empty highscores entries
 #. I18N: ./data/gui/track_info.stkgui
-#: src/states_screens/track_info_screen.cpp:252 data/po/gui_strings.h:65
-#: data/po/gui_strings.h:68 data/po/gui_strings.h:71
+#. I18N: for empty highscores entries
+#: src/states_screens/track_info_screen.cpp:252
 msgid "(Empty)"
-msgstr ""
+msgstr "(Gwag)"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:1002
 msgid "(network play is not yet available)"
-msgstr ""
+msgstr "(nyns yw gwari rosweyth kavadow hwath)"
 
 #: src/states_screens/options_screen_input2.cpp:372
 msgid "* A blue item means a conflict with another configuration"
-msgstr ""
+msgstr "* Tra las a styr mellyans gans restrans aral"
 
 #: src/states_screens/options_screen_input2.cpp:377
 msgid "* A red item means a conflict in the current configuration"
-msgstr ""
+msgstr "* Tra rudh a styr mellyans y'n restrans a-lemmyn"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
-#: data/po/gui_strings.h:977
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr ""
+msgstr "* Y hyllir gweles/chanjya an kolmow a-lemmyn y'n rol Dewisyow"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:1060
 msgid ""
 "* Most of these game modes can also be played in a Grand Prix fashion: "
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr ""
+msgstr "* Y hyllir gwari brassa rann an modhow gwari ma yn gis an Grand Prix ynwedh: yn le gwari unn resek, lies yn rew a warier. Dhe wella dha renk, dhe voy poyntys a gevydh. Wor'tiwedh, an gwarier ganso/gensi an moyha poyntys a wayn an hanaf."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:874
 msgid "* Restart STK to apply new settings"
-msgstr ""
+msgstr "* Dastalleth STK rag gweytha an settyansow nowydh"
 
 #. I18N: ./data/gui/options_input.stkgui
-#: data/po/gui_strings.h:1102
 msgid ""
-"* Which config to use will be inferred from which 'Select' key is pressed to "
-"join the game."
-msgstr ""
+"* Which config to use will be inferred from which 'Select' key is pressed to"
+" join the game."
+msgstr "* An restrans dhe usya a vydh determys dre bynag alhwedhen 'Dewis' a vo gweskys rag junya an gwari."
 
-#. I18N: ./data/gui/online/profile_overview.stkgui
 #. I18N: ./data/gui/online/profile_achievements.stkgui
-#. I18N: ./data/gui/online/profile_settings.stkgui
-#. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
-#: data/po/gui_strings.h:451 data/po/gui_strings.h:529
-#: data/po/gui_strings.h:734 data/po/gui_strings.h:748
-#: data/po/gui_strings.h:774
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: ./data/gui/online/profile_overview.stkgui
+#. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "..."
-msgstr ""
+msgstr "..."
 
 #: src/states_screens/addons_screen.cpp:52
 msgid "1 month"
-msgstr ""
+msgstr "1 vis"
 
 #: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
-msgstr ""
+msgstr "1 seythen"
 
 #: src/states_screens/addons_screen.cpp:56
 msgid "1 year"
-msgstr ""
+msgstr "1 vledhen"
 
 #: src/states_screens/addons_screen.cpp:51
 msgid "2 weeks"
-msgstr ""
+msgstr "2 seythen"
 
 #: src/states_screens/addons_screen.cpp:57
 msgid "2 years"
-msgstr ""
+msgstr "2 vledhen"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:182
 msgid "3 Strikes Battle"
-msgstr ""
+msgstr "Kas a 3 bomm"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:1048
 msgid ""
 "3 Strikes Battle: Only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
-msgstr ""
+msgstr "Kas a 3 bomm: Gwariow lieswarier hepken. Gwask an warioryon erel gans arvow bys may hollons aga bewnansow oll."
 
 #: src/states_screens/addons_screen.cpp:53
 msgid "3 months"
-msgstr ""
+msgstr "3 mis"
 
 #: src/states_screens/addons_screen.cpp:54
 msgid "6 months"
-msgstr ""
+msgstr "6 mis"
 
 #: src/states_screens/addons_screen.cpp:55
 msgid "9 months"
-msgstr ""
+msgstr "9 mis"
 
 #. I18N: ./data/gui/track_info.stkgui
-#: data/po/gui_strings.h:62
 msgid "= Highscores ="
-msgstr ""
+msgstr "= Skoryow ughella ="
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: data/po/gui_strings.h:195
 msgid "AI karts"
-msgstr ""
+msgstr "Kertys AI"
 
-#: src/states_screens/race_result_gui.cpp:178
+#: src/states_screens/race_result_gui.cpp:189
 msgid "Abort Grand Prix"
-msgstr ""
+msgstr "Astel an Grand Prix"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
-#: data/po/gui_strings.h:187
 msgid "About"
-msgstr ""
+msgstr "A-dro"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:236
 msgid "Accelerate"
-msgstr ""
+msgstr "Uskishe"
 
-#: src/tracks/track_object_presentation.cpp:945
+#: src/tracks/track_object_presentation.cpp:975
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "Uskisha ha gwask an alhwedhen <%s> yn unn dreylya rag skyddya. Skyddya pols a yll dha weres ow treylya moy uskis rag gul troyow lymm."
 
-#: src/tracks/track_object_presentation.cpp:875
+#: src/tracks/track_object_presentation.cpp:897
 #, c-format
 msgid "Accelerate with <%s> and steer with <%s> and <%s>"
-msgstr ""
+msgstr "Uskisha dre <%s> ha lew an kert dre <%s> ha <%s>"
 
-#. I18N: ./data/gui/online/user_info_dialog.stkgui
-#. I18N: User info dialog
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
-#: data/po/gui_strings.h:552 data/po/gui_strings.h:623
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
 msgid "Accept"
-msgstr ""
+msgstr "Degemeres"
 
-#. I18N: ./data/gui/online/recovery_input.stkgui
-#. I18N: In the recovery dialog
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
-#: data/po/gui_strings.h:507 data/po/gui_strings.h:763
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
 msgid "Account Recovery"
-msgstr ""
+msgstr "Daskavos akont"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:101 data/po/gui_strings.h:738
+#: src/states_screens/online_profile_base.cpp:101
 msgid "Account Settings"
-msgstr ""
+msgstr "Settyansow an akont"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:100 data/po/gui_strings.h:179
-#: data/po/gui_strings.h:778
+#: src/states_screens/online_profile_base.cpp:100
 msgid "Achievements"
-msgstr ""
+msgstr "Kowlwriansow"
 
 #: src/states_screens/options_screen_input2.cpp:71
 msgid "Action"
-msgstr ""
+msgstr "Gwrians"
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
-#: data/po/gui_strings.h:1173
 msgid "Add"
-msgstr ""
+msgstr "Keworra"
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
-#: data/po/gui_strings.h:548
 msgid "Add Friend"
-msgstr ""
+msgstr "Keworra koweth"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:111
 msgid "Add Keyboard Configuration"
-msgstr ""
+msgstr "Keworra restrans bysowek"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
-#: data/po/gui_strings.h:365
 msgid "Add Player"
-msgstr ""
+msgstr "Keworra gwarier"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:90
 msgid "Add Wiimote"
-msgstr ""
+msgstr "Keworra Wiimote"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:1099
 msgid "Add a device"
-msgstr ""
+msgstr "Keworra devis"
 
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
-#: data/po/gui_strings.h:246 data/po/gui_strings.h:335
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
 msgid "Add user"
-msgstr ""
+msgstr "Keworra devnydhyer"
 
-#. I18N: track group name
-#. I18N: kart group name
-#. I18N: arena group name
-#. I18N: track group name
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: track group
-#: src/states_screens/tracks_screen.cpp:155
+#. I18N: arena group name
+#. I18N: track group name
+#. I18N: kart group name
+#. I18N: track group name
+#: src/states_screens/arenas_screen.cpp:83
+#: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/grand_prix_editor_screen.cpp:336
 #: src/states_screens/kart_selection.cpp:286
-#: src/states_screens/arenas_screen.cpp:83
-#: src/states_screens/easter_egg_screen.cpp:145 data/po/gui_strings.h:1277
-#: data/po/gui_strings.h:1313
+#: src/states_screens/tracks_screen.cpp:155
 msgid "Add-Ons"
-msgstr ""
+msgstr "Keworransow"
 
 #: src/states_screens/addons_screen.cpp:110
 msgid "Add-on name"
-msgstr ""
+msgstr "Hanow an keworrans"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:163
 msgid "Addons"
-msgstr ""
+msgstr "Keworransow"
 
-#. I18N: ../stk-assets/karts/20_adiumy/kart.xml
-#: data/po/gui_strings.h:1355
+#. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
-msgstr ""
+msgstr "Adiumy"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:810
 msgid "Advanced pipeline (lights, etc.)"
-msgstr ""
+msgstr "Piblinen avonsys (golowow, etc.)"
 
-#. I18N: name of the tab that will show tracks from all groups
-#. I18N: if all kart animations are enabled
-#. I18N: Time filters for add-ons
-#. I18N: name of the tab that will show tracks from all groups
-#. I18N: name of the tab that will show arenas from all groups
-#. I18N: name of the tab that will show tracks from all groups
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: track group
-#: src/states_screens/tracks_screen.cpp:145
-#: src/states_screens/options_screen_video.cpp:412
-#: src/states_screens/grand_prix_editor_screen.cpp:333
+#. I18N: Time filters for add-ons
+#. I18N: name of the tab that will show arenas from all groups
+#. I18N: name of the tab that will show tracks from all groups
+#. I18N: if all kart animations are enabled
+#. I18N: name of the tab that will show tracks from all groups
 #: src/states_screens/addons_screen.cpp:49
-#: src/states_screens/kart_selection.cpp:278
-#: src/states_screens/edit_track_screen.cpp:147
 #: src/states_screens/arenas_screen.cpp:75
 #: src/states_screens/easter_egg_screen.cpp:137
-#: src/states_screens/gp_info_screen.cpp:76 data/po/gui_strings.h:1281
-#: data/po/gui_strings.h:1317
+#: src/states_screens/edit_track_screen.cpp:147
+#: src/states_screens/gp_info_screen.cpp:76
+#: src/states_screens/grand_prix_editor_screen.cpp:333
+#: src/states_screens/kart_selection.cpp:278
+#: src/states_screens/options_screen_video.cpp:434
+#: src/states_screens/tracks_screen.cpp:145
 msgid "All"
-msgstr ""
+msgstr "Oll"
 
-#. I18N: ./data/gui/tracks.stkgui
-#. I18N: In the track selection screen
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
-#: data/po/gui_strings.h:423 data/po/gui_strings.h:1305
+#. I18N: ./data/gui/tracks.stkgui
+#. I18N: In the track selection screen
 msgid "All Tracks"
-msgstr ""
+msgstr "Oll lerghow"
 
 #: src/states_screens/race_setup_screen.cpp:202
 msgid "All blows allowed, so catch weapons and make clever use of them!"
-msgstr ""
+msgstr "Oll bommys yw alowys, ytho kuntel arvow ha gwra devnydh da anedha!"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:1121
 msgid "Always show login screen"
+msgstr "Diskwedhes prest an skrin omgelmi"
+
+#. I18N: ../stk-assets/karts/amanda/kart.xml
+msgid "Amanda"
 msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:826
 msgid "Ambient Occlusion"
-msgstr ""
+msgstr "Okludyans an kerghynnedh"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:442
+#: src/states_screens/options_screen_video.cpp:464
 #, c-format
 msgid "Ambient occlusion : %s"
-msgstr ""
+msgstr "Okludyans an kerghynnedh : %s"
 
 #: src/states_screens/edit_gp_screen.cpp:323
 msgid "An error occurred while trying to save your grand prix."
-msgstr ""
+msgstr "Yth esa kammwrians owth assaya gwitha dha grand prix."
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:406
 msgid "Anchor - slows down greatly the kart in the first position."
-msgstr ""
+msgstr "Ankor - lenthe a wra an kert y'n le kensa"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:866
 msgid "Animated Characters"
-msgstr ""
+msgstr "Figurys bywhes"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:428
+#: src/states_screens/options_screen_video.cpp:450
 #, c-format
 msgid "Animated Characters : %s"
-msgstr ""
+msgstr "Figurys bywhes : %s"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:854
 msgid "Animated Scenery"
-msgstr ""
+msgstr "Kerghynnedh bywhes"
 
 #. I18N: in graphical options
 #. tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
 #. UserConfigParams::m_pixel_shaders ? enabled : disabled);
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:422
+#: src/states_screens/options_screen_video.cpp:444
 #, c-format
 msgid "Animated Scenery : %s"
-msgstr ""
+msgstr "Kerghynnedh bywhes : %s"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:80
+#: src/states_screens/dialogs/custom_video_settings.cpp:81
 msgid "Anisotropic x16"
-msgstr ""
-
-#: src/states_screens/dialogs/custom_video_settings.cpp:77
-msgid "Anisotropic x2"
-msgstr ""
+msgstr "Anisotropek x16"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:78
-msgid "Anisotropic x4"
-msgstr ""
+msgid "Anisotropic x2"
+msgstr "Anisotropek x2"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:79
+msgid "Anisotropic x4"
+msgstr "Anisotropek x4"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:80
 msgid "Anisotropic x8"
-msgstr ""
+msgstr "Anisotropek x8"
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:132
 msgid "Another grand prix with this name already exists."
-msgstr ""
+msgstr "Yma grand prix henwys yndelma seulabrys."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:838
 msgid "Anti-aliasing"
-msgstr ""
+msgstr "Gorth-aliasyans"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:439
+#: src/states_screens/options_screen_video.cpp:461
 #, c-format
 msgid "Anti-aliasing : %s"
-msgstr ""
+msgstr "Gorth-aliasyans : %s"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
-#: data/po/gui_strings.h:877
 msgid "Apply"
-msgstr ""
+msgstr "Gweytha"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:1265
 msgid "Apply new resolution"
-msgstr ""
+msgstr "Gweytha an klerder nowydh"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:14
 msgid "Arch Enemy"
-msgstr ""
+msgstr "Argheskar"
 
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options_screen_input2.cpp:575
 msgid "Are you sure you want to permanently delete this configuration?"
-msgstr ""
+msgstr "Os sur bos hwans dhis dilea yn fast an restrans ma?"
 
 #: src/states_screens/edit_gp_screen.cpp:123
 #: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
-msgstr ""
+msgstr "Os sur bos hwans dhis dilea '%s'?"
 
-#. I18N: ./data/gui/arenas.stkgui
-#. I18N: Section in arena tracks selection screen
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In the addons screen
-#: data/po/gui_strings.h:1269 data/po/gui_strings.h:1340
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: Section in arena tracks selection screen
 msgid "Arenas"
-msgstr ""
+msgstr "Plenys"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
-#: data/po/gui_strings.h:1457
 msgid "Around the lighthouse"
-msgstr ""
+msgstr "A-dro dhe'n golowji"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:1144
 msgid "Assign nothing"
-msgstr ""
+msgstr "Sevel orth kelmi"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:1140
 msgid "Assign to ESC key"
-msgstr ""
+msgstr "Kelmi orth an alhwedhen ESC"
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
-#: data/po/gui_strings.h:1343
 msgid "At World's End"
-msgstr ""
+msgstr "Orth Penn an Bys"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/user_screen.cpp:598
-#: src/states_screens/options_screen_input2.cpp:86
-#: src/states_screens/options_screen_video.cpp:136
 #: src/states_screens/options_screen_input.cpp:139
-#: src/states_screens/options_screen_ui.cpp:119 data/po/gui_strings.h:269
+#: src/states_screens/options_screen_input2.cpp:86
+#: src/states_screens/options_screen_ui.cpp:118
+#: src/states_screens/options_screen_video.cpp:163
+#: src/states_screens/user_screen.cpp:647
 msgid "Audio"
-msgstr ""
+msgstr "Son"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: src/tracks/track_object_presentation.cpp:883 data/po/gui_strings.h:961
+#: src/tracks/track_object_presentation.cpp:906
 msgid "Avoid bananas!"
-msgstr ""
+msgstr "Gohel an bananas!"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:284
 #, c-format
 msgid "Axis %d"
-msgstr ""
+msgstr "Aghel %d"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:272
 #, c-format
 msgid "Axis %d %s"
-msgstr ""
+msgstr "Aghel %d %s"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:279
 #, c-format
 msgid "Axis %d inverted"
-msgstr ""
+msgstr "Aghel %d trebuchyes"
 
-#. I18N: name of buttons on gamepads
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:216
 #: src/states_screens/dialogs/addons_loading.cpp:284
-#: src/input/gamepad_config.cpp:216 data/po/gui_strings.h:1297
 msgid "Back"
-msgstr ""
+msgstr "Dehweles"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
-#: data/po/gui_strings.h:884
 msgid "Back to Game"
-msgstr ""
+msgstr "Dehweles dhe'n gwari"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:907
 msgid "Back to Race"
-msgstr ""
+msgstr "Dehweles dhe'n resek"
 
-#: src/states_screens/race_result_gui.cpp:194
+#: src/states_screens/race_result_gui.cpp:205
 msgid "Back to challenge selection"
-msgstr ""
+msgstr "Dehweles dhe'n dewis chalenjys"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:1200
 msgid "Back to device list"
-msgstr ""
+msgstr "Dehweles dhe'n rol a dhevisow"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
-#: data/po/gui_strings.h:900
 msgid "Back to menu"
-msgstr ""
+msgstr "Dehweles dhe'n rol"
 
-#: src/states_screens/race_result_gui.cpp:200
+#: src/states_screens/race_result_gui.cpp:211
 msgid "Back to the menu"
-msgstr ""
+msgstr "Dehweles dhe'n rol"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:50
 msgid "Banana Lover"
-msgstr ""
+msgstr "Sim"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:412
 msgid ""
-"Basket Ball - bounces after the leader, and might squash and slow down karts "
-"down on the way."
-msgstr ""
+"Basket Ball - bounces after the leader, and might squash and slow down karts"
+" down on the way."
+msgstr "Pel ganstel - aslamma a wra war-lergh an kensa kert, hag y hallsa gwaska ha lenthe kertys war an fordh."
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
-#: data/po/gui_strings.h:1499
 msgid "Battle Island"
-msgstr ""
-
-#. I18N: ../stk-assets/karts/beagle/kart.xml
-#: data/po/gui_strings.h:1403
-msgid "Beagle"
-msgstr ""
+msgstr "Enys an Gas"
 
 #. I18N: ../stk-assets/karts/beastie/kart.xml
-#: data/po/gui_strings.h:1358
 msgid "Beastie"
-msgstr ""
+msgstr "Beastie"
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:163
+#: src/states_screens/grand_prix_lose.cpp:161
 msgid "Better luck next time!"
-msgstr ""
+msgstr "Chons gwell an nessa!"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:75
+#: src/states_screens/dialogs/custom_video_settings.cpp:76
 msgid "Bilinear"
-msgstr ""
+msgstr "Dewlinyek"
 
 #. I18N: Name of the black button on xbox controller
 #: src/input/gamepad_config.cpp:167
 msgid "Black"
-msgstr ""
+msgstr "Du"
 
 #. I18N: ../stk-assets/tracks/mansion/track.xml
-#: data/po/gui_strings.h:1418
 msgid "Blackhill Mansion"
-msgstr ""
+msgstr "Mansyon an Vre Dhu"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:818
 msgid "Bloom"
-msgstr ""
+msgstr "Bleujyowa"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:449
+#: src/states_screens/options_screen_video.cpp:473
 #, c-format
 msgid "Bloom : %s"
-msgstr ""
+msgstr "Bleujyowa : %s"
 
-#: src/states_screens/race_result_gui.cpp:960
+#: src/states_screens/race_result_gui.cpp:969
 msgid "Blue Team Wins"
-msgstr ""
+msgstr "An Lasyon a waynyas!"
 
 #. I18N: ../stk-assets/tracks/farm/track.xml
-#: data/po/gui_strings.h:1442
 msgid "Bovine Barnyard"
-msgstr ""
+msgstr "An Bowji"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:400
 msgid ""
-"Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
-"backwards."
-msgstr ""
+"Bowling Ball - bounces off walls. If you are looking back, it will be thrown"
+" backwards."
+msgstr "Pel dewlel - aslamma a wra orth fosow. Mars esos ow mires war gamm, tewlys war-dhelergh vydh."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:239
 msgid "Brake"
-msgstr ""
+msgstr "Fronna"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:391
 msgid ""
 "BubbleGum - protect yourself with a shield, or use while looking back to "
 "leave a sticky pink puddle behind you."
-msgstr ""
+msgstr "Glus hwethen - omwith dre skoos, po devnydh yn unn vires war gamm rag gasa pollen wynnrudh glusek war dha lergh."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:1472 data/po/gui_strings.h:1475
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr ""
+msgstr "Mes kroadur ewn ov, ytho gul bargen a wrav genes."
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:394
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
-msgstr ""
+msgstr "Tesen - tewlys orth an nessa kert, gwella war dreghow hir ha kompes."
 
-#: src/addons/news_manager.cpp:315 src/addons/addons_manager.cpp:97
+#: src/addons/addons_manager.cpp:97 src/addons/news_manager.cpp:315
 msgid "Can't access stkaddons server..."
-msgstr ""
+msgstr "Ny yllir drehedhes an servyer stkaddons..."
 
-#. I18N: ./data/gui/edit_track.stkgui
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
-#. I18N: ./data/gui/online/recovery_input.stkgui
-#. I18N: In the recovery dialog
-#. I18N: ./data/gui/online/registration_terms.stkgui
-#. I18N: In the registration dialog
-#. I18N: ./data/gui/online/create_server.stkgui
-#. I18N: In the server creation screen
-#. I18N: ./data/gui/online/register.stkgui
-#. I18N: In the registration dialog
-#. I18N: ./data/gui/online/server_info_dialog.stkgui
-#. I18N: In the server info dialog
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+#. I18N: ./data/gui/edit_track.stkgui
 #. I18N: ./data/gui/enter_gp_name_dialog.stkgui
 #. I18N: In the 'add new grand prix' dialog
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
-#: src/states_screens/user_screen.cpp:83
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
 #: src/states_screens/dialogs/addons_loading.cpp:227
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
-#: data/po/gui_strings.h:135 data/po/gui_strings.h:143
-#: data/po/gui_strings.h:258 data/po/gui_strings.h:308
-#: data/po/gui_strings.h:347 data/po/gui_strings.h:526
-#: data/po/gui_strings.h:627 data/po/gui_strings.h:655
-#: data/po/gui_strings.h:695 data/po/gui_strings.h:711
-#: data/po/gui_strings.h:1218 data/po/gui_strings.h:1230
+#: src/states_screens/user_screen.cpp:112
 msgid "Cancel"
-msgstr ""
+msgstr "Hedhi"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:56
 msgid "Cancel Request"
-msgstr ""
+msgstr "Hedhi an govyn"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:277
 msgid "Cancel/Back"
-msgstr ""
+msgstr "Hedhi / Dehweles"
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
-#: data/po/gui_strings.h:1424
 msgid "Cave X"
-msgstr ""
+msgstr "Kav X"
 
-#: src/states_screens/feature_unlocked.cpp:492
+#: src/states_screens/feature_unlocked.cpp:493
 msgid "Challenge Completed"
-msgstr ""
+msgstr "Chalenj kowlwrys"
 
-#: src/states_screens/race_gui.cpp:311 src/states_screens/race_gui.cpp:313
+#: src/states_screens/race_gui.cpp:313 src/states_screens/race_gui.cpp:315
 msgid "Challenge Failed"
-msgstr ""
+msgstr "Chalenj fyllys"
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
-#: data/po/gui_strings.h:91
 msgid "Challenges : Trophy Room"
-msgstr ""
+msgstr "Chalenjys : Stevel an Hanafow"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
-#: data/po/gui_strings.h:745
 msgid "Change"
-msgstr ""
+msgstr "Chanjya"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 #. I18N: ./data/gui/karts_online.stkgui
 #. I18N: In the kart selection (player setup) screen
-#: data/po/gui_strings.h:1285 data/po/gui_strings.h:1301
 msgid "Choose a Kart"
-msgstr ""
+msgstr "Dewis kert"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:2
 msgid "Christoffel Columbus"
-msgstr ""
+msgstr "Christoffel Columbus"
 
 #. I18N: ./data/gui/help1.stkgui
-#: data/po/gui_strings.h:953
 msgid "Click here to play the tutorial"
-msgstr ""
+msgstr "Klyck omma rag gwari an dyskans"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
-#. I18N: ./data/gui/online/user_info_dialog.stkgui
-#. I18N: User info dialog
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
-#. I18N: ./data/gui/online/vote_dialog.stkgui
-#. I18N: Vote dialog
 #. I18N: ./data/gui/online/notification_dialog.stkgui
 #. I18N: User info dialog
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
-#: data/po/gui_strings.h:503 data/po/gui_strings.h:564
-#: data/po/gui_strings.h:611 data/po/gui_strings.h:635
-#: data/po/gui_strings.h:719 data/po/gui_strings.h:771
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/online/vote_dialog.stkgui
+#. I18N: Vote dialog
 msgid "Close"
-msgstr ""
+msgstr "Degea"
 
-#. I18N: ../stk-assets/tracks/30_chocolate/track.xml
-#: data/po/gui_strings.h:1436
+#. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
-msgstr ""
+msgstr "Templa Koko"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:53
 msgid "Collect at least 5 bananas in one race."
-msgstr ""
+msgstr "Kuntel 5 banana dhe'n lyha yn unn resek."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:957
 msgid "Collect blue boxes : they will give you weapons or other powerups"
-msgstr ""
+msgstr "Kuntel kistennow glas : yma arvow po nerthellow erel ynna"
 
-#: src/tracks/track_object_presentation.cpp:892
+#: src/tracks/track_object_presentation.cpp:916
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
-msgstr ""
+msgstr "Kuntel kistennow, ha tenn an arv dre <%s> rag distrui an kistyow ma!"
 
-#: src/tracks/track_object_presentation.cpp:912
+#: src/tracks/track_object_presentation.cpp:938
 msgid "Collect nitro bottles (we will use them after the curve)"
-msgstr ""
+msgstr "Kuntel botellow nitro (ni a wra devnydh anedha wosa an grommen)"
 
 #: src/states_screens/race_gui_base.cpp:648
 msgid "Collect nitro!"
-msgstr ""
+msgstr "Kuntel nitro!"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:965
 msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
-"pressing the appropriate key. You can see your current level of nitro in the "
-"bar at the right of the game screen."
-msgstr ""
+"pressing the appropriate key. You can see your current level of nitro in the"
+" bar at the right of the game screen."
+msgstr "Kuntel nitro a'th has dhe gavos kenerthansow tooth byth pan vynni dre waska an alhwedhen wiw. Ty a yll gweles dha nivel a nitro y'n barr a-dhyghow dhe skrin an gwari."
 
-#: src/tracks/track_object_presentation.cpp:859
+#: src/tracks/track_object_presentation.cpp:880
 msgid "Complete all challenges to unlock the big door!"
-msgstr ""
+msgstr "Kowlwra keniver chalenj rag dialhwedha an daras bras!"
 
 #: src/achievements/achievement.cpp:202
 #, c-format
 msgid "Completed achievement \"%s\"."
-msgstr ""
+msgstr "Kowlwrians \"%s\" kowlwrys."
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
-#: data/po/gui_strings.h:495 data/po/gui_strings.h:679
 msgid "Confirm"
-msgstr ""
+msgstr "Afydhya"
 
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:81
 #, c-format
 msgid "Confirm resolution within %i seconds"
-msgstr ""
+msgstr "Afydh an klerder a-ji dhe %i sekond"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:1133
 msgid "Connect to the Internet"
-msgstr ""
+msgstr "Junya gans an kesrosweyth"
 
 #: src/input/wiimote_manager.cpp:387
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed "
 "instructions at supertuxkart.net/Wiimote"
-msgstr ""
+msgstr "Jun dha wiimote gans an dyghtyer Bluetooth, ena klyck OK. Yma danvonadow manylys orth supertuxkart.net/Wiimote"
 
 #: src/states_screens/race_setup_screen.cpp:209
 msgid "Contains no powerups, so only your driving skills matter!"
-msgstr ""
+msgstr "Nyns eus nerthellow ynno, ytho ny vern tra vyth marnas dha sleyneth lewya!"
 
+#. I18N: ./data/gui/feature_unlocked.stkgui
+#. I18N: ./data/gui/grand_prix_lose.stkgui
+#. I18N: ./data/gui/grand_prix_win.stkgui
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: ./data/gui/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
-#. I18N: ./data/gui/grand_prix_lose.stkgui
-#. I18N: ./data/gui/feature_unlocked.stkgui
-#. I18N: ./data/gui/grand_prix_win.stkgui
-#: src/states_screens/race_result_gui.cpp:175
-#: src/states_screens/dialogs/gp_info_dialog.cpp:212 data/po/gui_strings.h:117
-#: data/po/gui_strings.h:262 data/po/gui_strings.h:1151
-#: data/po/gui_strings.h:1157 data/po/gui_strings.h:1203
+#: src/states_screens/dialogs/gp_info_dialog.cpp:212
+#: src/states_screens/race_result_gui.cpp:186
 msgid "Continue"
-msgstr ""
+msgstr "Pesya"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/states_screens/gp_info_screen.cpp:142 data/po/gui_strings.h:215
+#: src/states_screens/gp_info_screen.cpp:146
 msgid "Continue saved GP"
-msgstr ""
+msgstr "Pesya an GP gwithys"
 
-#: src/states_screens/race_result_gui.cpp:145
+#: src/states_screens/race_result_gui.cpp:156
 msgid "Continue."
-msgstr ""
+msgstr "Pesya."
 
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: Section in the settings menu
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/user_screen.cpp:600
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
 #: src/states_screens/options_screen_audio.cpp:67
-#: src/states_screens/options_screen_video.cpp:139
-#: src/states_screens/options_screen_ui.cpp:121 data/po/gui_strings.h:1091
-#: data/po/gui_strings.h:1192
+#: src/states_screens/options_screen_ui.cpp:120
+#: src/states_screens/options_screen_video.cpp:166
+#: src/states_screens/user_screen.cpp:649
 msgid "Controls"
-msgstr ""
+msgstr "Kontrolyow"
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
-#: data/po/gui_strings.h:1072
 msgid "Copy"
-msgstr ""
+msgstr "Kopia"
 
-#: src/states_screens/register_screen.cpp:178
-#: src/states_screens/register_screen.cpp:185
+#: src/states_screens/register_screen.cpp:217
+#: src/states_screens/register_screen.cpp:224
 #, c-format
 msgid "Could not create player '%s'."
-msgstr ""
+msgstr "Ny ylles gwruthyl an gwarier/wariores '%s'."
 
-#: src/input/wiimote_manager.cpp:422
+#: src/input/wiimote_manager.cpp:418
 msgid "Could not detect any wiimote :/"
-msgstr ""
+msgstr "Ny ylles helerghi wiimote vyth :/"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
-#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
-#. I18N: In the 'add new grand prix' dialog
-#: data/po/gui_strings.h:651 data/po/gui_strings.h:1214
 msgid "Create"
-msgstr ""
+msgstr "Gwruthyl"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
-#: data/po/gui_strings.h:471
 msgid "Create Server"
-msgstr ""
+msgstr "Gwruthyl servyer"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
-#: data/po/gui_strings.h:659
 msgid "Create User"
-msgstr ""
-
-#. I18N: ./data/gui/online/register.stkgui
-#. I18N: In the registration dialog
-#: data/po/gui_strings.h:667
-msgid "Create online account"
-msgstr ""
+msgstr "Gwruthyl devnydhyer"
 
 #: src/states_screens/create_server_screen.cpp:117
 msgid "Creating server"
-msgstr ""
+msgstr "Ow kwruthyl an servyer"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
-#: data/po/gui_strings.h:121
 msgid "Credits"
-msgstr ""
+msgstr "Gwrioryon"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
-#: data/po/gui_strings.h:487
 msgid "Current Password"
-msgstr ""
+msgstr "Ger tremena a-lemmyn"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:134
 msgid "Current password invalid."
-msgstr ""
+msgstr "Drog yw an ger tremena a-lemmyn."
 
 #: src/config/player_manager.cpp:91
 msgid "Currently not signed in"
-msgstr ""
+msgstr "Nyns os omgelmys"
 
 #. I18N: custom video settings
-#: src/states_screens/options_screen_video.cpp:389
+#: src/states_screens/options_screen_video.cpp:411
 msgid "Custom"
-msgstr ""
+msgstr "Personelhes"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:1245
 msgid "Custom settings..."
-msgstr ""
+msgstr "Settyansow personelhes..."
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:195 src/input/gamepad_config.cpp:253
 msgid "DPad down"
-msgstr ""
+msgstr "DPad yn-nans"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:193 src/input/gamepad_config.cpp:257
 msgid "DPad left"
-msgstr ""
+msgstr "DPad kledh"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:191 src/input/gamepad_config.cpp:255
 msgid "DPad right"
-msgstr ""
+msgstr "DPad dyghow"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:197 src/input/gamepad_config.cpp:251
 msgid "DPad up"
-msgstr ""
+msgstr "DPad yn-bann"
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
-#: data/po/gui_strings.h:556
 msgid "Decline"
-msgstr ""
+msgstr "Nagha"
 
 #: src/states_screens/gp_info_screen.cpp:74
 msgid "Default"
-msgstr ""
+msgstr "Defowt"
 
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
-#: data/po/gui_strings.h:250 data/po/gui_strings.h:339
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
 msgid "Delete"
-msgstr ""
+msgstr "Dilea"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
-#: src/states_screens/options_screen_input2.cpp:111 data/po/gui_strings.h:1196
+#: src/states_screens/options_screen_input2.cpp:111
 msgid "Delete Configuration"
-msgstr ""
+msgstr "Dilea an restrans ma"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:846
 msgid "Depth of field"
-msgstr ""
+msgstr "Downder an gwel"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:461
+#: src/states_screens/options_screen_video.cpp:485
 #, c-format
 msgid "Depth of field : %s"
-msgstr ""
+msgstr "Downder an gwel : %s"
 
 #. I18N: button to disable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:96
 #: src/states_screens/options_screen_input2.cpp:587
 msgid "Disable Device"
-msgstr ""
+msgstr "Diallosegi an devis"
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:61
-#: src/states_screens/dialogs/custom_video_settings.cpp:85
-#: src/states_screens/options_screen_video.cpp:410
+#: src/states_screens/dialogs/custom_video_settings.cpp:62
+#: src/states_screens/dialogs/custom_video_settings.cpp:86
+#: src/states_screens/options_screen_video.cpp:432
 msgid "Disabled"
-msgstr ""
+msgstr "Diallosegys"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:1117
 msgid "Display FPS"
-msgstr ""
+msgstr "Diskwedhes FPS"
 
-#: src/states_screens/race_result_gui.cpp:343
+#: src/states_screens/race_result_gui.cpp:354
 msgid "Do you really want to abort the Grand Prix?"
-msgstr ""
+msgstr "Os sur bos hwans dhis astel an Grand Prix?"
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/user_screen.cpp:534
+#: src/states_screens/user_screen.cpp:583
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr ""
+msgstr "Os sur bos hwans dhis dilea '%s'?"
 
 #: src/states_screens/edit_gp_screen.cpp:140
 msgid "Do you want to save your changes?"
-msgstr ""
+msgstr "Eus hwans dhis gwitha dha janjyow?"
 
-#: src/karts/controller/player_controller.cpp:340
 #: src/karts/controller/network_player_controller.cpp:283
+#: src/karts/controller/player_controller.cpp:340
 msgid "Don't accelerate before go"
-msgstr ""
+msgstr "Na uskisha kens an dalleth!"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:265
 msgid "Down"
-msgstr ""
+msgstr "Yn-nans"
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
-#: data/po/gui_strings.h:83
 msgid "Drive in reverse"
-msgstr ""
+msgstr "Lewya yn dhelergh"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:433
+#: src/states_screens/options_screen_video.cpp:455
 #, c-format
 msgid "Dynamic lights : %s"
-msgstr ""
+msgstr "Golowys dynamek : %s"
 
-#. I18N: ./data/gui/gpeditor.stkgui
-#. I18N: Menu item
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
-#: data/po/gui_strings.h:1076 data/po/gui_strings.h:1177
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
 msgid "Edit"
-msgstr ""
+msgstr "Chanjya"
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Title in edit grand prix screen
-#: data/po/gui_strings.h:1161
 msgid "Edit Grand Prix"
-msgstr ""
+msgstr "Chanjya an Grand Prix ma"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:184
 msgid "Egg Hunt"
-msgstr ""
+msgstr "Helgh oyow"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:1056
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr ""
+msgstr "Helgh oyow: Eksplor lerghow rag diskudha keniver oy kudh"
 
 #: src/modes/easter_egg_hunt.cpp:202
 #, c-format
 msgid "Eggs: %d / %d"
-msgstr ""
+msgstr "Oyow: %d / %d"
 
 #. I18N: ../stk-assets/karts/elephpant/kart.xml
-#: data/po/gui_strings.h:1400
 msgid "Elephpant"
-msgstr ""
+msgstr "Elephpant"
 
-#: src/states_screens/race_result_gui.cpp:463
-#: src/states_screens/race_result_gui.cpp:824
+#: src/states_screens/race_result_gui.cpp:474
+#: src/states_screens/race_result_gui.cpp:833
 msgid "Eliminated"
-msgstr ""
+msgstr "Diles"
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
-#: data/po/gui_strings.h:518 data/po/gui_strings.h:683
 msgid "Email"
-msgstr ""
+msgstr "Ebost"
 
-#: src/states_screens/register_screen.cpp:246
+#: src/states_screens/register_screen.cpp:292
 msgid "Email has to be between 4 and 50 characters long!"
-msgstr ""
+msgstr "Res yw dhe'n ebost bos yntra 4 ha 50 lytheren yn hirder!"
 
-#: src/states_screens/register_screen.cpp:252
+#: src/states_screens/register_screen.cpp:298
 msgid "Email is invalid!"
-msgstr ""
+msgstr "Drog yw an ebost!"
 
-#: src/states_screens/register_screen.cpp:230
+#: src/states_screens/register_screen.cpp:276
 msgid "Emails don't match!"
-msgstr ""
+msgstr "Nyns yw an ebostow par!"
 
 #. I18N: ../stk-assets/karts/emule/kart.xml
-#: data/po/gui_strings.h:1394
 msgid "Emule"
-msgstr ""
+msgstr "Emule"
 
 #. I18N: button to enable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:98
 #: src/states_screens/options_screen_input2.cpp:588
 msgid "Enable Device"
-msgstr ""
+msgstr "Gallosegi an devis"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:1129
-msgid "Enable handicapped users"
+msgid "Enable per-player handicaps"
 msgstr ""
 
-#. I18N: in the graphical options tooltip;
-#. indicates a graphical feature is enabled
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
-#: src/states_screens/options_screen_video.cpp:407 data/po/gui_strings.h:277
-#: data/po/gui_strings.h:289
+#. I18N: in the graphical options tooltip;
+#. indicates a graphical feature is enabled
+#: src/states_screens/options_screen_video.cpp:429
 msgid "Enabled"
-msgstr ""
+msgstr "Gallosegys"
 
 #. I18N: animations setting (all karts are animated)
-#: src/states_screens/dialogs/custom_video_settings.cpp:65
+#: src/states_screens/dialogs/custom_video_settings.cpp:66
 msgid "Enabled for all"
-msgstr ""
+msgstr "Gallosegys rag peub"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
-#: data/po/gui_strings.h:1222
 msgid "Enter the new player's name"
-msgstr ""
+msgstr "Skrif hanow an gwarier/wariores nowydh"
 
 #: src/addons/news_manager.cpp:172
 #, c-format
 msgid "Error downloading news: '%s'."
-msgstr ""
+msgstr "Yth esa kammwrians owth iskarga an nowodhow: '%s'."
 
 #: src/states_screens/kart_selection.cpp:923
 msgid ""
 "Everyone:\n"
 "Press 'Select' now to join the game!"
-msgstr ""
+msgstr "Pubonan:\nGweskewgh 'Dewis' lemmyn rag junya an gwari!"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "Existing Online Account"
+msgstr "Akont warlinen byw"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In the networking lobby
-#: data/po/gui_strings.h:580
 msgid "Exit"
-msgstr ""
+msgstr "Kwytya"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:931
 msgid "Exit Race"
-msgstr ""
+msgstr "Kwytya an resek"
 
-#: src/states_screens/user_screen.cpp:82
+#: src/states_screens/user_screen.cpp:111
 msgid "Exit game"
-msgstr ""
+msgstr "Kwytya an gwari"
 
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:442 data/po/gui_strings.h:796
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
 msgid "Expert"
-msgstr ""
+msgstr "Konnyk"
 
 #: src/states_screens/race_setup_screen.cpp:252
 msgid "Explore tracks to find all hidden eggs"
-msgstr ""
+msgstr "Eksplor lerghow rag diskudha keniver oy kudh"
 
-#: src/graphics/irr_driver.cpp:1776
+#: src/graphics/irr_driver.cpp:1795
 #, c-format
 msgid "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
-msgstr ""
+msgstr "FPS: %d/%d/%d  - NiverPoli: %d Soled, %d Skeus - HirderGolow : %d"
 
-#: src/graphics/irr_driver.cpp:1785
+#: src/graphics/irr_driver.cpp:1804
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris"
-msgstr ""
+msgstr "FPS: %d/%d/%d - %d KTris"
 
 #: src/states_screens/online_profile_achievements.cpp:128
 #: src/states_screens/online_profile_achievements.cpp:168
 msgid "Fetching achievements"
-msgstr ""
+msgstr "Ow kerghes an kowlwriansow"
 
 #: src/states_screens/online_profile_friends.cpp:88
 #: src/states_screens/online_profile_friends.cpp:174
 msgid "Fetching friends"
-msgstr ""
+msgstr "Ow kerghes an gowetha"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:171
 msgid "Fetching last vote"
-msgstr ""
+msgstr "Ow kerghes an diwettha raglev"
 
 #: src/states_screens/server_selection.cpp:67
 #: src/states_screens/server_selection.cpp:210
 msgid "Fetching servers"
-msgstr ""
+msgstr "Ow kerghes an servyers"
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
-#: data/po/gui_strings.h:510
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
 "able to reset your password."
-msgstr ""
+msgstr "Lenow an hanow usyer hag an drigva ebost res genes ow kovskrifa rag dassettya dha er tremena."
 
-#: src/modes/linear_world.cpp:277
+#: src/modes/linear_world.cpp:276
 msgid "Final lap!"
-msgstr ""
+msgstr "Diwettha tro!"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
-#: data/po/gui_strings.h:467
 msgid "Find Server"
-msgstr ""
+msgstr "Kavos servyer"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:242
 msgid "Fire"
-msgstr ""
+msgstr "Tenna"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:1006
 msgid ""
 "First, you will need several input devices (having multiple gamepads or "
 "joysticks is the best way to play with several people). Go in the input "
 "configuration screen and setup the gamepads. It is also possible to play on "
-"keyboard(s), however each player will need a different set of keys, and keep "
-"in mind that most keyboards are not appropriate for multiplayer gameplay "
+"keyboard(s), however each player will need a different set of keys, and keep"
+" in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
-msgstr ""
+msgstr "Kens oll, yma odhom dhis a lies devis ynworra (lies gamepad po joystick yw an gwella fordh dhe wari gans moy pobel). Ke dhe'n skrin restrans ynworra ha fytt an gamepads. Y hyllir gwari dre vysowek/egi ynwedh, byttegyns yma odhom dhe bub gwarier a sett dyffrans a alhwedhennow, ha porth kov nag yw an brassa rann a vysowegi gwiw rag gwari lieswarier drefen na skoodhyons niver bras a waskow a'n alhwedhennow."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:180
 msgid "Follow the Leader"
-msgstr ""
+msgstr "Hol an Penn"
 
 #: src/states_screens/race_gui_base.cpp:650
 msgid "Follow the leader!"
-msgstr ""
+msgstr "Hol an penn!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:1044
 msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
-msgstr ""
+msgstr "Hol an penn: Resek rag an nessa renk, drefen bos an diwettha kert diles pub termyn may trehedh an niverell orth mann. Bydh war: mos a-dherag an penn a'th kyv diles ynwedh!"
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
-#: data/po/gui_strings.h:1502
 msgid "Fort Magma"
-msgstr ""
+msgstr "Dinas Magma"
 
-#: src/input/wiimote_manager.cpp:414
+#: src/input/wiimote_manager.cpp:413
 #, c-format
-msgid "Found %d wiimote(s)"
-msgstr ""
+msgid "Found %d wiimote"
+msgid_plural "Found %d wiimotes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:313
 msgid "Friend removed!"
-msgstr ""
+msgstr "Diles re beu an koweth!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:215
 msgid "Friend request accepted!"
-msgstr ""
+msgstr "Degemerys re beu an govyn koweth!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:364
 msgid "Friend request cancelled!"
-msgstr ""
+msgstr "Hedhys re beu an govyn koweth!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:267
 msgid "Friend request declined!"
-msgstr ""
+msgstr "Neghys re beu an govyn koweth!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:158
 msgid "Friend request sent!"
-msgstr ""
+msgstr "Danvenys re beu an govyn koweth!"
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:99 data/po/gui_strings.h:752
+#: src/states_screens/online_profile_base.cpp:99
 msgid "Friends"
-msgstr ""
+msgstr "Kowetha"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:1257
 msgid "Fullscreen"
-msgstr ""
+msgstr "Skrin leun"
 
 #. I18N: Shown when a goal is scored
 #: src/states_screens/race_gui_base.cpp:70
 msgid "GOAL!"
-msgstr ""
+msgstr "GOL!"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:144
 msgid "Game Keys"
-msgstr ""
+msgstr "Alhwedhennow an gwari"
 
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
-#. I18N: ./data/gui/help4.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:380 data/po/gui_strings.h:946
-#: data/po/gui_strings.h:992 data/po/gui_strings.h:1025
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "Game Modes"
-msgstr ""
+msgstr "Modhow an gwari"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: data/po/gui_strings.h:106
 msgid "Game type (Goals limit / Time limit)"
-msgstr ""
+msgstr "Eghen an gwari (Finweth golyow / termyn)"
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
 #: src/input/binding.cpp:292
 #, c-format
 msgid "Gamepad button %d"
-msgstr ""
+msgstr "Boton %d an gamepad"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/binding.cpp:260 src/input/binding.cpp:265
 #, c-format
 msgid "Gamepad hat %d"
-msgstr ""
+msgstr "Hatt %d an gamepad"
 
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
-#. I18N: ./data/gui/help4.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:372 data/po/gui_strings.h:938
-#: data/po/gui_strings.h:984 data/po/gui_strings.h:1017
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "General"
-msgstr ""
+msgstr "Ollgemmyn"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:919
 msgid "Give Up Race"
-msgstr ""
+msgstr "Hepkor an resek"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:830
 msgid "Global illumination"
-msgstr ""
+msgstr "Golowheans ollvysel"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:465
+#: src/states_screens/options_screen_video.cpp:489
 #, c-format
 msgid "Global illumination : %s"
-msgstr ""
+msgstr "Golowheans ollvysel : %s"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:834
 msgid "Glow (outlines)"
-msgstr ""
+msgstr "Golowi (linennow)"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:453
+#: src/states_screens/options_screen_video.cpp:477
 #, c-format
 msgid "Glow (outlines) : %s"
-msgstr ""
+msgstr "Golowi (linennow) : %s"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
-#: data/po/gui_strings.h:1370
 msgid "Gnu"
-msgstr ""
+msgstr "Gnu"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:68
 msgid "Go!"
-msgstr ""
+msgstr "Ke!"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:32
 msgid "Gold driver"
-msgstr ""
+msgstr "Lewyer/lewyores owr"
 
-#. I18N: ../stk-assets/tracks/20_island/track.xml
-#: data/po/gui_strings.h:1490
+#. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
-msgstr ""
+msgstr "Enys Gran Paradiso"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: In the track selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:145
-#: data/po/gui_strings.h:419
 msgid "Grand Prix"
-msgstr ""
+msgstr "Grand Prix"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
-#: data/po/gui_strings.h:183
 msgid "Grand Prix Editor"
-msgstr ""
+msgstr "Chanjyell Grand Prix"
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Title in grand prix editor screen
-#: data/po/gui_strings.h:1064
 msgid "Grand Prix editor"
-msgstr ""
+msgstr "Chanjyell Grand Prix"
 
-#: src/states_screens/race_result_gui.cpp:1205
+#: src/states_screens/race_result_gui.cpp:1214
 msgid "Grand Prix progress:"
-msgstr ""
+msgstr "Avonsyans y'n Grand Prix:"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:1241
 msgid "Graphical Effects Level"
-msgstr ""
+msgstr "Nivel an effeythow grafegel"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/user_screen.cpp:597
-#: src/states_screens/options_screen_input2.cpp:85
 #: src/states_screens/options_screen_audio.cpp:64
 #: src/states_screens/options_screen_input.cpp:138
-#: src/states_screens/options_screen_ui.cpp:118 data/po/gui_strings.h:1237
+#: src/states_screens/options_screen_input2.cpp:85
+#: src/states_screens/options_screen_ui.cpp:117
+#: src/states_screens/user_screen.cpp:646
 msgid "Graphics"
-msgstr ""
+msgstr "Grafegow"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
-#: data/po/gui_strings.h:806
 msgid "Graphics Settings"
-msgstr ""
+msgstr "Settyansow grafegow"
 
 #. I18N: ../stk-assets/tracks/greenvalley/track.xml
-#: data/po/gui_strings.h:1496
 msgid "Green Valley"
-msgstr ""
+msgstr "Nans Glas"
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:392
 msgid "Guest"
-msgstr ""
+msgstr "Gwester/Gwestores"
 
 #. I18N: Name of further guest players, with a 1, 2, ... attached
 #: src/config/player_manager.cpp:397
 #, c-format
 msgid "Guest %d"
-msgstr ""
+msgstr "Gwester/Gwestores %d"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
-#: data/po/gui_strings.h:599
-msgid "Guest Sign in"
-msgstr ""
+msgid "Guest Log in"
+msgstr "Omgelmi avel gwester/gwestores"
 
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
-#: data/po/gui_strings.h:1454
 msgid "Hacienda"
-msgstr ""
+msgstr "Hacienda"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -1565,617 +1440,627 @@ msgstr ""
 #. I18N: In the in-game dialog
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:171 data/po/gui_strings.h:896
-#: data/po/gui_strings.h:927
 msgid "Help"
-msgstr ""
+msgstr "Gweres"
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
-#: data/po/gui_strings.h:1361
 msgid "Hexley"
-msgstr ""
+msgstr "Hexley"
 
-#: src/states_screens/race_result_gui.cpp:1243
+#: src/states_screens/race_result_gui.cpp:1252
 msgid "Highscores"
-msgstr ""
+msgstr "Skoryow ughella"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:11
 msgid "Hit 10 karts with a bowling-ball."
-msgstr ""
+msgstr "Gweskel 10 kert gans pel dewlel."
 
 #: src/states_screens/race_setup_screen.cpp:231
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
-msgstr ""
+msgstr "Gwask tus erel gans arvow bys may hollons oll a'ga bewnansow. (Yn gwariow lieswarier hepken)"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:17
 msgid "Hit the same kart at least 5 times in one race."
-msgstr ""
+msgstr "Gwask an keth kert dhe'n lyha 5 termyn yn unn resek."
 
 #. I18N: animations setting (only karts with human players are animated)
-#: src/states_screens/dialogs/custom_video_settings.cpp:63
+#: src/states_screens/dialogs/custom_video_settings.cpp:64
 msgid "Human players only"
-msgstr ""
+msgstr "Gwarioryon a dhenses hepken"
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
-#: data/po/gui_strings.h:619
 msgid "I agree to the above terms and am 13 years or older. "
-msgstr ""
+msgstr "Unver ov gans an termynyow a-ugh hag yth ov 13 bloodh po kottha."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:1478 data/po/gui_strings.h:1481
 msgid "If you can beat me at racing, I will free the old codger."
-msgstr ""
+msgstr "Mar kyllydh ow fetha y'n resek, delivra an penn koth a wrav."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:969
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr ""
+msgstr "Mar kwelydh boton warnodho alhwedh a'n par ma, y fydh res dhis kowlwul chalenj rag y dhialhwedha."
 
-#: src/input/input_manager.cpp:716
+#: src/input/input_manager.cpp:729
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
+msgstr "Ow skonya aswon '%s', res o dhis junya moy a-varr rag gwari!"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Image-based lighting"
 msgstr ""
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
-#: data/po/gui_strings.h:1289
 msgid "Install"
-msgstr ""
+msgstr "Ynstallya"
 
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:438 data/po/gui_strings.h:792
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
 msgid "Intermediate"
-msgstr ""
+msgstr "Nivel kres"
 
-#: src/states_screens/user_screen.cpp:283
-#: src/states_screens/register_screen.cpp:347
+#: src/states_screens/register_screen.cpp:401
+#: src/states_screens/user_screen.cpp:328
 msgid "Internet access is disabled, please enable it in the options"
-msgstr ""
+msgstr "Diallosegys yw hedhas dhe'n kesrosweyth, gwra y allosegi y'n dewisyow"
 
-#: src/states_screens/race_result_gui.cpp:965
+#: src/states_screens/race_result_gui.cpp:974
 msgid "It's a draw"
-msgstr ""
+msgstr "Kehaval"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:56
 msgid "It's secret"
-msgstr ""
+msgstr "Kevrinek yw"
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
-#: data/po/gui_strings.h:707
 msgid "Join"
-msgstr ""
+msgstr "Junya"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:155
 msgid "Joining server"
-msgstr ""
+msgstr "Ow junya gans an sevyer"
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In the addons screen
-#: data/po/gui_strings.h:1332
 msgid "Karts"
-msgstr ""
+msgstr "Kertow"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-#: data/po/gui_strings.h:304
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
 msgid "Keep this resolution"
-msgstr ""
+msgstr "Gwitha an klerder ma"
 
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:222
 msgid "Keep up with the leader kart but don't overtake it!"
-msgstr ""
+msgstr "Kesstrif bys dhe'n penn, mes na bass!"
 
 #: src/states_screens/options_screen_input2.cpp:72
 msgid "Key binding"
-msgstr ""
+msgstr "Kolm alhwedhen"
 
 #: src/states_screens/options_screen_input.cpp:97
 #, c-format
 msgid "Keyboard %i"
-msgstr ""
+msgstr "Bysowek %i"
 
 #. I18N: ../stk-assets/karts/konqi/kart.xml
-#: data/po/gui_strings.h:1388
 msgid "Konqi"
-msgstr ""
+msgstr "Konqi"
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/race_gui_overworld.cpp:108
 msgid "Lap"
-msgstr ""
+msgstr "Tro"
 
-#: src/modes/linear_world.cpp:304
+#: src/modes/linear_world.cpp:303
 #, c-format
 msgid "Lap %i"
-msgstr ""
+msgstr "Tro %i"
 
 #: src/states_screens/edit_gp_screen.cpp:67
 msgid "Laps"
-msgstr ""
+msgstr "Troyow"
 
 #. I18N: number of laps to race in a challenge
 #: src/challenges/challenge_data.cpp:249
 #, c-format
 msgid "Laps : %i"
-msgstr ""
+msgstr "Troyow : %i"
 
 #: src/modes/follow_the_leader.cpp:57 src/modes/follow_the_leader.cpp:252
 msgid "Leader"
-msgstr ""
+msgstr "Penn"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:268
 msgid "Left"
-msgstr ""
+msgstr "Kledh"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:212
 msgid "Left bumper"
-msgstr ""
+msgstr "Bonkyell gledh"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:220
 msgid "Left thumb button"
-msgstr ""
+msgstr "Boton meus kledh"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:235
 msgid "Left thumb down"
-msgstr ""
+msgstr "Meus kledh yn-nans"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:233
 msgid "Left thumb left"
-msgstr ""
+msgstr "Meus kledh kledh"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:231
 msgid "Left thumb right"
-msgstr ""
+msgstr "Meus kledh dyghow"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:237
 msgid "Left thumb up"
-msgstr ""
+msgstr "Meus kledh yn-bann"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:179 src/input/gamepad_config.cpp:239
 msgid "Left trigger"
-msgstr ""
+msgstr "Tennell gledh"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:822
 msgid "Light shaft (God rays)"
-msgstr ""
+msgstr "Gwelen wolow (dewynnow Duw)"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:457
+#: src/states_screens/options_screen_video.cpp:481
 #, c-format
 msgid "Light shaft (God rays) : %s"
-msgstr ""
+msgstr "Gwelen wolow (dewynnow Duw) : %s"
 
-#: src/guiengine/engine.cpp:1324
+#: src/guiengine/engine.cpp:1330
 msgid "Loading"
-msgstr ""
+msgstr "Ow karga"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In networking lobby
-#: data/po/gui_strings.h:568
 msgid "Lobby"
-msgstr ""
+msgstr "Degemerva"
 
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
-#: data/po/gui_strings.h:723
 msgid "Lobby Settings"
-msgstr ""
+msgstr "Settyansow an dhegemerva"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
-#: data/po/gui_strings.h:663
-msgid "Local Username"
+msgid "Local Name"
 msgstr ""
 
 #: src/states_screens/kart_selection.cpp:853
 msgid "Locked"
-msgstr ""
+msgstr "Alhwedhys"
 
-#: src/states_screens/tracks_screen.cpp:283
-#: src/states_screens/race_setup_screen.cpp:214
-#: src/states_screens/kart_selection.cpp:858
-#: src/states_screens/kart_selection.cpp:1449
 #: src/states_screens/arenas_screen.cpp:237
 #: src/states_screens/arenas_screen.cpp:267
 #: src/states_screens/easter_egg_screen.cpp:225
 #: src/states_screens/easter_egg_screen.cpp:256
+#: src/states_screens/kart_selection.cpp:858
+#: src/states_screens/kart_selection.cpp:1449
+#: src/states_screens/race_setup_screen.cpp:214
+#: src/states_screens/tracks_screen.cpp:283
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr ""
+msgstr "Alhwedhys : Digolm chalenjys rag gwaynya hedhas dhe voy!"
 
 #: src/states_screens/tracks_screen.cpp:201
 msgid "Locked!"
-msgstr ""
+msgstr "Alhwedhys!"
 
-#. I18N: ./data/gui/user_screen.stkgui
 #. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid "Log In"
+msgstr "Omgelmi"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Log Out"
+msgstr "Omdenna"
+
+#: src/states_screens/online_screen.cpp:139
+#, c-format
+msgid "Logged in as: %s."
+msgstr "Omgelmys avel: %s."
+
+#: src/states_screens/online_screen.cpp:155
+msgid "Logging in"
+msgstr "Owth omgelmi"
+
+#: src/states_screens/user_screen.cpp:494
+#, c-format
+msgid "Logging in '%s'"
+msgstr "Owth omgelmi '%s'"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid ""
+"Logging in as a guest allows you to participate in online races, but it does"
+" not allow you to vote for addons, or collect any achievements while being "
+"online."
+msgstr "Omgelmi avel gwester po gwestores a'th has dhe vos kevrennek a resegow warlinen, mes ny'th has dhe ragleva rag keworransow, na dhe guntel kowlwriansow hedre vi warlinen."
+
+#: src/states_screens/online_screen.cpp:160
+msgid "Logging out"
+msgstr "Owth omdenna"
+
+#: src/states_screens/user_screen.cpp:493
+#, c-format
+msgid "Logging out '%s'"
+msgstr "Owth omdenna '%s'"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: ./data/gui/user_screen.stkgui
 #: src/states_screens/main_menu_screen.cpp:175
-#: src/states_screens/main_menu_screen.cpp:186 data/po/gui_strings.h:311
-#: data/po/gui_strings.h:583
+#: src/states_screens/main_menu_screen.cpp:186
 msgid "Login"
-msgstr ""
+msgstr "Omgelmi"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:251
 msgid "Look Back"
-msgstr ""
+msgstr "Mires war gamm"
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: In the profile screen
-#: data/po/gui_strings.h:756
 msgid "Look for more friends:"
-msgstr ""
-
-#. I18N: ../stk-assets/wip-tracks/20_luna/track.xml
-#: data/po/gui_strings.h:1508
-msgid "Luna"
-msgstr ""
+msgstr "Hwilas moy kowetha:"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:29
 msgid "Make 5 skidding in a single lap."
-msgstr ""
+msgstr "Gwra 5 skyddyow yn unn lapp."
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:23
 msgid "Make a race with 5 laps or more."
-msgstr ""
+msgstr "Gwra resek ynno 5 lapp po moy."
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:20
 msgid "Marathoner"
-msgstr ""
+msgstr "Marathonyer"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
-#: data/po/gui_strings.h:647 data/po/gui_strings.h:731
 msgid "Max. number of players"
-msgstr ""
+msgstr "Niver ughella a warioryon"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: data/po/gui_strings.h:102
 msgid "Maximum time (min.)"
-msgstr ""
+msgstr "Termyn ughella (myn.)"
 
 #. I18N: if some kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:414
+#: src/states_screens/options_screen_video.cpp:436
 msgid "Me Only"
-msgstr ""
+msgstr "My hepken"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:158
 msgid "Menu Keys"
-msgstr ""
+msgstr "Alhwedhennow rol"
 
 #. I18N: ../stk-assets/tracks/minigolf/track.xml
-#: data/po/gui_strings.h:1406
 msgid "Minigolf"
-msgstr ""
+msgstr "Korr-golf"
+
+#. I18N: ./data/achievements.xml
+msgid "Mosquito Hunter"
+msgstr "Helghyer/Helghyores a Voskitos"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:842
 msgid "Motion blur"
-msgstr ""
+msgstr "Fros gwaya"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:436
+#: src/states_screens/options_screen_video.cpp:458
 #, c-format
 msgid "Motion blur: %s"
-msgstr ""
+msgstr "Fros gwaya: %s"
 
-#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
+#. I18N: to appear in input configuration screen, for mouse (might not be used
+#. at all)
 #: src/input/binding.cpp:299
 #, c-format
 msgid "Mouse axis %d %s"
-msgstr ""
+msgstr "Logosen, aghel %d %s"
 
-#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
+#. I18N: to appear in input configuration screen, for mouse (might not be used
+#. at all)
 #: src/input/binding.cpp:295
 #, c-format
 msgid "Mouse button %d"
-msgstr ""
+msgstr "Logosen, boton %d"
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
-#: data/po/gui_strings.h:1169
 msgid "Move down"
-msgstr ""
+msgstr "Diyskynna"
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
-#: data/po/gui_strings.h:1165
 msgid "Move up"
-msgstr ""
+msgstr "Yskynna"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:155
 msgid "Multiplayer"
-msgstr ""
+msgstr "Lieswarier"
 
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
-#. I18N: ./data/gui/help4.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:384 data/po/gui_strings.h:950
-#: data/po/gui_strings.h:996 data/po/gui_strings.h:1029
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "Multi­player"
-msgstr ""
+msgstr "Lieswarier"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
-#: data/po/gui_strings.h:273
 msgid "Music"
-msgstr ""
+msgstr "Ilow"
 
-#. I18N: ./data/gui/online/user_info_dialog.stkgui
-#. I18N: User info dialog
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
-#: src/states_screens/server_selection.cpp:91
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
 #: src/states_screens/online_profile_achievements.cpp:73
-#: data/po/gui_strings.h:540 data/po/gui_strings.h:703
+#: src/states_screens/server_selection.cpp:91
 msgid "Name"
-msgstr ""
+msgstr "Hanow"
 
 #: src/states_screens/create_server_screen.cpp:132
 msgid "Name has to be between 4 and 30 characters long!"
-msgstr ""
+msgstr "Res yw dhe'n hanow bos yntra 4 ha 30 lytheren yn hirder!"
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:125
 msgid "Name is empty."
-msgstr ""
+msgstr "Gwag yw an hanow."
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:137
 msgid "Name is too long."
-msgstr ""
+msgstr "Re hir yw an hanow."
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
-#: data/po/gui_strings.h:643 data/po/gui_strings.h:727
 msgid "Name of the server"
+msgstr "Hanow an servyer"
+
+#. I18N: ../stk-assets/tracks/scotland/track.xml
+msgid "Nessie's pond"
 msgstr ""
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
-#: data/po/gui_strings.h:1068
 msgid "New"
-msgstr ""
+msgstr "Nowydh"
 
 #: src/challenges/challenge_data.cpp:502
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr ""
+msgstr "Grand Prix nowydh '%s' kavadow"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "New Online Account"
+msgstr "Akont warlinen nowydh"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
-#: data/po/gui_strings.h:491
 msgid "New Password"
-msgstr ""
+msgstr "Ger tremena nowydh"
 
 #: src/states_screens/online_profile_friends.cpp:145
 msgid "New Request"
-msgstr ""
+msgstr "Govyn nowydh"
 
 #: src/challenges/challenge_data.cpp:506
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr ""
+msgstr "Kaletter nowydh '%s' kavadow"
 
-#: src/modes/linear_world.cpp:361
+#: src/modes/linear_world.cpp:363
 msgid "New fastest lap"
-msgstr ""
+msgstr "Tro uskissa nowydh"
 
 #: src/challenges/challenge_data.cpp:492
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr ""
+msgstr "Modh gwari nowydh '%s' kavadow"
 
 #: src/challenges/challenge_data.cpp:516
 #, c-format
 msgid "New kart '%s' now available"
-msgstr ""
+msgstr "Kert nowydh '%s' kavadow"
 
 #: src/challenges/challenge_data.cpp:486
 #, c-format
 msgid "New track '%s' now available"
-msgstr ""
+msgstr "Lergh nowydh '%s' kavadow"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:245
 msgid "Nitro"
-msgstr ""
+msgstr "Nitro"
 
 #: src/states_screens/dialogs/select_challenge.cpp:147
 msgid "Nitro challenge"
-msgstr ""
+msgstr "Chalenj nitro"
 
+#: src/states_screens/dialogs/message_dialog.cpp:128
 #: src/states_screens/edit_gp_screen.cpp:253
-#: src/states_screens/dialogs/message_dialog.cpp:104
 msgid "No"
-msgstr ""
+msgstr "Na"
 
 #. I18N: ../stk-assets/karts/nolok/kart.xml
-#: data/po/gui_strings.h:1364
 msgid "Nolok"
-msgstr ""
+msgstr "Nolok"
 
 #. I18N: if no kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:416
 #: src/states_screens/gp_info_screen.cpp:75
+#: src/states_screens/options_screen_video.cpp:438
 msgid "None"
-msgstr ""
+msgstr "Nagonan"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:176
 msgid "Normal Race"
-msgstr ""
+msgstr "Resek usadow"
 
 #. I18N: ../stk-assets/tracks/snowmountain/track.xml
-#: data/po/gui_strings.h:1409
 msgid "Northern Resort"
-msgstr ""
+msgstr "Resort an North"
 
-#: src/tracks/track_object_presentation.cpp:953
+#: src/tracks/track_object_presentation.cpp:986
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
-msgstr ""
+msgstr "Mar teus ha skyddya lies sekond, y fydh res dhis kenerthyans bonus avel pewas!"
 
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:434 data/po/gui_strings.h:788
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
 msgid "Novice"
-msgstr ""
+msgstr "Dallether"
 
 #: src/states_screens/dialogs/select_challenge.cpp:68
 #, c-format
 msgid "Number of AI Karts : %i"
-msgstr ""
+msgstr "Niver a gertys AI : %i"
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
-#: data/po/gui_strings.h:79
 msgid "Number of AI karts"
-msgstr ""
+msgstr "Niver a gertys AI"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: data/po/gui_strings.h:98
 msgid "Number of goals to win"
-msgstr ""
+msgstr "Niver a wolyow rag gwaynya"
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
-#: data/po/gui_strings.h:75
 msgid "Number of laps"
-msgstr ""
+msgstr "Niver a droyow"
 
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: In the edit track screen
-#: data/po/gui_strings.h:125
 msgid "Number of laps:"
-msgstr ""
+msgstr "Niver a droyow:"
 
 #. I18N: ./data/gui/edit_track.stkgui
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the user screen
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
-#. I18N: ./data/gui/online/register.stkgui
-#. I18N: In the registration dialog
+#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
+#. I18N: In the 'add new grand prix' dialog
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
-#: src/states_screens/dialogs/message_dialog.cpp:98
-#: src/states_screens/dialogs/message_dialog.cpp:111 data/po/gui_strings.h:132
-#: data/po/gui_strings.h:242 data/po/gui_strings.h:331
-#: data/po/gui_strings.h:691 data/po/gui_strings.h:1226
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/dialogs/message_dialog.cpp:122
+#: src/states_screens/dialogs/message_dialog.cpp:135
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
-#: data/po/gui_strings.h:1349
 msgid "Off the beaten track"
-msgstr ""
+msgstr "A-ves dhe'n lerghow usadow"
 
 #: src/states_screens/online_profile_friends.cpp:150
 msgid "Offline"
-msgstr ""
+msgstr "Dhywarlinen"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "Offline Account"
+msgstr "Akont dhywarlinen"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:1466 data/po/gui_strings.h:1469
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr ""
+msgstr "Ogh, mir, yma ev y'm kastell lemmyn ha servys a vydh rag kon..."
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
-#: data/po/gui_strings.h:1445
 msgid "Old Mine"
-msgstr ""
+msgstr "An Bal Koth"
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
-#: data/po/gui_strings.h:1412
 msgid "Oliver's Math Class"
-msgstr ""
+msgstr "Klass Awgrym Oliver"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
-#: src/states_screens/online_profile_friends.cpp:149
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
 #: src/states_screens/main_menu_screen.cpp:170
-#: src/states_screens/main_menu_screen.cpp:185 data/po/gui_strings.h:159
-#: data/po/gui_strings.h:226 data/po/gui_strings.h:315
+#: src/states_screens/main_menu_screen.cpp:185
+#: src/states_screens/online_profile_friends.cpp:149
 msgid "Online"
-msgstr ""
+msgstr "Warlinen"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
-#: data/po/gui_strings.h:459
 msgid "Online Multiplayer"
-msgstr ""
+msgstr "Lieswarier warlinen"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
-#: data/po/gui_strings.h:671
 msgid "Online Username"
-msgstr ""
+msgstr "Hanow usyer warlinen"
 
-#: src/states_screens/register_screen.cpp:234
+#: src/states_screens/register_screen.cpp:280
 msgid "Online username has to be between 3 and 30 characters long!"
-msgstr ""
+msgstr "Res yw dhe'n hanow usyer warlinen bos yntra 3 ha 30 lytheren yn hirder!"
 
-#: src/states_screens/register_screen.cpp:238
+#: src/states_screens/register_screen.cpp:284
 msgid "Online username must not start with a number!"
-msgstr ""
+msgstr "Ny yll an hanow usyer warlinen dalleth gans niver!"
 
-#: src/input/input_manager.cpp:746
+#: src/input/input_manager.cpp:759
 msgid "Only the Game Master may act at this point!"
-msgstr ""
+msgstr "Ny yll marnas Mester an Gwari aktya y'n pols ma!"
 
-#: src/tracks/track_object_presentation.cpp:932
+#: src/tracks/track_object_presentation.cpp:960
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
-msgstr ""
+msgstr "Oups! Pan esos yn kaletter, gwask <%s> dhe vos sawyes"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -2183,1461 +2068,1310 @@ msgstr ""
 #. I18N: In the in-game dialog
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:167 data/po/gui_strings.h:892
-#: data/po/gui_strings.h:923
 msgid "Options"
-msgstr ""
+msgstr "Dewisyow"
 
 #. I18N: ./data/gui/online/profile_overview.stkgui
 #. I18N: Section in the profile screen
-#: data/po/gui_strings.h:455
 msgid "Overview"
-msgstr ""
+msgstr "Gorwolok"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:93
 msgid "POWER"
-msgstr ""
+msgstr "NERTH"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:403
 msgid "Parachute - slows down all karts in a better position."
-msgstr ""
+msgstr "Lammlen - lenthe a wra pub kert yn renk gwell."
 
-#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
-#. I18N: ./data/gui/online/register.stkgui
+#. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the registration dialog
-#: data/po/gui_strings.h:238 data/po/gui_strings.h:327
-#: data/po/gui_strings.h:675
 msgid "Password"
-msgstr ""
+msgstr "Ger tremena"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
-#: data/po/gui_strings.h:742
 msgid "Password :"
-msgstr ""
+msgstr "Ger tremena :"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
-#: data/po/gui_strings.h:483
 msgid "Password Change"
-msgstr ""
+msgstr "Chanjya an ger tremena"
 
-#: src/states_screens/register_screen.cpp:242
 #: src/states_screens/dialogs/change_password_dialog.cpp:140
+#: src/states_screens/register_screen.cpp:288
 msgid "Password has to be between 8 and 30 characters long!"
-msgstr ""
+msgstr "Res yw dhe'n ger tremena bos ynter 8 ha 30 lytheren yn hirder!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:210
 msgid "Password successfully changed."
-msgstr ""
+msgstr "Ger tremena chanjys yn sewen."
 
-#: src/states_screens/register_screen.cpp:226
 #: src/states_screens/dialogs/change_password_dialog.cpp:147
+#: src/states_screens/register_screen.cpp:272
 msgid "Passwords don't match!"
-msgstr ""
+msgstr "Nyns yw an geryow tremena par!"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:257
 msgid "Pause Game"
-msgstr ""
+msgstr "Powes an gwari"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: ./data/gui/race_paused_dialog.stkgui
-#: data/po/gui_strings.h:880 data/po/gui_strings.h:903
 msgid "Paused"
-msgstr ""
+msgstr "Powesys"
 
-#: src/karts/controller/player_controller.cpp:338
 #: src/karts/controller/network_player_controller.cpp:281
+#: src/karts/controller/player_controller.cpp:338
 msgid "Penalty time!!"
-msgstr ""
+msgstr "Prys spal!!"
 
 #: src/states_screens/online_profile_friends.cpp:146
 msgid "Pending"
-msgstr ""
+msgstr "Ow kortos"
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
-#: data/po/gui_strings.h:1346
 msgid "Penguin Playground"
-msgstr ""
+msgstr "Garth an Pennow Gwynn"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:247
 msgid "Performing vote"
-msgstr ""
+msgstr "Ow kul an sondyans"
 
 #. I18N: ../stk-assets/karts/pidgin/kart.xml
-#: data/po/gui_strings.h:1382
 msgid "Pidgin"
-msgstr ""
+msgstr "Pidgin"
 
 #. I18N: ./data/gui/tutorial.stkgui
-#: data/po/gui_strings.h:300
 msgid "Play all"
-msgstr ""
+msgstr "Gwari an oll"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:5
 msgid "Play every official track at least once."
-msgstr ""
+msgstr "Gwari pub lergh sodhogel unnweyth dhe'n lyha."
 
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: Section in the settings menu
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input2.cpp:88
-#: src/states_screens/server_selection.cpp:92
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
 #: src/states_screens/options_screen_audio.cpp:66
-#: src/states_screens/options_screen_video.cpp:138
 #: src/states_screens/options_screen_input.cpp:141
-#: src/states_screens/options_screen_ui.cpp:120 data/po/gui_strings.h:222
-#: data/po/gui_strings.h:354
+#: src/states_screens/options_screen_input2.cpp:88
+#: src/states_screens/options_screen_ui.cpp:119
+#: src/states_screens/options_screen_video.cpp:165
+#: src/states_screens/server_selection.cpp:92
 msgid "Players"
+msgstr "Gwarioryon"
+
+#: src/states_screens/options_screen_ui.cpp:154
+msgid ""
+"Players can select handicapped (more difficult) profiles on the kart "
+"selection screen"
 msgstr ""
 
 #. I18N: ./data/gui/enter_gp_name_dialog.stkgui
 #. I18N: In the 'add new grand prix' dialog
-#: data/po/gui_strings.h:1210
 msgid "Please enter the name of the grand prix"
-msgstr ""
+msgstr "Gwra entra hanow an grand prix"
 
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:500
 msgid "Please re-configure your key bindings."
+msgstr "Gwra dasrestra dha golmow."
+
+#: src/states_screens/dialogs/registration_dialog.cpp:42
+msgid "Please read the terms and conditions "
 msgstr ""
 
 #: src/states_screens/addons_screen.cpp:437
 msgid "Please wait while addons are updated"
-msgstr ""
+msgstr "Gorta nowedhi an keworransow"
 
 #: src/states_screens/main_menu_screen.cpp:557
 msgid "Please wait while the add-ons are loading"
-msgstr ""
+msgstr "Gorta karga an nowedhansow"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:397
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight."
-msgstr ""
+msgstr "Plonjell - towl yn kompes rag tenna erbynner/erbynores war-dhelergh, po towl yn unn vires war gamm rag gul dhe onan anedha kelli aga golok."
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:38
 msgid "Powerup Love"
-msgstr ""
+msgstr "Kenerthans Kerensa"
 
-#: src/tracks/track_object_presentation.cpp:904
+#: src/tracks/track_object_presentation.cpp:930
 #, c-format
 msgid ""
-"Press <%s> to look behind, and fire the weapon with <%s> while pressing <%s> "
-"to fire behind!"
-msgstr ""
+"Press <%s> to look behind, and fire the weapon with <%s> while pressing <%s>"
+" to fire behind!"
+msgstr "Gwask <%s> rag mires war gamm, ha tenn an arv dre <%s> yn unn waska <%s> rag tenna war-dhelergh!"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:1148
 msgid "Press ESC to cancel"
-msgstr ""
+msgstr "Gwask ESC rag hedhi"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
-#: data/po/gui_strings.h:1136
 msgid "Press a key"
-msgstr ""
+msgstr "Gwask alhwedhen"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:1095
 msgid "Press enter or double-click on a device to configure it"
-msgstr ""
+msgstr "Gwask entra po dobyl-klyck war dhevis rag y restra"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
-#: data/po/gui_strings.h:361
 msgid "Press enter or double-click on a player to edit him/her"
-msgstr ""
+msgstr "Gwask entra po dobyl-klyck war warier rag y janjya/hy chanjya"
 
 #: src/states_screens/race_gui_overworld.cpp:462
 msgid "Press fire to play the tutorial"
-msgstr ""
+msgstr "Gwask tenna rag gwari an dyskans"
 
 #: src/states_screens/race_gui_overworld.cpp:532
 msgid "Press fire to start the challenge"
-msgstr ""
+msgstr "Gwask tenna rag dalleth an chalenj"
 
 #: src/input/wiimote_manager.cpp:390
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
-msgstr ""
+msgstr "Gwask an botonyow 1+2 yn kettermynyek war dha wiimote rag y worra y'n modh diskudha, ena klyck OK. Yma danvonadow manylys orth supertuxkart.net/Wiimote"
 
 #: src/states_screens/dialogs/addons_loading.cpp:357
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr ""
+msgstr "Yth esa kudyn owth installya an keworrans '%s'."
 
 #: src/states_screens/dialogs/addons_loading.cpp:394
 #, c-format
 msgid "Problems removing the addon '%s'."
-msgstr ""
+msgstr "Yth esa kudyn ow tilea an keworrans '%s'."
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:474
 msgid "Processing"
-msgstr ""
+msgstr "Owth argerdhes"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
-#: data/po/gui_strings.h:475
 msgid "Profile"
-msgstr ""
+msgstr "Profil"
 
 #: src/states_screens/online_profile_achievements.cpp:79
 msgid "Progress"
-msgstr ""
+msgstr "Avonsyans"
 
 #. I18N: ../stk-assets/karts/puffy/kart.xml
-#: data/po/gui_strings.h:1376
 msgid "Puffy"
-msgstr ""
+msgstr "Puffy"
 
 #: src/states_screens/race_setup_screen.cpp:240
 msgid ""
 "Push the ball to the opposite cage to score goals. (Only in multiplayer "
 "games)"
-msgstr ""
+msgstr "Herdh an bel dhe'n kowel konter rag skorya golyow. (Gwariow lieswarier hepken)"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
-#: data/po/gui_strings.h:463
 msgid "Quick Play"
-msgstr ""
+msgstr "Gwari uskis"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
-#: data/po/gui_strings.h:191
 msgid "Quit"
-msgstr ""
+msgstr "Kwytya"
 
-#: src/states_screens/race_result_gui.cpp:148
+#: src/states_screens/race_result_gui.cpp:159
 msgid "Quit the server."
-msgstr ""
+msgstr "Kwytya an servyer."
 
-#. I18N: ./data/gui/soccer_setup.stkgui
-#. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:94 data/po/gui_strings.h:426
-#: data/po/gui_strings.h:781
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: ./data/gui/soccer_setup.stkgui
 msgid "Race Setup"
-msgstr ""
+msgstr "Fyttyans an resek"
 
 #: src/states_screens/gp_info_screen.cpp:77
 msgid "Random"
-msgstr ""
+msgstr "Chonsus"
 
 #: src/states_screens/arenas_screen.cpp:277
 msgid "Random Arena"
-msgstr ""
+msgstr "Plen chonsus"
 
 #: src/race/grand_prix_data.hpp:171
 msgid "Random Grand Prix"
-msgstr ""
+msgstr "Grand Prix chonsus"
 
 #: src/states_screens/kart_selection.cpp:839
 #: src/states_screens/kart_selection.cpp:1467
 msgid "Random Kart"
-msgstr ""
+msgstr "Kert chonsus"
 
-#: src/states_screens/tracks_screen.cpp:297
 #: src/states_screens/easter_egg_screen.cpp:270
+#: src/states_screens/tracks_screen.cpp:297
 msgid "Random Track"
-msgstr ""
+msgstr "Lergh chonsus"
 
 #: src/states_screens/race_gui_overworld.cpp:109
 msgid "Rank"
-msgstr ""
+msgstr "Renk"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: In addons screen, in the filtering bar, to enable a filter that will show only items with good rating
-#: data/po/gui_strings.h:1328
+#. I18N: In addons screen, in the filtering bar, to enable a filter that will
+#. show only items with good rating
 msgid "Rating >="
-msgstr ""
-
-#. I18N: ../stk-assets/wip-tracks/20_mansion/track.xml
-#: data/po/gui_strings.h:1514
-msgid "Ravenbridge mansion"
-msgstr ""
+msgstr "Kevradh >="
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:64
 msgid "Ready!"
-msgstr ""
+msgstr "Ombareus!"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:59
 msgid "Really ... a secret."
-msgstr ""
+msgstr "Dhe wir ... kevrin."
 
-#: src/states_screens/race_result_gui.cpp:956
+#: src/states_screens/race_result_gui.cpp:965
 msgid "Red Team Wins"
-msgstr ""
+msgstr "An Rudhyon a waynyas!"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
-#: data/po/gui_strings.h:595
 msgid "Register"
-msgstr ""
+msgstr "Kovskrifa"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:1036
 msgid ""
 "Regular Race: All blows allowed, so catch weapons and make clever use of "
 "them!"
-msgstr ""
+msgstr "Resek usadow: Oll bommys yw alowys, ytho kuntel arvow ha gwra devnydh da anedha!"
 
-#: src/states_screens/gp_info_screen.cpp:149
-#: src/states_screens/gp_info_screen.cpp:174
+#: src/states_screens/gp_info_screen.cpp:153
+#: src/states_screens/gp_info_screen.cpp:178
 msgid "Reload"
-msgstr ""
+msgstr "Daskarga"
 
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
-#: data/po/gui_strings.h:230 data/po/gui_strings.h:319
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
 msgid "Remember password"
-msgstr ""
+msgstr "Perthi kov a'n ger tremena"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:1261
 msgid "Remember window location"
-msgstr ""
+msgstr "Perthi kov a dyller an fenester"
 
-#. I18N: ./data/gui/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-#. I18N: ./data/gui/gpeditor.stkgui
-#. I18N: Menu item
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
-#: data/po/gui_strings.h:544 data/po/gui_strings.h:1080
-#: data/po/gui_strings.h:1181
-msgid "Remove"
-msgstr ""
-
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the user screen
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
-#: data/po/gui_strings.h:254 data/po/gui_strings.h:343
-#: data/po/gui_strings.h:1084
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Remove"
+msgstr "Dilea"
+
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
 msgid "Rename"
-msgstr ""
+msgstr "Dashenwel"
 
 #: src/states_screens/dialogs/select_challenge.cpp:64
 #, c-format
 msgid "Required Nitro Points : %i"
-msgstr ""
+msgstr "Poyntys nitro res: %i"
 
 #: src/states_screens/dialogs/select_challenge.cpp:53
 #, c-format
 msgid "Required Rank : %i"
-msgstr ""
+msgstr "Renk res : %i"
 
 #: src/states_screens/dialogs/select_challenge.cpp:58
 #, c-format
 msgid "Required Time : %i"
-msgstr ""
+msgstr "Termyn res : %i"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:254
 msgid "Rescue"
-msgstr ""
+msgstr "Sawya"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:1253
 msgid "Resolution"
-msgstr ""
+msgstr "Klerder"
 
-#: src/states_screens/race_result_gui.cpp:188
+#: src/states_screens/race_result_gui.cpp:199
 msgid "Restart"
-msgstr ""
+msgstr "Dastalleth"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:915
 msgid "Restart Race"
-msgstr ""
+msgstr "Dastalleth an resek"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: data/po/gui_strings.h:199
 msgid "Reverse"
-msgstr ""
+msgstr "Gorthtreylya"
 
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: In the edit track screen
-#: data/po/gui_strings.h:129
 msgid "Reverse:"
-msgstr ""
+msgstr "Gorthtreylya:"
 
 #: src/states_screens/edit_gp_screen.cpp:68
 msgid "Reversed"
-msgstr ""
+msgstr "Gorthtreylys"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:271
 msgid "Right"
-msgstr ""
+msgstr "Dyghow"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:214
 msgid "Right bumper"
-msgstr ""
+msgstr "Bonkyell dhyghow"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:222
 msgid "Right thumb button"
-msgstr ""
+msgstr "Boton meus dyghow"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:185 src/input/gamepad_config.cpp:243
 msgid "Right thumb down"
-msgstr ""
+msgstr "Meus dyghow yn-nans"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:183 src/input/gamepad_config.cpp:249
 msgid "Right thumb left"
-msgstr ""
+msgstr "Meus dyghow kledh"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:181 src/input/gamepad_config.cpp:247
 msgid "Right thumb right"
-msgstr ""
+msgstr "Meus dyghow dyghow"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:187 src/input/gamepad_config.cpp:245
 msgid "Right thumb up"
-msgstr ""
+msgstr "Meus dyghow yn-bann"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:189 src/input/gamepad_config.cpp:241
 msgid "Right trigger"
-msgstr ""
+msgstr "Tennel dhyghow"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:89
 msgid "SPEED"
-msgstr ""
+msgstr "TOOTH"
 
-#. I18N: ../stk-assets/tracks/startrack/track.xml
-#: data/po/gui_strings.h:1493
+#. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
+msgstr "STK Enterprise"
+
+#. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
+msgid "Sara the Racer"
 msgstr ""
 
-#. I18N: ../stk-assets/karts/20_sara_the_wizard/kart.xml
-#: data/po/gui_strings.h:1373
-msgid "Sara the wizard"
+#. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
+msgid "Sara the Wizard"
 msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
-#: data/po/gui_strings.h:1185
 msgid "Save"
-msgstr ""
+msgstr "Gwitha"
 
 #. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
-#: data/po/gui_strings.h:1154 data/po/gui_strings.h:1206
 msgid "Save Grand Prix"
-msgstr ""
+msgstr "Gwitha an Grand Prix ma"
 
-#. I18N: ../stk-assets/tracks/scotland/track.xml
-#: data/po/gui_strings.h:1433
-msgid "Scotland"
-msgstr ""
-
-#. I18N: ./data/gui/online/user_search.stkgui
 #. I18N: ./data/gui/online/profile_friends.stkgui
-#: data/po/gui_strings.h:448 data/po/gui_strings.h:759
+#. I18N: ./data/gui/online/user_search.stkgui
 msgid "Search"
-msgstr ""
+msgstr "Hwilas"
 
 #: src/states_screens/online_user_search.cpp:208
-#: src/states_screens/online_user_search.cpp:287
+#: src/states_screens/online_user_search.cpp:288
 msgid "Searching"
-msgstr ""
+msgstr "Ow hwilas"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:274
 msgid "Select"
-msgstr ""
+msgstr "Dewis"
 
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:784
 msgid "Select a difficulty"
-msgstr ""
+msgstr "Dewis kaletter"
 
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:803
 msgid "Select a game mode"
-msgstr ""
+msgstr "Dewis modh gwari"
 
 #: src/states_screens/edit_track_screen.cpp:238
 msgid "Select a track"
-msgstr ""
+msgstr "Dewis lergh"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
-#: data/po/gui_strings.h:888
 msgid "Select kart"
-msgstr ""
+msgstr "Dewis kert"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:1125
 msgid "Send anonymous HW statistics"
-msgstr ""
+msgstr "Danvon statystygyon kalesweyth dihanow"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: data/po/gui_strings.h:639
 msgid "Server Creation"
-msgstr ""
+msgstr "Gwruthyl servyer"
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
-#: data/po/gui_strings.h:699
 msgid "Server Info"
-msgstr ""
+msgstr "Kedhlow an servyer"
 
 #. I18N: ./data/gui/online/server_selection.stkgui
-#: data/po/gui_strings.h:532
 msgid "Server Selection"
-msgstr ""
+msgstr "Dewis servyer"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In the networking lobby
-#: data/po/gui_strings.h:572
 msgid "Server name :"
-msgstr ""
+msgstr "Hanow an servyer :"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:58
 msgid "Server successfully created. You can now join it."
-msgstr ""
+msgstr "Servyer gwrys yn sewen. Y junya lemmyn y hyllydh."
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:66
 msgid "Set!"
-msgstr ""
+msgstr "Parys!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:198 data/po/gui_strings.h:911
+#: src/states_screens/race_result_gui.cpp:209
 msgid "Setup New Race"
-msgstr ""
+msgstr "Fyttya resek nowydh"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:814
 msgid "Shadows"
-msgstr ""
+msgstr "Skeusow"
 
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:445
+#: src/states_screens/options_screen_video.cpp:470
+#, c-format
+msgid "Shadows: %i"
+msgstr "Skeusow: %i"
+
+#: src/states_screens/options_screen_video.cpp:468
 #, c-format
 msgid "Shadows: %s"
-msgstr ""
+msgstr "Skeusow: %s"
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
-#: data/po/gui_strings.h:1415
 msgid "Shifting Sands"
-msgstr ""
+msgstr "Tewes Gwaya"
 
 #. I18N: ../stk-assets/tracks/city/track.xml
-#: data/po/gui_strings.h:1430
 msgid "Shiny Suburbs"
-msgstr ""
+msgstr "An Ranndrevow"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
-#. I18N: ./data/gui/online/guest_login.stkgui
-#. I18N: In the login dialog
-#: data/po/gui_strings.h:587 data/po/gui_strings.h:607
 msgid "Sign In"
-msgstr ""
+msgstr "Omgelmi"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
-#: data/po/gui_strings.h:591
 msgid "Sign In As Guest"
-msgstr ""
-
-#. I18N: ./data/gui/online/main.stkgui
-#. I18N: In the online multiplayer screen
-#: data/po/gui_strings.h:479
-msgid "Sign Out"
-msgstr ""
-
-#: src/states_screens/online_screen.cpp:139
-#, c-format
-msgid "Signed in as: %s."
-msgstr ""
-
-#: src/states_screens/online_screen.cpp:155
-msgid "Signing in"
-msgstr ""
-
-#: src/states_screens/user_screen.cpp:445
-#, c-format
-msgid "Signing in '%s'"
-msgstr ""
-
-#. I18N: ./data/gui/online/guest_login.stkgui
-#. I18N: In the login dialog
-#: data/po/gui_strings.h:603
-msgid ""
-"Signing in as a guest allows you to participate in online races, but it does "
-"not allow you to vote for addons, or collect any achievements while being "
-"online."
-msgstr ""
-
-#: src/states_screens/online_screen.cpp:160
-msgid "Signing out"
-msgstr ""
-
-#: src/states_screens/user_screen.cpp:444
-#, c-format
-msgid "Signing out '%s'"
-msgstr ""
+msgstr "Omgelmi avel gwester po gwestores"
 
 #: src/states_screens/online_profile_friends.cpp:70
 msgid "Since"
-msgstr ""
+msgstr "A-dhia"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:151
 msgid "Singleplayer"
-msgstr ""
+msgstr "Unnwarier"
 
 #: src/states_screens/dialogs/addons_loading.cpp:177
 #, c-format
 msgid "Size: %s"
-msgstr ""
+msgstr "Myns: %s"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:26
 msgid "Skid-row"
-msgstr ""
+msgstr "Mester an Skydd"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:248
 msgid "Skidding"
-msgstr ""
+msgstr "Skyddya"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:1113
 msgid "Skin"
-msgstr ""
+msgstr "Kroghen"
 
 #. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
-#: data/po/gui_strings.h:1451
 msgid "Snow Peak"
-msgstr ""
+msgstr "Menydh gans Ergh"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:186
 msgid "Soccer"
-msgstr ""
+msgstr "Pel-droos"
 
 #. I18N: ../stk-assets/tracks/soccer_field/track.xml
-#: data/po/gui_strings.h:1448
 msgid "Soccer field"
-msgstr ""
+msgstr "Park pel-droos"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:1052
 msgid ""
 "Soccer: Only in multiplayer games. Use your kart to push the ball into the "
 "goal."
-msgstr ""
+msgstr "Pel-droos: Gwariow lieswarier hepken. Gwra devnydh a'th kert rag herdhya an bel y'n gol."
 
-#: src/states_screens/main_menu_screen.cpp:550
 #: src/states_screens/addons_screen.cpp:514
+#: src/states_screens/main_menu_screen.cpp:550
 msgid ""
-"Sorry, an error occurred while contacting the add-ons website. Make sure you "
-"are connected to the Internet and that SuperTuxKart is not blocked by a "
+"Sorry, an error occurred while contacting the add-ons website. Make sure you"
+" are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr ""
+msgstr "Diharesow, yth esa kammwrians ow kestava orth gwiasva an keworransow. Surha dha vos junyes dhe'n kesrosweyth ha check nag yw SuperTuxKart lettyes gans fos dan"
 
 #: src/states_screens/dialogs/addons_loading.cpp:279
 msgid "Sorry, downloading the add-on failed"
-msgstr ""
+msgstr "Diharesow, iskarga an keworrans a fyllis"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
-#: data/po/gui_strings.h:285
 msgid "Sound Effects"
-msgstr ""
+msgstr "Effeythyow son"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: track group
 #: src/states_screens/grand_prix_editor_screen.cpp:334
-#: data/po/gui_strings.h:1273 data/po/gui_strings.h:1309
 msgid "Standard"
-msgstr ""
+msgstr "Savonek"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:218
 msgid "Start"
-msgstr ""
+msgstr "Dalleth"
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:209
 msgid "Start Grand Prix"
-msgstr ""
+msgstr "Dalleth Grand Prix"
 
-#. I18N: ./data/gui/track_info.stkgui
-#. I18N: In the track info screen
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: data/po/gui_strings.h:87 data/po/gui_strings.h:211
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
 msgid "Start Race"
-msgstr ""
+msgstr "Dalleth an resek"
 
 #: src/states_screens/online_profile_friends.cpp:71
 msgid "Status"
-msgstr ""
+msgstr "Studh"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:230
 msgid "Steer Left"
-msgstr ""
+msgstr "Lewya dhe gledh"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:233
 msgid "Steer Right"
-msgstr ""
+msgstr "Lewya dhe dhyghow"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:147
 msgid "Story Mode"
-msgstr ""
+msgstr "Modh hwedhel"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:8
 msgid "Strike!"
-msgstr ""
+msgstr "Kowlwask!"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
-#: data/po/gui_strings.h:499 data/po/gui_strings.h:522
 msgid "Submit"
-msgstr ""
+msgstr "Danvon"
 
 #. I18N: ../stk-assets/tracks/subsea/track.xml
-#: data/po/gui_strings.h:1439
 msgid "Subsea"
-msgstr ""
+msgstr "Yn-dann an Mor"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:800
 msgid "SuperTux"
-msgstr ""
+msgstr "SuperTux"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#: data/po/gui_strings.h:1320
 msgid "SuperTuxKart Addons"
-msgstr ""
+msgstr "Keworransow SuperTuxKart"
 
-#. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help1.stkgui
-#. I18N: ./data/gui/help4.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help3.stkgui
-#: data/po/gui_strings.h:368 data/po/gui_strings.h:934
-#: data/po/gui_strings.h:980 data/po/gui_strings.h:1013
+#. I18N: ./data/gui/help4.stkgui
 msgid "SuperTuxKart Help"
-msgstr ""
+msgstr "Gweres SuperTuxKart"
 
-#. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: ./data/gui/options_audio.stkgui
-#. I18N: ./data/gui/options_players.stkgui
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: ./data/gui/options_ui.stkgui
 #. I18N: ./data/gui/options_device.stkgui
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: ./data/gui/options_ui.stkgui
 #. I18N: ./data/gui/options_video.stkgui
-#: data/po/gui_strings.h:218 data/po/gui_strings.h:265
-#: data/po/gui_strings.h:350 data/po/gui_strings.h:1087
-#: data/po/gui_strings.h:1105 data/po/gui_strings.h:1188
-#: data/po/gui_strings.h:1233
+#. I18N: ./data/gui/user_screen_tab.stkgui
 msgid "SuperTuxKart Options"
-msgstr ""
+msgstr "Dewisyow SuperTuxKart"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:999
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
-msgstr ""
+msgstr "Y hyllir gwari SuperTuxKart y'n modh lieswarier war an keth jynn-amontya"
 
 #. I18N: ./data/gui/help3.stkgui
-#: data/po/gui_strings.h:1032
 msgid "SuperTuxKart features several game modes"
-msgstr ""
+msgstr "Yma lies modh gwari gans SuperTuxKart"
 
-#: src/main.cpp:1129
+#: src/main.cpp:1201
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
-"development of STK. Would you like this feature to be enabled? (To change "
-"this setting at a later time, go to options, select tab 'User Interface', "
-"and edit \"Connect to the Internet\" and \"Send anonymous HW statistics\")."
+"development of STK. Please read our privacy policy at "
+"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
+"(To change this setting at a later time, go to options, select tab 'User "
+"Interface', and edit \"Connect to the Internet\" and \"Send anonymous HW "
+"statistics\")."
 msgstr ""
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
-#: data/po/gui_strings.h:1397
 msgid "Suzanne"
-msgstr ""
+msgstr "Suzanne"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:409
 msgid ""
-"Swapper - gift boxes are transformed into bananas and vice versa for a short "
-"time."
-msgstr ""
+"Swapper - gift boxes are transformed into bananas and vice versa for a short"
+" time."
+msgstr "Keschanjyer - treusfurvys yw kistennow dhe vananas ha'n konter dres pols."
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:415
 msgid "Swatter - will squash karts close by, slowing them down."
-msgstr ""
+msgstr "Swattyell - kertys nes a vydh skwattyes, orth aga lenthe."
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:186
 msgid "System Language"
+msgstr "Yeth an system"
+
+#. I18N: ./data/achievements.xml
+msgid ""
+"Take your opponents for mosquitos! With the swatter, squash at least 5 of "
+"them in a race."
+msgstr "Dyght dha erbynoryon kepar ha moskitos! Der an swattyell, skwatt 5 anedha dhe'n lyha yn unn resek."
+
+#. I18N: ../stk-assets/tracks/temple/track.xml
+msgid "Temple"
 msgstr ""
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
-#: data/po/gui_strings.h:615
 msgid "Terms and Agreement"
-msgstr ""
+msgstr "Termynyow hag unverheans"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:858
 msgid "Texture compression"
-msgstr ""
+msgstr "Gwaskans gwiasedhow"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:870
 msgid "Texture filtering"
-msgstr ""
+msgstr "Sidhlans gwiasedhow"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
-#: data/po/gui_strings.h:973
 msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
-msgstr ""
+msgstr "An alhwedhen 'skyddya' a'th has dhe skyddya yn troyow lymm ha kavos kenerthans."
 
 #. I18N: ../stk-assets/tracks/stadium/track.xml
-#: data/po/gui_strings.h:1505
 msgid "The Stadium"
-msgstr ""
+msgstr "An Sportva"
 
 #: src/states_screens/main_menu_screen.cpp:545
 msgid "The add-ons module is currently disabled in the Options screen"
-msgstr ""
+msgstr "Diallosegys yw unsys an keworransow a-lemmyn y'n skrin Dewisyow"
 
 #: src/race/highscore_manager.cpp:101
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr ""
+msgstr "Re goth o restren an skoryow ughella,\ndiles re beu oll an skoryow."
 
 #: src/states_screens/create_server_screen.cpp:136
 msgid "The maxinum number of players has to be between 2 and 12."
-msgstr ""
+msgstr "Res yw dhe'n niver ughella a warioryon bos ynter 2 ha 12."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:178
 msgid "Time Trial"
-msgstr ""
+msgstr "Erbynn an Klock"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:1040
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr ""
+msgstr "Erbynn an Klock: Nyns eus nerthellow ynno, ytho ny vern tra vyth marnas dha sleyneth lewya!"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
-"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it "
-"connected and it will appear in the list.\n"
+"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
 "\n"
-"To add a keyboard config, you can use the button below, HOWEVER please note "
-"that most keyboards only support a limited amount of simultaneous keypresses "
-"and are thus inappropriate for multiplayer gameplay. (You can, however, "
-"connect multiple keyboards to the computer. Remember that everyone still "
-"needs different keybindings in this case.)"
-msgstr ""
+"To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
+msgstr "Rag keworra devis Gamepad/Joystick nowydh, dalleth SuperTuxKart pan yw an devis junyes hag omdhiskwedhes y'n rol y hwra.\n\nRag keworra restrans bysowek, y hyllydh usya an boton a-woles, BYTTEGYNS gwra notya na skoodh an brassa rann a vysowegi marnas niver byghan a waskansow a'n alhwedhennow, ha nyns yns gwiw rag gwariow lieswarier. (Y hyllydh, byttegyns, junya lies bysowek gans an jynn-amontya. Porth kov bos odhom dhe bubonan a golmow dyffrans y'n kas ma.)"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:388
 msgid "To help you win, there are some powerups you can collect :"
-msgstr ""
+msgstr "Rag dha weres ow kwaynya, yma nebes kenerthansow dhe guntel:"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
-#: data/po/gui_strings.h:1352
 msgid "To the moon and back"
-msgstr ""
+msgstr "Dhe'n loor ha tre arta"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:154
 #: src/states_screens/dialogs/user_info_dialog.cpp:211
 msgid "Today"
-msgstr ""
+msgstr "Hedhyw"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
 #: src/states_screens/race_gui_base.cpp:103
 #, c-format
 msgid "Top %i"
-msgstr ""
+msgstr "Gwella %i"
 
 #: src/states_screens/edit_gp_screen.cpp:66
 msgid "Track"
-msgstr ""
+msgstr "Lergh"
 
-#: src/states_screens/race_result_gui.cpp:1121
+#: src/states_screens/race_result_gui.cpp:1130
 #, c-format
 msgid "Track %i/%i"
-msgstr ""
+msgstr "Lergh %i/%i"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
 #: src/states_screens/track_info_screen.cpp:107
 #, c-format
 msgid "Track by %s"
-msgstr ""
+msgstr "Lergh gans %s"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: data/po/gui_strings.h:207
 msgid "Track group"
-msgstr ""
+msgstr "Bagas lerghow"
 
-#. I18N: ./data/gui/gp_info.stkgui
-#. I18N: In the grand prix info screen
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In the addons screen
-#: data/po/gui_strings.h:203 data/po/gui_strings.h:1336
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Tracks"
-msgstr ""
+msgstr "Lerghow"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:76
+#: src/states_screens/dialogs/custom_video_settings.cpp:77
 msgid "Trilinear"
-msgstr ""
+msgstr "Trilinyek"
 
 #: src/states_screens/dialogs/addons_loading.cpp:369
 #: src/states_screens/dialogs/addons_loading.cpp:406
 msgid "Try again"
-msgstr ""
+msgstr "Assaya arta"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:455 data/po/gui_strings.h:175
+#: src/states_screens/race_gui_overworld.cpp:455
 msgid "Tutorial"
-msgstr ""
+msgstr "Dyskans"
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
-#: data/po/gui_strings.h:297
 msgid "Tutorial : Selection Room"
-msgstr ""
+msgstr "Dyskans : Stevel dhewis"
 
 #. I18N: ../stk-assets/karts/tux/kart.xml
-#: data/po/gui_strings.h:1367
 msgid "Tux"
-msgstr ""
+msgstr "Tux"
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
-#: data/po/gui_strings.h:430
 msgid "Type :"
-msgstr ""
+msgstr "Eghen :"
 
 #: src/states_screens/race_gui_overworld.cpp:502
 msgid "Type: Grand Prix"
-msgstr ""
+msgstr "Eghen: Grand Prix"
 
-#: src/online/xml_request.cpp:77
+#: src/online/xml_request.cpp:83
 msgid ""
-"Unable to connect to the server. Check your internet connection or try again "
-"later."
-msgstr ""
+"Unable to connect to the server. Check your internet connection or try again"
+" later."
+msgstr "Ny yllir junya gans an servyer. Check dha junyans kesrosweyth po assay arta moy a-varr."
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
-#: data/po/gui_strings.h:1293
 msgid "Uninstall"
-msgstr ""
+msgstr "Dilea"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:44
 msgid "Unstoppable"
-msgstr ""
+msgstr "Anhedhadow"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:262
 msgid "Up"
-msgstr ""
+msgstr "Yn-bann"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
-msgstr ""
+msgstr "Nowedhi"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: In addons screen, in the filtering bar, to enable a filter that will show only recently updated items
-#: data/po/gui_strings.h:1324
+#. I18N: In addons screen, in the filtering bar, to enable a filter that will
+#. show only recently updated items
 msgid "Updated"
-msgstr ""
+msgstr "Nowedhys"
 
 #: src/states_screens/addons_screen.cpp:111
 msgid "Updated date"
-msgstr ""
+msgstr "Dedhyans an nowedhi"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:41
 msgid "Use 10 or more powerups in a race."
-msgstr ""
+msgstr "Gwra devnydh a 10 kenerthans po moy yn unn resek."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:862
 msgid "Use high definition textures"
-msgstr ""
+msgstr "Usya gwiasedhow klerder ughel"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: data/po/gui_strings.h:110
 msgid "Use left/right to choose your team and press fire"
-msgstr ""
+msgstr "Gwra devnydh a'n botonyow kledh/dyghow rag dewis dha bara ha gwask tenna"
 
-#: src/tracks/track_object_presentation.cpp:922
+#: src/tracks/track_object_presentation.cpp:949
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
-msgstr ""
+msgstr "Gwra devnydh a'n nitro kuntelys genes dre waska <%s>!"
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog' dialog
-#: data/po/gui_strings.h:536
 msgid "User Info"
-msgstr ""
+msgstr "Kedhlow an devnydhyer"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/user_screen.cpp:599
-#: src/states_screens/options_screen_input2.cpp:87
 #: src/states_screens/options_screen_audio.cpp:65
-#: src/states_screens/options_screen_video.cpp:137
-#: src/states_screens/options_screen_input.cpp:140 data/po/gui_strings.h:1109
+#: src/states_screens/options_screen_input.cpp:140
+#: src/states_screens/options_screen_input2.cpp:87
+#: src/states_screens/options_screen_video.cpp:164
+#: src/states_screens/user_screen.cpp:648
 msgid "User Interface"
-msgstr ""
+msgstr "Ynterfas devnydhyer"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:335
 msgid "User defined"
-msgstr ""
+msgstr "Res gans an devnydhyer"
 
 #. I18N: ./data/gui/online/user_search.stkgui
-#: data/po/gui_strings.h:445
 msgid "User search"
-msgstr ""
+msgstr "Hwilas devnydhyer"
 
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the user screen
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/online_profile_friends.cpp:67
 #: src/states_screens/online_user_search.cpp:74
-#: src/states_screens/online_profile_friends.cpp:67 data/po/gui_strings.h:234
-#: data/po/gui_strings.h:323 data/po/gui_strings.h:514
 msgid "Username"
-msgstr ""
+msgstr "Hanow devnydhyer"
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
-msgstr ""
+msgstr "Drog yw an hanow devnydhyer hag/po an drigva ebost."
 
 #. I18N: ./data/gui/soccer_setup.stkgui
-#: data/po/gui_strings.h:113
 msgid "VS"
-msgstr ""
+msgstr "erbynn"
 
-#: src/states_screens/register_screen.cpp:302
 #: src/states_screens/dialogs/change_password_dialog.cpp:235
 #: src/states_screens/dialogs/recovery_dialog.cpp:209
+#: src/states_screens/register_screen.cpp:353
 msgid "Validating info"
-msgstr ""
+msgstr "Ow kwirya an kedhlow"
 
 #: src/states_screens/dialogs/addons_loading.cpp:108
 #, c-format
 msgid "Version: %d"
-msgstr ""
+msgstr "Versyon: %d"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:1249
 msgid "Vertical Sync (requires restart)"
-msgstr ""
+msgstr "Kettermynegyans serth (res yw dastalleth)"
 
-#. I18N: ./data/gui/online/user_info_dialog.stkgui
-#. I18N: User info dialog
 #. I18N: ./data/gui/online/notification_dialog.stkgui
 #. I18N: User info dialog
-#: data/po/gui_strings.h:560 data/po/gui_strings.h:715
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
 msgid "View"
-msgstr ""
+msgstr "Gweles"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
-#: data/po/gui_strings.h:281 data/po/gui_strings.h:293
 msgid "Volume"
-msgstr ""
+msgstr "Nivel"
 
 #. I18N: ./data/gui/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
-#: data/po/gui_strings.h:631
 msgid "Vote"
-msgstr ""
+msgstr "Ragleva"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:230
 msgid "Vote successful! You can now close the window."
-msgstr ""
+msgstr "An raglev a sewenas! Degea an fenester a yllydh lemmyn."
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:85
 msgid "WEIGHT"
-msgstr ""
+msgstr "POOS"
 
-#: src/modes/linear_world.cpp:880
+#: src/modes/linear_world.cpp:882
 msgid "WRONG WAY!"
-msgstr ""
+msgstr "TU KAMM!"
 
 #: src/states_screens/options_screen_input2.cpp:479
 msgid ""
 "Warning, 'Shift' is not a recommended key : when shift is pressed down, all "
 "keys that contain a character that is different in upper-case will stop "
 "working."
-msgstr ""
+msgstr "Gwarnyans, nyns yw 'Shift' alhwedhen gomendys : pan vo shift gweskys yn-nans, ny ober keniver alhwedhen a omdhesedh orth lytheren a's teves versyon brassa dyffrans."
 
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
-#. I18N: ./data/gui/help4.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:376 data/po/gui_strings.h:942
-#: data/po/gui_strings.h:988 data/po/gui_strings.h:1021
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "Weapons"
-msgstr ""
+msgstr "Arvow"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:850
 msgid "Weather Effects"
-msgstr ""
+msgstr "Effeythyow kewer"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:425
+#: src/states_screens/options_screen_video.cpp:447
 #, c-format
 msgid "Weather Effects : %s"
-msgstr ""
+msgstr "Effeythyow kewer : %s"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:1460 data/po/gui_strings.h:1463
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
-msgstr ""
+msgstr "Pandr'a hwer, a fleghes vyghan? Gallas dhe goll agas hembrenkyas meur gnu?"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:1010
 msgid ""
 "When input devices are configured, you are ready to play. Select the "
 "'multiplayer race' icon in the main menu. When it is time to choose a kart, "
-"each player can press on the 'fire' key of their gamepad or keyboard to join "
-"the game. Each player can use their input device to select their kart. The "
+"each player can press on the 'fire' key of their gamepad or keyboard to join"
+" the game. Each player can use their input device to select their kart. The "
 "game continues when everyone selected their kart. Note that the mouse may "
 "not be used for this operation."
-msgstr ""
+msgstr "Pan vo an devisyow ynworra restrys, parys os dhe wari. Dewis an arwodhik 'resek lieswarier' y'n bennrol. Pan vo prys dewis kert, pub gwarier ha gwariores a yll gwaska alhwedhen 'tenna' aga gamepad po bysowek rag junya an gwari. Pub gwarier ha gwariores a yll usya aga devis ynworra rag dewis aga hert. An gwari a wra pesya pan wrug pubonen dewis aga hert. Noten: ny yllir usya an logosen rag hemma."
 
 #. I18N: Name of the white button on xbox controller
 #: src/input/gamepad_config.cpp:171
 msgid "White"
-msgstr ""
+msgstr "Gwynn"
 
 #. I18N: ../stk-assets/karts/wilber/kart.xml
-#: data/po/gui_strings.h:1385
 msgid "Wilber"
-msgstr ""
+msgstr "Wilber"
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:47
 msgid "Win 5 single races in a row."
-msgstr ""
+msgstr "Gwayn 5 resek yn rew."
 
 #. I18N: ./data/achievements.xml
-#: data/po/gui_strings.h:35
 msgid "Win in all single player modes, against at least 3 opponents."
-msgstr ""
+msgstr "Gwayn yn pub modh unwarier, erbynn 3 ferson aral dhe'n lyha."
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
-#: data/po/gui_strings.h:1421
 msgid "XR591"
-msgstr ""
+msgstr "XR591"
 
-#. I18N: ../stk-assets/karts/20_xue/kart.xml
-#: data/po/gui_strings.h:1391
+#. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
-msgstr ""
+msgstr "Xue"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: src/states_screens/edit_gp_screen.cpp:253 data/po/gui_strings.h:139
+#: src/states_screens/edit_gp_screen.cpp:253
 msgid "Yes"
-msgstr ""
+msgstr "Ya"
 
-#: src/tracks/track_object_presentation.cpp:961
+#: src/tracks/track_object_presentation.cpp:996
 msgid "You are now ready to race. Good luck!"
-msgstr ""
+msgstr "Parys os dhe resek lemmyn. Chons da!"
 
 #. I18N: ./data/gui/options_players.stkgui
-#: data/po/gui_strings.h:357
 msgid "You are playing as"
-msgstr ""
+msgstr "Yth esos ow kwari avel"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:190
 msgid "You can adapt your previous rating by clicking the stars beneath."
-msgstr ""
+msgstr "Ty a yll aswiwa dha renk kens dre glyckya an sterennow yn-danno."
 
 #: src/states_screens/main_menu_screen.cpp:513
 msgid ""
-"You can not download addons without internet access. If you want to download "
-"addons, go to options, select  tab 'User Interface', and edit \"Connect to "
+"You can not download addons without internet access. If you want to download"
+" addons, go to options, select  tab 'User Interface', and edit \"Connect to "
 "the Internet\"."
-msgstr ""
+msgstr "Ny yllir iskarga keworransow heb hedhas dhe'n kesrosweyth. Mars eus hwans dhis iskarga keworransow, ke dhe'n dewisyow, dewis an tab 'Ynterfas devnydhyer' ha chanjya \"Junya gans an Kesrosweyth\"."
 
 #: src/states_screens/main_menu_screen.cpp:488
 msgid ""
-"You can not play online without internet access. If you want to play online, "
-"go to options, select  tab 'User Interface', and edit \"Connect to the "
+"You can not play online without internet access. If you want to play online,"
+" go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
-msgstr ""
+msgstr "Ny yllir gwari warlinen heb hedhas dhe'n kesrosweyth. Mars eus hwans dhis gwari warlinen, ke dhe'n dewisyow, dewis an tab 'Ynterfas devnydhyer', ha chanjya \"Junya gans an Kesrosweyth\"."
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
-#: data/po/gui_strings.h:687
 msgid ""
-"You can play without creating an online account by unchecking the online "
-"checkbox, though then you can not connect to friends, vote for addons etc. "
+"You can play without creating an online account by selecting an offline "
+"account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at http://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Ty a yll gwari heb gwruthyl akont warlinen dre dhewis akont dhywarlinen, kyn na ylli junya gans kowetha, ragleva rag keworransow, etc. Gwra redya agan menegyans privetter orth http://privacy.supertuxkart.net"
 
-#: src/states_screens/race_result_gui.cpp:164
-#: src/states_screens/grand_prix_win.cpp:125
+#: src/states_screens/grand_prix_win.cpp:124
+#: src/states_screens/race_result_gui.cpp:175
 msgid "You completed a challenge!"
-msgstr ""
+msgstr "Ty a kowlwrug chalenj!"
 
-#: src/states_screens/race_result_gui.cpp:165
+#: src/states_screens/race_result_gui.cpp:176
 msgid "You completed challenges!"
-msgstr ""
+msgstr "Ty a kowlwrug chalenjys!"
 
-#: src/states_screens/grand_prix_win.cpp:280
+#: src/states_screens/grand_prix_win.cpp:279
 msgid "You completed the Grand Prix!"
-msgstr ""
+msgstr "Ty a kowlwrug an Grand Prix!"
 
 #: src/states_screens/feature_unlocked.cpp:208
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
-msgstr ""
+msgstr "Ty a kowlwrug an chalenj kales! Poyntys dendylys war an nivel ma: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:200
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
-msgstr ""
+msgstr "Ty a kowlwrug an chalenj es! Poyntys dendylys war an nivel ma: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:204
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
-msgstr ""
+msgstr "Ty a kowlwrug an chalenj nivel kres! Poyntys dendylys war an nivel ma: %i/%i"
 
-#: src/karts/kart.cpp:855
+#: src/karts/kart.cpp:856
 msgid "You finished the race!"
-msgstr ""
+msgstr "Ty a gorfennas an resek!"
 
-#: src/online/online_player_profile.cpp:444
+#: src/online/online_player_profile.cpp:466
 #, c-format
-msgid "You have %d new friend requests!"
-msgstr ""
+msgid "You have %d new friend request!"
+msgid_plural "You have %d new friend requests!"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#: src/online/online_player_profile.cpp:449
+#: src/online/online_player_profile.cpp:472
 msgid "You have a new friend request!"
-msgstr ""
+msgstr "Yma govyn koweth nowydh dhis!"
 
-#: src/modes/world.cpp:1146
+#: src/modes/world.cpp:1144
 msgid "You have been eliminated!"
-msgstr ""
+msgstr "Diles re beus!"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:195
 msgid ""
 "You have not yet voted for this addon. Select your desired rating by "
 "clicking the stars beneath"
-msgstr ""
+msgstr "Ny raglevsys hwath rag an keworrans ma. Dewis dha renk preferys dre glyckya war an sterennow yn-danno."
 
-#: src/karts/kart.cpp:1898
+#: src/karts/kart.cpp:1913
 msgid ""
 "You need more points\n"
 "to enter this challenge!\n"
 "Check the minimap for\n"
 "available challenges."
-msgstr ""
+msgstr "Res yw dendyl moy poyntys\nkens gul an chalenj ma!\nCheck an mappa rag\nchalenjys kavadow."
 
-#: src/states_screens/user_screen.cpp:423
+#: src/states_screens/user_screen.cpp:472
 msgid "You need to enter a password."
-msgstr ""
+msgstr "Res yw entra ger tremena."
 
-#: src/states_screens/feature_unlocked.cpp:567
+#: src/states_screens/feature_unlocked.cpp:568
 msgid "You unlocked grand prix %0"
-msgstr ""
+msgstr "Ty a dhialhwedhas grand prix %0"
 
-#: src/states_screens/feature_unlocked.cpp:529
+#: src/states_screens/feature_unlocked.cpp:530
 msgid "You unlocked track %0"
-msgstr ""
+msgstr "Ty a dhialhwedhas an lergh %0"
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
-#: data/po/gui_strings.h:767
 msgid ""
 "You will receive an email with further instructions on how to reset your "
 "password. Please be patient and be sure to check your spam folder."
-msgstr ""
+msgstr "Ebost a vydh danvenys dhis ynni danvonadow a-dro dhe dhassettya dha er tremena. Gwra perthi an termyn ha surhe ty dhe jeckya dha blegel spam."
 
-#: src/states_screens/register_screen.cpp:310
+#: src/states_screens/register_screen.cpp:361
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
-msgstr ""
+msgstr "Ebost a vydh danvenys dhis ynni danvonadow a-dro dhe vywhe dha akont. Gwra perthi an termyn ha surhe ty dhe jeckya dha blegel spam."
 
-#: src/karts/kart.cpp:855 src/karts/kart.cpp:874
+#: src/karts/kart.cpp:856 src/karts/kart.cpp:875
 msgid "You won the race!"
+msgstr "Ty a waynyas an resek!"
+
+#: src/main.cpp:1375
+msgid ""
+"Your OpenGL version appears to be too old. Please verify if an update for "
+"your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
 msgstr ""
 
 #: src/config/user_config.cpp:700
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr ""
+msgstr "Drog o dha restrans, ytho diles a veu hag onan nowydh a vydh gwrys."
 
 #: src/config/user_config.cpp:711
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr ""
+msgstr "Re goth o dha restrans, ytho diles a veu hag onan nowydh a vydh gwrys."
+
+#: src/main.cpp:1367
+msgid ""
+"Your driver version is too old. Please install the latest video drivers."
+msgstr "Re goth yw versyon dha lewyer. Gwra ynstallya an lewyoryon video diwettha."
 
 #: src/input/device_manager.cpp:501
 msgid "Your input config file is not compatible with this version of STK."
-msgstr ""
+msgstr "Nyns yw dha restrans ynworra kesplegadow gans an versyon ma a STK."
 
 #: src/states_screens/online_profile_base.cpp:105
 #: src/states_screens/online_profile_base.cpp:115
 msgid "Your profile"
-msgstr ""
+msgstr "Dha brofil"
 
 #. I18N: ../stk-assets/tracks/zengarden/track.xml
-#: data/po/gui_strings.h:1427
 msgid "Zen Garden"
-msgstr ""
+msgstr "Lowarth Zen"
 
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:90
 msgid "[none]"
-msgstr ""
+msgstr "[nagonan]"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In networking lobby
-#: data/po/gui_strings.h:576
 msgid "actions"
-msgstr ""
+msgstr "gwriansow"
 
 #. I18N: track group name
 #: src/states_screens/tracks_screen.cpp:151
 msgid "all"
-msgstr ""
+msgstr "oll"
 
-#. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
+#. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
+#. "John Doe")
 #: src/states_screens/race_gui_base.cpp:540
 msgid "by"
-msgstr ""
+msgstr "gans"
 
 #: src/states_screens/dialogs/addons_loading.cpp:139
 msgid "featured"
-msgstr ""
+msgstr "diskwedhys"
 
-#. I18N: ../stk-assets/wip-tracks/20_harvest/track.xml
-#: data/po/gui_strings.h:1511
-msgid "harvest"
-msgstr ""
+#: src/states_screens/dialogs/custom_video_settings.cpp:88
+msgid "high"
+msgstr "ughel"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
-msgid "high"
-msgstr ""
-
-#: src/states_screens/dialogs/custom_video_settings.cpp:86
 msgid "low"
-msgstr ""
+msgstr "isel"
 
-#. I18N: ../stk-assets/wip-tracks/20_newton/track.xml
-#: data/po/gui_strings.h:1517
-msgid "newton"
-msgstr ""
-
-#. I18N: ../stk-assets/karts/20_sara_the_racer/kart.xml
-#: data/po/gui_strings.h:1379
-msgid "sara the racer"
-msgstr ""
-
-#. I18N: track group name
-#. I18N: kart group name
 #. I18N: arena group name
 #. I18N: track group name
-#: src/states_screens/tracks_screen.cpp:153
-#: src/states_screens/kart_selection.cpp:284
+#. I18N: kart group name
+#. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:81
 #: src/states_screens/easter_egg_screen.cpp:143
+#: src/states_screens/kart_selection.cpp:284
+#: src/states_screens/tracks_screen.cpp:153
 msgid "standard"
-msgstr ""
+msgstr "savonek"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr ""
-"Launchpad Contributions:\n"
-"  kernow https://launchpad.net/~kernow"
+msgstr "Launchpad Contributions:\n  STK-team https://launchpad.net/~stk\n  kernow https://launchpad.net/~kernow"

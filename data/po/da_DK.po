@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
@@ -11,11 +10,11 @@ msgstr ""
 "POT-Creation-Date: 2015-03-13 21:42-0400\n"
 "PO-Revision-Date: 2015-03-14 11:00+0000\n"
 "Last-Translator: Auria <auria.mg@gmail.com>\n"
-"Language-Team: Hungarian (http://www.transifex.com/projects/p/supertuxkart/language/hu/)\n"
+"Language-Team: Danish (Denmark) (http://www.transifex.com/projects/p/supertuxkart/language/da_DK/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hu\n"
+"Language: da_DK\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
@@ -23,14 +22,14 @@ msgstr ""
 #. N (or nothing) otherwise
 #: src/utils/translation.cpp:262
 msgid "   Is this a RTL language?"
-msgstr "   N"
+msgstr ""
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
-msgstr " De ti szánalmas kis hitvány fráterek soha nem lesztek képesek legyőzni engem  -  A Gokartok Királya!"
+msgstr ""
 
 #. I18N: Only used for count > 3
 #: src/online/online_player_profile.cpp:429
@@ -51,12 +50,12 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:176
 #, c-format
 msgid "%s KB"
-msgstr "%s KB"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:165
 #, c-format
 msgid "%s MB"
-msgstr "%s MB"
+msgstr ""
 
 #: src/online/online_player_profile.cpp:418
 #, c-format
@@ -68,13 +67,13 @@ msgstr ""
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
-msgstr "%s, %s által"
+msgstr ""
 
 #: src/modes/linear_world.cpp:358
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
-msgstr "%s, %s által"
+msgstr ""
 
 #: src/online/online_player_profile.cpp:414
 #, c-format
@@ -84,17 +83,17 @@ msgstr ""
 #: src/guiengine/widgets/player_kart_widget.cpp:420
 #, c-format
 msgid "%s is ready"
-msgstr "%s kész"
+msgstr ""
 
 #: src/states_screens/online_profile_base.cpp:108
 #, c-format
 msgid "%s's profile"
-msgstr "%s profilja"
+msgstr ""
 
 #: src/states_screens/create_server_screen.cpp:60
 #, c-format
 msgid "%s's server"
-msgstr "%s kiszolgálója"
+msgstr ""
 
 #: src/online/online_player_profile.cpp:423
 #, c-format
@@ -104,21 +103,21 @@ msgstr ""
 #: src/modes/world.cpp:1147
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr "\"%s\" el lett távolítva."
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: for empty highscores entries
 #: src/states_screens/track_info_screen.cpp:252
 msgid "(Empty)"
-msgstr "(Üres)"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 msgid "(network play is not yet available)"
-msgstr "(a hálózati játék még nem elérhető)"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:372
 msgid "* A blue item means a conflict with another configuration"
-msgstr "A kék szín ütközést jelent egy másik konfigurációval."
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:377
 msgid "* A red item means a conflict in the current configuration"
@@ -127,7 +126,7 @@ msgstr ""
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr "* A jelenlegi billentyűparancsokat meg lehet nézni/változtatni a Beállítások menüpontban"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -136,7 +135,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* Ezek közül a játékmódok közül a legtöbbet lehet Nagydíj stílusban is játszani: ahelyett, hogy egy futamot játszol le, többször versenyzel, sorban. Minél jobb helyezést érsz el, annál több pontot kapsz. A végén a legtöbb pontot elérő játékos nyeri a kupát."
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -155,55 +154,55 @@ msgstr ""
 #. I18N: ./data/gui/online/profile_overview.stkgui
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "..."
-msgstr "…"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:52
 msgid "1 month"
-msgstr "1 hónap"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
-msgstr "1 hét"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:56
 msgid "1 year"
-msgstr "1 év"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:51
 msgid "2 weeks"
-msgstr "2 hét"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:57
 msgid "2 years"
-msgstr "2 év"
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:182
 msgid "3 Strikes Battle"
-msgstr "3 Csapásos Csata"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid ""
 "3 Strikes Battle: Only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
-msgstr "3-csapásos Csata: csak többjátékos üzemmódban használható. Addig találd el az ellenfeleidet, míg elveszítik életüket."
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:53
 msgid "3 months"
-msgstr "3 hónap"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:54
 msgid "6 months"
-msgstr "6 hónap"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:55
 msgid "9 months"
-msgstr "9 hónap"
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 msgid "= Highscores ="
-msgstr "= Toplista ="
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -212,17 +211,17 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:189
 msgid "Abort Grand Prix"
-msgstr "Nagydíj megszakítása"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 msgid "About"
-msgstr "Névjegy"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:236
 msgid "Accelerate"
-msgstr "Gyorsítás"
+msgstr ""
 
 #: src/tracks/track_object_presentation.cpp:975
 #, c-format
@@ -241,20 +240,20 @@ msgstr ""
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept"
-msgstr "Elfogadás"
+msgstr ""
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Account Recovery"
-msgstr "Fiókvisszaállítás"
+msgstr ""
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: Section in the profile screen
 #: src/states_screens/online_profile_base.cpp:101
 msgid "Account Settings"
-msgstr "Fiókbeállítások"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -262,48 +261,48 @@ msgstr "Fiókbeállítások"
 #. I18N: Section in the profile screen
 #: src/states_screens/online_profile_base.cpp:100
 msgid "Achievements"
-msgstr "Eredmények"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:71
 msgid "Action"
-msgstr "Művelet"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
 msgid "Add"
-msgstr "Hozzáadás"
+msgstr ""
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Add Friend"
-msgstr "Barát hozzáadása"
+msgstr ""
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:111
 msgid "Add Keyboard Configuration"
-msgstr "Új billentyűzetbeállítás hozzáadása"
+msgstr ""
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
 msgid "Add Player"
-msgstr "Játékos hozzáadása"
+msgstr ""
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:90
 msgid "Add Wiimote"
-msgstr "Wiimote hozzáadása"
+msgstr ""
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Add a device"
-msgstr "Eszköz hozzáadása"
+msgstr ""
 
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Add user"
-msgstr "Felhasználó hozzáadása"
+msgstr ""
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
@@ -319,20 +318,20 @@ msgstr "Felhasználó hozzáadása"
 #: src/states_screens/kart_selection.cpp:286
 #: src/states_screens/tracks_screen.cpp:155
 msgid "Add-Ons"
-msgstr "Bővítmények"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:110
 msgid "Add-on name"
-msgstr "Kiegészítő neve"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 msgid "Addons"
-msgstr "Bővítmények"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
-msgstr "Adiumy"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -358,18 +357,18 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:434
 #: src/states_screens/tracks_screen.cpp:145
 msgid "All"
-msgstr "Összes"
+msgstr ""
 
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: In the track selection screen
 msgid "All Tracks"
-msgstr "Összes pálya"
+msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:202
 msgid "All blows allowed, so catch weapons and make clever use of them!"
-msgstr "Minden ütés engedélyezett, úgyhogy vedd fel a fegyvereket és használd fel őket okosan!"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -397,23 +396,23 @@ msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Anchor - slows down greatly the kart in the first position."
-msgstr "Horog - lelassítja a legelől haladó versenyzőt"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Animated Characters"
-msgstr "Animált karakterek"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:450
 #, c-format
 msgid "Animated Characters : %s"
-msgstr "Animált karakterek: %s"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Animated Scenery"
-msgstr "Animált táj"
+msgstr ""
 
 #. I18N: in graphical options
 #. tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
@@ -422,7 +421,7 @@ msgstr "Animált táj"
 #: src/states_screens/options_screen_video.cpp:444
 #, c-format
 msgid "Animated Scenery : %s"
-msgstr "Animált táj: %s"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
 msgid "Anisotropic x16"
@@ -447,22 +446,22 @@ msgstr ""
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Anti-aliasing"
-msgstr "Élsimítás"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:461
 #, c-format
 msgid "Anti-aliasing : %s"
-msgstr "Élsimítás: %s"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 msgid "Apply"
-msgstr "Alkalmaz"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Apply new resolution"
-msgstr "Új felbontás alkalmazása"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Arch Enemy"
@@ -471,7 +470,7 @@ msgstr ""
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options_screen_input2.cpp:575
 msgid "Are you sure you want to permanently delete this configuration?"
-msgstr "Biztos, hogy véglegesen törölni akarod ezeket a beállításokat?"
+msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:123
 #: src/states_screens/grand_prix_editor_screen.cpp:109
@@ -484,7 +483,7 @@ msgstr ""
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
 msgid "Arenas"
-msgstr "Arénák"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
@@ -498,11 +497,11 @@ msgstr ""
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Assign to ESC key"
-msgstr "Hozzárendelés az ESC billentyűhöz"
+msgstr ""
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
 msgid "At World's End"
-msgstr "A Világ Végén"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -512,25 +511,25 @@ msgstr "A Világ Végén"
 #: src/states_screens/options_screen_video.cpp:163
 #: src/states_screens/user_screen.cpp:647
 msgid "Audio"
-msgstr "Hang"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: src/tracks/track_object_presentation.cpp:906
 msgid "Avoid bananas!"
-msgstr "Kerüld a banánokat!"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:284
 #, c-format
 msgid "Axis %d"
-msgstr "%d tengely"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:272
 #, c-format
 msgid "Axis %d %s"
-msgstr "%d %s tengely"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:279
@@ -544,17 +543,17 @@ msgstr ""
 #: src/input/gamepad_config.cpp:216
 #: src/states_screens/dialogs/addons_loading.cpp:284
 msgid "Back"
-msgstr "Vissza"
+msgstr ""
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Back to Game"
-msgstr "Vissza a játékba"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Back to Race"
-msgstr "Vissza a versenybe"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:205
 msgid "Back to challenge selection"
@@ -563,16 +562,16 @@ msgstr ""
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
 msgid "Back to device list"
-msgstr "Vissza az eszközlistához"
+msgstr ""
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Back to menu"
-msgstr "Vissza a menübe"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:211
 msgid "Back to the menu"
-msgstr "Vissza a menübe"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Banana Lover"
@@ -582,33 +581,33 @@ msgstr ""
 msgid ""
 "Basket Ball - bounces after the leader, and might squash and slow down karts"
 " down on the way."
-msgstr "Kosárlabda - a vezető után pattan, szétlapít és lelassít más kocsikat az úton."
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
-msgstr "Csata-sziget"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/beastie/kart.xml
 msgid "Beastie"
-msgstr "Beastie"
+msgstr ""
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:161
 msgid "Better luck next time!"
-msgstr "Több szerencsét legközelebb!"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:76
 msgid "Bilinear"
-msgstr "Bilineáris"
+msgstr ""
 
 #. I18N: Name of the black button on xbox controller
 #: src/input/gamepad_config.cpp:167
 msgid "Black"
-msgstr "Fekete"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/mansion/track.xml
 msgid "Blackhill Mansion"
-msgstr "Sötét-domb Szálló"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -623,22 +622,22 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:969
 msgid "Blue Team Wins"
-msgstr "Kék Csapat nyert"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/farm/track.xml
 msgid "Bovine Barnyard"
-msgstr "Bovine Barnyard"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown"
 " backwards."
-msgstr "Bowling labda - lepattan a falakról. Ha hátrafelé nézel, hátrafelé fog elgurulni."
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:239
 msgid "Brake"
-msgstr "Fék"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
@@ -654,11 +653,11 @@ msgstr ""
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
-msgstr "Torta - a rövid távokon és a hosszú egyeneseken a leghatékonyabb."
+msgstr ""
 
 #: src/addons/addons_manager.cpp:97 src/addons/news_manager.cpp:315
 msgid "Can't access stkaddons server..."
-msgstr "Nem elérhető a stkaddons szerver..."
+msgstr ""
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -688,7 +687,7 @@ msgstr "Nem elérhető a stkaddons szerver..."
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
 #: src/states_screens/user_screen.cpp:112
 msgid "Cancel"
-msgstr "Mégse"
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:56
 msgid "Cancel Request"
@@ -697,43 +696,43 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:277
 msgid "Cancel/Back"
-msgstr "Mégse/Vissza"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
-msgstr "X Barlang"
+msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:493
 msgid "Challenge Completed"
-msgstr "Kihívás teljesítve"
+msgstr ""
 
 #: src/states_screens/race_gui.cpp:313 src/states_screens/race_gui.cpp:315
 msgid "Challenge Failed"
-msgstr "Kihívás sikertelen"
+msgstr ""
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
 msgid "Challenges : Trophy Room"
-msgstr "Feladatok: Trófea terem"
+msgstr ""
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "Change"
-msgstr "Módosítás"
+msgstr ""
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 #. I18N: ./data/gui/karts_online.stkgui
 #. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
-msgstr "Válassz gokartot"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Christoffel Columbus"
-msgstr "Kolumbusz Kristóf"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 msgid "Click here to play the tutorial"
-msgstr "Kattints ide az útmutató pálya játszásához"
+msgstr ""
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -748,7 +747,7 @@ msgstr "Kattints ide az útmutató pálya játszásához"
 #. I18N: ./data/gui/online/vote_dialog.stkgui
 #. I18N: Vote dialog
 msgid "Close"
-msgstr "Bezárás"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
@@ -761,7 +760,7 @@ msgstr ""
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 msgid "Collect blue boxes : they will give you weapons or other powerups"
-msgstr "Gyűjtsd a kék ládákat: fegyvereket és más extrákat kapsz érte"
+msgstr ""
 
 #: src/tracks/track_object_presentation.cpp:916
 #, c-format
@@ -775,7 +774,7 @@ msgstr ""
 
 #: src/states_screens/race_gui_base.cpp:648
 msgid "Collect nitro!"
-msgstr "Gyűjts nitrót!"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -783,7 +782,7 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the"
 " bar at the right of the game screen."
-msgstr "A nitrók összegyűjtése lehetővé teszi számodra a sebességfokozást, amikor csak akarod, a megfelelő billentyű lenyomásával. A jelenlegi nitrószintedet a játék képernyőjének jobb szélén lévő sávon láthatód."
+msgstr ""
 
 #: src/tracks/track_object_presentation.cpp:880
 msgid "Complete all challenges to unlock the big door!"
@@ -806,7 +805,7 @@ msgstr ""
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:81
 #, c-format
 msgid "Confirm resolution within %i seconds"
-msgstr "Felbontás megerősítése %i másodpercen belül"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -821,7 +820,7 @@ msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:209
 msgid "Contains no powerups, so only your driving skills matter!"
-msgstr "Nem tartalmaz extrákat, úgyhogy csak a vezetési képességeid számítanak!"
+msgstr ""
 
 #. I18N: ./data/gui/feature_unlocked.stkgui
 #. I18N: ./data/gui/grand_prix_lose.stkgui
@@ -833,7 +832,7 @@ msgstr "Nem tartalmaz extrákat, úgyhogy csak a vezetési képességeid számí
 #: src/states_screens/dialogs/gp_info_dialog.cpp:212
 #: src/states_screens/race_result_gui.cpp:186
 msgid "Continue"
-msgstr "Folytatás"
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -854,7 +853,7 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:166
 #: src/states_screens/user_screen.cpp:649
 msgid "Controls"
-msgstr "Irányítás"
+msgstr ""
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
@@ -869,7 +868,7 @@ msgstr ""
 
 #: src/input/wiimote_manager.cpp:418
 msgid "Could not detect any wiimote :/"
-msgstr "Nem sikerült érzékelni egy wiimote-ot sem :/"
+msgstr ""
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -893,7 +892,7 @@ msgstr ""
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
 msgid "Credits"
-msgstr "Készítők"
+msgstr ""
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -911,12 +910,12 @@ msgstr ""
 #. I18N: custom video settings
 #: src/states_screens/options_screen_video.cpp:411
 msgid "Custom"
-msgstr "Egyéni"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Custom settings..."
-msgstr "Egyéni beállítások..."
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:195 src/input/gamepad_config.cpp:253
@@ -958,7 +957,7 @@ msgstr ""
 #. I18N: In the input configuration screen
 #: src/states_screens/options_screen_input2.cpp:111
 msgid "Delete Configuration"
-msgstr "Konfiguráció törlése"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -975,7 +974,7 @@ msgstr ""
 #: src/states_screens/options_screen_input2.cpp:96
 #: src/states_screens/options_screen_input2.cpp:587
 msgid "Disable Device"
-msgstr "Eszköz letiltása"
+msgstr ""
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
@@ -983,22 +982,22 @@ msgstr "Eszköz letiltása"
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
 #: src/states_screens/options_screen_video.cpp:432
 msgid "Disabled"
-msgstr "Letiltva"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Display FPS"
-msgstr "FPS (képkockák/ másodperc) megjelenítése"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:354
 msgid "Do you really want to abort the Grand Prix?"
-msgstr "Biztosan meg szeretnéd szakítani a Grand Prix-et?"
+msgstr ""
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/user_screen.cpp:583
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr "Biztos benne, hogy törli a '%s' játékost?"
+msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:140
 msgid "Do you want to save your changes?"
@@ -1007,12 +1006,12 @@ msgstr ""
 #: src/karts/controller/network_player_controller.cpp:283
 #: src/karts/controller/player_controller.cpp:340
 msgid "Don't accelerate before go"
-msgstr "Ne gyorsuljon indulás előtt"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:265
 msgid "Down"
-msgstr "Le"
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
@@ -1040,26 +1039,26 @@ msgstr ""
 #. I18N: Game mode
 #: src/race/race_manager.hpp:184
 msgid "Egg Hunt"
-msgstr "Tojás Vadászat"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr "Tojás Vadászat: fedezd fel a pályákat, hogy megtaláld a rejtett tojásokat."
+msgstr ""
 
 #: src/modes/easter_egg_hunt.cpp:202
 #, c-format
 msgid "Eggs: %d / %d"
-msgstr "Tojások: %d / %d"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/elephpant/kart.xml
 msgid "Elephpant"
-msgstr "Elephpant"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:474
 #: src/states_screens/race_result_gui.cpp:833
 msgid "Eliminated"
-msgstr "Eltávolítva"
+msgstr ""
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
@@ -1082,13 +1081,13 @@ msgstr ""
 
 #. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"
-msgstr "Emule"
+msgstr ""
 
 #. I18N: button to enable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:98
 #: src/states_screens/options_screen_input2.cpp:588
 msgid "Enable Device"
-msgstr "Eszköz engedélyezése"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -1101,17 +1100,17 @@ msgstr ""
 #. indicates a graphical feature is enabled
 #: src/states_screens/options_screen_video.cpp:429
 msgid "Enabled"
-msgstr "Engedélyezve"
+msgstr ""
 
 #. I18N: animations setting (all karts are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
 msgid "Enabled for all"
-msgstr "Engedélyezve mindenkinek"
+msgstr ""
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
 msgid "Enter the new player's name"
-msgstr "Gépeld be az új játékos nevét"
+msgstr ""
 
 #: src/addons/news_manager.cpp:172
 #, c-format
@@ -1122,7 +1121,7 @@ msgstr ""
 msgid ""
 "Everyone:\n"
 "Press 'Select' now to join the game!"
-msgstr "Bárki:\nNyomj \"kiválaszt\" gombot a csatlakozáshoz!"
+msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
@@ -1137,7 +1136,7 @@ msgstr ""
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Exit Race"
-msgstr "Verseny elhagyása"
+msgstr ""
 
 #: src/states_screens/user_screen.cpp:111
 msgid "Exit game"
@@ -1148,11 +1147,11 @@ msgstr ""
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
 msgid "Expert"
-msgstr "Nehéz"
+msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:252
 msgid "Explore tracks to find all hidden eggs"
-msgstr "Fedezd fel a pályákat, hogy megtaláld a rejtett tojásokat."
+msgstr ""
 
 #: src/graphics/irr_driver.cpp:1795
 #, c-format
@@ -1191,7 +1190,7 @@ msgstr ""
 
 #: src/modes/linear_world.cpp:276
 msgid "Final lap!"
-msgstr "Utolsó kör!"
+msgstr ""
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
@@ -1201,7 +1200,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:242
 msgid "Fire"
-msgstr "Tűz"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -1212,16 +1211,16 @@ msgid ""
 "keyboard(s), however each player will need a different set of keys, and keep"
 " in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
-msgstr "Először, szükséged lesz néhány bemeneti eszközre (néhányan gamepad-al vagy joystick-al tudnak a legjobban játszani). Menj a bemeneti eszközök konfigurációs menübe és állítsd be a gamepad-od. Persze billentyűzeten is nagyszerűen lehet játszani, habár egyes játékosok más billentyű beállításokat kedvelnek, és figyelj oda rá, hogy nem mindegyik billentyűzet támogatja a többjátékos használatot a nagy számú billentyű lenyomás miatt."
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:180
 msgid "Follow the Leader"
-msgstr "Kövesd a Főnököt"
+msgstr ""
 
 #: src/states_screens/race_gui_base.cpp:650
 msgid "Follow the leader!"
-msgstr "Kövesd a vezért!"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -1233,7 +1232,7 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
-msgstr "Magma Erőd"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:413
 #, c-format
@@ -1271,17 +1270,17 @@ msgstr ""
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Fullscreen"
-msgstr "Teljes képernyő"
+msgstr ""
 
 #. I18N: Shown when a goal is scored
 #: src/states_screens/race_gui_base.cpp:70
 msgid "GOAL!"
-msgstr "GÓL!"
+msgstr ""
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:144
 msgid "Game Keys"
-msgstr "Játék billentyűk"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1292,7 +1291,7 @@ msgstr "Játék billentyűk"
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
 msgid "Game Modes"
-msgstr "Játék módok"
+msgstr ""
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -1303,13 +1302,13 @@ msgstr ""
 #: src/input/binding.cpp:292
 #, c-format
 msgid "Gamepad button %d"
-msgstr "Játékpad billentyű %d"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/binding.cpp:260 src/input/binding.cpp:265
 #, c-format
 msgid "Gamepad hat %d"
-msgstr "Gamepad hat %d"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1320,12 +1319,12 @@ msgstr "Gamepad hat %d"
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
 msgid "General"
-msgstr "Általános"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Give Up Race"
-msgstr "Verseny elhagyása"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -1351,12 +1350,12 @@ msgstr ""
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
-msgstr "Gnu"
+msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:68
 msgid "Go!"
-msgstr "Rajt!"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Gold driver"
@@ -1370,7 +1369,7 @@ msgstr ""
 #. I18N: In the track selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:145
 msgid "Grand Prix"
-msgstr "Nagy Díj"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -1384,12 +1383,12 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:1214
 msgid "Grand Prix progress:"
-msgstr "Nagy Díj állása:"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Graphical Effects Level"
-msgstr "Grafikai effektek szintje"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
@@ -1399,20 +1398,20 @@ msgstr "Grafikai effektek szintje"
 #: src/states_screens/options_screen_ui.cpp:117
 #: src/states_screens/user_screen.cpp:646
 msgid "Graphics"
-msgstr "Grafika"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 msgid "Graphics Settings"
-msgstr "Grafikai beállítások"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/greenvalley/track.xml
 msgid "Green Valley"
-msgstr "Zöld Völgy"
+msgstr ""
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:392
 msgid "Guest"
-msgstr "Vendég"
+msgstr ""
 
 #. I18N: Name of further guest players, with a 1, 2, ... attached
 #: src/config/player_manager.cpp:397
@@ -1427,7 +1426,7 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
-msgstr "Hacienda"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -1436,15 +1435,15 @@ msgstr "Hacienda"
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Help"
-msgstr "Súgó"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
-msgstr "Hexley"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:1252
 msgid "Highscores"
-msgstr "Dicsőségtábla"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
@@ -1454,7 +1453,7 @@ msgstr ""
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
-msgstr "Lődd a többieket fegyverekkel, amíg el ne veszítik az összes életüket. (Csak többjátékos játszmákban)"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Hit the same kart at least 5 times in one race."
@@ -1463,7 +1462,7 @@ msgstr ""
 #. I18N: animations setting (only karts with human players are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:64
 msgid "Human players only"
-msgstr "Csak emberi játékos"
+msgstr ""
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -1480,12 +1479,12 @@ msgstr ""
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "Ha látsz egy gombot egy ehhez hasonló lakattal, teljesítened kell a feladatot, hogy kinyisd azt."
+msgstr ""
 
 #: src/input/input_manager.cpp:729
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
-msgstr "'%s' figyelmen kívül hagyása, korábban kell csatlakoznod a játékhoz!"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -1495,14 +1494,14 @@ msgstr ""
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
 msgid "Install"
-msgstr "Telepít"
+msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
 msgid "Intermediate"
-msgstr "Haladó"
+msgstr ""
 
 #: src/states_screens/register_screen.cpp:401
 #: src/states_screens/user_screen.cpp:328
@@ -1529,18 +1528,18 @@ msgstr ""
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In the addons screen
 msgid "Karts"
-msgstr "Gokartok"
+msgstr ""
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Keep this resolution"
-msgstr "Felbontás megtartása"
+msgstr ""
 
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:222
 msgid "Keep up with the leader kart but don't overtake it!"
-msgstr "Kövesd a Főnök gokartját, de meg ne előzd!"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:72
 msgid "Key binding"
@@ -1549,21 +1548,21 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:97
 #, c-format
 msgid "Keyboard %i"
-msgstr "Billentyűzet %i"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/konqi/kart.xml
 msgid "Konqi"
-msgstr "Konqi"
+msgstr ""
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/race_gui_overworld.cpp:108
 msgid "Lap"
-msgstr "Kör"
+msgstr ""
 
 #: src/modes/linear_world.cpp:303
 #, c-format
 msgid "Lap %i"
-msgstr "%i. Kör"
+msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:67
 msgid "Laps"
@@ -1573,16 +1572,16 @@ msgstr ""
 #: src/challenges/challenge_data.cpp:249
 #, c-format
 msgid "Laps : %i"
-msgstr "%i. kör"
+msgstr ""
 
 #: src/modes/follow_the_leader.cpp:57 src/modes/follow_the_leader.cpp:252
 msgid "Leader"
-msgstr "Főnök"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:268
 msgid "Left"
-msgstr "Bal"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:212
@@ -1633,7 +1632,7 @@ msgstr ""
 
 #: src/guiengine/engine.cpp:1330
 msgid "Loading"
-msgstr "Betöltés"
+msgstr ""
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In networking lobby
@@ -1652,7 +1651,7 @@ msgstr ""
 
 #: src/states_screens/kart_selection.cpp:853
 msgid "Locked"
-msgstr "Zárolt"
+msgstr ""
 
 #: src/states_screens/arenas_screen.cpp:237
 #: src/states_screens/arenas_screen.cpp:267
@@ -1663,11 +1662,11 @@ msgstr "Zárolt"
 #: src/states_screens/race_setup_screen.cpp:214
 #: src/states_screens/tracks_screen.cpp:283
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr "Lezárva: teljesítsd az aktív feladatokat, hogy a többihez is hozzáférj!"
+msgstr ""
 
 #: src/states_screens/tracks_screen.cpp:201
 msgid "Locked!"
-msgstr "Lezárva!"
+msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
@@ -1720,7 +1719,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:251
 msgid "Look Back"
-msgstr "Hátrapillantás"
+msgstr ""
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: In the profile screen
@@ -1754,12 +1753,12 @@ msgstr ""
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:436
 msgid "Me Only"
-msgstr "Csak én"
+msgstr ""
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:158
 msgid "Menu Keys"
-msgstr "Menü billentyűk"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/minigolf/track.xml
 msgid "Minigolf"
@@ -1785,14 +1784,14 @@ msgstr ""
 #: src/input/binding.cpp:299
 #, c-format
 msgid "Mouse axis %d %s"
-msgstr "Egér tengely %d%s"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used
 #. at all)
 #: src/input/binding.cpp:295
 #, c-format
 msgid "Mouse button %d"
-msgstr "Egér gombok %d"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
@@ -1807,7 +1806,7 @@ msgstr ""
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 msgid "Multiplayer"
-msgstr "Többjátékos"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1818,12 +1817,12 @@ msgstr "Többjátékos"
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
 msgid "Multi­player"
-msgstr "Többjátékos"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Music"
-msgstr "Zene"
+msgstr ""
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
@@ -1865,7 +1864,7 @@ msgstr ""
 #: src/challenges/challenge_data.cpp:502
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr "Új Nagy Díj '%s' mostantól elérhető"
+msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
@@ -1884,31 +1883,31 @@ msgstr ""
 #: src/challenges/challenge_data.cpp:506
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr "Új nehézségi fok '%s' mostantól elérhető"
+msgstr ""
 
 #: src/modes/linear_world.cpp:363
 msgid "New fastest lap"
-msgstr "Új leggyorsabb kör"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:492
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr "Új játék mód '%s' mostantól elérhető"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:516
 #, c-format
 msgid "New kart '%s' now available"
-msgstr "Új gokart '%s' mostantól elérhető"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:486
 #, c-format
 msgid "New track '%s' now available"
-msgstr "Új pálya '%s' mostantól elérhető"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:245
 msgid "Nitro"
-msgstr "Nitró"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:147
 msgid "Nitro challenge"
@@ -1921,22 +1920,22 @@ msgstr ""
 
 #. I18N: ../stk-assets/karts/nolok/kart.xml
 msgid "Nolok"
-msgstr "Nolok"
+msgstr ""
 
 #. I18N: if no kart animations are enabled
 #: src/states_screens/gp_info_screen.cpp:75
 #: src/states_screens/options_screen_video.cpp:438
 msgid "None"
-msgstr "Nincs"
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:176
 msgid "Normal Race"
-msgstr "Sima verseny"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
-msgstr "Northern Resort"
+msgstr ""
 
 #: src/tracks/track_object_presentation.cpp:986
 msgid ""
@@ -1949,22 +1948,22 @@ msgstr ""
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
 msgid "Novice"
-msgstr "Kezdő"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:68
 #, c-format
 msgid "Number of AI Karts : %i"
-msgstr "PC vezérelt gokartok száma: %i"
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Number of AI karts"
-msgstr "Számítógép által vezérelt gokartok száma"
+msgstr ""
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Number of goals to win"
-msgstr "A megnyerendő célok száma"
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
@@ -1990,11 +1989,11 @@ msgstr ""
 #: src/states_screens/dialogs/message_dialog.cpp:122
 #: src/states_screens/dialogs/message_dialog.cpp:135
 msgid "OK"
-msgstr "Rendben"
+msgstr ""
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
 msgid "Off the beaten track"
-msgstr "A Járatlan Út"
+msgstr ""
 
 #: src/states_screens/online_profile_friends.cpp:150
 msgid "Offline"
@@ -2008,15 +2007,15 @@ msgstr ""
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr "Ó, igen, most már a kastélyomban van, és felszolgálva vacsorára..."
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
-msgstr "Régi Bánya"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
-msgstr "Olivér Matek Osztálya"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -2050,12 +2049,12 @@ msgstr ""
 
 #: src/input/input_manager.cpp:759
 msgid "Only the Game Master may act at this point!"
-msgstr "Csak a Játék Mester cselekedhet ezen a helyen!"
+msgstr ""
 
 #: src/tracks/track_object_presentation.cpp:960
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
-msgstr "Hupsz! Amikor bajba kerülsz, nyomd meg a %s-t a megmentéshez"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -2064,7 +2063,7 @@ msgstr "Hupsz! Amikor bajba kerülsz, nyomd meg a %s-t a megmentéshez"
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Options"
-msgstr "Beállítások"
+msgstr ""
 
 #. I18N: ./data/gui/online/profile_overview.stkgui
 #. I18N: Section in the profile screen
@@ -2115,17 +2114,17 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:257
 msgid "Pause Game"
-msgstr "Szünet"
+msgstr ""
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 msgid "Paused"
-msgstr "Szünet"
+msgstr ""
 
 #: src/karts/controller/network_player_controller.cpp:281
 #: src/karts/controller/player_controller.cpp:338
 msgid "Penalty time!!"
-msgstr "Büntető idő!"
+msgstr ""
 
 #: src/states_screens/online_profile_friends.cpp:146
 msgid "Pending"
@@ -2133,7 +2132,7 @@ msgstr ""
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
-msgstr "Pingvin Játszótér"
+msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:247
 msgid "Performing vote"
@@ -2141,11 +2140,11 @@ msgstr ""
 
 #. I18N: ../stk-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
-msgstr "Pidgin"
+msgstr ""
 
 #. I18N: ./data/gui/tutorial.stkgui
 msgid "Play all"
-msgstr "Mind lejátszása"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
@@ -2162,7 +2161,7 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:165
 #: src/states_screens/server_selection.cpp:92
 msgid "Players"
-msgstr "Játékosok"
+msgstr ""
 
 #: src/states_screens/options_screen_ui.cpp:154
 msgid ""
@@ -2178,7 +2177,7 @@ msgstr ""
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:500
 msgid "Please re-configure your key bindings."
-msgstr "Kérlek konfiguráld újra a billentyű beállításaid."
+msgstr ""
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
 msgid "Please read the terms and conditions "
@@ -2186,11 +2185,11 @@ msgstr ""
 
 #: src/states_screens/addons_screen.cpp:437
 msgid "Please wait while addons are updated"
-msgstr "Kérlek, várj, amíg a kiegészítők frissítésre kerülnek"
+msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:557
 msgid "Please wait while the add-ons are loading"
-msgstr "Kérlek, várj, amíg a kiegészítők betöltenek"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
@@ -2212,29 +2211,29 @@ msgstr ""
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Press ESC to cancel"
-msgstr "Nyomj ESC billentyűt a kilépéshez"
+msgstr ""
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 msgid "Press a key"
-msgstr "Nyomj meg egy billentyűt"
+msgstr ""
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
-msgstr "Nyomj Entert vagy klikkelj duplán az eszközödön, hogy bekonfiguráld"
+msgstr ""
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
 msgid "Press enter or double-click on a player to edit him/her"
-msgstr "Nyomj Entert vagy klikkelj duplán a játékoson, hogy szerkeszd őt"
+msgstr ""
 
 #: src/states_screens/race_gui_overworld.cpp:462
 msgid "Press fire to play the tutorial"
-msgstr "Nyomd meg a tűz gombot a bemutató pálya játszásához"
+msgstr ""
 
 #: src/states_screens/race_gui_overworld.cpp:532
 msgid "Press fire to start the challenge"
-msgstr "Nyomj \"tüzelést\" a kihívás elindításához"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:390
 msgid ""
@@ -2245,12 +2244,12 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:357
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr "Probléma lépett fel a '%s' kiegészítő telepítésekor."
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:394
 #, c-format
 msgid "Problems removing the addon '%s'."
-msgstr "Probléma lépett fel a '%s' kiegészítő törlésekor."
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:474
 msgid "Processing"
@@ -2267,7 +2266,7 @@ msgstr ""
 
 #. I18N: ../stk-assets/karts/puffy/kart.xml
 msgid "Puffy"
-msgstr "Puffy"
+msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:240
 msgid ""
@@ -2283,7 +2282,7 @@ msgstr ""
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 msgid "Quit"
-msgstr "Kilépés"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:159
 msgid "Quit the server."
@@ -2293,7 +2292,7 @@ msgstr ""
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: ./data/gui/soccer_setup.stkgui
 msgid "Race Setup"
-msgstr "Verseny Beállítások"
+msgstr ""
 
 #: src/states_screens/gp_info_screen.cpp:77
 msgid "Random"
@@ -2301,7 +2300,7 @@ msgstr ""
 
 #: src/states_screens/arenas_screen.cpp:277
 msgid "Random Arena"
-msgstr "Véletlenszerű Aréna"
+msgstr ""
 
 #: src/race/grand_prix_data.hpp:171
 msgid "Random Grand Prix"
@@ -2310,16 +2309,16 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:839
 #: src/states_screens/kart_selection.cpp:1467
 msgid "Random Kart"
-msgstr "Véletlenszerű Gokart"
+msgstr ""
 
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/tracks_screen.cpp:297
 msgid "Random Track"
-msgstr "Véletlenszerű Pálya"
+msgstr ""
 
 #: src/states_screens/race_gui_overworld.cpp:109
 msgid "Rank"
-msgstr "Helyezés"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
@@ -2330,7 +2329,7 @@ msgstr ""
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:64
 msgid "Ready!"
-msgstr "Kész!"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
@@ -2338,7 +2337,7 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:965
 msgid "Red Team Wins"
-msgstr "Piros Csapat nyert"
+msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
@@ -2367,7 +2366,7 @@ msgstr ""
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Remember window location"
-msgstr "Ablakpozíció megjegyzése"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
@@ -2376,7 +2375,7 @@ msgstr "Ablakpozíció megjegyzése"
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove"
-msgstr "Törlés"
+msgstr ""
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
@@ -2385,46 +2384,46 @@ msgstr "Törlés"
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Rename"
-msgstr "Átnevezés"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:64
 #, c-format
 msgid "Required Nitro Points : %i"
-msgstr "Szükséges Nitró-pontok: %i"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:53
 #, c-format
 msgid "Required Rank : %i"
-msgstr "Szükséges helyezés: %i"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:58
 #, c-format
 msgid "Required Time : %i"
-msgstr "Időkorlát: %i"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:254
 msgid "Rescue"
-msgstr "Kimentés"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Resolution"
-msgstr "Felbontás"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:199
 msgid "Restart"
-msgstr "Újrakezdés"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Restart Race"
-msgstr "Verseny újrakezdése"
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Reverse"
-msgstr "Visszafele"
+msgstr ""
 
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: In the edit track screen
@@ -2438,7 +2437,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:271
 msgid "Right"
-msgstr "Jobbra"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:214
@@ -2519,7 +2518,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:274
 msgid "Select"
-msgstr "Kiválasztás"
+msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 msgid "Select a difficulty"
@@ -2527,7 +2526,7 @@ msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 msgid "Select a game mode"
-msgstr "Játék mód kiválasztása"
+msgstr ""
 
 #: src/states_screens/edit_track_screen.cpp:238
 msgid "Select a track"
@@ -2536,7 +2535,7 @@ msgstr ""
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Select kart"
-msgstr "Gokart kiválasztása"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2569,13 +2568,13 @@ msgstr ""
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:66
 msgid "Set!"
-msgstr "Vigyázz!"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: src/states_screens/race_result_gui.cpp:209
 msgid "Setup New Race"
-msgstr "Új verseny beállítása"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -2594,11 +2593,11 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
-msgstr "Futó Homok"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/city/track.xml
 msgid "Shiny Suburbs"
-msgstr "Shiny Suburbs"
+msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
@@ -2622,7 +2621,7 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:177
 #, c-format
 msgid "Size: %s"
-msgstr "Méret: %s"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
@@ -2631,25 +2630,25 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:248
 msgid "Skidding"
-msgstr "Csúszás"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Skin"
-msgstr "Megjelenés"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
 msgid "Snow Peak"
-msgstr "Havas Csúcs"
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:186
 msgid "Soccer"
-msgstr "Foci"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
-msgstr "Focipálya"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -2664,16 +2663,16 @@ msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr "Sajnos egy hiba történt a kiegészítők oldalának elérése közben. Ellenőrizd, hogy csatlakozva vagy az internethez, és hogy nem-e a tűzfalad blokkolja az STK-t."
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:279
 msgid "Sorry, downloading the add-on failed"
-msgstr "Hupsz! A kiegészítő letöltése sikertelen"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Sound Effects"
-msgstr "Hangeffektusok"
+msgstr ""
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
@@ -2681,7 +2680,7 @@ msgstr "Hangeffektusok"
 #. I18N: track group
 #: src/states_screens/grand_prix_editor_screen.cpp:334
 msgid "Standard"
-msgstr "Szabványos"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:218
@@ -2690,14 +2689,14 @@ msgstr ""
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:209
 msgid "Start Grand Prix"
-msgstr "Nagy Díj kezdése"
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Start Race"
-msgstr "Verseny kezdése"
+msgstr ""
 
 #: src/states_screens/online_profile_friends.cpp:71
 msgid "Status"
@@ -2706,17 +2705,17 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:230
 msgid "Steer Left"
-msgstr "Balra irányít"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:233
 msgid "Steer Right"
-msgstr "Jobbra irányít"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 msgid "Story Mode"
-msgstr "Történet"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
@@ -2731,23 +2730,23 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/subsea/track.xml
 msgid "Subsea"
-msgstr "A Tenger Mélyén"
+msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 msgid "SuperTux"
-msgstr "SuperTux"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 msgid "SuperTuxKart Addons"
-msgstr "SuperTuxKart Kiegészítők"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: ./data/gui/help4.stkgui
 msgid "SuperTuxKart Help"
-msgstr "SuperTuxKart Súgó"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: ./data/gui/options_device.stkgui
@@ -2757,15 +2756,15 @@ msgstr "SuperTuxKart Súgó"
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: ./data/gui/user_screen_tab.stkgui
 msgid "SuperTuxKart Options"
-msgstr "SuperTuxKart Beállítások"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
-msgstr "A SuperTuxKart-al többjátékos módban tudsz játszani ugyanazon a számítógépen"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 msgid "SuperTuxKart features several game modes"
-msgstr "A SuperTuxKart több játék mód funkciót tartalmaz"
+msgstr ""
 
 #: src/main.cpp:1201
 msgid ""
@@ -2780,13 +2779,13 @@ msgstr ""
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
-msgstr "Suzanne"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short"
 " time."
-msgstr "Kicserélő - az ajándékdobozokat rövid időre banánokká változtatja."
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Swatter - will squash karts close by, slowing them down."
@@ -2795,7 +2794,7 @@ msgstr ""
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:186
 msgid "System Language"
-msgstr "Rendszer nyelve"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid ""
@@ -2820,7 +2819,7 @@ msgstr ""
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Texture filtering"
-msgstr "Textúra-szűrő"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
@@ -2829,17 +2828,17 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
-msgstr "A Stadion"
+msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:545
 msgid "The add-ons module is currently disabled in the Options screen"
-msgstr "Ez a kiegészítő modul jelenleg le van tiltva a beállítások képernyőn"
+msgstr ""
 
 #: src/race/highscore_manager.cpp:101
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr "A ranglista fájl túl régi volt,\naz összes ranglista törölve lett."
+msgstr ""
 
 #: src/states_screens/create_server_screen.cpp:136
 msgid "The maxinum number of players has to be between 2 and 12."
@@ -2848,28 +2847,28 @@ msgstr ""
 #. I18N: Game mode
 #: src/race/race_manager.hpp:178
 msgid "Time Trial"
-msgstr "Idő Próba"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr "Idő Próba: Nem tartalmaz extrákat, úgyhogy csak a vezetési képességeid számítanak!"
+msgstr ""
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
 "To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
 "\n"
 "To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
-msgstr "Ahhoz, hogy új Gamepad/Joysticke eszközt adj hozzá, egyszerűen csatlakoztasd és indítsd el a SpuerTuxKart-ot, és az eszköz megjelenik a listán.\n\nAhhoz, hogy egy billentyűzet konfigurációt adj hozzá, a lenti gombot használd, HABÁR jegyezd meg, hogy a legtöbb billentyűzet csak bizonyos mennyiségű egyidejű billentyű lenyomást támogat és ezek alkalmatlanok a többjátékos játékmódhoz. (Habár egyszerre több billentyűzetet is csatlakoztathatsz a számítógéphez. Ebben az esetben mindenkinek más billentyű beállítás szükséges a helyes működéshez)"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
 msgid "To help you win, there are some powerups you can collect :"
-msgstr "Ahhoz, hogy könnyebben nyerj, sok extra cuccot tudsz gyűjteni :"
+msgstr ""
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
 msgid "To the moon and back"
-msgstr "A Holdra és Vissza"
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:154
 #: src/states_screens/dialogs/user_info_dialog.cpp:211
@@ -2880,7 +2879,7 @@ msgstr ""
 #: src/states_screens/race_gui_base.cpp:103
 #, c-format
 msgid "Top %i"
-msgstr "Top %i"
+msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:66
 msgid "Track"
@@ -2896,7 +2895,7 @@ msgstr ""
 #: src/states_screens/track_info_screen.cpp:107
 #, c-format
 msgid "Track by %s"
-msgstr "Pálya készítője: %s"
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -2908,36 +2907,36 @@ msgstr ""
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Tracks"
-msgstr "Pályák"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:77
 msgid "Trilinear"
-msgstr "Trilineáris"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:369
 #: src/states_screens/dialogs/addons_loading.cpp:406
 msgid "Try again"
-msgstr "Próbáld újra"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 #: src/states_screens/race_gui_overworld.cpp:455
 msgid "Tutorial"
-msgstr "Bemutató"
+msgstr ""
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
 msgid "Tutorial : Selection Room"
-msgstr "Oktatójáték: Szóba választó"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/tux/kart.xml
 msgid "Tux"
-msgstr "Tux"
+msgstr ""
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
 msgid "Type :"
-msgstr "Típus:"
+msgstr ""
 
 #: src/states_screens/race_gui_overworld.cpp:502
 msgid "Type: Grand Prix"
@@ -2952,7 +2951,7 @@ msgstr ""
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
 msgid "Uninstall"
-msgstr "Eltávolítás"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Unstoppable"
@@ -2961,21 +2960,21 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:262
 msgid "Up"
-msgstr "Fel"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
-msgstr "Frissítés"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
 #. show only recently updated items
 msgid "Updated"
-msgstr "Frissítve"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:111
 msgid "Updated date"
-msgstr "Frissítési dátum"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Use 10 or more powerups in a race."
@@ -3009,7 +3008,7 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:164
 #: src/states_screens/user_screen.cpp:648
 msgid "User Interface"
-msgstr "Felhasználói felület"
+msgstr ""
 
 #: src/states_screens/grand_prix_editor_screen.cpp:335
 msgid "User defined"
@@ -3036,7 +3035,7 @@ msgstr ""
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 msgid "VS"
-msgstr "V5"
+msgstr ""
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:235
 #: src/states_screens/dialogs/recovery_dialog.cpp:209
@@ -3047,12 +3046,12 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:108
 #, c-format
 msgid "Version: %d"
-msgstr "Verzió: %d"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync (requires restart)"
-msgstr "Függőleges szinkron (újraindítás szükséges)"
+msgstr ""
 
 #. I18N: ./data/gui/online/notification_dialog.stkgui
 #. I18N: User info dialog
@@ -3064,31 +3063,31 @@ msgstr ""
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Volume"
-msgstr "Hangerő"
+msgstr ""
 
 #. I18N: ./data/gui/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
 msgid "Vote"
-msgstr "Szavazás"
+msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:230
 msgid "Vote successful! You can now close the window."
-msgstr "Sikerses szavazás! Most már bezárhatod az ablakot."
+msgstr ""
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:85
 msgid "WEIGHT"
-msgstr "SÚLY"
+msgstr ""
 
 #: src/modes/linear_world.cpp:882
 msgid "WRONG WAY!"
-msgstr "ROSSZ IRÁNY!"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:479
 msgid ""
 "Warning, 'Shift' is not a recommended key : when shift is pressed down, all "
 "keys that contain a character that is different in upper-case will stop "
 "working."
-msgstr "Figyelem, a 'Shift' gomb nem ajánlott : amikor a shift le van nyomva, az összes karaktert tartalmazó billentyű, amik különböznek a nagy betűktől nem fognak működni."
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -3099,23 +3098,23 @@ msgstr "Figyelem, a 'Shift' gomb nem ajánlott : amikor a shift le van nyomva, a
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
 msgid "Weapons"
-msgstr "Fegyverek"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Weather Effects"
-msgstr "Időjárási hatások"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:447
 #, c-format
 msgid "Weather Effects : %s"
-msgstr "Időjárás effektek: %s"
+msgstr ""
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
-msgstr "Mi a baj, ti kis hippik? A hatalmas gnú vezetőtök hiányzik?"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -3126,16 +3125,16 @@ msgid ""
 " the game. Each player can use their input device to select their kart. The "
 "game continues when everyone selected their kart. Note that the mouse may "
 "not be used for this operation."
-msgstr "Amikor a bemeneti eszközök be lettek konfigurálva, készen állsz a játékra. Válaszd ki a 'többjátékos verseny' ikonját a főmenüben. Amikor gokartot kell választanod, minden játékos nyomja meg a 'tűz' gombot a gamepadon vagy a billentyűzeten, hogy beléphessen a játékba. A bemeneti eszközökkel lehet gokartot váltani. A játék folytatódni fog, ha mindenki kiválasztotta a saját gokartját. Megjegyzés: ebben a műveletben az egér nem használható."
+msgstr ""
 
 #. I18N: Name of the white button on xbox controller
 #: src/input/gamepad_config.cpp:171
 msgid "White"
-msgstr "Fehér"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/wilber/kart.xml
 msgid "Wilber"
-msgstr "Wilber"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Win 5 single races in a row."
@@ -3147,25 +3146,25 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
-msgstr "XR591"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
-msgstr "Xue"
+msgstr ""
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
 #: src/states_screens/edit_gp_screen.cpp:253
 msgid "Yes"
-msgstr "Igen"
+msgstr ""
 
 #: src/tracks/track_object_presentation.cpp:996
 msgid "You are now ready to race. Good luck!"
-msgstr "Most már készen állsz a versenyzésre. Sok szerencsét!"
+msgstr ""
 
 #. I18N: ./data/gui/options_players.stkgui
 msgid "You are playing as"
-msgstr "Bejelentkezve, mint"
+msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:190
 msgid "You can adapt your previous rating by clicking the stars beneath."
@@ -3196,15 +3195,15 @@ msgstr ""
 #: src/states_screens/grand_prix_win.cpp:124
 #: src/states_screens/race_result_gui.cpp:175
 msgid "You completed a challenge!"
-msgstr "Teljesítetted a kihívást!"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:176
 msgid "You completed challenges!"
-msgstr "Teljesítetted a kihívást!"
+msgstr ""
 
 #: src/states_screens/grand_prix_win.cpp:279
 msgid "You completed the Grand Prix!"
-msgstr "Teljesítetted a Nagy Díjat!"
+msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:208
 #, c-format
@@ -3225,7 +3224,7 @@ msgstr ""
 
 #: src/karts/kart.cpp:856
 msgid "You finished the race!"
-msgstr "Befejezted a versenyt!"
+msgstr ""
 
 #: src/online/online_player_profile.cpp:466
 #, c-format
@@ -3240,7 +3239,7 @@ msgstr ""
 
 #: src/modes/world.cpp:1144
 msgid "You have been eliminated!"
-msgstr "Meg lettél semmisítve!"
+msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:195
 msgid ""
@@ -3258,15 +3257,15 @@ msgstr ""
 
 #: src/states_screens/user_screen.cpp:472
 msgid "You need to enter a password."
-msgstr "Meg kell adnod egy jelszót."
+msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:568
 msgid "You unlocked grand prix %0"
-msgstr "Nagy Díj feloldva: %0"
+msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:530
 msgid "You unlocked track %0"
-msgstr "Pálya feloldva: %0"
+msgstr ""
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -3283,7 +3282,7 @@ msgstr ""
 
 #: src/karts/kart.cpp:856 src/karts/kart.cpp:875
 msgid "You won the race!"
-msgstr "Megnyerted a versenyt!"
+msgstr ""
 
 #: src/main.cpp:1375
 msgid ""
@@ -3295,13 +3294,13 @@ msgstr ""
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr "A konfigurációs fájlod hibás volt, ezért az törölve lett és egy új lett készítve."
+msgstr ""
 
 #: src/config/user_config.cpp:711
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr "A konfigurációs fájlod régi volt, ezért az törölve lett és egy új lett készítve."
+msgstr ""
 
 #: src/main.cpp:1367
 msgid ""
@@ -3310,7 +3309,7 @@ msgstr ""
 
 #: src/input/device_manager.cpp:501
 msgid "Your input config file is not compatible with this version of STK."
-msgstr "A bemeneti konfigurációs fájlod nem kompatibilis ezzel az STK verzióval."
+msgstr ""
 
 #: src/states_screens/online_profile_base.cpp:105
 #: src/states_screens/online_profile_base.cpp:115
@@ -3319,40 +3318,40 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/zengarden/track.xml
 msgid "Zen Garden"
-msgstr "Zen Garden"
+msgstr ""
 
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:90
 msgid "[none]"
-msgstr "[nincs]"
+msgstr ""
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In networking lobby
 msgid "actions"
-msgstr "műveletek"
+msgstr ""
 
 #. I18N: track group name
 #: src/states_screens/tracks_screen.cpp:151
 msgid "all"
-msgstr "összes"
+msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
 #: src/states_screens/race_gui_base.cpp:540
 msgid "by"
-msgstr "szerző:"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:139
 msgid "featured"
-msgstr "ajánlott"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
 msgid "high"
-msgstr "magas"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 msgid "low"
-msgstr "alacsony"
+msgstr ""
 
 #. I18N: arena group name
 #. I18N: track group name
@@ -3363,8 +3362,8 @@ msgstr "alacsony"
 #: src/states_screens/kart_selection.cpp:284
 #: src/states_screens/tracks_screen.cpp:153
 msgid "standard"
-msgstr "alapjáték"
+msgstr ""
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Balint https://launchpad.net/~lbekefi\n  Gyönki Bendegúz https://launchpad.net/~gyonkibendeguz\n  Jacob https://launchpad.net/~jacob11\n  Jf. Tasz https://launchpad.net/~jftatsz\n  Molditz György https://launchpad.net/~molditz\n  Papp Bence https://launchpad.net/~sclegnrbs\n  STK-team https://launchpad.net/~stk\n  Úr Balázs https://launchpad.net/~urbalazs"
+msgstr ""
