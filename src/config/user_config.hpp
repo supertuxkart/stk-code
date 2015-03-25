@@ -482,6 +482,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_esm
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_esm",
         &m_video_group, "Enable Exponential Shadow Map (better but slower)"));
+    PARAM_PREFIX BoolUserConfigParam        m_old_driver_popup
+        PARAM_DEFAULT(BoolUserConfigParam(true, "old_driver_popup",
+        &m_video_group, "Determines if popup message about too old drivers should be displayed."));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
