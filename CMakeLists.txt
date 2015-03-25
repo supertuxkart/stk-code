@@ -2,7 +2,7 @@
 project(SuperTuxKart)
 set(PROJECT_VERSION "0.8.1")
 
-cmake_minimum_required(VERSION 2.8.1)
+cmake_minimum_required(VERSION 2.8.4)
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
   cmake_policy(SET CMP0043 OLD)
 endif()
@@ -32,7 +32,7 @@ else()
     set(WIIUSE_BUILD ON)
 endif()
 
-if(MINGW)
+if(MINGW OR CYGWIN)
     set(USE_WIIUSE OFF)
 endif()
 

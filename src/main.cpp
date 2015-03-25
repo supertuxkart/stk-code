@@ -1361,21 +1361,24 @@ int main(int argc, char *argv[] )
             exit(0);
         }
 
-        if (!ProfileWorld::isNoGraphics() && GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+        if (UserConfigParams::m_old_driver_popup)
         {
-            MessageDialog *dialog =
-                new MessageDialog(_("Your driver version is too old. Please install "
-                "the latest video drivers."),
-                /*from queue*/ true);
-            GUIEngine::DialogQueue::get()->pushDialog(dialog);
-        }
-        else if (!CVS->isGLSL())
-        {
-            MessageDialog *dialog =
-                new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
-                "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
-                /*from queue*/ true);
-            GUIEngine::DialogQueue::get()->pushDialog(dialog);
+            if (!ProfileWorld::isNoGraphics() && GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+            {
+                MessageDialog *dialog =
+                    new MessageDialog(_("Your driver version is too old. Please install "
+                    "the latest video drivers."),
+                    /*from queue*/ true);
+                GUIEngine::DialogQueue::get()->pushDialog(dialog);
+            }
+            else if (!CVS->isGLSL())
+            {
+                MessageDialog *dialog =
+                    new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
+                    "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
+                    /*from queue*/ true);
+                GUIEngine::DialogQueue::get()->pushDialog(dialog);
+            }
         }
 
         // Note that on the very first run of STK internet status is set to
