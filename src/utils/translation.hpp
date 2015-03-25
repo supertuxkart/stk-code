@@ -28,6 +28,7 @@
 
 #  define _(String, ...)        (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
 #undef _C
+#undef _P
 #  define _C(Ctx, String, ...)  (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String, Ctx), ##__VA_ARGS__)))
 #  define _P(Singular, Plural, Num, ...) (translations->fribidize(StringUtils::insertValues(translations->w_ngettext(Singular, Plural, Num), Num, ##__VA_ARGS__)))
 #  define _CP(Ctx, Singular, Plural, Num, ...) (translations->fribidize(StringUtils::insertValues(translations->w_ngettext(Singular, Plural, Num, Ctx), Num, ##__VA_ARGS__)))

@@ -35,6 +35,10 @@ if(UNIX AND USE_XRANDR)
     add_definitions(-D_IRR_LINUX_X11_RANDR_)
 endif()
 
+if(CYGWIN)
+    add_definitions(-DNO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
+endif()
+
 set(IRRLICHT_SOURCES
 source/Irrlicht/CGUIListBox.cpp
 source/Irrlicht/CZBuffer.cpp
