@@ -121,25 +121,36 @@ Camera::~Camera()
  */
 void Camera::applyMouseMovement (float x, float y)
 {
-    core::vector3df direction(m_target_direction);
-    core::vector3df up(m_camera->getUpVector());
+    vector3df direction(m_target_direction);
+    vector3df up(m_camera->getUpVector());
 
     // Set local values if the camera is attached to the kart
     if (m_attached)
         up = m_local_up;
 
-    core::vector3df side(direction.crossProduct(up));
-
     direction.normalize();
     up.normalize();
-    core::quaternion quat;
-    quat.fromAngleAxis(x, up);
 
-    core::quaternion quat_y;
-    quat_y.fromAngleAxis(y, side);
-    quat *= quat_y;
+    vector3df side(direction.crossProduct(up));
+    side.normalize();
+    core::quaternion quat;
+    quat.fromAngleAxis(y, side);
+
+    core::quaternion quat_x;
+    quat_x.fromAngleAxis(x, up);
+    quat *= quat_x;
 
     direction = quat * direction;
+    // Try to prevent toppling over
+    // If the camera would topple over with the next movement, the vertical
+    // movement gets reset close to the up vector
+    if ((direction - up).getLengthSQ() + (m_target_direction - up).getLengthSQ()
+        <= (direction - m_target_direction).getLengthSQ())
+        direction = quat_x * ((m_target_direction - up).setLength(0.02f) + up);
+    // Prevent toppling under
+    else if ((direction + up).getLengthSQ() + (m_target_direction + up).getLengthSQ()
+        <= (direction - m_target_direction).getLengthSQ())
+        direction = quat_x * ((m_target_direction + up).setLength(0.02f) - up);
     m_target_direction = direction;
 
     // Don't do that because it looks ugly and is bad to handle ;)
@@ -534,10 +545,10 @@ void Camera::update(float dt)
     // Update the first person camera
     else if (UserConfigParams::m_camera_debug == 3)
     {
-        core::vector3df direction(m_camera->getTarget() - m_camera->getPosition());
-        core::vector3df up(m_camera->getUpVector());
-        core::vector3df side(direction.crossProduct(up));
-        core::vector3df pos = m_camera->getPosition();
+        vector3df direction(m_camera->getTarget() - m_camera->getPosition());
+        vector3df up(m_camera->getUpVector());
+        vector3df side(direction.crossProduct(up));
+        vector3df pos = m_camera->getPosition();
 
         // Set local values if the camera is attached to the kart
         if (m_attached)
@@ -615,9 +626,12 @@ void Camera::update(float dt)
         up.normalize();
         side.normalize();
 
+        // Top vector is the real up vector, not the one used by the camera
+        vector3df top(side.crossProduct(direction));
+
         // Move camera
-        core::vector3df movement(direction * m_lin_velocity.Z +
-            up * m_lin_velocity.Y + side * m_lin_velocity.X);
+        vector3df movement(direction * m_lin_velocity.Z +
+            top * m_lin_velocity.Y + side * m_lin_velocity.X);
         pos = pos + movement * dt;
 
         if (m_attached)

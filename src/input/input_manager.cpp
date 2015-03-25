@@ -206,6 +206,28 @@ void InputManager::handleStaticAction(int key, int value)
             cam->setLinearVelocity(vel);
             break;
         }
+        case KEY_KEY_R:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.Y = value ? cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_F:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.Y = value ? -cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
+            break;
+        }
         // Rotating the first person camera
         case KEY_KEY_Q:
         {
