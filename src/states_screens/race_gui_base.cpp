@@ -327,7 +327,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
     assert(powerup->getIcon() != NULL);
     video::ITexture *t=powerup->getIcon()->getTexture();
     assert(t != NULL);
-    core::rect<s32> rect(core::position2di(0, 0), t->getOriginalSize());
+    core::rect<s32> rect(core::position2di(0, 0), t->getSize());
 
     for ( int i = 0 ; i < n ; i++ )
     {
@@ -588,7 +588,7 @@ void RaceGUIBase::drawGlobalMusicDescription()
                          noteX+iconSizeX/2+20,
                          noteY+iconSizeY/2+ICON_SIZE/2);
     const core::rect<s32> source(core::position2d<s32>(0,0),
-                                 t->getOriginalSize());
+                                 t->getSize());
 
     draw2DImage(t, dest, source,
                                               NULL, NULL, true);
@@ -855,7 +855,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
                                    100+(int)(100*cos(M_PI/2*i+World::getWorld()->getTime()*2)));
             }
             const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                       m_icons_frame->getTexture()->getOriginalSize());
+                                       m_icons_frame->getTexture()->getSize());
             draw2DImage(
                                                       m_icons_frame->getTexture(), pos, rect,NULL, colors, true);
         }
@@ -864,7 +864,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         if (icon  && !kart->getKartAnimation() && !kart->isSquashed())
         {
             const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                       icon->getOriginalSize());
+                                       icon->getSize());
             draw2DImage(icon, pos, rect,
                                                       NULL, NULL, true);
         }
@@ -877,7 +877,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             float t = kart->getKartAnimation()->getAnimationTimer();
             float t_anim=100*sin(0.5f*M_PI*t);
             const core::rect<s32> rect1(core::position2d<s32>(0,0),
-                                        icon->getOriginalSize());
+                                        icon->getSize());
             const core::rect<s32> pos1((int)(x-t_anim), y,
                                        (int)(x+w-t_anim), y+w);
             draw2DImage(icon, pos1, rect1,
@@ -890,7 +890,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             const core::rect<s32> destRect(core::position2d<s32>(x,y+w/4),
                                            core::position2d<s32>(x+w,y+w*3/4));
             const core::rect<s32> sourceRect(core::position2d<s32>(0,0),
-                                             icon->getOriginalSize());
+                                             icon->getSize());
             draw2DImage(icon, destRect,
                                                       sourceRect, NULL, NULL,
                                                       true);
@@ -902,8 +902,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             //exploses into 4 parts
             float t = kart->getKartAnimation()->getAnimationTimer();
             float t_anim=50.0f*sin(0.5f*M_PI*t);
-            u16 icon_size_x=icon->getOriginalSize().Width;
-            u16 icon_size_y=icon->getOriginalSize().Height;
+            u16 icon_size_x=icon->getSize().Width;
+            u16 icon_size_y=icon->getSize().Height;
 
             const core::rect<s32> rect1(0, 0, icon_size_x/2,icon_size_y/2);
             const core::rect<s32> pos1((int)(x-t_anim), (int)(y-t_anim),
@@ -940,7 +940,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             if (icon_plunger != NULL)
             {
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                           icon_plunger->getOriginalSize());
+                                           icon_plunger->getSize());
                 const core::rect<s32> pos1(x+10, y-10, x+w+10, y+w-10);
                 draw2DImage(icon_plunger, pos1,
                                                           rect, NULL, NULL,
@@ -956,7 +956,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             if (icon_attachment != NULL)
             {
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                           icon_attachment->getOriginalSize());
+                                           icon_attachment->getSize());
                 const core::rect<s32> pos1(x-20, y-10, x+w-20, y+w-10);
                 draw2DImage(icon_attachment,
                                                           pos1, rect, NULL,
@@ -1054,7 +1054,7 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
                          plunger_x+plunger_size, offset_y+plunger_size);
 
     const core::rect<s32> source(core::position2d<s32>(0,0),
-                                 t->getOriginalSize());
+                                 t->getSize());
 
     draw2DImage(t, dest, source,
                                               &viewport /* clip */,

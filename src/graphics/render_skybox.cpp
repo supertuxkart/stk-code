@@ -226,8 +226,8 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
     unsigned size = 0;
     for (unsigned i = 0; i < 6; i++)
     {
-        size = MAX2(size, textures[i]->getOriginalSize().Width);
-        size = MAX2(size, textures[i]->getOriginalSize().Height);
+        size = MAX2(size, textures[i]->getSize().Width);
+        size = MAX2(size, textures[i]->getSize().Height);
     }
 
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
@@ -299,8 +299,8 @@ void IrrDriver::generateDiffuseCoefficients()
 
         for (unsigned i = 0; i < 6; i++)
         {
-            sh_w = MAX2(sh_w, SphericalHarmonicsTextures[i]->getOriginalSize().Width);
-            sh_h = MAX2(sh_h, SphericalHarmonicsTextures[i]->getOriginalSize().Height);
+            sh_w = MAX2(sh_w, SphericalHarmonicsTextures[i]->getSize().Width);
+            sh_h = MAX2(sh_h, SphericalHarmonicsTextures[i]->getSize().Height);
         }
 
         for (unsigned i = 0; i < 6; i++)

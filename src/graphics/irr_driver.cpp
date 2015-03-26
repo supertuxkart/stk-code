@@ -592,10 +592,23 @@ void IrrDriver::initDevice()
     m_pointer_shown = true;
 }   // initDevice
 
+// ----------------------------------------------------------------------------
+void IrrDriver::setMaxTextureSize()
+{
+    if( (UserConfigParams::m_high_definition_textures & 0x01) == 0)
+    {
+        io::IAttributes &att = m_video_driver->getNonConstDriverAttributes();
+        att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(512, 512));
+    }
+}   // setMaxTextureSize
+
+// ----------------------------------------------------------------------------
 void IrrDriver::cleanSunInterposer()
 {
     delete m_sun_interposer;
-}
+}   // cleanSunInterposer
+
+// ----------------------------------------------------------------------------
 void IrrDriver::createSunInterposer()
 {
     scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
