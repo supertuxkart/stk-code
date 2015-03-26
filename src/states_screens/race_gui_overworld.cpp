@@ -330,7 +330,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
     if (old_rtt_mini_map != NULL)
     {
-        core::rect<s32> source(core::position2di(0, 0), old_rtt_mini_map->getOriginalSize());
+        core::rect<s32> source(core::position2di(0, 0), old_rtt_mini_map->getSize());
         draw2DImage(old_rtt_mini_map, dest, source, 0, 0, true);
     }
     else if (new_rtt_mini_map != NULL)
@@ -381,7 +381,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                     colors[i]=kart->getKartProperties()->getColor();
                 }
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                           m_icons_frame->getTexture()->getOriginalSize());
+                                           m_icons_frame->getTexture()->getSize());
 
                 draw2DImage(m_icons_frame->getTexture(), position,
                                                           rect, NULL, colors, true);
@@ -410,7 +410,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         else if (c->isSolved(RaceManager::DIFFICULTY_EASY))   state = COMPLETED_EASY;
 
         const core::rect<s32> source(core::position2d<s32>(0,0),
-                                     m_icons[state]->getOriginalSize());
+                                     m_icons[state]->getSize());
 
         int marker_size = m_minimap_challenge_size;
         core::position2di mouse = irr_driver->getMouseLocation();

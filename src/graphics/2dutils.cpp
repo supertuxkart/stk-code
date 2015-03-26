@@ -117,7 +117,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
         tex_width, tex_height,
         tex_center_pos_x, tex_center_pos_y;
 
-    getSize(texture->getOriginalSize().Width, texture->getOriginalSize().Height, texture->isRenderTarget(),
+    getSize(texture->getSize().Width, texture->getSize().Height, texture->isRenderTarget(),
         destRect, sourceRect, width, height, center_pos_x, center_pos_y,
         tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
 
