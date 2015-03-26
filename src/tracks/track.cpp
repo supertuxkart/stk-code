@@ -963,6 +963,8 @@ bool Track::loadMainTrack(const XMLNode &root)
     // and configure the path to them before loading the mesh.
     if ( (UserConfigParams::m_high_definition_textures & 0x01) == 0x00)
     {
+#undef USE_RESIZE_CACHE
+#ifdef USE_RESIZE_CACHE
         std::string cached_textures_dir =
             irr_driver->generateSmallerTextures(m_root);
 
@@ -972,10 +974,11 @@ bool Track::loadMainTrack(const XMLNode &root)
         std::string texture_default_path =
             scene_params->getAttributeAsString(scene::B3D_TEXTURE_PATH).c_str();
         scene_params->setAttribute(scene::B3D_TEXTURE_PATH, cached_textures_dir.c_str());
-
+#endif
         mesh = irr_driver->getMesh(full_path);
-
+#ifdef USE_RESIZE_CACHE
         scene_params->setAttribute(scene::B3D_TEXTURE_PATH, texture_default_path.c_str());
+#endif
     }
     else // Load mesh with default (hd) textures
     {
@@ -1637,6 +1640,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     file_manager->pushTextureSearchPath(m_root);
     file_manager->pushModelSearchPath  (m_root);
 
+    // For now ignore the resize cache, since atm it only handles texturs in
+    // the track directory.
+#undef USE_RESIZE_CACHE
+#ifdef USE_RESIZE_CACHE
     // If the hd texture option is disabled, we generate smaller textures
     // and we also add the cache directory to the texture search path
     if ( (UserConfigParams::m_high_definition_textures & 0x01) == 0x00)
@@ -1645,7 +1652,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             irr_driver->generateSmallerTextures(m_root);
         file_manager->pushTextureSearchPath(cached_textures_dir);
     }
-
+#endif
     // First read the temporary materials.xml file if it exists
     try
     {
@@ -1823,10 +1830,12 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         World::getWorld()->setClearbackBufferColor(m_sky_color);
     }
 
+#ifdef USE_RESIZE_CACHE
     if (!UserConfigParams::m_high_definition_textures)
     {
         file_manager->popTextureSearchPath();
     }
+#endif
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
