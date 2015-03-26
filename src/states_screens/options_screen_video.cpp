@@ -62,6 +62,7 @@ struct GFXPreset
     bool dof;
     bool global_illumination;
     bool degraded_ibl;
+    int hd_textures;
 };
 
 static GFXPreset GFX_PRESETS[] =
@@ -70,35 +71,35 @@ static GFXPreset GFX_PRESETS[] =
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
         false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */, true /* degraded IBL */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 0 /* hd_textures */
     },
 
     {
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */, true /* degraded IBL */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 0 /* hd_textures */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, true /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */, true /* degraded IBL */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 1 /* hd_textures */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */, true /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 8 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */, false /* degraded IBL */
+        false /* depth of field */, false /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
     },
 
     {
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
-        true /* depth of field */, true /* global illumination */, false /* degraded IBL */
+        true /* depth of field */, true /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
     }
 };
 
@@ -397,7 +398,8 @@ void OptionsScreenVideo::updateGfxSlider()
             GFX_PRESETS[l].weather == UserConfigParams::m_weather_effects &&
             GFX_PRESETS[l].dof == UserConfigParams::m_dof &&
             GFX_PRESETS[l].global_illumination == UserConfigParams::m_gi &&
-            GFX_PRESETS[l].degraded_ibl == UserConfigParams::m_degraded_IBL)
+            GFX_PRESETS[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
+            GFX_PRESETS[l].hd_textures == (UserConfigParams::m_high_definition_textures & 0x01))
         {
             gfx->setValue(l + 1);
             found = true;
@@ -488,7 +490,11 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Global illumination : %s",
         UserConfigParams::m_gi ? enabled : disabled);
-
+    
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Use high definition textures") + L" : " +
+        ((UserConfigParams::m_high_definition_textures & 0x1) == 0 ? disabled : enabled);
+    
     gfx->setTooltip(tooltip);
 }   // updateTooltip
 
@@ -570,6 +576,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_dof = GFX_PRESETS[level].dof;
         UserConfigParams::m_gi = GFX_PRESETS[level].global_illumination;
         UserConfigParams::m_degraded_IBL = GFX_PRESETS[level].degraded_ibl;
+        UserConfigParams::m_high_definition_textures = 0x02 | GFX_PRESETS[level].hd_textures;
 
         updateGfxSlider();
     }
