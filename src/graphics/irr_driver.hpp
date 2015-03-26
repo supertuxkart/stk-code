@@ -36,7 +36,6 @@
 #include <SColor.h>
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
-//#include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
@@ -354,6 +353,7 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
+    void setMaxTextureSize();
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 

@@ -1128,6 +1128,10 @@ void initRest()
     powerup_manager         = new PowerupManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
+
+    // The maximum texture size can not be set earlier, since
+    // e.g. the background image needs to be loaded in high res.
+    irr_driver->setMaxTextureSize();
     KartPropertiesManager::addKartSearchDir(
                  file_manager->getAddonsFile("karts/"));
     track_manager->addTrackSearchDir(

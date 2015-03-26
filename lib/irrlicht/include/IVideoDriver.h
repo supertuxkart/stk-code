@@ -324,6 +324,8 @@ namespace video
 		AntiAlias (int) Number of Samples the driver uses for each pixel. 0 and 1 means anti aliasing is off, typical values are 2,4,8,16,32
 		*/
 		virtual const io::IAttributes& getDriverAttributes() const=0;
+        //! Non-const version (with a different name to avoid involuntary mistakes). */
+        virtual io::IAttributes& getNonConstDriverAttributes() = 0;
 
 		//! Check if the driver was recently reset.
 		/** For d3d devices you will need to recreate the RTTs if the

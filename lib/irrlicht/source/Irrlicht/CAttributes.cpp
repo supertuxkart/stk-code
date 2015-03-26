@@ -429,7 +429,7 @@ void CAttributes::setAttribute(const c8* attributeName, core::dimension2d<u32> v
 //! Gets an attribute as dimension2d
 //! \param attributeName: Name of the attribute to get.
 //! \return Returns value of the attribute previously set by setAttribute()
-core::dimension2d<u32> CAttributes::getAttributeAsDimension2d(const c8* attributeName)
+core::dimension2d<u32> CAttributes::getAttributeAsDimension2d(const c8* attributeName) const
 {
 	IAttribute* att = getAttributeP(attributeName);
 	if (att)
@@ -737,7 +737,7 @@ core::rect<s32>  CAttributes::getAttributeAsRect(s32 index)
 
 //! Gets an attribute as dimension2d
 //! \param index: Index value, must be between 0 and getAttributeCount()-1.
-core::dimension2d<u32>  CAttributes::getAttributeAsDimension2d(s32 index)
+core::dimension2d<u32>  CAttributes::getAttributeAsDimension2d(s32 index) const
 {
 	if ((u32)index < Attributes.size())
 		return Attributes[index]->getDimension2d();
