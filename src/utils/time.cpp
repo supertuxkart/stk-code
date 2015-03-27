@@ -22,13 +22,31 @@
 
 #include <ctime>
 
+irr::ITimer *StkTime::m_timer = NULL;
+
+/** Init function for the timer. It grabs a copy of the timer of the
+ *  current irrlicht device (which is the NULL device). This way the
+ *  irrlicht time routine can be used even if no device exists. This
+ *  situation can happen when the window resolution is changed - if the
+ *  sfx manager (in a separate thread) would access the timer while the
+ *  device does not exist, stk crashes.
+ */
+void StkTime::init()
+{
+    assert(!m_timer);
+    m_timer = irr_driver->getDevice()->getTimer();
+    m_timer->grab();
+}   // init
+
+// ----------------------------------------------------------------------------
 /** Returns a time based on an arbitrary 'epoch' (e.g. could be start
  *  time of the application, 1.1.1970, ...).
  *  The value is a double precision floating point value in seconds.
  */
 double StkTime::getRealTime(long startAt)
 {
-    return irr_driver->getRealTime()/1000.0;
+    assert(m_timer);
+    return m_timer->getRealTime()/1000.0;
 }   // getTimeSinceEpoch
 
 // ----------------------------------------------------------------------------

@@ -1085,6 +1085,7 @@ void initRest()
     stk_config->load(file_manager->getAsset("stk_config.xml"));
 
     irr_driver = new IrrDriver();
+    StkTime::init();   // grabs the timer object from the irrlicht device
 
     // Now create the actual non-null device in the irrlicht driver
     irr_driver->initDevice();
