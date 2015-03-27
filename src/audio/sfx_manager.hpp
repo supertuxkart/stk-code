@@ -200,6 +200,8 @@ private:
     /** Thread id of the thread running in this object. */
     Synchronised<pthread_t *> m_thread_id;
 
+    double                    m_last_update_time;
+
     /** A conditional variable to wake up the main loop. */
     pthread_cond_t            m_cond_request;
 
@@ -253,7 +255,7 @@ public:
     void                     reallyPauseAllNow();
     void                     resumeAll();
     void                     reallyResumeAllNow();
-    void                     update(float dt);
+    void                     update();
     void                     reallyUpdateNow(SFXCommand *current);
     bool                     soundExist(const std::string &name);
     void                     setMasterSFXVolume(float gain);

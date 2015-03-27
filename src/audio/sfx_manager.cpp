@@ -74,6 +74,7 @@ SFXManager::SFXManager()
     // The sound manager initialises OpenAL
     m_initialized = music_manager->initialized();
     m_master_gain = UserConfigParams::m_sfx_volume;
+    m_last_update_time = -1.0f;
     // Init position, since it can be used before positionListener is called.
     // No need to use lock here, since the thread will be created later.
     m_listener_position.getData() = Vec3(0, 0, 0);
@@ -364,8 +365,10 @@ void* SFXManager::mainLoop(void *obj)
         {
             // Wait some time to let other threads run, then queue an
             // update event to keep music playing.
+            double t = StkTime::getRealTime();
             StkTime::sleep(1);
-            me->queue(SFX_UPDATE, (SFXBase*)NULL, 0.001f);
+            t = StkTime::getRealTime() - t;
+            me->queue(SFX_UPDATE, (SFXBase*)NULL, float(t));
         }
         me->m_sfx_commands.lock();
 
@@ -667,9 +670,9 @@ void SFXManager::deleteSFXMapping(const std::string &name)
  *  adds an update command for the music manager.
  *  \param dt Time step size.
  */
-void SFXManager::update(float dt)
+void SFXManager::update()
 {
-    queue(SFX_UPDATE, (SFXBase*)NULL, dt);
+    queue(SFX_UPDATE, (SFXBase*)NULL);
     // Wake up the sfx thread to handle all queued up audio commands.
     pthread_cond_signal(&m_cond_request);
 }   // update
@@ -681,8 +684,17 @@ void SFXManager::update(float dt)
 */
 void SFXManager::reallyUpdateNow(SFXCommand *current)
 {
+    if (m_last_update_time < 0.0)
+    {
+        // first time
+        m_last_update_time = StkTime::getRealTime();
+    }
+
+    double previous_update_time = m_last_update_time;
+    m_last_update_time = StkTime::getRealTime();
+    double dt = m_last_update_time - previous_update_time;
+
     assert(current->m_command==SFX_UPDATE);
-    float dt = current->m_parameter.getX();
     if (music_manager->getCurrentMusic())
         music_manager->getCurrentMusic()->update(dt);
     m_all_sfx.lock();
