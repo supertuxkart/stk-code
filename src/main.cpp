@@ -1365,9 +1365,10 @@ int main(int argc, char *argv[] )
             exit(0);
         }
 
-        if (UserConfigParams::m_old_driver_popup)
+        if (!ProfileWorld::isNoGraphics() &&
+            GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
         {
-            if (!ProfileWorld::isNoGraphics() && GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+            if (UserConfigParams::m_old_driver_popup)
             {
                 MessageDialog *dialog =
                     new MessageDialog(_("Your driver version is too old. Please install "
@@ -1375,7 +1376,11 @@ int main(int argc, char *argv[] )
                     /*from queue*/ true);
                 GUIEngine::DialogQueue::get()->pushDialog(dialog);
             }
-            else if (!CVS->isGLSL())
+            Log::warn("OpenGL", "Driver is too old!");
+        }
+        else if (!CVS->isGLSL())
+        {
+            if (UserConfigParams::m_old_driver_popup)
             {
                 MessageDialog *dialog =
                     new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
@@ -1383,6 +1388,7 @@ int main(int argc, char *argv[] )
                     /*from queue*/ true);
                 GUIEngine::DialogQueue::get()->pushDialog(dialog);
             }
+            Log::warn("OpenGL", "OpenGL version is too old!");
         }
 
         // Note that on the very first run of STK internet status is set to
