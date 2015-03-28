@@ -283,26 +283,22 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 #if ENABLE_BIDI
     if(this->isRTLLanguage())
     {
-        const int FRIBIDI_BUFFER_SIZE = 512;
-        FriBidiChar fribidiInput[FRIBIDI_BUFFER_SIZE];
-        int len = 0;
-        int n = 0;
-        //std::cout << "fribidi input : ";
-        for (n = 0; ; n++)
-        {
-            fribidiInput[n] = in_ptr[n];
-            //std::cout << (int)fribidiInput[n] << " ";
-            len++;
+        std::size_t length = wcslen(in_ptr);
+        FriBidiChar *fribidiInput;
 
-            if (n == FRIBIDI_BUFFER_SIZE-1) // prevent buffeoverflows
-            {
-                Log::warn("Translations::fribidize", "translated string too long, truncating");
-                fribidiInput[n] = 0;
-                break;
-            }
-            if (fribidiInput[n] == 0) break; // stop on '\0'
+        if (sizeof(wchar_t) == sizeof(FriBidiChar))
+            fribidiInput = (FriBidiChar*) in_ptr;
+        else
+        {
+            // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
+            // So we simply copy the characters over here (note that this
+            // is technically incorrect, all characters we use/support fit
+            // in 16 bits, which is what irrlicht supports atm).
+            fribidiInput = new FriBidiChar[length + 1];
+            std::memset(fribidiInput, 0, (length + 1) * sizeof(FriBidiChar));
+            for (std::size_t i = 0; i <= length; i++)
+                fribidiInput[i] = in_ptr[i];
         }
-        //std::cout << " (len=" << len << ")\n";
 
         // Assume right to left as start direction.
 #if FRIBIDI_MINOR_VERSION==10
@@ -314,37 +310,39 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
         FriBidiCharType pbase_dir = FRIBIDI_PAR_ON;
 #endif
 
-        static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
-        for (n = 0; n < 512 ; n++)  { fribidiOutput[n] = 0; }
+        FriBidiChar *fribidiOutput = new FriBidiChar[length + 1];
+        std::memset(fribidiOutput, 0, (length + 1) * sizeof(FriBidiChar));
         fribidi_boolean result = fribidi_log2vis(fribidiInput,
-                                                 len-1,
+                                                 length,
                                                  &pbase_dir,
                                                  fribidiOutput,
               /* gint   *position_L_to_V_list */ NULL,
               /* gint   *position_V_to_L_list */ NULL,
               /* gint8  *embedding_level_list */ NULL
                                                                );
+        delete[] fribidiInput;
 
         if (!result)
         {
+            delete[] fribidiOutput;
             Log::error("Translations::fribidize", "Fribidi failed in 'fribidi_log2vis' =(");
             m_converted_string = core::stringw(in_ptr);
             return m_converted_string.c_str();
         }
 
-#ifdef WIN32
-        // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
-        // So we simply copy the characters over here (note that this
-        // is technically incorrect, all characters we use/support fit
-        // in 16 bits, which is what irrlicht supports atm).
-        static wchar_t out[FRIBIDI_BUFFER_SIZE];
-        for(int i=0; i<len; i++)
-            out[i]=fribidiOutput[i];
-        out[len]=0;
-        return out;
-#else
-        return (const wchar_t*)fribidiOutput;
-#endif //WIND32
+        if (sizeof(wchar_t) == sizeof(FriBidiChar))
+            m_converted_string = core::stringw((wchar_t*) fribidiOutput);
+        else
+        {
+            // Copy back to wchar_t array
+            wchar_t *out = new wchar_t[length + 1];
+            for (std::size_t i = 0; i <= length; i++)
+                out[i] = fribidiOutput[i];
+            m_converted_string = core::stringw(out);
+            delete[] out;
+        }
+        delete[] fribidiOutput;
+        return m_converted_string.c_str();
     }
 
 #endif // ENABLE_BIDI
