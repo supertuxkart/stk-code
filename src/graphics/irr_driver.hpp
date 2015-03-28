@@ -218,7 +218,7 @@ private:
     core::array<video::IRenderTarget> m_mrt;
 
     /** Matrixes used in several places stored here to avoid recomputation. */
-    core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_previousProjViewMatrix, m_InvProjViewMatrix;
+    core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
     std::vector<video::ITexture *> SkyboxTextures;
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
@@ -678,8 +678,7 @@ public:
     void setProjMatrix(core::matrix4 matrix) { m_ProjMatrix = matrix; matrix.getInverse(m_InvProjMatrix); }
     const core::matrix4 &getProjMatrix() const { return m_ProjMatrix; }
     const core::matrix4 &getInvProjMatrix() const { return m_InvProjMatrix; }
-    void genProjViewMatrix() { m_previousProjViewMatrix = m_ProjViewMatrix; m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; m_InvProjViewMatrix = m_ProjViewMatrix; m_InvProjViewMatrix.makeInverse(); }
-    const core::matrix4 & getPreviousPVMatrix() { return m_previousProjViewMatrix; }
+    void genProjViewMatrix() { m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; m_InvProjViewMatrix = m_ProjViewMatrix; m_InvProjViewMatrix.makeInverse(); }
     const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
     const core::matrix4 &getInvProjViewMatrix() const { return m_InvProjViewMatrix; }
     const core::vector2df &getCurrentScreenSize() const { return m_current_screen_size; }
