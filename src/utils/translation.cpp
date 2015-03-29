@@ -295,7 +295,6 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
             // is technically incorrect, all characters we use/support fit
             // in 16 bits, which is what irrlicht supports atm).
             fribidiInput = new FriBidiChar[length + 1];
-            std::memset(fribidiInput, 0, (length + 1) * sizeof(FriBidiChar));
             for (std::size_t i = 0; i <= length; i++)
                 fribidiInput[i] = in_ptr[i];
         }
@@ -320,7 +319,8 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
               /* gint   *position_V_to_L_list */ NULL,
               /* gint8  *embedding_level_list */ NULL
                                                                );
-        delete[] fribidiInput;
+        if (sizeof(wchar_t) != sizeof(FriBidiChar))
+            delete[] fribidiInput;
 
         if (!result)
         {
