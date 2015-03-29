@@ -10,7 +10,7 @@
     </hard>
     <medium>
         <karts number="1"/>
-        <requirements energy="15" time="190"/>
+        <requirements energy="15" time="195"/>
     </medium>
     <easy>
         <karts number="1"/>
