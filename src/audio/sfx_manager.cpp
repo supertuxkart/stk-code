@@ -692,7 +692,7 @@ void SFXManager::reallyUpdateNow(SFXCommand *current)
 
     double previous_update_time = m_last_update_time;
     m_last_update_time = StkTime::getRealTime();
-    double dt = m_last_update_time - previous_update_time;
+    float dt = float(m_last_update_time - previous_update_time);
 
     assert(current->m_command==SFX_UPDATE);
     if (music_manager->getCurrentMusic())
