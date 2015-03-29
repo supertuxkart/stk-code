@@ -142,7 +142,7 @@ Track::Track(const std::string &filename)
     m_startup_run = false;
     m_default_number_of_laps= 3;
     m_all_nodes.clear();
-    m_all_physics_only_nodes.clear();
+    m_static_physics_only_nodes.clear();
     m_all_cached_meshes.clear();
     loadTrackInfo();
 }   // Track
@@ -293,7 +293,7 @@ void Track::cleanup()
         irr_driver->removeNode(m_all_nodes[i]);
     }
     m_all_nodes.clear();
-    m_all_physics_only_nodes.clear();
+    m_static_physics_only_nodes.clear();
 
     m_all_emitters.clearAndDeleteAll();
 
@@ -301,6 +301,12 @@ void Track::cleanup()
 
     delete m_track_object_manager;
     m_track_object_manager = NULL;
+
+    for (unsigned int i = 0; i < m_object_physics_only_nodes.size(); i++)
+    {
+        m_object_physics_only_nodes[i]->drop();
+    }
+    m_object_physics_only_nodes.clear();
 
     irr_driver->removeNode(m_sun);
 
@@ -718,6 +724,24 @@ void Track::createPhysicsModel(unsigned int main_track_count)
         Log::error("track",
                    "m_track_mesh == NULL, cannot createPhysicsModel\n");
         return;
+    }
+
+
+    // Now convert all objects that are only used for the physics
+    // (like invisible walls).
+    for (unsigned int i = 0; i<m_static_physics_only_nodes.size(); i++)
+    {
+        convertTrackToBullet(m_static_physics_only_nodes[i]);
+        irr_driver->removeNode(m_static_physics_only_nodes[i]);
+    }
+    m_static_physics_only_nodes.clear();
+
+    for (unsigned int i = 0; i<m_object_physics_only_nodes.size(); i++)
+    {
+        convertTrackToBullet(m_object_physics_only_nodes[i]);
+        m_object_physics_only_nodes[i]->setVisible(false);
+        m_object_physics_only_nodes[i]->grab();
+        irr_driver->removeNode(m_object_physics_only_nodes[i]);
     }
 
     m_track_mesh->removeAll();
@@ -1377,7 +1401,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             else
             {
                 if(interaction=="physics-only")
-                    m_all_physics_only_nodes.push_back( scene_node );
+                    m_static_physics_only_nodes.push_back(scene_node);
                 else
                     m_all_nodes.push_back( scene_node );
             }
@@ -1390,15 +1414,6 @@ bool Track::loadMainTrack(const XMLNode &root)
     {
         convertTrackToBullet(m_all_nodes[i]);
     }
-
-    // Now convert all objects that are only used for the physics
-    // (like invisible walls).
-    for(unsigned int i=0; i<m_all_physics_only_nodes.size(); i++)
-    {
-        convertTrackToBullet(m_all_physics_only_nodes[i]);
-        irr_driver->removeNode(m_all_physics_only_nodes[i]);
-    }
-    m_all_physics_only_nodes.clear();
 
     if (m_track_mesh == NULL)
     {
