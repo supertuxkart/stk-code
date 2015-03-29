@@ -100,7 +100,7 @@ void TrackInfoScreen::init()
     const bool has_laps       = race_manager->modeHasLaps();
     const bool has_highscores = race_manager->modeHasHighscores();
 
-    getWidget<LabelWidget>("name")->setText(m_track->getName(), false);
+    getWidget<LabelWidget>("name")->setText(translations->fribidize(m_track->getName()), false);
 
     //I18N: when showing who is the author of track '%s'
     //I18N: (place %s where the name of the author should appear)

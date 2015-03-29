@@ -200,7 +200,7 @@ void Achievement::check()
     {
         //show achievement
         core::stringw s = _("Completed achievement \"%s\".", 
-                            m_achievement_info->getName().c_str());
+                            m_achievement_info->getName());
         MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, s);
 
         // Sends a confirmation to the server that an achievement has been
