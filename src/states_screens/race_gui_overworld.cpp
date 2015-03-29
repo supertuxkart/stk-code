@@ -435,7 +435,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     // ---- Draw nearby challenge if any
     core::rect<s32> pos(15,
                         10,
-                        15 + irr_driver->getActualScreenSize().Width/2,
+                        irr_driver->getActualScreenSize().Width - 200,
                         10 + GUIEngine::getTitleFontHeight());
 
     m_close_to_a_challenge = false;
@@ -493,13 +493,12 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 font->draw(translations->fribidize(gp->getName()), pos, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
 
-                core::rect<s32> pos(15,
-                                    20 + GUIEngine::getTitleFontHeight(),
-                                    15 + irr_driver->getActualScreenSize().Width/2,
-                                    20 + 2*GUIEngine::getTitleFontHeight());
+                core::rect<s32> pos2(pos);
+                pos2.UpperLeftCorner.Y += 10 + GUIEngine::getTitleFontHeight();
+                pos2.LowerRightCorner.Y += 10 + GUIEngine::getTitleFontHeight();
 
                 //just below GP name
-                font->draw(_("Type: Grand Prix"), pos, video::SColor(255,255,255,255),
+                font->draw(_("Type: Grand Prix"), pos2, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
             }
             else
