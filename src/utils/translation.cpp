@@ -47,6 +47,8 @@
 
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
+// Define TEST_BIDI to force right-to-left style for all languages
+//#define TEST_BIDI
 
 using namespace tinygettext;
 
@@ -274,6 +276,9 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             break;
         }
     }
+#ifdef TEST_BIDI
+    m_rtl = true;
+#endif
 }   // Translations
 
 // ----------------------------------------------------------------------------
@@ -298,6 +303,12 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
             for (std::size_t i = 0; i <= length; i++)
                 fribidiInput[i] = in_ptr[i];
         }
+#ifdef TEST_BIDI
+        FriBidiChar *tmp = fribidiInput;
+        fribidiInput = new FriBidiChar[++length + 1];
+        std::memcpy(fribidiInput + 1, tmp, length * sizeof(FriBidiChar));
+        fribidiInput[0] = L'\u202E';
+#endif
 
         // Assume right to left as start direction.
 #if FRIBIDI_MINOR_VERSION==10
@@ -319,6 +330,11 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
               /* gint   *position_V_to_L_list */ NULL,
               /* gint8  *embedding_level_list */ NULL
                                                                );
+#ifdef TEST_BIDI
+        delete[] fribidiInput;
+        fribidiInput = tmp;
+#endif
+
         if (sizeof(wchar_t) != sizeof(FriBidiChar))
             delete[] fribidiInput;
 
