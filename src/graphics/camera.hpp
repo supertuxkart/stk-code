@@ -28,9 +28,10 @@
 #include "utils/log.hpp"
 #include "utils/vec3.hpp"
 
+#include "matrix4.h"
+#include "rect.h"
 #include "SColor.h"
 #include "vector2d.h"
-#include "rect.h"
 
 #include <vector>
 
@@ -64,6 +65,8 @@ private:
 
     /** The camera scene node. */
     scene::ICameraSceneNode *m_camera;
+    /** The project-view matrix of the previous frame, used for the blur shader. */
+    core::matrix4 m_previous_pv_matrix;
 
     /** Camera's mode. */
     Mode            m_mode;
@@ -272,7 +275,15 @@ public:
     void setInitialTransform();
     void activate(bool alsoActivateInIrrlicht=true);
     void update            (float dt);
-    void setKart           (AbstractKart *new_kart);
+    void setKart(AbstractKart *new_kart);
+
+    // ------------------------------------------------------------------------
+    /** Returns the project-view matrix of the previous frame. */
+    core::matrix4 getPreviousPVMatrix() const { return m_previous_pv_matrix; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the project-view matrix of the previous frame. */
+    void setPreviousPVMatrix(core::matrix4 mat) { m_previous_pv_matrix = mat; }
 
     // ------------------------------------------------------------------------
     /** Returns the kart to which this camera is attached. */
