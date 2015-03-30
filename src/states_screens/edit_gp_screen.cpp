@@ -155,7 +155,7 @@ void EditGPScreen::init()
     {
         LabelWidget* header = getWidget<LabelWidget>("title");
         assert(header != NULL);
-        header->setText(m_gp->getName(), true);
+        header->setText(translations->fribidize(m_gp->getName()), true);
 
         IconButtonWidget* button = getWidget<IconButtonWidget>("save");
         assert(button != NULL);
@@ -281,7 +281,8 @@ void EditGPScreen::setModified(const bool modified)
 
     LabelWidget* header = getWidget<LabelWidget>("title");
     assert(header != NULL);
-    header->setText(m_gp->getName() + (modified ? L" (+)" : L""), true);
+    //I18N: Indicate that the grand prix is modified and not saved
+    header->setText(modified ? _(L"%s (+)", m_gp->getName()) : L"", true);
 
     enableButtons();
 }

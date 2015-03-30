@@ -168,7 +168,7 @@ void GrandPrixEditorScreen::setSelection (const GrandPrixData* gpdata)
     else
     {
         m_selection = grand_prix_manager->editGrandPrix(gpdata->getId());
-        gpname_widget->setText (gpdata->getName(), true);
+        gpname_widget->setText(translations->fribidize(gpdata->getName()), true);
         gplist_widget->setSelection(m_selection->getId(), PLAYER_ID_GAME_MASTER, true);
         loadTrackList (gpdata->getId());
     }

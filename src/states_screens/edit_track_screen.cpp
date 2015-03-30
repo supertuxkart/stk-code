@@ -223,7 +223,7 @@ void EditTrackScreen::selectTrack(const std::string& id)
     if (m_track != NULL)
     {
         tracks->setSelection(m_track->getIdent(), PLAYER_ID_GAME_MASTER, true);
-        selected_track->setText(m_track->getName(), true);
+        selected_track->setText(translations->fribidize(m_track->getName()), true);
 
         laps->setValue(m_laps);
 
