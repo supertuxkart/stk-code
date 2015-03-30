@@ -55,6 +55,7 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     m_index         = camera_index;
     m_original_kart = kart;
     m_camera        = irr_driver->addCameraSceneNode();
+    m_previous_pv_matrix = core::matrix4();
 
 #ifdef DEBUG
     if (kart != NULL)

@@ -215,11 +215,11 @@ void GPInfoScreen::init()
         m_gp.createRandomGP(m_num_tracks_spinner->getValue(),
                             m_group_name, getReverse(), true);
 
-        getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
+        getWidget<LabelWidget>("name")->setText(translations->fribidize(m_gp.getName()), false);
     }
     else
     {
-        getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
+        getWidget<LabelWidget>("name")->setText(translations->fribidize(m_gp.getName()), false);
         m_gp.checkConsistency();
     }
 

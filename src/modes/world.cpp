@@ -1145,7 +1145,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
                                        2.0f);
             else
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
-                                       core::stringw(kart->getName())),
+                                       kart->getName()),
                                        camera->getKart(),
                                        2.0f);
         }  // for i < number of cameras

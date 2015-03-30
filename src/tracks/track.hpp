@@ -184,7 +184,12 @@ private:
 
     /** The list of all nodes that are to be converted into physics,
      *  but not to be drawn (e.g. invisible walls). */
-    std::vector<scene::ISceneNode*> m_all_physics_only_nodes;
+    std::vector<scene::ISceneNode*> m_static_physics_only_nodes;
+
+    /** Same concept but for track objects. stored separately due to different
+      * memory management.
+      */
+    std::vector<scene::ISceneNode*> m_object_physics_only_nodes;
 
     /** The list of all meshes that are loaded from disk, which means
      *  that those meshes are being cached by irrlicht, and need to be freed. */
@@ -650,6 +655,11 @@ public:
     bool hasShadows() const { return m_shadows; }
     // ------------------------------------------------------------------------
     void addNode(scene::ISceneNode* node) { m_all_nodes.push_back(node); }
+    // ------------------------------------------------------------------------
+    void addPhysicsOnlyNode(scene::ISceneNode* node)
+    {
+        m_object_physics_only_nodes.push_back(node);
+    }
     // ------------------------------------------------------------------------
     float getDisplacementSpeed() const { return m_displacement_speed;    }
     // ------------------------------------------------------------------------

@@ -276,6 +276,8 @@ void IrrDriver::renderGLSL(float dt)
                 glDisable(GL_FRAMEBUFFER_SRGB);
             }
         }
+        // Save projection-view matrix for the next frame
+        camera->setPreviousPVMatrix(m_ProjViewMatrix);
 
         PROFILER_POP_CPU_MARKER();
     }   // for i<world->getNumKarts()

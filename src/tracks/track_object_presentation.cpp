@@ -384,14 +384,28 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
     bool displacing = false;
-    if(xml_node)
+    std::string interaction;
+    if (xml_node)
+    {
         xml_node->get("displacing", &displacing);
+        xml_node->get("interaction", &interaction);
+    }
     animated &= !displacing;
 
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
 
-    if (m_is_in_skybox)
+    if (interaction == "physicsonly")
+    {
+        m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
+        enabled = false;
+        m_frame_start = 0;
+        m_frame_end = 0;
+
+        if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
+            World::getWorld()->getTrack()->addPhysicsOnlyNode(m_node);
+    }
+    else if (m_is_in_skybox)
     {
         // Tell the driver that this mesh is a part of the background
         scene::IMeshSceneNode * const node =

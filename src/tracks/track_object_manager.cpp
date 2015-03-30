@@ -42,13 +42,6 @@ TrackObjectManager::~TrackObjectManager()
 // ----------------------------------------------------------------------------
 /** Adds an object to the track object manager. The type to add is specified
  *  in the xml_node.
- * \note If you add add any objects with LOD, don't forget to call
- *       TrackObjectManager::assingLodNodes after everything is loaded
- *       to finalize their creation.
- *
- * FIXME: all of this is horrible, just make the exporter write LOD definitions
- *        in a separate section that's read before everything and remove all this
- *        crap
  */
 void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
                              ModelDefinitionLoader& model_def_loader)
@@ -351,21 +344,4 @@ void TrackObjectManager::removeObject(TrackObject* obj)
 
 // ----------------------------------------------------------------------------
 
-/*
-void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
-{
-    for (unsigned int n=0; n<lod_nodes.size(); n++)
-    {
-        std::vector<const XMLNode*>& queue = m_lod_objects[ lod_nodes[n]->getGroupName() ];
-        assert( queue.size() > 0 );
-        const XMLNode* xml = queue[ queue.size() - 1 ];
 
-        TrackObject* obj = new TrackObject(*xml, lod_nodes[n]->getParent(), lod_nodes[n]);
-        queue.erase( queue.end() - 1 );
-
-        m_all_objects.push_back(obj);
-    }
-
-    m_lod_objects.clear();
-}
-*/

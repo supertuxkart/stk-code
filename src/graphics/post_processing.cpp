@@ -520,25 +520,25 @@ void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo, FrameBuffe
 {
     MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
         getCallback(ES_MOTIONBLUR);
-    unsigned cam = Camera::getActiveCamera()->getIndex();
+    Camera *cam = Camera::getActiveCamera();
+    unsigned camID = cam->getIndex();
 
-    scene::ICameraSceneNode * const camnode =
-        Camera::getCamera(cam)->getCameraSceneNode();
+    scene::ICameraSceneNode * const camnode = cam->getCameraSceneNode();
 
     // Calculate the kart's Y position on screen
-    if (Camera::getCamera(cam)->getKart())
+    if (cam->getKart())
     {
-        const core::vector3df pos = Camera::getCamera(cam)->getKart()->getNode()->getPosition();
+        const core::vector3df pos = cam->getKart()->getNode()->getPosition();
         float ndc[4];
         core::matrix4 trans = camnode->getProjectionMatrix();
         trans *= camnode->getViewMatrix();
 
         trans.transformVect(ndc, pos);
         const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
-        setMotionBlurCenterY(cam, karty);
+        setMotionBlurCenterY(camID, karty);
     }
     else
-        setMotionBlurCenterY(cam, 0.5f);
+        setMotionBlurCenterY(camID, 0.5f);
 
     out_fbo.Bind();
     glClear(GL_COLOR_BUFFER_BIT);
@@ -546,9 +546,9 @@ void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo, FrameBuffe
     FullScreenShader::MotionBlurShader::getInstance()->SetTextureUnits(in_fbo.getRTT()[0], irr_driver->getDepthStencilTexture());
     DrawFullScreenEffect<FullScreenShader::MotionBlurShader>(
                                   // Todo : use a previousPVMatrix per cam, not global
-                                  irr_driver->getPreviousPVMatrix(),
+                                  cam->getPreviousPVMatrix(),
                                   core::vector2df(0.5, 0.5),
-                                  cb->getBoostTime(Camera::getActiveCamera()->getIndex()) * 10, // Todo : should be framerate dependent
+                                  cb->getBoostTime(cam->getIndex()) * 10, // Todo : should be framerate dependent
                                   0.15f);
 }
 
@@ -730,7 +730,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             // Downsample
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_BLOOM_256), GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_BLOOM_128), GL_COLOR_BUFFER_BIT, GL_LINEAR);
-			
+
 			// Copy for lens flare
 			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getFBO(FBO_LENS_512), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getFBO(FBO_LENS_256), GL_COLOR_BUFFER_BIT, GL_LINEAR);
