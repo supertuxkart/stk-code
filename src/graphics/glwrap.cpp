@@ -361,7 +361,7 @@ const std::string getGLExtensions()
 
 // ----------------------------------------------------------------------------
 /** Adds GL limits to the json data structure.
- *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
+ *  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs
  */
 void getGLLimits(HardwareStats::Json *json)
 {
