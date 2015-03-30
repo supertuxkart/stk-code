@@ -1,4 +1,4 @@
-// Copyright (C) 2002-2012 Nikolaus Gebhardt
+// Copyright (C) 2002-2015 Nikolaus Gebhardt
 //               2013 Glenn De Jonghe
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h

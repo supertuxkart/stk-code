@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Joerg Henrichs
+//  Copyright (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -57,7 +57,7 @@ namespace HardwareStats
 
 // ----------------------------------------------------------------------------
 /** Returns the amount of RAM in MB.
- *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
+ *  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs
  */
 int getRAM()
 {
@@ -98,7 +98,7 @@ int getRAM()
 
 // ----------------------------------------------------------------------------
 /** Returns the number of processors on the system.
- *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
+ *  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs
  */
 int getNumProcessors()
 {
@@ -204,7 +204,7 @@ void determineOSVersion()
 #endif
 
 #ifdef WIN32
-    //  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs.
+    //  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs.
 
     HKEY hKey;
     if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
