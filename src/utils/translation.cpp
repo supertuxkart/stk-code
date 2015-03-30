@@ -321,7 +321,7 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 #endif
 
         FriBidiChar *fribidiOutput = new FriBidiChar[length + 1];
-        std::memset(fribidiOutput, 0, (length + 1) * sizeof(FriBidiChar));
+        memset(fribidiOutput, 0, (length + 1) * sizeof(FriBidiChar));
         fribidi_boolean result = fribidi_log2vis(fribidiInput,
                                                  length,
                                                  &pbase_dir,
