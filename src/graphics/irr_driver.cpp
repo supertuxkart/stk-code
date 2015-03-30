@@ -1745,15 +1745,13 @@ video::SColorf IrrDriver::getAmbientLight() const
 void IrrDriver::displayFPS()
 {
     gui::IGUIFont* font = GUIEngine::getSmallFont();
+    core::rect<s32> position;
 
-    if(UserConfigParams::m_artist_debug_mode)
-    {
-        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,1100,40),NULL);
-    }
+    if (UserConfigParams::m_artist_debug_mode)
+        position = core::rect<s32>(75, 0, 1100, 40);
     else
-    {
-        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,40),NULL);
-    }
+        position = core::rect<s32>(75, 0, 900, 40);
+    GL32_draw2DRectangle(video::SColor(150, 96, 74, 196), position, NULL);
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
     const int NO_TRUST_COUNT = 200;
@@ -1805,7 +1803,7 @@ void IrrDriver::displayFPS()
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        fpsString = StringUtils::insertValues(_("FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"),
+        fpsString = _("FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d",
             min, fps, max, poly_count[SOLID_NORMAL_AND_DEPTH_PASS], poly_count[SHADOW_PASS], m_last_light_bucket_distance);
         poly_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         poly_count[SHADOW_PASS] = 0;
@@ -1814,11 +1812,11 @@ void IrrDriver::displayFPS()
         object_count[TRANSPARENT_PASS] = 0;
     }
     else
-        fpsString = StringUtils::insertValues(_("FPS: %d/%d/%d - %d KTris"), min, fps, max, (int)roundf(kilotris));
+        fpsString = _("FPS: %d/%d/%d - %d KTris", min, fps, max, (int)roundf(kilotris));
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
 
-    font->draw( fpsString.c_str(), core::rect< s32 >(100,0,400,50), fpsColor, false );
+    font->draw( fpsString.c_str(), position, fpsColor, false );
 }   // updateFPS
 
 // ----------------------------------------------------------------------------

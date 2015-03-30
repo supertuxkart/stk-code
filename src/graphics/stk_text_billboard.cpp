@@ -46,7 +46,8 @@ void STKTextBillboard::updateAbsolutePosition()
 
 scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFont* font)
 {
-    font->doDraw(text, core::rect<s32>(0, 0, 1000, 1000), video::SColor(255,255,255,255),
+    core::dimension2du size = font->getDimension(text.c_str());
+    font->doDraw(text, core::rect<s32>(0, 0, size.Width, size.Height), video::SColor(255,255,255,255),
         false, false, NULL, this);
 
     const float scale = 0.018f;

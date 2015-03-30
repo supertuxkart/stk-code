@@ -182,7 +182,7 @@ bool Track::operator<(const Track &other) const
     \note this is the LTR name, invoke fribidi as needed. */
 core::stringw Track::getName() const
 {
-    core::stringw translated = translations->w_gettext(m_name.c_str());
+    core::stringw translated = _LTR(m_name.c_str());
     int index = translated.find("|");
     if(index>-1)
     {
