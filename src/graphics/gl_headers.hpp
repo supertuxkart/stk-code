@@ -30,6 +30,9 @@ extern "C" {
 #    include <OpenGL/gl3.h>
 #    define OGL32CTX
 #    ifdef GL_ARB_instanced_arrays
+#        ifdef glVertexAttribDivisor
+#            undef glVertexAttribDivisor
+#        endif
 #        define glVertexAttribDivisor glVertexAttribDivisorARB
 #    endif
 #    ifndef GL_TEXTURE_SWIZZLE_RGBA
