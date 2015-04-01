@@ -4,6 +4,17 @@
 # listed in comments at the beginning of the file, to the 
 # 'translator-credits' translations - where launchpad added them
 # and which are shown in stk.
+#
+# Usage:  update_po_authors.py  PATH_TO/LANGUAGE.po
+#
+# IMPORTANT note: this script must be run on a file downloaded
+#           from transifex, not on a file on which this script had
+#           been run before (otherwise the transifex authors would
+#           be added again and again)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+# Less important note: The specified file is overwritten without
+#           a backup! Make sure the git status is unmodified.
+
 import re
 import sys
 
@@ -20,8 +31,8 @@ if __name__ == "__main__":
 
     f.close()
 
-    authors = []
-    found   = 0
+    new_authors = []
+    found        = 0
 
     # Find all authors with a simple finite state machine:
     contributions = -1
@@ -31,7 +42,7 @@ if __name__ == "__main__":
         if line=="# Translators:":
             found = 1
         elif found and line[:2]=="# ":
-            authors.append(line[2:])
+            new_authors.append(line[2:])
         elif line[:5]=="msgid":
             found = 0
         elif line[:31]== "msgstr \"Launchpad Contributions":
@@ -42,21 +53,41 @@ if __name__ == "__main__":
     # Delete all email addresses - not sure if the authors
     # would want them to be published
     email=re.compile(" *<.*@.*\..*> *")   # one @ and one dot at least
-    for i in range(len(authors)):
-        g = email.search(authors[i])
+    for i in range(len(new_authors)):
+        g = email.search(new_authors[i])
         if g:
-            authors[i] = authors[i][:g.start()]+authors[i][g.end():]
+            new_authors[i] = new_authors[i][:g.start()] \
+                           + new_authors[i][g.end():]
 
-    # Now append the new authors to the Launchpad string
-    if contributions==-1:
-        print "Can not find old Launchpad Contributions string."
-        sys.exit(-1)
+    # Get the old authors from the translator-credits string:
+    if contributions>0:
+        # Ignore the first entry, which is "msgstr ...", and the
+        # last two characters, which are the '"\n'.
+        old_authors = lines[contributions][:-2].split("\\n")[1:]
+        for i in range(len(old_authors)):
+            old_authors[i] = old_authors[i].strip()
     else:
-        # Remove trailing "
-        s=reduce(lambda x,y: x+"\\n  "+y, authors)
-        lines[contributions] = lines[contributions][:-2]+"\\n  "+s+\
-                               lines[contributions][-2:]
+        old_authors=[]
+    
+    all_authors = old_authors + new_authors;
+    all_authors = sorted(all_authors, key=lambda x: x.lower())
+    all_authors_string = reduce(lambda x,y: x+"\\n"+y, all_authors, "")
+    
+    # If no old authors exists, write a new entry:
+    if contributions==-1:
+        lines.append("\n")
+        lines.append("#: src/states_screens/credits.cpp:209\n")
+        lines.append("msgid \"translator-credits\"\n")
 
+    else:
+        # Otherwise just delete the old contribution string
+        # so that the new one can be appended below.
+        del lines[contributions]
+
+    # Append new author list
+    lines.append("msgstr \"Launchpad Contributions:\\n%s\"\n"%all_authors_string)
+
+    # Overwrite old file
     f = open(sys.argv[1], "w")
     for i in lines:
         f.write(i)
