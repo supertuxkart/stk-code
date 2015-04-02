@@ -27,7 +27,6 @@
 #include <stdlib.h>
 
 #include "language.hpp"
-#include "iconv.hpp"
 #include "dictionary.hpp"
 #include "plural_forms.hpp"
 
