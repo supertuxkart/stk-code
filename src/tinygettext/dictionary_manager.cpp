@@ -17,6 +17,8 @@
 
 #include "dictionary_manager.hpp"
 
+#include "utils/log.hpp"
+
 #include <memory>
 #include <assert.h>
 #include <stdlib.h>
@@ -24,7 +26,6 @@
 #include <fstream>
 #include <algorithm>
 
-#include "log_stream.hpp"
 #include "po_parser.hpp"
 #include "stk_file_system.hpp"
 
@@ -134,7 +135,8 @@ DictionaryManager::get_dictionary(const Language& language)
 
           if (!po_language)
           {
-            log_warning << *filename << ": warning: ignoring, unknown language" << std::endl;
+              Log::warn("tinygettext", "%s: warning: ignoring, unknown language",
+                         filename->c_str());
           }
           else
           {
@@ -157,7 +159,8 @@ DictionaryManager::get_dictionary(const Language& language)
           std::auto_ptr<std::istream> in = filesystem->open_file(pofile);
           if (!in.get())
           {
-            log_error << "error: failure opening: " << pofile << std::endl;
+              Log::error("tinygettext", "error: failure opening: '%s'.",
+                         pofile.c_str());
           }
           else
           {
@@ -166,8 +169,8 @@ DictionaryManager::get_dictionary(const Language& language)
         }
         catch(std::exception& e)
         {
-          log_error << "error: failure parsing: " << pofile << std::endl;
-          log_error << e.what() << "" << std::endl;
+          Log::error("tinygettext", "error: failure parsing: '%s'.", pofile.c_str());
+          Log::error("tinygettext", "%s", e.what());
         }
       }
     }

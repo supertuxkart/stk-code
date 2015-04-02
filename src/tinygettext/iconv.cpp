@@ -25,7 +25,6 @@
 #include <stdlib.h>
 
 #include "iconv.hpp"
-#include "log_stream.hpp"
 
 namespace tinygettext {
 

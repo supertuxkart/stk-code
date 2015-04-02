@@ -22,14 +22,16 @@
 #include <string>
 #include <istream>
 #include <string.h>
+#include <sstream>
 #include <map>
 #include <stdlib.h>
 
 #include "language.hpp"
-#include "log_stream.hpp"
 #include "iconv.hpp"
 #include "dictionary.hpp"
 #include "plural_forms.hpp"
+
+#include "utils/log.hpp"
 
 namespace tinygettext {
 
@@ -65,14 +67,15 @@ POParser::~POParser()
 void
 POParser::warning(const std::string& msg)
 {
-  log_warning << filename << ":" << line_number << ": warning: " << msg << ": " << current_line << std::endl;
-  //log_warning << "Line: " << current_line << std::endl;
+    Log::warn("tinygettext", "%s line %d %s: \"%s\"",
+        filename.c_str(), line_number, msg.c_str(), current_line.c_str());
 }
 
 void
 POParser::error(const std::string& msg)
 {
-  log_error << filename << ":" << line_number << ": error: " << msg  << ": " << current_line << std::endl;
+    Log::error("tinygettext", "%s line %d %s: \"%s\"",
+        filename.c_str(), line_number, msg.c_str(), current_line.c_str());
 
   // Try to recover from an error by searching for start of another entry
   do
