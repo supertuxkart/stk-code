@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
-        <label id="title" width="100%" text_align="center" word_wrap="true" proportion="1" />
+        <label id="title" width="100%" text_align="center" word_wrap="true" proportion="1"
+             I18N="In a 'are you sure?' dialog" text="Are you sure?" />
 
         <spacer height="25" width="10" />
 
