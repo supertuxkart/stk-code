@@ -243,7 +243,7 @@ namespace StringUtils
                 }
                 else
                 {
-                    if (keepSplitChar)
+                    if (keepSplitChar && start != 0)
                         result.push_back( s.subString(start - 1,
                                                       s.size()-start + 1) );
                     else

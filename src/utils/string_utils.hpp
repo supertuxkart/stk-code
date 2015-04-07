@@ -136,210 +136,69 @@ namespace StringUtils
     std::string insertValues(const std::string &s,
                              std::vector<std::string>& all_vals);
 
-    /** This no-op is useful when using variadic arguments, so that we may
-     *  support the case with 0 variadic arguments */
-    template <class T1>
-    T1 insertValues(const T1& s) { return s; }
-
     // ------------------------------------------------------------------------
     /** Same as above but for wide-strings */
     irr::core::stringw insertValues(const irr::core::stringw &s,
                                     std::vector<irr::core::stringw>& all_vals);
 
-    // ------------------------------------------------------------------------
-    // Note: the order in which the templates are specified is important, since
-    // otherwise some compilers will not find the right template to use.
-
-    template <class T1, class T2, class T3, class T4, class T5, class T6>
-    std::string insertValues(const std::string &s, const T1 &v1,
-                             const T2 &v2, const T3 &v3, const T4 &v4,
-                             const T5 &v5,const T6 &v6)
-    {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v3; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v4; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v5; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v6; all_vals.push_back(dummy.str());
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1, ..., v6)
-
-    // ------------------------------------------------------------------------
-    template <class T1, class T2, class T3, class T4, class T5>
-    std::string insertValues(const std::string &s, const T1 &v1,
-                             const T2 &v2, const T3 &v3, const T4 &v4,
-                             const T5 &v5)
-    {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v3; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v4; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v5; all_vals.push_back(dummy.str());
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1, ..., v5)
-
-    // ------------------------------------------------------------------------
-    template <class T1, class T2, class T3, class T4>
-    std::string insertValues(const std::string &s, const T1 &v1,
-                             const T2 &v2, const T3 &v3, const T4 &v4)
-    {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v3; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v4; all_vals.push_back(dummy.str());
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1, ..., v4)
-
-    // ------------------------------------------------------------------------
-    /** Shortcut insert_values taking three values, see above for
-     *  full docs.
-     *  \param s String in which all %s or %d are replaced.
-     *  \param v1,v2, v3 Value(s) to replace all %s or %d with.
-     */
-    template <class T1, class T2, class T3>
-    std::string insertValues(const std::string &s, const T1 &v1,
-                             const T2 &v2, const T3 &v3)
-    {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v3; all_vals.push_back(dummy.str());
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1, ..., v3)
-
-    // ------------------------------------------------------------------------
-    // Note: the order in which the templates are specified is important, since
-    // otherwise some compilers will not find the right template to use.
-    /** Shortcut insert_values taking three values, see above for
-     *  full docs.
-     *  \param s String in which all %s or %d are replaced.
-     *  \param v1,v2 Value(s) to replace all %s or %d with.
-     */
-    template <class T1, class T2>
-    std::string insertValues(const std::string &s, const T1 &v1,
-                             const T2 &v2)
-    {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
-
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1, v2)
-    // ------------------------------------------------------------------------
-    /** Shortcut insert_values taking three values, see above for
-     *  full docs.
-     *  \param s String in which all %s, %d are replaced.
-     *  \param v1 Value to replace.
-     */
-    template <class T1>
-    std::string insertValues(const std::string &s, const T1 &v1)
-    {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-
-        return insertValues(s, all_vals);
-    }   // insertValues(s, v1)
+    /** This no-op is useful when using variadic arguments, so that we may
+     *  support the case with 0 variadic arguments */
+    template <typename T>
+    T insertValues(T &s) { return s; }
 
     // ------------------------------------------------------------------------
     /** Intermediate struct to fill a vector using variadic templates */
-    struct __FillStringwVector
+    struct __FillStringVector
     {
         template<typename T, typename...Args>
-        static void __Fill(std::vector<irr::core::stringw> &all_vals, T&& v, Args &&...args)
+        static void __FillS(std::vector<std::string> &all_vals, T&& v, Args &&...args)
         {
-            all_vals.push_back(irr::core::stringw(std::forward<T>(v)));
-            __Fill(all_vals, std::forward<Args>(args)...);
+            std::ostringstream oss;
+            oss << v;
+            all_vals.push_back(oss.str());
+            __FillS(all_vals, std::forward<Args>(args)...);
         }
 
-        static void __Fill(std::vector<irr::core::stringw>&) {}
+        static void __FillS(std::vector<std::string>&) {}
+
+        template<typename T, typename...Args>
+        static void __FillW(std::vector<irr::core::stringw> &all_vals, T&& v, Args &&...args)
+        {
+            all_vals.push_back(irr::core::stringw(std::forward<T>(v)));
+            __FillW(all_vals, std::forward<Args>(args)...);
+        }
+
+        static void __FillW(std::vector<irr::core::stringw>&) {}
     };
+
+    template <typename...Args>
+    std::string insertValues(const std::string &s, Args ...args)
+    {
+        std::vector<std::string> all_vals;
+        __FillStringVector::__FillS(all_vals, std::forward<Args>(args)...);
+        return insertValues(s, all_vals);
+    }
+
+    template <typename...Args>
+    std::string insertValues(const char *s, Args ...args)
+    {
+        return insertValues(std::string(s), std::forward<Args>(args)...);
+    }
 
     /** Like the other ones above but for wide strings */
     template <typename...Args>
     irr::core::stringw insertValues(const irr::core::stringw &s, Args ...args)
     {
         std::vector<irr::core::stringw> all_vals;
-        __FillStringwVector::__Fill(all_vals, std::forward<Args>(args)...);
+        __FillStringVector::__FillW(all_vals, std::forward<Args>(args)...);
         return insertValues(s, all_vals);
     }
 
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for wide strings */
-    template <class T1, class T2, class T3, class T4, class T5>
-    irr::core::stringw insertValues(const wchar_t* chars, const T1 &v1,
-                                    const T2 &v2, const T3 &v3, const T4 &v4,
-                                    const T5 &v5)
+    template <typename...Args>
+    irr::core::stringw insertValues(const wchar_t *s, Args ...args)
     {
-        irr::core::stringw s(chars);
-        return insertValues(s, v1, v2, v3, v4, v5);
-    }   // insertValues(s, v1, ..., v5)
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for wide strings */
-    template <class T1, class T2, class T3>
-    irr::core::stringw insertValues(const wchar_t* chars, const T1 &v1,
-                                    const T2 &v2, const T3 &v3)
-    {
-        irr::core::stringw s(chars);
-        return insertValues(s, v1, v2, v3);
-    }   // insertValues(s, v1, ..., v3)
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for wide strings */
-    template <class T1, class T2>
-    irr::core::stringw insertValues(const wchar_t* chars, const T1 &v1,
-                                    const T2 &v2)
-    {
-        irr::core::stringw s(chars);
-        return insertValues(s, v1, v2);
-    }   // insertValues(s, v1, v2)
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for wide strings */
-    template <class T1>
-    irr::core::stringw insertValues(const wchar_t* chars, const T1 &v1)
-    {
-        irr::core::stringw s(chars);
-        return insertValues(s, v1);
-    }   // insertValues(s, v1)
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for C strings */
-    template <class T1, class T2, class T3>
-    std::string insertValues(const char* chars, const T1 &v1,
-                                    const T2 &v2, const T3 &v3)
-    {
-        std::string s(chars);
-        return insertValues(s, v1, v2, v3);
-    }   // insertValues(s, v1, ..., v3)
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for C strings */
-    template <class T1, class T2>
-    std::string insertValues(const char* chars, const T1 &v1,
-                                    const T2 &v2)
-    {
-        std::string s(chars);
-        return insertValues(s, v1, v2);
-    }   // insertValues(s, v1, v2)
-
-    // ------------------------------------------------------------------------
-    /** Like the other ones above but for C strings */
-    template <class T1>
-    std::string insertValues(const char* chars, const T1 &v1)
-    {
-        std::string s(chars);
-        return insertValues(s, v1);
-    }   // insertValues(s, v1)
+        return insertValues(irr::core::stringw(s), std::forward<Args>(args)...);
+    }
 
     // ------------------------------------------------------------------------
     template<typename T>
@@ -367,4 +226,3 @@ namespace StringUtils
 
 #endif
 
-/* EOF */
