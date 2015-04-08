@@ -64,6 +64,9 @@ public:
     const wchar_t*     fribidize(const wchar_t* in_ptr);
     const wchar_t*     fribidize(const irr::core::stringw &str) { return fribidize(str.c_str()); }
 
+    bool               isRTLText(const wchar_t* in_ptr);
+    bool               isRTLText(const irr::core::stringw &str) { return isRTLText(str.c_str()); }
+
     const std::vector<std::string>* getLanguageList() const;
 
     std::string        getCurrentLanguageName();

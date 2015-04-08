@@ -95,6 +95,61 @@ wchar_t* utf8_to_wide(const char* input)
 }
 
 // ----------------------------------------------------------------------------
+/** Converts a wstring to a FriBidi-string.
+    The caller must take care to free (or not to free) the result after use.
+    Freeing should be done with freeFribidiChar().
+
+    On linux, the string doesn't need to be converted because wchar_t is
+    already UTF-32. On windows the string is converted from UTF-16 by this
+    function. */
+FriBidiChar* toFribidiChar(const wchar_t* str)
+{
+    FriBidiChar *result;
+    if (sizeof(wchar_t) == sizeof(FriBidiChar))
+        result = (FriBidiChar*) str;
+    else
+    {
+        // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
+        // So we simply copy the characters over here (note that this
+        // is technically incorrect, all characters we use/support fit
+        // in 16 bits, which is what irrlicht supports atm).
+        std::size_t length = wcslen(str);
+        result = new FriBidiChar[length + 1];
+        for (std::size_t i = 0; i <= length; i++)
+            result[i] = str[i];
+    }
+    return result;
+}
+
+wchar_t* fromFribidiChar(const FriBidiChar* str)
+{
+    wchar_t *result;
+    if (sizeof(wchar_t) == sizeof(FriBidiChar))
+        result = (wchar_t*) str;
+    else
+    {
+        std::size_t length = 0;
+        while (str[length])
+            length++;
+
+        // Copy back to wchar_t array
+        result = new wchar_t[length + 1];
+        for (std::size_t i = 0; i <= length; i++)
+            result[i] = str[i];
+    }
+    return result;
+}
+
+/** Frees the memory allocated for the result of toFribidiChar() and
+    fromFribidiChar(). */
+template<typename T>
+void freeFribidiChar(T *str)
+{
+    if (sizeof(wchar_t) != sizeof(FriBidiChar))
+        delete[] str;
+}
+
+// ----------------------------------------------------------------------------
 Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
     m_dictionary_manager.add_directory(
@@ -289,24 +344,13 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
     if(this->isRTLLanguage())
     {
         std::size_t length = wcslen(in_ptr);
-        FriBidiChar *fribidiInput;
+        FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
 
-        if (sizeof(wchar_t) == sizeof(FriBidiChar))
-            fribidiInput = (FriBidiChar*) in_ptr;
-        else
-        {
-            // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
-            // So we simply copy the characters over here (note that this
-            // is technically incorrect, all characters we use/support fit
-            // in 16 bits, which is what irrlicht supports atm).
-            fribidiInput = new FriBidiChar[length + 1];
-            for (std::size_t i = 0; i <= length; i++)
-                fribidiInput[i] = in_ptr[i];
-        }
 #ifdef TEST_BIDI
         FriBidiChar *tmp = fribidiInput;
         fribidiInput = new FriBidiChar[++length + 1];
         std::memcpy(fribidiInput + 1, tmp, length * sizeof(FriBidiChar));
+        // Prepend a character that forces RTL style
         fribidiInput[0] = L'\u202E';
 #endif
 
@@ -335,8 +379,7 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
         fribidiInput = tmp;
 #endif
 
-        if (sizeof(wchar_t) != sizeof(FriBidiChar))
-            delete[] fribidiInput;
+        freeFribidiChar(fribidiInput);
 
         if (!result)
         {
@@ -346,23 +389,37 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
             return m_converted_string.c_str();
         }
 
-        if (sizeof(wchar_t) == sizeof(FriBidiChar))
-            m_converted_string = core::stringw((wchar_t*) fribidiOutput);
-        else
-        {
-            // Copy back to wchar_t array
-            wchar_t *out = new wchar_t[length + 1];
-            for (std::size_t i = 0; i <= length; i++)
-                out[i] = fribidiOutput[i];
-            m_converted_string = core::stringw(out);
-            delete[] out;
-        }
+        wchar_t *convertedString = fromFribidiChar(fribidiOutput);
+        m_converted_string = core::stringw(convertedString);
+        freeFribidiChar(convertedString);
         delete[] fribidiOutput;
         return m_converted_string.c_str();
     }
 
 #endif // ENABLE_BIDI
     return in_ptr;
+}
+
+bool Translations::isRTLText(const wchar_t *in_ptr)
+{
+#if ENABLE_BIDI
+    if (this->isRTLLanguage())
+    {
+        std::size_t length = wcslen(in_ptr);
+        FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
+
+        FriBidiCharType *types = new FriBidiCharType[length];
+        fribidi_get_bidi_types(fribidiInput, length, types);
+        freeFribidiChar(fribidiInput);
+
+        FriBidiParType type = fribidi_get_par_direction(types, length);
+        delete[] types;
+        return type == FRIBIDI_PAR_RTL;
+    }
+    return false;
+#else
+    return false;
+#endif
 }
 
 /**
