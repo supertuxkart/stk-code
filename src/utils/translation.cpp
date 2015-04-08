@@ -95,6 +95,25 @@ wchar_t* utf8_to_wide(const char* input)
 }
 
 // ----------------------------------------------------------------------------
+/** Frees the memory allocated for the result of toFribidiChar(). */
+void freeFribidiChar(FriBidiChar *str)
+{
+#ifdef TEST_BIDI
+    delete[] str;
+#else
+    if (sizeof(wchar_t) != sizeof(FriBidiChar))
+        delete[] str;
+#endif
+}
+
+/** Frees the memory allocated for the result of fromFribidiChar(). */
+void freeFribidiChar(wchar_t *str)
+{
+    if (sizeof(wchar_t) != sizeof(FriBidiChar))
+        delete[] str;
+}
+
+// ----------------------------------------------------------------------------
 /** Converts a wstring to a FriBidi-string.
     The caller must take care to free (or not to free) the result after use.
     Freeing should be done with freeFribidiChar().
@@ -104,6 +123,7 @@ wchar_t* utf8_to_wide(const char* input)
     function. */
 FriBidiChar* toFribidiChar(const wchar_t* str)
 {
+    std::size_t length = wcslen(str);
     FriBidiChar *result;
     if (sizeof(wchar_t) == sizeof(FriBidiChar))
         result = (FriBidiChar*) str;
@@ -113,11 +133,20 @@ FriBidiChar* toFribidiChar(const wchar_t* str)
         // So we simply copy the characters over here (note that this
         // is technically incorrect, all characters we use/support fit
         // in 16 bits, which is what irrlicht supports atm).
-        std::size_t length = wcslen(str);
         result = new FriBidiChar[length + 1];
         for (std::size_t i = 0; i <= length; i++)
             result[i] = str[i];
     }
+
+#ifdef TEST_BIDI
+    // Prepend a character that forces RTL style
+    FriBidiChar *tmp = result;
+    result = new FriBidiChar[++length + 1];
+    std::memcpy(result + 1, tmp, length * sizeof(FriBidiChar));
+    result[0] = L'\u202E';
+    freeFribidiChar(tmp);
+#endif
+
     return result;
 }
 
@@ -138,15 +167,6 @@ wchar_t* fromFribidiChar(const FriBidiChar* str)
             result[i] = str[i];
     }
     return result;
-}
-
-/** Frees the memory allocated for the result of toFribidiChar() and
-    fromFribidiChar(). */
-template<typename T>
-void freeFribidiChar(T *str)
-{
-    if (sizeof(wchar_t) != sizeof(FriBidiChar))
-        delete[] str;
 }
 
 // ----------------------------------------------------------------------------
@@ -343,16 +363,10 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 #if ENABLE_BIDI
     if(this->isRTLLanguage())
     {
-        std::size_t length = wcslen(in_ptr);
         FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
-
-#ifdef TEST_BIDI
-        FriBidiChar *tmp = fribidiInput;
-        fribidiInput = new FriBidiChar[++length + 1];
-        std::memcpy(fribidiInput + 1, tmp, length * sizeof(FriBidiChar));
-        // Prepend a character that forces RTL style
-        fribidiInput[0] = L'\u202E';
-#endif
+        std::size_t length = 0;
+        while (fribidiInput[length])
+            length++;
 
         // Assume right to left as start direction.
 #if FRIBIDI_MINOR_VERSION==10
@@ -374,10 +388,6 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
               /* gint   *position_V_to_L_list */ NULL,
               /* gint8  *embedding_level_list */ NULL
                                                                );
-#ifdef TEST_BIDI
-        delete[] fribidiInput;
-        fribidiInput = tmp;
-#endif
 
         freeFribidiChar(fribidiInput);
 
