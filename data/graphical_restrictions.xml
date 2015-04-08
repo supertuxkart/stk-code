@@ -12,9 +12,11 @@
   <card contains="Mesa"           os="linux"    version="<10.3"    disable="BufferStorage"/>
   <card contains="Mesa"           os="linux"    version="<10.3"    disable="DriverRecentEnough"/>
   <card contains="Mesa"           os="linux"    version="<10.6"    disable="GeometryShader4"/>
+  <card contains="Mesa"           os="linux"                       disable="TextureCompressionS3TC"/>
   <card contains="Gallium"        os="linux"    version="<10.3"    disable="BufferStorage"/>
   <card contains="Gallium"        os="linux"    version="<10.3"    disable="DriverRecentEnough"/>
   <card contains="Gallium"        os="linux"    version="<10.6"    disable="GeometryShader4"/>
+  <card contains="Gallium"        os="linux"                       disable="TextureCompressionS3TC"/>
   <card contains="Radeon"                       version="<14.300"  disable="DriverRecentEnough"/>
 </graphical-restrictions>
 
