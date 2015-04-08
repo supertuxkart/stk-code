@@ -196,10 +196,8 @@ void IconButtonWidget::add()
 
         setLabelFont();
 
-#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
-        m_label->setRightToLeft( translations->isRTLLanguage() );
+        m_label->setRightToLeft(translations->isRTLText(message));
         m_label->setTextRestrainedInside(false);
-#endif
     }
 
     // ---- IDs

@@ -145,7 +145,8 @@ void SpinnerWidget::add()
     else
     {
         rect<s32> subsize_label = rect<s32>(m_h, 0, m_w - m_h, m_h);
-        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(stringw(m_value).c_str(), subsize_label,
+        const wchar_t *text = stringw(m_value).c_str();
+        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(text, subsize_label,
                                                                       false /* border */, true /* word wrap */,
                                                                       btn, getNewNoFocusID());
         m_children[1].m_element = label;
@@ -155,6 +156,7 @@ void SpinnerWidget::add()
         label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         label->setTabStop(false);
         label->setNotClipped(true);
+        label->setRightToLeft(translations->isRTLText(text));
 
 
         if (m_labels.size() > 0)

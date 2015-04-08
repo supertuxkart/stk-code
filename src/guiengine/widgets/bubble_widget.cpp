@@ -53,11 +53,7 @@ void BubbleWidget::add()
                                                       false, true /* word wrap */, m_parent,
                                                       (m_focusable ? getNewID() : getNewNoFocusID()));
     irrwidget->setTextRestrainedInside(false);
-
-#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
-    irrwidget->setRightToLeft( translations->isRTLLanguage() );
-#endif
-
+    irrwidget->setRightToLeft(translations->isRTLText(message));
 
     m_element = irrwidget;
     replaceText();
@@ -120,9 +116,11 @@ void BubbleWidget::replaceText()
 void BubbleWidget::setText(const irr::core::stringw &s)
 {
     Widget::setText(s);
-    //If add() has already been called (and thus m_element is set) we need to replace the text.
-    if(m_element != NULL){
+    if (m_element != NULL)
+    {
+        //If add() has already been called (and thus m_element is set) we need to replace the text.
         replaceText();
+        getIrrlichtElement<IGUIStaticText>()->setRightToLeft(translations->isRTLText(getText()));
     }
 }
 
