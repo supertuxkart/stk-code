@@ -390,7 +390,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         // Bind() modifies the viewport. In order not to affect anything else,
         // the viewport is just reset here and not removed in Bind().
         const core::recti &vp = Camera::getActiveCamera()->getViewport();
-        glViewport(vp.UpperLeftCorner.X, vp.UpperLeftCorner.Y,
+        glViewport(vp.UpperLeftCorner.X,
+                   irr_driver->getActualScreenSize().Height - vp.LowerRightCorner.Y,
                    vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
                    vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
         glClear(GL_DEPTH_BUFFER_BIT);
