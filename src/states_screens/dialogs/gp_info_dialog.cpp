@@ -79,12 +79,14 @@ GPInfoDialog::~GPInfoDialog()
 void GPInfoDialog::addTitle()
 {
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_under_title);
+    const wchar_t *text = translations->fribidize(m_gp.getName());
     IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText(
-        translations->fribidize(m_gp.getName()),
+        text,
         area_top, false, true, // border, word wrap
         m_irrlicht_window);
     title->setTabStop(false);
     title->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+    title->setRightToLeft(translations->isRTLText(text));
 }
 
 // ----------------------------------------------------------------------------

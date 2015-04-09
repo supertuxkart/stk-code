@@ -156,9 +156,6 @@ namespace GUIEngine
          *  go in the map above, which uses narrow strings */
         irr::core::stringw m_text;
 
-        /** Whether the text in m_text is right-to-left */
-        bool m_is_text_rtl;
-
         /** When true, this widget shall use a bigger and more colourful font */
         bool m_title_font;
 

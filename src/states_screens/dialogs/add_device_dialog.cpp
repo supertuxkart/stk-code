@@ -76,7 +76,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
                                               /*word wrap*/true,
                                               m_irrlicht_window);
     b->setTabStop(false);
-    b->setRightToLeft(translations->isRTLLanguage());
+    b->setRightToLeft(translations->isRTLText(msg));
     // because it looks like 'setRightToLeft' applies next time
     // setText is called only
     b->setText(msg.c_str());
