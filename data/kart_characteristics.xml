@@ -7,7 +7,9 @@
         rest: Length of suspension when at rest.
         travel-cm: maximum movement of suspension - in cm!!
         exp-string-response: dampen the suspension spring reaction
-            exponentially.
+            exponentially. See
+			http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7369\&p=25236&hilit=vehicle#p25236 
+			for details.
         max-force: Maximum suspension force -->
     <suspension stiffness="140" rest="0.3" travel-cm="29"
         exp-spring-response="false" max-force="12000" />
@@ -163,7 +165,69 @@
     <lean max="8.6" speed="5.0" />
 
 
-    <!-- ********** Gameplay ********** -->
+    <!-- ********** Items ********** -->
+
+    <!-- Anvil
+        weight: The additional weight an anvil adds to a kart.
+        speed-factor: The additional slowdown caused by the anvil.
+        duration: The time an anvil is active. -->
+    <anvil duration="2.0" weight="150"  speed-factor="0.2" />
+
+    <!-- Parachute
+        friction: The friction increase when a parachute is attached.
+        duration: The time an attached parachute is active
+        duration-other: The time a parachute attached from other kart works
+        lbound-fraction: The lower bound fraction of speed when lost will
+            detach parachute. E.g. at nearly 0 speed, only 5% of speed
+            need to be lost.
+        ubound-fraction: The upper bound fraction of speed when lost will
+            detach parachute. E.g. at max-speed 30% of speed must be lost.
+        max-speed: A factor that decides the impact of rate of speed
+            (distance between bounds) -->
+    <parachute friction="2.0" duration="4.0" duration-other="8.0"
+               lbound-fraction="0.95" ubound-fraction="0.7" max-speed="23" />
+
+    <!-- Bubblegum
+        duration: How long the bubblegum lasts.
+        speed-fraction: To what fraction of top-speed the speed is reduced.
+        torque: To rotate the kart somewhat.
+        fade-in-time: How quick the slowdown takes effect.
+        shield-duration: How long the bubblegum shield lasts -->
+    <bubblegum duration="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"
+               shield-duration="10.0" />
+
+    <!-- Zipper
+        duration: Time a zipper is active.
+        force: Additional zipper force.
+        speed-gain: One time additional speed.
+        max-speed-increase: Additional speed allowed on top of the
+            kart-specific maximum kart speed.
+        fade-out-time: determines how long it takes for a zipper
+            to fade out (after 'time'). -->
+    <zipper duration="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
+            fade-out-time="1.0" />
+
+    <!-- Swatter
+        duration: how long can the swatter be active.
+        distance: How close a kart or an item must be before it can be hit.
+        squash-duration: How long a kart will remain squashed.
+        squash-slowdown: percentage of max speed that a kart is
+            restricted to. -->
+    <swatter duration="10" distance="3" squash-duration="5"
+             squash-slowdown="0.5" />
+
+    <!-- Plunger and rubber band handling
+        max-length: Te maximum length of rubber band before it snaps.
+        force: The force a plunger/rubber band applies to the kart(s).
+        duration: The duration a rubber band acts.
+            in-face-time determines how long it takes before a plunger
+            in your face is removed. -->
+    <plunger band-max-length="50" band-force="1500" band-duration="1"
+             band-speed-increase="7" band-fade-out-time="3"
+             in-face-time="3 4 4.5 4.5" />
+
+
+    <!-- ********** Miscellaneous ********** -->
 
     <!-- Startup
         If a kart starts within the specified time after 'go',
@@ -174,23 +238,23 @@
              boost="6 3" />
 
     <!-- Rescue
-        time: How long it takes the kart to be raised.
+        duration: How long it takes the kart to be raised.
         height: how height the kart will be raised before it is
             dropped back onto the track.
         vert rescue offset: used to raise karts a bit higher before
             releasing them on the ground after a rescue. Used to avoid
             resetting karts into the track. Not sure if this is still
             necessary. -->
-    <rescue vert-offset="0.0" time="1.2" height="2" />
+    <rescue vert-offset="0.0" duration="1.2" height="2" />
 
     <!-- Explosion
-        time: how long it takes before the kart can drive again (this
+        duration: how long it takes before the kart can drive again (this
             determines how height the kart is being thrown).
         invulnerability-time: how long a kart will be invulnerable
             after being hit by an explosion.
         radius: Kart closer to this value will be affected by
             an explosion as well.  -->
-    <explosion time="2" radius="5"
+    <explosion duration="2" radius="5"
                invulnerability-time="6" />
 
     <!-- Nitro
@@ -225,66 +289,4 @@
     <slipstream length="10" width="2" collect-time="2" use-time="5"
                 add-power="3" min-speed="10" max-speed-increase="5"
                 duration="1" fade-out-time="2" />
-
-
-    <!-- ********** Items ********** -->
-
-    <!-- Anvil
-        weight: The additional weight an anvil adds to a kart.
-        speed-factor: The additional slowdown caused by the anvil.
-        time: The time an anvil is active. -->
-    <anvil time="2.0" weight="150"  speed-factor="0.2" />
-
-    <!-- Parachute
-        friction: The friction increase when a parachute is attached.
-        time: The time an attached parachute is active
-        time-other: The time a parachute attached from other kart works
-        lbound-fraction: The lower bound fraction of speed when lost will
-            detach parachute. E.g. at nearly 0 speed, only 5% of speed
-            need to be lost.
-        ubound-fraction: The upper bound fraction of speed when lost will
-            detach parachute. E.g. at max-speed 30% of speed must be lost.
-        max-speed: A factor that decides the impact of rate of speed
-            (distance between bounds) -->
-    <parachute friction="2.0" time="4.0" time-other="8.0"
-               lbound-fraction="0.95" ubound-fraction="0.7" max-speed="23" />
-
-    <!-- Bubblegum
-        time: How long the bubblegum lasts.
-        speed-fraction: To what fraction of top-speed the speed is reduced.
-        torque: To rotate the kart somewhat.
-        fade-in-time: How quick the slowdown takes effect.
-        shield-time: How long the bubblegum shield lasts -->
-    <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"
-               shield-time="10.0" />
-
-    <!-- Zipper
-        time: Time a zipper is active.
-        force: Additional zipper force.
-        speed-gain: One time additional speed.
-        max-speed-increase: Additional speed allowed on top of the
-            kart-specific maximum kart speed.
-        fade-out-time: determines how long it takes for a zipper
-            to fade out (after 'time'). -->
-    <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
-            fade-out-time="1.0" />
-
-    <!-- Swatter
-        duration: how long can the swatter be active.
-        distance: How close a kart or an item must be before it can be hit.
-        squash-duration: How long a kart will remain squashed.
-        squash-slowdown: percentage of max speed that a kart is
-            restricted to. -->
-    <swatter duration="10" distance="3" squash-duration="5"
-             squash-slowdown="0.5" />
-
-    <!-- Plunger and rubber band handling
-        max-length: Te maximum length of rubber band before it snaps.
-        force: The force a plunger/rubber band applies to the kart(s).
-        duration: The duration a rubber band acts.
-            in-face-time determines how long it takes before a plunger
-            in your face is removed. -->
-    <plunger band-max-length="50" band-force="1500" band-duration="1"
-             band-speed-increase="7" band-fade-out-time="3"
-             in-face-time="3 4 4.5 4.5" />
 </kart-properties>

@@ -17,3 +17,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/abstract_characteristics.hpp"
+
+AbstractCharacteristics::AbstractCharacteristics()
+{
+    // Set default value
+}
