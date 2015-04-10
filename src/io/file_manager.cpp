@@ -160,6 +160,10 @@ FileManager::FileManager()
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
+#ifdef SUPERTUXKART_DATADIR
+    else if (m_file_system->existFile(SUPERTUXKART_DATADIR"/data"))
+        root_dir = SUPERTUXKART_DATADIR"/data/";
+#endif
     else if(m_file_system->existFile("data"))
         root_dir = "data/" ;
     else if(m_file_system->existFile("../data"))
@@ -179,14 +183,7 @@ FileManager::FileManager()
     }
     else
     {
-#ifdef SUPERTUXKART_DATADIR
-        root_dir = SUPERTUXKART_DATADIR"/data/";
-        if(root_dir.size()==0 || root_dir[root_dir.size()-1]!='/')
-            root_dir+='/';
-
-#else
         root_dir = "/usr/local/share/games/supertuxkart/";
-#endif
     }
 
     addRootDirs(root_dir);
