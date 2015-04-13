@@ -105,6 +105,13 @@ def main():
     # Print the results
     print("Variables ****************************************")
     for g in groups:
+        print("        // {0}".format(g.baseName.title()))
+        for n in g.subNames:
+            print("        {0},".format(joinSubName(g, n, False).upper()))
+
+    # Commented out code
+    """print("Variables ****************************************")
+    for g in groups:
         print()
         print("    // {0}".format(g.baseName.title()))
         for n in g.subNames:
@@ -153,7 +160,7 @@ def main():
             nameUnderscore = joinSubName(g, n, False)
             print("    void set{0}(float value){2} {{ m_{1}{3} = value; }}".
                 format(nameTitle, nameUnderscore, " " * (nameLengthTitle - len(nameTitle)),
-                    " " * (nameLengthUnderscore - len(nameUnderscore))))
+                    " " * (nameLengthUnderscore - len(nameUnderscore))))"""
 
 if __name__ == '__main__':
     main()
