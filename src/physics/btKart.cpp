@@ -972,7 +972,6 @@ void btKart::updateFriction(btScalar timeStep)
 // ----------------------------------------------------------------------------
 void btKart::debugDraw(btIDebugDraw* debugDrawer)
 {
-
     for (int v=0;v<getNumWheels();v++)
     {
         btVector3 wheelColor(0,1,1);
@@ -998,8 +997,9 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
                               wheelColor);
         // Draw the (interpolated) normal of the ground at the wheel position
         debugDrawer->drawLine(getWheelInfo(v).m_raycastInfo.m_contactPointWS,
-                              getWheelInfo(v).m_raycastInfo.m_contactPointWS+getWheelInfo(v).m_raycastInfo.m_contactNormalWS,
-            btVector3(0.5f, 0.5f, 0.5f));
+                              getWheelInfo(v).m_raycastInfo.m_contactPointWS+
+                                 getWheelInfo(v).m_raycastInfo.m_contactNormalWS,
+                              btVector3(1.0f, 1.0f, 1.0f));
 
     }   // for i < getNumWheels
     btVector3 yellow(1.0f, 1.0f, 0.0f);
