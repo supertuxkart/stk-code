@@ -406,6 +406,24 @@ void ParticleSystemProxy::simulate()
     glBindVertexArray(0);
 
     glDisable(GL_RASTERIZER_DISCARD);
+#ifdef DEBUG_PARTICLES
+    // This code maps the data from the particles (initial data, current data
+    // and output of transform feedback shader) into memory. Useful for debugging.
+    if (std::string(getName()) == std::string("particles(C:/Users/jhenrich/supertuxkart/stk-assets/textures/skid-particle1.png)"))
+    {
+        glBindVertexArray(current_simulation_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
+        ParticleData *p_initial = (ParticleData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, m_count*sizeof(ParticleData), GL_MAP_READ_BIT);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+        ParticleData *p_prev = (ParticleData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, m_count*sizeof(ParticleData), GL_MAP_READ_BIT);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
+        ParticleData *p_new = (ParticleData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, m_count*sizeof(ParticleData), GL_MAP_READ_BIT);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+#endif
+
     std::swap(tfb_buffers[0], tfb_buffers[1]);
     std::swap(current_rendering_vao, non_current_rendering_vao);
     std::swap(current_simulation_vao, non_current_simulation_vao);

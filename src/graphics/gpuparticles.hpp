@@ -56,7 +56,6 @@ protected:
     virtual void simulate();
     virtual void draw();
 
-public:
     struct ParticleData
     {
         float PositionX;
