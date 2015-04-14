@@ -47,6 +47,8 @@ private:
     btCollisionShape            *m_collision_shape;
     /** The three normals for each triangle. */
     AlignedArray<btVector3>      m_normals;
+    /** Pre-compute value used in smoothing. */
+    AlignedArray<float>          m_p1p2p3;
 public:
          TriangleMesh();
         ~TriangleMesh();
@@ -92,28 +94,36 @@ public:
     /** Returns the points of the 'indx' triangle.
      *  \param indx Index of the triangle to get.
      *  \param p1,p2,p3 On return the three points of the triangle. */
-    void getTriangle(unsigned int indx, btVector3 *p1, btVector3 *p2,
-                     btVector3 *p3) const
+    void getTriangle(unsigned int indx, btVector3 **p1, btVector3 **p2,
+                     btVector3 **p3) const
     {
         const IndexedMeshArray &m = m_mesh.getIndexedMeshArray();
         btVector3 *p = &(((btVector3*)(m[0].m_vertexBase))[3*indx]);
-        *p1 = p[0];
-        *p2 = p[1];
-        *p3 = p[2];
+        *p1 = &(p[0]);
+        *p2 = &(p[1]);
+        *p3 = &(p[2]);
     }   // getTriangle
     // ------------------------------------------------------------------------
     /** Returns the normals of the triangle with the given index.
      *  \param indx Index of the triangle to get the three normals of.
      *  \result n1,n2,n3 The three normals. */
-    void getNormals(unsigned int indx, btVector3 *n1, btVector3 *n2,
-                    btVector3 *n3) const
+    void getNormals(unsigned int indx, const btVector3 **n1, 
+                    const btVector3 **n2, const btVector3 **n3) const
     {
         assert(indx < m_triangleIndex2Material.size());
         unsigned int n = indx*3;
-        *n1 = m_normals[n  ];
-        *n2 = m_normals[n+1];
-        *n3 = m_normals[n+2];
+        *n1 = &(m_normals[n  ]);
+        *n2 = &(m_normals[n+1]);
+        *n3 = &(m_normals[n+2]);
     }   // getNormals
+    // ------------------------------------------------------------------------
+    /** Returns basically the area of the triangle, which is needed when
+     *  smoothing the normals. */
+    float getP1P2P3(unsigned int indx) const
+    {
+        assert(indx < m_p1p2p3.size());
+        return m_p1p2p3[indx];
+    }
 };
 #endif
 /* EOF */

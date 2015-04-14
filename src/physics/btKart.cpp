@@ -999,7 +999,7 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
         // Draw the (interpolated) normal of the ground at the wheel position
         debugDrawer->drawLine(getWheelInfo(v).m_raycastInfo.m_contactPointWS,
                               getWheelInfo(v).m_raycastInfo.m_contactPointWS+getWheelInfo(v).m_raycastInfo.m_contactNormalWS,
-            btVector3(0, 0, 1));
+            btVector3(0.5f, 0.5f, 0.5f));
 
     }   // for i < getNumWheels
     btVector3 yellow(1.0f, 1.0f, 0.0f);
