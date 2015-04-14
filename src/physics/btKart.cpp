@@ -23,6 +23,9 @@
 #include "BulletDynamics/ConstraintSolver/btContactConstraint.h"
 
 #include "karts/kart.hpp"
+#include "modes/world.hpp"
+#include "physics/triangle_mesh.hpp"
+#include "tracks/track.hpp"
 
 #define ROLLING_INFLUENCE_FIX
 
@@ -260,6 +263,7 @@ btScalar btKart::rayCast(unsigned int index)
         wheel.m_raycastInfo.m_contactNormalWS.normalize();
         wheel.m_raycastInfo.m_isInContact = true;
         ///@todo for driving on dynamic/movable objects!;
+        wheel.m_raycastInfo.m_triangle_index = rayResults.m_triangle_index;;
         wheel.m_raycastInfo.m_groundObject = &getFixedBody();
 
         wheel.m_raycastInfo.m_suspensionLength = depth - wheel.m_wheelsRadius;
@@ -975,7 +979,8 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
     for (int v=0;v<getNumWheels();v++)
     {
         btVector3 wheelColor(0,1,1);
-        if (getWheelInfo(v).m_raycastInfo.m_isInContact)
+        const btWheelInfo &w = getWheelInfo(v);
+        if (w.m_raycastInfo.m_isInContact)
         {
             wheelColor.setValue(0,0,1);
         } else
@@ -983,23 +988,40 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
             wheelColor.setValue(1,0,1);
         }
 
-        btVector3 wheelPosWS = getWheelInfo(v).m_worldTransform.getOrigin();
+        btVector3 wheelPosWS = w.m_worldTransform.getOrigin();
 
         btVector3 axle = btVector3(
-            getWheelInfo(v).m_worldTransform.getBasis()[0][getRightAxis()],
-            getWheelInfo(v).m_worldTransform.getBasis()[1][getRightAxis()],
-            getWheelInfo(v).m_worldTransform.getBasis()[2][getRightAxis()]);
+                            w.m_worldTransform.getBasis()[0][getRightAxis()],
+                            w.m_worldTransform.getBasis()[1][getRightAxis()],
+                            w.m_worldTransform.getBasis()[2][getRightAxis()]);
 
         //debug wheels (cylinders)
         debugDrawer->drawLine(wheelPosWS,wheelPosWS+axle,wheelColor);
         debugDrawer->drawLine(wheelPosWS,
-                              getWheelInfo(v).m_raycastInfo.m_contactPointWS,
+                              w.m_raycastInfo.m_contactPointWS,
                               wheelColor);
         // Draw the (interpolated) normal of the ground at the wheel position
-        debugDrawer->drawLine(getWheelInfo(v).m_raycastInfo.m_contactPointWS,
-                              getWheelInfo(v).m_raycastInfo.m_contactPointWS+
-                                 getWheelInfo(v).m_raycastInfo.m_contactNormalWS,
-                              btVector3(1.0f, 1.0f, 1.0f));
+        btVector3 white(1.0f, 1.0f, 1.0f);
+        debugDrawer->drawLine(w.m_raycastInfo.m_contactPointWS,
+                              w.m_raycastInfo.m_contactPointWS+
+                                 w.m_raycastInfo.m_contactNormalWS,
+                              white);
+        int n = w.m_raycastInfo.m_triangle_index;
+        if (n > -1)
+        {
+            const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+            btVector3 *p1, *p2, *p3;
+            tm.getTriangle(n, &p1, &p2, &p3);
+            const btVector3 *n1, *n2, *n3;
+            tm.getNormals(n, &n1, &n2, &n3);
+            // Draw the normals at the vertices
+            debugDrawer->drawLine(*p1, *p1 + *n1, white);
+            debugDrawer->drawLine(*p2, *p2 + *n2, white);
+            debugDrawer->drawLine(*p3, *p3 + *n3, white);
+            // Also draw the triangle in white, it can make it easier
+            // to identify which triangle a wheel is on
+            debugDrawer->drawTriangle(*p1, *p2, *p3, white, 1.0f);
+        }
 
     }   // for i < getNumWheels
     btVector3 yellow(1.0f, 1.0f, 0.0f);
@@ -1070,6 +1092,7 @@ btScalar btKart::rayCast(btWheelInfo& wheel, const btVector3& ray)
         wheel.m_raycastInfo.m_contactPointWS   = rayResults.m_hitPointInWorld;
         wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
         wheel.m_raycastInfo.m_isInContact      = true;
+        wheel.m_raycastInfo.m_triangle_index   = rayResults.m_triangle_index;
     }
 
     return depth;

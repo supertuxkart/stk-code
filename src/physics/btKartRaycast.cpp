@@ -70,6 +70,7 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
             result.m_hitNormalInWorld = rayCallback.m_hitNormalWorld;
             result.m_hitNormalInWorld.normalize();
             result.m_distFraction = rayCallback.m_closestHitFraction;
+            result.m_triangle_index = -1;
             const TriangleMesh &tm =
                 World::getWorld()->getTrack()->getTriangleMesh();
             if(m_smooth_normals &&
@@ -79,6 +80,7 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
 #ifdef DEBUG_NORMALS
                 btVector3 n=result.m_hitNormalInWorld;
 #endif
+                result.m_triangle_index = rayCallback.getTriangleIndex();
                 result.m_hitNormalInWorld =
                     tm.getInterpolatedNormal(rayCallback.getTriangleIndex(),
                                              result.m_hitPointInWorld);
