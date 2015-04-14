@@ -217,6 +217,12 @@ void Skidding::update(float dt, bool is_on_ground,
         reset();
         return;
     }
+#ifdef SKIDDING_PARTICLE_DEBUG
+    // This code will cause skidmarks to be displayed all the time, even
+    // when the kart is not moving.
+    m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDL, 0.5f);
+    m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDR, 0.5f);
+#endif
 
     // No skidding backwards or while stopped
     if(m_kart->getSpeed() < m_min_skid_speed &&
