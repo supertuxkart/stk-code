@@ -19,7 +19,7 @@
 
 
 #include "achievements/achievement.hpp"
-
+#include "achievements/achievements_manager.hpp"
 #include "achievements/achievement_info.hpp"
 #include "guiengine/message_queue.hpp"
 #include "io/utf_writer.hpp"
@@ -199,8 +199,13 @@ void Achievement::check()
     if(m_achievement_info->checkCompletion(this))
     {
         //show achievement
-        core::stringw s = _("Completed achievement \"%s\".", 
-                            m_achievement_info->getName());
+        // Note: the "name" variable is required, see issue #2068
+        // calling _("...", info->getName()) is invalid because getName also calls
+        // _() and thus the string it returns is mapped to a temporary buffer
+        // in theory, it should return a copy of the string, but clang tries to
+        // optimise away the copy
+        core::stringw name = m_achievement_info->getName();
+        core::stringw s = _("Completed achievement \"%s\".", name);
         MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, s);
 
         // Sends a confirmation to the server that an achievement has been
