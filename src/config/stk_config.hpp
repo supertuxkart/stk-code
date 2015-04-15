@@ -178,9 +178,17 @@ public:
     const KartProperties &
          getDefaultKartProperties() const {return *m_default_kart_properties; }
 
-    const KartProperties &
-         getKartProperties(std::string type) { return *m_kart_properties[type]; }
+    // ------------------------------------------------------------------------
+    /** Returns the kart properties for a certain type of kart.
+     *  \throw out_of_range if there is no data for 'type'.
+     *  \param type Type of kart (e.g. heavy, medium, ...).
+     */
+    const KartProperties& getKartProperties(std::string type)
+    {
+        return *m_kart_properties.at(type); 
+    }   // getKartProperties
 
+    // ------------------------------------------------------------------------
     const PlayerDifficulty * getPlayerDifficulty(PerPlayerDifficulty difficulty)
         { return m_player_difficulties[difficulty]; }
 }
