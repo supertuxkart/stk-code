@@ -20,13 +20,54 @@
 # This script takes the list from abstract_characteristics.hpp and creates the code
 # An empty line is expected to end the input
 
+class GroupMember:
+    def __init__(self, name, typeC, typeStr):
+        self.name = name
+        self.typeC = typeC
+        self.typeStr = typeStr
+
+    """E.g. power(std::vector<float>/floatVector)
+       or speed(InterpolationArray)
+       The default type is float"""
+    def parse(content):
+        typeC = "float"
+        typeStr = typeC
+        name = content.strip()
+        pos = content.find("(")
+        end = content.find(")", pos)
+        if pos != -1 and end != -1:
+            name = content[:pos].strip()
+            pos2 = content.find("/", pos, end)
+            if pos2 != -1:
+                typeC = content[pos + 1:pos2].strip()
+                typeStr = content[pos2 + 1:end].strip()
+            else:
+                typeC = content[pos + 1:end].strip()
+                typeStr = typeC
+
+        return GroupMember(name, typeC, typeStr)
+
 class Group:
     def __init__(self, baseName):
         self.baseName = baseName
-        self.subNames = []
+        self.members = []
 
-    def addName(self, name):
-        self.subNames.append(name)
+    def addMember(self, content):
+        self.members.append(GroupMember.parse(content))
+
+    """E.g. engine: power, gears(std::vector<Gear>/Gears)
+       or mass(float) or only mass"""
+    def parse(content):
+        pos = content.find(":")
+        if pos == -1:
+            group = Group("")
+            group.addMember(content)
+            return group
+        else:
+            group = Group(content[:pos].strip())
+            for m in content[pos + 1:].split(","):
+                group.addMember(m)
+            return group
 
 """Creates a list of words from a titlecase string"""
 def toList(name):
@@ -43,8 +84,8 @@ def toList(name):
 
 """titleCase: true  = result is titlecase
               false = result has underscores"""
-def joinSubName(g, subName, titleCase):
-    words = toList(g.baseName) + toList(subName)
+def joinSubName(group, member, titleCase):
+    words = toList(group.baseName) + toList(member.name)
     first = True
     if titleCase:
         words = map(lambda w: w.title(), words)
@@ -60,54 +101,39 @@ def main():
         line = input()
         if len(line) == 0:
             break
-
-        # Search base name
-        pos = line.find(":")
-        if pos != -1:
-            group = Group(line[:pos].strip())
-            # Find all subnames
-            while True:
-                pos2 = line.find(",", pos + 1)
-                # Are we already at the end?
-                if pos2 == -1:
-                    part = line[pos + 1:].strip()
-                else:
-                    part = line[pos + 1:pos2].strip()
-
-                if len(part) != 0:
-                    group.addName(part)
-
-                # Find the next one
-                pos, pos2 = pos2, pos
-
-                # We are at the end, so stop searching
-                if pos == -1:
-                    break
-            groups.append(group)
-        else:
-            # There is not base name, so use the whole line as one word
-            group = Group(line.strip())
-            group.addName("")
-            groups.append(group)
+        groups.append(Group.parse(line))
 
     # Find longest name to align the function bodies
     nameLengthTitle = 0
     nameLengthUnderscore = 0
     for g in groups:
-        for n in g.subNames:
-            l = len(joinSubName(g, n, True))
+        for m in g.members:
+            l = len(joinSubName(g, m, True))
             if l > nameLengthTitle:
                 nameLengthTitle = l
-            l = len(joinSubName(g, n, False))
+            l = len(joinSubName(g, m, False))
             if l > nameLengthUnderscore:
                 nameLengthUnderscore = l
 
     # Print the results
-    print("Variables ****************************************")
+    print("Enum ****************************************")
     for g in groups:
+        print()
         print("        // {0}".format(g.baseName.title()))
-        for n in g.subNames:
-            print("        {0},".format(joinSubName(g, n, False).upper()))
+        for m in g.members:
+            print("        {0},".format(joinSubName(g, m, False).upper()))
+
+    print()
+    print()
+    print("Getters ****************************************")
+
+    for g in groups:
+        print()
+        for m in g.members:
+            nameTitle = joinSubName(g, m, True)
+            nameUnderscore = joinSubName(g, m, False)
+            print("    {0} get{1}() const {{ return m_{2}; }}".
+                format(m.typeC, nameTitle, nameUnderscore))
 
     # Commented out code
     """print("Variables ****************************************")
@@ -136,19 +162,6 @@ def main():
     if lineLength > 4:
         line += "1;"
         print(line)
-
-    print()
-    print()
-    print("Getters ****************************************")
-
-    for g in groups:
-        print()
-        for n in g.subNames:
-            nameTitle = joinSubName(g, n, True)
-            nameUnderscore = joinSubName(g, n, False)
-            print("    float get{0}(){2} const {{ return m_{1};{3} }}".
-                format(nameTitle, nameUnderscore, " " * (nameLengthTitle - len(nameTitle)),
-                    " " * (nameLengthUnderscore - len(nameUnderscore))))
 
     print()
     print()
