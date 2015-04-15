@@ -160,19 +160,19 @@ FileManager::FileManager()
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
-    else if(m_file_system->existFile("data"))
+    else if(m_file_system->existFile("data/stk_config.xml"))
         root_dir = "data/" ;
-    else if(m_file_system->existFile("../data"))
+    else if(m_file_system->existFile("../data/stk_config.xml"))
         root_dir = "../data/" ;
-    else if(m_file_system->existFile("../../data"))
+    else if(m_file_system->existFile("../../data/stk_config.xml"))
         root_dir = "../../data/" ;
     // Test for old style build environment, with executable in root of stk
-    else if(m_file_system->existFile(exe_path+"data"))
+    else if(m_file_system->existFile(exe_path+"data/stk_config.xml"))
         root_dir = (exe_path+"data/").c_str();
     // Check for windows cmake style: bld/Debug/bin/supertuxkart.exe
-    else if (m_file_system->existFile(exe_path + "../../../data"))
+    else if (m_file_system->existFile(exe_path + "../../../data/stk_config.xml"))
         root_dir = (exe_path + "../../../data/").c_str();
-    else if (m_file_system->existFile(exe_path + "../data"))
+    else if (m_file_system->existFile(exe_path + "../data/stk_config.xml"))
     {
         root_dir = exe_path.c_str();
         root_dir += "../data/";
