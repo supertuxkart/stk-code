@@ -98,11 +98,11 @@ void PostProcessing::reset()
         const core::recti &vp = Camera::getCamera(i)->getViewport();
         // Map viewport to [-1,1] x [-1,1]. First define the coordinates
         // left, right, top, bottom:
-        float right = vp.LowerRightCorner.X < irr_driver->getActualScreenSize().Width
+        float right = vp.LowerRightCorner.X < (int)irr_driver->getActualScreenSize().Width
                      ? 0.0f : 1.0f;
         float left   = vp.UpperLeftCorner.X  > 0.0f ? 0.0f : -1.0f;
         float top    = vp.UpperLeftCorner.Y  > 0.0f ? 0.0f : 1.0f;
-        float bottom = vp.LowerRightCorner.Y < irr_driver->getActualScreenSize().Height
+        float bottom = vp.LowerRightCorner.Y < (int)irr_driver->getActualScreenSize().Height
                      ? 0.0f : -1.0f;
 
         // Use left etc to define 4 vertices on which the rendered screen
