@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-13 21:42-0400\n"
-"PO-Revision-Date: 2015-03-15 12:27+0000\n"
+"PO-Revision-Date: 2015-04-08 11:29+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/projects/p/supertuxkart/language/gd/)\n"
 "MIME-Version: 1.0\n"
@@ -897,7 +897,7 @@ msgstr "A’ cruthachadh cunntas"
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
 msgid "Credits"
-msgstr "Cliù"
+msgstr "urram"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -2687,7 +2687,7 @@ msgstr "Èifeachdan fuaime"
 #. I18N: track group
 #: src/states_screens/grand_prix_editor_screen.cpp:334
 msgid "Standard"
-msgstr "Bun-tomhasach"
+msgstr "Coitcheann"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:218
