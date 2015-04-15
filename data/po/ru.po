@@ -5,13 +5,14 @@
 # Translators:
 # Andrei Stepanov, 2015
 # Dmitry Dubrov <dimprogpro@hotmail.ru>, 2015
+# Oleg <laol-tomsk@mail.ru>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-13 21:42-0400\n"
-"PO-Revision-Date: 2015-03-16 09:10+0000\n"
-"Last-Translator: Dmitry Dubrov <dimprogpro@hotmail.ru>\n"
+"PO-Revision-Date: 2015-04-13 09:19+0000\n"
+"Last-Translator: Oleg <laol-tomsk@mail.ru>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/supertuxkart/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -138,7 +139,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* В бо́льшую часть этих видов игры можно сыграть в Гран-при: вместо одной трассы, вы можете проезжать несколько сразу. Чем лучше ваш ранг, тем больше очков вы получаете. В результате игрок с бо́льшим количеством очков выигрывает кубок."
+msgstr "* В большую часть этих видов игры можно сыграть в Гран-при: вместо одной трассы, вы можете проезжать несколько сразу. Чем лучше ваш ранг, тем больше очков вы получаете. В результате игрок с бо́льшим количеством очков выигрывает кубок."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -149,7 +150,7 @@ msgstr "* Перезапустите STK для применения измен�
 msgid ""
 "* Which config to use will be inferred from which 'Select' key is pressed to"
 " join the game."
-msgstr "* Выбор конфигурации будет зависеть от того,  с какого устройства нажата кнопка 'Выбрать' при соединении к игре."
+msgstr "* Выбор конфигурации будет зависеть от того,  с какого устройства нажата кнопка \"Выбрать\" при соединении к игре."
 
 #. I18N: ./data/gui/online/profile_achievements.stkgui
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
@@ -189,7 +190,7 @@ msgstr "Битва Трех Ударов"
 msgid ""
 "3 Strikes Battle: Only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
-msgstr "Битва трех ударов: только в многопользовательских играх. Атакуйте других с помощью оружия до тех пор, пока они не потеряют все свои жизни."
+msgstr "Битва Трех Ударов: только в мультиплеере. Атакуйте других с помощью оружия до тех пор, пока они не потеряют все свои жизни."
 
 #: src/states_screens/addons_screen.cpp:53
 msgid "3 months"
@@ -210,7 +211,7 @@ msgstr "= Результаты ="
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "AI karts"
-msgstr "Боты"
+msgstr "Виртуальные карты"
 
 #: src/states_screens/race_result_gui.cpp:189
 msgid "Abort Grand Prix"
@@ -334,7 +335,7 @@ msgstr "Дополнения"
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
-msgstr "Адиуми"
+msgstr "Adiumy"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -380,7 +381,7 @@ msgstr "Всегда показывать экран входа"
 
 #. I18N: ../stk-assets/karts/amanda/kart.xml
 msgid "Amanda"
-msgstr "Аманда"
+msgstr "Amanda"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -490,7 +491,7 @@ msgstr "Арены"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
-msgstr "Вокруг Маяка"
+msgstr "Around the Lighthouse"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -592,7 +593,7 @@ msgstr "Battle Island"
 
 #. I18N: ../stk-assets/karts/beastie/kart.xml
 msgid "Beastie"
-msgstr "Биши"
+msgstr "Beastie"
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:161
@@ -610,7 +611,7 @@ msgstr "Чёрный"
 
 #. I18N: ../stk-assets/tracks/mansion/track.xml
 msgid "Blackhill Mansion"
-msgstr "Тёмный особняк на холме"
+msgstr "Blackhill Mansion"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -629,7 +630,7 @@ msgstr "Синяя команда победила"
 
 #. I18N: ../stk-assets/tracks/farm/track.xml
 msgid "Bovine Barnyard"
-msgstr "Скотный Двор"
+msgstr "Bovine Barnyard"
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
@@ -703,7 +704,7 @@ msgstr "Отмена/Назад"
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
-msgstr "Пещера X"
+msgstr "Cave X"
 
 #: src/states_screens/feature_unlocked.cpp:493
 msgid "Challenge Completed"
@@ -754,7 +755,7 @@ msgstr "Закрыть"
 
 #. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
-msgstr "Храм Какао"
+msgstr "Cocoa Temple"
 
 #. I18N: ./data/achievements.xml
 msgid "Collect at least 5 bananas in one race."
@@ -1009,7 +1010,7 @@ msgstr "Хотите сохранить изменения?"
 #: src/karts/controller/network_player_controller.cpp:283
 #: src/karts/controller/player_controller.cpp:340
 msgid "Don't accelerate before go"
-msgstr "Не жмите газ до слова 'Марш'"
+msgstr "Не жмите газ до слова \"Вперёд\"!"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:265
@@ -1056,12 +1057,12 @@ msgstr "Яйца: %d / %d"
 
 #. I18N: ../stk-assets/karts/elephpant/kart.xml
 msgid "Elephpant"
-msgstr "Слон"
+msgstr "Elephpant"
 
 #: src/states_screens/race_result_gui.cpp:474
 #: src/states_screens/race_result_gui.cpp:833
 msgid "Eliminated"
-msgstr "Покинул гонку"
+msgstr "Выбыл из гонки"
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
@@ -1084,7 +1085,7 @@ msgstr "Электронные почты не совпадают!"
 
 #. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"
-msgstr "Эмуль"
+msgstr "Emule"
 
 #. I18N: button to enable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:98
@@ -1235,7 +1236,7 @@ msgstr "Следуйте за лидером: будьте на втором м�
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
-msgstr "Форт Магма"
+msgstr "Fort Magma"
 
 #: src/input/wiimote_manager.cpp:413
 #, c-format
@@ -1279,7 +1280,7 @@ msgstr "Полноэкранный режим"
 #. I18N: Shown when a goal is scored
 #: src/states_screens/race_gui_base.cpp:70
 msgid "GOAL!"
-msgstr "Гол!"
+msgstr "ГОЛ!"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:144
@@ -1354,7 +1355,7 @@ msgstr "Контурное свечение: %s"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
-msgstr "Гну"
+msgstr "GNU"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:68
@@ -1367,7 +1368,7 @@ msgstr "Золотой водила"
 
 #. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
-msgstr "Остров Гран-Парадизо"
+msgstr "Gran Paradiso Island"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: In the track selection screen
@@ -1410,7 +1411,7 @@ msgstr "Настройки графики"
 
 #. I18N: ../stk-assets/tracks/greenvalley/track.xml
 msgid "Green Valley"
-msgstr "Зелёная Долина"
+msgstr "Green Valley"
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:392
@@ -1430,7 +1431,7 @@ msgstr "Гость: вход"
 
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
-msgstr "Гасиенда"
+msgstr "Hacienda"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -1443,7 +1444,7 @@ msgstr "Помощь"
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
-msgstr "Хексли"
+msgstr "Hexley"
 
 #: src/states_screens/race_result_gui.cpp:1252
 msgid "Highscores"
@@ -1518,7 +1519,7 @@ msgstr "Это ничья"
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
-msgstr "Секретный"
+msgstr "Это секрет"
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
@@ -1556,7 +1557,7 @@ msgstr "Клавиатура %i"
 
 #. I18N: ../stk-assets/karts/konqi/kart.xml
 msgid "Konqi"
-msgstr "Конки"
+msgstr "Konqi"
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/race_gui_overworld.cpp:108
@@ -1766,7 +1767,7 @@ msgstr "Клавиши меню"
 
 #. I18N: ../stk-assets/tracks/minigolf/track.xml
 msgid "Minigolf"
-msgstr "Минигольф"
+msgstr "Minigolf"
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
@@ -1858,7 +1859,7 @@ msgstr "Имя сервера"
 
 #. I18N: ../stk-assets/tracks/scotland/track.xml
 msgid "Nessie's pond"
-msgstr "Лохнессовский пруд"
+msgstr "Nessie's pond"
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
@@ -1924,7 +1925,7 @@ msgstr "Нет"
 
 #. I18N: ../stk-assets/karts/nolok/kart.xml
 msgid "Nolok"
-msgstr "Нолок"
+msgstr "Nolok"
 
 #. I18N: if no kart animations are enabled
 #: src/states_screens/gp_info_screen.cpp:75
@@ -1939,13 +1940,13 @@ msgstr "Обычная гонка"
 
 #. I18N: ../stk-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
-msgstr "Северный курорт"
+msgstr "Northern Resort"
 
 #: src/tracks/track_object_presentation.cpp:986
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
-msgstr "Учтите, если вам удастся скользить в течение нескольких секунд, вы получите дополнительное ускорение в качестве награды."
+msgstr "Учтите, что если вам удастся скользить в течение нескольких секунд, вы получите дополнительное ускорение в качестве награды."
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -1957,12 +1958,12 @@ msgstr "Новичок"
 #: src/states_screens/dialogs/select_challenge.cpp:68
 #, c-format
 msgid "Number of AI Karts : %i"
-msgstr "Количество ботов: %i"
+msgstr "Количество виртуальных картов: %i"
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Number of AI karts"
-msgstr "Количество ботов"
+msgstr "Количество виртуальных картов"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -1993,7 +1994,7 @@ msgstr "Количество кругов:"
 #: src/states_screens/dialogs/message_dialog.cpp:122
 #: src/states_screens/dialogs/message_dialog.cpp:135
 msgid "OK"
-msgstr "ДА"
+msgstr "ОК"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
 msgid "Off the beaten track"
@@ -2015,11 +2016,11 @@ msgstr "Ах да, видите ли, он у меня сейчас в замк�
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
-msgstr "Старая шахта"
+msgstr "Old Mine"
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
-msgstr "Математический класс Оливера"
+msgstr "Oliver's Math Class"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -2118,7 +2119,7 @@ msgstr "Пароли не совпадают!"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:257
 msgid "Pause Game"
-msgstr "Пауза в игре"
+msgstr "Поставить на паузу"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: ./data/gui/race_paused_dialog.stkgui
@@ -2144,7 +2145,7 @@ msgstr "Выполнение голосования"
 
 #. I18N: ../stk-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
-msgstr "Пиджин"
+msgstr "Pidgin"
 
 #. I18N: ./data/gui/tutorial.stkgui
 msgid "Play all"
@@ -2270,7 +2271,7 @@ msgstr "Прогресс"
 
 #. I18N: ../stk-assets/karts/puffy/kart.xml
 msgid "Puffy"
-msgstr "Паффи"
+msgstr "Puffy"
 
 #: src/states_screens/race_setup_screen.cpp:240
 msgid ""
@@ -2489,15 +2490,15 @@ msgstr "СКОРОСТЬ"
 
 #. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
-msgstr "Завод STK"
+msgstr "STK Enterprise"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
-msgstr "Гонщица Сара"
+msgstr "Sara the Racer"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara the Wizard"
-msgstr "Мастерица Сара"
+msgstr "Sara the Wizard"
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
@@ -2597,11 +2598,11 @@ msgstr "Тени: %s"
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
-msgstr "Дюны"
+msgstr "Shifting Sands"
 
 #. I18N: ../stk-assets/tracks/city/track.xml
 msgid "Shiny Suburbs"
-msgstr "Солнечный Пригород"
+msgstr "Shiny Suburbs"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
@@ -2643,7 +2644,7 @@ msgstr "Тема"
 
 #. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
 msgid "Snow Peak"
-msgstr "Снежная вершина"
+msgstr "Snow Peak"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:186
@@ -2652,7 +2653,7 @@ msgstr "Футбол"
 
 #. I18N: ../stk-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
-msgstr "Футбольное поле"
+msgstr "Soccer field"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -2734,12 +2735,12 @@ msgstr "Подтвердить"
 
 #. I18N: ../stk-assets/tracks/subsea/track.xml
 msgid "Subsea"
-msgstr "Подводная"
+msgstr "Subsea"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 msgid "SuperTux"
-msgstr "Супер Тукс"
+msgstr "СуперTux"
 
 #. I18N: ./data/gui/addons_screen.stkgui
 msgid "SuperTuxKart Addons"
@@ -2783,7 +2784,7 @@ msgstr "SuperTuxKart может подключаться к серверу дл�
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
-msgstr "Сюзан"
+msgstr "Suzanne"
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
@@ -2808,7 +2809,7 @@ msgstr "Представь, что твои оппоненты - комары! �
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
 msgid "Temple"
-msgstr "Храм"
+msgstr "Temple"
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -2832,7 +2833,7 @@ msgstr "Клавиша заноса позволяет заносить карт
 
 #. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
-msgstr "Стадион"
+msgstr "The Stadium"
 
 #: src/states_screens/main_menu_screen.cpp:545
 msgid "The add-ons module is currently disabled in the Options screen"
@@ -2935,7 +2936,7 @@ msgstr "Обучение: Комната выбора"
 
 #. I18N: ../stk-assets/karts/tux/kart.xml
 msgid "Tux"
-msgstr "Тукс"
+msgstr "Tux"
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
@@ -3076,7 +3077,7 @@ msgstr "Голосовать"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:230
 msgid "Vote successful! You can now close the window."
-msgstr "Голосование завершено! Теперь вы может закрыть окно."
+msgstr "Голос засчитан! Теперь Вы можете закрыть окно."
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:85
 msgid "WEIGHT"
@@ -3138,7 +3139,7 @@ msgstr "Белый"
 
 #. I18N: ../stk-assets/karts/wilber/kart.xml
 msgid "Wilber"
-msgstr "Вилбер"
+msgstr "Wilber"
 
 #. I18N: ./data/achievements.xml
 msgid "Win 5 single races in a row."
@@ -3154,7 +3155,7 @@ msgstr "XR591"
 
 #. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
-msgstr "Сюэ"
+msgstr "Xue"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -3323,7 +3324,7 @@ msgstr "Ваш профиль"
 
 #. I18N: ../stk-assets/tracks/zengarden/track.xml
 msgid "Zen Garden"
-msgstr "Дзэн сад"
+msgstr "Zen Garden"
 
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:90
