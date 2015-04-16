@@ -34,6 +34,9 @@ bool GLContextDebugBit = true;
 bool GLContextDebugBit = false;
 #endif
 
+const int WIDTH  = 1024;
+const int HEIGHT = 768;
+
 const s32 texturesizes[] = {128, 256, 512, 1024, 2048, 4096, 0};
 
 const wchar_t *fileformats[]		 =  { L"bmp", L"ppm", 0 };  // bitmap font formats
@@ -339,6 +342,7 @@ void createGUI(IrrlichtDevice* device, CFontTool* fc)
 {
 	gui::IGUIEnvironment *env = device->getGUIEnvironment();
 
+    //env->getSkin()->setSize((gui::EGUI_DEFAULT_SIZE, 24);
 	// change transparency of skin
 	for (s32 i=0; i<gui::EGDC_COUNT ; ++i)
 	{
@@ -347,10 +351,10 @@ void createGUI(IrrlichtDevice* device, CFontTool* fc)
 		env->getSkin()->setColor((gui::EGUI_DEFAULT_COLOR)i, col);
 	}
 
-	IGUIWindow *win = env->addWindow( core::rect<s32>(10,10,200,500), false, L"Font Creator");
+	IGUIWindow *win = env->addWindow( core::rect<s32>(10,HEIGHT/30,WIDTH/4,HEIGHT-100), false, L"Font Creator");
 	win->getCloseButton()->setVisible(false);
 
-	s32 xs=10,xp=xs, yp=30, h=20;
+	s32 xs=10,xp=xs, yp=HEIGHT/20, h=HEIGHT/30;
 
 	env->addStaticText(L"Charset", core::rect<s32>(xp,yp,50,yp+h),false,false, win);
 
@@ -489,23 +493,35 @@ void createGUI(IrrlichtDevice* device, CFontTool* fc)
 
 	// font image
 	gui::IGUIImage *img = env->addImage(0, core::position2d<s32>(0,0), true,0, MYGUI_IMAGE);
-	img->setRelativePosition(core::rect<s32>(0,20,800,600));
+	img->setRelativePosition(core::rect<s32>(0,HEIGHT/30,WIDTH,HEIGHT));
 
 	// font scrollbar
-	IGUIScrollBar *scrl= env->addScrollBar(true,core::rect<s32>(0,0,800,20),0, MYGUI_CURRENTIMAGE);
+	IGUIScrollBar *scrl= env->addScrollBar(true,core::rect<s32>(0,0,WIDTH,HEIGHT/30),0, MYGUI_CURRENTIMAGE);
 	scrl->setMax(0);
 	scrl->setSmallStep(1);
 
 	yp += h*3;
 
 	env->getRootGUIElement()->bringToFront(win);
-	win->setRelativePosition( core::rect<s32>(10,10,200,yp));
+	win->setRelativePosition( core::rect<s32>(0,HEIGHT/30,200,yp));
 }
 
 int main(int argc,char **argv)
 {
-	IrrlichtDevice* device =createDevice(video::EDT_OPENGL, core::dimension2du(800, 600));
-	video::IVideoDriver* driver = device->getVideoDriver();
+    SIrrlichtCreationParameters p;
+    p.DriverType        = video::EDT_OPENGL;
+    p.WindowSize        = core::dimension2du(WIDTH, HEIGHT);
+    p.Bits              = 16;
+    p.Fullscreen        = false;
+    p.Stencilbuffer     = false;
+    p.Vsync             = false;
+    p.EventReceiver     = NULL;
+    p.FileSystem        = NULL;
+    p.ForceLegacyDevice = true;
+
+    IrrlichtDevice *device = createDeviceEx(p);
+
+    video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 	gui::IGUIEnvironment *env = device->getGUIEnvironment();
 
