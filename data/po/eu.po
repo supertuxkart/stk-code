@@ -3370,4 +3370,4 @@ msgstr "arrunta"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Amy Smile Kerkhof https://launchpad.net/~amy\n  Ander Elortondo https://launchpad.net/~ander-elor\n  Asier Iturralde Sarasola https://launchpad.net/~asier-iturralde\n  Jan Mees https://launchpad.net/~jmees001\n  Mikel Iturbe Urretxa https://launchpad.net/~mik-iturbe\n  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\nAmy Smile Kerkhof https://launchpad.net/~amy\nAnder Elortondo https://launchpad.net/~ander-elor\nAsier Iturralde Sarasola https://launchpad.net/~asier-iturralde\nAsier Iturralde Sarasola, 2015\nJan Mees https://launchpad.net/~jmees001\nManex Agirrezabal, 2015\nMikel Iturbe Urretxa https://launchpad.net/~mik-iturbe\nMikel Olasagasti Uranga, 2015\nSTK-team https://launchpad.net/~stk"

@@ -3368,4 +3368,4 @@ msgstr "skoueriek"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Alan https://launchpad.net/~alan-m.\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\nAlan https://launchpad.net/~alan-m.\nAlan Monfort, 2015\nDawid Gan https://launchpad.net/~deveee\nSTK-team https://launchpad.net/~stk"

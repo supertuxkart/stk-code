@@ -3367,4 +3367,4 @@ msgstr "Vanleg"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Alexander Mackinnon Jansen https://launchpad.net/~alexander-jansen\n  Karl Ove Hufthammer https://launchpad.net/~huftis"
+msgstr "Launchpad Contributions:\nAlexander Mackinnon Jansen https://launchpad.net/~alexander-jansen\nKarl Ove Hufthammer https://launchpad.net/~huftis\nKarl Ove Hufthammer, 2011"

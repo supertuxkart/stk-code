@@ -3373,4 +3373,4 @@ msgstr "standartinis"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Algimantas Margevičius https://launchpad.net/~gymka\n  Mantas Kriaučiūnas https://launchpad.net/~mantas\n  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\nAlgimantas Margevičius https://launchpad.net/~gymka\nAlgimantas Margevičius, 2011\nJonas Kriaučiūnas, 2015\nMantas Kriaučiūnas https://launchpad.net/~mantas\nMantas Kriaučiūnas, 2015\nSTK-team https://launchpad.net/~stk"

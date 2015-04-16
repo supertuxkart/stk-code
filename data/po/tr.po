@@ -3368,4 +3368,4 @@ msgstr "standart"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Muhammet Kara https://launchpad.net/~muhammet-k\n  Osman Tosun https://launchpad.net/~rainman-neu\n  STK-team https://launchpad.net/~stk\n  Volkan Gezer https://launchpad.net/~volkangezer\n  emre can yılmaz https://launchpad.net/~ecylmz\n  linuxseven https://launchpad.net/~linuxseven\n  maidis https://launchpad.net/~ozbekanil\n  yakup https://launchpad.net/~mutouk\n  zeugma https://launchpad.net/~sunder67"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nemre can yılmaz https://launchpad.net/~ecylmz\nlinuxseven https://launchpad.net/~linuxseven\nmaidis https://launchpad.net/~ozbekanil\nMuhammet Kara https://launchpad.net/~muhammet-k\nOsman Tosun https://launchpad.net/~rainman-neu\nSTK-team https://launchpad.net/~stk\nVolkan Gezer https://launchpad.net/~volkangezer\nVolkan Gezer, 2015\nyakup https://launchpad.net/~mutouk\nzeugma https://launchpad.net/~sunder67"

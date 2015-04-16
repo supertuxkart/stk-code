@@ -3368,4 +3368,4 @@ msgstr "standard"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  1001sd https://launchpad.net/~siadyhr\n  Aputsiaĸ Niels Janussen https://launchpad.net/~aj\n  Auria https://launchpad.net/~auria-mg\n  J https://launchpad.net/~rumbukken\n  Marcus Møller https://launchpad.net/~marcusmoller\n  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\n1001sd https://launchpad.net/~siadyhr\nAputsiaĸ Niels Janussen https://launchpad.net/~aj\nAuria https://launchpad.net/~auria-mg\nJ https://launchpad.net/~rumbukken\nJoe Hansen, 2009,2015\nMarcus Møller https://launchpad.net/~marcusmoller\nSTK-team https://launchpad.net/~stk\nSøren Dyhr, 2015"
