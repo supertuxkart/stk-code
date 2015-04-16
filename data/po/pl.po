@@ -3371,4 +3371,4 @@ msgstr "standardowe"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Auria https://launchpad.net/~auria-mg\n  Bill https://launchpad.net/~cges30901\n  Dawid Gan https://launchpad.net/~deveee\n  Kuba Polankowski https://launchpad.net/~tux4-b\n  Kuba Polankowski https://launchpad.net/~tux4-wp\n  Patryk Wychowaniec https://launchpad.net/~p98\n  STK-team https://launchpad.net/~stk\n  Twojwujaszek https://launchpad.net/~twojwujaszek-gmail"
+msgstr "Launchpad Contributions:\nAuria https://launchpad.net/~auria-mg\nBill https://launchpad.net/~cges30901\nDawid Gan https://launchpad.net/~deveee\nDawid Gan, 2015\nKuba Polankowski https://launchpad.net/~tux4-b\nKuba Polankowski https://launchpad.net/~tux4-wp\nPatryk Wychowaniec https://launchpad.net/~p98\nPatryk Wychowaniec, 2015\nSTK-team https://launchpad.net/~stk\nTwojwujaszek https://launchpad.net/~twojwujaszek-gmail"

@@ -3379,4 +3379,4 @@ msgstr "قياسي"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Benjamin Kerensa https://launchpad.net/~bkerensa\n  Dawid Gan https://launchpad.net/~deveee\n  Hichem Razgallah https://launchpad.net/~hichemraz\n  Majid Al-Dharrab https://launchpad.net/~majid\n  SAKOUM Yassine https://launchpad.net/~karaytanto\n  STK-team https://launchpad.net/~stk\n  abdXelrhman https://launchpad.net/~popo49-abdo\n  صفا الفليج https://launchpad.net/~safaalfulaij\n  محمدالحرقان https://launchpad.net/~imksa"
+msgstr "Launchpad Contributions:\nabdXelrhman https://launchpad.net/~popo49-abdo\nBenjamin Kerensa https://launchpad.net/~bkerensa\nDawid Gan https://launchpad.net/~deveee\nHichem Razgallah https://launchpad.net/~hichemraz\nMajid Al-Dharrab https://launchpad.net/~majid\nSAKOUM Yassine https://launchpad.net/~karaytanto\nSTK-team https://launchpad.net/~stk\nصفا الفليج https://launchpad.net/~safaalfulaij\nمحمدالحرقان https://launchpad.net/~imksa"

@@ -3368,4 +3368,4 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Willem Sonke https://launchpad.net/~willem-sonke\n  Wuzzy https://launchpad.net/~wuzzy"
+msgstr "Launchpad Contributions:\nWillem Sonke https://launchpad.net/~willem-sonke\nWuzzy https://launchpad.net/~wuzzy\nWuzzy, 2015"

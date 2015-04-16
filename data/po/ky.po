@@ -3364,4 +3364,4 @@ msgstr "стандарттуу"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk\n  chyngyz https://launchpad.net/~chyngyz"
+msgstr "Launchpad Contributions:\nchyngyz https://launchpad.net/~chyngyz\nDawid Gan https://launchpad.net/~deveee\nSTK-team https://launchpad.net/~stk"

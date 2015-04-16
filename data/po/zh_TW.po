@@ -3365,4 +3365,4 @@ msgstr "一般"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Bill https://launchpad.net/~cges30901\n  Carl X. Su https://launchpad.net/~bcbcarl\n  Jeff Huang https://launchpad.net/~s8321414\n  STK-team https://launchpad.net/~stk\n  WM https://launchpad.net/~wandererm\n  jyc https://launchpad.net/~alphabet14\n  minhsien https://launchpad.net/~minhsien0330\n  tryneeds https://launchpad.net/~tryneeds\n  Ｖ字龍(Vdragon) https://launchpad.net/~vdragon"
+msgstr "Launchpad Contributions:\nBill https://launchpad.net/~cges30901\nCarl X. Su https://launchpad.net/~bcbcarl\ncges30901, 2015\nJeff Huang https://launchpad.net/~s8321414\nJeff Huang, 2015\njyc https://launchpad.net/~alphabet14\nminhsien https://launchpad.net/~minhsien0330\nSTK-team https://launchpad.net/~stk\ntryneeds https://launchpad.net/~tryneeds\nWM https://launchpad.net/~wandererm\nＶ字龍(Vdragon) https://launchpad.net/~vdragon"

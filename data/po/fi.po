@@ -3368,3 +3368,7 @@ msgstr "vakio"
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
 msgstr "Jiri Grönroos\n\nLaunchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Joonas Nurmi https://launchpad.net/~joonas-nurmi\n  Kristian Laakkonen https://launchpad.net/~kristian-laakkonen\n  STK-team https://launchpad.net/~stk"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nJiri Grönroos, 2015"

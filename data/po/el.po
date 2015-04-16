@@ -3368,4 +3368,4 @@ msgstr "βασικό"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Konstantinos Thermos https://launchpad.net/~subdee\n  Nefeli Stylla https://launchpad.net/~nefeli-st\n  STK-team https://launchpad.net/~stk\n  Vangelis Skarmoutsos https://launchpad.net/~skarmoutsosv\n  Yannis Kaskamanidis https://launchpad.net/~ttnfy17\n  tzem https://launchpad.net/~athmakrigiannis"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nKonstantinos Thermos https://launchpad.net/~subdee\nNefeli Stylla https://launchpad.net/~nefeli-st\nSTK-team https://launchpad.net/~stk\ntzem https://launchpad.net/~athmakrigiannis\nVangelis Skarmoutsos https://launchpad.net/~skarmoutsosv\nWasilis Mandratzis-Walz, 2015\nYannis Kaskamanidis https://launchpad.net/~ttnfy17"

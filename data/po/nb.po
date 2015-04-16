@@ -3366,4 +3366,4 @@ msgstr "standard"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Eigil Iversen https://launchpad.net/~eig-iv\n  Magne Djupvik https://launchpad.net/~magnedj\n  STK-team https://launchpad.net/~stk\n  Tore Bergebakken https://launchpad.net/~toreb\n  oyvindln https://launchpad.net/~oyvindln"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nEigil Iversen https://launchpad.net/~eig-iv\nMagne Djupvik https://launchpad.net/~magnedj\noyvindln https://launchpad.net/~oyvindln\nSTK-team https://launchpad.net/~stk\nTore Bergebakken https://launchpad.net/~toreb"
