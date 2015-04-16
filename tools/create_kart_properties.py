@@ -17,14 +17,45 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-# This script takes the list from abstract_characteristics.hpp and creates the code
-# An empty line is expected to end the input
+# This script creates the output for the AbstractCharacteristics
+# It takes an argument that specifies what the output of the script should be.
+# Possibilities are enum, defs, getter and getType
+
+import sys
+
+# Input data
+#FIXME is wheelPosition needed??
+characteristics = """Suspension: stiffness, rest, travelCm, expSpringResponse, maxForce
+Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, smoothFlyingImpulse
+Turn: radius(InterpolationArray), timeResetSteer, timeFullSteer(InterpolationArray)
+Engine: power, maxSpeed, brakeFactor, brakeTimeIncrease, maxSpeedReverseRatio
+Gear: switchRatio(std::vector<float>/floatVector), powerIncrease(std::vector<float>/floatVector)
+Mass
+Wheels: dampingRelaxation, dampingCompression, radius, position(std::vector<float>/floatVector)
+Camera: distance, forwardUpAngle, backwardUpAngle
+Jump: animationTime
+Lean: max, speed
+Anvil: duration, weight, speedFactor
+Parachute: friction, duration, durationOther, lboundFranction, uboundFranction, maxSpeed
+Bubblegum: duration, speedFraction, torque, fadeInTime, shieldDuration
+Zipper: duration, force, speedGain, speedIncrease, fadeOutTime
+Swatter: duration, distance, squashDuration, squashSlowdown
+Plunger: maxLength, force, duration, speedIncrease, fadeOutTime, inFaceTime
+Startup: time(std::vector<float>/floatVector), boost(std::vector<float>/floatVector)
+Rescue: duration, vertOffset, height
+Explosion: duration, radius, invulnerabilityTime
+Nitro: duration, engineForce, consumption, smallContainer, bigContainer, maxSpeedIncrease, fadeOutTime, max
+Slipstream: duration, length, width, collectTime, useTime, addPower, minSpeed, maxSpeedIncrease, fadeOutTime"""
+
 
 class GroupMember:
     def __init__(self, name, typeC, typeStr):
         self.name = name
         self.typeC = typeC
         self.typeStr = typeStr
+
+    def shouldMove(self):
+        return self.typeC != "float"
 
     """E.g. power(std::vector<float>/floatVector)
        or speed(InterpolationArray)
@@ -54,6 +85,11 @@ class Group:
 
     def addMember(self, content):
         self.members.append(GroupMember.parse(content))
+
+    def getBaseName(self):
+        if len(self.baseName) == 0 and len(self.members) > 0:
+            return self.members[0].name
+        return self.baseName
 
     """E.g. engine: power, gears(std::vector<Gear>/Gears)
        or mass(float) or only mass"""
@@ -88,52 +124,83 @@ def joinSubName(group, member, titleCase):
     words = toList(group.baseName) + toList(member.name)
     first = True
     if titleCase:
-        words = map(lambda w: w.title(), words)
+        words = [w.title() for w in words]
         return "".join(words)
     else:
         return "_".join(words)
 
 def main():
-    # All variables are saved here in titlecase
-    groups = []
-    # Read in lines
-    while True:
-        line = input()
-        if len(line) == 0:
-            break
-        groups.append(Group.parse(line))
+    # Find out what to do
+    if len(sys.argv) == 1:
+        print("Please specify what you want to know [enum/defs/getter/getType]")
+        return
+    task = sys.argv[1]
+
+    groups = [Group.parse(line) for line in characteristics.split("\n")]
 
     # Find longest name to align the function bodies
-    nameLengthTitle = 0
-    nameLengthUnderscore = 0
-    for g in groups:
-        for m in g.members:
-            l = len(joinSubName(g, m, True))
-            if l > nameLengthTitle:
-                nameLengthTitle = l
-            l = len(joinSubName(g, m, False))
-            if l > nameLengthUnderscore:
-                nameLengthUnderscore = l
+    #nameLengthTitle = 0
+    #nameLengthUnderscore = 0
+    #for g in groups:
+    #    for m in g.members:
+    #        l = len(joinSubName(g, m, True))
+    #        if l > nameLengthTitle:
+    #            nameLengthTitle = l
+    #        l = len(joinSubName(g, m, False))
+    #        if l > nameLengthUnderscore:
+    #            nameLengthUnderscore = l
 
     # Print the results
-    print("Enum ****************************************")
-    for g in groups:
-        print()
-        print("        // {0}".format(g.baseName.title()))
-        for m in g.members:
-            print("        {0},".format(joinSubName(g, m, False).upper()))
+    if task == "enum":
+        for g in groups:
+            print()
+            print("        // {0}".format(g.getBaseName().title()))
+            for m in g.members:
+                print("        {0},".format(joinSubName(g, m, False).upper()))
+    elif task == "defs":
+        for g in groups:
+            print()
+            for m in g.members:
+                nameTitle = joinSubName(g, m, True)
+                nameUnderscore = joinSubName(g, m, False)
+                if m.shouldMove():
+                    typeC = m.typeC + "&&"
+                else:
+                    typeC = m.typeC
 
-    print()
-    print()
-    print("Getters ****************************************")
+                print("    {0} get{1}() const;".
+                    format(typeC, nameTitle, nameUnderscore))
+    elif task == "getter":
+        for g in groups:
+            for m in g.members:
+                nameTitle = joinSubName(g, m, True)
+                nameUnderscore = joinSubName(g, m, False)
+                if m.shouldMove():
+                    typeC = m.typeC + "&&"
+                    result = "std::move(result)"
+                else:
+                    typeC = m.typeC
+                    result = "result"
 
-    for g in groups:
-        print()
-        for m in g.members:
-            nameTitle = joinSubName(g, m, True)
-            nameUnderscore = joinSubName(g, m, False)
-            print("    {0} get{1}() const {{ return m_{2}; }}".
-                format(m.typeC, nameTitle, nameUnderscore))
+                print("""{3} AbstractCharacteristics::get{1}() const
+{{
+    {0} result;
+    bool isSet = false;
+    process({2}, &result, isSet);
+    if (!isSet)
+        Log::fatal("AbstractCharacteristics", "Can't get characteristic {2}");
+    return {4};
+}}
+""".format(m.typeC, nameTitle, nameUnderscore.upper(), typeC, result))
+    elif task == "getType":
+        for g in groups:
+            for m in g.members:
+                nameTitle = joinSubName(g, m, True)
+                nameUnderscore = joinSubName(g, m, False)
+                print("""    case {0}:\n        return TYPE_{1};""".
+                    format(nameUnderscore.upper(), "_".join(toList(m.typeStr)).upper()))
+    else:
+        print("Unknown task")
 
     # Commented out code
     """print("Variables ****************************************")
@@ -177,3 +244,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
