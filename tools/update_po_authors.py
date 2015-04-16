@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 # A simple script that adds all authors from transifex, which are
 # listed in comments at the beginning of the file, to the 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
         line = i[:-1]   # remove \n
         if line=="# Translators:":
             found = 1
-        elif found and line[:2]=="# ":
+        elif found and line[:2]=="# " and line [:14]!="# FIRST AUTHOR":
             new_authors.append(line[2:])
         elif line[:5]=="msgid":
             found = 0
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         del lines[contributions]
 
     # Append new author list
-    lines.append("msgstr \"Launchpad Contributions:\\n%s\"\n"%all_authors_string)
+    lines.append("msgstr \"Launchpad Contributions:%s\"\n"%all_authors_string)
 
     # Overwrite old file
     f = open(sys.argv[1], "w")
