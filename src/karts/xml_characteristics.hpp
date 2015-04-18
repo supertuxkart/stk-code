@@ -36,12 +36,12 @@ public:
     XmlCharacteristics(const XMLNode *node = nullptr);
 
     virtual const SkiddingProperties* getSkiddingProperties() const;
-    virtual void process(CharacteristicType type, Value value, bool &isSet) const;
+    virtual void process(CharacteristicType type, Value value, bool *isSet) const;
 
     void load(const XMLNode *node);
 
 private:
-    static float processFloat(float value, std::string processor);
+    static void processFloat(const std::string &processor, float *value, bool *isSet);
 };
 
 #endif

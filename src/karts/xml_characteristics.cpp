@@ -33,11 +33,12 @@ const SkiddingProperties* XmlCharacteristics::getSkiddingProperties() const
     return m_skidding;
 }
 
-void XmlCharacteristics::process(CharacteristicType type, Value value, bool &isSet) const
+void XmlCharacteristics::process(CharacteristicType type, Value value, bool *isSet) const
 {
     switch (getType(type))
     {
     case TYPE_FLOAT:
+        processFloat(m_values[type], value.f, isSet);
         break;
     case TYPE_FLOAT_VECTOR:
         break;
@@ -46,7 +47,7 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool &isS
     }
 }
 
-float XmlCharacteristics::processFloat(float value, std::string processor)
+void XmlCharacteristics::processFloat(const std::string &processor, float *value, bool *isSet)
 {
 
 }

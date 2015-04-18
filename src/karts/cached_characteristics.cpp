@@ -65,7 +65,7 @@ void CachedCharacteristics::updateSource()
         {
             float value;
             float *ptr = static_cast<float*>(v.content);
-            m_origin->process(static_cast<CharacteristicType>(i), &value, isSet);
+            m_origin->process(static_cast<CharacteristicType>(i), &value, &isSet);
             if (isSet)
             {
                 if (!ptr)
@@ -90,7 +90,7 @@ void CachedCharacteristics::updateSource()
         {
             std::vector<float> value;
             std::vector<float> *ptr = static_cast<std::vector<float>*>(v.content);
-            m_origin->process(static_cast<CharacteristicType>(i), &value, isSet);
+            m_origin->process(static_cast<CharacteristicType>(i), &value, &isSet);
             if (isSet)
             {
                 if (!ptr)
@@ -116,7 +116,7 @@ void CachedCharacteristics::updateSource()
         {
             InterpolationArray value;
             InterpolationArray *ptr = static_cast<InterpolationArray*>(v.content);
-            m_origin->process(static_cast<CharacteristicType>(i), &value, isSet);
+            m_origin->process(static_cast<CharacteristicType>(i), &value, &isSet);
             if (isSet)
             {
                 if (!ptr)
@@ -147,7 +147,7 @@ const SkiddingProperties* CachedCharacteristics::getSkiddingProperties() const
     return m_origin->getSkiddingProperties();
 }
 
-void CachedCharacteristics::process(CharacteristicType type, Value value, bool &isSet) const
+void CachedCharacteristics::process(CharacteristicType type, Value value, bool *isSet) const
 {
     void *v = m_values[type].content;
     if (v)
@@ -164,7 +164,7 @@ void CachedCharacteristics::process(CharacteristicType type, Value value, bool &
             *value.ia = *static_cast<InterpolationArray*>(v);
             break;
         }
-        isSet = true;
+        *isSet = true;
     }
 }
 

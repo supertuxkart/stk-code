@@ -186,7 +186,7 @@ def main():
 {{
     {0} result;
     bool isSet = false;
-    process({2}, &result, isSet);
+    process({2}, &result, &isSet);
     if (!isSet)
         Log::fatal("AbstractCharacteristics", "Can't get characteristic {2}");
     return {4};
@@ -212,45 +212,23 @@ def main():
     else:
         print("Unknown task")
 
-    # Commented out code
-    """print("Variables ****************************************")
-    for g in groups:
-        print()
-        print("    // {0}".format(g.baseName.title()))
-        for n in g.subNames:
-            print("    float m_{0};".format(joinSubName(g, n, False)))
-
-    print()
-    print()
-    print("Constructor ****************************************")
-    lineLength = 4;
-    line = "    "
-    for g in groups:
-        for n in g.subNames:
-            name = "m_{0} = ".format(joinSubName(g, n, False))
-            l = len(name)
-            if lineLength + l > 80 and lineLength > 4:
-                print(line)
-                line = "    " + name
-                lineLength = l + 4
-            else:
-                line += name
-                lineLength += l
-    if lineLength > 4:
-        line += "1;"
-        print(line)
-
-    print()
-    print()
-    print("Setters ****************************************")
-    for g in groups:
-        print()
-        for n in g.subNames:
-            nameTitle = joinSubName(g, n, True)
-            nameUnderscore = joinSubName(g, n, False)
-            print("    void set{0}(float value){2} {{ m_{1}{3} = value; }}".
-                format(nameTitle, nameUnderscore, " " * (nameLengthTitle - len(nameTitle)),
-                    " " * (nameLengthUnderscore - len(nameUnderscore))))"""
+    #print("Constructor ****************************************")
+    #lineLength = 4;
+    #line = "    "
+    #for g in groups:
+    #    for n in g.subNames:
+    #        name = "m_{0} = ".format(joinSubName(g, n, False))
+    #        l = len(name)
+    #        if lineLength + l > 80 and lineLength > 4:
+    #            print(line)
+    #            line = "    " + name
+    #            lineLength = l + 4
+    #        else:
+    #            line += name
+    #            lineLength += l
+    #if lineLength > 4:
+    #    line += "1;"
+    #    print(line)
 
 if __name__ == '__main__':
     main()

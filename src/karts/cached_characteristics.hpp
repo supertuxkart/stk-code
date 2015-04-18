@@ -48,7 +48,7 @@ public:
     void updateSource();
 
     virtual const SkiddingProperties* getSkiddingProperties() const;
-    virtual void process(CharacteristicType type, Value value, bool &isSet) const;
+    virtual void process(CharacteristicType type, Value value, bool *isSet) const;
 };
 
 #endif

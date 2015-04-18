@@ -211,7 +211,7 @@ public:
      * \param isSet If the current value was already set (so it can be used
      *              for computations.
      */
-    virtual void process(CharacteristicType type, Value value, bool &isSet) const;
+    virtual void process(CharacteristicType type, Value value, bool *isSet) const;
 
     static ValueType getType(CharacteristicType type);
 

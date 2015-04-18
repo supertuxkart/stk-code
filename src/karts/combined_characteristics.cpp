@@ -34,7 +34,7 @@ const SkiddingProperties* CombinedCharacteristics::getSkiddingProperties() const
     return nullptr;
 }
 
-void CombinedCharacteristics::process(CharacteristicType type, Value value, bool &isSet) const
+void CombinedCharacteristics::process(CharacteristicType type, Value value, bool *isSet) const
 {
     for (const AbstractCharacteristics *characteristic : m_childs)
         characteristic->process(type, value, isSet);
