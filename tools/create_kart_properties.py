@@ -132,7 +132,7 @@ def joinSubName(group, member, titleCase):
 def main():
     # Find out what to do
     if len(sys.argv) == 1:
-        print("Please specify what you want to know [enum/defs/getter/getType/getXml]")
+        print("Please specify what you want to know [enum/defs/getter/getProp/getXml]")
         return
     task = sys.argv[1]
 
@@ -188,17 +188,24 @@ def main():
     bool isSet = false;
     process({2}, &result, &isSet);
     if (!isSet)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic {2}");
+        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName({2}).c_str());
     return {4};
 }}
 """.format(m.typeC, nameTitle, nameUnderscore.upper(), typeC, result))
-    elif task == "getType":
+    elif task == "getProp":
         for g in groups:
             for m in g.members:
                 nameTitle = joinSubName(g, m, True)
                 nameUnderscore = joinSubName(g, m, False)
-                print("""    case {0}:\n        return TYPE_{1};""".
+                print("    case {0}:\n        return TYPE_{1};".
                     format(nameUnderscore.upper(), "_".join(toList(m.typeStr)).upper()))
+        print("\n\n-------------------- END --------------------\n")
+        for g in groups:
+            for m in g.members:
+                nameTitle = joinSubName(g, m, True)
+                nameUnderscore = joinSubName(g, m, False).upper()
+                print("    case {0}:\n        return \"{0}\";".
+                    format(nameUnderscore))
     elif task == "getXml":
         for g in groups:
             print("    if (const XMLNode *sub_node = node->getNode(\"{0}\"))\n    {{".

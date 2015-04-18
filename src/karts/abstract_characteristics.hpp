@@ -19,6 +19,7 @@
 #ifndef HEADER_ABSTRACT_CHARACTERISTICS_HPP
 #define HEADER_ABSTRACT_CHARACTERISTICS_HPP
 
+#include <string>
 #include <vector>
 
 class SkiddingProperties;
@@ -214,6 +215,7 @@ public:
     virtual void process(CharacteristicType type, Value value, bool *isSet) const;
 
     static ValueType getType(CharacteristicType type);
+    static std::string getName(CharacteristicType type);
 
     // Script-generated content
     float getSuspensionStiffness() const;
