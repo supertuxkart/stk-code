@@ -19,7 +19,7 @@
 
 # This script creates the output for the AbstractCharacteristics
 # It takes an argument that specifies what the output of the script should be.
-# Possibilities are enum, defs, getter and getType
+# The output options can be seen by running this script without arguments.
 
 import sys
 
@@ -132,23 +132,23 @@ def joinSubName(group, member, titleCase):
 def main():
     # Find out what to do
     if len(sys.argv) == 1:
-        print("Please specify what you want to know [enum/defs/getter/getType]")
+        print("Please specify what you want to know [enum/defs/getter/getType/getXml]")
         return
     task = sys.argv[1]
 
     groups = [Group.parse(line) for line in characteristics.split("\n")]
 
     # Find longest name to align the function bodies
-    #nameLengthTitle = 0
-    #nameLengthUnderscore = 0
-    #for g in groups:
-    #    for m in g.members:
-    #        l = len(joinSubName(g, m, True))
-    #        if l > nameLengthTitle:
-    #            nameLengthTitle = l
-    #        l = len(joinSubName(g, m, False))
-    #        if l > nameLengthUnderscore:
-    #            nameLengthUnderscore = l
+    nameLengthTitle = 0
+    nameLengthUnderscore = 0
+    for g in groups:
+        for m in g.members:
+            l = len(joinSubName(g, m, True))
+            if l > nameLengthTitle:
+                nameLengthTitle = l
+            l = len(joinSubName(g, m, False))
+            if l > nameLengthUnderscore:
+                nameLengthUnderscore = l
 
     # Print the results
     if task == "enum":
@@ -199,6 +199,16 @@ def main():
                 nameUnderscore = joinSubName(g, m, False)
                 print("""    case {0}:\n        return TYPE_{1};""".
                     format(nameUnderscore.upper(), "_".join(toList(m.typeStr)).upper()))
+    elif task == "getXml":
+        for g in groups:
+            print("    if (const XMLNode *sub_node = node->getNode(\"{0}\"))\n    {{".
+                format(g.baseName))
+            for m in g.members:
+                nameUnderscore = joinSubName(g, m, False)
+                nameMinus = "-".join(toList(m.name))
+                print("        sub_node->get(\"{0}\", &m_values[{1}]);".
+                    format(nameMinus, nameUnderscore.upper()))
+            print("    }\n")
     else:
         print("Unknown task")
 

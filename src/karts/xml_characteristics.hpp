@@ -23,6 +23,8 @@
 
 #include <string>
 
+class XMLNode;
+
 class XmlCharacteristics : public AbstractCharacteristics
 {
 private:
@@ -31,12 +33,15 @@ private:
     SkiddingProperties *m_skidding;
 
 public:
-    XmlCharacteristics(const std::string &filename = "");
+    XmlCharacteristics(const XMLNode *node = nullptr);
 
     virtual const SkiddingProperties* getSkiddingProperties() const;
     virtual void process(CharacteristicType type, Value value, bool &isSet) const;
 
-    void load(const std::string &filename);
+    void load(const XMLNode *node);
+
+private:
+    static float processFloat(float value, std::string processor);
 };
 
 #endif
