@@ -173,7 +173,64 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
 
 void XmlCharacteristics::processFloat(const std::string &processor, float *value, bool *is_set)
 {
+    // Split the string by operators
+    static const std::string operators = "*/+-";
+    std::vector<std::string> parts;
+    std::vector<std::string> operations;
+    std::size_t pos = 0;
+    std::size_t pos2;
+    while ((pos2 = processor.find_first_of(operators, pos)) != std::string::npos)
+    {
+        parts.push_back(processor.substr(pos, pos2));
+        operations.push_back(processor.substr(pos2, pos2 + 1));
+        pos = pos2 + 1;
+    }
+    parts.push_back(processor.substr(pos));
 
+    if (parts.empty())
+    {
+        Log::error("XmlCharacteristics::processFloat", "no content to process");
+        return;
+    }
+
+    // Compute the result
+    float x = *value;
+    std::size_t index = 0;
+    // If nothing preceeds the first operator, insert x
+    if (parts[index].empty())
+    {
+        if (!*is_set)
+        {
+            Log::error("XmlCharacteristics::processFloat", "x is unknown");
+            return;
+        }
+        else
+        {
+            *value = x;
+            index++;
+        }
+    }
+    for (; index < parts.size(); index++)
+    {
+        float val;
+        if (parts[index] == "x" || parts[index] == "X")
+            val = x;
+        else if (!StringUtils::fromString(parts[index], val))
+        {
+            Log::fatal("XmlCharacteristics::processFloat",
+                "Can't process %s: Not a float", parts[index].c_str());
+            return;
+        }
+        if (operations[index - 1] == "*")
+            *value *= val;
+        else if (operations[index - 1] == "/")
+            *value /= val;
+        else if (operations[index - 1] == "+")
+            *value += val;
+        else if (operations[index - 1] == "-")
+            *value -= val;
+    }
+    *is_set = true;
 }
 
 void XmlCharacteristics::load(const XMLNode *node)
