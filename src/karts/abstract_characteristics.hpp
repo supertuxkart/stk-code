@@ -209,10 +209,10 @@ public:
      *
      * \param type The characteristic that should be modified.
      * \param value The current value and result at the same time.
-     * \param isSet If the current value was already set (so it can be used
+     * \param is_set If the current value was already set (so it can be used
      *              for computations.
      */
-    virtual void process(CharacteristicType type, Value value, bool *isSet) const;
+    virtual void process(CharacteristicType type, Value value, bool *is_set) const;
 
     static ValueType getType(CharacteristicType type);
     static std::string getName(CharacteristicType type);

@@ -185,9 +185,9 @@ def main():
                 print("""{3} AbstractCharacteristics::get{1}() const
 {{
     {0} result;
-    bool isSet = false;
-    process({2}, &result, &isSet);
-    if (!isSet)
+    bool is_set = false;
+    process({2}, &result, &is_set);
+    if (!is_set)
         Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName({2}).c_str());
     return {4};
 }}

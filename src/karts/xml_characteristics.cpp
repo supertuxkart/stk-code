@@ -18,6 +18,10 @@
 
 #include "karts/xml_characteristics.hpp"
 
+#include "utils/interpolation_array.hpp"
+#include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+
 #include "io/xml_node.hpp"
 
 XmlCharacteristics::XmlCharacteristics(const XMLNode *node) :
@@ -33,21 +37,141 @@ const SkiddingProperties* XmlCharacteristics::getSkiddingProperties() const
     return m_skidding;
 }
 
-void XmlCharacteristics::process(CharacteristicType type, Value value, bool *isSet) const
+void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_set) const
 {
     switch (getType(type))
     {
     case TYPE_FLOAT:
-        processFloat(m_values[type], value.f, isSet);
+        processFloat(m_values[type], value.f, is_set);
         break;
     case TYPE_FLOAT_VECTOR:
+    {
+        const std::vector<std::string> processors =
+            StringUtils::split(m_values[type], ' ');
+        if (*is_set)
+        {
+            if (processors.size() != value.fv->size())
+            {
+                Log::error("XmlCharacteristics::process",
+                    "FloatVectors have different sizes for %s",
+                    getName(type).c_str());
+                break;
+            }
+            std::vector<float>::iterator fit = value.fv->begin();
+            for (std::vector<std::string>::const_iterator it = processors.begin();
+                 it != processors.end(); it++, fit++)
+                processFloat(*it, &*fit, is_set);
+        }
+        else
+        {
+            value.fv->resize(processors.size());
+            std::vector<float>::iterator fit = value.fv->begin();
+            for (std::vector<std::string>::const_iterator it = processors.begin();
+                 it != processors.end(); it++, fit++)
+            {
+                *is_set = false;
+                processFloat(*it, &*fit, is_set);
+
+                if (!*is_set)
+                {
+                    Log::error("XmlCharacteristics::process", "Can't process %s",
+                        getName(type).c_str());
+                    value.fv->clear();
+                    break;
+                }
+            }
+        }
         break;
+    }
     case TYPE_INTERPOLATION_ARRAY:
+    {
+        const std::vector<std::string> processors =
+            StringUtils::split(m_values[type], ' ');
+        if (*is_set)
+        {
+            if (processors.size() != value.fv->size())
+            {
+                Log::error("XmlCharacteristics::process",
+                    "InterpolationArrays have different sizes for %s",
+                    getName(type).c_str());
+                break;
+            }
+            else
+            {
+                for (std::vector<std::string>::const_iterator it = processors.begin();
+                     it != processors.end(); it++)
+                {
+                    std::vector<std::string> pair = StringUtils::split(*it,':');
+                    if (!pair.size() == 2)
+                        Log::error("XmlCharacteristics::process",
+                            "Can't process %s: Wrong format", getName(type).c_str());
+                    else
+                    {
+                        float x;
+                        if (!StringUtils::fromString(pair[0], x))
+                            Log::error("XmlCharacteristics::process",
+                                "Can't process %s: Not a float", getName(type).c_str());
+                        else
+                        {
+                            // Search the index of this x value
+                            bool found = false;
+                            for (unsigned int i = 0; i < value.ia->size(); i++)
+                            {
+                                if (value.ia->getX(i) == x)
+                                {
+                                    float val;
+                                    processFloat(pair[1], &val, is_set);
+                                    value.ia->setY(i, val);
+                                    break;
+                                }
+                            }
+                            if (!found)
+                                Log::error("XmlCharacteristics::process",
+                                    "Can't find the %f in %s", x,
+                                    getName(type).c_str());
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (std::vector<std::string>::const_iterator it = processors.begin();
+                 it != processors.end(); it++)
+            {
+                std::vector<std::string> pair = StringUtils::split(*it,':');
+                if (!pair.size() == 2)
+                    Log::error("XmlCharacteristics::process",
+                        "Can't process %s: Wrong format", getName(type).c_str());
+                else
+                {
+                    float x;
+                    if (!StringUtils::fromString(pair[0], x))
+                        Log::error("XmlCharacteristics::process",
+                            "Can't process %s: Not a float", getName(type).c_str());
+                    else
+                    {
+                        float val;
+                        *is_set = false;
+                        processFloat(pair[1], &val, is_set);
+                        if (!*is_set)
+                        {
+                            Log::error("XmlCharacteristics::process", "Can't process %s",
+                                getName(type).c_str());
+                            value.ia->clear();
+                            break;
+                        }
+                        value.ia->push_back(x, val);
+                    }
+                }
+            }
+        }
         break;
+    }
     }
 }
 
-void XmlCharacteristics::processFloat(const std::string &processor, float *value, bool *isSet)
+void XmlCharacteristics::processFloat(const std::string &processor, float *value, bool *is_set)
 {
 
 }

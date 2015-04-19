@@ -58,15 +58,15 @@ void CachedCharacteristics::updateSource()
     {
         SaveValue &v = m_values[i];
         
-        bool isSet = false;
+        bool is_set = false;
         switch (getType(static_cast<CharacteristicType>(i)))
         {
         case TYPE_FLOAT:
         {
             float value;
             float *ptr = static_cast<float*>(v.content);
-            m_origin->process(static_cast<CharacteristicType>(i), &value, &isSet);
-            if (isSet)
+            m_origin->process(static_cast<CharacteristicType>(i), &value, &is_set);
+            if (is_set)
             {
                 if (!ptr)
                 {
@@ -90,8 +90,8 @@ void CachedCharacteristics::updateSource()
         {
             std::vector<float> value;
             std::vector<float> *ptr = static_cast<std::vector<float>*>(v.content);
-            m_origin->process(static_cast<CharacteristicType>(i), &value, &isSet);
-            if (isSet)
+            m_origin->process(static_cast<CharacteristicType>(i), &value, &is_set);
+            if (is_set)
             {
                 if (!ptr)
                 {
@@ -116,8 +116,8 @@ void CachedCharacteristics::updateSource()
         {
             InterpolationArray value;
             InterpolationArray *ptr = static_cast<InterpolationArray*>(v.content);
-            m_origin->process(static_cast<CharacteristicType>(i), &value, &isSet);
-            if (isSet)
+            m_origin->process(static_cast<CharacteristicType>(i), &value, &is_set);
+            if (is_set)
             {
                 if (!ptr)
                 {
@@ -147,7 +147,7 @@ const SkiddingProperties* CachedCharacteristics::getSkiddingProperties() const
     return m_origin->getSkiddingProperties();
 }
 
-void CachedCharacteristics::process(CharacteristicType type, Value value, bool *isSet) const
+void CachedCharacteristics::process(CharacteristicType type, Value value, bool *is_set) const
 {
     void *v = m_values[type].content;
     if (v)
@@ -164,7 +164,7 @@ void CachedCharacteristics::process(CharacteristicType type, Value value, bool *
             *value.ia = *static_cast<InterpolationArray*>(v);
             break;
         }
-        *isSet = true;
+        *is_set = true;
     }
 }
 
