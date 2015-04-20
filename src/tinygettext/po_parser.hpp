@@ -21,8 +21,6 @@
 #include <iosfwd>
 #include <string>
 
-//#include "iconv.hpp"
-
 namespace tinygettext {
 
 class Dictionary;
