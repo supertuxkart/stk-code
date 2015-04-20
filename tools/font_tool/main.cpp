@@ -340,7 +340,13 @@ public:
 
 void createGUI(IrrlichtDevice* device, CFontTool* fc)
 {
+    // Scaling factor to allow a larger font to be used
+    float scale = 2.0f;
+    io::path previous_cwd = device->getFileSystem()->getWorkingDirectory();
+
 	gui::IGUIEnvironment *env = device->getGUIEnvironment();
+    gui::IGUIFont *font = env->getFont(io::path("../../../data/fonts/StkFont.xml"));
+    device->getGUIEnvironment()->getSkin()->setFont(font);
 
     //env->getSkin()->setSize((gui::EGUI_DEFAULT_SIZE, 24);
 	// change transparency of skin
@@ -351,29 +357,29 @@ void createGUI(IrrlichtDevice* device, CFontTool* fc)
 		env->getSkin()->setColor((gui::EGUI_DEFAULT_COLOR)i, col);
 	}
 
-	IGUIWindow *win = env->addWindow( core::rect<s32>(10,HEIGHT/30,WIDTH/4,HEIGHT-100), false, L"Font Creator");
+	IGUIWindow *win = env->addWindow( core::rect<s32>(10,HEIGHT/30,int(scale*WIDTH)/4,HEIGHT-100), false, L"Font Creator");
 	win->getCloseButton()->setVisible(false);
 
-	s32 xs=10,xp=xs, yp=HEIGHT/20, h=HEIGHT/30;
+	s32 xs=10,xp=xs, yp=HEIGHT/20, h=HEIGHT/20;
 
-	env->addStaticText(L"Charset", core::rect<s32>(xp,yp,50,yp+h),false,false, win);
+	env->addStaticText(L"Charset", core::rect<s32>(int(scale*xp),yp,int(scale*90),yp+h),false,false, win);
 
 	xp+=60;
 
 	// charset combo
-	gui::IGUIComboBox* cbo = env->addComboBox( core::rect<s32>(xp,yp,180,yp+h),win, MYGUI_CHARSET);
+	gui::IGUIComboBox* cbo = env->addComboBox( core::rect<s32>(int(scale*xp),yp,int(scale*180),yp+h),win, MYGUI_CHARSET);
 	for (u32 i=0; i < fc->CharSets.size(); ++i)
 		cbo->addItem(fc->CharSets[i].c_str());
 
 	yp += (s32)(h*1.5f);
 	xp = xs;
 
-	env->addStaticText(L"Font", core::rect<s32>(xp,yp,50,yp+h),false,false, win);
+	env->addStaticText(L"Font", core::rect<s32>(int(scale*xp),yp,int(scale*50),yp+h),false,false, win);
 
 	xp+=60;
 
 	// font name combo
-	cbo = env->addComboBox( core::rect<s32>(xp,yp,180,yp+h),win, MYGUI_FONTNAME);
+	cbo = env->addComboBox( core::rect<s32>(int(scale*xp),yp,int(scale*180),yp+h),win, MYGUI_FONTNAME);
 	for (u32 i=0; i < fc->FontNames.size(); ++i){
 		cbo->addItem(fc->FontNames[i].c_str());
 		if(fc->FontNames[i] == L"\u6587\u6CC9\u9A7F\u5FAE\u7C73\u9ED1") cbo->setSelected(i); //auto select wqy-microhei
@@ -382,7 +388,7 @@ void createGUI(IrrlichtDevice* device, CFontTool* fc)
 	yp += (s32)(h*1.5f);
 	xp = xs;
 
-	env->addStaticText(L"Size", core::rect<s32>(xp,yp,50,yp+h),false,false, win);
+	env->addStaticText(L"Size", core::rect<s32>(int(scale*xp),yp,int(scale*(50+xp)),yp+h),false,false, win);
 
 	xp += 60;
 
@@ -392,40 +398,40 @@ void createGUI(IrrlichtDevice* device, CFontTool* fc)
 	for (s32 i=0; fc->FontSizes[i] != 0; ++i)
 		cbo->addItem( ((core::stringw(fc->FontSizes[i])) + L"pt").c_str()); */
 
-	env->addEditBox(L"4",core::rect<s32>(xp,yp,xp+70,yp+h), true, win, MYGUI_SIZE);
-	xp += 80;
+	env->addEditBox(L"24",core::rect<s32>(int(scale*xp),yp,int(scale*(xp+70)),yp+h), true, win, MYGUI_SIZE);
+	xp += int(scale*80);
 	env->addStaticText(L"pt", core::rect<s32>(xp,yp,xp+50,yp+h),false,false,win);
 
 	xp = xs;
 	yp += (s32)(h*1.5f);
 
 	// bold checkbox
-	env->addCheckBox(false, core::rect<s32>(xp,yp,xp+50,yp+h),win, MYGUI_BOLD, L"Bold");
+	env->addCheckBox(false, core::rect<s32>(xp,yp,int(scale*(xp+50)),yp+h),win, MYGUI_BOLD, L"Bold");
 
-	xp += 45;
+	xp += int(45*scale);
 
 	// italic checkbox
-	env->addCheckBox(false, core::rect<s32>(xp,yp,xp+50,yp+h),win, MYGUI_ITALIC, L"Italic");
+	env->addCheckBox(false, core::rect<s32>(xp,yp,int(scale*(xp+50)),yp+h),win, MYGUI_ITALIC, L"Italic");
 
-	xp += 45;
+	xp += int(55*scale);
 
 	// AA checkbox
-	env->addCheckBox(false, core::rect<s32>(xp,yp,xp+50,yp+h),win, MYGUI_ANTIALIAS, L"AA");
+	env->addCheckBox(false, core::rect<s32>(xp,yp,int(scale*(xp+50)),yp+h),win, MYGUI_ANTIALIAS, L"AA");
 
-	xp +=40;
+    xp += int(scale * 40);
 
 	// Alpha checkbox
-	env->addCheckBox(false, core::rect<s32>(xp,yp,xp+50,yp+h),win, MYGUI_ALPHA, L"Alpha");
+	env->addCheckBox(false, core::rect<s32>(xp,yp,int(scale*(xp+50)),yp+h),win, MYGUI_ALPHA, L"Alpha");
 
 	xp = xs;
 	yp += (s32)(h*1.5f);
 
 	//new
 
-	env->addCheckBox(false, core::rect<s32>(xp,yp,xp+150,yp+h),win, 201, L"Export used characters only")->setChecked(false);
+	env->addCheckBox(false, core::rect<s32>(xp,yp,int(scale*(xp+200)),yp+h),win, 201, L"Only used characters")->setChecked(false);
 	yp += (s32)(h*1.5f);
 
-	env->addCheckBox(false, core::rect<s32>(xp,yp,xp+150,yp+h),win, 202, L"Exclude basic latin characters");
+	env->addCheckBox(false, core::rect<s32>(xp,yp,int(scale*(xp+200)),yp+h),win, 202, L"Exclude basic latin");
 	yp += (s32)(h*1.5f);
 
 	/*
@@ -435,61 +441,61 @@ void createGUI(IrrlichtDevice* device, CFontTool* fc)
 	yp += (s32)(h*1.5f);
 	*/
 
-	env->addStaticText(L"Max Width:", core::rect<s32>(xp,yp,50,yp+h),false,false, win);
+	env->addStaticText(L"Max Width:", core::rect<s32>(xp,yp,int(scale*100),yp+h),false,false, win);
 
-	xp += 60;
+	xp += int(scale*90);
 
 	// texture widths
-	cbo = env->addComboBox( core::rect<s32>(xp,yp,xp+70,yp+h),win, MYGUI_TEXWIDTH);
+	cbo = env->addComboBox( core::rect<s32>(xp,yp,xp+int(scale*80),yp+h),win, MYGUI_TEXWIDTH);
 	for (s32 i=0; texturesizes[i] != 0; ++i)
 		cbo->addItem( ((core::stringw(texturesizes[i])) + L" wide").c_str());
-
+    cbo->setSelected(2);   // 128, 256, 512 --> make 512 the default
 	xp=xs;
 	yp += (s32)(h*1.5f);
 
-	env->addStaticText(L"Max Height:", core::rect<s32>(xp,yp,60,yp+h),false,false, win);
+	env->addStaticText(L"Max Height:", core::rect<s32>(xp,yp,int(scale*100),yp+h),false,false, win);
 
-	xp += 60;
+	xp += int(scale*90);
 
 	// texture height
-	cbo = env->addComboBox( core::rect<s32>(xp,yp,xp+70,yp+h),win, MYGUI_TEXHEIGHT);
+	cbo = env->addComboBox( core::rect<s32>(xp,yp,xp+int(scale*80),yp+h),win, MYGUI_TEXHEIGHT);
 	for (s32 i=0; texturesizes[i] != 0; ++i)
 		cbo->addItem( ((core::stringw(texturesizes[i])) + L" tall").c_str());
-
+    cbo->setSelected(2);   // 512 as default
 	// file name
 	xp = xs;
 	yp += (s32)(h*1.5f);
-	env->addStaticText(L"Filename", core::rect<s32>(xp,yp,60,yp+h),false,false, win);
-	xp += 60;
-	env->addEditBox(L"myfont",core::rect<s32>(xp,yp,xp+70,yp+h), true, win, MYGUI_FILENAME);
+	env->addStaticText(L"Filename", core::rect<s32>(xp,yp,int(scale*100),yp+h),false,false, win);
+	xp += int(scale*90);
+	env->addEditBox(L"wqyMicroHei",core::rect<s32>(xp,yp,xp+int(scale*80),yp+h), true, win, MYGUI_FILENAME);
 
 	// file format
 	xp = xs;
 	yp += (s32)(h*1.5f);
-	env->addStaticText(L"File Format", core::rect<s32>(xp,yp,60,yp+h),false,false, win);
-	xp += 60;
+	env->addStaticText(L"File Format", core::rect<s32>(xp,yp,int(scale*100),yp+h),false,false, win);
+	xp += int(scale*90);
 
-	cbo = env->addComboBox( core::rect<s32>(xp,yp,xp+70,yp+h),win, MYGUI_FORMAT);
+	cbo = env->addComboBox( core::rect<s32>(xp,yp,xp+int(scale*80),yp+h),win, MYGUI_FORMAT);
 	for (s32 i=0; fileformats[i] != 0; ++i)
 		cbo->addItem( core::stringw(fileformats[i]).c_str());
 	for (s32 i=0; alphafileformats[i] != 0; ++i)
 		cbo->addItem( core::stringw(alphafileformats[i]).c_str());
-
+    cbo->setSelected(2);   // bmp, ppm, png, ... --> select pn
 	xp = xs;
 	yp += h*2;
 
 	// create button
-	env->addButton( core::rect<s32>(xp,yp,xp+50,yp+h),win, MYGUI_CREATE, L"Create");
+	env->addButton( core::rect<s32>(xp,yp,int(scale*(xp+50)),yp+h),win, MYGUI_CREATE, L"Create");
 
-	xp += 60;
+	xp += int(scale*60);
 
 	// save button
-	env->addButton( core::rect<s32>(xp,yp,xp+50,yp+h),win, MYGUI_SAVE, L"Save");
+	env->addButton( core::rect<s32>(xp,yp,xp+int(scale*50),yp+h),win, MYGUI_SAVE, L"Save");
 
-	xp += 60;
+	xp += int(scale*60);
 
 	// help button
-	env->addButton( core::rect<s32>(xp,yp,xp+50,yp+h),win, MYGUI_HELPBUTTON, L"Help");
+	env->addButton( core::rect<s32>(xp,yp,xp+int(scale*50),yp+h),win, MYGUI_HELPBUTTON, L"Help");
 
 	// font image
 	gui::IGUIImage *img = env->addImage(0, core::position2d<s32>(0,0), true,0, MYGUI_IMAGE);
@@ -503,7 +509,7 @@ void createGUI(IrrlichtDevice* device, CFontTool* fc)
 	yp += h*3;
 
 	env->getRootGUIElement()->bringToFront(win);
-	win->setRelativePosition( core::rect<s32>(0,HEIGHT/30,200,yp));
+	win->setRelativePosition( core::rect<s32>(0,HEIGHT/30,int(scale*200),yp));
 }
 
 int main(int argc,char **argv)
