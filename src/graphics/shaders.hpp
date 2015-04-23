@@ -339,37 +339,6 @@ namespace LightShader
     };
 }
 
-namespace ParticleShader
-{
-
-class SimpleSimulationShader : public ShaderHelperSingleton<SimpleSimulationShader, core::matrix4, int, int, float>
-{
-public:
-    SimpleSimulationShader();
-};
-
-
-
-class HeightmapSimulationShader : public ShaderHelperSingleton<HeightmapSimulationShader, core::matrix4, int, int, float, float, float, float, float>
-{
-public:
-    GLuint TU_heightmap;
-
-    HeightmapSimulationShader();
-};
-
-class SimpleParticleRender : public ShaderHelperSingleton<SimpleParticleRender, video::SColorf, video::SColorf>, public TextureRead<Trilinear_Anisotropic_Filtered, Nearest_Filtered>
-{
-public:
-    SimpleParticleRender();
-};
-
-class FlipParticleRender : public ShaderHelperSingleton<FlipParticleRender>, public TextureRead<Trilinear_Anisotropic_Filtered, Nearest_Filtered>
-{
-public:
-    FlipParticleRender();
-};
-}
 
 template<typename T, typename... Args>
 static void DrawFullScreenEffect(Args...args)

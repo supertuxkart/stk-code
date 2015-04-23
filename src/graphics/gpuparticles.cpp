@@ -17,6 +17,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/shaders_util.hpp"
 #include "gpuparticles.hpp"
 #include "io/file_manager.hpp"
 #include "config/user_config.hpp"
@@ -386,15 +387,15 @@ void ParticleSystemProxy::simulate()
     glEnable(GL_RASTERIZER_DISCARD);
     if (has_height_map)
     {
-        glUseProgram(ParticleShader::HeightmapSimulationShader::getInstance()->Program);
-        glActiveTexture(GL_TEXTURE0 + ParticleShader::HeightmapSimulationShader::getInstance()->TU_heightmap);
+        glUseProgram(HeightmapSimulationShader::getInstance()->Program);
+        glActiveTexture(GL_TEXTURE0 + HeightmapSimulationShader::getInstance()->TU_heightmap);
         glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
-        ParticleShader::HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
+        HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
     }
     else
     {
-        glUseProgram(ParticleShader::SimpleSimulationShader::getInstance()->Program);
-        ParticleShader::SimpleSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor);
+        PointEmitterShader::getInstance()->use();
+        PointEmitterShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor);
     }
 
     glBindVertexArray(current_simulation_vao);
@@ -432,10 +433,10 @@ void ParticleSystemProxy::simulate()
 void ParticleSystemProxy::drawFlip()
 {
     glBlendFunc(GL_ONE, GL_ONE);
-    glUseProgram(ParticleShader::FlipParticleRender::getInstance()->Program);
+    glUseProgram(FlipParticleRender::getInstance()->Program);
 
-    ParticleShader::FlipParticleRender::getInstance()->SetTextureUnits(texture, irr_driver->getDepthStencilTexture());
-    ParticleShader::FlipParticleRender::getInstance()->setUniforms();
+    FlipParticleRender::getInstance()->SetTextureUnits(texture, irr_driver->getDepthStencilTexture());
+    FlipParticleRender::getInstance()->setUniforms();
 
     glBindVertexArray(current_rendering_vao);
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_count);
@@ -447,13 +448,13 @@ void ParticleSystemProxy::drawNotFlip()
         glBlendFunc(GL_ONE, GL_ONE);
     else
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glUseProgram(ParticleShader::SimpleParticleRender::getInstance()->Program);
+    glUseProgram(SimpleParticleRender::getInstance()->Program);
 
-    ParticleShader::SimpleParticleRender::getInstance()->SetTextureUnits(texture, irr_driver->getDepthStencilTexture());
+    SimpleParticleRender::getInstance()->SetTextureUnits(texture, irr_driver->getDepthStencilTexture());
     video::SColorf ColorFrom = video::SColorf(getColorFrom()[0], getColorFrom()[1], getColorFrom()[2]);
     video::SColorf ColorTo = video::SColorf(getColorTo()[0], getColorTo()[1], getColorTo()[2]);
 
-    ParticleShader::SimpleParticleRender::getInstance()->setUniforms(ColorFrom, ColorTo);
+    SimpleParticleRender::getInstance()->setUniforms(ColorFrom, ColorTo);
 
     glBindVertexArray(current_rendering_vao);
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_count);
@@ -533,4 +534,98 @@ void ParticleSystemProxy::render() {
     m_first_execution = false;
     simulate();
     draw();
+}
+
+
+// ============================================================================
+
+PointEmitterShader::PointEmitterShader()
+{
+    const char *varyings[] = {
+        "new_particle_position",
+        "new_lifetime",
+        "new_particle_velocity",
+        "new_size",
+    };
+    loadTFBProgram("pointemitter.vert", varyings, 4);
+    assignUniforms("sourcematrix", "dt", "level", "size_increase_factor");
+}
+
+
+struct TexUnit
+{
+    GLuint m_index;
+    const char* m_uniform;
+
+    TexUnit(GLuint index, const char* uniform)
+    {
+        m_index = index;
+        m_uniform = uniform;
+    }
+};
+static void
+AssignTextureUnit(GLuint Program, TexUnit texUnit)
+{
+    glUseProgram(Program);
+    GLuint uniform = glGetUniformLocation(Program, texUnit.m_uniform);
+    glUniform1i(uniform, texUnit.m_index);
+    glUseProgram(0);
+}
+
+template<typename... T>
+static void AssignTextureUnit(GLuint Program, TexUnit texUnit, T... rest)
+{
+    glUseProgram(Program);
+    GLuint uniform = glGetUniformLocation(Program, texUnit.m_uniform);
+    glUniform1i(uniform, texUnit.m_index);
+    AssignTextureUnit_Sub(Program, rest...);
+    glUseProgram(0);
+}
+
+static void AssignTextureUnit_Sub(GLuint Program) {}
+
+template<typename... T>
+static void AssignTextureUnit_Sub(GLuint Program, TexUnit texUnit, T... rest)
+{
+    GLuint uniform = glGetUniformLocation(Program, texUnit.m_uniform);
+    glUniform1i(uniform, texUnit.m_index);
+    AssignTextureUnit_Sub(Program, rest...);
+}
+
+
+
+HeightmapSimulationShader::HeightmapSimulationShader()
+{
+    const char *varyings[] = {
+        "new_particle_position",
+        "new_lifetime",
+        "new_particle_velocity",
+        "new_size",
+    };
+    Program = LoadTFBProgram(file_manager->getAsset("shaders/particlesimheightmap.vert").c_str(), varyings, 4);
+    TU_heightmap = 2;
+    AssignTextureUnit(Program, TexUnit(TU_heightmap, "heightmap"));
+    AssignUniforms("sourcematrix", "dt", "level", "size_increase_factor", "track_x", "track_x_len", "track_z", "track_z_len");
+}
+
+SimpleParticleRender::SimpleParticleRender()
+{
+    Program = LoadProgram(PARTICLES_RENDERING,
+        GL_VERTEX_SHADER, file_manager->getAsset("shaders/particle.vert").c_str(),
+        GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+        GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
+    AssignUniforms("color_from", "color_to");
+
+    AssignSamplerNames(Program, 0, "tex", 1, "dtex");
+}
+
+FlipParticleRender::FlipParticleRender()
+{
+    Program = LoadProgram(PARTICLES_RENDERING,
+        GL_VERTEX_SHADER, file_manager->getAsset("shaders/flipparticle.vert").c_str(),
+        GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+        GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
+    AssignUniforms();
+
+    AssignSamplerNames(Program, 0, "tex", 1, "dtex");
 }

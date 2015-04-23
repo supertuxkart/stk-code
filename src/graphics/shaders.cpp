@@ -1491,56 +1491,6 @@ namespace LightShader
 }
 
 
-namespace ParticleShader
-{
-    SimpleSimulationShader::SimpleSimulationShader()
-    {
-        const char *varyings[] = {
-            "new_particle_position",
-            "new_lifetime",
-            "new_particle_velocity",
-            "new_size",
-        };
-        Program = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 4);
-        AssignUniforms("sourcematrix", "dt", "level", "size_increase_factor");
-    }
-
-    HeightmapSimulationShader::HeightmapSimulationShader()
-    {
-        const char *varyings[] = {
-            "new_particle_position",
-            "new_lifetime",
-            "new_particle_velocity",
-            "new_size",
-        };
-        Program = LoadTFBProgram(file_manager->getAsset("shaders/particlesimheightmap.vert").c_str(), varyings, 4);
-        TU_heightmap = 2;
-        AssignTextureUnit(Program, TexUnit(TU_heightmap, "heightmap"));
-        AssignUniforms("sourcematrix", "dt", "level", "size_increase_factor", "track_x", "track_x_len", "track_z", "track_z_len");
-    }
-
-    SimpleParticleRender::SimpleParticleRender()
-    {
-        Program = LoadProgram(PARTICLES_RENDERING,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/particle.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
-        AssignUniforms("color_from", "color_to");
-
-        AssignSamplerNames(Program, 0, "tex", 1, "dtex");
-    }
-
-    FlipParticleRender::FlipParticleRender()
-    {
-        Program = LoadProgram(PARTICLES_RENDERING,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/flipparticle.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
-        AssignUniforms();
-
-        AssignSamplerNames(Program, 0, "tex", 1, "dtex");
-    }
-}
 
 static GLuint createVAO(GLuint Program)
 {
