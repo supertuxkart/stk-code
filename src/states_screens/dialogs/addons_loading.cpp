@@ -353,9 +353,8 @@ void AddonsLoading::doInstall()
     bool error = !addons_manager->install(m_addon);
     if(error)
     {
-        core::stringw msg = StringUtils::insertValues(
-            _("Problems installing the addon '%s'."),
-            core::stringw(m_addon.getName().c_str()));
+        const core::stringw &name = m_addon.getName();
+        core::stringw msg = _("Problems installing the addon '%s'.", name);
         getWidget<BubbleWidget>("description")->setText(msg.c_str());
     }
 
@@ -391,8 +390,8 @@ void AddonsLoading::doUninstall()
         Log::warn("Addons", "Directory '%s' can not be removed.",
                   m_addon.getDataDir().c_str());
         Log::warn("Addons", "Please remove this directory manually.");
-        core::stringw msg = StringUtils::insertValues(_("Problems removing the addon '%s'."),
-                                                      core::stringw(m_addon.getName().c_str()));
+        const core::stringw &name = m_addon.getName();
+        core::stringw msg = _("Problems removing the addon '%s'.", name);
         getWidget<BubbleWidget>("description")->setText(msg.c_str());
     }
 

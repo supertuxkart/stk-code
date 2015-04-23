@@ -129,9 +129,6 @@ private:
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go, m_string_goal;
 
-    /** Translated string 'Top %d' displayed every frame. */
-    core::stringw    m_string_top;
-
     /** The position of the referee for all karts. */
     std::vector<Vec3> m_referee_pos;
 

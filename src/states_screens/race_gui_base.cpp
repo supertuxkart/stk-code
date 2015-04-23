@@ -98,10 +98,6 @@ RaceGUIBase::RaceGUIBase()
     m_dist_show_overlap     = 2;
     m_icons_inertia         = 2;
 
-
-    //I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-    m_string_top            = _("Top %i");
-
     m_referee               = NULL;
 }   // RaceGUIBase
 
@@ -812,7 +808,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             static video::SColor color = video::SColor(255, 255, 255, 255);
             pos_top.LowerRightCorner   = pos_top.UpperLeftCorner;
 
-            font->draw(StringUtils::insertValues( m_string_top, position-1 ), pos_top, color);
+            //I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
+            font->draw(_("Top %i", position-1 ), pos_top, color);
 
             break;
         }
