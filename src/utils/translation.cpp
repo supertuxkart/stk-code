@@ -96,6 +96,7 @@ wchar_t* utf8_to_wide(const char* input)
 
 // ----------------------------------------------------------------------------
 /** Frees the memory allocated for the result of toFribidiChar(). */
+#ifdef ENABLE_BIDI
 void freeFribidiChar(FriBidiChar *str)
 {
 #ifdef TEST_BIDI
@@ -105,13 +106,16 @@ void freeFribidiChar(FriBidiChar *str)
         delete[] str;
 #endif
 }
+#endif
 
 /** Frees the memory allocated for the result of fromFribidiChar(). */
+#ifdef ENABLE_BIDI
 void freeFribidiChar(wchar_t *str)
 {
     if (sizeof(wchar_t) != sizeof(FriBidiChar))
         delete[] str;
 }
+#endif
 
 // ----------------------------------------------------------------------------
 /** Converts a wstring to a FriBidi-string.
@@ -121,6 +125,7 @@ void freeFribidiChar(wchar_t *str)
     On linux, the string doesn't need to be converted because wchar_t is
     already UTF-32. On windows the string is converted from UTF-16 by this
     function. */
+#ifdef ENABLE_BIDI
 FriBidiChar* toFribidiChar(const wchar_t* str)
 {
     std::size_t length = wcslen(str);
@@ -168,6 +173,7 @@ wchar_t* fromFribidiChar(const FriBidiChar* str)
     }
     return result;
 }
+#endif
 
 // ----------------------------------------------------------------------------
 Translations::Translations() //: m_dictionary_manager("UTF-16")
