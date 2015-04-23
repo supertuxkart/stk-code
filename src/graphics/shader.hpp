@@ -220,6 +220,26 @@ private:
         setUniformsImpl<N + 1>(arg...);
     }   // setUniformsImpl
 
+    // ------------------------------------------------------------------------
+    /** End recursion for variadic template. */
+    template<typename ...Types>
+    void printFileList()
+    {
+        return;
+    }   // printFileList
+
+    // ------------------------------------------------------------------------
+    /** Variadic template to print a list of file names.
+     *  \param shader_type Ignored (used since the variadic calling function
+     *         has this parameter).
+     *  \param filepath Name of the file to print.
+     */
+    template<typename ...Types>
+    void printFileList(GLint shader_type, const char *filepath, Types ... args)
+    {
+        Log::error("shader", filepath);
+        printFileList(args...);
+    }   // printFileList
 
 public:
 

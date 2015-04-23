@@ -49,16 +49,16 @@ void loadAndAttach(GLint ProgramID, GLint ShaderType, const char *filepath, Type
 }
 
 template<typename ...Types>
-void printFileList()
+void oldPrintFileList()
 {
     return;
 }
 
 template<typename ...Types>
-void printFileList(GLint ShaderType, const char *filepath, Types ... args)
+void oldPrintFileList(GLint ShaderType, const char *filepath, Types ... args)
 {
     Log::error("GLWrapp", filepath);
-    printFileList(args...);
+    oldPrintFileList(args...);
 }
 
 enum AttributeType
@@ -84,7 +84,7 @@ GLint LoadProgram(AttributeType Tp, Types ... args)
     glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
     if (Result == GL_FALSE) {
         Log::error("GLWrapp", "Error when linking these shaders :");
-        printFileList(args...);
+        oldPrintFileList(args...);
         glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
         char *ErrorMessage = new char[InfoLogLength];
         glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
