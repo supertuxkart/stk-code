@@ -71,7 +71,7 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
         code << "#extension GL_ARB_bindless_texture : enable\n";
         code << "#define Use_Bindless_Texture\n";
     }
-    code << "//" + std::string(file) + "\n";
+    code << "//" << file << "\n";
     if (!CVS->isARBUniformBufferObjectUsable())
         code << "#define UBO_DISABLED\n";
     if (CVS->isAMDVertexShaderLayerUsable())
@@ -80,12 +80,12 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
         code << "#define SRGBBindlessFix\n";
     code << getHeader();
 
-    std::ifstream stream(file, std::ios::in);
+    std::ifstream stream(file_manager->getShader(file), std::ios::in);
     if (stream.is_open())
     {
         std::string Line = "";
         while (getline(stream, Line))
-            code << "\n" + Line;
+            code << "\n" << Line;
         stream.close();
     }
     else
@@ -127,9 +127,8 @@ int ShaderBase::loadTFBProgram(const std::string &shader_name,
                                const char **varyings,
                                unsigned varying_count)
 {
-    std::string full_path = file_manager->getShader(shader_name);
     m_program = glCreateProgram();
-    loadAndAttachShader(GL_VERTEX_SHADER, full_path);
+    loadAndAttachShader(GL_VERTEX_SHADER, shader_name);
     if (CVS->getGLSLVersion() < 330)
         setAttribute(PARTICLES_SIM);
 

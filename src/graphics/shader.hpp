@@ -40,24 +40,24 @@ private:
     /** Maintains a list of all shaders. */
     static std::vector<ShaderBase *> m_all_shaders;
 
+protected:
     enum AttributeType
     {
         OBJECT,
         PARTICLES_SIM,
         PARTICLES_RENDERING,
-    };
+    };   // AttributeType
 
-protected:
     /** OpenGL's program id. */
     GLuint m_program;
 
     void bypassUBO() const;
 
-private:
+protected:
     // ------------------------------------------------------------------------
     // Ends vararg template
     template<typename ... Types>
-    void loadAndAttachShader(GLint ProgramID)
+    void loadAndAttachShader()
     {
         return;
     }   // loadAndAttachShader
@@ -69,12 +69,21 @@ private:
         GLint shader_id = loadShader(name, shader_type);
         glAttachShader(m_program, shader_id);
         glDeleteShader(shader_id);
-        loadAndAttachShader(shader_type, args...);
+        loadAndAttachShader(args...);
     }   // loadAndAttachShader
+    // ------------------------------------------------------------------------
+    template<typename ... Types>
+    void loadAndAttachShader(GLint shader_type, const char *name,
+                             Types ... args)
+    {
+        loadAndAttachShader(shader_type, std::string(name), args...);
+    }   // loadAndAttachShader
+    // ------------------------------------------------------------------------
 
     const std::string& getHeader();
 
     GLuint loadShader(const std::string &file, unsigned type);
+protected:
     void setAttribute(AttributeType type);
 
 public:
@@ -139,6 +148,7 @@ private:
     }   // setUniformImpl
 
     // ------------------------------------------------------------------------
+    /** Implementation for setUniforms for a matrix SColorF values. */
     template<unsigned N = 0, typename... Args>
     void setUniformsImpl(const irr::video::SColorf &col, Args... arg) const
     {
@@ -147,6 +157,7 @@ private:
     }  // setUniformsImpl
 
     // ------------------------------------------------------------------------
+    /** Implementation for setUniforms for a SColor uniform. */
     template<unsigned N = 0, typename... Args>
     void setUniformsImpl(const irr::video::SColor &col, Args... arg) const
     {
@@ -156,6 +167,7 @@ private:
     }   // setUniformsImpl
 
     // ------------------------------------------------------------------------
+    /** Implementation for setUniforms for a vector3df uniform. */
     template<unsigned N = 0, typename... Args>
     void setUniformsImpl(const irr::core::vector3df &v, Args... arg) const
     {
@@ -163,8 +175,8 @@ private:
         setUniformsImpl<N + 1>(arg...);
     }   // setUniformsImpl
 
-
     // ------------------------------------------------------------------------
+    /** Implementation for setUniforms for a vector2df uniform. */
     template<unsigned N = 0, typename... Args>
     void setUniformsImpl(const irr::core::vector2df &v, Args... arg) const
     {
@@ -173,6 +185,7 @@ private:
     }   // setUniformsImpl
 
     // ------------------------------------------------------------------------
+    /** Implementation for setUniforms for a dimension2df uniform. */
     template<unsigned N = 0, typename... Args>
     void setUniformsImpl(const irr::core::dimension2df &v, Args... arg) const
     {
@@ -181,6 +194,7 @@ private:
     }   // setUniformsImpl
 
     // ------------------------------------------------------------------------
+    /** Implementation for setUniforms for a float uniform. */
     template<unsigned N = 0, typename... Args>
     void setUniformsImpl(float f, Args... arg) const
     {
@@ -189,6 +203,7 @@ private:
     }   // setUniformsImpl
 
     // ------------------------------------------------------------------------
+    /** Implementation for setUniforms for an int uniform. */
     template<unsigned N = 0, typename... Args>
     void setUniformsImpl(int f, Args... arg) const
     {
@@ -197,6 +212,7 @@ private:
     }   // setUniformsImpl
 
     // ------------------------------------------------------------------------
+    /** Implementation for setUniforms for a vector<float> uniform. */
     template<unsigned N = 0, typename... Args>
     void setUniformsImpl(const std::vector<float> &v, Args... arg) const
     {
@@ -204,7 +220,32 @@ private:
         setUniformsImpl<N + 1>(arg...);
     }   // setUniformsImpl
 
+
 public:
+
+    template<typename ... Types>
+    void loadProgram(AttributeType type, Types ... args)
+    {
+        m_program = glCreateProgram();
+        loadAndAttachShader(args...);
+        if (getGLSLVersion() < 330)
+            setAttribute(type);
+        glLinkProgram(m_program);
+
+        GLint Result = GL_FALSE;
+        glGetProgramiv(m_program, GL_LINK_STATUS, &Result);
+        if (Result == GL_FALSE) {
+            int info_length;
+            Log::error("GLWrapp", "Error when linking these shaders :");
+            printFileList(args...);
+            glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &info_length);
+            char *error_message = new char[info_length];
+            glGetProgramInfoLog(m_program, info_length, NULL, error_message);
+            Log::error("GLWrapp", error_message);
+            delete[] error_message;
+        }
+    }   // loadProgram
+
     // ------------------------------------------------------------------------
     /** This variadic template collects all names of uniforms in
      *  a std::vector. */
@@ -217,12 +258,13 @@ public:
     }   // assignUniforms
 
     // ------------------------------------------------------------------------
+    /** Sets the uniforms for this shader. */
     void setUniforms(const Args & ... args) const
     {
         if (!CVS->isARBUniformBufferObjectUsable())
             bypassUBO();
         setUniformsImpl(args...);
-    }
+    }   // setUniforms
 
 
 };   // Shader

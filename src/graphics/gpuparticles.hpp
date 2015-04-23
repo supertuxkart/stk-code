@@ -29,9 +29,19 @@ class PointEmitterShader : public Shader
 {
 public:
     PointEmitterShader();
-};
+};   // PointEmitterShader
 
+// ============================================================================
+class SimpleParticleRender : public Shader<SimpleParticleRender, video::SColorf,
+                                           video::SColorf>,
+                             public TextureRead<Trilinear_Anisotropic_Filtered,
+                                                Nearest_Filtered>
+{
+public:
+    SimpleParticleRender();
+};   // SimpleParticleRender
 
+// ============================================================================
 
     class HeightmapSimulationShader : public ShaderHelperSingleton<HeightmapSimulationShader, core::matrix4, int, int, float, float, float, float, float>
     {
@@ -41,11 +51,6 @@ public:
         HeightmapSimulationShader();
     };
 
-    class SimpleParticleRender : public ShaderHelperSingleton<SimpleParticleRender, video::SColorf, video::SColorf>, public TextureRead<Trilinear_Anisotropic_Filtered, Nearest_Filtered>
-    {
-    public:
-        SimpleParticleRender();
-    };
 
     class FlipParticleRender : public ShaderHelperSingleton<FlipParticleRender>, public TextureRead<Trilinear_Anisotropic_Filtered, Nearest_Filtered>
     {

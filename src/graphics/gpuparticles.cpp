@@ -448,7 +448,7 @@ void ParticleSystemProxy::drawNotFlip()
         glBlendFunc(GL_ONE, GL_ONE);
     else
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glUseProgram(SimpleParticleRender::getInstance()->Program);
+    SimpleParticleRender::getInstance()->use();
 
     SimpleParticleRender::getInstance()->SetTextureUnits(texture, irr_driver->getDepthStencilTexture());
     video::SColorf ColorFrom = video::SColorf(getColorFrom()[0], getColorFrom()[1], getColorFrom()[2]);
@@ -549,7 +549,22 @@ PointEmitterShader::PointEmitterShader()
     };
     loadTFBProgram("pointemitter.vert", varyings, 4);
     assignUniforms("sourcematrix", "dt", "level", "size_increase_factor");
-}
+}   // PointEmitterShader
+
+// ============================================================================
+SimpleParticleRender::SimpleParticleRender()
+{
+    loadProgram(PARTICLES_RENDERING,
+                GL_VERTEX_SHADER,   "particle.vert",
+                GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                GL_FRAGMENT_SHADER, "particle.frag");
+
+    assignUniforms("color_from", "color_to");
+
+    AssignSamplerNames(m_program, 0, "tex", 1, "dtex");
+}   // SimpleParticleRender
+
+// ============================================================================
 
 
 struct TexUnit
@@ -606,17 +621,6 @@ HeightmapSimulationShader::HeightmapSimulationShader()
     TU_heightmap = 2;
     AssignTextureUnit(Program, TexUnit(TU_heightmap, "heightmap"));
     AssignUniforms("sourcematrix", "dt", "level", "size_increase_factor", "track_x", "track_x_len", "track_z", "track_z_len");
-}
-
-SimpleParticleRender::SimpleParticleRender()
-{
-    Program = LoadProgram(PARTICLES_RENDERING,
-        GL_VERTEX_SHADER, file_manager->getAsset("shaders/particle.vert").c_str(),
-        GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-        GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
-    AssignUniforms("color_from", "color_to");
-
-    AssignSamplerNames(Program, 0, "tex", 1, "dtex");
 }
 
 FlipParticleRender::FlipParticleRender()
