@@ -18,6 +18,7 @@
 #ifndef SHADERS_UTIL_HPP
 #define SHADERS_UTIL_HPP
 
+#include "graphics/central_settings.hpp"
 #include "utils/singleton.hpp"
 #include <vector>
 #include <matrix4.h>
@@ -222,7 +223,7 @@ public:
 
     void setUniforms(const Args & ... args) const
     {
-        if (needsUBO())
+        if (!CVS->isARBUniformBufferObjectUsable())
             bypassUBO(Program);
         UniformHelper::setUniformsHelper(uniforms, args...);
     }

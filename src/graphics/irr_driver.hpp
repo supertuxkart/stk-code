@@ -300,7 +300,7 @@ private:
     u32                  m_renderpass;
     class STKMeshSceneNode *m_sun_interposer;
     scene::ICameraSceneNode *m_suncam;
-    core::vector3df m_sundirection;
+    core::vector3df m_sun_direction;
     video::SColorf m_suncolor;
     std::pair<float, float> m_shadow_scales[4];
     scene::ICameraSceneNode *m_shadow_camnodes[4];
@@ -544,11 +544,11 @@ public:
     // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
     // -----------------------------------------------------------------------
-    core::vector3df getSunDirection() const { return m_sundirection; };
+    const core::vector3df& getSunDirection() const { return m_sun_direction; };
     // -----------------------------------------------------------------------
     void setSunDirection(const core::vector3df &SunPos)
     {
-        m_sundirection = SunPos;
+        m_sun_direction = SunPos;
     }
     // -----------------------------------------------------------------------
     video::SColorf getSunColor() const { return m_suncolor; }

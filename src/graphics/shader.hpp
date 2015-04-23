@@ -18,6 +18,7 @@
 #ifndef HEADER_SHADER_HPP
 #define HEADER_SHADER_HPP
 
+#include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
 #include "utils/singleton.hpp"
 
@@ -49,6 +50,8 @@ private:
 protected:
     /** OpenGL's program id. */
     GLuint m_program;
+
+    void bypassUBO() const;
 
 private:
     // ------------------------------------------------------------------------
@@ -216,8 +219,8 @@ public:
     // ------------------------------------------------------------------------
     void setUniforms(const Args & ... args) const
     {
-        if (needsUBO())
-            bypassUBO(m_program);
+        if (!CVS->isARBUniformBufferObjectUsable())
+            bypassUBO();
         setUniformsImpl(args...);
     }
 

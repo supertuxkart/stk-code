@@ -129,9 +129,9 @@ unsigned IrrDriver::UpdateLightsInfo(scene::ICameraSceneNode * const camnode, fl
 void IrrDriver::uploadLightingData()
 {
     float Lighting[36];
-    Lighting[0] = m_sundirection.X;
-    Lighting[1] = m_sundirection.Y;
-    Lighting[2] = m_sundirection.Z;
+    Lighting[0] = m_sun_direction.X;
+    Lighting[1] = m_sun_direction.Y;
+    Lighting[2] = m_sun_direction.Z;
     Lighting[4] = m_suncolor.getRed();
     Lighting[5] = m_suncolor.getGreen();
     Lighting[6] = m_suncolor.getBlue();

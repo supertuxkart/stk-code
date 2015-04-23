@@ -648,10 +648,6 @@ namespace UtilShader
 }
 using namespace UtilShader;
 
-bool needsUBO()
-{
-    return !CVS->isARBUniformBufferObjectUsable();
-}
 
 void setTextureSampler(GLenum tp, GLuint texunit, GLuint tid, GLuint sid)
 {

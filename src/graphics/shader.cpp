@@ -20,6 +20,7 @@
 
 #include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
@@ -154,6 +155,49 @@ int ShaderBase::loadTFBProgram(const std::string &shader_name,
 }   // loadTFBProgram
 
 // ----------------------------------------------------------------------------
+void ShaderBase::bypassUBO() const
+{
+    GLint VM = glGetUniformLocation(m_program, "ViewMatrix");
+    glUniformMatrix4fv(VM, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
+
+    GLint PM = glGetUniformLocation(m_program, "ProjectionMatrix");
+    glUniformMatrix4fv(PM, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
+
+    GLint IVM = glGetUniformLocation(m_program, "InverseViewMatrix");
+    glUniformMatrix4fv(IVM, 1, GL_FALSE, irr_driver->getInvViewMatrix().pointer());
+
+    GLint IPM = glGetUniformLocation(m_program, "InverseProjectionMatrix");
+    glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
+
+    GLint Screen = glGetUniformLocation(m_program, "screen");
+    glUniform2f(Screen, irr_driver->getCurrentScreenSize().X, 
+                        irr_driver->getCurrentScreenSize().Y);
+
+    GLint bLmn = glGetUniformLocation(m_program, "blueLmn[0]");
+    glUniform1fv(bLmn, 9, irr_driver->blueSHCoeff);
+
+    GLint gLmn = glGetUniformLocation(m_program, "greenLmn[0]");
+    glUniform1fv(gLmn, 9, irr_driver->greenSHCoeff);
+
+    GLint rLmn = glGetUniformLocation(m_program, "redLmn[0]");
+    glUniform1fv(rLmn, 9, irr_driver->redSHCoeff);
+
+    GLint sun_dir = glGetUniformLocation(m_program, "sun_direction");
+    const core::vector3df &sd = irr_driver->getSunDirection();
+    glUniform3f(sun_dir, sd.X, sd.Y, sd.Z);
+
+    GLint sun_col = glGetUniformLocation(m_program, "sun_col");
+    const video::SColorf& sc = irr_driver->getSunColor();
+    glUniform3f(sun_col, sc.getRed(), sc.getGreen(), sc.getBlue());
+
+    GLint sun_angle = glGetUniformLocation(m_program, "sun_angle");
+    glUniform1f(sun_angle, 0.54f);
+}   // bypassUBO
+
+// ----------------------------------------------------------------------------
+/** Constructor, which adds the shader to all instantiated shaders (for the
+ *  reload-all-shaders debug option).
+ */
 ShaderBase::ShaderBase()
 {
     m_all_shaders.push_back(this);
