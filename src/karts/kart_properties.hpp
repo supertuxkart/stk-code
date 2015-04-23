@@ -458,7 +458,7 @@ public:
       */
     core::stringw getName() const
     {
-        return core::stringw(translations->w_gettext(m_name.c_str()));
+        return _LTR(m_name.c_str());
     }
 
     // ------------------------------------------------------------------------

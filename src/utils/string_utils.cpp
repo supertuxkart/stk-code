@@ -25,12 +25,13 @@
 
 #include "coreutil.h"
 
-#include <math.h>
 #include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdio>
 #include <cstring>
-#include <stdio.h>
+#include <cwchar>
 #include <exception>
-#include <assert.h>
 
 namespace StringUtils
 {

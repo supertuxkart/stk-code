@@ -175,6 +175,7 @@ namespace StringUtils
     std::string insertValues(const std::string &s, Args ...args)
     {
         std::vector<std::string> all_vals;
+        all_vals.reserve(sizeof...(args));
         __FillStringVector::__FillS(all_vals, std::forward<Args>(args)...);
         return insertValues(s, all_vals);
     }
@@ -190,6 +191,7 @@ namespace StringUtils
     irr::core::stringw insertValues(const irr::core::stringw &s, Args ...args)
     {
         std::vector<irr::core::stringw> all_vals;
+        all_vals.reserve(sizeof...(args));
         __FillStringVector::__FillW(all_vals, std::forward<Args>(args)...);
         return insertValues(s, all_vals);
     }
