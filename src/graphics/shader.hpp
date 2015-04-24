@@ -37,10 +37,11 @@ private:
     *  this file repeatedly. */
     static std::string m_shader_header;
 
-    /** Maintains a list of all shaders. */
-    static std::vector<ShaderBase *> m_all_shaders;
 
 protected:
+    /** Maintains a list of all shaders. */
+    static std::vector<void (*)()> m_all_kill_functions;
+
     enum AttributeType
     {
         OBJECT,
@@ -53,7 +54,6 @@ protected:
 
     void bypassUBO() const;
 
-protected:
     // ------------------------------------------------------------------------
     // Ends vararg template
     template<typename ... Types>
@@ -81,9 +81,7 @@ protected:
     // ------------------------------------------------------------------------
 
     const std::string& getHeader();
-
     GLuint loadShader(const std::string &file, unsigned type);
-protected:
     void setAttribute(AttributeType type);
 
 public:
@@ -91,7 +89,7 @@ public:
     int loadTFBProgram(const std::string &vertex_file_path,
                        const char **varyings,
                        unsigned varyingscount);
-
+    static void updateShaders();
     // ------------------------------------------------------------------------
     /** Activates the shader calling glUseProgram. */
     void use() { glUseProgram(m_program); }
@@ -242,6 +240,11 @@ private:
     }   // printFileList
 
 public:
+
+    Shader()
+    {
+        m_all_kill_functions.push_back(this->kill);
+    }
 
     template<typename ... Types>
     void loadProgram(AttributeType type, Types ... args)

@@ -28,8 +28,8 @@
 #include <sstream>
 #include <stdio.h>
 
-std::string                ShaderBase::m_shader_header = "";
-std::vector<ShaderBase *>  ShaderBase::m_all_shaders;
+std::string             ShaderBase::m_shader_header = "";
+std::vector<void(*)()>  ShaderBase::m_all_kill_functions;
 
 // ----------------------------------------------------------------------------
 /** Returns a string with the content of header.txt (which contains basic
@@ -199,11 +199,18 @@ void ShaderBase::bypassUBO() const
  */
 ShaderBase::ShaderBase()
 {
-    m_all_shaders.push_back(this);
 }   // ShaderBase
 
 // ----------------------------------------------------------------------------
+void ShaderBase::updateShaders()
+{
+    for (unsigned int i = 0; i < m_all_kill_functions.size(); i++)
+    {
+        m_all_kill_functions[i]();
+    }
+}   // updateShaders
 
+// ----------------------------------------------------------------------------
 void ShaderBase::setAttribute(AttributeType type)
 {
     switch (type)
