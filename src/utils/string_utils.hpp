@@ -141,11 +141,6 @@ namespace StringUtils
     irr::core::stringw insertValues(const irr::core::stringw &s,
                                     std::vector<irr::core::stringw>& all_vals);
 
-    /** This no-op is useful when using variadic arguments, so that we may
-     *  support the case with 0 variadic arguments */
-    template <typename T>
-    T insertValues(T &s) { return s; }
-
     // ------------------------------------------------------------------------
     /** Intermediate struct to fill a vector using variadic templates */
     struct __FillStringVector
