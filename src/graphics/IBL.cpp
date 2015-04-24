@@ -320,7 +320,7 @@ GLuint generateSpecularCubemap(GLuint probe)
     glViewport(0, 0, cubemap_size, cubemap_size);
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, bufs);
-    glUseProgram(UtilShader::SpecularIBLGenerator::getInstance()->Program);
+    UtilShader::SpecularIBLGenerator::getInstance()->use();
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);

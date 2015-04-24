@@ -161,7 +161,7 @@ private:
     template<unsigned N = 0, typename... Args>
     void setUniformsImpl(const irr::video::SColor &col, Args... arg) const
     {
-        glUniform4i(m_uniforms[N], col.getRed(), c ol.getGreen(),
+        glUniform4i(m_uniforms[N], col.getRed(), col.getGreen(),
                                    col.getBlue(), col.getAlpha());
         setUniformsImpl<N + 1>(arg...);
     }   // setUniformsImpl

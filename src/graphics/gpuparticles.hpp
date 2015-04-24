@@ -43,7 +43,7 @@ public:
 
 // ============================================================================
 
-    class HeightmapSimulationShader : public ShaderHelperSingleton<HeightmapSimulationShader, core::matrix4, int, int, float, float, float, float, float>
+    class HeightmapSimulationShader : public Shader<HeightmapSimulationShader, core::matrix4, int, int, float, float, float, float, float>
     {
     public:
         GLuint TU_heightmap;
@@ -52,7 +52,7 @@ public:
     };
 
 
-    class FlipParticleRender : public ShaderHelperSingleton<FlipParticleRender>, public TextureRead<Trilinear_Anisotropic_Filtered, Nearest_Filtered>
+    class FlipParticleRender : public Shader<FlipParticleRender>, public TextureRead<Trilinear_Anisotropic_Filtered, Nearest_Filtered>
     {
     public:
         FlipParticleRender();

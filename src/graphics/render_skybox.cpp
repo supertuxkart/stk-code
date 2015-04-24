@@ -403,7 +403,7 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 
     glDisable(GL_BLEND);
 
-    glUseProgram(MeshShader::SkyboxShader::getInstance()->Program);
+    MeshShader::SkyboxShader::getInstance()->use();
     glBindVertexArray(MeshShader::SkyboxShader::getInstance()->vao);
     MeshShader::SkyboxShader::getInstance()->setUniforms();
 

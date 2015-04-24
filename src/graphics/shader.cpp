@@ -91,7 +91,7 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
     else
         Log::error("shader", "Can not open '%s'.", file.c_str());
 
-    Log::info("shader", "Compiling shader : %s", file);
+    Log::info("shader", "Compiling shader : %s", file.c_str());
     const std::string &source  = code.str();
     char const *source_pointer = source.c_str();
     int len                    = source.size();

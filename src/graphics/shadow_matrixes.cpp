@@ -147,7 +147,7 @@ void IrrDriver::UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, si
     glBufferData(GL_SHADER_STORAGE_BUFFER, 4 * sizeof(CascadeBoundingBox), InitialCBB, GL_STATIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, CBBssbo);
 
-    glUseProgram(FullScreenShader::LightspaceBoundingBoxShader::getInstance()->Program);
+    FullScreenShader::LightspaceBoundingBoxShader::getInstance()->use();
     FullScreenShader::LightspaceBoundingBoxShader::getInstance()->SetTextureUnits(getDepthStencilTexture());
     FullScreenShader::LightspaceBoundingBoxShader::getInstance()->setUniforms(m_suncam->getViewMatrix(), shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4]);
     glDispatchCompute((int)width / 64, (int)height / 64, 1);
@@ -158,7 +158,7 @@ void IrrDriver::UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, si
     glBufferData(GL_SHADER_STORAGE_BUFFER, 4 * 16 * sizeof(float), 0, GL_STATIC_COPY);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, tempShadowMatssbo);
 
-    glUseProgram(FullScreenShader::ShadowMatrixesGenerationShader::getInstance()->Program);
+    FullScreenShader::ShadowMatrixesGenerationShader::getInstance()->use();
     FullScreenShader::ShadowMatrixesGenerationShader::getInstance()->setUniforms(m_suncam->getViewMatrix());
     glDispatchCompute(4, 1, 1);
 

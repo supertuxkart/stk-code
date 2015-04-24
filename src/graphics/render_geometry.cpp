@@ -426,7 +426,7 @@ template<typename T, int ...List>
 void renderMeshes1stPass()
 {
     auto &meshes = T::List::getInstance()->SolidPass;
-    glUseProgram(T::FirstPassShader::getInstance()->Program);
+    T::FirstPassShader::getInstance()->use();
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
@@ -456,7 +456,7 @@ template<typename T, typename...Args>
 void renderInstancedMeshes1stPass(Args...args)
 {
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
-    glUseProgram(T::InstancedFirstPassShader::getInstance()->Program);
+    T::InstancedFirstPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
@@ -480,7 +480,7 @@ void renderInstancedMeshes1stPass(Args...args)
 template<typename T, typename...Args>
 void multidraw1stPass(Args...args)
 {
-    glUseProgram(T::InstancedFirstPassShader::getInstance()->Program);
+    T::InstancedFirstPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     if (SolidPassCmd::getInstance()->Size[T::MaterialType])
     {
@@ -546,7 +546,7 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
     const std::vector<GLuint> &Prefilled_Tex)
 {
     auto &meshes = T::List::getInstance()->SolidPass;
-    glUseProgram(T::SecondPassShader::getInstance()->Program);
+    T::SecondPassShader::getInstance()->use();
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
@@ -575,7 +575,7 @@ template<typename T, typename...Args>
 void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args...args)
 {
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
-    glUseProgram(T::InstancedSecondPassShader::getInstance()->Program);
+    T::InstancedSecondPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
@@ -590,7 +590,7 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
 template<typename T, typename...Args>
 void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
 {
-    glUseProgram(T::InstancedSecondPassShader::getInstance()->Program);
+    T::InstancedSecondPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     uint64_t nulltex[10] = {};
     if (SolidPassCmd::getInstance()->Size[T::MaterialType])
@@ -664,7 +664,7 @@ void IrrDriver::renderSolidSecondPass()
 
             // template does not work with template due to extra depth texture
             {
-                glUseProgram(GrassMat::InstancedSecondPassShader::getInstance()->Program);
+                GrassMat::InstancedSecondPassShader::getInstance()->use();
                 glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(GrassMat::VertexType, GrassMat::Instance));
                 uint64_t nulltex[10] = {};
                 if (SolidPassCmd::getInstance()->Size[GrassMat::MaterialType])
@@ -690,7 +690,7 @@ void IrrDriver::renderSolidSecondPass()
             // template does not work with template due to extra depth texture
             {
                 std::vector<GLMesh *> &meshes = GrassMat::InstancedList::getInstance()->SolidPass;
-                glUseProgram(GrassMat::InstancedSecondPassShader::getInstance()->Program);
+                GrassMat::InstancedSecondPassShader::getInstance()->use();
                 glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(GrassMat::VertexType, GrassMat::Instance));
                 for (unsigned i = 0; i < meshes.size(); i++)
                 {
@@ -708,7 +708,7 @@ template<typename T>
 static void renderInstancedMeshNormals()
 {
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
-    glUseProgram(MeshShader::NormalVisualizer::getInstance()->Program);
+    MeshShader::NormalVisualizer::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
@@ -720,7 +720,7 @@ static void renderInstancedMeshNormals()
 template<typename T>
 static void renderMultiMeshNormals()
 {
-    glUseProgram(MeshShader::NormalVisualizer::getInstance()->Program);
+    MeshShader::NormalVisualizer::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     if (SolidPassCmd::getInstance()->Size[T::MaterialType])
     {
@@ -756,7 +756,7 @@ void IrrDriver::renderNormalsVisualisation()
 template<typename Shader, enum video::E_VERTEX_TYPE VertexType, int...List, typename... TupleType>
 void renderTransparenPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
 {
-    glUseProgram(Shader::getInstance()->Program);
+    Shader::getInstance()->use();
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
@@ -863,7 +863,7 @@ void IrrDriver::renderTransparent()
         GLenum itype = mesh.IndexType;
         size_t count = mesh.IndexCount;
 
-        glUseProgram(MeshShader::DisplaceMaskShader::getInstance()->Program);
+        MeshShader::DisplaceMaskShader::getInstance()->use();
         MeshShader::DisplaceMaskShader::getInstance()->setUniforms(AbsoluteTransformation);
         glDrawElementsBaseVertex(ptype, (int)count, itype,
                                  (GLvoid *)mesh.vaoOffset, (int)mesh.vaoBaseVertex);
@@ -890,7 +890,7 @@ void IrrDriver::renderTransparent()
             irr_driver->getRenderTargetTexture(RTT_COLOR),
             irr_driver->getRenderTargetTexture(RTT_TMP1),
             getTextureGLuint(mesh.textures[0]));
-        glUseProgram(MeshShader::DisplaceShader::getInstance()->Program);
+        MeshShader::DisplaceShader::getInstance()->use();
         MeshShader::DisplaceShader::getInstance()->setUniforms(AbsoluteTransformation,
             core::vector2df(cb->getDirX(), cb->getDirY()),
             core::vector2df(cb->getDir2X(), cb->getDir2Y()));
@@ -944,7 +944,7 @@ template<typename T, int...List>
 void renderShadow(unsigned cascade)
 {
     auto &t = T::List::getInstance()->Shadows[cascade];
-    glUseProgram(T::ShadowPassShader::getInstance()->Program);
+    T::ShadowPassShader::getInstance()->use();
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < t.size(); i++)
@@ -963,7 +963,7 @@ void renderShadow(unsigned cascade)
 template<typename T, typename...Args>
 void renderInstancedShadow(unsigned cascade, Args ...args)
 {
-    glUseProgram(T::InstancedShadowPassShader::getInstance()->Program);
+    T::InstancedShadowPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, InstanceTypeShadow));
     std::vector<GLMesh *> &t = T::InstancedList::getInstance()->Shadows[cascade];
     for (unsigned i = 0; i < t.size(); i++)
@@ -981,7 +981,7 @@ void renderInstancedShadow(unsigned cascade, Args ...args)
 template<typename T, typename...Args>
 static void multidrawShadow(unsigned i, Args ...args)
 {
-    glUseProgram(T::InstancedShadowPassShader::getInstance()->Program);
+    T::InstancedShadowPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, InstanceTypeShadow));
     if (ShadowPassCmd::getInstance()->Size[i][T::MaterialType])
     {
@@ -1096,7 +1096,7 @@ struct rsm_custom_unroll_args<N, List...>
 template<typename T, int... Selector>
 void drawRSM(const core::matrix4 & rsm_matrix)
 {
-    glUseProgram(T::RSMShader::getInstance()->Program);
+    T::RSMShader::getInstance()->use();
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     auto t = T::List::getInstance()->RSM;
@@ -1117,7 +1117,7 @@ void drawRSM(const core::matrix4 & rsm_matrix)
 template<typename T, typename...Args>
 void renderRSMShadow(Args ...args)
 {
-    glUseProgram(T::InstancedRSMShader::getInstance()->Program);
+    T::InstancedRSMShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, InstanceTypeRSM));
     auto t = T::InstancedList::getInstance()->RSM;
     for (unsigned i = 0; i < t.size(); i++)
@@ -1134,7 +1134,7 @@ void renderRSMShadow(Args ...args)
 template<typename T, typename... Args>
 void multidrawRSM(Args...args)
 {
-    glUseProgram(T::InstancedRSMShader::getInstance()->Program);
+    T::InstancedRSMShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, InstanceTypeRSM));
     if (RSMPassCmd::getInstance()->Size[T::MaterialType])
     {

@@ -18,11 +18,12 @@
 #ifndef HEADER_SHADERS_HPP
 #define HEADER_SHADERS_HPP
 
-#include <IShaderConstantSetCallBack.h>
-#include <IMeshSceneNode.h>
 #include "config/user_config.hpp"
+#include "graphics/shader.hpp"
+#include "graphics/shaders_util.hpp"
 
-#include "shaders_util.hpp"
+#include <IMeshSceneNode.h>
+#include <IShaderConstantSetCallBack.h>
 
 using namespace irr;
 class ParticleSystemProxy;
@@ -39,7 +40,7 @@ public:
 
 namespace UtilShader
 {
-class ColoredLine : public ShaderHelperSingleton<ColoredLine, video::SColor>
+class ColoredLine : public Shader<ColoredLine, video::SColor>
 {
 public:
     GLuint vao, vbo;
@@ -47,7 +48,7 @@ public:
     ColoredLine();
 };
 
-class SpecularIBLGenerator : public ShaderHelperSingleton<SpecularIBLGenerator, core::matrix4, float >, public TextureRead<Trilinear_cubemap>
+class SpecularIBLGenerator : public Shader<SpecularIBLGenerator, core::matrix4, float >, public TextureRead<Trilinear_cubemap>
 {
 public:
     GLuint TU_Samples;
@@ -58,244 +59,244 @@ public:
 
 namespace MeshShader
 {
-class ObjectPass1Shader : public ShaderHelperSingleton<ObjectPass1Shader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class ObjectPass1Shader : public Shader<ObjectPass1Shader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     ObjectPass1Shader();
 };
 
-class ObjectRefPass1Shader : public ShaderHelperSingleton<ObjectRefPass1Shader, core::matrix4, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class ObjectRefPass1Shader : public Shader<ObjectRefPass1Shader, core::matrix4, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     ObjectRefPass1Shader();
 };
 
-class GrassPass1Shader : public ShaderHelperSingleton<GrassPass1Shader, core::matrix4, core::matrix4, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class GrassPass1Shader : public Shader<GrassPass1Shader, core::matrix4, core::matrix4, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     GrassPass1Shader();
 };
 
-class NormalMapShader : public ShaderHelperSingleton<NormalMapShader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class NormalMapShader : public Shader<NormalMapShader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     NormalMapShader();
 };
 
-class InstancedObjectPass1Shader : public ShaderHelperSingleton<InstancedObjectPass1Shader>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedObjectPass1Shader : public Shader<InstancedObjectPass1Shader>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectPass1Shader();
 };
 
-class InstancedObjectRefPass1Shader : public ShaderHelperSingleton<InstancedObjectRefPass1Shader>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedObjectRefPass1Shader : public Shader<InstancedObjectRefPass1Shader>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectRefPass1Shader();
 };
 
-class InstancedGrassPass1Shader : public ShaderHelperSingleton<InstancedGrassPass1Shader, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedGrassPass1Shader : public Shader<InstancedGrassPass1Shader, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedGrassPass1Shader();
 };
 
-class InstancedNormalMapShader : public ShaderHelperSingleton<InstancedNormalMapShader>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedNormalMapShader : public Shader<InstancedNormalMapShader>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedNormalMapShader();
 };
 
-class ObjectPass2Shader : public ShaderHelperSingleton<ObjectPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class ObjectPass2Shader : public Shader<ObjectPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     ObjectPass2Shader();
 };
 
-class InstancedObjectPass2Shader : public ShaderHelperSingleton<InstancedObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedObjectPass2Shader : public Shader<InstancedObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectPass2Shader();
 };
 
-class InstancedObjectRefPass2Shader : public ShaderHelperSingleton<InstancedObjectRefPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedObjectRefPass2Shader : public Shader<InstancedObjectRefPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectRefPass2Shader();
 };
 
-class DetailledObjectPass2Shader : public ShaderHelperSingleton<DetailledObjectPass2Shader, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class DetailledObjectPass2Shader : public Shader<DetailledObjectPass2Shader, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     DetailledObjectPass2Shader();
 };
 
-class InstancedDetailledObjectPass2Shader : public ShaderHelperSingleton<InstancedDetailledObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedDetailledObjectPass2Shader : public Shader<InstancedDetailledObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedDetailledObjectPass2Shader();
 };
 
-class ObjectUnlitShader : public ShaderHelperSingleton<ObjectUnlitShader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class ObjectUnlitShader : public Shader<ObjectUnlitShader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     ObjectUnlitShader();
 };
 
-class InstancedObjectUnlitShader : public ShaderHelperSingleton<InstancedObjectUnlitShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedObjectUnlitShader : public Shader<InstancedObjectUnlitShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectUnlitShader();
 };
 
-class ObjectRefPass2Shader : public ShaderHelperSingleton<ObjectRefPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class ObjectRefPass2Shader : public Shader<ObjectRefPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     ObjectRefPass2Shader();
 };
 
-class GrassPass2Shader : public ShaderHelperSingleton<GrassPass2Shader, core::matrix4, core::vector3df>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class GrassPass2Shader : public Shader<GrassPass2Shader, core::matrix4, core::vector3df>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     GrassPass2Shader();
 };
 
-class InstancedGrassPass2Shader : public ShaderHelperSingleton<InstancedGrassPass2Shader, core::vector3df, core::vector3df>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Nearest_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedGrassPass2Shader : public Shader<InstancedGrassPass2Shader, core::vector3df, core::vector3df>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Nearest_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedGrassPass2Shader();
 };
 
-class SphereMapShader : public ShaderHelperSingleton<SphereMapShader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class SphereMapShader : public Shader<SphereMapShader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     SphereMapShader();
 };
 
-class InstancedSphereMapShader : public ShaderHelperSingleton<InstancedSphereMapShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedSphereMapShader : public Shader<InstancedSphereMapShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedSphereMapShader();
 };
 
-class SplattingShader : public ShaderHelperSingleton<SplattingShader, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class SplattingShader : public Shader<SplattingShader, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     SplattingShader();
 };
 
-class TransparentShader : public ShaderHelperSingleton<TransparentShader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class TransparentShader : public Shader<TransparentShader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     TransparentShader();
 };
 
-class TransparentFogShader : public ShaderHelperSingleton<TransparentFogShader, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class TransparentFogShader : public Shader<TransparentFogShader, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     TransparentFogShader();
 };
 
-class BillboardShader : public ShaderHelperSingleton<BillboardShader, core::matrix4, core::matrix4, core::vector3df, core::dimension2df>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class BillboardShader : public Shader<BillboardShader, core::matrix4, core::matrix4, core::vector3df, core::dimension2df>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     BillboardShader();
 };
 
 
-class ColorizeShader : public ShaderHelperSingleton<ColorizeShader, core::matrix4, video::SColorf>
+class ColorizeShader : public Shader<ColorizeShader, core::matrix4, video::SColorf>
 {
 public:
     ColorizeShader();
 };
 
-class InstancedColorizeShader : public ShaderHelperSingleton<InstancedColorizeShader>
+class InstancedColorizeShader : public Shader<InstancedColorizeShader>
 {
 public:
     InstancedColorizeShader();
 };
 
-class ShadowShader : public ShaderHelperSingleton<ShadowShader, int, core::matrix4>, public TextureRead<>
+class ShadowShader : public Shader<ShadowShader, int, core::matrix4>, public TextureRead<>
 {
 public:
     ShadowShader();
 };
 
-class RSMShader : public ShaderHelperSingleton<RSMShader, core::matrix4, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class RSMShader : public Shader<RSMShader, core::matrix4, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     RSMShader();
 };
 
-class InstancedRSMShader : public ShaderHelperSingleton<InstancedRSMShader, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedRSMShader : public Shader<InstancedRSMShader, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedRSMShader();
 };
 
-class SplattingRSMShader : public ShaderHelperSingleton<SplattingRSMShader, core::matrix4, core::matrix4>,
+class SplattingRSMShader : public Shader<SplattingRSMShader, core::matrix4, core::matrix4>,
     public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     SplattingRSMShader();
 };
 
-class InstancedShadowShader : public ShaderHelperSingleton<InstancedShadowShader, int>, public TextureRead<>
+class InstancedShadowShader : public Shader<InstancedShadowShader, int>, public TextureRead<>
 {
 public:
     InstancedShadowShader();
 };
 
-class RefShadowShader : public ShaderHelperSingleton<RefShadowShader, int, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class RefShadowShader : public Shader<RefShadowShader, int, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     RefShadowShader();
 };
 
-class InstancedRefShadowShader : public ShaderHelperSingleton<InstancedRefShadowShader, int>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedRefShadowShader : public Shader<InstancedRefShadowShader, int>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedRefShadowShader();
 };
 
-class GrassShadowShader : public ShaderHelperSingleton<GrassShadowShader, int, core::matrix4, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class GrassShadowShader : public Shader<GrassShadowShader, int, core::matrix4, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     GrassShadowShader();
 };
 
-class InstancedGrassShadowShader : public ShaderHelperSingleton<InstancedGrassShadowShader, int, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedGrassShadowShader : public Shader<InstancedGrassShadowShader, int, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedGrassShadowShader();
 };
 
-class DisplaceMaskShader : public ShaderHelperSingleton<DisplaceMaskShader, core::matrix4>
+class DisplaceMaskShader : public Shader<DisplaceMaskShader, core::matrix4>
 {
 public:
     DisplaceMaskShader();
 };
 
-class DisplaceShader : public ShaderHelperSingleton<DisplaceShader, core::matrix4, core::vector2df, core::vector2df>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class DisplaceShader : public Shader<DisplaceShader, core::matrix4, core::vector2df, core::vector2df>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     DisplaceShader();
 };
 
-class SkyboxShader : public ShaderHelperSingleton<SkyboxShader>, public TextureRead<Trilinear_cubemap>
+class SkyboxShader : public Shader<SkyboxShader>, public TextureRead<Trilinear_cubemap>
 {
 public:
     SkyboxShader();
     GLuint vao;
 };
 
-class NormalVisualizer : public ShaderHelperSingleton<NormalVisualizer, video::SColor>
+class NormalVisualizer : public Shader<NormalVisualizer, video::SColor>
 {
 public:
     NormalVisualizer();
 };
 
-class ViewFrustrumShader : public ShaderHelperSingleton<ViewFrustrumShader, video::SColor, int>
+class ViewFrustrumShader : public Shader<ViewFrustrumShader, video::SColor, int>
 {
 public:
     GLuint frustrumvao;
@@ -322,7 +323,7 @@ namespace LightShader
     };
 
 
-    class PointLightShader : public ShaderHelperSingleton<PointLightShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
+    class PointLightShader : public Shader<PointLightShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
     {
     public:
         GLuint vbo;
@@ -330,7 +331,7 @@ namespace LightShader
         PointLightShader();
     };
 
-    class PointLightScatterShader : public ShaderHelperSingleton<PointLightScatterShader, float, core::vector3df>, public TextureRead<Nearest_Filtered>
+    class PointLightScatterShader : public Shader<PointLightScatterShader, float, core::vector3df>, public TextureRead<Nearest_Filtered>
     {
     public:
         GLuint vbo;
@@ -343,7 +344,7 @@ namespace LightShader
 template<typename T, typename... Args>
 static void DrawFullScreenEffect(Args...args)
 {
-    glUseProgram(T::getInstance()->Program);
+    T::getInstance()->use();
     glBindVertexArray(SharedObject::FullScreenQuadVAO);
     T::getInstance()->setUniforms(args...);
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -352,82 +353,82 @@ static void DrawFullScreenEffect(Args...args)
 namespace FullScreenShader
 {
 
-class BloomShader : public ShaderHelperSingleton<BloomShader>, public TextureRead<Nearest_Filtered>
+class BloomShader : public Shader<BloomShader>, public TextureRead<Nearest_Filtered>
 {
 public:
     BloomShader();
 };
 
-class BloomBlendShader : public ShaderHelperSingleton<BloomBlendShader>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
+class BloomBlendShader : public Shader<BloomBlendShader>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
 {
 public:
     BloomBlendShader();
 };
 
-class LensBlendShader : public ShaderHelperSingleton<LensBlendShader>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
+class LensBlendShader : public Shader<LensBlendShader>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
 {
 public:
     LensBlendShader();
 };
 
 
-class ToneMapShader : public ShaderHelperSingleton<ToneMapShader, float>, public TextureRead<Nearest_Filtered>
+class ToneMapShader : public Shader<ToneMapShader, float>, public TextureRead<Nearest_Filtered>
 {
 public:
 
     ToneMapShader();
 };
 
-class DepthOfFieldShader : public ShaderHelperSingleton<DepthOfFieldShader>, public TextureRead<Bilinear_Filtered, Nearest_Filtered>
+class DepthOfFieldShader : public Shader<DepthOfFieldShader>, public TextureRead<Bilinear_Filtered, Nearest_Filtered>
 {
 public:
     DepthOfFieldShader();
 };
 
-class SunLightShader : public ShaderHelperSingleton<SunLightShader, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
+class SunLightShader : public Shader<SunLightShader, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
 {
 public:
     SunLightShader();
 };
 
-class IBLShader : public ShaderHelperSingleton<IBLShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_cubemap>
+class IBLShader : public Shader<IBLShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_cubemap>
 {
 public:
     IBLShader();
 };
 
-class DegradedIBLShader : public ShaderHelperSingleton<DegradedIBLShader>, public TextureRead<Nearest_Filtered>
+class DegradedIBLShader : public Shader<DegradedIBLShader>, public TextureRead<Nearest_Filtered>
 {
 public:
     DegradedIBLShader();
 };
 
-class ShadowedSunLightShaderPCF : public ShaderHelperSingleton<ShadowedSunLightShaderPCF, float, float, float, float, float>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
+class ShadowedSunLightShaderPCF : public Shader<ShadowedSunLightShaderPCF, float, float, float, float, float>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
 {
 public:
     ShadowedSunLightShaderPCF();
 };
 
-class ShadowedSunLightShaderESM : public ShaderHelperSingleton<ShadowedSunLightShaderESM, float, float, float, float>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_Clamped_Array2D>
+class ShadowedSunLightShaderESM : public Shader<ShadowedSunLightShaderESM, float, float, float, float>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_Clamped_Array2D>
 {
 public:
     ShadowedSunLightShaderESM();
 };
 
-class RadianceHintsConstructionShader : public ShaderHelperSingleton<RadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df, video::SColorf>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
+class RadianceHintsConstructionShader : public Shader<RadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df, video::SColorf>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
 {
 public:
     RadianceHintsConstructionShader();
 };
 
 // Workaround for a bug found in kepler nvidia linux and fermi nvidia windows
-class NVWorkaroundRadianceHintsConstructionShader : public ShaderHelperSingleton<NVWorkaroundRadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df, int, video::SColorf>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
+class NVWorkaroundRadianceHintsConstructionShader : public Shader<NVWorkaroundRadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df, int, video::SColorf>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
 {
 public:
     NVWorkaroundRadianceHintsConstructionShader();
 };
 
-class RHDebug : public ShaderHelperSingleton<RHDebug, core::matrix4, core::vector3df>
+class RHDebug : public Shader<RHDebug, core::matrix4, core::vector3df>
 {
 public:
     GLuint TU_SHR, TU_SHG, TU_SHB;
@@ -435,65 +436,65 @@ public:
     RHDebug();
 };
 
-class GlobalIlluminationReconstructionShader : public ShaderHelperSingleton<GlobalIlluminationReconstructionShader, core::matrix4, core::matrix4, core::vector3df>,
+class GlobalIlluminationReconstructionShader : public Shader<GlobalIlluminationReconstructionShader, core::matrix4, core::matrix4, core::vector3df>,
     public TextureRead<Nearest_Filtered, Nearest_Filtered, Volume_Linear_Filtered, Volume_Linear_Filtered, Volume_Linear_Filtered>
 {
 public:
     GlobalIlluminationReconstructionShader();
 };
 
-class Gaussian17TapHShader : public ShaderHelperSingleton<Gaussian17TapHShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered, Bilinear_Clamped_Filtered>
+class Gaussian17TapHShader : public Shader<Gaussian17TapHShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered, Bilinear_Clamped_Filtered>
 {
 public:
     Gaussian17TapHShader();
 };
 
-class ComputeGaussian17TapHShader : public ShaderHelperSingleton<ComputeGaussian17TapHShader, core::vector2df>, public TextureRead<Neared_Clamped_Filtered, Neared_Clamped_Filtered>
+class ComputeGaussian17TapHShader : public Shader<ComputeGaussian17TapHShader, core::vector2df>, public TextureRead<Neared_Clamped_Filtered, Neared_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
     ComputeGaussian17TapHShader();
 };
 
-class ComputeGaussian6HBlurShader : public ShaderHelperSingleton<ComputeGaussian6HBlurShader, core::vector2df, std::vector<float> >, public TextureRead<Bilinear_Clamped_Filtered>
+class ComputeGaussian6HBlurShader : public Shader<ComputeGaussian6HBlurShader, core::vector2df, std::vector<float> >, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
     ComputeGaussian6HBlurShader();
 };
 
-class ComputeShadowBlurHShader : public ShaderHelperSingleton<ComputeShadowBlurHShader, core::vector2df, std::vector<float> >, public TextureRead<Neared_Clamped_Filtered>
+class ComputeShadowBlurHShader : public Shader<ComputeShadowBlurHShader, core::vector2df, std::vector<float> >, public TextureRead<Neared_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
     ComputeShadowBlurHShader();
 };
 
-class Gaussian6HBlurShader : public ShaderHelperSingleton<Gaussian6HBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
+class Gaussian6HBlurShader : public Shader<Gaussian6HBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     Gaussian6HBlurShader();
 };
 
-class HorizontalBlurShader : public ShaderHelperSingleton<HorizontalBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
+class HorizontalBlurShader : public Shader<HorizontalBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     HorizontalBlurShader();
 };
 
-class Gaussian3HBlurShader : public ShaderHelperSingleton<Gaussian3HBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
+class Gaussian3HBlurShader : public Shader<Gaussian3HBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     Gaussian3HBlurShader();
 };
 
-class Gaussian17TapVShader : public ShaderHelperSingleton<Gaussian17TapVShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered, Bilinear_Clamped_Filtered>
+class Gaussian17TapVShader : public Shader<Gaussian17TapVShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered, Bilinear_Clamped_Filtered>
 {
 public:
     Gaussian17TapVShader();
 };
 
-class ComputeGaussian17TapVShader : public ShaderHelperSingleton<ComputeGaussian17TapVShader, core::vector2df>, public TextureRead<Neared_Clamped_Filtered, Neared_Clamped_Filtered>
+class ComputeGaussian17TapVShader : public Shader<ComputeGaussian17TapVShader, core::vector2df>, public TextureRead<Neared_Clamped_Filtered, Neared_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
@@ -501,39 +502,39 @@ public:
     ComputeGaussian17TapVShader();
 };
 
-class ComputeGaussian6VBlurShader : public ShaderHelperSingleton<ComputeGaussian6VBlurShader, core::vector2df, std::vector<float> >, public TextureRead<Bilinear_Clamped_Filtered>
+class ComputeGaussian6VBlurShader : public Shader<ComputeGaussian6VBlurShader, core::vector2df, std::vector<float> >, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
     ComputeGaussian6VBlurShader();
 };
 
-class ComputeShadowBlurVShader : public ShaderHelperSingleton<ComputeShadowBlurVShader, core::vector2df, std::vector<float> >, public TextureRead<Neared_Clamped_Filtered>
+class ComputeShadowBlurVShader : public Shader<ComputeShadowBlurVShader, core::vector2df, std::vector<float> >, public TextureRead<Neared_Clamped_Filtered>
 {
 public:
     GLuint TU_dest;
     ComputeShadowBlurVShader();
 };
 
-class Gaussian6VBlurShader : public ShaderHelperSingleton<Gaussian6VBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
+class Gaussian6VBlurShader : public Shader<Gaussian6VBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     Gaussian6VBlurShader();
 };
 
-class Gaussian3VBlurShader : public ShaderHelperSingleton<Gaussian3VBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
+class Gaussian3VBlurShader : public Shader<Gaussian3VBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
 {
 public:
     Gaussian3VBlurShader();
 };
 
-class PassThroughShader : public ShaderHelperSingleton<PassThroughShader, int, int>, public TextureRead<Bilinear_Filtered>
+class PassThroughShader : public Shader<PassThroughShader, int, int>, public TextureRead<Bilinear_Filtered>
 {
 public:
     PassThroughShader();
 };
 
-class LayerPassThroughShader : public ShaderHelperSingleton<LayerPassThroughShader, int>
+class LayerPassThroughShader : public Shader<LayerPassThroughShader, int>
 {
 public:
     GLuint TU_texture;
@@ -542,31 +543,31 @@ public:
     LayerPassThroughShader();
 };
 
-class LinearizeDepthShader : public ShaderHelperSingleton<LinearizeDepthShader, float, float>, public TextureRead<Bilinear_Filtered>
+class LinearizeDepthShader : public Shader<LinearizeDepthShader, float, float>, public TextureRead<Bilinear_Filtered>
 {
 public:
     LinearizeDepthShader();
 };
 
-class LightspaceBoundingBoxShader : public ShaderHelperSingleton<LightspaceBoundingBoxShader, core::matrix4, float, float, float, float>, public TextureRead < Nearest_Filtered >
+class LightspaceBoundingBoxShader : public Shader<LightspaceBoundingBoxShader, core::matrix4, float, float, float, float>, public TextureRead < Nearest_Filtered >
 {
 public:
     LightspaceBoundingBoxShader();
 };
 
-class ShadowMatrixesGenerationShader : public ShaderHelperSingleton <ShadowMatrixesGenerationShader, core::matrix4>
+class ShadowMatrixesGenerationShader : public Shader <ShadowMatrixesGenerationShader, core::matrix4>
 {
 public:
     ShadowMatrixesGenerationShader();
 };
 
-class DepthHistogramShader : public ShaderHelperSingleton<DepthHistogramShader>, public TextureRead <Nearest_Filtered>
+class DepthHistogramShader : public Shader<DepthHistogramShader>, public TextureRead <Nearest_Filtered>
 {
 public:
     DepthHistogramShader();
 };
 
-class GlowShader : public ShaderHelperSingleton<GlowShader>, public TextureRead<Bilinear_Filtered>
+class GlowShader : public Shader<GlowShader>, public TextureRead<Bilinear_Filtered>
 {
 public:
     GLuint vao;
@@ -574,49 +575,49 @@ public:
     GlowShader();
 };
 
-class SSAOShader : public ShaderHelperSingleton<SSAOShader, float, float, float>, public TextureRead<Semi_trilinear>
+class SSAOShader : public Shader<SSAOShader, float, float, float>, public TextureRead<Semi_trilinear>
 {
 public:
     SSAOShader();
 };
 
-class FogShader : public ShaderHelperSingleton<FogShader, float, core::vector3df>, public TextureRead<Nearest_Filtered>
+class FogShader : public Shader<FogShader, float, core::vector3df>, public TextureRead<Nearest_Filtered>
 {
 public:
     FogShader();
 };
 
-class MotionBlurShader : public ShaderHelperSingleton<MotionBlurShader, core::matrix4, core::vector2df, float, float>, public TextureRead<Bilinear_Clamped_Filtered, Nearest_Filtered>
+class MotionBlurShader : public Shader<MotionBlurShader, core::matrix4, core::vector2df, float, float>, public TextureRead<Bilinear_Clamped_Filtered, Nearest_Filtered>
 {
 public:
     MotionBlurShader();
 };
 
-class GodFadeShader : public ShaderHelperSingleton<GodFadeShader, video::SColorf>, public TextureRead<Bilinear_Filtered>
+class GodFadeShader : public Shader<GodFadeShader, video::SColorf>, public TextureRead<Bilinear_Filtered>
 {
 public:
     GodFadeShader();
 };
 
-class GodRayShader : public ShaderHelperSingleton<GodRayShader, core::vector2df>, public TextureRead<Bilinear_Filtered>
+class GodRayShader : public Shader<GodRayShader, core::vector2df>, public TextureRead<Bilinear_Filtered>
 {
 public:
     GodRayShader();
 };
 
-class MLAAColorEdgeDetectionSHader : public ShaderHelperSingleton<MLAAColorEdgeDetectionSHader, core::vector2df>, public TextureRead<Nearest_Filtered>
+class MLAAColorEdgeDetectionSHader : public Shader<MLAAColorEdgeDetectionSHader, core::vector2df>, public TextureRead<Nearest_Filtered>
 {
 public:
     MLAAColorEdgeDetectionSHader();
 };
 
-class MLAABlendWeightSHader : public ShaderHelperSingleton<MLAABlendWeightSHader, core::vector2df>, public TextureRead<Bilinear_Filtered, Nearest_Filtered>
+class MLAABlendWeightSHader : public Shader<MLAABlendWeightSHader, core::vector2df>, public TextureRead<Bilinear_Filtered, Nearest_Filtered>
 {
 public:
     MLAABlendWeightSHader();
 };
 
-class MLAAGatherSHader : public ShaderHelperSingleton<MLAAGatherSHader, core::vector2df>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
+class MLAAGatherSHader : public Shader<MLAAGatherSHader, core::vector2df>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
 {
 public:
     MLAAGatherSHader();
@@ -627,25 +628,25 @@ public:
 namespace UIShader
 {
 
-class Primitive2DList : public ShaderHelperSingleton<Primitive2DList>, public TextureRead < Bilinear_Filtered >
+class Primitive2DList : public Shader<Primitive2DList>, public TextureRead < Bilinear_Filtered >
 {
 public:
     Primitive2DList();
 };
 
-class TextureRectShader : public ShaderHelperSingleton<TextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df>, public TextureRead<Bilinear_Filtered>
+class TextureRectShader : public Shader<TextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df>, public TextureRead<Bilinear_Filtered>
 {
 public:
     TextureRectShader();
 };
 
-class UniformColoredTextureRectShader : public ShaderHelperSingleton<UniformColoredTextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df, video::SColor>, public TextureRead<Bilinear_Filtered>
+class UniformColoredTextureRectShader : public Shader<UniformColoredTextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df, video::SColor>, public TextureRead<Bilinear_Filtered>
 {
 public:
     UniformColoredTextureRectShader();
 };
 
-class ColoredTextureRectShader : public ShaderHelperSingleton<ColoredTextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df>, public TextureRead<Bilinear_Filtered>
+class ColoredTextureRectShader : public Shader<ColoredTextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df>, public TextureRead<Bilinear_Filtered>
 {
 public:
     GLuint colorvbo;
@@ -654,7 +655,7 @@ public:
     ColoredTextureRectShader();
 };
 
-class ColoredRectShader : public ShaderHelperSingleton<ColoredRectShader, core::vector2df, core::vector2df, video::SColor>
+class ColoredRectShader : public Shader<ColoredRectShader, core::vector2df, core::vector2df, video::SColor>
 {
 public:
     ColoredRectShader();

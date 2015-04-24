@@ -222,7 +222,7 @@ void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, 
 
     if (UserConfigParams::m_degraded_IBL)
     {
-        glUseProgram(FullScreenShader::DegradedIBLShader::getInstance()->Program);
+        FullScreenShader::DegradedIBLShader::getInstance()->use();
         glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
         FullScreenShader::DegradedIBLShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
@@ -230,7 +230,7 @@ void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, 
     }
     else
     {
-        glUseProgram(FullScreenShader::IBLShader::getInstance()->Program);
+        FullScreenShader::IBLShader::getInstance()->use();
         glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
         FullScreenShader::IBLShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox);
@@ -249,7 +249,7 @@ void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, 
 void PostProcessing::renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB, const core::matrix4 &rh_matrix, const core::vector3df &rh_extend)
 {
     glEnable(GL_PROGRAM_POINT_SIZE);
-    glUseProgram(FullScreenShader::RHDebug::getInstance()->Program);
+    FullScreenShader::RHDebug::getInstance()->use();
     glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHR);
     glBindTexture(GL_TEXTURE_3D, SHR);
     glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHG);
@@ -341,7 +341,7 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo, size_t layer,
     {
         const std::vector<float> &weightsV = getGaussianWeight(sigmaV, 7);
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
-        glUseProgram(FullScreenShader::ComputeShadowBlurVShader::getInstance()->Program);
+        FullScreenShader::ComputeShadowBlurVShader::getInstance()->use();
         FullScreenShader::ComputeShadowBlurVShader::getInstance()->SetTextureUnits(LayerTex);
         glBindSampler(FullScreenShader::ComputeShadowBlurVShader::getInstance()->TU_dest, 0);
         glBindImageTexture(FullScreenShader::ComputeShadowBlurVShader::getInstance()->TU_dest, irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R32F);
@@ -350,7 +350,7 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo, size_t layer,
 
         const std::vector<float> &weightsH = getGaussianWeight(sigmaH, 7);
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        glUseProgram(FullScreenShader::ComputeShadowBlurHShader::getInstance()->Program);
+        FullScreenShader::ComputeShadowBlurHShader::getInstance()->use();
         FullScreenShader::ComputeShadowBlurHShader::getInstance()->SetTextureUnits(irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0]);
         glBindSampler(FullScreenShader::ComputeShadowBlurHShader::getInstance()->TU_dest, 0);
         glBindImageTexture(FullScreenShader::ComputeShadowBlurHShader::getInstance()->TU_dest, LayerTex, 0, false, 0, GL_WRITE_ONLY, GL_R32F);
@@ -382,7 +382,7 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
     {
         const std::vector<float> &weightsV = getGaussianWeight(sigmaV, 7);
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
-        glUseProgram(FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->Program);
+        FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->use();
         FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->SetTextureUnits(in_fbo.getRTT()[0]);
         glBindSampler(FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->TU_dest, 0);
         glBindImageTexture(FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->TU_dest, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_RGBA16F);
@@ -391,7 +391,7 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
 
         const std::vector<float> &weightsH = getGaussianWeight(sigmaH, 7);
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        glUseProgram(FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->Program);
+        FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->use();
         FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->SetTextureUnits(auxiliary.getRTT()[0]);
         glBindSampler(FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->TU_dest, 0);
         glBindImageTexture(FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->TU_dest, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_RGBA16F);
@@ -436,7 +436,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         }
         else
         {
-            glUseProgram(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->Program);
+            FullScreenShader::ComputeGaussian17TapHShader::getInstance()->use();
             glBindSampler(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_dest, 0);
             FullScreenShader::ComputeGaussian17TapHShader::getInstance()->SetTextureUnits(in_fbo.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
             glBindImageTexture(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_dest, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
@@ -456,7 +456,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         }
         else
         {
-            glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->Program);
+            FullScreenShader::ComputeGaussian17TapVShader::getInstance()->use();
             glBindSampler(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_dest, 0);
             FullScreenShader::ComputeGaussian17TapVShader::getInstance()->SetTextureUnits(auxiliary.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
             glBindImageTexture(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_dest, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
@@ -476,7 +476,7 @@ void PostProcessing::renderPassThrough(GLuint tex, unsigned width, unsigned heig
 
 void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
 {
-    glUseProgram(FullScreenShader::LayerPassThroughShader::getInstance()->Program);
+    FullScreenShader::LayerPassThroughShader::getInstance()->use();
     glBindVertexArray(FullScreenShader::LayerPassThroughShader::getInstance()->vao);
 
     glActiveTexture(GL_TEXTURE0 + FullScreenShader::LayerPassThroughShader::getInstance()->TU_texture);
@@ -490,7 +490,7 @@ void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
 
 void PostProcessing::renderGlow(unsigned tex)
 {
-    glUseProgram(FullScreenShader::GlowShader::getInstance()->Program);
+    FullScreenShader::GlowShader::getInstance()->use();
     glBindVertexArray(FullScreenShader::GlowShader::getInstance()->vao);
 
     FullScreenShader::GlowShader::getInstance()->SetTextureUnits(tex);
@@ -590,7 +590,7 @@ void PostProcessing::applyMLAA()
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     // Pass 1: color edge detection
-    glUseProgram(FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->Program);
+    FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->use();
     FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS));
     DrawFullScreenEffect<FullScreenShader::MLAAColorEdgeDetectionSHader>(PIXEL_SIZE);
 
@@ -601,7 +601,7 @@ void PostProcessing::applyMLAA()
     irr_driver->getFBO(FBO_MLAA_BLEND).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(FullScreenShader::MLAABlendWeightSHader::getInstance()->Program);
+    FullScreenShader::MLAABlendWeightSHader::getInstance()->use();
     FullScreenShader::MLAABlendWeightSHader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), getTextureGLuint(m_areamap));
     DrawFullScreenEffect<FullScreenShader::MLAABlendWeightSHader>(PIXEL_SIZE);
 
@@ -611,7 +611,7 @@ void PostProcessing::applyMLAA()
     // Pass 3: gather
     irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
 
-    glUseProgram(FullScreenShader::MLAAGatherSHader::getInstance()->Program);
+    FullScreenShader::MLAAGatherSHader::getInstance()->use();
     FullScreenShader::MLAAGatherSHader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND), irr_driver->getRenderTargetTexture(RTT_MLAA_TMP));
     DrawFullScreenEffect<FullScreenShader::MLAAGatherSHader>(PIXEL_SIZE);
 

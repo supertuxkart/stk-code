@@ -274,7 +274,7 @@ void STKMeshSceneNode::render()
         glDisable(GL_CULL_FACE);
         if (update_each_frame)
             updatevbo();
-        glUseProgram(MeshShader::ObjectPass1Shader::getInstance()->Program);
+        MeshShader::ObjectPass1Shader::getInstance()->use();
         // Only untextured
         for (unsigned i = 0; i < GLmeshes.size(); i++)
         {
@@ -313,7 +313,7 @@ void STKMeshSceneNode::render()
         glDisable(GL_CULL_FACE);
         if (update_each_frame && !CVS->isDefferedEnabled())
             updatevbo();
-        glUseProgram(MeshShader::ObjectPass2Shader::getInstance()->Program);
+        MeshShader::ObjectPass2Shader::getInstance()->use();
         // Only untextured
         for (unsigned i = 0; i < GLmeshes.size(); i++)
         {
@@ -366,7 +366,7 @@ void STKMeshSceneNode::render()
 
     if (irr_driver->getPhase() == GLOW_PASS)
     {
-        glUseProgram(MeshShader::ColorizeShader::getInstance()->Program);
+        MeshShader::ColorizeShader::getInstance()->use();
         for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
@@ -395,7 +395,7 @@ void STKMeshSceneNode::render()
 
             if (World::getWorld() && World::getWorld()->isFogEnabled())
             {
-                glUseProgram(MeshShader::TransparentFogShader::getInstance()->Program);
+                MeshShader::TransparentFogShader::getInstance()->use();
                 for (unsigned i = 0; i < GLmeshes.size(); i++)
                 {
                     GLMesh &mesh = GLmeshes[i];
@@ -439,7 +439,7 @@ void STKMeshSceneNode::render()
             }
             else
             {
-                glUseProgram(MeshShader::TransparentShader::getInstance()->Program);
+                MeshShader::TransparentShader::getInstance()->use();
                 for (unsigned i = 0; i < GLmeshes.size(); i++)
                 {
                     irr_driver->IncreaseObjectCount();

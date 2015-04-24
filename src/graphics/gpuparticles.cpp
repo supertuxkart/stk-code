@@ -387,7 +387,7 @@ void ParticleSystemProxy::simulate()
     glEnable(GL_RASTERIZER_DISCARD);
     if (has_height_map)
     {
-        glUseProgram(HeightmapSimulationShader::getInstance()->Program);
+        HeightmapSimulationShader::getInstance()->use();
         glActiveTexture(GL_TEXTURE0 + HeightmapSimulationShader::getInstance()->TU_heightmap);
         glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
         HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
@@ -433,7 +433,7 @@ void ParticleSystemProxy::simulate()
 void ParticleSystemProxy::drawFlip()
 {
     glBlendFunc(GL_ONE, GL_ONE);
-    glUseProgram(FlipParticleRender::getInstance()->Program);
+    FlipParticleRender::getInstance()->use();
 
     FlipParticleRender::getInstance()->SetTextureUnits(texture, irr_driver->getDepthStencilTexture());
     FlipParticleRender::getInstance()->setUniforms();
@@ -617,19 +617,19 @@ HeightmapSimulationShader::HeightmapSimulationShader()
         "new_particle_velocity",
         "new_size",
     };
-    Program = LoadTFBProgram(file_manager->getAsset("shaders/particlesimheightmap.vert").c_str(), varyings, 4);
+    loadTFBProgram("particlesimheightmap.vert", varyings, 4);
     TU_heightmap = 2;
-    AssignTextureUnit(Program, TexUnit(TU_heightmap, "heightmap"));
-    AssignUniforms("sourcematrix", "dt", "level", "size_increase_factor", "track_x", "track_x_len", "track_z", "track_z_len");
+    AssignTextureUnit(m_program, TexUnit(TU_heightmap, "heightmap"));
+    assignUniforms("sourcematrix", "dt", "level", "size_increase_factor", "track_x", "track_x_len", "track_z", "track_z_len");
 }
 
 FlipParticleRender::FlipParticleRender()
 {
-    Program = LoadProgram(PARTICLES_RENDERING,
-        GL_VERTEX_SHADER, file_manager->getAsset("shaders/flipparticle.vert").c_str(),
-        GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-        GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
-    AssignUniforms();
+    loadProgram(PARTICLES_RENDERING,
+        GL_VERTEX_SHADER, "flipparticle.vert",
+        GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+        GL_FRAGMENT_SHADER, "particle.frag");
+    assignUniforms();
 
-    AssignSamplerNames(Program, 0, "tex", 1, "dtex");
+    AssignSamplerNames(m_program, 0, "tex", 1, "dtex");
 }

@@ -51,7 +51,7 @@
 
  \subsection shader_declaration_uniform_names Declare uniforms
 
- Use the AssignUniforms() function to pass name of the uniforms in the program.
+ Use the assignUniforms() function to pass name of the uniforms in the program.
  The order of name declaration is the same as the argument passed to setUniforms function.
 
  \subsection shader_declaration_bind_texture_unit Bind texture unit and name
@@ -129,7 +129,7 @@ Shaders::Shaders()
 static std::string LoadHeader()
 {
     std::string result;
-    std::ifstream Stream(file_manager->getAsset("shaders/header.txt").c_str(), std::ios::in);
+    std::ifstream Stream("header.txt", std::ios::in);
 
     if (Stream.is_open())
     {
@@ -558,11 +558,11 @@ namespace UtilShader
 {
     ColoredLine::ColoredLine()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "coloredquad.frag");
 
-        AssignUniforms("color");
+        assignUniforms("color");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -883,13 +883,13 @@ namespace UtilShader
 {
     SpecularIBLGenerator::SpecularIBLGenerator()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/importance_sampling_specular.frag").c_str());
-        AssignUniforms("PermutationMatrix", "ViewportSize");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
+        assignUniforms("PermutationMatrix", "ViewportSize");
         TU_Samples = 1;
-        AssignSamplerNames(Program, 0, "tex");
-        AssignTextureUnit(Program, TexUnit(TU_Samples, "samples"));
+        AssignSamplerNames(m_program, 0, "tex");
+        AssignTextureUnit(m_program, TexUnit(TU_Samples, "samples"));
     }
 }
 
@@ -898,226 +898,226 @@ namespace MeshShader
     // Solid Normal and depth pass shaders
     ObjectPass1Shader::ObjectPass1Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
-        AssignUniforms("ModelMatrix", "InverseModelMatrix");
-        AssignSamplerNames(Program, 0, "tex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+            GL_FRAGMENT_SHADER, "object_pass1.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     ObjectRefPass1Shader::ObjectRefPass1Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
-        AssignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
-        AssignSamplerNames(Program, 0, "tex", 1, "glosstex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+            GL_FRAGMENT_SHADER, "objectref_pass1.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
+        AssignSamplerNames(m_program, 0, "tex", 1, "glosstex");
     }
 
     GrassPass1Shader::GrassPass1Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
-        AssignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
-        AssignSamplerNames(Program, 0, "tex", 1, "glosstex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "grass_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+            GL_FRAGMENT_SHADER, "objectref_pass1.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
+        AssignSamplerNames(m_program, 0, "tex", 1, "glosstex");
     }
 
     NormalMapShader::NormalMapShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/normalmap.frag").c_str());
-        AssignUniforms("ModelMatrix", "InverseModelMatrix");
-        AssignSamplerNames(Program, 1, "normalMap", 0, "DiffuseForAlpha");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+            GL_FRAGMENT_SHADER, "normalmap.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix");
+        AssignSamplerNames(m_program, 1, "normalMap", 0, "DiffuseForAlpha");
     }
 
     InstancedObjectPass1Shader::InstancedObjectPass1Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_pass1.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+            GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
 
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "glosstex");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "glosstex");
     }
 
     InstancedObjectRefPass1Shader::InstancedObjectRefPass1Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass1.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+            GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
 
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "tex", 1, "glosstex");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "tex", 1, "glosstex");
     }
 
     InstancedGrassPass1Shader::InstancedGrassPass1Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_grass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass1.frag").c_str());
-        AssignUniforms("windDir");
-        AssignSamplerNames(Program, 0, "tex", 1, "glosstex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_grass.vert",
+            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+            GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
+        assignUniforms("windDir");
+        AssignSamplerNames(m_program, 0, "tex", 1, "glosstex");
     }
 
     InstancedNormalMapShader::InstancedNormalMapShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_normalmap.frag").c_str());
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "normalMap", 1, "glossMap");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+            GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "normalMap", 1, "glossMap");
     }
 
     // Solid Lit pass shaders
     ObjectPass2Shader::ObjectPass2Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
-        AssignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "object_pass2.frag");
+        assignUniforms("ModelMatrix", "TextureMatrix");
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedObjectPass2Shader::InstancedObjectPass2Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_pass2.frag").c_str());
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedObjectRefPass2Shader::InstancedObjectRefPass2Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass2.frag").c_str());
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     DetailledObjectPass2Shader::DetailledObjectPass2Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/detailledobject_pass2.frag").c_str());
-        AssignUniforms("ModelMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "detailledobject_pass2.frag");
+        assignUniforms("ModelMatrix");
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
     }
 
     InstancedDetailledObjectPass2Shader::InstancedDetailledObjectPass2Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_detailledobject_pass2.frag").c_str());
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "instanced_detailledobject_pass2.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
     }
 
     ObjectUnlitShader::ObjectUnlitShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
-        AssignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "object_unlit.frag");
+        assignUniforms("ModelMatrix", "TextureMatrix");
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
     InstancedObjectUnlitShader::InstancedObjectUnlitShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_unlit.frag").c_str());
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+            GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
     ObjectRefPass2Shader::ObjectRefPass2Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
-        AssignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "objectref_pass2.frag");
+        assignUniforms("ModelMatrix", "TextureMatrix");
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     GrassPass2Shader::GrassPass2Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
-        AssignUniforms("ModelMatrix", "windDir");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "grass_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "grass_pass2.frag");
+        assignUniforms("ModelMatrix", "windDir");
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedGrassPass2Shader::InstancedGrassPass2Shader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_grass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_grass_pass2.frag").c_str());
-        AssignUniforms("windDir", "SunDir");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo", 5, "SpecMap");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_grass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "instanced_grass_pass2.frag");
+        assignUniforms("windDir", "SunDir");
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo", 5, "SpecMap");
     }
 
     SphereMapShader::SphereMapShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
-        AssignUniforms("ModelMatrix", "InverseModelMatrix");
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "objectpass_spheremap.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix");
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
     InstancedSphereMapShader::InstancedSphereMapShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectpass_spheremap.frag").c_str());
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "instanced_objectpass_spheremap.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
     SplattingShader::SplattingShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/splatting.frag").c_str());
-        AssignUniforms("ModelMatrix");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+            GL_FRAGMENT_SHADER, "splatting.frag");
+        assignUniforms("ModelMatrix");
 
-        AssignSamplerNames(Program,
+        AssignSamplerNames(m_program,
             0, "DiffuseMap",
             1, "SpecularMap",
             2, "SSAO",
@@ -1130,47 +1130,47 @@ namespace MeshShader
 
     TransparentShader::TransparentShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparent.frag").c_str());
-        AssignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(Program, 0, "tex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "transparent.frag");
+        assignUniforms("ModelMatrix", "TextureMatrix");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     TransparentFogShader::TransparentFogShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparentfog.frag").c_str());
-        AssignUniforms("ModelMatrix", "TextureMatrix", "fogmax", "startH", "endH", "start", "end", "col");
-        AssignSamplerNames(Program, 0, "tex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "transparentfog.frag");
+        assignUniforms("ModelMatrix", "TextureMatrix", "fogmax", "startH", "endH", "start", "end", "col");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     BillboardShader::BillboardShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/billboard.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/billboard.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "billboard.vert",
+            GL_FRAGMENT_SHADER, "billboard.frag");
 
-        AssignUniforms("ModelViewMatrix", "ProjectionMatrix", "Position", "Size");
-        AssignSamplerNames(Program, 0, "tex");
+        assignUniforms("ModelViewMatrix", "ProjectionMatrix", "Position", "Size");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     ColorizeShader::ColorizeShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colorize.frag").c_str());
-        AssignUniforms("ModelMatrix", "col");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "object_pass.vert",
+            GL_FRAGMENT_SHADER, "colorize.frag");
+        assignUniforms("ModelMatrix", "col");
     }
 
     InstancedColorizeShader::InstancedColorizeShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/glow_object.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/glow_object.frag").c_str());
-        AssignUniforms();
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "glow_object.vert",
+            GL_FRAGMENT_SHADER, "glow_object.frag");
+        assignUniforms();
     }
 
     ShadowShader::ShadowShader()
@@ -1180,49 +1180,49 @@ namespace MeshShader
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "shadow.vert",
+                GL_FRAGMENT_SHADER, "shadow.frag");
         }
         else
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
-                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "shadow.vert",
+                GL_GEOMETRY_SHADER, "shadow.geom",
+                GL_FRAGMENT_SHADER, "shadow.frag");
         }
-        AssignUniforms("layer", "ModelMatrix");
+        assignUniforms("layer", "ModelMatrix");
     }
 
     RSMShader::RSMShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/rsm.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "rsm.vert",
+            GL_FRAGMENT_SHADER, "rsm.frag");
 
-        AssignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(Program, 0, "tex");
+        assignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     InstancedRSMShader::InstancedRSMShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_rsm.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_rsm.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_rsm.vert",
+            GL_FRAGMENT_SHADER, "instanced_rsm.frag");
 
-        AssignUniforms("RSMMatrix");
-        AssignSamplerNames(Program, 0, "tex");
+        assignUniforms("RSMMatrix");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     SplattingRSMShader::SplattingRSMShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/rsm.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/splatting_rsm.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "rsm.vert",
+            GL_FRAGMENT_SHADER, "splatting_rsm.frag");
 
-        AssignUniforms("RSMMatrix", "ModelMatrix");
-        AssignSamplerNames(Program, 0, "tex_layout", 1, "tex_detail0", 2, "tex_detail1", 3, "tex_detail2", 4, "tex_detail3");
+        assignUniforms("RSMMatrix", "ModelMatrix");
+        AssignSamplerNames(m_program, 0, "tex_layout", 1, "tex_detail0", 2, "tex_detail1", 3, "tex_detail2", 4, "tex_detail3");
     }
 
     InstancedShadowShader::InstancedShadowShader()
@@ -1232,20 +1232,20 @@ namespace MeshShader
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                GL_VERTEX_SHADER, "instanciedshadow.vert",
+                GL_FRAGMENT_SHADER, "shadow.frag");
         }
         else
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/instanced_shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadow.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                GL_VERTEX_SHADER, "instanciedshadow.vert",
+                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
+                GL_FRAGMENT_SHADER, "shadow.frag");
         }
-        AssignUniforms("layer");
+        assignUniforms("layer");
     }
 
     RefShadowShader::RefShadowShader()
@@ -1255,19 +1255,19 @@ namespace MeshShader
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadowref.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "shadow.vert",
+                GL_FRAGMENT_SHADER, "shadowref.frag");
         }
         else
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
-                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadowref.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "shadow.vert",
+                GL_GEOMETRY_SHADER, "shadow.geom",
+                GL_FRAGMENT_SHADER, "shadowref.frag");
         }
-        AssignUniforms("layer", "ModelMatrix");
-        AssignSamplerNames(Program, 0, "tex");
+        assignUniforms("layer", "ModelMatrix");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     InstancedRefShadowShader::InstancedRefShadowShader()
@@ -1277,21 +1277,21 @@ namespace MeshShader
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                GL_VERTEX_SHADER, "instanciedshadow.vert",
+                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/instanced_shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                GL_VERTEX_SHADER, "instanciedshadow.vert",
+                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
+                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
-        AssignUniforms("layer");
-        AssignSamplerNames(Program, 0, "tex");
+        assignUniforms("layer");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     GrassShadowShader::GrassShadowShader()
@@ -1301,19 +1301,19 @@ namespace MeshShader
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow_grass.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "shadow_grass.vert",
+                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow_grass.vert").c_str(),
-                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "shadow_grass.vert",
+                GL_GEOMETRY_SHADER, "shadow.geom",
+                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
-        AssignUniforms("layer", "ModelMatrix", "windDir");
-        AssignSamplerNames(Program, 0, "tex");
+        assignUniforms("layer", "ModelMatrix", "windDir");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     InstancedGrassShadowShader::InstancedGrassShadowShader()
@@ -1323,41 +1323,41 @@ namespace MeshShader
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedgrassshadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
+                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedgrassshadow.vert").c_str(),
-                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/instanced_shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
+                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
+                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
 
-        AssignSamplerNames(Program, 0, "tex");
-        AssignUniforms("layer", "windDir");
+        AssignSamplerNames(m_program, 0, "tex");
+        assignUniforms("layer", "windDir");
     }
 
     DisplaceMaskShader::DisplaceMaskShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
-        AssignUniforms("ModelMatrix");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "displace.vert",
+            GL_FRAGMENT_SHADER, "white.frag");
+        assignUniforms("ModelMatrix");
     }
 
 
     DisplaceShader::DisplaceShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/displace.frag").c_str());
-        AssignUniforms("ModelMatrix", "dir", "dir2");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "displace.vert",
+            GL_FRAGMENT_SHADER, "displace.frag");
+        assignUniforms("ModelMatrix", "dir", "dir2");
 
-        AssignSamplerNames(Program,
+        AssignSamplerNames(m_program,
             0, "displacement_tex",
             1, "color_tex",
             2, "mask_tex",
@@ -1366,11 +1366,11 @@ namespace MeshShader
 
     SkyboxShader::SkyboxShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/sky.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sky.frag").c_str());
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "tex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "sky.vert",
+            GL_FRAGMENT_SHADER, "sky.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "tex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -1382,21 +1382,21 @@ namespace MeshShader
 
     NormalVisualizer::NormalVisualizer()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
-            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/normal_visualizer.geom").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
-        AssignUniforms("color");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+            GL_GEOMETRY_SHADER, "normal_visualizer.geom",
+            GL_FRAGMENT_SHADER, "coloredquad.frag");
+        assignUniforms("color");
     }
 
     ViewFrustrumShader::ViewFrustrumShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/frustrum.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "frustrum.vert",
+            GL_FRAGMENT_SHADER, "coloredquad.frag");
 
-        AssignUniforms("color", "idx");
+        assignUniforms("color", "idx");
 
         glGenVertexArrays(1, &frustrumvao);
         glBindVertexArray(frustrumvao);
@@ -1412,16 +1412,16 @@ namespace LightShader
 {
     PointLightShader::PointLightShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlight.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "pointlight.vert",
+            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
+            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "pointlight.frag");
 
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "ntex", 1, "dtex");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -1430,10 +1430,10 @@ namespace LightShader
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, MAXLIGHT * sizeof(PointLightInfo), 0, GL_DYNAMIC_DRAW);
 
-        GLuint attrib_Position = glGetAttribLocation(Program, "Position");
-        GLuint attrib_Color = glGetAttribLocation(Program, "Color");
-        GLuint attrib_Energy = glGetAttribLocation(Program, "Energy");
-        GLuint attrib_Radius = glGetAttribLocation(Program, "Radius");
+        GLuint attrib_Position = glGetAttribLocation(m_program, "Position");
+        GLuint attrib_Color = glGetAttribLocation(m_program, "Color");
+        GLuint attrib_Energy = glGetAttribLocation(m_program, "Energy");
+        GLuint attrib_Radius = glGetAttribLocation(m_program, "Radius");
 
         glEnableVertexAttribArray(attrib_Position);
         glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), 0);
@@ -1452,23 +1452,23 @@ namespace LightShader
 
     PointLightScatterShader::PointLightScatterShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlightscatter.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "pointlight.vert",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "pointlightscatter.frag");
 
-        AssignUniforms("density", "fogcol");
-        AssignSamplerNames(Program, 0, "dtex");
+        assignUniforms("density", "fogcol");
+        AssignSamplerNames(m_program, 0, "dtex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, PointLightShader::getInstance()->vbo);
 
-        GLuint attrib_Position = glGetAttribLocation(Program, "Position");
-        GLuint attrib_Color = glGetAttribLocation(Program, "Color");
-        GLuint attrib_Energy = glGetAttribLocation(Program, "Energy");
-        GLuint attrib_Radius = glGetAttribLocation(Program, "Radius");
+        GLuint attrib_Position = glGetAttribLocation(m_program, "Position");
+        GLuint attrib_Color = glGetAttribLocation(m_program, "Color");
+        GLuint attrib_Energy = glGetAttribLocation(m_program, "Energy");
+        GLuint attrib_Radius = glGetAttribLocation(m_program, "Radius");
 
         glEnableVertexAttribArray(attrib_Position);
         glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), 0);
@@ -1508,473 +1508,472 @@ namespace FullScreenShader
 {
     BloomShader::BloomShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getRGBfromCIEXxy.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloom.frag").c_str());
-        AssignUniforms();
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/getCIEXYZ.frag",
+            GL_FRAGMENT_SHADER, "utils/getRGBfromCIEXxy.frag",
+            GL_FRAGMENT_SHADER, "bloom.frag");
+        assignUniforms();
 
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     BloomBlendShader::BloomBlendShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloomblend.frag").c_str());
-        AssignUniforms();
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "bloomblend.frag");
+        assignUniforms();
 
-        AssignSamplerNames(Program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
+        AssignSamplerNames(m_program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
     }
 	
 	LensBlendShader::LensBlendShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/lensblend.frag").c_str());
-        AssignUniforms();
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "lensblend.frag");
+        assignUniforms();
 
-        AssignSamplerNames(Program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
+        AssignSamplerNames(m_program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
     }
 
     ToneMapShader::ToneMapShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getRGBfromCIEXxy.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/tonemap.frag").c_str());
-        AssignUniforms("vignette_weight");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/getRGBfromCIEXxy.frag",
+            GL_FRAGMENT_SHADER, "utils/getCIEXYZ.frag",
+            GL_FRAGMENT_SHADER, "tonemap.frag");
+        assignUniforms("vignette_weight");
 
-        AssignSamplerNames(Program, 0, "text");
+        AssignSamplerNames(m_program, 0, "text");
     }
 
     DepthOfFieldShader::DepthOfFieldShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/dof.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "dof.frag");
 
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "tex", 1, "dtex");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "tex", 1, "dtex");
     }
 
     SunLightShader::SunLightShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SunMRP.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
+            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
+            GL_FRAGMENT_SHADER, "sunlight.frag");
 
-        AssignSamplerNames(Program, 0, "ntex", 1, "dtex");
-        AssignUniforms("direction", "col");
+        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex");
+        assignUniforms("direction", "col");
     }
 
     IBLShader::IBLShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/IBL.frag").c_str());
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
+            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
+            GL_FRAGMENT_SHADER, "IBL.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
     DegradedIBLShader::DegradedIBLShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/degraded_ibl.frag").c_str());
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "ntex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
+            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
+            GL_FRAGMENT_SHADER, "degraded_ibl.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "ntex");
     }
 
     ShadowedSunLightShaderPCF::ShadowedSunLightShaderPCF()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SunMRP.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
+            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
+            GL_FRAGMENT_SHADER, "sunlightshadow.frag");
 
         // Use 8 to circumvent a catalyst bug when binding sampler
-        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
-        AssignUniforms("split0", "split1", "split2", "splitmax", "shadow_res");
+        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex", 8, "shadowtex");
+        assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res");
     }
 
     ShadowedSunLightShaderESM::ShadowedSunLightShaderESM()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SunMRP.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadowesm.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
+            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
+            GL_FRAGMENT_SHADER, "sunlightshadowesm.frag");
 
         // Use 8 to circumvent a catalyst bug when binding sampler
-        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
-        AssignUniforms("split0", "split1", "split2", "splitmax");
+        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex", 8, "shadowtex");
+        assignUniforms("split0", "split1", "split2", "splitmax");
     }
 
     RadianceHintsConstructionShader::RadianceHintsConstructionShader()
     {
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/slicedscreenquad.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "slicedscreenquad.vert",
+                GL_FRAGMENT_SHADER, "rh.frag");
         }
         else
         {
-            Program = LoadProgram(OBJECT,
-                GL_VERTEX_SHADER, file_manager->getAsset("shaders/slicedscreenquad.vert").c_str(),
-                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/rhpassthrough.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
+            loadProgram(OBJECT,
+                GL_VERTEX_SHADER, "slicedscreenquad.vert",
+                GL_GEOMETRY_SHADER, "rhpassthrough.geom",
+                GL_FRAGMENT_SHADER, "rh.frag");
         }
 
-        AssignUniforms("RSMMatrix", "RHMatrix", "extents", "suncol");
-        AssignSamplerNames(Program, 0, "ctex", 1, "ntex", 2, "dtex");
+        assignUniforms("RSMMatrix", "RHMatrix", "extents", "suncol");
+        AssignSamplerNames(m_program, 0, "ctex", 1, "ntex", 2, "dtex");
     }
 
     NVWorkaroundRadianceHintsConstructionShader::NVWorkaroundRadianceHintsConstructionShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/slicedscreenquad_nvworkaround.vert").c_str(),
-            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/rhpassthrough.geom").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "slicedscreenquad_nvworkaround.vert",
+            GL_GEOMETRY_SHADER, "rhpassthrough.geom",
+            GL_FRAGMENT_SHADER, "rh.frag");
 
-        AssignUniforms("RSMMatrix", "RHMatrix", "extents", "slice", "suncol");
+        assignUniforms("RSMMatrix", "RHMatrix", "extents", "slice", "suncol");
 
-        AssignSamplerNames(Program, 0, "ctex", 1, "ntex", 2, "dtex");
+        AssignSamplerNames(m_program, 0, "ctex", 1, "ntex", 2, "dtex");
     }
 
     RHDebug::RHDebug()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/rhdebug.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rhdebug.frag").c_str());
-        AssignUniforms("RHMatrix", "extents");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "rhdebug.vert",
+            GL_FRAGMENT_SHADER, "rhdebug.frag");
+        assignUniforms("RHMatrix", "extents");
         TU_SHR = 0;
         TU_SHG = 1;
         TU_SHB = 2;
-        AssignTextureUnit(Program, TexUnit(TU_SHR, "SHR"), TexUnit(TU_SHG, "SHG"), TexUnit(TU_SHB, "SHB"));
+        AssignTextureUnit(m_program, TexUnit(TU_SHR, "SHR"), TexUnit(TU_SHG, "SHG"), TexUnit(TU_SHB, "SHB"));
     }
 
     GlobalIlluminationReconstructionShader::GlobalIlluminationReconstructionShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gi.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "gi.frag");
 
-        AssignUniforms("RHMatrix", "InvRHMatrix", "extents");
-        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "SHR", 3, "SHG", 4, "SHB");
+        assignUniforms("RHMatrix", "InvRHMatrix", "extents");
+        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex", 2, "SHR", 3, "SHG", 4, "SHB");
     }
 
     Gaussian17TapHShader::Gaussian17TapHShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralH.frag").c_str());
-        AssignUniforms("pixel");
-        AssignSamplerNames(Program, 0, "tex", 1, "depth");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "bilateralH.frag");
+        assignUniforms("pixel");
+        AssignSamplerNames(m_program, 0, "tex", 1, "depth");
     }
 
     ComputeGaussian17TapHShader::ComputeGaussian17TapHShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralH.comp").c_str());
+        loadProgram(OBJECT,  GL_COMPUTE_SHADER, "bilateralH.comp");
         TU_dest = 2;
-        AssignUniforms("pixel");
-        AssignSamplerNames(Program, 0, "source", 1, "depth");
-        AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
+        assignUniforms("pixel");
+        AssignSamplerNames(m_program, 0, "source", 1, "depth");
+        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
     }
 
     ComputeGaussian6HBlurShader::ComputeGaussian6HBlurShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian6h.comp").c_str());
+        loadProgram(OBJECT,
+            GL_COMPUTE_SHADER, "gaussian6h.comp");
         TU_dest = 1;
-        AssignUniforms("pixel", "weights");
-        AssignSamplerNames(Program, 0, "source");
-        AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
+        assignUniforms("pixel", "weights");
+        AssignSamplerNames(m_program, 0, "source");
+        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
     }
 
     ComputeShadowBlurHShader::ComputeShadowBlurHShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/blurshadowH.comp").c_str());
+        loadProgram(OBJECT,
+            GL_COMPUTE_SHADER, "blurshadowH.comp");
         TU_dest = 1;
-        AssignUniforms("pixel", "weights");
-        AssignSamplerNames(Program, 0, "source");
-        AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
+        assignUniforms("pixel", "weights");
+        AssignSamplerNames(m_program, 0, "source");
+        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
     }
 
     Gaussian6HBlurShader::Gaussian6HBlurShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6h.frag").c_str());
-        AssignUniforms("pixel", "sigma");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "gaussian6h.frag");
+        assignUniforms("pixel", "sigma");
 
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 	
 	HorizontalBlurShader::HorizontalBlurShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6h.frag").c_str());
-        AssignUniforms("pixel");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "gaussian6h.frag");
+        assignUniforms("pixel");
 
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     Gaussian3HBlurShader::Gaussian3HBlurShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian3h.frag").c_str());
-        AssignUniforms("pixel");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "gaussian3h.frag");
+        assignUniforms("pixel");
 
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     Gaussian17TapVShader::Gaussian17TapVShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralV.frag").c_str());
-        AssignUniforms("pixel");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "bilateralV.frag");
+        assignUniforms("pixel");
 
-        AssignSamplerNames(Program, 0, "tex", 1, "depth");
+        AssignSamplerNames(m_program, 0, "tex", 1, "depth");
     }
 
     ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralV.comp").c_str());
+        loadProgram(OBJECT,
+            GL_COMPUTE_SHADER, "bilateralV.comp");
         TU_dest = 2;
-        AssignUniforms("pixel");
-        AssignSamplerNames(Program, 0, "source", 1, "depth");
-        AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
+        assignUniforms("pixel");
+        AssignSamplerNames(m_program, 0, "source", 1, "depth");
+        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
     }
 
     ComputeGaussian6VBlurShader::ComputeGaussian6VBlurShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian6v.comp").c_str());
+        loadProgram(OBJECT,
+            GL_COMPUTE_SHADER, "gaussian6v.comp");
         TU_dest = 1;
-        AssignUniforms("pixel", "weights");
-        AssignSamplerNames(Program, 0, "source");
-        AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
+        assignUniforms("pixel", "weights");
+        AssignSamplerNames(m_program, 0, "source");
+        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
     }
 
     ComputeShadowBlurVShader::ComputeShadowBlurVShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/blurshadowV.comp").c_str());
+        loadProgram(OBJECT,
+            GL_COMPUTE_SHADER, "blurshadowV.comp");
         TU_dest = 1;
-        AssignUniforms("pixel", "weights");
-        AssignSamplerNames(Program, 0, "source");
-        AssignTextureUnit(Program, TexUnit(TU_dest, "dest"));
+        assignUniforms("pixel", "weights");
+        AssignSamplerNames(m_program, 0, "source");
+        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
     }
 
     Gaussian6VBlurShader::Gaussian6VBlurShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6v.frag").c_str());
-        AssignUniforms("pixel", "sigma");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "gaussian6v.frag");
+        assignUniforms("pixel", "sigma");
 
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     Gaussian3VBlurShader::Gaussian3VBlurShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian3v.frag").c_str());
-        AssignUniforms("pixel");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "gaussian3v.frag");
+        assignUniforms("pixel");
 
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     PassThroughShader::PassThroughShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/passthrough.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "passthrough.frag");
 
-        AssignUniforms("width", "height");
-        AssignSamplerNames(Program, 0, "tex");
+        assignUniforms("width", "height");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     LayerPassThroughShader::LayerPassThroughShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/layertexturequad.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "layertexturequad.frag");
         TU_texture = 0;
-        AssignUniforms("layer");
-        AssignTextureUnit(Program, TexUnit(TU_texture, "tex"));
-        vao = createVAO(Program);
+        assignUniforms("layer");
+        AssignTextureUnit(m_program, TexUnit(TU_texture, "tex"));
+        vao = createVAO(m_program);
     }
 
     LinearizeDepthShader::LinearizeDepthShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/linearizedepth.frag").c_str());
-        AssignUniforms("zn", "zf");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "linearizedepth.frag");
+        assignUniforms("zn", "zf");
 
-        AssignSamplerNames(Program, 0, "texture");
+        AssignSamplerNames(m_program, 0, "texture");
     }
 
 
     LightspaceBoundingBoxShader::LightspaceBoundingBoxShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/Lightspaceboundingbox.comp").c_str(),
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str());
-        AssignSamplerNames(Program, 0, "depth");
-        AssignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
-        GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
-        glShaderStorageBlockBinding(Program, block_idx, 2);
+        loadProgram(OBJECT,
+            GL_COMPUTE_SHADER, "Lightspaceboundingbox.comp",
+            GL_COMPUTE_SHADER, "utils/getPosFromUVDepth.frag");
+        AssignSamplerNames(m_program, 0, "depth");
+        assignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
+        GLuint block_idx = glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
+        glShaderStorageBlockBinding(m_program, block_idx, 2);
     }
 
     ShadowMatrixesGenerationShader::ShadowMatrixesGenerationShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/shadowmatrixgeneration.comp").c_str());
-        AssignUniforms("SunCamMatrix");
-        GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
-        glShaderStorageBlockBinding(Program, block_idx, 2);
-        block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "NewMatrixData");
-        glShaderStorageBlockBinding(Program, block_idx, 1);
+        loadProgram(OBJECT,
+            GL_COMPUTE_SHADER, "shadowmatrixgeneration.comp");
+        assignUniforms("SunCamMatrix");
+        GLuint block_idx = glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
+        glShaderStorageBlockBinding(m_program, block_idx, 2);
+        block_idx = glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, "NewMatrixData");
+        glShaderStorageBlockBinding(m_program, block_idx, 1);
     }
 
     DepthHistogramShader::DepthHistogramShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/depthhistogram.comp").c_str(),
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str());
-        AssignSamplerNames(Program, 0, "depth");
+        loadProgram(OBJECT,
+            GL_COMPUTE_SHADER, "depthhistogram.comp",
+            GL_COMPUTE_SHADER, "utils/getPosFromUVDepth.frag");
+        AssignSamplerNames(m_program, 0, "depth");
 
-        GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "Histogram");
-        glShaderStorageBlockBinding(Program, block_idx, 1);
+        GLuint block_idx = glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, "Histogram");
+        glShaderStorageBlockBinding(m_program, block_idx, 1);
     }
 
     GlowShader::GlowShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/glow.frag").c_str());
-        AssignUniforms();
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "glow.frag");
+        assignUniforms();
 
-        AssignSamplerNames(Program, 0, "tex");
-        vao = createVAO(Program);
+        AssignSamplerNames(m_program, 0, "tex");
+        vao = createVAO(m_program);
     }
 
     SSAOShader::SSAOShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/ssao.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "ssao.frag");
 
-        AssignSamplerNames(Program, 0, "dtex");
-        AssignUniforms("radius", "k", "sigma");
+        assignUniforms("radius", "k", "sigma");
+        AssignSamplerNames(m_program, 0, "dtex");
     }
 
     FogShader::FogShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/fog.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "fog.frag");
 
-        AssignUniforms("density", "col");
-        AssignSamplerNames(Program, 0, "tex");
+        assignUniforms("density", "col");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     MotionBlurShader::MotionBlurShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/motion_blur.frag").c_str());
-        AssignUniforms("previous_viewproj", "center", "boost_amount", "mask_radius");
-        AssignSamplerNames(Program, 0, "color_buffer", 1, "dtex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+            GL_FRAGMENT_SHADER, "motion_blur.frag");
+        assignUniforms("previous_viewproj", "center", "boost_amount", "mask_radius");
+        AssignSamplerNames(m_program, 0, "color_buffer", 1, "dtex");
     }
 
     GodFadeShader::GodFadeShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/godfade.frag").c_str());
-        AssignUniforms("col");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "godfade.frag");
+        assignUniforms("col");
 
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     GodRayShader::GodRayShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/godray.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "godray.frag");
 
-        AssignUniforms("sunpos");
-        AssignSamplerNames(Program, 0, "tex");
+        assignUniforms("sunpos");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     MLAAColorEdgeDetectionSHader::MLAAColorEdgeDetectionSHader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_color1.frag").c_str());
-        AssignUniforms("PIXEL_SIZE");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "mlaa_color1.frag");
+        assignUniforms("PIXEL_SIZE");
 
-        AssignSamplerNames(Program, 0, "colorMapG");
+        AssignSamplerNames(m_program, 0, "colorMapG");
     }
 
     MLAABlendWeightSHader::MLAABlendWeightSHader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_blend2.frag").c_str());
-        AssignUniforms("PIXEL_SIZE");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "mlaa_blend2.frag");
+        assignUniforms("PIXEL_SIZE");
 
-        AssignSamplerNames(Program, 0, "edgesMap", 1, "areaMap");
+        AssignSamplerNames(m_program, 0, "edgesMap", 1, "areaMap");
     }
 
     MLAAGatherSHader::MLAAGatherSHader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_neigh3.frag").c_str());
-        AssignUniforms("PIXEL_SIZE");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "mlaa_neigh3.frag");
+        assignUniforms("PIXEL_SIZE");
 
-        AssignSamplerNames(Program, 0, "blendMap", 1, "colorMap");
+        AssignSamplerNames(m_program, 0, "blendMap", 1, "colorMap");
     }
 }
 
@@ -1983,42 +1982,42 @@ namespace UIShader
 
     Primitive2DList::Primitive2DList()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/primitive2dlist.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparent.frag").c_str());
-        AssignUniforms();
-        AssignSamplerNames(Program, 0, "tex");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "primitive2dlist.vert",
+            GL_FRAGMENT_SHADER, "transparent.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     TextureRectShader::TextureRectShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/texturedquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
-        AssignUniforms("center", "size", "texcenter", "texsize");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "texturedquad.vert",
+            GL_FRAGMENT_SHADER, "texturedquad.frag");
+        assignUniforms("center", "size", "texcenter", "texsize");
 
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     UniformColoredTextureRectShader::UniformColoredTextureRectShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/texturedquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/uniformcolortexturedquad.frag").c_str());
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "texturedquad.vert",
+            GL_FRAGMENT_SHADER, "uniformcolortexturedquad.frag");
 
-        AssignUniforms("center", "size", "texcenter", "texsize", "color");
+        assignUniforms("center", "size", "texcenter", "texsize", "color");
 
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(m_program, 0, "tex");
     }
 
     ColoredTextureRectShader::ColoredTextureRectShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/colortexturedquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colortexturedquad.frag").c_str());
-        AssignUniforms("center", "size", "texcenter", "texsize");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "colortexturedquad.vert",
+            GL_FRAGMENT_SHADER, "colortexturedquad.frag");
+        assignUniforms("center", "size", "texcenter", "texsize");
 
-        AssignSamplerNames(Program, 0, "tex");
+        AssignSamplerNames(m_program, 0, "tex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -2043,9 +2042,9 @@ namespace UIShader
 
     ColoredRectShader::ColoredRectShader()
     {
-        Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/coloredquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
-        AssignUniforms("center", "size", "color");
+        loadProgram(OBJECT,
+            GL_VERTEX_SHADER, "coloredquad.vert",
+            GL_FRAGMENT_SHADER, "coloredquad.frag");
+        assignUniforms("center", "size", "color");
     }
 }

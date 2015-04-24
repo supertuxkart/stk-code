@@ -36,7 +36,7 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
     glBindBuffer(GL_ARRAY_BUFFER, UIShader::ColoredTextureRectShader::getInstance()->colorvbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, 16 * sizeof(unsigned), colors);
 
-    glUseProgram(UIShader::ColoredTextureRectShader::getInstance()->Program);
+    UIShader::ColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(UIShader::ColoredTextureRectShader::getInstance()->vao);
 
     UIShader::ColoredTextureRectShader::getInstance()->SetTextureUnits(static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
@@ -56,7 +56,7 @@ void drawTexQuad(GLuint texture, float width, float height,
 float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
 float tex_width, float tex_height)
 {
-    glUseProgram(UIShader::TextureRectShader::getInstance()->Program);
+    UIShader::TextureRectShader::getInstance()->use();
     glBindVertexArray(SharedObject::UIVAO);
 
     UIShader::TextureRectShader::getInstance()->SetTextureUnits(texture);
@@ -158,7 +158,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
             clipRect->getWidth(), clipRect->getHeight());
     }
 
-    glUseProgram(UIShader::UniformColoredTextureRectShader::getInstance()->Program);
+    UIShader::UniformColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(SharedObject::UIVAO);
 
     UIShader::UniformColoredTextureRectShader::getInstance()->SetTextureUnits(static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
@@ -194,7 +194,7 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
         destRect, sourceRect, width, height, center_pos_x, center_pos_y,
         tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
 
-    glUseProgram(UIShader::UniformColoredTextureRectShader::getInstance()->Program);
+    UIShader::UniformColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(SharedObject::UIVAO);
 
     UIShader::UniformColoredTextureRectShader::getInstance()->SetTextureUnits(texture);
@@ -281,7 +281,7 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
 
     VertexUtils::bindVertexArrayAttrib(vType);
 
-    glUseProgram(UIShader::Primitive2DList::getInstance()->Program);
+    UIShader::Primitive2DList::getInstance()->use();
     UIShader::Primitive2DList::getInstance()->setUniforms();
     const video::SOverrideMaterial &m = irr_driver->getVideoDriver()->getOverrideMaterial();
     compressTexture(tex, false);
@@ -339,7 +339,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
             clip->getWidth(), clip->getHeight());
     }
 
-    glUseProgram(UIShader::ColoredRectShader::getInstance()->Program);
+    UIShader::ColoredRectShader::getInstance()->use();
     glBindVertexArray(SharedObject::UIVAO);
     UIShader::ColoredRectShader::getInstance()->setUniforms(core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height), color);
 

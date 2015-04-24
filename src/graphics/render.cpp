@@ -192,7 +192,7 @@ void IrrDriver::renderGLSL(float dt)
         // Render bounding boxes
         if (irr_driver->getBoundingBoxesViz())
         {
-            glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
+            UtilShader::ColoredLine::getInstance()->use();
             glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
             glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
             UtilShader::ColoredLine::getInstance()->setUniforms(SColor(255, 255, 0, 0));
@@ -221,7 +221,7 @@ void IrrDriver::renderGLSL(float dt)
                 const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
                 std::map<video::SColor, std::vector<float> >::const_iterator it;
 
-                glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
+                UtilShader::ColoredLine::getInstance()->use();
                 glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
                 glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
                 for (it = lines.begin(); it != lines.end(); it++)
@@ -625,7 +625,7 @@ void IrrDriver::renderParticles()
 
 static void renderWireFrameFrustrum(float *tmp, unsigned i)
 {
-    glUseProgram(MeshShader::ViewFrustrumShader::getInstance()->Program);
+    MeshShader::ViewFrustrumShader::getInstance()->use();
     glBindVertexArray(MeshShader::ViewFrustrumShader::getInstance()->frustrumvao);
     glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
 
@@ -689,7 +689,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     if (CVS->supportsIndirectInstancingRendering())
     {
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
-        glUseProgram(MeshShader::InstancedColorizeShader::getInstance()->Program);
+        MeshShader::InstancedColorizeShader::getInstance()->use();
 
         glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeGlow));
         if (CVS->isAZDOEnabled())
