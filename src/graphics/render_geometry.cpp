@@ -754,7 +754,7 @@ void IrrDriver::renderNormalsVisualisation()
 }
 
 template<typename Shader, enum video::E_VERTEX_TYPE VertexType, int...List, typename... TupleType>
-void renderTransparenPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
+void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     Shader::getInstance()->use();
     if (CVS->isARBBaseInstanceUsable())
@@ -802,19 +802,19 @@ void IrrDriver::renderTransparent()
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         renderTransparenPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(TexUnits(
-            TexUnit(0, true)), ListBlendTransparentFog::getInstance());
+            RenderGeometry::TexUnit(0, true)), ListBlendTransparentFog::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
         renderTransparenPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(TexUnits(
-            TexUnit(0, true)), ListAdditiveTransparentFog::getInstance());
+            RenderGeometry::TexUnit(0, true)), ListAdditiveTransparentFog::getInstance());
     }
     else
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         renderTransparenPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(TexUnits(
-            TexUnit(0, true)), ListBlendTransparent::getInstance());
+            RenderGeometry::TexUnit(0, true)), ListBlendTransparent::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
         renderTransparenPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(TexUnits(
-            TexUnit(0, true)), ListAdditiveTransparent::getInstance());
+            RenderGeometry::TexUnit(0, true)), ListAdditiveTransparent::getInstance());
     }
 
     for (unsigned i = 0; i < BillBoardList::getInstance()->size(); i++)

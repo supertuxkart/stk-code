@@ -57,7 +57,7 @@
  \subsection shader_declaration_bind_texture_unit Bind texture unit and name
 
  Texture are optional but if you have one, you must give them determined texture unit (up to 32).
- You can do this using the AssignTextureUnit function that takes pair of texture unit and sampler name
+ You can do this using the assignTextureUnit function that takes pair of texture unit and sampler name
  as argument.
 
  \section shader_usage
@@ -97,6 +97,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/gpuparticles.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shaders_util.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 #include "graphics/glwrap.hpp"
@@ -515,20 +516,9 @@ namespace UtilShader
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    struct TexUnit
-    {
-        GLuint m_index;
-        const char* m_uniform;
-
-        TexUnit(GLuint index, const char* uniform)
-        {
-            m_index = index;
-            m_uniform = uniform;
-        }
-    };
 
     template <typename T>
-    std::vector<TexUnit> TexUnits(T curr) // required on older clang versions
+    std::vector<Shader::TexUnit> TexUnits(T curr) // required on older clang versions
     {
         std::vector<TexUnit> v;
         v.push_back(curr);
@@ -536,7 +526,7 @@ namespace UtilShader
     }
 
     template <typename T, typename... R>
-    std::vector<TexUnit> TexUnits(T curr, R... rest) // required on older clang versions
+    std::vector<Shader::TexUnit> TexUnits(T curr, R... rest) // required on older clang versions
     {
         std::vector<TexUnit> v;
         v.push_back(curr);
@@ -545,46 +535,18 @@ namespace UtilShader
     }
 
     template <typename T, typename... R>
-    void VTexUnits(std::vector<TexUnit>& v, T curr, R... rest) // required on older clang versions
+    void VTexUnits(std::vector<Shader::TexUnit>& v, T curr, R... rest) // required on older clang versions
     {
         v.push_back(curr);
         VTexUnits(v, rest...);
     }
 
     template <typename T>
-    void VTexUnits(std::vector<TexUnit>& v, T curr)
+    void VTexUnits(std::vector<Shader::TexUnit>& v, T curr)
     {
         v.push_back(curr);
     }
 
-    static void
-    AssignTextureUnit(GLuint Program, TexUnit texUnit)
-    {
-        glUseProgram(Program);
-        GLuint uniform = glGetUniformLocation(Program, texUnit.m_uniform);
-        glUniform1i(uniform, texUnit.m_index);
-        glUseProgram(0);
-    }
-
-    template<typename... T>
-    static void AssignTextureUnit(GLuint Program, TexUnit texUnit, T... rest)
-    {
-        glUseProgram(Program);
-        GLuint uniform = glGetUniformLocation(Program, texUnit.m_uniform);
-        glUniform1i(uniform, texUnit.m_index);
-        AssignTextureUnit_Sub(Program, rest...);
-        glUseProgram(0);
-    }
-
-    static void AssignTextureUnit_Sub(GLuint Program) {}
-
-    template<typename... T>
-    static void AssignTextureUnit_Sub(GLuint Program, TexUnit texUnit, T... rest)
-    {
-        GLuint uniform = glGetUniformLocation(Program, texUnit.m_uniform);
-        glUniform1i(uniform, texUnit.m_index);
-        AssignTextureUnit_Sub(Program, rest...);
-    }
 }
 using namespace UtilShader;
 
@@ -829,7 +791,7 @@ namespace UtilShader
         assignUniforms("PermutationMatrix", "ViewportSize");
         TU_Samples = 1;
         AssignSamplerNames(m_program, 0, "tex");
-        AssignTextureUnit(m_program, TexUnit(TU_Samples, "samples"));
+        assignTextureUnit(TexUnit(TU_Samples, "samples"));
     }
 }
 
@@ -1614,7 +1576,7 @@ namespace FullScreenShader
         TU_SHR = 0;
         TU_SHG = 1;
         TU_SHB = 2;
-        AssignTextureUnit(m_program, TexUnit(TU_SHR, "SHR"), TexUnit(TU_SHG, "SHG"), TexUnit(TU_SHB, "SHB"));
+        assignTextureUnit(TexUnit(TU_SHR, "SHR"), TexUnit(TU_SHG, "SHG"), TexUnit(TU_SHB, "SHB"));
     }
 
     GlobalIlluminationReconstructionShader::GlobalIlluminationReconstructionShader()
@@ -1644,7 +1606,7 @@ namespace FullScreenShader
         TU_dest = 2;
         assignUniforms("pixel");
         AssignSamplerNames(m_program, 0, "source", 1, "depth");
-        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
+        assignTextureUnit(TexUnit(TU_dest, "dest"));
     }
 
     ComputeGaussian6HBlurShader::ComputeGaussian6HBlurShader()
@@ -1654,7 +1616,7 @@ namespace FullScreenShader
         TU_dest = 1;
         assignUniforms("pixel", "weights");
         AssignSamplerNames(m_program, 0, "source");
-        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
+        assignTextureUnit(TexUnit(TU_dest, "dest"));
     }
 
     ComputeShadowBlurHShader::ComputeShadowBlurHShader()
@@ -1664,7 +1626,7 @@ namespace FullScreenShader
         TU_dest = 1;
         assignUniforms("pixel", "weights");
         AssignSamplerNames(m_program, 0, "source");
-        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
+        assignTextureUnit(TexUnit(TU_dest, "dest"));
     }
 
     Gaussian6HBlurShader::Gaussian6HBlurShader()
@@ -1714,7 +1676,7 @@ namespace FullScreenShader
         TU_dest = 2;
         assignUniforms("pixel");
         AssignSamplerNames(m_program, 0, "source", 1, "depth");
-        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
+        assignTextureUnit(TexUnit(TU_dest, "dest"));
     }
 
     ComputeGaussian6VBlurShader::ComputeGaussian6VBlurShader()
@@ -1724,7 +1686,7 @@ namespace FullScreenShader
         TU_dest = 1;
         assignUniforms("pixel", "weights");
         AssignSamplerNames(m_program, 0, "source");
-        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
+        assignTextureUnit(TexUnit(TU_dest, "dest"));
     }
 
     ComputeShadowBlurVShader::ComputeShadowBlurVShader()
@@ -1734,7 +1696,7 @@ namespace FullScreenShader
         TU_dest = 1;
         assignUniforms("pixel", "weights");
         AssignSamplerNames(m_program, 0, "source");
-        AssignTextureUnit(m_program, TexUnit(TU_dest, "dest"));
+        assignTextureUnit(TexUnit(TU_dest, "dest"));
     }
 
     Gaussian6VBlurShader::Gaussian6VBlurShader()
@@ -1774,7 +1736,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "layertexturequad.frag");
         TU_texture = 0;
         assignUniforms("layer");
-        AssignTextureUnit(m_program, TexUnit(TU_texture, "tex"));
+        assignTextureUnit(TexUnit(TU_texture, "tex"));
         vao = createVAO(m_program);
     }
 

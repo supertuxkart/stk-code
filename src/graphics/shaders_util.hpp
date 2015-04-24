@@ -369,6 +369,7 @@ protected:
     std::vector<GLuint> TextureUnits;
     std::vector<GLenum> TextureType;
     std::vector<GLenum> TextureLocation;
+public:
     template<typename...Args>
     void AssignSamplerNames(GLuint Program, Args...args)
     {

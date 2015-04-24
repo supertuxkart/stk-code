@@ -238,6 +238,52 @@ private:
         Log::error("shader", filepath);
         printFileList(args...);
     }   // printFileList
+protected:
+
+    /** Stores texture index and uniform. */
+    class TexUnit
+    {
+    public:
+        GLuint      m_index;
+        const char* m_uniform;
+
+        TexUnit(GLuint index, const char* uniform)
+        {
+            m_index    = index;
+            m_uniform = uniform;
+        }   // TexUnit
+    };   // class TexUnit
+
+    // ========================================================================
+    void assignTextureUnit(TexUnit tex_unit)
+    {
+        glUseProgram(m_program);
+        GLuint uniform = glGetUniformLocation(m_program, tex_unit.m_uniform);
+        glUniform1i(uniform, tex_unit.m_index);
+        glUseProgram(0);
+    }   // assignTextureUnit
+    // ------------------------------------------------------------------------
+    template<typename... T> 
+    void assignTextureUnit(TexUnit tex_unit, T... rest)
+    {
+        glUseProgram(m_program);
+        GLuint uniform = glGetUniformLocation(m_program, tex_unit.m_uniform);
+        glUniform1i(uniform, tex_unit.m_index);
+        assignTextureUnitNoUse(rest...);
+        glUseProgram(0);
+    }   // assignTextureUnit
+    // ------------------------------------------------------------------------
+
+    void assignTextureUnitNoUse() {}
+    // ------------------------------------------------------------------------
+    template<typename... T>
+    void assignTextureUnitNoUse(TexUnit tex_unit, T... rest)
+    {
+        GLuint uniform = glGetUniformLocation(m_program, tex_unit.m_uniform);
+        glUniform1i(uniform, tex_unit.m_index);
+        assignTextureUnitNoUse(rest...);
+    }
+
 
 public:
 

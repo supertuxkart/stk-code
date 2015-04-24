@@ -19,47 +19,15 @@
 #define HEADER_GPU_PARTICLES_HPP
 
 #include "graphics/shader.hpp"
+
 #include "../lib/irrlicht/source/Irrlicht/CParticleSystemSceneNode.h"
 #include <ISceneManager.h>
 #include <IParticleSystemSceneNode.h>
 
-
-class PointEmitterShader : public Shader 
-                           < PointEmitterShader, core::matrix4, int, int, float >
-{
-public:
-    PointEmitterShader();
-};   // PointEmitterShader
-
-// ============================================================================
-class SimpleParticleRender : public Shader<SimpleParticleRender, video::SColorf,
-                                           video::SColorf>,
-                             public TextureRead<Trilinear_Anisotropic_Filtered,
-                                                Nearest_Filtered>
-{
-public:
-    SimpleParticleRender();
-};   // SimpleParticleRender
-
-// ============================================================================
-
-    class HeightmapSimulationShader : public Shader<HeightmapSimulationShader, core::matrix4, int, int, float, float, float, float, float>
-    {
-    public:
-        GLuint TU_heightmap;
-
-        HeightmapSimulationShader();
-    };
-
-
-    class FlipParticleRender : public Shader<FlipParticleRender>, public TextureRead<Trilinear_Anisotropic_Filtered, Nearest_Filtered>
-    {
-    public:
-        FlipParticleRender();
-    };
-
-
 namespace irr { namespace video{ class ITexture; } }
+
+
+
 
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode
 {

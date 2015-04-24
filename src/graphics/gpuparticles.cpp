@@ -28,6 +28,91 @@
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
 #define COMPONENTCOUNT 8
 
+
+// ============================================================================
+/** Transform feedback shader that simulates the particles on GPU.
+*/
+class PointEmitterShader : public Shader
+    < PointEmitterShader, core::matrix4, int, int, float >
+{
+public:
+    PointEmitterShader()
+    {
+        const char *varyings[] = { "new_particle_position", "new_lifetime",
+                                   "new_particle_velocity",  "new_size"     };
+        loadTFBProgram("pointemitter.vert", varyings, 4);
+        assignUniforms("sourcematrix", "dt", "level", "size_increase_factor");
+    }   // PointEmitterShader
+
+};   // PointEmitterShader
+
+// ============================================================================
+
+/** A Shader to render particles.
+*/
+class SimpleParticleRender : public Shader<SimpleParticleRender, video::SColorf,
+                                           video::SColorf>,
+                             public TextureRead<Trilinear_Anisotropic_Filtered,
+                                                Nearest_Filtered>
+{
+public:
+    SimpleParticleRender()
+    {
+        loadProgram(PARTICLES_RENDERING,
+                    GL_VERTEX_SHADER,   "particle.vert",
+                    GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                    GL_FRAGMENT_SHADER, "particle.frag");
+
+        assignUniforms("color_from", "color_to");
+        AssignSamplerNames(m_program, 0, "tex", 1, "dtex");
+    }   // SimpleParticleRender
+
+};   // SimpleParticleRender
+
+// ============================================================================
+
+class FlipParticleRender : public Shader<FlipParticleRender>, 
+                           public TextureRead < Trilinear_Anisotropic_Filtered,
+                                                Nearest_Filtered >
+{
+public:
+    FlipParticleRender()
+    {
+        loadProgram(PARTICLES_RENDERING,
+                    GL_VERTEX_SHADER,   "flipparticle.vert",
+                    GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                    GL_FRAGMENT_SHADER, "particle.frag");
+        assignUniforms();
+        AssignSamplerNames(m_program, 0, "tex", 1, "dtex");
+    }
+
+};   // FlipParticleShader
+
+// ============================================================================
+/** */
+class HeightmapSimulationShader : public Shader <HeightmapSimulationShader,
+                                                 core::matrix4, int, int,
+                                                 float,float,float,float,float>
+{
+public:
+    GLuint m_TU_heightmap;
+
+    HeightmapSimulationShader()
+    {
+        const char *varyings[] = {"new_particle_position", "new_lifetime",
+                                  "new_particle_velocity", "new_size"      };
+        loadTFBProgram("particlesimheightmap.vert", varyings, 4);
+        assignUniforms("sourcematrix", "dt", "level", "size_increase_factor",
+                       "track_x", "track_x_len", "track_z", "track_z_len");
+        m_TU_heightmap = 2;
+        assignTextureUnit(TexUnit(m_TU_heightmap, "heightmap"));
+    }
+
+
+};
+
+// ============================================================================
+
 scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
     bool withDefaultEmitter, bool randomize_initial_y, ISceneNode* parent, s32 id,
     const core::vector3df& position,
@@ -388,7 +473,7 @@ void ParticleSystemProxy::simulate()
     if (has_height_map)
     {
         HeightmapSimulationShader::getInstance()->use();
-        glActiveTexture(GL_TEXTURE0 + HeightmapSimulationShader::getInstance()->TU_heightmap);
+        glActiveTexture(GL_TEXTURE0 + HeightmapSimulationShader::getInstance()->m_TU_heightmap);
         glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
         HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
     }
@@ -534,102 +619,4 @@ void ParticleSystemProxy::render() {
     m_first_execution = false;
     simulate();
     draw();
-}
-
-
-// ============================================================================
-
-PointEmitterShader::PointEmitterShader()
-{
-    const char *varyings[] = {
-        "new_particle_position",
-        "new_lifetime",
-        "new_particle_velocity",
-        "new_size",
-    };
-    loadTFBProgram("pointemitter.vert", varyings, 4);
-    assignUniforms("sourcematrix", "dt", "level", "size_increase_factor");
-}   // PointEmitterShader
-
-// ============================================================================
-SimpleParticleRender::SimpleParticleRender()
-{
-    loadProgram(PARTICLES_RENDERING,
-                GL_VERTEX_SHADER,   "particle.vert",
-                GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-                GL_FRAGMENT_SHADER, "particle.frag");
-
-    assignUniforms("color_from", "color_to");
-
-    AssignSamplerNames(m_program, 0, "tex", 1, "dtex");
-}   // SimpleParticleRender
-
-// ============================================================================
-
-
-struct TexUnit
-{
-    GLuint m_index;
-    const char* m_uniform;
-
-    TexUnit(GLuint index, const char* uniform)
-    {
-        m_index = index;
-        m_uniform = uniform;
-    }
-};
-static void
-AssignTextureUnit(GLuint Program, TexUnit texUnit)
-{
-    glUseProgram(Program);
-    GLuint uniform = glGetUniformLocation(Program, texUnit.m_uniform);
-    glUniform1i(uniform, texUnit.m_index);
-    glUseProgram(0);
-}
-
-template<typename... T>
-static void AssignTextureUnit(GLuint Program, TexUnit texUnit, T... rest)
-{
-    glUseProgram(Program);
-    GLuint uniform = glGetUniformLocation(Program, texUnit.m_uniform);
-    glUniform1i(uniform, texUnit.m_index);
-    AssignTextureUnit_Sub(Program, rest...);
-    glUseProgram(0);
-}
-
-static void AssignTextureUnit_Sub(GLuint Program) {}
-
-template<typename... T>
-static void AssignTextureUnit_Sub(GLuint Program, TexUnit texUnit, T... rest)
-{
-    GLuint uniform = glGetUniformLocation(Program, texUnit.m_uniform);
-    glUniform1i(uniform, texUnit.m_index);
-    AssignTextureUnit_Sub(Program, rest...);
-}
-
-
-
-HeightmapSimulationShader::HeightmapSimulationShader()
-{
-    const char *varyings[] = {
-        "new_particle_position",
-        "new_lifetime",
-        "new_particle_velocity",
-        "new_size",
-    };
-    loadTFBProgram("particlesimheightmap.vert", varyings, 4);
-    TU_heightmap = 2;
-    AssignTextureUnit(m_program, TexUnit(TU_heightmap, "heightmap"));
-    assignUniforms("sourcematrix", "dt", "level", "size_increase_factor", "track_x", "track_x_len", "track_z", "track_z_len");
-}
-
-FlipParticleRender::FlipParticleRender()
-{
-    loadProgram(PARTICLES_RENDERING,
-        GL_VERTEX_SHADER, "flipparticle.vert",
-        GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-        GL_FRAGMENT_SHADER, "particle.frag");
-    assignUniforms();
-
-    AssignSamplerNames(m_program, 0, "tex", 1, "dtex");
 }
