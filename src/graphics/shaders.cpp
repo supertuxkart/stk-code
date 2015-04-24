@@ -199,67 +199,7 @@ GLuint LoadShader(const char * file, unsigned type)
     return Id;
 }
 
-void setAttribute(AttributeType Tp, GLuint ProgramID)
-{
-    switch (Tp)
-    {
-    case OBJECT:
-        glBindAttribLocation(ProgramID, 0, "Position");
-        glBindAttribLocation(ProgramID, 1, "Normal");
-        glBindAttribLocation(ProgramID, 2, "Color");
-        glBindAttribLocation(ProgramID, 3, "Texcoord");
-        glBindAttribLocation(ProgramID, 4, "SecondTexcoord");
-        glBindAttribLocation(ProgramID, 5, "Tangent");
-        glBindAttribLocation(ProgramID, 6, "Bitangent");
-        glBindAttribLocation(ProgramID, 7, "Origin");
-        glBindAttribLocation(ProgramID, 8, "Orientation");
-        glBindAttribLocation(ProgramID, 9, "Scale");
-        break;
-    case PARTICLES_SIM:
-        glBindAttribLocation(ProgramID, 0, "particle_position");
-        glBindAttribLocation(ProgramID, 1, "lifetime");
-        glBindAttribLocation(ProgramID, 2, "particle_velocity");
-        glBindAttribLocation(ProgramID, 3, "size");
-        glBindAttribLocation(ProgramID, 4, "particle_position_initial");
-        glBindAttribLocation(ProgramID, 5, "lifetime_initial");
-        glBindAttribLocation(ProgramID, 6, "particle_velocity_initial");
-        glBindAttribLocation(ProgramID, 7, "size_initial");
-        break;
-    case PARTICLES_RENDERING:
-        glBindAttribLocation(ProgramID, 1, "lifetime");
-        glBindAttribLocation(ProgramID, 2, "size");
-        glBindAttribLocation(ProgramID, 4, "quadcorner");
-        glBindAttribLocation(ProgramID, 5, "rotationvec");
-        glBindAttribLocation(ProgramID, 6, "anglespeed");
-        break;
-    }
-}
 
-GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount)
-{
-    GLuint Program = glCreateProgram();
-    loadAndAttach(Program, GL_VERTEX_SHADER, vertex_file_path);
-    if (CVS->getGLSLVersion() < 330)
-        setAttribute(PARTICLES_SIM, Program);
-    glTransformFeedbackVaryings(Program, varyingscount, varyings, GL_INTERLEAVED_ATTRIBS);
-    glLinkProgram(Program);
-
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
-    glGetProgramiv(Program, GL_LINK_STATUS, &Result);
-    if (Result == GL_FALSE)
-    {
-        glGetProgramiv(Program, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        char *ErrorMessage = new char[InfoLogLength];
-        glGetProgramInfoLog(Program, InfoLogLength, NULL, ErrorMessage);
-        Log::error("GLWrap", ErrorMessage);
-        delete[] ErrorMessage;
-    }
-
-    glGetError();
-
-    return Program;
-}
 
 GLuint quad_vbo, tri_vbo;
 
