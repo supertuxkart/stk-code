@@ -224,7 +224,7 @@ void IrrDriver::renderGLSL(float dt)
                 glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
                 glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
                 glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
-                for (it = lines.begin(); it != lines.end(); it++)
+                for (it = lines.begin(); it != lines.end(); ++it)
                 {
                     UtilShader::ColoredLine::getInstance()->setUniforms(it->first);
                     const std::vector<float> &vertex = it->second;

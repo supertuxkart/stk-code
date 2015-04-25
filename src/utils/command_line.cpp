@@ -40,7 +40,7 @@ void CommandLine::init(unsigned int argc, char *argv[])
 bool CommandLine::has(const std::string &option)
 {
     std::vector<std::string>::iterator i;
-    for(i=m_argv.begin(); i!=m_argv.end(); i++)
+    for(i=m_argv.begin(); i!=m_argv.end(); ++i)
     {
         if(*i==option)
         {

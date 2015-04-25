@@ -188,7 +188,7 @@ ItemManager::~ItemManager()
     if(m_items_in_quads)
         delete m_items_in_quads;
     for(AllItemTypes::iterator i =m_all_items.begin();
-                               i!=m_all_items.end();  i++)
+                               i!=m_all_items.end();  ++i)
     {
         if(*i)
             delete *i;
@@ -310,7 +310,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
     // the original, simple and stable algorithm is left in place.
 
     for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
+        i!=m_all_items.end();  ++i)
     {
         if((!*i) || (*i)->wasCollected()) continue;
         // To allow inlining and avoid including kart.hpp in item.hpp,
@@ -339,7 +339,7 @@ void ItemManager::reset()
     if(m_switch_time>=0)
     {
         for(AllItemTypes::iterator i =m_all_items.begin();
-                                   i!=m_all_items.end(); i++)
+                                   i!=m_all_items.end(); ++i)
         {
             if(*i) (*i)->switchBack();
         }
@@ -355,18 +355,18 @@ void ItemManager::reset()
     {
         if(!*i)
         {
-            i++;
+            ++i;
             continue;
         }
         if((*i)->canBeUsedUp() || (*i)->getType()==Item::ITEM_BUBBLEGUM)
         {
             deleteItem( *i );
-            i++;
+            ++i;
         }
         else
         {
             (*i)->reset();
-            i++;
+            ++i;
         }
     }  // whilem_all_items.end() i
 
@@ -387,7 +387,7 @@ void ItemManager::update(float dt)
         if(m_switch_time<0)
         {
             for(AllItemTypes::iterator i =m_all_items.begin();
-                i!=m_all_items.end();  i++)
+                i!=m_all_items.end();  ++i)
             {
                 if(*i) (*i)->switchBack();
             }   // for m_all_items
@@ -395,7 +395,7 @@ void ItemManager::update(float dt)
     }   // m_switch_time>=0
 
     for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
+        i!=m_all_items.end();  ++i)
     {
         if(*i)
         {
@@ -442,7 +442,7 @@ void ItemManager::deleteItem(Item *item)
 void ItemManager::switchItems()
 {
     for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
+        i!=m_all_items.end();  ++i)
     {
         if(!*i) continue;
 

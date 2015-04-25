@@ -96,7 +96,7 @@ private:
         std::string s = version;
         std::string::iterator p = s.begin();
         while( (p !=s.end()) && ((*p<'0') || (*p>'9')) )
-            p++;
+            ++p;
         s.erase(s.begin(), p);
         m_version = StringUtils::splitToUInt(s, '.');
     }   // convertVersionString
@@ -489,7 +489,7 @@ void init(const std::string &driver_version,
         {
             std::vector<std::string> restrictions = rule.getRestrictions();
             std::vector<std::string>::iterator p;
-            for (p = restrictions.begin(); p != restrictions.end(); p++)
+            for (p = restrictions.begin(); p != restrictions.end(); ++p)
             {
                 GraphicsRestrictionsType t = getTypeForName(*p);
                 if (t != GR_COUNT)

@@ -37,7 +37,7 @@ StkFileSystem::open_directory(const std::string& pathname)
 
   file_manager->listFiles(result, pathname);
   std::vector<std::string> files;
-  for(std::set<std::string>::iterator i=result.begin(); i!=result.end(); i++)
+  for(std::set<std::string>::iterator i=result.begin(); i!=result.end(); ++i)
   {
     files.push_back(*i);
   }

@@ -301,7 +301,7 @@ void OptionsScreenVideo::init()
 
         // Add resolutions list
         for(std::vector<Resolution>::iterator it = resolutions.begin();
-            it != resolutions.end(); it++)
+            it != resolutions.end(); ++it)
         {
             const float ratio = it->getRatio();
             char name[32];

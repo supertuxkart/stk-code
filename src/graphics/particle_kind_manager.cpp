@@ -53,7 +53,7 @@ void ParticleKindManager::cleanup()
     cleanUpTrackSpecificGfx();
 
     std::map<std::string, ParticleKind*>::iterator it;
-    for (it = m_kinds.begin(); it != m_kinds.end(); it++)
+    for (it = m_kinds.begin(); it != m_kinds.end(); ++it)
     {
         delete it->second;
     }
@@ -65,7 +65,7 @@ void ParticleKindManager::cleanup()
 void ParticleKindManager::cleanUpTrackSpecificGfx()
 {
     std::map<std::string, ParticleKind*>::iterator it;
-    for (it = m_per_track_kinds.begin(); it != m_per_track_kinds.end(); it++)
+    for (it = m_per_track_kinds.begin(); it != m_per_track_kinds.end(); ++it)
     {
         delete it->second;
     }

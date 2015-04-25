@@ -602,7 +602,7 @@ void World::resetAllKarts()
 
     //Project karts onto track from above. This will lower each kart so
     //that at least one of its wheel will be on the surface of the track
-    for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
+    for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); ++i)
     {
         Vec3 xyz = (*i)->getXYZ();
         //start projection from top of kart
@@ -650,7 +650,7 @@ void World::resetAllKarts()
         }
         m_physics->update(1.f/60.f);
         all_finished=true;
-        for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
+        for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); ++i)
         {
             if(!(*i)->isInRest())
             {
@@ -692,7 +692,7 @@ void World::resetAllKarts()
         }
     }   // while
 
-    for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
+    for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); ++i)
     {
         (*i)->kartIsInRestNow();
     }
