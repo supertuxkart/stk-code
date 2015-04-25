@@ -25,12 +25,13 @@
 
 #include "utils/translation.hpp"
 
-#include <assert.h>
-#include <locale.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cerrno>
+#include <clocale>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
 #include <iostream>
 #include <vector>
 
@@ -358,11 +359,34 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
 // ----------------------------------------------------------------------------
 
+Translations::~Translations()
+{
+    // Remove cached strings
+    for (std::vector<std::pair<wchar_t*, wchar_t*> >::iterator it =
+         m_fribidized_strings.begin(); it != m_fribidized_strings.end(); it++)
+    {
+        delete[] it->first;
+        delete[] it->second;
+    }
+    m_fribidized_strings.clear();
+}   // ~Translations
+
+// ----------------------------------------------------------------------------
+
 const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 {
 #if ENABLE_BIDI
     if(this->isRTLLanguage())
     {
+        // Test if this string was already fribidized
+        for (std::vector<std::pair<wchar_t*, wchar_t*> >::iterator it =
+             m_fribidized_strings.begin(); it != m_fribidized_strings.end(); it++)
+        {
+            if (wcscmp(it->first, in_ptr) == 0)
+                return it->second;
+        }
+
+        // Use fribidi to fribidize the string
         FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
         std::size_t length = 0;
         while (fribidiInput[length])
@@ -395,15 +419,25 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
         {
             delete[] fribidiOutput;
             Log::error("Translations::fribidize", "Fribidi failed in 'fribidi_log2vis' =(");
-            m_converted_string = core::stringw(in_ptr);
-            return m_converted_string.c_str();
+            return in_ptr;
         }
 
-        wchar_t *convertedString = fromFribidiChar(fribidiOutput);
-        m_converted_string = core::stringw(convertedString);
-        freeFribidiChar(convertedString);
+        wchar_t *converted_string = fromFribidiChar(fribidiOutput);
         delete[] fribidiOutput;
-        return m_converted_string.c_str();
+        // Copy strings to save it in the map
+        std::size_t fribidized_length = wcslen(converted_string) + 1;
+        wchar_t *fribidized_string = new wchar_t[fribidized_length];
+        std::wmemcpy(fribidized_string, converted_string, fribidized_length);
+        freeFribidiChar(converted_string);
+        std::size_t original_length = wcslen(in_ptr) + 1;
+        wchar_t *original_string = new wchar_t[original_length];
+        std::wmemcpy(original_string, in_ptr, original_length);
+
+        // Save it in the map
+        m_fribidized_strings.push_back(std::pair<wchar_t*, wchar_t*>(
+            original_string, fribidized_string));
+
+        return fribidized_string;
     }
 
 #endif // ENABLE_BIDI
@@ -461,12 +495,13 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
 
     if (original_t == original)
     {
-        m_converted_string = utf8_to_wide(original);
+        static irr::core::stringw converted_string;
+        converted_string = utf8_to_wide(original);
 
 #if TRANSLATE_VERBOSE
-        std::wcout << L"  translation : " << m_converted_string << std::endl;
+        std::wcout << L"  translation : " << converted_string << std::endl;
 #endif
-        return m_converted_string.c_str();
+        return converted_string.c_str();
     }
 
     // print
