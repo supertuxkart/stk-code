@@ -422,9 +422,17 @@ bool Translations::isRTLText(const wchar_t *in_ptr)
         fribidi_get_bidi_types(fribidiInput, length, types);
         freeFribidiChar(fribidiInput);
 
-        FriBidiParType type = fribidi_get_par_direction(types, length);
+        // Declare as RTL if one character is RTL
+        for (std::size_t i = 0; i < length; i++)
+        {
+            if (types[i] == FRIBIDI_TYPE_RTL ||
+                types[i] == FRIBIDI_TYPE_RLO)
+            {
+                delete[] types;
+                return true;
+            }
+        }
         delete[] types;
-        return type == FRIBIDI_PAR_RTL;
     }
     return false;
 #else
