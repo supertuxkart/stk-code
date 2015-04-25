@@ -147,9 +147,10 @@ FriBidiChar* toFribidiChar(const wchar_t* str)
     // Prepend a character that forces RTL style
     FriBidiChar *tmp = result;
     result = new FriBidiChar[++length + 1];
-    std::memcpy(result + 1, tmp, length * sizeof(FriBidiChar));
+    memcpy(result + 1, tmp, length * sizeof(FriBidiChar));
     result[0] = L'\u202E';
-    freeFribidiChar(tmp);
+    if (sizeof(wchar_t) != sizeof(FriBidiChar))
+        delete[] tmp;
 #endif
 
     return result;
