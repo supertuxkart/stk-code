@@ -555,14 +555,10 @@ void cmdLineHelp()
 }   // cmdLineHelp
 
 //=============================================================================
-/** For base options that don't need much to be inited (and, in some cases,
- *  that need to be read before initing stuff) - it only assumes that
- *  user config is loaded (necessary to check for blacklisted screen
- *  resolutions), but nothing else (esp. not kart_properties_manager and
- *  track_manager, since their search path might be extended by command
- *  line options).
+/** For base options that modify the output (loglevel/color) or exit right
+ * after being processed (version/help).
  */
-int handleCmdLinePreliminary()
+int handleCmdLineOutputModifier()
 {
     if (CommandLine::has("--help") || CommandLine::has("-help") ||
         CommandLine::has("-h"))
@@ -585,7 +581,36 @@ int handleCmdLinePreliminary()
         exit(0);
     }
 
-    if(CommandLine::has("--gamepad-visualisation") ||   // only BE
+    int n;
+    if(CommandLine::has("--log", &n))
+        Log::setLogLevel(n);
+
+    if(CommandLine::has("--log=nocolor"))
+    {
+        Log::disableColor();
+        Log::verbose("main", "Colours disabled.");
+    }
+
+    if(CommandLine::has("--console"))
+        UserConfigParams::m_log_errors_to_console=true;
+    if(CommandLine::has("--no-console"))
+        UserConfigParams::m_log_errors_to_console=false;
+
+
+    return 0;
+}
+
+//=============================================================================
+/** For base options that don't need much to be inited (and, in some cases,
+ *  that need to be read before initing stuff) - it only assumes that
+ *  user config is loaded (necessary to check for blacklisted screen
+ *  resolutions), but nothing else (esp. not kart_properties_manager and
+ *  track_manager, since their search path might be extended by command
+ *  line options).
+ */
+int handleCmdLinePreliminary()
+{
+   if(CommandLine::has("--gamepad-visualisation") ||   // only BE
        CommandLine::has("--gamepad-visualization")    ) // both AE and BE
         UserConfigParams::m_gamepad_visualisation=true;
     if(CommandLine::has("--debug=memory"))
@@ -600,17 +625,8 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
     if(CommandLine::has("--debug=all") )
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
-    if(CommandLine::has("--console"))
-        UserConfigParams::m_log_errors_to_console=true;
-    if(CommandLine::has("--no-console"))
-        UserConfigParams::m_log_errors_to_console=false;
     if(CommandLine::has("--online"))
         MainMenuScreen::m_enable_online=true;
-    if(CommandLine::has("--log=nocolor"))
-    {
-        Log::disableColor();
-        Log::verbose("main", "Colours disabled.");
-    }
 
     std::string s;
     if(CommandLine::has("--stk-config", &s))
@@ -700,8 +716,6 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_xmas_mode = n;
     if (CommandLine::has("--easter", &n))
         UserConfigParams::m_easter_ear_mode = n;
-    if(CommandLine::has("--log", &n))
-        Log::setLogLevel(n);
 
     return 0;
 }   // handleCmdLinePreliminary
@@ -1238,6 +1252,9 @@ int main(int argc, char *argv[] )
     try
     {
         std::string s;
+
+        handleCmdLineOutputModifier();
+
         if(CommandLine::has("--root", &s))
         {
             FileManager::addRootDirs(s);
