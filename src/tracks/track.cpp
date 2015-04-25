@@ -448,6 +448,10 @@ void Track::cleanup()
         Log::info("CACHE", "[%i] %s", i, path.getPath().c_str());
     }
 #endif
+
+    Scripting::ScriptEngine* script_engine =
+        World::getWorld()->getScriptEngine();
+    script_engine->cleanupCache();
 }   // cleanup
 
 //-----------------------------------------------------------------------------

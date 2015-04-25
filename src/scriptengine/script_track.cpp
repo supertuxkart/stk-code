@@ -156,7 +156,7 @@ namespace Scripting
         void displayMessage(asIScriptGeneric *gen)
         {
             std::string *input = (std::string*)gen->GetArgAddress(0);
-            irr::core::stringw out = irr::core::stringw((*input).c_str()); //irr::core::stringw supported by message dialogs
+            irr::core::stringw out = StringUtils::utf8_to_wide(input->c_str());
             new TutorialMessageDialog((out), true);
         }
         //generic disable method for track objects

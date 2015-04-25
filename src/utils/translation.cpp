@@ -42,7 +42,6 @@
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
-#include "utils/utf8.h"
 
 
 // set to 1 to debug i18n
@@ -69,29 +68,6 @@ static LanguageList g_language_list;
 const LanguageList* Translations::getLanguageList() const
 {
     return &g_language_list;
-}
-
-
-char* wide_to_utf8(const wchar_t* input)
-{
-    static std::vector<char> utf8line;
-    utf8line.clear();
-
-    utf8::utf16to8(input, input + wcslen(input), back_inserter(utf8line));
-    utf8line.push_back(0);
-
-    return &utf8line[0];
-}
-
-wchar_t* utf8_to_wide(const char* input)
-{
-    static std::vector<wchar_t> utf16line;
-    utf16line.clear();
-
-    utf8::utf8to16(input, input + strlen(input), back_inserter(utf16line));
-    utf16line.push_back(0);
-
-    return &utf16line[0];
 }
 
 // ----------------------------------------------------------------------------
@@ -439,7 +415,8 @@ bool Translations::isRTLText(const wchar_t *in_ptr)
  */
 const wchar_t* Translations::w_gettext(const wchar_t* original, const char* context)
 {
-    return w_gettext( wide_to_utf8(original), context );
+    std::string in = StringUtils::wide_to_utf8(original);
+    return w_gettext(in.c_str(), context);
 }
 
 /**
@@ -461,7 +438,7 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
 
     if (original_t == original)
     {
-        m_converted_string = utf8_to_wide(original);
+        m_converted_string = StringUtils::utf8_to_wide(original);
 
 #if TRANSLATE_VERBOSE
         std::wcout << L"  translation : " << m_converted_string << std::endl;
@@ -472,9 +449,10 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     // print
     //for (int n=0;; n+=4)
 
-    wchar_t* original_tw = utf8_to_wide(original_t.c_str());
+    static core::stringw original_tw;
+    original_tw = StringUtils::utf8_to_wide(original_t.c_str());
 
-    wchar_t* out_ptr = original_tw;
+    const wchar_t* out_ptr = original_tw.c_str();
     if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE
@@ -493,7 +471,9 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
  */
 const wchar_t* Translations::w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context)
 {
-    return w_ngettext( wide_to_utf8(singular), wide_to_utf8(plural), num, context);
+    std::string in = StringUtils::wide_to_utf8(singular);
+    std::string in2 = StringUtils::wide_to_utf8(plural);
+    return w_ngettext(in.c_str(), in2.c_str(), num, context);
 }
 
 /**
@@ -509,7 +489,9 @@ const wchar_t* Translations::w_ngettext(const char* singular, const char* plural
                               m_dictionary.translate_plural(singular, plural, num) :
                               m_dictionary.translate_ctxt_plural(context, singular, plural, num));
 
-    wchar_t* out_ptr = utf8_to_wide(res.c_str());
+    static core::stringw str_buffer;
+    str_buffer = StringUtils::utf8_to_wide(res.c_str());
+    const wchar_t* out_ptr = str_buffer.c_str();
     if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE

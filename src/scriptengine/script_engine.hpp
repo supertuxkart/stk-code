@@ -65,6 +65,7 @@ namespace Scripting
         ~ScriptEngine();
         
         void runScript(std::string scriptName);
+        void cleanupCache();
         
     private:
         asIScriptEngine *m_engine;

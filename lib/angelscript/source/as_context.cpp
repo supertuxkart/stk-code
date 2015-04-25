@@ -339,7 +339,7 @@ int asCContext::Prepare(asIScriptFunction *func)
 		asASSERT( m_engine );
 
 		// Make sure the function is from the same engine as the context to avoid mixups
-		if( m_engine != func->GetEngine() )
+		if (m_engine != func->GetEngine())
 		{
 			asCString str;
 			str.Format(TXT_FAILED_IN_FUNC_s_WITH_s_d, "Prepare", func->GetDeclaration(true, true), asINVALID_ARG);

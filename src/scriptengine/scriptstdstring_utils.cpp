@@ -20,6 +20,7 @@
 #include "scriptarray.hpp"
 #include <stdio.h>
 #include <string.h>
+#include "utils/translation.hpp"
 
 using namespace std;
 
@@ -125,22 +126,110 @@ static void StringJoin_Generic(asIScriptGeneric *gen)
     new(gen->GetAddressOfReturnLocation()) string(StringJoin(*array, *delim));
 }
 
+void translate(asIScriptGeneric *gen)
+{
+    // Get the arguments
+    std::string *input = (std::string*)gen->GetArgAddress(0);
+
+    irr::core::stringw out = translations->fribidize(translations->w_gettext(input->c_str()));
+
+    // Return the string
+    new(gen->GetAddressOfReturnLocation()) string(StringUtils::wide_to_utf8(out.c_str()));
+}
+
+void insertValues1(asIScriptGeneric *gen)
+{
+    // Get the arguments
+    std::string *input = (std::string*)gen->GetArgAddress(0);
+    std::string *arg1 = (std::string*)gen->GetArgAddress(1);
+
+    irr::core::stringw out = StringUtils::insertValues(StringUtils::utf8_to_wide(input->c_str()),
+        StringUtils::utf8_to_wide(arg1->c_str()));
+
+    // Return the string
+    new(gen->GetAddressOfReturnLocation()) string(StringUtils::wide_to_utf8(out.c_str()));
+}
+
+void insertValues2(asIScriptGeneric *gen)
+{
+    // Get the arguments
+    std::string *input = (std::string*)gen->GetArgAddress(0);
+    std::string *arg1 = (std::string*)gen->GetArgAddress(1);
+    std::string *arg2 = (std::string*)gen->GetArgAddress(2);
+
+    irr::core::stringw out = StringUtils::insertValues(StringUtils::utf8_to_wide(input->c_str()),
+        StringUtils::utf8_to_wide(arg1->c_str()),
+        StringUtils::utf8_to_wide(arg2->c_str()));
+
+    // Return the string
+    new(gen->GetAddressOfReturnLocation()) string(StringUtils::wide_to_utf8(out.c_str()));
+}
+
+void insertValues3(asIScriptGeneric *gen)
+{
+    // Get the arguments
+    std::string *input = (std::string*)gen->GetArgAddress(0);
+    std::string *arg1 = (std::string*)gen->GetArgAddress(1);
+    std::string *arg2 = (std::string*)gen->GetArgAddress(2);
+    std::string *arg3 = (std::string*)gen->GetArgAddress(3);
+
+    irr::core::stringw out = StringUtils::insertValues(StringUtils::utf8_to_wide(input->c_str()),
+        StringUtils::utf8_to_wide(arg1->c_str()),
+        StringUtils::utf8_to_wide(arg2->c_str()),
+        StringUtils::utf8_to_wide(arg3->c_str()));
+
+    // Return the string
+    new(gen->GetAddressOfReturnLocation()) string(StringUtils::wide_to_utf8(out.c_str()));
+}
+
+/*
+void insertValues(asIScriptGeneric *gen)
+{
+    // Get the arguments
+    std::string *input = (std::string*)gen->GetArgAddress(0);
+    CScriptArray  *array = *(CScriptArray**)gen->GetAddressOfArg(1);
+
+    int size = array->GetSize();
+    vector<string> all_values;
+    for (int i = 0; i < size; i++)
+    {
+        string* curr = (string*)array->At(i);
+        all_values.push_back(curr);
+    }
+
+    StringUtils::insertValues(*input, all_values);
+
+    irr::core::stringw out = translations->fribidize(translations->w_gettext(input->c_str()));
+
+    // Return the string
+    new(gen->GetAddressOfReturnLocation()) string(irr::core::stringc(out).c_str());
+}
+*/
+
 // This is where the utility functions are registered.
 // The string type must have been registered first.
 void RegisterStdStringUtils(asIScriptEngine *engine)
 {
 	int r;
 
-	if( strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY") )
-	{
-		r = engine->RegisterObjectMethod("string", "array<string>@ split(const string &in) const", asFUNCTION(StringSplit_Generic), asCALL_GENERIC); assert(r >= 0);
-		r = engine->RegisterGlobalFunction("string join(const array<string> &in, const string &in)", asFUNCTION(StringJoin_Generic), asCALL_GENERIC); assert(r >= 0);
-	}
-	else
-	{
-		r = engine->RegisterObjectMethod("string", "array<string>@ split(const string &in) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST); assert(r >= 0);
-		r = engine->RegisterGlobalFunction("string join(const array<string> &in, const string &in)", asFUNCTION(StringJoin), asCALL_CDECL); assert(r >= 0);
-	}
+	//if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
+	//{
+		//r = engine->RegisterObjectMethod("string", "array<string>@ split(const string &in) const", asFUNCTION(StringSplit_Generic), asCALL_GENERIC); assert(r >= 0);
+		//r = engine->RegisterGlobalFunction("string join(const array<string> &in, const string &in)", asFUNCTION(StringJoin_Generic), asCALL_GENERIC); assert(r >= 0);
+        r = engine->RegisterGlobalFunction("string translate(const string &in)", asFUNCTION(translate), asCALL_GENERIC); assert(r >= 0);
+        r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in)", asFUNCTION(insertValues1), asCALL_GENERIC); assert(r >= 0);
+        r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in)", asFUNCTION(insertValues2), asCALL_GENERIC); assert(r >= 0);
+        r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in)", asFUNCTION(insertValues3), asCALL_GENERIC); assert(r >= 0);
+    //}
+	//else
+	//{
+	//	//r = engine->RegisterObjectMethod("string", "array<string>@ split(const string &in) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST); assert(r >= 0);
+	//	//r = engine->RegisterGlobalFunction("string join(const array<string> &in, const string &in)", asFUNCTION(StringJoin), asCALL_CDECL); assert(r >= 0);
+    //    r = engine->RegisterGlobalFunction("string translate(const string &in)", asFUNCTION(translate), asCALL_CDECL); assert(r >= 0);
+    //    r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &arg1)", asFUNCTION(insertValues1), asCALL_CDECL); assert(r >= 0);
+    //    r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &arg1, const string &arg2)", asFUNCTION(insertValues2), asCALL_CDECL); assert(r >= 0);
+    //    r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &arg1, const string &arg2, const string &arg3)", asFUNCTION(insertValues3), asCALL_CDECL); assert(r >= 0);
+	//}
 }
 
 END_AS_NAMESPACE

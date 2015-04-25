@@ -921,6 +921,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
                   _("Complete all challenges to unlock the big door!"), true);
         }
     }
+    /*
     else if (m_action == "tutorial_drive")
     {
         //if (World::getWorld()->getPhase() == World::RACE_PHASE)
@@ -1036,19 +1037,19 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 
         new TutorialMessageDialog(_("You are now ready to race. Good luck!"),
             true);
-    }
+    }*/
     else if (m_action == "tutorial_exit")
     {
+        // TODO: move to scripting
         World::getWorld()->scheduleExitRace();
         return;
     }
     else
     {	
-        //TODO move all above functions into scripts and remove the ifs
-        Scripting::ScriptEngine* m_script_engine =
+        Scripting::ScriptEngine* script_engine =
             World::getWorld()->getScriptEngine();
         m_action_active = false;
-        m_script_engine->runScript(m_action);
+        script_engine->runScript(m_action);
         
         /*
         Catch exception -> script not found
