@@ -240,35 +240,21 @@ private:
     }   // printFileList
 protected:
 
-    /** Stores texture index and uniform. */
-    class TexUnit
-    {
-    public:
-        GLuint      m_index;
-        const char* m_uniform;
-
-        TexUnit(GLuint index, const char* uniform)
-        {
-            m_index    = index;
-            m_uniform = uniform;
-        }   // TexUnit
-    };   // class TexUnit
-
     // ========================================================================
-    void assignTextureUnit(TexUnit tex_unit)
+    void assignTextureUnit(GLuint index, const char* uniform)
     {
         glUseProgram(m_program);
-        GLuint uniform = glGetUniformLocation(m_program, tex_unit.m_uniform);
-        glUniform1i(uniform, tex_unit.m_index);
+        GLuint uniform_loc = glGetUniformLocation(m_program, uniform);
+        glUniform1i(uniform_loc, index);
         glUseProgram(0);
     }   // assignTextureUnit
     // ------------------------------------------------------------------------
     template<typename... T> 
-    void assignTextureUnit(TexUnit tex_unit, T... rest)
+    void assignTextureUnit(GLuint index, const char* uniform, T... rest)
     {
         glUseProgram(m_program);
-        GLuint uniform = glGetUniformLocation(m_program, tex_unit.m_uniform);
-        glUniform1i(uniform, tex_unit.m_index);
+        GLuint uniform_loc = glGetUniformLocation(m_program, uniform);
+        glUniform1i(uniform_loc, index);
         assignTextureUnitNoUse(rest...);
         glUseProgram(0);
     }   // assignTextureUnit
@@ -277,12 +263,12 @@ protected:
     void assignTextureUnitNoUse() {}
     // ------------------------------------------------------------------------
     template<typename... T>
-    void assignTextureUnitNoUse(TexUnit tex_unit, T... rest)
+    void assignTextureUnitNoUse(GLuint index, const char* uniform, T... rest)
     {
-        GLuint uniform = glGetUniformLocation(m_program, tex_unit.m_uniform);
-        glUniform1i(uniform, tex_unit.m_index);
+        GLuint uniform_loc = glGetUniformLocation(m_program, uniform);
+        glUniform1i(uniform_loc, index);
         assignTextureUnitNoUse(rest...);
-    }
+    }   // assignTextureUnitNoUse
 
 
 public:

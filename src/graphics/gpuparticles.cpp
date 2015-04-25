@@ -105,11 +105,11 @@ public:
         assignUniforms("sourcematrix", "dt", "level", "size_increase_factor",
                        "track_x", "track_x_len", "track_z", "track_z_len");
         m_TU_heightmap = 2;
-        assignTextureUnit(TexUnit(m_TU_heightmap, "heightmap"));
-    }
+        assignTextureUnit(m_TU_heightmap, "heightmap");
+    }   // HeightmapSimulationShader
 
 
-};
+};   // class HeightmapSimulationShader
 
 // ============================================================================
 
