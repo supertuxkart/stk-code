@@ -82,6 +82,7 @@ namespace Scripting
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r;
+            engine->SetDefaultNamespace("Physics");
             r = engine->RegisterGlobalFunction("uint getCollidingKart1()", asFUNCTION(getCollidingKart1), asCALL_GENERIC); assert( r >= 0 );
             r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
             r = engine->RegisterGlobalFunction("string getCollisionType()", asFUNCTION(getCollisionType), asCALL_GENERIC); assert(r >= 0);

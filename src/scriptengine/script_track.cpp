@@ -207,15 +207,13 @@ namespace Scripting
         {
             int r;
 
-            r = engine->RegisterGlobalFunction("void displayMessage(string &in)", asFUNCTION(displayMessage), asCALL_GENERIC); assert(r >= 0);
+            engine->SetDefaultNamespace("Track");
             r = engine->RegisterGlobalFunction("void disable(string &in)", asFUNCTION(disableTrackObject), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void enable(string &in)", asFUNCTION(enableTrackObject), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void enableTrigger(string &in)", asFUNCTION(enableTrigger), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void disableTrigger(string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void createTrigger(string &in,Vec3 &in, float distance)",
                 asFUNCTION(createTrigger), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("string getKeyBinding(int input)", asFUNCTION(getKeyBinding), asCALL_GENERIC); assert(r >= 0);
-
 
             /*
             //Test singleton, and various calling conventions
@@ -275,35 +273,6 @@ namespace Scripting
             r = engine->RegisterObjectMethod("Animator", "void setPaused(bool mode)", asFUNCTION( setPaused ), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("void runScript(string &in)", asFUNCTION(runScript), asCALL_GENERIC); assert(r >= 0);
-
         }
-
-        void registerScriptEnums(asIScriptEngine *engine)
-        {
-
-            engine->RegisterEnum("PA");
-            engine->RegisterEnumValue("PA", "STEER_LEFT", PA_STEER_LEFT);
-            engine->RegisterEnumValue("PA", "STEER_RIGHT", PA_STEER_RIGHT);
-            engine->RegisterEnumValue("PA", "ACCEL", PA_ACCEL);
-            engine->RegisterEnumValue("PA", "BRAKE", PA_BRAKE);
-            engine->RegisterEnumValue("PA", "NITRO", PA_NITRO);
-            engine->RegisterEnumValue("PA", "DRIFT", PA_DRIFT);
-            engine->RegisterEnumValue("PA", "RESCUE", PA_RESCUE);
-            engine->RegisterEnumValue("PA", "FIRE", PA_FIRE);
-            engine->RegisterEnumValue("PA", "LOOK_BACK", PA_LOOK_BACK);
-            engine->RegisterEnumValue("PA", "PAUSE_RACE", PA_PAUSE_RACE);
-            engine->RegisterEnumValue("PA", "MENU_UP", PA_MENU_UP);
-            engine->RegisterEnumValue("PA", "MENU_DOWN", PA_MENU_DOWN);
-            engine->RegisterEnumValue("PA", "MENU_LEFT", PA_MENU_LEFT);
-            engine->RegisterEnumValue("PA", "MENU_RIGHT", PA_MENU_RIGHT);
-            engine->RegisterEnumValue("PA", "MENU_SELECT", PA_MENU_SELECT);
-            engine->RegisterEnumValue("PA", "MENU_CANCEL", PA_MENU_CANCEL);
-
-        }
-
-
-
-
-
     }
 }

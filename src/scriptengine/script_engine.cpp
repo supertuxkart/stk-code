@@ -16,16 +16,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <assert.h>  // assert()
+#include <assert.h>
 #include <angelscript.h>
 #include "io/file_manager.hpp"
-#include <iostream>  // cout
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
-#include "script_engine.hpp"
-#include "scriptstdstring.hpp"
-#include "scriptvec3.hpp"
-#include <string.h>  // strstr()
+#include "scriptengine/script_engine.hpp"
+#include "scriptengine/script_gui.hpp"
+#include "scriptengine/script_track.hpp"
+#include "scriptengine/scriptstdstring.hpp"
+#include "scriptengine/scriptvec3.hpp"
+#include <string.h>
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
@@ -255,7 +256,8 @@ void ScriptEngine::cleanupCache()
 {
     for (auto curr : m_script_cache)
     {
-        curr.second->Release();
+        if (curr.second != NULL)
+            curr.second->Release();
     }
     m_script_cache.clear();
 }
@@ -268,17 +270,16 @@ void ScriptEngine::configureEngine(asIScriptEngine *engine)
 {
     // Register the script string type
     RegisterStdString(engine); //register std::string
-    RegisterStdStringUtils(engine);
     RegisterVec3(engine);      //register Vec3
 
     Scripting::Track::registerScriptFunctions(m_engine);
-
-    Scripting::Track::registerScriptEnums(m_engine);
 
     Scripting::Kart::registerScriptFunctions(m_engine);
 
     Scripting::Physics::registerScriptFunctions(m_engine);
 
+    Scripting::GUI::registerScriptFunctions(m_engine);
+    Scripting::GUI::registerScriptEnums(m_engine);
     
     // It is possible to register the functions, properties, and types in 
     // configuration groups as well. When compiling the scripts it can then

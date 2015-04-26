@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SCRIPT_TRACK_HPP
-#define HEADER_SCRIPT_TRACK_HPP
+#ifndef HEADER_SCRIPT_GUI_HPP
+#define HEADER_SCRIPT_GUI_HPP
 
 #include <angelscript.h>
 
@@ -25,19 +25,13 @@
 
 namespace Scripting
 {
-    namespace Track
+    namespace GUI
     {
         //script engine functions
         void registerScriptFunctions(asIScriptEngine *engine);
         asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine , std::string scriptName);
-
-        //script-bound functions
-        void disableAnimation(asIScriptGeneric *gen);
-        void enableAnimation(asIScriptGeneric *gen);
-        void enableTrigger(asIScriptGeneric *gen);
-        void disableTrigger(asIScriptGeneric *gen);
-        void createTrigger(asIScriptGeneric *gen);
+            registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName);
+        void registerScriptEnums(asIScriptEngine *engine);
     }
 
 }

@@ -112,6 +112,7 @@ namespace Scripting
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r;
+            engine->SetDefaultNamespace("Karts");
             r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void teleportKart(int id, Vec3 &in)", asFUNCTION(teleportKart), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void setVelocity(int id, Vec3 &in)", asFUNCTION(setVelocity), asCALL_GENERIC); assert(r >= 0);

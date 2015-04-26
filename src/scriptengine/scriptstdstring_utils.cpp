@@ -20,7 +20,6 @@
 #include "scriptarray.hpp"
 #include <stdio.h>
 #include <string.h>
-#include "utils/translation.hpp"
 
 using namespace std;
 
@@ -45,19 +44,19 @@ static CScriptArray *StringSplit(const string &delim, const string &str)
     asIScriptEngine *engine = ctx->GetEngine();
 
     // TODO: This should only be done once
-	// TODO: This assumes that CScriptArray was already registered
-	asIObjectType *arrayType = engine->GetObjectTypeById(engine->GetTypeIdByDecl("array<string>"));
+    // TODO: This assumes that CScriptArray was already registered
+    asIObjectType *arrayType = engine->GetObjectTypeById(engine->GetTypeIdByDecl("array<string>"));
 
     // Create the array object
     CScriptArray *array = new CScriptArray(0, arrayType);
 
     // Find the existence of the delimiter in the input string
     int pos = 0, prev = 0, count = 0;
-    while( (pos = (int)str.find(delim, prev)) != (int)string::npos )
+    while ((pos = (int)str.find(delim, prev)) != (int)string::npos)
     {
         // Add the part to the array
-        array->Resize(array->GetSize()+1);
-        ((string*)array->At(count))->assign(&str[prev], pos-prev);
+        array->Resize(array->GetSize() + 1);
+        ((string*)array->At(count))->assign(&str[prev], pos - prev);
 
         // Find the next part
         count++;
@@ -65,16 +64,16 @@ static CScriptArray *StringSplit(const string &delim, const string &str)
     }
 
     // Add the remaining part
-    array->Resize(array->GetSize()+1);
+    array->Resize(array->GetSize() + 1);
     ((string*)array->At(count))->assign(&str[prev]);
 
-	return array;
+    return array;
 }
 
 static void StringSplit_Generic(asIScriptGeneric *gen)
 {
     // Get the arguments
-    string *str   = (string*)gen->GetObject();
+    string *str = (string*)gen->GetObject();
     string *delim = *(string**)gen->GetAddressOfArg(0);
 
     // Return the array by handle
@@ -100,20 +99,20 @@ static string StringJoin(const CScriptArray &array, const string &delim)
 {
     // Create the new string
     string str = "";
-	if( array.GetSize() )
-	{
-		int n;
-		for( n = 0; n < (int)array.GetSize() - 1; n++ )
-		{
-			str += *(string*)array.At(n);
-			str += delim;
-		}
+    if (array.GetSize())
+    {
+        int n;
+        for (n = 0; n < (int)array.GetSize() - 1; n++)
+        {
+            str += *(string*)array.At(n);
+            str += delim;
+        }
 
-		// Add the last part
-		str += *(string*)array.At(n);
-	}
+        // Add the last part
+        str += *(string*)array.At(n);
+    }
 
-	return str;
+    return str;
 }
 
 static void StringJoin_Generic(asIScriptGeneric *gen)
@@ -126,110 +125,22 @@ static void StringJoin_Generic(asIScriptGeneric *gen)
     new(gen->GetAddressOfReturnLocation()) string(StringJoin(*array, *delim));
 }
 
-void translate(asIScriptGeneric *gen)
-{
-    // Get the arguments
-    std::string *input = (std::string*)gen->GetArgAddress(0);
-
-    irr::core::stringw out = translations->fribidize(translations->w_gettext(input->c_str()));
-
-    // Return the string
-    new(gen->GetAddressOfReturnLocation()) string(StringUtils::wide_to_utf8(out.c_str()));
-}
-
-void insertValues1(asIScriptGeneric *gen)
-{
-    // Get the arguments
-    std::string *input = (std::string*)gen->GetArgAddress(0);
-    std::string *arg1 = (std::string*)gen->GetArgAddress(1);
-
-    irr::core::stringw out = StringUtils::insertValues(StringUtils::utf8_to_wide(input->c_str()),
-        StringUtils::utf8_to_wide(arg1->c_str()));
-
-    // Return the string
-    new(gen->GetAddressOfReturnLocation()) string(StringUtils::wide_to_utf8(out.c_str()));
-}
-
-void insertValues2(asIScriptGeneric *gen)
-{
-    // Get the arguments
-    std::string *input = (std::string*)gen->GetArgAddress(0);
-    std::string *arg1 = (std::string*)gen->GetArgAddress(1);
-    std::string *arg2 = (std::string*)gen->GetArgAddress(2);
-
-    irr::core::stringw out = StringUtils::insertValues(StringUtils::utf8_to_wide(input->c_str()),
-        StringUtils::utf8_to_wide(arg1->c_str()),
-        StringUtils::utf8_to_wide(arg2->c_str()));
-
-    // Return the string
-    new(gen->GetAddressOfReturnLocation()) string(StringUtils::wide_to_utf8(out.c_str()));
-}
-
-void insertValues3(asIScriptGeneric *gen)
-{
-    // Get the arguments
-    std::string *input = (std::string*)gen->GetArgAddress(0);
-    std::string *arg1 = (std::string*)gen->GetArgAddress(1);
-    std::string *arg2 = (std::string*)gen->GetArgAddress(2);
-    std::string *arg3 = (std::string*)gen->GetArgAddress(3);
-
-    irr::core::stringw out = StringUtils::insertValues(StringUtils::utf8_to_wide(input->c_str()),
-        StringUtils::utf8_to_wide(arg1->c_str()),
-        StringUtils::utf8_to_wide(arg2->c_str()),
-        StringUtils::utf8_to_wide(arg3->c_str()));
-
-    // Return the string
-    new(gen->GetAddressOfReturnLocation()) string(StringUtils::wide_to_utf8(out.c_str()));
-}
-
-/*
-void insertValues(asIScriptGeneric *gen)
-{
-    // Get the arguments
-    std::string *input = (std::string*)gen->GetArgAddress(0);
-    CScriptArray  *array = *(CScriptArray**)gen->GetAddressOfArg(1);
-
-    int size = array->GetSize();
-    vector<string> all_values;
-    for (int i = 0; i < size; i++)
-    {
-        string* curr = (string*)array->At(i);
-        all_values.push_back(curr);
-    }
-
-    StringUtils::insertValues(*input, all_values);
-
-    irr::core::stringw out = translations->fribidize(translations->w_gettext(input->c_str()));
-
-    // Return the string
-    new(gen->GetAddressOfReturnLocation()) string(irr::core::stringc(out).c_str());
-}
-*/
-
 // This is where the utility functions are registered.
 // The string type must have been registered first.
 void RegisterStdStringUtils(asIScriptEngine *engine)
 {
-	int r;
+    int r;
 
-	//if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
-	//{
-		//r = engine->RegisterObjectMethod("string", "array<string>@ split(const string &in) const", asFUNCTION(StringSplit_Generic), asCALL_GENERIC); assert(r >= 0);
-		//r = engine->RegisterGlobalFunction("string join(const array<string> &in, const string &in)", asFUNCTION(StringJoin_Generic), asCALL_GENERIC); assert(r >= 0);
-        r = engine->RegisterGlobalFunction("string translate(const string &in)", asFUNCTION(translate), asCALL_GENERIC); assert(r >= 0);
-        r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in)", asFUNCTION(insertValues1), asCALL_GENERIC); assert(r >= 0);
-        r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in)", asFUNCTION(insertValues2), asCALL_GENERIC); assert(r >= 0);
-        r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in)", asFUNCTION(insertValues3), asCALL_GENERIC); assert(r >= 0);
-    //}
-	//else
-	//{
-	//	//r = engine->RegisterObjectMethod("string", "array<string>@ split(const string &in) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST); assert(r >= 0);
-	//	//r = engine->RegisterGlobalFunction("string join(const array<string> &in, const string &in)", asFUNCTION(StringJoin), asCALL_CDECL); assert(r >= 0);
-    //    r = engine->RegisterGlobalFunction("string translate(const string &in)", asFUNCTION(translate), asCALL_CDECL); assert(r >= 0);
-    //    r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &arg1)", asFUNCTION(insertValues1), asCALL_CDECL); assert(r >= 0);
-    //    r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &arg1, const string &arg2)", asFUNCTION(insertValues2), asCALL_CDECL); assert(r >= 0);
-    //    r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &arg1, const string &arg2, const string &arg3)", asFUNCTION(insertValues3), asCALL_CDECL); assert(r >= 0);
-	//}
+    if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
+    {
+        r = engine->RegisterObjectMethod("string", "array<string>@ split(const string &in) const", asFUNCTION(StringSplit_Generic), asCALL_GENERIC); assert(r >= 0);
+        r = engine->RegisterGlobalFunction("string join(const array<string> &in, const string &in)", asFUNCTION(StringJoin_Generic), asCALL_GENERIC); assert(r >= 0);
+    }
+    else
+    {
+        r = engine->RegisterObjectMethod("string", "array<string>@ split(const string &in) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST); assert(r >= 0);
+        r = engine->RegisterGlobalFunction("string join(const array<string> &in, const string &in)", asFUNCTION(StringJoin), asCALL_CDECL); assert(r >= 0);
+    }
 }
 
 END_AS_NAMESPACE
