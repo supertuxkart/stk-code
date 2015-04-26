@@ -161,7 +161,7 @@ void GrandPrixEditorScreen::setSelection (const GrandPrixData* gpdata)
     if (gpdata == NULL)
     {
         m_selection = NULL;
-        gpname_widget->setText (L"Please select a Grand Prix", true);
+        gpname_widget->setText (_("Please select a Grand Prix"), true);
         tracks_widget->clearItems();
         tracks_widget->updateItemDisplay();
     }
