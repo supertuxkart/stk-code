@@ -369,7 +369,7 @@ GLuint generateSpecularCubemap(GLuint probe)
             GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
             assert(status == GL_FRAMEBUFFER_COMPLETE);
 
-            UtilShader::SpecularIBLGenerator::getInstance()->SetTextureUnits(probe);
+            UtilShader::SpecularIBLGenerator::getInstance()->setTextureUnits(probe);
             UtilShader::SpecularIBLGenerator::getInstance()->setUniforms(M[face], viewportSize);
 
             glDrawArrays(GL_TRIANGLES, 0, 3);

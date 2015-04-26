@@ -64,7 +64,7 @@ public:
                     GL_FRAGMENT_SHADER, "particle.frag");
 
         assignUniforms("color_from", "color_to");
-        AssignSamplerNames(m_program, 0, "tex", 1, "dtex");
+        assignSamplerNames(m_program, 0, "tex", 1, "dtex");
     }   // SimpleParticleRender
 
 };   // SimpleParticleRender
@@ -83,7 +83,7 @@ public:
                     GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                     GL_FRAGMENT_SHADER, "particle.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "tex", 1, "dtex");
+        assignSamplerNames(m_program, 0, "tex", 1, "dtex");
     }
 
 };   // FlipParticleShader
@@ -520,7 +520,7 @@ void ParticleSystemProxy::drawFlip()
     glBlendFunc(GL_ONE, GL_ONE);
     FlipParticleRender::getInstance()->use();
 
-    FlipParticleRender::getInstance()->SetTextureUnits(texture, irr_driver->getDepthStencilTexture());
+    FlipParticleRender::getInstance()->setTextureUnits(texture, irr_driver->getDepthStencilTexture());
     FlipParticleRender::getInstance()->setUniforms();
 
     glBindVertexArray(current_rendering_vao);
@@ -535,7 +535,7 @@ void ParticleSystemProxy::drawNotFlip()
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     SimpleParticleRender::getInstance()->use();
 
-    SimpleParticleRender::getInstance()->SetTextureUnits(texture, irr_driver->getDepthStencilTexture());
+    SimpleParticleRender::getInstance()->setTextureUnits(texture, irr_driver->getDepthStencilTexture());
     video::SColorf ColorFrom = video::SColorf(getColorFrom()[0], getColorFrom()[1], getColorFrom()[2]);
     video::SColorf ColorTo = video::SColorf(getColorTo()[0], getColorTo()[1], getColorTo()[2]);
 

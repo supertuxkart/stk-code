@@ -760,7 +760,7 @@ namespace UtilShader
             GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
         assignUniforms("PermutationMatrix", "ViewportSize");
         TU_Samples = 1;
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
         assignTextureUnit(TU_Samples, "samples");
     }
 }
@@ -775,7 +775,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "object_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     ObjectRefPass1Shader::ObjectRefPass1Shader()
@@ -785,7 +785,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
-        AssignSamplerNames(m_program, 0, "tex", 1, "glosstex");
+        assignSamplerNames(m_program, 0, "tex", 1, "glosstex");
     }
 
     GrassPass1Shader::GrassPass1Shader()
@@ -795,7 +795,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
-        AssignSamplerNames(m_program, 0, "tex", 1, "glosstex");
+        assignSamplerNames(m_program, 0, "tex", 1, "glosstex");
     }
 
     NormalMapShader::NormalMapShader()
@@ -805,7 +805,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "normalmap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
-        AssignSamplerNames(m_program, 1, "normalMap", 0, "DiffuseForAlpha");
+        assignSamplerNames(m_program, 1, "normalMap", 0, "DiffuseForAlpha");
     }
 
     InstancedObjectPass1Shader::InstancedObjectPass1Shader()
@@ -817,7 +817,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
 
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "glosstex");
+        assignSamplerNames(m_program, 0, "glosstex");
     }
 
     InstancedObjectRefPass1Shader::InstancedObjectRefPass1Shader()
@@ -829,7 +829,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
 
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "tex", 1, "glosstex");
+        assignSamplerNames(m_program, 0, "tex", 1, "glosstex");
     }
 
     InstancedGrassPass1Shader::InstancedGrassPass1Shader()
@@ -840,7 +840,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
         assignUniforms("windDir");
-        AssignSamplerNames(m_program, 0, "tex", 1, "glosstex");
+        assignSamplerNames(m_program, 0, "tex", 1, "glosstex");
     }
 
     InstancedNormalMapShader::InstancedNormalMapShader()
@@ -851,7 +851,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "normalMap", 1, "glossMap");
+        assignSamplerNames(m_program, 0, "normalMap", 1, "glossMap");
     }
 
     // Solid Lit pass shaders
@@ -862,7 +862,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "object_pass2.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedObjectPass2Shader::InstancedObjectPass2Shader()
@@ -873,7 +873,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedObjectRefPass2Shader::InstancedObjectRefPass2Shader()
@@ -884,7 +884,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     DetailledObjectPass2Shader::DetailledObjectPass2Shader()
@@ -894,7 +894,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "detailledobject_pass2.frag");
         assignUniforms("ModelMatrix");
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
     }
 
     InstancedDetailledObjectPass2Shader::InstancedDetailledObjectPass2Shader()
@@ -905,7 +905,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "instanced_detailledobject_pass2.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
     }
 
     ObjectUnlitShader::ObjectUnlitShader()
@@ -914,7 +914,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, "object_pass.vert",
             GL_FRAGMENT_SHADER, "object_unlit.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
     InstancedObjectUnlitShader::InstancedObjectUnlitShader()
@@ -924,7 +924,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, "instanced_object_pass.vert",
             GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
     ObjectRefPass2Shader::ObjectRefPass2Shader()
@@ -934,7 +934,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     GrassPass2Shader::GrassPass2Shader()
@@ -944,7 +944,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "grass_pass2.frag");
         assignUniforms("ModelMatrix", "windDir");
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
     }
 
     InstancedGrassPass2Shader::InstancedGrassPass2Shader()
@@ -955,7 +955,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "instanced_grass_pass2.frag");
         assignUniforms("windDir", "SunDir");
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo", 5, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo", 5, "SpecMap");
     }
 
     SphereMapShader::SphereMapShader()
@@ -966,7 +966,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
             GL_FRAGMENT_SHADER, "objectpass_spheremap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
     InstancedSphereMapShader::InstancedSphereMapShader()
@@ -978,7 +978,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
             GL_FRAGMENT_SHADER, "instanced_objectpass_spheremap.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
     SplattingShader::SplattingShader()
@@ -989,7 +989,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "splatting.frag");
         assignUniforms("ModelMatrix");
 
-        AssignSamplerNames(m_program,
+        assignSamplerNames(m_program,
             0, "DiffuseMap",
             1, "SpecularMap",
             2, "SSAO",
@@ -1006,7 +1006,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, "object_pass.vert",
             GL_FRAGMENT_SHADER, "transparent.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     TransparentFogShader::TransparentFogShader()
@@ -1015,7 +1015,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, "object_pass.vert",
             GL_FRAGMENT_SHADER, "transparentfog.frag");
         assignUniforms("ModelMatrix", "TextureMatrix", "fogmax", "startH", "endH", "start", "end", "col");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     BillboardShader::BillboardShader()
@@ -1025,7 +1025,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "billboard.frag");
 
         assignUniforms("ModelViewMatrix", "ProjectionMatrix", "Position", "Size");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     ColorizeShader::ColorizeShader()
@@ -1073,7 +1073,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "rsm.frag");
 
         assignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     InstancedRSMShader::InstancedRSMShader()
@@ -1084,7 +1084,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "instanced_rsm.frag");
 
         assignUniforms("RSMMatrix");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     SplattingRSMShader::SplattingRSMShader()
@@ -1094,7 +1094,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "splatting_rsm.frag");
 
         assignUniforms("RSMMatrix", "ModelMatrix");
-        AssignSamplerNames(m_program, 0, "tex_layout", 1, "tex_detail0", 2, "tex_detail1", 3, "tex_detail2", 4, "tex_detail3");
+        assignSamplerNames(m_program, 0, "tex_layout", 1, "tex_detail0", 2, "tex_detail1", 3, "tex_detail2", 4, "tex_detail3");
     }
 
     InstancedShadowShader::InstancedShadowShader()
@@ -1139,7 +1139,7 @@ namespace MeshShader
                 GL_FRAGMENT_SHADER, "shadowref.frag");
         }
         assignUniforms("layer", "ModelMatrix");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     InstancedRefShadowShader::InstancedRefShadowShader()
@@ -1163,7 +1163,7 @@ namespace MeshShader
                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         assignUniforms("layer");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     GrassShadowShader::GrassShadowShader()
@@ -1185,7 +1185,7 @@ namespace MeshShader
                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         assignUniforms("layer", "ModelMatrix", "windDir");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     InstancedGrassShadowShader::InstancedGrassShadowShader()
@@ -1209,7 +1209,7 @@ namespace MeshShader
                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
         assignUniforms("layer", "windDir");
     }
 
@@ -1229,7 +1229,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "displace.frag");
         assignUniforms("ModelMatrix", "dir", "dir2");
 
-        AssignSamplerNames(m_program,
+        assignSamplerNames(m_program,
             0, "displacement_tex",
             1, "color_tex",
             2, "mask_tex",
@@ -1242,7 +1242,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, "sky.vert",
             GL_FRAGMENT_SHADER, "sky.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -1293,7 +1293,7 @@ namespace LightShader
             GL_FRAGMENT_SHADER, "pointlight.frag");
 
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex");
+        assignSamplerNames(m_program, 0, "ntex", 1, "dtex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -1330,7 +1330,7 @@ namespace LightShader
             GL_FRAGMENT_SHADER, "pointlightscatter.frag");
 
         assignUniforms("density", "fogcol");
-        AssignSamplerNames(m_program, 0, "dtex");
+        assignSamplerNames(m_program, 0, "dtex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -1387,7 +1387,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "bloom.frag");
         assignUniforms();
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     BloomBlendShader::BloomBlendShader()
@@ -1397,7 +1397,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "bloomblend.frag");
         assignUniforms();
 
-        AssignSamplerNames(m_program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
+        assignSamplerNames(m_program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
     }
 	
 	LensBlendShader::LensBlendShader()
@@ -1407,7 +1407,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "lensblend.frag");
         assignUniforms();
 
-        AssignSamplerNames(m_program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
+        assignSamplerNames(m_program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
     }
 
     ToneMapShader::ToneMapShader()
@@ -1419,7 +1419,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "tonemap.frag");
         assignUniforms("vignette_weight");
 
-        AssignSamplerNames(m_program, 0, "text");
+        assignSamplerNames(m_program, 0, "text");
     }
 
     DepthOfFieldShader::DepthOfFieldShader()
@@ -1429,7 +1429,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "dof.frag");
 
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "tex", 1, "dtex");
+        assignSamplerNames(m_program, 0, "tex", 1, "dtex");
     }
 
     SunLightShader::SunLightShader()
@@ -1443,7 +1443,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
             GL_FRAGMENT_SHADER, "sunlight.frag");
 
-        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex");
+        assignSamplerNames(m_program, 0, "ntex", 1, "dtex");
         assignUniforms("direction", "col");
     }
 
@@ -1457,7 +1457,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
             GL_FRAGMENT_SHADER, "IBL.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex", 2, "probe");
+        assignSamplerNames(m_program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
     DegradedIBLShader::DegradedIBLShader()
@@ -1470,7 +1470,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
             GL_FRAGMENT_SHADER, "degraded_ibl.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "ntex");
+        assignSamplerNames(m_program, 0, "ntex");
     }
 
     ShadowedSunLightShaderPCF::ShadowedSunLightShaderPCF()
@@ -1485,7 +1485,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "sunlightshadow.frag");
 
         // Use 8 to circumvent a catalyst bug when binding sampler
-        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex", 8, "shadowtex");
+        assignSamplerNames(m_program, 0, "ntex", 1, "dtex", 8, "shadowtex");
         assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res");
     }
 
@@ -1501,7 +1501,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "sunlightshadowesm.frag");
 
         // Use 8 to circumvent a catalyst bug when binding sampler
-        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex", 8, "shadowtex");
+        assignSamplerNames(m_program, 0, "ntex", 1, "dtex", 8, "shadowtex");
         assignUniforms("split0", "split1", "split2", "splitmax");
     }
 
@@ -1522,7 +1522,7 @@ namespace FullScreenShader
         }
 
         assignUniforms("RSMMatrix", "RHMatrix", "extents", "suncol");
-        AssignSamplerNames(m_program, 0, "ctex", 1, "ntex", 2, "dtex");
+        assignSamplerNames(m_program, 0, "ctex", 1, "ntex", 2, "dtex");
     }
 
     NVWorkaroundRadianceHintsConstructionShader::NVWorkaroundRadianceHintsConstructionShader()
@@ -1534,7 +1534,7 @@ namespace FullScreenShader
 
         assignUniforms("RSMMatrix", "RHMatrix", "extents", "slice", "suncol");
 
-        AssignSamplerNames(m_program, 0, "ctex", 1, "ntex", 2, "dtex");
+        assignSamplerNames(m_program, 0, "ctex", 1, "ntex", 2, "dtex");
     }
 
     RHDebug::RHDebug()
@@ -1558,7 +1558,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gi.frag");
 
         assignUniforms("RHMatrix", "InvRHMatrix", "extents");
-        AssignSamplerNames(m_program, 0, "ntex", 1, "dtex", 2, "SHR", 3, "SHG", 4, "SHB");
+        assignSamplerNames(m_program, 0, "ntex", 1, "dtex", 2, "SHR", 3, "SHG", 4, "SHB");
     }
 
     Gaussian17TapHShader::Gaussian17TapHShader()
@@ -1567,7 +1567,7 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, "screenquad.vert",
             GL_FRAGMENT_SHADER, "bilateralH.frag");
         assignUniforms("pixel");
-        AssignSamplerNames(m_program, 0, "tex", 1, "depth");
+        assignSamplerNames(m_program, 0, "tex", 1, "depth");
     }
 
     ComputeGaussian17TapHShader::ComputeGaussian17TapHShader()
@@ -1575,7 +1575,7 @@ namespace FullScreenShader
         loadProgram(OBJECT,  GL_COMPUTE_SHADER, "bilateralH.comp");
         TU_dest = 2;
         assignUniforms("pixel");
-        AssignSamplerNames(m_program, 0, "source", 1, "depth");
+        assignSamplerNames(m_program, 0, "source", 1, "depth");
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1585,7 +1585,7 @@ namespace FullScreenShader
             GL_COMPUTE_SHADER, "gaussian6h.comp");
         TU_dest = 1;
         assignUniforms("pixel", "weights");
-        AssignSamplerNames(m_program, 0, "source");
+        assignSamplerNames(m_program, 0, "source");
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1595,7 +1595,7 @@ namespace FullScreenShader
             GL_COMPUTE_SHADER, "blurshadowH.comp");
         TU_dest = 1;
         assignUniforms("pixel", "weights");
-        AssignSamplerNames(m_program, 0, "source");
+        assignSamplerNames(m_program, 0, "source");
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1606,7 +1606,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gaussian6h.frag");
         assignUniforms("pixel", "sigma");
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 	
 	HorizontalBlurShader::HorizontalBlurShader()
@@ -1616,7 +1616,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gaussian6h.frag");
         assignUniforms("pixel");
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     Gaussian3HBlurShader::Gaussian3HBlurShader()
@@ -1626,7 +1626,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gaussian3h.frag");
         assignUniforms("pixel");
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     Gaussian17TapVShader::Gaussian17TapVShader()
@@ -1636,7 +1636,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "bilateralV.frag");
         assignUniforms("pixel");
 
-        AssignSamplerNames(m_program, 0, "tex", 1, "depth");
+        assignSamplerNames(m_program, 0, "tex", 1, "depth");
     }
 
     ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
@@ -1645,7 +1645,7 @@ namespace FullScreenShader
             GL_COMPUTE_SHADER, "bilateralV.comp");
         TU_dest = 2;
         assignUniforms("pixel");
-        AssignSamplerNames(m_program, 0, "source", 1, "depth");
+        assignSamplerNames(m_program, 0, "source", 1, "depth");
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1655,7 +1655,7 @@ namespace FullScreenShader
             GL_COMPUTE_SHADER, "gaussian6v.comp");
         TU_dest = 1;
         assignUniforms("pixel", "weights");
-        AssignSamplerNames(m_program, 0, "source");
+        assignSamplerNames(m_program, 0, "source");
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1665,7 +1665,7 @@ namespace FullScreenShader
             GL_COMPUTE_SHADER, "blurshadowV.comp");
         TU_dest = 1;
         assignUniforms("pixel", "weights");
-        AssignSamplerNames(m_program, 0, "source");
+        assignSamplerNames(m_program, 0, "source");
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1676,7 +1676,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gaussian6v.frag");
         assignUniforms("pixel", "sigma");
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     Gaussian3VBlurShader::Gaussian3VBlurShader()
@@ -1686,7 +1686,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gaussian3v.frag");
         assignUniforms("pixel");
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     PassThroughShader::PassThroughShader()
@@ -1696,7 +1696,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "passthrough.frag");
 
         assignUniforms("width", "height");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     LayerPassThroughShader::LayerPassThroughShader()
@@ -1717,7 +1717,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "linearizedepth.frag");
         assignUniforms("zn", "zf");
 
-        AssignSamplerNames(m_program, 0, "texture");
+        assignSamplerNames(m_program, 0, "texture");
     }
 
 
@@ -1726,7 +1726,7 @@ namespace FullScreenShader
         loadProgram(OBJECT,
             GL_COMPUTE_SHADER, "Lightspaceboundingbox.comp",
             GL_COMPUTE_SHADER, "utils/getPosFromUVDepth.frag");
-        AssignSamplerNames(m_program, 0, "depth");
+        assignSamplerNames(m_program, 0, "depth");
         assignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
         GLuint block_idx = glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
         glShaderStorageBlockBinding(m_program, block_idx, 2);
@@ -1748,7 +1748,7 @@ namespace FullScreenShader
         loadProgram(OBJECT,
             GL_COMPUTE_SHADER, "depthhistogram.comp",
             GL_COMPUTE_SHADER, "utils/getPosFromUVDepth.frag");
-        AssignSamplerNames(m_program, 0, "depth");
+        assignSamplerNames(m_program, 0, "depth");
 
         GLuint block_idx = glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, "Histogram");
         glShaderStorageBlockBinding(m_program, block_idx, 1);
@@ -1761,7 +1761,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "glow.frag");
         assignUniforms();
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
         vao = createVAO(m_program);
     }
 
@@ -1774,7 +1774,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "ssao.frag");
 
         assignUniforms("radius", "k", "sigma");
-        AssignSamplerNames(m_program, 0, "dtex");
+        assignSamplerNames(m_program, 0, "dtex");
     }
 
     FogShader::FogShader()
@@ -1785,7 +1785,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "fog.frag");
 
         assignUniforms("density", "col");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     MotionBlurShader::MotionBlurShader()
@@ -1795,7 +1795,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
             GL_FRAGMENT_SHADER, "motion_blur.frag");
         assignUniforms("previous_viewproj", "center", "boost_amount", "mask_radius");
-        AssignSamplerNames(m_program, 0, "color_buffer", 1, "dtex");
+        assignSamplerNames(m_program, 0, "color_buffer", 1, "dtex");
     }
 
     GodFadeShader::GodFadeShader()
@@ -1805,7 +1805,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "godfade.frag");
         assignUniforms("col");
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     GodRayShader::GodRayShader()
@@ -1815,7 +1815,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "godray.frag");
 
         assignUniforms("sunpos");
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     MLAAColorEdgeDetectionSHader::MLAAColorEdgeDetectionSHader()
@@ -1825,7 +1825,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "mlaa_color1.frag");
         assignUniforms("PIXEL_SIZE");
 
-        AssignSamplerNames(m_program, 0, "colorMapG");
+        assignSamplerNames(m_program, 0, "colorMapG");
     }
 
     MLAABlendWeightSHader::MLAABlendWeightSHader()
@@ -1835,7 +1835,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "mlaa_blend2.frag");
         assignUniforms("PIXEL_SIZE");
 
-        AssignSamplerNames(m_program, 0, "edgesMap", 1, "areaMap");
+        assignSamplerNames(m_program, 0, "edgesMap", 1, "areaMap");
     }
 
     MLAAGatherSHader::MLAAGatherSHader()
@@ -1845,7 +1845,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "mlaa_neigh3.frag");
         assignUniforms("PIXEL_SIZE");
 
-        AssignSamplerNames(m_program, 0, "blendMap", 1, "colorMap");
+        assignSamplerNames(m_program, 0, "blendMap", 1, "colorMap");
     }
 }
 
@@ -1858,7 +1858,7 @@ namespace UIShader
             GL_VERTEX_SHADER, "primitive2dlist.vert",
             GL_FRAGMENT_SHADER, "transparent.frag");
         assignUniforms();
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     TextureRectShader::TextureRectShader()
@@ -1868,7 +1868,7 @@ namespace UIShader
             GL_FRAGMENT_SHADER, "texturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     UniformColoredTextureRectShader::UniformColoredTextureRectShader()
@@ -1879,7 +1879,7 @@ namespace UIShader
 
         assignUniforms("center", "size", "texcenter", "texsize", "color");
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
     }
 
     ColoredTextureRectShader::ColoredTextureRectShader()
@@ -1889,7 +1889,7 @@ namespace UIShader
             GL_FRAGMENT_SHADER, "colortexturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
 
-        AssignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);

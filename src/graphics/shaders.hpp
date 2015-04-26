@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/shaders_util.hpp"
+#include "graphics/texture_read.hpp"
 
 #include <IMeshSceneNode.h>
 #include <IShaderConstantSetCallBack.h>
@@ -48,7 +49,8 @@ public:
     ColoredLine();
 };
 
-class SpecularIBLGenerator : public Shader<SpecularIBLGenerator, core::matrix4, float >, public TextureRead<Trilinear_cubemap>
+class SpecularIBLGenerator : public Shader<SpecularIBLGenerator, core::matrix4, float >,
+                             public TextureRead<Trilinear_cubemap>
 {
 public:
     GLuint TU_Samples;
@@ -59,13 +61,15 @@ public:
 
 namespace MeshShader
 {
-class ObjectPass1Shader : public Shader<ObjectPass1Shader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class ObjectPass1Shader : public Shader<ObjectPass1Shader, core::matrix4, core::matrix4>, 
+                          public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     ObjectPass1Shader();
 };
 
-class ObjectRefPass1Shader : public Shader<ObjectRefPass1Shader, core::matrix4, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class ObjectRefPass1Shader : public Shader<ObjectRefPass1Shader, core::matrix4, core::matrix4, core::matrix4>,
+                             public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     ObjectRefPass1Shader();

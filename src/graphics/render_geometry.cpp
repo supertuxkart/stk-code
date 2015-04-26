@@ -376,7 +376,7 @@ struct TexExpander_impl<T, 0>
     template<typename...TupleArgs, typename... Args>
     static void ExpandTex(GLMesh &mesh, const STK::Tuple<TupleArgs...> &TexSwizzle, Args... args)
     {
-        T::getInstance()->SetTextureUnits(args...);
+        T::getInstance()->setTextureUnits(args...);
     }
 };
 
@@ -408,7 +408,7 @@ struct HandleExpander_impl<T, 0>
     template<typename...TupleArgs, typename... Args>
     static void Expand(uint64_t *TextureHandles, const STK::Tuple<TupleArgs...> &TexSwizzle, Args... args)
     {
-        T::getInstance()->SetTextureHandles(args...);
+        T::getInstance()->setTextureHandles(args...);
     }
 };
 
@@ -614,19 +614,19 @@ void IrrDriver::renderSolidSecondPass()
 
     if (CVS->isAZDOEnabled())
     {
-        DiffuseHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
+        DiffuseHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
         if (!glIsTextureHandleResidentARB(DiffuseHandle))
             glMakeTextureHandleResidentARB(DiffuseHandle);
 
-        SpecularHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_SPECULAR), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[1]);
+        SpecularHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_SPECULAR), MeshShader::ObjectPass2Shader::getInstance()->m_sampler_ids[1]);
         if (!glIsTextureHandleResidentARB(SpecularHandle))
             glMakeTextureHandleResidentARB(SpecularHandle);
 
-        SSAOHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_HALF1_R), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[2]);
+        SSAOHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_HALF1_R), MeshShader::ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
         if (!glIsTextureHandleResidentARB(SSAOHandle))
             glMakeTextureHandleResidentARB(SSAOHandle);
 
-        DepthHandle = glGetTextureSamplerHandleARB(getDepthStencilTexture(), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[3]);
+        DepthHandle = glGetTextureSamplerHandleARB(getDepthStencilTexture(), MeshShader::ObjectPass2Shader::getInstance()->m_sampler_ids[3]);
         if (!glIsTextureHandleResidentARB(DepthHandle))
             glMakeTextureHandleResidentARB(DepthHandle);
     }
@@ -773,9 +773,9 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits, 
         }
 
         if (CVS->isAZDOEnabled())
-            Shader::getInstance()->SetTextureHandles(mesh.TextureHandles[0]);
+            Shader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
         else
-            Shader::getInstance()->SetTextureUnits(getTextureGLuint(mesh.textures[0]));
+            Shader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]));
         custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
 }
@@ -885,7 +885,7 @@ void IrrDriver::renderTransparent()
         GLenum itype = mesh.IndexType;
         size_t count = mesh.IndexCount;
         // Render the effect
-        MeshShader::DisplaceShader::getInstance()->SetTextureUnits(
+        MeshShader::DisplaceShader::getInstance()->setTextureUnits(
             getTextureGLuint(displaceTex),
             irr_driver->getRenderTargetTexture(RTT_COLOR),
             irr_driver->getRenderTargetTexture(RTT_TMP1),

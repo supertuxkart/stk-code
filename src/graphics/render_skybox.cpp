@@ -407,7 +407,7 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
     glBindVertexArray(MeshShader::SkyboxShader::getInstance()->vao);
     MeshShader::SkyboxShader::getInstance()->setUniforms();
 
-    MeshShader::SkyboxShader::getInstance()->SetTextureUnits(SkyboxCubeMap);
+    MeshShader::SkyboxShader::getInstance()->setTextureUnits(SkyboxCubeMap);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);

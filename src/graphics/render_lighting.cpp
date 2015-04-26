@@ -47,7 +47,7 @@ static void renderPointLights(unsigned count)
     glBindBuffer(GL_ARRAY_BUFFER, LightShader::PointLightShader::getInstance()->vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(LightShader::PointLightInfo), PointLightsInfo);
 
-    LightShader::PointLightShader::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture());
+    LightShader::PointLightShader::getInstance()->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture());
     LightShader::PointLightShader::getInstance()->setUniforms();
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
@@ -159,7 +159,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         if (CVS->needRHWorkaround())
         {
             FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->use();
-            FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->SetTextureUnits(
+            FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->setTextureUnits(
                 m_rtts->getRSM().getRTT()[0], m_rtts->getRSM().getRTT()[1], m_rtts->getRSM().getDepthTexture());
             for (unsigned i = 0; i < 32; i++)
             {
@@ -170,7 +170,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         else
         {
             FullScreenShader::RadianceHintsConstructionShader::getInstance()->use();
-            FullScreenShader::RadianceHintsConstructionShader::getInstance()->SetTextureUnits(
+            FullScreenShader::RadianceHintsConstructionShader::getInstance()->setTextureUnits(
                     m_rtts->getRSM().getRTT()[0],
                     m_rtts->getRSM().getRTT()[1],
                     m_rtts->getRSM().getDepthTexture()
@@ -212,12 +212,12 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 
             if (CVS->isESMEnabled())
             {
-                FullScreenShader::ShadowedSunLightShaderESM::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), m_rtts->getShadowFBO().getRTT()[0]);
+                FullScreenShader::ShadowedSunLightShaderESM::getInstance()->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), m_rtts->getShadowFBO().getRTT()[0]);
                 DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShaderESM>(shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4]);
             }
             else
             {
-                FullScreenShader::ShadowedSunLightShaderPCF::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), m_rtts->getShadowFBO().getDepthTexture());
+                FullScreenShader::ShadowedSunLightShaderPCF::getInstance()->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), m_rtts->getShadowFBO().getDepthTexture());
                 DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShaderPCF>(shadowSplit[1],
                                                                                   shadowSplit[2],
                                                                                   shadowSplit[3],
@@ -264,7 +264,7 @@ void IrrDriver::renderAmbientScatter()
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    FullScreenShader::FogShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
+    FullScreenShader::FogShader::getInstance()->setTextureUnits(irr_driver->getDepthStencilTexture());
     DrawFullScreenEffect<FullScreenShader::FogShader>(1.f / (40.f * start), col);
 }
 
@@ -295,7 +295,7 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
     LightShader::PointLightScatterShader::getInstance()->use();
     glBindVertexArray(LightShader::PointLightScatterShader::getInstance()->vao);
 
-    LightShader::PointLightScatterShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
+    LightShader::PointLightScatterShader::getInstance()->setTextureUnits(irr_driver->getDepthStencilTexture());
     LightShader::PointLightScatterShader::getInstance()->setUniforms(1.f / (40.f * start), col2);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, MIN2(pointlightcount, MAXLIGHT));
