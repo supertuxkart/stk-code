@@ -138,8 +138,8 @@ private:
     }   // setUniformImpl
     // ------------------------------------------------------------------------
     /** Implementation for setUniforms for a matrix uniform. */
-    template<unsigned N = 0, typename... Args>
-    void setUniformsImpl(const irr::core::matrix4 &mat, Args... arg) const
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(const irr::core::matrix4 &mat, Args1... arg) const
     {
         glUniformMatrix4fv(m_uniforms[N], 1, GL_FALSE, mat.pointer());
         setUniformsImpl<N + 1>(arg...);
@@ -147,8 +147,8 @@ private:
 
     // ------------------------------------------------------------------------
     /** Implementation for setUniforms for a matrix SColorF values. */
-    template<unsigned N = 0, typename... Args>
-    void setUniformsImpl(const irr::video::SColorf &col, Args... arg) const
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(const irr::video::SColorf &col, Args1... arg) const
     {
         glUniform3f(m_uniforms[N], col.r, col.g, col.b);
         setUniformsImpl<N + 1>(arg...);
@@ -156,8 +156,8 @@ private:
 
     // ------------------------------------------------------------------------
     /** Implementation for setUniforms for a SColor uniform. */
-    template<unsigned N = 0, typename... Args>
-    void setUniformsImpl(const irr::video::SColor &col, Args... arg) const
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(const irr::video::SColor &col, Args1... arg) const
     {
         glUniform4i(m_uniforms[N], col.getRed(), col.getGreen(),
                                    col.getBlue(), col.getAlpha());
@@ -166,8 +166,8 @@ private:
 
     // ------------------------------------------------------------------------
     /** Implementation for setUniforms for a vector3df uniform. */
-    template<unsigned N = 0, typename... Args>
-    void setUniformsImpl(const irr::core::vector3df &v, Args... arg) const
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(const irr::core::vector3df &v, Args1... arg) const
     {
         glUniform3f(m_uniforms[N], v.X, v.Y, v.Z);
         setUniformsImpl<N + 1>(arg...);
@@ -175,8 +175,8 @@ private:
 
     // ------------------------------------------------------------------------
     /** Implementation for setUniforms for a vector2df uniform. */
-    template<unsigned N = 0, typename... Args>
-    void setUniformsImpl(const irr::core::vector2df &v, Args... arg) const
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(const irr::core::vector2df &v, Args1... arg) const
     {
         glUniform2f(m_uniforms[N], v.X, v.Y);
         setUniformsImpl<N + 1>(arg...);
@@ -184,8 +184,8 @@ private:
 
     // ------------------------------------------------------------------------
     /** Implementation for setUniforms for a dimension2df uniform. */
-    template<unsigned N = 0, typename... Args>
-    void setUniformsImpl(const irr::core::dimension2df &v, Args... arg) const
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(const irr::core::dimension2df &v, Args1... arg) const
     {
         glUniform2f(m_uniforms[N], v.Width, v.Height);
         setUniformsImpl<N + 1>(arg...);
@@ -193,8 +193,8 @@ private:
 
     // ------------------------------------------------------------------------
     /** Implementation for setUniforms for a float uniform. */
-    template<unsigned N = 0, typename... Args>
-    void setUniformsImpl(float f, Args... arg) const
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(float f, Args1... arg) const
     {
         glUniform1f(m_uniforms[N], f);
         setUniformsImpl<N + 1>(arg...);
@@ -202,8 +202,8 @@ private:
 
     // ------------------------------------------------------------------------
     /** Implementation for setUniforms for an int uniform. */
-    template<unsigned N = 0, typename... Args>
-    void setUniformsImpl(int f, Args... arg) const
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(int f, Args1... arg) const
     {
         glUniform1i(m_uniforms[N], f);
         setUniformsImpl<N + 1>(arg...);
@@ -211,8 +211,8 @@ private:
 
     // ------------------------------------------------------------------------
     /** Implementation for setUniforms for a vector<float> uniform. */
-    template<unsigned N = 0, typename... Args>
-    void setUniformsImpl(const std::vector<float> &v, Args... arg) const
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(const std::vector<float> &v, Args1... arg) const
     {
         glUniform1fv(m_uniforms[N], (int)v.size(), v.data());
         setUniformsImpl<N + 1>(arg...);
@@ -249,8 +249,8 @@ protected:
         glUseProgram(0);
     }   // assignTextureUnit
     // ------------------------------------------------------------------------
-    template<typename... T> 
-    void assignTextureUnit(GLuint index, const char* uniform, T... rest)
+    template<typename... T1> 
+    void assignTextureUnit(GLuint index, const char* uniform, T1... rest)
     {
         glUseProgram(m_program);
         GLuint uniform_loc = glGetUniformLocation(m_program, uniform);
@@ -262,8 +262,8 @@ protected:
 
     void assignTextureUnitNoUse() {}
     // ------------------------------------------------------------------------
-    template<typename... T>
-    void assignTextureUnitNoUse(GLuint index, const char* uniform, T... rest)
+    template<typename... T1>
+    void assignTextureUnitNoUse(GLuint index, const char* uniform, T1... rest)
     {
         GLuint uniform_loc = glGetUniformLocation(m_program, uniform);
         glUniform1i(uniform_loc, index);
@@ -283,7 +283,7 @@ public:
     {
         m_program = glCreateProgram();
         loadAndAttachShader(args...);
-        if (getGLSLVersion() < 330)
+        if (CVS->getGLSLVersion() < 330)
             setAttribute(type);
         glLinkProgram(m_program);
 

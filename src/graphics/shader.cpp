@@ -103,7 +103,7 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
     if (result == GL_FALSE)
     {
         int info_length;
-        Log::error("GLWrap", "Error in shader %s", file);
+        Log::error("GLWrap", "Error in shader %s", file.c_str());
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &info_length);
         if (info_length<0)
             info_length = 1024;
