@@ -25,6 +25,7 @@
 
 #include "utils/translation.hpp"
 
+#include <algorithm>
 #include <assert.h>
 #include <locale.h>
 #include <stdio.h>
