@@ -74,7 +74,7 @@ void BubbleWidget::replaceText()
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
     if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
     else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
-    else if (translations->isRTLLanguage())             align = EGUIA_LOWERRIGHT;
+    else if (translations->isRTLText(message))          align = EGUIA_LOWERRIGHT;
 
     EGUI_ALIGNMENT valign = EGUIA_CENTER ; //TODO: make label v-align configurable through XML file?
 
@@ -90,7 +90,7 @@ void BubbleWidget::replaceText()
         m_expanded_size.LowerRightCorner.Y += additionalNeededSize/2 + 10;
 
         // reduce text to fit in the available space if it's too long
-        if (translations->isRTLLanguage())
+        if (translations->isRTLText(message))
         {
             while (text_height > m_shrinked_size.getHeight() && message.size() > 10)
             {
