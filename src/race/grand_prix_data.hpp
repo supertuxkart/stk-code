@@ -148,7 +148,7 @@ public:
     // ------------------------------------------------------------------------
     /** @return the (potentially translated) user-visible name of the Grand
      *  Prix (apply fribidi as needed) */
-    irr::core::stringw getName()      const { return _LTR(m_name.c_str());   }
+    irr::core::stringw getName()      const { return m_editable ? m_name.c_str() : _LTR(m_name.c_str());   }
 
     // ------------------------------------------------------------------------
     /** @return the internal indentifier of the Grand Prix (not translated) */

@@ -113,7 +113,7 @@ public:
     irr::core::stringw getDescription() const { return _(m_description.c_str()); }
     // ------------------------------------------------------------------------
     /** Returns the name of this achievement. */
-    irr::core::stringw getName() const { return _(m_name.c_str()); }
+    irr::core::stringw getName() const { return _LTR(m_name.c_str()); }
     // ------------------------------------------------------------------------
     bool needsResetAfterRace() const { return m_reset_type == AFTER_RACE; }
     // ------------------------------------------------------------------------
