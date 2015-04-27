@@ -301,8 +301,11 @@ void Physics::update(float dt)
                 if (target_kart != kart && c &&
                     c->getPlayer()->getConstProfile() == PlayerManager::getCurrentPlayer())
                 {
+                    // Compare the current value of hits with the 'hit' goal value
+                    // (otherwise it would be compared with the kart id goal value,
+                    // which doesn't exist.
                     PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_ARCH_ENEMY,
-                                                       target_kart->getIdent(), 1);
+                                                       target_kart->getIdent(), 1, "hit");
                     if (type == PowerupManager::POWERUP_BOWLING)
                     {
                         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_STRIKE,
