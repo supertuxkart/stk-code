@@ -82,7 +82,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             }   // if clicked_track
 
         }   // selection=="random_track"
-        else if (selection == "locked")
+        else if (selection == "locked" && race_manager->getNumLocalPlayers() == 1)
         {
             unlock_manager->playLockSound();
         }
@@ -105,7 +105,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         const std::string &selection =
                        gps_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if (selection == "locked")
+        if (selection == "locked" && race_manager->getNumLocalPlayers()==1)
         {
             unlock_manager->playLockSound();
         }
@@ -196,7 +196,8 @@ void TracksScreen::init()
         }
         assert(screenshots.size() > 0);
 
-        if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()))
+        if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()) && 
+            race_manager->getNumLocalPlayers() == 1)
         {
             gps_widget->addAnimatedItem(_("Locked!"), "locked",
                                         screenshots, 1.5f,
@@ -277,7 +278,8 @@ void TracksScreen::buildTrackList()
     for (unsigned int i = 0; i < tracks.size(); i++)
     {
         Track *curr = tracks.get(i);
-        if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
+        if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()) &&
+            race_manager->getNumLocalPlayers() == 1)
         {
             tracks_widget->addItem(
                 _("Locked : solve active challenges to gain access to more!"),
