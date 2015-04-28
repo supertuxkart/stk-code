@@ -711,7 +711,7 @@ void KartSelectionScreen::playerConfirm(const int player_id)
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert(w != NULL);
     const std::string selection = w->getSelectionIDString(player_id);
-    if (StringUtils::startsWith(selection, ID_LOCKED))
+    if (StringUtils::startsWith(selection, ID_LOCKED) && !m_multiplayer)
     {
         unlock_manager->playLockSound();
         return;
@@ -839,7 +839,7 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
         ->setText( _("Random Kart"), false );
     }
     // selection contains the name of the kart, so check only for substr
-    else if (StringUtils::startsWith(selection, ID_LOCKED))
+    else if (StringUtils::startsWith(selection, ID_LOCKED) && !m_multiplayer)
     {
         w3->clearModels();
         w3->addModel(irr_driver->getAnimatedMesh(
@@ -1009,13 +1009,13 @@ void KartSelectionScreen::eventCallback(Widget* widget,
                     {
                         // FIXME: two players may be given the same kart by
                         // the use of random
-                        const int randomID = random.get( count );
+                        const int random_id = random.get( count );
 
                         // select kart for players > 0 (player 0 is the one
                         // that can change the groups, so focus for player 0
                         // must remain on the tabs)
                         const bool success =
-                            w->setSelection( randomID, n,
+                            w->setSelection( random_id, n,
                                              n != PLAYER_ID_GAME_MASTER );
                         if (!success)
                             Log::warn("KartSelectionScreen",
@@ -1155,21 +1155,23 @@ void KartSelectionScreen::allPlayersDone()
         if (selected_kart == RANDOM_KART_ID)
         {
             // don't select an already selected kart
-            int randomID;
+            int random_id;
             // to prevent infinite loop in case they are all locked
             int count = 0;
             bool done = false;
             do
             {
-                randomID = random.get(item_count);
-                if (items[randomID].m_code_name != ID_DONT_USE &&
-                        !StringUtils::startsWith(items[randomID].m_code_name,
-                                                 ID_LOCKED))
+                random_id = random.get(item_count);
+                // valid kart if it can bt used, and is either not locked,
+                // or it's a multiplayer race.
+                if (items[random_id].m_code_name != ID_DONT_USE &&
+                    (!StringUtils::startsWith(items[random_id].m_code_name, ID_LOCKED)
+                    || m_multiplayer)                                                 )
                 {
-                    selected_kart = items[randomID].m_code_name;
+                    selected_kart = items[random_id].m_code_name;
                     done = true;
                 }
-                items[randomID].m_code_name = ID_DONT_USE;
+                items[random_id].m_code_name = ID_DONT_USE;
                 count++;
                 if (count > 100) return;
             }
@@ -1444,7 +1446,8 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     for(unsigned int i=0; i<karts.size(); i++)
     {
         const KartProperties* prop = karts.get(i);
-        if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()))
+        if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()) &&
+            !m_multiplayer)
         {
             w->addItem(_("Locked : solve active challenges to gain access to more!"),
                        ID_LOCKED + prop->getIdent(),
