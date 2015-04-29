@@ -159,7 +159,7 @@ void TrackManager::loadTrackList()
         std::set<std::string> dirs;
         file_manager->listFiles(dirs, dir);
         for(std::set<std::string>::iterator subdir = dirs.begin();
-            subdir != dirs.end(); subdir++)
+            subdir != dirs.end(); ++subdir)
         {
             if(*subdir=="." || *subdir=="..") continue;
             loadTrack(dir+*subdir+"/");
@@ -277,7 +277,7 @@ void TrackManager::removeTrack(const std::string &ident)
                                (i==1 ? m_arena_groups :
                                  m_track_groups));
         Group2Indices::iterator j;
-        for(j=g2i.begin(); j!=g2i.end(); j++)
+        for(j=g2i.begin(); j!=g2i.end(); ++j)
         {
             for(unsigned int i=0; i<(*j).second.size(); i++)
                 if((*j).second[i]>index) (*j).second[i]--;

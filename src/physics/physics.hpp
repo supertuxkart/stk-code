@@ -108,7 +108,7 @@ private:
     private:
         void push_back(CollisionPair p) {
             // only add a pair if it's not already in there
-            for(iterator i=begin(); i!=end(); i++) {
+            for(iterator i=begin(); i!=end(); ++i) {
                 if((*i)==p) return;
             }
             std::vector<CollisionPair>::push_back(p);

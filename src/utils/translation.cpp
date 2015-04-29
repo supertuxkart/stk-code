@@ -208,7 +208,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         g_language_list.push_back("en");
     
         std::set<Language>::iterator it;
-        for (it = languages.begin(); it != languages.end(); it++)
+        for (it = languages.begin(); it != languages.end(); ++it)
         {
             g_language_list.push_back((*it).str());
         }

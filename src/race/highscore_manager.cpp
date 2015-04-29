@@ -44,7 +44,7 @@ HighscoreManager::~HighscoreManager()
 {
     saveHighscores();
     for(type_all_scores::iterator i  = m_all_scores.begin();
-                                  i != m_all_scores.end();  i++)
+                                  i != m_all_scores.end();  ++i)
         delete *i;
 }   // ~HighscoreManager
 
@@ -186,7 +186,7 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType &hig
 
     // See if we already have a record for this type
     for(type_all_scores::iterator i  = m_all_scores.begin();
-                                  i != m_all_scores.end();  i++)
+                                  i != m_all_scores.end();  ++i)
     {
         if((*i)->matches(highscore_type, num_karts, difficulty, trackName,
                          number_of_laps, reverse) )

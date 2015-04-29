@@ -84,7 +84,7 @@ void ProjectileManager::update(float dt)
             he = next;
         }   // if hit effect finished
         else  // hit effect not finished, go to next one.
-            he++;
+            ++he;
     }   // while hit effect != end
 }   // update
 
@@ -107,7 +107,7 @@ void ProjectileManager::updateServer(float dt)
             p=p_next;
         }
         else
-            p++;
+            ++p;
     }   // while p!=m_active_projectiles.end()
     
 }   // updateServer
@@ -146,7 +146,7 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
     float r2 = radius*radius;
 
     for(Projectiles::iterator i  = m_active_projectiles.begin();
-                              i != m_active_projectiles.end();   i++)
+                              i != m_active_projectiles.end();   ++i)
     {
         float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
         if(dist2<r2) return true;

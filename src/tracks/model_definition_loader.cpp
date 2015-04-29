@@ -151,7 +151,7 @@ scene::IMesh* ModelDefinitionLoader::getFirstMeshFor(const std::string& name)
 void ModelDefinitionLoader::cleanLibraryNodesAfterLoad()
 {
     for (std::map<std::string, XMLNode*>::iterator it = m_library_nodes.begin();
-        it != m_library_nodes.end(); it++)
+        it != m_library_nodes.end(); ++it)
     {
         delete it->second;
 
