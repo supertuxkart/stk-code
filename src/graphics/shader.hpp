@@ -109,6 +109,22 @@ private:
         if (block_index != GL_INVALID_INDEX)
             glUniformBlockBinding(m_program, block_index, index);
     }   // bindPoint
+
+
+    // ========================================================================
+    // assignUniforms: Variadic Template
+protected:
+    /** This variadic template collects all names of uniforms in
+     *  a std::vector. It used assignUnfiromsImpl for the actual recursive
+     *  implementation. */
+    template<typename... U>
+    void assignUniforms(U... rest)
+    {
+        static_assert(sizeof...(rest) == sizeof...(Args),
+                      "Count of Uniform's name mismatch");
+        assignUniformsImpl(rest...);
+    }   // assignUniforms
+private:
     // ------------------------------------------------------------------------
     /** End of recursive implementation of assignUniforms. */
     void assignUniformsImpl()
@@ -129,6 +145,28 @@ private:
         assignUniformsImpl(rest...);
     }   // assignUniformsImpl
 
+
+    // ==============================================
+    // setUniforms: Variadic template implementation.
+
+protected:
+    /** Sets the uniforms for this shader. */
+    void setUniforms(const Args & ... args) const
+    {
+        if (!CVS->isARBUniformBufferObjectUsable())
+            bypassUBO();
+        setUniformsImpl(args...);
+    }   // setUniforms
+    // ------------------------------------------------------------------------
+private:
+    /** Implementation for setUniforms for a vector<float> uniform. */
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(const std::vector<float> &v, Args1... arg) const
+    {
+        glUniform1fv(m_uniforms[N], (int)v.size(), v.data());
+        setUniformsImpl<N + 1>(arg...);
+    }   // setUniformsImpl
+
     // ------------------------------------------------------------------------
     /** End of recursion for setUniforms implementation.
      */
@@ -136,6 +174,7 @@ private:
     void setUniformsImpl() const
     {
     }   // setUniformImpl
+
     // ------------------------------------------------------------------------
     /** Implementation for setUniforms for a matrix uniform. */
     template<unsigned N = 0, typename... Args1>
@@ -209,59 +248,60 @@ private:
         setUniformsImpl<N + 1>(arg...);
     }   // setUniformsImpl
 
-    // ------------------------------------------------------------------------
-    /** Implementation for setUniforms for a vector<float> uniform. */
-    template<unsigned N = 0, typename... Args1>
-    void setUniformsImpl(const std::vector<float> &v, Args1... arg) const
-    {
-        glUniform1fv(m_uniforms[N], (int)v.size(), v.data());
-        setUniformsImpl<N + 1>(arg...);
-    }   // setUniformsImpl
 
-    // ------------------------------------------------------------------------
-    /** End recursion for variadic template. */
-    template<typename ...Types>
-    void printFileList()
-    {
-        return;
-    }   // printFileList
-
-    // ------------------------------------------------------------------------
+    // printFileList: Variadic template for printing a list of shader filenames
+    // ========================================================================
     /** Variadic template to print a list of file names.
-     *  \param shader_type Ignored (used since the variadic calling function
-     *         has this parameter).
-     *  \param filepath Name of the file to print.
-     */
+    *  \param shader_type Ignored (used since the variadic calling function
+    *         has this parameter).
+    *  \param filepath Name of the file to print.
+    */
+protected:
     template<typename ...Types>
     void printFileList(GLint shader_type, const char *filepath, Types ... args)
     {
         Log::error("shader", filepath);
         printFileList(args...);
     }   // printFileList
-protected:
 
-    // ========================================================================
-    void assignTextureUnit(GLuint index, const char* uniform)
-    {
-        glUseProgram(m_program);
-        GLuint uniform_loc = glGetUniformLocation(m_program, uniform);
-        glUniform1i(uniform_loc, index);
-        glUseProgram(0);
-    }   // assignTextureUnit
     // ------------------------------------------------------------------------
+    /** End recursion for variadic template. */
+private:
+    template<typename ...Types>
+    void printFileList()
+    {
+        return;
+    }   // printFileList
+
+
+    // Variadic template implementation of assignTextureUnig
+    // ========================================================================
+public:
+    /** Variadic top level/public interface. It does the calls to glUseProgram
+     *  and uses assignTextureUnitNoUse() in recursion to avoid unnecessary
+     *  calls to glUseProgram.
+     *  \param index Index of the texture.
+     *  \param uniform Uniform name.
+     */
     template<typename... T1> 
     void assignTextureUnit(GLuint index, const char* uniform, T1... rest)
     {
         glUseProgram(m_program);
         GLuint uniform_loc = glGetUniformLocation(m_program, uniform);
         glUniform1i(uniform_loc, index);
+        // Avoid doing any additional glUseProgram for the remaining calls
         assignTextureUnitNoUse(rest...);
         glUseProgram(0);
     }   // assignTextureUnit
-    // ------------------------------------------------------------------------
 
-    void assignTextureUnitNoUse() {}
+private:
     // ------------------------------------------------------------------------
+    /** End of recursion. */
+    void assignTextureUnitNoUse() {}
+
+    // ------------------------------------------------------------------------
+    /** Recursive implementation of assignTextureUnit, but without the call
+     *  to gluseProgram (which is done by the public interface). */
     template<typename... T1>
     void assignTextureUnitNoUse(GLuint index, const char* uniform, T1... rest)
     {
@@ -270,14 +310,22 @@ protected:
         assignTextureUnitNoUse(rest...);
     }   // assignTextureUnitNoUse
 
+    // ========================================================================
 
 public:
 
+    /** Constructor. Adds the static kill function of this shader to the list
+     *  of all kill function, which is used for the debugging feature of
+     *  reloading all shaders.
+     */
     Shader()
     {
         m_all_kill_functions.push_back(this->kill);
-    }
+    }   // Shader
 
+    // ------------------------------------------------------------------------
+    /** Load a list of shaders and links them all together.
+     */
     template<typename ... Types>
     void loadProgram(AttributeType type, Types ... args)
     {
@@ -300,26 +348,6 @@ public:
             delete[] error_message;
         }
     }   // loadProgram
-
-    // ------------------------------------------------------------------------
-    /** This variadic template collects all names of uniforms in
-     *  a std::vector. */
-    template<typename... U>
-    void assignUniforms(U... rest)
-    {
-        static_assert(sizeof...(rest) == sizeof...(Args),
-                      "Count of Uniform's name mismatch");
-        assignUniformsImpl(rest...);
-    }   // assignUniforms
-
-    // ------------------------------------------------------------------------
-    /** Sets the uniforms for this shader. */
-    void setUniforms(const Args & ... args) const
-    {
-        if (!CVS->isARBUniformBufferObjectUsable())
-            bypassUBO();
-        setUniformsImpl(args...);
-    }   // setUniforms
 
 
 };   // Shader
