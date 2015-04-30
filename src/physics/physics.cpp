@@ -171,9 +171,9 @@ void Physics::update(float dt)
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
             int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
+            // TODO: do not use globals this way, pass directly as function paramters
             Scripting::Physics::setCollision(kartid1,kartid2);
-            Scripting::Physics::setCollisionType("KartKart");
-            script_engine->runScript("collisions");
+            script_engine->runScript("onKartKartCollision");
             continue;
         }  // if kart-kart collision
 
@@ -183,16 +183,15 @@ void Physics::update(float dt)
             // -------------------------
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             Scripting::Physics::setCollision(0, 0);
-            Scripting::Physics::setCollisionType("KartObject"); //object as in physical object
-            Scripting::Physics::setCollision
-                (
+            //Scripting::Physics::setCollisionType("KartObject"); //object as in physical object
+            Scripting::Physics::setCollision(
                 p->getUserPointer(0)->getPointerPhysicalObject()->getID(),
                 "kart"
-                );
-            script_engine->runScript("collisions");
+            );
+            script_engine->runScript("onKartObjectCollision");
             PhysicalObject *obj = p->getUserPointer(0)
                                    ->getPointerPhysicalObject();
-            if(obj->isCrashReset())
+            if (obj->isCrashReset())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 new RescueAnimation(kart);
@@ -219,7 +218,7 @@ void Physics::update(float dt)
             continue;
         }
 
-        if(p->getUserPointer(0)->is(UserPointer::UP_ANIMATION))
+        if (p->getUserPointer(0)->is(UserPointer::UP_ANIMATION))
         {
             // Kart hits animation
             ThreeDAnimation *anim=p->getUserPointer(0)->getPointerAnimation();
@@ -257,13 +256,12 @@ void Physics::update(float dt)
             // -------------------------------
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             Scripting::Physics::setCollision(0,0); //TODO : support item types etc
-            Scripting::Physics::setCollisionType("ItemObject");
-            Scripting::Physics::setCollision
-                (
+            //Scripting::Physics::setCollisionType("ItemObject");
+            Scripting::Physics::setCollision(
                 p->getUserPointer(1)->getPointerPhysicalObject()->getID(),
                 "item"
-                );
-            script_engine->runScript("collisions");
+            );
+            script_engine->runScript("onItemObjectCollision");
             p->getUserPointer(0)->getPointerFlyable()
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();

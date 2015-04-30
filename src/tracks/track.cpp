@@ -1486,7 +1486,7 @@ void Track::update(float dt)
     if (!m_startup_run) // first time running update = good point to run startup script
     {
         Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        script_engine->runScript("start");
+        script_engine->runScript("onStart");
         m_startup_run = true;
     }
     m_track_object_manager->update(dt);
@@ -1498,7 +1498,7 @@ void Track::update(float dt)
     CheckManager::get()->update(dt);
     ItemManager::get()->update(dt);
     Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-    script_engine->runScript("update");
+    script_engine->runScript("onUpdate");
 }   // update
 
 // ----------------------------------------------------------------------------

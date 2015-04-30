@@ -30,10 +30,7 @@ namespace Scripting
     namespace Physics
     {
         void registerScriptFunctions(asIScriptEngine *engine);
-        asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine);
         void setCollision(int collider1,int collider2);
-        void setCollisionType(std::string collisionType);
         void setCollision(std::string collider1, std::string collider2);
     }
 
@@ -50,12 +47,6 @@ namespace Scripting
 
         asIScriptFunction*
             registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName);
-
-        asIScriptFunction*
-            registerUpdateScriptCallbacks(asIScriptEngine *engine);
-
-        asIScriptFunction*
-            registerStartScriptCallbacks(asIScriptEngine *engine);
     }
         
     class ScriptEngine

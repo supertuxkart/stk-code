@@ -85,10 +85,9 @@ std::string getScript(std::string scriptName)
 {
     std::string script_dir = file_manager->getAsset(FileManager::SCRIPT, "");
     script_dir += World::getWorld()->getTrack()->getIdent() + "/";
-    if (scriptName != "update" && scriptName != "collisions" && scriptName != "start")
-        scriptName = "triggers";
 
-    script_dir += scriptName + ".as";
+    // TODO: allow splitting in multiple files
+    script_dir += "scripting.as";
     FILE *f = fopen(script_dir.c_str(), "rb");
     if (f == NULL)
     {
@@ -134,7 +133,8 @@ void ScriptEngine::runScript(std::string scriptName)
 
 
     asIScriptFunction *func;
-    if (m_script_cache.find(scriptName) == m_script_cache.end())
+    auto cached_script = m_script_cache.find(scriptName);
+    if (cached_script == m_script_cache.end())
     {
         // Compile the script code
         Log::debug("Scripting", "Compiling script '%s' (was not in cache)", scriptName.c_str());
@@ -142,7 +142,7 @@ void ScriptEngine::runScript(std::string scriptName)
         if (r < 0)
         {
             Log::debug("Scripting", "Script '%s' is not available", scriptName.c_str());
-            m_script_cache[scriptName] = NULL; // remember that this script is unavaiable
+            m_script_cache[scriptName] = NULL; // remember that this script is unavailable
             ctx->Release();
             return;
         }
@@ -150,27 +150,12 @@ void ScriptEngine::runScript(std::string scriptName)
         // Find the function for the function we want to execute.
         //This is how you call a normal function with arguments
         //asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void func(arg1Type, arg2Type)");
-        if (scriptName == "collisions")
-        {
-            func = Scripting::Physics::registerScriptCallbacks(m_engine);
-        }
-        else if (scriptName == "update")
-        {
-            func = Scripting::Track::registerUpdateScriptCallbacks(m_engine);
-        }
-        else if (scriptName == "start")
-        {
-            func = Scripting::Track::registerStartScriptCallbacks(m_engine);
-        }
-        else
-        {
-            //trigger type can have different names
-            func = Scripting::Track::registerScriptCallbacks(m_engine, scriptName);
-        }
-
+        func = Scripting::Track::registerScriptCallbacks(m_engine, scriptName);
+        
         if (func == NULL)
         {
-            Log::warn("Scripting", "The required function was not found : %s", scriptName.c_str());
+            Log::debug("Scripting", "Scripting function was not found : %s", scriptName.c_str());
+            m_script_cache[scriptName] = NULL; // remember that this script is unavailable
             ctx->Release();
             return;
         }
@@ -181,9 +166,8 @@ void ScriptEngine::runScript(std::string scriptName)
     }
     else
     {
-        //Script present in cache
-        // TODO: clear when done
-        func = m_script_cache[scriptName];
+        // Script present in cache
+        func = cached_script->second;
     }
 
     if (func == NULL)

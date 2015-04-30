@@ -174,6 +174,24 @@ namespace Scripting
             new(gen->GetAddressOfReturnLocation()) std::string(StringUtils::wide_to_utf8(out.c_str()));
         }
         
+        void scriptLogInfo(asIScriptGeneric *gen)
+        {
+            std::string input = *(std::string*)gen->GetArgAddress(0);
+            Log::info("Script", "%s", input.c_str());
+        }
+
+        void scriptLogWarning(asIScriptGeneric *gen)
+        {
+            std::string input = *(std::string*)gen->GetArgAddress(0);
+            Log::warn("Script", "%s", input.c_str());
+        }
+
+        void scriptLogError(asIScriptGeneric *gen)
+        {
+            std::string input = *(std::string*)gen->GetArgAddress(0);
+            Log::error("Script", "%s", input.c_str());
+        }
+
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r; // of type asERetCodes
@@ -185,13 +203,20 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in)", asFUNCTION(translateAndInsertValues1), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in, const string &in)", asFUNCTION(translateAndInsertValues2), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in, const string &in, const string &in)", asFUNCTION(translateAndInsertValues3), asCALL_GENERIC); assert(r >= 0);
+            
+            engine->SetDefaultNamespace("Utils");
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in)", asFUNCTION(insertValues1), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in)", asFUNCTION(insertValues2), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in)", asFUNCTION(insertValues3), asCALL_GENERIC); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void logInfo(const string &in)", asFUNCTION(scriptLogInfo), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void logWarning(const string &in)", asFUNCTION(scriptLogWarning), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void logError(const string &in)", asFUNCTION(scriptLogError), asCALL_GENERIC); assert(r >= 0);
         }
 
         void registerScriptEnums(asIScriptEngine *engine)
         {
+            engine->SetDefaultNamespace("GUI");
             engine->RegisterEnum("PA");
             engine->RegisterEnumValue("PA", "STEER_LEFT", PA_STEER_LEFT);
             engine->RegisterEnumValue("PA", "STEER_RIGHT", PA_STEER_RIGHT);

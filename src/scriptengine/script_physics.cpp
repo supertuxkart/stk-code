@@ -51,11 +51,6 @@ namespace Scripting
             void *pointer = &m_collider1;
             gen->SetReturnObject(pointer);
         }
-        void getCollisionType(asIScriptGeneric *gen)
-        {
-            void *pointer = &m_collisionType;
-            gen->SetReturnObject(pointer);
-        }
 
         //Callbacks from Physics Engine, for collisions
         void setCollision(int collider1,int collider2)
@@ -68,24 +63,12 @@ namespace Scripting
             m_collider1 = collider1;
             m_collider2 = collider2;
         }
-        void setCollisionType(std::string collisionType)
-        {
-            m_collisionType = collisionType;
-        }
-        asIScriptFunction* registerScriptCallbacks(asIScriptEngine *engine)
-        {
-            asIScriptFunction *func;
-            std::string function_name = "void on" + m_collisionType + "Collision()";
-            func = engine->GetModule(0)->GetFunctionByDecl(function_name.c_str());
-            return func;
-        }
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r;
             engine->SetDefaultNamespace("Physics");
             r = engine->RegisterGlobalFunction("uint getCollidingKart1()", asFUNCTION(getCollidingKart1), asCALL_GENERIC); assert( r >= 0 );
             r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
-            r = engine->RegisterGlobalFunction("string getCollisionType()", asFUNCTION(getCollisionType), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string getCollidingID()", asFUNCTION(getCollidingID), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", asFUNCTION(createExplosion), asCALL_GENERIC); assert(r >= 0);
         }

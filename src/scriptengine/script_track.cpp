@@ -46,18 +46,6 @@ namespace Scripting
             func = engine->GetModule(0)->GetFunctionByDecl(function_name.c_str());
             return func;
         }
-        asIScriptFunction* registerStartScriptCallbacks(asIScriptEngine *engine)
-        {
-            asIScriptFunction *func;
-            func = engine->GetModule(0)->GetFunctionByDecl("void onStart()");
-            return func;
-        }
-        asIScriptFunction* registerUpdateScriptCallbacks(asIScriptEngine *engine)
-        {
-            asIScriptFunction *func;
-            func = engine->GetModule(0)->GetFunctionByDecl("void onUpdate()");
-            return func;
-        }
         /*
         void disableAnimation(std::string *name, void *memory)
         {
