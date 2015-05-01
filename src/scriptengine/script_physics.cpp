@@ -36,40 +36,10 @@ namespace Scripting
             HitEffect *he = new Explosion(*explosion_loc, "explosion", "explosion_bomb.xml");
             projectile_manager->addHitEffect(he);
         }
-        //Bind getters for colliding karts
-        void getCollidingKart1(asIScriptGeneric *gen)
-        {
-            gen->SetReturnDWord(m_collidingkartid1);
-        }
-        void getCollidingKart2(asIScriptGeneric *gen)
-        {
-            gen->SetReturnDWord(m_collidingkartid2);
-        }
-        //Bind getter for colliding objects
-        void getCollidingID(asIScriptGeneric *gen)
-        {
-            void *pointer = &m_collider1;
-            gen->SetReturnObject(pointer);
-        }
-
-        //Callbacks from Physics Engine, for collisions
-        void setCollision(int collider1,int collider2)
-        {
-            m_collidingkartid1 = collider1;
-            m_collidingkartid2 = collider2;
-        }
-        void setCollision(std::string collider1, std::string collider2)
-        {
-            m_collider1 = collider1;
-            m_collider2 = collider2;
-        }
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r;
             engine->SetDefaultNamespace("Physics");
-            r = engine->RegisterGlobalFunction("uint getCollidingKart1()", asFUNCTION(getCollidingKart1), asCALL_GENERIC); assert( r >= 0 );
-            r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
-            r = engine->RegisterGlobalFunction("string getCollidingID()", asFUNCTION(getCollidingID), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", asFUNCTION(createExplosion), asCALL_GENERIC); assert(r >= 0);
         }
     }

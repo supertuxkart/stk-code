@@ -31,8 +31,6 @@ namespace Scripting
     namespace Physics
     {
         void registerScriptFunctions(asIScriptEngine *engine);
-        void setCollision(int collider1,int collider2);
-        void setCollision(std::string collider1, std::string collider2);
     }
 
     namespace Kart

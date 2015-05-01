@@ -171,9 +171,11 @@ void Physics::update(float dt)
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
             int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
-            // TODO: do not use globals this way, pass directly as function paramters
-            Scripting::Physics::setCollision(kartid1,kartid2);
-            script_engine->runScript("void onKartKartCollision()");
+            script_engine->runScript("void onKartKartCollision(int, int)",
+                [=](asIScriptContext* ctx) {
+                    ctx->SetArgDWord(0, kartid1);
+                    ctx->SetArgDWord(1, kartid2);
+                });
             continue;
         }  // if kart-kart collision
 
@@ -182,28 +184,27 @@ void Physics::update(float dt)
             // Kart hits physical object
             // -------------------------
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-            Scripting::Physics::setCollision(0, 0);
-            //Scripting::Physics::setCollisionType("KartObject"); //object as in physical object
-            Scripting::Physics::setCollision(
-                p->getUserPointer(0)->getPointerPhysicalObject()->getID(),
-                "kart"
-            );
-            script_engine->runScript("void onKartObjectCollision()");
+            AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+            int kartId = kart->getWorldKartId();
+            std::string obj_id = p->getUserPointer(0)->getPointerPhysicalObject()->getID();
+            
+            // TODO: pass obj_id as arguent
+            script_engine->runScript("void onKartObjectCollision(int)",
+                [=](asIScriptContext* ctx) {
+                    ctx->SetArgDWord(0, kartId);
+                });
             PhysicalObject *obj = p->getUserPointer(0)
                                    ->getPointerPhysicalObject();
             if (obj->isCrashReset())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 new RescueAnimation(kart);
             }
             else if (obj->isExplodeKartObject())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 ExplosionAnimation::create(kart);
             }
             else if (obj->isFlattenKartObject())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 const KartProperties* kp = kart->getKartProperties();
                 kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
                     kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
@@ -211,7 +212,6 @@ void Physics::update(float dt)
             else if(obj->isSoccerBall() && 
                     race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
-                int kartId = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
                 soccerWorld->setLastKartTohitBall(kartId);
             }
@@ -255,12 +255,11 @@ void Physics::update(float dt)
             // Projectile hits physical object
             // -------------------------------
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-            Scripting::Physics::setCollision(0,0); //TODO : support item types etc
-            //Scripting::Physics::setCollisionType("ItemObject");
-            Scripting::Physics::setCollision(
-                p->getUserPointer(1)->getPointerPhysicalObject()->getID(),
-                "item"
-            );
+            // TODO: pass arguments
+            //Scripting::Physics::setColl0ision(
+            //    p->getUserPointer(1)->getPointerPhysicalObject()->getID(),
+            //    "item"
+            //);
             script_engine->runScript("void onItemObjectCollision()");
             p->getUserPointer(0)->getPointerFlyable()
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
