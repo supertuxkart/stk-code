@@ -114,23 +114,24 @@ std::string getScript(std::string scriptName)
 }
 
 //-----------------------------------------------------------------------------
+
 /** runs the specified script
 *  \param string scriptName = name of script to run
 */
 void ScriptEngine::runScript(std::string scriptName)
 {
-    PROFILER_PUSH_CPU_MARKER("RunScript", 255, 0, 0);
+    std::function<void(asIScriptContext*)> callback;
+    runScript(scriptName, callback);
+}
 
-    // Create a context that will execute the script.
-    asIScriptContext *ctx = m_engine->CreateContext();
-    if (ctx == NULL)
-    {
-        Log::error("Scripting", "Failed to create the context.");
-        //m_engine->Release();
-        return;
-    }
+//-----------------------------------------------------------------------------
+
+/** runs the specified script
+*  \param string scriptName = name of script to run
+*/
+void ScriptEngine::runScript(std::string scriptName, std::function<void(asIScriptContext*)> callback)
+{
     int r; //int for error checking
-
 
     asIScriptFunction *func;
     auto cached_script = m_script_cache.find(scriptName);
@@ -143,7 +144,6 @@ void ScriptEngine::runScript(std::string scriptName)
         {
             Log::debug("Scripting", "Script '%s' is not available", scriptName.c_str());
             m_script_cache[scriptName] = NULL; // remember that this script is unavailable
-            ctx->Release();
             return;
         }
 
@@ -156,7 +156,6 @@ void ScriptEngine::runScript(std::string scriptName)
         {
             Log::debug("Scripting", "Scripting function was not found : %s", scriptName.c_str());
             m_script_cache[scriptName] = NULL; // remember that this script is unavailable
-            ctx->Release();
             return;
         }
 
@@ -172,8 +171,17 @@ void ScriptEngine::runScript(std::string scriptName)
 
     if (func == NULL)
     {
-        PROFILER_POP_CPU_MARKER();
         return; // script unavailable
+    }
+
+
+    // Create a context that will execute the script.
+    asIScriptContext *ctx = m_engine->CreateContext();
+    if (ctx == NULL)
+    {
+        Log::error("Scripting", "Failed to create the context.");
+        //m_engine->Release();
+        return;
     }
 
     // Prepare the script context with the function we wish to execute. Prepare()
@@ -194,6 +202,8 @@ void ScriptEngine::runScript(std::string scriptName)
     //ctx->setArgType(index, value);
     //for example : ctx->SetArgFloat(0, 3.14159265359f);
 
+    if (callback)
+        callback(ctx);
 
     // Execute the function
     r = ctx->Execute();
@@ -230,8 +240,6 @@ void ScriptEngine::runScript(std::string scriptName)
 
     // We must release the contexts when no longer using them
     ctx->Release();
-
-    PROFILER_POP_CPU_MARKER();
 }
 
 //-----------------------------------------------------------------------------

@@ -39,10 +39,10 @@ namespace Scripting
     namespace Track
     {
         //register callbacks
-        asIScriptFunction* registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName)
+        // TODO: move this out of Track namespace, it's not specific to tracks
+        asIScriptFunction* registerScriptCallbacks(asIScriptEngine *engine, std::string function_name)
         {
             asIScriptFunction *func;
-            std::string function_name = "void " + scriptName + "()";
             func = engine->GetModule(0)->GetFunctionByDecl(function_name.c_str());
             return func;
         }

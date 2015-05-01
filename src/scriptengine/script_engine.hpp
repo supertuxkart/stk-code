@@ -21,6 +21,7 @@
 
 #include <string>
 #include <angelscript.h>
+#include <functional>
 
 class TrackObjectPresentation;
 
@@ -48,14 +49,16 @@ namespace Scripting
         asIScriptFunction*
             registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName);
     }
-        
+    
     class ScriptEngine
     {
     public:
+
         ScriptEngine();
         ~ScriptEngine();
         
         void runScript(std::string scriptName);
+        void runScript(std::string scriptName, std::function<void(asIScriptContext*)> callback);
         void cleanupCache();
         
     private:

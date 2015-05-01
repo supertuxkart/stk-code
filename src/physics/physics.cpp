@@ -173,7 +173,7 @@ void Physics::update(float dt)
             int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
             // TODO: do not use globals this way, pass directly as function paramters
             Scripting::Physics::setCollision(kartid1,kartid2);
-            script_engine->runScript("onKartKartCollision");
+            script_engine->runScript("void onKartKartCollision()");
             continue;
         }  // if kart-kart collision
 
@@ -188,7 +188,7 @@ void Physics::update(float dt)
                 p->getUserPointer(0)->getPointerPhysicalObject()->getID(),
                 "kart"
             );
-            script_engine->runScript("onKartObjectCollision");
+            script_engine->runScript("void onKartObjectCollision()");
             PhysicalObject *obj = p->getUserPointer(0)
                                    ->getPointerPhysicalObject();
             if (obj->isCrashReset())
@@ -261,7 +261,7 @@ void Physics::update(float dt)
                 p->getUserPointer(1)->getPointerPhysicalObject()->getID(),
                 "item"
             );
-            script_engine->runScript("onItemObjectCollision");
+            script_engine->runScript("void onItemObjectCollision()");
             p->getUserPointer(0)->getPointerFlyable()
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();

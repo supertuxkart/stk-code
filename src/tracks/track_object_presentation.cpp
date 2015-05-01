@@ -22,6 +22,7 @@
 #include "audio/sfx_buffer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -34,6 +35,7 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "items/item_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
@@ -932,13 +934,11 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         Scripting::ScriptEngine* script_engine =
             World::getWorld()->getScriptEngine();
         m_action_active = false;
-        script_engine->runScript(m_action);
-        
-        /*
-        Catch exception -> script not found
-        fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
-                m_action.c_str());
-        
-         */
+        int idKart = 0;
+        Camera* camera = Camera::getActiveCamera();
+        if (camera != NULL && camera->getKart() != NULL)
+            idKart = camera->getKart()->getWorldKartId();
+        script_engine->runScript("void " + m_action + "(int)",
+            [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
     }
 }   // onTriggerItemApproached
