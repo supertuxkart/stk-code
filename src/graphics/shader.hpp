@@ -54,8 +54,8 @@ protected:
 
     void bypassUBO() const;
 
-    // ------------------------------------------------------------------------
-    // Ends vararg template
+    // ========================================================================
+    /** Ends recursion. */
     template<typename ... Types>
     void loadAndAttachShader()
     {
@@ -72,6 +72,7 @@ protected:
         loadAndAttachShader(args...);
     }   // loadAndAttachShader
     // ------------------------------------------------------------------------
+    /** Convenience interface using const char. */
     template<typename ... Types>
     void loadAndAttachShader(GLint shader_type, const char *name,
                              Types ... args)
@@ -149,7 +150,7 @@ private:
     // ==============================================
     // setUniforms: Variadic template implementation.
 
-protected:
+public:
     /** Sets the uniforms for this shader. */
     void setUniforms(const Args & ... args) const
     {
