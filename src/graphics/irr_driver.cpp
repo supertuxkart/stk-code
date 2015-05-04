@@ -109,7 +109,7 @@ IrrDriver::IrrDriver()
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
     m_device              = createDevice(video::EDT_NULL,
                                          irr::core::dimension2d<u32>(640, 480),
-                                         /*bits*/16U, /**fullscreen*/ false, 
+                                         /*bits*/16U, /**fullscreen*/ false,
                                          /*stencilBuffer*/ false,
                                          /*vsync*/false,
                                          /*event receiver*/ NULL,
@@ -349,8 +349,13 @@ void IrrDriver::initDevice()
 
         video::IVideoModeList* modes = m_device->getVideoModeList();
         const core::dimension2d<u32> ssize = modes->getDesktopResolution();
-        if (UserConfigParams::m_width > (int)ssize.Width ||
-            UserConfigParams::m_height > (int)ssize.Height)
+
+        if (ssize.Width < 1 || ssize.Height < 1)
+        {
+            Log::warn("irr_driver", "Unknown desktop resolution.");
+        }
+        else if (UserConfigParams::m_width > (int)ssize.Width ||
+                 UserConfigParams::m_height > (int)ssize.Height)
         {
             Log::warn("irr_driver", "The window size specified in "
                       "user config is larger than your screen!");
@@ -358,13 +363,13 @@ void IrrDriver::initDevice()
             UserConfigParams::m_height = (int)ssize.Height;
         }
 
-        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width,
-                                                    UserConfigParams::m_height);
-
         if (UserConfigParams::m_fullscreen)
         {
             if (modes->getVideoModeCount() > 0)
             {
+                core::dimension2d<u32> res = core::dimension2du(
+                                                    UserConfigParams::m_width,
+                                                    UserConfigParams::m_height);
                 res = modes->getVideoModeResolution(res, res);
 
                 UserConfigParams::m_width = res.Width;
@@ -372,11 +377,18 @@ void IrrDriver::initDevice()
             }
             else
             {
-                Log::verbose("irr_driver", "Cannot get information about "
-                             "resolutions. Try to use the default one.");
-                UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
-                UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
+                Log::warn("irr_driver", "Cannot get information about "
+                          "resolutions. Disable fullscreen.");
+                UserConfigParams::m_fullscreen = false;
             }
+        }
+
+        if (UserConfigParams::m_width < 1 || UserConfigParams::m_height < 1)
+        {
+            Log::warn("irr_driver", "Invalid window size. "
+                         "Try to use the default one.");
+            UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
+            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
         }
 
         m_device->closeDevice();
@@ -703,7 +715,7 @@ bool IrrDriver::moveWindow(int x, int y)
     }
 #elif defined(__linux__) && !defined(ANDROID)
     const video::SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
-    
+
     Display* display = (Display*)videoData.OpenGLLinux.X11Display;
     int screen = DefaultScreen(display);
     int screen_w = DisplayWidth(display, screen);
@@ -713,7 +725,7 @@ bool IrrDriver::moveWindow(int x, int y)
     {
         x = screen_w - UserConfigParams::m_width;
     }
-    
+
     if (y + UserConfigParams::m_height > screen_h)
     {
         y = screen_h - UserConfigParams::m_height;
