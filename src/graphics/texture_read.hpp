@@ -20,12 +20,10 @@
 
 #include "shaders_util.hpp"
 
+#include <functional>
 
-void   bindTextureNearest(unsigned TU, unsigned tid);
 GLuint createNearestSampler();
-void   bindTextureTrilinearAnisotropic(unsigned, unsigned);
 GLuint createTrilinearSampler();
-void   bindTextureNearesClamped(GLuint texture_unit, GLuint tex);
 
 
 enum SamplerTypeNew {
@@ -44,13 +42,15 @@ enum SamplerTypeNew {
 
 class TextureReadBaseNew
 {
-protected:
-
-private:
-
-    typedef void(*BindFunction)(unsigned, unsigned);
+public:
+    typedef  std::function<void(unsigned, unsigned)> BindFunction;
 
 protected:
+    static void   bindTextureNearest(GLuint TU, GLuint tid);
+    static void   bindTextureNearestClamped(GLuint texture_unit, GLuint tex);
+    static void   bindTextureTrilinearAnisotropic(GLuint, GLuint);
+
+
     static BindFunction m_all_bind_functions[2];
     std::vector<BindFunction> m_bind_functions;
     static GLuint m_all_texture_types[];
@@ -65,14 +65,6 @@ class TextureReadNew : public TextureReadBaseNew
 {
 
 private:
-    static void bindTextureNearest(unsigned TU, unsigned tid);
-//    static void bindTextureTrilinearAnisotropic(unsigned , unsigned );
-
-    //typedef void(TextureReadBaseNew::*BindFunction)(unsigned, unsigned);
-
-    //static void(*)(unsigned, unsigned) m_all_bind_functions[2];
-    
-//    std::vector<BindFunction> m_bind_functions;
 
     std::vector<GLuint> m_texture_units;
     std::vector<GLenum> m_texture_type;

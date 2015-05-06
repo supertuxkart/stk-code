@@ -20,9 +20,10 @@
 
 #include "config/user_config.hpp"
 
-TextureReadBaseNew::BindFunction TextureReadBaseNew::m_all_bind_functions[] = 
-{ &bindTextureNearest, 
-  &bindTextureTrilinearAnisotropic };
+TextureReadBaseNew::BindFunction TextureReadBaseNew::m_all_bind_functions[] =
+{ &TextureReadBaseNew::bindTextureNearest,
+  &TextureReadBaseNew::bindTextureTrilinearAnisotropic };
+
 GLuint TextureReadBaseNew::m_all_texture_types[] = { GL_TEXTURE_2D, GL_TEXTURE_2D };
 
 // ----------------------------------------------------------------------------
@@ -37,11 +38,12 @@ GLuint TextureReadBaseNew::createSamplers(SamplerTypeNew sampler_type)
 
     default:
         assert(false);
+        return 0;
     }   // switch
 }   // createSamplers
 
 // ----------------------------------------------------------------------------
-void bindTextureNearest(GLuint texture_unit, GLuint tex)
+void TextureReadBaseNew::bindTextureNearest(GLuint texture_unit, GLuint tex)
 {
     glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -53,9 +55,9 @@ void bindTextureNearest(GLuint texture_unit, GLuint tex)
 }   // bindTextureNearest
 
 // ----------------------------------------------------------------------------
-void bindTextureTrilinearAnisotropic(GLuint TU, GLuint tex)
+void TextureReadBaseNew::bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint tex)
 {
-    glActiveTexture(GL_TEXTURE0 + TU);
+    glActiveTexture(GL_TEXTURE0 + tex_unit);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -83,8 +85,8 @@ GLuint createNearestSampler()
 }   // createNearestSampler
 
 // ----------------------------------------------------------------------------
-void bindTextureNearesClamped(GLuint texture_unit,
-                                                  GLuint tex_id)
+void TextureReadBaseNew::bindTextureNearestClamped(GLuint texture_unit,
+                                                   GLuint tex_id)
 {
     glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_2D, tex_id);
@@ -108,9 +110,9 @@ void bindTextureBilinear(GLuint texture_unit, GLuint tex)
 }   // bindTextureBilinear
 
 // ----------------------------------------------------------------------------
-void bindTextureBilinearClamped(GLuint TU, GLuint tex)
+void bindTextureBilinearClamped(GLuint tex_unit, GLuint tex)
 {
-    glActiveTexture(GL_TEXTURE0 + TU);
+    glActiveTexture(GL_TEXTURE0 + tex_unit);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -120,9 +122,9 @@ void bindTextureBilinearClamped(GLuint TU, GLuint tex)
 }   // bindTextureBilinearClamped
 
 // ----------------------------------------------------------------------------
-void bindTextureSemiTrilinear(GLuint TU, GLuint tex)
+void bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex)
 {
-    glActiveTexture(GL_TEXTURE0 + TU);
+    glActiveTexture(GL_TEXTURE0 + tex_unit);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
