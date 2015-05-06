@@ -775,7 +775,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "object_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     ObjectRefPass1Shader::ObjectRefPass1Shader()

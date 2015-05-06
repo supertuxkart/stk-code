@@ -62,7 +62,7 @@ public:
 namespace MeshShader
 {
 class ObjectPass1Shader : public Shader<ObjectPass1Shader, core::matrix4, core::matrix4>, 
-                          public TextureRead<Trilinear_Anisotropic_Filtered>
+                          public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     ObjectPass1Shader();
