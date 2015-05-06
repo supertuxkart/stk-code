@@ -662,19 +662,6 @@ void BindTextureTrilinearAnisotropic(GLuint TU, GLuint tex)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
 }
 
-void BindCubemapTrilinear(unsigned TU, unsigned tex)
-{
-    glActiveTexture(GL_TEXTURE0 + TU);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    int aniso = UserConfigParams::m_anisotropic;
-    if (aniso == 0) aniso = 1;
-    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
-}
 
 GLuint createShadowSampler()
 {
@@ -760,7 +747,7 @@ namespace UtilShader
             GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
         assignUniforms("PermutationMatrix", "ViewportSize");
         TU_Samples = 1;
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_CUBEMAP);
         assignTextureUnit(TU_Samples, "samples");
     }
 }
@@ -1242,7 +1229,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, "sky.vert",
             GL_FRAGMENT_SHADER, "sky.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_CUBEMAP);
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -1457,7 +1444,9 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
             GL_FRAGMENT_SHADER, "IBL.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "ntex", 1, "dtex", 2, "probe");
+        assignSamplerNames(m_program, 0, "ntex",  ST_NEAREST_FILTERED,
+                                      1, "dtex",  ST_NEAREST_FILTERED,
+                                      2, "probe", ST_TRILINEAR_CUBEMAP);
     }
 
     DegradedIBLShader::DegradedIBLShader()

@@ -50,7 +50,7 @@ public:
 };
 
 class SpecularIBLGenerator : public Shader<SpecularIBLGenerator, core::matrix4, float >,
-                             public TextureRead<Trilinear_cubemap>
+                             public TextureReadNew<ST_TRILINEAR_CUBEMAP>
 {
 public:
     GLuint TU_Samples;
@@ -287,7 +287,7 @@ public:
     DisplaceShader();
 };
 
-class SkyboxShader : public Shader<SkyboxShader>, public TextureRead<Trilinear_cubemap>
+class SkyboxShader : public Shader<SkyboxShader>, public TextureReadNew<ST_TRILINEAR_CUBEMAP>
 {
 public:
     SkyboxShader();
@@ -395,7 +395,8 @@ public:
     SunLightShader();
 };
 
-class IBLShader : public Shader<IBLShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_cubemap>
+class IBLShader : public Shader<IBLShader>,
+                  public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_TRILINEAR_CUBEMAP>
 {
 public:
     IBLShader();

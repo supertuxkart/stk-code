@@ -21,26 +21,15 @@
 #include "config/user_config.hpp"
 
 TextureReadBaseNew::BindFunction TextureReadBaseNew::m_all_bind_functions[] =
-{ &TextureReadBaseNew::bindTextureNearest,
-  &TextureReadBaseNew::bindTextureTrilinearAnisotropic };
+{ /* ST_NEAREST_FILTERED               */ &TextureReadBaseNew::bindTextureNearest,
+  /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ &TextureReadBaseNew::bindTextureTrilinearAnisotropic,
+  /* ST_TRILINEAR_CUBEMAP              */ &TextureReadBaseNew::bindCubemapTrilinear
+};
 
-GLuint TextureReadBaseNew::m_all_texture_types[] = { GL_TEXTURE_2D, GL_TEXTURE_2D };
-
-// ----------------------------------------------------------------------------
-GLuint TextureReadBaseNew::createSamplers(SamplerTypeNew sampler_type)
-{
-    switch (sampler_type)
-    {
-    case ST_NEAREST_FILTERED:
-        return createNearestSampler();
-    case ST_TRILINEAR_ANISOTROPIC_FILTERED:
-        return createTrilinearSampler();
-
-    default:
-        assert(false);
-        return 0;
-    }   // switch
-}   // createSamplers
+GLuint TextureReadBaseNew::m_all_texture_types[] = 
+{ /* ST_NEAREST_FILTERED               */ GL_TEXTURE_2D,
+  /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ GL_TEXTURE_2D,
+  /* ST_TRILINEAR_CUBEMAP              */ GL_TEXTURE_CUBE_MAP };
 
 // ----------------------------------------------------------------------------
 void TextureReadBaseNew::bindTextureNearest(GLuint texture_unit, GLuint tex)
@@ -70,23 +59,24 @@ void TextureReadBaseNew::bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint
 }   // bindTextureTrilinearAnisotropic
 
 // ----------------------------------------------------------------------------
-GLuint TextureReadBaseNew::createNearestSampler()
+void TextureReadBaseNew::bindCubemapTrilinear(unsigned tex_unit, unsigned tex)
 {
-#ifdef GL_VERSION_3_3
-    unsigned id;
-    glGenSamplers(1, &id);
-    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
-    return id;
-#endif
-}   // createNearestSampler
+    glActiveTexture(GL_TEXTURE0 + tex_unit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    int aniso = UserConfigParams::m_anisotropic;
+    if (aniso == 0) aniso = 1;
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+                    (float)aniso);
+}   // bindCubemapTrilinear
 
 // ----------------------------------------------------------------------------
 void TextureReadBaseNew::bindTextureNearestClamped(GLuint texture_unit,
-                                                   GLuint tex_id)
+    GLuint tex_id)
 {
     glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_2D, tex_id);
@@ -132,6 +122,38 @@ void TextureReadBaseNew::bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
 }   // bindTextureSemiTrilinear
+
+// ----------------------------------------------------------------------------
+GLuint TextureReadBaseNew::createSamplers(SamplerTypeNew sampler_type)
+{
+    switch (sampler_type)
+    {
+    case ST_NEAREST_FILTERED:
+        return createNearestSampler();
+    case ST_TRILINEAR_ANISOTROPIC_FILTERED:
+        return createTrilinearSampler();
+    case ST_TRILINEAR_CUBEMAP:
+        return createTrilinearSampler();
+    default:
+        assert(false);
+        return 0;
+    }   // switch
+}   // createSamplers
+
+// ----------------------------------------------------------------------------
+GLuint TextureReadBaseNew::createNearestSampler()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+    return id;
+#endif
+}   // createNearestSampler
 
 // ----------------------------------------------------------------------------
 GLuint TextureReadBaseNew::createTrilinearSampler()

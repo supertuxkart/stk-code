@@ -51,7 +51,6 @@ enum SamplerType {
     Nearest_Filtered,
     Shadow_Sampler,
     Volume_Linear_Filtered,
-    Trilinear_cubemap,
     Trilinear_Clamped_Array2D,
 };
 
@@ -232,30 +231,6 @@ struct CreateSamplers<Trilinear_Anisotropic_Filtered, tp...>
 };
 
 void BindTextureTrilinearAnisotropic(unsigned TU, unsigned tex);
-
-template<SamplerType...tp>
-struct CreateSamplers<Trilinear_cubemap, tp...>
-{
-    static void exec(std::vector<unsigned> &v, std::vector<GLenum> &e)
-    {
-        v.push_back(createTrilinearSampler());
-        e.push_back(GL_TEXTURE_CUBE_MAP);
-        CreateSamplers<tp...>::exec(v, e);
-    }
-};
-
-void BindCubemapTrilinear(unsigned TU, unsigned tex);
-
-template<SamplerType...tp>
-struct BindTexture<Trilinear_cubemap, tp...>
-{
-    template<int N, typename...Args>
-    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
-    {
-        BindCubemapTrilinear(TU[N], TexId);
-        BindTexture<tp...>::template exec<N + 1>(TU, args...);
-    }
-};
 
 template<SamplerType...tp>
 struct BindTexture<Trilinear_Anisotropic_Filtered, tp...>

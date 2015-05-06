@@ -24,16 +24,19 @@
 
 
 enum SamplerTypeNew {
-    ST_NEAREST_FILTERED,
+    ST_MIN,
+    ST_NEAREST_FILTERED = ST_MIN,
     ST_TRILINEAR_ANISOTROPIC_FILTERED,
+    ST_TRILINEAR_CUBEMAP,
+    ST_MAX = ST_TRILINEAR_CUBEMAP,
+
     ST_SEMI_TRILINEAR,
     ST_BILINEAR_FILTERED,
     ST_BILINEAR_CLAMPED_FILTERED,
     ST_NEARED_CLAMPED_FILTERED,
     ST_SHADOW_SAMPLER,
     ST_VOLUME_LINEAR_FILTERED,
-    ST_TRILINEAR_CUBEMAP,
-    ST_TRILINEAR_CLAMPED_ARRAY2D,
+    ST_TRILINEAR_CLAMPED_ARRAY2D
 };
 
 
@@ -49,6 +52,7 @@ protected:
     static void   bindTextureNearestClamped(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex_id);
+    static void   bindCubemapTrilinear(unsigned tex_unit, unsigned tex);
 
     GLuint        createSamplers(SamplerTypeNew sampler_type);
 private:
@@ -57,7 +61,7 @@ private:
     static GLuint createTrilinearSampler();
 
 protected:
-    static BindFunction m_all_bind_functions[2];
+    static BindFunction m_all_bind_functions[];
     std::vector<BindFunction> m_bind_functions;
     static GLuint m_all_texture_types[];
 
@@ -100,12 +104,19 @@ private:
     {
 
         m_sampler_ids.push_back(createSamplers(sampler_type));
+
+        assert(sampler_type >= ST_MIN && sampler_type <= ST_MAX);
         m_texture_type.push_back(m_all_texture_types[sampler_type]);
+
         GLuint location = glGetUniformLocation(program, name);
         m_texture_location.push_back(location);
         glUniform1i(location, tex_unit);
         m_texture_units.push_back(tex_unit);
+
+        // Duplicated assert
+        assert(sampler_type >= ST_MIN && sampler_type <= ST_MAX);
         m_bind_functions.push_back( m_all_bind_functions[sampler_type]);
+
         assignTextureNamesImpl<N + 1>(program, args...);
     }   // assignTextureNamesImpl
 
