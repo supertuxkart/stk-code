@@ -22,9 +22,6 @@
 
 #include <functional>
 
-GLuint createNearestSampler();
-GLuint createTrilinearSampler();
-
 
 enum SamplerTypeNew {
     ST_NEAREST_FILTERED,
@@ -46,16 +43,24 @@ public:
     typedef  std::function<void(unsigned, unsigned)> BindFunction;
 
 protected:
-    static void   bindTextureNearest(GLuint TU, GLuint tid);
-    static void   bindTextureNearestClamped(GLuint texture_unit, GLuint tex);
-    static void   bindTextureTrilinearAnisotropic(GLuint, GLuint);
+    static void   bindTextureNearest(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureBilinear(GLuint texture_unit, GLuint tex);
+    static void   bindTextureBilinearClamped(GLuint tex_unit, GLuint tex);
+    static void   bindTextureNearestClamped(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex_id);
 
+    GLuint        createSamplers(SamplerTypeNew sampler_type);
+private:
 
+    static GLuint createNearestSampler();
+    static GLuint createTrilinearSampler();
+
+protected:
     static BindFunction m_all_bind_functions[2];
     std::vector<BindFunction> m_bind_functions;
     static GLuint m_all_texture_types[];
 
-    GLuint createSamplers(SamplerTypeNew);
 };   // TextureReadBaseNew
 
 // ============================================================================
