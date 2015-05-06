@@ -52,8 +52,8 @@ public:
 */
 class SimpleParticleRender : public Shader<SimpleParticleRender, video::SColorf,
                                            video::SColorf>,
-                             public TextureRead<Trilinear_Anisotropic_Filtered,
-                                                Nearest_Filtered>
+                             public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                                   ST_NEAREST_FILTERED>
 {
 public:
     SimpleParticleRender()
@@ -64,7 +64,8 @@ public:
                     GL_FRAGMENT_SHADER, "particle.frag");
 
         assignUniforms("color_from", "color_to");
-        assignSamplerNames(m_program, 0, "tex", 1, "dtex");
+        assignSamplerNames(m_program, 0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      1, "dtex", ST_NEAREST_FILTERED);
     }   // SimpleParticleRender
 
 };   // SimpleParticleRender

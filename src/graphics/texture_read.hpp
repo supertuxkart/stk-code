@@ -20,6 +20,218 @@
 
 #include "shaders_util.hpp"
 
+
+void   bindTextureNearest(unsigned TU, unsigned tid);
+GLuint createNearestSampler();
+void   bindTextureTrilinearAnisotropic(unsigned, unsigned);
+GLuint createTrilinearSampler();
+void   bindTextureNearesClamped(GLuint texture_unit, GLuint tex);
+
+
+enum SamplerTypeNew {
+    ST_NEAREST_FILTERED,
+    ST_TRILINEAR_ANISOTROPIC_FILTERED,
+    ST_SEMI_TRILINEAR,
+    ST_BILINEAR_FILTERED,
+    ST_BILINEAR_CLAMPED_FILTERED,
+    ST_NEARED_CLAMPED_FILTERED,
+    ST_SHADOW_SAMPLER,
+    ST_VOLUME_LINEAR_FILTERED,
+    ST_TRILINEAR_CUBEMAP,
+    ST_TRILINEAR_CLAMPED_ARRAY2D,
+};
+
+
+class TextureReadBaseNew
+{
+protected:
+
+private:
+
+    typedef void(*BindFunction)(unsigned, unsigned);
+
+protected:
+    static BindFunction m_all_bind_functions[2];
+    std::vector<BindFunction> m_bind_functions;
+    static GLuint m_all_texture_types[];
+
+    GLuint createSamplers(SamplerTypeNew);
+};   // TextureReadBaseNew
+
+// ============================================================================
+
+template<SamplerTypeNew...tp>
+class TextureReadNew : public TextureReadBaseNew
+{
+
+private:
+    static void bindTextureNearest(unsigned TU, unsigned tid);
+//    static void bindTextureTrilinearAnisotropic(unsigned , unsigned );
+
+    //typedef void(TextureReadBaseNew::*BindFunction)(unsigned, unsigned);
+
+    //static void(*)(unsigned, unsigned) m_all_bind_functions[2];
+    
+//    std::vector<BindFunction> m_bind_functions;
+
+    std::vector<GLuint> m_texture_units;
+    std::vector<GLenum> m_texture_type;
+    std::vector<GLenum> m_texture_location;
+
+public:
+    std::vector<GLuint> m_sampler_ids;
+
+    // A variadic template to assign texture names
+    // ===========================================
+private:
+    /** End of recursive variadic template AssigTextureNames. It just
+     *  checks if the number of arguments is correct.*/
+    template<unsigned N, typename...Args>
+    void assignTextureNamesImpl(GLuint)
+    {
+        static_assert(N == sizeof...(tp), "Wrong number of texture name");
+    }   // assignTextureNamesImpl
+
+    // ------------------------------------------------------------------------
+    /** Recursive implementation, peeling the texture unit and name off the
+     *  list of arguments.
+     */
+    template<unsigned N, typename...Args>
+    void assignTextureNamesImpl(GLuint program, GLuint tex_unit,
+                                const char *name, SamplerTypeNew sampler_type,
+                                Args...args)
+    {
+
+        m_sampler_ids.push_back(createSamplers(sampler_type));
+        m_texture_type.push_back(m_all_texture_types[sampler_type]);
+        GLuint location = glGetUniformLocation(program, name);
+        m_texture_location.push_back(location);
+        glUniform1i(location, tex_unit);
+        m_texture_units.push_back(tex_unit);
+        m_bind_functions.push_back( m_all_bind_functions[sampler_type]);
+        assignTextureNamesImpl<N + 1>(program, args...);
+    }   // assignTextureNamesImpl
+
+    // ------------------------------------------------------------------------
+public:
+    /** The protected interface for setting sampler names - it is only called
+    *  from instances.
+    */
+    template<typename...Args>
+    void assignSamplerNames(GLuint program, Args...args)
+    {
+        glUseProgram(program);
+        assignTextureNamesImpl<0>(program, args...);
+        glUseProgram(0);
+    }   // AssignSamplerNames
+
+
+    // Variadic template implementation of setTextureUnits
+    // ===================================================
+    /** End of recursion, just check if number of arguments is correct. */
+    template<int N>
+    void setTextureUnitsImpl()
+    {
+        static_assert(N == sizeof...(tp), "Not enough texture set");
+    }   // setTextureUnitsImpl
+
+    // ------------------------------------------------------------------------
+    /** The recursive implementation.
+     */
+    template<int N, typename... TexIds>
+    void setTextureUnitsImpl(GLuint texid, TexIds... args)
+    {
+        if (getGLSLVersion() >= 330)
+        {
+            setTextureSampler(m_texture_type[N], m_texture_units[N], texid,
+                              m_sampler_ids[N]);
+        }
+        else
+        {
+            m_bind_functions[N](m_texture_units[N], texid);
+        }
+        setTextureUnitsImpl<N + 1>(args...);
+    }   // setTextureUnitsImpl
+
+    // ------------------------------------------------------------------------
+public:
+    /** Public implementation of setTextureUnits.
+     */
+    template<typename... TexIds>
+    void setTextureUnits(TexIds... args)
+    {
+        setTextureUnitsImpl<0>(args...);
+    }   // setTextureUnits
+
+
+    // ========================================================================
+    // Variadic template implementation of setTextureHandles.
+
+    /** End of recursion, just checks at compile time if number of arguments
+     *  is correct.
+     *  \param N number of arguments. */
+    template<int N>
+    void setTextureHandlesImpl()
+    {
+        static_assert(N == sizeof...(tp), "Not enough handle set");
+    }   // setTextureHandlesImpl
+
+    // ------------------------------------------------------------------------
+    /** Recursive implementation of setTextureHandles.
+     * \param N The number of the current argument in the recursion (or the
+     *          recursion depth).
+     *  \param handle The texture handle to set.
+     */
+    template<int N, typename... HandlesId>
+    void setTextureHandlesImpl(uint64_t handle, HandlesId... args)
+    {
+        if (handle)
+            glUniformHandleui64ARB(m_texture_location[N], handle);
+        setTextureHandlesImpl<N + 1>(args...);
+    }   // setTextureHandlesImpl
+
+    // ------------------------------------------------------------------------
+public:
+    /** The protected interface.
+     *  \param ids The ids of all texture handls.
+     */
+    template<typename... HandlesId>
+    void setTextureHandles(HandlesId... ids)
+    {
+        setTextureHandlesImpl<0>(ids...);
+    }   // SetTextureHandles
+
+public:
+    // ------------------------------------------------------------------------
+    /** Destructor which frees al lsampler ids.
+     */
+    ~TextureReadNew()
+    {
+        for (unsigned i = 0; i < m_sampler_ids.size(); i++)
+            glDeleteSamplers(1, &m_sampler_ids[i]);
+    }   // ~TextureReadNew
+
+
+};   // class TextureReadNew
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+
+
+
+
+
+
+
+
+
 template<SamplerType...tp>
 class TextureRead
 {

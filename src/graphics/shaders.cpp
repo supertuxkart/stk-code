@@ -531,7 +531,7 @@ void setTextureSampler(GLenum tp, GLuint texunit, GLuint tid, GLuint sid)
 }
 
 
-GLuint createNearestSampler()
+GLuint XXXcreateNearestSampler()
 {
 #ifdef GL_VERSION_3_3
     unsigned id;
@@ -631,7 +631,7 @@ void BindTextureSemiTrilinear(GLuint TU, GLuint tex)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
 }
 
-GLuint createTrilinearSampler()
+GLuint XXXcreateTrilinearSampler()
 {
 #ifdef GL_VERSION_3_3
     unsigned id;
