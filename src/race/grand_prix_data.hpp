@@ -145,30 +145,30 @@ public:
                                        unsigned int laps, bool reverse);
     void                     remove(const unsigned int track);
 
-    // ------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     /** @return the (potentially translated) user-visible name of the Grand
      *  Prix (apply fribidi as needed) */
     irr::core::stringw getName()      const { return m_editable ? m_name.c_str() : _LTR(m_name.c_str());   }
 
-    // ------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     /** @return the internal indentifier of the Grand Prix (not translated) */
-    const std::string& getId()        const { return m_id;                   }
+    const std::string& getId()        const { return m_id;                     }
 
-    // ------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     /** Returns true if this GP is a random GP. */
-    bool isRandomGP()                 const { return m_id==getRandomGPID();  }
-    // ------------------------------------------------------------------------
+    bool isRandomGP()                 const { return m_id==getRandomGPID();    }
+    // -------------------------------------------------------------------------
     /** Returns the filename of the grand prix xml file. */
-    const std::string& getFilename()  const { return m_filename;             }
+    const std::string& getFilename()  const { return m_filename;               }
 
     // ------------------------------------------------------------------------
-    enum GPGroupType getGroup()       const { return m_group;                }
+    enum GPGroupType getGroup()       const { return m_group;                  }
 
-    // ------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     enum GPReverseType getReverseType()
-                                      const { return m_reverse_type;         }
-    static const char*    getRandomGPID()   { return "random";               }
-    static const wchar_t* getRandomGPName() { return _("Random Grand Prix"); }
+                                      const { return m_reverse_type;           }
+    static const char*    getRandomGPID()   { return "random";                 }
+    static const wchar_t* getRandomGPName() { return _LTR("Random Grand Prix");}
 };   // GrandPrixData
 
 #endif
