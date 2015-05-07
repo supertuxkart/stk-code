@@ -543,45 +543,52 @@ public:
     ComputeGaussian17TapHShader();
 };
 
-class ComputeGaussian6HBlurShader : public Shader<ComputeGaussian6HBlurShader, core::vector2df, std::vector<float> >, public TextureRead<Bilinear_Clamped_Filtered>
+class ComputeGaussian6HBlurShader : public Shader<ComputeGaussian6HBlurShader, core::vector2df, std::vector<float> >,
+                                    public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
 {
 public:
     GLuint TU_dest;
     ComputeGaussian6HBlurShader();
 };
 
-class ComputeShadowBlurHShader : public Shader<ComputeShadowBlurHShader, core::vector2df, std::vector<float> >, public TextureRead<Neared_Clamped_Filtered>
+class ComputeShadowBlurHShader : public Shader<ComputeShadowBlurHShader, core::vector2df, std::vector<float> >,
+                                public TextureReadNew<ST_NEARED_CLAMPED_FILTERED>
 {
 public:
     GLuint TU_dest;
     ComputeShadowBlurHShader();
 };
 
-class Gaussian6HBlurShader : public Shader<Gaussian6HBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
+class Gaussian6HBlurShader : public Shader<Gaussian6HBlurShader, core::vector2df, float>,
+                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
 {
 public:
     Gaussian6HBlurShader();
 };
 
-class HorizontalBlurShader : public Shader<HorizontalBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
+class HorizontalBlurShader : public Shader<HorizontalBlurShader, core::vector2df>,
+                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
 {
 public:
     HorizontalBlurShader();
 };
 
-class Gaussian3HBlurShader : public Shader<Gaussian3HBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
+class Gaussian3HBlurShader : public Shader<Gaussian3HBlurShader, core::vector2df>,
+                            public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
 {
 public:
     Gaussian3HBlurShader();
 };
 
-class Gaussian17TapVShader : public Shader<Gaussian17TapVShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered, Bilinear_Clamped_Filtered>
+class Gaussian17TapVShader : public Shader<Gaussian17TapVShader, core::vector2df>,
+                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED, ST_BILINEAR_CLAMPED_FILTERED>
 {
 public:
     Gaussian17TapVShader();
 };
 
-class ComputeGaussian17TapVShader : public Shader<ComputeGaussian17TapVShader, core::vector2df>, public TextureRead<Neared_Clamped_Filtered, Neared_Clamped_Filtered>
+class ComputeGaussian17TapVShader : public Shader<ComputeGaussian17TapVShader, core::vector2df>,
+                                    public TextureReadNew<ST_NEARED_CLAMPED_FILTERED, ST_NEARED_CLAMPED_FILTERED>
 {
 public:
     GLuint TU_dest;
@@ -589,33 +596,38 @@ public:
     ComputeGaussian17TapVShader();
 };
 
-class ComputeGaussian6VBlurShader : public Shader<ComputeGaussian6VBlurShader, core::vector2df, std::vector<float> >, public TextureRead<Bilinear_Clamped_Filtered>
+class ComputeGaussian6VBlurShader : public Shader<ComputeGaussian6VBlurShader, core::vector2df, std::vector<float> >,
+                                    public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
 {
 public:
     GLuint TU_dest;
     ComputeGaussian6VBlurShader();
 };
 
-class ComputeShadowBlurVShader : public Shader<ComputeShadowBlurVShader, core::vector2df, std::vector<float> >, public TextureRead<Neared_Clamped_Filtered>
+class ComputeShadowBlurVShader : public Shader<ComputeShadowBlurVShader, core::vector2df, std::vector<float> >,
+                                 public TextureReadNew<ST_NEARED_CLAMPED_FILTERED>
 {
 public:
     GLuint TU_dest;
     ComputeShadowBlurVShader();
 };
 
-class Gaussian6VBlurShader : public Shader<Gaussian6VBlurShader, core::vector2df, float>, public TextureRead<Bilinear_Clamped_Filtered>
+class Gaussian6VBlurShader : public Shader<Gaussian6VBlurShader, core::vector2df, float>,
+                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
 {
 public:
     Gaussian6VBlurShader();
 };
 
-class Gaussian3VBlurShader : public Shader<Gaussian3VBlurShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered>
+class Gaussian3VBlurShader : public Shader<Gaussian3VBlurShader, core::vector2df>,
+                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
 {
 public:
     Gaussian3VBlurShader();
 };
 
-class PassThroughShader : public Shader<PassThroughShader, int, int>, public TextureRead<Bilinear_Filtered>
+class PassThroughShader : public Shader<PassThroughShader, int, int>,
+                          public TextureReadNew<ST_BILINEAR_FILTERED>
 {
 public:
     PassThroughShader();
@@ -630,13 +642,17 @@ public:
     LayerPassThroughShader();
 };
 
-class LinearizeDepthShader : public Shader<LinearizeDepthShader, float, float>, public TextureRead<Bilinear_Filtered>
+class LinearizeDepthShader : public Shader<LinearizeDepthShader, float, float>,
+                             public TextureReadNew<ST_BILINEAR_FILTERED>
 {
 public:
     LinearizeDepthShader();
 };
 
-class LightspaceBoundingBoxShader : public Shader<LightspaceBoundingBoxShader, core::matrix4, float, float, float, float>, public TextureRead < Nearest_Filtered >
+class LightspaceBoundingBoxShader : public Shader<LightspaceBoundingBoxShader, 
+                                                  core::matrix4, float, float,
+                                                  float, float>,
+                                    public TextureReadNew<ST_NEAREST_FILTERED >
 {
 public:
     LightspaceBoundingBoxShader();
@@ -648,13 +664,15 @@ public:
     ShadowMatrixesGenerationShader();
 };
 
-class DepthHistogramShader : public Shader<DepthHistogramShader>, public TextureRead <Nearest_Filtered>
+class DepthHistogramShader : public Shader<DepthHistogramShader>, 
+                             public TextureReadNew<ST_NEAREST_FILTERED>
 {
 public:
     DepthHistogramShader();
 };
 
-class GlowShader : public Shader<GlowShader>, public TextureRead<Bilinear_Filtered>
+class GlowShader : public Shader<GlowShader>,
+                   public TextureReadNew<ST_BILINEAR_FILTERED>
 {
 public:
     GLuint vao;
@@ -662,49 +680,57 @@ public:
     GlowShader();
 };
 
-class SSAOShader : public Shader<SSAOShader, float, float, float>, public TextureRead<Semi_trilinear>
+class SSAOShader : public Shader<SSAOShader, float, float, float>,
+                   public TextureReadNew<ST_SEMI_TRILINEAR>
 {
 public:
     SSAOShader();
 };
 
-class FogShader : public Shader<FogShader, float, core::vector3df>, public TextureRead<Nearest_Filtered>
+class FogShader : public Shader<FogShader, float, core::vector3df>,
+                  public TextureReadNew<ST_NEAREST_FILTERED>
 {
 public:
     FogShader();
 };
 
-class MotionBlurShader : public Shader<MotionBlurShader, core::matrix4, core::vector2df, float, float>, public TextureRead<Bilinear_Clamped_Filtered, Nearest_Filtered>
+class MotionBlurShader : public Shader<MotionBlurShader, core::matrix4, core::vector2df, float, float>,
+                         public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED, ST_NEAREST_FILTERED>
 {
 public:
     MotionBlurShader();
 };
 
-class GodFadeShader : public Shader<GodFadeShader, video::SColorf>, public TextureRead<Bilinear_Filtered>
+class GodFadeShader : public Shader<GodFadeShader, video::SColorf>,
+                      public TextureReadNew<ST_BILINEAR_FILTERED>
 {
 public:
     GodFadeShader();
 };
 
-class GodRayShader : public Shader<GodRayShader, core::vector2df>, public TextureRead<Bilinear_Filtered>
+class GodRayShader : public Shader<GodRayShader, core::vector2df>,
+                     public TextureReadNew<ST_BILINEAR_FILTERED>
 {
 public:
     GodRayShader();
 };
 
-class MLAAColorEdgeDetectionSHader : public Shader<MLAAColorEdgeDetectionSHader, core::vector2df>, public TextureRead<Nearest_Filtered>
+class MLAAColorEdgeDetectionSHader : public Shader<MLAAColorEdgeDetectionSHader, core::vector2df>,
+                                    public TextureReadNew<ST_NEAREST_FILTERED>
 {
 public:
     MLAAColorEdgeDetectionSHader();
 };
 
-class MLAABlendWeightSHader : public Shader<MLAABlendWeightSHader, core::vector2df>, public TextureRead<Bilinear_Filtered, Nearest_Filtered>
+class MLAABlendWeightSHader : public Shader<MLAABlendWeightSHader, core::vector2df>,
+                              public TextureReadNew<ST_BILINEAR_FILTERED, ST_NEAREST_FILTERED>
 {
 public:
     MLAABlendWeightSHader();
 };
 
-class MLAAGatherSHader : public Shader<MLAAGatherSHader, core::vector2df>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
+class MLAAGatherSHader : public Shader<MLAAGatherSHader, core::vector2df>,
+                         public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED>
 {
 public:
     MLAAGatherSHader();
@@ -715,25 +741,36 @@ public:
 namespace UIShader
 {
 
-class Primitive2DList : public Shader<Primitive2DList>, public TextureRead < Bilinear_Filtered >
+class Primitive2DList : public Shader<Primitive2DList>,
+                        public TextureReadNew<ST_BILINEAR_FILTERED >
 {
 public:
     Primitive2DList();
 };
 
-class TextureRectShader : public Shader<TextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df>, public TextureRead<Bilinear_Filtered>
+class TextureRectShader : public Shader<TextureRectShader, core::vector2df,
+                                        core::vector2df, core::vector2df,
+                                        core::vector2df>,
+                          public TextureReadNew<ST_BILINEAR_FILTERED>
 {
 public:
     TextureRectShader();
 };
 
-class UniformColoredTextureRectShader : public Shader<UniformColoredTextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df, video::SColor>, public TextureRead<Bilinear_Filtered>
+class UniformColoredTextureRectShader : public Shader<UniformColoredTextureRectShader,
+                                                      core::vector2df, core::vector2df,
+                                                      core::vector2df, core::vector2df,
+                                                      video::SColor>,
+                                        public TextureReadNew<ST_BILINEAR_FILTERED>
 {
 public:
     UniformColoredTextureRectShader();
 };
 
-class ColoredTextureRectShader : public Shader<ColoredTextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df>, public TextureRead<Bilinear_Filtered>
+class ColoredTextureRectShader : public Shader<ColoredTextureRectShader, core::vector2df, 
+                                               core::vector2df, core::vector2df,
+                                               core::vector2df>,
+                                 public TextureReadNew<ST_BILINEAR_FILTERED>
 {
 public:
     GLuint colorvbo;
@@ -742,7 +779,8 @@ public:
     ColoredTextureRectShader();
 };
 
-class ColoredRectShader : public Shader<ColoredRectShader, core::vector2df, core::vector2df, video::SColor>
+class ColoredRectShader : public Shader<ColoredRectShader, core::vector2df,
+                                        core::vector2df, video::SColor>
 {
 public:
     ColoredRectShader();

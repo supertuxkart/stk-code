@@ -1653,7 +1653,7 @@ namespace FullScreenShader
             GL_COMPUTE_SHADER, "gaussian6h.comp");
         TU_dest = 1;
         assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source");
+        assignSamplerNames(m_program, 0, "source", ST_BILINEAR_CLAMPED_FILTERED);
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1663,7 +1663,7 @@ namespace FullScreenShader
             GL_COMPUTE_SHADER, "blurshadowH.comp");
         TU_dest = 1;
         assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source");
+        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1674,7 +1674,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gaussian6h.frag");
         assignUniforms("pixel", "sigma");
 
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }
 	
 	HorizontalBlurShader::HorizontalBlurShader()
@@ -1684,7 +1684,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gaussian6h.frag");
         assignUniforms("pixel");
 
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }
 
     Gaussian3HBlurShader::Gaussian3HBlurShader()
@@ -1694,7 +1694,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gaussian3h.frag");
         assignUniforms("pixel");
 
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }
 
     Gaussian17TapVShader::Gaussian17TapVShader()
@@ -1704,7 +1704,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "bilateralV.frag");
         assignUniforms("pixel");
 
-        assignSamplerNames(m_program, 0, "tex", 1, "depth");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
+                                      1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
     }
 
     ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
@@ -1713,7 +1714,8 @@ namespace FullScreenShader
             GL_COMPUTE_SHADER, "bilateralV.comp");
         TU_dest = 2;
         assignUniforms("pixel");
-        assignSamplerNames(m_program, 0, "source", 1, "depth");
+        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED,
+                                      1, "depth", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1723,7 +1725,7 @@ namespace FullScreenShader
             GL_COMPUTE_SHADER, "gaussian6v.comp");
         TU_dest = 1;
         assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source");
+        assignSamplerNames(m_program, 0, "source", ST_BILINEAR_CLAMPED_FILTERED);
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1733,7 +1735,7 @@ namespace FullScreenShader
             GL_COMPUTE_SHADER, "blurshadowV.comp");
         TU_dest = 1;
         assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source");
+        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(TU_dest, "dest");
     }
 
@@ -1744,7 +1746,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gaussian6v.frag");
         assignUniforms("pixel", "sigma");
 
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }
 
     Gaussian3VBlurShader::Gaussian3VBlurShader()
@@ -1754,7 +1756,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "gaussian3v.frag");
         assignUniforms("pixel");
 
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }
 
     PassThroughShader::PassThroughShader()
@@ -1764,7 +1766,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "passthrough.frag");
 
         assignUniforms("width", "height");
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
     }
 
     LayerPassThroughShader::LayerPassThroughShader()
@@ -1785,7 +1787,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "linearizedepth.frag");
         assignUniforms("zn", "zf");
 
-        assignSamplerNames(m_program, 0, "texture");
+        assignSamplerNames(m_program, 0, "texture", ST_BILINEAR_FILTERED);
     }
 
 
@@ -1794,7 +1796,7 @@ namespace FullScreenShader
         loadProgram(OBJECT,
             GL_COMPUTE_SHADER, "Lightspaceboundingbox.comp",
             GL_COMPUTE_SHADER, "utils/getPosFromUVDepth.frag");
-        assignSamplerNames(m_program, 0, "depth");
+        assignSamplerNames(m_program, 0, "depth", ST_NEAREST_FILTERED);
         assignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
         GLuint block_idx = glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
         glShaderStorageBlockBinding(m_program, block_idx, 2);
@@ -1816,7 +1818,7 @@ namespace FullScreenShader
         loadProgram(OBJECT,
             GL_COMPUTE_SHADER, "depthhistogram.comp",
             GL_COMPUTE_SHADER, "utils/getPosFromUVDepth.frag");
-        assignSamplerNames(m_program, 0, "depth");
+        assignSamplerNames(m_program, 0, "depth", ST_NEAREST_FILTERED);
 
         GLuint block_idx = glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, "Histogram");
         glShaderStorageBlockBinding(m_program, block_idx, 1);
@@ -1829,7 +1831,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "glow.frag");
         assignUniforms();
 
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
         vao = createVAO(m_program);
     }
 
@@ -1842,7 +1844,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "ssao.frag");
 
         assignUniforms("radius", "k", "sigma");
-        assignSamplerNames(m_program, 0, "dtex");
+        assignSamplerNames(m_program, 0, "dtex", ST_SEMI_TRILINEAR);
     }
 
     FogShader::FogShader()
@@ -1853,7 +1855,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "fog.frag");
 
         assignUniforms("density", "col");
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_NEAREST_FILTERED);
     }
 
     MotionBlurShader::MotionBlurShader()
@@ -1863,7 +1865,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
             GL_FRAGMENT_SHADER, "motion_blur.frag");
         assignUniforms("previous_viewproj", "center", "boost_amount", "mask_radius");
-        assignSamplerNames(m_program, 0, "color_buffer", 1, "dtex");
+        assignSamplerNames(m_program, 0, "color_buffer", ST_BILINEAR_CLAMPED_FILTERED,
+                                      1, "dtex", ST_NEAREST_FILTERED);
     }
 
     GodFadeShader::GodFadeShader()
@@ -1873,7 +1876,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "godfade.frag");
         assignUniforms("col");
 
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
     }
 
     GodRayShader::GodRayShader()
@@ -1883,7 +1886,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "godray.frag");
 
         assignUniforms("sunpos");
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
     }
 
     MLAAColorEdgeDetectionSHader::MLAAColorEdgeDetectionSHader()
@@ -1893,7 +1896,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "mlaa_color1.frag");
         assignUniforms("PIXEL_SIZE");
 
-        assignSamplerNames(m_program, 0, "colorMapG");
+        assignSamplerNames(m_program, 0, "colorMapG", ST_NEAREST_FILTERED);
     }
 
     MLAABlendWeightSHader::MLAABlendWeightSHader()
@@ -1903,7 +1906,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "mlaa_blend2.frag");
         assignUniforms("PIXEL_SIZE");
 
-        assignSamplerNames(m_program, 0, "edgesMap", 1, "areaMap");
+        assignSamplerNames(m_program, 0, "edgesMap", ST_BILINEAR_FILTERED,
+                                      1, "areaMap", ST_NEAREST_FILTERED);
     }
 
     MLAAGatherSHader::MLAAGatherSHader()
@@ -1913,7 +1917,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, "mlaa_neigh3.frag");
         assignUniforms("PIXEL_SIZE");
 
-        assignSamplerNames(m_program, 0, "blendMap", 1, "colorMap");
+        assignSamplerNames(m_program, 0, "blendMap", ST_NEAREST_FILTERED,
+                                      1, "colorMap", ST_NEAREST_FILTERED);
     }
 }
 
@@ -1926,7 +1931,7 @@ namespace UIShader
             GL_VERTEX_SHADER, "primitive2dlist.vert",
             GL_FRAGMENT_SHADER, "transparent.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
     }
 
     TextureRectShader::TextureRectShader()
@@ -1936,7 +1941,7 @@ namespace UIShader
             GL_FRAGMENT_SHADER, "texturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
 
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
     }
 
     UniformColoredTextureRectShader::UniformColoredTextureRectShader()
@@ -1947,7 +1952,7 @@ namespace UIShader
 
         assignUniforms("center", "size", "texcenter", "texsize", "color");
 
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
     }
 
     ColoredTextureRectShader::ColoredTextureRectShader()
@@ -1957,7 +1962,7 @@ namespace UIShader
             GL_FRAGMENT_SHADER, "colortexturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
 
-        assignSamplerNames(m_program, 0, "tex");
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);

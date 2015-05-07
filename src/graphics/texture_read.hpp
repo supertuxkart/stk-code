@@ -34,17 +34,15 @@ enum SamplerTypeNew {
     ST_VOLUME_LINEAR_FILTERED,
     ST_NEARED_CLAMPED_FILTERED,
     ST_BILINEAR_CLAMPED_FILTERED,
-    ST_MAX = ST_BILINEAR_CLAMPED_FILTERED,
-
-    XST_SEMI_TRILINEAR,
-    XST_TRILINEAR_CLAMPED_ARRAY2D
+    ST_SEMI_TRILINEAR,
+    ST_MAX = ST_SEMI_TRILINEAR
 };
 
 
 class TextureReadBaseNew
 {
 public:
-    typedef  std::function<void(unsigned, unsigned)> BindFunction;
+    typedef  std::function<void(GLuint, GLuint)> BindFunction;
 
 protected:
     static void   bindTextureNearest(GLuint tex_unit, GLuint tex_id);
@@ -53,10 +51,11 @@ protected:
     static void   bindTextureNearestClamped(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex_id);
-    static void   bindCubemapTrilinear(unsigned tex_unit, unsigned tex_id);
-    static void   bindTextureShadow(unsigned tex_unit, unsigned tex_id);
-    static void   bindTrilinearClampedArrayTexture(unsigned tex_unit, unsigned tex_id);
-    static void   bindTextureVolume(unsigned tex_unit, unsigned tex_id);
+    static void   bindCubemapTrilinear(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureShadow(GLuint tex_unit, GLuint tex_id);
+    static void   bindTrilinearClampedArrayTexture(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureVolume(GLuint tex_unit, GLuint tex_id);
+    
     GLuint        createSamplers(SamplerTypeNew sampler_type);
 private:
 
@@ -66,7 +65,7 @@ private:
     static GLuint createShadowSampler();
     static GLuint createTrilinearClampedArray();
     static GLuint createBilinearClampedSampler();
-
+    static GLuint createSemiTrilinearSampler();
 protected:
     static BindFunction m_all_bind_functions[];
     std::vector<BindFunction> m_bind_functions;

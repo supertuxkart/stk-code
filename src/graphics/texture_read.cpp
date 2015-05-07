@@ -30,6 +30,7 @@ TextureReadBaseNew::BindFunction TextureReadBaseNew::m_all_bind_functions[] =
   /* ST_VOLUME_LINEAR_FILTERED         */ &TextureReadBaseNew::bindTextureVolume,
   /* ST_NEARED_CLAMPED_FILTERED        */ &TextureReadBaseNew::bindTextureNearestClamped,
   /* ST_BILINEAR_CLAMPED_FILTERED      */ &TextureReadBaseNew::bindTextureBilinearClamped,
+  /* ST_SEMI_TRILINEAR                 */ &TextureReadBaseNew::bindTextureSemiTrilinear
 };
 
 GLuint TextureReadBaseNew::m_all_texture_types[] = 
@@ -42,6 +43,7 @@ GLuint TextureReadBaseNew::m_all_texture_types[] =
   /* ST_VOLUME_LINEAR_FILTERED         */ GL_TEXTURE_3D,
   /* ST_NEARED_CLAMPED_FILTERED        */ GL_TEXTURE_2D,
   /* ST_BILINEAR_CLAMPED_FILTERED      */ GL_TEXTURE_2D,
+  /* ST_SEMI_TRILINEAR                 */ GL_TEXTURE_2D
 };
 
 // ----------------------------------------------------------------------------
@@ -181,6 +183,7 @@ void TextureReadBaseNew::bindTextureVolume(unsigned tex_unit, unsigned tex_id)
 }   // bindTextureVolume
 
 // ----------------------------------------------------------------------------
+
 GLuint TextureReadBaseNew::createSamplers(SamplerTypeNew sampler_type)
 {
     switch (sampler_type)
@@ -213,6 +216,8 @@ GLuint TextureReadBaseNew::createSamplers(SamplerTypeNew sampler_type)
     }
     case ST_BILINEAR_CLAMPED_FILTERED:
         return createBilinearClampedSampler();
+    case ST_SEMI_TRILINEAR:
+        return createSemiTrilinearSampler();
     default:
         assert(false);
         return 0;
@@ -316,6 +321,20 @@ GLuint TextureReadBaseNew::createTrilinearClampedArray()
 #endif
 }   // createTrilinearClampedArray
 // ----------------------------------------------------------------------------
+GLuint TextureReadBaseNew::createSemiTrilinearSampler()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+    return id;
+#endif
+}
+
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
