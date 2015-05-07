@@ -772,7 +772,8 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
-        assignSamplerNames(m_program, 0, "tex", 1, "glosstex");
+        assignSamplerNames(m_program, 0, "tex",     ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      1, "glosstex",ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     GrassPass1Shader::GrassPass1Shader()
@@ -782,7 +783,8 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
-        assignSamplerNames(m_program, 0, "tex", 1, "glosstex");
+        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     NormalMapShader::NormalMapShader()
@@ -792,7 +794,8 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "normalmap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
-        assignSamplerNames(m_program, 1, "normalMap", 0, "DiffuseForAlpha");
+        assignSamplerNames(m_program, 1, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      0, "DiffuseForAlpha", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     InstancedObjectPass1Shader::InstancedObjectPass1Shader()
@@ -804,7 +807,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
 
         assignUniforms();
-        assignSamplerNames(m_program, 0, "glosstex");
+        assignSamplerNames(m_program, 0, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     InstancedObjectRefPass1Shader::InstancedObjectRefPass1Shader()
@@ -816,7 +819,8 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
 
         assignUniforms();
-        assignSamplerNames(m_program, 0, "tex", 1, "glosstex");
+        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     InstancedGrassPass1Shader::InstancedGrassPass1Shader()

@@ -69,31 +69,35 @@ public:
 };
 
 class ObjectRefPass1Shader : public Shader<ObjectRefPass1Shader, core::matrix4, core::matrix4, core::matrix4>,
-                             public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+                             public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     ObjectRefPass1Shader();
 };
 
-class GrassPass1Shader : public Shader<GrassPass1Shader, core::matrix4, core::matrix4, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class GrassPass1Shader : public Shader<GrassPass1Shader, core::matrix4, core::matrix4, core::vector3df>,
+                         public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     GrassPass1Shader();
 };
 
-class NormalMapShader : public Shader<NormalMapShader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class NormalMapShader : public Shader<NormalMapShader, core::matrix4, core::matrix4>,
+                        public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     NormalMapShader();
 };
 
-class InstancedObjectPass1Shader : public Shader<InstancedObjectPass1Shader>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedObjectPass1Shader : public Shader<InstancedObjectPass1Shader>,
+                                   public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     InstancedObjectPass1Shader();
 };
 
-class InstancedObjectRefPass1Shader : public Shader<InstancedObjectRefPass1Shader>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedObjectRefPass1Shader : public Shader<InstancedObjectRefPass1Shader>,
+                                      public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     InstancedObjectRefPass1Shader();
