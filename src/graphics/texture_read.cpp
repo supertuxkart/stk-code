@@ -23,13 +23,15 @@
 TextureReadBaseNew::BindFunction TextureReadBaseNew::m_all_bind_functions[] =
 { /* ST_NEAREST_FILTERED               */ &TextureReadBaseNew::bindTextureNearest,
   /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ &TextureReadBaseNew::bindTextureTrilinearAnisotropic,
-  /* ST_TRILINEAR_CUBEMAP              */ &TextureReadBaseNew::bindCubemapTrilinear
+  /* ST_TRILINEAR_CUBEMAP              */ &TextureReadBaseNew::bindCubemapTrilinear,
+  /* ST_BILINEAR_FILTERED              */ &TextureReadBaseNew::bindTextureBilinear
 };
 
 GLuint TextureReadBaseNew::m_all_texture_types[] = 
 { /* ST_NEAREST_FILTERED               */ GL_TEXTURE_2D,
   /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ GL_TEXTURE_2D,
-  /* ST_TRILINEAR_CUBEMAP              */ GL_TEXTURE_CUBE_MAP };
+  /* ST_TRILINEAR_CUBEMAP              */ GL_TEXTURE_CUBE_MAP,
+  /* ST_BILINEAR_FILTERED              */ GL_TEXTURE_2D };
 
 // ----------------------------------------------------------------------------
 void TextureReadBaseNew::bindTextureNearest(GLuint texture_unit, GLuint tex)
@@ -134,6 +136,8 @@ GLuint TextureReadBaseNew::createSamplers(SamplerTypeNew sampler_type)
         return createTrilinearSampler();
     case ST_TRILINEAR_CUBEMAP:
         return createTrilinearSampler();
+    case ST_BILINEAR_FILTERED:
+        return createBilinearSampler();
     default:
         assert(false);
         return 0;
@@ -174,6 +178,19 @@ GLuint TextureReadBaseNew::createTrilinearSampler()
 }   // createTrilinearSampler
 
 // ----------------------------------------------------------------------------
+GLuint TextureReadBaseNew::createBilinearSampler()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+    return id;
+#endif
+}   // createBilinearSampler
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

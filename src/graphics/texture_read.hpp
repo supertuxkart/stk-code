@@ -28,10 +28,10 @@ enum SamplerTypeNew {
     ST_NEAREST_FILTERED = ST_MIN,
     ST_TRILINEAR_ANISOTROPIC_FILTERED,
     ST_TRILINEAR_CUBEMAP,
-    ST_MAX = ST_TRILINEAR_CUBEMAP,
+    ST_BILINEAR_FILTERED,
+    ST_MAX = ST_BILINEAR_FILTERED,
 
     ST_SEMI_TRILINEAR,
-    ST_BILINEAR_FILTERED,
     ST_BILINEAR_CLAMPED_FILTERED,
     ST_NEARED_CLAMPED_FILTERED,
     ST_SHADOW_SAMPLER,
@@ -59,6 +59,7 @@ private:
 
     static GLuint createNearestSampler();
     static GLuint createTrilinearSampler();
+    static GLuint createBilinearSampler();
 
 protected:
     static BindFunction m_all_bind_functions[];

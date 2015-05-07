@@ -103,91 +103,124 @@ public:
     InstancedObjectRefPass1Shader();
 };
 
-class InstancedGrassPass1Shader : public Shader<InstancedGrassPass1Shader, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedGrassPass1Shader : public Shader<InstancedGrassPass1Shader, core::vector3df>,
+                                  public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     InstancedGrassPass1Shader();
 };
 
-class InstancedNormalMapShader : public Shader<InstancedNormalMapShader>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedNormalMapShader : public Shader<InstancedNormalMapShader>,
+    public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     InstancedNormalMapShader();
 };
 
-class ObjectPass2Shader : public Shader<ObjectPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class ObjectPass2Shader : public Shader<ObjectPass2Shader, core::matrix4, core::matrix4>,
+    public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
+                        ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     ObjectPass2Shader();
 };
 
-class InstancedObjectPass2Shader : public Shader<InstancedObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedObjectPass2Shader : public Shader<InstancedObjectPass2Shader>,
+    public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
+                          ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     InstancedObjectPass2Shader();
 };
 
-class InstancedObjectRefPass2Shader : public Shader<InstancedObjectRefPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedObjectRefPass2Shader : public Shader<InstancedObjectRefPass2Shader>, 
+    public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
+                          ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     InstancedObjectRefPass2Shader();
 };
 
-class DetailledObjectPass2Shader : public Shader<DetailledObjectPass2Shader, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class DetailledObjectPass2Shader : public Shader<DetailledObjectPass2Shader, core::matrix4>, 
+    public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
+                         ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                         ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     DetailledObjectPass2Shader();
 };
 
-class InstancedDetailledObjectPass2Shader : public Shader<InstancedDetailledObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedDetailledObjectPass2Shader : public Shader<InstancedDetailledObjectPass2Shader>,
+    public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
+                          ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                          ST_TRILINEAR_ANISOTROPIC_FILTERED >
 {
 public:
     InstancedDetailledObjectPass2Shader();
 };
 
-class ObjectUnlitShader : public Shader<ObjectUnlitShader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class ObjectUnlitShader : public Shader<ObjectUnlitShader, core::matrix4, core::matrix4>,
+                          public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED,
+                                                ST_BILINEAR_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED >
 {
 public:
     ObjectUnlitShader();
 };
 
-class InstancedObjectUnlitShader : public Shader<InstancedObjectUnlitShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedObjectUnlitShader : public Shader<InstancedObjectUnlitShader>,
+                                   public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, 
+                                                         ST_BILINEAR_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     InstancedObjectUnlitShader();
 };
 
-class ObjectRefPass2Shader : public Shader<ObjectRefPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class ObjectRefPass2Shader : public Shader<ObjectRefPass2Shader, core::matrix4, core::matrix4>,
+                             public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
+                                                   ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     ObjectRefPass2Shader();
 };
 
-class GrassPass2Shader : public Shader<GrassPass2Shader, core::matrix4, core::vector3df>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class GrassPass2Shader : public Shader<GrassPass2Shader, core::matrix4, core::vector3df>,
+                         public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
+                                               ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     GrassPass2Shader();
 };
 
-class InstancedGrassPass2Shader : public Shader<InstancedGrassPass2Shader, core::vector3df, core::vector3df>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Nearest_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedGrassPass2Shader : public Shader<InstancedGrassPass2Shader, core::vector3df, core::vector3df>,
+                                  public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
+                                                        ST_NEAREST_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED, 
+                                                        ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     InstancedGrassPass2Shader();
 };
 
-class SphereMapShader : public Shader<SphereMapShader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class SphereMapShader : public Shader<SphereMapShader, core::matrix4, core::matrix4>,
+                        public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, 
+                                              ST_BILINEAR_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     SphereMapShader();
 };
 
-class InstancedSphereMapShader : public Shader<InstancedSphereMapShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+class InstancedSphereMapShader : public Shader<InstancedSphereMapShader>,
+                                 public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED,
+                                                       ST_BILINEAR_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     InstancedSphereMapShader();
 };
 
-class SplattingShader : public Shader<SplattingShader, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class SplattingShader : public Shader<SplattingShader, core::matrix4>, 
+                        public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
+                                              ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                              ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                              ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
     SplattingShader();

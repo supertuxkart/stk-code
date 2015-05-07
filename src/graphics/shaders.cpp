@@ -831,7 +831,8 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
         assignUniforms("windDir");
-        assignSamplerNames(m_program, 0, "tex", 1, "glosstex");
+        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     InstancedNormalMapShader::InstancedNormalMapShader()
@@ -842,7 +843,8 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
             GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "normalMap", 1, "glossMap");
+        assignSamplerNames(m_program, 0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      1, "glossMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     // Solid Lit pass shaders
@@ -853,7 +855,11 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "object_pass2.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+            assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                          1, "SpecularMap", ST_NEAREST_FILTERED,
+                                          2, "SSAO", ST_BILINEAR_FILTERED,
+                                          3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                          4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     InstancedObjectPass2Shader::InstancedObjectPass2Shader()
@@ -864,7 +870,11 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+            assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                          1, "SpecularMap", ST_NEAREST_FILTERED,
+                                          2, "SSAO", ST_BILINEAR_FILTERED,
+                                          3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                          4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     InstancedObjectRefPass2Shader::InstancedObjectRefPass2Shader()
@@ -875,7 +885,11 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                      1, "SpecularMap", ST_NEAREST_FILTERED,
+                                      2, "SSAO", ST_BILINEAR_FILTERED,
+                                      3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     DetailledObjectPass2Shader::DetailledObjectPass2Shader()
@@ -885,7 +899,12 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "detailledobject_pass2.frag");
         assignUniforms("ModelMatrix");
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                      1, "SpecularMap", ST_NEAREST_FILTERED,
+                                      2, "SSAO", ST_BILINEAR_FILTERED,
+                                      3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      4, "Detail", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);            
     }
 
     InstancedDetailledObjectPass2Shader::InstancedDetailledObjectPass2Shader()
@@ -896,7 +915,12 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "instanced_detailledobject_pass2.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail", 5, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                     1, "SpecularMap", ST_NEAREST_FILTERED,
+                                     2, "SSAO", ST_BILINEAR_FILTERED,
+                                     3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                     4, "Detail", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                     5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     ObjectUnlitShader::ObjectUnlitShader()
@@ -905,7 +929,10 @@ namespace MeshShader
             GL_VERTEX_SHADER, "object_pass.vert",
             GL_FRAGMENT_SHADER, "object_unlit.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                      1, "SpecularMap", ST_NEAREST_FILTERED,
+                                      2, "SSAO", ST_BILINEAR_FILTERED,
+                                      3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     InstancedObjectUnlitShader::InstancedObjectUnlitShader()
@@ -915,7 +942,10 @@ namespace MeshShader
             GL_VERTEX_SHADER, "instanced_object_pass.vert",
             GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                      1, "SpecularMap", ST_NEAREST_FILTERED,
+                                      2, "SSAO", ST_BILINEAR_FILTERED,
+                                      3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     ObjectRefPass2Shader::ObjectRefPass2Shader()
@@ -925,7 +955,11 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                      1, "SpecularMap", ST_NEAREST_FILTERED,
+                                      2, "SSAO", ST_BILINEAR_FILTERED,
+                                      3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     GrassPass2Shader::GrassPass2Shader()
@@ -935,7 +969,11 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "grass_pass2.frag");
         assignUniforms("ModelMatrix", "windDir");
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                      1, "SpecularMap", ST_NEAREST_FILTERED,
+                                      2, "SSAO", ST_BILINEAR_FILTERED,
+                                      3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     InstancedGrassPass2Shader::InstancedGrassPass2Shader()
@@ -946,7 +984,12 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "instanced_grass_pass2.frag");
         assignUniforms("windDir", "SunDir");
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo", 5, "SpecMap");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                      1, "SpecularMap", ST_NEAREST_FILTERED,
+                                      2, "SSAO", ST_BILINEAR_FILTERED,
+                                      3, "dtex", ST_NEAREST_FILTERED,
+                                      4, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     SphereMapShader::SphereMapShader()
@@ -957,7 +1000,10 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
             GL_FRAGMENT_SHADER, "objectpass_spheremap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                      1, "SpecularMap", ST_NEAREST_FILTERED,
+                                      2, "SSAO", ST_BILINEAR_FILTERED,
+                                      3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     InstancedSphereMapShader::InstancedSphereMapShader()
@@ -969,7 +1015,10 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
             GL_FRAGMENT_SHADER, "instanced_objectpass_spheremap.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                                      1, "SpecularMap", ST_NEAREST_FILTERED,
+                                      2, "SSAO", ST_BILINEAR_FILTERED,
+                                      3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     SplattingShader::SplattingShader()
@@ -981,14 +1030,14 @@ namespace MeshShader
         assignUniforms("ModelMatrix");
 
         assignSamplerNames(m_program,
-            0, "DiffuseMap",
-            1, "SpecularMap",
-            2, "SSAO",
-            3, "tex_layout",
-            4, "tex_detail0",
-            5, "tex_detail1",
-            6, "tex_detail2",
-            7, "tex_detail3");
+            0, "DiffuseMap", ST_NEAREST_FILTERED,
+            1, "SpecularMap", ST_NEAREST_FILTERED,
+            2, "SSAO", ST_BILINEAR_FILTERED,
+            3, "tex_layout", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+            4, "tex_detail0", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+            5, "tex_detail1", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+            6, "tex_detail2", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+            7, "tex_detail3", ST_TRILINEAR_ANISOTROPIC_FILTERED);            
     }
 
     TransparentShader::TransparentShader()
