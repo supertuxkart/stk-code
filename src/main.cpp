@@ -547,6 +547,8 @@ void cmdLineHelp()
     "                          stdout.log.\n"
     "       --console          Write messages in the console and files\n"
     "  -h,  --help             Show this help.\n"
+    "       --log=N            Set the verbosity to a value between\n"
+    "                          0 (Debug) and 5 (Only Fatal messages)\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "http://supertuxkart.sourceforge.net\n\n",
