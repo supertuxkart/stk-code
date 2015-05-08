@@ -36,8 +36,8 @@
 #include <SColor.h>
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
-#include "graphics/shaders.hpp"
 #include "graphics/wind.hpp"
+#include "graphics/gl_headers.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
@@ -195,8 +195,7 @@ private:
     gui::IGUIFont              *m_race_font;
     /** Post-processing. */
     PostProcessing             *m_post_processing;
-    /** Shaders. */
-    Shaders              *m_shaders;
+
     /** Wind. */
     Wind                 *m_wind;
     /** RTTs. */
@@ -556,13 +555,6 @@ public:
     void setSunColor(const video::SColorf &col)
     {
         m_suncolor = col;
-    }
-    // -----------------------------------------------------------------------
-    inline video::E_MATERIAL_TYPE getShader(const ShaderType num)  {return m_shaders->getShader(num);}
-    // -----------------------------------------------------------------------
-    inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num)
-    {
-        return (m_shaders == NULL ? NULL : m_shaders->m_callbacks[num]);
     }
     // ------------------------------------------------------------------------
     GLuint getRenderTargetTexture(TypeRTT which);

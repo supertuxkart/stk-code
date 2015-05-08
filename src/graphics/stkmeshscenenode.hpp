@@ -19,6 +19,8 @@
 #define STKMESHSCENENODE_H
 
 #include "stkmesh.hpp"
+
+#include "graphics/shaders.hpp"
 #include "utils/ptr_vector.hpp"
 
 class STKMeshSceneNode : public irr::scene::CMeshSceneNode, public STKMeshCommon
@@ -66,7 +68,7 @@ public:
             if (!mb)
                 continue;
             if (isDisplacement)
-                mb->getMaterial().MaterialType = irr_driver->getShader(ES_DISPLACE);
+                mb->getMaterial().MaterialType = Shaders::getShader(ES_DISPLACE);
         }
     }
     virtual bool glow() const { return isGlow; }

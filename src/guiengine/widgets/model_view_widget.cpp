@@ -22,12 +22,15 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
-#include <algorithm>
+
 #include <IAnimatedMesh.h>
 #include <IAnimatedMeshSceneNode.h>
 #include <ICameraSceneNode.h>
 #include <ILightSceneNode.h>
 #include <ISceneManager.h>
+#include <IMeshSceneNode.h>
+
+#include <algorithm>
 
 using namespace GUIEngine;
 using namespace irr::core;

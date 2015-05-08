@@ -15,18 +15,21 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "graphics/stkmesh.hpp"
+
+#include "config/user_config.hpp"
 #include "central_settings.hpp"
+#include "graphics/callbacks.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stkmesh.hpp"
+#include "graphics/shaders.hpp"
+#include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "utils/helpers.hpp"
+
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
-#include "config/user_config.hpp"
-#include "graphics/callbacks.hpp"
-#include "utils/helpers.hpp"
-#include "graphics/camera.hpp"
-#include "modes/world.hpp"
 
 
 Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp,
@@ -40,7 +43,7 @@ Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialT
     default:
         return material->getShaderType();   
     case Material::SHADERTYPE_SOLID:
-        if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
+        if (MaterialType == Shaders::getShader(ES_NORMAL_MAP))
             return Material::SHADERTYPE_NORMAL_MAP;
         else if (tp == video::EVT_2TCOORDS)
             return Material::SHADERTYPE_DETAIL_MAP;
@@ -50,7 +53,7 @@ Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialT
 
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam, Material* material)
 {
-    if (type == irr_driver->getShader(ES_DISPLACE))
+    if (type == Shaders::getShader(ES_DISPLACE))
         return TM_DISPLACEMENT;
     if (material->getShaderType() == Material::SHADERTYPE_ADDITIVE)
         return TM_ADDITIVE;
@@ -252,7 +255,7 @@ core::matrix4 computeMVP(const core::matrix4 &ModelMatrix)
 core::vector3df getWindDir()
 {
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
+    GrassShaderProvider *gsp = (GrassShaderProvider *)Shaders::getCallback(ES_GRASS);
     float m_speed = gsp->getSpeed();
 
     return m_speed * vector3df(1., 0., 0.) * cos(time);
@@ -260,25 +263,25 @@ core::vector3df getWindDir()
 
 bool isObject(video::E_MATERIAL_TYPE type)
 {
-    if (type == irr_driver->getShader(ES_OBJECTPASS))
+    if (type == Shaders::getShader(ES_OBJECTPASS))
         return true;
-    if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+    if (type == Shaders::getShader(ES_OBJECTPASS_REF))
         return true;
-    if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
+    if (type == Shaders::getShader(ES_OBJECTPASS_RIMLIT))
         return true;
-    if (type == irr_driver->getShader(ES_NORMAL_MAP))
+    if (type == Shaders::getShader(ES_NORMAL_MAP))
         return true;
-    if (type == irr_driver->getShader(ES_SPHERE_MAP))
+    if (type == Shaders::getShader(ES_SPHERE_MAP))
         return true;
-    if (type == irr_driver->getShader(ES_SPLATTING))
+    if (type == Shaders::getShader(ES_SPLATTING))
         return true;
-    if (type == irr_driver->getShader(ES_GRASS))
+    if (type == Shaders::getShader(ES_GRASS))
         return true;
-    if (type == irr_driver->getShader(ES_GRASS_REF))
+    if (type == Shaders::getShader(ES_GRASS_REF))
         return true;
-    if (type == irr_driver->getShader(ES_DISPLACE))
+    if (type == Shaders::getShader(ES_DISPLACE))
         return true;
-    if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
+    if (type == Shaders::getShader(ES_OBJECT_UNLIT))
         return true;
     if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
         return true;

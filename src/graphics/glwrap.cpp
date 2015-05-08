@@ -15,11 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 
-#include "config/user_config.hpp"
+
 #include "config/hardware_stats.hpp"
+#include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
+#include "graphics/shaders.hpp"
 #include "graphics/stkmesh.hpp"
 #include "utils/profiler.hpp"
 #include "utils/cpp2011.hpp"

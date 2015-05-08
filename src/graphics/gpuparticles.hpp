@@ -26,8 +26,7 @@
 
 namespace irr { namespace video{ class ITexture; } }
 
-
-
+using namespace irr;
 
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode
 {

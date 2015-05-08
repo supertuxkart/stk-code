@@ -88,8 +88,8 @@ void PostProcessing::reset()
     m_center.resize(n);
     m_direction.resize(n);
 
-    MotionBlurProvider * const cb = (MotionBlurProvider *) irr_driver->
-                                                           getCallback(ES_MOTIONBLUR);
+    MotionBlurProvider * const cb = 
+        (MotionBlurProvider *) Shaders::getCallback(ES_MOTIONBLUR);
 
     for(unsigned int i=0; i<n; i++)
     {
@@ -147,8 +147,8 @@ void PostProcessing::reset()
 
 void PostProcessing::setMotionBlurCenterY(const u32 num, const float y)
 {
-    MotionBlurProvider * const cb = (MotionBlurProvider *) irr_driver->
-                                                           getCallback(ES_MOTIONBLUR);
+    MotionBlurProvider * const cb = 
+        (MotionBlurProvider *) Shaders::getCallback(ES_MOTIONBLUR);
 
     const float tex_height = m_vertices[num].v1.TCoords.Y - m_vertices[num].v0.TCoords.Y;
     m_center[num].Y = m_vertices[num].v0.TCoords.Y + y * tex_height;
@@ -174,8 +174,8 @@ void PostProcessing::giveBoost(unsigned int camera_index)
     {
         m_boost_time[camera_index] = 0.75f;
 
-        MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
-            getCallback(ES_MOTIONBLUR);
+        MotionBlurProvider * const cb =
+            (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
         cb->setBoostTime(camera_index, m_boost_time[camera_index]);
     }
 }   // giveBoost
@@ -190,7 +190,7 @@ void PostProcessing::update(float dt)
         return;
 
     MotionBlurProvider* const cb =
-        (MotionBlurProvider*) irr_driver->getCallback(ES_MOTIONBLUR);
+        (MotionBlurProvider*) Shaders::getCallback(ES_MOTIONBLUR);
 
     if (cb == NULL) return;
 
@@ -518,8 +518,7 @@ void PostProcessing::renderSSAO()
 
 void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo, FrameBuffer &out_fbo)
 {
-    MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
-        getCallback(ES_MOTIONBLUR);
+    MotionBlurProvider * const cb = (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
     Camera *cam = Camera::getActiveCamera();
     unsigned camID = cam->getIndex();
 
@@ -788,10 +787,11 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
-        MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
-            getCallback(ES_MOTIONBLUR);
+        MotionBlurProvider * const cb = 
+            (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
 
-        if (isRace && UserConfigParams::m_motionblur && World::getWorld() != NULL && cb->getBoostTime(Camera::getActiveCamera()->getIndex()) > 0.) // motion blur
+        if (isRace && UserConfigParams::m_motionblur && World::getWorld() &&
+            cb->getBoostTime(Camera::getActiveCamera()->getIndex()) > 0.) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo);
             std::swap(in_fbo, out_fbo);

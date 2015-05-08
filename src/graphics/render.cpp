@@ -84,7 +84,7 @@ void IrrDriver::renderGLSL(float dt)
     }
     if (m_mipviz)
     {
-        overridemat.Material.MaterialType = m_shaders->getShader(ES_MIPVIZ);
+        overridemat.Material.MaterialType = Shaders::getShader(ES_MIPVIZ);
         overridemat.EnableFlags |= video::EMF_MATERIAL_TYPE;
         overridemat.EnablePasses = scene::ESNRP_SOLID;
     }

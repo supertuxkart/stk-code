@@ -16,7 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "2dutils.hpp"
-#include "central_settings.hpp"
+
+#include "graphics/central_settings.hpp"
+#include "graphics/shaders.hpp"
 #include "glwrap.hpp"
 #include "utils/cpp2011.hpp"
 

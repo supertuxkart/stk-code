@@ -115,7 +115,6 @@ IrrDriver::IrrDriver()
                                          /*event receiver*/ NULL,
                                          file_manager->getFileSystem());
     m_request_screenshot = false;
-    m_shaders             = NULL;
     m_rtts                = NULL;
     m_post_processing     = NULL;
     m_wind                = new Wind();
@@ -153,7 +152,7 @@ IrrDriver::~IrrDriver()
     m_device = NULL;
     m_modes.clear();
 
-    delete m_shaders;
+    Shaders::destroy();
     delete m_wind;
 }   // ~IrrDriver
 
@@ -515,7 +514,7 @@ void IrrDriver::initDevice()
     // m_glsl might be reset in rtt if an error occurs.
     if (CVS->isGLSL())
     {
-        m_shaders = new Shaders();
+        Shaders::init();
 
         m_mrt.clear();
         m_mrt.reallocate(2);
@@ -628,7 +627,7 @@ void IrrDriver::createSunInterposer()
     m_sun_interposer->getMaterial(0).Lighting = false;
     m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
     m_sun_interposer->getMaterial(0).ZWriteEnable = false;
-    m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
+    m_sun_interposer->getMaterial(0).MaterialType = Shaders::getShader(ES_OBJECTPASS);
 
     sphere->drop();
 }
@@ -781,7 +780,7 @@ void IrrDriver::applyResolutionSettings()
     // FIXME: this load sequence is (mostly) duplicated from main.cpp!!
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
-    m_shaders->killShaders();
+    Shaders::destroy();
     VAOManager::getInstance()->kill();
     SolidPassCmd::getInstance()->kill();
     ShadowPassCmd::getInstance()->kill();
@@ -2425,13 +2424,13 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
 
     const u32 mcount = node->getMaterialCount();
     u32 i;
-    const video::E_MATERIAL_TYPE ref = rimlit ? m_shaders->getShader(ES_OBJECTPASS_RIMLIT):
-                                       m_shaders->getShader(ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE pass = rimlit ? m_shaders->getShader(ES_OBJECTPASS_RIMLIT):
-                                        m_shaders->getShader(ES_OBJECTPASS);
+    const video::E_MATERIAL_TYPE ref = Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT
+                                                                 : ES_OBJECTPASS_REF);
+    const video::E_MATERIAL_TYPE pass = Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT 
+                                                                  : ES_OBJECTPASS);
 
-    const video::E_MATERIAL_TYPE origref = m_shaders->getShader(ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE origpass = m_shaders->getShader(ES_OBJECTPASS);
+    const video::E_MATERIAL_TYPE origref = Shaders::getShader(ES_OBJECTPASS_REF);
+    const video::E_MATERIAL_TYPE origpass = Shaders::getShader(ES_OBJECTPASS);
 
     bool viamb = false;
     scene::IMesh *mesh = NULL;
@@ -2521,7 +2520,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
 
             m_rsm_matrix_initialized = false;
 
-            ((WaterShaderProvider *) m_shaders->m_callbacks[ES_WATER])->setSunPosition(pos);
+            ((WaterShaderProvider *) Shaders::getCallback(ES_WATER) )->setSunPosition(pos);
         }
 
         return light;

@@ -24,6 +24,8 @@
 
 #include <IMeshSceneNode.h>
 #include <IShaderConstantSetCallBack.h>
+#include <EMaterialTypes.h>
+
 
 using namespace irr;
 class ParticleSystemProxy;
@@ -824,20 +826,42 @@ static const char *shader_names[] = {
 
 class Shaders
 {
+private:
+    static bool m_has_been_initialised;
+
+    static int m_shaders[ES_COUNT];
+
+    static video::IShaderConstantSetCallBack *m_callbacks[ES_COUNT];
+
+    static void check(const int num);
+    static void loadShaders();
 public:
-    Shaders();
-    ~Shaders();
+    static void init();
+    static void destroy();
+    // ------------------------------------------------------------------------
+    /** Returns the material type of a shader. 
+     *  \param num The shader type.
+     */
+    static video::E_MATERIAL_TYPE getShader(const ShaderType num)
+    {
+        assert(m_has_been_initialised);
+        assert(num < ES_COUNT);
+        return (video::E_MATERIAL_TYPE)m_shaders[num];
+    }   // getShader
 
-    video::E_MATERIAL_TYPE getShader(const ShaderType num) const;
+    // ------------------------------------------------------------------------
+    /** Returns the callback for the specified shader type.
+     */
+    static video::IShaderConstantSetCallBack* getCallback(const ShaderType num)
+    {
+        return m_has_been_initialised ? m_callbacks[num] : NULL;
+    }   // getCallback
+    // ------------------------------------------------------------------------
 
-    video::IShaderConstantSetCallBack * m_callbacks[ES_COUNT];
 
-    void loadShaders();
+
     void killShaders();
 private:
-    void check(const int num) const;
-    
-    int m_shaders[ES_COUNT];
 };
 
 #undef ENUM

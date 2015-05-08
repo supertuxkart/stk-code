@@ -38,9 +38,9 @@ WaterNode::WaterNode(scene::ISceneManager* mgr, IMesh *mesh, float height, float
 
     m_mat.Lighting = false;
 
-    if (m_mat.MaterialType != irr_driver->getShader(ES_WATER))
+    if (m_mat.MaterialType != Shaders::getShader(ES_WATER))
     {
-        m_mat.MaterialType = irr_driver->getShader(ES_WATER_SURFACE);
+        m_mat.MaterialType = Shaders::getShader(ES_WATER_SURFACE);
     } else
     {
         m_mat.BlendOperation = EBO_ADD;
@@ -68,7 +68,8 @@ void WaterNode::render()
     if (SceneManager->getSceneNodeRenderPass() != scene::ESNRP_TRANSPARENT)
         return;
 
-    WaterShaderProvider * const cb = (WaterShaderProvider *) irr_driver->getCallback(ES_WATER);
+    WaterShaderProvider * const cb = 
+        (WaterShaderProvider *) Shaders::getCallback(ES_WATER);
     cb->setSpeed(m_speed);
     cb->setHeight(m_height);
     cb->setLength(m_length);

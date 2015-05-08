@@ -20,6 +20,8 @@
 #define STKMESH_H
 
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "utils/singleton.hpp"
 #include "utils/tuple.hpp"
 
 #include <IMeshSceneNode.h>
@@ -27,7 +29,6 @@
 #include "../lib/irrlicht/source/Irrlicht/CMeshSceneNode.h"
 
 #include <vector>
-#include "material.hpp"
 
 class Material;
 

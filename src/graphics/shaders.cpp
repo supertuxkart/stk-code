@@ -92,23 +92,30 @@
 
 #define SHADER_NAMES
 
+#include "graphics/shaders.hpp"
+
 #include "graphics/callbacks.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/gpuparticles.hpp"
-#include "graphics/shaders.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 #include "graphics/glwrap.hpp"
 #include <assert.h>
 #include <IGPUProgrammingServices.h>
 
+
+bool                               Shaders::m_has_been_initialised = false;
+video::IShaderConstantSetCallBack *Shaders::m_callbacks[ES_COUNT];
+int                                Shaders::m_shaders[ES_COUNT];
+
 using namespace video;
 
 std::vector<void(*)()> CleanTable;
 
-Shaders::Shaders()
+void Shaders::init()
 {
+    assert(!m_has_been_initialised);
     // Callbacks
     memset(m_callbacks, 0, sizeof(m_callbacks));
 
@@ -122,8 +129,25 @@ Shaders::Shaders()
         m_shaders[i] = -1;
 
     loadShaders();
-}
+    m_has_been_initialised = true;
+}   // init
 
+// ----------------------------------------------------------------------------
+/** Frees all memory used by the shader manager.
+ */
+void Shaders::destroy()
+{
+    assert(m_has_been_initialised);
+    u32 i;
+    for (i = 0; i < ES_COUNT; i++)
+    {
+        if (i == ES_GAUSSIAN3V || !m_callbacks[i]) continue;
+        delete m_callbacks[i];
+    }
+    m_has_been_initialised = false;
+}   // destroy
+
+// ----------------------------------------------------------------------------
 // Shader loading  related hook
 
 static std::string LoadHeader()
@@ -436,38 +460,26 @@ void Shaders::loadShaders()
     initParticleQuadVBO();
 }
 
+// ----------------------------------------------------------------------------
+/** C
+*/
 void Shaders::killShaders()
 {
     for (unsigned i = 0; i < CleanTable.size(); i++)
         CleanTable[i]();
-}
+}   // killShaders
 
-Shaders::~Shaders()
-{
-    u32 i;
-    for (i = 0; i < ES_COUNT; i++)
-    {
-        if (i == ES_GAUSSIAN3V || !m_callbacks[i]) continue;
-        delete m_callbacks[i];
-    }
-}
-
-E_MATERIAL_TYPE Shaders::getShader(const ShaderType num) const
-{
-    assert(num < ES_COUNT);
-
-    return (E_MATERIAL_TYPE)m_shaders[num];
-}
-
-void Shaders::check(const int num) const
+// ----------------------------------------------------------------------------
+void Shaders::check(const int num)
 {
     if (m_shaders[num] == -1)
     {
         Log::error("shaders", "Shader %s failed to load. Update your drivers, if the issue "
                    "persists, report a bug to us.", shader_names[num] + 3);
     }
-}
+}   // check
 
+// ----------------------------------------------------------------------------
 void bypassUBO(GLuint Program)
 {
     GLint VM = glGetUniformLocation(Program, "ViewMatrix");

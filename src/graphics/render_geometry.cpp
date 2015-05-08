@@ -829,7 +829,7 @@ void IrrDriver::renderTransparent()
     irr_driver->getFBO(FBO_DISPLACE).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
+    DisplaceProvider * const cb = (DisplaceProvider *)Shaders::getCallback(ES_DISPLACE);
     cb->update();
 
     glEnable(GL_DEPTH_TEST);

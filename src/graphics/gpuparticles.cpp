@@ -15,15 +15,19 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/irr_driver.hpp"
-#include "graphics/glwrap.hpp"
-#include "gpuparticles.hpp"
-#include "io/file_manager.hpp"
+#include "graphics/gpuparticles.hpp"
+
 #include "config/user_config.hpp"
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/particle_emitter.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/texture_read.hpp"
+#include "guiengine/engine.hpp"
+#include "io/file_manager.hpp"
+
 #include <ICameraSceneNode.h>
 #include <IParticleSystemSceneNode.h>
-#include "guiengine/engine.hpp"
-#include "graphics/particle_emitter.hpp"
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
 #define COMPONENTCOUNT 8
 
