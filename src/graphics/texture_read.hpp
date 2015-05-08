@@ -18,7 +18,10 @@
 #ifndef HEADER_TEXTURE_READ_HPP
 #define HEADER_TEXTURE_READ_HPP
 
+#include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
+
+#include <assert.h>
 #include <functional>
 #include <vector>
 
