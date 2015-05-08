@@ -18,12 +18,69 @@
 #ifndef HEADER_TEXTURE_READ_HPP
 #define HEADER_TEXTURE_READ_HPP
 
-#include "shaders_util.hpp"
+#include "graphics/gl_headers.hpp"
+#include <functional>
+#include <vector>
 
-template<SamplerType...tp>
-class TextureRead
+
+enum SamplerTypeNew
 {
+    ST_MIN,
+    ST_NEAREST_FILTERED = ST_MIN,
+    ST_TRILINEAR_ANISOTROPIC_FILTERED,
+    ST_TRILINEAR_CUBEMAP,
+    ST_BILINEAR_FILTERED,
+    ST_SHADOW_SAMPLER,
+    ST_TRILINEAR_CLAMPED_ARRAY2D,
+    ST_VOLUME_LINEAR_FILTERED,
+    ST_NEARED_CLAMPED_FILTERED,
+    ST_BILINEAR_CLAMPED_FILTERED,
+    ST_SEMI_TRILINEAR,
+    ST_MAX = ST_SEMI_TRILINEAR
+};   // SamplerTypeNew
+
+
+class TextureReadBaseNew
+{
+public:
+    typedef  std::function<void(GLuint, GLuint)> BindFunction;
+
 protected:
+    static void   bindTextureNearest(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureBilinear(GLuint texture_unit, GLuint tex_id);
+    static void   bindTextureBilinearClamped(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureNearestClamped(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex_id);
+    static void   bindCubemapTrilinear(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureShadow(GLuint tex_unit, GLuint tex_id);
+    static void   bindTrilinearClampedArrayTexture(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureVolume(GLuint tex_unit, GLuint tex_id);
+    
+    GLuint        createSamplers(SamplerTypeNew sampler_type);
+private:
+
+    static GLuint createNearestSampler();
+    static GLuint createTrilinearSampler();
+    static GLuint createBilinearSampler();
+    static GLuint createShadowSampler();
+    static GLuint createTrilinearClampedArray();
+    static GLuint createBilinearClampedSampler();
+    static GLuint createSemiTrilinearSampler();
+protected:
+    static BindFunction m_all_bind_functions[];
+    std::vector<BindFunction> m_bind_functions;
+    static GLuint m_all_texture_types[];
+};   // TextureReadBaseNew
+
+// ============================================================================
+
+template<SamplerTypeNew...tp>
+class TextureReadNew : public TextureReadBaseNew
+{
+
+private:
+
     std::vector<GLuint> m_texture_units;
     std::vector<GLenum> m_texture_type;
     std::vector<GLenum> m_texture_location;
@@ -47,26 +104,36 @@ private:
      *  list of arguments.
      */
     template<unsigned N, typename...Args>
-    void assignTextureNamesImpl(GLuint program, GLuint tex_unit, 
-                                const char *name, Args...args)
+    void assignTextureNamesImpl(GLuint program, GLuint tex_unit,
+                                const char *name, SamplerTypeNew sampler_type,
+                                Args...args)
     {
+
+        m_sampler_ids.push_back(createSamplers(sampler_type));
+
+        assert(sampler_type >= ST_MIN && sampler_type <= ST_MAX);
+        m_texture_type.push_back(m_all_texture_types[sampler_type]);
+
         GLuint location = glGetUniformLocation(program, name);
         m_texture_location.push_back(location);
         glUniform1i(location, tex_unit);
         m_texture_units.push_back(tex_unit);
+
+        // Duplicated assert
+        assert(sampler_type >= ST_MIN && sampler_type <= ST_MAX);
+        m_bind_functions.push_back( m_all_bind_functions[sampler_type]);
+
         assignTextureNamesImpl<N + 1>(program, args...);
     }   // assignTextureNamesImpl
 
     // ------------------------------------------------------------------------
-protected:
+public:
     /** The protected interface for setting sampler names - it is only called
     *  from instances.
     */
     template<typename...Args>
     void assignSamplerNames(GLuint program, Args...args)
     {
-        CreateSamplers<tp...>::exec(m_sampler_ids, m_texture_type);
-
         glUseProgram(program);
         assignTextureNamesImpl<0>(program, args...);
         glUseProgram(0);
@@ -86,10 +153,20 @@ protected:
     /** The recursive implementation.
      */
     template<int N, typename... TexIds>
-    void setTextureUnitsImpl(GLuint texid, TexIds... args)
+    void setTextureUnitsImpl(GLuint tex_id, TexIds... args)
     {
-        setTextureSampler(m_texture_type[N], m_texture_units[N], texid, 
-                          m_sampler_ids[N]);
+        if (CVS->getGLSLVersion() >= 330)
+        {
+#ifdef GL_VERSION_3_3
+            glActiveTexture(GL_TEXTURE0 + m_texture_units[N]);
+            glBindTexture(m_texture_type[N], tex_id);
+            glBindSampler(m_texture_units[N], m_sampler_ids[N]);
+#endif
+        }
+        else
+        {
+            m_bind_functions[N](m_texture_units[N], tex_id);
+        }
         setTextureUnitsImpl<N + 1>(args...);
     }   // setTextureUnitsImpl
 
@@ -100,11 +177,8 @@ public:
     template<typename... TexIds>
     void setTextureUnits(TexIds... args)
     {
-        if (getGLSLVersion() >= 330)
-            setTextureUnitsImpl<0>(args...);
-        else
-            BindTexture<tp...>::template exec<0>(m_texture_units, args...);
-    }   // SetTextureUnits
+        setTextureUnitsImpl<0>(args...);
+    }   // setTextureUnits
 
 
     // ========================================================================
@@ -148,13 +222,14 @@ public:
     // ------------------------------------------------------------------------
     /** Destructor which frees al lsampler ids.
      */
-    ~TextureRead()
+    ~TextureReadNew()
     {
         for (unsigned i = 0; i < m_sampler_ids.size(); i++)
             glDeleteSamplers(1, &m_sampler_ids[i]);
-    }   // ~TextureRead
+    }   // ~TextureReadNew
 
 
-};   // class TextureRead
+};   // class TextureReadNew
+
 
 #endif

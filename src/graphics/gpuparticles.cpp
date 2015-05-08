@@ -17,7 +17,6 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/shaders_util.hpp"
 #include "gpuparticles.hpp"
 #include "io/file_manager.hpp"
 #include "config/user_config.hpp"
@@ -33,7 +32,7 @@
 /** Transform feedback shader that simulates the particles on GPU.
 */
 class PointEmitterShader : public Shader
-    < PointEmitterShader, core::matrix4, int, int, float >
+                           < PointEmitterShader, core::matrix4, int, int, float >
 {
 public:
     PointEmitterShader()
@@ -52,8 +51,8 @@ public:
 */
 class SimpleParticleRender : public Shader<SimpleParticleRender, video::SColorf,
                                            video::SColorf>,
-                             public TextureRead<Trilinear_Anisotropic_Filtered,
-                                                Nearest_Filtered>
+                             public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                                   ST_NEAREST_FILTERED>
 {
 public:
     SimpleParticleRender()
@@ -64,7 +63,8 @@ public:
                     GL_FRAGMENT_SHADER, "particle.frag");
 
         assignUniforms("color_from", "color_to");
-        assignSamplerNames(m_program, 0, "tex", 1, "dtex");
+        assignSamplerNames(m_program, 0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      1, "dtex", ST_NEAREST_FILTERED);
     }   // SimpleParticleRender
 
 };   // SimpleParticleRender
@@ -72,8 +72,8 @@ public:
 // ============================================================================
 
 class FlipParticleRender : public Shader<FlipParticleRender>, 
-                           public TextureRead < Trilinear_Anisotropic_Filtered,
-                                                Nearest_Filtered >
+                           public TextureReadNew < ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                                   ST_NEAREST_FILTERED >
 {
 public:
     FlipParticleRender()
@@ -83,7 +83,8 @@ public:
                     GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                     GL_FRAGMENT_SHADER, "particle.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "tex", 1, "dtex");
+        assignSamplerNames(m_program, 0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                      1, "dtex", ST_NEAREST_FILTERED);
     }
 
 };   // FlipParticleShader
