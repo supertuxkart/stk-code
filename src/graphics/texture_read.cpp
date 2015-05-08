@@ -333,8 +333,7 @@ GLuint TextureReadBaseNew::createSemiTrilinearSampler()
     glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
     return id;
 #endif
-}
+}   // createSemiTrilinearSampler
 
-// ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

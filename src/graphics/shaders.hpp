@@ -20,7 +20,6 @@
 
 #include "config/user_config.hpp"
 #include "graphics/shader.hpp"
-#include "graphics/shaders_util.hpp"
 #include "graphics/texture_read.hpp"
 
 #include <IMeshSceneNode.h>

@@ -17,7 +17,6 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/shaders_util.hpp"
 #include "gpuparticles.hpp"
 #include "io/file_manager.hpp"
 #include "config/user_config.hpp"
