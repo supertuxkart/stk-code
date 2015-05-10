@@ -57,12 +57,6 @@ public:
     ObjectRefPass1Shader();
 };
 
-class GrassPass1Shader : public Shader<GrassPass1Shader, core::matrix4, core::matrix4, core::vector3df>,
-                         public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    GrassPass1Shader();
-};
 
 class NormalMapShader : public Shader<NormalMapShader, core::matrix4, core::matrix4>,
                         public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>

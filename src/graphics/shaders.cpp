@@ -565,16 +565,6 @@ namespace MeshShader
                                       1, "glosstex",ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
-    GrassPass1Shader::GrassPass1Shader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "grass_pass.vert",
-            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
-            GL_FRAGMENT_SHADER, "objectref_pass1.frag");
-        assignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
-        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                      1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
 
     NormalMapShader::NormalMapShader()
     {
