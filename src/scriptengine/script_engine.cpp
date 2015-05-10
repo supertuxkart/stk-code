@@ -24,6 +24,7 @@
 #include "scriptengine/script_engine.hpp"
 #include "scriptengine/script_gui.hpp"
 #include "scriptengine/script_track.hpp"
+#include "scriptengine/script_utils.hpp"
 #include "scriptengine/scriptstdstring.hpp"
 #include "scriptengine/scriptvec3.hpp"
 #include <string.h>
@@ -150,7 +151,7 @@ void ScriptEngine::runScript(std::string scriptName, std::function<void(asIScrip
         // Find the function for the function we want to execute.
         //This is how you call a normal function with arguments
         //asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void func(arg1Type, arg2Type)");
-        func = Scripting::Track::registerScriptCallbacks(m_engine, scriptName);
+        func = registerScriptCallbacks(m_engine, scriptName);
         
         if (func == NULL)
         {
@@ -244,6 +245,16 @@ void ScriptEngine::runScript(std::string scriptName, std::function<void(asIScrip
 
 //-----------------------------------------------------------------------------
 
+asIScriptFunction* ScriptEngine::registerScriptCallbacks(asIScriptEngine *engine,
+    std::string function_name)
+{
+    asIScriptFunction *func;
+    func = engine->GetModule(0)->GetFunctionByDecl(function_name.c_str());
+    return func;
+}
+
+//-----------------------------------------------------------------------------
+
 void ScriptEngine::cleanupCache()
 {
     for (auto curr : m_script_cache)
@@ -265,11 +276,9 @@ void ScriptEngine::configureEngine(asIScriptEngine *engine)
     RegisterVec3(engine);      //register Vec3
 
     Scripting::Track::registerScriptFunctions(m_engine);
-
     Scripting::Kart::registerScriptFunctions(m_engine);
-
     Scripting::Physics::registerScriptFunctions(m_engine);
-
+    Scripting::Utils::registerScriptFunctions(m_engine);
     Scripting::GUI::registerScriptFunctions(m_engine);
     Scripting::GUI::registerScriptEnums(m_engine);
     

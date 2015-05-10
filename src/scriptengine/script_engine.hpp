@@ -43,9 +43,6 @@ namespace Scripting
         void registerScriptFunctions(asIScriptEngine *engine);
 
         void registerScriptEnums(asIScriptEngine *engine);
-
-        asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName);
     }
     
     class ScriptEngine
@@ -58,7 +55,9 @@ namespace Scripting
         void runScript(std::string scriptName);
         void runScript(std::string scriptName, std::function<void(asIScriptContext*)> callback);
         void cleanupCache();
-        
+        asIScriptFunction*
+            registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName);
+
     private:
         asIScriptEngine *m_engine;
         std::map<std::string, asIScriptFunction*> m_script_cache;
