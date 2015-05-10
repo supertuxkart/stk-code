@@ -37,13 +37,13 @@ echo "---------------------------"
 echo "    Generating .pot file..."
 
 # XML Files
-xgettext  -d supertuxkart -s --keyword=_ --add-comments="I18N:" \
+xgettext  -d supertuxkart --keyword=_ --add-comments="I18N:" \
                                -p ./data/po -o supertuxkart.pot \
                                --no-location --from-code=UTF-8 ./data/po/gui_strings.h \
                                --package-name=supertuxkart
 
 # C++ Files
-xgettext  -j  -d supertuxkart -s --keyword=_ --keyword=N_ --keyword=_LTR \
+xgettext  -j  -d supertuxkart --keyword=_ --keyword=N_ --keyword=_LTR \
                                --keyword=_C:1c,2 --keyword=_P:1,2 \
                                --keyword=_CP:1c,2,3 --add-comments="I18N:" \
                                -p ./data/po -o supertuxkart.pot $CPP_FILE_LIST \
