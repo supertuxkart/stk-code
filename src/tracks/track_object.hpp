@@ -109,7 +109,6 @@ public:
               bool isAbsoluteCoord);
 
     virtual void reset();
-    void setEnable(bool mode);
     const core::vector3df& getPosition() const;
     const core::vector3df  getAbsolutePosition() const;
     const core::vector3df& getRotation() const;
@@ -151,8 +150,6 @@ public:
     const PhysicalObject* getPhysicalObject() const { return m_physical_object; }
     // ------------------------------------------------------------------------
     PhysicalObject* getPhysicalObject() { return m_physical_object; }
-    //Due to above overload AngelScript cannot decide which function to bind
-    PhysicalObject* getPhysicalObjectForScript() { return m_physical_object; }
     // ------------------------------------------------------------------------
     const core::vector3df getInitXYZ() const { return m_init_xyz; }
     // ------------------------------------------------------------------------
@@ -165,20 +162,47 @@ public:
     // ------------------------------------------------------------------------
     template<typename T>
     const T* getPresentation() const { return dynamic_cast<T*>(m_presentation); }
-
-    //specialized getters for scripts
-    TrackObjectPresentationMesh* getMesh(){ return getPresentation<TrackObjectPresentationMesh>(); }
-
-    TrackObjectPresentationParticles* getParticles(){ return getPresentation<TrackObjectPresentationParticles>(); }
-
-    TrackObjectPresentationSound* getSound(){ return getPresentation<TrackObjectPresentationSound>(); }
-
+    // ------------------------------------------------------------------------
+    // Methods usable by scripts
+    /**
+    * \addtogroup Scripting
+    * @{
+    * \addtogroup Scripting_Track Track
+    * @{
+    * \addtogroup Scripting_TrackObject TrackObject (script binding)
+    * @{
+    */
+    /** Should only be used on mesh track objects.
+    * On the script side, the returned object is of type : @ref Scripting_Mesh
+    */
+    TrackObjectPresentationMesh* getMesh() { return getPresentation<TrackObjectPresentationMesh>(); }
+    /** Should only be used on particle emitter track objects.
+    * On the script side, the returned object is of type : @ref Scripting_ParticleEmitter
+    */
+    TrackObjectPresentationParticles* getParticleEmitter() { return getPresentation<TrackObjectPresentationParticles>(); }
+    /** Should only be used on sound emitter track objects.
+      * On the script side, the returned object is of type : @ref Scripting_SoundEmitter
+      */
+    TrackObjectPresentationSound* getSoundEmitter(){ return getPresentation<TrackObjectPresentationSound>(); }
+    // For angelscript. Needs to be named something different than getAnimator since it's overloaded.
+    /** Should only be used on TrackObjects that use curve-based animation.
+      * On the script side, the returned object is of type : @ref Scripting_Animator
+      */
+    ThreeDAnimation* getIPOAnimator() { return m_animator; }
+    // For angelscript. Needs to be named something different than getPhysicalObject since it's overloaded.
+    /** Get the physics representation of an object.
+      * On the script side, the returned object is of type : @ref Scripting_PhysicalObject
+      */
+    PhysicalObject* getPhysics() { return m_physical_object; }
+    /** Hide or show the object */
+    void setEnable(bool mode);
+    /* @} */
+    /* @} */
+    /* @} */
     // ------------------------------------------------------------------------
     ThreeDAnimation* getAnimator() { return m_animator; }
     // ------------------------------------------------------------------------
     const ThreeDAnimation* getAnimator() const { return m_animator; }
-    //Due to above overload AngelScript cannot decide which function to bind
-    ThreeDAnimation* getAnimatorForScript() { return m_animator; }
     // ------------------------------------------------------------------------
     void setPaused(bool mode){ m_animator->setPaused(mode); }
     // ------------------------------------------------------------------------

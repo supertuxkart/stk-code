@@ -101,6 +101,15 @@ namespace Scripting
             return StringUtils::wide_to_utf8(out.c_str());
         }
 
+        /** Runs the script specified by the given string */
+        // TODO: type arguments
+        void runScript(asIScriptGeneric *gen)
+        {
+            std::string *str = (std::string*)gen->GetArgAddress(0);
+            ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            script_engine->runScript(*str);
+        }
+
         /** Log to the console */
         void logInfo(std::string* log)
         {
@@ -153,6 +162,8 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues2), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues3), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues4), asCALL_CDECL); assert(r >= 0);
+            
+            r = engine->RegisterGlobalFunction("void runScript(string &in)", asFUNCTION(runScript), asCALL_GENERIC); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("void logInfo(const string &in)", asFUNCTION(logInfo), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void logWarning(const string &in)", asFUNCTION(logWarning), asCALL_CDECL); assert(r >= 0);

@@ -29,6 +29,7 @@ namespace Scripting
     namespace Physics
     {
         //Creates an explosion animation at specified Vec3 location
+        // TODO: does this even belong in Physics?
         void createExplosion(asIScriptGeneric *gen)
         {
             //TODO: allow different types? sand etc

@@ -826,7 +826,24 @@ void TrackObjectPresentationParticles::triggerParticles()
         m_emitter->setParticleType(m_emitter->getParticlesInfo());
     }
 }   // triggerParticles
-
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationParticles::stop()
+{
+    if (m_emitter != NULL)
+    {
+        m_emitter->setCreationRateAbsolute(0.0f);
+        m_emitter->clearParticles();
+    }
+}
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationParticles::setRate(float rate)
+{
+    if (m_emitter != NULL)
+    {
+        m_emitter->setCreationRateAbsolute(rate);
+        m_emitter->setParticleType(m_emitter->getParticlesInfo());
+    }
+}
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLight::TrackObjectPresentationLight(
                                                      const XMLNode& xml_node, 
