@@ -40,25 +40,6 @@ public:
     static GLuint UIVAO;
 };
 
-namespace UtilShader
-{
-class ColoredLine : public Shader<ColoredLine, video::SColor>
-{
-public:
-    GLuint vao, vbo;
-
-    ColoredLine();
-};
-
-class SpecularIBLGenerator : public Shader<SpecularIBLGenerator, core::matrix4, float >,
-                             public TextureReadNew<ST_TRILINEAR_CUBEMAP>
-{
-public:
-    GLuint TU_Samples;
-    SpecularIBLGenerator();
-};
-}
-
 
 namespace MeshShader
 {
@@ -861,8 +842,32 @@ public:
 
 
     void killShaders();
-private:
-};
+
+    // ========================================================================
+    /** Shader to draw a colored line.
+     */
+    class ColoredLine : public Shader<ColoredLine, video::SColor>
+    {
+    private:
+        GLuint m_vao, m_vbo;
+    public:
+        ColoredLine();
+
+        // --------------------------------------------------------------------
+        /** Bind the vertex array of this shader. */
+        void bindVertexArray()
+        {
+            glBindVertexArray(m_vao);
+        }   // bindVertexArray
+        // --------------------------------------------------------------------
+        /** Binds the vbo of this shader. */
+        void bindBuffer()
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        }   // bindBuffer
+    };   // class ColoredLine
+
+};   // class Shaders
 
 #undef ENUM
 #undef STR

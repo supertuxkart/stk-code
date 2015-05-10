@@ -225,6 +225,26 @@ GLuint LoadShader(const char * file, unsigned type)
 
 
 
+Shaders::ColoredLine::ColoredLine()
+{
+    loadProgram(OBJECT, GL_VERTEX_SHADER,   "object_pass.vert",
+                        GL_FRAGMENT_SHADER, "coloredquad.frag");
+
+    assignUniforms("color");
+
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+    glGenBuffers(1, &m_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 1024 * sizeof(float), 0, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}   // Shaders::ColoredLine
+
+
+
 GLuint quad_vbo, tri_vbo;
 
 GLuint SharedObject::FullScreenQuadVAO = 0;
@@ -508,24 +528,6 @@ void bypassUBO(GLuint Program)
 
 namespace UtilShader
 {
-    ColoredLine::ColoredLine()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "object_pass.vert",
-            GL_FRAGMENT_SHADER, "coloredquad.frag");
-
-        assignUniforms("color");
-
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, 6 * 1024 * sizeof(float), 0, GL_DYNAMIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
 }
 
 
@@ -537,20 +539,6 @@ using namespace UtilShader;
 unsigned getGLSLVersion()
 {
     return CVS->getGLSLVersion();
-}
-
-namespace UtilShader
-{
-    SpecularIBLGenerator::SpecularIBLGenerator()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
-        assignUniforms("PermutationMatrix", "ViewportSize");
-        TU_Samples = 1;
-        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_CUBEMAP);
-        assignTextureUnit(TU_Samples, "samples");
-    }
 }
 
 namespace MeshShader

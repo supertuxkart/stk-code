@@ -373,7 +373,7 @@ void IrrDriver::generateDiffuseCoefficients()
         }
     }
 
-    SphericalHarmonics(FloatTexCube, sh_w, blueSHCoeff, greenSHCoeff, redSHCoeff);
+    generateSphericalHarmonics(FloatTexCube, sh_w, blueSHCoeff, greenSHCoeff, redSHCoeff);
 
     for (unsigned i = 0; i < 6; i++)
     {

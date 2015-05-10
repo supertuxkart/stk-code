@@ -192,10 +192,11 @@ void IrrDriver::renderGLSL(float dt)
         // Render bounding boxes
         if (irr_driver->getBoundingBoxesViz())
         {
-            UtilShader::ColoredLine::getInstance()->use();
-            glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
-            glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
-            UtilShader::ColoredLine::getInstance()->setUniforms(SColor(255, 255, 0, 0));
+            Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
+            line->use();
+            line->bindVertexArray();
+            line->bindBuffer();
+            line->setUniforms(SColor(255, 255, 0, 0));
             const float *tmp = BoundingBoxes.data();
             for (unsigned int i = 0; i < BoundingBoxes.size(); i += 1024 * 6)
             {
@@ -221,12 +222,13 @@ void IrrDriver::renderGLSL(float dt)
                 const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
                 std::map<video::SColor, std::vector<float> >::const_iterator it;
 
-                UtilShader::ColoredLine::getInstance()->use();
-                glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
-                glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
+                Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
+                line->use();
+                line->bindVertexArray();
+                line->bindBuffer();
                 for (it = lines.begin(); it != lines.end(); it++)
                 {
-                    UtilShader::ColoredLine::getInstance()->setUniforms(it->first);
+                    line->setUniforms(it->first);
                     const std::vector<float> &vertex = it->second;
                     const float *tmp = vertex.data();
                     for (unsigned int i = 0; i < vertex.size(); i += 1024 * 6)
