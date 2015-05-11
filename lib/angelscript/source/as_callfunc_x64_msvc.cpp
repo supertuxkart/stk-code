@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -28,6 +28,9 @@
    andreas@angelcode.com
 */
 
+//
+// Added support for thiscall methods by Jordi Oliveras Rovira in April, 2014.
+//
 
 #include <stdio.h>
 
@@ -48,7 +51,7 @@ extern "C" asQWORD CallX64(const asQWORD *args, const asQWORD *floatArgs, int pa
 extern "C" asDWORD GetReturnedFloat();
 extern "C" asQWORD GetReturnedDouble();
 
-asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/)
+asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/, void *secondObject)
 {
 	asCScriptEngine *engine = context->m_engine;
 	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
@@ -62,10 +65,10 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	asQWORD  floatArgBuffer[4];
 
 	int callConv = sysFunc->callConv;
-	if( callConv == ICC_THISCALL ||
-		callConv == ICC_THISCALL_RETURNINMEM ||
-		callConv == ICC_VIRTUAL_THISCALL || 
-		callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM )
+
+	// Optimization to avoid check 12 values (all ICC_ that contains THISCALL)
+	if( (callConv >= ICC_THISCALL && callConv <= ICC_VIRTUAL_THISCALL_RETURNINMEM) ||
+		(callConv >= ICC_THISCALL_OBJLAST && callConv <= ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM) )
 	{
 		// Add the object pointer as the first parameter
 		allArgBuffer[paramSize++] = (asQWORD)obj;
@@ -86,9 +89,21 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		// Add the object pointer as the first parameter
 		allArgBuffer[paramSize++] = (asQWORD)obj;
 	}
+	else if( callConv == ICC_THISCALL_OBJFIRST ||
+		callConv == ICC_THISCALL_OBJFIRST_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJFIRST ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM )
+	{
+		// Add the object pointer as the first parameter
+		allArgBuffer[paramSize++] = (asQWORD)secondObject;
+	}
 
 	if( callConv == ICC_VIRTUAL_THISCALL ||
-		callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM )
+		callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJFIRST ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJLAST ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM )
 	{
 		// Get the true function pointer from the virtual function table
 		vftable = *(void***)obj;
@@ -100,10 +115,11 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	asUINT spos = 0;
 	for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
 	{
-		if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
+		asCDataType &dt = descr->parameterTypes[n];
+		if( dt.IsObject() && !dt.IsObjectHandle() && !dt.IsReference() )
 		{
-			if( descr->parameterTypes[n].GetSizeInMemoryDWords() >= AS_LARGE_OBJ_MIN_SIZE ||
-				(descr->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK) )
+			if( dt.GetSizeInMemoryDWords() >= AS_LARGE_OBJ_MIN_SIZE ||
+				(dt.GetObjectType()->flags & COMPLEX_MASK) )
 			{
 				allArgBuffer[dpos++] = *(asQWORD*)&args[spos];
 				spos += AS_PTR_SIZE;
@@ -112,18 +128,18 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			else
 			{
 				// Copy the object's memory to the buffer
-				memcpy(&allArgBuffer[dpos], *(void**)(args+spos), descr->parameterTypes[n].GetSizeInMemoryBytes());
+				memcpy(&allArgBuffer[dpos], *(void**)(args+spos), dt.GetSizeInMemoryBytes());
 
 				// Delete the original memory
 				engine->CallFree(*(char**)(args+spos));
 				spos += AS_PTR_SIZE;
-				asUINT dwords = descr->parameterTypes[n].GetSizeInMemoryDWords();
+				asUINT dwords = dt.GetSizeInMemoryDWords();
 				asUINT qwords = (dwords >> 1) + (dwords & 1);
 				dpos      += qwords;
 				paramSize += qwords;
 			}
 		}
-		else if( descr->parameterTypes[n].GetTokenType() == ttQuestion )
+		else if( dt.GetTokenType() == ttQuestion )
 		{
 			// Copy the reference and the type id
 			allArgBuffer[dpos++] = *(asQWORD*)&args[spos];
@@ -134,14 +150,14 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		else
 		{
 			// Copy the value directly
-			asUINT dwords = descr->parameterTypes[n].GetSizeOnStackDWords();
+			asUINT dwords = dt.GetSizeOnStackDWords();
 			if( dwords > 1 )
 			{
 				allArgBuffer[dpos] = *(asQWORD*)&args[spos];
 
 				// Double arguments are moved to a separate buffer in order to be placed in the XMM registers,
 				// though this is only done for first 4 arguments, the rest are placed on the stack
-				if( paramSize < 4 && descr->parameterTypes[n].IsDoubleType() )
+				if( paramSize < 4 && dt.IsDoubleType() )
 					floatArgBuffer[dpos] = *(asQWORD*)&args[spos];
 
 				dpos++;
@@ -153,7 +169,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 				// Float arguments are moved to a separate buffer in order to be placed in the XMM registers,
 				// though this is only done for first 4 arguments, the rest are placed on the stack
-				if( paramSize < 4 && descr->parameterTypes[n].IsFloatType() )
+				if( paramSize < 4 && dt.IsFloatType() )
 					floatArgBuffer[dpos] = args[spos];
 				
 				dpos++;
@@ -169,6 +185,14 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	{
 		// Add the object pointer as the last parameter
 		allArgBuffer[paramSize++] = (asQWORD)obj;
+	}
+	else if( callConv == ICC_THISCALL_OBJLAST ||
+		callConv == ICC_THISCALL_OBJLAST_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJLAST ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM )
+	{
+		// Add the object pointer as the last parameter
+		allArgBuffer[paramSize++] = (asQWORD)secondObject;
 	}
 
 	retQW = CallX64(allArgBuffer, floatArgBuffer, paramSize*8, (asPWORD)func);

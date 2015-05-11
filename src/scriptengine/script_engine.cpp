@@ -59,7 +59,7 @@ ScriptEngine::ScriptEngine()
     m_engine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
     if (m_engine == NULL)
     {
-        Log::error("Scripting", "Failed to create script engine.");
+        Log::fatal("Scripting", "Failed to create script engine.");
     }
 
     // The script compiler will write any compiler messages to the callback.

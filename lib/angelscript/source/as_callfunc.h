@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -46,6 +46,7 @@ BEGIN_AS_NAMESPACE
 class asCContext;
 class asCScriptEngine;
 class asCScriptFunction;
+class asCObjectType;
 struct asSSystemFunctionInterface;
 
 int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, void *objForThiscall, asSSystemFunctionInterface *internal);
@@ -54,7 +55,7 @@ int PrepareSystemFunctionGeneric(asCScriptFunction *func, asSSystemFunctionInter
 
 int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *internal, asCScriptEngine *engine);
 
-int CallSystemFunction(int id, asCContext *context, void *objectPointer);
+int CallSystemFunction(int id, asCContext *context);
 
 inline asPWORD FuncPtrToUInt(asFUNCTION_t func)
 {
@@ -83,7 +84,15 @@ enum internalCallConv
 	ICC_CDECL_OBJFIRST,
 	ICC_CDECL_OBJFIRST_RETURNINMEM,
 	ICC_GENERIC_METHOD,
-	ICC_GENERIC_METHOD_RETURNINMEM // never used
+	ICC_GENERIC_METHOD_RETURNINMEM, // never used
+	ICC_THISCALL_OBJLAST,
+	ICC_THISCALL_OBJLAST_RETURNINMEM,
+	ICC_VIRTUAL_THISCALL_OBJLAST,
+	ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM,
+	ICC_THISCALL_OBJFIRST,
+	ICC_THISCALL_OBJFIRST_RETURNINMEM,
+	ICC_VIRTUAL_THISCALL_OBJFIRST,
+	ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM
 };
 
 struct asSSystemFunctionInterface
@@ -97,10 +106,17 @@ struct asSSystemFunctionInterface
 	int                  hostReturnSize;
 	int                  paramSize;
 	bool                 takesObjByVal;
-	asCArray<bool>       paramAutoHandles;
+	asCArray<bool>       paramAutoHandles; // TODO: Should be able to remove this array. Perhaps the flags can be stored together with the inOutFlags in asCScriptFunction?
 	bool                 returnAutoHandle;
-	bool                 hasAutoHandles;
 	void                *objForThiscall;
+
+	struct SClean
+	{
+		asCObjectType *ot; // argument type for clean up
+		short op;          // clean up operation: 0 = release, 1 = free, 2 = destruct then free
+		short off;         // argument offset on the stack
+	};
+	asCArray<SClean>     cleanArgs;
 
 	asSSystemFunctionInterface() {}
 
@@ -122,8 +138,8 @@ struct asSSystemFunctionInterface
 		takesObjByVal      = in.takesObjByVal;
 		paramAutoHandles   = in.paramAutoHandles;
 		returnAutoHandle   = in.returnAutoHandle;
-		hasAutoHandles     = in.hasAutoHandles;
 		objForThiscall     = in.objForThiscall;
+		cleanArgs          = in.cleanArgs;
 		return *this;
 	}
 };

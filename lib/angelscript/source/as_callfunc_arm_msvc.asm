@@ -1,6 +1,6 @@
 ;
 ;  AngelCode Scripting Library
-;  Copyright (c) 2003-2013 Andreas Jonsson
+;  Copyright (c) 2003-2014 Andreas Jonsson
 ;
 ;  This software is provided 'as-is', without any express or implied
 ;  warranty. In no event will the authors be held liable for any
@@ -29,7 +29,7 @@
 ;
 
 
-; Assembly routines for the ARM call convention
+; Assembly routines for the ARM call convention used for Windows CE
 ; Written by Fredrik Ehnbom in June 2009
 
 ; MSVC currently doesn't support inline assembly for the ARM platform
