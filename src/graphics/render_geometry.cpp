@@ -447,6 +447,56 @@ public:
 };   // InstancedGrassShadowShader
 
 // ============================================================================
+class DetailedObjectPass2Shader : public Shader<DetailedObjectPass2Shader,
+                                                 core::matrix4>,
+                                   public TextureReadNew<ST_NEAREST_FILTERED,
+                                             ST_NEAREST_FILTERED, 
+                                             ST_BILINEAR_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED >
+{
+public:
+    DetailedObjectPass2Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                            GL_FRAGMENT_SHADER, "detailedobject_pass2.frag");
+        assignUniforms("ModelMatrix");
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "Detail", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }  // DetailedObjectPass2Shader
+};   // DetailedObjectPass2Shader
+
+// ============================================================================
+class InstancedDetailedObjectPass2Shader : public Shader<InstancedDetailedObjectPass2Shader>,
+      public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, 
+                            ST_BILINEAR_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                            ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                            ST_TRILINEAR_ANISOTROPIC_FILTERED >
+{
+public:
+    InstancedDetailedObjectPass2Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                   GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                   GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                   GL_FRAGMENT_SHADER, "instanced_detailedobject_pass2.frag");
+        assignUniforms();
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "Detail", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedDetailedObjectPass2Shader
+};   // InstancedDetailedObjectPass2Shader
+
+// ============================================================================
 
 
 
@@ -516,12 +566,12 @@ const STK::Tuple<size_t> NormalMat::RSMTextures = STK::Tuple<size_t>(0);
 struct DetailMat
 {
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;
-    typedef MeshShader::InstancedDetailledObjectPass2Shader InstancedSecondPassShader;
+    typedef InstancedDetailedObjectPass2Shader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
     typedef InstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatDetails InstancedList;
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
-    typedef MeshShader::DetailledObjectPass2Shader SecondPassShader;
+    typedef DetailedObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
     typedef RSMShader RSMShader;
     typedef ListMatDetails List;

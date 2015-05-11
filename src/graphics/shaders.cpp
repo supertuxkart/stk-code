@@ -633,36 +633,6 @@ namespace MeshShader
                                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
-    DetailledObjectPass2Shader::DetailledObjectPass2Shader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "object_pass.vert",
-            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-            GL_FRAGMENT_SHADER, "detailledobject_pass2.frag");
-        assignUniforms("ModelMatrix");
-        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
-                                      1, "SpecularMap", ST_NEAREST_FILTERED,
-                                      2, "SSAO", ST_BILINEAR_FILTERED,
-                                      3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                      4, "Detail", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                      5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);            
-    }
-
-    InstancedDetailledObjectPass2Shader::InstancedDetailledObjectPass2Shader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-            GL_FRAGMENT_SHADER, "instanced_detailledobject_pass2.frag");
-        assignUniforms();
-        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
-                                     1, "SpecularMap", ST_NEAREST_FILTERED,
-                                     2, "SSAO", ST_BILINEAR_FILTERED,
-                                     3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                     4, "Detail", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                     5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
 
     ObjectUnlitShader::ObjectUnlitShader()
     {

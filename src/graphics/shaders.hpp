@@ -98,24 +98,6 @@ public:
     InstancedObjectRefPass2Shader();
 };
 
-class DetailledObjectPass2Shader : public Shader<DetailledObjectPass2Shader, core::matrix4>, 
-    public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
-                         ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                         ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    DetailledObjectPass2Shader();
-};
-
-class InstancedDetailledObjectPass2Shader : public Shader<InstancedDetailledObjectPass2Shader>,
-    public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
-                          ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                          ST_TRILINEAR_ANISOTROPIC_FILTERED >
-{
-public:
-    InstancedDetailledObjectPass2Shader();
-};
-
 class ObjectUnlitShader : public Shader<ObjectUnlitShader, core::matrix4, core::matrix4>,
                           public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED,
                                                 ST_BILINEAR_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED >
