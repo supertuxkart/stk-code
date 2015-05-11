@@ -554,17 +554,6 @@ namespace MeshShader
         assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
-    ObjectRefPass1Shader::ObjectRefPass1Shader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "object_pass.vert",
-            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
-            GL_FRAGMENT_SHADER, "objectref_pass1.frag");
-        assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
-        assignSamplerNames(m_program, 0, "tex",     ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                      1, "glosstex",ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
-
 
     NormalMapShader::NormalMapShader()
     {
@@ -575,18 +564,6 @@ namespace MeshShader
         assignUniforms("ModelMatrix", "InverseModelMatrix");
         assignSamplerNames(m_program, 1, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                                       0, "DiffuseForAlpha", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
-
-    InstancedObjectPass1Shader::InstancedObjectPass1Shader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
-            GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
-
-        assignUniforms();
-        assignSamplerNames(m_program, 0, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
     InstancedObjectRefPass1Shader::InstancedObjectRefPass1Shader()
@@ -634,21 +611,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
             GL_FRAGMENT_SHADER, "object_pass2.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
-            assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
-                                          1, "SpecularMap", ST_NEAREST_FILTERED,
-                                          2, "SSAO", ST_BILINEAR_FILTERED,
-                                          3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                          4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
-
-    InstancedObjectPass2Shader::InstancedObjectPass2Shader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-            GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
-        assignUniforms();
             assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
                                           1, "SpecularMap", ST_NEAREST_FILTERED,
                                           2, "SSAO", ST_BILINEAR_FILTERED,
@@ -865,84 +827,7 @@ namespace MeshShader
         assignUniforms();
     }
 
-    ShadowShader::ShadowShader()
-    {
-        // Geometry shader needed
-        if (CVS->getGLSLVersion() < 150)
-            return;
-        if (CVS->isAMDVertexShaderLayerUsable())
-        {
-            loadProgram(OBJECT,
-                GL_VERTEX_SHADER, "shadow.vert",
-                GL_FRAGMENT_SHADER, "shadow.frag");
-        }
-        else
-        {
-            loadProgram(OBJECT,
-                GL_VERTEX_SHADER, "shadow.vert",
-                GL_GEOMETRY_SHADER, "shadow.geom",
-                GL_FRAGMENT_SHADER, "shadow.frag");
-        }
-        assignUniforms("layer", "ModelMatrix");
-    }
 
-    RSMShader::RSMShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "rsm.vert",
-            GL_FRAGMENT_SHADER, "rsm.frag");
-
-        assignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
-        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
-
-    InstancedRSMShader::InstancedRSMShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-            GL_VERTEX_SHADER, "instanced_rsm.vert",
-            GL_FRAGMENT_SHADER, "instanced_rsm.frag");
-
-        assignUniforms("RSMMatrix");
-        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
-
-    SplattingRSMShader::SplattingRSMShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "rsm.vert",
-            GL_FRAGMENT_SHADER, "splatting_rsm.frag");
-
-        assignUniforms("RSMMatrix", "ModelMatrix");
-        assignSamplerNames(m_program, 0, "tex_layout", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                      1, "tex_detail0", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                      2, "tex_detail1", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                      3, "tex_detail2", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                      4, "tex_detail3", ST_TRILINEAR_ANISOTROPIC_FILTERED);            
-    }
-
-    InstancedShadowShader::InstancedShadowShader()
-    {
-        // Geometry shader needed
-        if (CVS->getGLSLVersion() < 150)
-            return;
-        if (CVS->isAMDVertexShaderLayerUsable())
-        {
-            loadProgram(OBJECT,
-                GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                GL_VERTEX_SHADER, "instanciedshadow.vert",
-                GL_FRAGMENT_SHADER, "shadow.frag");
-        }
-        else
-        {
-            loadProgram(OBJECT,
-                GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                GL_VERTEX_SHADER, "instanciedshadow.vert",
-                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
-                GL_FRAGMENT_SHADER, "shadow.frag");
-        }
-        assignUniforms("layer");
-    }
 
     RefShadowShader::RefShadowShader()
     {
@@ -990,52 +875,7 @@ namespace MeshShader
         assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
-    GrassShadowShader::GrassShadowShader()
-    {
-        // Geometry shader needed
-        if (CVS->getGLSLVersion() < 150)
-            return;
-        if (CVS->isAMDVertexShaderLayerUsable())
-        {
-            loadProgram(OBJECT,
-                GL_VERTEX_SHADER, "shadow_grass.vert",
-                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
-        }
-        else
-        {
-            loadProgram(OBJECT,
-                GL_VERTEX_SHADER, "shadow_grass.vert",
-                GL_GEOMETRY_SHADER, "shadow.geom",
-                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
-        }
-        assignUniforms("layer", "ModelMatrix", "windDir");
-        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
 
-    InstancedGrassShadowShader::InstancedGrassShadowShader()
-    {
-        // Geometry shader needed
-        if (CVS->getGLSLVersion() < 150)
-            return;
-        if (CVS->isAMDVertexShaderLayerUsable())
-        {
-            loadProgram(OBJECT,
-                GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
-                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
-        }
-        else
-        {
-            loadProgram(OBJECT,
-                GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
-                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
-                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
-        }
-
-        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-        assignUniforms("layer", "windDir");
-    }
 
     DisplaceMaskShader::DisplaceMaskShader()
     {

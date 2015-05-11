@@ -50,12 +50,6 @@ public:
     ObjectPass1Shader();
 };
 
-class ObjectRefPass1Shader : public Shader<ObjectRefPass1Shader, core::matrix4, core::matrix4, core::matrix4>,
-                             public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    ObjectRefPass1Shader();
-};
 
 
 class NormalMapShader : public Shader<NormalMapShader, core::matrix4, core::matrix4>,
@@ -65,12 +59,6 @@ public:
     NormalMapShader();
 };
 
-class InstancedObjectPass1Shader : public Shader<InstancedObjectPass1Shader>,
-                                   public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    InstancedObjectPass1Shader();
-};
 
 class InstancedObjectRefPass1Shader : public Shader<InstancedObjectRefPass1Shader>,
                                       public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
@@ -101,13 +89,6 @@ public:
     ObjectPass2Shader();
 };
 
-class InstancedObjectPass2Shader : public Shader<InstancedObjectPass2Shader>,
-    public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
-                          ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    InstancedObjectPass2Shader();
-};
 
 class InstancedObjectRefPass2Shader : public Shader<InstancedObjectRefPass2Shader>, 
     public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
@@ -238,40 +219,7 @@ public:
     InstancedColorizeShader();
 };
 
-class ShadowShader : public Shader<ShadowShader, int, core::matrix4>, public TextureReadNew<>
-{
-public:
-    ShadowShader();
-};
 
-class RSMShader : public Shader<RSMShader, core::matrix4, core::matrix4, core::matrix4>,
-                  public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    RSMShader();
-};
-
-class InstancedRSMShader : public Shader<InstancedRSMShader, core::matrix4>,
-                          public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    InstancedRSMShader();
-};
-
-class SplattingRSMShader : public Shader<SplattingRSMShader, core::matrix4, core::matrix4>,
-                           public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                                 ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                                 ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    SplattingRSMShader();
-};
-
-class InstancedShadowShader : public Shader<InstancedShadowShader, int>, public TextureReadNew<>
-{
-public:
-    InstancedShadowShader();
-};
 
 class RefShadowShader : public Shader<RefShadowShader, int, core::matrix4>,
                         public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
@@ -287,19 +235,6 @@ public:
     InstancedRefShadowShader();
 };
 
-class GrassShadowShader : public Shader<GrassShadowShader, int, core::matrix4, core::vector3df>,
-                          public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    GrassShadowShader();
-};
-
-class InstancedGrassShadowShader : public Shader<InstancedGrassShadowShader, int, core::vector3df>,
-                                   public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    InstancedGrassShadowShader();
-};
 
 class DisplaceMaskShader : public Shader<DisplaceMaskShader, core::matrix4>
 {

@@ -76,17 +76,190 @@ layout(location = 6) in vec3 Bitangent;
 
 */
 
+// ============================================================================
+class InstancedObjectPass1Shader : public Shader<InstancedObjectPass1Shader>,
+                    public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    InstancedObjectPass1Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+                            GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
+
+        assignUniforms();
+        assignSamplerNames(m_program, 0, "glosstex",
+                           ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedObjectPass1Shader
+};   // class InstancedObjectPass1Shader
+
+// ============================================================================
+class InstancedObjectPass2Shader : public Shader<InstancedObjectPass2Shader>,
+    public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
+    ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    InstancedObjectPass2Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                            GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
+        assignUniforms();
+        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedObjectPass2Shader
+};   // InstancedObjectPass2Shader
+
+// ============================================================================
+class ShadowShader : public Shader<ShadowShader, int, core::matrix4>,
+                     public TextureReadNew<>
+{
+public:
+    ShadowShader()
+    {
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150)
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "shadow.vert",
+                                GL_FRAGMENT_SHADER, "shadow.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "shadow.vert",
+                                GL_GEOMETRY_SHADER, "shadow.geom",
+                                GL_FRAGMENT_SHADER, "shadow.frag");
+        }
+        assignUniforms("layer", "ModelMatrix");
+    }   // ShadowShader
+};   // ShadowShader
+// ============================================================================
+class InstancedShadowShader : public Shader<InstancedShadowShader, int>,
+                              public TextureReadNew<>
+{
+public:
+    InstancedShadowShader()
+    {
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150)
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                                GL_VERTEX_SHADER, "instanciedshadow.vert",
+                                GL_FRAGMENT_SHADER, "shadow.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                                GL_VERTEX_SHADER, "instanciedshadow.vert",
+                                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
+                                GL_FRAGMENT_SHADER, "shadow.frag");
+        }
+        assignUniforms("layer");
+    }   // InstancedShadowShader
+
+};   // InstancedShadowShader
+
+// ============================================================================
+class RSMShader : public Shader<RSMShader, core::matrix4, core::matrix4, 
+                               core::matrix4>,
+                  public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    RSMShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "rsm.vert",
+                            GL_FRAGMENT_SHADER, "rsm.frag");
+
+        assignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
+        assignSamplerNames(m_program, 0, "tex",
+                           ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // RSMShader
+};   // RSMShader
+
+
+// ============================================================================
+class SplattingRSMShader : public Shader<SplattingRSMShader, core::matrix4,
+                                  core::matrix4>,
+                      public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED, 
+                                            ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                            ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                            ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                            ST_TRILINEAR_ANISOTROPIC_FILTERED >
+{
+public:
+    SplattingRSMShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "rsm.vert",
+                            GL_FRAGMENT_SHADER, "splatting_rsm.frag");
+
+        assignUniforms("RSMMatrix", "ModelMatrix");
+        assignSamplerNames(m_program,
+                           0, "tex_layout", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "tex_detail0", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           2, "tex_detail1", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           3, "tex_detail2", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "tex_detail3", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // SplattingRSMShader
+
+};  // SplattingRSMShader
+
+// ============================================================================
+class InstancedRSMShader : public Shader<InstancedRSMShader, core::matrix4>,
+                       public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    InstancedRSMShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER, "instanced_rsm.vert",
+                            GL_FRAGMENT_SHADER, "instanced_rsm.frag");
+
+        assignUniforms("RSMMatrix");
+        assignSamplerNames(m_program, 0, "tex",
+                           ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedRSMShader
+};   // InstancedRSMShader
+
+// ============================================================================
+class ObjectRefPass1Shader : public Shader<ObjectRefPass1Shader, core::matrix4,
+                                           core::matrix4, core::matrix4>,
+                       public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    ObjectRefPass1Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+                            GL_FRAGMENT_SHADER, "objectref_pass1.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
+        assignSamplerNames(m_program, 
+                           0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // ObjectRefPass1Shader
+};  // ObjectRefPass1Shader
+
+
+// ============================================================================
 struct DefaultMaterial
 {
-    typedef MeshShader::InstancedObjectPass1Shader InstancedFirstPassShader;
-    typedef MeshShader::InstancedObjectPass2Shader InstancedSecondPassShader;
-    typedef MeshShader::InstancedShadowShader InstancedShadowPassShader;
-    typedef MeshShader::InstancedRSMShader InstancedRSMShader;
+    typedef InstancedObjectPass1Shader InstancedFirstPassShader;
+    typedef InstancedObjectPass2Shader InstancedSecondPassShader;
+    typedef InstancedShadowShader InstancedShadowPassShader;
+    typedef InstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatDefault InstancedList;
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef MeshShader::ObjectPass2Shader SecondPassShader;
-    typedef MeshShader::ShadowShader ShadowPassShader;
-    typedef MeshShader::RSMShader RSMShader;
+    typedef ShadowShader ShadowPassShader;
+    typedef RSMShader RSMShader;
     typedef ListMatDefault List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType
@@ -111,12 +284,12 @@ struct AlphaRef
     typedef MeshShader::InstancedObjectRefPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectRefPass2Shader InstancedSecondPassShader;
     typedef MeshShader::InstancedRefShadowShader InstancedShadowPassShader;
-    typedef MeshShader::InstancedRSMShader InstancedRSMShader;
+    typedef InstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatAlphaRef InstancedList;
-    typedef MeshShader::ObjectRefPass1Shader FirstPassShader;
+    typedef ObjectRefPass1Shader FirstPassShader;
     typedef MeshShader::ObjectRefPass2Shader SecondPassShader;
     typedef MeshShader::RefShadowShader ShadowPassShader;
-    typedef MeshShader::RSMShader RSMShader;
+    typedef RSMShader RSMShader;
     typedef ListMatAlphaRef List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_ALPHA_TEST;
@@ -138,15 +311,15 @@ const STK::Tuple<size_t> AlphaRef::RSMTextures = STK::Tuple<size_t>(0);
 // ----------------------------------------------------------------------------
 struct SphereMap
 {
-    typedef MeshShader::InstancedObjectPass1Shader InstancedFirstPassShader;
+    typedef InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedSphereMapShader InstancedSecondPassShader;
-    typedef MeshShader::InstancedShadowShader InstancedShadowPassShader;
-    typedef MeshShader::InstancedRSMShader InstancedRSMShader;
+    typedef InstancedShadowShader InstancedShadowPassShader;
+    typedef InstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatSphereMap InstancedList;
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef MeshShader::SphereMapShader SecondPassShader;
-    typedef MeshShader::ShadowShader ShadowPassShader;
-    typedef MeshShader::RSMShader RSMShader;
+    typedef ShadowShader ShadowPassShader;
+    typedef RSMShader RSMShader;
     typedef ListMatSphereMap List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType 
@@ -170,12 +343,12 @@ struct UnlitMat
     typedef MeshShader::InstancedObjectRefPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectUnlitShader InstancedSecondPassShader;
     typedef MeshShader::InstancedRefShadowShader InstancedShadowPassShader;
-    typedef MeshShader::InstancedRSMShader InstancedRSMShader;
+    typedef InstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatUnlit InstancedList;
-    typedef MeshShader::ObjectRefPass1Shader FirstPassShader;
+    typedef ObjectRefPass1Shader FirstPassShader;
     typedef MeshShader::ObjectUnlitShader SecondPassShader;
     typedef MeshShader::RefShadowShader ShadowPassShader;
-    typedef MeshShader::RSMShader RSMShader;
+    typedef RSMShader RSMShader;
     typedef ListMatUnlit List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType =
@@ -214,19 +387,81 @@ public:
 
 };   // class GrassPass1Shader
 
+// ============================================================================
+class GrassShadowShader : public Shader<GrassShadowShader, int, core::matrix4,
+                                        core::vector3df>,
+                       public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    GrassShadowShader()
+    {
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150)
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "shadow_grass.vert",
+                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "shadow_grass.vert",
+                                GL_GEOMETRY_SHADER, "shadow.geom",
+                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+        }
+        assignUniforms("layer", "ModelMatrix", "windDir");
+        assignSamplerNames(m_program, 0, "tex",
+            ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // GrassShadowShader
+};   // GrassShadowShader
+
+// ============================================================================
+class InstancedGrassShadowShader : public Shader<InstancedGrassShadowShader,
+                                                 int, core::vector3df>,
+                    public TextureReadNew < ST_TRILINEAR_ANISOTROPIC_FILTERED >
+{
+public:
+    InstancedGrassShadowShader()
+    {
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150)
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                                GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
+                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                                GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
+                                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
+                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+        }
+
+        assignSamplerNames(m_program, 0, "tex",
+                           ST_TRILINEAR_ANISOTROPIC_FILTERED);
+        assignUniforms("layer", "windDir");
+    }   // InstancedGrassShadowShader
+};   // InstancedGrassShadowShader
+
+// ============================================================================
+
+
 
 // ----------------------------------------------------------------------------
 struct GrassMat
 {
     typedef MeshShader::InstancedGrassPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedGrassPass2Shader InstancedSecondPassShader;
-    typedef MeshShader::InstancedGrassShadowShader InstancedShadowPassShader;
-    typedef MeshShader::InstancedRSMShader InstancedRSMShader;
+    typedef InstancedGrassShadowShader InstancedShadowPassShader;
+    typedef InstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatGrass InstancedList;
     typedef GrassPass1Shader FirstPassShader;
     typedef MeshShader::GrassPass2Shader SecondPassShader;
-    typedef MeshShader::GrassShadowShader ShadowPassShader;
-    typedef MeshShader::RSMShader RSMShader;
+    typedef GrassShadowShader ShadowPassShader;
+    typedef RSMShader RSMShader;
     typedef ListMatGrass List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType 
@@ -250,14 +485,14 @@ const STK::Tuple<size_t> GrassMat::RSMTextures = STK::Tuple<size_t>(0);
 struct NormalMat
 {
     typedef MeshShader::InstancedNormalMapShader InstancedFirstPassShader;
-    typedef MeshShader::InstancedObjectPass2Shader InstancedSecondPassShader;
-    typedef MeshShader::InstancedShadowShader InstancedShadowPassShader;
-    typedef MeshShader::InstancedRSMShader InstancedRSMShader;
+    typedef InstancedObjectPass2Shader InstancedSecondPassShader;
+    typedef InstancedShadowShader InstancedShadowPassShader;
+    typedef InstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatNormalMap InstancedList;
     typedef MeshShader::NormalMapShader FirstPassShader;
     typedef MeshShader::ObjectPass2Shader SecondPassShader;
-    typedef MeshShader::ShadowShader ShadowPassShader;
-    typedef MeshShader::RSMShader RSMShader;
+    typedef ShadowShader ShadowPassShader;
+    typedef RSMShader RSMShader;
     typedef ListMatNormalMap List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
     static const enum Material::ShaderType MaterialType
@@ -280,15 +515,15 @@ const STK::Tuple<size_t> NormalMat::RSMTextures = STK::Tuple<size_t>(0);
 // ----------------------------------------------------------------------------
 struct DetailMat
 {
-    typedef MeshShader::InstancedObjectPass1Shader InstancedFirstPassShader;
+    typedef InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedDetailledObjectPass2Shader InstancedSecondPassShader;
-    typedef MeshShader::InstancedShadowShader InstancedShadowPassShader;
-    typedef MeshShader::InstancedRSMShader InstancedRSMShader;
+    typedef InstancedShadowShader InstancedShadowPassShader;
+    typedef InstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatDetails InstancedList;
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef MeshShader::DetailledObjectPass2Shader SecondPassShader;
-    typedef MeshShader::ShadowShader ShadowPassShader;
-    typedef MeshShader::RSMShader RSMShader;
+    typedef ShadowShader ShadowPassShader;
+    typedef RSMShader RSMShader;
     typedef ListMatDetails List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
     static const enum Material::ShaderType MaterialType
@@ -312,8 +547,8 @@ struct SplattingMat
 {
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef MeshShader::SplattingShader SecondPassShader;
-    typedef MeshShader::ShadowShader ShadowPassShader;
-    typedef MeshShader::SplattingRSMShader RSMShader;
+    typedef ShadowShader ShadowPassShader;
+    typedef SplattingRSMShader RSMShader;
     typedef ListMatSplatting List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
     static const STK::Tuple<size_t> FirstPassTextures;
