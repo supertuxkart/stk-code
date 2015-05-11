@@ -95,9 +95,58 @@ public:
 };   // class InstancedObjectPass1Shader
 
 // ============================================================================
+class InstancedObjectRefPass1Shader : public Shader<InstancedObjectRefPass1Shader>,
+                       public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                            ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    InstancedObjectRefPass1Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+                            GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
+
+        assignUniforms();
+        assignSamplerNames(m_program,
+                           0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }
+
+};   // InstancedObjectRefPass1Shader
+
+// ============================================================================
+class ObjectRefPass2Shader : public Shader<ObjectRefPass2Shader, core::matrix4,
+                                           core::matrix4>,
+                       public TextureReadNew<ST_NEAREST_FILTERED,
+                                             ST_NEAREST_FILTERED, 
+                                             ST_BILINEAR_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED >
+{
+public:
+    ObjectRefPass2Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                            GL_FRAGMENT_SHADER, "objectref_pass2.frag");
+        assignUniforms("ModelMatrix", "TextureMatrix");
+        assignSamplerNames(m_program,
+                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // ObjectRefPass2Shader
+};   // ObjectRefPass2Shader
+
+// ============================================================================
 class InstancedObjectPass2Shader : public Shader<InstancedObjectPass2Shader>,
-    public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_BILINEAR_FILTERED,
-    ST_TRILINEAR_ANISOTROPIC_FILTERED, ST_TRILINEAR_ANISOTROPIC_FILTERED>
+                       public TextureReadNew<ST_NEAREST_FILTERED, 
+                                             ST_NEAREST_FILTERED, 
+                                             ST_BILINEAR_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED >
 {
 public:
     InstancedObjectPass2Shader()
@@ -114,6 +163,31 @@ public:
                            4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedObjectPass2Shader
 };   // InstancedObjectPass2Shader
+
+// ============================================================================
+class InstancedObjectRefPass2Shader : public Shader<InstancedObjectRefPass2Shader>, 
+                      public TextureReadNew<ST_NEAREST_FILTERED,
+                                            ST_NEAREST_FILTERED,
+                                            ST_BILINEAR_FILTERED,
+                                            ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                            ST_TRILINEAR_ANISOTROPIC_FILTERED >
+{
+public:
+    InstancedObjectRefPass2Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                            GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
+        assignUniforms();
+        assignSamplerNames(m_program, 
+                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }    // InstancedObjectRefPass2Shader
+};   // InstancedObjectRefPass2Shader
 
 // ============================================================================
 class ShadowShader : public Shader<ShadowShader, int, core::matrix4>,
@@ -139,6 +213,7 @@ public:
         assignUniforms("layer", "ModelMatrix");
     }   // ShadowShader
 };   // ShadowShader
+
 // ============================================================================
 class InstancedShadowShader : public Shader<InstancedShadowShader, int>,
                               public TextureReadNew<>
@@ -229,6 +304,85 @@ public:
 };   // CInstancedRSMShader
 
 // ============================================================================
+class SphereMapShader : public Shader<SphereMapShader, core::matrix4,
+                                      core::matrix4>,
+                       public TextureReadNew<ST_NEAREST_FILTERED, 
+                                             ST_NEAREST_FILTERED, 
+                                             ST_BILINEAR_FILTERED, 
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    SphereMapShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "objectpass_spheremap.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix");
+        assignSamplerNames(m_program,
+                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // SphereMapShader
+};   // SphereMapShader
+
+// ============================================================================
+class InstancedSphereMapShader : public Shader<InstancedSphereMapShader>,
+                       public TextureReadNew<ST_NEAREST_FILTERED,
+                                             ST_NEAREST_FILTERED,
+                                             ST_BILINEAR_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    InstancedSphereMapShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                    GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                    GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                    GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                    GL_FRAGMENT_SHADER, "instanced_objectpass_spheremap.frag");
+        assignUniforms();
+        assignSamplerNames(m_program,
+                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedSphereMapShader
+};   // InstancedSphereMapShader
+
+// ============================================================================
+class SplattingShader : public Shader<SplattingShader, core::matrix4>, 
+                       public TextureReadNew<ST_NEAREST_FILTERED,
+                                             ST_NEAREST_FILTERED,
+                                             ST_BILINEAR_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED, 
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    SplattingShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                            GL_FRAGMENT_SHADER, "splatting.frag");
+        assignUniforms("ModelMatrix");
+
+        assignSamplerNames(m_program,
+                         0, "DiffuseMap", ST_NEAREST_FILTERED,
+                         1, "SpecularMap", ST_NEAREST_FILTERED,
+                         2, "SSAO", ST_BILINEAR_FILTERED,
+                         3, "tex_layout", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                         4, "tex_detail0", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                         5, "tex_detail1", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                         6, "tex_detail2", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                         7, "tex_detail3", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // SplattingShader
+};   // SplattingShader
+
+// ============================================================================
 class ObjectRefPass1Shader : public Shader<ObjectRefPass1Shader, core::matrix4,
                                            core::matrix4, core::matrix4>,
                        public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -247,6 +401,89 @@ public:
     }   // ObjectRefPass1Shader
 };  // ObjectRefPass1Shader
 
+
+// ============================================================================
+class NormalMapShader : public Shader<NormalMapShader, core::matrix4, 
+                                      core::matrix4>,
+                        public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                              ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    NormalMapShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+                            GL_FRAGMENT_SHADER, "normalmap.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix");
+        assignSamplerNames(m_program, 
+                           1, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           0, "DiffuseForAlpha", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // NormalMapShader
+
+};   // NormalMapShader
+
+// ============================================================================
+class InstancedNormalMapShader : public Shader<InstancedNormalMapShader>,
+                      public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                            ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    InstancedNormalMapShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+                            GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
+        assignUniforms();
+        assignSamplerNames(m_program,
+                           0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "glossMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedNormalMapShader
+};   // InstancedNormalMapShader
+
+// ============================================================================
+class ObjectUnlitShader : public Shader<ObjectUnlitShader, core::matrix4, 
+                                        core::matrix4>,
+                          public TextureReadNew<ST_NEAREST_FILTERED,
+                                                ST_NEAREST_FILTERED,
+                                                ST_BILINEAR_FILTERED,
+                                                ST_TRILINEAR_ANISOTROPIC_FILTERED >
+{
+public:
+    ObjectUnlitShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                            GL_FRAGMENT_SHADER, "object_unlit.frag");
+        assignUniforms("ModelMatrix", "TextureMatrix");
+        assignSamplerNames(m_program,
+                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // ObjectUnlitShader
+};   // ObjectUnlitShader
+
+// ============================================================================
+class InstancedObjectUnlitShader : public Shader<InstancedObjectUnlitShader>,
+                       public TextureReadNew<ST_NEAREST_FILTERED, 
+                                             ST_NEAREST_FILTERED, 
+                                             ST_BILINEAR_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED >
+{
+public:
+    InstancedObjectUnlitShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                            GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
+        assignUniforms();
+        assignSamplerNames(m_program, 
+                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedObjectUnlitShader
+};   // InstancedObjectUnlitShader
 
 // ============================================================================
 struct DefaultMaterial
@@ -281,13 +518,13 @@ const STK::Tuple<size_t> DefaultMaterial::RSMTextures = STK::Tuple<size_t>(0);
 // ----------------------------------------------------------------------------
 struct AlphaRef
 {
-    typedef MeshShader::InstancedObjectRefPass1Shader InstancedFirstPassShader;
-    typedef MeshShader::InstancedObjectRefPass2Shader InstancedSecondPassShader;
+    typedef InstancedObjectRefPass1Shader InstancedFirstPassShader;
+    typedef InstancedObjectRefPass2Shader InstancedSecondPassShader;
     typedef MeshShader::InstancedRefShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatAlphaRef InstancedList;
     typedef ObjectRefPass1Shader FirstPassShader;
-    typedef MeshShader::ObjectRefPass2Shader SecondPassShader;
+    typedef ObjectRefPass2Shader SecondPassShader;
     typedef MeshShader::RefShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
     typedef ListMatAlphaRef List;
@@ -312,12 +549,12 @@ const STK::Tuple<size_t> AlphaRef::RSMTextures = STK::Tuple<size_t>(0);
 struct SphereMap
 {
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;
-    typedef MeshShader::InstancedSphereMapShader InstancedSecondPassShader;
+    typedef InstancedSphereMapShader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatSphereMap InstancedList;
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
-    typedef MeshShader::SphereMapShader SecondPassShader;
+    typedef SphereMapShader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
     typedef ListMatSphereMap List;
@@ -340,13 +577,13 @@ const STK::Tuple<size_t> SphereMap::RSMTextures = STK::Tuple<size_t>(0);
 // ----------------------------------------------------------------------------
 struct UnlitMat
 {
-    typedef MeshShader::InstancedObjectRefPass1Shader InstancedFirstPassShader;
-    typedef MeshShader::InstancedObjectUnlitShader InstancedSecondPassShader;
+    typedef InstancedObjectRefPass1Shader InstancedFirstPassShader;
+    typedef InstancedObjectUnlitShader InstancedSecondPassShader;
     typedef MeshShader::InstancedRefShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatUnlit InstancedList;
     typedef ObjectRefPass1Shader FirstPassShader;
-    typedef MeshShader::ObjectUnlitShader SecondPassShader;
+    typedef ObjectUnlitShader SecondPassShader;
     typedef MeshShader::RefShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
     typedef ListMatUnlit List;
@@ -386,6 +623,26 @@ public:
     }   // GrassPass1Shader
 
 };   // class GrassPass1Shader
+
+// ============================================================================
+class InstancedGrassPass1Shader : public Shader<InstancedGrassPass1Shader,
+                                                core::vector3df>,
+                       public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    InstancedGrassPass1Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER, "instanced_grass.vert",
+                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+                            GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
+        assignUniforms("windDir");
+        assignSamplerNames(m_program, 
+                           0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedGrassPass1Shader
+};   // InstancedGrassPass1Shader
 
 // ============================================================================
 class GrassShadowShader : public Shader<GrassShadowShader, int, core::matrix4,
@@ -446,6 +703,60 @@ public:
     }   // InstancedGrassShadowShader
 };   // InstancedGrassShadowShader
 
+
+// ============================================================================
+class GrassPass2Shader : public Shader<GrassPass2Shader, core::matrix4,
+                                       core::vector3df>,
+                      public TextureReadNew<ST_NEAREST_FILTERED, 
+                                            ST_NEAREST_FILTERED,
+                                            ST_BILINEAR_FILTERED,
+                                            ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                            ST_TRILINEAR_ANISOTROPIC_FILTERED >
+{
+public:
+    GrassPass2Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "grass_pass.vert",
+                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                            GL_FRAGMENT_SHADER, "grass_pass2.frag");
+        assignUniforms("ModelMatrix", "windDir");
+        assignSamplerNames(m_program,
+                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // GrassPass2Shader
+};   // GrassPass2Shader
+
+// ============================================================================
+class InstancedGrassPass2Shader : public Shader<InstancedGrassPass2Shader,
+                                             core::vector3df, core::vector3df>,
+                       public TextureReadNew<ST_NEAREST_FILTERED,
+                                             ST_NEAREST_FILTERED,
+                                             ST_BILINEAR_FILTERED,
+                                             ST_NEAREST_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                                             ST_TRILINEAR_ANISOTROPIC_FILTERED >
+{
+public:
+    InstancedGrassPass2Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER, "instanced_grass.vert",
+                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                            GL_FRAGMENT_SHADER, "instanced_grass_pass2.frag");
+        assignUniforms("windDir", "SunDir");
+        assignSamplerNames(m_program,
+                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "dtex", ST_NEAREST_FILTERED,
+                           4, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedGrassPass2Shader
+};   // InstancedGrassPass2Shader
+
 // ============================================================================
 class DetailedObjectPass2Shader : public Shader<DetailedObjectPass2Shader,
                                                  core::matrix4>,
@@ -503,13 +814,13 @@ public:
 // ----------------------------------------------------------------------------
 struct GrassMat
 {
-    typedef MeshShader::InstancedGrassPass1Shader InstancedFirstPassShader;
-    typedef MeshShader::InstancedGrassPass2Shader InstancedSecondPassShader;
+    typedef InstancedGrassPass1Shader InstancedFirstPassShader;
+    typedef InstancedGrassPass2Shader InstancedSecondPassShader;
     typedef InstancedGrassShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatGrass InstancedList;
     typedef GrassPass1Shader FirstPassShader;
-    typedef MeshShader::GrassPass2Shader SecondPassShader;
+    typedef GrassPass2Shader SecondPassShader;
     typedef GrassShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
     typedef ListMatGrass List;
@@ -534,12 +845,12 @@ const STK::Tuple<size_t> GrassMat::RSMTextures = STK::Tuple<size_t>(0);
 // ----------------------------------------------------------------------------
 struct NormalMat
 {
-    typedef MeshShader::InstancedNormalMapShader InstancedFirstPassShader;
+    typedef InstancedNormalMapShader InstancedFirstPassShader;
     typedef InstancedObjectPass2Shader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatNormalMap InstancedList;
-    typedef MeshShader::NormalMapShader FirstPassShader;
+    typedef NormalMapShader FirstPassShader;
     typedef MeshShader::ObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
@@ -596,7 +907,7 @@ const STK::Tuple<size_t> DetailMat::RSMTextures = STK::Tuple<size_t>(0);
 struct SplattingMat
 {
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
-    typedef MeshShader::SplattingShader SecondPassShader;
+    typedef SplattingShader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
     typedef SplattingRSMShader RSMShader;
     typedef ListMatSplatting List;
