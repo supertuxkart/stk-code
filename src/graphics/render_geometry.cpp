@@ -168,12 +168,12 @@ public:
 };   // InstancedShadowShader
 
 // ============================================================================
-class RSMShader : public Shader<RSMShader, core::matrix4, core::matrix4, 
-                               core::matrix4>,
+class CRSMShader : public Shader<CRSMShader, core::matrix4, core::matrix4, 
+                                 core::matrix4>,
                   public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
-    RSMShader()
+    CRSMShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "rsm.vert",
                             GL_FRAGMENT_SHADER, "rsm.frag");
@@ -181,8 +181,8 @@ public:
         assignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
         assignSamplerNames(m_program, 0, "tex",
                            ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }   // RSMShader
-};   // RSMShader
+    }   // CRSMShader
+};   // CRSMShader
 
 
 // ============================================================================
@@ -212,11 +212,11 @@ public:
 };  // SplattingRSMShader
 
 // ============================================================================
-class InstancedRSMShader : public Shader<InstancedRSMShader, core::matrix4>,
+class CInstancedRSMShader : public Shader<CInstancedRSMShader, core::matrix4>,
                        public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
 {
 public:
-    InstancedRSMShader()
+    CInstancedRSMShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
                             GL_VERTEX_SHADER, "instanced_rsm.vert",
@@ -225,8 +225,8 @@ public:
         assignUniforms("RSMMatrix");
         assignSamplerNames(m_program, 0, "tex",
                            ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }   // InstancedRSMShader
-};   // InstancedRSMShader
+    }   // CInstancedRSMShader
+};   // CInstancedRSMShader
 
 // ============================================================================
 class ObjectRefPass1Shader : public Shader<ObjectRefPass1Shader, core::matrix4,
@@ -254,12 +254,12 @@ struct DefaultMaterial
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef InstancedObjectPass2Shader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
-    typedef InstancedRSMShader InstancedRSMShader;
+    typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatDefault InstancedList;
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef MeshShader::ObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
-    typedef RSMShader RSMShader;
+    typedef CRSMShader RSMShader;
     typedef ListMatDefault List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType
@@ -284,12 +284,12 @@ struct AlphaRef
     typedef MeshShader::InstancedObjectRefPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectRefPass2Shader InstancedSecondPassShader;
     typedef MeshShader::InstancedRefShadowShader InstancedShadowPassShader;
-    typedef InstancedRSMShader InstancedRSMShader;
+    typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatAlphaRef InstancedList;
     typedef ObjectRefPass1Shader FirstPassShader;
     typedef MeshShader::ObjectRefPass2Shader SecondPassShader;
     typedef MeshShader::RefShadowShader ShadowPassShader;
-    typedef RSMShader RSMShader;
+    typedef CRSMShader RSMShader;
     typedef ListMatAlphaRef List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_ALPHA_TEST;
@@ -314,12 +314,12 @@ struct SphereMap
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedSphereMapShader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
-    typedef InstancedRSMShader InstancedRSMShader;
+    typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatSphereMap InstancedList;
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef MeshShader::SphereMapShader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
-    typedef RSMShader RSMShader;
+    typedef CRSMShader RSMShader;
     typedef ListMatSphereMap List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType 
@@ -343,12 +343,12 @@ struct UnlitMat
     typedef MeshShader::InstancedObjectRefPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedObjectUnlitShader InstancedSecondPassShader;
     typedef MeshShader::InstancedRefShadowShader InstancedShadowPassShader;
-    typedef InstancedRSMShader InstancedRSMShader;
+    typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatUnlit InstancedList;
     typedef ObjectRefPass1Shader FirstPassShader;
     typedef MeshShader::ObjectUnlitShader SecondPassShader;
     typedef MeshShader::RefShadowShader ShadowPassShader;
-    typedef RSMShader RSMShader;
+    typedef CRSMShader RSMShader;
     typedef ListMatUnlit List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType =
@@ -506,12 +506,12 @@ struct GrassMat
     typedef MeshShader::InstancedGrassPass1Shader InstancedFirstPassShader;
     typedef MeshShader::InstancedGrassPass2Shader InstancedSecondPassShader;
     typedef InstancedGrassShadowShader InstancedShadowPassShader;
-    typedef InstancedRSMShader InstancedRSMShader;
+    typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatGrass InstancedList;
     typedef GrassPass1Shader FirstPassShader;
     typedef MeshShader::GrassPass2Shader SecondPassShader;
     typedef GrassShadowShader ShadowPassShader;
-    typedef RSMShader RSMShader;
+    typedef CRSMShader RSMShader;
     typedef ListMatGrass List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType 
@@ -537,12 +537,12 @@ struct NormalMat
     typedef MeshShader::InstancedNormalMapShader InstancedFirstPassShader;
     typedef InstancedObjectPass2Shader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
-    typedef InstancedRSMShader InstancedRSMShader;
+    typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatNormalMap InstancedList;
     typedef MeshShader::NormalMapShader FirstPassShader;
     typedef MeshShader::ObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
-    typedef RSMShader RSMShader;
+    typedef CRSMShader RSMShader;
     typedef ListMatNormalMap List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
     static const enum Material::ShaderType MaterialType
@@ -568,12 +568,12 @@ struct DetailMat
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;
     typedef InstancedDetailedObjectPass2Shader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
-    typedef InstancedRSMShader InstancedRSMShader;
+    typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatDetails InstancedList;
     typedef MeshShader::ObjectPass1Shader FirstPassShader;
     typedef DetailedObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
-    typedef RSMShader RSMShader;
+    typedef CRSMShader RSMShader;
     typedef ListMatDetails List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
     static const enum Material::ShaderType MaterialType
