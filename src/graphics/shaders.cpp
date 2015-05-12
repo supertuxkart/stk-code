@@ -1326,14 +1326,6 @@ namespace FullScreenShader
 namespace UIShader
 {
 
-    Primitive2DList::Primitive2DList()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "primitive2dlist.vert",
-            GL_FRAGMENT_SHADER, "transparent.frag");
-        assignUniforms();
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
-    }
 
     TextureRectShader::TextureRectShader()
     {

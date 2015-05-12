@@ -524,12 +524,6 @@ public:
 namespace UIShader
 {
 
-class Primitive2DList : public Shader<Primitive2DList>,
-                        public TextureReadNew<ST_BILINEAR_FILTERED >
-{
-public:
-    Primitive2DList();
-};
 
 class TextureRectShader : public Shader<TextureRectShader, core::vector2df,
                                         core::vector2df, core::vector2df,
