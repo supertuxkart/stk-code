@@ -281,30 +281,7 @@ static void initQuadVBO()
     glBindVertexArray(0);
 }
 
-// It should be possible to merge it with previous one...
-GLuint quad_buffer;
 
-static void initQuadBuffer()
-{
-    const float quad_vertex[] = {
-        -1., -1., -1., 1., // UpperLeft
-        -1., 1., -1., -1., // LowerLeft
-        1., -1., 1., 1., // UpperRight
-        1., 1., 1., -1., // LowerRight
-    };
-    glGenBuffers(1, &quad_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-    glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex, GL_STATIC_DRAW);
-
-    glGenVertexArrays(1, &SharedObject::UIVAO);
-    glBindVertexArray(SharedObject::UIVAO);
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(3);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-    glBindVertexArray(0);
-}
 
 GLuint SharedObject::billboardvbo = 0;
 
@@ -471,7 +448,6 @@ void Shaders::loadShaders()
     initGL();
     CleanTable.clear();
     initQuadVBO();
-    initQuadBuffer();
     initBillboardVBO();
     initSkyTriVBO();
     initFrustrumVBO();
@@ -1337,47 +1313,8 @@ namespace UIShader
         assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
     }
 
-    UniformColoredTextureRectShader::UniformColoredTextureRectShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "texturedquad.vert",
-            GL_FRAGMENT_SHADER, "uniformcolortexturedquad.frag");
 
-        assignUniforms("center", "size", "texcenter", "texsize", "color");
-
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
-    }
-
-    ColoredTextureRectShader::ColoredTextureRectShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "colortexturedquad.vert",
-            GL_FRAGMENT_SHADER, "colortexturedquad.frag");
-        assignUniforms("center", "size", "texcenter", "texsize");
-
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
-
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(3);
-        glEnableVertexAttribArray(2);
-        glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-        const unsigned quad_color[] = {
-            0, 0, 0, 255,
-            255, 0, 0, 255,
-            0, 255, 0, 255,
-            0, 0, 255, 255,
-        };
-        glGenBuffers(1, &colorvbo);
-        glBindBuffer(GL_ARRAY_BUFFER, colorvbo);
-        glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(unsigned), quad_color, GL_DYNAMIC_DRAW);
-        glVertexAttribIPointer(2, 4, GL_UNSIGNED_INT, 4 * sizeof(unsigned), 0);
-        glBindVertexArray(0);
-    }
-
+    
     ColoredRectShader::ColoredRectShader()
     {
         loadProgram(OBJECT,

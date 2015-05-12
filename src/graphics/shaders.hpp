@@ -534,27 +534,6 @@ public:
     TextureRectShader();
 };
 
-class UniformColoredTextureRectShader : public Shader<UniformColoredTextureRectShader,
-                                                      core::vector2df, core::vector2df,
-                                                      core::vector2df, core::vector2df,
-                                                      video::SColor>,
-                                        public TextureReadNew<ST_BILINEAR_FILTERED>
-{
-public:
-    UniformColoredTextureRectShader();
-};
-
-class ColoredTextureRectShader : public Shader<ColoredTextureRectShader, core::vector2df, 
-                                               core::vector2df, core::vector2df,
-                                               core::vector2df>,
-                                 public TextureReadNew<ST_BILINEAR_FILTERED>
-{
-public:
-    GLuint colorvbo;
-    GLuint vao;
-
-    ColoredTextureRectShader();
-};
 
 class ColoredRectShader : public Shader<ColoredRectShader, core::vector2df,
                                         core::vector2df, video::SColor>

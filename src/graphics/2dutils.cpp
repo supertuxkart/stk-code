@@ -39,6 +39,91 @@ public:
 };   //Primitive2DList
 
 // ============================================================================
+class UniformColoredTextureRectShader : public Shader<UniformColoredTextureRectShader,
+                                                      core::vector2df, core::vector2df,
+                                                      core::vector2df, core::vector2df,
+                                                      video::SColor>,
+                                        public TextureReadNew<ST_BILINEAR_FILTERED>
+{
+public:
+    UniformColoredTextureRectShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "texturedquad.vert",
+                    GL_FRAGMENT_SHADER, "uniformcolortexturedquad.frag");
+
+        assignUniforms("center", "size", "texcenter", "texsize", "color");
+
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
+    }   // UniformColoredTextureRectShader
+};   // UniformColoredTextureRectShader
+
+// ============================================================================
+class ColoredTextureRectShader : public Shader<ColoredTextureRectShader,
+                                               core::vector2df, core::vector2df,
+                                               core::vector2df, core::vector2df>,
+                                 public TextureReadNew<ST_BILINEAR_FILTERED>
+{
+private:
+    GLuint m_quad_buffer = -1;
+
+    void initQuadBuffer()
+    {
+        const float quad_vertex[] = { -1., -1., -1.,  1.,   // UpperLeft
+                                      -1.,  1., -1., -1.,   // LowerLeft
+                                       1., -1.,  1.,  1.,   // UpperRight
+                                       1.,  1.,  1., -1. }; // LowerRight 
+        glGenBuffers(1, &m_quad_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_quad_buffer);
+        glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex,
+                     GL_STATIC_DRAW);
+
+        glGenVertexArrays(1, &SharedObject::UIVAO);
+        glBindVertexArray(SharedObject::UIVAO);
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(3);
+        glBindBuffer(GL_ARRAY_BUFFER, m_quad_buffer);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 
+                              (GLvoid *)(2 * sizeof(float)));
+        glBindVertexArray(0);
+    }   // initQuadBuffer
+
+public:
+    GLuint m_color_vbo;
+    GLuint m_vao;
+
+    ColoredTextureRectShader()
+    {
+        initQuadBuffer();
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "colortexturedquad.vert",
+                            GL_FRAGMENT_SHADER, "colortexturedquad.frag");
+        assignUniforms("center", "size", "texcenter", "texsize");
+
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
+
+        glGenVertexArrays(1, &m_vao);
+        glBindVertexArray(m_vao);
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(3);
+        glEnableVertexAttribArray(2);
+        glBindBuffer(GL_ARRAY_BUFFER, m_quad_buffer);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 
+                              (GLvoid *)(2 * sizeof(float)));
+        const unsigned quad_color[] = {   0,   0,   0, 255,
+                                        255,   0,   0, 255,
+                                          0, 255,   0, 255,
+                                          0,   0, 255, 255 };
+        glGenBuffers(1, &m_color_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, m_color_vbo);
+        glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(unsigned), quad_color,
+                     GL_DYNAMIC_DRAW);
+        glVertexAttribIPointer(2, 4, GL_UNSIGNED_INT, 4 * sizeof(unsigned), 0);
+        glBindVertexArray(0);
+    }   // ColoredTextureRectShader
+};   // ColoredTextureRectShader
+
+// ============================================================================
 static void drawTexColoredQuad(const video::ITexture *texture,
                                const video::SColor *col, float width,
                                float height, float center_pos_x,
@@ -53,14 +138,14 @@ static void drawTexColoredQuad(const video::ITexture *texture,
         col[3].getRed(), col[3].getGreen(), col[3].getBlue(), col[3].getAlpha(),
     };
 
-    glBindBuffer(GL_ARRAY_BUFFER, UIShader::ColoredTextureRectShader::getInstance()->colorvbo);
+    glBindBuffer(GL_ARRAY_BUFFER, ColoredTextureRectShader::getInstance()->m_color_vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, 16 * sizeof(unsigned), colors);
 
-    UIShader::ColoredTextureRectShader::getInstance()->use();
-    glBindVertexArray(UIShader::ColoredTextureRectShader::getInstance()->vao);
+    ColoredTextureRectShader::getInstance()->use();
+    glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
 
-    UIShader::ColoredTextureRectShader::getInstance()->setTextureUnits(static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
-    UIShader::ColoredTextureRectShader::getInstance()->setUniforms(
+    ColoredTextureRectShader::getInstance()->setTextureUnits(static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
+    ColoredTextureRectShader::getInstance()->setUniforms(
         core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height),
         core::vector2df(tex_center_pos_x, tex_center_pos_y), core::vector2df(tex_width, tex_height));
 
@@ -184,15 +269,15 @@ void draw2DImage(const video::ITexture* texture,
                   clip_rect->getWidth(), clip_rect->getHeight());
     }
 
-    UIShader::UniformColoredTextureRectShader::getInstance()->use();
+    UniformColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(SharedObject::UIVAO);
 
     const video::COpenGLTexture *c_texture = 
         static_cast<const video::COpenGLTexture*>(texture);
-    UIShader::UniformColoredTextureRectShader::getInstance()
+    UniformColoredTextureRectShader::getInstance()
         ->setTextureUnits(c_texture->getOpenGLTextureName());
 
-    UIShader::UniformColoredTextureRectShader::getInstance()
+    UniformColoredTextureRectShader::getInstance()
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
                       core::vector2df(width, height),
                       core::vector2df(tex_center_pos_x, tex_center_pos_y),
@@ -231,11 +316,11 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
         destRect, sourceRect, width, height, center_pos_x, center_pos_y,
         tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
 
-    UIShader::UniformColoredTextureRectShader::getInstance()->use();
+    UniformColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(SharedObject::UIVAO);
 
-    UIShader::UniformColoredTextureRectShader::getInstance()->setTextureUnits(texture);
-    UIShader::UniformColoredTextureRectShader::getInstance()
+    UniformColoredTextureRectShader::getInstance()->setTextureUnits(texture);
+    UniformColoredTextureRectShader::getInstance()
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y), 
                       core::vector2df(width, height),
                       core::vector2df(tex_center_pos_x, tex_center_pos_y),
