@@ -1298,28 +1298,3 @@ namespace FullScreenShader
                                       1, "colorMap", ST_NEAREST_FILTERED);
     }
 }
-
-namespace UIShader
-{
-
-
-    TextureRectShader::TextureRectShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "texturedquad.vert",
-            GL_FRAGMENT_SHADER, "texturedquad.frag");
-        assignUniforms("center", "size", "texcenter", "texsize");
-
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
-    }
-
-
-    
-    ColoredRectShader::ColoredRectShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "coloredquad.vert",
-            GL_FRAGMENT_SHADER, "coloredquad.frag");
-        assignUniforms("center", "size", "color");
-    }
-}

@@ -521,28 +521,6 @@ public:
 
 }
 
-namespace UIShader
-{
-
-
-class TextureRectShader : public Shader<TextureRectShader, core::vector2df,
-                                        core::vector2df, core::vector2df,
-                                        core::vector2df>,
-                          public TextureReadNew<ST_BILINEAR_FILTERED>
-{
-public:
-    TextureRectShader();
-};
-
-
-class ColoredRectShader : public Shader<ColoredRectShader, core::vector2df,
-                                        core::vector2df, video::SColor>
-{
-public:
-    ColoredRectShader();
-};
-}
-
 #define FOREACH_SHADER(ACT) \
     ACT(ES_NORMAL_MAP) \
     ACT(ES_NORMAL_MAP_LIGHTMAP) \

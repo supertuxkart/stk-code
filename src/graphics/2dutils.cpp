@@ -58,6 +58,36 @@ public:
 };   // UniformColoredTextureRectShader
 
 // ============================================================================
+class TextureRectShader : public Shader<TextureRectShader, core::vector2df,
+                                        core::vector2df, core::vector2df,
+                                        core::vector2df>,
+                          public TextureReadNew<ST_BILINEAR_FILTERED>
+{
+public:
+    TextureRectShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "texturedquad.vert",
+                            GL_FRAGMENT_SHADER, "texturedquad.frag");
+        assignUniforms("center", "size", "texcenter", "texsize");
+
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
+    }   // TextureRectShader
+};   // TextureRectShader
+
+// ============================================================================
+class ColoredRectShader : public Shader<ColoredRectShader, core::vector2df,
+                                        core::vector2df, video::SColor>
+{
+public:
+    ColoredRectShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "coloredquad.vert",
+                            GL_FRAGMENT_SHADER, "coloredquad.frag");
+        assignUniforms("center", "size", "color");
+    }   // ColoredRectShader
+};   // ColoredRectShader
+
+// ============================================================================
 class ColoredTextureRectShader : public Shader<ColoredTextureRectShader,
                                                core::vector2df, core::vector2df,
                                                core::vector2df, core::vector2df>,
@@ -162,11 +192,11 @@ static void drawTexQuad(GLuint texture, float width, float height,
                         float tex_center_pos_x, float tex_center_pos_y,
                         float tex_width, float tex_height)
 {
-    UIShader::TextureRectShader::getInstance()->use();
+    TextureRectShader::getInstance()->use();
     glBindVertexArray(SharedObject::UIVAO);
 
-    UIShader::TextureRectShader::getInstance()->setTextureUnits(texture);
-    UIShader::TextureRectShader::getInstance()->setUniforms(
+    TextureRectShader::getInstance()->setTextureUnits(texture);
+    TextureRectShader::getInstance()->setUniforms(
                     core::vector2df(center_pos_x, center_pos_y), 
                     core::vector2df(width, height),
                     core::vector2df(tex_center_pos_x, tex_center_pos_y),
@@ -489,9 +519,9 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
                   clip->getWidth(), clip->getHeight());
     }
 
-    UIShader::ColoredRectShader::getInstance()->use();
+    ColoredRectShader::getInstance()->use();
     glBindVertexArray(SharedObject::UIVAO);
-    UIShader::ColoredRectShader::getInstance()
+    ColoredRectShader::getInstance()
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
                       core::vector2df(width, height), color        );
 
