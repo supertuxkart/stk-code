@@ -42,6 +42,22 @@ using namespace video;
 using namespace scene;
 
 // ============================================================================
+class Gaussian3HBlurShader : public Shader<Gaussian3HBlurShader,
+                                           core::vector2df>,
+                            public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
+{
+public:
+    Gaussian3HBlurShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "gaussian3h.frag");
+        assignUniforms("pixel");
+
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
+    }   // Gaussian3HBlurShader
+};   // Gaussian3HBlurShader
+
+// ============================================================================
 class ComputeShadowBlurVShader : public Shader<ComputeShadowBlurVShader,
                                                core::vector2df,
                                                std::vector<float> >,
@@ -516,8 +532,8 @@ void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
     {
         in_fbo.Bind();
 
-        FullScreenShader::Gaussian3HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian3HBlurShader>(core::vector2df(inv_width, inv_height));
+        Gaussian3HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
+        DrawFullScreenEffect<Gaussian3HBlurShader>(core::vector2df(inv_width, inv_height));
     }
 }
 

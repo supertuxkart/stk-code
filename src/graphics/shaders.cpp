@@ -1014,17 +1014,6 @@ namespace FullScreenShader
         assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }
 
-    Gaussian3HBlurShader::Gaussian3HBlurShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "gaussian3h.frag");
-        assignUniforms("pixel");
-
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
-    }
-
-
     PassThroughShader::PassThroughShader()
     {
         loadProgram(OBJECT,

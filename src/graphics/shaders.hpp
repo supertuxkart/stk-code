@@ -316,13 +316,6 @@ public:
     HorizontalBlurShader();
 };
 
-class Gaussian3HBlurShader : public Shader<Gaussian3HBlurShader, core::vector2df>,
-                            public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
-{
-public:
-    Gaussian3HBlurShader();
-};
-
 
 class PassThroughShader : public Shader<PassThroughShader, int, int>,
                           public TextureReadNew<ST_BILINEAR_FILTERED>
