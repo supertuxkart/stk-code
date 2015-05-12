@@ -21,6 +21,7 @@
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "script_kart.hpp"
+#include "scriptvec3.hpp"
 
 //debug
 #include <iostream>
@@ -47,12 +48,11 @@ namespace Scripting
         }
 
         /** Teleports the kart to the specified Vec3 location */
-        void teleport(int idKart, Vec3* position)
+        void teleport(int idKart, SimpleVec3* position)
         {
-            // TODO: must we delete "position" ?
-
             AbstractKart* kart = World::getWorld()->getKart(idKart);
-            kart->setXYZ(*position);
+            Vec3 v(position->getX(), position->getY(), position->getZ());
+            kart->setXYZ(v);
             unsigned int index = World::getWorld()->getRescuePositionIndex(kart);
             btTransform s = World::getWorld()->getRescueTransform(index);
             const btVector3 &xyz = s.getOrigin();
@@ -92,10 +92,11 @@ namespace Scripting
         //}
         
         /** Returns the location of the corresponding kart. */
-        Vec3 getLocation(int idKart)
+        SimpleVec3 getLocation(int idKart)
         {
             AbstractKart* kart = World::getWorld()->getKart(idKart);
-            return kart->getXYZ();
+            Vec3 v = kart->getXYZ();
+            return SimpleVec3(v.getX(), v.getY(), v.getZ());
         }
 
         /** Sets the kart's velocity to the specified value. */
