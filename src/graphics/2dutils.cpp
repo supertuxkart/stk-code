@@ -94,7 +94,7 @@ class ColoredTextureRectShader : public Shader<ColoredTextureRectShader,
                                  public TextureReadNew<ST_BILINEAR_FILTERED>
 {
 private:
-    GLuint m_quad_buffer = -1;
+    GLuint m_quad_buffer;
 
     void initQuadBuffer()
     {
@@ -168,16 +168,22 @@ static void drawTexColoredQuad(const video::ITexture *texture,
         col[3].getRed(), col[3].getGreen(), col[3].getBlue(), col[3].getAlpha(),
     };
 
-    glBindBuffer(GL_ARRAY_BUFFER, ColoredTextureRectShader::getInstance()->m_color_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER,
+                 ColoredTextureRectShader::getInstance()->m_color_vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, 16 * sizeof(unsigned), colors);
 
     ColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
 
-    ColoredTextureRectShader::getInstance()->setTextureUnits(static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
-    ColoredTextureRectShader::getInstance()->setUniforms(
-        core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height),
-        core::vector2df(tex_center_pos_x, tex_center_pos_y), core::vector2df(tex_width, tex_height));
+    const irr::video::COpenGLTexture *t = 
+                       static_cast<const irr::video::COpenGLTexture*>(texture);
+    ColoredTextureRectShader::getInstance()
+        ->setTextureUnits(t->getOpenGLTextureName());
+    ColoredTextureRectShader::getInstance()
+        ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
+                      core::vector2df(width, height),
+                      core::vector2df(tex_center_pos_x, tex_center_pos_y),
+                      core::vector2df(tex_width, tex_height));
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
