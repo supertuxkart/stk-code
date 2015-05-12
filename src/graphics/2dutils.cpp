@@ -18,7 +18,9 @@
 #include "2dutils.hpp"
 
 #include "graphics/central_settings.hpp"
+#include "graphics/shader.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/texture_read.hpp"
 #include "glwrap.hpp"
 #include "utils/cpp2011.hpp"
 

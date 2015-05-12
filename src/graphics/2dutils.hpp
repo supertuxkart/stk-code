@@ -19,13 +19,14 @@
 #define UTILS2D_HPP
 
 #include "gl_headers.hpp"
-#include <rect.h>
-#include <SColor.h>
-#include <S3DVertex.h>
-#include <SVertexIndex.h>
+
 #include <EPrimitiveTypes.h>
-#include <ITexture.h>
 #include <irrTypes.h>
+#include <ITexture.h>
+#include <rect.h>
+#include <S3DVertex.h>
+#include <SColor.h>
+#include <SVertexIndex.h>
 
 void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
                         const irr::core::rect<irr::s32>& destRect,
