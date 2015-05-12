@@ -591,15 +591,6 @@ namespace MeshShader
         assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
-    BillboardShader::BillboardShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "billboard.vert",
-            GL_FRAGMENT_SHADER, "billboard.frag");
-
-        assignUniforms("ModelViewMatrix", "ProjectionMatrix", "Position", "Size");
-        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
 
     ColorizeShader::ColorizeShader()
     {

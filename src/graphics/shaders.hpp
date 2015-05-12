@@ -78,14 +78,6 @@ public:
     TransparentFogShader();
 };
 
-class BillboardShader : public Shader<BillboardShader, core::matrix4, core::matrix4,
-                                      core::vector3df, core::dimension2df>, 
-                       public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
-{
-public:
-    BillboardShader();
-};
-
 
 class ColorizeShader : public Shader<ColorizeShader, core::matrix4, video::SColorf>
 {

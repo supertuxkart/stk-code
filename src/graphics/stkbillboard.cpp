@@ -23,9 +23,31 @@
 
 using namespace irr;
 
+
 static GLuint billboardvao = 0;
 
-static void createbillboardvao()
+
+class BillboardShader : public Shader<BillboardShader, core::matrix4,
+                                      core::matrix4, core::vector3df,
+                                      core::dimension2df>,
+                       public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
+{
+public:
+    BillboardShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "billboard.vert",
+                            GL_FRAGMENT_SHADER, "billboard.frag");
+
+        assignUniforms("ModelViewMatrix", "ProjectionMatrix", "Position",
+                       "Size");
+        assignSamplerNames(m_program, 
+                           0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // BillboardShader
+};   // BillboardShader
+
+// ============================================================================
+
+static void createBillboardVAO()
 {
     glGenVertexArrays(1, &billboardvao);
     glBindVertexArray(billboardvao);
@@ -33,19 +55,27 @@ static void createbillboardvao()
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*) (2 * sizeof(float)));
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 
+                          (GLvoid*) (2 * sizeof(float)));
     glBindVertexArray(0);
-}
+}   // createBillboardVAO
 
-STKBillboard::STKBillboard(irr::scene::ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
-    const irr::core::vector3df& position, const irr::core::dimension2d<irr::f32>& size,
-    irr::video::SColor colorTop,    irr::video::SColor colorBottom) :
-    IBillboardSceneNode(parent, mgr, id, position), CBillboardSceneNode(parent, mgr, id, position, size, colorTop, colorBottom)
+// ----------------------------------------------------------------------------
+STKBillboard::STKBillboard(irr::scene::ISceneNode* parent,
+                           irr::scene::ISceneManager* mgr, irr::s32 id,
+                           const irr::core::vector3df& position,
+                           const irr::core::dimension2d<irr::f32>& size,
+                           irr::video::SColor colorTop, 
+                           irr::video::SColor colorBottom)
+            : IBillboardSceneNode(parent, mgr, id, position),
+              CBillboardSceneNode(parent, mgr, id, position, size, 
+                                  colorTop, colorBottom)
 {
     if (!billboardvao)
-        createbillboardvao();
-}
+        createBillboardVAO();
+}   // STKBillboard
 
+// ----------------------------------------------------------------------------
 void STKBillboard::OnRegisterSceneNode()
 {
     if (IsVisible)
@@ -54,9 +84,9 @@ void STKBillboard::OnRegisterSceneNode()
     }
 
     ISceneNode::OnRegisterSceneNode();
-}
+}   // OnRegisterSceneNode
 
-
+// ----------------------------------------------------------------------------
 void STKBillboard::render()
 {
     if (irr_driver->getPhase() != TRANSPARENT_PASS)
@@ -64,14 +94,16 @@ void STKBillboard::render()
     core::vector3df pos = getAbsolutePosition();
     glBindVertexArray(billboardvao);
     video::ITexture *tex = Material.getTexture(0);
-    if (tex == NULL)
+    if (!tex )
         return;
+
     compressTexture(tex, true, true);
     GLuint texid = getTextureGLuint(tex);
-    MeshShader::BillboardShader::getInstance()->use();
-    MeshShader::BillboardShader::getInstance()->setTextureUnits(texid);
-    MeshShader::BillboardShader::getInstance()->setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), pos, Size);
+    BillboardShader::getInstance()->use();
+    BillboardShader::getInstance()->setTextureUnits(texid);
+    BillboardShader::getInstance()->setUniforms(irr_driver->getViewMatrix(), 
+                                                irr_driver->getProjMatrix(),
+                                                pos, Size);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
-    return;
-}
+}   // render
