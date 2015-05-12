@@ -61,7 +61,7 @@ namespace Scripting
     void RegisterVec3(asIScriptEngine *engine)
     {
         int r;
-        r = engine->RegisterObjectType("Vec3", sizeof(SimpleVec3), asOBJ_VALUE | asOBJ_APP_CLASS_ALLFLOATS | asGetTypeTraits<SimpleVec3>()); assert(r >= 0);
+        r = engine->RegisterObjectType("Vec3", sizeof(SimpleVec3), asOBJ_VALUE | asOBJ_APP_CLASS_ALLFLOATS | asOBJ_APP_CLASS_CDA); assert(r >= 0);
         // Register the behaviours
         r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Constructor), asCALL_CDECL_OBJLAST); assert(r >= 0);
         r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Destructor), asCALL_CDECL_OBJLAST); assert(r >= 0);
