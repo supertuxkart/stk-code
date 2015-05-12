@@ -1004,56 +1004,6 @@ namespace FullScreenShader
                                       4, "SHB", ST_VOLUME_LINEAR_FILTERED);
     }
 
-    Gaussian17TapHShader::Gaussian17TapHShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "bilateralH.frag");
-        assignUniforms("pixel");
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
-                                      1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
-    }
-
-    ComputeGaussian17TapHShader::ComputeGaussian17TapHShader()
-    {
-        loadProgram(OBJECT,  GL_COMPUTE_SHADER, "bilateralH.comp");
-        TU_dest = 2;
-        assignUniforms("pixel");
-        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED,
-                                      1, "depth", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(TU_dest, "dest");
-    }
-
-    ComputeGaussian6HBlurShader::ComputeGaussian6HBlurShader()
-    {
-        loadProgram(OBJECT,
-            GL_COMPUTE_SHADER, "gaussian6h.comp");
-        TU_dest = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source", ST_BILINEAR_CLAMPED_FILTERED);
-        assignTextureUnit(TU_dest, "dest");
-    }
-
-    ComputeShadowBlurHShader::ComputeShadowBlurHShader()
-    {
-        loadProgram(OBJECT,
-            GL_COMPUTE_SHADER, "blurshadowH.comp");
-        TU_dest = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(TU_dest, "dest");
-    }
-
-    Gaussian6HBlurShader::Gaussian6HBlurShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "gaussian6h.frag");
-        assignUniforms("pixel", "sigma");
-
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
-    }
-	
 	HorizontalBlurShader::HorizontalBlurShader()
     {
         loadProgram(OBJECT,
@@ -1074,67 +1024,6 @@ namespace FullScreenShader
         assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }
 
-    Gaussian17TapVShader::Gaussian17TapVShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "bilateralV.frag");
-        assignUniforms("pixel");
-
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
-                                      1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
-    }
-
-    ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
-    {
-        loadProgram(OBJECT,
-            GL_COMPUTE_SHADER, "bilateralV.comp");
-        TU_dest = 2;
-        assignUniforms("pixel");
-        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED,
-                                      1, "depth", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(TU_dest, "dest");
-    }
-
-    ComputeGaussian6VBlurShader::ComputeGaussian6VBlurShader()
-    {
-        loadProgram(OBJECT,
-            GL_COMPUTE_SHADER, "gaussian6v.comp");
-        TU_dest = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source", ST_BILINEAR_CLAMPED_FILTERED);
-        assignTextureUnit(TU_dest, "dest");
-    }
-
-    ComputeShadowBlurVShader::ComputeShadowBlurVShader()
-    {
-        loadProgram(OBJECT,
-            GL_COMPUTE_SHADER, "blurshadowV.comp");
-        TU_dest = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(TU_dest, "dest");
-    }
-
-    Gaussian6VBlurShader::Gaussian6VBlurShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "gaussian6v.frag");
-        assignUniforms("pixel", "sigma");
-
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
-    }
-
-    Gaussian3VBlurShader::Gaussian3VBlurShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "gaussian3v.frag");
-        assignUniforms("pixel");
-
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
-    }
 
     PassThroughShader::PassThroughShader()
     {

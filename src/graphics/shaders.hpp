@@ -309,46 +309,6 @@ public:
     GlobalIlluminationReconstructionShader();
 };
 
-class Gaussian17TapHShader : public Shader<Gaussian17TapHShader, core::vector2df>,
-                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED,
-                                                   ST_BILINEAR_CLAMPED_FILTERED>
-{
-public:
-    Gaussian17TapHShader();
-};
-
-class ComputeGaussian17TapHShader : public Shader<ComputeGaussian17TapHShader, core::vector2df>,
-                                    public TextureReadNew<ST_NEARED_CLAMPED_FILTERED,
-                                                          ST_NEARED_CLAMPED_FILTERED>
-{
-public:
-    GLuint TU_dest;
-    ComputeGaussian17TapHShader();
-};
-
-class ComputeGaussian6HBlurShader : public Shader<ComputeGaussian6HBlurShader, core::vector2df, std::vector<float> >,
-                                    public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
-{
-public:
-    GLuint TU_dest;
-    ComputeGaussian6HBlurShader();
-};
-
-class ComputeShadowBlurHShader : public Shader<ComputeShadowBlurHShader, core::vector2df, std::vector<float> >,
-                                public TextureReadNew<ST_NEARED_CLAMPED_FILTERED>
-{
-public:
-    GLuint TU_dest;
-    ComputeShadowBlurHShader();
-};
-
-class Gaussian6HBlurShader : public Shader<Gaussian6HBlurShader, core::vector2df, float>,
-                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
-{
-public:
-    Gaussian6HBlurShader();
-};
-
 class HorizontalBlurShader : public Shader<HorizontalBlurShader, core::vector2df>,
                              public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
 {
@@ -363,51 +323,6 @@ public:
     Gaussian3HBlurShader();
 };
 
-class Gaussian17TapVShader : public Shader<Gaussian17TapVShader, core::vector2df>,
-                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED, ST_BILINEAR_CLAMPED_FILTERED>
-{
-public:
-    Gaussian17TapVShader();
-};
-
-class ComputeGaussian17TapVShader : public Shader<ComputeGaussian17TapVShader, core::vector2df>,
-                                    public TextureReadNew<ST_NEARED_CLAMPED_FILTERED, ST_NEARED_CLAMPED_FILTERED>
-{
-public:
-    GLuint TU_dest;
-
-    ComputeGaussian17TapVShader();
-};
-
-class ComputeGaussian6VBlurShader : public Shader<ComputeGaussian6VBlurShader, core::vector2df, std::vector<float> >,
-                                    public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
-{
-public:
-    GLuint TU_dest;
-    ComputeGaussian6VBlurShader();
-};
-
-class ComputeShadowBlurVShader : public Shader<ComputeShadowBlurVShader, core::vector2df, std::vector<float> >,
-                                 public TextureReadNew<ST_NEARED_CLAMPED_FILTERED>
-{
-public:
-    GLuint TU_dest;
-    ComputeShadowBlurVShader();
-};
-
-class Gaussian6VBlurShader : public Shader<Gaussian6VBlurShader, core::vector2df, float>,
-                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
-{
-public:
-    Gaussian6VBlurShader();
-};
-
-class Gaussian3VBlurShader : public Shader<Gaussian3VBlurShader, core::vector2df>,
-                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
-{
-public:
-    Gaussian3VBlurShader();
-};
 
 class PassThroughShader : public Shader<PassThroughShader, int, int>,
                           public TextureReadNew<ST_BILINEAR_FILTERED>

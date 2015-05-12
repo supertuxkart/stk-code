@@ -41,6 +41,205 @@
 using namespace video;
 using namespace scene;
 
+// ============================================================================
+class ComputeShadowBlurVShader : public Shader<ComputeShadowBlurVShader,
+                                               core::vector2df,
+                                               std::vector<float> >,
+                              public TextureReadNew<ST_NEARED_CLAMPED_FILTERED>
+{
+public:
+    GLuint m_dest_tu;
+    ComputeShadowBlurVShader()
+    {
+        loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowV.comp");
+        m_dest_tu = 1;
+        assignUniforms("pixel", "weights");
+        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED);
+        assignTextureUnit(m_dest_tu, "dest");
+    }   // ComputeShadowBlurVShader
+
+};   // ComputeShadowBlurVShader
+
+// ============================================================================
+class Gaussian6VBlurShader : public Shader<Gaussian6VBlurShader,
+                                           core::vector2df, float>,
+                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
+{
+public:
+    Gaussian6VBlurShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "gaussian6v.frag");
+        assignUniforms("pixel", "sigma");
+
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
+    }   // Gaussian6VBlurShader
+};   // Gaussian6VBlurShader
+
+// ============================================================================
+class Gaussian3VBlurShader : public Shader<Gaussian3VBlurShader,
+                                           core::vector2df>,
+                            public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
+{
+public:
+    Gaussian3VBlurShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "gaussian3v.frag");
+        assignUniforms("pixel");
+
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
+    }   // Gaussian3VBlurShader
+};   // Gaussian3VBlurShader
+
+// ============================================================================
+class ComputeGaussian6VBlurShader : public Shader<ComputeGaussian6VBlurShader,
+                                                  core::vector2df,
+                                                  std::vector<float> >,
+                            public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
+{
+public:
+    GLuint m_dest_tu;
+    ComputeGaussian6VBlurShader()
+    {
+        loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6v.comp");
+        m_dest_tu = 1;
+        assignUniforms("pixel", "weights");
+        assignSamplerNames(m_program, 0, "source", 
+                           ST_BILINEAR_CLAMPED_FILTERED);
+        assignTextureUnit(m_dest_tu, "dest");
+    }   // ComputeGaussian6VBlurShader
+};   // ComputeGaussian6VBlurShader
+
+// ============================================================================
+class ComputeGaussian6HBlurShader : public Shader<ComputeGaussian6HBlurShader,
+                                                  core::vector2df, 
+                                                  std::vector<float> >,
+                            public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
+{
+public:
+    GLuint m_dest_tu;
+    ComputeGaussian6HBlurShader()
+    {
+        loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6h.comp");
+        m_dest_tu = 1;
+        assignUniforms("pixel", "weights");
+        assignSamplerNames(m_program, 0, "source", 
+                          ST_BILINEAR_CLAMPED_FILTERED);
+        assignTextureUnit(m_dest_tu, "dest");
+    }   // ComputeGaussian6HBlurShader
+};   // ComputeGaussian6HBlurShader
+
+// ============================================================================
+class ComputeShadowBlurHShader : public Shader<ComputeShadowBlurHShader,
+                                               core::vector2df,
+                                               std::vector<float> >,
+                              public TextureReadNew<ST_NEARED_CLAMPED_FILTERED>
+{
+public:
+    GLuint m_dest_tu;
+    ComputeShadowBlurHShader()
+    {
+        loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowH.comp");
+        m_dest_tu = 1;
+        assignUniforms("pixel", "weights");
+        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED);
+        assignTextureUnit(m_dest_tu, "dest");
+    }   // ComputeShadowBlurHShader
+};   // ComputeShadowBlurHShader
+
+// ============================================================================
+class Gaussian6HBlurShader : public Shader<Gaussian6HBlurShader,
+                                           core::vector2df, float>,
+                             public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED>
+{
+public:
+    Gaussian6HBlurShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "gaussian6h.frag");
+        assignUniforms("pixel", "sigma");
+
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
+    }   // Gaussian6HBlurShader
+};   // Gaussian6HBlurShader
+
+// ============================================================================
+class Gaussian17TapHShader : public Shader<Gaussian17TapHShader,
+                                           core::vector2df>,
+                            public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED,
+                                                  ST_BILINEAR_CLAMPED_FILTERED>
+{
+public:
+    Gaussian17TapHShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "bilateralH.frag");
+        assignUniforms("pixel");
+        assignSamplerNames(m_program,0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
+                                     1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
+    }   // Gaussian17TapHShader
+};   // Gaussian17TapHShader
+
+// ============================================================================
+class ComputeGaussian17TapHShader : public Shader<ComputeGaussian17TapHShader,
+                                                  core::vector2df>,
+                              public TextureReadNew<ST_NEARED_CLAMPED_FILTERED,
+                                                    ST_NEARED_CLAMPED_FILTERED>
+{
+public:
+    GLuint m_dest_tu;
+    ComputeGaussian17TapHShader()
+    {
+        loadProgram(OBJECT,  GL_COMPUTE_SHADER, "bilateralH.comp");
+        m_dest_tu = 2;
+        assignUniforms("pixel");
+        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED,
+                                      1, "depth", ST_NEARED_CLAMPED_FILTERED);
+        assignTextureUnit(m_dest_tu, "dest");
+    }   // ComputeGaussian17TapHShader
+};   // ComputeGaussian17TapHShader
+
+
+// ============================================================================
+class Gaussian17TapVShader : public Shader<Gaussian17TapVShader,
+                                           core::vector2df>,
+                            public TextureReadNew<ST_BILINEAR_CLAMPED_FILTERED,
+                                                  ST_BILINEAR_CLAMPED_FILTERED>
+{
+public:
+    Gaussian17TapVShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "bilateralV.frag");
+        assignUniforms("pixel");
+
+        assignSamplerNames(m_program,0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
+                                     1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
+    }   // Gaussian17TapVShader
+};   // Gaussian17TapVShader
+
+// ============================================================================
+class ComputeGaussian17TapVShader : public Shader<ComputeGaussian17TapVShader, 
+                                                  core::vector2df>,
+                              public TextureReadNew<ST_NEARED_CLAMPED_FILTERED,
+                                                    ST_NEARED_CLAMPED_FILTERED>
+{
+public:
+    GLuint m_dest_tu;
+
+    ComputeGaussian17TapVShader()
+    {
+        loadProgram(OBJECT, GL_COMPUTE_SHADER, "bilateralV.comp");
+        m_dest_tu = 2;
+        assignUniforms("pixel");
+        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED,
+                                      1, "depth", ST_NEARED_CLAMPED_FILTERED);
+        assignTextureUnit(m_dest_tu, "dest");
+    }   // ComputeGaussian17TapVShader
+};   // ComputeGaussian17TapVShader
+
+// ============================================================================
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
     // Initialization
@@ -311,8 +510,8 @@ void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
     {
         auxiliary.Bind();
 
-        FullScreenShader::Gaussian3VBlurShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian3VBlurShader>(core::vector2df(inv_width, inv_height));
+        Gaussian3VBlurShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0]);
+        DrawFullScreenEffect<Gaussian3VBlurShader>(core::vector2df(inv_width, inv_height));
     }
     {
         in_fbo.Bind();
@@ -331,30 +530,30 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo, size_t layer,
     {
         // Used as temp
         irr_driver->getFBO(FBO_SCALAR_1024).Bind();
-        FullScreenShader::Gaussian6VBlurShader::getInstance()->setTextureUnits(LayerTex);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6VBlurShader>(core::vector2df(1.f / UserConfigParams::m_shadows_resolution, 1.f / UserConfigParams::m_shadows_resolution), sigmaV);
+        Gaussian6VBlurShader::getInstance()->setTextureUnits(LayerTex);
+        DrawFullScreenEffect<Gaussian6VBlurShader>(core::vector2df(1.f / UserConfigParams::m_shadows_resolution, 1.f / UserConfigParams::m_shadows_resolution), sigmaV);
         in_fbo.BindLayer(layer);
-        FullScreenShader::Gaussian6HBlurShader::getInstance()->setTextureUnits(irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(1.f / UserConfigParams::m_shadows_resolution, 1.f / UserConfigParams::m_shadows_resolution), sigmaH);
+        Gaussian6HBlurShader::getInstance()->setTextureUnits(irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0]);
+        DrawFullScreenEffect<Gaussian6HBlurShader>(core::vector2df(1.f / UserConfigParams::m_shadows_resolution, 1.f / UserConfigParams::m_shadows_resolution), sigmaH);
     }
     else
     {
         const std::vector<float> &weightsV = getGaussianWeight(sigmaV, 7);
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
-        FullScreenShader::ComputeShadowBlurVShader::getInstance()->use();
-        FullScreenShader::ComputeShadowBlurVShader::getInstance()->setTextureUnits(LayerTex);
-        glBindSampler(FullScreenShader::ComputeShadowBlurVShader::getInstance()->TU_dest, 0);
-        glBindImageTexture(FullScreenShader::ComputeShadowBlurVShader::getInstance()->TU_dest, irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R32F);
-        FullScreenShader::ComputeShadowBlurVShader::getInstance()->setUniforms(core::vector2df(1.f / UserConfigParams::m_shadows_resolution, 1.f / UserConfigParams::m_shadows_resolution), weightsV);
+        ComputeShadowBlurVShader::getInstance()->use();
+        ComputeShadowBlurVShader::getInstance()->setTextureUnits(LayerTex);
+        glBindSampler(ComputeShadowBlurVShader::getInstance()->m_dest_tu, 0);
+        glBindImageTexture(ComputeShadowBlurVShader::getInstance()->m_dest_tu, irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R32F);
+        ComputeShadowBlurVShader::getInstance()->setUniforms(core::vector2df(1.f / UserConfigParams::m_shadows_resolution, 1.f / UserConfigParams::m_shadows_resolution), weightsV);
         glDispatchCompute((int)UserConfigParams::m_shadows_resolution / 8 + 1, (int)UserConfigParams::m_shadows_resolution / 8 + 1, 1);
 
         const std::vector<float> &weightsH = getGaussianWeight(sigmaH, 7);
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        FullScreenShader::ComputeShadowBlurHShader::getInstance()->use();
-        FullScreenShader::ComputeShadowBlurHShader::getInstance()->setTextureUnits(irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0]);
-        glBindSampler(FullScreenShader::ComputeShadowBlurHShader::getInstance()->TU_dest, 0);
-        glBindImageTexture(FullScreenShader::ComputeShadowBlurHShader::getInstance()->TU_dest, LayerTex, 0, false, 0, GL_WRITE_ONLY, GL_R32F);
-        FullScreenShader::ComputeShadowBlurHShader::getInstance()->setUniforms(core::vector2df(1.f / UserConfigParams::m_shadows_resolution, 1.f / UserConfigParams::m_shadows_resolution), weightsH);
+        ComputeShadowBlurHShader::getInstance()->use();
+        ComputeShadowBlurHShader::getInstance()->setTextureUnits(irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0]);
+        glBindSampler(ComputeShadowBlurHShader::getInstance()->m_dest_tu, 0);
+        glBindImageTexture(ComputeShadowBlurHShader::getInstance()->m_dest_tu, LayerTex, 0, false, 0, GL_WRITE_ONLY, GL_R32F);
+        ComputeShadowBlurHShader::getInstance()->setUniforms(core::vector2df(1.f / UserConfigParams::m_shadows_resolution, 1.f / UserConfigParams::m_shadows_resolution), weightsH);
         glDispatchCompute((int)UserConfigParams::m_shadows_resolution / 8 + 1, (int)UserConfigParams::m_shadows_resolution / 8 + 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
@@ -370,32 +569,32 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
     {
         auxiliary.Bind();
 
-        FullScreenShader::Gaussian6VBlurShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6VBlurShader>(core::vector2df(inv_width, inv_height), sigmaV);
+        Gaussian6VBlurShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0]);
+        DrawFullScreenEffect<Gaussian6VBlurShader>(core::vector2df(inv_width, inv_height), sigmaV);
 
         in_fbo.Bind();
 
-        FullScreenShader::Gaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), sigmaH);
+        Gaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
+        DrawFullScreenEffect<Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), sigmaH);
     }
     else
     {
         const std::vector<float> &weightsV = getGaussianWeight(sigmaV, 7);
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
-        FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->use();
-        FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0]);
-        glBindSampler(FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->TU_dest, 0);
-        glBindImageTexture(FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->TU_dest, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_RGBA16F);
-        FullScreenShader::ComputeGaussian6VBlurShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height), weightsV);
+        ComputeGaussian6VBlurShader::getInstance()->use();
+        ComputeGaussian6VBlurShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0]);
+        glBindSampler(ComputeGaussian6VBlurShader::getInstance()->m_dest_tu, 0);
+        glBindImageTexture(ComputeGaussian6VBlurShader::getInstance()->m_dest_tu, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_RGBA16F);
+        ComputeGaussian6VBlurShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height), weightsV);
         glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, (int)in_fbo.getHeight() / 8 + 1, 1);
 
         const std::vector<float> &weightsH = getGaussianWeight(sigmaH, 7);
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->use();
-        FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
-        glBindSampler(FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->TU_dest, 0);
-        glBindImageTexture(FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->TU_dest, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_RGBA16F);
-        FullScreenShader::ComputeGaussian6HBlurShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height), weightsH);
+        ComputeGaussian6HBlurShader::getInstance()->use();
+        ComputeGaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
+        glBindSampler(ComputeGaussian6HBlurShader::getInstance()->m_dest_tu, 0);
+        glBindImageTexture(ComputeGaussian6HBlurShader::getInstance()->m_dest_tu, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_RGBA16F);
+        ComputeGaussian6HBlurShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height), weightsH);
         glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, (int)in_fbo.getHeight() / 8 + 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
@@ -409,14 +608,14 @@ void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo, FrameBuffer &auxi
     {
         auxiliary.Bind();
 
-        FullScreenShader::Gaussian6HBlurShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0f);
+        Gaussian6HBlurShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0]);
+        DrawFullScreenEffect<Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0f);
     }
     {
         in_fbo.Bind();
 
-        FullScreenShader::Gaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
-        DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0f);
+        Gaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
+        DrawFullScreenEffect<Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height), 2.0f);
     }
 }
 
@@ -431,16 +630,16 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         if (!CVS->supportsComputeShadersFiltering())
         {
             auxiliary.Bind();
-            FullScreenShader::Gaussian17TapHShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
-            DrawFullScreenEffect<FullScreenShader::Gaussian17TapHShader>(core::vector2df(inv_width, inv_height));
+            Gaussian17TapHShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
+            DrawFullScreenEffect<Gaussian17TapHShader>(core::vector2df(inv_width, inv_height));
         }
         else
         {
-            FullScreenShader::ComputeGaussian17TapHShader::getInstance()->use();
-            glBindSampler(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_dest, 0);
-            FullScreenShader::ComputeGaussian17TapHShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
-            glBindImageTexture(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_dest, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
-            FullScreenShader::ComputeGaussian17TapHShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height));
+            ComputeGaussian17TapHShader::getInstance()->use();
+            glBindSampler(ComputeGaussian17TapHShader::getInstance()->m_dest_tu, 0);
+            ComputeGaussian17TapHShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
+            glBindImageTexture(ComputeGaussian17TapHShader::getInstance()->m_dest_tu, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
+            ComputeGaussian17TapHShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height));
             glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, (int)in_fbo.getHeight() / 8 + 1, 1);
         }
     }
@@ -451,16 +650,16 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         {
             in_fbo.Bind();
 
-            FullScreenShader::Gaussian17TapVShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
-            DrawFullScreenEffect<FullScreenShader::Gaussian17TapVShader>(core::vector2df(inv_width, inv_height));
+            Gaussian17TapVShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
+            DrawFullScreenEffect<Gaussian17TapVShader>(core::vector2df(inv_width, inv_height));
         }
         else
         {
-            FullScreenShader::ComputeGaussian17TapVShader::getInstance()->use();
-            glBindSampler(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_dest, 0);
-            FullScreenShader::ComputeGaussian17TapVShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
-            glBindImageTexture(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_dest, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
-            FullScreenShader::ComputeGaussian17TapVShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height));
+            ComputeGaussian17TapVShader::getInstance()->use();
+            glBindSampler(ComputeGaussian17TapVShader::getInstance()->m_dest_tu, 0);
+            ComputeGaussian17TapVShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0], irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
+            glBindImageTexture(ComputeGaussian17TapVShader::getInstance()->m_dest_tu, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
+            ComputeGaussian17TapVShader::getInstance()->setUniforms(core::vector2df(inv_width, inv_height));
             glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, (int)in_fbo.getHeight() / 8 + 1, 1);
         }
     }
