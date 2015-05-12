@@ -54,6 +54,10 @@ namespace Scripting
         std::cout << script_vec3->getX() << "," << script_vec3->getY() << "," << script_vec3->getZ() << std::endl;
     }
 
+    float getX(SimpleVec3* v) { return v->getX(); }
+    float getY(SimpleVec3* v) { return v->getY(); }
+    float getZ(SimpleVec3* v) { return v->getZ(); }
+
     void RegisterVec3(asIScriptEngine *engine)
     {
         int r;
@@ -64,8 +68,8 @@ namespace Scripting
         r = engine->RegisterObjectMethod("Vec3", "Vec3 &opAssign(const Vec3 &in)", asMETHODPR(SimpleVec3, operator =, (const SimpleVec3&), SimpleVec3&), asCALL_THISCALL); assert(r >= 0);
         r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f(float, float, float)", asFUNCTION(ConstructVector3FromFloats), asCALL_CDECL_OBJLAST); assert(r >= 0);
         r = engine->RegisterGlobalFunction("void printVec3(Vec3 a)", asFUNCTION(printVec3), asCALL_GENERIC); assert(r >= 0);   
-        r = engine->RegisterObjectMethod("Vec3", "float &getX()", asMETHOD(SimpleVec3, getX), asCALL_THISCALL); assert(r >= 0);
-        r = engine->RegisterObjectMethod("Vec3", "float &getY()", asMETHOD(SimpleVec3, getY), asCALL_THISCALL); assert(r >= 0);
-        r = engine->RegisterObjectMethod("Vec3", "float &getZ()", asMETHOD(SimpleVec3, getZ), asCALL_THISCALL); assert(r >= 0);
+        r = engine->RegisterObjectMethod("Vec3", "float getX()", asFUNCTION(getX), asCALL_CDECL_OBJLAST); assert(r >= 0);
+        r = engine->RegisterObjectMethod("Vec3", "float getY()", asFUNCTION(getY), asCALL_CDECL_OBJLAST); assert(r >= 0);
+        r = engine->RegisterObjectMethod("Vec3", "float getZ()", asFUNCTION(getZ), asCALL_CDECL_OBJLAST); assert(r >= 0);
     }
 }
