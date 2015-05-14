@@ -282,7 +282,7 @@ void TracksScreen::buildTrackList()
             race_manager->getNumLocalPlayers() == 1)
         {
             tracks_widget->addItem(
-                _("Locked : solve active challenges to gain access to more!"),
+                _("Locked: solve active challenges to gain access to more!"),
                 "locked", curr->getScreenshotFile(), LOCKED_BADGE,
                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
