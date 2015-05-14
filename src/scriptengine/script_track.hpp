@@ -31,13 +31,6 @@ namespace Scripting
         void registerScriptFunctions(asIScriptEngine *engine);
         asIScriptFunction*
             registerScriptCallbacks(asIScriptEngine *engine , std::string scriptName);
-
-        //script-bound functions
-        void disableAnimation(asIScriptGeneric *gen);
-        void enableAnimation(asIScriptGeneric *gen);
-        void enableTrigger(asIScriptGeneric *gen);
-        void disableTrigger(asIScriptGeneric *gen);
-        void createTrigger(asIScriptGeneric *gen);
     }
 
 }

@@ -61,52 +61,44 @@ namespace Scripting
             return World::getWorld()->getTrack()->getTrackObjectManager()->getTrackObject(*objID);
         }
 
-        // TODO: assign types for documentation
-        /** Generic disable method for track objects */
-        void disableTrackObject(asIScriptGeneric *gen)
+        /** Hide/disable a track object */
+        void disableTrackObject(std::string* objID)
         {
-            std::string *str = (std::string*)gen->GetArgAddress(0);
-            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
+            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*objID);
         }
 
-        /** Generic enable method for track objects */
-        void enableTrackObject(asIScriptGeneric *gen)
+        /** Show/enable a track objects */
+        void enableTrackObject(std::string* objID)
         {
-            std::string *str = (std::string*)gen->GetArgAddress(0);
-            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
+            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*objID);
         }
 
         /** Disables an action trigger of specified ID */
-        void disableTrigger(asIScriptGeneric *gen)
+        void disableTrigger(std::string* triggerID)
         {
-            std::string *str = (std::string*)gen->GetArgAddress(0);
-            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
+            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*triggerID);
         }
 
         /** Enables an action trigger of specified ID */
-        void enableTrigger(asIScriptGeneric *gen)
+        void enableTrigger(std::string* triggerID)
         {
-            std::string *str = (std::string*)gen->GetArgAddress(0);
-            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
+            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*triggerID);
         }
 
         /** Creates a trigger at the specified location */
-        void createTrigger(asIScriptGeneric *gen)
+        void createTrigger(std::string* triggerID, Vec3* creation_loc, float distance)
         {
-            std::string *script_name = (std::string*)gen->GetArgAddress(0);
-            Vec3 *creation_loc = (Vec3*)gen->GetArgAddress(1);
             float x = creation_loc->getX();
             float y = creation_loc->getY();
             float z = creation_loc->getZ();
-            float distance = gen->GetArgFloat(2); //triggering distance
             core::vector3df posi(x, y, z);
             core::vector3df hpr(0, 0, 0);
             core::vector3df scale(1.0f, 1.0f, 1.0f);
             TrackObjectPresentationActionTrigger* newtrigger =
-                new TrackObjectPresentationActionTrigger(posi, *script_name, distance);
+                new TrackObjectPresentationActionTrigger(posi, *triggerID, distance);
             TrackObject* tobj = new TrackObject(posi, hpr, scale,
                 "none", newtrigger, false /* isDynamic */, NULL /* physics settings */);
-            tobj->setID(*script_name);
+            tobj->setID(*triggerID);
             World::getWorld()->getTrack()->getTrackObjectManager()->insertObject(tobj);
         }
     }
@@ -246,11 +238,11 @@ namespace Scripting
             r = engine->RegisterObjectType("SoundEmitter", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectType("Animator", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
 
-            r = engine->RegisterGlobalFunction("void disableTrackObject(const string &in)", asFUNCTION(disableTrackObject), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void enableTrackObject(const string &in)", asFUNCTION(enableTrackObject), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void enableTrigger(const string &in)", asFUNCTION(enableTrigger), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void disableTrigger(const string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void createTrigger(const string &in,Vec3 &in, float distance)",
+            r = engine->RegisterGlobalFunction("void disableTrackObject(const string &in)", asFUNCTION(disableTrackObject), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void enableTrackObject(const string &in)", asFUNCTION(enableTrackObject), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void enableTrigger(const string &in)", asFUNCTION(enableTrigger), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void disableTrigger(const string &in)", asFUNCTION(disableTrigger), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void createTrigger(const string &in, const Vec3 &in, float distance)",
                 asFUNCTION(createTrigger), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in)", asFUNCTION(getTrackObject), asCALL_CDECL); assert(r >= 0);
             
