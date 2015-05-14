@@ -22,6 +22,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 #include "graphics/texture_read.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
@@ -414,7 +415,7 @@ void ParticleSystemProxy::cleanGL()
 
 void ParticleSystemProxy::CommonRenderingVAO(GLuint PositionBuffer)
 {
-    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::ParticleQuadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getParticleQuadVBO());
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glEnableVertexAttribArray(3);

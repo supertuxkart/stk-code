@@ -16,17 +16,19 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+#include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/shared_gpu_objects.hpp"
+#include "modes/world.hpp"
+#include "physics/triangle_mesh.hpp"
+#include "tracks/track.hpp"
+
 #include <limits>
 #include <ICameraSceneNode.h>
 #include <SViewFrustum.h>
 #include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
-#include "graphics/central_settings.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/shaders.hpp"
-#include "modes/world.hpp"
-#include "physics/triangle_mesh.hpp"
-#include "tracks/track.hpp"
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
@@ -164,8 +166,10 @@ void IrrDriver::UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, si
 
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     glBindBuffer(GL_COPY_READ_BUFFER, tempShadowMatssbo);
-    glBindBuffer(GL_COPY_WRITE_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 80 * sizeof(float), 4 * 16 * sizeof(float));
+    glBindBuffer(GL_COPY_WRITE_BUFFER,
+                 SharedGPUObjects::getViewProjectionMatricesUBO());
+    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0,
+                        80 * sizeof(float), 4 * 16 * sizeof(float));
 }
 
 /** Generate View, Projection, Inverse View, Inverse Projection, ViewProjection and InverseProjection matrixes
@@ -318,7 +322,7 @@ void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnod
 
     tmp[144] = float(width);
     tmp[145] = float(height);
-    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getViewProjectionMatricesUBO());
     if (CVS->isSDSMEnabled())
     {
         glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 5) * sizeof(float), tmp);

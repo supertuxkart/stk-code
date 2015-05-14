@@ -16,9 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/stkbillboard.hpp"
+
 #include "graphics/glwrap.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/shared_gpu_objects.hpp"
+
 #include <ISceneManager.h>
 
 using namespace irr;
@@ -51,7 +54,7 @@ static void createBillboardVAO()
 {
     glGenVertexArrays(1, &billboardvao);
     glBindVertexArray(billboardvao);
-    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::billboardvbo);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getBillboardVBO());
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);

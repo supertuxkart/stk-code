@@ -24,6 +24,7 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
@@ -141,7 +142,7 @@ void IrrDriver::uploadLightingData()
     memcpy(&Lighting[17], greenSHCoeff, 9 * sizeof(float));
     memcpy(&Lighting[26], redSHCoeff, 9 * sizeof(float));
 
-    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getLightingDataUBO());
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 36 * sizeof(float), Lighting);
 }
 
@@ -155,7 +156,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
         glDisable(GL_BLEND);
         m_rtts->getRH().Bind();
-        glBindVertexArray(SharedObject::FullScreenQuadVAO);
+        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
         if (CVS->needRHWorkaround())
         {
             FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->use();

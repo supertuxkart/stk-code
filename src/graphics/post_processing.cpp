@@ -25,6 +25,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 #include "graphics/stkmeshscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -438,7 +439,7 @@ void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, 
     if (UserConfigParams::m_degraded_IBL)
     {
         FullScreenShader::DegradedIBLShader::getInstance()->use();
-        glBindVertexArray(SharedObject::FullScreenQuadVAO);
+        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
 
         FullScreenShader::DegradedIBLShader::getInstance()->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
         FullScreenShader::DegradedIBLShader::getInstance()->setUniforms();
@@ -446,7 +447,7 @@ void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, 
     else
     {
         FullScreenShader::IBLShader::getInstance()->use();
-        glBindVertexArray(SharedObject::FullScreenQuadVAO);
+        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
 
         FullScreenShader::IBLShader::getInstance()->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox);
         FullScreenShader::IBLShader::getInstance()->setUniforms();

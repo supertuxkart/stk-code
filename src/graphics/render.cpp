@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 #include "central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
@@ -288,8 +289,10 @@ void IrrDriver::renderGLSL(float dt)
     float tmp[2];
     tmp[0] = float(m_actual_screen_size.Width);
     tmp[1] = float(m_actual_screen_size.Height);
-    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float), 2 * sizeof(float), tmp);
+    glBindBuffer(GL_UNIFORM_BUFFER, 
+                 SharedGPUObjects::getViewProjectionMatricesUBO());
+    glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float),
+                    2 * sizeof(float), tmp);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -342,8 +345,8 @@ void IrrDriver::renderGLSL(float dt)
 
 void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedObject::LightingDataUBO);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
     m_scene_manager->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
@@ -629,7 +632,7 @@ static void renderWireFrameFrustrum(float *tmp, unsigned i)
 {
     MeshShader::ViewFrustrumShader::getInstance()->use();
     glBindVertexArray(MeshShader::ViewFrustrumShader::getInstance()->frustrumvao);
-    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getFrustrumVBO());
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), (void *)tmp);
     MeshShader::ViewFrustrumShader::getInstance()->setUniforms(video::SColor(255, 0, 255, 0), i);

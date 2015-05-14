@@ -20,11 +20,13 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 #include "graphics/texture_read.hpp"
 #include "glwrap.hpp"
 #include "utils/cpp2011.hpp"
 
 #include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
+
 
 // ============================================================================
 class Primitive2DList : public Shader<Primitive2DList>,
@@ -90,11 +92,13 @@ public:
 };   // ColoredRectShader
 
 // ============================================================================
+
 class ColoredTextureRectShader : public Shader<ColoredTextureRectShader,
                                                core::vector2df, core::vector2df,
                                                core::vector2df, core::vector2df>,
                                  public TextureReadNew<ST_BILINEAR_FILTERED>
 {
+#ifdef XX
 private:
     GLuint m_quad_buffer;
 
@@ -119,14 +123,16 @@ private:
                               (GLvoid *)(2 * sizeof(float)));
         glBindVertexArray(0);
     }   // initQuadBuffer
-
+#endif
 public:
     GLuint m_color_vbo;
     GLuint m_vao;
 
     ColoredTextureRectShader()
     {
+#ifdef XX
         initQuadBuffer();
+#endif
         loadProgram(OBJECT, GL_VERTEX_SHADER, "colortexturedquad.vert",
                             GL_FRAGMENT_SHADER, "colortexturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
@@ -138,7 +144,7 @@ public:
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(3);
         glEnableVertexAttribArray(2);
-        glBindBuffer(GL_ARRAY_BUFFER, m_quad_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getQuadBuffer());
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
         glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 
                               (GLvoid *)(2 * sizeof(float)));
@@ -201,7 +207,7 @@ static void drawTexQuad(GLuint texture, float width, float height,
                         float tex_width, float tex_height)
 {
     TextureRectShader::getInstance()->use();
-    glBindVertexArray(SharedObject::UIVAO);
+    glBindVertexArray(SharedGPUObjects::getUI_VAO());
 
     TextureRectShader::getInstance()->setTextureUnits(texture);
     TextureRectShader::getInstance()->setUniforms(
@@ -308,7 +314,7 @@ void draw2DImage(const video::ITexture* texture,
     }
 
     UniformColoredTextureRectShader::getInstance()->use();
-    glBindVertexArray(SharedObject::UIVAO);
+    glBindVertexArray(SharedGPUObjects::getUI_VAO());
 
     const video::COpenGLTexture *c_texture = 
         static_cast<const video::COpenGLTexture*>(texture);
@@ -355,7 +361,7 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
         tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
 
     UniformColoredTextureRectShader::getInstance()->use();
-    glBindVertexArray(SharedObject::UIVAO);
+    glBindVertexArray(SharedGPUObjects::getUI_VAO());
 
     UniformColoredTextureRectShader::getInstance()->setTextureUnits(texture);
     UniformColoredTextureRectShader::getInstance()
@@ -528,7 +534,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
     }
 
     ColoredRectShader::getInstance()->use();
-    glBindVertexArray(SharedObject::UIVAO);
+    glBindVertexArray(SharedGPUObjects::getUI_VAO());
     ColoredRectShader::getInstance()
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
                       core::vector2df(width, height), color        );

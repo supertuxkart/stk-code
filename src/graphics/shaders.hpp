@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/shader.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 #include "graphics/texture_read.hpp"
 
 #include <IMeshSceneNode.h>
@@ -29,16 +30,6 @@
 
 using namespace irr;
 class ParticleSystemProxy;
-
-class SharedObject
-{
-public:
-    static GLuint billboardvbo;
-    static GLuint skytrivbo, frustrumvbo, frustrumindexes, ParticleQuadVBO;
-    static GLuint ViewProjectionMatrixesUBO, LightingDataUBO;
-    static GLuint FullScreenQuadVAO;
-    static GLuint UIVAO;
-};
 
 
 namespace MeshShader
@@ -187,7 +178,7 @@ template<typename T, typename... Args>
 static void DrawFullScreenEffect(Args...args)
 {
     T::getInstance()->use();
-    glBindVertexArray(SharedObject::FullScreenQuadVAO);
+    glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
     T::getInstance()->setUniforms(args...);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }

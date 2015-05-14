@@ -15,12 +15,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "IBL.hpp"
-#include "gl_headers.hpp"
-#include "shaders.hpp"
+#include "graphics/IBL.hpp"
+
+#include "graphics/central_settings.hpp"
+#include "graphics/gl_headers.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/shared_gpu_objects.hpp"
+
 #include <cmath>
 #include <set>
-#include "central_settings.hpp"
 
 
 class SpecularIBLGenerator : public Shader<SpecularIBLGenerator, core::matrix4,
@@ -410,7 +413,7 @@ GLuint generateSpecularCubemap(GLuint probe)
         glGenTextures(1, &sampleTex);
         glBindTexture(GL_TEXTURE_BUFFER, sampleTex);
         glTexBuffer(GL_TEXTURE_BUFFER, GL_RG32F, sampleBuffer);
-        glBindVertexArray(SharedObject::FullScreenQuadVAO);
+        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
 
         for (unsigned face = 0; face < 6; face++)
         {
