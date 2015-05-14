@@ -257,6 +257,134 @@ public:
 };   // ComputeGaussian17TapVShader
 
 // ============================================================================
+class BloomShader : public Shader<BloomShader>,
+                    public TextureReadNew<ST_NEAREST_FILTERED>
+{
+public:
+    BloomShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/getCIEXYZ.frag",
+                            GL_FRAGMENT_SHADER, "utils/getRGBfromCIEXxy.frag",
+                            GL_FRAGMENT_SHADER, "bloom.frag");
+        assignUniforms();
+        assignSamplerNames(m_program, 0, "tex", ST_NEAREST_FILTERED);
+    }   // BloomShader
+};   // BloomShader
+
+// ============================================================================
+class BloomBlendShader : public Shader<BloomBlendShader>,
+                         public TextureReadNew<ST_BILINEAR_FILTERED, 
+                                               ST_BILINEAR_FILTERED,
+                                               ST_BILINEAR_FILTERED>
+{
+public:
+    BloomBlendShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "bloomblend.frag");
+        assignUniforms();
+        assignSamplerNames(m_program, 0, "tex_128", ST_BILINEAR_FILTERED,
+                                      1, "tex_256", ST_BILINEAR_FILTERED,
+                                      2, "tex_512", ST_BILINEAR_FILTERED);
+    }   // BloomBlendShader
+};   // BloomBlendShader
+
+// ============================================================================
+class LensBlendShader : public Shader<LensBlendShader>, 
+                        public TextureReadNew<ST_BILINEAR_FILTERED,
+                                              ST_BILINEAR_FILTERED,
+                                              ST_BILINEAR_FILTERED>
+{
+public:
+    LensBlendShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "lensblend.frag");
+        assignUniforms();
+
+        assignSamplerNames(m_program, 0, "tex_128", ST_BILINEAR_FILTERED,
+                                      1, "tex_256", ST_BILINEAR_FILTERED,
+                                      2, "tex_512", ST_BILINEAR_FILTERED);
+    }   // LensBlendShader
+};   // LensBlendShader
+
+// ============================================================================
+class ToneMapShader : public Shader<ToneMapShader, float>,
+                      public TextureReadNew<ST_NEAREST_FILTERED>
+{
+public:
+
+    ToneMapShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/getRGBfromCIEXxy.frag",
+                            GL_FRAGMENT_SHADER, "utils/getCIEXYZ.frag",
+                            GL_FRAGMENT_SHADER, "tonemap.frag");
+        assignUniforms("vignette_weight");
+        assignSamplerNames(m_program, 0, "text", ST_NEAREST_FILTERED);
+    }   // ToneMapShader
+};   // ToneMapShader
+
+// ============================================================================
+class DepthOfFieldShader : public Shader<DepthOfFieldShader>,
+                           public TextureReadNew<ST_BILINEAR_FILTERED, 
+                                                 ST_NEAREST_FILTERED>
+{
+public:
+    DepthOfFieldShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "dof.frag");
+
+        assignUniforms();
+        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED,
+                                      1, "dtex", ST_NEAREST_FILTERED);
+    }   // DepthOfFieldShader
+};   // DepthOfFieldShader
+
+// ============================================================================
+class IBLShader : public Shader<IBLShader>,
+                  public TextureReadNew<ST_NEAREST_FILTERED,
+                                        ST_NEAREST_FILTERED,
+                                        ST_TRILINEAR_CUBEMAP>
+{
+public:
+    IBLShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
+                            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
+                            GL_FRAGMENT_SHADER, "IBL.frag");
+        assignUniforms();
+        assignSamplerNames(m_program, 0, "ntex",  ST_NEAREST_FILTERED,
+                                      1, "dtex",  ST_NEAREST_FILTERED,
+                                      2, "probe", ST_TRILINEAR_CUBEMAP);
+    }   // IBLShader
+};   // IBLShader
+
+// ============================================================================
+class DegradedIBLShader : public Shader<DegradedIBLShader>,
+                          public TextureReadNew<ST_NEAREST_FILTERED>
+{
+public:
+    DegradedIBLShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
+                            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
+                            GL_FRAGMENT_SHADER, "degraded_ibl.frag");
+        assignUniforms();
+        assignSamplerNames(m_program, 0, "ntex", ST_NEAREST_FILTERED);
+    }   // DegradedIBLShader
+};   // DegradedIBLShader
+
+// ============================================================================
+
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
     // Initialization
@@ -422,12 +550,11 @@ void PostProcessing::update(float dt)
     }
 }   // update
 
-static
-void renderBloom(GLuint in)
+static void renderBloom(GLuint in)
 {
-    FullScreenShader::BloomShader::getInstance()->setTextureUnits(in);
-    DrawFullScreenEffect<FullScreenShader::BloomShader>();
-}
+    BloomShader::getInstance()->setTextureUnits(in);
+    DrawFullScreenEffect<BloomShader>();
+}   // renderBloom
 
 void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff, GLuint skybox)
 {
@@ -438,19 +565,19 @@ void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, 
 
     if (UserConfigParams::m_degraded_IBL)
     {
-        FullScreenShader::DegradedIBLShader::getInstance()->use();
+        DegradedIBLShader::getInstance()->use();
         glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
 
-        FullScreenShader::DegradedIBLShader::getInstance()->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
-        FullScreenShader::DegradedIBLShader::getInstance()->setUniforms();
+        DegradedIBLShader::getInstance()->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
+        DegradedIBLShader::getInstance()->setUniforms();
     }
     else
     {
-        FullScreenShader::IBLShader::getInstance()->use();
+        IBLShader::getInstance()->use();
         glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
 
-        FullScreenShader::IBLShader::getInstance()->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox);
-        FullScreenShader::IBLShader::getInstance()->setUniforms();
+        IBLShader::getInstance()->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), skybox);
+        IBLShader::getInstance()->setUniforms();
     }
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -782,15 +909,15 @@ static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
 static void toneMap(FrameBuffer &fbo, GLuint rtt, float vignette_weight)
 {
     fbo.Bind();
-    FullScreenShader::ToneMapShader::getInstance()->setTextureUnits(rtt);
-    DrawFullScreenEffect<FullScreenShader::ToneMapShader>(vignette_weight);
+    ToneMapShader::getInstance()->setTextureUnits(rtt);
+    DrawFullScreenEffect<ToneMapShader>(vignette_weight);
 }
 
 static void renderDoF(FrameBuffer &fbo, GLuint rtt)
 {
     fbo.Bind();
-    FullScreenShader::DepthOfFieldShader::getInstance()->setTextureUnits(rtt, irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<FullScreenShader::DepthOfFieldShader>();
+    DepthOfFieldShader::getInstance()->setTextureUnits(rtt, irr_driver->getDepthStencilTexture());
+    DrawFullScreenEffect<DepthOfFieldShader>();
 }
 
 void PostProcessing::applyMLAA()
@@ -968,13 +1095,13 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
             
-            FullScreenShader::BloomBlendShader::getInstance()->setTextureUnits(
+            BloomBlendShader::getInstance()->setTextureUnits(
                 irr_driver->getRenderTargetTexture(RTT_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
-            DrawFullScreenEffect<FullScreenShader::BloomBlendShader>();
+            DrawFullScreenEffect<BloomBlendShader>();
 
-            FullScreenShader::LensBlendShader::getInstance()->setTextureUnits(
+            LensBlendShader::getInstance()->setTextureUnits(
                 irr_driver->getRenderTargetTexture(RTT_LENS_128), irr_driver->getRenderTargetTexture(RTT_LENS_256), irr_driver->getRenderTargetTexture(RTT_LENS_512));
-            DrawFullScreenEffect<FullScreenShader::LensBlendShader>();
+            DrawFullScreenEffect<LensBlendShader>();
 
 
             glDisable(GL_BLEND);

@@ -186,64 +186,12 @@ static void DrawFullScreenEffect(Args...args)
 namespace FullScreenShader
 {
 
-class BloomShader : public Shader<BloomShader>,
-                    public TextureReadNew<ST_NEAREST_FILTERED>
-{
-public:
-    BloomShader();
-};
-
-class BloomBlendShader : public Shader<BloomBlendShader>,
-                         public TextureReadNew<ST_BILINEAR_FILTERED, ST_BILINEAR_FILTERED,
-                                               ST_BILINEAR_FILTERED>
-{
-public:
-    BloomBlendShader();
-};
-
-class LensBlendShader : public Shader<LensBlendShader>, 
-                        public TextureReadNew<ST_BILINEAR_FILTERED, ST_BILINEAR_FILTERED,
-                                              ST_BILINEAR_FILTERED>
-{
-public:
-    LensBlendShader();
-};
-
-
-class ToneMapShader : public Shader<ToneMapShader, float>,
-                      public TextureReadNew<ST_NEAREST_FILTERED>
-{
-public:
-
-    ToneMapShader();
-};
-
-class DepthOfFieldShader : public Shader<DepthOfFieldShader>,
-                           public TextureReadNew<ST_BILINEAR_FILTERED, ST_NEAREST_FILTERED>
-{
-public:
-    DepthOfFieldShader();
-};
 
 class SunLightShader : public Shader<SunLightShader, core::vector3df, video::SColorf>,
                        public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED>
 {
 public:
     SunLightShader();
-};
-
-class IBLShader : public Shader<IBLShader>,
-                  public TextureReadNew<ST_NEAREST_FILTERED, ST_NEAREST_FILTERED, ST_TRILINEAR_CUBEMAP>
-{
-public:
-    IBLShader();
-};
-
-class DegradedIBLShader : public Shader<DegradedIBLShader>,
-                          public TextureReadNew<ST_NEAREST_FILTERED>
-{
-public:
-    DegradedIBLShader();
 };
 
 class ShadowedSunLightShaderPCF : public Shader<ShadowedSunLightShaderPCF, float, float, float, float, float>,

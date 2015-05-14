@@ -675,64 +675,6 @@ static GLuint createVAO(GLuint Program)
 
 namespace FullScreenShader
 {
-    BloomShader::BloomShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "utils/getCIEXYZ.frag",
-            GL_FRAGMENT_SHADER, "utils/getRGBfromCIEXxy.frag",
-            GL_FRAGMENT_SHADER, "bloom.frag");
-        assignUniforms();
-
-        assignSamplerNames(m_program, 0, "tex", ST_NEAREST_FILTERED);
-    }
-
-    BloomBlendShader::BloomBlendShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "bloomblend.frag");
-        assignUniforms();
-
-        assignSamplerNames(m_program, 0, "tex_128", ST_BILINEAR_FILTERED,
-                                      1, "tex_256", ST_BILINEAR_FILTERED,
-                                      2, "tex_512", ST_BILINEAR_FILTERED);
-    }
-	
-	LensBlendShader::LensBlendShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "lensblend.frag");
-        assignUniforms();
-
-        assignSamplerNames(m_program, 0, "tex_128", ST_BILINEAR_FILTERED,
-                                      1, "tex_256", ST_BILINEAR_FILTERED,
-                                      2, "tex_512", ST_BILINEAR_FILTERED);
-    }
-
-    ToneMapShader::ToneMapShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "utils/getRGBfromCIEXxy.frag",
-            GL_FRAGMENT_SHADER, "utils/getCIEXYZ.frag",
-            GL_FRAGMENT_SHADER, "tonemap.frag");
-        assignUniforms("vignette_weight");
-
-        assignSamplerNames(m_program, 0, "text", ST_NEAREST_FILTERED);
-    }
-
-    DepthOfFieldShader::DepthOfFieldShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "dof.frag");
-
-        assignUniforms();
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED,
-                                      1, "dtex", ST_NEAREST_FILTERED);
-    }
 
     SunLightShader::SunLightShader()
     {
@@ -750,33 +692,6 @@ namespace FullScreenShader
         assignUniforms("direction", "col");
     }
 
-    IBLShader::IBLShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
-            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
-            GL_FRAGMENT_SHADER, "IBL.frag");
-        assignUniforms();
-        assignSamplerNames(m_program, 0, "ntex",  ST_NEAREST_FILTERED,
-                                      1, "dtex",  ST_NEAREST_FILTERED,
-                                      2, "probe", ST_TRILINEAR_CUBEMAP);
-    }
-
-    DegradedIBLShader::DegradedIBLShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
-            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
-            GL_FRAGMENT_SHADER, "degraded_ibl.frag");
-        assignUniforms();
-        assignSamplerNames(m_program, 0, "ntex", ST_NEAREST_FILTERED);
-    }
 
     ShadowedSunLightShaderPCF::ShadowedSunLightShaderPCF()
     {
