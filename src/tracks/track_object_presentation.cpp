@@ -935,8 +935,8 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
             irr::core::stringw left = config->getBindingAsString(PA_STEER_LEFT);
             irr::core::stringw right = config->getBindingAsString(PA_STEER_RIGHT);
 
-            new TutorialMessageDialog(_("Accelerate with <%s> and steer with "
-                                        "<%s> and <%s>", accel, left, right),
+            new TutorialMessageDialog(_("Accelerate with <%s>, and steer with "
+                                        "<%s> and <%s>.", accel, left, right),
                 false);
         }
     }
@@ -977,7 +977,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         m_action_active = false;
 
         new TutorialMessageDialog(_("Collect nitro bottles (we will use them "
-                                    "after the curve)"), true);
+                                    "after the curve)."), true);
     }
     else if (m_action == "tutorial_nitro_use")
     {
@@ -999,7 +999,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         irr::core::stringw rescue = config->getBindingAsString(PA_RESCUE);
 
         new TutorialMessageDialog(_("Oops! When you're in trouble, press <%s> "
-                                    "to be rescued", rescue),
+                                    "to be rescued.", rescue),
                                   false);
     }
     else if (m_action == "tutorial_skidding")

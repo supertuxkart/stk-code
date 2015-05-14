@@ -748,7 +748,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                         //I18N: message shown when an input device is used but
                         // is not associated to any player
                         GUIEngine::showMessage(
-                            _("Ignoring '%s', you needed to join earlier to play!",
+                            _("Ignoring '%s'. You needed to join earlier to play!",
                             core::stringw(gp->getName().c_str())));
                     }
                 }

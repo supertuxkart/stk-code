@@ -4,7 +4,7 @@
 
     <div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
 
-        <header I18N="Title for challenges screen" text="Challenges : Trophy Room" text_align="center" align="center" width="80%" />
+        <header I18N="Title for challenges screen" text="Challenges - Trophy Room" text_align="center" align="center" width="80%" />
 
         <spacer height="5" width="100%"/>
 
