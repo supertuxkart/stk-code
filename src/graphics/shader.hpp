@@ -94,6 +94,11 @@ public:
     // ------------------------------------------------------------------------
     /** Activates the shader calling glUseProgram. */
     void use() { glUseProgram(m_program); }
+    // ------------------------------------------------------------------------
+    GLuint getUniformLocation(const char *name)
+    {
+        return glGetUniformLocation(m_program, name);
+    }   // getUniformLocation
 };   // ShaderBase
 
 // ============================================================================
