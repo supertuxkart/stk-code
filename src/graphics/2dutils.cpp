@@ -29,8 +29,7 @@
 
 
 // ============================================================================
-class Primitive2DList : public Shader<Primitive2DList>,
-                        public TextureReadNew<ST_BILINEAR_FILTERED >
+class Primitive2DList : public TextureRead<Primitive2DList, 1>
 {
 public:
     Primitive2DList()
@@ -43,11 +42,10 @@ public:
 };   //Primitive2DList
 
 // ============================================================================
-class UniformColoredTextureRectShader : public Shader<UniformColoredTextureRectShader,
+class UniformColoredTextureRectShader : public TextureRead<UniformColoredTextureRectShader,1,
                                                       core::vector2df, core::vector2df,
                                                       core::vector2df, core::vector2df,
-                                                      video::SColor>,
-                                        public TextureReadNew<ST_BILINEAR_FILTERED>
+                                                      video::SColor>
 {
 public:
     UniformColoredTextureRectShader()
@@ -62,10 +60,9 @@ public:
 };   // UniformColoredTextureRectShader
 
 // ============================================================================
-class TextureRectShader : public Shader<TextureRectShader, core::vector2df,
-                                        core::vector2df, core::vector2df,
-                                        core::vector2df>,
-                          public TextureReadNew<ST_BILINEAR_FILTERED>
+class TextureRectShader : public TextureRead<TextureRectShader, 1, 
+                                             core::vector2df, core::vector2df,
+                                             core::vector2df, core::vector2df>
 {
 public:
     TextureRectShader()
@@ -93,10 +90,9 @@ public:
 
 // ============================================================================
 
-class ColoredTextureRectShader : public Shader<ColoredTextureRectShader,
+class ColoredTextureRectShader : public TextureRead<ColoredTextureRectShader, 1,
                                                core::vector2df, core::vector2df,
-                                               core::vector2df, core::vector2df>,
-                                 public TextureReadNew<ST_BILINEAR_FILTERED>
+                                               core::vector2df, core::vector2df>
 {
 #ifdef XX
 private:

@@ -26,9 +26,8 @@
 #include <set>
 
 
-class SpecularIBLGenerator : public Shader<SpecularIBLGenerator, core::matrix4,
-                                           float >,
-                             public TextureReadNew<ST_TRILINEAR_CUBEMAP>
+class SpecularIBLGenerator : public TextureRead<SpecularIBLGenerator, 1, 
+                                                core::matrix4, float >
 {
 public:
     GLuint m_tu_samples;

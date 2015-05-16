@@ -30,10 +30,9 @@ using namespace irr;
 static GLuint billboardvao = 0;
 
 
-class BillboardShader : public Shader<BillboardShader, core::matrix4,
+class BillboardShader : public TextureRead<BillboardShader, 1, core::matrix4,
                                       core::matrix4, core::vector3df,
-                                      core::dimension2df>,
-                       public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED>
+                                      core::dimension2df>
 {
 public:
     BillboardShader()

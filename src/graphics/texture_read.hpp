@@ -20,6 +20,7 @@
 
 #include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
+#include "graphics/shader.hpp"
 
 #include <assert.h>
 #include <functional>
@@ -76,10 +77,14 @@ protected:
     static GLuint m_all_texture_types[];
 };   // TextureReadBaseNew
 
-// ============================================================================
-
-template<SamplerTypeNew...tp>
-class TextureReadNew : public TextureReadBaseNew
+// ========================================================================
+/** Class C needs to be the newly declared shaders class (necessary for
+ *  the instance template). NUM_TEXTURES is the number of texture units
+ *  used in this shader. It is used to test at compile time that the 
+ *  right number of arguments are supplied to the variadic functions.
+ */
+template<class C, int NUM_TEXTURES, typename...tp>
+class TextureRead : public TextureReadBaseNew, public Shader<C, tp...>
 {
 
 private:
@@ -99,7 +104,7 @@ private:
     template<unsigned N, typename...Args>
     void assignTextureNamesImpl(GLuint)
     {
-        static_assert(N == sizeof...(tp), "Wrong number of texture name");
+        static_assert(N == NUM_TEXTURES, "Wrong number of texture names");
     }   // assignTextureNamesImpl
 
     // ------------------------------------------------------------------------
@@ -149,7 +154,7 @@ public:
     template<int N>
     void setTextureUnitsImpl()
     {
-        static_assert(N == sizeof...(tp), "Not enough texture set");
+        static_assert(N == NUM_TEXTURES, "Not enough texture set");
     }   // setTextureUnitsImpl
 
     // ------------------------------------------------------------------------
@@ -193,7 +198,7 @@ public:
     template<int N>
     void setTextureHandlesImpl()
     {
-        static_assert(N == sizeof...(tp), "Not enough handle set");
+        static_assert(N == NUM_TEXTURES, "Not enough handles set");
     }   // setTextureHandlesImpl
 
     // ------------------------------------------------------------------------
@@ -225,14 +230,13 @@ public:
     // ------------------------------------------------------------------------
     /** Destructor which frees al lsampler ids.
      */
-    ~TextureReadNew()
+    ~TextureRead()
     {
         for (unsigned i = 0; i < m_sampler_ids.size(); i++)
             glDeleteSamplers(1, &m_sampler_ids[i]);
-    }   // ~TextureReadNew
+    }   // ~TextureRead
 
 
-};   // class TextureReadNew
-
+};   // class TextureRead
 
 #endif

@@ -54,10 +54,8 @@ public:
 
 /** A Shader to render particles.
 */
-class SimpleParticleRender : public Shader<SimpleParticleRender, video::SColorf,
-                                           video::SColorf>,
-                             public TextureReadNew<ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                                   ST_NEAREST_FILTERED>
+class SimpleParticleRender : public TextureRead<SimpleParticleRender, 2,
+                                                video::SColorf, video::SColorf>
 {
 public:
     SimpleParticleRender()
@@ -76,9 +74,7 @@ public:
 
 // ============================================================================
 
-class FlipParticleRender : public Shader<FlipParticleRender>, 
-                           public TextureReadNew < ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                                   ST_NEAREST_FILTERED >
+class FlipParticleRender : public TextureRead<FlipParticleRender, 2>
 {
 public:
     FlipParticleRender()
