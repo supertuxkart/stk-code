@@ -103,7 +103,7 @@ private:
     /** End of recursive variadic template AssigTextureNames. It just
      *  checks if the number of arguments is correct.*/
     template<unsigned N, typename...Args>
-    void assignTextureNamesImpl(GLuint)
+    void assignTextureNamesImpl()
     {
         static_assert(N == NUM_TEXTURES, "Wrong number of texture names");
     }   // assignTextureNamesImpl
@@ -113,9 +113,8 @@ private:
      *  list of arguments.
      */
     template<unsigned N, typename...Args>
-    void assignTextureNamesImpl(GLuint program, GLuint tex_unit,
-                                const char *name, SamplerTypeNew sampler_type,
-                                Args...args)
+    void assignTextureNamesImpl(GLuint tex_unit, const char *name,
+                                SamplerTypeNew sampler_type, Args...args)
     {
 
         m_sampler_ids.push_back(createSamplers(sampler_type));
@@ -123,7 +122,7 @@ private:
         assert(sampler_type >= ST_MIN && sampler_type <= ST_MAX);
         m_texture_type.push_back(m_all_texture_types[sampler_type]);
 
-        GLuint location = glGetUniformLocation(program, name);
+        GLuint location = glGetUniformLocation(m_program, name);
         m_texture_location.push_back(location);
         glUniform1i(location, tex_unit);
         m_texture_units.push_back(tex_unit);
@@ -132,7 +131,7 @@ private:
         assert(sampler_type >= ST_MIN && sampler_type <= ST_MAX);
         m_bind_functions.push_back( m_all_bind_functions[sampler_type]);
 
-        assignTextureNamesImpl<N + 1>(program, args...);
+        assignTextureNamesImpl<N + 1>(args...);
     }   // assignTextureNamesImpl
 
     // ------------------------------------------------------------------------
@@ -141,10 +140,10 @@ public:
     *  from instances.
     */
     template<typename...Args>
-    void assignSamplerNames(GLuint program, Args...args)
+    void assignSamplerNames(Args...args)
     {
-        glUseProgram(program);
-        assignTextureNamesImpl<0>(program, args...);
+        glUseProgram(m_program);
+        assignTextureNamesImpl<0>(args...);
         glUseProgram(0);
     }   // AssignSamplerNames
 

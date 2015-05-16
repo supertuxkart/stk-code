@@ -37,7 +37,7 @@ public:
                       GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
         assignUniforms("PermutationMatrix", "ViewportSize");
         m_tu_samples = 1;
-        assignSamplerNames(m_program, 0, "tex", ST_TRILINEAR_CUBEMAP);
+        assignSamplerNames(0, "tex", ST_TRILINEAR_CUBEMAP);
         assignTextureUnit(m_tu_samples, "samples");
     }
 

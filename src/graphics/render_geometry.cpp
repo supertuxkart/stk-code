@@ -88,8 +88,7 @@ public:
                             GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
 
         assignUniforms();
-        assignSamplerNames(m_program, 0, "glosstex",
-                           ST_TRILINEAR_ANISOTROPIC_FILTERED);
+        assignSamplerNames(0, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedObjectPass1Shader
 };   // class InstancedObjectPass1Shader
 
@@ -105,8 +104,7 @@ public:
                             GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
 
         assignUniforms();
-        assignSamplerNames(m_program,
-                           0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
@@ -123,8 +121,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
-        assignSamplerNames(m_program,
-                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -143,7 +140,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -162,8 +159,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 
-                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -233,8 +229,7 @@ public:
                             GL_FRAGMENT_SHADER, "rsm.frag");
 
         assignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
-        assignSamplerNames(m_program, 0, "tex",
-                           ST_TRILINEAR_ANISOTROPIC_FILTERED);
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // CRSMShader
 };   // CRSMShader
 
@@ -250,8 +245,7 @@ public:
                             GL_FRAGMENT_SHADER, "splatting_rsm.frag");
 
         assignUniforms("RSMMatrix", "ModelMatrix");
-        assignSamplerNames(m_program,
-                           0, "tex_layout", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+        assignSamplerNames(0, "tex_layout", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "tex_detail0", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            2, "tex_detail1", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            3, "tex_detail2", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -271,8 +265,7 @@ public:
                             GL_FRAGMENT_SHADER, "instanced_rsm.frag");
 
         assignUniforms("RSMMatrix");
-        assignSamplerNames(m_program, 0, "tex",
-                           ST_TRILINEAR_ANISOTROPIC_FILTERED);
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // CInstancedRSMShader
 };   // CInstancedRSMShader
 
@@ -288,8 +281,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                             GL_FRAGMENT_SHADER, "objectpass_spheremap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
-        assignSamplerNames(m_program,
-                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -308,8 +300,7 @@ public:
                     GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                     GL_FRAGMENT_SHADER, "instanced_objectpass_spheremap.frag");
         assignUniforms();
-        assignSamplerNames(m_program,
-                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -327,15 +318,14 @@ public:
                             GL_FRAGMENT_SHADER, "splatting.frag");
         assignUniforms("ModelMatrix");
 
-        assignSamplerNames(m_program,
-                         0, "DiffuseMap", ST_NEAREST_FILTERED,
-                         1, "SpecularMap", ST_NEAREST_FILTERED,
-                         2, "SSAO", ST_BILINEAR_FILTERED,
-                         3, "tex_layout", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                         4, "tex_detail0", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                         5, "tex_detail1", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                         6, "tex_detail2", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                         7, "tex_detail3", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "tex_layout", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "tex_detail0", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "tex_detail1", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           6, "tex_detail2", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           7, "tex_detail3", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // SplattingShader
 };   // SplattingShader
 
@@ -350,8 +340,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
-        assignSamplerNames(m_program, 
-                           0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // ObjectRefPass1Shader
 };  // ObjectRefPass1Shader
@@ -368,8 +357,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "normalmap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
-        assignSamplerNames(m_program, 
-                           1, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+        assignSamplerNames(1, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            0, "DiffuseForAlpha", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // NormalMapShader
 
@@ -386,8 +374,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
         assignUniforms();
-        assignSamplerNames(m_program,
-                           0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+        assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glossMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedNormalMapShader
 };   // InstancedNormalMapShader
@@ -402,8 +389,7 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                             GL_FRAGMENT_SHADER, "object_unlit.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
-        assignSamplerNames(m_program,
-                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -420,8 +406,7 @@ public:
                             GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 
-                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -558,8 +543,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
-        assignSamplerNames(m_program,
-                           0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // GrassPass1Shader
 
@@ -577,8 +561,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
         assignUniforms("windDir");
-        assignSamplerNames(m_program, 
-                           0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedGrassPass1Shader
 };   // InstancedGrassPass1Shader
@@ -605,8 +588,7 @@ public:
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         assignUniforms("layer", "ModelMatrix", "windDir");
-        assignSamplerNames(m_program, 0, "tex",
-            ST_TRILINEAR_ANISOTROPIC_FILTERED);
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // GrassShadowShader
 };   // GrassShadowShader
 
@@ -634,8 +616,7 @@ public:
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
 
-        assignSamplerNames(m_program, 0, "tex",
-                           ST_TRILINEAR_ANISOTROPIC_FILTERED);
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
         assignUniforms("layer", "windDir");
     }   // InstancedGrassShadowShader
 };   // InstancedGrassShadowShader
@@ -652,8 +633,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "grass_pass2.frag");
         assignUniforms("ModelMatrix", "windDir");
-        assignSamplerNames(m_program,
-                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -673,8 +653,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "instanced_grass_pass2.frag");
         assignUniforms("windDir", "SunDir");
-        assignSamplerNames(m_program,
-                           0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "dtex", ST_NEAREST_FILTERED,
@@ -694,7 +673,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "detailedobject_pass2.frag");
         assignUniforms("ModelMatrix");
-        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -714,7 +693,7 @@ public:
                    GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                    GL_FRAGMENT_SHADER, "instanced_detailedobject_pass2.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "DiffuseMap", ST_NEAREST_FILTERED,
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,

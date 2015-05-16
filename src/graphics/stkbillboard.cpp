@@ -42,8 +42,7 @@ public:
 
         assignUniforms("ModelViewMatrix", "ProjectionMatrix", "Position",
                        "Size");
-        assignSamplerNames(m_program, 
-                           0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // BillboardShader
 };   // BillboardShader
 

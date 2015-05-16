@@ -37,7 +37,7 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "primitive2dlist.vert",
                             GL_FRAGMENT_SHADER, "transparent.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // Primitive2DList
 };   //Primitive2DList
 
@@ -55,7 +55,7 @@ public:
 
         assignUniforms("center", "size", "texcenter", "texsize", "color");
 
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // UniformColoredTextureRectShader
 };   // UniformColoredTextureRectShader
 
@@ -71,7 +71,7 @@ public:
                             GL_FRAGMENT_SHADER, "texturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
 
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // TextureRectShader
 };   // TextureRectShader
 
@@ -133,7 +133,7 @@ public:
                             GL_FRAGMENT_SHADER, "colortexturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
 
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
 
         glGenVertexArrays(1, &m_vao);
         glBindVertexArray(m_vao);

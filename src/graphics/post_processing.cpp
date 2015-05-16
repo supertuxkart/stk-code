@@ -53,7 +53,7 @@ public:
                             GL_FRAGMENT_SHADER, "gaussian3h.frag");
         assignUniforms("pixel");
 
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian3HBlurShader
 };   // Gaussian3HBlurShader
 
@@ -69,7 +69,7 @@ public:
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowV.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED);
+        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeShadowBlurVShader
 
@@ -86,7 +86,7 @@ public:
                             GL_FRAGMENT_SHADER, "gaussian6v.frag");
         assignUniforms("pixel", "sigma");
 
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian6VBlurShader
 };   // Gaussian6VBlurShader
 
@@ -101,7 +101,7 @@ public:
                             GL_FRAGMENT_SHADER, "gaussian3v.frag");
         assignUniforms("pixel");
 
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian3VBlurShader
 };   // Gaussian3VBlurShader
 
@@ -117,8 +117,7 @@ public:
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6v.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source", 
-                           ST_BILINEAR_CLAMPED_FILTERED);
+        assignSamplerNames(0, "source", ST_BILINEAR_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeGaussian6VBlurShader
 };   // ComputeGaussian6VBlurShader
@@ -135,8 +134,7 @@ public:
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6h.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source", 
-                          ST_BILINEAR_CLAMPED_FILTERED);
+        assignSamplerNames(0, "source",  ST_BILINEAR_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeGaussian6HBlurShader
 };   // ComputeGaussian6HBlurShader
@@ -153,7 +151,7 @@ public:
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowH.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
-        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED);
+        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeShadowBlurHShader
 };   // ComputeShadowBlurHShader
@@ -169,7 +167,7 @@ public:
                             GL_FRAGMENT_SHADER, "gaussian6h.frag");
         assignUniforms("pixel", "sigma");
 
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian6HBlurShader
 };   // Gaussian6HBlurShader
 
@@ -183,8 +181,8 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "bilateralH.frag");
         assignUniforms("pixel");
-        assignSamplerNames(m_program,0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
-                                     1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
+                           1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian17TapHShader
 };   // Gaussian17TapHShader
 
@@ -199,8 +197,8 @@ public:
         loadProgram(OBJECT,  GL_COMPUTE_SHADER, "bilateralH.comp");
         m_dest_tu = 2;
         assignUniforms("pixel");
-        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED,
-                                      1, "depth", ST_NEARED_CLAMPED_FILTERED);
+        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED,
+                           1, "depth", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeGaussian17TapHShader
 };   // ComputeGaussian17TapHShader
@@ -217,8 +215,8 @@ public:
                             GL_FRAGMENT_SHADER, "bilateralV.frag");
         assignUniforms("pixel");
 
-        assignSamplerNames(m_program,0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
-                                     1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
+                           1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian17TapVShader
 };   // Gaussian17TapVShader
 
@@ -234,8 +232,8 @@ public:
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "bilateralV.comp");
         m_dest_tu = 2;
         assignUniforms("pixel");
-        assignSamplerNames(m_program, 0, "source", ST_NEARED_CLAMPED_FILTERED,
-                                      1, "depth", ST_NEARED_CLAMPED_FILTERED);
+        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED,
+                           1, "depth", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeGaussian17TapVShader
 };   // ComputeGaussian17TapVShader
@@ -251,7 +249,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/getRGBfromCIEXxy.frag",
                             GL_FRAGMENT_SHADER, "bloom.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "tex", ST_NEAREST_FILTERED);
+        assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
     }   // BloomShader
 };   // BloomShader
 
@@ -264,9 +262,9 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "bloomblend.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "tex_128", ST_BILINEAR_FILTERED,
-                                      1, "tex_256", ST_BILINEAR_FILTERED,
-                                      2, "tex_512", ST_BILINEAR_FILTERED);
+        assignSamplerNames(0, "tex_128", ST_BILINEAR_FILTERED,
+                           1, "tex_256", ST_BILINEAR_FILTERED,
+                           2, "tex_512", ST_BILINEAR_FILTERED);
     }   // BloomBlendShader
 };   // BloomBlendShader
 
@@ -280,9 +278,9 @@ public:
                             GL_FRAGMENT_SHADER, "lensblend.frag");
         assignUniforms();
 
-        assignSamplerNames(m_program, 0, "tex_128", ST_BILINEAR_FILTERED,
-                                      1, "tex_256", ST_BILINEAR_FILTERED,
-                                      2, "tex_512", ST_BILINEAR_FILTERED);
+        assignSamplerNames(0, "tex_128", ST_BILINEAR_FILTERED,
+                           1, "tex_256", ST_BILINEAR_FILTERED,
+                           2, "tex_512", ST_BILINEAR_FILTERED);
     }   // LensBlendShader
 };   // LensBlendShader
 
@@ -298,7 +296,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/getCIEXYZ.frag",
                             GL_FRAGMENT_SHADER, "tonemap.frag");
         assignUniforms("vignette_weight");
-        assignSamplerNames(m_program, 0, "text", ST_NEAREST_FILTERED);
+        assignSamplerNames(0, "text", ST_NEAREST_FILTERED);
     }   // ToneMapShader
 };   // ToneMapShader
 
@@ -312,8 +310,8 @@ public:
                             GL_FRAGMENT_SHADER, "dof.frag");
 
         assignUniforms();
-        assignSamplerNames(m_program, 0, "tex", ST_BILINEAR_FILTERED,
-                                      1, "dtex", ST_NEAREST_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED);
     }   // DepthOfFieldShader
 };   // DepthOfFieldShader
 
@@ -330,9 +328,9 @@ public:
                             GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
                             GL_FRAGMENT_SHADER, "IBL.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "ntex",  ST_NEAREST_FILTERED,
-                                      1, "dtex",  ST_NEAREST_FILTERED,
-                                      2, "probe", ST_TRILINEAR_CUBEMAP);
+        assignSamplerNames(0, "ntex",  ST_NEAREST_FILTERED,
+                           1, "dtex",  ST_NEAREST_FILTERED,
+                           2, "probe", ST_TRILINEAR_CUBEMAP);
     }   // IBLShader
 };   // IBLShader
 
@@ -349,7 +347,7 @@ public:
                             GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
                             GL_FRAGMENT_SHADER, "degraded_ibl.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "ntex", ST_NEAREST_FILTERED);
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED);
     }   // DegradedIBLShader
 };   // DegradedIBLShader
 

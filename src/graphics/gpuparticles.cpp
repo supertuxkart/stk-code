@@ -66,8 +66,8 @@ public:
                     GL_FRAGMENT_SHADER, "particle.frag");
 
         assignUniforms("color_from", "color_to");
-        assignSamplerNames(m_program, 0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                      1, "dtex", ST_NEAREST_FILTERED);
+        assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED);
     }   // SimpleParticleRender
 
 };   // SimpleParticleRender
@@ -84,8 +84,8 @@ public:
                     GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                     GL_FRAGMENT_SHADER, "particle.frag");
         assignUniforms();
-        assignSamplerNames(m_program, 0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                                      1, "dtex", ST_NEAREST_FILTERED);
+        assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED);
     }
 
 };   // FlipParticleShader
