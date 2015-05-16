@@ -21,7 +21,7 @@
 #include "graphics/shader.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
-#include "graphics/texture_read.hpp"
+#include "graphics/texture_shader.hpp"
 #include "glwrap.hpp"
 #include "utils/cpp2011.hpp"
 
@@ -29,7 +29,7 @@
 
 
 // ============================================================================
-class Primitive2DList : public TextureRead<Primitive2DList, 1>
+class Primitive2DList : public TextureShader<Primitive2DList, 1>
 {
 public:
     Primitive2DList()
@@ -42,7 +42,7 @@ public:
 };   //Primitive2DList
 
 // ============================================================================
-class UniformColoredTextureRectShader : public TextureRead<UniformColoredTextureRectShader,1,
+class UniformColoredTextureRectShader : public TextureShader<UniformColoredTextureRectShader,1,
                                                       core::vector2df, core::vector2df,
                                                       core::vector2df, core::vector2df,
                                                       video::SColor>
@@ -60,7 +60,7 @@ public:
 };   // UniformColoredTextureRectShader
 
 // ============================================================================
-class TextureRectShader : public TextureRead<TextureRectShader, 1, 
+class TextureRectShader : public TextureShader<TextureRectShader, 1, 
                                              core::vector2df, core::vector2df,
                                              core::vector2df, core::vector2df>
 {
@@ -90,7 +90,7 @@ public:
 
 // ============================================================================
 
-class ColoredTextureRectShader : public TextureRead<ColoredTextureRectShader, 1,
+class ColoredTextureRectShader : public TextureShader<ColoredTextureRectShader, 1,
                                                core::vector2df, core::vector2df,
                                                core::vector2df, core::vector2df>
 {

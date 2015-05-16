@@ -21,7 +21,7 @@
 #include "config/user_config.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/shared_gpu_objects.hpp"
-#include "graphics/texture_read.hpp"
+#include "graphics/texture_shader.hpp"
 
 #include <IMeshSceneNode.h>
 #include <IShaderConstantSetCallBack.h>
@@ -34,7 +34,7 @@ class ParticleSystemProxy;
 
 namespace MeshShader
 {
-class ObjectPass1Shader : public TextureRead<ObjectPass1Shader, 1,
+class ObjectPass1Shader : public TextureShader<ObjectPass1Shader, 1,
                                              core::matrix4, core::matrix4>
 {
 public:
@@ -43,7 +43,7 @@ public:
 
 
 
-class ObjectPass2Shader : public TextureRead<ObjectPass2Shader, 5, core::matrix4, core::matrix4>
+class ObjectPass2Shader : public TextureShader<ObjectPass2Shader, 5, core::matrix4, core::matrix4>
 {
 public:
     ObjectPass2Shader();
@@ -52,13 +52,13 @@ public:
 
 
 
-class TransparentShader : public TextureRead<TransparentShader, 1, core::matrix4, core::matrix4>
+class TransparentShader : public TextureShader<TransparentShader, 1, core::matrix4, core::matrix4>
 {
 public:
     TransparentShader();
 };
 
-class TransparentFogShader : public TextureRead<TransparentFogShader, 1, core::matrix4, core::matrix4, float, float, 
+class TransparentFogShader : public TextureShader<TransparentFogShader, 1, core::matrix4, core::matrix4, float, float, 
                                            float, float, float, video::SColorf>
 {
 public:
@@ -80,13 +80,13 @@ public:
 
 
 
-class RefShadowShader : public TextureRead<RefShadowShader, 1, int, core::matrix4>
+class RefShadowShader : public TextureShader<RefShadowShader, 1, int, core::matrix4>
 {
 public:
     RefShadowShader();
 };
 
-class InstancedRefShadowShader : public TextureRead<InstancedRefShadowShader, 1, int>
+class InstancedRefShadowShader : public TextureShader<InstancedRefShadowShader, 1, int>
 {
 public:
     InstancedRefShadowShader();
@@ -99,14 +99,14 @@ public:
     DisplaceMaskShader();
 };
 
-class DisplaceShader : public TextureRead<DisplaceShader, 4, core::matrix4,
+class DisplaceShader : public TextureShader<DisplaceShader, 4, core::matrix4,
                                           core::vector2df, core::vector2df>
 {
 public:
     DisplaceShader();
 };
 
-class SkyboxShader : public TextureRead<SkyboxShader,1>
+class SkyboxShader : public TextureShader<SkyboxShader,1>
 {
 public:
     SkyboxShader();
@@ -146,7 +146,7 @@ namespace LightShader
     };
 
 
-    class PointLightShader : public TextureRead<PointLightShader, 2>
+    class PointLightShader : public TextureShader<PointLightShader, 2>
     {
     public:
         GLuint vbo;
@@ -154,7 +154,7 @@ namespace LightShader
         PointLightShader();
     };
 
-    class PointLightScatterShader : public TextureRead<PointLightScatterShader, 1, float, core::vector3df>
+    class PointLightScatterShader : public TextureShader<PointLightScatterShader, 1, float, core::vector3df>
     {
     public:
         GLuint vbo;
@@ -177,25 +177,25 @@ namespace FullScreenShader
 {
 
 
-class SunLightShader : public TextureRead<SunLightShader, 2,  core::vector3df, video::SColorf>
+class SunLightShader : public TextureShader<SunLightShader, 2,  core::vector3df, video::SColorf>
 {
 public:
     SunLightShader();
 };
 
-class ShadowedSunLightShaderPCF : public TextureRead<ShadowedSunLightShaderPCF, 3,  float, float, float, float, float>
+class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF, 3,  float, float, float, float, float>
 {
 public:
     ShadowedSunLightShaderPCF();
 };
 
-class ShadowedSunLightShaderESM : public TextureRead<ShadowedSunLightShaderESM, 3, float, float, float, float>
+class ShadowedSunLightShaderESM : public TextureShader<ShadowedSunLightShaderESM, 3, float, float, float, float>
 {
 public:
     ShadowedSunLightShaderESM();
 };
 
-class RadianceHintsConstructionShader : public TextureRead<RadianceHintsConstructionShader, 3, core::matrix4, 
+class RadianceHintsConstructionShader : public TextureShader<RadianceHintsConstructionShader, 3, core::matrix4, 
                                                       core::matrix4, core::vector3df, video::SColorf>
 {
 public:
@@ -203,7 +203,7 @@ public:
 };
 
 // Workaround for a bug found in kepler nvidia linux and fermi nvidia windows
-class NVWorkaroundRadianceHintsConstructionShader : public TextureRead<NVWorkaroundRadianceHintsConstructionShader,
+class NVWorkaroundRadianceHintsConstructionShader : public TextureShader<NVWorkaroundRadianceHintsConstructionShader,
                                                                    3, core::matrix4, core::matrix4, core::vector3df,
                                                                    int, video::SColorf>
 {
@@ -219,21 +219,21 @@ public:
     RHDebug();
 };
 
-class GlobalIlluminationReconstructionShader : public TextureRead<GlobalIlluminationReconstructionShader, 5,
+class GlobalIlluminationReconstructionShader : public TextureShader<GlobalIlluminationReconstructionShader, 5,
                                                              core::matrix4, core::matrix4, core::vector3df>
 {
 public:
     GlobalIlluminationReconstructionShader();
 };
 
-class HorizontalBlurShader : public TextureRead<HorizontalBlurShader, 1, core::vector2df>
+class HorizontalBlurShader : public TextureShader<HorizontalBlurShader, 1, core::vector2df>
 {
 public:
     HorizontalBlurShader();
 };
 
 
-class PassThroughShader : public TextureRead<PassThroughShader, 1, int, int>
+class PassThroughShader : public TextureShader<PassThroughShader, 1, int, int>
 {
 public:
     PassThroughShader();
@@ -248,13 +248,13 @@ public:
     LayerPassThroughShader();
 };
 
-class LinearizeDepthShader : public TextureRead<LinearizeDepthShader, 1, float, float>
+class LinearizeDepthShader : public TextureShader<LinearizeDepthShader, 1, float, float>
 {
 public:
     LinearizeDepthShader();
 };
 
-class LightspaceBoundingBoxShader : public TextureRead<LightspaceBoundingBoxShader, 1,
+class LightspaceBoundingBoxShader : public TextureShader<LightspaceBoundingBoxShader, 1,
                                                   core::matrix4, float, float,
                                                   float, float>
 {
@@ -268,13 +268,13 @@ public:
     ShadowMatrixesGenerationShader();
 };
 
-class DepthHistogramShader : public TextureRead<DepthHistogramShader, 1>
+class DepthHistogramShader : public TextureShader<DepthHistogramShader, 1>
 {
 public:
     DepthHistogramShader();
 };
 
-class GlowShader : public TextureRead<GlowShader, 1>
+class GlowShader : public TextureShader<GlowShader, 1>
 {
 public:
     GLuint vao;
@@ -282,49 +282,49 @@ public:
     GlowShader();
 };
 
-class SSAOShader : public TextureRead<SSAOShader, 1, float, float, float>
+class SSAOShader : public TextureShader<SSAOShader, 1, float, float, float>
 {
 public:
     SSAOShader();
 };
 
-class FogShader : public TextureRead<FogShader, 1, float, core::vector3df>
+class FogShader : public TextureShader<FogShader, 1, float, core::vector3df>
 {
 public:
     FogShader();
 };
 
-class MotionBlurShader : public TextureRead<MotionBlurShader, 2, core::matrix4, core::vector2df, float, float>
+class MotionBlurShader : public TextureShader<MotionBlurShader, 2, core::matrix4, core::vector2df, float, float>
 {
 public:
     MotionBlurShader();
 };
 
-class GodFadeShader : public TextureRead<GodFadeShader, 1, video::SColorf>
+class GodFadeShader : public TextureShader<GodFadeShader, 1, video::SColorf>
 {
 public:
     GodFadeShader();
 };
 
-class GodRayShader : public TextureRead<GodRayShader, 1, core::vector2df>
+class GodRayShader : public TextureShader<GodRayShader, 1, core::vector2df>
 {
 public:
     GodRayShader();
 };
 
-class MLAAColorEdgeDetectionSHader : public TextureRead<MLAAColorEdgeDetectionSHader, 1, core::vector2df>
+class MLAAColorEdgeDetectionSHader : public TextureShader<MLAAColorEdgeDetectionSHader, 1, core::vector2df>
 {
 public:
     MLAAColorEdgeDetectionSHader();
 };
 
-class MLAABlendWeightSHader : public TextureRead<MLAABlendWeightSHader, 2, core::vector2df>
+class MLAABlendWeightSHader : public TextureShader<MLAABlendWeightSHader, 2, core::vector2df>
 {
 public:
     MLAABlendWeightSHader();
 };
 
-class MLAAGatherSHader : public TextureRead<MLAAGatherSHader, 2, core::vector2df>
+class MLAAGatherSHader : public TextureShader<MLAAGatherSHader, 2, core::vector2df>
 {
 public:
     MLAAGatherSHader();

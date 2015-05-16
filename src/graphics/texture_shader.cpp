@@ -16,24 +16,24 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/texture_read.hpp"
+#include "graphics/texture_shader.hpp"
 
 #include "config/user_config.hpp"
 
-TextureReadBaseNew::BindFunction TextureReadBaseNew::m_all_bind_functions[] =
-{ /* ST_NEAREST_FILTERED               */ &TextureReadBaseNew::bindTextureNearest,
-  /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ &TextureReadBaseNew::bindTextureTrilinearAnisotropic,
-  /* ST_TRILINEAR_CUBEMAP              */ &TextureReadBaseNew::bindCubemapTrilinear,
-  /* ST_BILINEAR_FILTERED              */ &TextureReadBaseNew::bindTextureBilinear,
-  /* ST_SHADOW_SAMPLER                 */ &TextureReadBaseNew::bindTextureShadow,
-  /* ST_TRILINEAR_CLAMPED_ARRAY2D      */ &TextureReadBaseNew::bindTrilinearClampedArrayTexture,
-  /* ST_VOLUME_LINEAR_FILTERED         */ &TextureReadBaseNew::bindTextureVolume,
-  /* ST_NEARED_CLAMPED_FILTERED        */ &TextureReadBaseNew::bindTextureNearestClamped,
-  /* ST_BILINEAR_CLAMPED_FILTERED      */ &TextureReadBaseNew::bindTextureBilinearClamped,
-  /* ST_SEMI_TRILINEAR                 */ &TextureReadBaseNew::bindTextureSemiTrilinear
+TextureShaderBase::BindFunction TextureShaderBase::m_all_bind_functions[] =
+{ /* ST_NEAREST_FILTERED               */ &TextureShaderBase::bindTextureNearest,
+  /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ &TextureShaderBase::bindTextureTrilinearAnisotropic,
+  /* ST_TRILINEAR_CUBEMAP              */ &TextureShaderBase::bindCubemapTrilinear,
+  /* ST_BILINEAR_FILTERED              */ &TextureShaderBase::bindTextureBilinear,
+  /* ST_SHADOW_SAMPLER                 */ &TextureShaderBase::bindTextureShadow,
+  /* ST_TRILINEAR_CLAMPED_ARRAY2D      */ &TextureShaderBase::bindTrilinearClampedArrayTexture,
+  /* ST_VOLUME_LINEAR_FILTERED         */ &TextureShaderBase::bindTextureVolume,
+  /* ST_NEARED_CLAMPED_FILTERED        */ &TextureShaderBase::bindTextureNearestClamped,
+  /* ST_BILINEAR_CLAMPED_FILTERED      */ &TextureShaderBase::bindTextureBilinearClamped,
+  /* ST_SEMI_TRILINEAR                 */ &TextureShaderBase::bindTextureSemiTrilinear
 };
 
-GLuint TextureReadBaseNew::m_all_texture_types[] = 
+GLuint TextureShaderBase::m_all_texture_types[] = 
 { /* ST_NEAREST_FILTERED               */ GL_TEXTURE_2D,
   /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ GL_TEXTURE_2D,
   /* ST_TRILINEAR_CUBEMAP              */ GL_TEXTURE_CUBE_MAP,
@@ -47,7 +47,7 @@ GLuint TextureReadBaseNew::m_all_texture_types[] =
 };
 
 // ----------------------------------------------------------------------------
-void TextureReadBaseNew::bindTextureNearest(GLuint texture_unit, GLuint tex)
+void TextureShaderBase::bindTextureNearest(GLuint texture_unit, GLuint tex)
 {
     glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -60,7 +60,7 @@ void TextureReadBaseNew::bindTextureNearest(GLuint texture_unit, GLuint tex)
 }   // bindTextureNearest
 
 // ----------------------------------------------------------------------------
-void TextureReadBaseNew::bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint tex)
+void TextureShaderBase::bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint tex)
 {
     glActiveTexture(GL_TEXTURE0 + tex_unit);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -75,7 +75,7 @@ void TextureReadBaseNew::bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint
 }   // bindTextureTrilinearAnisotropic
 
 // ----------------------------------------------------------------------------
-void TextureReadBaseNew::bindCubemapTrilinear(unsigned tex_unit, unsigned tex)
+void TextureShaderBase::bindCubemapTrilinear(unsigned tex_unit, unsigned tex)
 {
     glActiveTexture(GL_TEXTURE0 + tex_unit);
     glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
@@ -91,7 +91,7 @@ void TextureReadBaseNew::bindCubemapTrilinear(unsigned tex_unit, unsigned tex)
 }   // bindCubemapTrilinear
 
 // ----------------------------------------------------------------------------
-void TextureReadBaseNew::bindTextureNearestClamped(GLuint texture_unit,
+void TextureShaderBase::bindTextureNearestClamped(GLuint texture_unit,
                                                    GLuint tex_id)
 {
     glActiveTexture(GL_TEXTURE0 + texture_unit);
@@ -106,7 +106,7 @@ void TextureReadBaseNew::bindTextureNearestClamped(GLuint texture_unit,
 // ----------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
-void TextureReadBaseNew::bindTextureBilinear(GLuint texture_unit, GLuint tex)
+void TextureShaderBase::bindTextureBilinear(GLuint texture_unit, GLuint tex)
 {
     glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -118,7 +118,7 @@ void TextureReadBaseNew::bindTextureBilinear(GLuint texture_unit, GLuint tex)
 }   // bindTextureBilinear
 
 // ----------------------------------------------------------------------------
-void TextureReadBaseNew::bindTextureBilinearClamped(GLuint tex_unit, GLuint tex)
+void TextureShaderBase::bindTextureBilinearClamped(GLuint tex_unit, GLuint tex)
 {
     glActiveTexture(GL_TEXTURE0 + tex_unit);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -130,7 +130,7 @@ void TextureReadBaseNew::bindTextureBilinearClamped(GLuint tex_unit, GLuint tex)
 }   // bindTextureBilinearClamped
 
 // ----------------------------------------------------------------------------
-void TextureReadBaseNew::bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex_id)
+void TextureShaderBase::bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex_id)
 {
     glActiveTexture(GL_TEXTURE0 + tex_unit);
     glBindTexture(GL_TEXTURE_2D, tex_id);
@@ -142,7 +142,7 @@ void TextureReadBaseNew::bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex_id
 }   // bindTextureSemiTrilinear
 
 // ----------------------------------------------------------------------------
-void TextureReadBaseNew::bindTextureShadow(GLuint tex_unit, GLuint tex_id)
+void TextureShaderBase::bindTextureShadow(GLuint tex_unit, GLuint tex_id)
 {
     glActiveTexture(GL_TEXTURE0 + tex_unit);
     glBindTexture(GL_TEXTURE_2D_ARRAY, tex_id);
@@ -155,7 +155,7 @@ void TextureReadBaseNew::bindTextureShadow(GLuint tex_unit, GLuint tex_id)
 }   // bindTextureShadow
 
 // ----------------------------------------------------------------------------
-void TextureReadBaseNew::bindTrilinearClampedArrayTexture(unsigned tex_unit,
+void TextureShaderBase::bindTrilinearClampedArrayTexture(unsigned tex_unit,
                                                           unsigned tex_id)
 {
     glActiveTexture(GL_TEXTURE0 + tex_unit);
@@ -171,7 +171,7 @@ void TextureReadBaseNew::bindTrilinearClampedArrayTexture(unsigned tex_unit,
 }   // bindTrilinearClampedArrayTexture
 
 // ----------------------------------------------------------------------------
-void TextureReadBaseNew::bindTextureVolume(unsigned tex_unit, unsigned tex_id)
+void TextureShaderBase::bindTextureVolume(unsigned tex_unit, unsigned tex_id)
 {
     glActiveTexture(GL_TEXTURE0 + tex_unit);
     glBindTexture(GL_TEXTURE_3D, tex_id);
@@ -184,7 +184,7 @@ void TextureReadBaseNew::bindTextureVolume(unsigned tex_unit, unsigned tex_id)
 
 // ----------------------------------------------------------------------------
 
-GLuint TextureReadBaseNew::createSamplers(SamplerTypeNew sampler_type)
+GLuint TextureShaderBase::createSamplers(SamplerTypeNew sampler_type)
 {
     switch (sampler_type)
     {
@@ -225,7 +225,7 @@ GLuint TextureReadBaseNew::createSamplers(SamplerTypeNew sampler_type)
 }   // createSamplers
 
 // ----------------------------------------------------------------------------
-GLuint TextureReadBaseNew::createNearestSampler()
+GLuint TextureShaderBase::createNearestSampler()
 {
 #ifdef GL_VERSION_3_3
     unsigned id;
@@ -240,7 +240,7 @@ GLuint TextureReadBaseNew::createNearestSampler()
 }   // createNearestSampler
 
 // ----------------------------------------------------------------------------
-GLuint TextureReadBaseNew::createTrilinearSampler()
+GLuint TextureShaderBase::createTrilinearSampler()
 {
 #ifdef GL_VERSION_3_3
     unsigned id;
@@ -258,7 +258,7 @@ GLuint TextureReadBaseNew::createTrilinearSampler()
 }   // createTrilinearSampler
 
 // ----------------------------------------------------------------------------
-GLuint TextureReadBaseNew::createBilinearSampler()
+GLuint TextureShaderBase::createBilinearSampler()
 {
 #ifdef GL_VERSION_3_3
     unsigned id;
@@ -272,7 +272,7 @@ GLuint TextureReadBaseNew::createBilinearSampler()
 #endif
 }   // createBilinearSampler
 // ----------------------------------------------------------------------------
-GLuint TextureReadBaseNew::createShadowSampler()
+GLuint TextureShaderBase::createShadowSampler()
 {
 #ifdef GL_VERSION_3_3
     unsigned id;
@@ -288,7 +288,7 @@ GLuint TextureReadBaseNew::createShadowSampler()
 }   // createShadowSampler
 
 // ----------------------------------------------------------------------------
-GLuint TextureReadBaseNew::createBilinearClampedSampler()
+GLuint TextureShaderBase::createBilinearClampedSampler()
 {
 #ifdef GL_VERSION_3_3
     unsigned id;
@@ -304,7 +304,7 @@ GLuint TextureReadBaseNew::createBilinearClampedSampler()
 
 
 // ----------------------------------------------------------------------------
-GLuint TextureReadBaseNew::createTrilinearClampedArray()
+GLuint TextureShaderBase::createTrilinearClampedArray()
 {
 #ifdef GL_VERSION_3_3
     unsigned id;
@@ -321,7 +321,7 @@ GLuint TextureReadBaseNew::createTrilinearClampedArray()
 #endif
 }   // createTrilinearClampedArray
 // ----------------------------------------------------------------------------
-GLuint TextureReadBaseNew::createSemiTrilinearSampler()
+GLuint TextureShaderBase::createSemiTrilinearSampler()
 {
 #ifdef GL_VERSION_3_3
     unsigned id;

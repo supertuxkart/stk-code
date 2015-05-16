@@ -77,7 +77,7 @@ layout(location = 6) in vec3 Bitangent;
 */
 
 // ============================================================================
-class InstancedObjectPass1Shader : public TextureRead<InstancedObjectPass1Shader, 1>
+class InstancedObjectPass1Shader : public TextureShader<InstancedObjectPass1Shader, 1>
 {
 public:
     InstancedObjectPass1Shader()
@@ -94,7 +94,7 @@ public:
 };   // class InstancedObjectPass1Shader
 
 // ============================================================================
-class InstancedObjectRefPass1Shader : public TextureRead<InstancedObjectRefPass1Shader, 2>
+class InstancedObjectRefPass1Shader : public TextureShader<InstancedObjectRefPass1Shader, 2>
 {
 public:
     InstancedObjectRefPass1Shader()
@@ -113,7 +113,7 @@ public:
 };   // InstancedObjectRefPass1Shader
 
 // ============================================================================
-class ObjectRefPass2Shader : public TextureRead<ObjectRefPass2Shader, 5,
+class ObjectRefPass2Shader : public TextureShader<ObjectRefPass2Shader, 5,
                                                 core::matrix4, core::matrix4>
 {
 public:
@@ -133,7 +133,7 @@ public:
 };   // ObjectRefPass2Shader
 
 // ============================================================================
-class InstancedObjectPass2Shader : public TextureRead<InstancedObjectPass2Shader, 5>
+class InstancedObjectPass2Shader : public TextureShader<InstancedObjectPass2Shader, 5>
 {
 public:
     InstancedObjectPass2Shader()
@@ -152,7 +152,7 @@ public:
 };   // InstancedObjectPass2Shader
 
 // ============================================================================
-class InstancedObjectRefPass2Shader : public TextureRead<InstancedObjectRefPass2Shader, 5>
+class InstancedObjectRefPass2Shader : public TextureShader<InstancedObjectRefPass2Shader, 5>
 {
 public:
     InstancedObjectRefPass2Shader()
@@ -172,7 +172,7 @@ public:
 };   // InstancedObjectRefPass2Shader
 
 // ============================================================================
-class ShadowShader : public TextureRead<ShadowShader, 0, int, core::matrix4>
+class ShadowShader : public TextureShader<ShadowShader, 0, int, core::matrix4>
 {
 public:
     ShadowShader()
@@ -196,7 +196,7 @@ public:
 };   // ShadowShader
 
 // ============================================================================
-class InstancedShadowShader : public TextureRead<InstancedShadowShader, 0, int>
+class InstancedShadowShader : public TextureShader<InstancedShadowShader, 0, int>
 {
 public:
     InstancedShadowShader()
@@ -223,7 +223,7 @@ public:
 };   // InstancedShadowShader
 
 // ============================================================================
-class CRSMShader : public TextureRead<CRSMShader, 1, core::matrix4, core::matrix4, 
+class CRSMShader : public TextureShader<CRSMShader, 1, core::matrix4, core::matrix4, 
                                  core::matrix4>
 {
 public:
@@ -240,7 +240,7 @@ public:
 
 
 // ============================================================================
-class SplattingRSMShader : public TextureRead<SplattingRSMShader, 5, core::matrix4,
+class SplattingRSMShader : public TextureShader<SplattingRSMShader, 5, core::matrix4,
                                   core::matrix4>
 {
 public:
@@ -261,7 +261,7 @@ public:
 };  // SplattingRSMShader
 
 // ============================================================================
-class CInstancedRSMShader : public TextureRead<CInstancedRSMShader, 1, core::matrix4>
+class CInstancedRSMShader : public TextureShader<CInstancedRSMShader, 1, core::matrix4>
 {
 public:
     CInstancedRSMShader()
@@ -277,7 +277,7 @@ public:
 };   // CInstancedRSMShader
 
 // ============================================================================
-class SphereMapShader : public TextureRead<SphereMapShader, 4, core::matrix4,
+class SphereMapShader : public TextureShader<SphereMapShader, 4, core::matrix4,
                                       core::matrix4>
 {
 public:
@@ -297,7 +297,7 @@ public:
 };   // SphereMapShader
 
 // ============================================================================
-class InstancedSphereMapShader : public TextureRead<InstancedSphereMapShader, 4>
+class InstancedSphereMapShader : public TextureShader<InstancedSphereMapShader, 4>
 {
 public:
     InstancedSphereMapShader()
@@ -317,7 +317,7 @@ public:
 };   // InstancedSphereMapShader
 
 // ============================================================================
-class SplattingShader : public TextureRead<SplattingShader, 8, core::matrix4>
+class SplattingShader : public TextureShader<SplattingShader, 8, core::matrix4>
 {
 public:
     SplattingShader()
@@ -340,7 +340,7 @@ public:
 };   // SplattingShader
 
 // ============================================================================
-class ObjectRefPass1Shader : public TextureRead<ObjectRefPass1Shader, 2, core::matrix4,
+class ObjectRefPass1Shader : public TextureShader<ObjectRefPass1Shader, 2, core::matrix4,
                                            core::matrix4, core::matrix4>
 {
 public:
@@ -358,7 +358,7 @@ public:
 
 
 // ============================================================================
-class NormalMapShader : public TextureRead<NormalMapShader, 2, core::matrix4, 
+class NormalMapShader : public TextureShader<NormalMapShader, 2, core::matrix4, 
                                       core::matrix4>
 {
 public:
@@ -376,7 +376,7 @@ public:
 };   // NormalMapShader
 
 // ============================================================================
-class InstancedNormalMapShader : public TextureRead<InstancedNormalMapShader, 2>
+class InstancedNormalMapShader : public TextureShader<InstancedNormalMapShader, 2>
 {
 public:
     InstancedNormalMapShader()
@@ -393,7 +393,7 @@ public:
 };   // InstancedNormalMapShader
 
 // ============================================================================
-class ObjectUnlitShader : public TextureRead<ObjectUnlitShader, 4, core::matrix4, 
+class ObjectUnlitShader : public TextureShader<ObjectUnlitShader, 4, core::matrix4, 
                                         core::matrix4>
 {
 public:
@@ -411,7 +411,7 @@ public:
 };   // ObjectUnlitShader
 
 // ============================================================================
-class InstancedObjectUnlitShader : public TextureRead<InstancedObjectUnlitShader, 4>
+class InstancedObjectUnlitShader : public TextureShader<InstancedObjectUnlitShader, 4>
 {
 public:
     InstancedObjectUnlitShader()
@@ -548,7 +548,7 @@ const STK::Tuple<size_t> UnlitMat::ShadowTextures = STK::Tuple<size_t>(0);
 const STK::Tuple<size_t> UnlitMat::RSMTextures = STK::Tuple<size_t>(0);
 
 // ============================================================================
-class GrassPass1Shader : public TextureRead<GrassPass1Shader, 2, core::matrix4,
+class GrassPass1Shader : public TextureShader<GrassPass1Shader, 2, core::matrix4,
                                        core::matrix4, core::vector3df>
 {
 public:
@@ -566,7 +566,7 @@ public:
 };   // class GrassPass1Shader
 
 // ============================================================================
-class InstancedGrassPass1Shader : public TextureRead<InstancedGrassPass1Shader, 2,
+class InstancedGrassPass1Shader : public TextureShader<InstancedGrassPass1Shader, 2,
                                                 core::vector3df>
 {
 public:
@@ -584,7 +584,7 @@ public:
 };   // InstancedGrassPass1Shader
 
 // ============================================================================
-class GrassShadowShader : public TextureRead<GrassShadowShader, 1, int, core::matrix4,
+class GrassShadowShader : public TextureShader<GrassShadowShader, 1, int, core::matrix4,
                                         core::vector3df>
 {
 public:
@@ -611,7 +611,7 @@ public:
 };   // GrassShadowShader
 
 // ============================================================================
-class InstancedGrassShadowShader : public TextureRead<InstancedGrassShadowShader, 1, 
+class InstancedGrassShadowShader : public TextureShader<InstancedGrassShadowShader, 1, 
                                                  int, core::vector3df>
 {
 public:
@@ -642,7 +642,7 @@ public:
 
 
 // ============================================================================
-class GrassPass2Shader : public TextureRead<GrassPass2Shader, 5, core::matrix4,
+class GrassPass2Shader : public TextureShader<GrassPass2Shader, 5, core::matrix4,
                                        core::vector3df>
 {
 public:
@@ -662,7 +662,7 @@ public:
 };   // GrassPass2Shader
 
 // ============================================================================
-class InstancedGrassPass2Shader : public TextureRead<InstancedGrassPass2Shader, 6,
+class InstancedGrassPass2Shader : public TextureShader<InstancedGrassPass2Shader, 6,
                                              core::vector3df, core::vector3df>
 {
 public:
@@ -684,7 +684,7 @@ public:
 };   // InstancedGrassPass2Shader
 
 // ============================================================================
-class DetailedObjectPass2Shader : public TextureRead<DetailedObjectPass2Shader, 6,
+class DetailedObjectPass2Shader : public TextureShader<DetailedObjectPass2Shader, 6,
                                                  core::matrix4>
 {
 public:
@@ -704,7 +704,7 @@ public:
 };   // DetailedObjectPass2Shader
 
 // ============================================================================
-class InstancedDetailedObjectPass2Shader : public TextureRead<InstancedDetailedObjectPass2Shader, 6>
+class InstancedDetailedObjectPass2Shader : public TextureShader<InstancedDetailedObjectPass2Shader, 6>
 {
 public:
     InstancedDetailedObjectPass2Shader()

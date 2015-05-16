@@ -43,7 +43,7 @@ using namespace video;
 using namespace scene;
 
 // ============================================================================
-class Gaussian3HBlurShader : public TextureRead<Gaussian3HBlurShader, 1,
+class Gaussian3HBlurShader : public TextureShader<Gaussian3HBlurShader, 1,
                                            core::vector2df>
 {
 public:
@@ -58,7 +58,7 @@ public:
 };   // Gaussian3HBlurShader
 
 // ============================================================================
-class ComputeShadowBlurVShader : public TextureRead<ComputeShadowBlurVShader, 1,
+class ComputeShadowBlurVShader : public TextureShader<ComputeShadowBlurVShader, 1,
                                                core::vector2df,
                                                std::vector<float> >
 {
@@ -76,7 +76,7 @@ public:
 };   // ComputeShadowBlurVShader
 
 // ============================================================================
-class Gaussian6VBlurShader : public TextureRead<Gaussian6VBlurShader, 1,
+class Gaussian6VBlurShader : public TextureShader<Gaussian6VBlurShader, 1,
                                            core::vector2df, float>
 {
 public:
@@ -91,7 +91,7 @@ public:
 };   // Gaussian6VBlurShader
 
 // ============================================================================
-class Gaussian3VBlurShader : public TextureRead<Gaussian3VBlurShader, 1,
+class Gaussian3VBlurShader : public TextureShader<Gaussian3VBlurShader, 1,
                                            core::vector2df>
 {
 public:
@@ -106,7 +106,7 @@ public:
 };   // Gaussian3VBlurShader
 
 // ============================================================================
-class ComputeGaussian6VBlurShader : public TextureRead<ComputeGaussian6VBlurShader, 1,
+class ComputeGaussian6VBlurShader : public TextureShader<ComputeGaussian6VBlurShader, 1,
                                                   core::vector2df,
                                                   std::vector<float> >
 {
@@ -124,7 +124,7 @@ public:
 };   // ComputeGaussian6VBlurShader
 
 // ============================================================================
-class ComputeGaussian6HBlurShader : public TextureRead<ComputeGaussian6HBlurShader, 1,
+class ComputeGaussian6HBlurShader : public TextureShader<ComputeGaussian6HBlurShader, 1,
                                                   core::vector2df, 
                                                   std::vector<float> >
 {
@@ -142,7 +142,7 @@ public:
 };   // ComputeGaussian6HBlurShader
 
 // ============================================================================
-class ComputeShadowBlurHShader : public TextureRead<ComputeShadowBlurHShader, 1,
+class ComputeShadowBlurHShader : public TextureShader<ComputeShadowBlurHShader, 1,
                                                core::vector2df,
                                                std::vector<float> >
 {
@@ -159,7 +159,7 @@ public:
 };   // ComputeShadowBlurHShader
 
 // ============================================================================
-class Gaussian6HBlurShader : public TextureRead<Gaussian6HBlurShader, 1,
+class Gaussian6HBlurShader : public TextureShader<Gaussian6HBlurShader, 1,
                                            core::vector2df, float>
 {
 public:
@@ -174,7 +174,7 @@ public:
 };   // Gaussian6HBlurShader
 
 // ============================================================================
-class Gaussian17TapHShader : public TextureRead<Gaussian17TapHShader, 2,
+class Gaussian17TapHShader : public TextureShader<Gaussian17TapHShader, 2,
                                            core::vector2df>
 {
 public:
@@ -189,7 +189,7 @@ public:
 };   // Gaussian17TapHShader
 
 // ============================================================================
-class ComputeGaussian17TapHShader : public TextureRead<ComputeGaussian17TapHShader, 2,
+class ComputeGaussian17TapHShader : public TextureShader<ComputeGaussian17TapHShader, 2,
                                                   core::vector2df>
 {
 public:
@@ -207,7 +207,7 @@ public:
 
 
 // ============================================================================
-class Gaussian17TapVShader : public TextureRead<Gaussian17TapVShader, 2,
+class Gaussian17TapVShader : public TextureShader<Gaussian17TapVShader, 2,
                                            core::vector2df>
 {
 public:
@@ -223,7 +223,7 @@ public:
 };   // Gaussian17TapVShader
 
 // ============================================================================
-class ComputeGaussian17TapVShader : public TextureRead<ComputeGaussian17TapVShader, 2, 
+class ComputeGaussian17TapVShader : public TextureShader<ComputeGaussian17TapVShader, 2, 
                                                   core::vector2df>
 {
 public:
@@ -241,7 +241,7 @@ public:
 };   // ComputeGaussian17TapVShader
 
 // ============================================================================
-class BloomShader : public TextureRead<BloomShader, 1>
+class BloomShader : public TextureShader<BloomShader, 1>
 {
 public:
     BloomShader()
@@ -256,7 +256,7 @@ public:
 };   // BloomShader
 
 // ============================================================================
-class BloomBlendShader : public TextureRead<BloomBlendShader, 3>
+class BloomBlendShader : public TextureShader<BloomBlendShader, 3>
 {
 public:
     BloomBlendShader()
@@ -271,7 +271,7 @@ public:
 };   // BloomBlendShader
 
 // ============================================================================
-class LensBlendShader : public TextureRead<LensBlendShader, 3>
+class LensBlendShader : public TextureShader<LensBlendShader, 3>
 {
 public:
     LensBlendShader()
@@ -287,7 +287,7 @@ public:
 };   // LensBlendShader
 
 // ============================================================================
-class ToneMapShader : public TextureRead<ToneMapShader, 1, float>
+class ToneMapShader : public TextureShader<ToneMapShader, 1, float>
 {
 public:
 
@@ -303,7 +303,7 @@ public:
 };   // ToneMapShader
 
 // ============================================================================
-class DepthOfFieldShader : public TextureRead<DepthOfFieldShader, 2>
+class DepthOfFieldShader : public TextureShader<DepthOfFieldShader, 2>
 {
 public:
     DepthOfFieldShader()
@@ -318,7 +318,7 @@ public:
 };   // DepthOfFieldShader
 
 // ============================================================================
-class IBLShader : public TextureRead<IBLShader, 3>
+class IBLShader : public TextureShader<IBLShader, 3>
 {
 public:
     IBLShader()
@@ -337,7 +337,7 @@ public:
 };   // IBLShader
 
 // ============================================================================
-class DegradedIBLShader : public TextureRead<DegradedIBLShader, 1>
+class DegradedIBLShader : public TextureShader<DegradedIBLShader, 1>
 {
 public:
     DegradedIBLShader()

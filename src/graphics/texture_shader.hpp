@@ -15,8 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_TEXTURE_READ_HPP
-#define HEADER_TEXTURE_READ_HPP
+#ifndef HEADER_TEXTURE_SHADER_HPP
+#define HEADER_TEXTURE_SHADER_HPP
 
 #include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
@@ -44,7 +44,7 @@ enum SamplerTypeNew
 };   // SamplerTypeNew
 
 
-class TextureReadBaseNew
+class TextureShaderBase
 {
 public:
     typedef  std::function<void(GLuint, GLuint)> BindFunction;
@@ -75,7 +75,7 @@ protected:
     static BindFunction m_all_bind_functions[];
     std::vector<BindFunction> m_bind_functions;
     static GLuint m_all_texture_types[];
-};   // TextureReadBaseNew
+};   // TextureshaderBase
 
 // ========================================================================
 /** Class C needs to be the newly declared shaders class (necessary for
@@ -84,7 +84,8 @@ protected:
  *  right number of arguments are supplied to the variadic functions.
  */
 template<class C, int NUM_TEXTURES, typename...tp>
-class TextureRead : public TextureReadBaseNew, public Shader<C, tp...>
+class TextureShader : public TextureShaderBase
+                    , public Shader<C, tp...>
 {
 
 private:
@@ -230,13 +231,13 @@ public:
     // ------------------------------------------------------------------------
     /** Destructor which frees al lsampler ids.
      */
-    ~TextureRead()
+    ~TextureShader()
     {
         for (unsigned i = 0; i < m_sampler_ids.size(); i++)
             glDeleteSamplers(1, &m_sampler_ids[i]);
-    }   // ~TextureRead
+    }   // ~TextureShader
 
 
-};   // class TextureRead
+};   // class TextureShader
 
 #endif

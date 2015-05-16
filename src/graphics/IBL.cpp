@@ -26,7 +26,7 @@
 #include <set>
 
 
-class SpecularIBLGenerator : public TextureRead<SpecularIBLGenerator, 1, 
+class SpecularIBLGenerator : public TextureShader<SpecularIBLGenerator, 1, 
                                                 core::matrix4, float >
 {
 public:

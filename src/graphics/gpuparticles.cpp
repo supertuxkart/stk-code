@@ -23,7 +23,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
-#include "graphics/texture_read.hpp"
+#include "graphics/texture_shader.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 
@@ -54,7 +54,7 @@ public:
 
 /** A Shader to render particles.
 */
-class SimpleParticleRender : public TextureRead<SimpleParticleRender, 2,
+class SimpleParticleRender : public TextureShader<SimpleParticleRender, 2,
                                                 video::SColorf, video::SColorf>
 {
 public:
@@ -74,7 +74,7 @@ public:
 
 // ============================================================================
 
-class FlipParticleRender : public TextureRead<FlipParticleRender, 2>
+class FlipParticleRender : public TextureShader<FlipParticleRender, 2>
 {
 public:
     FlipParticleRender()
