@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef STKMESH_H
-#define STKMESH_H
+#ifndef HEADER_STK_MESH_H
+#define HEADER_STK_MESH_H
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -38,9 +38,10 @@ enum TransparentMaterial
     TM_ADDITIVE,
     TM_DISPLACEMENT,
     TM_COUNT
-};
+};   // TransparentMaterial
 
-struct GLMesh {
+struct GLMesh
+{
     GLuint vao;
     GLuint vertex_buffer;
     GLuint index_buffer;
@@ -58,18 +59,20 @@ struct GLMesh {
 #ifdef DEBUG
     std::string debug_name;
 #endif
-};
+};   // GLMesh
 
-GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name);
-void fillLocalBuffer(GLMesh &, scene::IMeshBuffer* mb);
+// ----------------------------------------------------------------------------
+GLMesh               allocateMeshBuffer(scene::IMeshBuffer* mb,
+                                        const std::string& debug_name);
+void                 fillLocalBuffer(GLMesh &, scene::IMeshBuffer* mb);
 video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride);
-GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type);
-core::matrix4 computeMVP(const core::matrix4 &ModelViewProjectionMatrix);
-bool isObject(video::E_MATERIAL_TYPE type);
+GLuint               createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type);
+core::matrix4        computeMVP(const core::matrix4 &ModelViewProjectionMatrix);
+bool                 isObject(video::E_MATERIAL_TYPE type);
+core::vector3df      getWindDir();
 
-core::vector3df getWindDir();
 
-
+// ----------------------------------------------------------------------------
 class STKMeshCommon
 {
 protected:
@@ -82,8 +85,9 @@ public:
     virtual void updateGL() = 0;
     virtual bool glow() const = 0;
     virtual bool isImmediateDraw() const { return false; }
-};
+};   // STKMeshCommon
 
+// ----------------------------------------------------------------------------
 template<typename T, typename... Args>
 class MeshList : public Singleton<T>
 {
@@ -96,8 +100,9 @@ public:
         for (unsigned i = 0; i < 4; i++)
             Shadows[i].clear();
     }
-};
+};   // MeshList
 
+// ----------------------------------------------------------------------------
 template<typename T>
 class InstancedMeshList : public Singleton<T>
 {
@@ -110,90 +115,133 @@ public:
         for (unsigned i = 0; i < 4; i++)
             Shadows[i].clear();
     }
-};
+};   // InstancedMeshList
 
-// -----------------------------------------Mat Default---------------------------------------------------- //
-class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+// ----------------------------------------------------------------------------
+class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4,
+                                      core::matrix4, core::matrix4>
 {};
 
+// ----------------------------------------------------------------------------
 class ListInstancedMatDefault : public InstancedMeshList<ListInstancedMatDefault>
 {};
 
-
-// -----------------------------------------Mat Alpha Ref---------------------------------------------------- //
-class ListMatAlphaRef : public MeshList<ListMatAlphaRef, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+// ----------------------------------------------------------------------------
+class ListMatAlphaRef : public MeshList<ListMatAlphaRef, GLMesh *, core::matrix4,
+                                        core::matrix4, core::matrix4>
 {};
 
+// ----------------------------------------------------------------------------
 class ListInstancedMatAlphaRef : public InstancedMeshList<ListInstancedMatAlphaRef>
 {};
 
-// -----------------------------------------Mat Normap Map---------------------------------------------------- //
-class ListMatNormalMap : public MeshList<ListMatNormalMap, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+// ----------------------------------------------------------------------------
+class ListMatNormalMap : public MeshList<ListMatNormalMap, GLMesh *, core::matrix4,
+                                         core::matrix4, core::matrix4>
 {};
 
+// ----------------------------------------------------------------------------
 class ListInstancedMatNormalMap : public InstancedMeshList<ListInstancedMatNormalMap>
 {};
 
-// -----------------------------------------Mat Grass---------------------------------------------------- //
-class ListMatGrass : public MeshList<ListMatGrass, GLMesh *, core::matrix4, core::matrix4, core::vector3df>
+// ----------------------------------------------------------------------------
+class ListMatGrass : public MeshList<ListMatGrass, GLMesh *, core::matrix4, 
+                                     core::matrix4, core::vector3df>
 {};
 
+// ----------------------------------------------------------------------------
 class ListInstancedMatGrass : public InstancedMeshList<ListInstancedMatGrass>
 {};
 
-// -----------------------------------------Mat Sphere Map---------------------------------------------------- //
-class ListMatSphereMap : public MeshList<ListMatSphereMap, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+// ----------------------------------------------------------------------------
+class ListMatSphereMap : public MeshList<ListMatSphereMap, GLMesh *,
+                                         core::matrix4, core::matrix4,
+                                         core::matrix4>
 {};
 
+// ----------------------------------------------------------------------------
 class ListInstancedMatSphereMap : public InstancedMeshList<ListInstancedMatSphereMap>
 {};
 
-// -----------------------------------------Mat Splatting---------------------------------------------------- //
-class ListMatSplatting : public MeshList<ListMatSplatting, GLMesh *, core::matrix4, core::matrix4>
+// ----------------------------------------------------------------------------
+class ListMatSplatting : public MeshList<ListMatSplatting, GLMesh *,
+                                         core::matrix4, core::matrix4>
 {};
 
-// -----------------------------------------Mat Unlit---------------------------------------------------- //
-class ListMatUnlit : public MeshList<ListMatUnlit, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+// ----------------------------------------------------------------------------
+class ListMatUnlit : public MeshList<ListMatUnlit, GLMesh *, core::matrix4,
+                                     core::matrix4, core::matrix4>
 {};
 
+// ----------------------------------------------------------------------------
 class ListInstancedMatUnlit : public InstancedMeshList<ListInstancedMatUnlit>
 {};
 
-// -----------------------------------------Mat Details---------------------------------------------------- //
-class ListMatDetails : public MeshList<ListMatDetails, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+// ----------------------------------------------------------------------------
+class ListMatDetails : public MeshList<ListMatDetails, GLMesh *, core::matrix4,
+                                       core::matrix4, core::matrix4>
 {};
 
+// ----------------------------------------------------------------------------
 class ListInstancedMatDetails : public InstancedMeshList<ListInstancedMatDetails>
 {};
 
+// ----------------------------------------------------------------------------
 // Transparent
 template <typename T, typename ...Args>
 class MiscList : public Singleton<T>, public std::vector<STK::Tuple<Args...> >
 {};
 
-class ListBlendTransparent : public MiscList<ListBlendTransparent, GLMesh *, core::matrix4, core::matrix4>
+// ----------------------------------------------------------------------------
+class ListBlendTransparent : public MiscList<ListBlendTransparent, GLMesh *,
+                                             core::matrix4, core::matrix4>
 {};
 
-class ListAdditiveTransparent : public MiscList<ListAdditiveTransparent, GLMesh *, core::matrix4, core::matrix4>
+// ----------------------------------------------------------------------------
+class ListAdditiveTransparent : public MiscList<ListAdditiveTransparent,
+                                                GLMesh *, core::matrix4,
+                                                core::matrix4>
 {};
 
-class ListBlendTransparentFog : public MiscList<ListBlendTransparentFog, GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf>
+// ----------------------------------------------------------------------------
+class ListBlendTransparentFog : public MiscList<ListBlendTransparentFog,
+                                                GLMesh *, core::matrix4,
+                                                core::matrix4, float, float,
+                                                float, float, float,
+                                                video::SColorf>
 {};
 
-class ListAdditiveTransparentFog : public MiscList<ListAdditiveTransparentFog, GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf>
+// ----------------------------------------------------------------------------
+class ListAdditiveTransparentFog : public MiscList<ListAdditiveTransparentFog,
+                                                   GLMesh *, core::matrix4,
+                                                   core::matrix4, float, float,
+                                                   float, float, float,
+                                                   video::SColorf>
 {};
 
-class ListDisplacement : public MiscList<ListDisplacement, GLMesh *, core::matrix4>
+// ----------------------------------------------------------------------------
+class ListDisplacement : public MiscList<ListDisplacement, GLMesh *,
+                                         core::matrix4>
 {};
 
-class ListInstancedGlow : public Singleton<ListInstancedGlow>, public std::vector<GLMesh *>
+// ----------------------------------------------------------------------------
+class ListInstancedGlow : public Singleton<ListInstancedGlow>
+                        , public std::vector<GLMesh *>
 {};
 
-Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp,
-    Material* material, Material* layer2Material);
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam, Material* material);
+// ----------------------------------------------------------------------------
+Material::ShaderType getMeshMaterialFromType(video::E_MATERIAL_TYPE MaterialType,
+                                             video::E_VERTEX_TYPE tp,
+                                             Material* material,
+                                             Material* layer2Material);
+// ----------------------------------------------------------------------------
+TransparentMaterial getTransparentMaterialFromType(video::E_MATERIAL_TYPE,
+                                                   f32 MaterialTypeParam,
+                                                   Material* material);
 
-void InitTextures(GLMesh &mesh, Material::ShaderType);
-void InitTexturesTransparent(GLMesh &mesh);
+// ----------------------------------------------------------------------------
+void initTextures(GLMesh &mesh, Material::ShaderType);
+// ----------------------------------------------------------------------------
+void initTexturesTransparent(GLMesh &mesh);
 
 #endif // STKMESH_H

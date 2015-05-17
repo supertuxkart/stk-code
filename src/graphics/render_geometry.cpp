@@ -40,7 +40,7 @@
 You need to consider twice before adding a new material : in the worst case a material requires 8 shaders :
 one for each solid pass, one for shadow pass, one for RSM pass, and you need to double that for instanced version.
 
-You need to declare a new enum in MeshMaterial and to write the corresponding dispatch code in MaterialTypeToMeshMaterial
+You need to declare a new enum in MeshMaterial and to write the corresponding dispatch code in getMeshMaterialFromType
 and to create 2 new List* structures (one for standard and one for instanced version).
 
 Then you need to write the code in stkscenemanager.cpp that will add any mesh with the new material to their corresponding

@@ -121,12 +121,12 @@ void STKAnimatedMesh::updateNoGL()
 
             if (rnd->isTransparent())
             {
-                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam, material);
+                TransparentMaterial TranspMat = getTransparentMaterialFromType(type, MaterialTypeParam, material);
                 TransparentMesh[TranspMat].push_back(&mesh);
             }
             else
             {
-                Material::ShaderType MatType = material->getShaderType();// MaterialTypeToMeshMaterial(type, mb->getVertexType(), material);
+                Material::ShaderType MatType = material->getShaderType();// getMeshMaterialFromType(type, mb->getVertexType(), material);
                 MeshSolidMaterial[MatType].push_back(&mesh);
             }
         }
@@ -167,11 +167,11 @@ void STKAnimatedMesh::updateGL()
                 if (mb->getMaterial().getTexture(1) != NULL)
                     material2 = material_manager->getMaterialFor(mb->getMaterial().getTexture(1), mb);
 
-                Material::ShaderType MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material, material2);
-                InitTextures(mesh, MatType);
+                Material::ShaderType MatType = getMeshMaterialFromType(type, mb->getVertexType(), material, material2);
+                initTextures(mesh, MatType);
             }
             else
-                InitTexturesTransparent(mesh);
+                initTexturesTransparent(mesh);
 
             if (CVS->isARBBaseInstanceUsable())
             {

@@ -157,7 +157,7 @@ void STKMeshSceneNode::updateNoGL()
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
             if (rnd->isTransparent())
             {
-                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam, material);
+                TransparentMaterial TranspMat = getTransparentMaterialFromType(type, MaterialTypeParam, material);
                 if (!immediate_draw)
                     TransparentMesh[TranspMat].push_back(&mesh);
                 else
@@ -169,7 +169,7 @@ void STKMeshSceneNode::updateNoGL()
                 Material* material2 = NULL;
                 if (mb->getMaterial().getTexture(1) != NULL)
                     material2 = material_manager->getMaterialFor(mb->getMaterial().getTexture(1), mb);
-                Material::ShaderType MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material, material2);
+                Material::ShaderType MatType = getMeshMaterialFromType(type, mb->getVertexType(), material, material2);
                 if (!immediate_draw)
                     MeshSolidMaterial[MatType].push_back(&mesh);
             }
@@ -208,12 +208,12 @@ void STKMeshSceneNode::updateGL()
             Material* material2 = NULL;
             if (mb->getMaterial().getTexture(1) != NULL)
                 material2 = material_manager->getMaterialFor(mb->getMaterial().getTexture(1), mb);
-            Material::ShaderType MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType(), material, material2);
+            Material::ShaderType MatType = getMeshMaterialFromType(type, mb->getVertexType(), material, material2);
             if (!immediate_draw)
-                InitTextures(mesh, MatType);
+                initTextures(mesh, MatType);
         }
         else if (!immediate_draw)
-            InitTexturesTransparent(mesh);
+            initTexturesTransparent(mesh);
 
         if (!immediate_draw && CVS->isARBBaseInstanceUsable())
         {
