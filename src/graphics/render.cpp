@@ -43,6 +43,22 @@
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
 
+
+// ============================================================================
+class InstancedColorizeShader : public Shader<InstancedColorizeShader>
+{
+public:
+    InstancedColorizeShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER,   "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER,   "glow_object.vert",
+                            GL_FRAGMENT_SHADER, "glow_object.frag");
+        assignUniforms();
+    }   // InstancedColorizeShader
+};   // InstancedColorizeShader
+
+// ============================================================================
+
 extern std::vector<float> BoundingBoxes;
 
 void IrrDriver::renderGLSL(float dt)
@@ -694,7 +710,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     if (CVS->supportsIndirectInstancingRendering())
     {
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
-        MeshShader::InstancedColorizeShader::getInstance()->use();
+        InstancedColorizeShader::getInstance()->use();
 
         glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeGlow));
         if (CVS->isAZDOEnabled())

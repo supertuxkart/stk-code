@@ -66,53 +66,6 @@ public:
 };
 
 
-class ColorizeShader : public Shader<ColorizeShader, core::matrix4, video::SColorf>
-{
-public:
-    ColorizeShader();
-};
-
-class InstancedColorizeShader : public Shader<InstancedColorizeShader>
-{
-public:
-    InstancedColorizeShader();
-};
-
-
-
-class RefShadowShader : public TextureShader<RefShadowShader, 1, int, core::matrix4>
-{
-public:
-    RefShadowShader();
-};
-
-class InstancedRefShadowShader : public TextureShader<InstancedRefShadowShader, 1, int>
-{
-public:
-    InstancedRefShadowShader();
-};
-
-
-class DisplaceMaskShader : public Shader<DisplaceMaskShader, core::matrix4>
-{
-public:
-    DisplaceMaskShader();
-};
-
-class DisplaceShader : public TextureShader<DisplaceShader, 4, core::matrix4,
-                                          core::vector2df, core::vector2df>
-{
-public:
-    DisplaceShader();
-};
-
-class SkyboxShader : public TextureShader<SkyboxShader,1>
-{
-public:
-    SkyboxShader();
-    GLuint vao;
-};
-
 class NormalVisualizer : public Shader<NormalVisualizer, video::SColor>
 {
 public:

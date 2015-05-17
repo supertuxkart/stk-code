@@ -32,6 +32,22 @@
 #include "utils/tuple.hpp"
 #include "utils/cpp2011.hpp"
 
+
+// ============================================================================
+class ColorizeShader : public Shader<ColorizeShader, core::matrix4, 
+                                     video::SColorf>
+{
+public:
+    ColorizeShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                            GL_FRAGMENT_SHADER, "colorize.frag");
+        assignUniforms("ModelMatrix", "col");
+    }
+
+};   // ColorizeShader
+
+// ============================================================================
 STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr,
     irr::s32 id, const std::string& debug_name,
     const irr::core::vector3df& position,
@@ -108,7 +124,7 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     GLenum ptype = mesh.PrimitiveType;
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
-    MeshShader::ColorizeShader::getInstance()->setUniforms(AbsoluteTransformation, video::SColorf(glowcolor.getRed() / 255.f, glowcolor.getGreen() / 255.f, glowcolor.getBlue() / 255.f));
+    ColorizeShader::getInstance()->setUniforms(AbsoluteTransformation, video::SColorf(glowcolor.getRed() / 255.f, glowcolor.getGreen() / 255.f, glowcolor.getBlue() / 255.f));
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
@@ -366,7 +382,7 @@ void STKMeshSceneNode::render()
 
     if (irr_driver->getPhase() == GLOW_PASS)
     {
-        MeshShader::ColorizeShader::getInstance()->use();
+        ColorizeShader::getInstance()->use();
         for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);

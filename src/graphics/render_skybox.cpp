@@ -25,6 +25,34 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
+class SkyboxShader : public TextureShader<SkyboxShader,1>
+{
+private:
+    GLuint m_vao;
+
+public:
+    SkyboxShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "sky.vert",
+                            GL_FRAGMENT_SHADER, "sky.frag");
+        assignUniforms();
+        assignSamplerNames(0, "tex", ST_TRILINEAR_CUBEMAP);
+
+        glGenVertexArrays(1, &m_vao);
+        glBindVertexArray(m_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getSkyTriVBO());
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glBindVertexArray(0);
+    }   // SkyboxShader
+    // ------------------------------------------------------------------------
+    void bindVertexArray()
+    {
+        glBindVertexArray(m_vao);
+    }   // bindVertexArray
+};   // SkyboxShader
+
+// ============================================================================
 static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height, float *Coeff, float *Y00, float *Y1minus1, float *Y10, float *Y11,
     float *Y2minus2, float * Y2minus1, float * Y20, float *Y21, float *Y22)
 {
@@ -403,11 +431,11 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 
     glDisable(GL_BLEND);
 
-    MeshShader::SkyboxShader::getInstance()->use();
-    glBindVertexArray(MeshShader::SkyboxShader::getInstance()->vao);
-    MeshShader::SkyboxShader::getInstance()->setUniforms();
+    SkyboxShader::getInstance()->use();
+    SkyboxShader::getInstance()->bindVertexArray();
+    SkyboxShader::getInstance()->setUniforms();
 
-    MeshShader::SkyboxShader::getInstance()->setTextureUnits(SkyboxCubeMap);
+    SkyboxShader::getInstance()->setTextureUnits(SkyboxCubeMap);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);

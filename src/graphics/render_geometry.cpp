@@ -414,6 +414,90 @@ public:
 };   // InstancedObjectUnlitShader
 
 // ============================================================================
+class RefShadowShader : public TextureShader<RefShadowShader, 1, 
+                                             int, core::matrix4>
+{
+public:
+    RefShadowShader()
+    {
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150)
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "shadow.vert",
+                                GL_FRAGMENT_SHADER, "shadowref.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "shadow.vert",
+                                GL_GEOMETRY_SHADER, "shadow.geom",
+                                GL_FRAGMENT_SHADER, "shadowref.frag");
+        }
+        assignUniforms("layer", "ModelMatrix");
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // RefShadowShader
+};   // RefShadowShader
+
+// ============================================================================
+class InstancedRefShadowShader : public TextureShader<InstancedRefShadowShader,
+                                                      1, int>
+{
+public:
+    InstancedRefShadowShader()
+    {
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150)
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT,GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                               GL_VERTEX_SHADER, "instanciedshadow.vert",
+                               GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT,GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                               GL_VERTEX_SHADER, "instanciedshadow.vert",
+                               GL_GEOMETRY_SHADER, "instanced_shadow.geom",
+                               GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+        }
+        assignUniforms("layer");
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedRefShadowShader
+};   // InstancedRefShadowShader
+
+// ============================================================================
+class DisplaceMaskShader : public Shader<DisplaceMaskShader, core::matrix4>
+{
+public:
+    DisplaceMaskShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "displace.vert",
+                            GL_FRAGMENT_SHADER, "white.frag");
+        assignUniforms("ModelMatrix");
+    }   // DisplaceMaskShader
+};   // DisplaceMaskShader
+
+// ============================================================================
+class DisplaceShader : public TextureShader<DisplaceShader, 4, core::matrix4,
+                                          core::vector2df, core::vector2df>
+{
+public:
+    DisplaceShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "displace.vert",
+                            GL_FRAGMENT_SHADER, "displace.frag");
+        assignUniforms("ModelMatrix", "dir", "dir2");
+
+        assignSamplerNames(0, "displacement_tex", ST_BILINEAR_FILTERED, 
+                           1, "color_tex", ST_BILINEAR_FILTERED,
+                           2, "mask_tex", ST_BILINEAR_FILTERED,
+                           3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // DisplaceShader
+};   // DisplaceShader
+
+// ============================================================================
 struct DefaultMaterial
 {
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;
@@ -448,12 +532,12 @@ struct AlphaRef
 {
     typedef InstancedObjectRefPass1Shader InstancedFirstPassShader;
     typedef InstancedObjectRefPass2Shader InstancedSecondPassShader;
-    typedef MeshShader::InstancedRefShadowShader InstancedShadowPassShader;
+    typedef InstancedRefShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatAlphaRef InstancedList;
     typedef ObjectRefPass1Shader FirstPassShader;
     typedef ObjectRefPass2Shader SecondPassShader;
-    typedef MeshShader::RefShadowShader ShadowPassShader;
+    typedef RefShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
     typedef ListMatAlphaRef List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
@@ -507,12 +591,12 @@ struct UnlitMat
 {
     typedef InstancedObjectRefPass1Shader InstancedFirstPassShader;
     typedef InstancedObjectUnlitShader InstancedSecondPassShader;
-    typedef MeshShader::InstancedRefShadowShader InstancedShadowPassShader;
+    typedef InstancedRefShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatUnlit InstancedList;
     typedef ObjectRefPass1Shader FirstPassShader;
     typedef ObjectUnlitShader SecondPassShader;
-    typedef MeshShader::RefShadowShader ShadowPassShader;
+    typedef RefShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
     typedef ListMatUnlit List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
@@ -1504,8 +1588,8 @@ void IrrDriver::renderTransparent()
         GLenum itype = mesh.IndexType;
         size_t count = mesh.IndexCount;
 
-        MeshShader::DisplaceMaskShader::getInstance()->use();
-        MeshShader::DisplaceMaskShader::getInstance()->setUniforms(AbsoluteTransformation);
+        DisplaceMaskShader::getInstance()->use();
+        DisplaceMaskShader::getInstance()->setUniforms(AbsoluteTransformation);
         glDrawElementsBaseVertex(ptype, (int)count, itype,
                                  (GLvoid *)mesh.vaoOffset, (int)mesh.vaoBaseVertex);
     }
@@ -1528,13 +1612,13 @@ void IrrDriver::renderTransparent()
         GLenum itype = mesh.IndexType;
         size_t count = mesh.IndexCount;
         // Render the effect
-        MeshShader::DisplaceShader::getInstance()->setTextureUnits(
+        DisplaceShader::getInstance()->setTextureUnits(
             getTextureGLuint(displaceTex),
             irr_driver->getRenderTargetTexture(RTT_COLOR),
             irr_driver->getRenderTargetTexture(RTT_TMP1),
             getTextureGLuint(mesh.textures[0]));
-        MeshShader::DisplaceShader::getInstance()->use();
-        MeshShader::DisplaceShader::getInstance()->setUniforms(AbsoluteTransformation,
+        DisplaceShader::getInstance()->use();
+        DisplaceShader::getInstance()->setUniforms(AbsoluteTransformation,
             core::vector2df(cb->getDirX(), cb->getDirY()),
             core::vector2df(cb->getDir2X(), cb->getDir2Y()));
 
