@@ -122,7 +122,7 @@ private:
         assert(sampler_type >= ST_MIN && sampler_type <= ST_MAX);
         m_texture_type.push_back(m_all_texture_types[sampler_type]);
 
-        GLuint location = getUniformLocation(name);
+        GLuint location = this->getUniformLocation(name);
         m_texture_location.push_back(location);
         glUniform1i(location, tex_unit);
         m_texture_units.push_back(tex_unit);
@@ -142,7 +142,7 @@ public:
     template<typename...Args>
     void assignSamplerNames(Args...args)
     {
-        use();
+        this->use();
         assignTextureNamesImpl<0>(args...);
         glUseProgram(0);
     }   // AssignSamplerNames
