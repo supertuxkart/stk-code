@@ -171,7 +171,7 @@ void Physics::update(float dt)
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
             int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
-            script_engine->runScript("void onKartKartCollision(int, int)",
+            script_engine->runFunction("void onKartKartCollision(int, int)",
                 [=](asIScriptContext* ctx) {
                     ctx->SetArgDWord(0, kartid1);
                     ctx->SetArgDWord(1, kartid2);
@@ -189,7 +189,7 @@ void Physics::update(float dt)
             std::string obj_id = p->getUserPointer(0)->getPointerPhysicalObject()->getID();
             
             // TODO: pass obj_id as arguent
-            script_engine->runScript("void onKartObjectCollision(int)",
+            script_engine->runFunction("void onKartObjectCollision(int)",
                 [=](asIScriptContext* ctx) {
                     ctx->SetArgDWord(0, kartId);
                 });
@@ -260,7 +260,7 @@ void Physics::update(float dt)
             //    p->getUserPointer(1)->getPointerPhysicalObject()->getID(),
             //    "item"
             //);
-            script_engine->runScript("void onItemObjectCollision()");
+            script_engine->runFunction("void onItemObjectCollision()");
             p->getUserPointer(0)->getPointerFlyable()
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();

@@ -115,7 +115,7 @@ namespace Scripting
 
         void registerScriptFunctions(asIScriptEngine *engine)
         {
-            int r;
+            int r; // of type asERetCodes
             engine->SetDefaultNamespace("Kart");
             r = engine->RegisterGlobalFunction("void squash(int id, float time)", asFUNCTION(squash), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", asFUNCTION(teleport), asCALL_CDECL); assert(r >= 0);

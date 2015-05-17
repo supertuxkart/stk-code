@@ -107,7 +107,7 @@ namespace Scripting
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
             ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-            script_engine->runScript(*str);
+            script_engine->runFunction(*str);
         }
 
         /** Log to the console */

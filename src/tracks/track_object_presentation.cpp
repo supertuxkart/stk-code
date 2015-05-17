@@ -955,7 +955,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         Camera* camera = Camera::getActiveCamera();
         if (camera != NULL && camera->getKart() != NULL)
             idKart = camera->getKart()->getWorldKartId();
-        script_engine->runScript("void " + m_action + "(int)",
+        script_engine->runFunction("void " + m_action + "(int)",
             [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
     }
 }   // onTriggerItemApproached

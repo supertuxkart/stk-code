@@ -227,7 +227,7 @@ namespace Scripting
 
         void registerScriptFunctions(asIScriptEngine *engine)
         {
-            int r;
+            int r; // of type asERetCodes
 
             engine->SetDefaultNamespace("Track");
 
@@ -243,7 +243,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void enableTrigger(const string &in)", asFUNCTION(enableTrigger), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void disableTrigger(const string &in)", asFUNCTION(disableTrigger), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void createTrigger(const string &in, const Vec3 &in, float distance)",
-                asFUNCTION(createTrigger), asCALL_GENERIC); assert(r >= 0);
+                asFUNCTION(createTrigger), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in)", asFUNCTION(getTrackObject), asCALL_CDECL); assert(r >= 0);
             
             // TrackObject

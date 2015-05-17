@@ -33,6 +33,7 @@
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
+#include "states_screens/dialogs/scripting_console.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -103,6 +104,7 @@ enum DebugMenuCommand
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
     DEBUG_ADJUST_LIGHTS,
+    DEBUG_SCRIPT_CONSOLE
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -265,6 +267,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
             mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
             mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
+            mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();
@@ -649,6 +652,10 @@ bool onEvent(const SEvent &event)
                     );
                     dsd->changeLabel("SSAO Sigma", "[None]");
 #endif
+                }
+                else if (cmdID == DEBUG_SCRIPT_CONSOLE)
+                {
+                    ScriptingConsole* console = new ScriptingConsole();
                 }
             }
 

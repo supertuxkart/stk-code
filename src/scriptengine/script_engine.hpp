@@ -51,16 +51,16 @@ namespace Scripting
 
         ScriptEngine();
         ~ScriptEngine();
-        
-        void runScript(std::string scriptName);
-        void runScript(std::string scriptName, std::function<void(asIScriptContext*)> callback);
+
+        void runFunction(std::string function_name);
+        void runFunction(std::string function_name, std::function<void(asIScriptContext*)> callback);
+        void evalScript(std::string script_fragment);
         void cleanupCache();
-        asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName);
 
     private:
         asIScriptEngine *m_engine;
-        std::map<std::string, asIScriptFunction*> m_script_cache;
+        std::map<std::string, bool> m_loaded_files;
+        std::map<std::string, asIScriptFunction*> m_functions_cache;
 
         void configureEngine(asIScriptEngine *engine);
         int  compileScript(asIScriptEngine *engine,std::string scriptName);
