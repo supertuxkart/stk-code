@@ -142,7 +142,7 @@ public:
     template<typename...Args>
     void assignSamplerNames(Args...args)
     {
-        glUseProgram(m_program);
+        use();
         assignTextureNamesImpl<0>(args...);
         glUseProgram(0);
     }   // AssignSamplerNames
