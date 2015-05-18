@@ -300,7 +300,7 @@ FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
     // TODO: put this outside of the rendering loop
     irr_driver->generateDiffuseCoefficients();
     irr_driver->computeMatrixesAndCameras(camera, m_width, m_height);
-    unsigned plc = irr_driver->UpdateLightsInfo(camera, dt);
+    unsigned plc = irr_driver->updateLightsInfo(camera, dt);
     irr_driver->uploadLightingData();
     irr_driver->renderScene(camera, plc, glows, dt, false, true);
     FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);

@@ -228,7 +228,7 @@ void IrrDriver::renderGLSL(float dt)
             glEnable(GL_FRAMEBUFFER_SRGB);
 
         PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
-        unsigned plc = UpdateLightsInfo(camnode, dt);
+        unsigned plc = updateLightsInfo(camnode, dt);
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);

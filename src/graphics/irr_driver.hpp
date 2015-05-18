@@ -719,7 +719,7 @@ public:
     void onUnloadWorld();
 
     void renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadows, bool forceRTT);
-    unsigned UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
+    unsigned updateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
     void UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, size_t height);
     void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
     void uploadLightingData();

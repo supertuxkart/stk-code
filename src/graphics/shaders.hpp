@@ -67,39 +67,6 @@ public:
 
 }
 
-#define MAXLIGHT 32
-
-namespace LightShader
-{
-    struct PointLightInfo
-    {
-        float posX;
-        float posY;
-        float posZ;
-        float energy;
-        float red;
-        float green;
-        float blue;
-        float radius;
-    };
-
-
-    class PointLightShader : public TextureShader<PointLightShader, 2>
-    {
-    public:
-        GLuint vbo;
-        GLuint vao;
-        PointLightShader();
-    };
-
-    class PointLightScatterShader : public TextureShader<PointLightScatterShader, 1, float, core::vector3df>
-    {
-    public:
-        GLuint vbo;
-        GLuint vao;
-        PointLightScatterShader();
-    };
-}
 
 
 template<typename T, typename... Args>
