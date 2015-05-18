@@ -287,9 +287,9 @@ void RegisterScreen::doRegister()
     {
         m_info_widget->setText(_("Password has to be between 8 and 30 characters long!"), false);
     }
-    else if (email.size() < 4 || email.size() > 50)
+    else if (email.size() < 5 || email.size() > 254)
     {
-        m_info_widget->setText(_("Email has to be between 4 and 50 characters long!"), false);
+        m_info_widget->setText(_("Email has to be between 5 and 254 characters long!"), false);
     }
     else if (  email.find(L"@")== -1 || email.find(L".")== -1 ||
               (email.findLast(L'.') - email.findLast(L'@') <= 2 ) ||
