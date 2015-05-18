@@ -88,12 +88,6 @@ public:
     SunLightShader();
 };
 
-class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF, 3,  float, float, float, float, float>
-{
-public:
-    ShadowedSunLightShaderPCF();
-};
-
 class ShadowedSunLightShaderESM : public TextureShader<ShadowedSunLightShaderESM, 3, float, float, float, float>
 {
 public:

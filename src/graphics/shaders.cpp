@@ -480,23 +480,6 @@ namespace FullScreenShader
     }
 
 
-    ShadowedSunLightShaderPCF::ShadowedSunLightShaderPCF()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
-            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
-            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
-            GL_FRAGMENT_SHADER, "sunlightshadow.frag");
-
-        // Use 8 to circumvent a catalyst bug when binding sampler
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
-                           1, "dtex", ST_NEAREST_FILTERED,
-                           8, "shadowtex", ST_SHADOW_SAMPLER);
-        assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res");
-    }
 
     ShadowedSunLightShaderESM::ShadowedSunLightShaderESM()
     {

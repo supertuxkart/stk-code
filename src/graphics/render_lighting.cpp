@@ -58,7 +58,6 @@ LightBaseClass::PointLightInfo m_point_lights_info[LightBaseClass::MAXLIGHT];
 
 // ============================================================================
 class PointLightShader : public TextureShader < PointLightShader, 2 >
-                       , private LightBaseClass
 {
 public:
     GLuint vbo;
@@ -80,8 +79,9 @@ public:
 
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, MAXLIGHT * sizeof(PointLightInfo), 0,
-                     GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 
+                     LightBaseClass::MAXLIGHT * sizeof(LightBaseClass::PointLightInfo),
+                     0, GL_DYNAMIC_DRAW);
 
         GLuint attrib_Position = glGetAttribLocation(m_program, "Position");
         GLuint attrib_Color = glGetAttribLocation(m_program, "Color");
@@ -90,18 +90,18 @@ public:
 
         glEnableVertexAttribArray(attrib_Position);
         glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE, 
-                              sizeof(PointLightInfo), 0);
+                              sizeof(LightBaseClass::PointLightInfo), 0);
         glEnableVertexAttribArray(attrib_Energy);
         glVertexAttribPointer(attrib_Energy, 1, GL_FLOAT, GL_FALSE,
-                              sizeof(PointLightInfo),
+                              sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(3 * sizeof(float)));
         glEnableVertexAttribArray(attrib_Color);
         glVertexAttribPointer(attrib_Color, 3, GL_FLOAT, GL_FALSE,
-                              sizeof(PointLightInfo),
+                              sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(4 * sizeof(float)));
         glEnableVertexAttribArray(attrib_Radius);
         glVertexAttribPointer(attrib_Radius, 1, GL_FLOAT, GL_FALSE, 
-                              sizeof(PointLightInfo),
+                              sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
 
         glVertexAttribDivisorARB(attrib_Position, 1);
@@ -160,6 +160,31 @@ public:
         glVertexAttribDivisorARB(attrib_Radius, 1);
     }   // PointLightScatterShader
 };
+
+// ============================================================================
+class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF,
+                                                       3,  float, float, float,
+                                                       float, float>
+{
+public:
+    ShadowedSunLightShaderPCF()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
+                            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
+                            GL_FRAGMENT_SHADER, "sunlightshadow.frag");
+
+        // Use 8 to circumvent a catalyst bug when binding sampler
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED,
+                           8, "shadowtex", ST_SHADOW_SAMPLER);
+        assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res");
+    }   // ShadowedSunLightShaderPCF
+};   // ShadowedSunLightShaderPCF
+
 // ============================================================================
 static void renderPointLights(unsigned count)
 {
@@ -375,15 +400,14 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
             }
             else
             {
-                FullScreenShader::ShadowedSunLightShaderPCF::getInstance()
-                    ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), 
-                                      irr_driver->getDepthStencilTexture(),
-                                      m_rtts->getShadowFBO().getDepthTexture());
-                DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShaderPCF>(shadowSplit[1],
-                                                                                  shadowSplit[2],
-                                                                                  shadowSplit[3],
-                                                                                  shadowSplit[4],
-                                                                                  float(UserConfigParams::m_shadows_resolution));
+                ShadowedSunLightShaderPCF::getInstance()->setTextureUnits
+                    (irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
+                     irr_driver->getDepthStencilTexture(),
+                     m_rtts->getShadowFBO().getDepthTexture()                );
+                DrawFullScreenEffect<ShadowedSunLightShaderPCF>
+                    (shadowSplit[1], shadowSplit[2], shadowSplit[3],
+                     shadowSplit[4],
+                     float(UserConfigParams::m_shadows_resolution)   );
             }
         }
         else
@@ -464,17 +488,23 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
     PointLightScatterShader::getInstance()->use();
     glBindVertexArray(PointLightScatterShader::getInstance()->vao);
 
-    PointLightScatterShader::getInstance()->setTextureUnits(irr_driver->getDepthStencilTexture());
-    PointLightScatterShader::getInstance()->setUniforms(1.f / (40.f * start), col2);
+    PointLightScatterShader::getInstance()
+        ->setTextureUnits(irr_driver->getDepthStencilTexture());
+    PointLightScatterShader::getInstance()
+        ->setUniforms(1.f / (40.f * start), col2);
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, MIN2(pointlightcount, LightBaseClass::MAXLIGHT));
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4,
+                          MIN2(pointlightcount, LightBaseClass::MAXLIGHT));
 
     glDisable(GL_BLEND);
-    m_post_processing->renderGaussian6Blur(getFBO(FBO_HALF1), getFBO(FBO_HALF2), 5., 5.);
+    m_post_processing->renderGaussian6Blur(getFBO(FBO_HALF1),
+                                           getFBO(FBO_HALF2), 5., 5.);
     glEnable(GL_BLEND);
 
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     getFBO(FBO_COLORS).Bind();
-    m_post_processing->renderPassThrough(getRenderTargetTexture(RTT_HALF1), getFBO(FBO_COLORS).getWidth(), getFBO(FBO_COLORS).getHeight());
+    m_post_processing->renderPassThrough(getRenderTargetTexture(RTT_HALF1),
+                                         getFBO(FBO_COLORS).getWidth(),
+                                         getFBO(FBO_COLORS).getHeight());
 }   // renderLightsScatter
