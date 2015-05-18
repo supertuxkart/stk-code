@@ -121,9 +121,15 @@ elseif(MSVC)
 endif()
 
 
-# Build the angelscript library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
-include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+# Build the angelscript library if not in system
+find_package(Angelscript)
+if(ANGELSCRIPT_FOUND)
+    include_directories(${Angelscript_INCLUDE_DIRS})
+else()
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+    set(Angelscript_LIBRARIES angelscript)
+endif()
 
 # OpenAL
 if(APPLE)
@@ -310,7 +316,7 @@ target_link_libraries(supertuxkart
     enet
     glew
     stkirrlicht
-    angelscript
+    ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
