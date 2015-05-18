@@ -208,13 +208,13 @@ public:
     /** Returns true if this object should cause a kart that touches it to
     *  be flattened. */
     bool isFlattenKartObject() const { return m_flatten_kart; }
-    void disable(void *memory)
+    void disable(/** \cond DOXYGEN_IGNORE */void *memory/** \endcond */)
     {
         ((PhysicalObject*)(memory))->removeBody();
     }
 
     //enables track object passed from the script
-    void enable(void *memory)
+    void enable(/** \cond DOXYGEN_IGNORE */void *memory/** \endcond */)
     {
         ((PhysicalObject*)(memory))->addBody();
     }
