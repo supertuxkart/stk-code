@@ -88,13 +88,6 @@ public:
     SunLightShader();
 };
 
-class HorizontalBlurShader : public TextureShader<HorizontalBlurShader, 1, core::vector2df>
-{
-public:
-    HorizontalBlurShader();
-};
-
-
 class PassThroughShader : public TextureShader<PassThroughShader, 1, int, int>
 {
 public:

@@ -479,19 +479,6 @@ namespace FullScreenShader
         assignUniforms("direction", "col");
     }
 
-
-
-
-	HorizontalBlurShader::HorizontalBlurShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "gaussian6h.frag");
-        assignUniforms("pixel");
-
-        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
-    }
-
     PassThroughShader::PassThroughShader()
     {
         loadProgram(OBJECT,
