@@ -186,6 +186,80 @@ public:
 };   // ShadowedSunLightShaderPCF
 
 // ============================================================================
+class ShadowedSunLightShaderESM : public TextureShader<ShadowedSunLightShaderESM,
+                                                       3, float, float, float,
+                                                       float>
+{
+public:
+    ShadowedSunLightShaderESM() 
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
+                            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
+                            GL_FRAGMENT_SHADER, "sunlightshadowesm.frag");
+
+        // Use 8 to circumvent a catalyst bug when binding sampler
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED,
+                           8, "shadowtex", ST_TRILINEAR_CLAMPED_ARRAY2D);
+            
+        assignUniforms("split0", "split1", "split2", "splitmax");
+    }   // ShadowedSunLightShaderESM
+};   // ShadowedSunLightShaderESM
+
+// ============================================================================
+class RadianceHintsConstructionShader
+    : public TextureShader<RadianceHintsConstructionShader, 3, core::matrix4, 
+                          core::matrix4, core::vector3df, video::SColorf>
+{
+public:
+    RadianceHintsConstructionShader()
+    {
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
+                                GL_FRAGMENT_SHADER, "rh.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
+                                GL_GEOMETRY_SHADER, "rhpassthrough.geom",
+                                GL_FRAGMENT_SHADER, "rh.frag");
+        }
+
+        assignUniforms("RSMMatrix", "RHMatrix", "extents", "suncol");
+        assignSamplerNames(0, "ctex", ST_BILINEAR_FILTERED,
+                           1, "ntex", ST_BILINEAR_FILTERED,
+                           2, "dtex", ST_BILINEAR_FILTERED);
+    }   // RadianceHintsConstructionShader
+};   // RadianceHintsConstructionShader
+
+// ============================================================================
+// Workaround for a bug found in kepler nvidia linux and fermi nvidia windows
+class NVWorkaroundRadianceHintsConstructionShader
+    : public TextureShader<NVWorkaroundRadianceHintsConstructionShader,
+                           3, core::matrix4, core::matrix4, core::vector3df,
+                           int, video::SColorf >
+{
+public:
+    NVWorkaroundRadianceHintsConstructionShader()
+    {
+        loadProgram(OBJECT,GL_VERTEX_SHADER,"slicedscreenquad_nvworkaround.vert",
+                           GL_GEOMETRY_SHADER, "rhpassthrough.geom",
+                           GL_FRAGMENT_SHADER, "rh.frag");
+
+        assignUniforms("RSMMatrix", "RHMatrix", "extents", "slice", "suncol");
+
+        assignSamplerNames(0, "ctex", ST_BILINEAR_FILTERED,
+                           1, "ntex", ST_BILINEAR_FILTERED,
+                           2, "dtex", ST_BILINEAR_FILTERED);
+    }   // NVWorkaroundRadianceHintsConstructionShader
+};   // NVWorkaroundRadianceHintsConstructionShader
+
+// ============================================================================
 static void renderPointLights(unsigned count)
 {
     glEnable(GL_BLEND);
@@ -321,32 +395,31 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
         if (CVS->needRHWorkaround())
         {
-            FullScreenShader::NVWorkaroundRadianceHintsConstructionShader
-                            ::getInstance()->use();
-            FullScreenShader::NVWorkaroundRadianceHintsConstructionShader
-                            ::getInstance()->setTextureUnits(
-                m_rtts->getRSM().getRTT()[0],
-                m_rtts->getRSM().getRTT()[1],
-                m_rtts->getRSM().getDepthTexture());
+            NVWorkaroundRadianceHintsConstructionShader::getInstance()->use();
+            NVWorkaroundRadianceHintsConstructionShader::getInstance()
+                ->setTextureUnits(
+                    m_rtts->getRSM().getRTT()[0],
+                    m_rtts->getRSM().getRTT()[1],
+                    m_rtts->getRSM().getDepthTexture());
             for (unsigned i = 0; i < 32; i++)
             {
-                FullScreenShader::NVWorkaroundRadianceHintsConstructionShader
-                       ::getInstance()->setUniforms(rsm_matrix, rh_matrix,
-                                                    rh_extend, i,
-                                                    irr_driver->getSunColor());
+                NVWorkaroundRadianceHintsConstructionShader::getInstance()
+                    ->setUniforms(rsm_matrix, rh_matrix,
+                                  rh_extend, i,
+                                  irr_driver->getSunColor());
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             }
         }
         else
         {
-            FullScreenShader::RadianceHintsConstructionShader::getInstance()->use();
-            FullScreenShader::RadianceHintsConstructionShader::getInstance()
+            RadianceHintsConstructionShader::getInstance()->use();
+            RadianceHintsConstructionShader::getInstance()
                 ->setTextureUnits(
                     m_rtts->getRSM().getRTT()[0],
                     m_rtts->getRSM().getRTT()[1],
                     m_rtts->getRSM().getDepthTexture()
             );
-            FullScreenShader::RadianceHintsConstructionShader::getInstance()
+            RadianceHintsConstructionShader::getInstance()
                 ->setUniforms(rsm_matrix, rh_matrix, rh_extend,
                               irr_driver->getSunColor());
             glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
@@ -389,14 +462,15 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 
             if (CVS->isESMEnabled())
             {
-                FullScreenShader::ShadowedSunLightShaderESM::getInstance()
+                ShadowedSunLightShaderESM::getInstance()
                     ->setTextureUnits(
                         irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
                         irr_driver->getDepthStencilTexture(),
                         m_rtts->getShadowFBO().getRTT()[0]);
-                DrawFullScreenEffect<FullScreenShader
-                    ::ShadowedSunLightShaderESM>(shadowSplit[1], shadowSplit[2],
-                                                 shadowSplit[3], shadowSplit[4]);
+                DrawFullScreenEffect<ShadowedSunLightShaderESM>(shadowSplit[1],
+                                                                shadowSplit[2],
+                                                                shadowSplit[3],
+                                                                shadowSplit[4]);
             }
             else
             {

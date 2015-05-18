@@ -88,43 +88,6 @@ public:
     SunLightShader();
 };
 
-class ShadowedSunLightShaderESM : public TextureShader<ShadowedSunLightShaderESM, 3, float, float, float, float>
-{
-public:
-    ShadowedSunLightShaderESM();
-};
-
-class RadianceHintsConstructionShader : public TextureShader<RadianceHintsConstructionShader, 3, core::matrix4, 
-                                                      core::matrix4, core::vector3df, video::SColorf>
-{
-public:
-    RadianceHintsConstructionShader();
-};
-
-// Workaround for a bug found in kepler nvidia linux and fermi nvidia windows
-class NVWorkaroundRadianceHintsConstructionShader : public TextureShader<NVWorkaroundRadianceHintsConstructionShader,
-                                                                   3, core::matrix4, core::matrix4, core::vector3df,
-                                                                   int, video::SColorf>
-{
-public:
-    NVWorkaroundRadianceHintsConstructionShader();
-};
-
-class RHDebug : public Shader<RHDebug, core::matrix4, core::vector3df>
-{
-public:
-    GLuint TU_SHR, TU_SHG, TU_SHB;
-
-    RHDebug();
-};
-
-class GlobalIlluminationReconstructionShader : public TextureShader<GlobalIlluminationReconstructionShader, 5,
-                                                             core::matrix4, core::matrix4, core::vector3df>
-{
-public:
-    GlobalIlluminationReconstructionShader();
-};
-
 class HorizontalBlurShader : public TextureShader<HorizontalBlurShader, 1, core::vector2df>
 {
 public:

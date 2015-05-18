@@ -352,6 +352,47 @@ public:
 };   // DegradedIBLShader
 
 // ============================================================================
+class RHDebug : public Shader<RHDebug, core::matrix4, core::vector3df>
+{
+public:
+    GLuint m_tu_shr, m_tu_shg, m_tu_shb;
+
+    RHDebug()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "rhdebug.vert",
+                            GL_FRAGMENT_SHADER, "rhdebug.frag");
+        assignUniforms("RHMatrix", "extents");
+        m_tu_shr = 0;
+        m_tu_shg = 1;
+        m_tu_shb = 2;
+        assignTextureUnit(m_tu_shr, "SHR",  m_tu_shg, "SHG", 
+                          m_tu_shb, "SHB");
+    }   // RHDebug
+};   // RHDebug
+
+// ============================================================================
+class GlobalIlluminationReconstructionShader 
+    : public TextureShader<GlobalIlluminationReconstructionShader, 5,
+                           core::matrix4, core::matrix4, core::vector3df >
+{
+public:
+    GlobalIlluminationReconstructionShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "gi.frag");
+
+        assignUniforms("RHMatrix", "InvRHMatrix", "extents");
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED,
+                           2, "SHR", ST_VOLUME_LINEAR_FILTERED,
+                           3, "SHG", ST_VOLUME_LINEAR_FILTERED,
+                           4, "SHB", ST_VOLUME_LINEAR_FILTERED);
+    }   // GlobalIlluminationReconstructionShader
+};   // GlobalIlluminationReconstructionShader
+
+// ============================================================================
 
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
@@ -571,14 +612,14 @@ void PostProcessing::renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB,
                                    const core::vector3df &rh_extend)
 {
     glEnable(GL_PROGRAM_POINT_SIZE);
-    FullScreenShader::RHDebug::getInstance()->use();
-    glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHR);
+    RHDebug::getInstance()->use();
+    glActiveTexture(GL_TEXTURE0 + RHDebug::getInstance()->m_tu_shr);
     glBindTexture(GL_TEXTURE_3D, SHR);
-    glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHG);
+    glActiveTexture(GL_TEXTURE0 + RHDebug::getInstance()->m_tu_shg);
     glBindTexture(GL_TEXTURE_3D, SHG);
-    glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHB);
+    glActiveTexture(GL_TEXTURE0 + RHDebug::getInstance()->m_tu_shb);
     glBindTexture(GL_TEXTURE_3D, SHB);
-    FullScreenShader::RHDebug::getInstance()->setUniforms(rh_matrix, rh_extend);
+    RHDebug::getInstance()->setUniforms(rh_matrix, rh_extend);
     glDrawArrays(GL_POINTS, 0, 32 * 16 * 32);
     glDisable(GL_PROGRAM_POINT_SIZE);
 }   // renderRHDebug
@@ -591,10 +632,10 @@ void PostProcessing::renderGI(const core::matrix4 &RHMatrix,
     core::matrix4 InvRHMatrix;
     RHMatrix.getInverse(InvRHMatrix);
     glDisable(GL_DEPTH_TEST);
-    FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()
+    GlobalIlluminationReconstructionShader::getInstance()
         ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), 
                           irr_driver->getDepthStencilTexture(), shr, shg, shb);
-    DrawFullScreenEffect<FullScreenShader::GlobalIlluminationReconstructionShader>
+    DrawFullScreenEffect<GlobalIlluminationReconstructionShader>
                                      (RHMatrix, InvRHMatrix, rh_extend);
 }   // renderGI
 
