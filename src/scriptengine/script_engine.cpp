@@ -120,23 +120,15 @@ namespace Scripting
     {
         script_fragment = "void evalScript_main() { \n" + script_fragment + "\n}";
 
-        asIScriptModule* mod = m_engine->GetModule(MODULE_ID_EVAL, asGM_ALWAYS_CREATE);
-        int r = mod->AddScriptSection("script", &script_fragment[0], script_fragment.size());
+        asIScriptModule* mod = m_engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE, asGM_ONLY_IF_EXISTS);
+
+        asIScriptFunction* func;
+        int r = mod->CompileFunction("eval", script_fragment.c_str(), 0, 0, &func);
         if (r < 0)
         {
-            Log::error("Scripting", "evalScript: AddScriptSection() failed");
+            Log::error("Scripting", "evalScript: CompileFunction() failed");
             return;
         }
-
-        r = mod->Build();
-        if (r < 0)
-        {
-            Log::error("Scripting", "evalScript: Build() failed");
-            return;
-        }
-
-        asIScriptFunction* func = m_engine->GetModule(MODULE_ID_EVAL)
-            ->GetFunctionByDecl("void evalScript_main()");
 
         asIScriptContext *ctx = m_engine->CreateContext();
         if (ctx == NULL)
@@ -174,6 +166,7 @@ namespace Scripting
         }
 
         ctx->Release();
+        func->Release();
     }
 
     //-----------------------------------------------------------------------------
