@@ -498,6 +498,20 @@ public:
 };   // DisplaceShader
 
 // ============================================================================
+class NormalVisualizer : public Shader<NormalVisualizer, video::SColor>
+{
+public:
+    NormalVisualizer()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                            GL_GEOMETRY_SHADER, "normal_visualizer.geom",
+                            GL_FRAGMENT_SHADER, "coloredquad.frag");
+        assignUniforms("color");
+    }   // NormalVisualizer
+};   // NormalVisualizer
+
+// ============================================================================
 struct DefaultMaterial
 {
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;
@@ -1412,11 +1426,11 @@ template<typename T>
 static void renderInstancedMeshNormals()
 {
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
-    MeshShader::NormalVisualizer::getInstance()->use();
+    NormalVisualizer::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        MeshShader::NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
+        NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
              (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i) 
              * sizeof(DrawElementsIndirectCommand)));
@@ -1427,11 +1441,11 @@ static void renderInstancedMeshNormals()
 template<typename T>
 static void renderMultiMeshNormals()
 {
-    MeshShader::NormalVisualizer::getInstance()->use();
+    NormalVisualizer::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     if (SolidPassCmd::getInstance()->Size[T::MaterialType])
     {
-        MeshShader::NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
+        NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
             (const void*)(SolidPassCmd::getInstance()->Offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
             (int)SolidPassCmd::getInstance()->Size[T::MaterialType],

@@ -441,33 +441,6 @@ namespace MeshShader
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }
 
-    NormalVisualizer::NormalVisualizer()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-            GL_GEOMETRY_SHADER, "normal_visualizer.geom",
-            GL_FRAGMENT_SHADER, "coloredquad.frag");
-        assignUniforms("color");
-    }
-
-    ViewFrustrumShader::ViewFrustrumShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "frustrum.vert",
-            GL_FRAGMENT_SHADER, "coloredquad.frag");
-
-        assignUniforms("color", "idx");
-
-        glGenVertexArrays(1, &frustrumvao);
-        glBindVertexArray(frustrumvao);
-        glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getFrustrumVBO());
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                     SharedGPUObjects::getFrustrumIndices());
-        glBindVertexArray(0);
-    }
 }
 
 namespace LightShader

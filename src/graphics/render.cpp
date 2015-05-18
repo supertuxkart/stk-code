@@ -58,6 +58,36 @@ public:
 };   // InstancedColorizeShader
 
 // ============================================================================
+class ViewFrustrumShader : public Shader<ViewFrustrumShader, video::SColor, int>
+{
+private:
+    GLuint m_frustrum_vao;
+
+public:    ViewFrustrumShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "frustrum.vert",
+                            GL_FRAGMENT_SHADER, "coloredquad.frag");
+
+        assignUniforms("color", "idx");
+
+        glGenVertexArrays(1, &m_frustrum_vao);
+        glBindVertexArray(m_frustrum_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getFrustrumVBO());
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                     SharedGPUObjects::getFrustrumIndices());
+        glBindVertexArray(0);
+    }   // ViewFrustrumShader
+    // ------------------------------------------------------------------------
+    void bindVertexArray()
+    {
+        glBindVertexArray(m_frustrum_vao);
+    }   // bindVertexArray
+
+};   // ViewFrustrumShader
+
+// ============================================================================
 
 extern std::vector<float> BoundingBoxes;
 
@@ -646,12 +676,12 @@ void IrrDriver::renderParticles()
 
 static void renderWireFrameFrustrum(float *tmp, unsigned i)
 {
-    MeshShader::ViewFrustrumShader::getInstance()->use();
-    glBindVertexArray(MeshShader::ViewFrustrumShader::getInstance()->frustrumvao);
+    ViewFrustrumShader::getInstance()->use();
+    ViewFrustrumShader::getInstance()->bindVertexArray();
     glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getFrustrumVBO());
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), (void *)tmp);
-    MeshShader::ViewFrustrumShader::getInstance()->setUniforms(video::SColor(255, 0, 255, 0), i);
+    ViewFrustrumShader::getInstance()->setUniforms(video::SColor(255, 0, 255, 0), i);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 }
 

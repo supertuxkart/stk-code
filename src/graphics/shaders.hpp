@@ -65,21 +65,6 @@ public:
     TransparentFogShader();
 };
 
-
-class NormalVisualizer : public Shader<NormalVisualizer, video::SColor>
-{
-public:
-    NormalVisualizer();
-};
-
-class ViewFrustrumShader : public Shader<ViewFrustrumShader, video::SColor, int>
-{
-public:
-    GLuint frustrumvao;
-
-    ViewFrustrumShader();
-};
-
 }
 
 #define MAXLIGHT 32
