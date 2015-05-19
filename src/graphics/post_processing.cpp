@@ -251,6 +251,12 @@ public:
         assignUniforms();
         assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
     }   // BloomShader
+    // ------------------------------------------------------------------------
+    void render(GLuint in)
+    {
+        BloomShader::getInstance()->setTextureUnits(in);
+        drawFullScreenEffect();
+    }   // render
 };   // BloomShader
 
 // ============================================================================
@@ -570,7 +576,7 @@ public:
     void render(GLuint tex, const core::vector2df &sunpos)
     {
         setTextureUnits(tex);
-        DrawFullScreenEffect<GodRayShader>(sunpos);
+        drawFullScreenEffect(sunpos);
     }   // render
 };   // GodRayShader
 
@@ -812,8 +818,7 @@ void PostProcessing::update(float dt)
 // ----------------------------------------------------------------------------
 static void renderBloom(GLuint in)
 {
-    BloomShader::getInstance()->setTextureUnits(in);
-    DrawFullScreenEffect<BloomShader>();
+    BloomShader::getInstance()->render(in);
 }   // renderBloom
 
 // ----------------------------------------------------------------------------
