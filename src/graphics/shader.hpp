@@ -356,6 +356,15 @@ public:
         }
     }   // loadProgram
 
+    // ------------------------------------------------------------------------
+    template<typename... Args>
+    void drawFullScreenEffect(Args...args)
+    {
+        use();
+        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
+        setUniforms(args...);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }   // drawFullScreenEffect
 
 };   // Shader
 

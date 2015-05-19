@@ -298,6 +298,13 @@ public:
         assignUniforms("vignette_weight");
         assignSamplerNames(0, "text", ST_NEAREST_FILTERED);
     }   // ToneMapShader
+    // ----------------------------------------------------------------------------
+    void render(FrameBuffer &fbo, GLuint rtt, float vignette_weight)
+    {
+        fbo.Bind();
+        setTextureUnits(rtt);
+        drawFullScreenEffect(vignette_weight);
+    }   // render
 };   // ToneMapShader
 
 // ============================================================================
@@ -361,7 +368,7 @@ public:
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "rhdebug.vert",
                             GL_FRAGMENT_SHADER, "rhdebug.frag");
-        assignUniforms("RHMatrix", "extents");
+        assignUniforms("rh_matrix", "extents");
         m_tu_shr = 0;
         m_tu_shg = 1;
         m_tu_shb = 2;
@@ -383,13 +390,26 @@ public:
                             GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                             GL_FRAGMENT_SHADER, "gi.frag");
 
-        assignUniforms("RHMatrix", "InvRHMatrix", "extents");
+        assignUniforms("rh_matrix", "inv_rh_matrix", "extents");
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED,
                            2, "SHR", ST_VOLUME_LINEAR_FILTERED,
                            3, "SHG", ST_VOLUME_LINEAR_FILTERED,
                            4, "SHB", ST_VOLUME_LINEAR_FILTERED);
     }   // GlobalIlluminationReconstructionShader
+
+    // ------------------------------------------------------------------------
+    void render(const core::matrix4 &rh_matrix,
+                const core::vector3df &rh_extend, const FrameBuffer &fb)
+    {
+        core::matrix4 inv_rh_matrix;
+        rh_matrix.getInverse(inv_rh_matrix);
+        glDisable(GL_DEPTH_TEST);
+        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
+                        irr_driver->getDepthStencilTexture(),
+                        fb.getRTT()[0], fb.getRTT()[1], fb.getRTT()[2]);
+        drawFullScreenEffect(rh_matrix, inv_rh_matrix, rh_extend);
+    }   // render
 };   // GlobalIlluminationReconstructionShader
 
 // ============================================================================
@@ -403,6 +423,13 @@ public:
         assignUniforms("width", "height");
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // PassThroughShader
+    // ------------------------------------------------------------------------
+    void render(GLuint tex, unsigned width, unsigned height)
+    {
+        PassThroughShader::getInstance()->setTextureUnits(tex);
+        drawFullScreenEffect(width, height);
+    }   // render
+
 };   // PassThroughShader
 
 // ============================================================================
@@ -451,18 +478,27 @@ public:
 // ============================================================================
 class GlowShader : public TextureShader < GlowShader, 1 >
 {
+private:
+    GLuint m_vao;
 public:
-    GLuint vao;
 
     GlowShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "glow.frag");
+                            GL_FRAGMENT_SHADER, "glow.frag");
         assignUniforms();
-
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
-        vao = createVAO();
+        m_vao = createVAO();
     }   // GlowShader
+    // ------------------------------------------------------------------------
+    void render(unsigned tex)
+    {
+        use();
+        glBindVertexArray(m_vao);
+        setTextureUnits(tex);
+        setUniforms();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }   // render
 };   // GlowShader
 
 // ============================================================================
@@ -510,7 +546,13 @@ public:
         assignUniforms("col");
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // GodFadeShader
-};
+    // ----------------------------------------------------------------------------
+    void render(GLuint tex, const SColor &col)
+    {
+        setTextureUnits(tex);
+        drawFullScreenEffect(col);
+    }   // render
+};   // GodFadeShader
 
 // ============================================================================
 class GodRayShader : public TextureShader<GodRayShader, 1, core::vector2df>
@@ -524,6 +566,12 @@ public:
         assignUniforms("sunpos");
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // GodRayShader
+    // ----------------------------------------------------------------------------
+    void render(GLuint tex, const core::vector2df &sunpos)
+    {
+        setTextureUnits(tex);
+        DrawFullScreenEffect<GodRayShader>(sunpos);
+    }   // render
 };   // GodRayShader
 
 // ============================================================================
@@ -825,18 +873,13 @@ void PostProcessing::renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB,
 }   // renderRHDebug
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGI(const core::matrix4 &RHMatrix,
-                              const core::vector3df &rh_extend, GLuint shr,
-                              GLuint shg, GLuint shb)
+void PostProcessing::renderGI(const core::matrix4 &rh_matrix,
+                              const core::vector3df &rh_extend,
+                              const FrameBuffer &fb)
 {
-    core::matrix4 InvRHMatrix;
-    RHMatrix.getInverse(InvRHMatrix);
-    glDisable(GL_DEPTH_TEST);
-    GlobalIlluminationReconstructionShader::getInstance()
-        ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), 
-                          irr_driver->getDepthStencilTexture(), shr, shg, shb);
-    DrawFullScreenEffect<GlobalIlluminationReconstructionShader>
-                                     (RHMatrix, InvRHMatrix, rh_extend);
+    GlobalIlluminationReconstructionShader::getInstance()->render(rh_matrix,
+                                                                  rh_extend,
+                                                                  fb);
 }   // renderGI
 
 // ----------------------------------------------------------------------------
@@ -1126,8 +1169,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo,
 void PostProcessing::renderPassThrough(GLuint tex, unsigned width,
                                        unsigned height)
 {
-    PassThroughShader::getInstance()->setTextureUnits(tex);
-    DrawFullScreenEffect<PassThroughShader>(width, height);
+    PassThroughShader::getInstance()->render(tex, width, height);
 }   // renderPassThrough
 
 // ----------------------------------------------------------------------------
@@ -1147,13 +1189,7 @@ void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGlow(unsigned tex)
 {
-    GlowShader::getInstance()->use();
-    glBindVertexArray(GlowShader::getInstance()->vao);
-
-    GlowShader::getInstance()->setTextureUnits(tex);
-    GlowShader::getInstance()->setUniforms();
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    GlowShader::getInstance()->render(tex);
 }   // renderGlow
 
 // ----------------------------------------------------------------------------
@@ -1219,27 +1255,6 @@ void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo,
          0.15f);
 }   // renderMotionBlur
 
-// ----------------------------------------------------------------------------
-static void renderGodFade(GLuint tex, const SColor &col)
-{
-    GodFadeShader::getInstance()->setTextureUnits(tex);
-    DrawFullScreenEffect<GodFadeShader>(col);
-}   // renderGodFade
-
-// ----------------------------------------------------------------------------
-static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
-{
-    GodRayShader::getInstance()->setTextureUnits(tex);
-    DrawFullScreenEffect<GodRayShader>(sunpos);
-}   // renderGodRay
-
-// ----------------------------------------------------------------------------
-static void toneMap(FrameBuffer &fbo, GLuint rtt, float vignette_weight)
-{
-    fbo.Bind();
-    ToneMapShader::getInstance()->setTextureUnits(rtt);
-    DrawFullScreenEffect<ToneMapShader>(vignette_weight);
-}   // toneMap
 
 // ----------------------------------------------------------------------------
 static void renderDoF(FrameBuffer &fbo, GLuint rtt)
@@ -1357,7 +1372,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             irr_driver->getFBO(FBO_QUARTER1).Bind();
             glViewport(0, 0, irr_driver->getActualScreenSize().Width / 4,
                              irr_driver->getActualScreenSize().Height / 4);
-            renderGodFade(out_fbo->getRTT()[0], col);
+            GodFadeShader::getInstance()->render(out_fbo->getRTT()[0], col);
 
             // Blur
             renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER1),
@@ -1381,8 +1396,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
             // Rays please
             irr_driver->getFBO(FBO_QUARTER2).Bind();
-            renderGodRay(irr_driver->getRenderTargetTexture(RTT_QUARTER1),
-                         core::vector2df(sunx, suny));
+            GodRayShader::getInstance()
+                ->render(irr_driver->getRenderTargetTexture(RTT_QUARTER1),
+                       core::vector2df(sunx, suny)                       );
 
             // Blur
             renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER2),
@@ -1484,14 +1500,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
 		// only enable vignette during race
-		if(isRace)
-		{
-			toneMap(*out_fbo, in_fbo->getRTT()[0], 1.0);
-		}
-		else
-		{
-			toneMap(*out_fbo, in_fbo->getRTT()[0], 0.0);
-		}
+        ToneMapShader::getInstance()->render(*out_fbo, in_fbo->getRTT()[0],
+                                             isRace ? 1.0f : 0.0f);
         std::swap(in_fbo, out_fbo);
         PROFILER_POP_CPU_MARKER();
     }
