@@ -468,35 +468,4 @@ namespace FullScreenShader
         assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
     }
 
-    MLAAColorEdgeDetectionSHader::MLAAColorEdgeDetectionSHader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "mlaa_color1.frag");
-        assignUniforms("PIXEL_SIZE");
-
-        assignSamplerNames(0, "colorMapG", ST_NEAREST_FILTERED);
-    }
-
-    MLAABlendWeightSHader::MLAABlendWeightSHader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "mlaa_blend2.frag");
-        assignUniforms("PIXEL_SIZE");
-
-        assignSamplerNames(0, "edgesMap", ST_BILINEAR_FILTERED,
-                           1, "areaMap", ST_NEAREST_FILTERED);
-    }
-
-    MLAAGatherSHader::MLAAGatherSHader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "mlaa_neigh3.frag");
-        assignUniforms("PIXEL_SIZE");
-
-        assignSamplerNames(0, "blendMap", ST_NEAREST_FILTERED,
-                           1, "colorMap", ST_NEAREST_FILTERED);
-    }
 }

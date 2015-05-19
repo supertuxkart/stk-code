@@ -527,6 +527,51 @@ public:
 };   // GodRayShader
 
 // ============================================================================
+class MLAAColorEdgeDetectionSHader 
+    : public TextureShader<MLAAColorEdgeDetectionSHader, 1, core::vector2df>
+{
+public:
+    MLAAColorEdgeDetectionSHader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "mlaa_color1.frag");
+        assignUniforms("PIXEL_SIZE");
+        assignSamplerNames(0, "colorMapG", ST_NEAREST_FILTERED);
+    }   // MLAAColorEdgeDetectionSHader
+};   // MLAAColorEdgeDetectionSHader
+
+// ============================================================================
+class MLAABlendWeightSHader : public TextureShader<MLAABlendWeightSHader,
+                                                   2, core::vector2df>
+{
+public:
+    MLAABlendWeightSHader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "mlaa_blend2.frag");
+        assignUniforms("PIXEL_SIZE");
+
+        assignSamplerNames(0, "edgesMap", ST_BILINEAR_FILTERED,
+                           1, "areaMap", ST_NEAREST_FILTERED);
+    }   // MLAABlendWeightSHader
+};   // MLAABlendWeightSHader
+
+// ============================================================================
+class MLAAGatherSHader : public TextureShader<MLAAGatherSHader, 2,
+                                              core::vector2df>
+{
+public:
+    MLAAGatherSHader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "mlaa_neigh3.frag");
+        assignUniforms("PIXEL_SIZE");
+        assignSamplerNames(0, "blendMap", ST_NEAREST_FILTERED,
+                           1, "colorMap", ST_NEAREST_FILTERED);
+    }   // MLAAGatherSHader
+};   // MLAAGatherSHader
+
+// ============================================================================
 
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
@@ -1199,11 +1244,10 @@ void PostProcessing::applyMLAA()
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     // Pass 1: color edge detection
-    FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->use();
-    FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()
+    MLAAColorEdgeDetectionSHader::getInstance()->use();
+    MLAAColorEdgeDetectionSHader::getInstance()
         ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS));
-    DrawFullScreenEffect<FullScreenShader::MLAAColorEdgeDetectionSHader>
-                                                                  (PIXEL_SIZE);
+    DrawFullScreenEffect<MLAAColorEdgeDetectionSHader>(PIXEL_SIZE);
 
     glStencilFunc(GL_EQUAL, 1, ~0);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -1212,11 +1256,11 @@ void PostProcessing::applyMLAA()
     irr_driver->getFBO(FBO_MLAA_BLEND).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    FullScreenShader::MLAABlendWeightSHader::getInstance()->use();
-    FullScreenShader::MLAABlendWeightSHader::getInstance()
+    MLAABlendWeightSHader::getInstance()->use();
+    MLAABlendWeightSHader::getInstance()
         ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_TMP),
                           getTextureGLuint(m_areamap));
-    DrawFullScreenEffect<FullScreenShader::MLAABlendWeightSHader>(PIXEL_SIZE);
+    DrawFullScreenEffect<MLAABlendWeightSHader>(PIXEL_SIZE);
 
     // Blit in to tmp1
     FrameBuffer::Blit(irr_driver->getFBO(FBO_MLAA_COLORS),
@@ -1225,11 +1269,11 @@ void PostProcessing::applyMLAA()
     // Pass 3: gather
     irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
 
-    FullScreenShader::MLAAGatherSHader::getInstance()->use();
-    FullScreenShader::MLAAGatherSHader::getInstance()
+    MLAAGatherSHader::getInstance()->use();
+    MLAAGatherSHader::getInstance()
         ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND),
                           irr_driver->getRenderTargetTexture(RTT_MLAA_TMP));
-    DrawFullScreenEffect<FullScreenShader::MLAAGatherSHader>(PIXEL_SIZE);
+    DrawFullScreenEffect<MLAAGatherSHader>(PIXEL_SIZE);
 
     // Done.
     glDisable(GL_STENCIL_TEST);

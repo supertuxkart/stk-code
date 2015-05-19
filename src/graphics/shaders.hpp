@@ -94,24 +94,6 @@ public:
     FogShader();
 };
 
-class MLAAColorEdgeDetectionSHader : public TextureShader<MLAAColorEdgeDetectionSHader, 1, core::vector2df>
-{
-public:
-    MLAAColorEdgeDetectionSHader();
-};
-
-class MLAABlendWeightSHader : public TextureShader<MLAABlendWeightSHader, 2, core::vector2df>
-{
-public:
-    MLAABlendWeightSHader();
-};
-
-class MLAAGatherSHader : public TextureShader<MLAAGatherSHader, 2, core::vector2df>
-{
-public:
-    MLAAGatherSHader();
-};
-
 }
 
 #define FOREACH_SHADER(ACT) \
