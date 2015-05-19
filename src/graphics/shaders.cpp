@@ -459,17 +459,6 @@ namespace FullScreenShader
 
 
 
-    LightspaceBoundingBoxShader::LightspaceBoundingBoxShader()
-    {
-        loadProgram(OBJECT,
-            GL_COMPUTE_SHADER, "Lightspaceboundingbox.comp",
-            GL_COMPUTE_SHADER, "utils/getPosFromUVDepth.frag");
-        assignSamplerNames(0, "depth", ST_NEAREST_FILTERED);
-        assignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
-        GLuint block_idx = glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
-        glShaderStorageBlockBinding(m_program, block_idx, 2);
-    }
-
     ShadowMatrixesGenerationShader::ShadowMatrixesGenerationShader()
     {
         loadProgram(OBJECT,

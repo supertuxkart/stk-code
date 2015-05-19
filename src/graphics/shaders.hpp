@@ -88,13 +88,6 @@ public:
     SunLightShader();
 };
 
-class LightspaceBoundingBoxShader : public TextureShader<LightspaceBoundingBoxShader, 1,
-                                                  core::matrix4, float, float,
-                                                  float, float>
-{
-public:
-    LightspaceBoundingBoxShader();
-};
 
 class ShadowMatrixesGenerationShader : public Shader <ShadowMatrixesGenerationShader, core::matrix4>
 {

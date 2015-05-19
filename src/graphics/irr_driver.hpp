@@ -620,7 +620,8 @@ public:
     // ------------------------------------------------------------------------
     std::vector<LightNode *> getLights() { return m_lights; }
     // ------------------------------------------------------------------------
-    void addGlowingNode(scene::ISceneNode *n, float r = 1.0f, float g = 1.0f, float b = 1.0f)
+    void addGlowingNode(scene::ISceneNode *n, float r = 1.0f, float g = 1.0f,
+                        float b = 1.0f)
     {
         GlowData dat;
         dat.node = n;
@@ -644,61 +645,106 @@ public:
     // ------------------------------------------------------------------------
     void clearForcedBloom() { m_forcedbloom.clear(); }
     // ------------------------------------------------------------------------
-    const std::vector<BloomData> &getForcedBloom() const { return m_forcedbloom; }
+    const std::vector<BloomData> &getForcedBloom() const
+    { 
+        return m_forcedbloom;
+    }
     // ------------------------------------------------------------------------
     void clearBackgroundNodes() { m_background.clear(); }
     // ------------------------------------------------------------------------
-    void addBackgroundNode(scene::ISceneNode * const n) { m_background.push_back(n); }
+    void addBackgroundNode(scene::ISceneNode * const n) 
+    {
+        m_background.push_back(n);
+    }
     // ------------------------------------------------------------------------
     void applyObjectPassShader();
-    void applyObjectPassShader(scene::ISceneNode * const node, bool rimlit = false);
+    void applyObjectPassShader(scene::ISceneNode * const node,
+                               bool rimlit = false);
     // ------------------------------------------------------------------------
-    scene::ISceneNode *addLight(const core::vector3df &pos, float energy, float radius, float r,
-                  float g, float b, bool sun = false, scene::ISceneNode* parent = NULL);
+    scene::ISceneNode *addLight(const core::vector3df &pos, float energy,
+                                float radius, float r, float g, float b,
+                                bool sun = false, 
+                                scene::ISceneNode* parent = NULL);
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
     class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
+    // ------------------------------------------------------------------------
     void cleanSunInterposer();
     void createSunInterposer();
     // ------------------------------------------------------------------------
-    void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; matrix.getInverse(m_InvViewMatrix); }
+    void setViewMatrix(core::matrix4 matrix)
+    {
+        m_ViewMatrix = matrix; matrix.getInverse(m_InvViewMatrix);
+    }
+    // ------------------------------------------------------------------------
     const core::matrix4 &getViewMatrix() const { return m_ViewMatrix; }
+    // ------------------------------------------------------------------------
     const core::matrix4 &getInvViewMatrix() const { return m_InvViewMatrix; }
-    void setProjMatrix(core::matrix4 matrix) { m_ProjMatrix = matrix; matrix.getInverse(m_InvProjMatrix); }
+    // ------------------------------------------------------------------------
+    void setProjMatrix(core::matrix4 matrix)
+    {
+        m_ProjMatrix = matrix; matrix.getInverse(m_InvProjMatrix);
+    }
+    // ------------------------------------------------------------------------
     const core::matrix4 &getProjMatrix() const { return m_ProjMatrix; }
+    // ------------------------------------------------------------------------
     const core::matrix4 &getInvProjMatrix() const { return m_InvProjMatrix; }
-    void genProjViewMatrix() { m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; m_InvProjViewMatrix = m_ProjViewMatrix; m_InvProjViewMatrix.makeInverse(); }
+    // ------------------------------------------------------------------------
+    void genProjViewMatrix() 
+    {
+        m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; 
+        m_InvProjViewMatrix = m_ProjViewMatrix; 
+        m_InvProjViewMatrix.makeInverse(); 
+    }
+    // ------------------------------------------------------------------------
     const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
-    const core::matrix4 &getInvProjViewMatrix() const { return m_InvProjViewMatrix; }
-    const core::vector2df &getCurrentScreenSize() const { return m_current_screen_size; }
-    const core::dimension2du getActualScreenSize() const { return m_actual_screen_size; }
+    // ------------------------------------------------------------------------
+    const core::matrix4 &getInvProjViewMatrix() const 
+    {
+        return m_InvProjViewMatrix;
+    }
+    // ------------------------------------------------------------------------
+    const core::vector2df &getCurrentScreenSize() const
+    {
+        return m_current_screen_size;
+    }
+    // ------------------------------------------------------------------------
+    const core::dimension2du getActualScreenSize() const
+    { 
+        return m_actual_screen_size;
+    }
     // ------------------------------------------------------------------------
     float getSSAORadius() const
     {
         return m_ssao_radius;
     }
 
+    // ------------------------------------------------------------------------
     void setSSAORadius(float v)
     {
         m_ssao_radius = v;
     }
 
+    // ------------------------------------------------------------------------
     float getSSAOK() const
     {
         return m_ssao_k;
     }
 
+    // ------------------------------------------------------------------------
     void setSSAOK(float v)
     {
         m_ssao_k = v;
     }
 
+    // ------------------------------------------------------------------------
     float getSSAOSigma() const
     {
         return m_ssao_sigma;
     }
 
+    // ------------------------------------------------------------------------
     void setSSAOSigma(float v)
     {
         m_ssao_sigma = v;
@@ -718,10 +764,15 @@ public:
     void onLoadWorld();
     void onUnloadWorld();
 
-    void renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadows, bool forceRTT);
-    unsigned updateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
-    void UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, size_t height);
-    void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
+    void renderScene(scene::ICameraSceneNode * const camnode,
+                     unsigned pointlightcount, std::vector<GlowData>& glows,
+                     float dt, bool hasShadows, bool forceRTT);
+    unsigned updateLightsInfo(scene::ICameraSceneNode * const camnode,
+                              float dt);
+    void updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
+                                                         size_t height);
+    void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
+                                   size_t width, size_t height);
     void uploadLightingData();
 
     // --------------------- OLD RTT --------------------
