@@ -54,6 +54,28 @@ public:
 };   // LightspaceBoundingBoxShader
 
 // ============================================================================
+class ShadowMatricesGenerationShader 
+    : public Shader <ShadowMatricesGenerationShader, core::matrix4>
+{
+public:
+    ShadowMatricesGenerationShader()
+    {
+        loadProgram(OBJECT,  GL_COMPUTE_SHADER, "shadowmatrixgeneration.comp");
+        assignUniforms("SunCamMatrix");
+        GLuint block_idx = 
+            glGetProgramResourceIndex(m_program, 
+                                      GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
+        glShaderStorageBlockBinding(m_program, block_idx, 2);
+        block_idx = 
+            glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK,
+                                      "NewMatrixData");
+        glShaderStorageBlockBinding(m_program, block_idx, 1);
+    }
+
+
+};   // ShadowMatricesGenerationShader
+
+// ============================================================================
 static std::vector<vector3df> getFrustrumVertex(const scene::SViewFrustum &frustrum)
 {
     std::vector<vector3df> vectors;
@@ -194,8 +216,8 @@ void IrrDriver::updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
                  GL_STATIC_COPY);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, tempShadowMatssbo);
 
-    FullScreenShader::ShadowMatrixesGenerationShader::getInstance()->use();
-    FullScreenShader::ShadowMatrixesGenerationShader::getInstance()
+    ShadowMatricesGenerationShader::getInstance()->use();
+    ShadowMatricesGenerationShader::getInstance()
         ->setUniforms(m_suncam->getViewMatrix());
     glDispatchCompute(4, 1, 1);
 

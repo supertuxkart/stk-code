@@ -88,13 +88,6 @@ public:
     SunLightShader();
 };
 
-
-class ShadowMatrixesGenerationShader : public Shader <ShadowMatrixesGenerationShader, core::matrix4>
-{
-public:
-    ShadowMatrixesGenerationShader();
-};
-
 class GlowShader : public TextureShader<GlowShader, 1>
 {
 public:
