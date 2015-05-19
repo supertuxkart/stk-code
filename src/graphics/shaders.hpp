@@ -88,30 +88,10 @@ public:
     SunLightShader();
 };
 
-class GlowShader : public TextureShader<GlowShader, 1>
-{
-public:
-    GLuint vao;
-
-    GlowShader();
-};
-
-class SSAOShader : public TextureShader<SSAOShader, 1, float, float, float>
-{
-public:
-    SSAOShader();
-};
-
 class FogShader : public TextureShader<FogShader, 1, float, core::vector3df>
 {
 public:
     FogShader();
-};
-
-class MotionBlurShader : public TextureShader<MotionBlurShader, 2, core::matrix4, core::vector2df, float, float>
-{
-public:
-    MotionBlurShader();
 };
 
 class GodFadeShader : public TextureShader<GodFadeShader, 1, video::SColorf>

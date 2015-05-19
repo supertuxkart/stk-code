@@ -457,29 +457,6 @@ namespace FullScreenShader
         assignUniforms("direction", "col");
     }
 
-    GlowShader::GlowShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "glow.frag");
-        assignUniforms();
-
-        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
-        vao = createVAO();
-    }
-
-    SSAOShader::SSAOShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-            GL_FRAGMENT_SHADER, "ssao.frag");
-
-        assignUniforms("radius", "k", "sigma");
-        assignSamplerNames(0, "dtex", ST_SEMI_TRILINEAR);
-    }
-
     FogShader::FogShader()
     {
         loadProgram(OBJECT,
@@ -489,17 +466,6 @@ namespace FullScreenShader
 
         assignUniforms("density", "col");
         assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
-    }
-
-    MotionBlurShader::MotionBlurShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-            GL_FRAGMENT_SHADER, "motion_blur.frag");
-        assignUniforms("previous_viewproj", "center", "boost_amount", "mask_radius");
-        assignSamplerNames(0, "color_buffer", ST_BILINEAR_CLAMPED_FILTERED,
-                           1, "dtex", ST_NEAREST_FILTERED);
     }
 
     GodFadeShader::GodFadeShader()

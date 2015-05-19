@@ -449,6 +449,57 @@ public:
 };   // LinearizeDepthShader
 
 // ============================================================================
+class GlowShader : public TextureShader < GlowShader, 1 >
+{
+public:
+    GLuint vao;
+
+    GlowShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+            GL_FRAGMENT_SHADER, "glow.frag");
+        assignUniforms();
+
+        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
+        vao = createVAO();
+    }   // GlowShader
+};   // GlowShader
+
+// ============================================================================
+class SSAOShader : public TextureShader<SSAOShader, 1, float, float, float>
+{
+public:
+    SSAOShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "ssao.frag");
+
+        assignUniforms("radius", "k", "sigma");
+        assignSamplerNames(0, "dtex", ST_SEMI_TRILINEAR);
+    }   // SSAOShader
+};   // SSAOShader
+
+// ============================================================================
+class MotionBlurShader : public TextureShader<MotionBlurShader, 2,
+                                              core::matrix4, core::vector2df,
+                                              float, float>
+{
+public:
+    MotionBlurShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "motion_blur.frag");
+        assignUniforms("previous_viewproj", "center", "boost_amount",
+                        "mask_radius");
+        assignSamplerNames(0, "color_buffer", ST_BILINEAR_CLAMPED_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED);
+    }    // MotionBlurShader
+};   // MotionBlurShader
+
+// ============================================================================
 
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
@@ -1003,11 +1054,11 @@ void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGlow(unsigned tex)
 {
-    FullScreenShader::GlowShader::getInstance()->use();
-    glBindVertexArray(FullScreenShader::GlowShader::getInstance()->vao);
+    GlowShader::getInstance()->use();
+    glBindVertexArray(GlowShader::getInstance()->vao);
 
-    FullScreenShader::GlowShader::getInstance()->setTextureUnits(tex);
-    FullScreenShader::GlowShader::getInstance()->setUniforms();
+    GlowShader::getInstance()->setTextureUnits(tex);
+    GlowShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }   // renderGlow
@@ -1027,11 +1078,11 @@ void PostProcessing::renderSSAO()
          irr_driver->getSceneManager()->getActiveCamera()->getFarValue()  );
     irr_driver->getFBO(FBO_SSAO).Bind();
 
-    FullScreenShader::SSAOShader::getInstance()
+    SSAOShader::getInstance()
         ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH));
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    DrawFullScreenEffect<FullScreenShader::SSAOShader>
+    DrawFullScreenEffect<SSAOShader>
         (irr_driver->getSSAORadius(), irr_driver->getSSAOK(),
          irr_driver->getSSAOSigma()                           );
 }
@@ -1064,10 +1115,10 @@ void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo,
     out_fbo.Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    FullScreenShader::MotionBlurShader::getInstance()
+    MotionBlurShader::getInstance()
         ->setTextureUnits(in_fbo.getRTT()[0], 
                           irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<FullScreenShader::MotionBlurShader>
+    DrawFullScreenEffect<MotionBlurShader>
         (// Todo : use a previousPVMatrix per cam, not global
          cam->getPreviousPVMatrix(),
          core::vector2df(0.5, 0.5),
