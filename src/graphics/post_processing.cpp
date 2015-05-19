@@ -500,6 +500,33 @@ public:
 };   // MotionBlurShader
 
 // ============================================================================
+class GodFadeShader : public TextureShader<GodFadeShader, 1, video::SColorf>
+{
+public:
+    GodFadeShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "godfade.frag");
+        assignUniforms("col");
+        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
+    }   // GodFadeShader
+};
+
+// ============================================================================
+class GodRayShader : public TextureShader<GodRayShader, 1, core::vector2df>
+{
+public:
+    GodRayShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "godray.frag");
+
+        assignUniforms("sunpos");
+        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
+    }   // GodRayShader
+};   // GodRayShader
+
+// ============================================================================
 
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
@@ -1129,15 +1156,15 @@ void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo,
 // ----------------------------------------------------------------------------
 static void renderGodFade(GLuint tex, const SColor &col)
 {
-    FullScreenShader::GodFadeShader::getInstance()->setTextureUnits(tex);
-    DrawFullScreenEffect<FullScreenShader::GodFadeShader>(col);
+    GodFadeShader::getInstance()->setTextureUnits(tex);
+    DrawFullScreenEffect<GodFadeShader>(col);
 }   // renderGodFade
 
 // ----------------------------------------------------------------------------
 static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
 {
-    FullScreenShader::GodRayShader::getInstance()->setTextureUnits(tex);
-    DrawFullScreenEffect<FullScreenShader::GodRayShader>(sunpos);
+    GodRayShader::getInstance()->setTextureUnits(tex);
+    DrawFullScreenEffect<GodRayShader>(sunpos);
 }   // renderGodRay
 
 // ----------------------------------------------------------------------------

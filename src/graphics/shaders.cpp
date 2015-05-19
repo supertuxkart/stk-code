@@ -468,26 +468,6 @@ namespace FullScreenShader
         assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
     }
 
-    GodFadeShader::GodFadeShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "godfade.frag");
-        assignUniforms("col");
-
-        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
-    }
-
-    GodRayShader::GodRayShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "godray.frag");
-
-        assignUniforms("sunpos");
-        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
-    }
-
     MLAAColorEdgeDetectionSHader::MLAAColorEdgeDetectionSHader()
     {
         loadProgram(OBJECT,

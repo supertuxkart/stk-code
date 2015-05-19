@@ -94,18 +94,6 @@ public:
     FogShader();
 };
 
-class GodFadeShader : public TextureShader<GodFadeShader, 1, video::SColorf>
-{
-public:
-    GodFadeShader();
-};
-
-class GodRayShader : public TextureShader<GodRayShader, 1, core::vector2df>
-{
-public:
-    GodRayShader();
-};
-
 class MLAAColorEdgeDetectionSHader : public TextureShader<MLAAColorEdgeDetectionSHader, 1, core::vector2df>
 {
 public:
