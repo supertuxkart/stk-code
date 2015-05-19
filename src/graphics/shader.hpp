@@ -20,6 +20,7 @@
 
 #include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 #include "utils/singleton.hpp"
 
 #include <matrix4.h>
