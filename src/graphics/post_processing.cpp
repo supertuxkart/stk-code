@@ -572,6 +572,27 @@ public:
 };   // MLAAGatherSHader
 
 // ============================================================================
+class SunLightShader : public TextureShader<SunLightShader, 2,
+                                            core::vector3df, video::SColorf>
+{
+public:
+    SunLightShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
+                            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
+                            GL_FRAGMENT_SHADER, "sunlight.frag");
+
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED);
+        assignUniforms("direction", "col");
+    }   // SunLightShader
+};   // SunLightShader
+
+// ============================================================================
 
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
@@ -827,10 +848,10 @@ void PostProcessing::renderSunlight(const core::vector3df &direction,
     glBlendFunc(GL_ONE, GL_ONE);
     glBlendEquation(GL_FUNC_ADD);
 
-    FullScreenShader::SunLightShader::getInstance()
+    SunLightShader::getInstance()
         ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
                           irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<FullScreenShader::SunLightShader>(direction, col);
+    DrawFullScreenEffect<SunLightShader>(direction, col);
 }   // renderSunlight
 
 // ----------------------------------------------------------------------------

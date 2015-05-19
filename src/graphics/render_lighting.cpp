@@ -260,6 +260,20 @@ public:
 };   // NVWorkaroundRadianceHintsConstructionShader
 
 // ============================================================================
+class FogShader : public TextureShader<FogShader, 1, float, core::vector3df>
+{
+public:
+    FogShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "fog.frag");
+        assignUniforms("density", "col");
+        assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
+    }   // FogShader
+};   // FogShader
+
+// ============================================================================
 static void renderPointLights(unsigned count)
 {
     glEnable(GL_BLEND);
@@ -529,9 +543,9 @@ void IrrDriver::renderAmbientScatter()
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    FullScreenShader::FogShader::getInstance()
+    FogShader::getInstance()
         ->setTextureUnits(irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<FullScreenShader::FogShader>(1.f / (40.f * start), col);
+    DrawFullScreenEffect<FogShader>(1.f / (40.f * start), col);
 }   // renderAmbientScatter
 
 // ----------------------------------------------------------------------------

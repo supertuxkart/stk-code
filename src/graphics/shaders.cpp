@@ -344,42 +344,6 @@ void Shaders::check(const int num)
     }
 }   // check
 
-// ----------------------------------------------------------------------------
-void bypassUBO(GLuint Program)
-{
-    GLint VM = glGetUniformLocation(Program, "ViewMatrix");
-    glUniformMatrix4fv(VM, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
-    GLint PM = glGetUniformLocation(Program, "ProjectionMatrix");
-    glUniformMatrix4fv(PM, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
-    GLint IVM = glGetUniformLocation(Program, "InverseViewMatrix");
-    glUniformMatrix4fv(IVM, 1, GL_FALSE, irr_driver->getInvViewMatrix().pointer());
-    GLint IPM = glGetUniformLocation(Program, "InverseProjectionMatrix");
-    glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
-    GLint Screen = glGetUniformLocation(Program, "screen");
-    glUniform2f(Screen, irr_driver->getCurrentScreenSize().X, irr_driver->getCurrentScreenSize().Y);
-    GLint bLmn = glGetUniformLocation(Program, "blueLmn[0]");
-    glUniform1fv(bLmn, 9, irr_driver->blueSHCoeff);
-    GLint gLmn = glGetUniformLocation(Program, "greenLmn[0]");
-    glUniform1fv(gLmn, 9, irr_driver->greenSHCoeff);
-    GLint rLmn = glGetUniformLocation(Program, "redLmn[0]");
-    glUniform1fv(rLmn, 9, irr_driver->redSHCoeff);
-    GLint sundir = glGetUniformLocation(Program, "sun_direction");
-    glUniform3f(sundir, irr_driver->getSunDirection().X, irr_driver->getSunDirection().Y, irr_driver->getSunDirection().Z);
-    GLint suncol = glGetUniformLocation(Program, "sun_col");
-    glUniform3f(suncol, irr_driver->getSunColor().getRed(), irr_driver->getSunColor().getGreen(), irr_driver->getSunColor().getBlue());
-    GLint sunangle = glGetUniformLocation(Program, "sun_angle");
-    glUniform1f(sunangle, 0.54f);
-}
-
-namespace UtilShader
-{
-}
-
-
-using namespace UtilShader;
-
-
-
 
 unsigned getGLSLVersion()
 {
@@ -438,34 +402,3 @@ namespace MeshShader
 
 }
 
-namespace FullScreenShader
-{
-
-    SunLightShader::SunLightShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
-            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
-            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
-            GL_FRAGMENT_SHADER, "sunlight.frag");
-
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
-                           1, "dtex", ST_NEAREST_FILTERED);
-        assignUniforms("direction", "col");
-    }
-
-    FogShader::FogShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-            GL_FRAGMENT_SHADER, "fog.frag");
-
-        assignUniforms("density", "col");
-        assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
-    }
-
-}

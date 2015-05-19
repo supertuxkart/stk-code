@@ -78,23 +78,6 @@ static void DrawFullScreenEffect(Args...args)
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-namespace FullScreenShader
-{
-
-
-class SunLightShader : public TextureShader<SunLightShader, 2,  core::vector3df, video::SColorf>
-{
-public:
-    SunLightShader();
-};
-
-class FogShader : public TextureShader<FogShader, 1, float, core::vector3df>
-{
-public:
-    FogShader();
-};
-
-}
 
 #define FOREACH_SHADER(ACT) \
     ACT(ES_NORMAL_MAP) \
