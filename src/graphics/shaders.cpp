@@ -244,11 +244,6 @@ Shaders::ColoredLine::ColoredLine()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }   // Shaders::ColoredLine
 
-
-
-GLuint quad_vbo, tri_vbo;
-
-
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
