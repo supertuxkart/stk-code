@@ -95,12 +95,6 @@ public:
     ShadowMatrixesGenerationShader();
 };
 
-class DepthHistogramShader : public TextureShader<DepthHistogramShader, 1>
-{
-public:
-    DepthHistogramShader();
-};
-
 class GlowShader : public TextureShader<GlowShader, 1>
 {
 public:

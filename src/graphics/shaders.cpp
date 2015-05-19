@@ -470,17 +470,6 @@ namespace FullScreenShader
         glShaderStorageBlockBinding(m_program, block_idx, 1);
     }
 
-    DepthHistogramShader::DepthHistogramShader()
-    {
-        loadProgram(OBJECT,
-            GL_COMPUTE_SHADER, "depthhistogram.comp",
-            GL_COMPUTE_SHADER, "utils/getPosFromUVDepth.frag");
-        assignSamplerNames(0, "depth", ST_NEAREST_FILTERED);
-
-        GLuint block_idx = glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, "Histogram");
-        glShaderStorageBlockBinding(m_program, block_idx, 1);
-    }
-
     GlowShader::GlowShader()
     {
         loadProgram(OBJECT,
