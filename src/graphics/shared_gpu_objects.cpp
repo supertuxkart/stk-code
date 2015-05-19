@@ -27,6 +27,7 @@ GLuint SharedGPUObjects::m_lighting_data_ubo;
 GLuint SharedGPUObjects::m_full_screen_quad_vao;
 GLuint SharedGPUObjects::m_ui_vao;
 GLuint SharedGPUObjects::m_quad_buffer;
+GLuint SharedGPUObjects::m_quad_vbo;
 bool   SharedGPUObjects::m_has_been_initialised = false;
 
 /** Initialises m_full_screen_quad_vbo.
@@ -40,9 +41,8 @@ void SharedGPUObjects::initQuadVBO()
          1., -1., 1., 0.,   // UpperRight
          1.,  1., 1., 1.    // LowerRight
     }; 
-    GLuint quad_vbo;
-    glGenBuffers(1, &quad_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+    glGenBuffers(1, &m_quad_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
     glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), QUAD_VERTEX,
                  GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

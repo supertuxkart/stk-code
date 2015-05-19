@@ -393,6 +393,62 @@ public:
 };   // GlobalIlluminationReconstructionShader
 
 // ============================================================================
+class PassThroughShader : public TextureShader<PassThroughShader, 1, int, int>
+{
+public:
+    PassThroughShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "passthrough.frag");
+        assignUniforms("width", "height");
+        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
+    }   // PassThroughShader
+};   // PassThroughShader
+
+// ============================================================================
+class LayerPassThroughShader : public Shader<LayerPassThroughShader, int>
+{
+private:
+    GLuint m_tu_texture;
+    GLuint m_vao;
+
+public:
+    LayerPassThroughShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "layertexturequad.frag");
+        m_tu_texture = 0;
+        assignUniforms("layer");
+        assignTextureUnit(m_tu_texture, "tex");
+        m_vao = createVAO();
+    }   // LayerPassThroughShader
+    // ------------------------------------------------------------------------
+    void bindVertexArray()
+    {
+        glBindVertexArray(m_vao);
+    }   // bindVertexArray
+    // ------------------------------------------------------------------------
+    void activateTexture()
+    {
+        glActiveTexture(GL_TEXTURE0 + m_tu_texture);
+    }   // activateTexture
+};   // LayerPassThroughShader
+
+// ============================================================================
+class LinearizeDepthShader : public TextureShader<LinearizeDepthShader, 1,
+                                                  float, float>
+{
+public:
+    LinearizeDepthShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "linearizedepth.frag");
+        assignUniforms("zn", "zf");
+        assignSamplerNames(0, "texture", ST_BILINEAR_FILTERED);
+    }   // LinearizeDepthShader
+};   // LinearizeDepthShader
+
+// ============================================================================
 
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
@@ -926,22 +982,20 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo,
 void PostProcessing::renderPassThrough(GLuint tex, unsigned width,
                                        unsigned height)
 {
-    FullScreenShader::PassThroughShader::getInstance()->setTextureUnits(tex);
-    DrawFullScreenEffect<FullScreenShader::PassThroughShader>(width, height);
+    PassThroughShader::getInstance()->setTextureUnits(tex);
+    DrawFullScreenEffect<PassThroughShader>(width, height);
 }   // renderPassThrough
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
 {
-    FullScreenShader::LayerPassThroughShader::getInstance()->use();
-    glBindVertexArray(FullScreenShader::LayerPassThroughShader::getInstance()->vao);
-
-    glActiveTexture(GL_TEXTURE0 + FullScreenShader::LayerPassThroughShader
-                                                  ::getInstance()->TU_texture);
+    LayerPassThroughShader::getInstance()->use();
+    LayerPassThroughShader::getInstance()->bindVertexArray();
+    LayerPassThroughShader::getInstance()->activateTexture();
     glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    FullScreenShader::LayerPassThroughShader::getInstance()->setUniforms(layer);
+    LayerPassThroughShader::getInstance()->setUniforms(layer);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }   // renderTextureLayer
@@ -966,9 +1020,9 @@ void PostProcessing::renderSSAO()
 
     // Generate linear depth buffer
     irr_driver->getFBO(FBO_LINEAR_DEPTH).Bind();
-    FullScreenShader::LinearizeDepthShader::getInstance()
+    LinearizeDepthShader::getInstance()
         ->setTextureUnits(irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<FullScreenShader::LinearizeDepthShader>
+    DrawFullScreenEffect<LinearizeDepthShader>
         (irr_driver->getSceneManager()->getActiveCamera()->getNearValue(), 
          irr_driver->getSceneManager()->getActiveCamera()->getFarValue()  );
     irr_driver->getFBO(FBO_SSAO).Bind();

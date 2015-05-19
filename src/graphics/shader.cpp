@@ -21,6 +21,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
@@ -246,5 +247,24 @@ void ShaderBase::setAttribute(AttributeType type)
         break;
     }
 }   // setAttribute
+
+// ----------------------------------------------------------------------------
+GLuint ShaderBase::createVAO()
+{
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    GLuint attrib_position = glGetAttribLocation(m_program, "Position");
+    GLuint attrib_texcoord = glGetAttribLocation(m_program, "Texcoord");
+    glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getQuadVBO());
+    glEnableVertexAttribArray(attrib_position);
+    glEnableVertexAttribArray(attrib_texcoord);
+    glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE,
+                          4 * sizeof(float), 0);
+    glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE,
+                          4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+    glBindVertexArray(0);
+    return vao;
+}   // createVAO
 
 // ============================================================================

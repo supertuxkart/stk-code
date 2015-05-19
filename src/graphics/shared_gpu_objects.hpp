@@ -36,6 +36,7 @@ private:
     static GLuint m_full_screen_quad_vao;
     static GLuint m_ui_vao;
     static GLuint m_quad_buffer;
+    static GLuint m_quad_vbo;
 
     static void initQuadVBO();
     static void initQuadBuffer();
@@ -108,7 +109,12 @@ public:
         assert(m_has_been_initialised);
         return m_quad_buffer;
     }   // getQuadBuffer
- 
+    // ------------------------------------------------------------------------
+    static GLuint getQuadVBO()
+    {
+        assert(m_has_been_initialised);
+        return m_quad_vbo;
+    }   // getQuadVBO
 };   // class SharedGPUObjecctS
 
 

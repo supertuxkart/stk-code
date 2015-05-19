@@ -91,6 +91,7 @@ public:
                        const char **varyings,
                        unsigned varyingscount);
     static void updateShaders();
+    GLuint createVAO();
     // ------------------------------------------------------------------------
     /** Activates the shader calling glUseProgram. */
     void use() { glUseProgram(m_program); }

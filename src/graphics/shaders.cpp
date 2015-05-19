@@ -443,23 +443,6 @@ namespace MeshShader
 
 }
 
-
-static GLuint createVAO(GLuint Program)
-{
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    GLuint attrib_position = glGetAttribLocation(Program, "Position");
-    GLuint attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-    glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-    glEnableVertexAttribArray(attrib_position);
-    glEnableVertexAttribArray(attrib_texcoord);
-    glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-    glBindVertexArray(0);
-    return vao;
-}
-
 namespace FullScreenShader
 {
 
@@ -479,36 +462,6 @@ namespace FullScreenShader
         assignUniforms("direction", "col");
     }
 
-    PassThroughShader::PassThroughShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "passthrough.frag");
-
-        assignUniforms("width", "height");
-        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
-    }
-
-    LayerPassThroughShader::LayerPassThroughShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "layertexturequad.frag");
-        TU_texture = 0;
-        assignUniforms("layer");
-        assignTextureUnit(TU_texture, "tex");
-        vao = createVAO(m_program);
-    }
-
-    LinearizeDepthShader::LinearizeDepthShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "screenquad.vert",
-            GL_FRAGMENT_SHADER, "linearizedepth.frag");
-        assignUniforms("zn", "zf");
-
-        assignSamplerNames(0, "texture", ST_BILINEAR_FILTERED);
-    }
 
 
     LightspaceBoundingBoxShader::LightspaceBoundingBoxShader()
@@ -552,7 +505,7 @@ namespace FullScreenShader
         assignUniforms();
 
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
-        vao = createVAO(m_program);
+        vao = createVAO();
     }
 
     SSAOShader::SSAOShader()

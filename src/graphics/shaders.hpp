@@ -88,27 +88,6 @@ public:
     SunLightShader();
 };
 
-class PassThroughShader : public TextureShader<PassThroughShader, 1, int, int>
-{
-public:
-    PassThroughShader();
-};
-
-class LayerPassThroughShader : public Shader<LayerPassThroughShader, int>
-{
-public:
-    GLuint TU_texture;
-    GLuint vao;
-
-    LayerPassThroughShader();
-};
-
-class LinearizeDepthShader : public TextureShader<LinearizeDepthShader, 1, float, float>
-{
-public:
-    LinearizeDepthShader();
-};
-
 class LightspaceBoundingBoxShader : public TextureShader<LightspaceBoundingBoxShader, 1,
                                                   core::matrix4, float, float,
                                                   float, float>
