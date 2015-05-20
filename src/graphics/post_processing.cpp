@@ -55,6 +55,13 @@ public:
 
         assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian3HBlurShader
+    // ------------------------------------------------------------------------
+    void render(const FrameBuffer &auxiliary, float inv_width,
+                float inv_height)
+    {
+        setTextureUnits(auxiliary.getRTT()[0]);
+        drawFullScreenEffect(core::vector2df(inv_width, inv_height));
+    }   // render
 };   // Gaussian3HBlurShader
 
 // ============================================================================
@@ -103,6 +110,12 @@ public:
 
         assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian3VBlurShader
+    // ------------------------------------------------------------------------
+    void render(FrameBuffer in_fbo, float inv_width, float inv_height)
+    {
+        setTextureUnits(in_fbo.getRTT()[0]);
+        drawFullScreenEffect(core::vector2df(inv_width, inv_height));
+    }   // render
 };   // Gaussian3VBlurShader
 
 // ============================================================================
@@ -644,6 +657,18 @@ public:
                            1, "dtex", ST_NEAREST_FILTERED);
         assignUniforms("direction", "col");
     }   // SunLightShader
+    // ------------------------------------------------------------------------
+    void render(const core::vector3df &direction, const video::SColorf &col)
+    {
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBlendEquation(GL_FUNC_ADD);
+
+        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
+                        irr_driver->getDepthStencilTexture());
+        drawFullScreenEffect(direction, col);
+    }   // render
 };   // SunLightShader
 
 // ============================================================================
@@ -891,15 +916,7 @@ void PostProcessing::renderGI(const core::matrix4 &rh_matrix,
 void PostProcessing::renderSunlight(const core::vector3df &direction,
                                     const video::SColorf &col)
 {
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glBlendEquation(GL_FUNC_ADD);
-
-    SunLightShader::getInstance()
-        ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
-                          irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<SunLightShader>(direction, col);
+    SunLightShader::getInstance()->render(direction, col);
 }   // renderSunlight
 
 // ----------------------------------------------------------------------------
@@ -934,19 +951,13 @@ void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo,
     float inv_height = 1.0f / in_fbo.getHeight();
     {
         auxiliary.Bind();
-
-        Gaussian3VBlurShader::getInstance()
-            ->setTextureUnits(in_fbo.getRTT()[0]);
-        DrawFullScreenEffect<Gaussian3VBlurShader>
-                                     (core::vector2df(inv_width, inv_height));
+        Gaussian3VBlurShader::getInstance()->render(in_fbo, inv_width,
+                                                    inv_height);
     }
     {
         in_fbo.Bind();
-
-        Gaussian3HBlurShader::getInstance()
-            ->setTextureUnits(auxiliary.getRTT()[0]);
-        DrawFullScreenEffect<Gaussian3HBlurShader>
-                                      (core::vector2df(inv_width, inv_height));
+        Gaussian3HBlurShader::getInstance()->render(auxiliary, inv_width,
+                                                    inv_height);
     }
 }   // renderGaussian3Blur
 
