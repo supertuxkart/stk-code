@@ -96,14 +96,11 @@ public:
         assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian6VBlurShader
     // ------------------------------------------------------------------------
-    void render(GLuint layer_tex, float sigma_v)
+    void render(GLuint layer_tex, int width, int height, float sigma_v)
     {
-        irr_driver->getFBO(FBO_SCALAR_1024).Bind();
         Gaussian6VBlurShader::getInstance()->setTextureUnits(layer_tex);
-        drawFullScreenEffect(
-            core::vector2df(1.f / UserConfigParams::m_shadows_resolution,
-                            1.f / UserConfigParams::m_shadows_resolution),
-            sigma_v);
+        drawFullScreenEffect(core::vector2df(1.f / width, 1.f / height),
+                             sigma_v);
     }   // render
 };   // Gaussian6VBlurShader
 
@@ -993,7 +990,9 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
     {
         // Used as temp
         irr_driver->getFBO(FBO_SCALAR_1024).Bind();
-        Gaussian6VBlurShader::getInstance()->render(layer_tex, sigma_v);
+        Gaussian6VBlurShader::getInstance()
+            ->render(layer_tex, UserConfigParams::m_shadows_resolution, 
+                     UserConfigParams::m_shadows_resolution, sigma_v);
 
         in_fbo.BindLayer(layer);
         Gaussian6HBlurShader::getInstance()->render(sigma_h);
@@ -1048,10 +1047,9 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo,
     if (!CVS->supportsComputeShadersFiltering())
     {
         auxiliary.Bind();
-
-        Gaussian6VBlurShader::getInstance()->setTextureUnits(in_fbo.getRTT()[0]);
-        DrawFullScreenEffect<Gaussian6VBlurShader>
-                        (core::vector2df(inv_width, inv_height), sigma_v);
+        Gaussian6VBlurShader::getInstance()
+            ->render(in_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getWidth(),
+                     sigma_v);
 
         in_fbo.Bind();
 
