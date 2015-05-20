@@ -358,7 +358,6 @@ public:
     }   // loadProgram
 
     // ------------------------------------------------------------------------
-    template<typename... Args>
     void drawFullScreenEffect(Args...args)
     {
         use();
