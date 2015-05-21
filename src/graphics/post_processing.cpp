@@ -213,6 +213,14 @@ public:
         assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
                            1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian17TapHShader
+    // ------------------------------------------------------------------------
+    void render(const FrameBuffer &fb, int width, int height)
+    {
+        setTextureUnits(fb.getRTT()[0],
+                        irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0] );
+        drawFullScreenEffect(core::vector2df(1.0f/width, 1.0f/height));
+
+    }   // render
 };   // Gaussian17TapHShader
 
 // ============================================================================
@@ -230,6 +238,19 @@ public:
                            1, "depth", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeGaussian17TapHShader
+    // ------------------------------------------------------------------------
+    void render(const FrameBuffer &fb, const FrameBuffer &auxiliary,
+                int width, int height)
+    {
+        use();
+        glBindSampler(m_dest_tu, 0);
+        setTextureUnits(fb.getRTT()[0],
+                        irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
+        glBindImageTexture(m_dest_tu, auxiliary.getRTT()[0], 0, false,
+                           0, GL_WRITE_ONLY, GL_R16F);
+        setUniforms(core::vector2df(1.0f/width, 1.0f/height));
+        glDispatchCompute((int)width / 8 + 1, (int)height / 8 + 1, 1);
+    }   // render
 };   // ComputeGaussian17TapHShader
 
 
@@ -1126,27 +1147,16 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo,
         if (!CVS->supportsComputeShadersFiltering())
         {
             auxiliary.Bind();
-            Gaussian17TapHShader::getInstance()
-                ->setTextureUnits(in_fbo.getRTT()[0], 
-                             irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
-            DrawFullScreenEffect<Gaussian17TapHShader>
-                                      (core::vector2df(inv_width, inv_height));
+            Gaussian17TapHShader::getInstance()->render(in_fbo,
+                                                        in_fbo.getWidth(),
+                                                        in_fbo.getHeight());
         }
         else
         {
-            ComputeGaussian17TapHShader::getInstance()->use();
-            glBindSampler(ComputeGaussian17TapHShader::getInstance()
-                          ->m_dest_tu, 0);
-            ComputeGaussian17TapHShader::getInstance()
-                ->setTextureUnits(in_fbo.getRTT()[0], 
-                             irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
-            glBindImageTexture(ComputeGaussian17TapHShader::getInstance()
-                               ->m_dest_tu, auxiliary.getRTT()[0], 0, false,
-                               0, GL_WRITE_ONLY, GL_R16F);
-            ComputeGaussian17TapHShader::getInstance()
-                ->setUniforms(core::vector2df(inv_width, inv_height));
-            glDispatchCompute((int)in_fbo.getWidth()  / 8 + 1,
-                              (int)in_fbo.getHeight() / 8 + 1, 1);
+            ComputeGaussian17TapHShader::getInstance()->render(in_fbo,
+                                                               auxiliary,
+                                                               in_fbo.getWidth(),
+                                                               in_fbo.getHeight());
         }
     }
     if (CVS->supportsComputeShadersFiltering())
