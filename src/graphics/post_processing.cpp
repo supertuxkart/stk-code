@@ -702,6 +702,13 @@ public:
         assignUniforms("PIXEL_SIZE");
         assignSamplerNames(0, "colorMapG", ST_NEAREST_FILTERED);
     }   // MLAAColorEdgeDetectionSHader
+    // ------------------------------------------------------------------------
+    void render(const core::vector2df &pixel_size)
+    {
+        use();
+        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS));
+        drawFullScreenEffect(pixel_size);
+    }   // render
 };   // MLAAColorEdgeDetectionSHader
 
 // ============================================================================
@@ -1336,10 +1343,7 @@ void PostProcessing::applyMLAA()
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     // Pass 1: color edge detection
-    MLAAColorEdgeDetectionSHader::getInstance()->use();
-    MLAAColorEdgeDetectionSHader::getInstance()
-        ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS));
-    DrawFullScreenEffect<MLAAColorEdgeDetectionSHader>(PIXEL_SIZE);
+    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE);
 
     glStencilFunc(GL_EQUAL, 1, ~0);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
