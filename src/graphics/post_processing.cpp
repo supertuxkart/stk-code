@@ -725,6 +725,15 @@ public:
         assignSamplerNames(0, "edgesMap", ST_BILINEAR_FILTERED,
                            1, "areaMap", ST_NEAREST_FILTERED);
     }   // MLAABlendWeightSHader
+    // ------------------------------------------------------------------------
+    void render(video::ITexture *area_map, const core::vector2df &pixel_size)
+    {
+        use();
+        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_TMP),
+                        getTextureGLuint(area_map));
+    DrawFullScreenEffect<MLAABlendWeightSHader>(pixel_size);
+
+    }   // render
 };   // MLAABlendWeightSHader
 
 // ============================================================================
@@ -1352,11 +1361,7 @@ void PostProcessing::applyMLAA()
     irr_driver->getFBO(FBO_MLAA_BLEND).bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    MLAABlendWeightSHader::getInstance()->use();
-    MLAABlendWeightSHader::getInstance()
-        ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_TMP),
-                          getTextureGLuint(m_areamap));
-    DrawFullScreenEffect<MLAABlendWeightSHader>(PIXEL_SIZE);
+    MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE);
 
     // Blit in to tmp1
     FrameBuffer::Blit(irr_driver->getFBO(FBO_MLAA_COLORS),
