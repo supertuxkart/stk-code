@@ -186,6 +186,8 @@ public:
 };   // ShadowedSunLightShaderPCF
 
 // ============================================================================
+extern float shadowSplit[5];
+// ----------------------------------------------------------------------------
 class ShadowedSunLightShaderESM : public TextureShader<ShadowedSunLightShaderESM,
                                                        3, float, float, float,
                                                        float>
@@ -208,6 +210,15 @@ public:
             
         assignUniforms("split0", "split1", "split2", "splitmax");
     }   // ShadowedSunLightShaderESM
+    // ------------------------------------------------------------------------
+    void render(RTT *rtt)
+    {
+        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
+                        irr_driver->getDepthStencilTexture(),
+                        rtt->getShadowFBO().getRTT()[0]);
+        drawFullScreenEffect(shadowSplit[1], shadowSplit[2],
+                             shadowSplit[3], shadowSplit[4]);
+    }   // render
 };   // ShadowedSunLightShaderESM
 
 // ============================================================================
@@ -395,9 +406,6 @@ void IrrDriver::uploadLightingData()
 }   // uploadLightingData
 
 // ----------------------------------------------------------------------------
-extern float shadowSplit[5];
-
-// ----------------------------------------------------------------------------
 void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 {
     //RH
@@ -473,15 +481,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 
             if (CVS->isESMEnabled())
             {
-                ShadowedSunLightShaderESM::getInstance()
-                    ->setTextureUnits(
-                        irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
-                        irr_driver->getDepthStencilTexture(),
-                        m_rtts->getShadowFBO().getRTT()[0]);
-                DrawFullScreenEffect<ShadowedSunLightShaderESM>(shadowSplit[1],
-                                                                shadowSplit[2],
-                                                                shadowSplit[3],
-                                                                shadowSplit[4]);
+                ShadowedSunLightShaderESM::getInstance()->render(m_rtts);
             }
             else
             {
