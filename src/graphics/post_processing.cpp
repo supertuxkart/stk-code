@@ -344,6 +344,14 @@ public:
                            1, "tex_256", ST_BILINEAR_FILTERED,
                            2, "tex_512", ST_BILINEAR_FILTERED);
     }   // BloomBlendShader
+    // ------------------------------------------------------------------------
+    void render()
+    {
+        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_BLOOM_128),
+                        irr_driver->getRenderTargetTexture(RTT_BLOOM_256),
+                        irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
+        drawFullScreenEffect();
+    }   // render
 };   // BloomBlendShader
 
 // ============================================================================
@@ -360,6 +368,15 @@ public:
                            1, "tex_256", ST_BILINEAR_FILTERED,
                            2, "tex_512", ST_BILINEAR_FILTERED);
     }   // LensBlendShader
+    // ------------------------------------------------------------------------
+    void render()
+    {
+        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_LENS_128),
+                        irr_driver->getRenderTargetTexture(RTT_LENS_256),
+                        irr_driver->getRenderTargetTexture(RTT_LENS_512));
+        drawFullScreenEffect();
+
+    }   // render
 };   // LensBlendShader
 
 // ============================================================================
@@ -731,7 +748,7 @@ public:
         use();
         setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_TMP),
                         getTextureGLuint(area_map));
-    DrawFullScreenEffect<MLAABlendWeightSHader>(pixel_size);
+        drawFullScreenEffect(pixel_size);
 
     }   // render
 };   // MLAABlendWeightSHader
@@ -1545,18 +1562,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
             
-            BloomBlendShader::getInstance()->setTextureUnits(
-                irr_driver->getRenderTargetTexture(RTT_BLOOM_128),
-                irr_driver->getRenderTargetTexture(RTT_BLOOM_256),
-                irr_driver->getRenderTargetTexture(RTT_BLOOM_512)  );
-            DrawFullScreenEffect<BloomBlendShader>();
-
-            LensBlendShader::getInstance()->setTextureUnits(
-                irr_driver->getRenderTargetTexture(RTT_LENS_128),
-                irr_driver->getRenderTargetTexture(RTT_LENS_256),
-                irr_driver->getRenderTargetTexture(RTT_LENS_512));
-            DrawFullScreenEffect<LensBlendShader>();
-
+            BloomBlendShader::getInstance()->render();
+            LensBlendShader::getInstance()->render();
 
             glDisable(GL_BLEND);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
