@@ -39,7 +39,6 @@ using namespace Scripting;
 namespace Scripting
 {
     const char* MODULE_ID_MAIN_SCRIPT_FILE = "main";
-    const char* MODULE_ID_EVAL = "eval";
 
     void AngelScript_ErrorCallback (const asSMessageInfo *msg, void *param)
     {

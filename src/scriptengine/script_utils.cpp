@@ -102,10 +102,8 @@ namespace Scripting
         }
 
         /** Runs the script specified by the given string */
-        // TODO: type arguments
-        void runScript(asIScriptGeneric *gen)
+        void runScript(const std::string* str)
         {
-            std::string *str = (std::string*)gen->GetArgAddress(0);
             ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             script_engine->runFunction(*str);
         }
@@ -163,7 +161,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues3), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues4), asCALL_CDECL); assert(r >= 0);
             
-            r = engine->RegisterGlobalFunction("void runScript(string &in)", asFUNCTION(runScript), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void runScript(string &in)", asFUNCTION(runScript), asCALL_CDECL); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("void logInfo(const string &in)", asFUNCTION(logInfo), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void logWarning(const string &in)", asFUNCTION(logWarning), asCALL_CDECL); assert(r >= 0);
