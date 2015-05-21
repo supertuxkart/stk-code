@@ -551,6 +551,14 @@ public:
         assignUniforms("zn", "zf");
         assignSamplerNames(0, "texture", ST_BILINEAR_FILTERED);
     }   // LinearizeDepthShader
+    // ------------------------------------------------------------------------
+    void render()
+    {
+        setTextureUnits(irr_driver->getDepthStencilTexture());
+        scene::ICameraSceneNode *c = irr_driver->getSceneManager()->getActiveCamera();
+        drawFullScreenEffect(c->getNearValue(), c->getFarValue()  );
+
+    }   // render
 };   // LinearizeDepthShader
 
 // ============================================================================
@@ -1249,13 +1257,8 @@ void PostProcessing::renderSSAO()
 
     // Generate linear depth buffer
     irr_driver->getFBO(FBO_LINEAR_DEPTH).Bind();
-    LinearizeDepthShader::getInstance()
-        ->setTextureUnits(irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<LinearizeDepthShader>
-        (irr_driver->getSceneManager()->getActiveCamera()->getNearValue(), 
-         irr_driver->getSceneManager()->getActiveCamera()->getFarValue()  );
+    LinearizeDepthShader::getInstance()->render();
     irr_driver->getFBO(FBO_SSAO).Bind();
-
     SSAOShader::getInstance()->render();
 }   // renderSSAO
 
