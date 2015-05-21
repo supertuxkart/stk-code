@@ -178,7 +178,7 @@ public:
 
 // ============================================================================
 class Gaussian6HBlurShader : public TextureShader<Gaussian6HBlurShader, 1,
-                                           core::vector2df, float>
+                                                 core::vector2df, float>
 {
 public:
     Gaussian6HBlurShader()
@@ -1105,10 +1105,8 @@ void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo,
     {
         auxiliary.Bind();
 
-        Gaussian6HBlurShader::getInstance()
-                                ->setTextureUnits(in_fbo.getRTT()[0]);
-        DrawFullScreenEffect<Gaussian6HBlurShader>
-                         (core::vector2df(inv_width, inv_height), 2.0f);
+        Gaussian6HBlurShader::getInstance()->render(in_fbo, in_fbo.getWidth(),
+                                                    in_fbo.getHeight(), 2.0f );
     }
     {
         in_fbo.Bind();
