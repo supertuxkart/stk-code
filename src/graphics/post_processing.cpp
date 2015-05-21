@@ -593,6 +593,17 @@ public:
         assignUniforms("radius", "k", "sigma");
         assignSamplerNames(0, "dtex", ST_SEMI_TRILINEAR);
     }   // SSAOShader
+    // ------------------------------------------------------------------------
+    void render()
+    {
+        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH));
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        drawFullScreenEffect(irr_driver->getSSAORadius(),
+                             irr_driver->getSSAOK(),
+                             irr_driver->getSSAOSigma());
+
+    }   // render
 };   // SSAOShader
 
 // ============================================================================
@@ -1245,14 +1256,9 @@ void PostProcessing::renderSSAO()
          irr_driver->getSceneManager()->getActiveCamera()->getFarValue()  );
     irr_driver->getFBO(FBO_SSAO).Bind();
 
-    SSAOShader::getInstance()
-        ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH));
-    glGenerateMipmap(GL_TEXTURE_2D);
+    SSAOShader::getInstance()->render();
+}   // renderSSAO
 
-    DrawFullScreenEffect<SSAOShader>
-        (irr_driver->getSSAORadius(), irr_driver->getSSAOK(),
-         irr_driver->getSSAOSigma()                           );
-}
 // ----------------------------------------------------------------------------
 void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo,
                                       FrameBuffer &out_fbo)
