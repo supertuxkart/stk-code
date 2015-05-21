@@ -69,8 +69,8 @@ public:
     FrameBuffer(const std::vector <GLuint> &RTTs, size_t w, size_t h, bool layered = false);
     FrameBuffer(const std::vector <GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered = false);
     ~FrameBuffer();
-    void Bind();
-    void BindLayer(unsigned);
+    void bind() const;
+    void bindLayer(unsigned);
     const std::vector<GLuint> &getRTT() const { return RenderTargets; }
     GLuint &getDepthTexture() { assert(DepthTexture); return DepthTexture; }
     size_t getWidth() const { return width; }

@@ -405,7 +405,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
         glDisable(GL_BLEND);
-        m_rtts->getRH().Bind();
+        m_rtts->getRH().bind();
         glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
         if (CVS->needRHWorkaround())
         {
@@ -442,17 +442,17 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
-    m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
+    m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    m_rtts->getFBO(FBO_DIFFUSE).Bind();
+    m_rtts->getFBO(FBO_DIFFUSE).bind();
     if (CVS->isGlobalIlluminationEnabled() && hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH());
     }
 
-    m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
+    m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
 
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
@@ -508,7 +508,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 // ----------------------------------------------------------------------------
 void IrrDriver::renderSSAO()
 {
-    m_rtts->getFBO(FBO_SSAO).Bind();
+    m_rtts->getFBO(FBO_SSAO).bind();
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
     m_post_processing->renderSSAO();
@@ -548,7 +548,7 @@ void IrrDriver::renderAmbientScatter()
 // ----------------------------------------------------------------------------
 void IrrDriver::renderLightsScatter(unsigned pointlightcount)
 {
-    getFBO(FBO_HALF1).Bind();
+    getFBO(FBO_HALF1).bind();
     glClearColor(0., 0., 0., 0.);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -588,7 +588,7 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
 
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    getFBO(FBO_COLORS).Bind();
+    getFBO(FBO_COLORS).bind();
     m_post_processing->renderPassThrough(getRenderTargetTexture(RTT_HALF1),
                                          getFBO(FBO_COLORS).getWidth(),
                                          getFBO(FBO_COLORS).getHeight());

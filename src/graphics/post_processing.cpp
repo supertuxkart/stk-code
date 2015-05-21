@@ -379,7 +379,7 @@ public:
     // ----------------------------------------------------------------------------
     void render(FrameBuffer &fbo, GLuint rtt, float vignette_weight)
     {
-        fbo.Bind();
+        fbo.bind();
         setTextureUnits(rtt);
         drawFullScreenEffect(vignette_weight);
     }   // render
@@ -398,6 +398,14 @@ public:
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED);
     }   // DepthOfFieldShader
+    // ------------------------------------------------------------------------
+    void render(const FrameBuffer &fb, GLuint rtt)
+    {
+        fb.bind();
+        setTextureUnits(rtt, irr_driver->getDepthStencilTexture());
+        drawFullScreenEffect();
+
+    }   // render
 };   // DepthOfFieldShader
 
 // ============================================================================
@@ -1039,12 +1047,12 @@ void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo,
     float inv_width  = 1.0f / in_fbo.getWidth();
     float inv_height = 1.0f / in_fbo.getHeight();
     {
-        auxiliary.Bind();
+        auxiliary.bind();
         Gaussian3VBlurShader::getInstance()->render(in_fbo, inv_width,
                                                     inv_height);
     }
     {
-        in_fbo.Bind();
+        in_fbo.bind();
         Gaussian3HBlurShader::getInstance()->render(auxiliary, inv_width,
                                                     inv_height);
     }
@@ -1062,12 +1070,12 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
     if (!CVS->supportsComputeShadersFiltering())
     {
         // Used as temp
-        irr_driver->getFBO(FBO_SCALAR_1024).Bind();
+        irr_driver->getFBO(FBO_SCALAR_1024).bind();
         Gaussian6VBlurShader::getInstance()
             ->render(layer_tex, UserConfigParams::m_shadows_resolution, 
                      UserConfigParams::m_shadows_resolution, sigma_v);
 
-        in_fbo.BindLayer(layer);
+        in_fbo.bindLayer(layer);
         Gaussian6HBlurShader::getInstance()
             ->render(irr_driver->getFBO(FBO_SCALAR_1024),
                      UserConfigParams::m_shadows_resolution, 
@@ -1122,12 +1130,12 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo,
 
     if (!CVS->supportsComputeShadersFiltering())
     {
-        auxiliary.Bind();
+        auxiliary.bind();
         Gaussian6VBlurShader::getInstance()
             ->render(in_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getWidth(),
                      sigma_v);
 
-        in_fbo.Bind();
+        in_fbo.bind();
         Gaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
         Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
                                                    in_fbo.getHeight(), sigma_h);
@@ -1176,10 +1184,10 @@ void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo,
     float inv_width  = 1.0f / in_fbo.getWidth();
     float inv_height = 1.0f / in_fbo.getHeight();
 
-    auxiliary.Bind();
+    auxiliary.bind();
     Gaussian6HBlurShader::getInstance()->render(in_fbo, in_fbo.getWidth(),
                                                 in_fbo.getHeight(), 2.0f );
-    in_fbo.Bind();
+    in_fbo.bind();
     Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
                                                 in_fbo.getHeight(), 2.0f);
 }   // renderHorizontalBlur
@@ -1198,7 +1206,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo,
     {
         if (!CVS->supportsComputeShadersFiltering())
         {
-            auxiliary.Bind();
+            auxiliary.bind();
             Gaussian17TapHShader::getInstance()->render(in_fbo,
                                                         in_fbo.getWidth(),
                                                         in_fbo.getHeight());
@@ -1216,7 +1224,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo,
     {
         if (!CVS->supportsComputeShadersFiltering())
         {
-            in_fbo.Bind();
+            in_fbo.bind();
             Gaussian17TapVShader::getInstance()->render(auxiliary,
                                                         in_fbo.getWidth(),
                                                         in_fbo.getHeight());
@@ -1267,9 +1275,9 @@ void PostProcessing::renderSSAO()
     glDisable(GL_BLEND);
 
     // Generate linear depth buffer
-    irr_driver->getFBO(FBO_LINEAR_DEPTH).Bind();
+    irr_driver->getFBO(FBO_LINEAR_DEPTH).bind();
     LinearizeDepthShader::getInstance()->render();
-    irr_driver->getFBO(FBO_SSAO).Bind();
+    irr_driver->getFBO(FBO_SSAO).bind();
     SSAOShader::getInstance()->render();
 }   // renderSSAO
 
@@ -1299,7 +1307,7 @@ void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo,
     else
         setMotionBlurCenterY(camID, 0.5f);
 
-    out_fbo.Bind();
+    out_fbo.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     float boost_time = cb->getBoostTime(cam->getIndex()) * 10;
@@ -1308,12 +1316,9 @@ void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo,
 
 
 // ----------------------------------------------------------------------------
-static void renderDoF(FrameBuffer &fbo, GLuint rtt)
+static void renderDoF(const FrameBuffer &fbo, GLuint rtt)
 {
-    fbo.Bind();
-    DepthOfFieldShader::getInstance()
-        ->setTextureUnits(rtt, irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<DepthOfFieldShader>();
+    DepthOfFieldShader::getInstance()->render(fbo, rtt);
 }   // renderDoF
 
 // ----------------------------------------------------------------------------
@@ -1323,7 +1328,7 @@ void PostProcessing::applyMLAA()
                      core::vector2df(1.0f / UserConfigParams::m_width,
                                      1.0f / UserConfigParams::m_height);
 
-    irr_driver->getFBO(FBO_MLAA_TMP).Bind();
+    irr_driver->getFBO(FBO_MLAA_TMP).bind();
     glEnable(GL_STENCIL_TEST);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -1340,7 +1345,7 @@ void PostProcessing::applyMLAA()
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
     // Pass 2: blend weights
-    irr_driver->getFBO(FBO_MLAA_BLEND).Bind();
+    irr_driver->getFBO(FBO_MLAA_BLEND).bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     MLAABlendWeightSHader::getInstance()->use();
@@ -1354,7 +1359,7 @@ void PostProcessing::applyMLAA()
                       irr_driver->getFBO(FBO_MLAA_TMP));
 
     // Pass 3: gather
-    irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
+    irr_driver->getFBO(FBO_MLAA_COLORS).bind();
 
     MLAAGatherSHader::getInstance()->use();
     MLAAGatherSHader::getInstance()
@@ -1403,7 +1408,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
             glEnable(GL_DEPTH_TEST);
             // Grab the sky
-            out_fbo->Bind();
+            out_fbo->bind();
             glClear(GL_COLOR_BUFFER_BIT);
 //            irr_driver->renderSkybox(camnode);
 
@@ -1420,7 +1425,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             glDisable(GL_DEPTH_TEST);
 
             // Fade to quarter
-            irr_driver->getFBO(FBO_QUARTER1).Bind();
+            irr_driver->getFBO(FBO_QUARTER1).bind();
             glViewport(0, 0, irr_driver->getActualScreenSize().Width / 4,
                              irr_driver->getActualScreenSize().Height / 4);
             GodFadeShader::getInstance()->render(out_fbo->getRTT()[0], col);
@@ -1446,7 +1451,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
 
             // Rays please
-            irr_driver->getFBO(FBO_QUARTER2).Bind();
+            irr_driver->getFBO(FBO_QUARTER2).bind();
             GodRayShader::getInstance()
                 ->render(irr_driver->getRenderTargetTexture(RTT_QUARTER1),
                        core::vector2df(sunx, suny)                       );
@@ -1461,7 +1466,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
 
-            in_fbo->Bind();
+            in_fbo->bind();
             renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER2),
                               in_fbo->getWidth(), in_fbo->getHeight());
             glDisable(GL_BLEND);
@@ -1482,7 +1487,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             FrameBuffer::Blit(*in_fbo, irr_driver->getFBO(FBO_BLOOM_1024),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-            irr_driver->getFBO(FBO_BLOOM_512).Bind();
+            irr_driver->getFBO(FBO_BLOOM_512).bind();
             renderBloom(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024));
 
             // Downsample
@@ -1522,7 +1527,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             
 
             // Additively blend on top of tmp1
-            in_fbo->Bind();
+            in_fbo->bind();
             glEnable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
@@ -1577,7 +1582,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         return in_fbo;
 
     glEnable(GL_FRAMEBUFFER_SRGB);
-    irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
+    irr_driver->getFBO(FBO_MLAA_COLORS).bind();
     renderPassThrough(in_fbo->getRTT()[0],
                       irr_driver->getFBO(FBO_MLAA_COLORS).getWidth(),
                       irr_driver->getFBO(FBO_MLAA_COLORS).getHeight());

@@ -1560,9 +1560,9 @@ void IrrDriver::renderTransparent()
         return;
 
     // Render displacement nodes
-    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
+    irr_driver->getFBO(FBO_TMP1_WITH_DS).bind();
     glClear(GL_COLOR_BUFFER_BIT);
-    irr_driver->getFBO(FBO_DISPLACE).Bind();
+    irr_driver->getFBO(FBO_DISPLACE).bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     DisplaceProvider * const cb =
@@ -1581,7 +1581,7 @@ void IrrDriver::renderTransparent()
         glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_2TCOORDS));
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
-    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
+    irr_driver->getFBO(FBO_TMP1_WITH_DS).bind();
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh =
@@ -1608,7 +1608,7 @@ void IrrDriver::renderTransparent()
                                  (GLvoid *)mesh.vaoOffset, (int)mesh.vaoBaseVertex);
     }
 
-    irr_driver->getFBO(FBO_DISPLACE).Bind();
+    irr_driver->getFBO(FBO_DISPLACE).bind();
     if (!displaceTex)
         displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
@@ -1640,7 +1640,7 @@ void IrrDriver::renderTransparent()
                                  (int)mesh.vaoBaseVertex);
     }
 
-    irr_driver->getFBO(FBO_COLORS).Bind();
+    irr_driver->getFBO(FBO_COLORS).bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
     m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE),
                                          irr_driver->getFBO(FBO_COLORS).getWidth(), 
@@ -1757,7 +1757,7 @@ void IrrDriver::renderShadows()
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
-    m_rtts->getShadowFBO().Bind();
+    m_rtts->getShadowFBO().bind();
     if (!CVS->isESMEnabled())
     {
         glDrawBuffer(GL_NONE);
@@ -1923,7 +1923,7 @@ void IrrDriver::renderRSM()
     if (m_rsm_map_available)
         return;
     ScopedGPUTimer Timer(getGPUTimer(Q_RSM));
-    m_rtts->getRSM().Bind();
+    m_rtts->getRSM().bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     drawRSM<DefaultMaterial, 3, 1>(rsm_matrix);

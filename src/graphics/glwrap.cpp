@@ -244,7 +244,7 @@ FrameBuffer::~FrameBuffer()
         glDeleteFramebuffers(1, &fbolayer);
 }
 
-void FrameBuffer::Bind()
+void FrameBuffer::bind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glViewport(0, 0, (int)width, (int)height);
@@ -252,7 +252,7 @@ void FrameBuffer::Bind()
     glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
-void FrameBuffer::BindLayer(unsigned i)
+void FrameBuffer::bindLayer(unsigned i)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbolayer);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, RenderTargets[0], 0, i);

@@ -257,11 +257,11 @@ RTT::RTT(size_t width, size_t height)
     }
 
     // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
-    getFBO(FBO_HALF1_R).Bind();
+    getFBO(FBO_HALF1_R).bind();
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
+    getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
     glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

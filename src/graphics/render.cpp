@@ -427,7 +427,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     glEnable(GL_CULL_FACE);
     if (CVS->isDefferedEnabled() || forceRTT)
     {
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         glClearColor(0., 0., 0., 0.);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderSolidFirstPass();
@@ -437,7 +437,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         // We need a cleared depth buffer for some effect (eg particles depth blending)
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
             glDisable(GL_FRAMEBUFFER_SRGB);
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         // Bind() modifies the viewport. In order not to affect anything else,
         // the viewport is just reset here and not removed in Bind().
         const core::recti &vp = Camera::getActiveCamera()->getViewport();
@@ -474,7 +474,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
     if (CVS->isDefferedEnabled() || forceRTT)
     {
-        m_rtts->getFBO(FBO_COLORS).Bind();
+        m_rtts->getFBO(FBO_COLORS).bind();
         SColor clearColor(0, 150, 150, 150);
         if (World::getWorld() != NULL)
             clearColor = World::getWorld()->getClearColor();
@@ -489,9 +489,9 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
 
     if (getNormals())
     {
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         renderNormalsVisualisation();
-        m_rtts->getFBO(FBO_COLORS).Bind();
+        m_rtts->getFBO(FBO_COLORS).bind();
     }
 
     // Render ambient scattering
@@ -524,14 +524,17 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     if (getRH())
     {
         glDisable(GL_BLEND);
-        m_rtts->getFBO(FBO_COLORS).Bind();
-        m_post_processing->renderRHDebug(m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2], rh_matrix, rh_extend);
+        m_rtts->getFBO(FBO_COLORS).bind();
+        m_post_processing->renderRHDebug(m_rtts->getRH().getRTT()[0],
+                                         m_rtts->getRH().getRTT()[1], 
+                                         m_rtts->getRH().getRTT()[2],
+                                         rh_matrix, rh_extend);
     }
 
     if (getGI())
     {
         glDisable(GL_BLEND);
-        m_rtts->getFBO(FBO_COLORS).Bind();
+        m_rtts->getFBO(FBO_COLORS).bind();
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH());
     }
 
@@ -709,7 +712,7 @@ void IrrDriver::renderShadowsDebug()
 void IrrDriver::renderGlow(std::vector<GlowData>& glows)
 {
     m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
-    m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
+    m_rtts->getFBO(FBO_TMP1_WITH_DS).bind();
     glClearStencil(0);
     glClearColor(0, 0, 0, 0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -776,7 +779,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glStencilFunc(GL_EQUAL, 0, ~0);
     glEnable(GL_STENCIL_TEST);
-    m_rtts->getFBO(FBO_COLORS).Bind();
+    m_rtts->getFBO(FBO_COLORS).bind();
     m_post_processing->renderGlow(m_rtts->getRenderTarget(RTT_QUARTER1));
     glDisable(GL_STENCIL_TEST);
 }
