@@ -1,6 +1,6 @@
 /*
   AngelCode Scripting Library
-  Copyright (c) 2003-2014 Andreas Jonsson
+  Copyright (c) 2003-2013 Andreas Jonsson
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any
@@ -29,21 +29,23 @@
 */
 
 /*
-   Assembly routines for the ARM call convention
-   Written by Fredrik Ehnbom in June 2009
+   Assembly routines for the Playstation Vita SNC call convention.
 
-   Adapted to GNUC by darktemplar216 in September 2009
-
-   Modified by Lasse Oorni for 8-byte stack alignment in May 2012
-
-   The assembler routines for Linux were written by Carlos Luna in December 2012
+   This code was adapted from as_callfunc_arm_gcc (ARM, Linux hard float) by Brandon Bare on October 2014.
 */
 
-#if defined(__arm__) || defined(__ARM__) || defined(I3D_ARCH_ARM)
+#ifdef __psp2__
 
-#if !defined(__linux__) || defined(__ANDROID__) || defined(ANDROID) || defined(__SOFTFP__)
+.syntax unified
+.cpu cortex-a9
+.fpu neon
 
-/* iOS, Android, and Marmalade goes here */
+.section .text.armCallFunc
+.balign 2
+.thumb
+.thumb_func
+
+.align 2
 
 .global armFunc
 .global armFuncR0
@@ -51,244 +53,16 @@
 .global armFuncObjLast
 .global armFuncR0ObjLast
 
+.type armFunc, %function
+.type armFuncR0, %function
+.type armFuncR0R1, %function
+.type armFuncObjLast, %function
+.type armFuncR0ObjLast, %function
+
 /* --------------------------------------------------------------------------------------------*/
 armFunc:
-    stmdb   sp!, {r4-r8, lr}
-    mov     r6, r0  /* arg table */
-    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
-    mov     r4, r2  /* function address */
-    mov     r8, #0
+	.fnstart
 
-    beq     nomoreargs
-
-    /* Load the first 4 arguments into r0-r3 */
-    cmp     r7, #4
-    ldrge   r0, [r6],#4
-    cmp     r7, #2*4
-    ldrge   r1, [r6],#4
-    cmp     r7, #3*4
-    ldrge   r2, [r6],#4
-    cmp     r7, #4*4
-    ldrge   r3, [r6],#4
-    ble     nomoreargs
-
-    /* Load the rest of the arguments onto the stack */
-    sub     r7, r7, #4*4      /* skip the 4 registers already loaded into r0-r3 */
-    add     r8, r7, #4        /* ensure 8-byte stack alignment */
-    bic     r8, r8, #4
-    sub     sp, sp, r8
-    mov     r12, sp           /* copy size != frame size, so store frame start sp */
-stackargsloop:
-    ldr     r5, [r6], #4
-    str     r5, [sp], #4
-    subs    r7, r7, #4
-    bne     stackargsloop
-    mov     sp, r12
-nomoreargs:
-    blx     r4
-    add     sp, sp, r8
-    ldmia   sp!, {r4-r8, pc}
-
-/* --------------------------------------------------------------------------------------------*/
-armFuncObjLast:
-    stmdb   sp!, {r4-r8, lr}
-    mov     r6, r0  /* arg table */
-    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
-    mov     r4, r2  /* function address */
-    mov     r8, #0
-
-    mov     r0, r3          /* objlast. might get overwritten */
-    mov     r5, r3          /* objlast to temp reg */
-
-    beq     nomoreargsarmFuncObjLast
-
-    /* Load the first 4 arguments into r0-r3 */
-    cmp     r7, #4
-    ldrge   r0, [r6],#4
-    cmp     r7, #2*4
-    ldrge   r1, [r6],#4
-    movlt   r1, r5
-    cmp     r7, #3*4
-    ldrge   r2, [r6],#4
-    movlt   r2, r5
-    cmp     r7, #4*4
-    ldrge   r3, [r6],#4
-    movlt   r3, r5
-    blt     nomoreargsarmFuncObjLast
-
-    /* Load the rest of the arguments onto the stack */
-    sub     r7, r7, #4*4    /* skip the 4 registers already loaded into r0-r3 */
-    add     r8, r7, #8      /* account for the objlast pointer, ensure 8-byte stack alignment */
-    bic     r8, r8, #4
-    str     r5, [sp,#-4]    /* store the objlast on stack, twice in case we adjusted alignment */
-    str     r5, [sp,#-8]
-    sub     sp, sp, r8      /* adjust frame */
-    cmp     r7, #0          /* we may also have come here with no extra params */
-    beq     nomoreargsarmFuncObjLast
-    mov     r12, sp         /* copy size != frame size, so store frame start sp */
-stackargslooparmFuncObjLast:
-    ldr     r5, [r6], #4
-    str     r5, [sp], #4
-    subs    r7, r7, #4
-    bne     stackargslooparmFuncObjLast
-    mov     sp, r12
-nomoreargsarmFuncObjLast:
-    blx     r4
-    add     sp, sp, r8
-    ldmia   sp!, {r4-r8, pc}
-
-/* --------------------------------------------------------------------------------------------*/
-armFuncR0ObjLast:
-    stmdb   sp!, {r4-r8, lr}
-    ldr     r5, [sp,#6*4]   /* objlast to temp reg */
-
-    mov     r6, r0  /* arg table */
-    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
-    mov     r4, r2  /* function address */
-    mov     r8, #0
-
-    mov     r0, r3      /* r0 explicitly set */
-    mov     r1, r5      /* objlast.  might get overwritten */
-
-    beq     nomoreargsarmFuncR0ObjLast
-
-    /* Load the first 3 arguments into r1-r3 */
-    cmp     r7, #1*4
-    ldrge   r1, [r6],#4
-    cmp     r7, #2*4
-    ldrge   r2, [r6],#4
-    movlt   r2, r5
-    cmp     r7, #3*4
-    ldrge   r3, [r6],#4
-    movlt   r3, r5
-    blt     nomoreargsarmFuncR0ObjLast
-
-    /* Load the rest of the arguments onto the stack */
-    sub     r7, r7, #3*4    /* skip the 3 registers already loaded into r1-r3 */
-    add     r8, r7, #8      /* account for the objlast pointer, ensure 8-byte stack alignment */
-    bic     r8, r8, #4
-    str     r5, [sp,#-4]    /* store the objlast on stack, twice in case we adjusted alignment */
-    str     r5, [sp,#-8]
-    sub     sp, sp, r8      /* adjust frame */
-    cmp     r7, #0          /* we may also have come here with no extra params */
-    beq     nomoreargsarmFuncR0ObjLast
-    mov     r12, sp         /* copy size != frame size, so store frame start sp */
-stackargslooparmFuncR0ObjLast:
-    ldr     r5, [r6], #4
-    str     r5, [sp], #4
-    subs    r7, r7, #4
-    bne     stackargslooparmFuncR0ObjLast
-    mov     sp, r12
-nomoreargsarmFuncR0ObjLast:
-    blx     r4
-    add     sp, sp, r8
-    ldmia   sp!, {r4-r8, pc}
-
-/* --------------------------------------------------------------------------------------------*/
-armFuncR0:
-    stmdb   sp!, {r4-r8, lr}
-    mov     r6, r0  /* arg table */
-    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
-    mov     r4, r2  /* function address */
-    mov     r8, #0
-
-    mov     r0, r3  /* r0 explicitly set */
-
-    beq     nomoreargsarmFuncR0
-
-    /* Load the first 3 arguments into r1-r3 */
-    cmp     r7, #1*4
-    ldrge   r1, [r6],#4
-    cmp     r7, #2*4
-    ldrge   r2, [r6],#4
-    cmp     r7, #3*4
-    ldrge   r3, [r6],#4
-    ble     nomoreargsarmFuncR0
-
-    /* Load the rest of the arguments onto the stack */
-    sub     r7, r7, #3*4    /* skip the 3 registers already loaded into r1-r3 */
-    add     r8, r7, #4      /* ensure 8-byte stack alignment */
-    bic     r8, r8, #4
-    sub     sp, sp, r8
-    mov     r12, sp         /* copy size != frame size, so store frame start sp */
-stackargslooparmFuncR0:
-    ldr     r5, [r6], #4
-    str     r5, [sp], #4
-    subs    r7, r7, #4
-    bne     stackargslooparmFuncR0
-    mov     sp, r12
-nomoreargsarmFuncR0:
-    blx     r4
-    add     sp, sp, r8
-    ldmia   sp!, {r4-r8, pc}
-
-/* --------------------------------------------------------------------------------------------*/
-armFuncR0R1:
-    stmdb   sp!, {r4-r8, lr}
-    mov     r6, r0  /* arg table */
-    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
-    mov     r4, r2  /* function address */
-    mov     r8, #0
-
-    mov     r0, r3          /* r0 explicitly set */
-    ldr     r1, [sp, #6*4]  /* r1 explicitly set too */
-
-    beq     nomoreargsarmFuncR0R1
-
-    /* Load the first 2 arguments into r2-r3 */
-    cmp     r7, #1*4
-    ldrge   r2, [r6],#4
-    cmp     r7, #2*4
-    ldrge   r3, [r6],#4
-    ble     nomoreargsarmFuncR0R1
-
-    /* Load the rest of the arguments onto the stack */
-    sub     r7, r7, #2*4    /* skip the 2 registers already loaded into r2-r3 */
-    add     r8, r7, #4      /* ensure 8-byte stack alignment */
-    bic     r8, r8, #4
-    sub     sp, sp, r8
-    mov     r12, sp         /* copy size != frame size, so store frame start sp */
-stackargslooparmFuncR0R1:
-    ldr     r5, [r6], #4
-    str     r5, [sp], #4
-    subs    r7, r7, #4
-    bne     stackargslooparmFuncR0R1
-    mov     sp, r12
-nomoreargsarmFuncR0R1:
-    blx     r4
-    add     sp, sp, r8
-    ldmia   sp!, {r4-r8, pc}
-
-/* --------------------------------------------------------------------------------------------*/
-#elif defined(__linux__) && !defined(__SOFTFP__)
-
-/* The Linux code goes here */
-
-
-/* These codes are suitable for armeabi + vfp  / armeabihf */
-/* when using armeabi + vfp, please set C_FLAGS -mfloat-abi=softfp -mfpu=vfp */
-/* using armeabihf, please set C_FLAGS -mfloat-abi=hard -mfpu=vfpv3-d16 */
-
-/* if you prefer to run in ARM mode, please add -marm to C_FLAGS */
-/* while using thumb mode, please add -mthumb -Wa,-mimplicit-it=thumb */
-
-
-/* SP is a multiple of 8 when control first enters a program.*/
-/* This places an obligation on authors of low level OS, RTOS, and runtime library code to align SP at all points */
-/* at which control first enters a body of (AAPCS-conforming) code. (please read "ARM IHI 0046B" document)*/
-
-
-.section .text
-
-    .align 2        /* Align the function code to a 4-byte (2^n) word boundary. */
-#if defined(__thumb__) || defined(__thumb2__)
-    .thumb
-    .syntax unified
-#else
-    .arm            /* Use ARM instructions instead of Thumb.*/
-#endif
-    .globl armFunc  /* Make the function globally accessible.*/
-armFunc:
     push    {r4-r8, r10, r11, lr}   /* sp must be 8-byte alignment for ABI compliance, so the pushed registers must be even */
 
     mov     r6, r0  /* arg table */
@@ -306,12 +80,20 @@ armFunc:
 
     /* Load the first 4 arguments into r0-r3 */
     cmp     r7, #4
+
+	it ge
     ldrge   r0, [r6]
     cmp     r7, #8
+
+	it ge
     ldrge   r1, [r6, #4]
     cmp     r7, #12
+
+	it ge
     ldrge   r2, [r6, #8]
     cmp     r7, #16
+
+	it ge
     ldrge   r3, [r6, #12]
 
 stackargs:
@@ -340,27 +122,18 @@ stackargsloop:
     mov     sp, r12
 
 nomoreargs:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
-    mov    lr, pc   /* older ARM didn't support blx */
-    mov    pc, r4
-#else
     blx     r4
-#endif
     add     sp, sp, r8
     vstmia.64 r10, {d0-d7}   /* Copy contents of registers d0-d7 to the address stored in r10 */
 
     pop {r4-r8, r10, r11, pc}
 
+	.fnend
+
 /* --------------------------------------------------------------------------------------------*/
-    .align 2        /* Align the function code to a 4-byte (2^n) word boundary. */
-#if defined(__thumb__) || defined(__thumb2__)
-    .thumb
-    .syntax unified
-#else
-    .arm            /* Use ARM instructions instead of Thumb.*/
-#endif
-    .globl armFuncObjLast       /* Make the function globally accessible.*/
 armFuncObjLast:
+	.fnstart
+
     push {r4-r8, r10, r11, lr}  /* We´re storing r11 just to keep the stack aligned to an 8 byte boundary */
 
     mov     r6, r0  /* arg table */
@@ -383,15 +156,29 @@ armFuncObjLast:
 
     /* Load the first 4 arguments into r0-r3 */
     cmp     r7, #4
+
+	it ge
     ldrge   r0, [r6]
     cmp     r7, #8
+
+	it ge
     ldrge   r1, [r6,#4]
+
+	it lt
     movlt   r1, r5
     cmp     r7, #12
+
+	it ge
     ldrge   r2, [r6,#8]
+
+	it lt
     movlt   r2, r5
     cmp     r7, #16
+
+	it ge
     ldrge   r3, [r6,#12]
+
+	ittt lt
     movlt   r3, r5
     movlt   r5, #0                  /* If objlast got placed into a register, r5 = 0 */
     blt     stackargsFuncObjLast    /* If objlast got placed into a register, go to stackargsFuncObjLast */
@@ -427,27 +214,18 @@ stackargslooparmFuncObjLast:
     mov     sp, r12
 
 nomoreargsarmFuncObjLast:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
-    mov    lr, pc
-    mov    pc, r4
-#else
     blx     r4
-#endif
     add     sp, sp, r8
     vstmia.64   r10, {d0-d7}    /* Copy contents of registers d0-d10 to the address stored in r10 */
 
     pop   {r4-r8, r10,r11, pc}
 
-/* ------------------------------------------------------------------------------------------- */
-    .align 2        /* Align the function code to a 4-byte (2^n) word boundary. */
-#if defined(__thumb__) || defined(__thumb2__)
-    .thumb
-    .syntax unified
-#else
-    .arm            /* Use ARM instructions instead of Thumb.*/
-#endif
-    .globl armFuncR0ObjLast     /* Make the function globally accessible.*/
+	.fnend
+
+/* --------------------------------------------------------------------------------------------*/
 armFuncR0ObjLast:
+	.fnstart
+
     push    {r4-r8, r10, r11, lr}
 
     ldr     r5, [sp,#32]   /* objlast to temp reg */
@@ -473,23 +251,36 @@ armFuncR0ObjLast:
 
     /* Load the first 3 arguments into r1-r3 */
     cmp     r7, #4
+
+	it ge
     ldrge   r1, [r6]
     cmp     r7, #8
+
+	it ge
     ldrge   r2, [r6,#4]
+
+	it lt
     movlt   r2, r5
     cmp     r7, #12
+
+	it ge
     ldrge   r3, [r6,#8]
+
+	ittt lt
     movlt   r3, r5
     movlt   r5, #0                  /* If objlast got placed into a register, r5 = 0 */
     blt     stackargsFuncR0ObjLast  /* If objlast got placed into a register, go to stackargsFuncR0ObjLast */
 
     cmp     r7, #16                 /* Else if we have one last arg set the offset accordingly and store the arg in the array */
+
+	itt ge
     ldrge   r7, [r6, #12]
     strge   r7, [r6, #8]
 
     str     r5, [r6, #12]           /* Put objlast in r6 + 12 */
-    mov     r5, #0
+	mov     r5, #0
 
+	it ge
     movge   r5, #4                  /* Set r5 with an offset of #4 if there´s one last arg that couldn´t be placed in r registers */
     add     r5, r5, #4              /* Set r5 with an offset of + #4, so objlast can be loaded into the stack */
 
@@ -521,27 +312,18 @@ stackargslooparmFuncR0ObjLast:
     mov     sp, r12
 
 nomoreargsarmFuncR0ObjLast:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
-    mov    lr, pc
-    mov    pc, r4
-#else
     blx     r4
-#endif
     add     sp, sp, r8
     vstmia.64   r10, {d0-d7}    /* Copy contents of registers d0-d10 to the address stored in r10 */
 
     pop {r4-r8, r10, r11, pc}
 
-/* ------------------------------------------------------------------------------------------- */
-    .align 2        /* Align the function code to a 4-byte (2^n) word boundary. */
-#if defined(__thumb__) || defined(__thumb2__)
-    .thumb
-    .syntax unified
-#else
-    .arm            /* Use ARM instructions instead of Thumb.*/
-#endif
-    .globl armFuncR0        /* Make the function globally accessible.*/
+	.fnend
+
+/* --------------------------------------------------------------------------------------------*/
 armFuncR0:
+	.fnstart
+
     push {r4-r8, r10, r11, lr}
 
     mov     r6, r0  /* arg table */
@@ -561,12 +343,20 @@ armFuncR0:
 
     /* Load the first 3 arguments into r1-r3 */
     cmp     r7, #4
+
+	it ge
     ldrge   r1, [r6]
     cmp     r7, #8
+
+	it ge
     ldrge   r2, [r6, #4]
     cmp     r7, #12
+
+	it ge
     ldrge   r3, [r6, #8]
     cmp     r7, #16
+
+	it ge
     movge   r11, #4         /* If there is still one arg to be placed, set the offset in r11 to #4 */
 
 stackargsarmFuncR0:
@@ -597,27 +387,18 @@ stackargslooparmFuncR0:
     mov     sp, r12
 
 nomoreargsarmFuncR0:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
-    mov    lr, pc
-    mov    pc, r4
-#else
     blx     r4
-#endif
     add     sp, sp, r8
     vstmia.64   r10, {d0-d7}    /* Copy contents of registers d0-d10 to the address stored in r10 */
 
     pop {r4-r8, r10, r11, pc}
 
-/* ------------------------------------------------------------------------------------------- */
-    .align 2        /* Align the function code to a 4-byte (2^n) word boundary. */
-#if defined(__thumb__) || defined(__thumb2__)
-    .thumb
-    .syntax unified
-#else
-    .arm            /* Use ARM instructions instead of Thumb.*/
-#endif
-    .globl armFuncR0R1      /* Make the function globally accessible.*/
+	.fnend
+
+/* --------------------------------------------------------------------------------------------*/
 armFuncR0R1:
+	.fnstart
+
     push {r4-r8, r10, r11, lr}
 
     mov     r6, r0  /* arg table */
@@ -639,13 +420,24 @@ armFuncR0R1:
 
     /* Load the first 2 arguments into r2-r3 */
     cmp     r7, #4
+
+	it ge
     ldrge   r2, [r6]
     cmp     r7, #8
+
+	it ge
     ldrge   r3, [r6, #4]
     cmp     r7, #12
+
+	it ge
     movge   r11, #4         /* If there is a third arg to be placed, set the offset in r11 to #4 */
+
     cmp     r7, #16
+
+	it ge
     movge   r11, #8         /* If there is a fourth arg to be placed, set the offset in r11 to #8 */
+
+	itt lt
     ldrlt   r7, [r6, #8]    /* Else copy the third arg to the correct place in the array */
     strlt   r7, [r6, #12]
 
@@ -677,23 +469,12 @@ stackargslooparmFuncR0R1:
     mov     sp, r12
 
 nomoreargsarmFuncR0R1:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
-    mov    lr, pc
-    mov    pc, r4
-#else
     blx     r4
-#endif
     add     sp, sp, r8
     vstmia.64   r10, {d0-d7}    /* Copy contents of registers d0-d10 to the address stored in r10 */
 
     pop {r4-r8, r10, r11, pc}
 
-#endif /* hard float abi */
+	.fnend
 
-#if defined(__linux__) && defined(__ELF__)
-/* ref: http://hardened.gentoo.org/gnu-stack.xml */
-.section .note.GNU-stack,"",%progbits
 #endif
-
-#endif /* arm */
-

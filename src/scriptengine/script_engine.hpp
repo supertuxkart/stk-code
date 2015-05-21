@@ -21,6 +21,7 @@
 
 #include <string>
 #include <angelscript.h>
+#include <functional>
 
 class TrackObjectPresentation;
 
@@ -30,11 +31,6 @@ namespace Scripting
     namespace Physics
     {
         void registerScriptFunctions(asIScriptEngine *engine);
-        asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine);
-        void setCollision(int collider1,int collider2);
-        void setCollisionType(std::string collisionType);
-        void setCollision(std::string collider1, std::string collider2);
     }
 
     namespace Kart
@@ -47,28 +43,24 @@ namespace Scripting
         void registerScriptFunctions(asIScriptEngine *engine);
 
         void registerScriptEnums(asIScriptEngine *engine);
-
-        asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName);
-
-        asIScriptFunction*
-            registerUpdateScriptCallbacks(asIScriptEngine *engine);
-
-        asIScriptFunction*
-            registerStartScriptCallbacks(asIScriptEngine *engine);
     }
-        
+    
     class ScriptEngine
     {
     public:
+
         ScriptEngine();
         ~ScriptEngine();
-        
-        void runScript(std::string scriptName);
-        
+
+        void runFunction(std::string function_name);
+        void runFunction(std::string function_name, std::function<void(asIScriptContext*)> callback);
+        void evalScript(std::string script_fragment);
+        void cleanupCache();
+
     private:
         asIScriptEngine *m_engine;
-        std::map<std::string, asIScriptFunction*> m_script_cache;
+        std::map<std::string, bool> m_loaded_files;
+        std::map<std::string, asIScriptFunction*> m_functions_cache;
 
         void configureEngine(asIScriptEngine *engine);
         int  compileScript(asIScriptEngine *engine,std::string scriptName);

@@ -448,6 +448,10 @@ void Track::cleanup()
         Log::info("CACHE", "[%i] %s", i, path.getPath().c_str());
     }
 #endif
+
+    Scripting::ScriptEngine* script_engine =
+        World::getWorld()->getScriptEngine();
+    script_engine->cleanupCache();
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -1482,7 +1486,7 @@ void Track::update(float dt)
     if (!m_startup_run) // first time running update = good point to run startup script
     {
         Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        script_engine->runScript("start");
+        script_engine->runFunction("void onStart()");
         m_startup_run = true;
     }
     m_track_object_manager->update(dt);
@@ -1493,8 +1497,10 @@ void Track::update(float dt)
     }
     CheckManager::get()->update(dt);
     ItemManager::get()->update(dt);
-    Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-    script_engine->runScript("update");
+
+    // TODO: enable onUpdate scripts if we ever find a compelling use for them
+    //Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+    //script_engine->runScript("void onUpdate()");
 }   // update
 
 // ----------------------------------------------------------------------------

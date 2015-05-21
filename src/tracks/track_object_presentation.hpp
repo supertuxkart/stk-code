@@ -312,6 +312,8 @@ public:
 
     virtual void update(float dt) OVERRIDE;
     void triggerParticles();
+    void stop();
+    void setRate(float rate);
     // ------------------------------------------------------------------------
     /** Returns the trigger condition for this object. */
     std::string& getTriggerCondition() { return m_trigger_condition; }

@@ -185,10 +185,6 @@ public:
      *  it. */
     bool isExplodeKartObject () const { return m_explode_kart; }
     // ------------------------------------------------------------------------
-    /** Returns true if this object should cause a kart that touches it to
-     *  be flattened. */
-    bool isFlattenKartObject () const { return m_flatten_kart; }
-    // ------------------------------------------------------------------------
     /** Sets the interaction type */
     void setInteraction(std::string interaction);
     // ------------------------------------------------------------------------
@@ -197,6 +193,34 @@ public:
     // ------------------------------------------------------------------------
     /** Add body to dynamic world */
     void addBody();
+    // ------------------------------------------------------------------------
+    // Methods usable by scripts
+
+    /**
+    * \addtogroup Scripting
+    * @{
+    * \addtogroup Scripting_Track Track
+    * @{
+    * \addtogroup Scripting_PhysicalObject PhysicalObject (script binding)
+    * Type returned by trackObject.getPhysicalObject()
+    * @{
+    */
+    /** Returns true if this object should cause a kart that touches it to
+    *  be flattened. */
+    bool isFlattenKartObject() const { return m_flatten_kart; }
+    void disable(/** \cond DOXYGEN_IGNORE */void *memory/** \endcond */)
+    {
+        ((PhysicalObject*)(memory))->removeBody();
+    }
+
+    //enables track object passed from the script
+    void enable(/** \cond DOXYGEN_IGNORE */void *memory/** \endcond */)
+    {
+        ((PhysicalObject*)(memory))->addBody();
+    }
+    /** @} */
+    /** @} */
+    /** @} */
 
     LEAK_CHECK()
 };  // PhysicalObject

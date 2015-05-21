@@ -22,6 +22,7 @@
 #include "audio/sfx_buffer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -34,6 +35,7 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "items/item_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
@@ -824,7 +826,24 @@ void TrackObjectPresentationParticles::triggerParticles()
         m_emitter->setParticleType(m_emitter->getParticlesInfo());
     }
 }   // triggerParticles
-
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationParticles::stop()
+{
+    if (m_emitter != NULL)
+    {
+        m_emitter->setCreationRateAbsolute(0.0f);
+        m_emitter->clearParticles();
+    }
+}
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationParticles::setRate(float rate)
+{
+    if (m_emitter != NULL)
+    {
+        m_emitter->setCreationRateAbsolute(rate);
+        m_emitter->setParticleType(m_emitter->getParticlesInfo());
+    }
+}
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLight::TrackObjectPresentationLight(
                                                      const XMLNode& xml_node, 
@@ -921,140 +940,22 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
                   _("Complete all challenges to unlock the big door!"), true);
         }
     }
-    else if (m_action == "tutorial_drive")
-    {
-        //if (World::getWorld()->getPhase() == World::RACE_PHASE)
-        {
-            m_action_active = false;
-            //World::getWorld()->getRaceGUI()->clearAllMessages();
-
-            InputDevice* device = input_manager->getDeviceManager()
-                                               ->getLatestUsedDevice();
-            DeviceConfig* config = device->getConfiguration();
-            irr::core::stringw accel = config->getBindingAsString(PA_ACCEL);
-            irr::core::stringw left = config->getBindingAsString(PA_STEER_LEFT);
-            irr::core::stringw right = config->getBindingAsString(PA_STEER_RIGHT);
-
-            new TutorialMessageDialog(_("Accelerate with <%s> and steer with "
-                                        "<%s> and <%s>", accel, left, right),
-                false);
-        }
-    }
-    else if (m_action == "tutorial_bananas")
-    {
-        m_action_active = false;
-
-        new TutorialMessageDialog(_("Avoid bananas!"), true);
-    }
-    else if (m_action == "tutorial_giftboxes")
-    {
-        m_action_active = false;
-        InputDevice* device = input_manager->getDeviceManager()
-                                           ->getLatestUsedDevice();
-        DeviceConfig* config = device->getConfiguration();
-        irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
-
-        new TutorialMessageDialog(_("Collect gift boxes, and fire the weapon "
-                                    "with <%s> to blow away these boxes!",
-                                    fire),true);
-    }
-    else if (m_action == "tutorial_backgiftboxes")
-    {
-        m_action_active = false;
-        InputDevice* device = input_manager->getDeviceManager()
-                                           ->getLatestUsedDevice();
-        DeviceConfig* config = device->getConfiguration();
-        irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
-        irr::core::stringw back = config->getBindingAsString(PA_LOOK_BACK);
-
-    new TutorialMessageDialog(
-           _("Press <%s> to look behind, and fire the weapon with <%s> while "
-             "pressing <%s> to fire behind!", back, fire, back),
-            true);
-    }
-    else if (m_action == "tutorial_nitro_collect")
-    {
-        m_action_active = false;
-
-        new TutorialMessageDialog(_("Collect nitro bottles (we will use them "
-                                    "after the curve)"), true);
-    }
-    else if (m_action == "tutorial_nitro_use")
-    {
-        m_action_active = false;
-        InputDevice* device = input_manager->getDeviceManager()
-                                           ->getLatestUsedDevice();
-        DeviceConfig* config = device->getConfiguration();
-        irr::core::stringw nitro = config->getBindingAsString(PA_NITRO);
-
-        new TutorialMessageDialog(_("Use the nitro you collected by "
-                                    "pressing <%s>!", nitro), true);
-    }
-    else if (m_action == "tutorial_rescue")
-    {
-        m_action_active = false;
-        InputDevice* device = input_manager->getDeviceManager()
-                                           ->getLatestUsedDevice();
-        DeviceConfig* config = device->getConfiguration();
-        irr::core::stringw rescue = config->getBindingAsString(PA_RESCUE);
-
-        new TutorialMessageDialog(_("Oops! When you're in trouble, press <%s> "
-                                    "to be rescued", rescue),
-                                  false);
-    }
-    else if (m_action == "tutorial_skidding")
-    {
-        m_action_active = false;
-        //World::getWorld()->getRaceGUI()->clearAllMessages();
-
-        InputDevice* device = input_manager->getDeviceManager()
-                                           ->getLatestUsedDevice();
-        DeviceConfig* config = device->getConfiguration();
-        irr::core::stringw skid = config->getBindingAsString(PA_DRIFT);
-
-
-        new TutorialMessageDialog(_("Accelerate and press the <%s> key while "
-                                    "turning to skid. Skidding for a short "
-                                    "while can help you turn faster to take "
-                                    "sharp turns.", skid),
-            true);
-    }
-    else if (m_action == "tutorial_skidding2")
-    {
-        m_action_active = false;
-        World::getWorld()->getRaceGUI()->clearAllMessages();
-
-        new TutorialMessageDialog(_("Note that if you manage to skid for "
-                                    "several seconds, you will receive a bonus "
-                                    "speedup as a reward!"),
-            true);
-    }
-    else if (m_action == "tutorial_endmessage")
-    {
-        m_action_active = false;
-        World::getWorld()->getRaceGUI()->clearAllMessages();
-
-        new TutorialMessageDialog(_("You are now ready to race. Good luck!"),
-            true);
-    }
     else if (m_action == "tutorial_exit")
     {
+        // TODO: move to scripting
         World::getWorld()->scheduleExitRace();
         return;
     }
     else
     {	
-        //TODO move all above functions into scripts and remove the ifs
-        Scripting::ScriptEngine* m_script_engine =
+        Scripting::ScriptEngine* script_engine =
             World::getWorld()->getScriptEngine();
         m_action_active = false;
-        m_script_engine->runScript(m_action);
-        
-        /*
-        Catch exception -> script not found
-        fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
-                m_action.c_str());
-        
-         */
+        int idKart = 0;
+        Camera* camera = Camera::getActiveCamera();
+        if (camera != NULL && camera->getKart() != NULL)
+            idKart = camera->getKart()->getWorldKartId();
+        script_engine->runFunction("void " + m_action + "(int)",
+            [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
     }
 }   // onTriggerItemApproached

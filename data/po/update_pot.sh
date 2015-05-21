@@ -17,11 +17,13 @@ XML_FILE_LIST="`find ./data ../stk-assets/tracks ../stk-assets/karts \
                      -name '*.grandprix' -or                     \
                      -name '*.stkgui'                            \
               `"
+ANGELSCRIPT_FILE_LIST="`find ./data ../stk-assets/tracks -name '*.as'`"
 
 echo "--------------------"
 echo "    Source Files :"
 echo "--------------------"
 echo $CPP_FILE_LIST
+echo $ANGELSCRIPT_FILE_LIST
 
 echo "--------------------"
 echo "    XML Files :"
@@ -49,6 +51,10 @@ xgettext  -j  -d supertuxkart --keyword=_ --keyword=N_ --keyword=_LTR \
                                -p ./data/po -o supertuxkart.pot $CPP_FILE_LIST \
                                --package-name=supertuxkart
 
+# Angelscript files (xgettext doesn't support AS so pretend it's c++)
+xgettext  -j  -d supertuxkart -s --keyword="translate" --add-comments="I18N:" \
+                               -p ./data/po -o supertuxkart.pot $ANGELSCRIPT_FILE_LIST \
+                               --package-name=supertuxkart --language=c++
 
 
 echo "    Done"
