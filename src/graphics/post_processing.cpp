@@ -630,6 +630,17 @@ public:
         assignSamplerNames(0, "color_buffer", ST_BILINEAR_CLAMPED_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED);
     }    // MotionBlurShader
+    // ------------------------------------------------------------------------
+    void render(const FrameBuffer &fb, float boost_time)
+    {
+        setTextureUnits(fb.getRTT()[0],  irr_driver->getDepthStencilTexture());
+        Camera *cam = Camera::getActiveCamera();
+        // Todo : use a previousPVMatrix per cam, not global
+        drawFullScreenEffect(cam->getPreviousPVMatrix(),
+                             core::vector2df(0.5, 0.5),
+                             boost_time, // Todo : should be framerate dependent=
+                             0.15f);
+    }   // render
 };   // MotionBlurShader
 
 // ============================================================================
@@ -1291,15 +1302,8 @@ void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo,
     out_fbo.Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    MotionBlurShader::getInstance()
-        ->setTextureUnits(in_fbo.getRTT()[0], 
-                          irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<MotionBlurShader>
-        (// Todo : use a previousPVMatrix per cam, not global
-         cam->getPreviousPVMatrix(),
-         core::vector2df(0.5, 0.5),
-         cb->getBoostTime(cam->getIndex()) * 10, // Todo : should be framerate dependent
-         0.15f);
+    float boost_time = cb->getBoostTime(cam->getIndex()) * 10;
+    MotionBlurShader::getInstance()->render(in_fbo, boost_time);
 }   // renderMotionBlur
 
 
