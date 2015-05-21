@@ -749,6 +749,15 @@ public:
         assignSamplerNames(0, "blendMap", ST_NEAREST_FILTERED,
                            1, "colorMap", ST_NEAREST_FILTERED);
     }   // MLAAGatherSHader
+    // ------------------------------------------------------------------------
+    void render(const core::vector2df &pixel_size)
+    {
+        use();
+        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND),
+                        irr_driver->getRenderTargetTexture(RTT_MLAA_TMP));
+        drawFullScreenEffect(pixel_size);
+
+    }   // render
 };   // MLAAGatherSHader
 
 // ============================================================================
@@ -1369,12 +1378,7 @@ void PostProcessing::applyMLAA()
 
     // Pass 3: gather
     irr_driver->getFBO(FBO_MLAA_COLORS).bind();
-
-    MLAAGatherSHader::getInstance()->use();
-    MLAAGatherSHader::getInstance()
-        ->setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND),
-                          irr_driver->getRenderTargetTexture(RTT_MLAA_TMP));
-    DrawFullScreenEffect<MLAAGatherSHader>(PIXEL_SIZE);
+    MLAAGatherSHader::getInstance()->render(PIXEL_SIZE);
 
     // Done.
     glDisable(GL_STENCIL_TEST);
