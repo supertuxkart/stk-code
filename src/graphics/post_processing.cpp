@@ -1102,20 +1102,13 @@ void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo,
            in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width  = 1.0f / in_fbo.getWidth();
     float inv_height = 1.0f / in_fbo.getHeight();
-    {
-        auxiliary.Bind();
 
-        Gaussian6HBlurShader::getInstance()->render(in_fbo, in_fbo.getWidth(),
-                                                    in_fbo.getHeight(), 2.0f );
-    }
-    {
-        in_fbo.Bind();
-
-        Gaussian6HBlurShader::getInstance()
-                      ->setTextureUnits(auxiliary.getRTT()[0]);
-        DrawFullScreenEffect<Gaussian6HBlurShader>
-                   (core::vector2df(inv_width, inv_height), 2.0f);
-    }
+    auxiliary.Bind();
+    Gaussian6HBlurShader::getInstance()->render(in_fbo, in_fbo.getWidth(),
+                                                in_fbo.getHeight(), 2.0f );
+    in_fbo.Bind();
+    Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
+                                                in_fbo.getHeight(), 2.0f);
 }   // renderHorizontalBlur
 
 
