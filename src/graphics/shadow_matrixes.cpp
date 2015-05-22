@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "graphics/shadow_matrixes.hpp"
 
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
@@ -33,6 +34,8 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
+
+float ShadowMatrices::m_shadow_split[5] = { 1., 5., 20., 50., 150 };
 
 // ============================================================================
 class LightspaceBoundingBoxShader 
@@ -140,30 +143,6 @@ static core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform,
 }   // getTighestFitOrthoProj
 
 // ----------------------------------------------------------------------------
-float shadowSplit[5] = { 1., 5., 20., 50., 150 };
-
-struct CascadeBoundingBox
-{
-    int xmin;
-    int xmax;
-    int ymin;
-    int ymax;
-    int zmin;
-    int zmax;
-};
-
-static size_t currentCBB = 0;
-static CascadeBoundingBox *CBB[2];
-
-struct Histogram
-{
-    int bin[1024];
-    int mindepth;
-    int maxdepth;
-    int count;
-};
-
-// ----------------------------------------------------------------------------
 /** Update shadowSplit values and make Cascade Bounding Box pointer valid.
  *  The function aunches two compute kernel that generates an histogram of the 
  *  depth buffer value (between 0 and 250 with increment of 0.25) and get an
@@ -178,6 +157,16 @@ struct Histogram
 void IrrDriver::updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
                                                                 size_t height)
 {
+    struct CascadeBoundingBox
+    {
+        int xmin;
+        int xmax;
+        int ymin;
+        int ymax;
+        int zmin;
+        int zmax;
+    };   // struct CascadeBoundingBox
+
     // Value that should be kept between multiple calls
     static bool ssboInit = false;
     static GLuint CBBssbo, tempShadowMatssbo;
@@ -205,8 +194,11 @@ void IrrDriver::updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
     LightspaceBoundingBoxShader::getInstance()
         ->setTextureUnits(getDepthStencilTexture());
     LightspaceBoundingBoxShader::getInstance()
-        ->setUniforms(m_suncam->getViewMatrix(), shadowSplit[1],
-                      shadowSplit[2], shadowSplit[3], shadowSplit[4]);
+        ->setUniforms(m_suncam->getViewMatrix(),
+                      ShadowMatrices::m_shadow_split[1],
+                      ShadowMatrices::m_shadow_split[2],
+                      ShadowMatrices::m_shadow_split[3],
+                      ShadowMatrices::m_shadow_split[4]);
     glDispatchCompute((int)width / 64, (int)height / 64, 1);
 
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -257,17 +249,17 @@ void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnod
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
     {
-        shadowSplit[1],
-        shadowSplit[2],
-        shadowSplit[3],
-        shadowSplit[4],
+        ShadowMatrices::m_shadow_split[1],
+        ShadowMatrices::m_shadow_split[2],
+        ShadowMatrices::m_shadow_split[3],
+        ShadowMatrices::m_shadow_split[4],
     };
     float NearValues[] =
     {
-        shadowSplit[0],
-        shadowSplit[1],
-        shadowSplit[2],
-        shadowSplit[3]
+        ShadowMatrices::m_shadow_split[0],
+        ShadowMatrices::m_shadow_split[1],
+        ShadowMatrices::m_shadow_split[2],
+        ShadowMatrices::m_shadow_split[3]
     };
 
     float tmp[16 * 9 + 2];
