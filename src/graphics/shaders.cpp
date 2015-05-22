@@ -167,8 +167,9 @@ static std::string LoadHeader()
     return result;
 }
 
+// ----------------------------------------------------------------------------
 // Mostly from shader tutorial
-GLuint LoadShader(const char * file, unsigned type)
+GLuint loadShader(const char * file, unsigned type)
 {
     GLuint Id = glCreateShader(type);
     char versionString[20];
@@ -222,14 +223,15 @@ GLuint LoadShader(const char * file, unsigned type)
     glGetError();
 
     return Id;
-}
+}   // loadShader
 
-
+// ----------------------------------------------------------------------------
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
 
-    IGPUProgrammingServices * const gpu = irr_driver->getVideoDriver()->getGPUProgrammingServices();
+    IGPUProgrammingServices * const gpu = irr_driver->getVideoDriver()
+                                        ->getGPUProgrammingServices();
 
 #define glsl(a, b, c) gpu->addHighLevelShaderMaterialFromFiles((a).c_str(), (b).c_str(), (IShaderConstantSetCallBack*) c)
 #define glslmat(a, b, c, d) gpu->addHighLevelShaderMaterialFromFiles((a).c_str(), (b).c_str(), (IShaderConstantSetCallBack*) c, d)
@@ -304,7 +306,7 @@ void Shaders::loadShaders()
     initGL();
     CleanTable.clear();
     SharedGPUObjects::init();
-}
+}   // loadShaders
 
 // ----------------------------------------------------------------------------
 /** C
@@ -320,16 +322,11 @@ void Shaders::check(const int num)
 {
     if (m_shaders[num] == -1)
     {
-        Log::error("shaders", "Shader %s failed to load. Update your drivers, if the issue "
+        Log::error("shaders",
+                   "Shader %s failed to load. Update your drivers, if the issue "
                    "persists, report a bug to us.", shader_names[num] + 3);
     }
 }   // check
-
-
-unsigned getGLSLVersion()
-{
-    return CVS->getGLSLVersion();
-}
 
 // ============================================================================
 // Solid Normal and depth pass shaders
