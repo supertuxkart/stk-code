@@ -24,6 +24,7 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shadow_matrixes.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
@@ -162,8 +163,6 @@ public:
 };
 
 // ============================================================================
-extern float shadowSplit[5];
-// ----------------------------------------------------------------------------
 class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF,
                                                        3,  float, float, float,
                                                        float, float>
@@ -191,8 +190,10 @@ public:
         setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
                         irr_driver->getDepthStencilTexture(),
                         rtts->getShadowFBO().getDepthTexture()                );
-       drawFullScreenEffect(shadowSplit[1], shadowSplit[2], shadowSplit[3],
-                            shadowSplit[4], 
+       drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
+                            ShadowMatrices::m_shadow_split[2],
+                            ShadowMatrices::m_shadow_split[3],
+                            ShadowMatrices::m_shadow_split[4], 
                             float(UserConfigParams::m_shadows_resolution)   );
 
     }    // render
@@ -227,8 +228,10 @@ public:
         setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
                         irr_driver->getDepthStencilTexture(),
                         rtt->getShadowFBO().getRTT()[0]);
-        drawFullScreenEffect(shadowSplit[1], shadowSplit[2],
-                             shadowSplit[3], shadowSplit[4]);
+        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
+                             ShadowMatrices::m_shadow_split[2],
+                             ShadowMatrices::m_shadow_split[3],
+                             ShadowMatrices::m_shadow_split[4]);
     }   // render
 };   // ShadowedSunLightShaderESM
 
