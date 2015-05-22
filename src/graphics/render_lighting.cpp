@@ -293,6 +293,13 @@ public:
         assignUniforms("density", "col");
         assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
     }   // FogShader
+    // ------------------------------------------------------------------------
+    void render(float start, const core::vector3df &color)
+    {
+        setTextureUnits(irr_driver->getDepthStencilTexture());
+        drawFullScreenEffect(1.f / (40.f * start), color);
+
+    }   // render
 };   // FogShader
 
 // ============================================================================
@@ -544,9 +551,7 @@ void IrrDriver::renderAmbientScatter()
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    FogShader::getInstance()
-        ->setTextureUnits(irr_driver->getDepthStencilTexture());
-    DrawFullScreenEffect<FogShader>(1.f / (40.f * start), col);
+    FogShader::getInstance()->render(start, col);
 }   // renderAmbientScatter
 
 // ----------------------------------------------------------------------------
