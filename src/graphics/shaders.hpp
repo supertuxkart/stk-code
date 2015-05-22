@@ -68,17 +68,6 @@ public:
 }
 
 
-
-template<typename T, typename... Args>
-static void DrawFullScreenEffect(Args...args)
-{
-    T::getInstance()->use();
-    glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
-    T::getInstance()->setUniforms(args...);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-
-
 #define FOREACH_SHADER(ACT) \
     ACT(ES_NORMAL_MAP) \
     ACT(ES_NORMAL_MAP_LIGHTMAP) \
