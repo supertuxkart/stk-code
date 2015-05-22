@@ -101,6 +101,12 @@ namespace Scripting
             tobj->setID(*triggerID);
             World::getWorld()->getTrack()->getTrackObjectManager()->insertObject(tobj);
         }
+
+        /** Exits the race to the main menu */
+        void exitRace()
+        {
+            World::getWorld()->scheduleExitRace();
+        }
     }
 
     /** \cond DOXYGEN_IGNORE */
@@ -245,7 +251,8 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void createTrigger(const string &in, const Vec3 &in, float distance)",
                 asFUNCTION(createTrigger), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in)", asFUNCTION(getTrackObject), asCALL_CDECL); assert(r >= 0);
-            
+            r = engine->RegisterGlobalFunction("void exitRace()", asFUNCTION(exitRace), asCALL_CDECL); assert(r >= 0);
+
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnable(bool status)", asMETHOD(TrackObject, setEnable), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "SoundEmitter@ getSoundEmitter()", asMETHOD(TrackObject, getSoundEmitter), asCALL_THISCALL); assert(r >= 0);

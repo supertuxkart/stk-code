@@ -940,12 +940,6 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
                   _("Complete all challenges to unlock the big door!"), true);
         }
     }
-    else if (m_action == "tutorial_exit")
-    {
-        // TODO: move to scripting
-        World::getWorld()->scheduleExitRace();
-        return;
-    }
     else
     {	
         Scripting::ScriptEngine* script_engine =
