@@ -347,7 +347,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
         {
             mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(
                 getTextureGLuint(mesh.textures[i]),
-                MeshShader::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
+                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
         }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
@@ -426,7 +426,7 @@ void initTexturesTransparent(GLMesh &mesh)
         {
             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(
                 getTextureGLuint(mesh.textures[0]),
-                MeshShader::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
+                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
         }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);

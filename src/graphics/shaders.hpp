@@ -31,43 +31,6 @@
 using namespace irr;
 class ParticleSystemProxy;
 
-
-namespace MeshShader
-{
-class ObjectPass1Shader : public TextureShader<ObjectPass1Shader, 1,
-                                             core::matrix4, core::matrix4>
-{
-public:
-    ObjectPass1Shader();
-};
-
-
-
-class ObjectPass2Shader : public TextureShader<ObjectPass2Shader, 5, core::matrix4, core::matrix4>
-{
-public:
-    ObjectPass2Shader();
-};
-
-
-
-
-class TransparentShader : public TextureShader<TransparentShader, 1, core::matrix4, core::matrix4>
-{
-public:
-    TransparentShader();
-};
-
-class TransparentFogShader : public TextureShader<TransparentFogShader, 1, core::matrix4, core::matrix4, float, float, 
-                                           float, float, float, video::SColorf>
-{
-public:
-    TransparentFogShader();
-};
-
-}
-
-
 #define FOREACH_SHADER(ACT) \
     ACT(ES_NORMAL_MAP) \
     ACT(ES_NORMAL_MAP_LIGHTMAP) \
@@ -165,6 +128,41 @@ public:
             glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         }   // bindBuffer
     };   // class ColoredLine
+
+    // ========================================================================
+    class TransparentShader : public TextureShader<TransparentShader, 1,
+                                                   core::matrix4, core::matrix4 >
+    {
+    public:
+        TransparentShader();
+    };   // TransparentShader
+
+    // ========================================================================
+    class TransparentFogShader : public TextureShader<TransparentFogShader, 1,
+                                     core::matrix4, core::matrix4, float, float,
+                                     float, float, float, video::SColorf >
+    {
+    public:
+        TransparentFogShader();
+    };   // TransparentFogShader
+    // ========================================================================
+    class ObjectPass1Shader : public TextureShader<ObjectPass1Shader, 1,
+                                                  core::matrix4, core::matrix4>
+    {
+    public:
+        ObjectPass1Shader();
+    };   // ObjectPass1Shader
+
+    // ========================================================================
+    class ObjectPass2Shader : public TextureShader < ObjectPass2Shader, 5,
+                                                 core::matrix4, core::matrix4 >
+    {
+    public:
+        ObjectPass2Shader();
+    };   // ObjectPass2Shader
+
+    // ========================================================================
+
 
 };   // class Shaders
 

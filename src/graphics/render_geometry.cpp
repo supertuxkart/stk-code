@@ -519,8 +519,8 @@ struct DefaultMaterial
     typedef InstancedShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatDefault InstancedList;
-    typedef MeshShader::ObjectPass1Shader FirstPassShader;
-    typedef MeshShader::ObjectPass2Shader SecondPassShader;
+    typedef Shaders::ObjectPass1Shader FirstPassShader;
+    typedef Shaders::ObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
     typedef ListMatDefault List;
@@ -579,7 +579,7 @@ struct SphereMap
     typedef InstancedShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatSphereMap InstancedList;
-    typedef MeshShader::ObjectPass1Shader FirstPassShader;
+    typedef Shaders::ObjectPass1Shader FirstPassShader;
     typedef SphereMapShader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
@@ -844,7 +844,7 @@ struct NormalMat
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatNormalMap InstancedList;
     typedef NormalMapShader FirstPassShader;
-    typedef MeshShader::ObjectPass2Shader SecondPassShader;
+    typedef Shaders::ObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
     typedef ListMatNormalMap List;
@@ -874,7 +874,7 @@ struct DetailMat
     typedef InstancedShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
     typedef ListInstancedMatDetails InstancedList;
-    typedef MeshShader::ObjectPass1Shader FirstPassShader;
+    typedef Shaders::ObjectPass1Shader FirstPassShader;
     typedef DetailedObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
     typedef CRSMShader RSMShader;
@@ -899,7 +899,7 @@ const STK::Tuple<size_t> DetailMat::RSMTextures = STK::Tuple<size_t>(0);
 // ----------------------------------------------------------------------------
 struct SplattingMat
 {
-    typedef MeshShader::ObjectPass1Shader FirstPassShader;
+    typedef Shaders::ObjectPass1Shader FirstPassShader;
     typedef SplattingShader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
     typedef SplattingRSMShader RSMShader;
@@ -1312,22 +1312,22 @@ void IrrDriver::renderSolidSecondPass()
     if (CVS->isAZDOEnabled())
     {
         DiffuseHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_DIFFUSE),
-                          MeshShader::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+                          Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
         if (!glIsTextureHandleResidentARB(DiffuseHandle))
             glMakeTextureHandleResidentARB(DiffuseHandle);
 
         SpecularHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_SPECULAR),
-                           MeshShader::ObjectPass2Shader::getInstance()->m_sampler_ids[1]);
+                           Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[1]);
         if (!glIsTextureHandleResidentARB(SpecularHandle))
             glMakeTextureHandleResidentARB(SpecularHandle);
 
         SSAOHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_HALF1_R),
-                        MeshShader::ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
+                        Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
         if (!glIsTextureHandleResidentARB(SSAOHandle))
             glMakeTextureHandleResidentARB(SSAOHandle);
 
         DepthHandle = glGetTextureSamplerHandleARB(getDepthStencilTexture(),
-                     MeshShader::ObjectPass2Shader::getInstance()->m_sampler_ids[3]);
+                     Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[3]);
         if (!glIsTextureHandleResidentARB(DepthHandle))
             glMakeTextureHandleResidentARB(DepthHandle);
     }
@@ -1530,12 +1530,12 @@ void IrrDriver::renderTransparent()
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        renderTransparenPass<MeshShader::TransparentFogShader, video::EVT_STANDARD,
+        renderTransparenPass<Shaders::TransparentFogShader, video::EVT_STANDARD,
                              8, 7, 6, 5, 4, 3, 2, 1>(
                              TexUnits(RenderGeometry::TexUnit(0, true)),
                               ListBlendTransparentFog::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
-        renderTransparenPass<MeshShader::TransparentFogShader, 
+        renderTransparenPass<Shaders::TransparentFogShader, 
                              video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(
                              TexUnits(RenderGeometry::TexUnit(0, true)), 
                                        ListAdditiveTransparentFog::getInstance());
@@ -1543,12 +1543,12 @@ void IrrDriver::renderTransparent()
     else
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        renderTransparenPass<MeshShader::TransparentShader,
+        renderTransparenPass<Shaders::TransparentShader,
                              video::EVT_STANDARD, 2, 1>(
                                   TexUnits(RenderGeometry::TexUnit(0, true)),
                                            ListBlendTransparent::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
-        renderTransparenPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(
+        renderTransparenPass<Shaders::TransparentShader, video::EVT_STANDARD, 2, 1>(
                              TexUnits(RenderGeometry::TexUnit(0, true)),
                                       ListAdditiveTransparent::getInstance());
     }

@@ -225,25 +225,6 @@ GLuint LoadShader(const char * file, unsigned type)
 }
 
 
-
-Shaders::ColoredLine::ColoredLine()
-{
-    loadProgram(OBJECT, GL_VERTEX_SHADER,   "object_pass.vert",
-                        GL_FRAGMENT_SHADER, "coloredquad.frag");
-
-    assignUniforms("color");
-
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
-    glGenBuffers(1, &m_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 6 * 1024 * sizeof(float), 0, GL_DYNAMIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}   // Shaders::ColoredLine
-
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
@@ -350,55 +331,66 @@ unsigned getGLSLVersion()
     return CVS->getGLSLVersion();
 }
 
-namespace MeshShader
+// ============================================================================
+// Solid Normal and depth pass shaders
+Shaders::ObjectPass1Shader::ObjectPass1Shader()
 {
-    // Solid Normal and depth pass shaders
-    ObjectPass1Shader::ObjectPass1Shader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "object_pass.vert",
-            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
-            GL_FRAGMENT_SHADER, "object_pass1.frag");
-        assignUniforms("ModelMatrix", "InverseModelMatrix");
-        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                        GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+                        GL_FRAGMENT_SHADER, "object_pass1.frag");
+    assignUniforms("ModelMatrix", "InverseModelMatrix");
+    assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+}   // ObjectPass1Shader
 
+// ============================================================================
+// Solid Lit pass shaders
+Shaders::ObjectPass2Shader::ObjectPass2Shader()
+{
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                        GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                        GL_FRAGMENT_SHADER, "object_pass2.frag");
+    assignUniforms("ModelMatrix", "TextureMatrix");
+    assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                       1, "SpecularMap", ST_NEAREST_FILTERED,
+                       2, "SSAO", ST_BILINEAR_FILTERED,
+                       3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+}   // ObjectPass2Shader
 
-    // Solid Lit pass shaders
-    ObjectPass2Shader::ObjectPass2Shader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "object_pass.vert",
-            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-            GL_FRAGMENT_SHADER, "object_pass2.frag");
-        assignUniforms("ModelMatrix", "TextureMatrix");
-            assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
-                               1, "SpecularMap", ST_NEAREST_FILTERED,
-                               2, "SSAO", ST_BILINEAR_FILTERED,
-                               3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                               4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
+// ============================================================================
+Shaders::TransparentShader::TransparentShader()
+{
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                        GL_FRAGMENT_SHADER, "transparent.frag");
+    assignUniforms("ModelMatrix", "TextureMatrix");
+    assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+}   // TransparentShader
 
+// ============================================================================
+Shaders::TransparentFogShader::TransparentFogShader()
+{
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                        GL_FRAGMENT_SHADER, "transparentfog.frag");
+    assignUniforms("ModelMatrix", "TextureMatrix", "fogmax", "startH",
+                   "endH", "start", "end", "col");
+    assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+}   // TransparentFogShader
 
+// ============================================================================
+Shaders::ColoredLine::ColoredLine()
+{
+    loadProgram(OBJECT, GL_VERTEX_SHADER,   "object_pass.vert",
+                        GL_FRAGMENT_SHADER, "coloredquad.frag");
 
-    TransparentShader::TransparentShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "object_pass.vert",
-            GL_FRAGMENT_SHADER, "transparent.frag");
-        assignUniforms("ModelMatrix", "TextureMatrix");
-        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
+    assignUniforms("color");
 
-    TransparentFogShader::TransparentFogShader()
-    {
-        loadProgram(OBJECT,
-            GL_VERTEX_SHADER, "object_pass.vert",
-            GL_FRAGMENT_SHADER, "transparentfog.frag");
-        assignUniforms("ModelMatrix", "TextureMatrix", "fogmax", "startH",
-                       "endH", "start", "end", "col");
-        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }
-
-}
-
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+    glGenBuffers(1, &m_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 1024 * sizeof(float), 0, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}   // Shaders::ColoredLine
