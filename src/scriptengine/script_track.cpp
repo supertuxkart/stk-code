@@ -24,6 +24,7 @@
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
+#include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -106,6 +107,11 @@ namespace Scripting
         void exitRace()
         {
             World::getWorld()->scheduleExitRace();
+        }
+
+        void pauseRace()
+        {
+            new RacePausedDialog(0.8f, 0.6f);
         }
     }
 
@@ -252,6 +258,7 @@ namespace Scripting
                 asFUNCTION(createTrigger), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in)", asFUNCTION(getTrackObject), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void exitRace()", asFUNCTION(exitRace), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void pauseRace()", asFUNCTION(pauseRace), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnable(bool status)", asMETHOD(TrackObject, setEnable), asCALL_THISCALL); assert(r >= 0);

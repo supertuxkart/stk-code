@@ -38,7 +38,6 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
-#include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
@@ -914,42 +913,13 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 {
     if (!m_action_active) return;
 
-    // TODO: replace all of these hardcoded actions with scripting
-
-    if (m_action == "garage")
-    {
-        m_action_active = false;
-
-        new RacePausedDialog(0.8f, 0.6f);
-        //dynamic_cast<OverWorld*>(World::getWorld())->scheduleSelectKart();
-    }
-    //action trigger near big doors in the overword to notify players that
-    // they'll open once they finish all the challenges
-    else if (m_action == "big_door")
-    {
-        m_action_active = false;
-
-        Track* m_track = World::getWorld()->getTrack();
-        unsigned int unlocked_challenges = m_track->getNumOfCompletedChallenges();
-        std::vector<OverworldChallenge> m_challenges = m_track->getChallengeList();
-
-        // allow ONE unsolved challenge : the last one
-        if (unlocked_challenges < m_challenges.size() - 1)
-        {
-            new TutorialMessageDialog(
-                  _("Complete all challenges to unlock the big door!"), true);
-        }
-    }
-    else
-    {	
-        Scripting::ScriptEngine* script_engine =
-            World::getWorld()->getScriptEngine();
-        m_action_active = false;
-        int idKart = 0;
-        Camera* camera = Camera::getActiveCamera();
-        if (camera != NULL && camera->getKart() != NULL)
-            idKart = camera->getKart()->getWorldKartId();
-        script_engine->runFunction("void " + m_action + "(int)",
-            [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
-    }
+    Scripting::ScriptEngine* script_engine =
+        World::getWorld()->getScriptEngine();
+    m_action_active = false; // TODO: allow auto re-activating?
+    int idKart = 0;
+    Camera* camera = Camera::getActiveCamera();
+    if (camera != NULL && camera->getKart() != NULL)
+        idKart = camera->getKart()->getWorldKartId();
+    script_engine->runFunction("void " + m_action + "(int)",
+        [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
 }   // onTriggerItemApproached
