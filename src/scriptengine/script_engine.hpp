@@ -53,7 +53,11 @@ namespace Scripting
         ~ScriptEngine();
 
         void runFunction(std::string function_name);
-        void runFunction(std::string function_name, std::function<void(asIScriptContext*)> callback);
+        void runFunction(std::string function_name,
+            std::function<void(asIScriptContext*)> callback);
+        void runFunction(std::string function_name,
+            std::function<void(asIScriptContext*)> callback,
+            std::function<void(asIScriptContext*)> get_return_value);
         void evalScript(std::string script_fragment);
         void cleanupCache();
 

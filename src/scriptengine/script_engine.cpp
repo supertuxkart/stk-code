@@ -177,7 +177,17 @@ namespace Scripting
     void ScriptEngine::runFunction(std::string function_name)
     {
         std::function<void(asIScriptContext*)> callback;
-        runFunction(function_name, callback);
+        std::function<void(asIScriptContext*)> get_return_value;
+        runFunction(function_name, callback, get_return_value);
+    }
+
+    //-----------------------------------------------------------------------------
+
+    void ScriptEngine::runFunction(std::string function_name,
+        std::function<void(asIScriptContext*)> callback)
+    {
+        std::function<void(asIScriptContext*)> get_return_value;
+        runFunction(function_name, callback, get_return_value);
     }
 
     //-----------------------------------------------------------------------------
@@ -185,7 +195,9 @@ namespace Scripting
     /** runs the specified script
     *  \param string scriptName = name of script to run
     */
-    void ScriptEngine::runFunction(std::string function_name, std::function<void(asIScriptContext*)> callback)
+    void ScriptEngine::runFunction(std::string function_name,
+        std::function<void(asIScriptContext*)> callback,
+        std::function<void(asIScriptContext*)> get_return_value)
     {
         int r; //int for error checking
 
@@ -199,11 +211,11 @@ namespace Scripting
         if (cached_script == m_loaded_files.end())
         {
             // Compile the script code
-            Log::debug("Scripting", "Compiling script '%s' (was not in cache)", script_filename.c_str());
+            Log::info("Scripting", "Checking for script file '%s'", script_filename.c_str());
             r = compileScript(m_engine, script_filename);
             if (r < 0)
             {
-                Log::debug("Scripting", "Script '%s' is not available", script_filename.c_str());
+                Log::info("Scripting", "Script '%s' is not available", script_filename.c_str());
                 m_loaded_files[script_filename] = false;
                 m_functions_cache[function_name] = NULL; // remember that this script is unavailable
                 return;
@@ -306,6 +318,9 @@ namespace Scripting
             // Retrieve the return value from the context here (for scripts that return values)
             // <type> returnValue = ctx->getReturnType(); for example
             //float returnValue = ctx->GetReturnFloat();
+
+            if (get_return_value)
+                get_return_value(ctx);
         }
 
         // We must release the contexts when no longer using them
