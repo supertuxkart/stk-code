@@ -67,6 +67,10 @@ public:
         /** If the item is below that height, it is reset (when
          *  m_reset_when_too_low is true). */
         float                     m_reset_height;
+        /** If non-empty, the name of the scripting function to call
+          * when a kart collides with this object
+          */
+        std::string               m_on_kart_collision;
     private:
         void init();
     public:
@@ -140,6 +144,10 @@ private:
     /** If m_reset_when_too_low this object is set back to its start
      *  position if its height is below this value. */
     float                 m_reset_height;
+    /** If non-empty, the name of the scripting function to call
+    * when a kart collides with this object
+    */
+    std::string           m_on_kart_collision;
 
     /** If this body is a bullet dynamic body, i.e. affected by physics
      *  or not (static (not moving) or kinematic (animated outside
@@ -193,6 +201,8 @@ public:
     // ------------------------------------------------------------------------
     /** Add body to dynamic world */
     void addBody();
+    // ------------------------------------------------------------------------
+    const std::string& getOnKartCollisionFunction() const { return m_on_kart_collision; }
     // ------------------------------------------------------------------------
     // Methods usable by scripts
 

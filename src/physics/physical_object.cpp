@@ -63,6 +63,7 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
     xml_node.get("reset",   &m_crash_reset );
     xml_node.get("explode", &m_knock_kart  );
     xml_node.get("flatten", &m_flatten_kart);
+    xml_node.get("on-kart-collision", &m_on_kart_collision);
     m_reset_when_too_low =
         xml_node.get("reset-when-below", &m_reset_height) == 1;
 
@@ -140,6 +141,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_flatten_kart       = settings.m_flatten_kart;
     m_reset_when_too_low = settings.m_reset_when_too_low;
     m_reset_height       = settings.m_reset_height;
+    m_on_kart_collision  = settings.m_on_kart_collision;
 
     m_init_pos.setIdentity();
     Vec3 radHpr(m_init_hpr);

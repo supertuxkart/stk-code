@@ -186,15 +186,17 @@ void Physics::update(float dt)
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
             int kartId = kart->getWorldKartId();
-            std::string obj_id = p->getUserPointer(0)->getPointerPhysicalObject()->getID();
-            
-            // TODO: pass obj_id as arguent
-            script_engine->runFunction("void onKartObjectCollision(int)",
-                [=](asIScriptContext* ctx) {
-                    ctx->SetArgDWord(0, kartId);
-                });
-            PhysicalObject *obj = p->getUserPointer(0)
-                                   ->getPointerPhysicalObject();
+            PhysicalObject* obj = p->getUserPointer(0)->getPointerPhysicalObject();
+            std::string obj_id = obj->getID();
+            std::string scripting_function = obj->getOnKartCollisionFunction();
+            if (scripting_function.size() > 0)
+            {
+                script_engine->runFunction("void " + scripting_function + "(int, const string)",
+                    [&](asIScriptContext* ctx) {
+                        ctx->SetArgDWord(0, kartId);
+                        ctx->SetArgObject(1, &obj_id);
+                    });
+            }
             if (obj->isCrashReset())
             {
                 new RescueAnimation(kart);
