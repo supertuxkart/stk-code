@@ -152,7 +152,7 @@ void Shaders::destroy()
 // ----------------------------------------------------------------------------
 // Shader loading  related hook
 
-static std::string LoadHeader()
+static std::string loadHeader()
 {
     std::string result;
     std::ifstream Stream("header.txt", std::ios::in);
@@ -166,7 +166,7 @@ static std::string LoadHeader()
     }
 
     return result;
-}
+}   // loadHeader
 
 // ----------------------------------------------------------------------------
 // Mostly from shader tutorial
@@ -191,7 +191,7 @@ GLuint loadShader(const char * file, unsigned type)
         Code += "#define VSLayer\n";
     if (CVS->needsRGBBindlessWorkaround())
         Code += "#define SRGBBindlessFix\n";
-    Code += LoadHeader();
+    Code += loadHeader();
     if (Stream.is_open())
     {
         std::string Line = "";
