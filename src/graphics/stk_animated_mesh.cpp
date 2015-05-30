@@ -15,20 +15,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "central_settings.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/stkanimatedmesh.hpp"
-#include <ISceneManager.h>
-#include <IMaterialRenderer.h>
-#include <ISkinnedMesh.h>
-#include "graphics/irr_driver.hpp"
-#include "graphics/material_manager.hpp"
+
 #include "config/user_config.hpp"
+#include "central_settings.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/stk_animated_mesh.hpp"
+#include "graphics/material_manager.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
-#include "graphics/camera.hpp"
 #include "utils/profiler.hpp"
 #include "utils/cpp2011.hpp"
+
+#include <IMaterialRenderer.h>
+#include <ISceneManager.h>
+#include <ISkinnedMesh.h>
 
 using namespace irr;
 

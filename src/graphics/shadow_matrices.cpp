@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/shadow_matrixes.hpp"
+#include "graphics/shadow_matrices.hpp"
 
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
@@ -37,6 +37,7 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
+float ShadowMatrices:: m_shadow_split[5] = { 1., 5., 20., 50., 150 };
 
 // ============================================================================
 class LightspaceBoundingBoxShader 
@@ -78,8 +79,6 @@ public:
 
 
 };   // ShadowMatricesGenerationShader
-
-float ShadowMatrices:: m_shadow_split[5] = { 1., 5., 20., 50., 150 };
 
 // ============================================================================
 class ViewFrustrumShader : public Shader<ViewFrustrumShader, video::SColor, int>

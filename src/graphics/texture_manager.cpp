@@ -15,12 +15,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "central_settings.hpp"
-#include "texturemanager.hpp"
+#include "graphics/texture_manager.hpp"
+
+#include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
+
+#include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
+
 #include <fstream>
 #include <sstream>
-#include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
-#include "irr_driver.hpp"
 
 
 GLuint getTextureGLuint(irr::video::ITexture *tex)

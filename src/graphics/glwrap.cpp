@@ -22,7 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stkmesh.hpp"
+#include "graphics/stk_mesh.hpp"
 #include "utils/profiler.hpp"
 #include "utils/cpp2011.hpp"
 

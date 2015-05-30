@@ -18,11 +18,12 @@
 #ifndef STKANIMATEDMESH_HPP
 #define STKANIMATEDMESH_HPP
 
+#include "graphics/stk_mesh.hpp"
+#include "utils/ptr_vector.hpp"
+
 #include "../lib/irrlicht/source/Irrlicht/CAnimatedMeshSceneNode.h"
 #include <IAnimatedMesh.h>
 #include <irrTypes.h>
-#include "graphics/stkmesh.hpp"
-#include "utils/ptr_vector.hpp"
 
 class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode, public STKMeshCommon
 {

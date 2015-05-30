@@ -21,8 +21,10 @@
 #include "graphics/gl_headers.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/vaomanager.hpp"
+#include "graphics/texture_manager.hpp"
+#include "graphics/vao_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/vec3.hpp"
 
 #include <vector>
 
@@ -142,9 +144,6 @@ public:
         }
     }
 };
-
-#include "utils/vec3.hpp"
-#include "texturemanager.hpp"
 
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);

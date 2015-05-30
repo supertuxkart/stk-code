@@ -17,17 +17,18 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tracks/track_object_presentation.hpp"
-#include "graphics/central_settings.hpp"
+
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_buffer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"

@@ -16,20 +16,20 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "graphics/irr_driver.hpp"
-#include "central_settings.hpp"
 #include "config/user_config.hpp"
+#include "graphics/callbacks.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/shadow_matrixes.hpp"
+#include "graphics/shadow_matrices.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
-#include "callbacks.hpp"
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))

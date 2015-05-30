@@ -21,11 +21,11 @@
 
 #include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
-#include "graphics/stkmeshscenenode.hpp"
 
 #include <IMeshSceneNode.h>
 #include <SMesh.h>

@@ -15,11 +15,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "vaomanager.hpp"
-#include "irr_driver.hpp"
-#include "stkmesh.hpp"
-#include "glwrap.hpp"
-#include "central_settings.hpp"
+#include "graphics/vao_manager.hpp"
+
+#include "graphics/central_settings.hpp"
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/stk_mesh.hpp"
 
 VAOManager::VAOManager()
 {

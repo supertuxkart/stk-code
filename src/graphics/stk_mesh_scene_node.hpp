@@ -15,10 +15,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef STKMESHSCENENODE_H
-#define STKMESHSCENENODE_H
+#ifndef HEADER_STK_MESH_SCENE_NODE
+#define HEADER_STK_MESH_SCENE_NODE
 
-#include "stkmesh.hpp"
+#include "graphics/stk_mesh.hpp"
 
 #include "graphics/shaders.hpp"
 #include "utils/ptr_vector.hpp"

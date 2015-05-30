@@ -15,22 +15,24 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "central_settings.hpp"
-#include "stkmeshscenenode.hpp"
-#include "stkmesh.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/glwrap.hpp"
-#include "tracks/track.hpp"
-#include <ISceneManager.h>
-#include <IMaterialRenderer.h>
+#include "graphics/stk_mesh_scene_node.hpp"
+
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/stk_mesh.hpp"
+#include "tracks/track.hpp"
 #include "modes/world.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/helpers.hpp"
 #include "utils/tuple.hpp"
-#include "utils/cpp2011.hpp"
+
+#include <ISceneManager.h>
+#include <IMaterialRenderer.h>
 
 
 // ============================================================================

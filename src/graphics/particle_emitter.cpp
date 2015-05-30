@@ -17,18 +17,19 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/particle_emitter.hpp"
+
 #include "graphics/central_settings.hpp"
+#include "graphics/gpu_particles.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind.hpp"
-#include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/helpers.hpp"
-#include "graphics/gpuparticles.hpp"
 
 #include <SParticle.h>
 #include <IParticleAffector.h>
@@ -36,6 +37,7 @@
 #include <IParticleSystemSceneNode.h>
 #include <IParticleBoxEmitter.h>
 #include <ISceneManager.h>
+
 #include <algorithm>
 
 class FadeAwayAffector : public scene::IParticleAffector
