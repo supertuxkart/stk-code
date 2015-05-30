@@ -62,6 +62,7 @@ class PerCameraNode;
 class PostProcessing;
 class LightNode;
 class ShadowImportance;
+class ShadowMatrices;
 
 enum STKRenderingPass
 {
@@ -200,12 +201,6 @@ private:
     Wind                 *m_wind;
     /** RTTs. */
     RTT                *m_rtts;
-    std::vector<core::matrix4> sun_ortho_matrix;
-    core::vector3df    rh_extend;
-    core::matrix4      rh_matrix;
-    core::matrix4      rsm_matrix;
-    bool               m_rsm_matrix_initialized;
-    bool               m_rsm_map_available;
     core::vector2df    m_current_screen_size;
     core::dimension2du m_actual_screen_size;
 
@@ -239,6 +234,8 @@ private:
      *  one), but no confirmation dialog. */
     enum {RES_CHANGE_NONE, RES_CHANGE_YES,
           RES_CHANGE_CANCEL}                m_resolution_changing;
+
+    ShadowMatrices *m_shadow_matrices;
 
 public:
     GLuint SkyboxCubeMap;
@@ -298,12 +295,8 @@ private:
     unsigned             poly_count[PASS_COUNT];
     u32                  m_renderpass;
     class STKMeshSceneNode *m_sun_interposer;
-    scene::ICameraSceneNode *m_suncam;
     core::vector3df m_sun_direction;
     video::SColorf m_suncolor;
-    std::pair<float, float> m_shadow_scales[4];
-    scene::ICameraSceneNode *m_shadow_camnodes[4];
-    float m_shadows_cam[4][24];
 
     std::vector<GlowData> m_glowing;
 
@@ -361,10 +354,6 @@ public:
     void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;
-    const std::vector<core::matrix4> &getShadowViewProj() const
-    {
-        return sun_ortho_matrix;
-    }
     void IncreaseObjectCount();
     void IncreasePolyCount(unsigned);
     core::array<video::IRenderTarget> &getMainSetup();
@@ -670,6 +659,9 @@ public:
     // ------------------------------------------------------------------------
     class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
     // ------------------------------------------------------------------------
+    ShadowMatrices *getShadowMatrices() { return m_shadow_matrices;  }
+    // ------------------------------------------------------------------------
+    
     void cleanSunInterposer();
     void createSunInterposer();
     // ------------------------------------------------------------------------

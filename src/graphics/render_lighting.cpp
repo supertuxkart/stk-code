@@ -447,8 +447,9 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
             for (unsigned i = 0; i < 32; i++)
             {
                 NVWorkaroundRadianceHintsConstructionShader::getInstance()
-                    ->setUniforms(rsm_matrix, rh_matrix,
-                                  rh_extend, i,
+                    ->setUniforms(getShadowMatrices()->getRSMMatrix(), 
+                                  getShadowMatrices()->getRHMatrix(),
+                                  getShadowMatrices()->getRHExtend(), i,
                                   irr_driver->getSunColor());
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             }
@@ -463,14 +464,14 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
                     m_rtts->getRSM().getDepthTexture()
             );
             RadianceHintsConstructionShader::getInstance()
-                ->setUniforms(rsm_matrix, rh_matrix, rh_extend,
+                ->setUniforms(getShadowMatrices()->getRSMMatrix(),
+                              getShadowMatrices()->getRHMatrix(), 
+                              getShadowMatrices()->getRHExtend(),
                               irr_driver->getSunColor());
             glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
         }
     }
-
-    for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
-        sun_ortho_matrix[i] *= getInvViewMatrix();
+    getShadowMatrices()->updateSunOrthoMatrices();
     m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -478,7 +479,9 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     if (CVS->isGlobalIlluminationEnabled() && hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
-        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH());
+        m_post_processing->renderGI(getShadowMatrices()->getRHMatrix(),
+                                    getShadowMatrices()->getRHExtend(),
+                                    m_rtts->getRH());
     }
 
     m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();

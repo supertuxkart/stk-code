@@ -31,6 +31,7 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shadow_matrixes.hpp"
 #include "graphics/stkanimatedmesh.hpp"
 #include "graphics/stkbillboard.hpp"
 #include "graphics/stkmeshscenenode.hpp"
@@ -105,6 +106,7 @@ const int MIN_SUPPORTED_WIDTH  = 800;
  */
 IrrDriver::IrrDriver()
 {
+    m_shadow_matrices     = NULL;
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
     m_device              = createDevice(video::EDT_NULL,
@@ -121,10 +123,6 @@ IrrDriver::IrrDriver()
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
         m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = m_boundingboxesviz = false;
     SkyboxCubeMap = m_last_light_bucket_distance = 0;
-    m_shadow_camnodes[0] = NULL;
-    m_shadow_camnodes[1] = NULL;
-    m_shadow_camnodes[2] = NULL;
-    m_shadow_camnodes[3] = NULL;
     memset(object_count, 0, sizeof(object_count));
 }   // IrrDriver
 
@@ -152,6 +150,8 @@ IrrDriver::~IrrDriver()
     m_device = NULL;
     m_modes.clear();
 
+    delete m_shadow_matrices;
+    m_shadow_matrices = NULL;
     Shaders::destroy();
     delete m_wind;
 }   // ~IrrDriver
@@ -193,6 +193,14 @@ GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 {
     return m_perf_query[i];
 }
+
+// ----------------------------------------------------------------------------
+void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
+                                          size_t width, size_t height)
+{
+    m_current_screen_size = core::vector2df(float(width), float(height));
+    m_shadow_matrices->computeMatrixesAndCameras(camnode, width, height);
+}   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
 
@@ -519,9 +527,6 @@ void IrrDriver::initDevice()
         m_mrt.clear();
         m_mrt.reallocate(2);
 
-        m_suncam = m_scene_manager->addCameraSceneNode(0, vector3df(0), vector3df(0), -1, false);
-        m_suncam->grab();
-        m_suncam->setParent(NULL);
     }
     else
     {
@@ -588,6 +593,7 @@ void IrrDriver::initDevice()
     // so let's decide ourselves...)
     m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
+    m_shadow_matrices = new ShadowMatrices();
 }   // initDevice
 
 // ----------------------------------------------------------------------------
@@ -1701,7 +1707,7 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
 // ----------------------------------------------------------------------------
 void IrrDriver::setRTT(RTT* rtt)
 {
-    memset(m_shadow_camnodes, 0, 4 * sizeof(void*));
+    m_shadow_matrices->resetShadowCamNodes();
     m_rtts = rtt;
 }
 // ----------------------------------------------------------------------------
@@ -1710,7 +1716,8 @@ void IrrDriver::onLoadWorld()
     if (CVS->isGLSL())
     {
         const core::recti &viewport = Camera::getCamera(0)->getViewport();
-        size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+        size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
+        size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
         m_rtts = new RTT(width, height);
     }
 }
@@ -2514,11 +2521,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
         {
             //m_sun_interposer->setPosition(pos);
             //m_sun_interposer->updateAbsolutePosition();
-
-            m_suncam->setPosition(pos);
-            m_suncam->updateAbsolutePosition();
-
-            m_rsm_matrix_initialized = false;
+            m_shadow_matrices->addLight(pos);
 
             ((WaterShaderProvider *) Shaders::getCallback(ES_WATER) )->setSunPosition(pos);
         }

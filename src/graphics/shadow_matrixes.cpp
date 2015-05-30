@@ -18,7 +18,10 @@
 #include "graphics/shadow_matrixes.hpp"
 
 #include "graphics/central_settings.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/post_processing.hpp"
+#include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "modes/world.hpp"
@@ -34,8 +37,6 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
-
-float ShadowMatrices::m_shadow_split[5] = { 1., 5., 20., 50., 150 };
 
 // ============================================================================
 class LightspaceBoundingBoxShader 
@@ -78,6 +79,68 @@ public:
 
 };   // ShadowMatricesGenerationShader
 
+float ShadowMatrices:: m_shadow_split[5] = { 1., 5., 20., 50., 150 };
+
+// ============================================================================
+class ViewFrustrumShader : public Shader<ViewFrustrumShader, video::SColor, int>
+{
+private:
+    GLuint m_frustrum_vao;
+
+public:    ViewFrustrumShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "frustrum.vert",
+                            GL_FRAGMENT_SHADER, "coloredquad.frag");
+
+        assignUniforms("color", "idx");
+
+        glGenVertexArrays(1, &m_frustrum_vao);
+        glBindVertexArray(m_frustrum_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getFrustrumVBO());
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                     SharedGPUObjects::getFrustrumIndices());
+        glBindVertexArray(0);
+    }   // ViewFrustrumShader
+    // ------------------------------------------------------------------------
+    void bindVertexArray()
+    {
+        glBindVertexArray(m_frustrum_vao);
+    }   // bindVertexArray
+
+};   // ViewFrustrumShader
+
+// ============================================================================
+ShadowMatrices::ShadowMatrices()
+{
+    m_sun_cam = irr_driver->getSceneManager()
+              ->addCameraSceneNode(0, vector3df(0), vector3df(0), -1, false);
+    m_sun_cam->grab();
+    m_sun_cam->setParent(NULL);
+
+    m_shadow_cam_nodes[0] = NULL;
+    m_shadow_cam_nodes[1] = NULL;
+    m_shadow_cam_nodes[2] = NULL;
+    m_shadow_cam_nodes[3] = NULL;
+}   // ShadowMatrices
+// ----------------------------------------------------------------------------
+void ShadowMatrices::addLight(const core::vector3df &pos)
+{
+    m_sun_cam->setPosition(pos);
+    m_sun_cam->updateAbsolutePosition();
+
+    m_rsm_matrix_initialized = false;
+
+}   // addLight
+
+// ----------------------------------------------------------------------------
+void ShadowMatrices::updateSunOrthoMatrices()
+{
+    for (unsigned i = 0; i < m_sun_ortho_matrices.size(); i++)
+        m_sun_ortho_matrices[i] *= irr_driver->getInvViewMatrix();
+}   // updateSunOrthoMatrices
+
 // ============================================================================
 static std::vector<vector3df> getFrustrumVertex(const scene::SViewFrustum &frustrum)
 {
@@ -101,7 +164,7 @@ static std::vector<vector3df> getFrustrumVertex(const scene::SViewFrustum &frust
  *  \param pointsInside a vector of point in 3d space.
  *  \param size returns the size (width, height) of shadowmap coverage
  */
-static core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform,
+core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transform,
                                     const std::vector<vector3df> &pointsInside,
                                     std::pair<float, float> &size)
 {
@@ -154,8 +217,8 @@ static core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform,
  *  TODO : The depth histogram part is commented out, needs to tweak it when 
  *         I have some motivation
  */
-void IrrDriver::updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
-                                                                size_t height)
+void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
+                                                                     unsigned int height)
 {
     struct CascadeBoundingBox
     {
@@ -192,9 +255,9 @@ void IrrDriver::updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
 
     LightspaceBoundingBoxShader::getInstance()->use();
     LightspaceBoundingBoxShader::getInstance()
-        ->setTextureUnits(getDepthStencilTexture());
+        ->setTextureUnits(irr_driver->getDepthStencilTexture());
     LightspaceBoundingBoxShader::getInstance()
-        ->setUniforms(m_suncam->getViewMatrix(),
+        ->setUniforms(m_sun_cam->getViewMatrix(),
                       ShadowMatrices::m_shadow_split[1],
                       ShadowMatrices::m_shadow_split[2],
                       ShadowMatrices::m_shadow_split[3],
@@ -210,7 +273,7 @@ void IrrDriver::updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
 
     ShadowMatricesGenerationShader::getInstance()->use();
     ShadowMatricesGenerationShader::getInstance()
-        ->setUniforms(m_suncam->getViewMatrix());
+        ->setUniforms(m_sun_cam->getViewMatrix());
     glDispatchCompute(4, 1, 1);
 
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -229,12 +292,12 @@ void IrrDriver::updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
  *   \param width of the rendering viewport
  *   \param height of the rendering viewport
  */
-void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
-                                          size_t width, size_t height)
+void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
+                                               unsigned int width, unsigned int height)
 {
     if (CVS->isSDSMEnabled())
         updateSplitAndLightcoordRangeFromComputeShaders(width, height);
-    static_cast<scene::CSceneManager *>(m_scene_manager)
+    static_cast<scene::CSceneManager *>(irr_driver->getSceneManager())
         ->OnAnimate(os::Timer::getTime());
     camnode->render();
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()
@@ -243,7 +306,6 @@ void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnod
                               ->getTransform(video::ETS_VIEW));
     irr_driver->genProjViewMatrix();
 
-    m_current_screen_size = core::vector2df(float(width), float(height));
 
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
@@ -269,15 +331,15 @@ void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnod
     memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(),  16 * sizeof(float));
     memcpy(&tmp[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
 
-    m_suncam->render();
+    m_sun_cam->render();
     for (unsigned i = 0; i < 4; i++)
     {
-        if (m_shadow_camnodes[i])
-            delete m_shadow_camnodes[i];
-        m_shadow_camnodes[i] = (scene::ICameraSceneNode *) m_suncam->clone();
+        if (m_shadow_cam_nodes[i])
+            delete m_shadow_cam_nodes[i];
+        m_shadow_cam_nodes[i] = (scene::ICameraSceneNode *) m_sun_cam->clone();
     }
-    sun_ortho_matrix.clear();
-    const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
+    m_sun_ortho_matrices.clear();
+    const core::matrix4 &sun_cam_view_matrix = m_sun_cam->getViewMatrix();
 
     if (World::getWorld() && World::getWorld()->getTrack())
     {
@@ -330,16 +392,16 @@ void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnod
             memcpy(m_shadows_cam[i], tmp, 24 * sizeof(float));
 
             std::vector<vector3df> vectors = getFrustrumVertex(*frustrum);
-            tmp_matrix = getTighestFitOrthoProj(SunCamViewMatrix, vectors,
+            tmp_matrix = getTighestFitOrthoProj(sun_cam_view_matrix, vectors,
                                                 m_shadow_scales[i]);
 
 
-            m_shadow_camnodes[i]->setProjectionMatrix(tmp_matrix, true);
-            m_shadow_camnodes[i]->render();
+            m_shadow_cam_nodes[i]->setProjectionMatrix(tmp_matrix, true);
+            m_shadow_cam_nodes[i]->render();
 
-            sun_ortho_matrix.push_back(
-                  getVideoDriver()->getTransform(video::ETS_PROJECTION) 
-                * getVideoDriver()->getTransform(video::ETS_VIEW)       );
+            m_sun_ortho_matrices.push_back(
+                  irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION) 
+                * irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW)       );
         }
 
         // Rsm Matrix and camera
@@ -347,42 +409,42 @@ void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnod
         {
             if (trackbox.MinEdge.X != trackbox.MaxEdge.X &&
                 trackbox.MinEdge.Y != trackbox.MaxEdge.Y &&
-                // Cover the case where SunCamViewMatrix is null
-                SunCamViewMatrix.getScale() != core::vector3df(0., 0., 0.))
+                // Cover the case where sun_cam_view_matrix is null
+                sun_cam_view_matrix.getScale() != core::vector3df(0., 0., 0.))
             {
-                SunCamViewMatrix.transformBoxEx(trackbox);
+                sun_cam_view_matrix.transformBoxEx(trackbox);
                 core::matrix4 tmp_matrix;
                 tmp_matrix.buildProjectionMatrixOrthoLH(trackbox.MinEdge.X,
                                                         trackbox.MaxEdge.X,
                                                         trackbox.MaxEdge.Y,
                                                         trackbox.MinEdge.Y,
                                                         30, trackbox.MaxEdge.Z);
-                m_suncam->setProjectionMatrix(tmp_matrix, true);
-                m_suncam->render();
+                m_sun_cam->setProjectionMatrix(tmp_matrix, true);
+                m_sun_cam->render();
             }
-            rsm_matrix = getVideoDriver()->getTransform(video::ETS_PROJECTION) 
-                       * getVideoDriver()->getTransform(video::ETS_VIEW);
+            m_rsm_matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION) 
+                         * irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
             m_rsm_matrix_initialized = true;
             m_rsm_map_available = false;
         }
-        rh_extend = core::vector3df(128, 64, 128);
+        m_rh_extend = core::vector3df(128, 64, 128);
         core::vector3df campos = camnode->getAbsolutePosition();
         core::vector3df translation(8 * floor(campos.X / 8), 
                                     8 * floor(campos.Y / 8),
                                     8 * floor(campos.Z / 8));
-        rh_matrix.setTranslation(translation);
+        m_rh_matrix.setTranslation(translation);
 
 
-        assert(sun_ortho_matrix.size() == 4);
+        assert(m_sun_ortho_matrices.size() == 4);
         // reset normal camera
         camnode->setNearValue(oldnear);
         camnode->setFarValue(oldfar);
         camnode->render();
 
-        size_t size = irr_driver->getShadowViewProj().size();
+        size_t size = m_sun_ortho_matrices.size();
         for (unsigned i = 0; i < size; i++)
             memcpy(&tmp[16 * i + 80],
-                   irr_driver->getShadowViewProj()[i].pointer(),
+                   m_sun_ortho_matrices[i].pointer(),
                    16 * sizeof(float));
     }
 
@@ -400,3 +462,38 @@ void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode * const camnod
         glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float),
                         tmp);
 }   // computeMatrixesAndCameras
+
+// ----------------------------------------------------------------------------
+void ShadowMatrices::renderWireFrameFrustrum(float *tmp, unsigned i)
+{
+    ViewFrustrumShader::getInstance()->use();
+    ViewFrustrumShader::getInstance()->bindVertexArray();
+    glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getFrustrumVBO());
+
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), (void *)tmp);
+    ViewFrustrumShader::getInstance()->setUniforms(video::SColor(255, 0, 255, 0), i);
+    glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
+}
+// ----------------------------------------------------------------------------
+void ShadowMatrices::renderShadowsDebug()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, UserConfigParams::m_height / 2,
+               UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    PostProcessing *post_processing = irr_driver->getPostProcessing();
+    RTT *rtt = irr_driver->getRTT();
+    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 0);
+    renderWireFrameFrustrum(m_shadows_cam[0], 0);
+    glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2,
+               UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 1);
+    renderWireFrameFrustrum(m_shadows_cam[1], 1);
+    glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 2);
+    renderWireFrameFrustrum(m_shadows_cam[2], 2);
+    glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2,
+               UserConfigParams::m_height / 2);
+    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 3);
+    renderWireFrameFrustrum(m_shadows_cam[3], 3);
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+}

@@ -30,6 +30,7 @@
 #include "graphics/rtts.hpp"
 #include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shadow_matrixes.hpp"
 #include "graphics/stkmeshscenenode.hpp"
 #include "items/item_manager.hpp"
 #include "modes/world.hpp"
@@ -56,36 +57,6 @@ public:
         assignUniforms();
     }   // InstancedColorizeShader
 };   // InstancedColorizeShader
-
-// ============================================================================
-class ViewFrustrumShader : public Shader<ViewFrustrumShader, video::SColor, int>
-{
-private:
-    GLuint m_frustrum_vao;
-
-public:    ViewFrustrumShader()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "frustrum.vert",
-                            GL_FRAGMENT_SHADER, "coloredquad.frag");
-
-        assignUniforms("color", "idx");
-
-        glGenVertexArrays(1, &m_frustrum_vao);
-        glBindVertexArray(m_frustrum_vao);
-        glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getFrustrumVBO());
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                     SharedGPUObjects::getFrustrumIndices());
-        glBindVertexArray(0);
-    }   // ViewFrustrumShader
-    // ------------------------------------------------------------------------
-    void bindVertexArray()
-    {
-        glBindVertexArray(m_frustrum_vao);
-    }   // bindVertexArray
-
-};   // ViewFrustrumShader
 
 // ============================================================================
 
@@ -313,7 +284,7 @@ void IrrDriver::renderGLSL(float dt)
             }
             else if (irr_driver->getShadowViz())
             {
-                renderShadowsDebug();
+                getShadowMatrices()->renderShadowsDebug();
             }
             else
             {
@@ -401,7 +372,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     // Shadows
     {
         // To avoid wrong culling, use the largest view possible
-        m_scene_manager->setActiveCamera(m_suncam);
+        m_scene_manager->setActiveCamera(getShadowMatrices()->getSunCam());
         if (CVS->isDefferedEnabled() &&
             CVS->isShadowEnabled() && hasShadow)
         {
@@ -528,14 +499,17 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         m_post_processing->renderRHDebug(m_rtts->getRH().getRTT()[0],
                                          m_rtts->getRH().getRTT()[1], 
                                          m_rtts->getRH().getRTT()[2],
-                                         rh_matrix, rh_extend);
+                                         getShadowMatrices()->getRHMatrix(),
+                                         getShadowMatrices()->getRHExtend());
     }
 
     if (getGI())
     {
         glDisable(GL_BLEND);
         m_rtts->getFBO(FBO_COLORS).bind();
-        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH());
+        m_post_processing->renderGI(getShadowMatrices()->getRHMatrix(),
+                                    getShadowMatrices()->getRHExtend(),
+                                    m_rtts->getRH());
     }
 
     PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
@@ -675,36 +649,6 @@ void IrrDriver::renderParticles()
     for (unsigned i = 0; i < ParticlesList::getInstance()->size(); ++i)
         ParticlesList::getInstance()->at(i)->render();
 //    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
-}
-
-static void renderWireFrameFrustrum(float *tmp, unsigned i)
-{
-    ViewFrustrumShader::getInstance()->use();
-    ViewFrustrumShader::getInstance()->bindVertexArray();
-    glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getFrustrumVBO());
-
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), (void *)tmp);
-    ViewFrustrumShader::getInstance()->setUniforms(video::SColor(255, 0, 255, 0), i);
-    glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
-}
-
-
-void IrrDriver::renderShadowsDebug()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 0);
-    renderWireFrameFrustrum(m_shadows_cam[0], 0);
-    glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 1);
-    renderWireFrameFrustrum(m_shadows_cam[1], 1);
-    glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 2);
-    renderWireFrameFrustrum(m_shadows_cam[2], 2);
-    glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 3);
-    renderWireFrameFrustrum(m_shadows_cam[3], 3);
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
 
 // ----------------------------------------------------------------------------

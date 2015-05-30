@@ -16,19 +16,20 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/irr_driver.hpp"
-#include "central_settings.hpp"
+
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shadow_matrixes.hpp"
+#include "graphics/stkscenemanager.hpp"
 #include "modes/world.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/tuple.hpp"
-#include "stkscenemanager.hpp"
-#include "utils/profiler.hpp"
 
 #include <S3DVertex.h>
 
@@ -1815,11 +1816,14 @@ void IrrDriver::renderShadows()
 
         if (CVS->isARBTextureViewUsable())
         {
+            const std::pair<float, float>* shadow_scales 
+                = getShadowMatrices()->getShadowScales();
+
             for (unsigned i = 0; i < 2; i++)
             {
                 m_post_processing->renderGaussian6BlurLayer(m_rtts->getShadowFBO(), i,
-                    2.f * m_shadow_scales[0].first / m_shadow_scales[i].first,
-                    2.f * m_shadow_scales[0].second / m_shadow_scales[i].second);
+                    2.f * shadow_scales[0].first / shadow_scales[i].first,
+                    2.f * shadow_scales[0].second / shadow_scales[i].second);
             }
         }
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_rtts->getShadowFBO().getRTT()[0]);
@@ -1920,12 +1924,13 @@ void multidrawRSM(Args...args)
 // ----------------------------------------------------------------------------
 void IrrDriver::renderRSM()
 {
-    if (m_rsm_map_available)
+    if (getShadowMatrices()->isRSMMapAvail())
         return;
     ScopedGPUTimer Timer(getGPUTimer(Q_RSM));
     m_rtts->getRSM().bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    const core::matrix4 &rsm_matrix = getShadowMatrices()->getRSMMatrix();
     drawRSM<DefaultMaterial, 3, 1>(rsm_matrix);
     drawRSM<AlphaRef, 3, 1>(rsm_matrix);
     drawRSM<NormalMat, 3, 1>(rsm_matrix);
@@ -1953,5 +1958,5 @@ void IrrDriver::renderRSM()
         renderRSMShadow<NormalMat>(rsm_matrix);
         renderRSMShadow<DetailMat>(rsm_matrix);
     }
-    m_rsm_map_available = true;
+    getShadowMatrices()->setRSMMapAvail(true);
 }   // renderRSM
