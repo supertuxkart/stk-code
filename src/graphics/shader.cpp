@@ -209,6 +209,7 @@ void ShaderBase::updateShaders()
     {
         m_all_kill_functions[i]();
     }
+    m_all_kill_functions.clear();
 }   // updateShaders
 
 // ----------------------------------------------------------------------------
