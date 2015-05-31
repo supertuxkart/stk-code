@@ -71,6 +71,10 @@ public:
           * when a kart collides with this object
           */
         std::string               m_on_kart_collision;
+        /** If non-empty, the name of the scripting function to call
+        * when a (flyable) item collides with this object
+        */
+        std::string               m_on_item_collision;
     private:
         void init();
     public:
@@ -148,7 +152,10 @@ private:
     * when a kart collides with this object
     */
     std::string           m_on_kart_collision;
-
+    /** If non-empty, the name of the scripting function to call
+    * when a (flyable) item collides with this object
+    */
+    std::string           m_on_item_collision;
     /** If this body is a bullet dynamic body, i.e. affected by physics
      *  or not (static (not moving) or kinematic (animated outside
      *  of physics). */
@@ -203,6 +210,8 @@ public:
     void addBody();
     // ------------------------------------------------------------------------
     const std::string& getOnKartCollisionFunction() const { return m_on_kart_collision; }
+    // ------------------------------------------------------------------------
+    const std::string& getOnItemCollisionFunction() const { return m_on_item_collision; }
     // ------------------------------------------------------------------------
     // Methods usable by scripts
 

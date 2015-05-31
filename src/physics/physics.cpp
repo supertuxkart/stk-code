@@ -260,13 +260,16 @@ void Physics::update(float dt)
             Flyable* flyable = p->getUserPointer(0)->getPointerFlyable();
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
             std::string obj_id = obj->getID();
-            // TODO: attach this callback directly to a specific track object
-            script_engine->runFunction("void onItemObjectCollision(int, int, const string)",
-                [&](asIScriptContext* ctx) {
-                    ctx->SetArgDWord(0, (int)flyable->getType());
-                    ctx->SetArgDWord(1, flyable->getOwnerId());
-                    ctx->SetArgObject(2, &obj_id);
-                });
+            std::string scripting_function = obj->getOnItemCollisionFunction();
+            if (scripting_function.size() > 0)
+            {
+                script_engine->runFunction("void " + scripting_function + "(int, int, const string)",
+                        [&](asIScriptContext* ctx) {
+                        ctx->SetArgDWord(0, (int)flyable->getType());
+                        ctx->SetArgDWord(1, flyable->getOwnerId());
+                        ctx->SetArgObject(2, &obj_id);
+                    });
+            }
             flyable->hit(NULL, obj);
 
             if (obj->isSoccerBall() && 
