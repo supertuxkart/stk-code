@@ -257,15 +257,17 @@ void Physics::update(float dt)
             // Projectile hits physical object
             // -------------------------------
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-            // TODO: pass arguments
-            //Scripting::Physics::setColl0ision(
-            //    p->getUserPointer(1)->getPointerPhysicalObject()->getID(),
-            //    "item"
-            //);
-            script_engine->runFunction("void onItemObjectCollision()");
-            p->getUserPointer(0)->getPointerFlyable()
-                ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
+            Flyable* flyable = p->getUserPointer(0)->getPointerFlyable();
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
+            std::string obj_id = obj->getID();
+            // TODO: attach this callback directly to a specific track object
+            script_engine->runFunction("void onItemObjectCollision(int, int, const string)",
+                [&](asIScriptContext* ctx) {
+                    ctx->SetArgDWord(0, (int)flyable->getType());
+                    ctx->SetArgDWord(1, flyable->getOwnerId());
+                    ctx->SetArgObject(2, &obj_id);
+                });
+            flyable->hit(NULL, obj);
 
             if (obj->isSoccerBall() && 
                 race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
