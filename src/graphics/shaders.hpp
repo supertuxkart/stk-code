@@ -52,24 +52,19 @@ class ParticleSystemProxy;
     ACT(ES_DISPLACE) \
 
 #define ENUM(a) a,
-#define STR(a) #a,
 
 enum ShaderType
 {
     FOREACH_SHADER(ENUM)
-
     ES_COUNT
 };
+#undef ENUM
 
-#ifdef SHADER_NAMES
-static const char *shader_names[] = {
-    FOREACH_SHADER(STR)
-};
-#endif
 
 class Shaders
 {
 private:
+    static const char *shader_names[];
     static bool m_has_been_initialised;
 
     static int m_shaders[ES_COUNT];
@@ -99,11 +94,6 @@ public:
     {
         return m_has_been_initialised ? m_callbacks[num] : NULL;
     }   // getCallback
-    // ------------------------------------------------------------------------
-
-
-
-    void killShaders();
 
     // ========================================================================
     /** Shader to draw a colored line.
@@ -165,9 +155,5 @@ public:
 
 
 };   // class Shaders
-
-#undef ENUM
-#undef STR
-#undef FOREACH_SHADER
 
 #endif

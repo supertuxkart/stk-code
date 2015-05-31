@@ -90,8 +90,6 @@
 
 */
 
-#define SHADER_NAMES
-
 #include "graphics/shaders.hpp"
 
 #include "graphics/callbacks.hpp"
@@ -111,9 +109,13 @@ bool                               Shaders::m_has_been_initialised = false;
 video::IShaderConstantSetCallBack *Shaders::m_callbacks[ES_COUNT];
 int                                Shaders::m_shaders[ES_COUNT];
 
-using namespace video;
+// Use macro FOREACH_SHADER from shaders.hpp to create an array
+// with all shader names.
+#define STR(a) #a,
+const char *Shaders::shader_names[] = { FOREACH_SHADER(STR) };  
+#undef STR
 
-std::vector<void(*)()> CleanTable;
+using namespace video;
 
 void Shaders::init()
 {
@@ -305,18 +307,8 @@ void Shaders::loadShaders()
     }
 
     initGL();
-    CleanTable.clear();
     SharedGPUObjects::init();
 }   // loadShaders
-
-// ----------------------------------------------------------------------------
-/** C
-*/
-void Shaders::killShaders()
-{
-    for (unsigned i = 0; i < CleanTable.size(); i++)
-        CleanTable[i]();
-}   // killShaders
 
 // ----------------------------------------------------------------------------
 void Shaders::check(const int num)
