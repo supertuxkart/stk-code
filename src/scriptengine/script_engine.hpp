@@ -27,24 +27,6 @@ class TrackObjectPresentation;
 
 namespace Scripting
 {
-
-    namespace Physics
-    {
-        void registerScriptFunctions(asIScriptEngine *engine);
-    }
-
-    namespace Kart
-    {
-        void registerScriptFunctions(asIScriptEngine *engine);
-    }
-
-    namespace Track
-    {
-        void registerScriptFunctions(asIScriptEngine *engine);
-
-        void registerScriptEnums(asIScriptEngine *engine);
-    }
-    
     class ScriptEngine
     {
     public:

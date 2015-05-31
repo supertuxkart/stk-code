@@ -22,8 +22,10 @@
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/script_challenges.hpp"
+#include "scriptengine/script_kart.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "scriptengine/script_gui.hpp"
+#include "scriptengine/script_physics.hpp"
 #include "scriptengine/script_track.hpp"
 #include "scriptengine/script_utils.hpp"
 #include "scriptengine/scriptstdstring.hpp"
@@ -353,6 +355,7 @@ namespace Scripting
         Scripting::Track::registerScriptFunctions(m_engine);
         Scripting::Challenges::registerScriptFunctions(m_engine);
         Scripting::Kart::registerScriptFunctions(m_engine);
+        Scripting::Kart::registerScriptEnums(m_engine);
         Scripting::Physics::registerScriptFunctions(m_engine);
         Scripting::Utils::registerScriptFunctions(m_engine);
         Scripting::GUI::registerScriptFunctions(m_engine);
