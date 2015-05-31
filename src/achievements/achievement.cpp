@@ -151,20 +151,21 @@ irr::core::stringw Achievement::getProgressAsString() const
  *  \param key The key whose value is increased.
  *  \param increase Amount to add to the value of this key.
  */
-void Achievement::increase(const std::string & key, int increase)
+void Achievement::increase(const std::string & key, 
+                           const std::string &goal_key, int increase)
 {
     std::map<std::string, int>::iterator it;
     it = m_progress_map.find(key);
     if (it != m_progress_map.end())
     {
         it->second += increase;
-        if (it->second > m_achievement_info->getGoalValue(key))
-            it->second = m_achievement_info->getGoalValue(key);
+        if (it->second > m_achievement_info->getGoalValue(goal_key))
+            it->second = m_achievement_info->getGoalValue(goal_key);
     }
     else
     {
-        if (increase>m_achievement_info->getGoalValue(key))
-            increase = m_achievement_info->getGoalValue(key);
+        if (increase>m_achievement_info->getGoalValue(goal_key))
+            increase = m_achievement_info->getGoalValue(goal_key);
         m_progress_map[key] = increase;
     }
     check();

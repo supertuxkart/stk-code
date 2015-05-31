@@ -448,6 +448,10 @@ void Track::cleanup()
         Log::info("CACHE", "[%i] %s", i, path.getPath().c_str());
     }
 #endif
+
+    Scripting::ScriptEngine* script_engine =
+        World::getWorld()->getScriptEngine();
+    script_engine->cleanupCache();
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -1112,6 +1116,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         // some static meshes are conditional
         std::string condition;
         n->get("if", &condition);
+
+        // TODO: convert "if" and "ifnot" to scripting.
         if (condition == "splatting")
         {
             if (!irr_driver->supportsSplatting()) continue;
@@ -1189,15 +1195,15 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             if (!shown) continue;
         }
-        else if (condition == "allchallenges")
-        {
-            // allow ONE unsolved challenge : the last one
-            if (getNumOfCompletedChallenges() < m_challenges.size() - 1)
-                continue;
-        }
         else if (condition.size() > 0)
         {
-            Log::error("track", "Unknown condition <%s>\n", condition.c_str());
+            unsigned char result = -1;
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            std::function<void(asIScriptContext*)> null_callback;
+            script_engine->runFunction("bool " + condition + "()", null_callback,
+                [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
+            if (result == 0)
+                continue;
         }
 
         std::string neg_condition;
@@ -1206,17 +1212,17 @@ bool Track::loadMainTrack(const XMLNode &root)
         {
             if (irr_driver->supportsSplatting()) continue;
         }
-        else if (neg_condition == "allchallenges")
-        {
-            // allow ONE unsolved challenge : the last one
-            if (getNumOfCompletedChallenges() >= m_challenges.size() - 1)
-                continue;
-        }
         else if (neg_condition.size() > 0)
         {
-            Log::error("track", "Unknown condition <%s>\n",
-                       neg_condition.c_str());
+            unsigned char result = -1;
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            std::function<void(asIScriptContext*)> null_callback;
+            script_engine->runFunction("bool " + neg_condition + "()", null_callback,
+                [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
+            if (result != 0)
+                continue;
         }
+
 
         bool tangent = false;
         n->get("tangents", &tangent);
@@ -1482,7 +1488,7 @@ void Track::update(float dt)
     if (!m_startup_run) // first time running update = good point to run startup script
     {
         Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        script_engine->runScript("start");
+        script_engine->runFunction("void onStart()");
         m_startup_run = true;
     }
     m_track_object_manager->update(dt);
@@ -1493,8 +1499,10 @@ void Track::update(float dt)
     }
     CheckManager::get()->update(dt);
     ItemManager::get()->update(dt);
-    Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-    script_engine->runScript("update");
+
+    // TODO: enable onUpdate scripts if we ever find a compelling use for them
+    //Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+    //script_engine->runScript("void onUpdate()");
 }   // update
 
 // ----------------------------------------------------------------------------

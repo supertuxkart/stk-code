@@ -65,7 +65,8 @@ public:
     virtual void load(const XMLNode *node);
     virtual void save(UTFWriter &out);
     virtual int getValue(const std::string & key);
-    void increase(const std::string & key, int increase = 1);
+    void increase(const std::string & key, const std::string &goal_key,
+                  int increase = 1);
 
     virtual void reset();
     virtual irr::core::stringw getProgressAsString() const;

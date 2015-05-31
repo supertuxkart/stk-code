@@ -259,7 +259,7 @@ namespace StringUtils
             all_vals.push_back(irr::core::stringw(std::forward<T>(v)));
             __Fill(all_vals, std::forward<Args>(args)...);
         }
-
+    
         static void __Fill(std::vector<irr::core::stringw>&) {}
     };
 
@@ -362,6 +362,11 @@ namespace StringUtils
     {
         return parseString(input.c_str(), output);
     }   // parseString
+
+    // ------------------------------------------------------------------------
+    
+    std::string wide_to_utf8(const wchar_t* input);
+    irr::core::stringw utf8_to_wide(const char* input);
 
 } // namespace StringUtils
 

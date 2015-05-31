@@ -25,25 +25,10 @@
 
 namespace Scripting
 {
-
     namespace Track
     {
-
         //script engine functions
         void registerScriptFunctions(asIScriptEngine *engine);
-        asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine , std::string scriptName);
-        void registerScriptEnums(asIScriptEngine *engine);
-
-
-        //script-bound functions
-        void displayMessage(asIScriptGeneric *gen);
-        void disableAnimation(asIScriptGeneric *gen);
-        void enableAnimation(asIScriptGeneric *gen);
-        void enableTrigger(asIScriptGeneric *gen);
-        void disableTrigger(asIScriptGeneric *gen);
-        void createTrigger(asIScriptGeneric *gen);
-
     }
 
 }

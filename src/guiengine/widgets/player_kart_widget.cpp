@@ -346,6 +346,7 @@ void PlayerKartWidget::add()
         name = m_associated_player->getProfile()->getName();
     if (m_associated_user)
         name = m_associated_user->getUserName();
+    core::stringw label = translations->fribidize(name);
 
     if (m_parent_screen->m_multiplayer)
     {
@@ -359,21 +360,21 @@ void PlayerKartWidget::add()
             {
                 // I18N: 'handicapped' indicates that per-player handicaps are
                 //       activated for this kart (i.e. it will drive slower)
-                label = _("%s (handicapped)", label);
+                label = _("%s (handicapped)", name);
                 m_player_ident_spinner->addLabel(label);
             }
         }
 
         // select the right player profile in the spinner
-        m_player_ident_spinner->setValue(name);
+        m_player_ident_spinner->setValue(label);
     }
     else
     {
-        m_player_ident_spinner->addLabel(name);
+        m_player_ident_spinner->addLabel(label);
         m_player_ident_spinner->setVisible(false);
     }
 
-    assert(m_player_ident_spinner->getStringValue() == name);
+    assert(m_player_ident_spinner->getStringValue() == label);
 }   // add
 
 // ------------------------------------------------------------------------
