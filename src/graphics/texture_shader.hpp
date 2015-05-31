@@ -43,7 +43,12 @@ enum SamplerTypeNew
     ST_MAX = ST_SEMI_TRILINEAR
 };   // SamplerTypeNew
 
-
+// ============================================================================
+/** A simple non-templated base class for a shader that uses textures. A non
+ *  templated base class is necessary to easily handle static objects (like 
+ *  list of all bind functions to call) - with templates each instance is a 
+ *  different class (with different static values).
+ */
 class TextureShaderBase
 {
 public:

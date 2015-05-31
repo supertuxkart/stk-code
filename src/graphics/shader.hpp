@@ -30,6 +30,12 @@
 #include <string>
 #include <vector>
 
+/** A simple non-templated base class. It is used to store some enums used in 
+ *  templates, the actual header for a shader, and a statis list of all kill
+ *  functions (which delete all singletons, and therefore forces a reload of all
+ *  shaders).
+ *  It has some conventient templated functions to load a set of shaders.
+ */
 class ShaderBase
 {
 private:
@@ -104,6 +110,11 @@ public:
 };   // ShaderBase
 
 // ============================================================================
+/** The main templated base class for all shaders that do not use textures.
+ *  The template arguments are the types of the shader's uniforms. This allows
+ *  compile time checks for the number of arguments when setting the name of
+ *  the shader arguments.
+ */
 template<typename T, typename... Args>
 class Shader : public ShaderBase, public Singleton<T>
 {
@@ -282,7 +293,7 @@ private:
     }   // printFileList
 
 
-    // Variadic template implementation of assignTextureUnig
+    // Variadic template implementation of assignTextureUnit
     // ========================================================================
 public:
     /** Variadic top level/public interface. It does the calls to glUseProgram
