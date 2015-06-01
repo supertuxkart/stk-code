@@ -1,3 +1,20 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #ifndef SHADERS_UTIL_HPP
 #define SHADERS_UTIL_HPP
 
@@ -221,6 +238,7 @@ enum SamplerType {
     Shadow_Sampler,
     Volume_Linear_Filtered,
     Trilinear_cubemap,
+    Trilinear_Clamped_Array2D,
 };
 
 void setTextureSampler(GLenum, GLuint, GLuint, GLuint);
@@ -485,6 +503,33 @@ struct BindTexture<Shadow_Sampler, tp...>
         BindTexture<tp...>::template exec<N + 1>(TU, args...);
     }
 };
+
+GLuint createTrilinearClampedArray();
+
+template<SamplerType...tp>
+struct CreateSamplers<Trilinear_Clamped_Array2D, tp...>
+{
+    static void exec(std::vector<unsigned> &v, std::vector<GLenum> &e)
+    {
+        v.push_back(createTrilinearClampedArray());
+        e.push_back(GL_TEXTURE_2D_ARRAY);
+        CreateSamplers<tp...>::exec(v, e);
+    }
+};
+
+void BindTrilinearClampedArrayTexture(unsigned TU, unsigned tex);
+
+template<SamplerType...tp>
+struct BindTexture<Trilinear_Clamped_Array2D, tp...>
+{
+    template <int N, typename...Args>
+    static void exec(const std::vector<unsigned> &TU, GLuint TexId, Args... args)
+    {
+        BindTrilinearClampedArrayTexture(TU[N], TexId);
+        BindTexture<tp...>::template exec<N + 1>(TU, args...);
+    }
+};
+
 
 template<SamplerType...tp>
 class TextureRead

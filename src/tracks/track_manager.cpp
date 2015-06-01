@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,16 +18,16 @@
 
 #include "tracks/track_manager.hpp"
 
-#include <stdio.h>
-#include <stdexcept>
-#include <algorithm>
-#include <sstream>
-#include <iostream>
-
-#include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
+
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <stdio.h>
 
 TrackManager* track_manager = 0;
 std::vector<std::string>  TrackManager::m_track_search_path;
@@ -207,6 +207,12 @@ bool TrackManager::loadTrack(const std::string& dirname)
     m_tracks.push_back(track);
     m_track_avail.push_back(true);
     updateGroups(track);
+
+    // Populate the texture cache with track screenshots
+    // (internal tracks like end cutscene don't have screenshots)
+    if (!track->isInternal())
+        irr_driver->getTexture(track->getScreenshotFile());
+
     return true;
 }   // loadTrack
 

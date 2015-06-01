@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,9 +28,10 @@
 #include "utils/log.hpp"
 #include "utils/vec3.hpp"
 
+#include "matrix4.h"
+#include "rect.h"
 #include "SColor.h"
 #include "vector2d.h"
-#include "rect.h"
 
 #include <vector>
 
@@ -64,6 +65,8 @@ private:
 
     /** The camera scene node. */
     scene::ICameraSceneNode *m_camera;
+    /** The project-view matrix of the previous frame, used for the blur shader. */
+    core::matrix4 m_previous_pv_matrix;
 
     /** Camera's mode. */
     Mode            m_mode;
@@ -113,6 +116,10 @@ private:
     /** Smooth acceleration with the first person camera. */
     bool m_smooth;
 
+    /** Attache the first person camera to a kart.
+        That means moving the kart also moves the camera. */
+    bool m_attached;
+
     /** The speed at which the up-vector rotates, only used for the first person camera. */
     float m_angular_velocity;
 
@@ -137,6 +144,15 @@ private:
 
     /** The up vector the camera should have, only used for the first person camera. */
     core::vector3df m_target_up_vector;
+
+    /** Save the local position if the first person camera is attached to the kart. */
+    core::vector3df m_local_position;
+
+    /** Save the local direction if the first person camera is attached to the kart. */
+    core::vector3df m_local_direction;
+
+    /** Save the local up vector if the first person camera is attached to the kart. */
+    core::vector3df m_local_up;
 
     /** List of all cameras. */
     static std::vector<Camera*> m_all_cameras;
@@ -259,7 +275,15 @@ public:
     void setInitialTransform();
     void activate(bool alsoActivateInIrrlicht=true);
     void update            (float dt);
-    void setKart           (AbstractKart *new_kart);
+    void setKart(AbstractKart *new_kart);
+
+    // ------------------------------------------------------------------------
+    /** Returns the project-view matrix of the previous frame. */
+    core::matrix4 getPreviousPVMatrix() const { return m_previous_pv_matrix; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the project-view matrix of the previous frame. */
+    void setPreviousPVMatrix(core::matrix4 mat) { m_previous_pv_matrix = mat; }
 
     // ------------------------------------------------------------------------
     /** Returns the kart to which this camera is attached. */
@@ -270,12 +294,24 @@ public:
     AbstractKart* getKart() { return m_kart; }
 
     // ------------------------------------------------------------------------
+    /** Applies mouse movement to the first person camera. */
+    void applyMouseMovement (float x, float y);
+
+    // ------------------------------------------------------------------------
     /** Sets if the first person camera should be moved smooth. */
     void setSmoothMovement (bool value) { m_smooth = value; }
 
     // ------------------------------------------------------------------------
     /** If the first person camera should be moved smooth. */
     bool getSmoothMovement () { return m_smooth; }
+
+    // ------------------------------------------------------------------------
+    /** Sets if the first person camera should be moved with the kart. */
+    void setAttachedFpsCam (bool value) { m_attached = value; }
+
+    // ------------------------------------------------------------------------
+    /** If the first person camera should be moved with the kart. */
+    bool getAttachedFpsCam () { return m_attached; }
 
     // ------------------------------------------------------------------------
     /** Sets the angular velocity for this camera. */

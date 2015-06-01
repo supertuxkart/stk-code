@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Lucas Baudin
+//  Copyright (C) 2010-2015 Lucas Baudin
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -583,13 +583,19 @@ bool AddonsManager::uninstall(const Addon &addon)
  */
 void AddonsManager::saveInstalled()
 {
-    //Put the addons in the xml file
-    //Manually because the irrlicht xml writer doesn't seem finished, FIXME ?
+    // Put the addons in the xml file
+    // Manually because the irrlicht xml writer doesn't seem finished, FIXME ?
     std::ofstream xml_installed(m_file_installed.c_str());
 
-    //write the header of the xml file
+    // Write the header of the xml file
     xml_installed << "<?xml version=\"1.0\"?>" << std::endl;
-    xml_installed << "<addons  xmlns='http://stkaddons.net/'>"
+
+    // Get server address from config
+    std::string server = UserConfigParams::m_server_addons;
+    // Find the third slash (end of the domain)
+    std::string::size_type index = server.find('/');
+    index = server.find('/', index + 2) + 1; // Omit one slash
+    xml_installed << "<addons  xmlns='" << server.substr(0, index) << "'>"
                     << std::endl;
 
     for(unsigned int i = 0; i < m_addons_list.getData().size(); i++)

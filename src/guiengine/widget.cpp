@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -76,7 +76,6 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_supports_multiplayer  = false;
     m_is_bounding_box_round = false;
     m_has_tooltip           = false;
-    m_is_text_rtl           = false;
 
     m_absolute_x = m_absolute_y = m_absolute_w = m_absolute_h = -1;
     m_relative_x = m_relative_y = m_relative_w = m_relative_h = -1;
@@ -134,6 +133,7 @@ void Widget::elementRemoved()
     assert(m_magic_number == 0xCAFEC001);
 
     m_element = NULL;
+    m_is_visible = true;
 
     // If any player focused this widget, unset that focus
     for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
@@ -254,10 +254,11 @@ void Widget::setFocusForPlayer(const int playerID)
     assert(m_magic_number == 0xCAFEC001);
 
     // Unset focus flag on previous widget that had focus
-    if (GUIEngine::getFocusForPlayer(playerID) != NULL)
+    Widget* previous_focus = GUIEngine::getFocusForPlayer(playerID);
+    if (previous_focus != NULL)
     {
-        GUIEngine::getFocusForPlayer(playerID)->unfocused(playerID, this);
-        GUIEngine::getFocusForPlayer(playerID)->m_player_focus[playerID] = false;
+        previous_focus->unfocused(playerID, this);
+        previous_focus->m_player_focus[playerID] = false;
     }
 
     m_player_focus[playerID] = true;
@@ -265,6 +266,10 @@ void Widget::setFocusForPlayer(const int playerID)
 
     // Callback
     this->focused(playerID);
+
+    Screen* screen = GUIEngine::getCurrentScreen();
+    if(screen)
+        screen->onFocusChanged(previous_focus, this, playerID);
 }
 
 // -----------------------------------------------------------------------------

@@ -7,8 +7,8 @@
 
 #include "ISceneNode.h"
 #include "IBoneSceneNode.h"
-#include "IAnimatedMeshMD2.h"
-#include "IAnimatedMeshMD3.h"
+#include "IMesh.h"
+#include "IAnimatedMesh.h"
 
 namespace irr
 {
@@ -94,27 +94,6 @@ namespace scene
 		/** \return The importance of the animation: 1.f keeps the original animation, 0.f is no animation. */
 		virtual f32 getAnimationStrength() const =0;
 
-		//! Creates shadow volume scene node as child of this node.
-		/** The shadow can be rendered using the ZPass or the zfail
-		method. ZPass is a little bit faster because the shadow volume
-		creation is easier, but with this method there occur ugly
-		looking artifacs when the camera is inside the shadow volume.
-		These error do not occur with the ZFail method.
-		\param shadowMesh: Optional custom mesh for shadow volume.
-		\param id: Id of the shadow scene node. This id can be used to
-		identify the node later.
-		\param zfailmethod: If set to true, the shadow will use the
-		zfail method, if not, zpass is used.
-		\param infinity: Value used by the shadow volume algorithm to
-		scale the shadow volume (for zfail shadow volume we support only
-		finite shadows, so camera zfar must be larger than shadow back cap,
-		which is depend on infinity parameter).
-		\return Pointer to the created shadow scene node. This pointer
-		should not be dropped. See IReferenceCounted::drop() for more
-		information. */
-		virtual IShadowVolumeSceneNode* addShadowVolumeSceneNode(const IMesh* shadowMesh=0,
-			s32 id=-1, bool zfailmethod=true, f32 infinity=1000.0f) = 0;
-
 
 		//! Get a pointer to a joint in the mesh (if the mesh is a bone based mesh).
 		/** With this method it is possible to attach scene nodes to
@@ -139,31 +118,6 @@ namespace scene
 		//! Gets joint count.
 		/** \return Amount of joints in the mesh. */
 		virtual u32 getJointCount() const = 0;
-
-		//! Starts a default MD2 animation.
-		/** With this method it is easily possible to start a Run,
-		Attack, Die or whatever animation, if the mesh contained in
-		this scene node is an md2 mesh. Otherwise, nothing happens.
-		\param anim: An MD2 animation type, which should be played, for
-		example EMAT_STAND for the standing animation.
-		\return True if successful, and false if not, for example if
-		the mesh in the scene node is not a md2 mesh. */
-		virtual bool setMD2Animation(EMD2_ANIMATION_TYPE anim) = 0;
-
-		//! Starts a special MD2 animation.
-		/** With this method it is easily possible to start a Run,
-		Attack, Die or whatever animation, if the mesh contained in
-		this scene node is an md2 mesh. Otherwise, nothing happens.
-		This method uses a character string to identify the animation.
-		If the animation is a standard md2 animation, you might want to
-		start this animation with the EMD2_ANIMATION_TYPE enumeration
-		instead.
-		\param animationName: Name of the animation which should be
-		played.
-		\return Returns true if successful, and false if not, for
-		example if the mesh in the scene node is not an md2 mesh, or no
-		animation with this name could be found. */
-		virtual bool setMD2Animation(const c8* animationName) = 0;
 
 		//! Returns the currently displayed frame number.
 		virtual f32 getFrameNr() const = 0;
@@ -200,9 +154,6 @@ namespace scene
 
 		//! Returns the current mesh
 		virtual IAnimatedMesh* getMesh(void) = 0;
-
-		//! Get the absolute transformation for a special MD3 Tag if the mesh is a md3 mesh, or the absolutetransformation if it's a normal scenenode
-		virtual const SMD3QuaternionTag* getMD3TagTransformation( const core::stringc & tagname) = 0;
 
 		//! Set how the joints should be updated on render
 		virtual void setJointMode(E_JOINT_UPDATE_ON_RENDER mode)=0;

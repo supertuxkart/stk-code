@@ -1,3 +1,21 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include "central_settings.hpp"
 #include "texturemanager.hpp"
 #include <fstream>
 #include <sstream>
@@ -34,7 +52,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
 
     std::string cached_file;
-    if (irr_driver->usesTextureCompression())
+    if (CVS->isTextureCompressionEnabled())
     {
         // Try to retrieve the compressed texture in cache
         std::string tex_name = irr_driver->getTextureName(tex);
@@ -70,7 +88,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
         }
     }
 
-    if (!irr_driver->usesTextureCompression())
+    if (!CVS->isTextureCompressionEnabled())
     {
         if (srgb)
             internalFormat = (tex->hasAlpha()) ? GL_SRGB_ALPHA : GL_SRGB;
@@ -88,7 +106,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
     glGenerateMipmap(GL_TEXTURE_2D);
     delete[] data;
 
-    if (irr_driver->usesTextureCompression() && !cached_file.empty())
+    if (CVS->isTextureCompressionEnabled() && !cached_file.empty())
     {
         // Save the compressed texture in the cache for later use.
         saveCompressedTexture(cached_file);

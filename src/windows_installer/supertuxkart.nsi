@@ -24,7 +24,7 @@
 
   ;Name and file
   Name "SuperTuxKart"
-  OutFile "supertuxkart.exe"
+  OutFile "supertuxkart-installer.exe"
 
   RequestExecutionLevel admin
 
@@ -42,6 +42,7 @@
   !define MUI_UNICON "SuperTuxKart\uninstall.ico"
   !define MUI_HEADERIMAGE	
   !define MUI_WELCOMEFINISHPAGE_BITMAP "stk_installer.bmp"
+  !define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
   !define MUI_HEADERIMAGE_BITMAP "logo_slim.bmp"
   ;!define MUI_TEXT_INSTALLING_SUBTITLE "Please vote for SuperTuxKart to become SourceForge's Project of the month at vote.supertuxkart.net"
   ;!define MUI_TEXT_FINISH_INFO_TEXT "Please vote for SuperTuxKart to become $\"Project of the Month$\" at vote.supertuxkart.net"
@@ -67,14 +68,14 @@
 Function validate_dir
   IfFileExists $INSTDIR\data\*.* 0 return
     IfFileExists $INSTDIR\Uninstall.exe 0 dont_uninstall
-      MessageBox MB_YESNO "You can't install SuperTuxKart 0.8.1-rc1 in an existing directory. Do you wish to run the uninstaller in $INSTDIR?"  IDNO dont_uninstall
+      MessageBox MB_YESNO "You can't install SuperTuxKart 0.8.2 in an existing directory. Do you wish to run the uninstaller in $INSTDIR?"  IDNO dont_uninstall
 	; -?=$INSTDIR makes sure that this installer waits for the uninstaller
 	; to finish. The uninstaller (and directory) are not removed, but the
 	; uninstaller will be overwritten by our installer anyway.
         ExecWait '"$INSTDIR\Uninstall.exe" _?=$INSTDIR'
         goto return
     dont_uninstall:
-      MessageBox MB_OK "You can't install SuperTuxKart 0.8.1-rc1 in an existing directory. Please select a new directory."
+      MessageBox MB_OK "You can't install SuperTuxKart 0.8.2 in an existing directory. Please select a new directory."
       abort
   return:
 FunctionEnd
@@ -134,7 +135,8 @@ Section "Main Section" SecMain
     SetShellVarContext all
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\uninstall.ico"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\supertuxkart.ico"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart_editor.lnk" "$INSTDIR\supertuxkart_editor.exe" "" "$INSTDIR\supertuxkart_editor.ico"
     ShellLink::SetShortCutShowMode $SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart.lnk 0
 
   !insertmacro MUI_STARTMENU_WRITE_END
@@ -160,9 +162,35 @@ SectionEnd
 Section "Uninstall"redist
 
   ;Removes all the supertuxkart data files
-  RMDir /r /REBOOTOK $INSTDIR
+  RMDir /r /REBOOTOK $INSTDIR\data
+  RMDir /r /REBOOTOK $INSTDIR\Prerequisites
 
-  Delete "$INSTDIR\Uninstall.exe"
+  DELETE /REBOOTOK "$INSTDIR\glew32.dll"
+  DELETE /REBOOTOK "$INSTDIR\install.ico"
+  DELETE /REBOOTOK "$INSTDIR\Irrlicht.dll"
+  DELETE /REBOOTOK "$INSTDIR\libcurl.dll"
+  DELETE /REBOOTOK "$INSTDIR\libeay32.dll"
+  DELETE /REBOOTOK "$INSTDIR\libidn-11.dll"
+  DELETE /REBOOTOK "$INSTDIR\License.txt"
+  DELETE /REBOOTOK "$INSTDIR\ogg.dll"
+  DELETE /REBOOTOK "$INSTDIR\OpenAL32.dll"
+  DELETE /REBOOTOK "$INSTDIR\physfs.dll"
+  DELETE /REBOOTOK "$INSTDIR\pthreadVC2.dll"
+  DELETE /REBOOTOK "$INSTDIR\ssleay32.dll"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart.exe"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart.ico"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart.icon"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart.ilk"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart.pdb"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart_editor.exe"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart_editor.ico"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart_editor.pdb"
+  DELETE /REBOOTOK "$INSTDIR\uninstall.ico"
+  DELETE /REBOOTOK "$INSTDIR\vorbis.dll"
+  DELETE /REBOOTOK "$INSTDIR\zlib.dll"
+  DELETE /REBOOTOK "$INSTDIR\zlib1.dll"
+
+  Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
   RMDir "$INSTDIR"
 
   SetShellVarContext all
@@ -172,6 +200,7 @@ Section "Uninstall"redist
 
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart_editor.lnk"
 
   ;Delete empty start menu parent diretories
   StrCpy $MUI_TEMP "$SMPROGRAMS\$MUI_TEMP"

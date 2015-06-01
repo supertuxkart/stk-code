@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,11 +26,12 @@
 
 #include <string.h>
 #if defined(WIN32)
-#  include "Ws2tcpip.h"
+#  include "ws2tcpip.h"
 #  define inet_ntop InetNtop
 #else
 #  include <arpa/inet.h>
 #  include <errno.h>
+#  include <sys/socket.h>
 #endif
 #include <pthread.h>
 #include <signal.h>

@@ -1,6 +1,5 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,11 +20,10 @@
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/graphics_restrictions.hpp"
-#include "graphics/hardware_skinning.hpp"
-#include "graphics/lens_flare.hpp"
 #include "graphics/light.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
@@ -82,7 +80,7 @@
 using namespace irr;
 
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 #if defined(__linux__) && !defined(ANDROID)
 #include <X11/Xlib.h>
@@ -109,8 +107,14 @@ IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
-    m_device              = createDevice(video::EDT_NULL);
-    m_request_screenshot  = false;
+    m_device              = createDevice(video::EDT_NULL,
+                                         irr::core::dimension2d<u32>(640, 480),
+                                         /*bits*/16U, /**fullscreen*/ false,
+                                         /*stencilBuffer*/ false,
+                                         /*vsync*/false,
+                                         /*event receiver*/ NULL,
+                                         file_manager->getFileSystem());
+    m_request_screenshot = false;
     m_shaders             = NULL;
     m_rtts                = NULL;
     m_post_processing     = NULL;
@@ -158,7 +162,7 @@ IrrDriver::~IrrDriver()
  */
 void IrrDriver::reset()
 {
-    if (m_glsl) m_post_processing->reset();
+    if (CVS->isGLSL()) m_post_processing->reset();
 }   // reset
 
 void IrrDriver::setPhase(STKRenderingPass p)
@@ -321,8 +325,6 @@ void IrrDriver::createListOfVideoModes()
  */
 void IrrDriver::initDevice()
 {
-    GraphicsRestrictions::init();
-
     // If --no-graphics option was used, the null device can still be used.
     if (!ProfileWorld::isNoGraphics())
     {
@@ -347,8 +349,13 @@ void IrrDriver::initDevice()
 
         video::IVideoModeList* modes = m_device->getVideoModeList();
         const core::dimension2d<u32> ssize = modes->getDesktopResolution();
-        if (UserConfigParams::m_width > (int)ssize.Width ||
-            UserConfigParams::m_height > (int)ssize.Height)
+
+        if (ssize.Width < 1 || ssize.Height < 1)
+        {
+            Log::warn("irr_driver", "Unknown desktop resolution.");
+        }
+        else if (UserConfigParams::m_width > (int)ssize.Width ||
+                 UserConfigParams::m_height > (int)ssize.Height)
         {
             Log::warn("irr_driver", "The window size specified in "
                       "user config is larger than your screen!");
@@ -356,25 +363,32 @@ void IrrDriver::initDevice()
             UserConfigParams::m_height = (int)ssize.Height;
         }
 
-        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width,
-                                                    UserConfigParams::m_height);
-        
         if (UserConfigParams::m_fullscreen)
         {
             if (modes->getVideoModeCount() > 0)
             {
+                core::dimension2d<u32> res = core::dimension2du(
+                                                    UserConfigParams::m_width,
+                                                    UserConfigParams::m_height);
                 res = modes->getVideoModeResolution(res, res);
-    
+
                 UserConfigParams::m_width = res.Width;
                 UserConfigParams::m_height = res.Height;
             }
             else
             {
-                Log::verbose("irr_driver", "Cannot get information about "
-                             "resolutions. Try to use the default one.");
-                UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
-                UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
+                Log::warn("irr_driver", "Cannot get information about "
+                          "resolutions. Disable fullscreen.");
+                UserConfigParams::m_fullscreen = false;
             }
+        }
+
+        if (UserConfigParams::m_width < 1 || UserConfigParams::m_height < 1)
+        {
+            Log::warn("irr_driver", "Invalid window size. "
+                         "Try to use the default one.");
+            UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
+            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
         }
 
         m_device->closeDevice();
@@ -390,12 +404,11 @@ void IrrDriver::initDevice()
         // the problem for now.
         m_device->clearSystemMessages();
         m_device->run();
-        // Clear the pointer stored in the file manager
-        file_manager->dropFileSystem();
         m_device->drop();
         m_device  = NULL;
 
         SIrrlichtCreationParameters params;
+        params.ForceLegacyDevice = UserConfigParams::m_force_legacy_device;
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
@@ -410,6 +423,7 @@ void IrrDriver::initDevice()
             params.EventReceiver = this;
             params.Fullscreen    = UserConfigParams::m_fullscreen;
             params.Vsync         = UserConfigParams::m_vsync;
+            params.FileSystem    = file_manager->getFileSystem();
             params.WindowSize    =
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
@@ -456,7 +470,8 @@ void IrrDriver::initDevice()
                                     UserConfigParams::m_fullscreen,
                                     false,  // stencil buffers
                                     false,  // vsync
-                                    this    // event receiver
+                                    this,   // event receiver
+                                    file_manager->getFileSystem()
                                     );
             if (m_device)
             {
@@ -474,124 +489,21 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
-
-    m_gl_major_version = 2;
-    m_gl_minor_version = 1;
-    // Call to glGetIntegerv should not be made if --no-graphics is used
-    if(!ProfileWorld::isNoGraphics())
-    {
-
-    }
-    if(!ProfileWorld::isNoGraphics())
-    {
-        glGetIntegerv(GL_MAJOR_VERSION, &m_gl_major_version);
-        glGetIntegerv(GL_MINOR_VERSION, &m_gl_minor_version);
-        Log::info("IrrDriver", "OpenGL version: %d.%d", m_gl_major_version, m_gl_minor_version);
-        Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
-        Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
-        Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
-
-        m_need_ubo_workaround = false;
-        m_need_rh_workaround = false;
-        m_need_srgb_workaround = false;
-        m_support_sdsm = true;
-        m_support_texture_compression = true;
-        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL)
-        {
-            // Intel on windows doesnt support srgb compressed textures properly
-            m_support_texture_compression = false;
-#ifdef WIN32
-            // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
-            if (m_gl_major_version == 3 && m_gl_minor_version == 1)
-                m_need_ubo_workaround = true;
-#endif
-        }
-
-        // Fix for Nvidia and instanced RH
-        if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
-        {
-            m_need_rh_workaround = true;
-            m_support_sdsm = false;
-        }
-
-        // Fix for AMD and bindless sRGB textures
-        if (strstr((const char *)glGetString(GL_VENDOR), "ATI") != NULL)
-            m_need_srgb_workaround = true;
-    }
-#ifdef WIN32
-    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
-#else
-    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
-#endif
-    if (!ProfileWorld::isNoGraphics())
-        initGL();
     m_sync = 0;
 
-    // Parse extensions
-    hasVSLayer = false;
-    hasBaseInstance = false;
-    hasBuffserStorage = false;
-    hasDrawIndirect = false;
-    hasComputeShaders = false;
-    hasTextureStorage = false;
-    hasTextureView = false;
-    hasBindlessTexture = false;
-    // Default false value for hasVSLayer if --no-graphics argument is used
-#if !defined(__APPLE__)
-    if (!ProfileWorld::isNoGraphics())
+    m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
+
+    CVS->init();
+
+
+    if (UserConfigParams::m_shadows_resolution != 0 &&
+        (UserConfigParams::m_shadows_resolution < 512 ||
+         UserConfigParams::m_shadows_resolution > 2048))
     {
-        if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
-            hasVSLayer = true;
-            Log::info("GLDriver", "AMD Vertex Shader Layer enabled");
-        }
-        if (hasGLExtension("GL_ARB_buffer_storage")) {
-            hasBuffserStorage = true;
-            Log::info("GLDriver", "ARB Buffer Storage enabled");
-        }
-        if (hasGLExtension("GL_ARB_base_instance")) {
-            hasBaseInstance = true;
-            Log::info("GLDriver", "ARB Base Instance enabled");
-        }
-        if (hasGLExtension("GL_ARB_draw_indirect")) {
-            hasDrawIndirect = true;
-            Log::info("GLDriver", "ARB Draw Indirect enabled");
-        }
-        if (hasGLExtension("GL_ARB_compute_shader")) {
-            hasComputeShaders = true;
-            Log::info("GLDriver", "ARB Compute Shader enabled");
-        }
-        if (hasGLExtension("GL_ARB_texture_storage")) {
-            hasTextureStorage = true;
-            Log::info("GLDriver", "ARB Texture Storage enabled");
-        }
-        if (hasGLExtension("GL_ARB_texture_view")) {
-            hasTextureView = true;
-            Log::info("GLDriver", "ARB Texture View enabled");
-        }
-        if (hasGLExtension("GL_ARB_bindless_texture")) {
-            hasBindlessTexture = true;
-            Log::info("GLDriver", "ARB Bindless Texture enabled");
-        }
-        m_support_sdsm = m_support_sdsm && hasComputeShaders && hasBuffserStorage;
-
-        std::string driver((char*)(glGetString(GL_VERSION)));
-        std::string card((char*)(glGetString(GL_RENDERER)));
-        std::vector<std::string> restrictions =
-            GraphicsRestrictions::getRestrictions(driver, card);
-
-        for (const std::string &restriction : restrictions)
-        {
-            if (!restriction.compare("BufferStorage"))
-            {
-                hasBuffserStorage = false;
-                Log::info("Graphics restrictions", "Buffer Storage disabled");
-            }
-        }
+        Log::warn("IrrDriver", "Invalid value for UserConfigParams::m_shadows_resolution : %i",
+            (int)UserConfigParams::m_shadows_resolution);
+        UserConfigParams::m_shadows_resolution = 0;
     }
-#else
-    m_support_sdsm = false;
-#endif
-
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
     m_device->setResizable(false);
@@ -600,51 +512,25 @@ void IrrDriver::initDevice()
     m_video_driver->beginScene(/*backBuffer clear*/true, /* Z */ false);
     m_video_driver->endScene();
 
-    // Stores the new file system pointer.
-    file_manager->reInit();
-
-
-    if (m_glsl)
+    if (CVS->isGLSL())
     {
         Log::info("irr_driver", "GLSL supported.");
     }
 
-    if (!supportGeometryShader())
+/*    if (!supportGeometryShader())
     {
         // these options require geometry shaders
         UserConfigParams::m_shadows = 0;
         UserConfigParams::m_gi = false;
-    }
+    }*/
 
     // m_glsl might be reset in rtt if an error occurs.
-    if(m_glsl)
+    if (CVS->isGLSL())
     {
         m_shaders = new Shaders();
 
         m_mrt.clear();
         m_mrt.reallocate(2);
-
-        scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
-        for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
-        {
-            scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
-            if (!mb)
-                continue;
-            mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
-            mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-        }
-        m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1, "sun_interposer");
-
-        m_sun_interposer->grab();
-        m_sun_interposer->setParent(NULL);
-        m_sun_interposer->setScale(core::vector3df(20));
-
-        m_sun_interposer->getMaterial(0).Lighting = false;
-        m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
-        m_sun_interposer->getMaterial(0).ZWriteEnable = false;
-        m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
-
-        sphere->drop();
 
         m_suncam = m_scene_manager->addCameraSceneNode(0, vector3df(0), vector3df(0), -1, false);
         m_suncam->grab();
@@ -717,6 +603,48 @@ void IrrDriver::initDevice()
     m_pointer_shown = true;
 }   // initDevice
 
+// ----------------------------------------------------------------------------
+void IrrDriver::setMaxTextureSize()
+{
+    if( (UserConfigParams::m_high_definition_textures & 0x01) == 0)
+    {
+        io::IAttributes &att = m_video_driver->getNonConstDriverAttributes();
+        att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(512, 512));
+    }
+}   // setMaxTextureSize
+
+// ----------------------------------------------------------------------------
+void IrrDriver::cleanSunInterposer()
+{
+    delete m_sun_interposer;
+}   // cleanSunInterposer
+
+// ----------------------------------------------------------------------------
+void IrrDriver::createSunInterposer()
+{
+    scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
+    for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
+    {
+        scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
+        if (!mb)
+            continue;
+        mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+        mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    }
+    m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1, "sun_interposer");
+
+    m_sun_interposer->grab();
+    m_sun_interposer->setParent(NULL);
+    m_sun_interposer->setScale(core::vector3df(20));
+
+    m_sun_interposer->getMaterial(0).Lighting = false;
+    m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
+    m_sun_interposer->getMaterial(0).ZWriteEnable = false;
+    m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
+
+    sphere->drop();
+}
+
 //-----------------------------------------------------------------------------
 void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
                               std::string *version)
@@ -765,7 +693,7 @@ core::position2di IrrDriver::getMouseLocation()
  *  \return true on success, false on failure
  *          (always true on Linux at the moment)
  */
-bool IrrDriver::moveWindow(const int x, const int y)
+bool IrrDriver::moveWindow(int x, int y)
 {
 #ifdef WIN32
     const video::SExposedVideoData& videoData =
@@ -787,10 +715,24 @@ bool IrrDriver::moveWindow(const int x, const int y)
     }
 #elif defined(__linux__) && !defined(ANDROID)
     const video::SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
+
+    Display* display = (Display*)videoData.OpenGLLinux.X11Display;
+    int screen = DefaultScreen(display);
+    int screen_w = DisplayWidth(display, screen);
+    int screen_h = DisplayHeight(display, screen);
+
+    if (x + UserConfigParams::m_width > screen_w)
+    {
+        x = screen_w - UserConfigParams::m_width;
+    }
+
+    if (y + UserConfigParams::m_height > screen_h)
+    {
+        y = screen_h - UserConfigParams::m_height;
+    }
+
     // TODO: Actually handle possible failure
-    XMoveWindow((Display*)videoData.OpenGLLinux.X11Display,
-                videoData.OpenGLLinux.X11Window,
-                x, y);
+    XMoveWindow(display, videoData.OpenGLLinux.X11Window, x, y);
 #endif
     return true;
 }
@@ -1011,7 +953,7 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
  *   joints data.
  *  \param mesh Original mesh
  *  \return Newly created skinned mesh. You should call drop() when you don't
- *          need it anymore. 
+ *          need it anymore.
  */
 scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
 {
@@ -1065,7 +1007,7 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
                 material_manager->setAllUntexturedMaterialFlags(mb);
             }
         }
-        
+
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags
 
@@ -1155,7 +1097,7 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                           const std::string& debug_name,
                                           scene::ISceneNode *parent)
 {
-    if (!isGLSL())
+    if (!CVS->isGLSL())
         return m_scene_manager->addMeshSceneNode(mesh, parent);
 
     if (!parent)
@@ -1187,7 +1129,7 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
                                            scene::ISceneNode* parent, bool alphaTesting)
 {
     scene::IBillboardSceneNode* node;
-    if (isGLSL())
+    if (CVS->isGLSL())
     {
         if (!parent)
             parent = m_scene_manager->getRootSceneNode();
@@ -1343,7 +1285,7 @@ void IrrDriver::removeTexture(video::ITexture *t)
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh,
     const std::string& debug_name, scene::ISceneNode* parent)
 {
-    if (!isGLSL())
+    if (!CVS->isGLSL())
     {
         return m_scene_manager->addAnimatedMeshSceneNode(mesh, parent, -1,
             core::vector3df(0, 0, 0),
@@ -1778,7 +1720,7 @@ void IrrDriver::setRTT(RTT* rtt)
 // ----------------------------------------------------------------------------
 void IrrDriver::onLoadWorld()
 {
-    if (m_glsl)
+    if (CVS->isGLSL())
     {
         const core::recti &viewport = Camera::getCamera(0)->getViewport();
         size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
@@ -1814,15 +1756,13 @@ video::SColorf IrrDriver::getAmbientLight() const
 void IrrDriver::displayFPS()
 {
     gui::IGUIFont* font = GUIEngine::getSmallFont();
+    core::rect<s32> position;
 
-    if(UserConfigParams::m_artist_debug_mode)
-    {
-        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,1100,40),NULL);
-    }
+    if (UserConfigParams::m_artist_debug_mode)
+        position = core::rect<s32>(75, 0, 1100, 40);
     else
-    {
-        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,40),NULL);
-    }
+        position = core::rect<s32>(75, 0, 900, 40);
+    GL32_draw2DRectangle(video::SColor(150, 96, 74, 196), position, NULL);
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
     const int NO_TRUST_COUNT = 200;
@@ -1874,7 +1814,7 @@ void IrrDriver::displayFPS()
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        fpsString = StringUtils::insertValues(_("FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"),
+        fpsString = _("FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d",
             min, fps, max, poly_count[SOLID_NORMAL_AND_DEPTH_PASS], poly_count[SHADOW_PASS], m_last_light_bucket_distance);
         poly_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         poly_count[SHADOW_PASS] = 0;
@@ -1883,11 +1823,11 @@ void IrrDriver::displayFPS()
         object_count[TRANSPARENT_PASS] = 0;
     }
     else
-        fpsString = StringUtils::insertValues(_("FPS: %d/%d/%d - %d KTris"), min, fps, max, (int)roundf(kilotris));
+        fpsString = _("FPS: %d/%d/%d - %d KTris", min, fps, max, (int)roundf(kilotris));
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
 
-    font->draw( fpsString.c_str(), core::rect< s32 >(100,0,400,50), fpsColor, false );
+    font->draw( fpsString.c_str(), position, fpsColor, false );
 }   // updateFPS
 
 // ----------------------------------------------------------------------------
@@ -2173,7 +2113,7 @@ void IrrDriver::update(float dt)
         //                           video::SColor(0,0,0,255));
         //m_scene_manager->drawAll();
 
-        if (m_glsl)
+        if (CVS->isGLSL())
             renderGLSL(dt);
         else
             renderFixed(dt);
@@ -2193,7 +2133,7 @@ void IrrDriver::update(float dt)
         return;
     }
 
-    if (m_glsl)
+    if (CVS->isGLSL())
         renderGLSL(dt);
     else
         renderFixed(dt);
@@ -2223,6 +2163,14 @@ void IrrDriver::update(float dt)
 
 void IrrDriver::requestScreenshot()
 {
+    RaceGUIBase* base = World::getWorld()
+                         ? World::getWorld()->getRaceGUI()
+                         : NULL;
+    if (base)
+    {
+        base->clearAllMessages();
+    }
+
     m_request_screenshot = true;
 }
 
@@ -2259,7 +2207,7 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 
 bool IrrDriver::supportsSplatting()
 {
-    return m_glsl;
+    return CVS->isGLSL();
 }
 
 // ----------------------------------------------------------------------------
@@ -2402,7 +2350,7 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera =  irr_driver->getSceneManager()->addCameraSceneNode();
 
     m_camera->setPosition( core::vector3df(0.0, 20.0f, 70.0f) );
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
         m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     else
         m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
@@ -2479,7 +2427,7 @@ video::ITexture* IrrDriver::RTTProvider::renderToTexture(float angle,
 
 void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimlit)
 {
-    if (!m_glsl)
+    if (!CVS->isGLSL())
         return;
 
     // Don't override sky
@@ -2547,7 +2495,7 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
 
 void IrrDriver::applyObjectPassShader()
 {
-    if (!m_glsl)
+    if (!CVS->isGLSL())
         return;
 
     applyObjectPassShader(m_scene_manager->getRootSceneNode());
@@ -2558,7 +2506,7 @@ void IrrDriver::applyObjectPassShader()
 scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy, float radius,
     float r, float g, float b, bool sun, scene::ISceneNode* parent)
 {
-    if (m_glsl)
+    if (CVS->isGLSL())
     {
         if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
         LightNode *light = NULL;

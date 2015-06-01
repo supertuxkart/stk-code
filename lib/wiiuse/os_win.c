@@ -48,7 +48,7 @@
 #	ifdef __cplusplus
 extern "C" {
 #	endif
-	WINHIDSDI BOOL WINAPI HidD_SetOutputReport(HANDLE, PVOID, ULONG);
+	HIDAPI BOOL NTAPI HidD_SetOutputReport(HANDLE, PVOID, ULONG);
 #	ifdef __cplusplus
 }
 #	endif

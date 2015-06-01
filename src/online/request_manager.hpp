@@ -1,8 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2014 Lucas Baudin
-//                2011-2014 Joerg Henrichs
-//                2013-2014 Glenn De Jonghe
+//  Copyright (C) 2010-2015 Lucas Baudin
+//            (C) 2011-2015 Joerg Henrichs
+//            (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -122,7 +122,7 @@ namespace Online
                         >  m_request_queue;
 
             /** The list of pointers to all requests that are already executed
-             *  by the networking thread, but still need to be processed by the 
+             *  by the networking thread, but still need to be processed by the
              *  main thread. */
             Synchronised< std::queue<Online::Request*> >    m_result_queue;
 
@@ -133,7 +133,7 @@ namespace Online
 
             RequestManager(); //const std::string &url
             ~RequestManager();
-            
+
             static RequestManager * m_request_manager;
 
         public:
@@ -159,12 +159,12 @@ namespace Online
             void startNetworkThread();
             void stopNetworkThread();
 
-            bool getAbort(){ return m_abort.getAtomic(); }
+            bool getAbort() { return m_abort.getAtomic(); }
             void update(float dt);
 
             // ----------------------------------------------------------------
             /** Sets the interval with which poll requests are send to the
-             *  server. This can happen from the news manager (i.e. info 
+             *  server. This can happen from the news manager (i.e. info
              *  contained in the news.xml file), or a poll request. */
             void setMenuPollingInterval(float polling_interval)
             {
@@ -172,7 +172,7 @@ namespace Online
             }   // setPollingInterval
             // ----------------------------------------------------------------
             /** Sets the interval with which poll requests are send to the
-             *  server. This can happen from the news manager (i.e. info 
+             *  server. This can happen from the news manager (i.e. info
              *  contained in the news.xml file), or a poll request. */
             void setGamePollingInterval(float polling_interval)
             {

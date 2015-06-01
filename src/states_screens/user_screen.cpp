@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -46,18 +46,14 @@ DEFINE_SCREEN_SINGLETON( TabbedUserScreen );
 
 BaseUserScreen::BaseUserScreen(const std::string &name) : Screen(name.c_str())
 {
+    m_online_cb           = NULL;
+    m_new_registered_data = false;
+    m_auto_login          = false;
 }   // BaseUserScreen
 
 // ----------------------------------------------------------------------------
 
 void BaseUserScreen::loadedFromFile()
-{
-
-}   // loadedFromFile
-
-// ----------------------------------------------------------------------------
-
-void BaseUserScreen::init()
 {
     m_online_cb = getWidget<CheckBoxWidget>("online");
     assert(m_online_cb);
@@ -65,13 +61,46 @@ void BaseUserScreen::init()
     assert(m_username_tb);
     m_password_tb = getWidget<TextBoxWidget >("password");
     assert(m_password_tb);
-    m_password_tb->setPasswordBox(true, L'*');
     m_players = getWidget<DynamicRibbonWidget>("players");
     assert(m_players);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget);
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
+
+}   // loadedFromFile
+
+// ----------------------------------------------------------------------------
+/** Stores information from the register screen. It allows this screen to 
+ *  use the entered user name and password to prefill fields so that the user
+ *  does not have to enter them again.
+ *  \param online If the user created an online account.
+ *  \param auto-login If the user should be automatically logged in online.
+ *         This can not be done for newly created online accounts, since they
+ *         need to be confirmed first.
+ * \param online_name The online account name.
+ *  \param password The password for the online account.
+ */
+void BaseUserScreen::setNewAccountData(bool online, bool auto_login,
+                                       const core::stringw &online_name,
+                                       const core::stringw &password)
+{
+    // Indicate for init that new user data is available.
+    m_new_registered_data = true;
+    m_auto_login          = auto_login;
+    m_online_cb->setState(online);
+    m_username_tb->setText(online_name);
+    m_password_tb->setText(password);
+}   // setOnline
+
+// ----------------------------------------------------------------------------
+/** Initialises the user screen. Searches for all players to fill the 
+ *  list of users with their icons, and initialises all widgets for the
+ *  current user (e.g. the online flag etc).
+ */
+void BaseUserScreen::init()
+{
+    m_password_tb->setPasswordBox(true, L'*');
 
     // The behaviour of the screen is slightly different at startup, i.e.
     // when it is the first screen: cancel will exit the game, and in
@@ -112,13 +141,7 @@ void BaseUserScreen::init()
     // Select the current player. That can only be done after
     // updateItemDisplay is called.
     if (current_player_index != -1)
-    {
-        // Only set focus in case of non-tabbed version (so that keyboard
-        // or gamepad navigation with tabs works as expected, i.e. you can
-        // select the next tab without having to go up to the tab list first.
-        if(!getWidget<RibbonWidget>("options_choice"))
-            selectUser(current_player_index);
-    }
+        selectUser(current_player_index);
     // no current player found
     // The first player is the most frequently used, so select it
     else if (PlayerManager::get()->getNumPlayers() > 0)
@@ -139,6 +162,14 @@ void BaseUserScreen::init()
         getWidget<IconButtonWidget>("rename")->setActivated();
         getWidget<IconButtonWidget>("delete")->setActivated();
     }
+    m_new_registered_data = false;
+    if (m_auto_login)
+    {
+        login();
+        m_auto_login = false;
+        return;
+    }
+    m_auto_login = false;
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -160,25 +191,35 @@ void BaseUserScreen::tearDown()
 
 // ----------------------------------------------------------------------------
 /** Called when a user is selected. It updates the online checkbox and
- *  entrye fields.
+ *  entry fields.
  */
 void BaseUserScreen::selectUser(int index)
 {
     PlayerProfile *profile = PlayerManager::get()->getPlayer(index);
     assert(profile);
 
+    // Only set focus in case of non-tabbed version (so that keyboard
+    // or gamepad navigation with tabs works as expected, i.e. you can
+    // select the next tab without having to go up to the tab list first.
+    bool focus_it = !getWidget<RibbonWidget>("options_choice");
     m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
-                            /*focusIt*/ true);
+                            focus_it);
     
-    m_username_tb->setText(profile->getLastOnlineName());
-    // Delete a password that might have been typed for another user
-    m_password_tb->setText("");
+    if (!m_new_registered_data)
+        m_username_tb->setText(profile->getLastOnlineName());
+
+    if (!m_new_registered_data)
+    {
+        // Delete a password that might have been typed for another user
+        m_password_tb->setText("");
+    }
 
     // Last game was not online, so make the offline settings the default
     // (i.e. unckeck online checkbox, and make entry fields invisible).
     if (!profile->wasOnlineLastTime() || profile->getLastOnlineName() == "")
     {
-        m_online_cb->setState(false);
+        if (!m_new_registered_data)
+            m_online_cb->setState(false);
         makeEntryFieldsVisible();
         return;
     }
@@ -239,6 +280,10 @@ void BaseUserScreen::makeEntryFieldsVisible()
     {
         getWidget<LabelWidget>("label_password")->setVisible(online);
         m_password_tb->setVisible(online);
+        // Is user has no online name, make sure the user can enter one
+        if (player->getLastOnlineName().empty())
+            m_username_tb->setActivated();
+
     }
 }   // makeEntryFieldsVisible
 
@@ -299,6 +344,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
         else if (button == "new_user")
         {
             RegisterScreen::getInstance()->push();
+            RegisterScreen::getInstance()->setParent(this);
             // Make sure the new user will have an empty online name field
             // that can also be edited.
             m_username_tb->setText("");
@@ -318,6 +364,9 @@ void BaseUserScreen::eventCallback(Widget* widget,
             PlayerProfile *cp = getSelectedPlayer();
             RegisterScreen::getInstance()->setRename(cp);
             RegisterScreen::getInstance()->push();
+            RegisterScreen::getInstance()->setParent(this);
+            m_new_registered_data = false;
+            m_auto_login          = false;
             // Init will automatically be called, which
             // refreshes the player list
         }
@@ -441,8 +490,8 @@ void BaseUserScreen::onUpdate(float dt)
     if (!m_options_widget->isActivated())
     {
         core::stringw message = (m_state & STATE_LOGOUT)
-                              ? _(L"Signing out '%s'",m_sign_out_name.c_str())
-                              : _(L"Signing in '%s'", m_sign_in_name.c_str());
+                              ? _(L"Logging out '%s'",m_sign_out_name.c_str())
+                              : _(L"Logging in '%s'", m_sign_in_name.c_str());
         m_info_widget->setText(StringUtils::loadingDots(message.c_str()),
                                false                                      );
     }
@@ -596,7 +645,7 @@ void TabbedUserScreen::init()
     if (tab_bar) tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
     tab_bar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tab_bar->getRibbonChildren()[1].setTooltip( _("Audio") );
-    tab_bar->getRibbonChildren()[2].setTooltip(_("User Interface"));
+    tab_bar->getRibbonChildren()[2].setTooltip( _("User Interface") );
     tab_bar->getRibbonChildren()[4].setTooltip( _("Controls") );
     BaseUserScreen::init();
 }   // init

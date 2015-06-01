@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Erwin Coumans http://continuousphysics.com/Bullet/
+ * Copyright (C) 2005-2015 Erwin Coumans http://continuousphysics.com/Bullet/
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,

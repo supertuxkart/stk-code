@@ -5,7 +5,7 @@
         <header height="5%" width="80%" text="Race Setup" align="center" text_align="center" />
 
         <spacer height="5%" width="25"/>
-        <box width="95%" height="40%" padding="10" layout="vertical-row">
+        <box width="100%" height="40%" padding="10" layout="vertical-row">
             <bright width="100%" text="Select a difficulty" align="center" text_align="left" />
 
             <ribbon id="difficulty" height="135" width="100%" align="center">
@@ -21,7 +21,7 @@
         </box>
         <spacer height="5%" width="25"/>
 
-        <box width="95%" height="40%" padding="10" layout="vertical-row">
+        <box width="100%" height="40%" padding="10" layout="vertical-row">
             <bright width="100%" text="Select a game mode" align="center" text_align="left" />
 
             <scrollable_toolbar id="gamemode" height="135" width="85%" label_location="bottom" align="center"

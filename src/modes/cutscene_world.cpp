@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,7 +19,6 @@
 
 #include "animations/animation_base.hpp"
 #include "animations/three_d_animation.hpp"
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -408,7 +407,6 @@ void CutsceneWorld::enterRaceOverState()
             GUIEngine::Screen* newStack[] = { mainMenu, credits, NULL };
             race_manager->exitRace();
             StateManager::get()->resetAndSetStack(newStack);
-            credits->push();
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else  if (m_parts.size() == 1 && m_parts[0] == "gpwin")
@@ -519,13 +517,17 @@ void CutsceneWorld::enterRaceOverState()
             {
                 race_manager->exitRace();
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-
                 player->setFirstTime(false);
                 PlayerManager::get()->save();
                 KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
                 s->setMultiplayer(false);
                 s->setGoToOverworldNext();
                 s->push();
+            } else
+            {
+                race_manager->exitRace();
+                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                OverWorld::enterOverWorld();
             }
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably

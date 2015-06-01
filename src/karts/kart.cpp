@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,8 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/kart.hpp"
-
-#include "audio/music_manager.hpp"
+#include "graphics/central_settings.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/challenge_status.hpp"
@@ -33,7 +32,6 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
 #include "graphics/stk_text_billboard.hpp"
@@ -118,7 +116,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_squash_time          = 0.0f;
     m_shadow_enabled       = false;
 
-    m_shadow               = NULL;
     m_wheel_box            = NULL;
     m_collision_particles  = NULL;
     m_slipstream           = NULL;
@@ -133,6 +130,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
     m_nitro_light          = NULL;
+    m_skidding_light_1     = NULL;
+    m_skidding_light_2     = NULL;
+    m_type                 = RaceManager::KT_AI;
 
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
@@ -179,6 +179,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 */
 void Kart::init(RaceManager::KartType type)
 {
+    m_type = type;
+
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
     {
@@ -264,7 +266,6 @@ Kart::~Kart()
     if(m_attachment)             delete m_attachment;
     if(m_stars_effect)          delete m_stars_effect;
 
-    delete m_shadow;
     if (m_wheel_box) m_wheel_box->remove();
     if(m_skidmarks) delete m_skidmarks ;
 
@@ -589,7 +590,7 @@ void Kart::createPhysics()
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
     Vec3 wheel_pos[4];
     assert(bevel.getX() || bevel.getY() || bevel.getZ());
-    
+
     Vec3 orig_factor(1, 1, 1 - bevel.getZ());
     Vec3 bevel_factor(1.0f - bevel.getX(), 1.0f - bevel.getY(), 1.0f);
     btConvexHullShape *hull = new btConvexHullShape();
@@ -1089,6 +1090,19 @@ void Kart::eliminate()
  */
 void Kart::update(float dt)
 {
+#ifdef DEBUG_TO_COMPARE_KART_PHYSICS
+    // This information is useful when comparing kart physics, e.g. to
+    // see top speed, acceleration (i.e. time to top speed) etc.
+    Log::verbose("physics", "%s t %f xyz %f %f %f %f v %f %f %f %f maxv %f",
+        getIdent().c_str(),
+        World::getWorld()->getTime(),
+        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
+        getXYZ().length(),
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
+        getVelocity().length(),
+        m_max_speed->getCurrentMaxSpeed());
+#endif
+
     if ( UserConfigParams::m_graphical_effects )
     {
         // update star effect (call will do nothing if stars are not activated)
@@ -1346,7 +1360,7 @@ void Kart::update(float dt)
 
         // A jump starts only the kart isn't already jumping, is on a new
         // (or no) texture.
-        if (!m_is_jumping && last_m && last_m != m && 
+        if (!m_is_jumping && last_m && last_m != m &&
             m_kart_model->getAnimation() == KartModel::AF_DEFAULT)
         {
             float v = getVelocity().getY();
@@ -1390,11 +1404,9 @@ void Kart::update(float dt)
     if((!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
-        m_shadow->disableShadow();
     }
     if(!m_shadow_enabled && isOnGround() && !emergency)
     {
-        m_shadow->enableShadow();
         m_shadow_enabled = true;
     }
 }   // update
@@ -1477,7 +1489,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // In multiplayer mode sounds are NOT positional, because we have
         // multiple listeners. This would make the sounds of all AIs be
         // audible at all times. So silence AI karts.
-        if (s.size()!=0 && (race_manager->getNumPlayers()==1 || 
+        if (s.size()!=0 && (race_manager->getNumPlayers()==1 ||
                             m_controller->isPlayerController()  ) )
         {
             m_terrain_sound = SFXManager::get()->createSoundSource(s);
@@ -1813,8 +1825,11 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
             impulse.normalize();
         else
             impulse = Vec3(0, 0, -1); // Arbitrary
-        // impulse depends of kart speed - and speed can be negative
-        impulse *= sqrt(fabsf(getSpeed()))
+        // Impulse depends of kart speed - and speed can be negative
+        // If the speed is too low, karts can still get stuck into a wall
+        // so make sure there is always enough impulse to avoid this
+        float abs_speed = fabsf(getSpeed());
+        impulse *= ( abs_speed<10 ? 10.0f : sqrt(abs_speed) )
                  * m_kart_properties->getCollisionTerrainImpulse();
         m_bounce_back_time = 0.2f;
         m_vehicle->setTimedCentralImpulse(0.1f, impulse);
@@ -1899,14 +1914,15 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                                       "to enter this challenge!\n"
                                       "Check the minimap for\n"
                                       "available challenges.");
-                std::vector<core::stringw> parts = 
+                std::vector<core::stringw> parts =
                     StringUtils::split(msg, '\n', false);
 
-                // For now, until we have scripting, special-case 
+                // For now, until we have scripting, special-case
                 // the overworld... (TODO)
                 if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
                 {
                     SFXManager::get()->quickSound("forcefield");
+                    World::getWorld()->getRaceGUI()->clearAllMessages();
 
                     for (unsigned int n = 0; n < parts.size(); n++)
                     {
@@ -2390,9 +2406,23 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
     m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
+    // Create nitro light
     m_nitro_light = irr_driver->addLight(core::vector3df(0.0f, 0.5f, m_kart_model->getLength()*-0.5f - 0.05f),
-        0.6f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
+        0.4f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
     m_nitro_light->setVisible(false);
+    m_nitro_light->setName( ("nitro emitter (" + getIdent() + ")").c_str() );
+
+    // Create skidding lights
+    // For the first skidding level
+    m_skidding_light_1 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
+        0.3f /* force */, 3.0f /* radius */, 1.0f, 0.6f, 0.0f, false, m_node);
+    m_skidding_light_1->setVisible(false);
+    m_skidding_light_1->setName( ("skidding emitter 1 (" + getIdent() + ")").c_str() );
+    // For the second skidding level
+    m_skidding_light_2 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
+        0.4f /* force */, 4.0f /* radius */, 1.0f, 0.0f, 0.0f, false, m_node);
+    m_skidding_light_2->setVisible(false);
+    m_skidding_light_2->setName( ("skidding emitter 2 (" + getIdent() + ")").c_str() );
 
 #ifdef DEBUG
     m_node->setName( (getIdent()+"(lod-node)").c_str() );
@@ -2436,13 +2466,6 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
             track_manager->getTrack(race_manager->getTrackName())
                          ->isFogEnabled() );
     }
-
-    m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
-                          m_node,
-                          m_kart_properties->getShadowScale(),
-                          m_kart_properties->getShadowXOffset(),
-                          m_kart_properties->getGraphicalYOffset(),
-                          m_kart_properties->getShadowZOffset());
 
     World::getWorld()->kartAdded(this, m_node);
 }   // loadData
@@ -2518,8 +2541,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
-        float f = fabsf(getSpeed())/m_kart_properties->getMaxSpeed() *
-                  m_difficulty->getMaxSpeed();
+        float f = fabsf(getSpeed())/(m_kart_properties->getMaxSpeed() *
+                  m_difficulty->getMaxSpeed());
         // The speed of the kart can be higher (due to powerups) than
         // the normal maximum speed of the kart.
         if(f>1.0f) f = 1.0f;
@@ -2611,7 +2634,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     float xx = fabsf(m_speed)* getKartProperties()->getDownwardImpulseFactor()*0.0006f;
     Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset()
                               + lean_height +m_graphical_y_offset+xx, 0);
-    
+
     // Try to prevent the graphical chassis to be inside of the terrain:
     if(m_kart_properties->getPreventChassisInTerrain())
     {
@@ -2626,14 +2649,14 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         }   // for i<num_wheels
 
         const btWheelInfo &w = getVehicle()->getWheelInfo(0);
-        // Recompute the default average suspension length, see 
+        // Recompute the default average suspension length, see
         // kartIsInRestNow() how to get from y-offset to susp. len.
         float av_sus_len = -m_graphical_y_offset
                          + w.m_chassisConnectionPointCS.getY()
                          - w.m_wheelsRadius;
 
         float delta = av_sus_len - min_susp_len;
-        // If the suspension length is so short, that it is less than the 
+        // If the suspension length is so short, that it is less than the
         // lowest point of the kart, it indicates that the graphical chassis
         // would be inside of the track:
         if (delta > m_kart_model->getLowestPoint())
@@ -2705,7 +2728,7 @@ void Kart::setOnScreenText(const wchar_t *text)
     // is started without splash screen (since "Loading" is shown even in this
     // case). A smaller font would be better
 
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
     {
         gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont() : GUIEngine::getTitleFont();
         new STKTextBillboard(text, font,
@@ -2734,5 +2757,12 @@ void Kart::setOnScreenText(const wchar_t *text)
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.
 }   // setOnScreenText
+
+// ----------------------------------------------------------------------------
+void Kart::activateSkidLight(unsigned int level)
+{
+    m_skidding_light_1->setVisible(level == 1);
+    m_skidding_light_2->setVisible(level > 1);
+}   // activateSkidLight
 
 /* EOF */

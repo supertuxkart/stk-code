@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -161,14 +161,14 @@ void GrandPrixEditorScreen::setSelection (const GrandPrixData* gpdata)
     if (gpdata == NULL)
     {
         m_selection = NULL;
-        gpname_widget->setText (L"Please select a Grand Prix", true);
+        gpname_widget->setText (_("Please select a Grand Prix"), true);
         tracks_widget->clearItems();
         tracks_widget->updateItemDisplay();
     }
     else
     {
         m_selection = grand_prix_manager->editGrandPrix(gpdata->getId());
-        gpname_widget->setText (gpdata->getName(), true);
+        gpname_widget->setText(translations->fribidize(gpdata->getName()), true);
         gplist_widget->setSelection(m_selection->getId(), PLAYER_ID_GAME_MASTER, true);
         loadTrackList (gpdata->getId());
     }

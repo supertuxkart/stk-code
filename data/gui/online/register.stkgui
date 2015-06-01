@@ -4,21 +4,22 @@
 
         <header align="center" width="80%" text="Create User" text_align="center"
                 I18N="In the registration dialog" />
-        <spacer height="15" width="10"/>
+      <spacer height="15" width="10"/>
+      <tabs id="mode_tabs" height="10%" max_height="110" x="2%" width="98%" align="center">
+        <icon-button id="tab_new_online" width="128" height="128" icon="gui/main_network.png"
+                     I18N="Section in the register screen" text="New Online Account"/>
+        <icon-button id="tab_existing_online" width="128" height="128" icon="gui/main_network.png"
+                     I18N="Section in the register screen" text="Existing Online Account"/>
+        <icon-button id="tab_offline" width="128" height="128" icon="gui/options_players.png"
+                     I18N="Section in the register screen" text="Offline Account"/>
+      </tabs>
 
-        <box proportion="1" width="100%" height="100%" layout="vertical-row">
+      <box proportion="1" width="100%" height="100%" layout="vertical-row">
             <div width="90%" align="center" layout="vertical-row" height="80%">
                 <div width="100%" height="12%" layout="horizontal-row" >
                     <label   proportion="1" height="100%" text_align="left"
-                             I18N="In the registration dialog" text="Local Username"/>
+                             I18N="In the registration dialog" text="Local Name"/>
                     <textbox id="local_username" proportion="2" height="fit" I18N="In the registration dialog"/>
-                </div>
-                <div width="100%" height="12%" layout="horizontal-row" >
-                    <label    id="label_online" proportion="1" height="100%" text_align="left"
-                              I18N="In the registration dialog" text="Create online account"/>
-                    <div proportion="2" layout="horizontal-row" height="fit">
-                        <checkbox id="online" I18N="In the registration dialog" text_align="left"/>
-                    </div>
                 </div>
 
                 <div width="100%" height="12%" layout="horizontal-row" >
@@ -53,7 +54,7 @@
 -->
                 <label id="info" height="20%" width="100%" align="center" text_align="center" word_wrap="true"
                    I18N="In the registration dialog" 
-                       text="You can play without creating an online account by unchecking the online checkbox, though then you can not connect to friends, vote for addons etc. Please read our privacy statement at http://privacy.supertuxkart.net"/>
+                       text="You can play without creating an online account by selecting an offline account. Though then you can not connect to friends, vote for addons etc. Please read our privacy statement at http://privacy.supertuxkart.net"/>
             </div>
 
             <buttonbar id="options" width="40%" height="15%" align="center">

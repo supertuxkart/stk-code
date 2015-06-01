@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013  Ingo Ruhnke <grumbel@gmx.de>
-//  Copyright (C) 2006-2013  Joerg Henrichs
+//  Copyright (C) 2004-2015  Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -66,8 +66,8 @@ void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
                                    bool new_tracks)
 {
     m_filename = "Random GP - Not loaded from a file!";
-    m_id       = "random";
-    m_name     = "Random Grand Prix";
+    m_id       = getRandomGPID();
+    m_name     = getRandomGPName();
     m_editable = false;
     m_group    = GP_NONE;
     m_reverse_type = use_reverse;

@@ -1,333 +1,283 @@
-# Turkish translation for stk
-# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
-# This file is distributed under the same license as the stk package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
-#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010
+# Volkan Gezer <volkangezer@gmail.com>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: stk\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-11-12 11:39+1100\n"
-"PO-Revision-Date: 2013-11-16 07:03+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
-"Language-Team: Turkish <tr@li.org>\n"
+"Project-Id-Version: SuperTuxKart\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-13 21:42-0400\n"
+"PO-Revision-Date: 2015-03-14 11:00+0000\n"
+"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"Language-Team: Turkish (http://www.transifex.com/projects/p/supertuxkart/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-11-24 21:41+0000\n"
-"X-Generator: Launchpad (build 16831)\n"
+"Language: tr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
-#: src/utils/translation.cpp:263
+#: src/utils/translation.cpp:262
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
-#. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
-#. I18N: ./data/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:98 data/po/gui_strings.h:101
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
-msgstr ""
-" Fakat siz beceriksiz ahmaklar beni asla yenemeyeceksiniz - Kartların Kralı!"
+msgstr " Fakat siz beceriksiz ahmaklar beni asla yenemeyeceksiniz - Kartların Kralı!"
 
-#. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-#: src/items/rubber_band.cpp:49
-msgid "%0 bites %1's bait"
-msgstr "%0, %1 oyuncusunun oltasına takıldı"
-
-#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/cake.cpp:151
-msgid "%0 eats too much of %1's cake"
-msgstr "%0, %1 oyuncusunun pastalarından çok fazla yemeye başladı"
-
-#. I18N: shown when a player receives a plunger in his face
-#: src/items/plunger.cpp:133
-msgid "%0 gets a fancy mask from %1"
-msgstr "%0, %1 tarafından gönderilen harika bir maske aldı"
-
-#. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
-#. the victim.
-#: src/items/bowling.cpp:136
-msgid "%0 is bowled over by %1"
-msgstr "%0, %1 tarafından vurulup devrildi"
-
-#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/cake.cpp:153
-msgid "%0 is dubious of %1's cooking skills"
-msgstr "%0, %1 oyuncusunun yemek yapma becerisinden şüpheli"
-
-#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/cake.cpp:155
-msgid "%0 should not play with %1's lunch"
-msgstr "%0, %1 oyuncusunun yemeğiyle oynamamalıydı"
-
-#. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
-#. the victim.
-#: src/items/bowling.cpp:130
-msgid "%0 will not go bowling with %1 again"
-msgstr "%0, bir daha %1 ile bowlinge gitmeyecek gibi"
-
-#. I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
-#: src/items/swatter.cpp:340
-msgid "%1 flattens %0"
-msgstr "%1, %0 oyuncusunu yere yapıştırdı"
-
-#. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-#: src/items/rubber_band.cpp:51
-msgid "%1 latches onto %0 for a free ride"
-msgstr "%1 benzinden tasarruf için %0 oyuncusuna yapıştı"
-
-#. I18N: shown when a player receives a plunger in his face
-#: src/items/plunger.cpp:135
-msgid "%1 merges %0's face with a plunger"
-msgstr "%1, %0 oyuncusunun suratına pompayı yapıştırdı"
-
-#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/cake.cpp:157
-msgid "%1 ruins %0's cakeless diet"
-msgstr "%1 %0 oyuncusunu keksiz diyete başlattı"
-
-#. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
-#. the victim.
-#: src/items/bowling.cpp:133
-msgid "%1 strikes %0"
-msgstr "%1, %0 oyuncusunu tamamen devirdi"
-
-#. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-#: src/items/rubber_band.cpp:53
-msgid "%1 tests a tractor beam on %0"
-msgstr "%1, %0 üzerinde bir traktör kirişinin testini yapıyor"
-
-#. I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
-#: src/items/swatter.cpp:338
-msgid "%1 thinks %0 is a big fly"
-msgstr "%1, %0 için koca sinek diyor"
-
-#. I18N: ./data/gui/track_info_dialog.stkgui
-#. I18N: In the track setup screen (number of laps choice, where %i is the number)
-#: data/po/gui_strings.h:316
+#. I18N: Only used for count > 3
+#: src/online/online_player_profile.cpp:429
 #, c-format
-msgid "%i laps"
-msgstr "%i tur"
+msgid "%d friend is now online."
+msgid_plural "%d friends are now online."
+msgstr[0] ""
+msgstr[1] ""
 
-#. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:314
+#. I18N: 'handicapped' indicates that per-player handicaps are
+#. activated for this kart (i.e. it will drive slower)
+#: src/guiengine/widgets/player_kart_widget.cpp:360
 #, c-format
-msgid ""
-"%s\n"
-"by %s"
+msgid "%s (handicapped)"
 msgstr ""
-"%s\n"
-"yazan %s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:171
-#: src/states_screens/dialogs/addons_loading.cpp:175
+#: src/states_screens/dialogs/addons_loading.cpp:172
+#: src/states_screens/dialogs/addons_loading.cpp:176
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: src/states_screens/dialogs/addons_loading.cpp:164
+#: src/states_screens/dialogs/addons_loading.cpp:165
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
+#: src/online/online_player_profile.cpp:418
+#, c-format
+msgid "%s and %s are now online."
+msgstr ""
+
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:304
+#: src/states_screens/addons_screen.cpp:306
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s, %s tarafından"
 
-#. I18N: as in "fastest lap: 60 seconds by Wilber"
-#: src/modes/linear_world.cpp:350
+#: src/modes/linear_world.cpp:358
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr "%s, %s tarafından"
 
-#. I18N: shown when hit by swatter. %s is the victim
-#: src/items/swatter.cpp:342
+#: src/online/online_player_profile.cpp:414
 #, c-format
-msgid "%s feels flat today"
-msgstr "%s bugün düz hissediyor"
+msgid "%s is now online."
+msgstr ""
 
-#: src/items/powerup.cpp:51
-#, c-format
-msgid "%s is a mighty pirate!"
-msgstr "%s güçlü bir korsan!"
-
-#. I18N: shown when a player is hit by a rubber ball. %1 is the
-#. attacker, %0 is the victim.
-#: src/items/rubber_ball.cpp:310
-#, c-format
-msgid "%s is being bounced around."
-msgstr "%s sekmeye başladı."
-
-#. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/bowling.cpp:146
-#, c-format
-msgid "%s is practicing with a blue, big, spheric yo-yo"
-msgstr "%s büyük, küresel, mavi bir yoyoyla pratik yapıyor"
-
-#: src/states_screens/kart_selection.cpp:597
+#: src/guiengine/widgets/player_kart_widget.cpp:420
 #, c-format
 msgid "%s is ready"
 msgstr "%s hazır"
 
-#. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/bowling.cpp:148
+#: src/states_screens/online_profile_base.cpp:108
 #, c-format
-msgid "%s is the world master of the boomerang ball"
-msgstr "%s bumerang topunda dünya şampiyonu"
+msgid "%s's profile"
+msgstr ""
 
-#: src/items/powerup.cpp:50
+#: src/states_screens/create_server_screen.cpp:60
 #, c-format
-msgid "%s pays the next round of grog!"
-msgstr "%s sonraki içkileri ısmarlıyor!"
+msgid "%s's server"
+msgstr ""
 
-#. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/bowling.cpp:150
+#: src/online/online_player_profile.cpp:423
 #, c-format
-msgid "%s should play (rubber) darts instead of bowling"
-msgstr "%s bowling yerine (plastik uçlu) dart oynamalı"
+msgid "%s, %s and %s are now online."
+msgstr ""
 
-#: src/modes/world.cpp:1028
+#: src/modes/world.cpp:1147
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' yok edildi."
 
+#. I18N: ./data/gui/track_info.stkgui
 #. I18N: for empty highscores entries
-#. I18N: ./data/gui/track_info_dialog.stkgui
-#: src/states_screens/dialogs/track_info_dialog.cpp:227
-#: data/po/gui_strings.h:302 data/po/gui_strings.h:305
-#: data/po/gui_strings.h:308
+#: src/states_screens/track_info_screen.cpp:252
 msgid "(Empty)"
 msgstr "(Boş)"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:241
 msgid "(network play is not yet available)"
 msgstr "(ağ oyunu henüz mevcut değil)"
 
-#: src/states_screens/options_screen_input2.cpp:322
+#: src/states_screens/options_screen_input2.cpp:372
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Bir mavi öge, başka bir yapılandırmayla çakışma demektir."
 
+#: src/states_screens/options_screen_input2.cpp:377
+msgid "* A red item means a conflict in the current configuration"
+msgstr ""
+
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
-#: data/po/gui_strings.h:646
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr ""
-"* Şu anki tuş bağlantıları Seçenekler menüsünden görülebilir / "
-"değiştirilebilir"
+msgstr "* Şu anki tuş bağlantıları Seçenekler menüsünden görülebilir / değiştirilebilir"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:760
 msgid ""
 "* Most of these game modes can also be played in a Grand Prix fashion: "
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
+msgstr "* Bu oyun kiplerinden pek çoğu Grand Prix şeklinde de oynanabilir. Böylece tek kişilik yarış oynamak yerine diğerleriyle yarışabilirsiniz. Daha iyi sıralamalar yaptıkça daha fazla pun kazanırsınız. Oyunun sonunda da en çok puan yapmış oyuncu kupayı kazanır."
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "* Restart STK to apply new settings"
 msgstr ""
-"* Bu oyun kiplerinden pek çoğu Grand Prix şeklinde de oynanabilir. Böylece "
-"tek kişilik yarış oynamak yerine diğerleriyle yarışabilirsiniz. Daha iyi "
-"sıralamalar yaptıkça daha fazla pun kazanırsınız. Oyunun sonunda da en çok "
-"puan yapmış oyuncu kupayı kazanır."
 
 #. I18N: ./data/gui/options_input.stkgui
-#: data/po/gui_strings.h:216
 msgid ""
-"* Which config to use will be inferred from which 'fire' key is pressed to "
-"join the game."
+"* Which config to use will be inferred from which 'Select' key is pressed to"
+" join the game."
 msgstr ""
-"Mevcut ayarlarınızda 'ateş' anlamına gelen tuşa basarak oyuna girebilirsiniz."
 
-#: src/states_screens/addons_screen.cpp:49
+#. I18N: ./data/gui/online/profile_achievements.stkgui
+#. I18N: ./data/gui/online/profile_achievements_tab.stkgui
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: ./data/gui/online/profile_overview.stkgui
+#. I18N: ./data/gui/online/profile_settings.stkgui
+msgid "..."
+msgstr ""
+
+#: src/states_screens/addons_screen.cpp:52
 msgid "1 month"
 msgstr "1 ay"
 
-#: src/states_screens/addons_screen.cpp:47
+#: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
 msgstr "1 hafta"
 
-#: src/states_screens/addons_screen.cpp:53
+#: src/states_screens/addons_screen.cpp:56
 msgid "1 year"
 msgstr "1 yıl"
 
-#: src/states_screens/addons_screen.cpp:48
+#: src/states_screens/addons_screen.cpp:51
 msgid "2 weeks"
 msgstr "2 hafta"
 
-#: src/states_screens/addons_screen.cpp:54
+#: src/states_screens/addons_screen.cpp:57
 msgid "2 years"
 msgstr "2 yıl"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:181
+#: src/race/race_manager.hpp:182
 msgid "3 Strikes Battle"
 msgstr "3 Vuruşlu Savaş"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:748
 msgid ""
 "3 Strikes Battle: Only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
-msgstr ""
+msgstr "3 Vuruşlu Savaş: Sadece çok oyunculu oyunlarda. Canlarını kaybedinceye kadar diğerlerine silahlarla ateş edin."
 
-#: src/states_screens/addons_screen.cpp:50
+#: src/states_screens/addons_screen.cpp:53
 msgid "3 months"
 msgstr "3 ay"
 
-#: src/states_screens/addons_screen.cpp:51
+#: src/states_screens/addons_screen.cpp:54
 msgid "6 months"
 msgstr "6 ay"
 
-#: src/states_screens/addons_screen.cpp:52
+#: src/states_screens/addons_screen.cpp:55
 msgid "9 months"
 msgstr "9 ay"
 
-#. I18N: ./data/gui/track_info_dialog.stkgui
-#: data/po/gui_strings.h:299
+#. I18N: ./data/gui/track_info.stkgui
 msgid "= Highscores ="
 msgstr "= Yüksek Puanlar ="
 
-#: src/items/powerup.cpp:84
-msgid "A wizard did it!"
-msgstr "Bunu bir sihirbaz yaptı!"
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+msgid "AI karts"
+msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:126
+#: src/states_screens/race_result_gui.cpp:189
 msgid "Abort Grand Prix"
 msgstr "Grand Prix'i Durdur"
 
 #. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: data/po/gui_strings.h:546
+#. I18N: In the main screen
 msgid "About"
 msgstr "Hakkında"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:190
+#: src/states_screens/options_screen_input2.cpp:236
 msgid "Accelerate"
 msgstr "Hızlandırıcı"
 
-#: src/tracks/track_object_presentation.cpp:667
+#: src/tracks/track_object_presentation.cpp:975
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
-msgstr ""
-"Dönerken kaymak için hızlan ve <%s> tuşuna bas. Kısa bir süre kaymak, keskin "
-"virajları alman için daha hızlı dönmeni sağlar."
+msgstr "Dönerken kaymak için hızlan ve <%s> tuşuna bas. Kısa bir süre kaymak, keskin virajları alman için daha hızlı dönmeni sağlar."
 
-#: src/tracks/track_object_presentation.cpp:610
+#: src/tracks/track_object_presentation.cpp:897
 #, c-format
 msgid "Accelerate with <%s> and steer with <%s> and <%s>"
 msgstr "<%s> ile hızlan ve <%s> <%s> tuşları ile yön değiştir"
+
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Accept"
+msgstr "Kabul Et"
+
+#. I18N: ./data/gui/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+msgid "Account Recovery"
+msgstr ""
+
+#. I18N: ./data/gui/online/profile_settings.stkgui
+#. I18N: Section in the profile screen
+#: src/states_screens/online_profile_base.cpp:101
+msgid "Account Settings"
+msgstr ""
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+#. I18N: ./data/gui/online/profile_achievements_tab.stkgui
+#. I18N: Section in the profile screen
+#: src/states_screens/online_profile_base.cpp:100
+msgid "Achievements"
+msgstr ""
+
+#: src/states_screens/options_screen_input2.cpp:71
+msgid "Action"
+msgstr ""
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Add"
+msgstr ""
+
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Add Friend"
+msgstr ""
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:111
@@ -335,8 +285,7 @@ msgid "Add Keyboard Configuration"
 msgstr "Klavye Yapılandırması Ekle"
 
 #. I18N: ./data/gui/options_players.stkgui
-#. I18N: In players configuration menu
-#: data/po/gui_strings.h:514
+#. I18N: In the player configuration screen
 msgid "Add Player"
 msgstr "Oyuncu Ekle"
 
@@ -347,1866 +296,2671 @@ msgstr "Wiimote Ekle"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:213
 msgid "Add a device"
 msgstr "Aygıt ekle"
 
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Add user"
+msgstr ""
+
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: track group
 #. I18N: arena group name
 #. I18N: track group name
 #. I18N: kart group name
-#. I18N: ./data/gui/arenas.stkgui
-#. I18N: track group
-#: src/states_screens/arenas_screen.cpp:81
-#: src/states_screens/tracks_screen.cpp:176
-#: src/states_screens/kart_selection.cpp:1042 data/po/gui_strings.h:585
+#. I18N: track group name
+#: src/states_screens/arenas_screen.cpp:83
+#: src/states_screens/easter_egg_screen.cpp:145
+#: src/states_screens/grand_prix_editor_screen.cpp:336
+#: src/states_screens/kart_selection.cpp:286
+#: src/states_screens/tracks_screen.cpp:155
 msgid "Add-Ons"
 msgstr "Eklentiler"
 
-#: src/states_screens/addons_screen.cpp:107
+#: src/states_screens/addons_screen.cpp:110
 msgid "Add-on name"
-msgstr "Ekleme ismi"
+msgstr "Eklenti ismi"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:530
 msgid "Addons"
 msgstr "Eklentiler"
 
-#. I18N: ./data/karts/adiumy/kart.xml
-#: data/po/gui_strings.h:867
+#. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
 msgstr "Adiumy"
 
-#. I18N: name of the tab that will show arenas from all groups
-#. I18N: name of the tab that will show tracks from all groups
-#. I18N: Time filters for add-ons
-#. I18N: name of the tab that will show tracks from all groups
-#. I18N: if all kart animations are enabled
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Advanced pipeline (lights, etc.)"
+msgstr ""
+
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: src/states_screens/arenas_screen.cpp:73
-#: src/states_screens/tracks_screen.cpp:168
-#: src/states_screens/addons_screen.cpp:46
-#: src/states_screens/kart_selection.cpp:1034
-#: src/states_screens/options_screen_video.cpp:353 data/po/gui_strings.h:589
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: track group
+#. I18N: Time filters for add-ons
+#. I18N: name of the tab that will show arenas from all groups
+#. I18N: name of the tab that will show tracks from all groups
+#. I18N: if all kart animations are enabled
+#. I18N: name of the tab that will show tracks from all groups
+#: src/states_screens/addons_screen.cpp:49
+#: src/states_screens/arenas_screen.cpp:75
+#: src/states_screens/easter_egg_screen.cpp:137
+#: src/states_screens/edit_track_screen.cpp:147
+#: src/states_screens/gp_info_screen.cpp:76
+#: src/states_screens/grand_prix_editor_screen.cpp:333
+#: src/states_screens/kart_selection.cpp:278
+#: src/states_screens/options_screen_video.cpp:434
+#: src/states_screens/tracks_screen.cpp:145
 msgid "All"
 msgstr "Tümü"
 
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: Section in easter egg tracks selection screen
 #. I18N: ./data/gui/tracks.stkgui
-#. I18N: Section in track selection screen
-#: data/po/gui_strings.h:194
+#. I18N: In the track selection screen
 msgid "All Tracks"
 msgstr "Tüm Yollar"
 
-#: src/states_screens/race_setup_screen.cpp:259
+#: src/states_screens/race_setup_screen.cpp:202
 msgid "All blows allowed, so catch weapons and make clever use of them!"
-msgstr ""
-"Tüm patlatmalara izin var, öyleyse silahları kap ve onları zekice kullan !"
+msgstr "Tüm patlatmalara izin var, öyleyse silahları kap ve onları zekice kullan !"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:451
-msgid "Allow STK to connect to the Internet"
-msgstr "STK'ın Internet'e bağlanmasına izin ver"
+msgid "Always show login screen"
+msgstr ""
 
-#. I18N: ./data/tracks/jungle/track.xml
-#: data/po/gui_strings.h:17
-msgid "Amazonian Journey"
-msgstr "Amazon Yolculuğu"
+#. I18N: ../stk-assets/karts/amanda/kart.xml
+msgid "Amanda"
+msgstr ""
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Ambient Occlusion"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:464
+#, c-format
+msgid "Ambient occlusion : %s"
+msgstr ""
+
+#: src/states_screens/edit_gp_screen.cpp:323
+msgid "An error occurred while trying to save your grand prix."
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:687
 msgid "Anchor - slows down greatly the kart in the first position."
 msgstr "Çapa - birinci konumdaki aracı inanılmaz derecede yavaşlatır."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:413
 msgid "Animated Characters"
 msgstr "Hareketli Karakterler"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:379
+#: src/states_screens/options_screen_video.cpp:450
 #, c-format
 msgid "Animated Characters : %s"
 msgstr "Animasyonlu Karakterler : %s"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:405
 msgid "Animated Scenery"
 msgstr "Hareketli Manzara"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:373
+#. tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
+#. UserConfigParams::m_pixel_shaders ? enabled : disabled);
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:444
 #, c-format
 msgid "Animated Scenery : %s"
 msgstr "Animasyonlu Manzara : %s"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:75
+#: src/states_screens/dialogs/custom_video_settings.cpp:81
 msgid "Anisotropic x16"
-msgstr ""
+msgstr "Eşyönsüz x16"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:72
+#: src/states_screens/dialogs/custom_video_settings.cpp:78
 msgid "Anisotropic x2"
-msgstr ""
+msgstr "Eşyönsüz x2"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:73
+#: src/states_screens/dialogs/custom_video_settings.cpp:79
 msgid "Anisotropic x4"
-msgstr ""
+msgstr "Eşyönsüz x4"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:74
+#: src/states_screens/dialogs/custom_video_settings.cpp:80
 msgid "Anisotropic x8"
+msgstr "Eşyönsüz x8"
+
+#: src/states_screens/dialogs/enter_gp_name_dialog.cpp:132
+msgid "Another grand prix with this name already exists."
 msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:421
-msgid "Anti-aliasing (requires restart)"
-msgstr "Anti-aliasing (Yeniden başlatma gerektirir)"
+msgid "Anti-aliasing"
+msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:384
+#: src/states_screens/options_screen_video.cpp:461
 #, c-format
-msgid "Anti-aliasing (requires restart) : %s"
-msgstr "Örtüşme önleme (yeniden başlatma gerektirir) : %s"
+msgid "Anti-aliasing : %s"
+msgstr ""
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+msgid "Apply"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
-#. I18N: In the video settings menu
-#: data/po/gui_strings.h:296
+#. I18N: In the video settings
 msgid "Apply new resolution"
 msgstr "Yeni çözünürlüğü uygula"
 
+#. I18N: ./data/achievements.xml
+msgid "Arch Enemy"
+msgstr ""
+
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options_screen_input2.cpp:504
+#: src/states_screens/options_screen_input2.cpp:575
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Bu yapılandırmayı kalıcı olarak silmek istediğinizden emin misiniz?"
 
+#: src/states_screens/edit_gp_screen.cpp:123
+#: src/states_screens/grand_prix_editor_screen.cpp:109
+#, c-format
+msgid "Are you sure you want to remove '%s'?"
+msgstr ""
+
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: Section in the addons menu
+#. I18N: In the addons screen
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
-#: data/po/gui_strings.h:573 data/po/gui_strings.h:577
 msgid "Arenas"
 msgstr "Arenalar"
 
-#. I18N: ./data/tracks/lighthouse/track.xml
-#: data/po/gui_strings.h:44
+#. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
 msgstr "Deniz feneri çevresinde"
 
-#. I18N: shown when anchor applied. %s is the victim.
-#: src/items/powerup.cpp:49
-#, c-format
-msgid "Arrr, the %s dropped anchor, Captain!"
-msgstr "Eeeh, %s demir attı, Kaptan!"
+#. I18N: ./data/gui/press_a_key_dialog.stkgui
+#. I18N: When configuring input
+msgid "Assign nothing"
+msgstr ""
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:462
 msgid "Assign to ESC key"
 msgstr "ESC tuşuna ata"
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
-#: data/po/gui_strings.h:110 data/po/gui_strings.h:816
 msgid "At World's End"
 msgstr "Dünyanın Sonunda"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input2.cpp:71
-#: src/states_screens/options_screen_input.cpp:138
-#: src/states_screens/options_screen_players.cpp:71
-#: src/states_screens/options_screen_ui.cpp:112
-#: src/states_screens/options_screen_video.cpp:87 data/po/gui_strings.h:139
+#: src/states_screens/options_screen_input.cpp:139
+#: src/states_screens/options_screen_input2.cpp:86
+#: src/states_screens/options_screen_ui.cpp:118
+#: src/states_screens/options_screen_video.cpp:163
+#: src/states_screens/user_screen.cpp:647
 msgid "Audio"
 msgstr "Ses ve Müzik"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: src/tracks/track_object_presentation.cpp:618 data/po/gui_strings.h:630
+#: src/tracks/track_object_presentation.cpp:906
 msgid "Avoid bananas!"
 msgstr "Muzlardan kaç !"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:293
+#: src/input/binding.cpp:284
 #, c-format
 msgid "Axis %d"
-msgstr ""
+msgstr "Eksen %d"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:281
+#: src/input/binding.cpp:272
 #, c-format
 msgid "Axis %d %s"
 msgstr "Eksenler %d %s"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:288
+#: src/input/binding.cpp:279
 #, c-format
 msgid "Axis %d inverted"
-msgstr ""
+msgstr "Eksen %d ters çevrilmiş"
 
 #. I18N: ./data/gui/addons_loading.stkgui
-#. I18N: Add-ons screen action
-#: src/states_screens/dialogs/addons_loading.cpp:260 data/po/gui_strings.h:186
+#. I18N: Add-on screen action
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:216
+#: src/states_screens/dialogs/addons_loading.cpp:284
 msgid "Back"
 msgstr "Geri"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
-#. I18N: Race paused button
-#: data/po/gui_strings.h:476
+#. I18N: In the in-game dialog
 msgid "Back to Game"
 msgstr "Oyuna Dön"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:326
 msgid "Back to Race"
 msgstr "Yarışa Geri Dön"
 
-#: src/states_screens/race_result_gui.cpp:142
+#: src/states_screens/race_result_gui.cpp:205
 msgid "Back to challenge selection"
 msgstr "Meydan okuma seçimine geri dön"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:398
 msgid "Back to device list"
 msgstr "Aygıt listesine geri dön"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
-#. I18N: Race paused button
-#: data/po/gui_strings.h:492
+#. I18N: In the in-game dialog
 msgid "Back to menu"
 msgstr "Menüye Dön"
 
-#: src/states_screens/race_result_gui.cpp:148
+#: src/states_screens/race_result_gui.cpp:211
 msgid "Back to the menu"
 msgstr "Menüye dön"
 
-#: src/items/powerup.cpp:85
-msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr "Muz mu? Kutu mu? Muz mu? Kutu mu? Muz mu? Kutu mu?"
+#. I18N: ./data/achievements.xml
+msgid "Banana Lover"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:693
 msgid ""
-"Basket Ball - bounces after the leader, and might squash and slow down karts "
-"down on the way."
-msgstr ""
-"Basket Topu - liderin arkasından zıplar ve önündeki araçları ezip "
-"yavaşlatabilir."
+"Basket Ball - bounces after the leader, and might squash and slow down karts"
+" down on the way."
+msgstr "Basket Topu - liderin arkasından zıplar ve önündeki araçları ezip yavaşlatabilir."
 
-#. I18N: ./data/tracks/battleisland/track.xml
-#: data/po/gui_strings.h:23
+#. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
 msgstr "Savaş Adası"
 
-#. I18N: ./data/karts/beagle/kart.xml
-#: data/po/gui_strings.h:837
-msgid "Beagle"
-msgstr "Beagle"
-
-#. I18N: ./data/karts/beastie/kart.xml
-#: data/po/gui_strings.h:849
+#. I18N: ../stk-assets/karts/beastie/kart.xml
 msgid "Beastie"
 msgstr "Beastie"
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:260
+#: src/states_screens/grand_prix_lose.cpp:161
 msgid "Better luck next time!"
 msgstr "Bir dahaki oyunda iyi şanslar!"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:70
+#: src/states_screens/dialogs/custom_video_settings.cpp:76
 msgid "Bilinear"
+msgstr "Çift Doğrusal"
+
+#. I18N: Name of the black button on xbox controller
+#: src/input/gamepad_config.cpp:167
+msgid "Black"
 msgstr ""
 
-#. I18N: ./data/tracks/mansion/track.xml
-#: data/po/gui_strings.h:29
+#. I18N: ../stk-assets/tracks/mansion/track.xml
 msgid "Blackhill Mansion"
 msgstr "Karatepe Konağı"
 
-#: src/states_screens/race_result_gui.cpp:864
-msgid "Blue Team Wins"
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Bloom"
 msgstr ""
 
-#. I18N: ./data/tracks/farm/track.xml
-#: data/po/gui_strings.h:38
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:473
+#, c-format
+msgid "Bloom : %s"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:969
+msgid "Blue Team Wins"
+msgstr "Mavi Takım Kazandı"
+
+#. I18N: ../stk-assets/tracks/farm/track.xml
 msgid "Bovine Barnyard"
 msgstr "Durgun Çiftlik"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:681
 msgid ""
-"Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
-"backwards."
-msgstr ""
-"Bowling Topu - duvarlardan seker. Arkaya doğru bakarsanız geriye doğru "
-"atabilirsiniz."
+"Bowling Ball - bounces off walls. If you are looking back, it will be thrown"
+" backwards."
+msgstr "Bowling Topu - duvarlardan seker. Arkaya doğru bakarsanız geriye doğru atabilirsiniz."
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:193
+#: src/states_screens/options_screen_input2.cpp:239
 msgid "Brake"
 msgstr "Fren"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:672
 msgid ""
 "BubbleGum - protect yourself with a shield, or use while looking back to "
 "leave a sticky pink puddle behind you."
-msgstr ""
-"Şişen Sakız - kendini bir kalkanla koru veya arkana bakarken pembe yapışkan "
-"bir baloncuk bırakmak için kullan"
+msgstr "Şişen Sakız - kendini bir kalkanla koru veya arkana bakarken pembe yapışkan bir baloncuk bırakmak için kullan"
 
-#. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
-#. I18N: ./data/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:86 data/po/gui_strings.h:89
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr "Fakat ben adaletli bir canlıyım, bu yüzden bi anlaşma yapacağım."
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:675
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
-msgstr ""
-"Kek - en yakın rakibe atılır, kısa mesafede veya uzun düzlüklerde en "
-"etkilidir."
+msgstr "Kek - en yakın rakibe atılır, kısa mesafede veya uzun düzlüklerde en etkilidir."
 
-#: src/addons/network_http.cpp:432 src/addons/news_manager.cpp:149
+#: src/addons/addons_manager.cpp:97 src/addons/news_manager.cpp:315
 msgid "Can't access stkaddons server..."
 msgstr "stkaddons (stkeklenti) sunucusuna erişilemiyor..."
 
-#: src/addons/network_http.cpp:339
-msgid "Can't download addons list, check terminal for details."
-msgstr "Eklenti listesi indirilemedi, detaylar için terminali kontrol edin."
-
-#: src/addons/network_http.cpp:349
-msgid "Can't download news file, check terminal for details."
-msgstr "Haber dosyası indirilemiyor, ayrıntılar için uçbirime bakınız."
-
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#. I18N: ./data/gui/story_mode_new.stkgui
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
+#. I18N: In the 'add new grand prix' dialog
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: In the 'add new player' dialog
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/dialogs/addons_loading.cpp:227
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
-#: src/states_screens/dialogs/player_info_dialog.cpp:106
-#: src/states_screens/dialogs/addons_loading.cpp:226 data/po/gui_strings.h:257
-#: data/po/gui_strings.h:375 data/po/gui_strings.h:383
+#: src/states_screens/user_screen.cpp:112
 msgid "Cancel"
 msgstr "İptal"
 
-#. I18N: In the player info dialog (when deleting)
-#: src/states_screens/dialogs/player_info_dialog.cpp:198
-msgid "Cancel Remove"
-msgstr "Silme İptal"
+#: src/states_screens/dialogs/user_info_dialog.cpp:56
+msgid "Cancel Request"
+msgstr ""
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:231
+#: src/states_screens/options_screen_input2.cpp:277
 msgid "Cancel/Back"
 msgstr "İptal / Geri"
 
-#: src/states_screens/dialogs/enter_player_name_dialog.cpp:126
-#: src/states_screens/dialogs/enter_player_name_dialog.cpp:145
-msgid "Cannot add a player with this name."
-msgstr "Bu isimde bir kullanıcı eklenemiyor."
-
-#. I18N: ./data/tracks/cave/track.xml
-#: data/po/gui_strings.h:20
+#. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
 msgstr "Gizemli Mağara"
 
-#: src/states_screens/feature_unlocked.cpp:574
+#: src/states_screens/feature_unlocked.cpp:493
 msgid "Challenge Completed"
 msgstr "Mücadele Tamamlandı"
 
-#: src/states_screens/race_gui.cpp:320 src/states_screens/race_gui.cpp:322
+#: src/states_screens/race_gui.cpp:313 src/states_screens/race_gui.cpp:315
 msgid "Challenge Failed"
 msgstr "Mücadele Başarısız"
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
-#: data/po/gui_strings.h:496
 msgid "Challenges : Trophy Room"
 msgstr "Meydan Okuma : Kupa Odası"
 
+#. I18N: ./data/gui/online/profile_settings.stkgui
+msgid "Change"
+msgstr ""
+
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
-#: data/po/gui_strings.h:600
+#. I18N: ./data/gui/karts_online.stkgui
+#. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
 msgstr "Bir Kart Seçin"
 
+#. I18N: ./data/achievements.xml
+msgid "Christoffel Columbus"
+msgstr ""
+
 #. I18N: ./data/gui/help1.stkgui
-#: data/po/gui_strings.h:622
 msgid "Click here to play the tutorial"
 msgstr "Öğreticiyi oynamak için buraya tıkla"
 
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#: data/po/gui_strings.h:432
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+#. I18N: ./data/gui/online/notification_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/online/vote_dialog.stkgui
+#. I18N: Vote dialog
 msgid "Close"
 msgstr "Kapat"
 
+#. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
+msgid "Cocoa Temple"
+msgstr ""
+
+#. I18N: ./data/achievements.xml
+msgid "Collect at least 5 bananas in one race."
+msgstr ""
+
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:626
 msgid "Collect blue boxes : they will give you weapons or other powerups"
-msgstr ""
-"Mavi kutuları toplayın : bunlar size silah ve diğer güç nesnelerini verecek"
+msgstr "Mavi kutuları toplayın : bunlar size silah ve diğer güç nesnelerini verecek"
 
-#: src/tracks/track_object_presentation.cpp:627
+#: src/tracks/track_object_presentation.cpp:916
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
-msgstr ""
-"Hediye kutusu topla ve bu kutuları uçurmak için <%s> tuşu ile silahı ateşle!"
+msgstr "Hediye kutusu topla ve bu kutuları uçurmak için <%s> tuşu ile silahı ateşle!"
 
-#: src/tracks/track_object_presentation.cpp:634
+#: src/tracks/track_object_presentation.cpp:938
 msgid "Collect nitro bottles (we will use them after the curve)"
 msgstr "Nitro şişeleri topla (kıvrımdan sonra kullanacağız)"
 
-#: src/states_screens/race_gui_base.cpp:730
+#: src/states_screens/race_gui_base.cpp:648
 msgid "Collect nitro!"
 msgstr "Nitro biriktir!"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:634
 msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
-"pressing the appropriate key. You can see your current level of nitro in the "
-"bar at the right of the game screen."
+"pressing the appropriate key. You can see your current level of nitro in the"
+" bar at the right of the game screen."
+msgstr "Nitro toplamak, istediğiniz zaman uygun tuşa basarak hız artışı kazanmanızı sağlar. O anki nitro seviyenizi oyun ekranının sağ tarafındaki seviye çubuğundan görebilirsiniz."
+
+#: src/tracks/track_object_presentation.cpp:880
+msgid "Complete all challenges to unlock the big door!"
 msgstr ""
-"Nitro toplamak, istediğiniz zaman uygun tuşa basarak hız artışı kazanmanızı "
-"sağlar. O anki nitro seviyenizi oyun ekranının sağ tarafındaki seviye "
-"çubuğundan görebilirsiniz."
 
-#. I18N: In the player info dialog (when deleting)
-#: src/states_screens/dialogs/player_info_dialog.cpp:179
-msgid "Confirm Remove"
-msgstr "Kaldırmayı Onayla"
+#: src/achievements/achievement.cpp:202
+#, c-format
+msgid "Completed achievement \"%s\"."
+msgstr ""
 
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:72
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Confirm"
+msgstr ""
+
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:81
 #, c-format
 msgid "Confirm resolution within %i seconds"
 msgstr "Çözünürlüğü %i saniye içinde onaylayın"
 
-#: src/input/wiimote_manager.cpp:309
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Connect to the Internet"
+msgstr ""
+
+#: src/input/wiimote_manager.cpp:387
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed "
 "instructions at supertuxkart.net/Wiimote"
-msgstr ""
+msgstr "Wiimote'unuzu Bluetooth yöneticinize bağlayın ve ardından Tamam tıklayın. Ayrıntılı talimatlar supertuxkart.net/Wiimote adresinde."
 
-#: src/states_screens/race_setup_screen.cpp:266
+#: src/states_screens/race_setup_screen.cpp:209
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr "Güç nesneleri içermiyor, yani sadece sürüş yeteneğiniz için!"
 
 #. I18N: ./data/gui/feature_unlocked.stkgui
-#. I18N: ./data/gui/tutorial_message_dialog.stkgui
-#. I18N: Button in tutorial
-#. I18N: ./data/gui/grand_prix_win.stkgui
 #. I18N: ./data/gui/grand_prix_lose.stkgui
+#. I18N: ./data/gui/grand_prix_win.stkgui
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:123 data/po/gui_strings.h:174
-#: data/po/gui_strings.h:198 data/po/gui_strings.h:469
-#: data/po/gui_strings.h:789 data/po/gui_strings.h:807
+#. I18N: ./data/gui/tutorial_message_dialog.stkgui
+#. I18N: Button in tutorial
+#: src/states_screens/dialogs/gp_info_dialog.cpp:212
+#: src/states_screens/race_result_gui.cpp:186
 msgid "Continue"
 msgstr "Devam"
 
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: Section in the settings menu
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#: src/states_screens/gp_info_screen.cpp:146
+msgid "Continue saved GP"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:156
+msgid "Continue."
+msgstr ""
+
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_players.cpp:73
-#: src/states_screens/options_screen_ui.cpp:114
-#: src/states_screens/options_screen_audio.cpp:66
-#: src/states_screens/options_screen_video.cpp:90 data/po/gui_strings.h:205
-#: data/po/gui_strings.h:390
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/options_screen_audio.cpp:67
+#: src/states_screens/options_screen_ui.cpp:120
+#: src/states_screens/options_screen_video.cpp:166
+#: src/states_screens/user_screen.cpp:649
 msgid "Controls"
 msgstr "Kontroller"
 
-#: src/input/wiimote_manager.cpp:344
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+msgid "Copy"
+msgstr ""
+
+#: src/states_screens/register_screen.cpp:217
+#: src/states_screens/register_screen.cpp:224
+#, c-format
+msgid "Could not create player '%s'."
+msgstr ""
+
+#: src/input/wiimote_manager.cpp:418
 msgid "Could not detect any wiimote :/"
 msgstr "Hiç wiimote tespit edilmedi :/"
 
-#. I18N: ./data/gui/story_mode_lobby.stkgui
-#. I18N: In story mode 'select a game slot' menu
-#: data/po/gui_strings.h:706
-msgid "Create a new player"
-msgstr "Yeni bir oyuncu oluştur"
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Create"
+msgstr ""
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Create Server"
+msgstr ""
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Create User"
+msgstr ""
+
+#: src/states_screens/create_server_screen.cpp:117
+msgid "Creating server"
+msgstr ""
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
-#: data/po/gui_strings.h:710
 msgid "Credits"
 msgstr "Hazırlayanlar"
 
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+msgid "Current Password"
+msgstr ""
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:134
+msgid "Current password invalid."
+msgstr ""
+
+#: src/config/player_manager.cpp:91
+msgid "Currently not signed in"
+msgstr ""
+
 #. I18N: custom video settings
-#: src/states_screens/options_screen_video.cpp:330
+#: src/states_screens/options_screen_video.cpp:411
 msgid "Custom"
 msgstr "Kişisel"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:272
 msgid "Custom settings..."
 msgstr "Özel ayarlar..."
 
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:195 src/input/gamepad_config.cpp:253
+msgid "DPad down"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:193 src/input/gamepad_config.cpp:257
+msgid "DPad left"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:191 src/input/gamepad_config.cpp:255
+msgid "DPad right"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:197 src/input/gamepad_config.cpp:251
+msgid "DPad up"
+msgstr ""
+
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Decline"
+msgstr ""
+
+#: src/states_screens/gp_info_screen.cpp:74
+msgid "Default"
+msgstr ""
+
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Delete"
+msgstr ""
+
 #. I18N: ./data/gui/options_device.stkgui
-#. I18N: To delete a keyboard configuration
-#: src/states_screens/options_screen_input2.cpp:96 data/po/gui_strings.h:394
+#. I18N: In the input configuration screen
+#: src/states_screens/options_screen_input2.cpp:111
 msgid "Delete Configuration"
 msgstr "Yapılandırmayı Sil"
 
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Depth of field"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:485
+#, c-format
+msgid "Depth of field : %s"
+msgstr ""
+
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options_screen_input2.cpp:81
-#: src/states_screens/options_screen_input2.cpp:516
+#: src/states_screens/options_screen_input2.cpp:96
+#: src/states_screens/options_screen_input2.cpp:587
 msgid "Disable Device"
 msgstr "Aygıtı Devre Dışı Bırak"
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:56
-#: src/states_screens/dialogs/custom_video_settings.cpp:80
-#: src/states_screens/options_screen_video.cpp:351
+#: src/states_screens/dialogs/custom_video_settings.cpp:62
+#: src/states_screens/dialogs/custom_video_settings.cpp:86
+#: src/states_screens/options_screen_video.cpp:432
 msgid "Disabled"
 msgstr "Devre Dışı"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:447
 msgid "Display FPS"
 msgstr "SBK Göster"
 
-#: src/states_screens/race_result_gui.cpp:238
+#: src/states_screens/race_result_gui.cpp:354
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "Gerçekten Büyük Yarış'ı iptal etmek istiyor musun?"
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/dialogs/player_info_dialog.cpp:155
+#: src/states_screens/user_screen.cpp:583
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
 msgstr "'%s' oyuncusunu gerçekten silmek istiyor musunuz?"
 
-#: src/items/powerup.cpp:68
-msgid "Do you want to fly kites?"
-msgstr "Uçurtma uçurmak ister misin?"
+#: src/states_screens/edit_gp_screen.cpp:140
+msgid "Do you want to save your changes?"
+msgstr ""
 
-#: src/karts/controller/player_controller.cpp:334
+#: src/karts/controller/network_player_controller.cpp:283
+#: src/karts/controller/player_controller.cpp:340
 msgid "Don't accelerate before go"
 msgstr "Gitmeden önce hızlanmayın"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:219
+#: src/states_screens/options_screen_input2.cpp:265
 msgid "Down"
 msgstr "Aşağı"
 
-#. I18N: Game mode
-#: src/race/race_manager.hpp:183
-msgid "Egg Hunt"
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Drive in reverse"
 msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:455
+#, c-format
+msgid "Dynamic lights : %s"
+msgstr ""
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+msgid "Edit"
+msgstr ""
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Title in edit grand prix screen
+msgid "Edit Grand Prix"
+msgstr ""
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:184
+msgid "Egg Hunt"
+msgstr "Yumurta Avı"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:756
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr ""
+msgstr "Yumurta avı: Tüm gizli yumurtaları bulmak için yolları keşfedin."
 
 #: src/modes/easter_egg_hunt.cpp:202
 #, c-format
 msgid "Eggs: %d / %d"
 msgstr "Yumurtalar: %d / %d"
 
-#. I18N: ./data/karts/elephpant/kart.xml
-#: data/po/gui_strings.h:858
+#. I18N: ../stk-assets/karts/elephpant/kart.xml
 msgid "Elephpant"
 msgstr "Elephpant"
 
-#: src/states_screens/race_result_gui.cpp:353
-#: src/states_screens/race_result_gui.cpp:717
+#: src/states_screens/race_result_gui.cpp:474
+#: src/states_screens/race_result_gui.cpp:833
 msgid "Eliminated"
 msgstr "Elendi"
 
-#. I18N: ./data/karts/emule/kart.xml
-#: data/po/gui_strings.h:840
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Email"
+msgstr ""
+
+#: src/states_screens/register_screen.cpp:292
+msgid "Email has to be between 4 and 50 characters long!"
+msgstr ""
+
+#: src/states_screens/register_screen.cpp:298
+msgid "Email is invalid!"
+msgstr ""
+
+#: src/states_screens/register_screen.cpp:276
+msgid "Emails don't match!"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"
 msgstr "Emule"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options_screen_input2.cpp:83
-#: src/states_screens/options_screen_input2.cpp:517
+#: src/states_screens/options_screen_input2.cpp:98
+#: src/states_screens/options_screen_input2.cpp:588
 msgid "Enable Device"
 msgstr "Aygıtı Aktifleştir"
 
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Enable per-player handicaps"
+msgstr ""
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: In the audio options screen
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
-#. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Next to checkbox in settings menu
-#: src/states_screens/options_screen_video.cpp:348 data/po/gui_strings.h:147
-#: data/po/gui_strings.h:159
+#: src/states_screens/options_screen_video.cpp:429
 msgid "Enabled"
 msgstr "Etkin"
 
 #. I18N: animations setting (all karts are animated)
-#: src/states_screens/dialogs/custom_video_settings.cpp:60
+#: src/states_screens/dialogs/custom_video_settings.cpp:66
 msgid "Enabled for all"
 msgstr "Tümü için etkinleştir"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
-#: data/po/gui_strings.h:167
 msgid "Enter the new player's name"
 msgstr "Yeni oyuncunun ismini girin"
 
-#: src/states_screens/kart_selection.cpp:1287
+#: src/addons/news_manager.cpp:172
+#, c-format
+msgid "Error downloading news: '%s'."
+msgstr ""
+
+#: src/states_screens/kart_selection.cpp:923
 msgid ""
 "Everyone:\n"
 "Press 'Select' now to join the game!"
+msgstr "Herkes:\nOyuna katılmak için şimdi 'Seç' tıklayın!"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "Existing Online Account"
 msgstr ""
-"Herkes:\n"
-"Oyuna katılmak için şimdi 'Seç' tıklayın!"
+
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In the networking lobby
+msgid "Exit"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:350
 msgid "Exit Race"
 msgstr "Yarıştan çık"
 
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/story_mode_new.stkgui
-#. I18N: Difficulty
+#: src/states_screens/user_screen.cpp:111
+msgid "Exit game"
+msgstr ""
+
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:132 data/po/gui_strings.h:369
-#: data/po/gui_strings.h:779
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
 msgid "Expert"
 msgstr "Uzman"
 
-#: src/states_screens/race_setup_screen.cpp:309
+#: src/states_screens/race_setup_screen.cpp:252
 msgid "Explore tracks to find all hidden eggs"
+msgstr "Tüm gizli yumurtaları bulmak için yolları keşfedin."
+
+#: src/graphics/irr_driver.cpp:1795
+#, c-format
+msgid "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
 msgstr ""
 
-#. I18N: shown when a player is hit by a rubber ball. %1 is the
-#. attacker, %0 is the victim.
-#: src/items/rubber_ball.cpp:313
-msgid "Fetch the ball, %0!"
-msgstr "Yakala topu, %0!"
+#: src/graphics/irr_driver.cpp:1804
+#, c-format
+msgid "FPS: %d/%d/%d - %d KTris"
+msgstr ""
 
-#: src/modes/linear_world.cpp:266
+#: src/states_screens/online_profile_achievements.cpp:128
+#: src/states_screens/online_profile_achievements.cpp:168
+msgid "Fetching achievements"
+msgstr ""
+
+#: src/states_screens/online_profile_friends.cpp:88
+#: src/states_screens/online_profile_friends.cpp:174
+msgid "Fetching friends"
+msgstr ""
+
+#: src/states_screens/dialogs/vote_dialog.cpp:171
+msgid "Fetching last vote"
+msgstr ""
+
+#: src/states_screens/server_selection.cpp:67
+#: src/states_screens/server_selection.cpp:210
+msgid "Fetching servers"
+msgstr ""
+
+#. I18N: ./data/gui/online/recovery_input.stkgui
+msgid ""
+"Fill in the username and email address you supplied at registration to be "
+"able to reset your password."
+msgstr ""
+
+#: src/modes/linear_world.cpp:276
 msgid "Final lap!"
 msgstr "Son tur!"
 
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Find Server"
+msgstr ""
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:196
+#: src/states_screens/options_screen_input2.cpp:242
 msgid "Fire"
 msgstr "Ateş"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:245
 msgid ""
 "First, you will need several input devices (having multiple gamepads or "
 "joysticks is the best way to play with several people). Go in the input "
 "configuration screen and setup the gamepads. It is also possible to play on "
-"keyboard(s), however each player will need a different set of keys, and keep "
-"in mind that most keyboards are not appropriate for multiplayer gameplay "
+"keyboard(s), however each player will need a different set of keys, and keep"
+" in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
-msgstr ""
-"İlk önce, birkaç tane girdi aygıtına (birden fazla oyun kumandası veya oyun "
-"çubuğu birkaç kişiyle birlikte oynamak için en iyi yoldur). Girdi "
-"yapılandırma ekranına gidin ve oyun çubuklarınızın kurulumunu yapın. Ayrıca "
-"klavye(ler) üzerinden oynamak da mümkündür, bununla birlikte her oyuncu "
-"farklı tuş setleri kullanmalıdır, ayrıca çoğu klavyenin yüksek sayıda tuş "
-"basışını desteklemediği için çoklu oynama için uygun olmadığını aklınızda "
-"bulundurun."
+msgstr "İlk önce, birkaç tane girdi aygıtına (birden fazla oyun kumandası veya oyun çubuğu birkaç kişiyle birlikte oynamak için en iyi yoldur). Girdi yapılandırma ekranına gidin ve oyun çubuklarınızın kurulumunu yapın. Ayrıca klavye(ler) üzerinden oynamak da mümkündür, bununla birlikte her oyuncu farklı tuş setleri kullanmalıdır, ayrıca çoğu klavyenin yüksek sayıda tuş basışını desteklemediği için çoklu oynama için uygun olmadığını aklınızda bulundurun."
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:179
+#: src/race/race_manager.hpp:180
 msgid "Follow the Leader"
 msgstr "Lideri İzle"
 
-#: src/states_screens/race_gui_base.cpp:732
+#: src/states_screens/race_gui_base.cpp:650
 msgid "Follow the leader!"
-msgstr ""
+msgstr "Lideri takip et!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:744
 msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
-msgstr ""
+msgstr "Lideri takip et: Sayaç her sıfıra düştüğünde en son kalan yarış aracı diskalifiye olduğundan ikinci olmak üzere yarışın. Dikkat: liderini önünde olmak da sizi kaybettirecek!"
 
-#. I18N: ./data/tracks/fortmagma/track.xml
-#: data/po/gui_strings.h:56
+#. I18N: ../stk-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
 msgstr "Fort Magma"
 
-#: src/input/wiimote_manager.cpp:336
+#: src/input/wiimote_manager.cpp:413
 #, c-format
-msgid "Found %d wiimote(s)"
-msgstr "%d wiimote bulundu"
+msgid "Found %d wiimote"
+msgid_plural "Found %d wiimotes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:313
+msgid "Friend removed!"
+msgstr ""
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:215
+msgid "Friend request accepted!"
+msgstr ""
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:364
+msgid "Friend request cancelled!"
+msgstr ""
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:267
+msgid "Friend request declined!"
+msgstr ""
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:158
+msgid "Friend request sent!"
+msgstr ""
+
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: Section in the profile screen
+#: src/states_screens/online_profile_base.cpp:99
+msgid "Friends"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:288
 msgid "Fullscreen"
 msgstr "Tam ekran"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:73
+#: src/states_screens/race_gui_base.cpp:70
 msgid "GOAL!"
 msgstr "GOL!"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_input2.cpp:129
+#: src/states_screens/options_screen_input2.cpp:144
 msgid "Game Keys"
 msgstr "Oyun Tuşları"
 
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:231 data/po/gui_strings.h:615
-#: data/po/gui_strings.h:661 data/po/gui_strings.h:725
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "Game Modes"
 msgstr "Oyun Kipleri"
 
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Game type (Goals limit / Time limit)"
+msgstr ""
+
 #. I18N: to appear in input configuration screen, for gamepad buttons
-#: src/input/binding.cpp:301
+#: src/input/binding.cpp:292
 #, c-format
 msgid "Gamepad button %d"
 msgstr "Oyun tablası düğmesi %d"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
-#: src/input/binding.cpp:269 src/input/binding.cpp:274
+#: src/input/binding.cpp:260 src/input/binding.cpp:265
 #, c-format
 msgid "Gamepad hat %d"
 msgstr "Oyun kumandası şapkası %d"
 
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:223 data/po/gui_strings.h:607
-#: data/po/gui_strings.h:653 data/po/gui_strings.h:717
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "General"
 msgstr "Genel"
 
-#: src/items/powerup.cpp:66
-msgid "Geronimo!!!"
-msgstr "Geronimo!!!"
-
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:338
 msgid "Give Up Race"
 msgstr "Yarışı Bırak"
 
-#. I18N: ./data/karts/gnu/kart.xml
-#: data/po/gui_strings.h:828
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Global illumination"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:489
+#, c-format
+msgid "Global illumination : %s"
+msgstr ""
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Glow (outlines)"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:477
+#, c-format
+msgid "Glow (outlines) : %s"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
 msgstr "Gnu"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:71
+#: src/states_screens/race_gui_base.cpp:68
 msgid "Go!"
 msgstr "Git!"
 
+#. I18N: ./data/achievements.xml
+msgid "Gold driver"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
+msgid "Gran Paradiso Island"
+msgstr ""
+
 #. I18N: ./data/gui/tracks.stkgui
-#. I18N: Section in track selection screen
-#: src/states_screens/dialogs/select_challenge.cpp:140
-#: data/po/gui_strings.h:190
+#. I18N: In the track selection screen
+#: src/states_screens/dialogs/select_challenge.cpp:145
 msgid "Grand Prix"
 msgstr "Grand Prix"
 
-#: src/states_screens/race_result_gui.cpp:1070
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+msgid "Grand Prix Editor"
+msgstr ""
+
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Title in grand prix editor screen
+msgid "Grand Prix editor"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:1214
 msgid "Grand Prix progress:"
 msgstr "Grand Prix ilerlemesi:"
 
 #. I18N: ./data/gui/options_video.stkgui
-#. I18N: In the graphics settings
-#: data/po/gui_strings.h:268
+#. I18N: In the video settings
 msgid "Graphical Effects Level"
 msgstr "Grafik Efekt Seviyesi"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input2.cpp:70
-#: src/states_screens/options_screen_input.cpp:137
-#: src/states_screens/options_screen_players.cpp:70
-#: src/states_screens/options_screen_ui.cpp:111
-#: src/states_screens/options_screen_audio.cpp:63 data/po/gui_strings.h:264
+#: src/states_screens/options_screen_audio.cpp:64
+#: src/states_screens/options_screen_input.cpp:138
+#: src/states_screens/options_screen_input2.cpp:85
+#: src/states_screens/options_screen_ui.cpp:117
+#: src/states_screens/user_screen.cpp:646
 msgid "Graphics"
 msgstr "Grafik"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
-#: data/po/gui_strings.h:401
 msgid "Graphics Settings"
 msgstr "Görüntü Ayarları"
 
-#. I18N: ./data/tracks/greenvalley/track.xml
-#: data/po/gui_strings.h:8
+#. I18N: ../stk-assets/tracks/greenvalley/track.xml
 msgid "Green Valley"
 msgstr "Yeşil Vadi"
 
-#: src/config/user_config.cpp:607 src/config/user_config.cpp:727
+#. I18N: Name of first guest player (without number)
+#: src/config/player_manager.cpp:392
 msgid "Guest"
 msgstr "Konuk"
 
-#. I18N: ./data/tracks/hacienda/track.xml
-#: data/po/gui_strings.h:62
+#. I18N: Name of further guest players, with a 1, 2, ... attached
+#: src/config/player_manager.cpp:397
+#, c-format
+msgid "Guest %d"
+msgstr ""
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid "Guest Log in"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
 msgstr "Çiftlik"
 
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+#. I18N: ./data/gui/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#. I18N: ./data/gui/overworld_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: data/po/gui_strings.h:346 data/po/gui_strings.h:488
-#: data/po/gui_strings.h:538
 msgid "Help"
 msgstr "Yardım"
 
-#. I18N: ./data/karts/hexley/kart.xml
-#: data/po/gui_strings.h:825
+#. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
 msgstr "Hexley"
 
-#: src/states_screens/race_result_gui.cpp:1103
+#: src/states_screens/race_result_gui.cpp:1252
 msgid "Highscores"
 msgstr "Yüksek Puanlar"
 
-#: src/states_screens/race_setup_screen.cpp:288
+#. I18N: ./data/achievements.xml
+msgid "Hit 10 karts with a bowling-ball."
+msgstr ""
+
+#: src/states_screens/race_setup_screen.cpp:231
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
+msgstr "Diğerlerini silahlarınızla tüm canlarını kaybedene kadar vurun. (Yalnızca çok oyunculu bölümlerde)"
+
+#. I18N: ./data/achievements.xml
+msgid "Hit the same kart at least 5 times in one race."
 msgstr ""
-"Diğerlerini silahlarınızla tüm canlarını kaybedene kadar vurun. (Yalnızca "
-"çok oyunculu bölümlerde)"
 
 #. I18N: animations setting (only karts with human players are animated)
-#: src/states_screens/dialogs/custom_video_settings.cpp:58
+#: src/states_screens/dialogs/custom_video_settings.cpp:64
 msgid "Human players only"
 msgstr "Sadece gerçek kullanıcılar"
 
-#. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
-#. I18N: ./data/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:92 data/po/gui_strings.h:95
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+msgid "I agree to the above terms and am 13 years or older. "
+msgstr ""
+
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
 msgstr "Eğer beni yarışta yenebilirsen, yaşlı moruğu serbest bırakacağım."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:638
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr ""
-"Eğer burada olduğu gibi kilitli bir düğme görüyorsanız, onu açmak için bir "
-"meydan okumayı tamamlamanız gerekmektedir."
+msgstr "Eğer burada olduğu gibi kilitli bir düğme görüyorsanız, onu açmak için bir meydan okumayı tamamlamanız gerekmektedir."
 
-#: src/input/input_manager.cpp:656
+#: src/input/input_manager.cpp:729
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
+msgstr "'%s' göz ardı ediliyor, oynamak için daha önce daha önce katılmalıydınız."
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Image-based lighting"
 msgstr ""
-"'%s' göz ardı ediliyor, oynamak için daha önce daha önce katılmalıydınız."
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
-#: data/po/gui_strings.h:178
 msgid "Install"
 msgstr "Kur"
 
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/story_mode_new.stkgui
-#. I18N: Difficulty
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:128 data/po/gui_strings.h:365
-#: data/po/gui_strings.h:775
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
 msgid "Intermediate"
 msgstr "Orta Seviye"
 
-#: src/states_screens/race_result_gui.cpp:869
+#: src/states_screens/register_screen.cpp:401
+#: src/states_screens/user_screen.cpp:328
+msgid "Internet access is disabled, please enable it in the options"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:974
 msgid "It's a draw"
+msgstr "Beraberlik"
+
+#. I18N: ./data/achievements.xml
+msgid "It's secret"
+msgstr ""
+
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+msgid "Join"
+msgstr ""
+
+#: src/states_screens/dialogs/server_info_dialog.cpp:155
+msgid "Joining server"
 msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: Section in the addons menu
-#: data/po/gui_strings.h:565
+#. I18N: In the addons screen
 msgid "Karts"
 msgstr "Kartlar"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-#: data/po/gui_strings.h:379
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
 msgid "Keep this resolution"
 msgstr "Bu çözünürlüğü sakla"
 
 #. I18N: short definition for follow-the-leader game mode
-#: src/states_screens/race_setup_screen.cpp:279
+#: src/states_screens/race_setup_screen.cpp:222
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "Lider kartı takip et ama onu geçme!"
 
-#: src/states_screens/options_screen_input.cpp:96
+#: src/states_screens/options_screen_input2.cpp:72
+msgid "Key binding"
+msgstr ""
+
+#: src/states_screens/options_screen_input.cpp:97
 #, c-format
 msgid "Keyboard %i"
 msgstr "Klavye %i"
 
-#. I18N: ./data/karts/konqi/kart.xml
-#: data/po/gui_strings.h:861
+#. I18N: ../stk-assets/karts/konqi/kart.xml
 msgid "Konqi"
 msgstr "Konqi"
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui.cpp:103
-#: src/states_screens/race_gui_overworld.cpp:106
+#: src/states_screens/race_gui_overworld.cpp:108
 msgid "Lap"
 msgstr "Tur"
 
-#: src/modes/linear_world.cpp:293
+#: src/modes/linear_world.cpp:303
 #, c-format
 msgid "Lap %i"
 msgstr "Tur %i"
 
+#: src/states_screens/edit_gp_screen.cpp:67
+msgid "Laps"
+msgstr ""
+
 #. I18N: number of laps to race in a challenge
-#: src/challenges/challenge_data.cpp:255
+#: src/challenges/challenge_data.cpp:249
 #, c-format
 msgid "Laps : %i"
 msgstr "Tur: %i"
 
-#: src/modes/follow_the_leader.cpp:56 src/modes/follow_the_leader.cpp:251
+#: src/modes/follow_the_leader.cpp:57 src/modes/follow_the_leader.cpp:252
 msgid "Leader"
 msgstr "Lider"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:222
+#: src/states_screens/options_screen_input2.cpp:268
 msgid "Left"
 msgstr "Sol"
 
-#: src/guiengine/engine.cpp:1286
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:212
+msgid "Left bumper"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:220
+msgid "Left thumb button"
+msgstr ""
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:235
+msgid "Left thumb down"
+msgstr ""
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:233
+msgid "Left thumb left"
+msgstr ""
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:231
+msgid "Left thumb right"
+msgstr ""
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:237
+msgid "Left thumb up"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:179 src/input/gamepad_config.cpp:239
+msgid "Left trigger"
+msgstr ""
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Light shaft (God rays)"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:481
+#, c-format
+msgid "Light shaft (God rays) : %s"
+msgstr ""
+
+#: src/guiengine/engine.cpp:1330
 msgid "Loading"
 msgstr "Yükleniyor"
 
-#: src/states_screens/kart_selection.cpp:933
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In networking lobby
+msgid "Lobby"
+msgstr ""
+
+#. I18N: ./data/gui/online/lobby_settings.stkgui
+#. I18N: In the lobby settings screen
+msgid "Lobby Settings"
+msgstr ""
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Local Name"
+msgstr ""
+
+#: src/states_screens/kart_selection.cpp:853
 msgid "Locked"
 msgstr "Kilitli"
 
-#: src/states_screens/arenas_screen.cpp:239
-#: src/states_screens/arenas_screen.cpp:269
-#: src/states_screens/tracks_screen.cpp:297
-#: src/states_screens/tracks_screen.cpp:328
-#: src/states_screens/kart_selection.cpp:938
-#: src/states_screens/kart_selection.cpp:2064
-#: src/states_screens/kart_selection.cpp:2096
-#: src/states_screens/race_setup_screen.cpp:271
+#: src/states_screens/arenas_screen.cpp:237
+#: src/states_screens/arenas_screen.cpp:267
+#: src/states_screens/easter_egg_screen.cpp:225
+#: src/states_screens/easter_egg_screen.cpp:256
+#: src/states_screens/kart_selection.cpp:858
+#: src/states_screens/kart_selection.cpp:1449
+#: src/states_screens/race_setup_screen.cpp:214
+#: src/states_screens/tracks_screen.cpp:283
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Kilitli : Daha fazlasına erişmek için aktif meydan okumaları hallet"
 
-#: src/states_screens/tracks_screen.cpp:234
+#: src/states_screens/tracks_screen.cpp:201
 msgid "Locked!"
 msgstr "Kilitli !"
 
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid "Log In"
+msgstr ""
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Log Out"
+msgstr ""
+
+#: src/states_screens/online_screen.cpp:139
+#, c-format
+msgid "Logged in as: %s."
+msgstr ""
+
+#: src/states_screens/online_screen.cpp:155
+msgid "Logging in"
+msgstr ""
+
+#: src/states_screens/user_screen.cpp:494
+#, c-format
+msgid "Logging in '%s'"
+msgstr ""
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid ""
+"Logging in as a guest allows you to participate in online races, but it does"
+" not allow you to vote for addons, or collect any achievements while being "
+"online."
+msgstr ""
+
+#: src/states_screens/online_screen.cpp:160
+msgid "Logging out"
+msgstr ""
+
+#: src/states_screens/user_screen.cpp:493
+#, c-format
+msgid "Logging out '%s'"
+msgstr ""
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: ./data/gui/user_screen.stkgui
+#: src/states_screens/main_menu_screen.cpp:175
+#: src/states_screens/main_menu_screen.cpp:186
+msgid "Login"
+msgstr ""
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:205
+#: src/states_screens/options_screen_input2.cpp:251
 msgid "Look Back"
 msgstr "Arkaya Bak"
 
-#: src/items/powerup.cpp:83
-msgid "Magic, son. Nothing else in the world smells like that."
-msgstr "Sihir evlat. Dünyada başka hiçbir şey onun gibi kokmaz."
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: In the profile screen
+msgid "Look for more friends:"
+msgstr ""
+
+#. I18N: ./data/achievements.xml
+msgid "Make 5 skidding in a single lap."
+msgstr ""
+
+#. I18N: ./data/achievements.xml
+msgid "Make a race with 5 laps or more."
+msgstr ""
+
+#. I18N: ./data/achievements.xml
+msgid "Marathoner"
+msgstr ""
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#. I18N: ./data/gui/online/lobby_settings.stkgui
+#. I18N: In the lobby settings screen
+msgid "Max. number of players"
+msgstr ""
+
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Maximum time (min.)"
+msgstr ""
 
 #. I18N: if some kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:355
+#: src/states_screens/options_screen_video.cpp:436
 msgid "Me Only"
 msgstr "Yalnızca Ben"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_input2.cpp:143
+#: src/states_screens/options_screen_input2.cpp:158
 msgid "Menu Keys"
 msgstr "Menü Tuşları"
 
-#. I18N: ./data/tracks/minigolf/track.xml
-#: data/po/gui_strings.h:47
-msgid "Minigolf Mischief"
-msgstr "Minigold Yaramazı"
+#. I18N: ../stk-assets/tracks/minigolf/track.xml
+msgid "Minigolf"
+msgstr ""
 
-#. I18N: ./data/gui/options_ui.stkgui
-#. I18N: In the ui settings
-#: data/po/gui_strings.h:455
-msgid "Minimal Race GUI"
-msgstr "Minimal Yarış GKA"
+#. I18N: ./data/achievements.xml
+msgid "Mosquito Hunter"
+msgstr ""
 
-#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
-#: src/input/binding.cpp:308
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Motion blur"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:458
+#, c-format
+msgid "Motion blur: %s"
+msgstr ""
+
+#. I18N: to appear in input configuration screen, for mouse (might not be used
+#. at all)
+#: src/input/binding.cpp:299
 #, c-format
 msgid "Mouse axis %d %s"
 msgstr "Fare ekseni %d %s"
 
-#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
-#: src/input/binding.cpp:304
+#. I18N: to appear in input configuration screen, for mouse (might not be used
+#. at all)
+#: src/input/binding.cpp:295
 #, c-format
 msgid "Mouse button %d"
 msgstr "Fare düğmesi %d"
 
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Move down"
+msgstr ""
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Move up"
+msgstr ""
+
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:526
 msgid "Multiplayer"
 msgstr "Çok oyunculu"
 
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:235 data/po/gui_strings.h:619
-#: data/po/gui_strings.h:665 data/po/gui_strings.h:729
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "Multi­player"
 msgstr "Çok Oyuncu"
 
 #. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Section in the audio/video settings submenu
-#: data/po/gui_strings.h:143
+#. I18N: In the audio options screen
 msgid "Music"
 msgstr "Müzik"
 
-#. I18N: ./data/gui/story_mode_new.stkgui
-#: data/po/gui_strings.h:353
-msgid "New Game"
-msgstr "Yeni Oyun"
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#: src/states_screens/online_profile_achievements.cpp:73
+#: src/states_screens/server_selection.cpp:91
+msgid "Name"
+msgstr ""
 
-#: src/challenges/challenge_data.cpp:509
+#: src/states_screens/create_server_screen.cpp:132
+msgid "Name has to be between 4 and 30 characters long!"
+msgstr ""
+
+#: src/states_screens/dialogs/enter_gp_name_dialog.cpp:125
+msgid "Name is empty."
+msgstr ""
+
+#: src/states_screens/dialogs/enter_gp_name_dialog.cpp:137
+msgid "Name is too long."
+msgstr ""
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#. I18N: ./data/gui/online/lobby_settings.stkgui
+#. I18N: In the lobby settings screen
+msgid "Name of the server"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/scotland/track.xml
+msgid "Nessie's pond"
+msgstr ""
+
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+msgid "New"
+msgstr ""
+
+#: src/challenges/challenge_data.cpp:502
 #, c-format
 msgid "New Grand Prix '%s' now available"
 msgstr "Yeni Grand Prix '%s' şimdi uygun"
 
-#: src/challenges/challenge_data.cpp:513
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "New Online Account"
+msgstr ""
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+msgid "New Password"
+msgstr ""
+
+#: src/states_screens/online_profile_friends.cpp:145
+msgid "New Request"
+msgstr ""
+
+#: src/challenges/challenge_data.cpp:506
 #, c-format
 msgid "New difficulty '%s' now available"
 msgstr "Yeni zorluk '%s' şimdi uygun"
 
-#: src/modes/linear_world.cpp:356
+#: src/modes/linear_world.cpp:363
 msgid "New fastest lap"
 msgstr "Yeni en hızlı tur"
 
-#: src/challenges/challenge_data.cpp:499
+#: src/challenges/challenge_data.cpp:492
 #, c-format
 msgid "New game mode '%s' now available"
 msgstr "Yeni oyun kipi '%s' şimdi uygun"
 
-#: src/challenges/challenge_data.cpp:523
+#: src/challenges/challenge_data.cpp:516
 #, c-format
 msgid "New kart '%s' now available"
 msgstr "Yeni kart '%s' şimdi uygun"
 
-#: src/challenges/challenge_data.cpp:493
+#: src/challenges/challenge_data.cpp:486
 #, c-format
 msgid "New track '%s' now available"
 msgstr "Yeni yol '%s' şimdi uygun"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:199
+#: src/states_screens/options_screen_input2.cpp:245
 msgid "Nitro"
 msgstr "Nitro"
 
-#: src/states_screens/dialogs/select_challenge.cpp:142
+#: src/states_screens/dialogs/select_challenge.cpp:147
 msgid "Nitro challenge"
 msgstr "Nitro meydan okuması"
 
-#. I18N: ./data/karts/nolok/kart.xml
-#: data/po/gui_strings.h:834
+#: src/states_screens/dialogs/message_dialog.cpp:128
+#: src/states_screens/edit_gp_screen.cpp:253
+msgid "No"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/nolok/kart.xml
 msgid "Nolok"
 msgstr "Nolok"
 
 #. I18N: if no kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:357
+#: src/states_screens/gp_info_screen.cpp:75
+#: src/states_screens/options_screen_video.cpp:438
 msgid "None"
 msgstr "Hiçbiri"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:175
+#: src/race/race_manager.hpp:176
 msgid "Normal Race"
 msgstr "Normal Yarış"
 
-#. I18N: ./data/tracks/snowmountain/track.xml
-#: data/po/gui_strings.h:65
+#. I18N: ../stk-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
 msgstr "Kuzey Mesire"
 
-#: src/tracks/track_object_presentation.cpp:675
+#: src/tracks/track_object_presentation.cpp:986
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
-msgstr ""
-"Eğer birkaç saniye kaymayı başarırsan, ödül olarak bonus bir hızlandırma "
-"alacaksın!"
+msgstr "Eğer birkaç saniye kaymayı başarırsan, ödül olarak bonus bir hızlandırma alacaksın!"
 
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/story_mode_new.stkgui
-#. I18N: Difficulty
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:124 data/po/gui_strings.h:361
-#: data/po/gui_strings.h:771
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
 msgid "Novice"
 msgstr "Acemi"
 
-#: src/states_screens/dialogs/select_challenge.cpp:65
+#: src/states_screens/dialogs/select_challenge.cpp:68
 #, c-format
 msgid "Number of AI Karts : %i"
 msgstr "Bilgisayar Araç Sayısı: %i"
 
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: In race setup menu
-#: data/po/gui_strings.h:767
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
 msgid "Number of AI karts"
 msgstr "YZ kartların sayısı"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
-#. I18N: In soccer setup menu
-#: data/po/gui_strings.h:796
+#. I18N: In soccer setup screen
 msgid "Number of goals to win"
 msgstr "Kazanmak için gol sayısı"
 
-#: src/states_screens/dialogs/message_dialog.cpp:86
-#: src/states_screens/dialogs/message_dialog.cpp:93
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of laps"
+msgstr ""
+
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: In the edit track screen
+msgid "Number of laps:"
+msgstr ""
+
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
+#. I18N: In the 'add new grand prix' dialog
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: In the 'add new player' dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/dialogs/message_dialog.cpp:122
+#: src/states_screens/dialogs/message_dialog.cpp:135
 msgid "OK"
 msgstr "Tamam"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
-#: data/po/gui_strings.h:113 data/po/gui_strings.h:819
 msgid "Off the beaten track"
 msgstr "Yenen yoldan dışarı"
 
-#. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
-#. I18N: ./data/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:80 data/po/gui_strings.h:83
+#: src/states_screens/online_profile_friends.cpp:150
+msgid "Offline"
+msgstr ""
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "Offline Account"
+msgstr ""
+
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
 msgstr "Ooo, evet. Şimdi benim kalemde ve akşam yemeği verilecek..."
 
-#. I18N: ./data/tracks/mines/track.xml
-#: data/po/gui_strings.h:71
+#. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
 msgstr "Eski Maden"
 
-#. I18N: ./data/tracks/olivermath/track.xml
-#: data/po/gui_strings.h:5
+#. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
 msgstr "Oliver'in Matematik Sınıfı"
 
-#: src/input/input_manager.cpp:686
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/main_menu_screen.cpp:170
+#: src/states_screens/main_menu_screen.cpp:185
+#: src/states_screens/online_profile_friends.cpp:149
+msgid "Online"
+msgstr ""
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Online Multiplayer"
+msgstr ""
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Online Username"
+msgstr ""
+
+#: src/states_screens/register_screen.cpp:280
+msgid "Online username has to be between 3 and 30 characters long!"
+msgstr ""
+
+#: src/states_screens/register_screen.cpp:284
+msgid "Online username must not start with a number!"
+msgstr ""
+
+#: src/input/input_manager.cpp:759
 msgid "Only the Game Master may act at this point!"
 msgstr "Yalnızca oyun ustaları burada hareket edebilir!"
 
-#: src/tracks/track_object_presentation.cpp:654
+#: src/tracks/track_object_presentation.cpp:960
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Olamaz! Başın beladaysa, kurtarılmak için <%s> tuşuna bas"
 
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+#. I18N: ./data/gui/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#. I18N: ./data/gui/overworld_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: data/po/gui_strings.h:342 data/po/gui_strings.h:484
-#: data/po/gui_strings.h:534
 msgid "Options"
 msgstr "Seçenekler"
 
+#. I18N: ./data/gui/online/profile_overview.stkgui
+#. I18N: Section in the profile screen
+msgid "Overview"
+msgstr ""
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:93
+msgid "POWER"
+msgstr ""
+
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:684
 msgid "Parachute - slows down all karts in a better position."
 msgstr "Paraşüt - daha iyi konumdaki tüm araçları yavaşlatır"
 
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the registration dialog
+msgid "Password"
+msgstr ""
+
+#. I18N: ./data/gui/online/profile_settings.stkgui
+#. I18N: In the online account settings screen
+msgid "Password :"
+msgstr ""
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+msgid "Password Change"
+msgstr ""
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:140
+#: src/states_screens/register_screen.cpp:288
+msgid "Password has to be between 8 and 30 characters long!"
+msgstr ""
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:210
+msgid "Password successfully changed."
+msgstr ""
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:147
+#: src/states_screens/register_screen.cpp:272
+msgid "Passwords don't match!"
+msgstr ""
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:211
+#: src/states_screens/options_screen_input2.cpp:257
 msgid "Pause Game"
 msgstr "Oyunu Duraklat"
 
-#. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: ./data/gui/overworld_dialog.stkgui
-#: data/po/gui_strings.h:322 data/po/gui_strings.h:472
+#. I18N: ./data/gui/race_paused_dialog.stkgui
 msgid "Paused"
 msgstr "Durdu"
 
-#: src/karts/controller/player_controller.cpp:332
+#: src/karts/controller/network_player_controller.cpp:281
+#: src/karts/controller/player_controller.cpp:338
 msgid "Penalty time!!"
 msgstr "Ceza zamanı!!"
 
+#: src/states_screens/online_profile_friends.cpp:146
+msgid "Pending"
+msgstr ""
+
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
-#: data/po/gui_strings.h:104 data/po/gui_strings.h:810
 msgid "Penguin Playground"
 msgstr "Penguen Oyun Alanı"
 
-#. I18N: ./data/karts/pidgin/kart.xml
-#: data/po/gui_strings.h:852
+#: src/states_screens/dialogs/vote_dialog.cpp:247
+msgid "Performing vote"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
 msgstr "Pidgin"
 
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#. I18N: Video settings
-#: data/po/gui_strings.h:429
-msgid "Pixel Shaders"
-msgstr "Piksel Gölgeleyicileri"
-
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:387
-#, c-format
-msgid "Pixel shaders : %s"
-msgstr "Piksel gölgeleyicileri: %s"
-
 #. I18N: ./data/gui/tutorial.stkgui
-#: data/po/gui_strings.h:596
 msgid "Play all"
 msgstr "Tümünü oyna"
 
+#. I18N: ./data/achievements.xml
+msgid "Play every official track at least once."
+msgstr ""
+
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input2.cpp:73
-#: src/states_screens/options_screen_input.cpp:140
-#: src/states_screens/options_screen_ui.cpp:113
-#: src/states_screens/options_screen_audio.cpp:65
-#: src/states_screens/options_screen_video.cpp:89 data/po/gui_strings.h:503
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/options_screen_audio.cpp:66
+#: src/states_screens/options_screen_input.cpp:141
+#: src/states_screens/options_screen_input2.cpp:88
+#: src/states_screens/options_screen_ui.cpp:119
+#: src/states_screens/options_screen_video.cpp:165
+#: src/states_screens/server_selection.cpp:92
 msgid "Players"
 msgstr "Oyuncular"
 
+#: src/states_screens/options_screen_ui.cpp:154
+msgid ""
+"Players can select handicapped (more difficult) profiles on the kart "
+"selection screen"
+msgstr ""
+
+#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
+#. I18N: In the 'add new grand prix' dialog
+msgid "Please enter the name of the grand prix"
+msgstr ""
+
 #. I18N: shown when config file is too old
-#: src/input/device_manager.cpp:480
+#: src/input/device_manager.cpp:500
 msgid "Please re-configure your key bindings."
 msgstr "Lütfen tuş bağlantılarınızı yeniden yapılandırın."
 
-#: src/states_screens/addons_screen.cpp:434
+#: src/states_screens/dialogs/registration_dialog.cpp:42
+msgid "Please read the terms and conditions "
+msgstr ""
+
+#: src/states_screens/addons_screen.cpp:437
 msgid "Please wait while addons are updated"
 msgstr "Eklentiler güncelleninceye kadar bekleyin"
 
-#: src/states_screens/main_menu_screen.cpp:403
+#: src/states_screens/main_menu_screen.cpp:557
 msgid "Please wait while the add-ons are loading"
 msgstr "Eklentiler yükleninceye kadar bekleyin"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:678
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight."
+msgstr "Pompa - rakibi geri çekmek için düz atın veya arkaya bakarak birinin görüşünü engellemek için atın."
+
+#. I18N: ./data/achievements.xml
+msgid "Powerup Love"
 msgstr ""
-"Pompa - rakibi geri çekmek için düz atın veya arkaya bakarak birinin "
-"görüşünü engellemek için atın."
 
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#. I18N: Video settings
-#: data/po/gui_strings.h:425
-msgid "Post-processing (motion blur)"
-msgstr "İşlem sonrası (hareket buğusu)"
-
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:390
+#: src/tracks/track_object_presentation.cpp:930
 #, c-format
-msgid "Post-processing (motion blur) : %s"
-msgstr "İşlem sonrası (hareket buğusu): %s"
+msgid ""
+"Press <%s> to look behind, and fire the weapon with <%s> while pressing <%s>"
+" to fire behind!"
+msgstr ""
 
-#. I18N: ./data/gui/enter_player_name_dialog.stkgui
-#. I18N: When configuring input
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:171 data/po/gui_strings.h:466
 msgid "Press ESC to cancel"
 msgstr "İptal etmek için ESC tuşuna basın"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
-#: data/po/gui_strings.h:458
 msgid "Press a key"
 msgstr "Bir tuşa basın"
 
 #. I18N: ./data/gui/options_input.stkgui
-#. I18N: In key bindings configuration menu
-#: data/po/gui_strings.h:209
+#. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
-msgstr ""
-"Bir aygıtı yapılandırmak için üstündeyken enter tuşuna basın veya iki kere "
-"tıklayın"
+msgstr "Bir aygıtı yapılandırmak için üstündeyken enter tuşuna basın veya iki kere tıklayın"
 
 #. I18N: ./data/gui/options_players.stkgui
-#. I18N: In players configuration menu
-#: data/po/gui_strings.h:510
+#. I18N: In the player configuration screen
 msgid "Press enter or double-click on a player to edit him/her"
-msgstr ""
-"Bir oyuncuyu düzenlemek için üstündeyken enter tuşuna basın veya iki kere "
-"tıklayın"
+msgstr "Bir oyuncuyu düzenlemek için üstündeyken enter tuşuna basın veya iki kere tıklayın"
 
-#: src/states_screens/race_gui_overworld.cpp:455
+#: src/states_screens/race_gui_overworld.cpp:462
 msgid "Press fire to play the tutorial"
 msgstr "Öğreticiyi oynamak için ateşe bas"
 
-#: src/states_screens/race_gui_overworld.cpp:515
+#: src/states_screens/race_gui_overworld.cpp:532
 msgid "Press fire to start the challenge"
 msgstr "Mücadeleyi başlatmak için ateş düğmesine bas"
 
-#: src/input/wiimote_manager.cpp:312
+#: src/input/wiimote_manager.cpp:390
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
-msgstr ""
+msgstr "Wiimote'unuzu keşif kipine koymak için 1+2 tuşlarına aynı anda basın ve ardından Tamam tıklayın. Ayrıntılı talimatlar supertuxkart.net/Wiimote adresinde"
 
-#: src/states_screens/dialogs/addons_loading.cpp:326
+#: src/states_screens/dialogs/addons_loading.cpp:357
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "'%s' eklentisini yüklerken hata."
 
-#: src/states_screens/dialogs/addons_loading.cpp:366
+#: src/states_screens/dialogs/addons_loading.cpp:394
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "'%s' eklentisini kaldırırken hata."
 
-#. I18N: ./data/karts/puffy/kart.xml
-#: data/po/gui_strings.h:846
+#: src/states_screens/dialogs/user_info_dialog.cpp:474
+msgid "Processing"
+msgstr ""
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Profile"
+msgstr ""
+
+#: src/states_screens/online_profile_achievements.cpp:79
+msgid "Progress"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/puffy/kart.xml
 msgid "Puffy"
 msgstr "Puffy"
 
-#: src/states_screens/race_setup_screen.cpp:297
+#: src/states_screens/race_setup_screen.cpp:240
 msgid ""
 "Push the ball to the opposite cage to score goals. (Only in multiplayer "
 "games)"
+msgstr "Gol atmak için toplu karşı kafese ittir. (Sadece çoklu oyunculu oyunlarda)"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Quick Play"
 msgstr ""
-"Gol atmak için toplu karşı kafese ittir. (Sadece çoklu oyunculu oyunlarda)"
 
 #. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: data/po/gui_strings.h:550
+#. I18N: In the main screen
 msgid "Quit"
 msgstr "Çık"
 
-#. I18N: ./data/gui/select_challenge.stkgui
+#: src/states_screens/race_result_gui.cpp:159
+msgid "Quit the server."
+msgstr ""
+
 #. I18N: ./data/gui/racesetup.stkgui
+#. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: ./data/gui/soccer_setup.stkgui
-#: data/po/gui_strings.h:116 data/po/gui_strings.h:763
-#: data/po/gui_strings.h:792
 msgid "Race Setup"
 msgstr "Yarış Ayarları"
 
-#: src/states_screens/arenas_screen.cpp:279
+#: src/states_screens/gp_info_screen.cpp:77
+msgid "Random"
+msgstr ""
+
+#: src/states_screens/arenas_screen.cpp:277
 msgid "Random Arena"
 msgstr "Rastgele Arena"
 
-#: src/states_screens/kart_selection.cpp:919
-#: src/states_screens/kart_selection.cpp:2115
+#: src/race/grand_prix_data.hpp:171
+msgid "Random Grand Prix"
+msgstr ""
+
+#: src/states_screens/kart_selection.cpp:839
+#: src/states_screens/kart_selection.cpp:1467
 msgid "Random Kart"
 msgstr "Rastgele Kart"
 
-#: src/states_screens/tracks_screen.cpp:342
+#: src/states_screens/easter_egg_screen.cpp:270
+#: src/states_screens/tracks_screen.cpp:297
 msgid "Random Track"
 msgstr "Rastgele Yol"
 
-#: src/states_screens/race_gui.cpp:104
-#: src/states_screens/race_gui_overworld.cpp:107
+#: src/states_screens/race_gui_overworld.cpp:109
 msgid "Rank"
 msgstr "Sıra"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: In addons screen, in the filtering bar, to enable a filter that will show only recently items with good rating
-#: data/po/gui_strings.h:561
+#. I18N: In addons screen, in the filtering bar, to enable a filter that will
+#. show only items with good rating
 msgid "Rating >="
 msgstr "Beğeni >="
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:67
+#: src/states_screens/race_gui_base.cpp:64
 msgid "Ready!"
 msgstr "Hazır!"
 
-#: src/states_screens/race_result_gui.cpp:860
+#. I18N: ./data/achievements.xml
+msgid "Really ... a secret."
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:965
 msgid "Red Team Wins"
+msgstr "Kırmızı Takım Kazandı"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: Tab in login menu
+msgid "Register"
 msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:736
 msgid ""
 "Regular Race: All blows allowed, so catch weapons and make clever use of "
 "them!"
+msgstr "Normal Yarış: Tüm uçurmalar serbest olduğundan silahları yakalayın ve akıllıca kullanın!"
+
+#: src/states_screens/gp_info_screen.cpp:153
+#: src/states_screens/gp_info_screen.cpp:178
+msgid "Reload"
 msgstr ""
 
-#. I18N: ./data/gui/story_mode_lobby.stkgui
-#: data/po/gui_strings.h:702
-msgid "Remember me"
-msgstr "Beni hatırla"
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Remember password"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:292
 msgid "Remember window location"
 msgstr "Pencere konumunu hatırla"
 
-#. I18N: In the player info dialog
-#: src/states_screens/dialogs/player_info_dialog.cpp:125
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
 msgid "Remove"
 msgstr "Kaldır"
 
-#. I18N: In the player info dialog
-#: src/states_screens/dialogs/player_info_dialog.cpp:91
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
 msgid "Rename"
 msgstr "Yeniden Adlandır"
 
-#: src/states_screens/dialogs/select_challenge.cpp:61
+#: src/states_screens/dialogs/select_challenge.cpp:64
 #, c-format
 msgid "Required Nitro Points : %i"
 msgstr "Gerekli Nitro Puanı: %i"
 
-#: src/states_screens/dialogs/select_challenge.cpp:50
+#: src/states_screens/dialogs/select_challenge.cpp:53
 #, c-format
 msgid "Required Rank : %i"
 msgstr "Gerekli Sıra: %i"
 
-#: src/states_screens/dialogs/select_challenge.cpp:55
+#: src/states_screens/dialogs/select_challenge.cpp:58
 #, c-format
 msgid "Required Time : %i"
 msgstr "Gerekli Zaman: %i"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:208
+#: src/states_screens/options_screen_input2.cpp:254
 msgid "Rescue"
 msgstr "Kurtarma"
 
 #. I18N: ./data/gui/options_video.stkgui
-#. I18N: In the graphics settings
-#: data/po/gui_strings.h:284
+#. I18N: In the video settings
 msgid "Resolution"
 msgstr "Çözünürlük"
 
-#: src/states_screens/race_result_gui.cpp:136
+#: src/states_screens/race_result_gui.cpp:199
 msgid "Restart"
 msgstr "Yeniden Başlat"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:334
 msgid "Restart Race"
 msgstr "Yarışı yeniden başlat"
 
-#. I18N: ./data/gui/track_info_dialog.stkgui
-#. I18N: Drive the track reverse
-#: data/po/gui_strings.h:312
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Reverse"
 msgstr "Tersine Çevir"
 
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: In the edit track screen
+msgid "Reverse:"
+msgstr ""
+
+#: src/states_screens/edit_gp_screen.cpp:68
+msgid "Reversed"
+msgstr ""
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:225
+#: src/states_screens/options_screen_input2.cpp:271
 msgid "Right"
 msgstr "Sağ"
 
-#. I18N: ./data/tracks/startrack/track.xml
-#: data/po/gui_strings.h:41
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:214
+msgid "Right bumper"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:222
+msgid "Right thumb button"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:185 src/input/gamepad_config.cpp:243
+msgid "Right thumb down"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:183 src/input/gamepad_config.cpp:249
+msgid "Right thumb left"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:181 src/input/gamepad_config.cpp:247
+msgid "Right thumb right"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:187 src/input/gamepad_config.cpp:245
+msgid "Right thumb up"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:189 src/input/gamepad_config.cpp:241
+msgid "Right trigger"
+msgstr ""
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:89
+msgid "SPEED"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
 msgstr ""
 
-#. I18N: ./data/karts/sara/kart.xml
-#: data/po/gui_strings.h:855
-msgid "Sara"
+#. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
+msgid "Sara the Racer"
 msgstr ""
 
-#. I18N: ./data/tracks/scotland/track.xml
-#: data/po/gui_strings.h:2
-msgid "Scotland"
-msgstr "İskoçya"
+#. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
+msgid "Sara the Wizard"
+msgstr ""
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Save"
+msgstr ""
+
+#. I18N: ./data/gui/grand_prix_lose.stkgui
+#. I18N: ./data/gui/grand_prix_win.stkgui
+msgid "Save Grand Prix"
+msgstr ""
+
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: ./data/gui/online/user_search.stkgui
+msgid "Search"
+msgstr ""
+
+#: src/states_screens/online_user_search.cpp:208
+#: src/states_screens/online_user_search.cpp:288
+msgid "Searching"
+msgstr ""
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:228
+#: src/states_screens/options_screen_input2.cpp:274
 msgid "Select"
 msgstr "Seç"
 
-#. I18N: ./data/gui/story_mode_lobby.stkgui
-#: data/po/gui_strings.h:699
-msgid "Select a Player"
-msgstr "Bir Oyuncu Seç"
+#. I18N: ./data/gui/racesetup.stkgui
+msgid "Select a difficulty"
+msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:786
 msgid "Select a game mode"
 msgstr "Bir oyun kipi seçin"
 
+#: src/states_screens/edit_track_screen.cpp:238
+msgid "Select a track"
+msgstr ""
+
 #. I18N: ./data/gui/overworld_dialog.stkgui
-#. I18N: Race paused button
-#: data/po/gui_strings.h:480
+#. I18N: In the in-game dialog
 msgid "Select kart"
 msgstr "Araç seç"
 
-#. I18N: ./data/gui/story_mode_new.stkgui
-#. I18N: In the new story mode game dialog
-#: data/po/gui_strings.h:357
-msgid "Select your identity"
-msgstr "Kimliğinizi seçin"
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Send anonymous HW statistics"
+msgstr ""
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Server Creation"
+msgstr ""
+
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+msgid "Server Info"
+msgstr ""
+
+#. I18N: ./data/gui/online/server_selection.stkgui
+msgid "Server Selection"
+msgstr ""
+
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In the networking lobby
+msgid "Server name :"
+msgstr ""
+
+#: src/states_screens/dialogs/server_info_dialog.cpp:58
+msgid "Server successfully created. You can now join it."
+msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:69
+#: src/states_screens/race_gui_base.cpp:66
 msgid "Set!"
 msgstr "Dikkat!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:146 data/po/gui_strings.h:330
+#: src/states_screens/race_result_gui.cpp:209
 msgid "Setup New Race"
 msgstr "Yeni Yarış Ayarları"
 
-#. I18N: ./data/tracks/sandtrack/track.xml
-#: data/po/gui_strings.h:59
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Shadows"
+msgstr ""
+
+#: src/states_screens/options_screen_video.cpp:470
+#, c-format
+msgid "Shadows: %i"
+msgstr ""
+
+#: src/states_screens/options_screen_video.cpp:468
+#, c-format
+msgid "Shadows: %s"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
 msgstr "Bataklık Kumları"
 
-#. I18N: ./data/tracks/city/track.xml
-#: data/po/gui_strings.h:14
+#. I18N: ../stk-assets/tracks/city/track.xml
 msgid "Shiny Suburbs"
 msgstr "Parlak Kent Dolayları"
 
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: Tab in login menu
+msgid "Sign In"
+msgstr ""
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: Tab in login menu
+msgid "Sign In As Guest"
+msgstr ""
+
+#: src/states_screens/online_profile_friends.cpp:70
+msgid "Since"
+msgstr ""
+
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:522
-msgid "Single-player"
-msgstr "Tek Oyuncu"
+msgid "Singleplayer"
+msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:176
+#: src/states_screens/dialogs/addons_loading.cpp:177
 #, c-format
 msgid "Size: %s"
 msgstr "Boyut:%s"
 
+#. I18N: ./data/achievements.xml
+msgid "Skid-row"
+msgstr ""
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:202
+#: src/states_screens/options_screen_input2.cpp:248
 msgid "Skidding"
 msgstr "Savrulma"
 
 #. I18N: ./data/gui/options_ui.stkgui
-#. I18N: In the graphics settings
-#: data/po/gui_strings.h:443
+#. I18N: In the ui settings
 msgid "Skin"
 msgstr "Görünüm"
 
-#. I18N: ./data/tracks/snowtuxpeak/track.xml
-#: data/po/gui_strings.h:11
+#. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
 msgid "Snow Peak"
 msgstr "Kar Tepesi"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:185
+#: src/race/race_manager.hpp:186
 msgid "Soccer"
 msgstr "Futbol"
 
-#. I18N: ./data/tracks/soccer_field/track.xml
-#: data/po/gui_strings.h:26
+#. I18N: ../stk-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
 msgstr "Futbol sahası"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:752
 msgid ""
 "Soccer: Only in multiplayer games. Use your kart to push the ball into the "
 "goal."
-msgstr ""
+msgstr "Maç: Sadece çok oyunculu oyunlarda. Aracı kullanarak gol atmak üzere topu itin."
 
-#: src/states_screens/addons_screen.cpp:512
-#: src/states_screens/main_menu_screen.cpp:396
+#: src/states_screens/addons_screen.cpp:514
+#: src/states_screens/main_menu_screen.cpp:550
 msgid ""
-"Sorry, an error occurred while contacting the add-ons website. Make sure you "
-"are connected to the Internet and that SuperTuxKart is not blocked by a "
+"Sorry, an error occurred while contacting the add-ons website. Make sure you"
+" are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr ""
-"Üzgünüz, eklendi web sitesine erişilirken bir hata oluştu. Internet'e bağlı "
-"olduğunuzu ve SuperTuxKart'ın güvenlik duvarı tarafından engellenmediğinden "
-"emin olun."
+msgstr "Üzgünüz, eklendi web sitesine erişilirken bir hata oluştu. Internet'e bağlı olduğunuzu ve SuperTuxKart'ın güvenlik duvarı tarafından engellenmediğinden emin olun."
 
-#: src/states_screens/dialogs/addons_loading.cpp:255
+#: src/states_screens/dialogs/addons_loading.cpp:279
 msgid "Sorry, downloading the add-on failed"
 msgstr "Üzgünüz, eklenti indirme başarısız"
 
 #. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Section in audio/video settings submenu
-#: data/po/gui_strings.h:155
+#. I18N: In the audio options screen
 msgid "Sound Effects"
 msgstr "Ses Efektleri"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: data/po/gui_strings.h:581
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: track group
+#: src/states_screens/grand_prix_editor_screen.cpp:334
 msgid "Standard"
 msgstr "Standart"
 
-#. I18N: ./data/gui/story_mode_new.stkgui
-#: data/po/gui_strings.h:372
-msgid "Start Game"
-msgstr "Oyunu Başlat"
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:218
+msgid "Start"
+msgstr ""
 
-#: src/states_screens/dialogs/gp_info_dialog.cpp:146
+#: src/states_screens/dialogs/gp_info_dialog.cpp:209
 msgid "Start Grand Prix"
 msgstr "Grand Prix'e Başla"
 
-#. I18N: ./data/gui/track_info_dialog.stkgui
-#: data/po/gui_strings.h:319
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
 msgid "Start Race"
 msgstr "Yarışa Başla"
 
+#: src/states_screens/online_profile_friends.cpp:71
+msgid "Status"
+msgstr ""
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:184
+#: src/states_screens/options_screen_input2.cpp:230
 msgid "Steer Left"
 msgstr "Sol Yap"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:187
+#: src/states_screens/options_screen_input2.cpp:233
 msgid "Steer Right"
 msgstr "Sağ Yap"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:518
 msgid "Story Mode"
 msgstr "Hikaye Oyunu"
 
-#. I18N: ./data/tracks/subsea/track.xml
-#: data/po/gui_strings.h:50
+#. I18N: ./data/achievements.xml
+msgid "Strike!"
+msgstr ""
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+msgid "Submit"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/subsea/track.xml
 msgid "Subsea"
 msgstr "Deniz altı"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:783
 msgid "SuperTux"
 msgstr "SuperTux"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#: data/po/gui_strings.h:553
 msgid "SuperTuxKart Addons"
 msgstr "SuperTuxKart Eklentileri"
 
-#. I18N: ./data/gui/help4.stkgui
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help3.stkgui
-#: data/po/gui_strings.h:219 data/po/gui_strings.h:603
-#: data/po/gui_strings.h:649 data/po/gui_strings.h:713
+#. I18N: ./data/gui/help4.stkgui
 msgid "SuperTuxKart Help"
 msgstr "SuperTuxKart Yardım"
 
 #. I18N: ./data/gui/options_audio.stkgui
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: ./data/gui/options_video.stkgui
 #. I18N: ./data/gui/options_device.stkgui
-#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: ./data/gui/options_input.stkgui
 #. I18N: ./data/gui/options_players.stkgui
-#: data/po/gui_strings.h:135 data/po/gui_strings.h:201
-#: data/po/gui_strings.h:260 data/po/gui_strings.h:386
-#: data/po/gui_strings.h:435 data/po/gui_strings.h:499
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: ./data/gui/user_screen_tab.stkgui
 msgid "SuperTuxKart Options"
 msgstr "SuperTuxKart Seçenekler"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:238
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
 msgstr "SuperTuxKart aynı bilgisayar üzerinde çok oyunculu kipte oynanabilir"
 
 #. I18N: ./data/gui/help3.stkgui
-#: data/po/gui_strings.h:732
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart birkaç oyun kipine sahiptir"
 
-#: src/main.cpp:1439
+#: src/main.cpp:1201
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
-"updates. Would you like this feature to be enabled? (To change this setting "
-"at a later time, go to options, select tab 'User Interface', and edit "
-"\"Allow STK to connect to the Internet\")."
+"updates. We also collect anonymous hardware statistics to help with the "
+"development of STK. Please read our privacy policy at "
+"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
+"(To change this setting at a later time, go to options, select tab 'User "
+"Interface', and edit \"Connect to the Internet\" and \"Send anonymous HW "
+"statistics\")."
 msgstr ""
-"SuperTuxKar, bir sunucuya bağlanıp eklenti ve güncellemeler için sizi "
-"bilgilendirebilir. Bu özelliği etkinleştirmek istediğinizden emin misiniz? "
-"(Bu seçeneği daha sonra değiştirmek için, ayarlara gidin ve 'Kullanıcı "
-"Arayüzü' sekmesinden, \"STK'nın Internet'e bağlanmasına izin ver\" "
-"işaretleyin)."
 
-#. I18N: ./data/karts/suzanne/kart.xml
-#: data/po/gui_strings.h:831
+#. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
 msgstr "Suzanne"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:690
 msgid ""
-"Swapper - gift boxes are transformed into bananas and vice versa for a short "
-"time."
-msgstr ""
-"Değiştirici - kısa bir süre için hediye kutuları muza, ve muzlar kutulara "
-"dönüştürülür."
+"Swapper - gift boxes are transformed into bananas and vice versa for a short"
+" time."
+msgstr "Değiştirici - kısa bir süre için hediye kutuları muza, ve muzlar kutulara dönüştürülür."
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:696
 msgid "Swatter - will squash karts close by, slowing them down."
 msgstr "Sineklik - yakındaki araçları vurarak, yavaşlatır."
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/options_screen_ui.cpp:162
+#: src/states_screens/options_screen_ui.cpp:186
 msgid "System Language"
 msgstr "Sistem Dili"
 
+#. I18N: ./data/achievements.xml
+msgid ""
+"Take your opponents for mosquitos! With the swatter, squash at least 5 of "
+"them in a race."
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/temple/track.xml
+msgid "Temple"
+msgstr ""
+
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+msgid "Terms and Agreement"
+msgstr ""
+
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:417
+msgid "Texture compression"
+msgstr ""
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
 msgid "Texture filtering"
 msgstr "Doku filtreleme"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
-#: data/po/gui_strings.h:642
 msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
-msgstr ""
-"'Savrulma' tuşu, hız arttırıcı almanızı ve keskin dönüşlerde kaymanızı "
-"sağlar."
+msgstr "'Savrulma' tuşu, hız arttırıcı almanızı ve keskin dönüşlerde kaymanızı sağlar."
 
-#. I18N: ./data/tracks/islandtrack/track.xml
-#: data/po/gui_strings.h:53
-msgid "The Island"
-msgstr "Ada"
-
-#: src/items/powerup.cpp:67
-msgid "The Space Shuttle has landed!"
-msgstr "Uzay Mekiği indi!"
-
-#. I18N: ./data/tracks/stadium/track.xml
-#: data/po/gui_strings.h:35
+#. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
 msgstr "Stadyum"
 
-#: src/states_screens/main_menu_screen.cpp:391
+#: src/states_screens/main_menu_screen.cpp:545
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Eklentiler modülü şuan Ayarlar ekranından devre dışı bırakılmış"
 
-#: src/race/highscore_manager.cpp:100
+#: src/race/highscore_manager.cpp:101
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr ""
-"Yüksek skor dosyası çok eskiydi,\n"
-"tüm yüksek skorlar silindi."
+msgstr "Yüksek skor dosyası çok eskiydi,\ntüm yüksek skorlar silindi."
 
-#: src/states_screens/dialogs/gp_info_dialog.cpp:151
-msgid "This Grand Prix is broken!"
-msgstr "Grand Prix bozuk!"
+#: src/states_screens/create_server_screen.cpp:136
+msgid "The maxinum number of players has to be between 2 and 12."
+msgstr ""
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:177
+#: src/race/race_manager.hpp:178
 msgid "Time Trial"
 msgstr "Zaman Yarışı"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:740
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr ""
-"Zaman Yarışı: Güç nesneleri bulunmuyor, önemli olan sadece sürüş yeteneğiniz!"
+msgstr "Zaman Yarışı: Güç nesneleri bulunmuyor, önemli olan sadece sürüş yeteneğiniz!"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
-"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it "
-"connected and it will appear in the list.\n"
+"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
 "\n"
-"To add a keyboard config, you can use the button below, HOWEVER please note "
-"that most keyboards only support a limited amount of simultaneous keypresses "
-"and are thus inappropriate for multiplayer gameplay. (You can, however, "
-"connect multiple keyboards to the computer. Remember that everyone still "
-"needs different keybindings in this case.)"
-msgstr ""
-"Yeni bir oyun tablası / oyun çubuğu eklemek için aygıt bağlıyken "
-"SuperTuxKart'ı başlatın, aygıtın listede belirdiğini göreceksiniz.\n"
-"Bir klavye yapılandırması eklemek için aşağıdaki düğmeyi kullanabilirsiniz. "
-"BUNUNLA BİRLİKTE lütfen çoğu klavyenin yalnızca sınırlı bir eşzamanlı tuş "
-"basmayı desteklediğini ve bu yüzden çok oyunculu oyunlar için uygun "
-"olmadığını unutmayın. (Bununla birlikte bilgisayara birden fazla klavye "
-"bağlayabilirsiniz, yine de herkes farklı tuş bağlayıcılara sahip olmalıdır.)"
+"To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
+msgstr "Yeni bir oyun tablası / oyun çubuğu eklemek için aygıt bağlıyken SuperTuxKart'ı başlatın, aygıtın listede belirdiğini göreceksiniz.\nBir klavye yapılandırması eklemek için aşağıdaki düğmeyi kullanabilirsiniz. BUNUNLA BİRLİKTE lütfen çoğu klavyenin yalnızca sınırlı bir eşzamanlı tuş basmayı desteklediğini ve bu yüzden çok oyunculu oyunlar için uygun olmadığını unutmayın. (Bununla birlikte bilgisayara birden fazla klavye bağlayabilirsiniz, yine de herkes farklı tuş bağlayıcılara sahip olmalıdır.)"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:669
 msgid "To help you win, there are some powerups you can collect :"
-msgstr ""
-"Kazanmanızda yardımcı olacak bazı güç nesnelerini toplayabilirsiniz :"
+msgstr "Kazanmanızda yardımcı olacak bazı güç nesnelerini toplayabilirsiniz :"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
-#: data/po/gui_strings.h:107 data/po/gui_strings.h:813
 msgid "To the moon and back"
 msgstr "Aya gidiş ve geliş"
 
+#: src/states_screens/dialogs/user_info_dialog.cpp:154
+#: src/states_screens/dialogs/user_info_dialog.cpp:211
+msgid "Today"
+msgstr ""
+
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:97
+#: src/states_screens/race_gui_base.cpp:103
 #, c-format
 msgid "Top %i"
 msgstr "En İyi %i"
 
-#. I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
-#: src/states_screens/dialogs/track_info_dialog.cpp:69
+#: src/states_screens/edit_gp_screen.cpp:66
+msgid "Track"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:1130
+#, c-format
+msgid "Track %i/%i"
+msgstr ""
+
+#. I18N: when showing who is the author of track '%s'
+#. I18N: (place %s where the name of the author should appear)
+#: src/states_screens/track_info_screen.cpp:107
 #, c-format
 msgid "Track by %s"
 msgstr "Yolu hazırlayan: %s"
 
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+msgid "Track group"
+msgstr ""
+
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: Section in the addons menu
-#: data/po/gui_strings.h:569
+#. I18N: In the addons screen
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Tracks"
 msgstr "Yollar"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:71
+#: src/states_screens/dialogs/custom_video_settings.cpp:77
 msgid "Trilinear"
-msgstr ""
+msgstr "Üç çizgili"
 
-#: src/states_screens/dialogs/addons_loading.cpp:338
-#: src/states_screens/dialogs/addons_loading.cpp:378
+#: src/states_screens/dialogs/addons_loading.cpp:369
+#: src/states_screens/dialogs/addons_loading.cpp:406
 msgid "Try again"
 msgstr "Tekrar dene"
 
 #. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: src/states_screens/race_gui_overworld.cpp:448 data/po/gui_strings.h:542
+#. I18N: In the main screen
+#: src/states_screens/race_gui_overworld.cpp:455
 msgid "Tutorial"
 msgstr "Öğretici"
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
-#: data/po/gui_strings.h:593
 msgid "Tutorial : Selection Room"
 msgstr "Eğitsel : Seçim Odası"
 
-#. I18N: ./data/karts/tux/kart.xml
-#: data/po/gui_strings.h:843
+#. I18N: ../stk-assets/karts/tux/kart.xml
 msgid "Tux"
 msgstr "Tux"
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
-#: data/po/gui_strings.h:120
 msgid "Type :"
 msgstr "Tür :"
 
+#: src/states_screens/race_gui_overworld.cpp:502
+msgid "Type: Grand Prix"
+msgstr ""
+
+#: src/online/xml_request.cpp:83
+msgid ""
+"Unable to connect to the server. Check your internet connection or try again"
+" later."
+msgstr ""
+
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
-#: data/po/gui_strings.h:182
 msgid "Uninstall"
 msgstr "Kaldır"
 
+#. I18N: ./data/achievements.xml
+msgid "Unstoppable"
+msgstr ""
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:216
+#: src/states_screens/options_screen_input2.cpp:262
 msgid "Up"
 msgstr "Yukarı"
 
@@ -2215,46 +2969,81 @@ msgid "Update"
 msgstr "Güncelle"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: In addons screen, in the filtering bar, to enable a filter that will show only recently updated items
-#: data/po/gui_strings.h:557
+#. I18N: In addons screen, in the filtering bar, to enable a filter that will
+#. show only recently updated items
 msgid "Updated"
 msgstr "Güncellenmiş"
 
-#: src/states_screens/addons_screen.cpp:108
+#: src/states_screens/addons_screen.cpp:111
 msgid "Updated date"
 msgstr "Güncelleme zamanı"
 
-#. I18N: ./data/gui/options_video.stkgui
-#. I18N: In the video settings
-#: data/po/gui_strings.h:280
-msgid "Use Frame Buffer Objects (requires restart)"
-msgstr "Çerçeve Tampon Nesneleri Kullan (yeniden başlatma gerektirir)"
+#. I18N: ./data/achievements.xml
+msgid "Use 10 or more powerups in a race."
+msgstr ""
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Use high definition textures"
+msgstr ""
 
 #. I18N: ./data/gui/soccer_setup.stkgui
-#. I18N: In soccer setup menu
-#: data/po/gui_strings.h:800
-msgid "Use left/right to choose your team"
-msgstr "Takımını seçmek için sol/sağ kullan"
+#. I18N: In soccer setup screen
+msgid "Use left/right to choose your team and press fire"
+msgstr ""
 
-#: src/tracks/track_object_presentation.cpp:644
+#: src/tracks/track_object_presentation.cpp:949
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
 msgstr "Topladığın nitroyu kullanmak için <%s> tuşuna bas!"
 
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog' dialog
+msgid "User Info"
+msgstr ""
+
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input2.cpp:72
-#: src/states_screens/options_screen_input.cpp:139
-#: src/states_screens/options_screen_players.cpp:72
-#: src/states_screens/options_screen_audio.cpp:64
-#: src/states_screens/options_screen_video.cpp:88 data/po/gui_strings.h:439
+#: src/states_screens/options_screen_audio.cpp:65
+#: src/states_screens/options_screen_input.cpp:140
+#: src/states_screens/options_screen_input2.cpp:87
+#: src/states_screens/options_screen_video.cpp:164
+#: src/states_screens/user_screen.cpp:648
 msgid "User Interface"
 msgstr "Kullanıcı Arayüzü"
 
+#: src/states_screens/grand_prix_editor_screen.cpp:335
+msgid "User defined"
+msgstr ""
+
+#. I18N: ./data/gui/online/user_search.stkgui
+msgid "User search"
+msgstr ""
+
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/online_profile_friends.cpp:67
+#: src/states_screens/online_user_search.cpp:74
+msgid "Username"
+msgstr ""
+
+#: src/states_screens/dialogs/recovery_dialog.cpp:121
+msgid "Username and/or email address invalid."
+msgstr ""
+
 #. I18N: ./data/gui/soccer_setup.stkgui
-#: data/po/gui_strings.h:803
 msgid "VS"
 msgstr "İLE"
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:235
+#: src/states_screens/dialogs/recovery_dialog.cpp:209
+#: src/states_screens/register_screen.cpp:353
+msgid "Validating info"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:108
 #, c-format
@@ -2263,228 +3052,320 @@ msgstr "Sürüm: %d"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:276
 msgid "Vertical Sync (requires restart)"
 msgstr "Dikey Senkronizasyon (yeniden başlatma gerektirir)"
 
+#. I18N: ./data/gui/online/notification_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "View"
+msgstr ""
+
 #. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Music volume in options
-#. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Sound volume in options
-#: data/po/gui_strings.h:151 data/po/gui_strings.h:163
+#. I18N: In the audio options screen
 msgid "Volume"
 msgstr "Ses Seviyesi"
 
-#: src/modes/linear_world.cpp:854
+#. I18N: ./data/gui/online/vote_dialog.stkgui
+#. I18N: In the vote dialog
+msgid "Vote"
+msgstr ""
+
+#: src/states_screens/dialogs/vote_dialog.cpp:230
+msgid "Vote successful! You can now close the window."
+msgstr ""
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:85
+msgid "WEIGHT"
+msgstr ""
+
+#: src/modes/linear_world.cpp:882
 msgid "WRONG WAY!"
 msgstr "YANLIŞ YÖN!"
 
-#: src/states_screens/options_screen_input2.cpp:410
+#: src/states_screens/options_screen_input2.cpp:479
 msgid ""
 "Warning, 'Shift' is not a recommended key : when shift is pressed down, all "
 "keys that contain a character that is different in upper-case will stop "
 "working."
-msgstr ""
-"Uyarı, shift önerilen bir tuş değildir : shift tuşuna basıldığında, büyük "
-"harf hali farklı karakter içeren tüm tuşlar çalışmayı bırakacaktır."
+msgstr "Uyarı, shift önerilen bir tuş değildir : shift tuşuna basıldığında, büyük harf hali farklı karakter içeren tüm tuşlar çalışmayı bırakacaktır."
 
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:227 data/po/gui_strings.h:611
-#: data/po/gui_strings.h:657 data/po/gui_strings.h:721
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "Weapons"
 msgstr "Silahlar"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:409
 msgid "Weather Effects"
 msgstr "Hava Durumu Efektleri"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:376
+#: src/states_screens/options_screen_video.cpp:447
 #, c-format
 msgid "Weather Effects : %s"
 msgstr "Hava Efektleri : %s"
 
-#. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
-#. I18N: ./data/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:74 data/po/gui_strings.h:77
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
 msgstr "Ne oldu küçük hippiler? Muhteşem GNU lideriniz mi kayıp?"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:249
 msgid ""
 "When input devices are configured, you are ready to play. Select the "
 "'multiplayer race' icon in the main menu. When it is time to choose a kart, "
-"each player can press on the 'fire' key of their gamepad or keyboard to join "
-"the game. Each player can use their input device to select their kart. The "
+"each player can press on the 'fire' key of their gamepad or keyboard to join"
+" the game. Each player can use their input device to select their kart. The "
 "game continues when everyone selected their kart. Note that the mouse may "
 "not be used for this operation."
-msgstr ""
-"Girdi aygıtları ayarlandıktan sonra, oynamaya hazırsınız demektir. Menüden "
-"çok oyuncu yarışını seçin. Sıra bir kart seçmeye geldiğinde her oyuncu kendi "
-"oyun tablasından veya klavyesinden ateş tuşuna basarak oyuna katılabilir. "
-"Her oyuncu kartını seçmek için kendi girdi aygıtını kullanabilir. Oyun "
-"herkes kartını seçtikten sonra devam eder. Unutmayın bu işlem için fare "
-"kullanılamaz."
+msgstr "Girdi aygıtları ayarlandıktan sonra, oynamaya hazırsınız demektir. Menüden çok oyuncu yarışını seçin. Sıra bir kart seçmeye geldiğinde her oyuncu kendi oyun tablasından veya klavyesinden ateş tuşuna basarak oyuna katılabilir. Her oyuncu kartını seçmek için kendi girdi aygıtını kullanabilir. Oyun herkes kartını seçtikten sonra devam eder. Unutmayın bu işlem için fare kullanılamaz."
 
-#. I18N: ./data/karts/wilber/kart.xml
-#: data/po/gui_strings.h:864
+#. I18N: Name of the white button on xbox controller
+#: src/input/gamepad_config.cpp:171
+msgid "White"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/wilber/kart.xml
 msgid "Wilber"
 msgstr "Wilber"
 
-#. I18N: ./data/tracks/xr591/track.xml
-#: data/po/gui_strings.h:32
+#. I18N: ./data/achievements.xml
+msgid "Win 5 single races in a row."
+msgstr ""
+
+#. I18N: ./data/achievements.xml
+msgid "Win in all single player modes, against at least 3 opponents."
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
 msgstr "XR591"
 
-#. I18N: ./data/karts/xfcemouse/kart.xml
-#: data/po/gui_strings.h:822
+#. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
 msgstr ""
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: data/po/gui_strings.h:253
+#: src/states_screens/edit_gp_screen.cpp:253
 msgid "Yes"
 msgstr "Evet"
 
-#: src/tracks/track_object_presentation.cpp:683
+#: src/tracks/track_object_presentation.cpp:996
 msgid "You are now ready to race. Good luck!"
 msgstr "Artık yarışa hazırsın. İyi şanslar!"
 
 #. I18N: ./data/gui/options_players.stkgui
-#: data/po/gui_strings.h:506
 msgid "You are playing as"
 msgstr "Şu olarak oynuyorsunuz"
 
-#: src/states_screens/dialogs/player_info_dialog.cpp:160
-msgid "You cannot delete this player because it is currently in use."
-msgstr "Bu oyuncu şuan kullanımda olduğundan silemezsiniz."
+#: src/states_screens/dialogs/vote_dialog.cpp:190
+msgid "You can adapt your previous rating by clicking the stars beneath."
+msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:104
-#: src/states_screens/race_result_gui.cpp:112
+#: src/states_screens/main_menu_screen.cpp:513
+msgid ""
+"You can not download addons without internet access. If you want to download"
+" addons, go to options, select  tab 'User Interface', and edit \"Connect to "
+"the Internet\"."
+msgstr ""
+
+#: src/states_screens/main_menu_screen.cpp:488
+msgid ""
+"You can not play online without internet access. If you want to play online,"
+" go to options, select  tab 'User Interface', and edit \"Connect to the "
+"Internet\"."
+msgstr ""
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid ""
+"You can play without creating an online account by selecting an offline "
+"account. Though then you can not connect to friends, vote for addons etc. "
+"Please read our privacy statement at http://privacy.supertuxkart.net"
+msgstr ""
+
+#: src/states_screens/grand_prix_win.cpp:124
+#: src/states_screens/race_result_gui.cpp:175
 msgid "You completed a challenge!"
 msgstr "Bir mücadele tamamladınız!"
 
-#: src/states_screens/race_result_gui.cpp:113
+#: src/states_screens/race_result_gui.cpp:176
 msgid "You completed challenges!"
 msgstr "Mücadeleleri tamamladınız!"
 
-#: src/states_screens/grand_prix_win.cpp:380
+#: src/states_screens/grand_prix_win.cpp:279
 msgid "You completed the Grand Prix!"
 msgstr "Grand Prix'i tamamladınız!"
 
-#: src/states_screens/feature_unlocked.cpp:182
-#, c-format
-msgid "You completed the difficult challenge! This trophy is worth %i points"
-msgstr "Zor mücadeleyi tamamladınız! Bu ödül %i puan değerinde."
-
-#: src/states_screens/feature_unlocked.cpp:174
-#, c-format
-msgid "You completed the easy challenge! This trophy is worth %i points"
-msgstr "Kolay mücadeleyi tamamladınız! Bu ödül %i puan değerinde."
-
-#: src/states_screens/feature_unlocked.cpp:178
+#: src/states_screens/feature_unlocked.cpp:208
 #, c-format
 msgid ""
-"You completed the intermediate challenge! This trophy is worth %i points"
-msgstr "Orta mücadeleyi tamamladınız! Bu ödül %i puan değerinde."
+"You completed the difficult challenge! Points earned on this level: %i/%i"
+msgstr ""
 
-#: src/karts/kart.cpp:825
+#: src/states_screens/feature_unlocked.cpp:200
+#, c-format
+msgid "You completed the easy challenge! Points earned on this level: %i/%i"
+msgstr ""
+
+#: src/states_screens/feature_unlocked.cpp:204
+#, c-format
+msgid ""
+"You completed the intermediate challenge! Points earned on this level: %i/%i"
+msgstr ""
+
+#: src/karts/kart.cpp:856
 msgid "You finished the race!"
 msgstr "Yarışı tamamladınız!"
 
-#: src/modes/world.cpp:1025
+#: src/online/online_player_profile.cpp:466
+#, c-format
+msgid "You have %d new friend request!"
+msgid_plural "You have %d new friend requests!"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/online/online_player_profile.cpp:472
+msgid "You have a new friend request!"
+msgstr ""
+
+#: src/modes/world.cpp:1144
 msgid "You have been eliminated!"
 msgstr "Elendiniz!"
 
-#: src/karts/kart.cpp:1814
+#: src/states_screens/dialogs/vote_dialog.cpp:195
+msgid ""
+"You have not yet voted for this addon. Select your desired rating by "
+"clicking the stars beneath"
+msgstr ""
+
+#: src/karts/kart.cpp:1913
 msgid ""
 "You need more points\n"
-"to enter this challenge!"
+"to enter this challenge!\n"
+"Check the minimap for\n"
+"available challenges."
 msgstr ""
-"Bu mücadeleye girmek için\n"
-"daha fazla puan gerekiyor!"
 
-#: src/states_screens/feature_unlocked.cpp:649
+#: src/states_screens/user_screen.cpp:472
+msgid "You need to enter a password."
+msgstr ""
+
+#: src/states_screens/feature_unlocked.cpp:568
 msgid "You unlocked grand prix %0"
 msgstr "Grand prix %0 kilidini açtınız"
 
-#: src/states_screens/feature_unlocked.cpp:611
+#: src/states_screens/feature_unlocked.cpp:530
 msgid "You unlocked track %0"
 msgstr "%0 yolunu açtınız"
 
-#: src/karts/kart.cpp:825 src/karts/kart.cpp:843
+#. I18N: ./data/gui/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+msgid ""
+"You will receive an email with further instructions on how to reset your "
+"password. Please be patient and be sure to check your spam folder."
+msgstr ""
+
+#: src/states_screens/register_screen.cpp:361
+msgid ""
+"You will receive an email with further instructions regarding account "
+"activation. Please be patient and be sure to check your spam folder."
+msgstr ""
+
+#: src/karts/kart.cpp:856 src/karts/kart.cpp:875
 msgid "You won the race!"
 msgstr "Yarışı kazandınız!"
 
-#: src/config/user_config.cpp:658
+#: src/main.cpp:1375
+msgid ""
+"Your OpenGL version appears to be too old. Please verify if an update for "
+"your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
+msgstr ""
+
+#: src/config/user_config.cpp:700
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr ""
-"Yapılandırma dosyanız hatalıydı, bu yüzden silindi ve yeni bir tane "
-"oluşturulacak."
+msgstr "Yapılandırma dosyanız hatalıydı, bu yüzden silindi ve yeni bir tane oluşturulacak."
 
-#: src/config/user_config.cpp:669
+#: src/config/user_config.cpp:711
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr ""
-"Yapılandırma dosyanız çok eskiydi, bu yüzden silindi ve yeni bir tane "
-"oluşturulacak."
+msgstr "Yapılandırma dosyanız çok eskiydi, bu yüzden silindi ve yeni bir tane oluşturulacak."
 
-#: src/input/device_manager.cpp:482
+#: src/main.cpp:1367
+msgid ""
+"Your driver version is too old. Please install the latest video drivers."
+msgstr ""
+
+#: src/input/device_manager.cpp:501
 msgid "Your input config file is not compatible with this version of STK."
 msgstr "Girdi yapılandırma dosyanız STK'nın bu sürümüyle uyumlu değil."
 
-#. I18N: ./data/tracks/zengarden/track.xml
-#: data/po/gui_strings.h:68
+#: src/states_screens/online_profile_base.cpp:105
+#: src/states_screens/online_profile_base.cpp:115
+msgid "Your profile"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/zengarden/track.xml
 msgid "Zen Garden"
 msgstr "Zen Bahçesi"
 
 #. I18N: Unbound key binding
-#: src/input/binding.cpp:100
+#: src/input/binding.cpp:90
 msgid "[none]"
 msgstr "[hiçbiri]"
 
-#. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/race_gui_base.cpp:623
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In networking lobby
+msgid "actions"
+msgstr ""
+
+#. I18N: track group name
+#: src/states_screens/tracks_screen.cpp:151
+msgid "all"
+msgstr ""
+
+#. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
+#. "John Doe")
+#: src/states_screens/race_gui_base.cpp:540
 msgid "by"
 msgstr "-"
 
-#: src/states_screens/dialogs/addons_loading.cpp:138
+#: src/states_screens/dialogs/addons_loading.cpp:139
 msgid "featured"
 msgstr "öne çıkan"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:88
+msgid "high"
+msgstr ""
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:87
+msgid "low"
+msgstr ""
 
 #. I18N: arena group name
 #. I18N: track group name
 #. I18N: kart group name
-#: src/states_screens/arenas_screen.cpp:79
-#: src/states_screens/tracks_screen.cpp:174
-#: src/states_screens/kart_selection.cpp:1040
+#. I18N: track group name
+#: src/states_screens/arenas_screen.cpp:81
+#: src/states_screens/easter_egg_screen.cpp:143
+#: src/states_screens/kart_selection.cpp:284
+#: src/states_screens/tracks_screen.cpp:153
 msgid "standard"
 msgstr "standart"
 
-#: src/states_screens/credits.cpp:213
+#: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr ""
-"Launchpad Contributions:\n"
-"  Muhammet Kara https://launchpad.net/~muhammet-k\n"
-"  Osman Tosun https://launchpad.net/~rainman-neu\n"
-"  STK-team https://launchpad.net/~stk\n"
-"  Volkan Gezer https://launchpad.net/~volkangezer\n"
-"  emre can yılmaz https://launchpad.net/~ecylmz\n"
-"  linuxseven https://launchpad.net/~linuxseven\n"
-"  maidis https://launchpad.net/~ozbekanil\n"
-"  zeugma https://launchpad.net/~sunder67"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nemre can yılmaz https://launchpad.net/~ecylmz\nlinuxseven https://launchpad.net/~linuxseven\nmaidis https://launchpad.net/~ozbekanil\nMuhammet Kara https://launchpad.net/~muhammet-k\nOsman Tosun https://launchpad.net/~rainman-neu\nSTK-team https://launchpad.net/~stk\nVolkan Gezer https://launchpad.net/~volkangezer\nVolkan Gezer, 2015\nyakup https://launchpad.net/~mutouk\nzeugma https://launchpad.net/~sunder67"

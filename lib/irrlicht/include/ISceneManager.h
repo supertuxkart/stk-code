@@ -124,11 +124,6 @@ namespace scene
 	class ITriangleSelector;
 	class IVolumeLightSceneNode;
 
-	namespace quake3
-	{
-		struct IShader;
-	} // end namespace quake3
-
 	//! The Scene Manager manages scene nodes, mesh recources, cameras and all the other stuff.
 	/** All Scene nodes can be created only here. There is a always growing
 	list of scene nodes for lots of purposes: Indoor rendering scene nodes
@@ -427,28 +422,6 @@ namespace scene
 		/** \return Pointer to the FileSystem
 		This pointer should not be dropped. See IReferenceCounted::drop() for more information. */
 		virtual io::IFileSystem* getFileSystem() = 0;
-
-		//! adds Volume Lighting Scene Node.
-		/** Example Usage:
-			scene::IVolumeLightSceneNode * n = smgr->addVolumeLightSceneNode(0, -1,
-						32, 32, //Subdivide U/V
-						video::SColor(0, 180, 180, 180), //foot color
-						video::SColor(0, 0, 0, 0) //tail color
-						);
-			if (n)
-			{
-				n->setScale(core::vector3df(46.0f, 45.0f, 46.0f));
-				n->getMaterial(0).setTexture(0, smgr->getVideoDriver()->getTexture("lightFalloff.png"));
-			}
-		\return Pointer to the volumeLight if successful, otherwise NULL.
-		This pointer should not be dropped. See IReferenceCounted::drop() for more information. */
-		virtual IVolumeLightSceneNode* addVolumeLightSceneNode(ISceneNode* parent=0, s32 id=-1,
-			const u32 subdivU = 32, const u32 subdivV = 32,
-			const video::SColor foot = video::SColor(51, 0, 230, 180),
-			const video::SColor tail = video::SColor(0, 0, 0, 0),
-			const core::vector3df& position = core::vector3df(0,0,0),
-			const core::vector3df& rotation = core::vector3df(0,0,0),
-			const core::vector3df& scale = core::vector3df(1.0f, 1.0f, 1.0f)) = 0;
 
 		//! Adds a cube scene node
 		/** \param size: Size of the cube, uniformly in each dimension.
@@ -913,14 +886,6 @@ namespace scene
 			video::SColor vertexColor = video::SColor(255,255,255,255),
 			s32 maxLOD=5, E_TERRAIN_PATCH_SIZE patchSize=ETPS_17, s32 smoothFactor=0,
 			bool addAlsoIfHeightmapEmpty = false) = 0;
-
-		//! Adds a quake3 scene node to the scene graph.
-		/** A Quake3 Scene renders multiple meshes for a specific HighLanguage Shader (Quake3 Style )
-		\return Pointer to the quake3 scene node if successful, otherwise NULL.
-		This pointer should not be dropped. See IReferenceCounted::drop() for more information. */
-		virtual IMeshSceneNode* addQuake3SceneNode(const IMeshBuffer* meshBuffer, const quake3::IShader * shader,
-												ISceneNode* parent=0, s32 id=-1
-												) = 0;
 
 
 		//! Adds an empty scene node to the scene graph.

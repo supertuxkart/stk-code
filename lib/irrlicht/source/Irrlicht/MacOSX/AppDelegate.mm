@@ -50,6 +50,7 @@
 - (void)windowWillClose:(id)sender
 {
 	_quit = TRUE;
+	exit(0); // FIXME: hackish workaround, irrlicht crashes if we attempt clean exit
 }
 
 - (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize

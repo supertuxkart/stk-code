@@ -45,11 +45,6 @@ namespace scene
 		//! Returns type of the scene node
 		virtual ESCENE_NODE_TYPE getType() const { return ESNT_CUBE; }
 
-		//! Creates shadow volume scene node as child of this node
-		//! and returns a pointer to it.
-		virtual IShadowVolumeSceneNode* addShadowVolumeSceneNode(const IMesh* shadowMesh,
-			s32 id, bool zfailmethod=true, f32 infinity=10000.0f);
-
 		//! Writes attributes of the scene node.
 		virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options=0) const;
 
@@ -82,7 +77,6 @@ namespace scene
 		void setSize();
 
 		IMesh* Mesh;
-		IShadowVolumeSceneNode* Shadow;
 		f32 Size;
 	};
 

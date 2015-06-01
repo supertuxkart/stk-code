@@ -1,8 +1,8 @@
 
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2011-2013 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2011-2015 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -152,7 +152,8 @@
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
-#include "graphics/hardware_skinning.hpp"
+#include "graphics/central_settings.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
@@ -206,6 +207,7 @@
 
 static void cleanSuperTuxKart();
 static void cleanUserConfig();
+void runUnitTests();
 
 // ============================================================================
 //                        gamepad visualisation screen
@@ -389,6 +391,65 @@ void handleXmasMode()
         kart_properties_manager->setHatMeshName("christmas_hat.b3d");
 }   // handleXmasMode
 // ============================================================================
+/** Determines if Easter Ears should be used
+ *  m_easter_ear_mode (0: use current date, 1: always on, 2: always off).
+ */
+bool isEasterMode(int day, int month, int year, int before_after_days)
+{
+    switch (UserConfigParams::m_easter_ear_mode)
+    {
+    case 0:
+    {
+        // Compute Easter date, based on wikipedia formula
+        // http://en.wikipedia.org/wiki/Computus
+        int a = year % 19;
+        int b = year >> 2;
+        int c = int(floor(b / 25)) + 1;
+        int d = (c * 3) >> 2;
+        int e = ((a * 19) - int(floor((c * 8 + 5) / 25)) + d + 15) % 30;
+        e += (29578 - a - e * 32) >> 10;
+        e -= ((year % 7) + b - d + e + 2) % 7;
+        d = e >> 5;
+        int easter_day = e - d * 31;
+        int easter_month = d + 3;
+
+        int easter_start_day = easter_day - before_after_days;
+        int easter_start_month = easter_month;
+        if (easter_start_day < 1)
+        {
+            easter_start_day += 31; // Month is April, going into March
+            easter_start_month--;
+        }
+        int easter_end_day = easter_day + before_after_days;
+        int easter_end_month = easter_month;
+        int month_length = easter_end_month == 3 ? 31 : 30;
+        if (easter_end_day > month_length)
+        {
+            easter_end_day -= month_length;
+            easter_end_month++;
+        }
+        return (month > easter_start_month || (month == easter_start_month && day >= easter_start_day)) &&
+               (month < easter_end_month   || (month == easter_end_month   && day <= easter_end_day));
+        break;
+    }
+    case 1:  return true;  break;
+    default: return false; break;
+    }   // switch m_xmas_mode
+
+}   // isEasterMode(day, month, year, before_after_days)
+
+// ============================================================================
+/** Wrapper around handleEasterEarMode(day, month, year, before_after_days).
+ */
+void handleEasterEarMode()
+{
+    int day, month, year;
+    StkTime::getDate(&day, &month, &year);
+    if (isEasterMode(day, month, year, /*before_after_days*/5))
+        kart_properties_manager->setHatMeshName("easter_ears.b3d");
+}   // handleEasterMode
+
+// ============================================================================
 /** This function sets up all data structure for an immediate race start.
  *  It is used when the -N or -R command line options are used.
  */
@@ -478,14 +539,16 @@ void cmdLineHelp()
     // "                            n=1: recorded positions\n"
     // "                            n=2: recorded key strokes\n"
     "       --server           Start a server (not a playing client).\n"
-    "       --login=s          Automatically sign in (set the login).\n"
-    "       --password=s       Automatically sign in (set the password).\n"
+    "       --login=s          Automatically log in (set the login).\n"
+    "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
     "       --no-console       Does not write messages in the console but to\n"
     "                          stdout.log.\n"
     "       --console          Write messages in the console and files\n"
     "  -h,  --help             Show this help.\n"
+    "       --log=N            Set the verbosity to a value between\n"
+    "                          0 (Debug) and 5 (Only Fatal messages)\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "http://supertuxkart.sourceforge.net\n\n",
@@ -494,14 +557,10 @@ void cmdLineHelp()
 }   // cmdLineHelp
 
 //=============================================================================
-/** For base options that don't need much to be inited (and, in some cases,
- *  that need to be read before initing stuff) - it only assumes that
- *  user config is loaded (necessary to check for blacklisted screen
- *  resolutions), but nothing else (esp. not kart_properties_manager and
- *  track_manager, since their search path might be extended by command
- *  line options).
+/** For base options that modify the output (loglevel/color) or exit right
+ * after being processed (version/help).
  */
-int handleCmdLinePreliminary()
+int handleCmdLineOutputModifier()
 {
     if (CommandLine::has("--help") || CommandLine::has("-help") ||
         CommandLine::has("-h"))
@@ -524,7 +583,36 @@ int handleCmdLinePreliminary()
         exit(0);
     }
 
-    if(CommandLine::has("--gamepad-visualisation") ||   // only BE
+    int n;
+    if(CommandLine::has("--log", &n))
+        Log::setLogLevel(n);
+
+    if(CommandLine::has("--log=nocolor"))
+    {
+        Log::disableColor();
+        Log::verbose("main", "Colours disabled.");
+    }
+
+    if(CommandLine::has("--console"))
+        UserConfigParams::m_log_errors_to_console=true;
+    if(CommandLine::has("--no-console"))
+        UserConfigParams::m_log_errors_to_console=false;
+
+
+    return 0;
+}
+
+//=============================================================================
+/** For base options that don't need much to be inited (and, in some cases,
+ *  that need to be read before initing stuff) - it only assumes that
+ *  user config is loaded (necessary to check for blacklisted screen
+ *  resolutions), but nothing else (esp. not kart_properties_manager and
+ *  track_manager, since their search path might be extended by command
+ *  line options).
+ */
+int handleCmdLinePreliminary()
+{
+   if(CommandLine::has("--gamepad-visualisation") ||   // only BE
        CommandLine::has("--gamepad-visualization")    ) // both AE and BE
         UserConfigParams::m_gamepad_visualisation=true;
     if(CommandLine::has("--debug=memory"))
@@ -539,17 +627,8 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
     if(CommandLine::has("--debug=all") )
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
-    if(CommandLine::has("--console"))
-        UserConfigParams::m_log_errors_to_console=true;
-    if(CommandLine::has("--no-console"))
-        UserConfigParams::m_log_errors_to_console=false;
     if(CommandLine::has("--online"))
         MainMenuScreen::m_enable_online=true;
-    if(CommandLine::has("--log=nocolor"))
-    {
-        Log::disableColor();
-        Log::verbose("main", "Colours disabled.");
-    }
 
     std::string s;
     if(CommandLine::has("--stk-config", &s))
@@ -637,8 +716,8 @@ int handleCmdLinePreliminary()
     int n;
     if(CommandLine::has("--xmas", &n))
         UserConfigParams::m_xmas_mode = n;
-    if(CommandLine::has("--log", &n))
-        Log::setLogLevel(n);
+    if (CommandLine::has("--easter", &n))
+        UserConfigParams::m_easter_ear_mode = n;
 
     return 0;
 }   // handleCmdLinePreliminary
@@ -656,9 +735,13 @@ int handleCmdLine()
     bool try_login = false;
     irr::core::stringw login, password;
 
-    if(CommandLine::has("--gamepad-debug"))
+    if (CommandLine::has("--unit-testing"))
+        UserConfigParams::m_unit_testing = true;
+    if (CommandLine::has("--gamepad-debug"))
         UserConfigParams::m_gamepad_debug=true;
-    if(CommandLine::has("--wiimote-debug"))
+    if (CommandLine::has("--keyboard-debug"))
+        UserConfigParams::m_keyboard_debug = true;
+    if (CommandLine::has("--wiimote-debug"))
         UserConfigParams::m_wiimote_debug = true;
     if(CommandLine::has("--tutorial-debug"))
             UserConfigParams::m_tutorial_debug = true;
@@ -989,11 +1072,13 @@ int handleCmdLine()
  */
 void initUserConfig()
 {
-    irr_driver              = new IrrDriver();
-    file_manager            = new FileManager();
+    file_manager = new FileManager();
     user_config             = new UserConfig();     // needs file_manager
     user_config->loadConfig();
-    file_manager->discoverPaths();
+    // Some parts of the file manager needs user config (paths for models
+    // depend on artist debug flag). So init the rest of the file manager
+    // after reading the user config file.
+    file_manager->init();
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -1008,13 +1093,15 @@ void initUserConfig()
     translations            = new Translations();   // needs file_manager
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
-
 }   // initUserConfig
 
 //=============================================================================
 void initRest()
 {
     stk_config->load(file_manager->getAsset("stk_config.xml"));
+
+    irr_driver = new IrrDriver();
+    StkTime::init();   // grabs the timer object from the irrlicht device
 
     // Now create the actual non-null device in the irrlicht driver
     irr_driver->initDevice();
@@ -1045,7 +1132,7 @@ void initRest()
     Online::RequestManager::get()->startNetworkThread();
     NewsManager::get();   // this will create the news manager
 
-    music_manager           = new MusicManager();
+    music_manager = new MusicManager();
     SFXManager::create();
     // The order here can be important, e.g. KartPropertiesManager needs
     // defaultKartProperties, which are defined in stk_config.
@@ -1058,6 +1145,10 @@ void initRest()
     powerup_manager         = new PowerupManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
+
+    // The maximum texture size can not be set earlier, since
+    // e.g. the background image needs to be loaded in high res.
+    irr_driver->setMaxTextureSize();
     KartPropertiesManager::addKartSearchDir(
                  file_manager->getAddonsFile("karts/"));
     track_manager->addTrackSearchDir(
@@ -1087,7 +1178,7 @@ void initRest()
 
     if (!track_manager->getTrack(UserConfigParams::m_last_track))
         UserConfigParams::m_last_track.revertToDefaults();
-        
+
     race_manager->setTrack(UserConfigParams::m_last_track);
 
 }   // initRest
@@ -1095,48 +1186,50 @@ void initRest()
 //=============================================================================
 void askForInternetPermission()
 {
-    if (UserConfigParams::m_internet_status ==
+    if (UserConfigParams::m_internet_status !=
         Online::RequestManager::IPERM_NOT_ASKED)
+        return;
+
+    class ConfirmServer :
+          public MessageDialog::IConfirmDialogListener
     {
-        class ConfirmServer :
-            public MessageDialog::IConfirmDialogListener
+    public:
+        virtual void onConfirm()
         {
-        public:
-            virtual void onConfirm()
-            {
-                // Typically internet is disabled here (just better safe
-                // than sorry). If internet should be allowed, the news
-                // manager needs to be started (which in turn activates
-                // the addons manager).
-                bool need_to_start_news_manager = 
-                     UserConfigParams::m_internet_status!=
-                                       Online::RequestManager::IPERM_ALLOWED;
-                UserConfigParams::m_internet_status =
-                    Online::RequestManager::IPERM_ALLOWED;
-                if(need_to_start_news_manager)
-                    NewsManager::get()->init(false);
-                GUIEngine::ModalDialog::dismiss();
-            }   // onConfirm
-            // --------------------------------------------------------
-            virtual void onCancel()
-            {
-                UserConfigParams::m_internet_status =
-                    Online::RequestManager::IPERM_NOT_ALLOWED;
-                GUIEngine::ModalDialog::dismiss();
-            }   // onCancel
-        };   // ConfirmServer
+            // Typically internet is disabled here (just better safe
+            // than sorry). If internet should be allowed, the news
+            // manager needs to be started (which in turn activates
+            // the addons manager).
+            bool need_to_start_news_manager =
+                UserConfigParams::m_internet_status !=
+                                  Online::RequestManager::IPERM_ALLOWED;
+            UserConfigParams::m_internet_status =
+                                  Online::RequestManager::IPERM_ALLOWED;
+            if (need_to_start_news_manager)
+                NewsManager::get()->init(false);
+            GUIEngine::ModalDialog::dismiss();
+        }   // onConfirm
+        // --------------------------------------------------------
+        virtual void onCancel()
+        {
+            UserConfigParams::m_internet_status =
+                Online::RequestManager::IPERM_NOT_ALLOWED;
+            GUIEngine::ModalDialog::dismiss();
+        }   // onCancel
+    };   // ConfirmServer
 
-        new MessageDialog(_("SuperTuxKart may connect to a server "
-            "to download add-ons and notify you of updates. We also collect "
-            "anonymous hardware statistics to help with the development of STK. "
-            "Would you like this feature to be enabled? (To change this setting "
-            "at a later time, go to options, select tab "
-            "'User Interface', and edit \"Allow STK to connect to the "
-            "Internet\" and \"Allow STK to send anonymous HW statistics\")."),
-            MessageDialog::MESSAGE_DIALOG_YESNO,
-            new ConfirmServer(), true);
-    }
-
+    GUIEngine::ModalDialog *dialog =
+    new MessageDialog(_("SuperTuxKart may connect to a server "
+        "to download add-ons and notify you of updates. We also collect "
+        "anonymous hardware statistics to help with the development of STK. "
+        "Please read our privacy policy at http://privacy.supertuxkart.net. "
+        "Would you like this feature to be enabled? (To change this setting "
+        "at a later time, go to options, select tab "
+        "'User Interface', and edit \"Connect to the "
+        "Internet\" and \"Send anonymous HW statistics\")."),
+        MessageDialog::MESSAGE_DIALOG_YESNO,
+        new ConfirmServer(), true, true);
+    GUIEngine::DialogQueue::get()->pushDialog(dialog, false);
 }   // askForInternetPermission
 
 //=============================================================================
@@ -1161,6 +1254,9 @@ int main(int argc, char *argv[] )
     try
     {
         std::string s;
+
+        handleCmdLineOutputModifier();
+
         if(CommandLine::has("--root", &s))
         {
             FileManager::addRootDirs(s);
@@ -1189,13 +1285,16 @@ int main(int argc, char *argv[] )
         // Load the font textures - they are all lazily loaded
         // so no need to push a texture search path. They will actually
         // be loaded from ScalableFont.
+        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::FONT, ""));
         material_manager->addSharedMaterial(
                    file_manager->getAsset(FileManager::FONT,"materials.xml"));
+        file_manager->popTextureSearchPath();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
         handleXmasMode();
+        handleEasterEarMode();
 
         // Needs the kart and track directories to load potential challenges
         // in those dirs, so it can only be created after reading tracks
@@ -1228,7 +1327,7 @@ int main(int argc, char *argv[] )
             material_manager->addSharedMaterial(materials_file);
         }
         Referee::init();
-        powerup_manager         -> loadAllPowerups ();
+        powerup_manager->loadAllPowerups();
         ItemManager::loadDefaultItemMeshes();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
@@ -1280,6 +1379,38 @@ int main(int argc, char *argv[] )
             }
         }
 
+        if(UserConfigParams::m_unit_testing)
+        {
+            runUnitTests();
+            exit(0);
+        }
+
+        if (!ProfileWorld::isNoGraphics() &&
+            GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+        {
+            if (UserConfigParams::m_old_driver_popup)
+            {
+                MessageDialog *dialog =
+                    new MessageDialog(_("Your driver version is too old. Please install "
+                    "the latest video drivers."),
+                    /*from queue*/ true);
+                GUIEngine::DialogQueue::get()->pushDialog(dialog);
+            }
+            Log::warn("OpenGL", "Driver is too old!");
+        }
+        else if (!CVS->isGLSL())
+        {
+            if (UserConfigParams::m_old_driver_popup)
+            {
+                MessageDialog *dialog =
+                    new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
+                    "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
+                    /*from queue*/ true);
+                GUIEngine::DialogQueue::get()->pushDialog(dialog);
+            }
+            Log::warn("OpenGL", "OpenGL version is too old!");
+        }
+
         // Note that on the very first run of STK internet status is set to
         // "not asked", so the report will only be sent in the next run.
         if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
@@ -1304,8 +1435,11 @@ int main(int argc, char *argv[] )
                 // If there is no player, push the RegisterScreen on top of
                 // the login screen. This way on first start players are
                 // forced to create a player.
-                if(PlayerManager::get()->getNumPlayers()==0)
+                if (PlayerManager::get()->getNumPlayers() == 0)
+                {
                     RegisterScreen::getInstance()->push();
+                    RegisterScreen::getInstance()->setParent(UserScreen::getInstance());
+                }
             }
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */
@@ -1409,6 +1543,8 @@ int main(int argc, char *argv[] )
     }
 #endif
 
+    delete file_manager;
+
     return 0 ;
 }   // main
 
@@ -1433,6 +1569,9 @@ static void cleanSuperTuxKart()
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
 
+    // Stop music (this request will go into the sfx manager queue, so it needs
+    // to be done before stopping the thread).
+    music_manager->stopMusic();
     SFXManager::get()->stopThread();
     irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
@@ -1450,8 +1589,6 @@ static void cleanSuperTuxKart()
     if(material_manager)        delete material_manager;
     if(history)                 delete history;
     ReplayRecorder::destroy();
-    SFXManager::destroy();
-    if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();
     PlayerManager::destroy();
     if(unlock_manager)          delete unlock_manager;
@@ -1477,6 +1614,17 @@ static void cleanSuperTuxKart()
         Log::info("Thread", "Request Manager not aborting in time, aborting.");
     }
     Online::RequestManager::deallocate();
+
+    if (!SFXManager::get()->waitForReadyToDeleted(2.0f))
+    {
+        Log::info("Thread", "SFXManager not stopping, exiting anyway.");
+    }
+    SFXManager::destroy();
+
+    // Music manager can not be deleted before the sfx thread is stopped
+    // (since sfx commands can contain music information, which are
+    // deleted by the music manager).
+    delete music_manager;
 
     // The addons manager might still be called from a currenty running request
     // in the request manager, so it can not be deleted earlier.
@@ -1509,6 +1657,40 @@ static void cleanUserConfig()
         delete user_config;
     }
 
-    if(file_manager)            delete file_manager;
     if(irr_driver)              delete irr_driver;
-}
+}   // cleanUserConfig
+
+//=============================================================================
+void runUnitTests()
+{
+    GraphicsRestrictions::unitTesting();
+    // Test easter mode: in 2015 Easter is 5th of April - check with 0 days
+    // before and after
+    int saved_easter_mode = UserConfigParams::m_easter_ear_mode;
+    UserConfigParams::m_easter_ear_mode = 0;   // disable always on or off mode
+    assert( isEasterMode( 5, 4, 2015, 0));
+    assert(!isEasterMode( 4, 4, 2015, 0));
+    assert(!isEasterMode( 6, 4, 2015, 0));
+
+    assert( isEasterMode( 1, 4, 2018, 0));
+    assert( isEasterMode(27, 3, 2016, 0));
+
+    // Check days before/after
+    assert( isEasterMode( 2, 4, 2015, 3));
+    assert(!isEasterMode( 1, 4, 2015, 3));
+    assert( isEasterMode( 8, 4, 2015, 3));
+    assert(!isEasterMode( 9, 4, 2015, 3));
+
+    // Check if going to previous month is handled correctly: 1/4/2018
+    assert( isEasterMode(27, 3, 2018, 5));
+    assert(!isEasterMode(26, 3, 2018, 5));
+    assert( isEasterMode( 6, 4, 2018, 5));
+    assert(!isEasterMode( 7, 4, 2018, 5));
+
+    // Check if going to previous month is handled correctly: 1/4/2018
+    assert( isEasterMode( 1, 4, 2016, 5));
+    assert(!isEasterMode( 2, 4, 2016, 5));
+    assert( isEasterMode(22, 3, 2016, 5));
+    assert(!isEasterMode(21, 3, 2016, 5));
+    UserConfigParams::m_easter_ear_mode = saved_easter_mode;
+}   // unitTesting

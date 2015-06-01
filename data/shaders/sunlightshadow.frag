@@ -1,11 +1,12 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
-uniform sampler2DArray shadowtex;
+uniform sampler2DArrayShadow shadowtex;
 
 uniform float split0;
 uniform float split1;
 uniform float split2;
 uniform float splitmax;
+uniform float shadow_res;
 
 in vec2 uv;
 out vec4 Diff;
@@ -15,26 +16,24 @@ vec3 DecodeNormal(vec2 n);
 vec3 SpecularBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 vec3 DiffuseBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
-
-vec3 getMostRepresentativePoint(vec3 direction, vec3 R, float angularRadius)
-{
-    vec3 D = direction;
-    float d = cos(angularRadius);
-    float r = sin(angularRadius);
-    float DdotR = dot(D, R);
-    vec3 S = R - DdotR * D;
-    return (DdotR < d) ? normalize(d * D + normalize (S) * r) : R;
-}
+vec3 SunMRP(vec3 normal, vec3 eyedir);
 
 float getShadowFactor(vec3 pos, int index)
 {
     vec4 shadowcoord = (ShadowViewProjMatrixes[index] * InverseViewMatrix * vec4(pos, 1.0));
     shadowcoord.xy /= shadowcoord.w;
     vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
+    float d = .5 * shadowcoord.z + .5;
 
-    float z = texture(shadowtex, vec3(shadowtexcoord, float(index))).x;
-    float d = shadowcoord.z;
-    return min(pow(exp(-32. * d) * z, 8.), 1.);
+    float result = 0.;
+
+    for (float i = -1.; i <= 1.; i += 1.)
+    {
+        for (float j = -1.; j <= 1.; j += 1.)
+            result += texture(shadowtex, vec4(shadowtexcoord + vec2(i,j) / shadow_res, float(index), d));
+    }
+
+    return result / 9.;
 }
 
 void main() {
@@ -46,12 +45,8 @@ void main() {
     float roughness =texture(ntex, uv).z;
     vec3 eyedir = -normalize(xpos.xyz);
 
-    vec3 L = normalize((transpose(InverseViewMatrix) * vec4(sun_direction, 0.)).xyz);
-    float NdotL = clamp(dot(norm, L), 0., 1.);
-
-    float angle = 3.14 * sun_angle / 180.;
-    vec3 R = reflect(-eyedir, norm);
-    vec3 Lightdir = getMostRepresentativePoint(L, R, angle);
+    vec3 Lightdir = SunMRP(norm, eyedir);
+    float NdotL = clamp(dot(norm, Lightdir), 0., 1.);
 
     vec3 Specular = SpecularBRDF(norm, eyedir, Lightdir, vec3(1.), roughness);
     vec3 Diffuse = DiffuseBRDF(norm, eyedir, Lightdir, vec3(1.), roughness);

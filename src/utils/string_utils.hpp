@@ -1,8 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013  Steve Baker <sjbaker1@airmail.net>,
-//  Copyright (C) 2004-2013  Ingo Ruhnke <grumbel@gmx.de>
-//  Copyright (C) 2006-2013  SuperTuxKart-Team
+//  Copyright (C) 2004-2015  Steve Baker <sjbaker1@airmail.net>,
+//  Copyright (C) 2004-2015  Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015  SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -59,9 +59,9 @@ namespace StringUtils
     std::vector<std::string>        splitPath(const std::string& path);
     std::string replace(const std::string& other, const std::string& from, const std::string& to);
 
-    irr::core::stringw decodeFromHtmlEntities(const std::string& input);
+    irr::core::stringw xmlDecode(const std::string& input);
 
-    std::string encodeToHtmlEntities(const irr::core::stringw &output);
+    std::string xmlEncode(const irr::core::stringw &output);
 
     // ------------------------------------------------------------------------
     template <class T>
@@ -259,7 +259,7 @@ namespace StringUtils
             all_vals.push_back(irr::core::stringw(std::forward<T>(v)));
             __Fill(all_vals, std::forward<Args>(args)...);
         }
-
+    
         static void __Fill(std::vector<irr::core::stringw>&) {}
     };
 
@@ -362,6 +362,11 @@ namespace StringUtils
     {
         return parseString(input.c_str(), output);
     }   // parseString
+
+    // ------------------------------------------------------------------------
+    
+    std::string wide_to_utf8(const wchar_t* input);
+    irr::core::stringw utf8_to_wide(const char* input);
 
 } // namespace StringUtils
 

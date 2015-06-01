@@ -1,4 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -92,6 +93,7 @@
 #define SHADER_NAMES
 
 #include "graphics/callbacks.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/gpuparticles.hpp"
 #include "graphics/shaders.hpp"
@@ -145,22 +147,22 @@ GLuint LoadShader(const char * file, unsigned type)
 {
     GLuint Id = glCreateShader(type);
     char versionString[20];
-    sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
+    sprintf(versionString, "#version %d\n", CVS->getGLSLVersion());
     std::string Code = versionString;
-    if (irr_driver->hasVSLayerExtension())
+    if (CVS->isAMDVertexShaderLayerUsable())
         Code += "#extension GL_AMD_vertex_shader_layer : enable\n";
-    if (irr_driver->useAZDO())
+    if (CVS->isAZDOEnabled())
     {
         Code += "#extension GL_ARB_bindless_texture : enable\n";
         Code += "#define Use_Bindless_Texture\n";
     }
     std::ifstream Stream(file, std::ios::in);
     Code += "//" + std::string(file) + "\n";
-    if (irr_driver->needUBOWorkaround())
+    if (!CVS->isARBUniformBufferObjectUsable())
         Code += "#define UBO_DISABLED\n";
-    if (irr_driver->hasVSLayerExtension())
+    if (CVS->isAMDVertexShaderLayerUsable())
         Code += "#define VSLayer\n";
-    if (irr_driver->needsRGBBindlessWorkaround())
+    if (CVS->needsRGBBindlessWorkaround())
         Code += "#define SRGBBindlessFix\n";
     Code += LoadHeader();
     if (Stream.is_open())
@@ -237,7 +239,7 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
 {
     GLuint Program = glCreateProgram();
     loadAndAttach(Program, GL_VERTEX_SHADER, vertex_file_path);
-    if (irr_driver->getGLSLVersion() < 330)
+    if (CVS->getGLSLVersion() < 330)
         setAttribute(PARTICLES_SIM, Program);
     glTransformFeedbackVaryings(Program, varyingscount, varyings, GL_INTERLEAVED_ATTRIBS);
     glLinkProgram(Program);
@@ -335,66 +337,19 @@ static void initBillboardVBO()
     glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad, GL_STATIC_DRAW);
 }
 
-GLuint SharedObject::cubevbo = 0;
-GLuint SharedObject::cubeindexes = 0;
+GLuint SharedObject::skytrivbo = 0;
 
-static void initCubeVBO()
+static void initSkyTriVBO()
 {
-    // From CSkyBoxSceneNode
-    float corners[] =
-        {
-            // top side
-            1., 1., -1.,
-            1., 1., 1.,
-            -1., 1., 1.,
-            -1., 1., -1.,
+  const float tri_vertex[] = {
+      -1., -1., 1.,
+      -1., 3., 1.,
+      3., -1., 1.,
+  };
 
-            // Bottom side
-            1., -1., 1.,
-            1., -1., -1.,
-            -1., -1., -1.,
-            -1., -1., 1.,
-
-            // right side
-            1., -1, -1,
-            1., -1, 1,
-            1., 1., 1.,
-            1., 1., -1.,
-
-            // left side
-            -1., -1., 1.,
-            -1., -1., -1.,
-            -1., 1., -1.,
-            -1., 1., 1.,
-
-            // back side
-            -1., -1., -1.,
-            1., -1, -1.,
-            1, 1, -1.,
-            -1, 1, -1.,
-
-            // front side
-            1., -1., 1.,
-            -1., -1., 1.,
-            -1, 1., 1.,
-            1., 1., 1.,
-        };
-    int indices[] = {
-        0, 1, 2, 2, 3, 0,
-        4, 5, 6, 6, 7, 4,
-        8, 9, 10, 10, 11, 8,
-        12, 13, 14, 14, 15, 12,
-        16, 17, 18, 18, 19, 16,
-        20, 21, 22, 22, 23, 20
-    };
-
-    glGenBuffers(1, &SharedObject::cubevbo);
-    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::cubevbo);
-    glBufferData(GL_ARRAY_BUFFER, 6 * 4 * 3 * sizeof(float), corners, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &SharedObject::cubeindexes);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::cubeindexes);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
+    glGenBuffers(1, &SharedObject::skytrivbo);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::skytrivbo);
+    glBufferData(GL_ARRAY_BUFFER, 3 * 3 * sizeof(float), tri_vertex, GL_STATIC_DRAW);
 }
 
 GLuint SharedObject::frustrumvbo = 0;
@@ -534,7 +489,7 @@ void Shaders::loadShaders()
     initQuadVBO();
     initQuadBuffer();
     initBillboardVBO();
-    initCubeVBO();
+    initSkyTriVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
     initLightingDataUBO();
@@ -695,7 +650,7 @@ using namespace UtilShader;
 
 bool needsUBO()
 {
-    return irr_driver->needUBOWorkaround();
+    return !CVS->isARBUniformBufferObjectUsable();
 }
 
 void setTextureSampler(GLenum tp, GLuint texunit, GLuint tid, GLuint sid)
@@ -862,10 +817,8 @@ GLuint createShadowSampler()
     glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    int aniso = UserConfigParams::m_anisotropic;
-    if (aniso == 0) aniso = 1;
-    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
+    glSamplerParameterf(id, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glSamplerParameterf(id, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     return id;
 #endif
 }
@@ -882,6 +835,38 @@ void BindTextureShadow(GLuint TU, GLuint tex)
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 }
 
+
+GLuint createTrilinearClampedArray()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    int aniso = UserConfigParams::m_anisotropic;
+    if (aniso == 0) aniso = 1;
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
+    return id;
+#endif
+}
+
+void BindTrilinearClampedArrayTexture(unsigned TU, unsigned tex)
+{
+    glActiveTexture(GL_TEXTURE0 + TU);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    int aniso = UserConfigParams::m_anisotropic;
+    if (aniso == 0) aniso = 1;
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
+}
+
 void BindTextureVolume(GLuint TU, GLuint tex)
 {
     glActiveTexture(GL_TEXTURE0 + TU);
@@ -895,7 +880,7 @@ void BindTextureVolume(GLuint TU, GLuint tex)
 
 unsigned getGLSLVersion()
 {
-    return irr_driver->getGLSLVersion();
+    return CVS->getGLSLVersion();
 }
 
 namespace UtilShader
@@ -1195,9 +1180,9 @@ namespace MeshShader
     ShadowShader::ShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
@@ -1247,9 +1232,9 @@ namespace MeshShader
     InstancedShadowShader::InstancedShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
@@ -1270,9 +1255,9 @@ namespace MeshShader
     RefShadowShader::RefShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
@@ -1292,9 +1277,9 @@ namespace MeshShader
     InstancedRefShadowShader::InstancedRefShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
@@ -1316,9 +1301,9 @@ namespace MeshShader
     GrassShadowShader::GrassShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow_grass.vert").c_str(),
@@ -1338,9 +1323,9 @@ namespace MeshShader
     InstancedGrassShadowShader::InstancedGrassShadowShader()
     {
         // Geometry shader needed
-        if (irr_driver->getGLSLVersion() < 150)
+        if (CVS->getGLSLVersion() < 150)
             return;
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
@@ -1386,17 +1371,16 @@ namespace MeshShader
     SkyboxShader::SkyboxShader()
     {
         Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/sky.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sky.frag").c_str());
-        AssignUniforms("ModelMatrix");
+        AssignUniforms();
         AssignSamplerNames(Program, 0, "tex");
 
-        glGenVertexArrays(1, &cubevao);
-        glBindVertexArray(cubevao);
-        glBindBuffer(GL_ARRAY_BUFFER, SharedObject::cubevbo);
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, SharedObject::skytrivbo);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::cubeindexes);
         glBindVertexArray(0);
     }
 
@@ -1638,6 +1622,7 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SunMRP.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
 
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex");
@@ -1657,7 +1642,20 @@ namespace FullScreenShader
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "probe");
     }
 
-    ShadowedSunLightShader::ShadowedSunLightShader()
+    DegradedIBLShader::DegradedIBLShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularIBL.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/degraded_ibl.frag").c_str());
+        AssignUniforms();
+        AssignSamplerNames(Program, 0, "ntex");
+    }
+
+    ShadowedSunLightShaderPCF::ShadowedSunLightShaderPCF()
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
@@ -1665,16 +1663,33 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SunMRP.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
 
         // Use 8 to circumvent a catalyst bug when binding sampler
         AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
-        AssignUniforms("split0", "split1", "split2", "splitmax", "direction", "col");
+        AssignUniforms("split0", "split1", "split2", "splitmax", "shadow_res");
+    }
+
+    ShadowedSunLightShaderESM::ShadowedSunLightShaderESM()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SpecularBRDF.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/DiffuseBRDF.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/SunMRP.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadowesm.frag").c_str());
+
+        // Use 8 to circumvent a catalyst bug when binding sampler
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
+        AssignUniforms("split0", "split1", "split2", "splitmax");
     }
 
     RadianceHintsConstructionShader::RadianceHintsConstructionShader()
     {
-        if (irr_driver->hasVSLayerExtension())
+        if (CVS->isAMDVertexShaderLayerUsable())
         {
             Program = LoadProgram(OBJECT,
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/slicedscreenquad.vert").c_str(),
@@ -1861,11 +1876,10 @@ namespace FullScreenShader
     {
         Program = LoadProgram(OBJECT,
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/passthrough.frag").c_str());
 
-        AssignUniforms();
+        AssignUniforms("width", "height");
         AssignSamplerNames(Program, 0, "tex");
-        vao = createVAO(Program);
     }
 
     LayerPassThroughShader::LayerPassThroughShader()
@@ -1899,6 +1913,17 @@ namespace FullScreenShader
         AssignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
         GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
         glShaderStorageBlockBinding(Program, block_idx, 2);
+    }
+
+    ShadowMatrixesGenerationShader::ShadowMatrixesGenerationShader()
+    {
+        Program = LoadProgram(OBJECT,
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/shadowmatrixgeneration.comp").c_str());
+        AssignUniforms("SunCamMatrix");
+        GLuint block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
+        glShaderStorageBlockBinding(Program, block_idx, 2);
+        block_idx = glGetProgramResourceIndex(Program, GL_SHADER_STORAGE_BLOCK, "NewMatrixData");
+        glShaderStorageBlockBinding(Program, block_idx, 1);
     }
 
     DepthHistogramShader::DepthHistogramShader()
@@ -1964,7 +1989,6 @@ namespace FullScreenShader
         AssignUniforms("col");
 
         AssignSamplerNames(Program, 0, "tex");
-        vao = createVAO(Program);
     }
 
     GodRayShader::GodRayShader()
@@ -1975,18 +1999,16 @@ namespace FullScreenShader
 
         AssignUniforms("sunpos");
         AssignSamplerNames(Program, 0, "tex");
-        vao = createVAO(Program);
     }
 
     MLAAColorEdgeDetectionSHader::MLAAColorEdgeDetectionSHader()
     {
         Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/mlaa_offset.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_color1.frag").c_str());
         AssignUniforms("PIXEL_SIZE");
 
         AssignSamplerNames(Program, 0, "colorMapG");
-        vao = createVAO(Program);
     }
 
     MLAABlendWeightSHader::MLAABlendWeightSHader()
@@ -1997,18 +2019,16 @@ namespace FullScreenShader
         AssignUniforms("PIXEL_SIZE");
 
         AssignSamplerNames(Program, 0, "edgesMap", 1, "areaMap");
-        vao = createVAO(Program);
     }
 
     MLAAGatherSHader::MLAAGatherSHader()
     {
         Program = LoadProgram(OBJECT,
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/mlaa_offset.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_neigh3.frag").c_str());
         AssignUniforms("PIXEL_SIZE");
 
         AssignSamplerNames(Program, 0, "blendMap", 1, "colorMap");
-        vao = createVAO(Program);
     }
 }
 

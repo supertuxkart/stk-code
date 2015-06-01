@@ -14,8 +14,6 @@ extern bool GLContextDebugBit;
 #include "COpenGLMaterialRenderer.h"
 #include "COpenGLShaderMaterialRenderer.h"
 #include "COpenGLSLMaterialRenderer.h"
-#include "COpenGLCgMaterialRenderer.h"
-#include "COpenGLNormalMapRenderer.h"
 #include "COpenGLParallaxMapRenderer.h"
 #include "os.h"
 
@@ -49,10 +47,6 @@ COpenGLDriver::COpenGLDriver(const irr::SIrrlichtCreationParameters& params,
 {
 	#ifdef _DEBUG
 	setDebugName("COpenGLDriver");
-	#endif
-
-	#ifdef _IRR_COMPILE_WITH_CG_
-	CgContext = 0;
 	#endif
 }
 
@@ -89,93 +83,96 @@ bool COpenGLDriver::changeRenderContext(const SExposedVideoData& videoData, CIrr
 
 static PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs_ARB;
 
-static HGLRC getMeAGLContext(HDC HDc)
+static HGLRC getMeAGLContext(HDC HDc, bool force_legacy_context)
 {
-    useCoreContext = true;
-    HGLRC hrc = 0;
-    int ctx44debug[] =
+    if (!force_legacy_context)
     {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        0
-    };
+        useCoreContext = true;
+        HGLRC hrc = 0;
+        int ctx44debug[] =
+        {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0
+        };
 
-    int ctx44[] =
-    {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        0
-    };
+        int ctx44[] =
+        {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0
+        };
 
-    hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx44debug : ctx44);
-    if (hrc)
-        return hrc;
+        hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx44debug : ctx44);
+        if (hrc)
+            return hrc;
 
-    int ctx40debug[] =
-    {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 0,
-        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        0
-    };
+        int ctx40debug[] =
+        {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0
+        };
 
-    int ctx40[] =
-    {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 0,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        0
-    };
+        int ctx40[] =
+        {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0
+        };
 
-    hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx40debug : ctx40);
-    if (hrc)
-        return hrc;
+        hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx40debug : ctx40);
+        if (hrc)
+            return hrc;
 
-    int ctx33debug[] =
-    {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        0
-    };
+        int ctx33debug[] =
+        {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0
+        };
 
-    int ctx33[] =
-    {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        0
-    };
+        int ctx33[] =
+        {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0
+        };
 
-    hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx33debug : ctx33);
-    if (hrc)
-        return hrc;
+        hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx33debug : ctx33);
+        if (hrc)
+            return hrc;
 
-    int ctx31debug[] =
-    {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        0
-    };
+        int ctx31debug[] =
+        {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0
+        };
 
-    int ctx31[] =
-    {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        0
-    };
+        int ctx31[] =
+        {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0
+        };
 
-    hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx31debug : ctx31);
-    if (hrc)
-        return hrc;
+        hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx31debug : ctx31);
+        if (hrc)
+            return hrc;
+    }   // if (!force_legacy_context)
 
     useCoreContext = false;
     int legacyctx[] =
@@ -184,7 +181,7 @@ static HGLRC getMeAGLContext(HDC HDc)
         WGL_CONTEXT_MINOR_VERSION_ARB, 1,
         0
     };
-    hrc = wglCreateContextAttribs_ARB(HDc, 0, legacyctx);
+    HGLRC hrc = wglCreateContextAttribs_ARB(HDc, 0, legacyctx);
     if (hrc)
         return hrc;
 
@@ -516,7 +513,7 @@ bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 #ifdef WGL_ARB_create_context
 	if (wglCreateContextAttribs_ARB)
 	{
-        hrc = getMeAGLContext(HDc);
+        hrc = getMeAGLContext(HDc, Params.ForceLegacyDevice);
     }
 	else
 #endif
@@ -585,10 +582,6 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 	setDebugName("COpenGLDriver");
 	#endif
 
-	#ifdef _IRR_COMPILE_WITH_CG_
-	CgContext = 0;
-	#endif
-
 	genericDriverInit();
 }
 
@@ -610,10 +603,6 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 {
 	#ifdef _DEBUG
 	setDebugName("COpenGLDriver");
-	#endif
-
-	#ifdef _IRR_COMPILE_WITH_CG_
-	CgContext = 0;
 	#endif
 }
 
@@ -705,10 +694,6 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 	setDebugName("COpenGLDriver");
 	#endif
 
-	#ifdef _IRR_COMPILE_WITH_CG_
-	CgContext = 0;
-	#endif
-
 	genericDriverInit();
 }
 
@@ -718,11 +703,6 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 //! destructor
 COpenGLDriver::~COpenGLDriver()
 {
-	#ifdef _IRR_COMPILE_WITH_CG_
-	if (CgContext)
-		cgDestroyContext(CgContext);
-	#endif
-
 	RequestedLights.clear();
 
 	deleteMaterialRenders();
@@ -868,10 +848,6 @@ bool COpenGLDriver::genericDriverInit()
 	// This fixes problems with intermediate changes to the material during texture load.
 	ResetRenderStates = true;
 
-	#ifdef _IRR_COMPILE_WITH_CG_
-	CgContext = cgCreateContext();
-	#endif
-
 	return true;
 }
 
@@ -907,12 +883,6 @@ void COpenGLDriver::createMaterialRenderers()
 	// add normal map renderers
 	s32 tmp = 0;
 	video::IMaterialRenderer* renderer = 0;
-	renderer = new COpenGLNormalMapRenderer(this, tmp, MaterialRenderers[EMT_SOLID].Renderer);
-	renderer->drop();
-	renderer = new COpenGLNormalMapRenderer(this, tmp, MaterialRenderers[EMT_TRANSPARENT_ADD_COLOR].Renderer);
-	renderer->drop();
-	renderer = new COpenGLNormalMapRenderer(this, tmp, MaterialRenderers[EMT_TRANSPARENT_VERTEX_ALPHA].Renderer);
-	renderer->drop();
 
 	// add parallax map renderers
 	renderer = new COpenGLParallaxMapRenderer(this, tmp, MaterialRenderers[EMT_SOLID].Renderer);
@@ -4091,21 +4061,6 @@ s32 COpenGLDriver::addHighLevelShaderMaterial(
 {
 	s32 nr = -1;
 
-	#ifdef _IRR_COMPILE_WITH_CG_
-	if (shadingLang == EGSL_CG)
-	{
-		COpenGLCgMaterialRenderer* r = new COpenGLCgMaterialRenderer(
-			this, nr,
-			vertexShaderProgram, vertexShaderEntryPointName, vsCompileTarget,
-			pixelShaderProgram, pixelShaderEntryPointName, psCompileTarget,
-			geometryShaderProgram, geometryShaderEntryPointName, gsCompileTarget,
-			inType, outType, verticesOut,
-			callback,getMaterialRenderer(baseMaterial), userData);
-
-		r->drop();
-	}
-	else
-	#endif
 	{
 		COpenGLSLMaterialRenderer* r = new COpenGLSLMaterialRenderer(
 			this, nr,
@@ -4651,7 +4606,7 @@ IImage* COpenGLDriver::createScreenShot(video::ECOLOR_FORMAT format, video::E_RE
 		pixels = static_cast<u8*>(newImage->lock());
 	if (pixels)
 	{
-		GLenum tgt=GL_FRONT;
+		GLenum tgt=GL_BACK;
 		switch (target)
 		{
 		case video::ERT_FRAME_BUFFER:
@@ -4877,13 +4832,6 @@ GLenum COpenGLDriver::getZBufferBits() const
 	}
 	return bits;
 }
-
-#ifdef _IRR_COMPILE_WITH_CG_
-const CGcontext& COpenGLDriver::getCgContext()
-{
-	return CgContext;
-}
-#endif
 
 
 } // end namespace

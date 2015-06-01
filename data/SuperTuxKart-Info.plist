@@ -24,5 +24,7 @@
 	<string>0.8.1</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
+	<key>LSMinimumSystemVersion</key>
+    <string>10.9</string>
 </dict>
 </plist>

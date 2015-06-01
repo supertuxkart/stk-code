@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2008-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2008-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -38,6 +38,13 @@
 #include <iostream>
 #include <string>
 
+namespace irr {
+    namespace io
+    {
+        IFileSystem* createFileSystem();
+    }
+}
+
 // For mkdir
 #if !defined(WIN32)
 #  include <sys/stat.h>
@@ -46,7 +53,7 @@
 #  include <unistd.h>
 #else
 #  include <direct.h>
-#  include <Windows.h>
+#  include <windows.h>
 #  include <stdio.h>
 #  if !defined(__CYGWIN__ ) && !defined(__MINGW32__)
      /*Needed by the remove directory function */
@@ -98,13 +105,11 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
 // ============================================================================
 FileManager* file_manager = 0;
 
-/** With irrlicht the constructor creates a NULL device. This is necessary to
- *  handle the Chicken/egg problem with irrlicht: access to the file system
- *  is given from the device, but we can't create the device before reading
- *  the user_config file (for resolution, fullscreen). So we create a dummy
- *  device here to begin with, which is then later (once the real device
- *  exists) changed in reInit().
- *
+/** The constructor of the file manager creates an irrlicht file system and
+ *  detects paths for the user config file and assets base directory (data).
+ *  A second initialisation is done later once (see init()), once the user
+ *  config file is read. This is necessary since part of discoverPaths 
+ *  depend on artist debug mode.
  */
 FileManager::FileManager()
 {
@@ -135,8 +140,7 @@ FileManager::FileManager()
     chdir( buffer );
 #endif
 
-    m_file_system  = irr_driver->getDevice()->getFileSystem();
-    m_file_system->grab();
+    m_file_system = irr::io::createFileSystem();
 
     irr::io::path exe_path;
 
@@ -156,19 +160,19 @@ FileManager::FileManager()
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
-    else if(m_file_system->existFile("data"))
+    else if(m_file_system->existFile("data/stk_config.xml"))
         root_dir = "data/" ;
-    else if(m_file_system->existFile("../data"))
+    else if(m_file_system->existFile("../data/stk_config.xml"))
         root_dir = "../data/" ;
-    else if(m_file_system->existFile("../../data"))
+    else if(m_file_system->existFile("../../data/stk_config.xml"))
         root_dir = "../../data/" ;
     // Test for old style build environment, with executable in root of stk
-    else if(m_file_system->existFile(exe_path+"data"))
+    else if(m_file_system->existFile(exe_path+"data/stk_config.xml"))
         root_dir = (exe_path+"data/").c_str();
     // Check for windows cmake style: bld/Debug/bin/supertuxkart.exe
-    else if (m_file_system->existFile(exe_path + "../../../data"))
+    else if (m_file_system->existFile(exe_path + "../../../data/stk_config.xml"))
         root_dir = (exe_path + "../../../data/").c_str();
-    else if (m_file_system->existFile(exe_path + "../data"))
+    else if (m_file_system->existFile(exe_path + "../data/stk_config.xml"))
     {
         root_dir = exe_path.c_str();
         root_dir += "../data/";
@@ -268,27 +272,16 @@ void FileManager::discoverPaths()
     if(was_error)
         Log::fatal("[FileManager]", "Not all assets found - aborting.");
 
-
 }  // discoverPaths
 
- //-----------------------------------------------------------------------------
-/** Remove the dummy file system (which is called from IrrDriver before
- *  creating the actual device.
- */
-void FileManager::dropFileSystem()
-{
-    m_file_system->drop();
-}   // dropFileSystem
-
 //-----------------------------------------------------------------------------
-/** This function is used to re-initialise the file-manager after reading in
- *  the user configuration data.
-*/
-void FileManager::reInit()
+/** This function is used to initialise the file-manager after reading in
+ *  the user configuration data. Esp. discovering the paths of all assets
+ *  depends on the user config file (artist debug mode).
+ */
+void FileManager::init()
 {
-    m_file_system  = irr_driver->getDevice()->getFileSystem();
-    m_file_system->grab();
-
+    discoverPaths();
     // Note that we can't push the texture search path in the constructor
     // since this also adds a file archive to the file system - and
     // m_file_system is deleted (in irr_driver)
@@ -297,7 +290,6 @@ void FileManager::reInit()
         pushTextureSearchPath(m_subdir_name[TEXTURE]+"deprecated/");
 
     pushTextureSearchPath(m_subdir_name[GUI]);
-
 
     pushModelSearchPath  (m_subdir_name[MODEL]);
     pushMusicSearchPath  (m_subdir_name[MUSIC]);
@@ -310,7 +302,7 @@ void FileManager::reInit()
         for(int i=0;i<(int)dirs.size(); i++)
             pushMusicSearchPath(dirs[i]);
     }
-}   // reInit
+}   // init
 
 //-----------------------------------------------------------------------------
 FileManager::~FileManager()
@@ -1097,7 +1089,7 @@ std::string FileManager::getTextureCacheLocation(const std::string& filename)
         parent_dir = parent_dir.substr(0, parent_dir.size() - 1);
     parent_dir = StringUtils::getBasename(parent_dir);
 
-    std::string cache_subdir = UserConfigParams::m_high_definition_textures
+    std::string cache_subdir = (UserConfigParams::m_high_definition_textures & 0x01) == 0x01
                                ? "hd/"
                                : "resized/";
     std::string cached_file =

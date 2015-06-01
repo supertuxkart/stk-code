@@ -7,7 +7,7 @@
 
         <spacer width="1" height="5%"/>
 
-        <box width="95%" height="40%" padding="10" layout="horizontal-row">
+        <box width="100%" height="40%" padding="10" layout="horizontal-row">
             <!-- Left pane -->
             <div proportion="1" height="100%" layout="vertical-row">
                 <icon-button proportion="1" width="100%" height="100%" id="screenshot" custom_ratio="1.33333"/>
@@ -47,31 +47,33 @@
 
         </box>
         <spacer width="1" height="5%"/>
-        <box width="95%" height="25%" padding="10" layout="vertical-row">
-            <spacer width="1" height="5%"/>
-
-            <div width="75%" height="fit" layout="horizontal-row" >
-                <spacer width="40" height="2" />
-                <label id="lap-text" height="100%" width="40%" I18N="In the track info screen" text="Number of laps"/>
-                <spacer witdh="40" height="2" />
-                <spinner id="lap-spinner" width="20%" min_value="1" max_value="20" align="center"
-                         wrap_around="true" />
-                <spacer proportion="1" height="2" />
+        <box width="100%" height="25%" padding="15" layout="vertical-row">
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="lap-text" proportion="1" I18N="In the track info screen" text="Number of laps" text_align="right"/>
+                <spacer width="40"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <spinner id="lap-spinner" width="50%" min_value="1" max_value="20" align="center"
+                             wrap_around="true" />
+                </div>
             </div>
-            <div width="75%" height="fit" layout="horizontal-row" >
-                <spacer width="40" height="2" />
-                <label id="ai-text" height="100%" width="40%" I18N="In the track info screen" text="Number of AI karts"/>
-                <spacer with="40" height="2" />
-                <spinner id="ai-spinner" width="20%" min_value="1" max_value="20" align="center"
-                         wrap_around="true" />
-                <spacer proportion="1" height="2" />
+            <spacer height="10"/>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="ai-text" proportion="1" I18N="In the track info screen" text="Number of AI karts" text_align="right"/>
+                <spacer width="40"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <spinner id="ai-spinner" width="50%" min_value="1" max_value="20" align="center"
+                             wrap_around="true" />
+                </div>
             </div>
-            <div width="75%" height="fit" layout="horizontal-row" >
-                <spacer width="40" height="2" />
-                <label id="reverse-text" height="100%" width="40%" I18N="In the track info screen" text="Drive in reverse"/>
-                <spacer width="40" height="2" />
-                <checkbox id="reverse"/>
-                <spacer proportion="1" height="2" />
+            <spacer height="10"/>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="reverse-text" proportion="1" I18N="In the track info screen" text="Drive in reverse" text_align="right"/>
+                <spacer width="40"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <div width="50%" height="fit" text-align="center" layout="vertical-row" >
+                        <checkbox id="reverse" align="center"/>
+                    </div>
+                </div>
             </div>
             <spacer width="1" height="2%"/>
         </box>

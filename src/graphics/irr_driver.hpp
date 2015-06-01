@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -36,7 +36,6 @@
 #include <SColor.h>
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
-//#include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
@@ -102,15 +101,15 @@ enum TypeFBO
     FBO_SCALAR_1024,
     FBO_BLOOM_512,
     FBO_TMP_512,
-	FBO_LENS_512,
+    FBO_LENS_512,
 
     FBO_BLOOM_256,
-	FBO_TMP_256,
-	FBO_LENS_256,
-	
+    FBO_TMP_256,
+    FBO_LENS_256,
+
     FBO_BLOOM_128,
     FBO_TMP_128,
-	FBO_LENS_128,
+    FBO_LENS_128,
     FBO_COUNT
 };
 
@@ -164,13 +163,13 @@ enum TypeRTT
     RTT_SCALAR_1024,
     RTT_BLOOM_512,
     RTT_TMP_512,
-	RTT_LENS_512,
+    RTT_LENS_512,
     RTT_BLOOM_256,
     RTT_TMP_256,
-	RTT_LENS_256,
+    RTT_LENS_256,
     RTT_BLOOM_128,
     RTT_TMP_128,
-	RTT_LENS_128,
+    RTT_LENS_128,
 
     RTT_COUNT
 };
@@ -183,20 +182,6 @@ enum TypeRTT
 class IrrDriver : public IEventReceiver, public NoCopy
 {
 private:
-    int m_gl_major_version, m_gl_minor_version;
-    bool hasVSLayer;
-    bool hasBaseInstance;
-    bool hasDrawIndirect;
-    bool hasBuffserStorage;
-    bool hasComputeShaders;
-    bool hasTextureStorage;
-    bool hasTextureView;
-    bool hasBindlessTexture;
-    bool m_support_sdsm;
-    bool m_support_texture_compression;
-    bool m_need_ubo_workaround;
-    bool m_need_rh_workaround;
-    bool m_need_srgb_workaround;
     GLsync m_sync;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
@@ -223,6 +208,7 @@ private:
     bool               m_rsm_matrix_initialized;
     bool               m_rsm_map_available;
     core::vector2df    m_current_screen_size;
+    core::dimension2du m_actual_screen_size;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */
@@ -232,7 +218,7 @@ private:
     core::array<video::IRenderTarget> m_mrt;
 
     /** Matrixes used in several places stored here to avoid recomputation. */
-    core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_previousProjViewMatrix, m_InvProjViewMatrix;
+    core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
     std::vector<video::ITexture *> SkyboxTextures;
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
@@ -275,106 +261,6 @@ public:
         float power;
     };
 
-    unsigned getGLSLVersion() const
-    {
-        if (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version == 3))
-            return m_gl_major_version * 100 + m_gl_minor_version * 10;
-        else if (m_gl_major_version == 3)
-            return 100 + (m_gl_minor_version + 3) * 10;
-        else
-            return 120;
-    }
-
-    bool supportsSDSM() const
-    {
-        return m_support_sdsm && UserConfigParams::m_sdsm;
-    }
-
-    bool supportTextureCompression() const
-    {
-        return m_support_texture_compression;
-    }
-
-    bool supportGeometryShader() const
-    {
-        return getGLSLVersion() >= 330;
-    }
-
-    bool usesShadows() const
-    {
-        return supportGeometryShader() && UserConfigParams::m_shadows && !needUBOWorkaround();
-    }
-
-    bool usesGI() const
-    {
-        return supportGeometryShader() && UserConfigParams::m_gi && !needUBOWorkaround();
-    }
-
-    bool usesTextureCompression() const
-    {
-        return UserConfigParams::m_texture_compression && m_support_texture_compression;
-    }
-
-    bool useAZDO() const
-    {
-        return hasBindlessTexture && UserConfigParams::m_azdo;
-    }
-
-    bool needUBOWorkaround() const
-    {
-        return m_need_ubo_workaround;
-    }
-
-    bool needRHWorkaround() const
-    {
-        return m_need_rh_workaround;
-    }
-
-    bool needsRGBBindlessWorkaround() const
-    {
-        return m_need_srgb_workaround;
-    }
-
-    bool hasARB_base_instance() const
-    {
-        return hasBaseInstance;
-    }
-
-    bool hasARB_draw_indirect() const
-    {
-        return hasDrawIndirect;
-    }
-
-    bool hasVSLayerExtension() const
-    {
-        return hasVSLayer;
-    }
-
-    bool hasBufferStorageExtension() const
-    {
-        return hasBuffserStorage;
-    }
-
-    bool hasARBComputeShaders() const
-    {
-        return hasComputeShaders;
-    }
-
-    bool hasARBTextureStorage() const
-    {
-        return hasTextureStorage;
-    }
-
-    bool hasARBTextureView() const
-    {
-        return hasTextureView;
-    }
-
-    bool hasARBBindlessTexture() const
-    {
-        return hasBindlessTexture;
-    }
-
     video::SColorf getAmbientLight() const;
 
     struct GlowData {
@@ -389,9 +275,6 @@ private:
 
     /** Whether the mouse cursor is currently shown */
     bool                  m_pointer_shown;
-
-    /** Supports GLSL */
-    bool                  m_glsl;
 
     /** Internal method that applies the resolution in user settings. */
     void                 applyResolutionSettings();
@@ -460,6 +343,7 @@ private:
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
     void renderLights(unsigned pointlightCount, bool hasShadow);
+    void renderAmbientScatter();
     void renderLightsScatter(unsigned pointlightCount);
     void renderShadowsDebug();
     void doScreenShot();
@@ -469,6 +353,7 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
+    void setMaxTextureSize();
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
@@ -553,7 +438,7 @@ public:
   /** Call this to roll back to the previous resolution if a resolution switch attempt goes bad */
     void                  cancelResChange();
 
-    bool                  moveWindow(const int x, const int y);
+    bool                  moveWindow(int x, int y);
 
     void                  showPointer();
     void                  hidePointer();
@@ -686,12 +571,6 @@ public:
     FrameBuffer& getFBO(TypeFBO which);
     GLuint getDepthStencilTexture();
     // ------------------------------------------------------------------------
-    inline bool isGLSL() const { return m_glsl; }
-    // ------------------------------------------------------------------------
-    /** Called when the driver pretends to support it, but fails at some
-     *  operations. */
-    void disableGLSL() { m_glsl = false; }
-    // ------------------------------------------------------------------------
     void resetDebugModes()
     {
         m_wireframe = false;
@@ -749,6 +628,8 @@ public:
     // ------------------------------------------------------------------------
     u32 getRenderPass() { return m_renderpass; }
     // ------------------------------------------------------------------------
+    std::vector<LightNode *> getLights() { return m_lights; }
+    // ------------------------------------------------------------------------
     void addGlowingNode(scene::ISceneNode *n, float r = 1.0f, float g = 1.0f, float b = 1.0f)
     {
         GlowData dat;
@@ -788,6 +669,8 @@ public:
     void clearLights();
     // ------------------------------------------------------------------------
     class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
+    void cleanSunInterposer();
+    void createSunInterposer();
     // ------------------------------------------------------------------------
     void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; matrix.getInverse(m_InvViewMatrix); }
     const core::matrix4 &getViewMatrix() const { return m_ViewMatrix; }
@@ -795,11 +678,11 @@ public:
     void setProjMatrix(core::matrix4 matrix) { m_ProjMatrix = matrix; matrix.getInverse(m_InvProjMatrix); }
     const core::matrix4 &getProjMatrix() const { return m_ProjMatrix; }
     const core::matrix4 &getInvProjMatrix() const { return m_InvProjMatrix; }
-    void genProjViewMatrix() { m_previousProjViewMatrix = m_ProjViewMatrix; m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; m_InvProjViewMatrix = m_ProjViewMatrix; m_InvProjViewMatrix.makeInverse(); }
-    const core::matrix4 & getPreviousPVMatrix() { return m_previousProjViewMatrix; }
+    void genProjViewMatrix() { m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; m_InvProjViewMatrix = m_ProjViewMatrix; m_InvProjViewMatrix.makeInverse(); }
     const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
     const core::matrix4 &getInvProjViewMatrix() const { return m_InvProjViewMatrix; }
     const core::vector2df &getCurrentScreenSize() const { return m_current_screen_size; }
+    const core::dimension2du getActualScreenSize() const { return m_actual_screen_size; }
     // ------------------------------------------------------------------------
     float getSSAORadius() const
     {
@@ -848,7 +731,8 @@ public:
     void renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadows, bool forceRTT);
     unsigned UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
     void UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, size_t height);
-    void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
+    void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
+    void uploadLightingData();
 
     // --------------------- OLD RTT --------------------
     /**

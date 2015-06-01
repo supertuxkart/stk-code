@@ -40,8 +40,15 @@ CIrrDeviceStub::CIrrDeviceStub(const SIrrlichtCreationParameters& params)
 	os::Printer::Logger = Logger;
 	Randomizer = createDefaultRandomizer();
 
-	FileSystem = io::createFileSystem();
-	core::stringc s = "Irrlicht Engine version ";
+    // If the user supplies a file system, use it instead of creating a new one
+    if (params.FileSystem)
+    {
+        FileSystem = params.FileSystem;
+        FileSystem->grab();
+    }
+    else
+        FileSystem = io::createFileSystem();
+    core::stringc s = "Irrlicht Engine version ";
 	s.append(getVersion());
 	os::Printer::log(s.c_str(), ELL_INFORMATION);
 

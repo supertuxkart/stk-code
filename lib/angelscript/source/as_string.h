@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -38,13 +38,16 @@
 #include <stdio.h>
 #include <string.h>
 
-// TODO: optimize: On compilers with C++11 support the string class should take advantage of the move operator &&
-
 class asCString
 {
 public:
 	asCString();
 	~asCString();
+
+#ifdef AS_CAN_USE_CPP11
+	asCString(asCString &&);
+	asCString &operator =(asCString &&);
+#endif // c++11
 
 	asCString(const asCString &);
 	asCString(const char *);

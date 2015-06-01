@@ -11,7 +11,6 @@
 #include "IAnimatedMesh.h"
 #include "IMaterialRenderer.h"
 #include "os.h"
-#include "CShadowVolumeSceneNode.h"
 
 namespace irr
 {
@@ -24,7 +23,7 @@ COctreeSceneNode::COctreeSceneNode(ISceneNode* parent, ISceneManager* mgr,
 					 s32 id, s32 minimalPolysPerNode)
 	: IMeshSceneNode(parent, mgr, id), StdOctree(0), LightMapOctree(0),
 	TangentsOctree(0), VertexType((video::E_VERTEX_TYPE)-1),
-	MinimalPolysPerNode(minimalPolysPerNode), Mesh(0), Shadow(0),
+	MinimalPolysPerNode(minimalPolysPerNode), Mesh(0),
 	UseVBOs(OCTREE_USE_HARDWARE), UseVisibilityAndVBOs(OCTREE_USE_VISIBILITY),
 	BoxBased(OCTREE_BOX_BASED)
 {
@@ -37,8 +36,6 @@ COctreeSceneNode::COctreeSceneNode(ISceneNode* parent, ISceneManager* mgr,
 //! destructor
 COctreeSceneNode::~COctreeSceneNode()
 {
-	if (Shadow)
-		Shadow->drop();
 	deleteTree();
 }
 
@@ -103,9 +100,6 @@ void COctreeSceneNode::render()
 	++PassCount;
 
 	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
-
-	if (Shadow)
-		Shadow->updateShadowVolumes();
 
 	SViewFrustum frust = *camera->getViewFrustum();
 
@@ -291,32 +285,7 @@ void COctreeSceneNode::render()
 //! or to remove attached childs.
 bool COctreeSceneNode::removeChild(ISceneNode* child)
 {
-	if (child && Shadow == child)
-	{
-		Shadow->drop();
-		Shadow = 0;
-	}
-
 	return ISceneNode::removeChild(child);
-}
-
-
-//! Creates shadow volume scene node as child of this node
-//! and returns a pointer to it.
-IShadowVolumeSceneNode* COctreeSceneNode::addShadowVolumeSceneNode(
-		const IMesh* shadowMesh, s32 id, bool zfailmethod, f32 infinity)
-{
-	if (!SceneManager->getVideoDriver()->queryFeature(video::EVDF_STENCIL_BUFFER))
-		return 0;
-
-	if (!shadowMesh)
-		shadowMesh = Mesh; // if null is given, use the mesh of node
-
-	if (Shadow)
-		Shadow->drop();
-
-	Shadow = new CShadowVolumeSceneNode(shadowMesh, this, SceneManager, id,  zfailmethod, infinity);
-	return Shadow;
 }
 
 

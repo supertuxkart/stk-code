@@ -1,5 +1,23 @@
-#include "graphics/irr_driver.hpp"
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+
+#include "graphics/irr_driver.hpp"
+#include "central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/light.hpp"
@@ -106,16 +124,39 @@ unsigned IrrDriver::UpdateLightsInfo(scene::ICameraSceneNode * const camnode, fl
     return lightnum;
 }
 
+/** Upload lighting info to the dedicated uniform buffer
+*/
+void IrrDriver::uploadLightingData()
+{
+    float Lighting[36];
+    Lighting[0] = m_sundirection.X;
+    Lighting[1] = m_sundirection.Y;
+    Lighting[2] = m_sundirection.Z;
+    Lighting[4] = m_suncolor.getRed();
+    Lighting[5] = m_suncolor.getGreen();
+    Lighting[6] = m_suncolor.getBlue();
+    Lighting[7] = 0.54f;
+
+    memcpy(&Lighting[8], blueSHCoeff, 9 * sizeof(float));
+    memcpy(&Lighting[17], greenSHCoeff, 9 * sizeof(float));
+    memcpy(&Lighting[26], redSHCoeff, 9 * sizeof(float));
+
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::LightingDataUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 36 * sizeof(float), Lighting);
+}
+
+extern float shadowSplit[5];
+
 void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 {
     //RH
-    if (UserConfigParams::m_gi && UserConfigParams::m_shadows && hasShadow)
+    if (CVS->isGlobalIlluminationEnabled() && hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
         glDisable(GL_BLEND);
         m_rtts->getRH().Bind();
         glBindVertexArray(SharedObject::FullScreenQuadVAO);
-        if (irr_driver->needRHWorkaround())
+        if (CVS->needRHWorkaround())
         {
             glUseProgram(FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->Program);
             FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->SetTextureUnits(
@@ -145,7 +186,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_rtts->getFBO(FBO_DIFFUSE).Bind();
-    if (irr_driver->usesGI() && hasShadow)
+    if (CVS->isGlobalIlluminationEnabled() && hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
@@ -162,8 +203,28 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
-        if (World::getWorld() && irr_driver->usesShadows() && hasShadow)
-            m_post_processing->renderShadowedSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor(), sun_ortho_matrix, m_rtts->getShadowFBO().getRTT()[0]);
+        if (World::getWorld() && CVS->isShadowEnabled() && hasShadow)
+        {
+            glEnable(GL_BLEND);
+            glDisable(GL_DEPTH_TEST);
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
+
+            if (CVS->isESMEnabled())
+            {
+                FullScreenShader::ShadowedSunLightShaderESM::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), m_rtts->getShadowFBO().getRTT()[0]);
+                DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShaderESM>(shadowSplit[1], shadowSplit[2], shadowSplit[3], shadowSplit[4]);
+            }
+            else
+            {
+                FullScreenShader::ShadowedSunLightShaderPCF::getInstance()->SetTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), m_rtts->getShadowFBO().getDepthTexture());
+                DrawFullScreenEffect<FullScreenShader::ShadowedSunLightShaderPCF>(shadowSplit[1],
+                                                                                  shadowSplit[2],
+                                                                                  shadowSplit[3],
+                                                                                  shadowSplit[4],
+                                                                                  float(UserConfigParams::m_shadows_resolution));
+            }
+        }
         else
             m_post_processing->renderSunlight(irr_driver->getSunDirection(), irr_driver->getSunColor());
     }
@@ -185,16 +246,12 @@ void IrrDriver::renderSSAO()
 
 }
 
-void IrrDriver::renderLightsScatter(unsigned pointlightcount)
+void IrrDriver::renderAmbientScatter()
 {
-    getFBO(FBO_HALF1).Bind();
-    glClearColor(0., 0., 0., 0.);
-    glClear(GL_COLOR_BUFFER_BIT);
-
     const Track * const track = World::getWorld()->getTrack();
 
     // This function is only called once per frame - thus no need for setters.
-    float start = track->getFogStart() + .001;
+    float start = track->getFogStart() + .001f;
     const video::SColor tmpcol = track->getFogColor();
 
     core::vector3df col(tmpcol.getRed() / 255.0f,
@@ -209,6 +266,28 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
 
     FullScreenShader::FogShader::getInstance()->SetTextureUnits(irr_driver->getDepthStencilTexture());
     DrawFullScreenEffect<FullScreenShader::FogShader>(1.f / (40.f * start), col);
+}
+
+void IrrDriver::renderLightsScatter(unsigned pointlightcount)
+{
+    getFBO(FBO_HALF1).Bind();
+    glClearColor(0., 0., 0., 0.);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    const Track * const track = World::getWorld()->getTrack();
+
+    // This function is only called once per frame - thus no need for setters.
+    float start = track->getFogStart() + .001f;
+    const video::SColor tmpcol = track->getFogColor();
+
+    core::vector3df col(tmpcol.getRed() / 255.0f,
+        tmpcol.getGreen() / 255.0f,
+        tmpcol.getBlue() / 255.0f);
+
+    glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
 
     glEnable(GL_DEPTH_TEST);
     core::vector3df col2(1., 1., 1.);
@@ -228,5 +307,5 @@ void IrrDriver::renderLightsScatter(unsigned pointlightcount)
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     getFBO(FBO_COLORS).Bind();
-    m_post_processing->renderPassThrough(getRenderTargetTexture(RTT_HALF1));
+    m_post_processing->renderPassThrough(getRenderTargetTexture(RTT_HALF1), getFBO(FBO_COLORS).getWidth(), getFBO(FBO_COLORS).getHeight());
 }

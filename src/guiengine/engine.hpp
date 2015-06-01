@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -83,6 +83,7 @@ namespace GUIEngine
         extern Skin* g_skin;
         extern irr::gui::ScalableFont* g_small_font;
         extern irr::gui::ScalableFont* g_font;
+        extern irr::gui::ScalableFont* g_outline_font;
         extern irr::gui::ScalableFont* g_large_font;
         extern irr::gui::ScalableFont* g_title_font;
         extern irr::gui::ScalableFont* g_digit_font;
@@ -135,6 +136,8 @@ namespace GUIEngine
       * \return the "normal" font (useful for text)
       */
     inline irr::gui::ScalableFont*    getFont()          { return Private::g_font;           }
+
+    inline irr::gui::ScalableFont*    getOutlineFont()   { return Private::g_outline_font;   }
 
     /**
       * \return the "large" font (useful for text)

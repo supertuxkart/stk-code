@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "utils/translation.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 
 #include <IGUIEnvironment.h>
@@ -54,7 +55,8 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("anim_gfx")->setState(UserConfigParams::m_graphical_effects);
     getWidget<CheckBoxWidget>("weather_gfx")->setState(UserConfigParams::m_weather_effects);
     getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
-    getWidget<CheckBoxWidget>("hd-textures")->setState(UserConfigParams::m_high_definition_textures);
+    getWidget<CheckBoxWidget>("hd-textures")
+        ->setState((UserConfigParams::m_high_definition_textures & 0x01)==0x01);
 
     SpinnerWidget* kart_anim = getWidget<SpinnerWidget>("steering_animations");
     kart_anim->addLabel(_("Disabled")); // 0
@@ -84,19 +86,20 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel(_("Disabled"));   // 0
     shadows->addLabel(_("low"));        // 1
     shadows->addLabel(_("high"));       // 2
-    if (!irr_driver->needUBOWorkaround())
-        shadows->setValue(UserConfigParams::m_shadows);
+    if (CVS->supportsShadows())
+        shadows->setValue(UserConfigParams::m_shadows_resolution / 512);
     else
         shadows->setValue(0);
     getWidget<CheckBoxWidget>("dynamiclight")->setState(UserConfigParams::m_dynamic_lights);
     getWidget<CheckBoxWidget>("lightshaft")->setState(UserConfigParams::m_light_shaft);
+    getWidget<CheckBoxWidget>("ibl")->setState(!UserConfigParams::m_degraded_IBL);
     getWidget<CheckBoxWidget>("global_illumination")->setState(UserConfigParams::m_gi);
     getWidget<CheckBoxWidget>("motionblur")->setState(UserConfigParams::m_motionblur);
     getWidget<CheckBoxWidget>("mlaa")->setState(UserConfigParams::m_mlaa);
     getWidget<CheckBoxWidget>("glow")->setState(UserConfigParams::m_glow);
     getWidget<CheckBoxWidget>("ssao")->setState(UserConfigParams::m_ssao);
     getWidget<CheckBoxWidget>("bloom")->setState(UserConfigParams::m_bloom);
-    if (irr_driver->supportTextureCompression())
+    if (CVS->isEXTTextureCompressionS3TCUsable())
     {
         getWidget<CheckBoxWidget>("texture_compression")->setState(UserConfigParams::m_texture_compression);
     }
@@ -107,7 +110,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         cb_tex_cmp->setDeactivated();
     }
 
-    if (!irr_driver->supportGeometryShader())
+    if (!CVS->supportsGlobalIllumination())
     {
         shadows->setDeactivated();
         getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
@@ -129,14 +132,14 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_motionblur      =
             advanced_pipeline && getWidget<CheckBoxWidget>("motionblur")->getState();
 
-        if (advanced_pipeline && irr_driver->supportGeometryShader())
+        if (advanced_pipeline && CVS->supportsShadows())
         {
-            UserConfigParams::m_shadows =
-                getWidget<SpinnerWidget>("shadows")->getValue();
+            UserConfigParams::m_shadows_resolution =
+                getWidget<SpinnerWidget>("shadows")->getValue() * 512;
         }
         else
         {
-            UserConfigParams::m_shadows = 0;
+            UserConfigParams::m_shadows_resolution = 0;
         }
 
         UserConfigParams::m_mlaa =
@@ -148,8 +151,11 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_light_shaft =
             advanced_pipeline && getWidget<CheckBoxWidget>("lightshaft")->getState();
 
+        UserConfigParams::m_degraded_IBL =
+            !getWidget<CheckBoxWidget>("ibl")->getState();
+
         UserConfigParams::m_gi =
-            advanced_pipeline && irr_driver->supportGeometryShader() &&
+            advanced_pipeline && CVS->supportsGlobalIllumination() &&
             getWidget<CheckBoxWidget>("global_illumination")->getState();
 
         UserConfigParams::m_glow =
@@ -167,8 +173,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_weather_effects =
             getWidget<CheckBoxWidget>("weather_gfx")->getState();
 
+        // Set bit 0 for enabled/disabled, and set bit 1 to indicate that this
+        // is now a user's choice and should not be overwritten by any default
         UserConfigParams::m_high_definition_textures =
-            getWidget<CheckBoxWidget>("hd-textures")->getState();
+            getWidget<CheckBoxWidget>("hd-textures")->getState() ? 0x03 : 0x02;
 
         UserConfigParams::m_show_steering_animations =
             getWidget<SpinnerWidget>("steering_animations")->getValue();
@@ -227,6 +235,7 @@ void CustomVideoSettingsDialog::updateActivation()
         getWidget<CheckBoxWidget>("mlaa")->setActivated();
         getWidget<CheckBoxWidget>("ssao")->setActivated();
         getWidget<CheckBoxWidget>("lightshaft")->setActivated();
+        getWidget<CheckBoxWidget>("ibl")->setActivated();
         getWidget<CheckBoxWidget>("global_illumination")->setActivated();
         getWidget<CheckBoxWidget>("glow")->setActivated();
         getWidget<CheckBoxWidget>("bloom")->setActivated();
@@ -239,12 +248,13 @@ void CustomVideoSettingsDialog::updateActivation()
         getWidget<CheckBoxWidget>("mlaa")->setDeactivated();
         getWidget<CheckBoxWidget>("ssao")->setDeactivated();
         getWidget<CheckBoxWidget>("lightshaft")->setDeactivated();
+        getWidget<CheckBoxWidget>("ibl")->setDeactivated();
         getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
         getWidget<CheckBoxWidget>("glow")->setDeactivated();
         getWidget<CheckBoxWidget>("bloom")->setDeactivated();
     }
 
-    if (!irr_driver->supportGeometryShader())
+    if (!CVS->supportsShadows() && !CVS->supportsGlobalIllumination())
     {
         getWidget<SpinnerWidget>("shadows")->setDeactivated();
         getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();

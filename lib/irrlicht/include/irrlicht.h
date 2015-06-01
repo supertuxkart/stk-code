@@ -54,8 +54,6 @@
 #include "fast_atof.h"
 #include "heapsort.h"
 #include "IAnimatedMesh.h"
-#include "IAnimatedMeshMD2.h"
-#include "IAnimatedMeshMD3.h"
 #include "IAnimatedMeshSceneNode.h"
 #include "IAttributeExchangingObject.h"
 #include "IAttributes.h"
@@ -112,12 +110,9 @@
 #include "IMeshManipulator.h"
 #include "IMeshSceneNode.h"
 #include "IMeshWriter.h"
-#include "IColladaMeshWriter.h"
 #include "IMetaTriangleSelector.h"
 #include "IOSOperator.h"
 #include "IParticleSystemSceneNode.h" // also includes all emitters and attractors
-#include "IQ3LevelMesh.h"
-#include "IQ3Shader.h"
 #include "IReadFile.h"
 #include "IReferenceCounted.h"
 #include "irrArray.h"
@@ -142,7 +137,6 @@
 #include "ISceneNodeFactory.h"
 #include "ISceneUserDataSerializer.h"
 #include "IShaderConstantSetCallBack.h"
-#include "IShadowVolumeSceneNode.h"
 #include "ISkinnedMesh.h"
 #include "ITerrainSceneNode.h"
 #include "ITextSceneNode.h"
@@ -152,7 +146,6 @@
 #include "IVertexBuffer.h"
 #include "IVideoDriver.h"
 #include "IVideoModeList.h"
-#include "IVolumeLightSceneNode.h"
 #include "IWriteFile.h"
 #include "IXMLReader.h"
 #include "IXMLWriter.h"
@@ -329,7 +322,8 @@ namespace irr
 		bool fullscreen = false,
 		bool stencilbuffer = false,
 		bool vsync = false,
-		IEventReceiver* receiver = 0);
+		IEventReceiver* receiver = 0,
+        io::IFileSystem *file_system = NULL);
 
 	//! typedef for Function Pointer
 	typedef IrrlichtDevice* (IRRCALLCONV *funcptr_createDevice )(

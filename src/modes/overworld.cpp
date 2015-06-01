@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -114,9 +114,8 @@ void OverWorld::update(float dt)
         // so we have to start music 'manually', since we skip all phases.
         World::getWorld()->getTrack()->startMusic();
 
-        if (music_manager->getCurrentMusic() != NULL &&
-            UserConfigParams::m_music)
-            music_manager->getCurrentMusic()->startMusic();
+        if (UserConfigParams::m_music)
+            music_manager->startMusic();
         m_karts[0]->startEngineSFX();
     }
     WorldWithRank::update(dt);

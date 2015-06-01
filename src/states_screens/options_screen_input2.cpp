@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 #include "states_screens/options_screen_input2.hpp"
 
 #include "config/user_config.hpp"
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
@@ -431,10 +431,10 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
             }
         }
 
+        GamePadDevice *gpad = input_manager->getDeviceManager()
+                            ->getGamePadFromIrrID(sensed_input.m_device_id);
 
-        std::string gamepad_name = input_manager->getDeviceManager()
-                                 ->getGamePadFromIrrID(sensed_input.m_device_id)
-                                 ->getName();
+        std::string gamepad_name = gpad ? gpad->getName() : "UNKNOWN DEVICE";
         if (m_config->getName() == gamepad_name)
         {
             GamepadConfig* config =  (GamepadConfig*)m_config;

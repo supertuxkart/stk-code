@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -75,6 +75,11 @@ namespace GUIEngine
     
         /** \brief Whether to wrap back to the first value when going "beyond" the last value */
         bool m_wrap_around;
+
+        /** \brief Keeps track of the custom text in spinner (a text which isn't related to a value)
+        *   to remember it and set it back (example : when we deactivate the widget)
+        */
+        core::stringw m_customText;
         
         /** \brief implementing method from base class Widget */
         virtual EventPropagation transmitEvent(Widget* w,
@@ -86,6 +91,9 @@ namespace GUIEngine
         
         /** \brief implementing method from base class Widget */
         virtual EventPropagation leftPressed(const int playerID);
+
+        /** \brief implementing method from base class Widget */
+        virtual void onClick();
         
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */

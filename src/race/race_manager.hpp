@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -120,7 +120,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** True if the AI should have additional abbilities, e.g.
-     *  nolik will get special bubble gums in the final challenge. */
+     *  nolok will get special bubble gums in the final challenge. */
     enum AISuperPower
     {
         SUPERPOWER_NONE       = 0,

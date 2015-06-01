@@ -1,3 +1,21 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include "central_settings.hpp"
 #include "graphics/IBL.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
@@ -225,8 +243,8 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
     unsigned size = 0;
     for (unsigned i = 0; i < 6; i++)
     {
-        size = MAX2(size, textures[i]->getOriginalSize().Width);
-        size = MAX2(size, textures[i]->getOriginalSize().Height);
+        size = MAX2(size, textures[i]->getSize().Width);
+        size = MAX2(size, textures[i]->getSize().Height);
     }
 
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
@@ -263,7 +281,7 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, result);
-        if (irr_driver->usesTextureCompression())
+        if (CVS->isTextureCompressionEnabled())
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, size, size, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
         else
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, size, size, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
@@ -298,8 +316,8 @@ void IrrDriver::generateDiffuseCoefficients()
 
         for (unsigned i = 0; i < 6; i++)
         {
-            sh_w = MAX2(sh_w, SphericalHarmonicsTextures[i]->getOriginalSize().Width);
-            sh_h = MAX2(sh_h, SphericalHarmonicsTextures[i]->getOriginalSize().Height);
+            sh_w = MAX2(sh_w, SphericalHarmonicsTextures[i]->getSize().Width);
+            sh_h = MAX2(sh_h, SphericalHarmonicsTextures[i]->getSize().Height);
         }
 
         for (unsigned i = 0; i < 6; i++)
@@ -379,27 +397,18 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 {
     if (SkyboxTextures.empty())
         return;
-    glBindVertexArray(MeshShader::SkyboxShader::getInstance()->cubevao);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     assert(SkyboxTextures.size() == 6);
 
-    core::matrix4 translate;
-    translate.setTranslation(camera->getAbsolutePosition());
-
-    // Draw the sky box between the near and far clip plane
-    const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
-    core::matrix4 scale;
-    scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
-    core::matrix4 transform = translate * scale;
-    core::matrix4 invtransform;
-    transform.getInverse(invtransform);
     glDisable(GL_BLEND);
 
     glUseProgram(MeshShader::SkyboxShader::getInstance()->Program);
-    MeshShader::SkyboxShader::getInstance()->setUniforms(transform);
+    glBindVertexArray(MeshShader::SkyboxShader::getInstance()->vao);
+    MeshShader::SkyboxShader::getInstance()->setUniforms();
+
     MeshShader::SkyboxShader::getInstance()->SetTextureUnits(SkyboxCubeMap);
 
-    glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
 }

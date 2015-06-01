@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -37,6 +37,7 @@ namespace irr
 using namespace irr;
 
 class CheckLine;
+class RTT;
 class FrameBuffer;
 
 /**
@@ -54,6 +55,8 @@ class QuadGraph : public NoCopy
 
 private:
     static QuadGraph        *m_quad_graph;
+
+    RTT* m_new_rtt;
 
     /** The actual graph data structure. */
     std::vector<GraphNode*>  m_all_nodes;

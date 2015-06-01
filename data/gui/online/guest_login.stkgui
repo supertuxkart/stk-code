@@ -15,19 +15,19 @@
 
         <box proportion="1" width="100%" layout="vertical-row">
             <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"
-                    I18N="In the login dialog" text="Guest Sign in"/>
+                    I18N="In the login dialog" text="Guest Log in"/>
             <spacer height="15" width="10"/>
             <box proportion="4" width="90%" layout="vertical-row" align="center">
                 <div x="2%" y="2%" width="96%" height="80%" layout="vertical-row" id="outer_box" >
                     <label I18N="In the login dialog" proportion="4" word_wrap="true"
-                        text="Signing in as a guest allows you to participate in online races, but it does not allow you to vote for addons, or collect any achievements while being online."
+                        text="Logging in as a guest allows you to participate in online races, but it does not allow you to vote for addons, or collect any achievements while being online."
                          align="center"/>
                 </div>
             </box>
             <spacer height="15" width="10"/>
             <buttonbar id="options" width="90%" height="13%" align="bottom">
                 <icon-button id="sign_in" width="64" height="64" icon="gui/green_check.png"
-                             I18N="In the login dialog"  text="Sign In" label_location="bottom"/>
+                             I18N="In the login dialog"  text="Log In" label_location="bottom"/>
                 <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
                              I18N="In the login dialog" text="Close" label_location="bottom"/>
             </buttonbar>

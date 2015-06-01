@@ -1,5 +1,5 @@
 // Copyright (C) 2002-2012 Nikolaus Gebhardt
-// Copyright (C) 2014 Dawid Gan
+// Copyright (C) 2014-2015 Dawid Gan
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
@@ -11,6 +11,7 @@ extern bool GLContextDebugBit;
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/utsname.h>
 #include <time.h>
 #include "IEventReceiver.h"
@@ -35,7 +36,7 @@ extern bool GLContextDebugBit;
 #include <fcntl.h>
 #include <unistd.h>
 
-#ifdef __FREE_BSD_
+#ifdef __FreeBSD__
 #include <sys/joystick.h>
 #else
 
@@ -58,7 +59,7 @@ namespace irr
 {
 	namespace video
 	{
-        extern bool useCoreContext;
+		extern bool useCoreContext;
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
 	}
@@ -497,10 +498,10 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 }
 #endif
 
-static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
+static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
 {
 	GLXContext Context;
-    irr::video::useCoreContext = true;
+	irr::video::useCoreContext = true;
 	int core43ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
@@ -509,13 +510,13 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
-    int core43ctx[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-        None
-    };
+	int core43ctx[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		None
+	};
 	int core33ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
@@ -524,21 +525,21 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
-    int core33ctx[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-        None
-    };
-    int core31ctxdebug[] =
-    {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 1,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-        GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-        None
-    };
+	int core33ctx[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		None
+	};
+	int core31ctxdebug[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+		None
+	};
 	int core31ctx[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
@@ -556,31 +557,35 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
   
-	// create core 4.3 context
-    os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
-	if (!XErrorSignaled)
-		return Context;
+    if(!force_legacy_context)
+    {
+        // create core 4.3 context
+        os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
+        if (!XErrorSignaled)
+            return Context;
+        
+        XErrorSignaled = false;
+        // create core 3.3 context
+        os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
+        if (!XErrorSignaled)
+            return Context;
+
+        XErrorSignaled = false;
+        // create core 3.1 context (for older mesa)
+        os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
+        if (!XErrorSignaled)
+            return Context;
+
+    }   // if(force_legacy_context)
 
 	XErrorSignaled = false;
-	// create core 3.3 context
-    os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
-	if (!XErrorSignaled)
-		return Context;
-
-	XErrorSignaled = false;
-	// create core 3.1 context (for older mesa)
-    os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
-    Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
-	if (!XErrorSignaled)
-		return Context;
-
-	XErrorSignaled = false;
-    irr::video::useCoreContext = false;
+	irr::video::useCoreContext = false;
 	// fall back to legacy context
-    os::Printer::log("Creating legacy OpenGL 2.1 context...", ELL_INFORMATION);
-    Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
+	os::Printer::log("Creating legacy OpenGL 2.1 context...", ELL_INFORMATION);
+	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
 
@@ -998,7 +1003,7 @@ bool CIrrDeviceLinux::createWindow()
 		glxWin=glXCreateWindow(display,glxFBConfig,window,NULL);
 		if (glxWin)
 		{
-			Context = getMeAGLContext(display, glxFBConfig);
+			Context = getMeAGLContext(display, glxFBConfig, CreationParams.ForceLegacyDevice);
 			if (Context)
 			{
 				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))
@@ -1322,7 +1327,7 @@ bool CIrrDeviceLinux::run()
 					irrevent.KeyInput.Control = (event.xkey.state & ControlMask) != 0;
 					irrevent.KeyInput.Shift = (event.xkey.state & ShiftMask) != 0;
 
-					event.xkey.state = 0; // ignore shift-ctrl states for figuring out the key
+					event.xkey.state &= ~(ControlMask|ShiftMask); // ignore shift-ctrl states for figuring out the key
 					XLookupString(&event.xkey, buf, sizeof(buf), &mp.X11Key, NULL);
 					const s32 idx = KeyMap.binary_search(mp);
 					if (idx != -1)
@@ -1793,7 +1798,7 @@ void CIrrDeviceLinux::createKeyMap()
 	// I find a better version.
 
 #ifdef _IRR_COMPILE_WITH_X11_
-	KeyMap.reallocate(84);
+	KeyMap.reallocate(190);
 	KeyMap.push_back(SKeyMap(XK_BackSpace, KEY_BACK));
 	KeyMap.push_back(SKeyMap(XK_Tab, KEY_TAB));
 	KeyMap.push_back(SKeyMap(XK_ISO_Left_Tab, KEY_TAB));
@@ -1846,16 +1851,16 @@ void CIrrDeviceLinux::createKeyMap()
 	KeyMap.push_back(SKeyMap(XK_KP_Subtract, KEY_SUBTRACT));
 	KeyMap.push_back(SKeyMap(XK_KP_Decimal, KEY_DECIMAL));
 	KeyMap.push_back(SKeyMap(XK_KP_Divide, KEY_DIVIDE));
-	KeyMap.push_back(SKeyMap(XK_KP_0, KEY_KEY_0));
-	KeyMap.push_back(SKeyMap(XK_KP_1, KEY_KEY_1));
-	KeyMap.push_back(SKeyMap(XK_KP_2, KEY_KEY_2));
-	KeyMap.push_back(SKeyMap(XK_KP_3, KEY_KEY_3));
-	KeyMap.push_back(SKeyMap(XK_KP_4, KEY_KEY_4));
-	KeyMap.push_back(SKeyMap(XK_KP_5, KEY_KEY_5));
-	KeyMap.push_back(SKeyMap(XK_KP_6, KEY_KEY_6));
-	KeyMap.push_back(SKeyMap(XK_KP_7, KEY_KEY_7));
-	KeyMap.push_back(SKeyMap(XK_KP_8, KEY_KEY_8));
-	KeyMap.push_back(SKeyMap(XK_KP_9, KEY_KEY_9));
+	KeyMap.push_back(SKeyMap(XK_KP_0, KEY_NUMPAD0));
+	KeyMap.push_back(SKeyMap(XK_KP_1, KEY_NUMPAD1));
+	KeyMap.push_back(SKeyMap(XK_KP_2, KEY_NUMPAD2));
+	KeyMap.push_back(SKeyMap(XK_KP_3, KEY_NUMPAD3));
+	KeyMap.push_back(SKeyMap(XK_KP_4, KEY_NUMPAD4));
+	KeyMap.push_back(SKeyMap(XK_KP_5, KEY_NUMPAD5));
+	KeyMap.push_back(SKeyMap(XK_KP_6, KEY_NUMPAD6));
+	KeyMap.push_back(SKeyMap(XK_KP_7, KEY_NUMPAD7));
+	KeyMap.push_back(SKeyMap(XK_KP_8, KEY_NUMPAD8));
+	KeyMap.push_back(SKeyMap(XK_KP_9, KEY_NUMPAD9));
 	KeyMap.push_back(SKeyMap(XK_F1, KEY_F1));
 	KeyMap.push_back(SKeyMap(XK_F2, KEY_F2));
 	KeyMap.push_back(SKeyMap(XK_F3, KEY_F3));
@@ -2023,7 +2028,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 		if (-1 == info.fd)
 			continue;
 
-#ifdef __FREE_BSD_
+#ifdef __FreeBSD__
 		info.axes=2;
 		info.buttons=2;
 #else
@@ -2042,13 +2047,13 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 
 		ActiveJoysticks.push_back(info);
 
-        returnInfo.HasGenericName = false;
+		returnInfo.HasGenericName = false;
 		returnInfo.Joystick = joystick;
 		returnInfo.PovHat = SJoystickInfo::POV_HAT_UNKNOWN;
 		returnInfo.Axes = info.axes;
 		returnInfo.Buttons = info.buttons;
 
-#ifndef __FREE_BSD_
+#ifndef __FreeBSD__
 		char name[80];
 		ioctl( info.fd, JSIOCGNAME(80), name);
 		returnInfo.Name = name;
@@ -2083,13 +2088,14 @@ void CIrrDeviceLinux::pollJoysticks()
 	{
 		JoystickInfo & info =  ActiveJoysticks[j];
 
-#ifdef __FREE_BSD_
+#ifdef __FreeBSD__
 		struct joystick js;
-		if (read(info.fd, &js, JS_RETURN) == JS_RETURN)
+		if (read(info.fd, &js, sizeof(js)) == sizeof(js))
 		{
-			info.persistentData.JoystickEvent.ButtonStates = js.buttons; /* should be a two-bit field */
+			info.persistentData.JoystickEvent.ButtonStates = js.b1 | (js.b2 << 1); /* should be a two-bit field */
 			info.persistentData.JoystickEvent.Axis[0] = js.x; /* X axis */
 			info.persistentData.JoystickEvent.Axis[1] = js.y; /* Y axis */
+		}
 #else
 		struct js_event event;
 		while (sizeof(event) == read(info.fd, &event, sizeof(event)))
@@ -2217,47 +2223,59 @@ bool CIrrDeviceLinux::getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &bright
 const c8* CIrrDeviceLinux::getTextFromClipboard() const
 {
 #if defined(_IRR_COMPILE_WITH_X11_)
-	Window ownerWindow = XGetSelectionOwner (display, X_ATOM_CLIPBOARD);
-	if ( ownerWindow ==  window )
+	if (X_ATOM_CLIPBOARD == None) 
+	{
+		os::Printer::log("Couldn't access X clipboard", ELL_WARNING);
+		return 0;
+	}
+	
+	Window ownerWindow = XGetSelectionOwner(display, X_ATOM_CLIPBOARD);
+	if (ownerWindow == window)
 	{
 		return Clipboard.c_str();
 	}
+
 	Clipboard = "";
-	if (ownerWindow != None )
+
+	if (ownerWindow == None)
+		return 0;
+
+	Atom selection = XInternAtom(display, "IRR_SELECTION", False);
+	XConvertSelection(display, X_ATOM_CLIPBOARD, XA_STRING, selection, window, CurrentTime);
+	
+	const int SELECTION_RETRIES = 500;
+	int i = 0;
+	for (i = 0; i < SELECTION_RETRIES; i++)
 	{
-		XConvertSelection (display, X_ATOM_CLIPBOARD, XA_STRING, None, ownerWindow, CurrentTime);
-		XFlush (display);
+		XEvent xevent;
+		bool res = XCheckTypedWindowEvent(display, window, SelectionNotify, &xevent);
+		
+		if (res && xevent.xselection.selection == X_ATOM_CLIPBOARD) 
+			break;
 
-		// check for data
-		Atom type;
-		int format;
-		unsigned long numItems, bytesLeft, dummy;
-		unsigned char *data;
-		XGetWindowProperty (display, ownerWindow,
-				XA_STRING, // property name
-				0, // offset
-				0, // length (we only check for data, so 0)
-				0, // Delete 0==false
-				AnyPropertyType, // AnyPropertyType or property identifier
-				&type, // return type
-				&format, // return format
-				&numItems, // number items
-				&bytesLeft, // remaining bytes for partial reads
-				&data); // data
-		if ( bytesLeft > 0 )
-		{
-			// there is some data to get
-			int result = XGetWindowProperty (display, ownerWindow, XA_STRING, 0,
-										bytesLeft, 0, AnyPropertyType, &type, &format,
-										&numItems, &dummy, &data);
-			if (result == Success)
-				Clipboard = (irr::c8*)data;
-			XFree (data);
-		}
+		usleep(1000);
 	}
+	
+	if (i == SELECTION_RETRIES)
+	{
+		os::Printer::log("Timed out waiting for SelectionNotify event", ELL_WARNING);
+		return 0;
+	}
+	
+	Atom type;
+	int format;
+	unsigned long numItems, dummy;
+	unsigned char *data;
 
+	int result = XGetWindowProperty(display, window, selection, 0, INT_MAX/4, 
+									False, AnyPropertyType, &type, &format, 
+									&numItems, &dummy, &data);
+
+	if (result == Success)
+		Clipboard = (irr::c8*)data;
+		
+	XFree (data);
 	return Clipboard.c_str();
-
 #else
 	return 0;
 #endif

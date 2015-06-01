@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Joerg Henrichs
+//  Copyright (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@
 #include "config/hardware_stats.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "online/http_request.hpp"
@@ -56,7 +57,7 @@ namespace HardwareStats
 
 // ----------------------------------------------------------------------------
 /** Returns the amount of RAM in MB.
- *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
+ *  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs
  */
 int getRAM()
 {
@@ -97,7 +98,7 @@ int getRAM()
 
 // ----------------------------------------------------------------------------
 /** Returns the number of processors on the system.
- *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
+ *  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs
  */
 int getNumProcessors()
 {
@@ -203,7 +204,7 @@ void determineOSVersion()
 #endif
 
 #ifdef WIN32
-    //  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs.
+    //  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs.
 
     HKEY hKey;
     if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
@@ -303,7 +304,7 @@ void reportHardwareStats()
 
     json.add("os_version", getOSVersion());
 
-    unsigned int ogl_version = irr_driver->getGLSLVersion();
+    unsigned int ogl_version = CVS->getGLSLVersion();
     unsigned int major = ogl_version/100;
     unsigned int minor = ogl_version - 100*major;
     std::string version =
@@ -312,9 +313,6 @@ void reportHardwareStats()
 
     std::string vendor, renderer, full_version;
     irr_driver->getOpenGLData(&vendor, &renderer, &full_version);
-    json.add("GL_VENDOR",   vendor          );
-    json.add("GL_RENDERER", renderer        );
-    json.add("GL_VERSION",  full_version    );
     json.add("gfx_drv_ver", "OpenGL "+vendor);
 
     std::string card_name = vendor;

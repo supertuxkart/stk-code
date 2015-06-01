@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,7 +18,6 @@
 #include "states_screens/options_screen_ui.hpp"
 
 #include "addons/news_manager.hpp"
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/hardware_stats.hpp"
@@ -152,6 +151,7 @@ void OptionsScreenUI::init()
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
     difficulty->setState( UserConfigParams::m_per_player_difficulty );
+    difficulty->setTooltip(_("Players can select handicapped (more difficult) profiles on the kart selection screen"));
 
     CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
     assert( show_login!= NULL );

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,7 +27,6 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/hardware_skinning.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
@@ -405,7 +404,6 @@ World::~World()
     if(m_physics)
         delete m_physics;
 
-    music_manager->stopMusic();
     m_world = NULL;
 
     irr_driver->getSceneManager()->clear();
@@ -1147,7 +1145,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
                                        2.0f);
             else
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
-                                       core::stringw(kart->getName())),
+                                       kart->getName()),
                                        camera->getKart(),
                                        2.0f);
         }  // for i < number of cameras

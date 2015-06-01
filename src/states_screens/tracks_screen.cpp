@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -82,7 +82,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             }   // if clicked_track
 
         }   // selection=="random_track"
-        else if (selection == "locked")
+        else if (selection == "locked" && race_manager->getNumLocalPlayers() == 1)
         {
             unlock_manager->playLockSound();
         }
@@ -105,15 +105,14 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         const std::string &selection =
                        gps_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if (selection == "locked")
+        if (selection == "locked" && race_manager->getNumLocalPlayers()==1)
         {
             unlock_manager->playLockSound();
         }
         else
         {
             GPInfoScreen *gpis = GPInfoScreen::getInstance();
-            gpis->setGP( selection == "Random Grand Prix" ? "random" 
-                                                          : selection);
+            gpis->setGP( selection );
             gpis->push();
         }
     }
@@ -148,6 +147,8 @@ void TracksScreen::beforeAddingWidget()
 
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
+    //I18N: track group name
+    FOR_GETTEXT_ONLY( _("all") )
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("standard") )
     //I18N: track group name
@@ -195,7 +196,8 @@ void TracksScreen::init()
         }
         assert(screenshots.size() > 0);
 
-        if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()))
+        if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()) && 
+            race_manager->getNumLocalPlayers() == 1)
         {
             gps_widget->addAnimatedItem(_("Locked!"), "locked",
                                         screenshots, 1.5f,
@@ -214,8 +216,8 @@ void TracksScreen::init()
     // Random GP
     std::vector<std::string> screenshots;
     screenshots.push_back(file_manager->getAsset(FileManager::GUI, "main_help.png"));
-    gps_widget->addAnimatedItem(translations->fribidize("Random Grand Prix"),
-                                "Random Grand Prix",
+    gps_widget->addAnimatedItem(translations->fribidize(GrandPrixData::getRandomGPName()),
+                                GrandPrixData::getRandomGPID(),
                                 screenshots, 1.5f, 0,
                                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 
@@ -276,7 +278,8 @@ void TracksScreen::buildTrackList()
     for (unsigned int i = 0; i < tracks.size(); i++)
     {
         Track *curr = tracks.get(i);
-        if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
+        if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()) &&
+            race_manager->getNumLocalPlayers() == 1)
         {
             tracks_widget->addItem(
                 _("Locked : solve active challenges to gain access to more!"),

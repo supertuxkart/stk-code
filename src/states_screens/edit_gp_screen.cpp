@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 #include "states_screens/edit_gp_screen.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -155,7 +155,7 @@ void EditGPScreen::init()
     {
         LabelWidget* header = getWidget<LabelWidget>("title");
         assert(header != NULL);
-        header->setText(m_gp->getName(), true);
+        header->setText(translations->fribidize(m_gp->getName()), true);
 
         IconButtonWidget* button = getWidget<IconButtonWidget>("save");
         assert(button != NULL);
@@ -281,7 +281,8 @@ void EditGPScreen::setModified(const bool modified)
 
     LabelWidget* header = getWidget<LabelWidget>("title");
     assert(header != NULL);
-    header->setText(m_gp->getName() + (modified ? L" (+)" : L""), true);
+    //I18N: Indicate that the grand prix is modified and not saved
+    header->setText(modified ? _(L"%s (+)", m_gp->getName()) : L"", true);
 
     enableButtons();
 }

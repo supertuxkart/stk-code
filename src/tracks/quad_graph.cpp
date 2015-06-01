@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
 
 #include <IMesh.h>
 #include <ICameraSceneNode.h>
-
+#include "graphics/central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/irr_driver.hpp"
@@ -55,6 +55,7 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
+    m_new_rtt              = NULL;
     QuadSet::create();
     QuadSet::get()->init(quad_file_name);
     m_quad_filename        = quad_file_name;
@@ -72,6 +73,8 @@ QuadGraph::~QuadGraph()
     }
     if(UserConfigParams::m_track_debug)
         cleanupDebugMesh();
+    if (m_new_rtt != NULL)
+        delete m_new_rtt;
 }   // ~QuadGraph
 
 // -----------------------------------------------------------------------------
@@ -989,9 +992,9 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
 
     RTT* newRttProvider = NULL;
     IrrDriver::RTTProvider* oldRttProvider = NULL;
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
     {
-        newRttProvider = new RTT(dimension.Width, dimension.Height);
+        m_new_rtt = newRttProvider = new RTT(dimension.Width, dimension.Height);
     }
     else
     {
@@ -1076,12 +1079,9 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     video::ITexture* texture = NULL;
     FrameBuffer* frame_buffer = NULL;
 
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
     {
         frame_buffer = newRttProvider->render(camera, GUIEngine::getLatestDt());
-
-        // TODO: leak
-        //delete newRttProvider;
     }
     else
     {

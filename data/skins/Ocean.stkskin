@@ -68,12 +68,16 @@ when the border that intersect at this corner are enabled.
 <!--  Stateless -->
 <element type="background" image="ocean/background.jpg" />
 
-<element type="achievement-message" image="ocean/glassbutton.png"
-      left_border="13" right_border="13" top_border="13" bottom_border="13"
+<element type="achievement-message" image="ocean/achievement.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.3" vborder_out_portion="0"/>
+
+<element type="friend-message" image="ocean/friend.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
-<element type="friend-message" image="ocean/glassbutton.png"
-      left_border="13" right_border="13" top_border="13" bottom_border="13"
+<element type="error-message" image="ocean/error.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
 <element type="button" state="neutral" image="ocean/glassbutton.png"

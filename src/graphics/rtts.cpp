@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Lauri Kasanen
+//  Copyright (C) 2013-2015 Lauri Kasanen
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/rtts.hpp"
-
+#include "central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
@@ -29,7 +29,7 @@ static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint i
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(target, result);
-    if (irr_driver->hasARBTextureStorage())
+    if (CVS->isARBTextureStorageUsable())
         glTexStorage3D(target, mipmaplevel, internalFormat, w, h, d);
     else
         glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
@@ -41,31 +41,11 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(GL_TEXTURE_2D, result);
-    if (irr_driver->hasARBTextureStorage())
+    if (CVS->isARBTextureStorageUsable())
         glTexStorage2D(GL_TEXTURE_2D, mipmaplevel, internalFormat, res.Width, res.Height);
     else
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
     return result;
-}
-
-static GLuint generateFBO(GLuint ColorAttachement)
-{
-    GLuint fbo;
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ColorAttachement, 0);
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
-    return fbo;
-}
-
-static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
-{
-    GLuint fbo = generateFBO(ColorAttachement);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthAttachement, 0);
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
-    return fbo;
 }
 
 RTT::RTT(size_t width, size_t height)
@@ -243,17 +223,17 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_LENS_128]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
 
-    if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
+    if (CVS->isShadowEnabled())
     {
-        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R32F, GL_RED, GL_FLOAT, 10);
-        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1);
+        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, 4, GL_R32F, GL_RED, GL_FLOAT, 10);
+        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1);
 
         somevector.clear();
         somevector.push_back(shadowColorTex);
-        m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
+        m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, true);
     }
 
-    if (UserConfigParams::m_gi)
+    if (CVS->isGlobalIlluminationEnabled())
     {
         //Todo : use "normal" shadowtex
         RSM_Color = generateRTT(shadowsize0, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE);
@@ -291,13 +271,13 @@ RTT::~RTT()
 {
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
-    if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
+    if (CVS->isShadowEnabled())
     {
         delete m_shadow_FBO;
         glDeleteTextures(1, &shadowColorTex);
         glDeleteTextures(1, &shadowDepthTex);
     }
-    if (UserConfigParams::m_gi)
+    if (CVS->isGlobalIlluminationEnabled())
     {
         delete m_RH_FBO;
         delete m_RSM;
@@ -319,13 +299,16 @@ FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
     std::vector<IrrDriver::GlowData> glows;
     // TODO: put this outside of the rendering loop
     irr_driver->generateDiffuseCoefficients();
-    irr_driver->computeCameraMatrix(camera, m_width, m_height);
+    irr_driver->computeMatrixesAndCameras(camera, m_width, m_height);
     unsigned plc = irr_driver->UpdateLightsInfo(camera, dt);
+    irr_driver->uploadLightingData();
     irr_driver->renderScene(camera, plc, glows, dt, false, true);
     FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
 
     // reset
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    glViewport(0, 0,
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height);
     irr_driver->setRTT(NULL);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

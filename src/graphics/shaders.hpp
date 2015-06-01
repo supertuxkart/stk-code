@@ -1,4 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -30,7 +31,7 @@ class SharedObject
 {
 public:
     static GLuint billboardvbo;
-    static GLuint cubevbo, cubeindexes, frustrumvbo, frustrumindexes, ParticleQuadVBO;
+    static GLuint skytrivbo, frustrumvbo, frustrumindexes, ParticleQuadVBO;
     static GLuint ViewProjectionMatrixesUBO, LightingDataUBO;
     static GLuint FullScreenQuadVAO;
     static GLuint UIVAO;
@@ -281,11 +282,11 @@ public:
     DisplaceShader();
 };
 
-class SkyboxShader : public ShaderHelperSingleton<SkyboxShader, core::matrix4>, public TextureRead<Trilinear_cubemap>
+class SkyboxShader : public ShaderHelperSingleton<SkyboxShader>, public TextureRead<Trilinear_cubemap>
 {
 public:
     SkyboxShader();
-    GLuint cubevao;
+    GLuint vao;
 };
 
 class NormalVisualizer : public ShaderHelperSingleton<NormalVisualizer, video::SColor>
@@ -426,10 +427,22 @@ public:
     IBLShader();
 };
 
-class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShader, float, float, float, float, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
+class DegradedIBLShader : public ShaderHelperSingleton<DegradedIBLShader>, public TextureRead<Nearest_Filtered>
 {
 public:
-    ShadowedSunLightShader();
+    DegradedIBLShader();
+};
+
+class ShadowedSunLightShaderPCF : public ShaderHelperSingleton<ShadowedSunLightShaderPCF, float, float, float, float, float>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
+{
+public:
+    ShadowedSunLightShaderPCF();
+};
+
+class ShadowedSunLightShaderESM : public ShaderHelperSingleton<ShadowedSunLightShaderESM, float, float, float, float>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Trilinear_Clamped_Array2D>
+{
+public:
+    ShadowedSunLightShaderESM();
 };
 
 class RadianceHintsConstructionShader : public ShaderHelperSingleton<RadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df, video::SColorf>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
@@ -545,11 +558,9 @@ public:
     Gaussian3VBlurShader();
 };
 
-class PassThroughShader : public ShaderHelperSingleton<PassThroughShader>, public TextureRead<Bilinear_Filtered>
+class PassThroughShader : public ShaderHelperSingleton<PassThroughShader, int, int>, public TextureRead<Bilinear_Filtered>
 {
 public:
-    GLuint vao;
-
     PassThroughShader();
 };
 
@@ -572,6 +583,12 @@ class LightspaceBoundingBoxShader : public ShaderHelperSingleton<LightspaceBound
 {
 public:
     LightspaceBoundingBoxShader();
+};
+
+class ShadowMatrixesGenerationShader : public ShaderHelperSingleton <ShadowMatrixesGenerationShader, core::matrix4>
+{
+public:
+    ShadowMatrixesGenerationShader();
 };
 
 class DepthHistogramShader : public ShaderHelperSingleton<DepthHistogramShader>, public TextureRead <Nearest_Filtered>
@@ -609,40 +626,30 @@ public:
 class GodFadeShader : public ShaderHelperSingleton<GodFadeShader, video::SColorf>, public TextureRead<Bilinear_Filtered>
 {
 public:
-    GLuint vao;
-
     GodFadeShader();
 };
 
 class GodRayShader : public ShaderHelperSingleton<GodRayShader, core::vector2df>, public TextureRead<Bilinear_Filtered>
 {
 public:
-    GLuint vao;
-
     GodRayShader();
 };
 
 class MLAAColorEdgeDetectionSHader : public ShaderHelperSingleton<MLAAColorEdgeDetectionSHader, core::vector2df>, public TextureRead<Nearest_Filtered>
 {
 public:
-    GLuint vao;
-
     MLAAColorEdgeDetectionSHader();
 };
 
 class MLAABlendWeightSHader : public ShaderHelperSingleton<MLAABlendWeightSHader, core::vector2df>, public TextureRead<Bilinear_Filtered, Nearest_Filtered>
 {
 public:
-    GLuint vao;
-
     MLAABlendWeightSHader();
 };
 
 class MLAAGatherSHader : public ShaderHelperSingleton<MLAAGatherSHader, core::vector2df>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
 {
 public:
-    GLuint vao;
-
     MLAAGatherSHader();
 };
 

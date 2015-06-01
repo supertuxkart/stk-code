@@ -48,6 +48,7 @@ struct btWheelInfo
 		btVector3	m_wheelAxleWS; // axle in worldspace
 		bool		m_isInContact;
 		void*		m_groundObject; //could be general void* ptr
+        int         m_triangle_index; // if a triangle mesh was hit, the index of the triangle.
 	};
 
 	RaycastInfo	m_raycastInfo;

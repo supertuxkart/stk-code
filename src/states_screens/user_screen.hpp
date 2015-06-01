@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -89,6 +89,15 @@ private:
     /** The dynamic ribbon containing all players. */
     GUIEngine::DynamicRibbonWidget* m_players;
 
+    /** Set to indicate when the sceen is initialised that new data from a
+     *  registration are available, and therefore entry fields are not
+     *  all cleared. */
+    bool m_new_registered_data;
+
+    /** Set from the register screen if the newly created account can be
+     *  used directly without waiting to confirm the account. */
+    bool m_auto_login;
+
     void selectUser(int index);
     void makeEntryFieldsVisible();
     void login();
@@ -115,6 +124,9 @@ public:
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
 
+    void setNewAccountData(bool online, bool auto_login,
+                           const core::stringw &online_name="",
+                           const core::stringw &password="");
     void loginSuccessful();
     void loginError(const irr::core::stringw &error_message);
     void logoutSuccessful();

@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2010-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2010-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -84,6 +84,8 @@ private:
 
     /** Name of the texture. */
     std::string      m_texname;
+
+    std::string      m_full_path;
 
     /** If true, the texture will not automatically be loaded and bound
      *  at load time, it must be loaded elsewhere. This is used to store
@@ -288,6 +290,9 @@ public:
     // ------------------------------------------------------------------------
     const std::string&
           getTexFname        () const { return m_texname;            }
+    // ------------------------------------------------------------------------
+    const std::string&
+          getTexFullPath     () const { return m_full_path;          }
 
     // ------------------------------------------------------------------------
     bool  isTransparent      () const

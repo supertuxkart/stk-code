@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 Marianne Gagnon
+//  Copyright (C) 2012-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -131,13 +131,13 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     if (c->getData()->isGrandPrix())
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(c->getData()->getGPId());
-        getWidget<LabelWidget>("title")->setText( gp->getName(), true );
+        getWidget<LabelWidget>("title")->setText(translations->fribidize(gp->getName()), true);
     }
     else
     {
         const core::stringw track_name =
             track_manager->getTrack(c->getData()->getTrackId())->getName();
-        getWidget<LabelWidget>("title")->setText( track_name, true );
+        getWidget<LabelWidget>("title")->setText(translations->fribidize(track_name), true);
     }
 
     LabelWidget* typeLbl = getWidget<LabelWidget>("race_type_val");

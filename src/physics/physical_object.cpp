@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -37,6 +37,7 @@ using namespace irr;
 
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
+#include <ITexture.h>
 
 /** Creates a physical Settings object with the given type, radius and mass.
  */
@@ -62,6 +63,8 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
     xml_node.get("reset",   &m_crash_reset );
     xml_node.get("explode", &m_knock_kart  );
     xml_node.get("flatten", &m_flatten_kart);
+    xml_node.get("on-kart-collision", &m_on_kart_collision);
+    xml_node.get("on-item-collision", &m_on_item_collision);
     m_reset_when_too_low =
         xml_node.get("reset-when-below", &m_reset_height) == 1;
 
@@ -139,6 +142,8 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_flatten_kart       = settings.m_flatten_kart;
     m_reset_when_too_low = settings.m_reset_when_too_low;
     m_reset_height       = settings.m_reset_height;
+    m_on_kart_collision  = settings.m_on_kart_collision;
+    m_on_item_collision  = settings.m_on_item_collision;
 
     m_init_pos.setIdentity();
     Vec3 radHpr(m_init_hpr);
@@ -245,6 +250,10 @@ void PhysicalObject::init()
     {
         Log::fatal("PhysicalObject", "Unknown node type");
     }
+
+    max = max * Vec3(m_init_scale);
+    min = min * Vec3(m_init_scale);
+
     Vec3 extend = max-min;
     // Adjust the mesth of the graphical object so that its center is where it
     // is in bullet (usually at (0,0,0)). It can be changed in the case clause
@@ -502,10 +511,8 @@ void PhysicalObject::update(float dt)
     hpr.setHPR(t.getRotation());
     //m_node->setRotation(hpr.toIrrHPR());
 
-    core::vector3df scale(1,1,1);
     m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE,
-                   scale, false);
-    return;
+                   m_init_scale, false, true /* isAbsoluteCoord */);
 }   // update
 
 // ----------------------------------------------------------------------------

@@ -38,27 +38,6 @@ public:
 	/** \return Pointer to mesh which is displayed by this node. */
 	virtual IMesh* getMesh(void) = 0;
 
-	//! Creates shadow volume scene node as child of this node.
-	/** The shadow can be rendered using the ZPass or the zfail
-	method. ZPass is a little bit faster because the shadow volume
-	creation is easier, but with this method there occur ugly
-	looking artifacs when the camera is inside the shadow volume.
-	These error do not occur with the ZFail method.
-	\param shadowMesh: Optional custom mesh for shadow volume.
-	\param id: Id of the shadow scene node. This id can be used to
-	identify the node later.
-	\param zfailmethod: If set to true, the shadow will use the
-	zfail method, if not, zpass is used.
-	\param infinity: Value used by the shadow volume algorithm to
-	scale the shadow volume (for zfail shadow volume we support only
-	finite shadows, so camera zfar must be larger than shadow back cap,
-	which is depend on infinity parameter).
-	\return Pointer to the created shadow scene node. This pointer
-	should not be dropped. See IReferenceCounted::drop() for more
-	information. */
-	virtual IShadowVolumeSceneNode* addShadowVolumeSceneNode(const IMesh* shadowMesh=0,
-		s32 id=-1, bool zfailmethod=true, f32 infinity=1000.0f) = 0;
-
 	//! Sets if the scene node should not copy the materials of the mesh but use them in a read only style.
 	/** In this way it is possible to change the materials of a mesh
 	causing all mesh scene nodes referencing this mesh to change, too.

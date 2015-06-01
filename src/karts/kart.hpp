@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -170,9 +170,6 @@ private:
     /** Is time flying activated */
     bool             m_is_jumping;
 
-    /** The shadow of a kart. */
-    Shadow          *m_shadow;
-
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool             m_shadow_enabled;
@@ -217,11 +214,18 @@ private:
     SFXBase      *m_goo_sound;
     SFXBase      *m_boing_sound;
     float         m_time_last_crash;
+    RaceManager::KartType m_type;
 
     /** To prevent using nitro in too short bursts */
     float         m_min_nitro_time;
 
+    /** A light that's shown when the kart uses nitro. */
     scene::ISceneNode* m_nitro_light;
+
+    /** Lights that are shown when the kart is skidding. */
+    scene::ISceneNode* m_skidding_light_1;
+    /** A light that's shown on the second skid-level with another color. */
+    scene::ISceneNode* m_skidding_light_2;
 
     void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);
@@ -249,8 +253,8 @@ public:
     virtual bool   isInRest         () const;
     virtual void   applyEngineForce (float force);
 
-    virtual void flyUp();
-    virtual void flyDown();
+    virtual void   flyUp();
+    virtual void   flyDown();
 
     virtual void   startEngineSFX   ();
     virtual void   adjustSpeed      (float f);
@@ -359,6 +363,8 @@ public:
      *  skidding related values) - non-const. */
     virtual Skidding *getSkidding() { return m_skidding; }
     // ------------------------------------------------------------------------
+    virtual RaceManager::KartType getType() const { return m_type; }
+    // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
     virtual btKart    *getVehicle() const {return m_vehicle;               }
     // ------------------------------------------------------------------------
@@ -445,6 +451,8 @@ public:
     /** Counter which is used for displaying wrong way message after a delay */
     float getWrongwayCounter() { return m_wrongway_counter; }
     void setWrongwayCounter(float counter) { m_wrongway_counter = counter; }
+
+    void activateSkidLight(unsigned int level);
 };   // Kart
 
 

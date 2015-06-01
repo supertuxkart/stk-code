@@ -5,18 +5,11 @@ uniform sampler2D tex;
 uniform vec2 dir;
 uniform vec2 dir2;
 
-#if __VERSION__ >= 130
 in vec2 uv;
 in vec2 uv_bis;
 in float camdist;
 
 out vec4 FragColor;
-#else
-varying vec2 uv;
-varying vec2 uv_bis;
-varying float camdist;
-#define FragColor gl_FragColor
-#endif
 
 const float maxlen = 0.02;
 

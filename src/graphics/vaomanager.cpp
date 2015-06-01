@@ -1,23 +1,44 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "vaomanager.hpp"
 #include "irr_driver.hpp"
 #include "stkmesh.hpp"
 #include "glwrap.hpp"
+#include "central_settings.hpp"
 
 VAOManager::VAOManager()
 {
-    vao[0] = vao[1] = vao[2] = 0;
-    vbo[0] = vbo[1] = vbo[2] = 0;
-    ibo[0] = ibo[1] = ibo[2] = 0;
-    last_vertex[0] = last_vertex[1] = last_vertex[2] = 0;
-    last_index[0] = last_index[1] = last_index[2] = 0;
-    RealVBOSize[0] = RealVBOSize[1] = RealVBOSize[2] = 0;
-    RealIBOSize[0] = RealIBOSize[1] = RealIBOSize[2] = 0;
+    for (unsigned i = 0; i < VTXTYPE_COUNT; i++)
+    {
+        vao[i] = 0;
+        vbo[i] = 0;
+        ibo[i] = 0;
+        last_vertex[i] = 0;
+        last_index[i] = 0;
+        RealVBOSize[i] = 0;
+        RealIBOSize[i] = 0;
+    }
 
     for (unsigned i = 0; i < InstanceTypeCount; i++)
     {
         glGenBuffers(1, &instance_vbo[i]);
         glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[i]);
-        if (irr_driver->hasBufferStorageExtension())
+        if (CVS->supportsAsyncInstanceUpload())
         {
             glBufferStorage(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceDataDualTex), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
             Ptr[i] = glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
@@ -40,7 +61,7 @@ void VAOManager::cleanInstanceVAOs()
 VAOManager::~VAOManager()
 {
     cleanInstanceVAOs();
-    for (unsigned i = 0; i < 3; i++)
+    for (unsigned i = 0; i < VTXTYPE_COUNT; i++)
     {
         if (vbo[i])
             glDeleteBuffers(1, &vbo[i]);
@@ -56,63 +77,43 @@ VAOManager::~VAOManager()
 
 }
 
+static void
+resizeBufferIfNecessary(size_t &lastIndex, size_t newLastIndex, size_t bufferSize, size_t stride, GLenum type, GLuint &id, void *&Pointer)
+{
+    if (newLastIndex * stride >= bufferSize)
+    {
+        while (newLastIndex >= bufferSize)
+            bufferSize = 2 * bufferSize + 1;
+        GLuint newVBO;
+        glGenBuffers(1, &newVBO);
+        glBindBuffer(type, newVBO);
+        if (CVS->supportsAsyncInstanceUpload())
+        {
+            glBufferStorage(type, bufferSize *stride, 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+            Pointer = glMapBufferRange(type, 0, bufferSize * stride, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+        }
+        else
+            glBufferData(type, bufferSize * stride, 0, GL_DYNAMIC_DRAW);
+
+        if (id)
+        {
+            // Copy old data
+            GLuint oldVBO = id;
+            glBindBuffer(GL_COPY_WRITE_BUFFER, newVBO);
+            glBindBuffer(GL_COPY_READ_BUFFER, oldVBO);
+            glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, lastIndex * stride);
+            glDeleteBuffers(1, &oldVBO);
+        }
+        id = newVBO;
+    }
+    lastIndex = newLastIndex;
+}
+
 void VAOManager::regenerateBuffer(enum VTXTYPE tp, size_t newlastvertex, size_t newlastindex)
 {
     glBindVertexArray(0);
-
-    if (newlastindex >= RealVBOSize[tp])
-    {
-        while (newlastindex >= RealVBOSize[tp])
-            RealVBOSize[tp] = 2 * RealVBOSize[tp] + 1;
-        GLuint newVBO;
-        glGenBuffers(1, &newVBO);
-        glBindBuffer(GL_ARRAY_BUFFER, newVBO);
-        if (irr_driver->hasBufferStorageExtension())
-        {
-            glBufferStorage(GL_ARRAY_BUFFER, RealVBOSize[tp] * getVertexPitch(tp), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-            VBOPtr[tp] = glMapBufferRange(GL_ARRAY_BUFFER, 0, RealVBOSize[tp] * getVertexPitch(tp), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-        }
-        else
-            glBufferData(GL_ARRAY_BUFFER, RealVBOSize[tp] * getVertexPitch(tp), 0, GL_DYNAMIC_DRAW);
-
-        if (vbo[tp])
-        {
-            GLuint oldVBO = vbo[tp];
-            glBindBuffer(GL_COPY_WRITE_BUFFER, newVBO);
-            glBindBuffer(GL_COPY_READ_BUFFER, oldVBO);
-            glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, last_vertex[tp] * getVertexPitch(tp));
-            glDeleteBuffers(1, &oldVBO);
-        }
-        vbo[tp] = newVBO;
-    }
-    last_vertex[tp] = newlastvertex;
-
-    if (newlastindex >= RealIBOSize[tp])
-    {
-        while (newlastindex >= RealIBOSize[tp])
-            RealIBOSize[tp] = 2 * RealIBOSize[tp] + 1;
-        GLuint newIBO;
-        glGenBuffers(1, &newIBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newIBO);
-        if (irr_driver->hasBufferStorageExtension())
-        {
-            glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, RealIBOSize[tp] * sizeof(u16), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-            IBOPtr[tp] = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, RealIBOSize[tp] * sizeof(u16), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-        }
-        else
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, RealIBOSize[tp] * sizeof(u16), 0, GL_STATIC_DRAW);
-
-        if (ibo[tp])
-        {
-            GLuint oldIBO = ibo[tp];
-            glBindBuffer(GL_COPY_WRITE_BUFFER, newIBO);
-            glBindBuffer(GL_COPY_READ_BUFFER, oldIBO);
-            glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, last_index[tp] * sizeof(u16));
-            glDeleteBuffers(1, &oldIBO);
-        }
-        ibo[tp] = newIBO;
-    }
-    last_index[tp] = newlastindex;
+    resizeBufferIfNecessary(last_vertex[tp], newlastvertex, RealVBOSize[tp], getVertexPitch(tp), GL_ARRAY_BUFFER, vbo[tp], VBOPtr[tp]);
+    resizeBufferIfNecessary(last_index[tp], newlastindex, RealIBOSize[tp], sizeof(u16), GL_ELEMENT_ARRAY_BUFFER, ibo[tp], IBOPtr[tp]);
 }
 
 void VAOManager::regenerateVAO(enum VTXTYPE tp)
@@ -287,7 +288,7 @@ void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
     size_t old_idx_cnt = last_index[tp];
 
     regenerateBuffer(tp, old_vtx_cnt + mb->getVertexCount(), old_idx_cnt + mb->getIndexCount());
-    if (irr_driver->hasBufferStorageExtension())
+    if (CVS->supportsAsyncInstanceUpload())
     {
         void *tmp = (char*)VBOPtr[tp] + old_vtx_cnt * getVertexPitch(tp);
         memcpy(tmp, mb->getVertices(), mb->getVertexCount() * getVertexPitch(tp));
@@ -297,7 +298,7 @@ void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
         glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
         glBufferSubData(GL_ARRAY_BUFFER, old_vtx_cnt * getVertexPitch(tp), mb->getVertexCount() * getVertexPitch(tp), mb->getVertices());
     }
-    if (irr_driver->hasBufferStorageExtension())
+    if (CVS->supportsAsyncInstanceUpload())
     {
         void *tmp = (char*)IBOPtr[tp] + old_idx_cnt * sizeof(u16);
         memcpy(tmp, mb->getIndices(), mb->getIndexCount() * sizeof(u16));

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -229,7 +229,6 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 if (text != NULL)
                 {
                     widget.m_text = _(text);
-                    widget.m_is_text_rtl = (translations->isRTLLanguage() && widget.m_text != text);
                 }
 
                 const wchar_t* raw_text = xml->getAttributeValue(L"raw_text");

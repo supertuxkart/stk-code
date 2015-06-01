@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,8 @@
 #define HEADER_RIBBONGRID_HPP
 
 #include <irrString.h>
+
+#include <algorithm>
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -236,6 +238,13 @@ namespace GUIEngine
         /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
             'updateItemDisplay' to update the display. */
         void clearItems();
+
+        /** Sort the list of items with a given comparator. */
+        template<typename Compare>
+        void sortItems(Compare comp)
+        {
+            std::sort(m_items.begin(), m_items.end(), comp);
+        }
 
         /**
           * \brief Register a listener to be notified of selection changes within the ribbon.

@@ -1,3 +1,21 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+
 // Not really a scene manager yet but hold algorithm that
 // rework scene manager output
 
@@ -5,6 +23,7 @@
 #define HEADER_STKSCENEMANAGER_HPP
 
 #include "utils/singleton.hpp"
+#include "central_settings.hpp"
 #include "gl_headers.hpp"
 #include "stkmesh.hpp"
 #include "gpuparticles.hpp"
@@ -20,7 +39,7 @@ public:
     {
         glGenBuffers(1, &drawindirectcmd);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
-        if (irr_driver->hasBufferStorageExtension())
+        if (CVS->supportsAsyncInstanceUpload())
         {
             glBufferStorage(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
             Ptr = (DrawElementsIndirectCommand *)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);

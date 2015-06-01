@@ -1,8 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2014 Glenn De Jonghe
-//                     2014 Joerg Henrichs
-
+//  Copyright (C) 2013-2015 Glenn De Jonghe
+//            (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,10 +20,10 @@
 #ifndef HEADER_ACHIEVEMENT_INFO_HPP
 #define HEADER_ACHIEVEMENT_INFO_HPP
 
-#include "utils/types.hpp"
-
-#include "io/xml_node.hpp"
 #include "achievements/achievement.hpp"
+#include "io/xml_node.hpp"
+#include "utils/translation.hpp"
+#include "utils/types.hpp"
 
 #include <irrString.h>
 #include <string>
@@ -51,7 +50,8 @@ public:
            ACHIEVE_GOLD_DRIVER   = 6,
            ACHIEVE_POWERUP_LOVER = 7,
            ACHIEVE_UNSTOPPABLE   = 8,
-           ACHIEVE_BANANA        = 9
+           ACHIEVE_BANANA        = 9,
+           ACHIEVE_MOSQUITO      = 11
     };
 
     /** Achievement check type:
@@ -80,7 +80,7 @@ private:
     uint32_t           m_id;
 
     /** The title of this achievement. */
-    irr::core::stringw m_title;
+    irr::core::stringw m_name;
 
     /** The description of this achievement. */
     irr::core::stringw m_description;
@@ -110,10 +110,10 @@ public:
     uint32_t getID() const { return m_id; }
     // ------------------------------------------------------------------------
     /** Returns the description of this achievement. */
-    irr::core::stringw getDescription() const { return m_description; }
+    irr::core::stringw getDescription() const { return _(m_description.c_str()); }
     // ------------------------------------------------------------------------
-    /** Returns the title of this achievement. */
-    irr::core::stringw getTitle() const { return m_title; }
+    /** Returns the name of this achievement. */
+    irr::core::stringw getName() const { return _LTR(m_name.c_str()); }
     // ------------------------------------------------------------------------
     bool needsResetAfterRace() const { return m_reset_type == AFTER_RACE; }
     // ------------------------------------------------------------------------

@@ -14,6 +14,6 @@
     </medium>
     <easy>
         <karts number="4"/>
-        <requirements time="215"/>
+        <requirements time="255"/>
     </easy>
 </challenge>

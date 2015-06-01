@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Joerg Henrichs
+//  Copyright (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -33,10 +33,50 @@ namespace GraphicsRestrictions
     class Rule;
     namespace Private
     {
-        std::vector<Rule*> m_all_rules;
+        /** Stores for each grpahics restriction if it's enabled or not. */
+        std::vector<bool> m_all_graphics_restriction;
 
+        /** The list of names used in the XML file for the graphics
+         *  restriction types. They must be in the same order as the types. */
+
+        char *m_names_of_restrictions[] = {
+            "UniformBufferObject",
+            "GeometryShader4",
+            "DrawIndirect",
+            "TextureView",
+            "TextureStorage",
+            "ImageLoadStore",
+            "BaseInstance",
+            "ComputeShader",
+            "ShaderStorageBufferObject",
+            "MultiDrawIndirect",
+            "ShaderAtomicCounters",
+            "BufferStorage",
+            "BindlessTexture",
+            "TextureCompressionS3TC",
+            "AMDVertexShaderLayer",
+            "DriverRecentEnough",
+            "HighDefinitionTextures",
+            "AdvancedPipeline",
+            "FramebufferSRGBWorking",
+            "GI",
+        };
     }   // namespace Private
     using namespace Private;
+
+    /** Returns the graphics restrictions type for a string, or
+     *  GR_COUNT if the name is not found. */
+GraphicsRestrictionsType getTypeForName(const std::string &name)
+{
+    unsigned int i = 0;
+    while (m_names_of_restrictions[i] != NULL)
+    {
+        if (name == m_names_of_restrictions[i])
+            return (GraphicsRestrictionsType)i;
+        i++;
+    }
+    return GR_COUNT;
+}   // getTypeForName
 
 // ============================================================================
 /** A small utility class to manage and compare version tuples.
@@ -85,6 +125,27 @@ public:
     {
         m_version.clear();
 
+        // Mesa needs to be tested first, otherwise (if testing for card name
+        // further down) it would be detected as a non-mesa driver.
+        if (driver_version.find("Mesa") != std::string::npos)
+        {
+            std::string driver;
+            // Try to force the driver name to be in a standard way by removing
+            // optional strings
+            driver = StringUtils::replace(driver_version, "-devel",         "");
+            driver = StringUtils::replace(driver,         "(Core Profile) ", "");
+            std::vector<std::string> l = StringUtils::split(driver, ' ');
+            if (l.size() > 2)
+            {
+                // driver can be: "1.4 (3.0 Mesa 10.1.0)" --> l[3] must be used
+                if (l[2] != "Mesa")
+                    convertVersionString(l[2]);
+                else
+                    convertVersionString(l[3]);
+                return;
+            }
+        }
+
         // Intel card: driver version = "3.1.0 - Build 9.17.10.3517"
         // ---------------------------------------------------------
         if (StringUtils::startsWith(card_name, "Intel"))
@@ -110,6 +171,39 @@ public:
 
         }
 
+        // ATI: some drivers use e.g.: "4.1 ATI-1.24.38"
+        if (driver_version.find("ATI-") != std::string::npos)
+        {
+            std::string driver;
+            // Try to force the driver name to be in a standard way by removing
+            // optional strings
+            driver = StringUtils::replace(driver_version, "ATI-", "");
+            std::vector<std::string> s = StringUtils::split(driver, ' ');
+            convertVersionString(s[1]);
+            return;
+        }
+
+        // AMD: driver_version = "4.3.13283 Core Profile/Debug Context 14.501.1003.0"
+        // ----------------------------------------------
+        if (card_name.find("AMD") != std::string::npos)
+        {
+            std::vector<std::string> s = StringUtils::split(driver_version, ' ');
+            if (s.size() == 5)
+            {
+                convertVersionString(s[4]);
+                return;
+            }
+
+        }
+
+        // ATI: other drivers use "4.0.10188 Core Profile Context"
+        if (card_name.find("ATI") != std::string::npos)
+        {
+            std::vector<std::string> s = StringUtils::split(driver_version, ' ');
+            convertVersionString(s[0]);
+            return;
+        }
+
         Log::warn("Graphics", "Can not find version for '%s' '%s' - ignored.",
             driver_version.c_str(), card_name.c_str());
 
@@ -117,33 +211,53 @@ public:
 
     // ------------------------------------------------------------------------
     /** Compares two version numbers. Equal returns true if the elements are
-     *  identical up to the minimum number of elements, e.g.: [1.2.3] = [1.2].
-     *  This allows so e.g. disable a feature for all minor versions by just
-     *  specifying the major version.
+     *  identical.
      */
     bool operator== (const Version &other) const
     {
-        unsigned int min_n = std::min(m_version.size(), other.m_version.size());
-        for(unsigned int i=0; i<min_n; i++)
+        if (m_version.size() != other.m_version.size()) return false;
+        for(unsigned int i=0; i<m_version.size(); i++)
             if(other.m_version[i]!=m_version[i]) return false;
         return true;
-    }   // operator ==
+    }   // operator==
     // ------------------------------------------------------------------------
+    /** Compares two version numbers. Equal returns true if the elements are
+    *  identical.
+    */
+    bool operator!= (const Version &other) const
+    {
+        return !this->operator==(other);
+    }   // operator!=
+        // ------------------------------------------------------------------------
+    /** If *this < other. */
     bool operator< (const Version &other) const
     {
         unsigned int min_n = std::min(m_version.size(), other.m_version.size());
-        for(unsigned int i=0; i<min_n; i++)
-            if(other.m_version[i]>=m_version[i]) return false;
-        return true;
-    }   // operator>
+        for (unsigned int i = 0; i<min_n; i++)
+        {
+            if (m_version[i] > other.m_version[i]) return false;
+            if (m_version[i] < other.m_version[i]) return true;
+        }
+        if (m_version.size() >= other.m_version.size())
+            return false;
+        else
+            return true;
+    }   // operator<
     // ------------------------------------------------------------------------
+    /** If *this <= other. */
     bool operator<= (const Version &other) const
     {
         unsigned int min_n = std::min(m_version.size(), other.m_version.size());
-        for(unsigned int i=0; i<min_n; i++)
-            if(other.m_version[i]>m_version[i]) return false;
-        return true;
-    }   // operator>
+        for (unsigned int i = 0; i<min_n; i++)
+        {
+            if (m_version[i] > other.m_version[i]) return false;
+            if (m_version[i] < other.m_version[i]) return true;
+        }
+        if (m_version.size() > other.m_version.size())
+            return false;
+        else
+            return true;
+    }   // operator<=
 
 };   // class Version
 // ============================================================================
@@ -254,9 +368,11 @@ public:
         case VERSION_EQUAL: if(!(version==m_driver_version)) return false;
             break;
         case VERSION_LESS_EQUAL:
-            if(m_driver_version < version) return false;
+            if (!(version <= m_driver_version)) return false;
+            break;
         case VERSION_LESS:
-            if(m_driver_version <= version) return false;
+            if (!(version < m_driver_version )) return false;
+            break;
         }   // switch m_version_test
         return true;
         // -----------------------------------------------
@@ -272,62 +388,125 @@ public:
 };   // class Rule
 
 // ============================================================================
-
-void init()
+/** Very rudimentary and brute unit testing. Better than nothing :P
+ */
+void unitTesting()
 {
-    std::string filename = 
+    assert(Version("1")     == Version("1"));
+    assert(Version("1")     != Version("2"));
+    assert(Version("1")     <= Version("2"));
+    assert(Version("1")     <  Version("2"));
+    assert(Version("1.2.3") <  Version("2"));
+    assert(Version("1.2.3") <  Version("1.3"));
+    assert(Version("1.2.3") <  Version("1.2.4"));
+    assert(Version("1.2.3") <  Version("1.2.3.1"));
+    assert(Version("1.2.3") <= Version("2"));
+    assert(Version("1.2.3") <= Version("1.3"));
+    assert(Version("1.2.3") <= Version("1.2.4"));
+    assert(Version("1.2.3") <= Version("1.2.3.1"));
+    assert(Version("1.2.3") <= Version("1.2.3"));
+    assert(Version("1.2.3") == Version("1.2.3"));
+    assert(Version("10.3")  <  Version("10.3.2"));
+    assert(Version("10.3") <=  Version("10.3.2"));
+    assert(!(Version("10.3.2") <  Version("10.3")));
+    assert(!(Version("10.3.2") <= Version("10.3")));
+    assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1", 
+                   "NVIDIA GeForce GTX 680MX OpenGL Engine")
+           == Version("310.90.10.5")                                    );
+
+    assert(Version("4.1 NVIDIA-10.0.43 310.41.05f01",
+                    "NVIDIA GeForce GTX 780M OpenGL Engine")
+        == Version("310.41.05"));
+
+    assert(Version("3.1 (Core Profile) Mesa 10.3.0",
+                  "Mesa DRI Mobile Intel\u00ae GM45 Express Chipset")
+           == Version("10.3.0")                                         );
+    assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel", 
+                   "Gallium 0.4 on NVC1")
+           == Version("10.5.0")                                         );
+    assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel",
+                   "Mesa DRI Intel(R) Sandybridge Mobile")
+           == Version("10.5.0")                                         );
+    assert(Version("2.1 Mesa 10.5.0-devel (git-82e919d)",
+                   "Gallium 0.4 on i915 (chipse)")
+           == Version("10.5.0")                                         );
+    assert(Version("1.4 (3.0 Mesa 10.1.0)",
+                   "Mesa DRI Intel(R) Ivybridge Mobile")
+           == Version("10.1.0"));
+    assert(Version("4.3.13283 Core Profile Context 14.501.1003.0",
+                   "AMD Radeon R9 200 Series")
+        == Version("14.501.1003.0"));
+    assert(Version("4.0.10188 Core Profile Context",
+                   "ATI Radeon HD 5400 Series")
+        == Version("4.0.10188"));
+    assert(Version("4.1 ATI-1.24.38", "AMD Radeon HD 6970M OpenGL Engine") 
+        == Version("1.24.38"));
+
+}   // unitTesting
+
+// ----------------------------------------------------------------------------
+/** Reads in the graphical restriction file.
+ *  \param driver_version The GL_VERSION string (i.e. opengl and version
+ *         number).
+ *  \param card_name The GL_RENDERER string (i.e. graphics card).
+ */
+void init(const std::string &driver_version,
+          const std::string &card_name)
+{
+    for (unsigned int i = 0; i < GR_COUNT; i++)
+        m_all_graphics_restriction.push_back(false);
+
+    std::string filename =
         file_manager->getUserConfigFile("graphical_restrictions.xml");
-    if(!file_manager->fileExists(filename))
+    if (!file_manager->fileExists(filename))
         filename = file_manager->getAsset("graphical_restrictions.xml");
     const XMLNode *rules = file_manager->createXMLTree(filename);
-    if(!rules)
+    if (!rules)
     {
         Log::warn("Graphics", "Could not find graphical_restrictions.xm");
         return;
     }
-    if(rules->getName()!="graphical-restrictions")
+    if (rules->getName() != "graphical-restrictions")
     {
         delete rules;
         Log::warn("Graphics", "'%s' did not contain graphical-restrictions tag",
-                  filename.c_str());
+            filename.c_str());
         return;
     }
-    for(unsigned int i=0; i<rules->getNumNodes(); i++)
+
+    Version version(driver_version, card_name);
+    for (unsigned int i = 0; i<rules->getNumNodes(); i++)
     {
-        const XMLNode *rule = rules->getNode(i);
-        if(rule->getName()!="card")
+        const XMLNode *xml_rule = rules->getNode(i);
+        if (xml_rule->getName() != "card")
         {
             Log::warn("Graphics", "Incorrect node '%s' found in '%s' - ignored.",
-                      rule->getName().c_str(), filename.c_str());
+                      xml_rule->getName().c_str(), filename.c_str());
             continue;
         }
-        m_all_rules.push_back(new Rule(rule));
+        Rule rule(xml_rule);
+        if (rule.applies(card_name, version))
+        {
+            std::vector<std::string> restrictions = rule.getRestrictions();
+            std::vector<std::string>::iterator p;
+            for (p = restrictions.begin(); p != restrictions.end(); p++)
+            {
+                GraphicsRestrictionsType t = getTypeForName(*p);
+                if (t != GR_COUNT)
+                    m_all_graphics_restriction[t] = true;
+            }   // for p in rules
+        }   // if m_all_rules[i].applies()
     }
     delete rules;
 }   // init
 
 // ----------------------------------------------------------------------------
-/** Returns a list of graphical features that need to be disabled for the
- *  specified driver and graphics card (and OS).
- *  \paaram driver_version The GL_VERSION string (i.e. opengl and version
- *          number).
- *  \param card_name The GL_RENDERER string (i.e. graphics card).
+/** Returns if the specified graphics restriction is defined.
+ *  \param type The graphical restriction to tes.t
  */
-std::vector<std::string> getRestrictions(const std::string &driver_version,
-                                         const std::string &card_name)
+bool isDisabled(GraphicsRestrictionsType type)
 {
-    std::vector<std::string> restrictions;
-
-    Version version(driver_version, card_name);
-    for(unsigned int i=0; i<m_all_rules.size(); i++)
-    {
-        if(m_all_rules[i]->applies(card_name, version))
-        {
-            std::vector<std::string> r = m_all_rules[i]->getRestrictions();
-            restrictions.insert(restrictions.end(), r.begin(), r.end());
-        }
-    }
-    return restrictions;
-}   // getRestrictions
+    return m_all_graphics_restriction[type];
+}   // isDisabled
 
 }   // namespace HardwareStats

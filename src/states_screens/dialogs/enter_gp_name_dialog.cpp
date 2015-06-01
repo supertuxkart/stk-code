@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -125,7 +125,8 @@ void EnterGPNameDialog::validateName()
         label->setText(_("Name is empty."), false);
         SFXManager::get()->quickSound("anvil");
     }
-    else if (grand_prix_manager->existsName(name) || name == "Random Grand Prix")
+    else if (grand_prix_manager->existsName(name) ||
+        name == GrandPrixData::getRandomGPName())
     {
         // check for duplicate names
         label->setText(_("Another grand prix with this name already exists."), false);

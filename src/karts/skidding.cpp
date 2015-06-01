@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -77,6 +77,7 @@ void Skidding::reset()
     m_jump_speed          = 0.0f;
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+    m_kart->activateSkidLight(0);
     m_kart->getControls().m_skid = KartControl::SC_NONE;
     
     btVector3 rot(0, 0, 0);
@@ -216,6 +217,12 @@ void Skidding::update(float dt, bool is_on_ground,
         reset();
         return;
     }
+#ifdef SKIDDING_PARTICLE_DEBUG
+    // This code will cause skidmarks to be displayed all the time, even
+    // when the kart is not moving.
+    m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDL, 0.5f);
+    m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDR, 0.5f);
+#endif
 
     // No skidding backwards or while stopped
     if(m_kart->getSpeed() < m_min_skid_speed &&
@@ -392,6 +399,7 @@ void Skidding::update(float dt, bool is_on_ground,
             {
                 m_skid_bonus_ready = true;
                 m_kart->getKartGFX()->setSkidLevel(level);
+                m_kart->activateSkidLight(level);
             }
             // If player stops skidding, trigger bonus, and change state to
             // SKID_SHOW_GFX_*
@@ -445,6 +453,7 @@ void Skidding::update(float dt, bool is_on_ground,
                   ->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
             m_kart->getKartGFX()
                   ->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+            m_kart->activateSkidLight(0);
             m_skid_state = SKID_NONE;
         }
     }   // switch

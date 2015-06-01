@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Lionel Fuentes
+//  Copyright (C) 2013-2015 Lionel Fuentes
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/light.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
@@ -32,12 +33,15 @@
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
+#include "states_screens/dialogs/scripting_console.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
+
+#include <cmath>
 
 using namespace irr;
 using namespace gui;
@@ -94,14 +98,17 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_WHEEL,
     DEBUG_GUI_CAM_NORMAL,
     DEBUG_GUI_CAM_SMOOTH,
+    DEBUG_GUI_CAM_ATTACH,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
+    DEBUG_ADJUST_LIGHTS,
+    DEBUG_SCRIPT_CONSOLE
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
-// Add powerup selected from debug menu for all player karts
+/** Add powerup selected from debug menu for all player karts */
 void addPowerup(PowerupManager::PowerupType powerup)
 {
     World* world = World::getWorld();
@@ -145,7 +152,41 @@ void addAttachment(Attachment::AttachmentType type)
 }   // addAttachment
 
 // -----------------------------------------------------------------------------
-// Debug menu handling
+/** returns the light node with the lowest distance to the player kart (excluding
+ * nitro emitters) */
+LightNode* findNearestLight()
+{
+
+    Camera* camera = Camera::getActiveCamera();
+    if (camera == NULL) {
+        Log::error("[Debug Menu]", "No camera found.");
+        return NULL;
+    }
+
+    core::vector3df cam_pos = camera->getCameraSceneNode()->getAbsolutePosition();
+    LightNode* nearest = 0;
+    float nearest_dist = 1000000.0; // big enough
+    for (unsigned int i = 0; i < irr_driver->getLights().size(); i++)
+    {
+        LightNode* light = irr_driver->getLights()[i];
+
+        // Avoid modifying the nitro emitter or another invisible light
+        if (std::string(light->getName()).find("nitro emitter") == 0 || !light->isVisible())
+            continue;
+
+        core::vector3df light_pos = light->getAbsolutePosition();
+        if ( cam_pos.getDistanceFrom(light_pos) < nearest_dist)
+        {
+            nearest      = irr_driver->getLights()[i];
+            nearest_dist = cam_pos.getDistanceFrom(light_pos);
+        }
+    }
+
+    return nearest;
+}
+
+// -----------------------------------------------------------------------------
+/** Debug menu handling */
 bool onEvent(const SEvent &event)
 {
     // Only activated in artist debug mode
@@ -212,18 +253,21 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"First person view", DEBUG_GUI_CAM_FREE);
             sub->addItem(L"Normal view", DEBUG_GUI_CAM_NORMAL);
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
+            sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 
-            mnu->addItem(L"Profiler",DEBUG_PROFILER);
+            mnu->addItem(L"Profiler", DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
                 mnu->addItem(L"Toggle capture profiler report",
                              DEBUG_PROFILER_GENERATE_REPORT);
             mnu->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
-            mnu->addItem(L"FPS",DEBUG_FPS);
+            mnu->addItem(L"Toggle FPS", DEBUG_FPS);
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
             mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
+            mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
+            mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();
@@ -479,6 +523,10 @@ bool onEvent(const SEvent &event)
                 {
                     UserConfigParams::m_camera_debug = 3;
                     irr_driver->getDevice()->getCursorControl()->setVisible(false);
+                    // Reset camera rotation
+                    Camera *cam = Camera::getActiveCamera();
+                    cam->setDirection(vector3df(0, 0, 1));
+                    cam->setUpVector(vector3df(0, 1, 0));
                 }
                 else if (cmdID == DEBUG_GUI_CAM_NORMAL)
                 {
@@ -489,6 +537,11 @@ bool onEvent(const SEvent &event)
                 {
                     Camera *cam = Camera::getActiveCamera();
                     cam->setSmoothMovement(!cam->getSmoothMovement());
+                }
+                else if (cmdID == DEBUG_GUI_CAM_ATTACH)
+                {
+                    Camera *cam = Camera::getActiveCamera();
+                    cam->setAttachedFpsCam(!cam->getAttachedFpsCam());
                 }
                 else if (cmdID == DEBUG_PRINT_START_POS)
                 {
@@ -507,7 +560,7 @@ bool onEvent(const SEvent &event)
                 {
 #if !defined(__APPLE__)
                     DebugSliderDialog *dsd = new DebugSliderDialog();
-                    dsd->setSliderHook( "red_slider", 0, 255,
+                    dsd->setSliderHook("red_slider", 0, 255,
                         [](){ return int(irr_driver->getAmbientLight().r * 255.f); },
                         [](int v){
                             video::SColorf ambient = irr_driver->getAmbientLight();
@@ -541,6 +594,68 @@ bool onEvent(const SEvent &event)
                         [](int v){irr_driver->setSSAOSigma(v / 10.f); }
                     );
 #endif
+                }
+                else if (cmdID == DEBUG_ADJUST_LIGHTS)
+                {
+#if !defined(__APPLE__)
+                    // Some sliders use multipliers because the spinner widget
+                    // only supports integers
+                    DebugSliderDialog *dsd = new DebugSliderDialog();
+                    dsd->changeLabel("Red", "Red (x10)");
+                    dsd->setSliderHook("red_slider", 0, 100,
+                        []()
+                        {
+                            return int(findNearestLight()->getColor().X * 100);
+                        },
+                        [](int intensity)
+                        {
+                            LightNode* nearest = findNearestLight();
+                            core::vector3df color = nearest->getColor();
+                            nearest->setColor(intensity / 100.0f, color.Y, color.Z);
+                        }
+                    );
+                    dsd->changeLabel("Green", "Green (x10)");
+                    dsd->setSliderHook("green_slider", 0, 100,
+                        []()
+                        {
+                            return int(findNearestLight()->getColor().Y * 100);
+                        },
+                        [](int intensity)
+                        {
+                            LightNode* nearest = findNearestLight();
+                            core::vector3df color = nearest->getColor();
+                            nearest->setColor(color.X, intensity / 100.0f, color.Z);
+                        }
+                    );
+                    dsd->changeLabel("Blue", "Blue (x10)");
+                    dsd->setSliderHook("blue_slider", 0, 100,
+                        []()
+                        {
+                            return int(findNearestLight()->getColor().Z * 100);
+                        },
+                        [](int intensity)
+                        {
+                            LightNode* nearest = findNearestLight();
+                            core::vector3df color = nearest->getColor();
+                            nearest->setColor(color.X, color.Y, intensity / 100.0f);
+                        }
+                    );
+                    dsd->changeLabel("SSAO radius", "energy (x10)");
+                    dsd->setSliderHook("ssao_radius", 0, 100,
+                        []()     { return int(findNearestLight()->getEnergy() * 10);  },
+                        [](int v){        findNearestLight()->setEnergy(v / 10.0f); }
+                    );
+                    dsd->changeLabel("SSAO k", "radius");
+                    dsd->setSliderHook("ssao_k", 0, 100,
+                        []()     { return int(findNearestLight()->getRadius());  },
+                        [](int v){        findNearestLight()->setRadius(float(v)); }
+                    );
+                    dsd->changeLabel("SSAO Sigma", "[None]");
+#endif
+                }
+                else if (cmdID == DEBUG_SCRIPT_CONSOLE)
+                {
+                    ScriptingConsole* console = new ScriptingConsole();
                 }
             }
 

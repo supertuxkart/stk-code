@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2008-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2008-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -96,6 +96,7 @@ private:
     void              checkAndCreateScreenshotDir();
     void              checkAndCreateCachedTexturesDir();
     void              checkAndCreateGPDir();
+    void              discoverPaths();
 #if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
     std::string       checkAndCreateLinuxDir(const char *env_name,
                                              const char *dir_name,
@@ -106,9 +107,7 @@ private:
 public:
                       FileManager();
                      ~FileManager();
-    void              reInit();
-    void              discoverPaths();
-    void              dropFileSystem();
+    void              init();
     static void       addRootDirs(const std::string &roots);
     io::IXMLReader   *createXMLReader(const std::string &filename);
     XMLNode          *createXMLTree(const std::string &filename);
@@ -149,6 +148,9 @@ public:
 
     bool       fileIsNewer(const std::string& f1, const std::string& f2) const;
 
+    // ------------------------------------------------------------------------
+    /** Returns the irrlicht file system. */
+    irr::io::IFileSystem* getFileSystem() { return m_file_system; }
     // ------------------------------------------------------------------------
     /** Adds a directory to the music search path (or stack).
      */

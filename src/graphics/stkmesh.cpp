@@ -1,3 +1,21 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include "central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stkmesh.hpp"
@@ -282,11 +300,12 @@ SetTexture(GLMesh &mesh, unsigned i, bool isSrgb, const std::string &matname)
 {
     if (!mesh.textures[i])
     {
-        Log::fatal("STKMesh", "Missing texture %d for material %s", i, matname.c_str());
-        return;
+        Log::error("STKMesh", "Missing texture %d for material %s", i, matname.c_str());
+        // use unicolor texture to replace missing texture
+        mesh.textures[i] = getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
     compressTexture(mesh.textures[i], isSrgb);
-    if (irr_driver->useAZDO())
+    if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[i])
             mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[i]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
@@ -359,7 +378,7 @@ void InitTexturesTransparent(GLMesh &mesh)
         return;
     }
     compressTexture(mesh.textures[0], true);
-    if (irr_driver->useAZDO())
+    if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[0])
             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);

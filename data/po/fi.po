@@ -1,328 +1,282 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: SuperTuxKart 0.5\n"
+"Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-12 11:39+1100\n"
-"PO-Revision-Date: 2013-11-16 07:03+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2015-03-13 21:42-0400\n"
+"PO-Revision-Date: 2015-04-03 11:14+0000\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
+"Language-Team: Finnish (http://www.transifex.com/projects/p/supertuxkart/language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-11-24 21:41+0000\n"
-"X-Generator: Launchpad (build 16831)\n"
-"X-Poedit-Language: finnish\n"
+"Language: fi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
-#: src/utils/translation.cpp:263
+#: src/utils/translation.cpp:262
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
-#. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
-#. I18N: ./data/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:98 data/po/gui_strings.h:101
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
-msgstr ""
-" Mutta te typerykset ette koskaan tule voittamaan minua, mikroautoilun "
-"kuningasta!"
+msgstr " Mutta te typerykset ette koskaan tule voittamaan minua, mikroautoilun kuningasta!"
 
-#. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-#: src/items/rubber_band.cpp:49
-msgid "%0 bites %1's bait"
-msgstr "%0 tarttuu pelaajan %1 syöttiin"
-
-#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/cake.cpp:151
-msgid "%0 eats too much of %1's cake"
-msgstr "%0 syö liikaa pelaajan %1 kakkua"
-
-#. I18N: shown when a player receives a plunger in his face
-#: src/items/plunger.cpp:133
-msgid "%0 gets a fancy mask from %1"
-msgstr "%0 saa hassun naamarin pelaajalta %1"
-
-#. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
-#. the victim.
-#: src/items/bowling.cpp:136
-msgid "%0 is bowled over by %1"
-msgstr "%1 keilaa pelaajan %0 kumoon"
-
-#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/cake.cpp:153
-msgid "%0 is dubious of %1's cooking skills"
-msgstr "%0 pitää pelaajan %1 leipomistaitoja kyseenalaisina"
-
-#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/cake.cpp:155
-msgid "%0 should not play with %1's lunch"
-msgstr "%0 ei saisi leikkiä pelaajan %1 ruualla"
-
-#. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
-#. the victim.
-#: src/items/bowling.cpp:130
-msgid "%0 will not go bowling with %1 again"
-msgstr "%0 ei lähde keilaamaan pelaajan %1 kanssa enää ikinä"
-
-#. I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
-#: src/items/swatter.cpp:340
-msgid "%1 flattens %0"
-msgstr "%1 litistää pelaajan %0"
-
-#. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-#: src/items/rubber_band.cpp:51
-msgid "%1 latches onto %0 for a free ride"
-msgstr "%1 ottaa pelaajalta %0 ilmaisen kyydin"
-
-#. I18N: shown when a player receives a plunger in his face
-#: src/items/plunger.cpp:135
-msgid "%1 merges %0's face with a plunger"
-msgstr "%1 läväyttää imukupin pelaajan %0 naamalle"
-
-#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/cake.cpp:157
-msgid "%1 ruins %0's cakeless diet"
-msgstr "%1 pilaa pelaajan %0 kakuttoman laihdutuskuurin"
-
-#. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
-#. the victim.
-#: src/items/bowling.cpp:133
-msgid "%1 strikes %0"
-msgstr "%1 läimäyttää pelaajaa %0"
-
-#. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-#: src/items/rubber_band.cpp:53
-msgid "%1 tests a tractor beam on %0"
-msgstr "%1 testaa vetosädettä pelaajaan %0"
-
-#. I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
-#: src/items/swatter.cpp:338
-msgid "%1 thinks %0 is a big fly"
-msgstr "%1 kuvittelee, että %0 on iso kärpänen"
-
-#. I18N: ./data/gui/track_info_dialog.stkgui
-#. I18N: In the track setup screen (number of laps choice, where %i is the number)
-#: data/po/gui_strings.h:316
+#. I18N: Only used for count > 3
+#: src/online/online_player_profile.cpp:429
 #, c-format
-msgid "%i laps"
-msgstr "%i kierrosta"
+msgid "%d friend is now online."
+msgid_plural "%d friends are now online."
+msgstr[0] "%d kaveri on nyt linjoilla."
+msgstr[1] "%d kaveria on nyt linjoilla."
 
-#. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:314
+#. I18N: 'handicapped' indicates that per-player handicaps are
+#. activated for this kart (i.e. it will drive slower)
+#: src/guiengine/widgets/player_kart_widget.cpp:360
 #, c-format
-msgid ""
-"%s\n"
-"by %s"
-msgstr ""
-"%s\n"
-"Tekijä: %s"
+msgid "%s (handicapped)"
+msgstr "%s (tasoitettu)"
 
-#: src/states_screens/dialogs/addons_loading.cpp:171
-#: src/states_screens/dialogs/addons_loading.cpp:175
+#: src/states_screens/dialogs/addons_loading.cpp:172
+#: src/states_screens/dialogs/addons_loading.cpp:176
 #, c-format
 msgid "%s KB"
 msgstr "%s kt"
 
-#: src/states_screens/dialogs/addons_loading.cpp:164
+#: src/states_screens/dialogs/addons_loading.cpp:165
 #, c-format
 msgid "%s MB"
 msgstr "%s Mt"
 
+#: src/online/online_player_profile.cpp:418
+#, c-format
+msgid "%s and %s are now online."
+msgstr "%s ja %s ovat nyt linjoilla."
+
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:304
+#: src/states_screens/addons_screen.cpp:306
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s, tekijä: %s"
 
-#. I18N: as in "fastest lap: 60 seconds by Wilber"
-#: src/modes/linear_world.cpp:350
+#: src/modes/linear_world.cpp:358
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr "%s (%s)"
 
-#. I18N: shown when hit by swatter. %s is the victim
-#: src/items/swatter.cpp:342
+#: src/online/online_player_profile.cpp:414
 #, c-format
-msgid "%s feels flat today"
-msgstr "%s tuntee olonsa litteäksi tänään"
+msgid "%s is now online."
+msgstr "%s on nyt linjoilla."
 
-#: src/items/powerup.cpp:51
-#, c-format
-msgid "%s is a mighty pirate!"
-msgstr "%s on mahtava merirosvo!"
-
-#. I18N: shown when a player is hit by a rubber ball. %1 is the
-#. attacker, %0 is the victim.
-#: src/items/rubber_ball.cpp:310
-#, c-format
-msgid "%s is being bounced around."
-msgstr "Pelaajaa %s pomputellaan sinne tänne."
-
-#. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/bowling.cpp:146
-#, c-format
-msgid "%s is practicing with a blue, big, spheric yo-yo"
-msgstr "%s harjoittelee suurella, pyöreällä, sinisellä jojolla"
-
-#: src/states_screens/kart_selection.cpp:597
+#: src/guiengine/widgets/player_kart_widget.cpp:420
 #, c-format
 msgid "%s is ready"
 msgstr "%s on valmis"
 
-#. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/bowling.cpp:148
+#: src/states_screens/online_profile_base.cpp:108
 #, c-format
-msgid "%s is the world master of the boomerang ball"
-msgstr "%s on bumerangipallon maailmanmestari"
+msgid "%s's profile"
+msgstr "Käyttäjän %s profiili"
 
-#: src/items/powerup.cpp:50
+#: src/states_screens/create_server_screen.cpp:60
 #, c-format
-msgid "%s pays the next round of grog!"
-msgstr "%s tarjoaa seuraavan kierroksen!"
+msgid "%s's server"
+msgstr "Käyttäjän %s palvelin"
 
-#. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/bowling.cpp:150
+#: src/online/online_player_profile.cpp:423
 #, c-format
-msgid "%s should play (rubber) darts instead of bowling"
-msgstr "Pelaajan %s pitäisi harrastaa jotain muuta kuin keilausta"
+msgid "%s, %s and %s are now online."
+msgstr "%s, %s ja %s ovat nyt linjoilla."
 
-#: src/modes/world.cpp:1028
+#: src/modes/world.cpp:1147
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "%s on poistettu."
 
+#. I18N: ./data/gui/track_info.stkgui
 #. I18N: for empty highscores entries
-#. I18N: ./data/gui/track_info_dialog.stkgui
-#: src/states_screens/dialogs/track_info_dialog.cpp:227
-#: data/po/gui_strings.h:302 data/po/gui_strings.h:305
-#: data/po/gui_strings.h:308
+#: src/states_screens/track_info_screen.cpp:252
 msgid "(Empty)"
 msgstr "(Tyhjä)"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:241
 msgid "(network play is not yet available)"
 msgstr "(verkkopeli ei ole vielä käytössä)"
 
-#: src/states_screens/options_screen_input2.cpp:322
+#: src/states_screens/options_screen_input2.cpp:372
 msgid "* A blue item means a conflict with another configuration"
-msgstr "Sininen merkintä tarkoittaa ristiriitaa toisten asetusten kanssa"
+msgstr "* Sininen merkintä tarkoittaa ristiriitaa toisen asetuksen kanssa"
+
+#: src/states_screens/options_screen_input2.cpp:377
+msgid "* A red item means a conflict in the current configuration"
+msgstr "* Punainen merkintä tarkoittaa ristiriitaa nykyisten asetusten kanssa"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
-#: data/po/gui_strings.h:646
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr "Nykyisiä näppäinasetuksia voi tarkastella/muokata Valinnat-valikossa"
+msgstr "* Nykyisiä näppäinasetuksia voi tarkastella/muokata Valinnat-valikossa"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:760
 msgid ""
 "* Most of these game modes can also be played in a Grand Prix fashion: "
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr ""
-"Suurinta osaa näistä pelimuodoista voi pelata myös grand prix -tyyliin, eli "
-"yhden kisan sijasta pelataan monta peräkkäin. Mitä paremmin sijoitut, sitä "
-"enemmän saat pisteitä. Eniten pisteitä saanut voittaa."
+msgstr "* Suurinta osaa näistä pelimuodoista voi pelata myös grand prix -tyyliin, eli yhden kisan sijasta pelataan monta peräkkäin. Mitä paremmin sijoitut, sitä enemmän saat pisteitä. Eniten pisteitä saanut voittaa."
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "* Restart STK to apply new settings"
+msgstr "* Käynnistä STK uudelleen, jotta muutokset tulevat voimaan"
 
 #. I18N: ./data/gui/options_input.stkgui
-#: data/po/gui_strings.h:216
 msgid ""
-"* Which config to use will be inferred from which 'fire' key is pressed to "
-"join the game."
-msgstr ""
-"Asetukset valitaan sen mukaan, mitä ampumisnäppäintä peliin liittyessä "
-"painettiin."
+"* Which config to use will be inferred from which 'Select' key is pressed to"
+" join the game."
+msgstr "* Käytettävä asetus päätellään sen mukaan, minkä ohjaimen \"Valitse\"-näppäintä painetaan peliin liitymisen yhteydessä."
 
-#: src/states_screens/addons_screen.cpp:49
+#. I18N: ./data/gui/online/profile_achievements.stkgui
+#. I18N: ./data/gui/online/profile_achievements_tab.stkgui
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: ./data/gui/online/profile_overview.stkgui
+#. I18N: ./data/gui/online/profile_settings.stkgui
+msgid "..."
+msgstr "..."
+
+#: src/states_screens/addons_screen.cpp:52
 msgid "1 month"
 msgstr "1 kuukausi"
 
-#: src/states_screens/addons_screen.cpp:47
+#: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
 msgstr "1 viikko"
 
-#: src/states_screens/addons_screen.cpp:53
+#: src/states_screens/addons_screen.cpp:56
 msgid "1 year"
 msgstr "1 vuosi"
 
-#: src/states_screens/addons_screen.cpp:48
+#: src/states_screens/addons_screen.cpp:51
 msgid "2 weeks"
 msgstr "2 viikkoa"
 
-#: src/states_screens/addons_screen.cpp:54
+#: src/states_screens/addons_screen.cpp:57
 msgid "2 years"
 msgstr "2 vuotta"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:181
+#: src/race/race_manager.hpp:182
 msgid "3 Strikes Battle"
 msgstr "Kolmen iskun taistelu"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:748
 msgid ""
 "3 Strikes Battle: Only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
-msgstr ""
+msgstr "Kolmen iskun taistelu: vain moninpelinä. Ammu aseilla kunnes muut menettävät kaikki elämänsä."
 
-#: src/states_screens/addons_screen.cpp:50
+#: src/states_screens/addons_screen.cpp:53
 msgid "3 months"
 msgstr "3 kuukautta"
 
-#: src/states_screens/addons_screen.cpp:51
+#: src/states_screens/addons_screen.cpp:54
 msgid "6 months"
 msgstr "6 kuukautta"
 
-#: src/states_screens/addons_screen.cpp:52
+#: src/states_screens/addons_screen.cpp:55
 msgid "9 months"
 msgstr "9 kuukautta"
 
-#. I18N: ./data/gui/track_info_dialog.stkgui
-#: data/po/gui_strings.h:299
+#. I18N: ./data/gui/track_info.stkgui
 msgid "= Highscores ="
 msgstr "= Ennätykset ="
 
-#: src/items/powerup.cpp:84
-msgid "A wizard did it!"
-msgstr "Taikuri teki sen!"
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+msgid "AI karts"
+msgstr "Tietokonevastustajia"
 
-#: src/states_screens/race_result_gui.cpp:126
+#: src/states_screens/race_result_gui.cpp:189
 msgid "Abort Grand Prix"
 msgstr "Keskeytä grand prix"
 
 #. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: data/po/gui_strings.h:546
+#. I18N: In the main screen
 msgid "About"
-msgstr "Tietoja ohjelmasta"
+msgstr "Tietoja"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:190
+#: src/states_screens/options_screen_input2.cpp:236
 msgid "Accelerate"
 msgstr "Kiihdytä"
 
-#: src/tracks/track_object_presentation.cpp:667
+#: src/tracks/track_object_presentation.cpp:975
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
-msgstr ""
-"Kiihdytä ja paina kääntyessäsi näppäintä <%s> päästäksesi sivuluisuun. Lyhyt "
-"sivuluisu voi nopeuttaa tiukoista mutkista selviämistä."
+msgstr "Kiihdytä ja paina kääntyessäsi näppäintä <%s> päästäksesi sivuluisuun. Lyhyt sivuluisu voi nopeuttaa tiukoista mutkista selviämistä."
 
-#: src/tracks/track_object_presentation.cpp:610
+#: src/tracks/track_object_presentation.cpp:897
 #, c-format
 msgid "Accelerate with <%s> and steer with <%s> and <%s>"
 msgstr "Kiihdytä painamalla <%s> ja ohjaa näppäimillä <%s> ja <%s>"
+
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Accept"
+msgstr "Hyväksy"
+
+#. I18N: ./data/gui/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+msgid "Account Recovery"
+msgstr "Tilin palautus"
+
+#. I18N: ./data/gui/online/profile_settings.stkgui
+#. I18N: Section in the profile screen
+#: src/states_screens/online_profile_base.cpp:101
+msgid "Account Settings"
+msgstr "Tilin asetukset"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+#. I18N: ./data/gui/online/profile_achievements_tab.stkgui
+#. I18N: Section in the profile screen
+#: src/states_screens/online_profile_base.cpp:100
+msgid "Achievements"
+msgstr "Saavutukset"
+
+#: src/states_screens/options_screen_input2.cpp:71
+msgid "Action"
+msgstr "Toiminto"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Add"
+msgstr "Lisää"
+
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Add Friend"
+msgstr "Lisää kaveri"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:111
@@ -330,8 +284,7 @@ msgid "Add Keyboard Configuration"
 msgstr "Lisää uudet näppäinasetukset"
 
 #. I18N: ./data/gui/options_players.stkgui
-#. I18N: In players configuration menu
-#: data/po/gui_strings.h:514
+#. I18N: In the player configuration screen
 msgid "Add Player"
 msgstr "Lisää pelaaja"
 
@@ -342,1865 +295,2671 @@ msgstr "Lisää Wiimote"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:213
 msgid "Add a device"
 msgstr "Lisää laite"
 
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Add user"
+msgstr "Lisää käyttäjä"
+
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: track group
 #. I18N: arena group name
 #. I18N: track group name
 #. I18N: kart group name
-#. I18N: ./data/gui/arenas.stkgui
-#. I18N: track group
-#: src/states_screens/arenas_screen.cpp:81
-#: src/states_screens/tracks_screen.cpp:176
-#: src/states_screens/kart_selection.cpp:1042 data/po/gui_strings.h:585
+#. I18N: track group name
+#: src/states_screens/arenas_screen.cpp:83
+#: src/states_screens/easter_egg_screen.cpp:145
+#: src/states_screens/grand_prix_editor_screen.cpp:336
+#: src/states_screens/kart_selection.cpp:286
+#: src/states_screens/tracks_screen.cpp:155
 msgid "Add-Ons"
 msgstr "Lisäosat"
 
-#: src/states_screens/addons_screen.cpp:107
+#: src/states_screens/addons_screen.cpp:110
 msgid "Add-on name"
 msgstr "Lisäosan nimi"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:530
 msgid "Addons"
 msgstr "Lisäosat"
 
-#. I18N: ./data/karts/adiumy/kart.xml
-#: data/po/gui_strings.h:867
+#. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
 msgstr "Adiumy"
 
-#. I18N: name of the tab that will show arenas from all groups
-#. I18N: name of the tab that will show tracks from all groups
-#. I18N: Time filters for add-ons
-#. I18N: name of the tab that will show tracks from all groups
-#. I18N: if all kart animations are enabled
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Advanced pipeline (lights, etc.)"
+msgstr "Hienot grafiikat (valaistus yms.)"
+
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: src/states_screens/arenas_screen.cpp:73
-#: src/states_screens/tracks_screen.cpp:168
-#: src/states_screens/addons_screen.cpp:46
-#: src/states_screens/kart_selection.cpp:1034
-#: src/states_screens/options_screen_video.cpp:353 data/po/gui_strings.h:589
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: track group
+#. I18N: Time filters for add-ons
+#. I18N: name of the tab that will show arenas from all groups
+#. I18N: name of the tab that will show tracks from all groups
+#. I18N: if all kart animations are enabled
+#. I18N: name of the tab that will show tracks from all groups
+#: src/states_screens/addons_screen.cpp:49
+#: src/states_screens/arenas_screen.cpp:75
+#: src/states_screens/easter_egg_screen.cpp:137
+#: src/states_screens/edit_track_screen.cpp:147
+#: src/states_screens/gp_info_screen.cpp:76
+#: src/states_screens/grand_prix_editor_screen.cpp:333
+#: src/states_screens/kart_selection.cpp:278
+#: src/states_screens/options_screen_video.cpp:434
+#: src/states_screens/tracks_screen.cpp:145
 msgid "All"
 msgstr "Kaikki"
 
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: Section in easter egg tracks selection screen
 #. I18N: ./data/gui/tracks.stkgui
-#. I18N: Section in track selection screen
-#: data/po/gui_strings.h:194
+#. I18N: In the track selection screen
 msgid "All Tracks"
 msgstr "Kaikki radat"
 
-#: src/states_screens/race_setup_screen.cpp:259
+#: src/states_screens/race_setup_screen.cpp:202
 msgid "All blows allowed, so catch weapons and make clever use of them!"
-msgstr ""
-"Kaikki keinot ovat sallittuja, joten poimi aseita ja käytä niitä järkevästi!"
+msgstr "Kaikki keinot ovat sallittuja, joten poimi aseita ja käytä niitä järkevästi!"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:451
-msgid "Allow STK to connect to the Internet"
-msgstr "Salli STK:n ottaa yhteyttä Internetiin"
+msgid "Always show login screen"
+msgstr "Näytä aina kirjautumisnäkymä"
 
-#. I18N: ./data/tracks/jungle/track.xml
-#: data/po/gui_strings.h:17
-msgid "Amazonian Journey"
-msgstr "Reissu Amazonissa"
+#. I18N: ../stk-assets/karts/amanda/kart.xml
+msgid "Amanda"
+msgstr "Amanda"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Ambient Occlusion"
+msgstr "Ambientin okkluusio"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:464
+#, c-format
+msgid "Ambient occlusion : %s"
+msgstr "Ambientin okkluusio: %s"
+
+#: src/states_screens/edit_gp_screen.cpp:323
+msgid "An error occurred while trying to save your grand prix."
+msgstr "Grand prix'tä tallennettaessa tapahtui virhe."
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:687
 msgid "Anchor - slows down greatly the kart in the first position."
 msgstr "Ankkuri - hidastaa merkittävästi ensimmäisenä olevaa autoa."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:413
 msgid "Animated Characters"
 msgstr "Animoidut hahmot"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:379
+#: src/states_screens/options_screen_video.cpp:450
 #, c-format
 msgid "Animated Characters : %s"
 msgstr "Animoidut hahmot: %s"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:405
 msgid "Animated Scenery"
 msgstr "Animoitu maisema"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:373
+#. tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
+#. UserConfigParams::m_pixel_shaders ? enabled : disabled);
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:444
 #, c-format
 msgid "Animated Scenery : %s"
 msgstr "Animoitu maisema: %s"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:75
+#: src/states_screens/dialogs/custom_video_settings.cpp:81
 msgid "Anisotropic x16"
-msgstr ""
+msgstr "Anisotrooppinen x16"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:72
+#: src/states_screens/dialogs/custom_video_settings.cpp:78
 msgid "Anisotropic x2"
-msgstr ""
+msgstr "Anisotrooppinen x2"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:73
+#: src/states_screens/dialogs/custom_video_settings.cpp:79
 msgid "Anisotropic x4"
-msgstr ""
+msgstr "Anisotrooppinen x4"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:74
+#: src/states_screens/dialogs/custom_video_settings.cpp:80
 msgid "Anisotropic x8"
-msgstr ""
+msgstr "Anisotrooppinen x8"
+
+#: src/states_screens/dialogs/enter_gp_name_dialog.cpp:132
+msgid "Another grand prix with this name already exists."
+msgstr "Toinen grand prix samalla nimellä on jo olemassa."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:421
-msgid "Anti-aliasing (requires restart)"
-msgstr "Reunanpehmennys (vaatii uudelleenkäynnistyksen)"
+msgid "Anti-aliasing"
+msgstr "Reunanpehmennys"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:384
+#: src/states_screens/options_screen_video.cpp:461
 #, c-format
-msgid "Anti-aliasing (requires restart) : %s"
-msgstr "Reunanpehmennys (vaatii uudelleenkäynnistyksen): %s"
+msgid "Anti-aliasing : %s"
+msgstr "Reunanpehmennys: %s"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+msgid "Apply"
+msgstr "Toteuta"
 
 #. I18N: ./data/gui/options_video.stkgui
-#. I18N: In the video settings menu
-#: data/po/gui_strings.h:296
+#. I18N: In the video settings
 msgid "Apply new resolution"
 msgstr "Käytä uutta resoluutiota"
 
+#. I18N: ./data/achievements.xml
+msgid "Arch Enemy"
+msgstr "Arkkivihollinen"
+
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options_screen_input2.cpp:504
+#: src/states_screens/options_screen_input2.cpp:575
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Haluatko varmasti poistaa nämä asetukset?"
 
+#: src/states_screens/edit_gp_screen.cpp:123
+#: src/states_screens/grand_prix_editor_screen.cpp:109
+#, c-format
+msgid "Are you sure you want to remove '%s'?"
+msgstr "Poistetaanko varmasti '%s'?"
+
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: Section in the addons menu
+#. I18N: In the addons screen
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
-#: data/po/gui_strings.h:573 data/po/gui_strings.h:577
 msgid "Arenas"
 msgstr "Areenat"
 
-#. I18N: ./data/tracks/lighthouse/track.xml
-#: data/po/gui_strings.h:44
+#. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
 msgstr "Majakan ympäri"
 
-#. I18N: shown when anchor applied. %s is the victim.
-#: src/items/powerup.cpp:49
-#, c-format
-msgid "Arrr, the %s dropped anchor, Captain!"
-msgstr "Arrr, kapteeni, %s laski ankkurin!"
+#. I18N: ./data/gui/press_a_key_dialog.stkgui
+#. I18N: When configuring input
+msgid "Assign nothing"
+msgstr "Älä aseta mitään"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:462
 msgid "Assign to ESC key"
 msgstr "Aseta näppäimelle ESC"
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
-#: data/po/gui_strings.h:110 data/po/gui_strings.h:816
 msgid "At World's End"
 msgstr "Maailman laidalla"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input2.cpp:71
-#: src/states_screens/options_screen_input.cpp:138
-#: src/states_screens/options_screen_players.cpp:71
-#: src/states_screens/options_screen_ui.cpp:112
-#: src/states_screens/options_screen_video.cpp:87 data/po/gui_strings.h:139
+#: src/states_screens/options_screen_input.cpp:139
+#: src/states_screens/options_screen_input2.cpp:86
+#: src/states_screens/options_screen_ui.cpp:118
+#: src/states_screens/options_screen_video.cpp:163
+#: src/states_screens/user_screen.cpp:647
 msgid "Audio"
 msgstr "Ääni"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: src/tracks/track_object_presentation.cpp:618 data/po/gui_strings.h:630
+#: src/tracks/track_object_presentation.cpp:906
 msgid "Avoid bananas!"
 msgstr "Vältä banaaneja!"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:293
+#: src/input/binding.cpp:284
 #, c-format
 msgid "Axis %d"
-msgstr ""
+msgstr "Akseli %d"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:281
+#: src/input/binding.cpp:272
 #, c-format
 msgid "Axis %d %s"
-msgstr "Akseli %d%s"
+msgstr "Akseli %d %s"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:288
+#: src/input/binding.cpp:279
 #, c-format
 msgid "Axis %d inverted"
-msgstr ""
+msgstr "Akseli %d käännetty"
 
 #. I18N: ./data/gui/addons_loading.stkgui
-#. I18N: Add-ons screen action
-#: src/states_screens/dialogs/addons_loading.cpp:260 data/po/gui_strings.h:186
+#. I18N: Add-on screen action
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:216
+#: src/states_screens/dialogs/addons_loading.cpp:284
 msgid "Back"
 msgstr "Takaisin"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
-#. I18N: Race paused button
-#: data/po/gui_strings.h:476
+#. I18N: In the in-game dialog
 msgid "Back to Game"
 msgstr "Takaisin peliin"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:326
 msgid "Back to Race"
 msgstr "Takaisin kilpailuun"
 
-#: src/states_screens/race_result_gui.cpp:142
+#: src/states_screens/race_result_gui.cpp:205
 msgid "Back to challenge selection"
 msgstr "Takaisin haasteen valintaan"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:398
 msgid "Back to device list"
 msgstr "Takaisin laitelistaan"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
-#. I18N: Race paused button
-#: data/po/gui_strings.h:492
+#. I18N: In the in-game dialog
 msgid "Back to menu"
 msgstr "Takaisin valikkoon"
 
-#: src/states_screens/race_result_gui.cpp:148
+#: src/states_screens/race_result_gui.cpp:211
 msgid "Back to the menu"
 msgstr "Takaisin valikkoon"
 
-#: src/items/powerup.cpp:85
-msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr "Banaani? Laatikko? Banaani? Laatikko? Banaani? Laatikko?"
+#. I18N: ./data/achievements.xml
+msgid "Banana Lover"
+msgstr "Banaanirohmu"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:693
 msgid ""
-"Basket Ball - bounces after the leader, and might squash and slow down karts "
-"down on the way."
-msgstr ""
-"Koripallo - pomppii kärjessä olevan perään, saattaa lytätä ja hidastaa muita "
-"autoja."
+"Basket Ball - bounces after the leader, and might squash and slow down karts"
+" down on the way."
+msgstr "Koripallo - pomppii kärjessä olevan perään, saattaa lytätä ja hidastaa muita autoja."
 
-#. I18N: ./data/tracks/battleisland/track.xml
-#: data/po/gui_strings.h:23
+#. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
 msgstr "Taistelusaari"
 
-#. I18N: ./data/karts/beagle/kart.xml
-#: data/po/gui_strings.h:837
-msgid "Beagle"
-msgstr "Beagle"
-
-#. I18N: ./data/karts/beastie/kart.xml
-#: data/po/gui_strings.h:849
+#. I18N: ../stk-assets/karts/beastie/kart.xml
 msgid "Beastie"
 msgstr "Beastie"
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:260
+#: src/states_screens/grand_prix_lose.cpp:161
 msgid "Better luck next time!"
 msgstr "Parempi onni ensi kerralla!"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:70
+#: src/states_screens/dialogs/custom_video_settings.cpp:76
 msgid "Bilinear"
-msgstr ""
+msgstr "Bilineaarinen"
 
-#. I18N: ./data/tracks/mansion/track.xml
-#: data/po/gui_strings.h:29
+#. I18N: Name of the black button on xbox controller
+#: src/input/gamepad_config.cpp:167
+msgid "Black"
+msgstr "Musta"
+
+#. I18N: ../stk-assets/tracks/mansion/track.xml
 msgid "Blackhill Mansion"
 msgstr "Kummituskartano"
 
-#: src/states_screens/race_result_gui.cpp:864
-msgid "Blue Team Wins"
-msgstr ""
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Bloom"
+msgstr "Kukoistus"
 
-#. I18N: ./data/tracks/farm/track.xml
-#: data/po/gui_strings.h:38
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:473
+#, c-format
+msgid "Bloom : %s"
+msgstr "Kukoistus: %s"
+
+#: src/states_screens/race_result_gui.cpp:969
+msgid "Blue Team Wins"
+msgstr "Sininen joukkue voittaa"
+
+#. I18N: ../stk-assets/tracks/farm/track.xml
 msgid "Bovine Barnyard"
 msgstr "Karjapihan kierros"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:681
 msgid ""
-"Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
-"backwards."
-msgstr ""
-"Keilapallo - kimpoaa seinistä. Jos olet katsomassa taakse, se heitetään "
-"taaksepäin."
+"Bowling Ball - bounces off walls. If you are looking back, it will be thrown"
+" backwards."
+msgstr "Keilapallo - kimpoaa seinistä. Jos katsot taakse, pallo heitetään taaksepäin."
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:193
+#: src/states_screens/options_screen_input2.cpp:239
 msgid "Brake"
 msgstr "Jarruta"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:672
 msgid ""
 "BubbleGum - protect yourself with a shield, or use while looking back to "
 "leave a sticky pink puddle behind you."
-msgstr ""
-"Purkka - käytä suojakilpenä, tai jätä tahmea pinkki klöntti taaksesi."
+msgstr "Purkka - käytä suojakilpenä, tai jätä tahmea pinkki klöntti taaksesi."
 
-#. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
-#. I18N: ./data/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:86 data/po/gui_strings.h:89
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr "Mutta olen reilu kaveri, joten tehdään diili."
+msgstr "Mutta olen reilu otus, joten teen sinulle tarjouksen."
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:675
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
-msgstr ""
-"Kakku - heitetään lähimpää kilpailijaa kohti, toimii parhaiten lyhyillä "
-"etäisyyksillä ja pitkillä suorilla."
+msgstr "Kakku - heitetään lähintä kilpailijaa kohti, toimii parhaiten lyhyillä etäisyyksillä ja pitkillä suorilla."
 
-#: src/addons/network_http.cpp:432 src/addons/news_manager.cpp:149
+#: src/addons/addons_manager.cpp:97 src/addons/news_manager.cpp:315
 msgid "Can't access stkaddons server..."
 msgstr "Yhteyttä stkaddons-palvelimeen ei saada..."
 
-#: src/addons/network_http.cpp:339
-msgid "Can't download addons list, check terminal for details."
-msgstr ""
-"Lisäosien luettelon lataaminen epäonnistui. Lisätietoja komentorivin "
-"tulosteessa."
-
-#: src/addons/network_http.cpp:349
-msgid "Can't download news file, check terminal for details."
-msgstr ""
-"Uutistiedoston lataaminen epäonnistui. Lisätietoja komentorivin tulosteessa."
-
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#. I18N: ./data/gui/story_mode_new.stkgui
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
+#. I18N: In the 'add new grand prix' dialog
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: In the 'add new player' dialog
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/dialogs/addons_loading.cpp:227
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
-#: src/states_screens/dialogs/player_info_dialog.cpp:106
-#: src/states_screens/dialogs/addons_loading.cpp:226 data/po/gui_strings.h:257
-#: data/po/gui_strings.h:375 data/po/gui_strings.h:383
+#: src/states_screens/user_screen.cpp:112
 msgid "Cancel"
-msgstr "Peruuta"
+msgstr "Peru"
 
-#. I18N: In the player info dialog (when deleting)
-#: src/states_screens/dialogs/player_info_dialog.cpp:198
-msgid "Cancel Remove"
-msgstr "Peruuta poisto"
+#: src/states_screens/dialogs/user_info_dialog.cpp:56
+msgid "Cancel Request"
+msgstr "Peru pyyntö"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:231
+#: src/states_screens/options_screen_input2.cpp:277
 msgid "Cancel/Back"
-msgstr "Peruuta/takaisin"
+msgstr "Peru/takaisin"
 
-#: src/states_screens/dialogs/enter_player_name_dialog.cpp:126
-#: src/states_screens/dialogs/enter_player_name_dialog.cpp:145
-msgid "Cannot add a player with this name."
-msgstr "Tämännimisen pelaajan lisääminen ei onnistu."
-
-#. I18N: ./data/tracks/cave/track.xml
-#: data/po/gui_strings.h:20
+#. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
 msgstr "Luola X"
 
-#: src/states_screens/feature_unlocked.cpp:574
+#: src/states_screens/feature_unlocked.cpp:493
 msgid "Challenge Completed"
 msgstr "Haaste suoritettu"
 
-#: src/states_screens/race_gui.cpp:320 src/states_screens/race_gui.cpp:322
+#: src/states_screens/race_gui.cpp:313 src/states_screens/race_gui.cpp:315
 msgid "Challenge Failed"
 msgstr "Haasteen suorittaminen epäonnistui"
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
-#: data/po/gui_strings.h:496
 msgid "Challenges : Trophy Room"
 msgstr "Haasteet: Palkintohuone"
 
+#. I18N: ./data/gui/online/profile_settings.stkgui
+msgid "Change"
+msgstr "Vaihda"
+
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
-#: data/po/gui_strings.h:600
+#. I18N: ./data/gui/karts_online.stkgui
+#. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
 msgstr "Valitse auto"
 
+#. I18N: ./data/achievements.xml
+msgid "Christoffel Columbus"
+msgstr "Kristoffer Kolumbus"
+
 #. I18N: ./data/gui/help1.stkgui
-#: data/po/gui_strings.h:622
 msgid "Click here to play the tutorial"
 msgstr "Paina tästä pelataksesi opaskierroksen"
 
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#: data/po/gui_strings.h:432
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+#. I18N: ./data/gui/online/notification_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/online/vote_dialog.stkgui
+#. I18N: Vote dialog
 msgid "Close"
 msgstr "Sulje"
 
+#. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
+msgid "Cocoa Temple"
+msgstr "Kaakaotemppeli"
+
+#. I18N: ./data/achievements.xml
+msgid "Collect at least 5 bananas in one race."
+msgstr "Kerää vähintään viisi banaania yhdessä kilpailussa."
+
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:626
 msgid "Collect blue boxes : they will give you weapons or other powerups"
-msgstr ""
-"Kerää sinisiä laatikoita: niistä saat aseita tai muita hyödyllisiä esineitä"
+msgstr "Kerää sinisiä laatikoita: niistä saat aseita tai muita hyödyllisiä esineitä"
 
-#: src/tracks/track_object_presentation.cpp:627
+#: src/tracks/track_object_presentation.cpp:916
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
 msgstr "Kerää lahjapaketteja. Näppäimellä <%s> voit ampua paketteja pois."
 
-#: src/tracks/track_object_presentation.cpp:634
+#: src/tracks/track_object_presentation.cpp:938
 msgid "Collect nitro bottles (we will use them after the curve)"
 msgstr "Kerää nitropulloja (voit käyttää niitä mutkan jälkeen)"
 
-#: src/states_screens/race_gui_base.cpp:730
+#: src/states_screens/race_gui_base.cpp:648
 msgid "Collect nitro!"
 msgstr "Kerää nitroa!"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:634
 msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
-"pressing the appropriate key. You can see your current level of nitro in the "
-"bar at the right of the game screen."
-msgstr ""
-"Nitroa keräämällä voit lisätä nopeuttasi milloin haluat painamalla siihen "
-"tarkoitettua näppäintä. Keräämäsi nitron määrän näet ruudun oikeassa "
-"reunassa olevasta palkista."
+"pressing the appropriate key. You can see your current level of nitro in the"
+" bar at the right of the game screen."
+msgstr "Nitroa keräämällä voit lisätä nopeuttasi milloin haluat painamalla siihen tarkoitettua näppäintä. Keräämäsi nitron määrän näet ruudun oikeassa reunassa olevasta palkista."
 
-#. I18N: In the player info dialog (when deleting)
-#: src/states_screens/dialogs/player_info_dialog.cpp:179
-msgid "Confirm Remove"
-msgstr "Vahvista poisto"
+#: src/tracks/track_object_presentation.cpp:880
+msgid "Complete all challenges to unlock the big door!"
+msgstr "Suorita kaikki haasteet avataksesi suuren oven!"
 
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:72
+#: src/achievements/achievement.cpp:202
+#, c-format
+msgid "Completed achievement \"%s\"."
+msgstr "Suoritettiin saavutus \"%s\"."
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Confirm"
+msgstr "Vahvista"
+
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:81
 #, c-format
 msgid "Confirm resolution within %i seconds"
 msgstr "Vahvista resoluutio %i sekunnin kuluessa"
 
-#: src/input/wiimote_manager.cpp:309
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Connect to the Internet"
+msgstr "Yhdistä internetiin"
+
+#: src/input/wiimote_manager.cpp:387
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed "
 "instructions at supertuxkart.net/Wiimote"
-msgstr ""
+msgstr "Liitä Wiimote Bluetooth-hallintaan ja paina sitten Ok. Tarkemmat ohjeet: supertuxkart.net/Wiimote"
 
-#: src/states_screens/race_setup_screen.cpp:266
+#: src/states_screens/race_setup_screen.cpp:209
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr "Ei kerättäviä esineitä, joten vain ajotaito ratkaisee!"
 
 #. I18N: ./data/gui/feature_unlocked.stkgui
-#. I18N: ./data/gui/tutorial_message_dialog.stkgui
-#. I18N: Button in tutorial
-#. I18N: ./data/gui/grand_prix_win.stkgui
 #. I18N: ./data/gui/grand_prix_lose.stkgui
+#. I18N: ./data/gui/grand_prix_win.stkgui
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:123 data/po/gui_strings.h:174
-#: data/po/gui_strings.h:198 data/po/gui_strings.h:469
-#: data/po/gui_strings.h:789 data/po/gui_strings.h:807
+#. I18N: ./data/gui/tutorial_message_dialog.stkgui
+#. I18N: Button in tutorial
+#: src/states_screens/dialogs/gp_info_dialog.cpp:212
+#: src/states_screens/race_result_gui.cpp:186
 msgid "Continue"
 msgstr "Jatka"
 
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: Section in the settings menu
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#: src/states_screens/gp_info_screen.cpp:146
+msgid "Continue saved GP"
+msgstr "Jatka tallennettua GP'tä"
+
+#: src/states_screens/race_result_gui.cpp:156
+msgid "Continue."
+msgstr "Jatka."
+
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_players.cpp:73
-#: src/states_screens/options_screen_ui.cpp:114
-#: src/states_screens/options_screen_audio.cpp:66
-#: src/states_screens/options_screen_video.cpp:90 data/po/gui_strings.h:205
-#: data/po/gui_strings.h:390
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/options_screen_audio.cpp:67
+#: src/states_screens/options_screen_ui.cpp:120
+#: src/states_screens/options_screen_video.cpp:166
+#: src/states_screens/user_screen.cpp:649
 msgid "Controls"
 msgstr "Ohjaimet"
 
-#: src/input/wiimote_manager.cpp:344
-msgid "Could not detect any wiimote :/"
-msgstr "Yhtään Wiimotea ei löydetty :/"
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+msgid "Copy"
+msgstr "Kopioi"
 
-#. I18N: ./data/gui/story_mode_lobby.stkgui
-#. I18N: In story mode 'select a game slot' menu
-#: data/po/gui_strings.h:706
-msgid "Create a new player"
-msgstr "Luo uusi pelaaja"
+#: src/states_screens/register_screen.cpp:217
+#: src/states_screens/register_screen.cpp:224
+#, c-format
+msgid "Could not create player '%s'."
+msgstr "Käyttäjän \"%s\" luominen epäonnistui."
+
+#: src/input/wiimote_manager.cpp:418
+msgid "Could not detect any wiimote :/"
+msgstr "Yhtäkään Wiimotea ei löytynyt :/"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Create"
+msgstr "Luo"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Create Server"
+msgstr "Luo palvelin"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Create User"
+msgstr "Luo käyttäjä"
+
+#: src/states_screens/create_server_screen.cpp:117
+msgid "Creating server"
+msgstr "Luodaan palvelinta"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
-#: data/po/gui_strings.h:710
 msgid "Credits"
 msgstr "Tekijät"
 
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+msgid "Current Password"
+msgstr "Nykyinen salasana"
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:134
+msgid "Current password invalid."
+msgstr "Nykyinen salasana on virheellinen."
+
+#: src/config/player_manager.cpp:91
+msgid "Currently not signed in"
+msgstr "Ei sisäänkirjautuneena"
+
 #. I18N: custom video settings
-#: src/states_screens/options_screen_video.cpp:330
+#: src/states_screens/options_screen_video.cpp:411
 msgid "Custom"
 msgstr "Oma"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:272
 msgid "Custom settings..."
 msgstr "Omat asetukset..."
 
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:195 src/input/gamepad_config.cpp:253
+msgid "DPad down"
+msgstr "Suuntanäppäin alas"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:193 src/input/gamepad_config.cpp:257
+msgid "DPad left"
+msgstr "Suuntanäppäin vasemmalle"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:191 src/input/gamepad_config.cpp:255
+msgid "DPad right"
+msgstr "Suuntanäppäin oikealle"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:197 src/input/gamepad_config.cpp:251
+msgid "DPad up"
+msgstr "Suuntanäppäin ylös"
+
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Decline"
+msgstr "Kieltäydy"
+
+#: src/states_screens/gp_info_screen.cpp:74
+msgid "Default"
+msgstr "Oletus"
+
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Delete"
+msgstr "Poista"
+
 #. I18N: ./data/gui/options_device.stkgui
-#. I18N: To delete a keyboard configuration
-#: src/states_screens/options_screen_input2.cpp:96 data/po/gui_strings.h:394
+#. I18N: In the input configuration screen
+#: src/states_screens/options_screen_input2.cpp:111
 msgid "Delete Configuration"
 msgstr "Poista näppäinasetukset"
 
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Depth of field"
+msgstr "Terävyysalue"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:485
+#, c-format
+msgid "Depth of field : %s"
+msgstr "Terävyysalue: %s"
+
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options_screen_input2.cpp:81
-#: src/states_screens/options_screen_input2.cpp:516
+#: src/states_screens/options_screen_input2.cpp:96
+#: src/states_screens/options_screen_input2.cpp:587
 msgid "Disable Device"
 msgstr "Poista laite käytöstä"
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:56
-#: src/states_screens/dialogs/custom_video_settings.cpp:80
-#: src/states_screens/options_screen_video.cpp:351
+#: src/states_screens/dialogs/custom_video_settings.cpp:62
+#: src/states_screens/dialogs/custom_video_settings.cpp:86
+#: src/states_screens/options_screen_video.cpp:432
 msgid "Disabled"
 msgstr "Ei käytössä"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:447
 msgid "Display FPS"
 msgstr "Näytä ruudunpäivitysnopeus (FPS)"
 
-#: src/states_screens/race_result_gui.cpp:238
+#: src/states_screens/race_result_gui.cpp:354
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "Haluatko varmasti keskeyttää Grand Prixin?"
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/dialogs/player_info_dialog.cpp:155
+#: src/states_screens/user_screen.cpp:583
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
 msgstr "Haluatko varmasti poistaa pelaajan %s?"
 
-#: src/items/powerup.cpp:68
-msgid "Do you want to fly kites?"
-msgstr "Haluatko lennättää leijaa?"
+#: src/states_screens/edit_gp_screen.cpp:140
+msgid "Do you want to save your changes?"
+msgstr "Haluatko tallentaa muutoksesi?"
 
-#: src/karts/controller/player_controller.cpp:334
+#: src/karts/controller/network_player_controller.cpp:283
+#: src/karts/controller/player_controller.cpp:340
 msgid "Don't accelerate before go"
 msgstr "Älä kiihdytä ennen lähtömerkkiä"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:219
+#: src/states_screens/options_screen_input2.cpp:265
 msgid "Down"
 msgstr "Alas"
 
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Drive in reverse"
+msgstr "Aja vastasuuntaan"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:455
+#, c-format
+msgid "Dynamic lights : %s"
+msgstr "Dynaamiset valot: %s"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+msgid "Edit"
+msgstr "Muokkaa"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Title in edit grand prix screen
+msgid "Edit Grand Prix"
+msgstr "Muokkaa Grand Prix'tä"
+
 #. I18N: Game mode
-#: src/race/race_manager.hpp:183
+#: src/race/race_manager.hpp:184
 msgid "Egg Hunt"
-msgstr ""
+msgstr "Munajahti"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:756
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr ""
+msgstr "Munajahti: löydä kaikki radoille piilotetut munat."
 
 #: src/modes/easter_egg_hunt.cpp:202
 #, c-format
 msgid "Eggs: %d / %d"
 msgstr "Munia: %d / %d"
 
-#. I18N: ./data/karts/elephpant/kart.xml
-#: data/po/gui_strings.h:858
+#. I18N: ../stk-assets/karts/elephpant/kart.xml
 msgid "Elephpant"
 msgstr "Fantti"
 
-#: src/states_screens/race_result_gui.cpp:353
-#: src/states_screens/race_result_gui.cpp:717
+#: src/states_screens/race_result_gui.cpp:474
+#: src/states_screens/race_result_gui.cpp:833
 msgid "Eliminated"
 msgstr "Poistettu"
 
-#. I18N: ./data/karts/emule/kart.xml
-#: data/po/gui_strings.h:840
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Email"
+msgstr "Sähköposti"
+
+#: src/states_screens/register_screen.cpp:292
+msgid "Email has to be between 4 and 50 characters long!"
+msgstr "Sähköpostiosoitteen tulee olla pituudeltaan 4-50 merkkiä!"
+
+#: src/states_screens/register_screen.cpp:298
+msgid "Email is invalid!"
+msgstr "Sähköpostiosoite on virheellinen!"
+
+#: src/states_screens/register_screen.cpp:276
+msgid "Emails don't match!"
+msgstr "Sähköpostiosoitteet eivät täsmää!"
+
+#. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"
 msgstr "Emule"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options_screen_input2.cpp:83
-#: src/states_screens/options_screen_input2.cpp:517
+#: src/states_screens/options_screen_input2.cpp:98
+#: src/states_screens/options_screen_input2.cpp:588
 msgid "Enable Device"
 msgstr "Ota laite käyttöön"
 
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Enable per-player handicaps"
+msgstr "Käytä pelaajakohtaisia tasoituksia"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: In the audio options screen
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
-#. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Next to checkbox in settings menu
-#: src/states_screens/options_screen_video.cpp:348 data/po/gui_strings.h:147
-#: data/po/gui_strings.h:159
+#: src/states_screens/options_screen_video.cpp:429
 msgid "Enabled"
 msgstr "Käytössä"
 
 #. I18N: animations setting (all karts are animated)
-#: src/states_screens/dialogs/custom_video_settings.cpp:60
+#: src/states_screens/dialogs/custom_video_settings.cpp:66
 msgid "Enabled for all"
 msgstr "Kaikki"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
-#: data/po/gui_strings.h:167
 msgid "Enter the new player's name"
 msgstr "Anna uuden pelaajan nimi"
 
-#: src/states_screens/kart_selection.cpp:1287
+#: src/addons/news_manager.cpp:172
+#, c-format
+msgid "Error downloading news: '%s'."
+msgstr "Virhe uutisia ladattaessa: '%s'."
+
+#: src/states_screens/kart_selection.cpp:923
 msgid ""
 "Everyone:\n"
 "Press 'Select' now to join the game!"
-msgstr ""
-"Kaikki pelaajat:\n"
-"Painakaa \"Valitse\"-nappia liittyäksenne peliin!"
+msgstr "Kaikki pelaajat:\nPainakaa \"Valitse\"-nappia liittyäksenne peliin!"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "Existing Online Account"
+msgstr "Olemassa oleva verkkotili"
+
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In the networking lobby
+msgid "Exit"
+msgstr "Poistu"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:350
 msgid "Exit Race"
 msgstr "Poistu kilpailusta"
 
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/story_mode_new.stkgui
-#. I18N: Difficulty
+#: src/states_screens/user_screen.cpp:111
+msgid "Exit game"
+msgstr "Poistu pelistä"
+
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:132 data/po/gui_strings.h:369
-#: data/po/gui_strings.h:779
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
 msgid "Expert"
 msgstr "Kokenut"
 
-#: src/states_screens/race_setup_screen.cpp:309
+#: src/states_screens/race_setup_screen.cpp:252
 msgid "Explore tracks to find all hidden eggs"
-msgstr ""
+msgstr "Löydä kaikki radoille piilotetut munat"
 
-#. I18N: shown when a player is hit by a rubber ball. %1 is the
-#. attacker, %0 is the victim.
-#: src/items/rubber_ball.cpp:313
-msgid "Fetch the ball, %0!"
-msgstr "%0, nouda pallo!"
+#: src/graphics/irr_driver.cpp:1795
+#, c-format
+msgid "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
+msgstr "FPS: %d/%d/%d  - Poly-määrä: %d kappaletta, %d varjoa - Valon etäisyys: %d"
 
-#: src/modes/linear_world.cpp:266
+#: src/graphics/irr_driver.cpp:1804
+#, c-format
+msgid "FPS: %d/%d/%d - %d KTris"
+msgstr "FPS: %d/%d/%d - %d KTris"
+
+#: src/states_screens/online_profile_achievements.cpp:128
+#: src/states_screens/online_profile_achievements.cpp:168
+msgid "Fetching achievements"
+msgstr "Noudetaan saavutuksia"
+
+#: src/states_screens/online_profile_friends.cpp:88
+#: src/states_screens/online_profile_friends.cpp:174
+msgid "Fetching friends"
+msgstr "Noudetaan kavereita"
+
+#: src/states_screens/dialogs/vote_dialog.cpp:171
+msgid "Fetching last vote"
+msgstr "Noudetaan viimeistä ääntä"
+
+#: src/states_screens/server_selection.cpp:67
+#: src/states_screens/server_selection.cpp:210
+msgid "Fetching servers"
+msgstr "Noudetaan palvelimia"
+
+#. I18N: ./data/gui/online/recovery_input.stkgui
+msgid ""
+"Fill in the username and email address you supplied at registration to be "
+"able to reset your password."
+msgstr "Anna rekisteröitymisen yhteydessä antamasi käyttäjätunnus ja salasana, jotta voit nollata salasanan."
+
+#: src/modes/linear_world.cpp:276
 msgid "Final lap!"
 msgstr "Viimeinen kierros!"
 
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Find Server"
+msgstr "Etsi palvelin"
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:196
+#: src/states_screens/options_screen_input2.cpp:242
 msgid "Fire"
 msgstr "Ampumisnäppäin"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:245
 msgid ""
 "First, you will need several input devices (having multiple gamepads or "
 "joysticks is the best way to play with several people). Go in the input "
 "configuration screen and setup the gamepads. It is also possible to play on "
-"keyboard(s), however each player will need a different set of keys, and keep "
-"in mind that most keyboards are not appropriate for multiplayer gameplay "
+"keyboard(s), however each player will need a different set of keys, and keep"
+" in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
-msgstr ""
-"Tarvitset useamman syöttölaitteen (peliohjaimet tai joystickit ovat hyviä "
-"useamman pelaajan pelissä). Laita peliohjainten asetukset kuntoon "
-"valikoista. Myös näppäimistö(i)llä pelaaminen on mahdollista, mutta "
-"jokaisella pelaajalla täytyy olla eri näppäinasetukset ja useimmat "
-"näppäimistöt tukevat varsin rajoitettua määrää yhtäaikaisia "
-"näppäimenpainalluksia."
+msgstr "Tarvitset useamman syöttölaitteen (peliohjaimet tai joystickit ovat hyviä useamman pelaajan pelissä). Laita peliohjainten asetukset kuntoon valikoista. Myös näppäimistö(i)llä pelaaminen on mahdollista, mutta jokaisella pelaajalla täytyy olla eri näppäinasetukset ja useimmat näppäimistöt tukevat varsin rajoitettua määrää yhtäaikaisia näppäimenpainalluksia."
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:179
+#: src/race/race_manager.hpp:180
 msgid "Follow the Leader"
 msgstr "Seuraa johtajaa"
 
-#: src/states_screens/race_gui_base.cpp:732
+#: src/states_screens/race_gui_base.cpp:650
 msgid "Follow the leader!"
-msgstr ""
+msgstr "Seuraa johtajaa!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:744
 msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
-msgstr ""
+msgstr "Seuraa johtajaa: pysy toisena, sillä viimeisenä oleva kilpailija poistetaan kisasta joka kerta kun laskuri menee nollaan. Varo myös menemästä johtajan edelle - silloinkin sinut poistetaan!"
 
-#. I18N: ./data/tracks/fortmagma/track.xml
-#: data/po/gui_strings.h:56
+#. I18N: ../stk-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
 msgstr "Magman linnake"
 
-#: src/input/wiimote_manager.cpp:336
+#: src/input/wiimote_manager.cpp:413
 #, c-format
-msgid "Found %d wiimote(s)"
-msgstr "%d Wiimote(a) löydetty"
+msgid "Found %d wiimote"
+msgid_plural "Found %d wiimotes"
+msgstr[0] "Löydetty %d wiimote"
+msgstr[1] "Löydetty %d wiimotea"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:313
+msgid "Friend removed!"
+msgstr "Kaveri poistettu!"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:215
+msgid "Friend request accepted!"
+msgstr "Kaveripyyntö hyväksytty!"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:364
+msgid "Friend request cancelled!"
+msgstr "Kaveripyyntö peruttu!"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:267
+msgid "Friend request declined!"
+msgstr "Kaveripyyntö hylätty!"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:158
+msgid "Friend request sent!"
+msgstr "Kaveripyyntö lähetetty!"
+
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: Section in the profile screen
+#: src/states_screens/online_profile_base.cpp:99
+msgid "Friends"
+msgstr "Kaverit"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:288
 msgid "Fullscreen"
-msgstr "Kokoruututila"
+msgstr "Koko näytön tila"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:73
+#: src/states_screens/race_gui_base.cpp:70
 msgid "GOAL!"
 msgstr "MAALI!"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_input2.cpp:129
+#: src/states_screens/options_screen_input2.cpp:144
 msgid "Game Keys"
 msgstr "Pelinäppäimet"
 
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:231 data/po/gui_strings.h:615
-#: data/po/gui_strings.h:661 data/po/gui_strings.h:725
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "Game Modes"
 msgstr "Pelimuodot"
 
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Game type (Goals limit / Time limit)"
+msgstr "Pelin tyyppi (maaliraja / aikaraja)"
+
 #. I18N: to appear in input configuration screen, for gamepad buttons
-#: src/input/binding.cpp:301
+#: src/input/binding.cpp:292
 #, c-format
 msgid "Gamepad button %d"
 msgstr "Peliohjaimen nappi %d"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
-#: src/input/binding.cpp:269 src/input/binding.cpp:274
+#: src/input/binding.cpp:260 src/input/binding.cpp:265
 #, c-format
 msgid "Gamepad hat %d"
 msgstr "Peliohjaimen hattu %d"
 
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:223 data/po/gui_strings.h:607
-#: data/po/gui_strings.h:653 data/po/gui_strings.h:717
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "General"
 msgstr "Yleistä"
 
-#: src/items/powerup.cpp:66
-msgid "Geronimo!!!"
-msgstr "Geronimo!!!"
-
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:338
 msgid "Give Up Race"
 msgstr "Luovuta kilpailu"
 
-#. I18N: ./data/karts/gnu/kart.xml
-#: data/po/gui_strings.h:828
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Global illumination"
+msgstr "Yleinen valaisu"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:489
+#, c-format
+msgid "Global illumination : %s"
+msgstr "Yleinen valaisu: %s"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Glow (outlines)"
+msgstr "Hohto (ääriviivat)"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:477
+#, c-format
+msgid "Glow (outlines) : %s"
+msgstr "Hohto (ääriviivat): %s"
+
+#. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
 msgstr "Gnu"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:71
+#: src/states_screens/race_gui_base.cpp:68
 msgid "Go!"
 msgstr "Aja!"
 
-#. I18N: ./data/gui/tracks.stkgui
-#. I18N: Section in track selection screen
-#: src/states_screens/dialogs/select_challenge.cpp:140
-#: data/po/gui_strings.h:190
-msgid "Grand Prix"
-msgstr "Grand prix"
+#. I18N: ./data/achievements.xml
+msgid "Gold driver"
+msgstr "Kultakuski"
 
-#: src/states_screens/race_result_gui.cpp:1070
+#. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
+msgid "Gran Paradiso Island"
+msgstr "Gran Paradiso -saari"
+
+#. I18N: ./data/gui/tracks.stkgui
+#. I18N: In the track selection screen
+#: src/states_screens/dialogs/select_challenge.cpp:145
+msgid "Grand Prix"
+msgstr "Grand Prix"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+msgid "Grand Prix Editor"
+msgstr "Grand Prix -editori"
+
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Title in grand prix editor screen
+msgid "Grand Prix editor"
+msgstr "Grand Prix -editori"
+
+#: src/states_screens/race_result_gui.cpp:1214
 msgid "Grand Prix progress:"
 msgstr "Grand prixin tilanne:"
 
 #. I18N: ./data/gui/options_video.stkgui
-#. I18N: In the graphics settings
-#: data/po/gui_strings.h:268
+#. I18N: In the video settings
 msgid "Graphical Effects Level"
 msgstr "Graafisten tehosteiden taso"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input2.cpp:70
-#: src/states_screens/options_screen_input.cpp:137
-#: src/states_screens/options_screen_players.cpp:70
-#: src/states_screens/options_screen_ui.cpp:111
-#: src/states_screens/options_screen_audio.cpp:63 data/po/gui_strings.h:264
+#: src/states_screens/options_screen_audio.cpp:64
+#: src/states_screens/options_screen_input.cpp:138
+#: src/states_screens/options_screen_input2.cpp:85
+#: src/states_screens/options_screen_ui.cpp:117
+#: src/states_screens/user_screen.cpp:646
 msgid "Graphics"
 msgstr "Grafiikka"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
-#: data/po/gui_strings.h:401
 msgid "Graphics Settings"
 msgstr "Graafiset asetukset"
 
-#. I18N: ./data/tracks/greenvalley/track.xml
-#: data/po/gui_strings.h:8
+#. I18N: ../stk-assets/tracks/greenvalley/track.xml
 msgid "Green Valley"
 msgstr "Vihreä laakso"
 
-#: src/config/user_config.cpp:607 src/config/user_config.cpp:727
+#. I18N: Name of first guest player (without number)
+#: src/config/player_manager.cpp:392
 msgid "Guest"
 msgstr "Vierailija"
 
-#. I18N: ./data/tracks/hacienda/track.xml
-#: data/po/gui_strings.h:62
+#. I18N: Name of further guest players, with a 1, 2, ... attached
+#: src/config/player_manager.cpp:397
+#, c-format
+msgid "Guest %d"
+msgstr "Vieras %d"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid "Guest Log in"
+msgstr "Vieraskirjautuminen"
+
+#. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
 msgstr "Hacienda"
 
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+#. I18N: ./data/gui/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#. I18N: ./data/gui/overworld_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: data/po/gui_strings.h:346 data/po/gui_strings.h:488
-#: data/po/gui_strings.h:538
 msgid "Help"
-msgstr "Apua"
+msgstr "Ohje"
 
-#. I18N: ./data/karts/hexley/kart.xml
-#: data/po/gui_strings.h:825
+#. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
 msgstr "Hexley"
 
-#: src/states_screens/race_result_gui.cpp:1103
+#: src/states_screens/race_result_gui.cpp:1252
 msgid "Highscores"
 msgstr "Ennätykset"
 
-#: src/states_screens/race_setup_screen.cpp:288
+#. I18N: ./data/achievements.xml
+msgid "Hit 10 karts with a bowling-ball."
+msgstr "Osu kymmeneen autoon keilapallolla."
+
+#: src/states_screens/race_setup_screen.cpp:231
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
-msgstr ""
-"Käytä aseistustasi muihin pelaajiin kunnes heiltä loppuu elämät. (Vain "
-"moninpelinä)"
+msgstr "Käytä aseistustasi muihin pelaajiin kunnes heiltä loppuu elämät. (Vain moninpelinä)"
+
+#. I18N: ./data/achievements.xml
+msgid "Hit the same kart at least 5 times in one race."
+msgstr "Osu samaan autoon vähintään viisi kertaa yhden kisan aikana."
 
 #. I18N: animations setting (only karts with human players are animated)
-#: src/states_screens/dialogs/custom_video_settings.cpp:58
+#: src/states_screens/dialogs/custom_video_settings.cpp:64
 msgid "Human players only"
 msgstr "Vain ihmispelaajat"
 
-#. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
-#. I18N: ./data/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:92 data/po/gui_strings.h:95
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+msgid "I agree to the above terms and am 13 years or older. "
+msgstr "Hyväksyn yllä olevat ehdot ja olen vähintään 13 vuotta vanha."
+
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
 msgstr "Jos voitatte minut kilvanajossa, vapautan vanhan höppänän."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:638
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr ""
-"Jos näet oheisen kaltaisen lukollisen painikkeen, sinun täytyy suorittaa "
-"haaste avataksesi lukituksen."
+msgstr "Jos näet oheisen kaltaisen lukollisen painikkeen, sinun täytyy suorittaa haaste avataksesi lukituksen."
 
-#: src/input/input_manager.cpp:656
+#: src/input/input_manager.cpp:729
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
-msgstr ""
-"Jätetään %s huomiotta. Pelataksesi sinun olisi pitänyt liittyä aikaisemmin!"
+msgstr "Jätetään %s huomiotta. Pelataksesi sinun olisi pitänyt liittyä aikaisemmin!"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Image-based lighting"
+msgstr "Kuvapohjainen valaistus"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
-#: data/po/gui_strings.h:178
 msgid "Install"
 msgstr "Asenna"
 
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/story_mode_new.stkgui
-#. I18N: Difficulty
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:128 data/po/gui_strings.h:365
-#: data/po/gui_strings.h:775
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
 msgid "Intermediate"
 msgstr "Keskitaso"
 
-#: src/states_screens/race_result_gui.cpp:869
+#: src/states_screens/register_screen.cpp:401
+#: src/states_screens/user_screen.cpp:328
+msgid "Internet access is disabled, please enable it in the options"
+msgstr "Pääsy internetiin on estetty, muuta valintaa asetuksista"
+
+#: src/states_screens/race_result_gui.cpp:974
 msgid "It's a draw"
-msgstr ""
+msgstr "Tasapeli"
+
+#. I18N: ./data/achievements.xml
+msgid "It's secret"
+msgstr "Se on salaisuus"
+
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+msgid "Join"
+msgstr "Liity"
+
+#: src/states_screens/dialogs/server_info_dialog.cpp:155
+msgid "Joining server"
+msgstr "Liitytään palvelimelle"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: Section in the addons menu
-#: data/po/gui_strings.h:565
+#. I18N: In the addons screen
 msgid "Karts"
 msgstr "Autot"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-#: data/po/gui_strings.h:379
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
 msgid "Keep this resolution"
 msgstr "Säilytä tämä resoluutio"
 
 #. I18N: short definition for follow-the-leader game mode
-#: src/states_screens/race_setup_screen.cpp:279
+#: src/states_screens/race_setup_screen.cpp:222
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "Pysy johtaja-auton vauhdissa, mutta älä ohita sitä!"
 
-#: src/states_screens/options_screen_input.cpp:96
+#: src/states_screens/options_screen_input2.cpp:72
+msgid "Key binding"
+msgstr "Näppäinsidos"
+
+#: src/states_screens/options_screen_input.cpp:97
 #, c-format
 msgid "Keyboard %i"
 msgstr "Näppäimistö %i"
 
-#. I18N: ./data/karts/konqi/kart.xml
-#: data/po/gui_strings.h:861
+#. I18N: ../stk-assets/karts/konqi/kart.xml
 msgid "Konqi"
 msgstr "Konqi"
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui.cpp:103
-#: src/states_screens/race_gui_overworld.cpp:106
+#: src/states_screens/race_gui_overworld.cpp:108
 msgid "Lap"
 msgstr "Kierros"
 
-#: src/modes/linear_world.cpp:293
+#: src/modes/linear_world.cpp:303
 #, c-format
 msgid "Lap %i"
 msgstr "%i. kierros"
 
+#: src/states_screens/edit_gp_screen.cpp:67
+msgid "Laps"
+msgstr "Kierrokset"
+
 #. I18N: number of laps to race in a challenge
-#: src/challenges/challenge_data.cpp:255
+#: src/challenges/challenge_data.cpp:249
 #, c-format
 msgid "Laps : %i"
 msgstr "Kierroksia: %i"
 
-#: src/modes/follow_the_leader.cpp:56 src/modes/follow_the_leader.cpp:251
+#: src/modes/follow_the_leader.cpp:57 src/modes/follow_the_leader.cpp:252
 msgid "Leader"
 msgstr "Johtaja"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:222
+#: src/states_screens/options_screen_input2.cpp:268
 msgid "Left"
 msgstr "Vasen"
 
-#: src/guiengine/engine.cpp:1286
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:212
+msgid "Left bumper"
+msgstr "L1-painike"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:220
+msgid "Left thumb button"
+msgstr "Vasen peukalonäppäin"
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:235
+msgid "Left thumb down"
+msgstr "Vasen peukalo alas"
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:233
+msgid "Left thumb left"
+msgstr "Vasen peukalo vasemmalle"
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:231
+msgid "Left thumb right"
+msgstr "Vasen peukalo oikealle"
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:237
+msgid "Left thumb up"
+msgstr "Vasen peukalo ylös"
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:179 src/input/gamepad_config.cpp:239
+msgid "Left trigger"
+msgstr "L2-painike"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Light shaft (God rays)"
+msgstr "Valokeila (jumalsäteet)"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:481
+#, c-format
+msgid "Light shaft (God rays) : %s"
+msgstr "Valokeila (jumalsäteet): %s"
+
+#: src/guiengine/engine.cpp:1330
 msgid "Loading"
 msgstr "Ladataan"
 
-#: src/states_screens/kart_selection.cpp:933
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In networking lobby
+msgid "Lobby"
+msgstr "Aula"
+
+#. I18N: ./data/gui/online/lobby_settings.stkgui
+#. I18N: In the lobby settings screen
+msgid "Lobby Settings"
+msgstr "Aulan asetukset"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Local Name"
+msgstr "Paikallinen nimi"
+
+#: src/states_screens/kart_selection.cpp:853
 msgid "Locked"
 msgstr "Lukittu"
 
-#: src/states_screens/arenas_screen.cpp:239
-#: src/states_screens/arenas_screen.cpp:269
-#: src/states_screens/tracks_screen.cpp:297
-#: src/states_screens/tracks_screen.cpp:328
-#: src/states_screens/kart_selection.cpp:938
-#: src/states_screens/kart_selection.cpp:2064
-#: src/states_screens/kart_selection.cpp:2096
-#: src/states_screens/race_setup_screen.cpp:271
+#: src/states_screens/arenas_screen.cpp:237
+#: src/states_screens/arenas_screen.cpp:267
+#: src/states_screens/easter_egg_screen.cpp:225
+#: src/states_screens/easter_egg_screen.cpp:256
+#: src/states_screens/kart_selection.cpp:858
+#: src/states_screens/kart_selection.cpp:1449
+#: src/states_screens/race_setup_screen.cpp:214
+#: src/states_screens/tracks_screen.cpp:283
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr ""
-"Lukittu. Suorita aktiivisia haasteita saadaksesi käyttöön uusia "
-"ominaisuuksia!"
+msgstr "Lukittu. Suorita aktiivisia haasteita saadaksesi käyttöön uusia ominaisuuksia!"
 
-#: src/states_screens/tracks_screen.cpp:234
+#: src/states_screens/tracks_screen.cpp:201
 msgid "Locked!"
 msgstr "Lukittu!"
 
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid "Log In"
+msgstr "Kirjaudu sisään"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Log Out"
+msgstr "Kirjaudu ulos"
+
+#: src/states_screens/online_screen.cpp:139
+#, c-format
+msgid "Logged in as: %s."
+msgstr "Kirjauduttu käyttäjänä: %s."
+
+#: src/states_screens/online_screen.cpp:155
+msgid "Logging in"
+msgstr "Kirjaudutaan sisään"
+
+#: src/states_screens/user_screen.cpp:494
+#, c-format
+msgid "Logging in '%s'"
+msgstr "Kirjataan sisään '%s'"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid ""
+"Logging in as a guest allows you to participate in online races, but it does"
+" not allow you to vote for addons, or collect any achievements while being "
+"online."
+msgstr "Sisäänkirjautuminen vieraana mahdollistaa osallistumisen kilpailuihin verkossa, mutta ei salli äänestystä lisäosista tai saavutusten keräämistä verkossa."
+
+#: src/states_screens/online_screen.cpp:160
+msgid "Logging out"
+msgstr "Kirjaudutaan ulos"
+
+#: src/states_screens/user_screen.cpp:493
+#, c-format
+msgid "Logging out '%s'"
+msgstr "Kirjataan ulos '%s'"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: ./data/gui/user_screen.stkgui
+#: src/states_screens/main_menu_screen.cpp:175
+#: src/states_screens/main_menu_screen.cpp:186
+msgid "Login"
+msgstr "Kirjaudu"
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:205
+#: src/states_screens/options_screen_input2.cpp:251
 msgid "Look Back"
 msgstr "Katso taakse"
 
-#: src/items/powerup.cpp:83
-msgid "Magic, son. Nothing else in the world smells like that."
-msgstr "Taikuutta, poikani. Mikään muu maailmassa ei tuoksu samalta."
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: In the profile screen
+msgid "Look for more friends:"
+msgstr "Etsi lisää kavereita:"
+
+#. I18N: ./data/achievements.xml
+msgid "Make 5 skidding in a single lap."
+msgstr "Suorita viisi sivuluisua yhden kierroksen aikana."
+
+#. I18N: ./data/achievements.xml
+msgid "Make a race with 5 laps or more."
+msgstr "Suorita kilpailu, jossa on vähintään viisi kierrosta."
+
+#. I18N: ./data/achievements.xml
+msgid "Marathoner"
+msgstr "Maratoonari"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#. I18N: ./data/gui/online/lobby_settings.stkgui
+#. I18N: In the lobby settings screen
+msgid "Max. number of players"
+msgstr "Pelaajien enimmäismäärä"
+
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Maximum time (min.)"
+msgstr "Enimmäisaika (min)"
 
 #. I18N: if some kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:355
+#: src/states_screens/options_screen_video.cpp:436
 msgid "Me Only"
 msgstr "Vain oma auto"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_input2.cpp:143
+#: src/states_screens/options_screen_input2.cpp:158
 msgid "Menu Keys"
 msgstr "Valikkonäppäimet"
 
-#. I18N: ./data/tracks/minigolf/track.xml
-#: data/po/gui_strings.h:47
-msgid "Minigolf Mischief"
-msgstr "Golf-raran kolttoset"
+#. I18N: ../stk-assets/tracks/minigolf/track.xml
+msgid "Minigolf"
+msgstr "Minigolf"
 
-#. I18N: ./data/gui/options_ui.stkgui
-#. I18N: In the ui settings
-#: data/po/gui_strings.h:455
-msgid "Minimal Race GUI"
-msgstr "Suppea näkymä kilpailtaessa"
+#. I18N: ./data/achievements.xml
+msgid "Mosquito Hunter"
+msgstr "Itikan metsästäjä!"
 
-#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
-#: src/input/binding.cpp:308
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Motion blur"
+msgstr "Liikepehmennys"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:458
+#, c-format
+msgid "Motion blur: %s"
+msgstr "Liikepehmennys: %s"
+
+#. I18N: to appear in input configuration screen, for mouse (might not be used
+#. at all)
+#: src/input/binding.cpp:299
 #, c-format
 msgid "Mouse axis %d %s"
 msgstr "Hiiren akseli %d%s"
 
-#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
-#: src/input/binding.cpp:304
+#. I18N: to appear in input configuration screen, for mouse (might not be used
+#. at all)
+#: src/input/binding.cpp:295
 #, c-format
 msgid "Mouse button %d"
 msgstr "Hiiren näppäin %d"
 
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Move down"
+msgstr "Siirry alas"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Move up"
+msgstr "Siirry ylös"
+
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:526
 msgid "Multiplayer"
 msgstr "Moninpeli"
 
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:235 data/po/gui_strings.h:619
-#: data/po/gui_strings.h:665 data/po/gui_strings.h:729
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "Multi­player"
 msgstr "Moninpeli"
 
 #. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Section in the audio/video settings submenu
-#: data/po/gui_strings.h:143
+#. I18N: In the audio options screen
 msgid "Music"
 msgstr "Musiikki"
 
-#. I18N: ./data/gui/story_mode_new.stkgui
-#: data/po/gui_strings.h:353
-msgid "New Game"
-msgstr "Uusi peli"
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#: src/states_screens/online_profile_achievements.cpp:73
+#: src/states_screens/server_selection.cpp:91
+msgid "Name"
+msgstr "Nimi"
 
-#: src/challenges/challenge_data.cpp:509
+#: src/states_screens/create_server_screen.cpp:132
+msgid "Name has to be between 4 and 30 characters long!"
+msgstr "Nimen tulee olla pituudeltaan 4-30 merkkiä!"
+
+#: src/states_screens/dialogs/enter_gp_name_dialog.cpp:125
+msgid "Name is empty."
+msgstr "Nimi on tyhjä."
+
+#: src/states_screens/dialogs/enter_gp_name_dialog.cpp:137
+msgid "Name is too long."
+msgstr "Nimi on liian pitkä."
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#. I18N: ./data/gui/online/lobby_settings.stkgui
+#. I18N: In the lobby settings screen
+msgid "Name of the server"
+msgstr "Palvelimen nimi"
+
+#. I18N: ../stk-assets/tracks/scotland/track.xml
+msgid "Nessie's pond"
+msgstr "Nessien lammikko"
+
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+msgid "New"
+msgstr "Uusi"
+
+#: src/challenges/challenge_data.cpp:502
 #, c-format
 msgid "New Grand Prix '%s' now available"
 msgstr "Uusi grand prix, \"%s\", on nyt käytössäsi"
 
-#: src/challenges/challenge_data.cpp:513
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "New Online Account"
+msgstr "Uusi verkkotili"
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+msgid "New Password"
+msgstr "Uusi salasana"
+
+#: src/states_screens/online_profile_friends.cpp:145
+msgid "New Request"
+msgstr "Uusi määrä"
+
+#: src/challenges/challenge_data.cpp:506
 #, c-format
 msgid "New difficulty '%s' now available"
 msgstr "Uusi vaikeusaste, \"%s\", on nyt käytössäsi"
 
-#: src/modes/linear_world.cpp:356
+#: src/modes/linear_world.cpp:363
 msgid "New fastest lap"
 msgstr "Uusi nopein kierros"
 
-#: src/challenges/challenge_data.cpp:499
+#: src/challenges/challenge_data.cpp:492
 #, c-format
 msgid "New game mode '%s' now available"
 msgstr "Uusi pelimuoto, \"%s\", on nyt käytössäsi"
 
-#: src/challenges/challenge_data.cpp:523
+#: src/challenges/challenge_data.cpp:516
 #, c-format
 msgid "New kart '%s' now available"
 msgstr "Uusi auto, \"%s\", on nyt käytössäsi"
 
-#: src/challenges/challenge_data.cpp:493
+#: src/challenges/challenge_data.cpp:486
 #, c-format
 msgid "New track '%s' now available"
 msgstr "Uusi rata, \"%s\", on nyt käytössäsi"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:199
+#: src/states_screens/options_screen_input2.cpp:245
 msgid "Nitro"
 msgstr "Nitro"
 
-#: src/states_screens/dialogs/select_challenge.cpp:142
+#: src/states_screens/dialogs/select_challenge.cpp:147
 msgid "Nitro challenge"
 msgstr "Nitro-haaste"
 
-#. I18N: ./data/karts/nolok/kart.xml
-#: data/po/gui_strings.h:834
+#: src/states_screens/dialogs/message_dialog.cpp:128
+#: src/states_screens/edit_gp_screen.cpp:253
+msgid "No"
+msgstr "Ei"
+
+#. I18N: ../stk-assets/karts/nolok/kart.xml
 msgid "Nolok"
 msgstr "Nolok"
 
 #. I18N: if no kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:357
+#: src/states_screens/gp_info_screen.cpp:75
+#: src/states_screens/options_screen_video.cpp:438
 msgid "None"
 msgstr "Ei"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:175
+#: src/race/race_manager.hpp:176
 msgid "Normal Race"
 msgstr "Normaali kilpailu"
 
-#. I18N: ./data/tracks/snowmountain/track.xml
-#: data/po/gui_strings.h:65
+#. I18N: ../stk-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
 msgstr "Pohjoinen hiihtokeskus"
 
-#: src/tracks/track_object_presentation.cpp:675
+#: src/tracks/track_object_presentation.cpp:986
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
-msgstr ""
-"Jos onnistut pysymään sivuluisussa useamman sekunnin ajan, saat "
-"nopeusbonuksen palkinnoksi!"
+msgstr "Jos onnistut pysymään sivuluisussa useamman sekunnin ajan, saat nopeusbonuksen palkinnoksi!"
 
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/story_mode_new.stkgui
-#. I18N: Difficulty
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:124 data/po/gui_strings.h:361
-#: data/po/gui_strings.h:771
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
 msgid "Novice"
 msgstr "Aloittelija"
 
-#: src/states_screens/dialogs/select_challenge.cpp:65
+#: src/states_screens/dialogs/select_challenge.cpp:68
 #, c-format
 msgid "Number of AI Karts : %i"
 msgstr "Tietokoneen ohjaamien pelaajien määrä: %i"
 
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: In race setup menu
-#: data/po/gui_strings.h:767
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
 msgid "Number of AI karts"
 msgstr "Tietokoneen ohjaamien pelaajien määrä"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
-#. I18N: In soccer setup menu
-#: data/po/gui_strings.h:796
+#. I18N: In soccer setup screen
 msgid "Number of goals to win"
 msgstr "Voittoon tarvittavien maalien määrä"
 
-#: src/states_screens/dialogs/message_dialog.cpp:86
-#: src/states_screens/dialogs/message_dialog.cpp:93
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of laps"
+msgstr "Kierrosten määrä"
+
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: In the edit track screen
+msgid "Number of laps:"
+msgstr "Kierrosten määrä:"
+
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
+#. I18N: In the 'add new grand prix' dialog
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: In the 'add new player' dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/dialogs/message_dialog.cpp:122
+#: src/states_screens/dialogs/message_dialog.cpp:135
 msgid "OK"
 msgstr "OK"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
-#: data/po/gui_strings.h:113 data/po/gui_strings.h:819
 msgid "Off the beaten track"
 msgstr "Sivussa valtavirrasta"
 
-#. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
-#. I18N: ./data/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:80 data/po/gui_strings.h:83
-msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr ""
-"Niin, nähkääs, hän on nyt linnassani ja kohta hänet tarjoillaan "
-"illallisena..."
+#: src/states_screens/online_profile_friends.cpp:150
+msgid "Offline"
+msgstr "Ei linjoilla"
 
-#. I18N: ./data/tracks/mines/track.xml
-#: data/po/gui_strings.h:71
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "Offline Account"
+msgstr "Yhteydetön tili"
+
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+msgid "Oh yes, see, he's in my castle now and will be served for supper..."
+msgstr "Niin, nähkääs, hän on nyt linnassani ja kohta hänet tarjoillaan illallisena..."
+
+#. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
 msgstr "Vanha kaivos"
 
-#. I18N: ./data/tracks/olivermath/track.xml
-#: data/po/gui_strings.h:5
+#. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
 msgstr "Oliverin matikantunti"
 
-#: src/input/input_manager.cpp:686
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/main_menu_screen.cpp:170
+#: src/states_screens/main_menu_screen.cpp:185
+#: src/states_screens/online_profile_friends.cpp:149
+msgid "Online"
+msgstr "Verkkopeli"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Online Multiplayer"
+msgstr "Moninpeli verkossa"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Online Username"
+msgstr "Verkkopelitunnus"
+
+#: src/states_screens/register_screen.cpp:280
+msgid "Online username has to be between 3 and 30 characters long!"
+msgstr "Verkkopelitunnuksen tulee olla pituudeltaan 3-30 merkkiä!"
+
+#: src/states_screens/register_screen.cpp:284
+msgid "Online username must not start with a number!"
+msgstr "Verkkopelitunnus ei saa alkaa numerolla!"
+
+#: src/input/input_manager.cpp:759
 msgid "Only the Game Master may act at this point!"
 msgstr "Vain pelin johtaja voi tehdä muutoksia tässä vaiheessa!"
 
-#: src/tracks/track_object_presentation.cpp:654
+#: src/tracks/track_object_presentation.cpp:960
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Hupsis! Kun joudut pulaan, paina <%s> pelastuaksesi tilanteesta"
 
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+#. I18N: ./data/gui/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#. I18N: ./data/gui/overworld_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: data/po/gui_strings.h:342 data/po/gui_strings.h:484
-#: data/po/gui_strings.h:534
 msgid "Options"
 msgstr "Valinnat"
 
+#. I18N: ./data/gui/online/profile_overview.stkgui
+#. I18N: Section in the profile screen
+msgid "Overview"
+msgstr "Yhteenveto"
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:93
+msgid "POWER"
+msgstr "TEHO"
+
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:684
 msgid "Parachute - slows down all karts in a better position."
 msgstr "Laskuvarjo - hidastaa kaikkia edelläsi olevia kilpailijoita."
 
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the registration dialog
+msgid "Password"
+msgstr "Salasana"
+
+#. I18N: ./data/gui/online/profile_settings.stkgui
+#. I18N: In the online account settings screen
+msgid "Password :"
+msgstr "Salasana:"
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+msgid "Password Change"
+msgstr "Salasanan vaihto"
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:140
+#: src/states_screens/register_screen.cpp:288
+msgid "Password has to be between 8 and 30 characters long!"
+msgstr "Salasanan tulee olla pituudeltaan 8-30 merkkiä!"
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:210
+msgid "Password successfully changed."
+msgstr "Salasana vaihdettu onnistuneesti."
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:147
+#: src/states_screens/register_screen.cpp:272
+msgid "Passwords don't match!"
+msgstr "Salasanat eivät täsmää!"
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:211
+#: src/states_screens/options_screen_input2.cpp:257
 msgid "Pause Game"
 msgstr "Pysäytä peli"
 
-#. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: ./data/gui/overworld_dialog.stkgui
-#: data/po/gui_strings.h:322 data/po/gui_strings.h:472
+#. I18N: ./data/gui/race_paused_dialog.stkgui
 msgid "Paused"
 msgstr "Pysäytetty"
 
-#: src/karts/controller/player_controller.cpp:332
+#: src/karts/controller/network_player_controller.cpp:281
+#: src/karts/controller/player_controller.cpp:338
 msgid "Penalty time!!"
 msgstr "Sakkoaika!"
 
+#: src/states_screens/online_profile_friends.cpp:146
+msgid "Pending"
+msgstr "Odottaa"
+
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
-#: data/po/gui_strings.h:104 data/po/gui_strings.h:810
 msgid "Penguin Playground"
 msgstr "Pingviinien leikkikenttä"
 
-#. I18N: ./data/karts/pidgin/kart.xml
-#: data/po/gui_strings.h:852
+#: src/states_screens/dialogs/vote_dialog.cpp:247
+msgid "Performing vote"
+msgstr "Suoritetaan äänestystä"
+
+#. I18N: ../stk-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
 msgstr "Pidgin"
 
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#. I18N: Video settings
-#: data/po/gui_strings.h:429
-msgid "Pixel Shaders"
-msgstr "Pikselisävyttimet"
-
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:387
-#, c-format
-msgid "Pixel shaders : %s"
-msgstr "Pikselisävyttimet: %s"
-
 #. I18N: ./data/gui/tutorial.stkgui
-#: data/po/gui_strings.h:596
 msgid "Play all"
 msgstr "Pelaa kaikkia"
 
+#. I18N: ./data/achievements.xml
+msgid "Play every official track at least once."
+msgstr "Pelaa jokaista virallista rataa vähintään kerran."
+
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input2.cpp:73
-#: src/states_screens/options_screen_input.cpp:140
-#: src/states_screens/options_screen_ui.cpp:113
-#: src/states_screens/options_screen_audio.cpp:65
-#: src/states_screens/options_screen_video.cpp:89 data/po/gui_strings.h:503
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/options_screen_audio.cpp:66
+#: src/states_screens/options_screen_input.cpp:141
+#: src/states_screens/options_screen_input2.cpp:88
+#: src/states_screens/options_screen_ui.cpp:119
+#: src/states_screens/options_screen_video.cpp:165
+#: src/states_screens/server_selection.cpp:92
 msgid "Players"
 msgstr "Pelaajat"
 
+#: src/states_screens/options_screen_ui.cpp:154
+msgid ""
+"Players can select handicapped (more difficult) profiles on the kart "
+"selection screen"
+msgstr "Pelaajat voivat valita tasoitettuja profiileja (tavallista vaikeampia), kun autoa valitaan."
+
+#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
+#. I18N: In the 'add new grand prix' dialog
+msgid "Please enter the name of the grand prix"
+msgstr "Anna nimi Grand Prix'lle"
+
 #. I18N: shown when config file is too old
-#: src/input/device_manager.cpp:480
+#: src/input/device_manager.cpp:500
 msgid "Please re-configure your key bindings."
 msgstr "Ole hyvä ja tee näppäinasetukset uudelleen."
 
-#: src/states_screens/addons_screen.cpp:434
+#: src/states_screens/dialogs/registration_dialog.cpp:42
+msgid "Please read the terms and conditions "
+msgstr "Lue käyttöehdot"
+
+#: src/states_screens/addons_screen.cpp:437
 msgid "Please wait while addons are updated"
 msgstr "Odota, lisäosia päivitetään"
 
-#: src/states_screens/main_menu_screen.cpp:403
+#: src/states_screens/main_menu_screen.cpp:557
 msgid "Please wait while the add-ons are loading"
 msgstr "Odota, lisäosia ladataan"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:678
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight."
-msgstr ""
-"Imukuppi - Heitä eteenpäin kiskoaksesi edeltäjääsi, tai taaksepäin "
-"seuraajasi näköesteeksi."
+msgstr "Imukuppi - Heitä eteenpäin kiskoaksesi edeltäjääsi, tai taaksepäin seuraajasi näköesteeksi."
 
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#. I18N: Video settings
-#: data/po/gui_strings.h:425
-msgid "Post-processing (motion blur)"
-msgstr "Jälkikäsittely (liikkeen sumennus)"
+#. I18N: ./data/achievements.xml
+msgid "Powerup Love"
+msgstr "Esinerakkautta"
 
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:390
+#: src/tracks/track_object_presentation.cpp:930
 #, c-format
-msgid "Post-processing (motion blur) : %s"
-msgstr "Jälkikäsittely (liike-epäterävyys): %s"
+msgid ""
+"Press <%s> to look behind, and fire the weapon with <%s> while pressing <%s>"
+" to fire behind!"
+msgstr "Paina <%s> katsoaksesi taaksesi, ammu käyttäen <%s> ja ammu taakse painamalla samalla <%s>!"
 
-#. I18N: ./data/gui/enter_player_name_dialog.stkgui
-#. I18N: When configuring input
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:171 data/po/gui_strings.h:466
 msgid "Press ESC to cancel"
-msgstr "Paina ESCiä peruuttaaksesi"
+msgstr "Paina ESCiä peruaksesi"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
-#: data/po/gui_strings.h:458
 msgid "Press a key"
 msgstr "Paina näppäintä"
 
 #. I18N: ./data/gui/options_input.stkgui
-#. I18N: In key bindings configuration menu
-#: data/po/gui_strings.h:209
+#. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
-msgstr ""
-"Kaksoisnapsauta laitetta tai paina enter sen kohdalla säätääksesi asetuksia"
+msgstr "Kaksoisnapsauta laitetta tai paina enter sen kohdalla säätääksesi asetuksia"
 
 #. I18N: ./data/gui/options_players.stkgui
-#. I18N: In players configuration menu
-#: data/po/gui_strings.h:510
+#. I18N: In the player configuration screen
 msgid "Press enter or double-click on a player to edit him/her"
 msgstr "Paina enter tai kaksoisnapsauta pelaajaa muokataksesi"
 
-#: src/states_screens/race_gui_overworld.cpp:455
+#: src/states_screens/race_gui_overworld.cpp:462
 msgid "Press fire to play the tutorial"
 msgstr "Paina ampumisnäppäintä pelataksesi opaskierroksen"
 
-#: src/states_screens/race_gui_overworld.cpp:515
+#: src/states_screens/race_gui_overworld.cpp:532
 msgid "Press fire to start the challenge"
 msgstr "Paina ampumisnäppäintä aloittaaksesi haasteen"
 
-#: src/input/wiimote_manager.cpp:312
+#: src/input/wiimote_manager.cpp:390
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
-msgstr ""
+msgstr "Paina Wiimoten näppäimiä 1 ja 2 yhtä aikaa laittaaksesi sen hakutilaan ja paina sitten Ok. Tarkemmat ohjeet: supertuxkart.net/Wiimote"
 
-#: src/states_screens/dialogs/addons_loading.cpp:326
+#: src/states_screens/dialogs/addons_loading.cpp:357
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "Lisäosan \"%s\" asentaminen epäonnistui."
 
-#: src/states_screens/dialogs/addons_loading.cpp:366
+#: src/states_screens/dialogs/addons_loading.cpp:394
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "Lisäosan \"%s\" poistaminen epännistui."
 
-#. I18N: ./data/karts/puffy/kart.xml
-#: data/po/gui_strings.h:846
+#: src/states_screens/dialogs/user_info_dialog.cpp:474
+msgid "Processing"
+msgstr "Käsitellään"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Profile"
+msgstr "Profiili"
+
+#: src/states_screens/online_profile_achievements.cpp:79
+msgid "Progress"
+msgstr "Edistyminen"
+
+#. I18N: ../stk-assets/karts/puffy/kart.xml
 msgid "Puffy"
 msgstr "Puffy"
 
-#: src/states_screens/race_setup_screen.cpp:297
+#: src/states_screens/race_setup_screen.cpp:240
 msgid ""
 "Push the ball to the opposite cage to score goals. (Only in multiplayer "
 "games)"
-msgstr ""
-"Työnnä pallo vastapuolen verkkoon tehdäksesi maalin. (vain moninpelissä)"
+msgstr "Työnnä pallo vastapuolen verkkoon tehdäksesi maalin. (vain moninpelissä)"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Quick Play"
+msgstr "Pikapeli"
 
 #. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: data/po/gui_strings.h:550
+#. I18N: In the main screen
 msgid "Quit"
-msgstr "Poistu"
+msgstr "Poistu   "
 
-#. I18N: ./data/gui/select_challenge.stkgui
+#: src/states_screens/race_result_gui.cpp:159
+msgid "Quit the server."
+msgstr "Lopeta palvelin."
+
 #. I18N: ./data/gui/racesetup.stkgui
+#. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: ./data/gui/soccer_setup.stkgui
-#: data/po/gui_strings.h:116 data/po/gui_strings.h:763
-#: data/po/gui_strings.h:792
 msgid "Race Setup"
 msgstr "Kilpailun asetukset"
 
-#: src/states_screens/arenas_screen.cpp:279
+#: src/states_screens/gp_info_screen.cpp:77
+msgid "Random"
+msgstr "Satunnainen"
+
+#: src/states_screens/arenas_screen.cpp:277
 msgid "Random Arena"
 msgstr "Satunnainen areena"
 
-#: src/states_screens/kart_selection.cpp:919
-#: src/states_screens/kart_selection.cpp:2115
+#: src/race/grand_prix_data.hpp:171
+msgid "Random Grand Prix"
+msgstr "Satunnainen Grand Prix"
+
+#: src/states_screens/kart_selection.cpp:839
+#: src/states_screens/kart_selection.cpp:1467
 msgid "Random Kart"
 msgstr "Satunnainen auto"
 
-#: src/states_screens/tracks_screen.cpp:342
+#: src/states_screens/easter_egg_screen.cpp:270
+#: src/states_screens/tracks_screen.cpp:297
 msgid "Random Track"
 msgstr "Satunnainen rata"
 
-#: src/states_screens/race_gui.cpp:104
-#: src/states_screens/race_gui_overworld.cpp:107
+#: src/states_screens/race_gui_overworld.cpp:109
 msgid "Rank"
 msgstr "Sijoitus"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: In addons screen, in the filtering bar, to enable a filter that will show only recently items with good rating
-#: data/po/gui_strings.h:561
+#. I18N: In addons screen, in the filtering bar, to enable a filter that will
+#. show only items with good rating
 msgid "Rating >="
 msgstr "Arvostelu >="
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:67
+#: src/states_screens/race_gui_base.cpp:64
 msgid "Ready!"
 msgstr "Paikoillenne!"
 
-#: src/states_screens/race_result_gui.cpp:860
+#. I18N: ./data/achievements.xml
+msgid "Really ... a secret."
+msgstr "Oikeasti... salaisuus."
+
+#: src/states_screens/race_result_gui.cpp:965
 msgid "Red Team Wins"
-msgstr ""
+msgstr "Punainen joukkue voittaa"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: Tab in login menu
+msgid "Register"
+msgstr "Rekisteröidy"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:736
 msgid ""
 "Regular Race: All blows allowed, so catch weapons and make clever use of "
 "them!"
-msgstr ""
+msgstr "Normaali kilpailu - kaikki keinot sallittuja, joten poimi aseita ja käytä niitä järkevästi!"
 
-#. I18N: ./data/gui/story_mode_lobby.stkgui
-#: data/po/gui_strings.h:702
-msgid "Remember me"
-msgstr "Muista minut"
+#: src/states_screens/gp_info_screen.cpp:153
+#: src/states_screens/gp_info_screen.cpp:178
+msgid "Reload"
+msgstr "Päivitä"
+
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Remember password"
+msgstr "Muista salasana"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:292
 msgid "Remember window location"
 msgstr "Muista ikkunan sijainti"
 
-#. I18N: In the player info dialog
-#: src/states_screens/dialogs/player_info_dialog.cpp:125
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
 msgid "Remove"
 msgstr "Poista"
 
-#. I18N: In the player info dialog
-#: src/states_screens/dialogs/player_info_dialog.cpp:91
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
 msgid "Rename"
 msgstr "Nimeä uudelleen"
 
-#: src/states_screens/dialogs/select_challenge.cpp:61
+#: src/states_screens/dialogs/select_challenge.cpp:64
 #, c-format
 msgid "Required Nitro Points : %i"
 msgstr "Vaaditut Nitro-pisteet: %i"
 
-#: src/states_screens/dialogs/select_challenge.cpp:50
+#: src/states_screens/dialogs/select_challenge.cpp:53
 #, c-format
 msgid "Required Rank : %i"
 msgstr "Vaadittu sijoitus: %i"
 
-#: src/states_screens/dialogs/select_challenge.cpp:55
+#: src/states_screens/dialogs/select_challenge.cpp:58
 #, c-format
 msgid "Required Time : %i"
 msgstr "Vaadittu aika: %i"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:208
+#: src/states_screens/options_screen_input2.cpp:254
 msgid "Rescue"
 msgstr "Pelastus"
 
 #. I18N: ./data/gui/options_video.stkgui
-#. I18N: In the graphics settings
-#: data/po/gui_strings.h:284
+#. I18N: In the video settings
 msgid "Resolution"
 msgstr "Resoluutio"
 
-#: src/states_screens/race_result_gui.cpp:136
+#: src/states_screens/race_result_gui.cpp:199
 msgid "Restart"
 msgstr "Käynnistä uudelleen"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:334
 msgid "Restart Race"
 msgstr "Käynnistä kilpailu uudelleen"
 
-#. I18N: ./data/gui/track_info_dialog.stkgui
-#. I18N: Drive the track reverse
-#: data/po/gui_strings.h:312
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Reverse"
 msgstr "Käänteinen suunta"
 
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: In the edit track screen
+msgid "Reverse:"
+msgstr "Käänteinen:"
+
+#: src/states_screens/edit_gp_screen.cpp:68
+msgid "Reversed"
+msgstr "Käänteinen"
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:225
+#: src/states_screens/options_screen_input2.cpp:271
 msgid "Right"
 msgstr "Oikea"
 
-#. I18N: ./data/tracks/startrack/track.xml
-#: data/po/gui_strings.h:41
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:214
+msgid "Right bumper"
+msgstr "R1-painike"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:222
+msgid "Right thumb button"
+msgstr "Oikea peukalonäppäin"
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:185 src/input/gamepad_config.cpp:243
+msgid "Right thumb down"
+msgstr "Oikea peukalo alas"
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:183 src/input/gamepad_config.cpp:249
+msgid "Right thumb left"
+msgstr "Oikea peukalo vasemmalle"
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:181 src/input/gamepad_config.cpp:247
+msgid "Right thumb right"
+msgstr "Oikea peukalo oikealle"
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:187 src/input/gamepad_config.cpp:245
+msgid "Right thumb up"
+msgstr "Oikea peukalo ylös"
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:189 src/input/gamepad_config.cpp:241
+msgid "Right trigger"
+msgstr "R2-painike"
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:89
+msgid "SPEED"
+msgstr "NOPEUS"
+
+#. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
-msgstr ""
+msgstr "STK Enterprise"
 
-#. I18N: ./data/karts/sara/kart.xml
-#: data/po/gui_strings.h:855
-msgid "Sara"
-msgstr ""
+#. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
+msgid "Sara the Racer"
+msgstr "Sara kilpakuskina"
 
-#. I18N: ./data/tracks/scotland/track.xml
-#: data/po/gui_strings.h:2
-msgid "Scotland"
-msgstr "Skotlanti"
+#. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
+msgid "Sara the Wizard"
+msgstr "Sara velhona"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Save"
+msgstr "Tallenna"
+
+#. I18N: ./data/gui/grand_prix_lose.stkgui
+#. I18N: ./data/gui/grand_prix_win.stkgui
+msgid "Save Grand Prix"
+msgstr "Tallenna Grand Prix"
+
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: ./data/gui/online/user_search.stkgui
+msgid "Search"
+msgstr "Etsi"
+
+#: src/states_screens/online_user_search.cpp:208
+#: src/states_screens/online_user_search.cpp:288
+msgid "Searching"
+msgstr "Etsitään"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:228
+#: src/states_screens/options_screen_input2.cpp:274
 msgid "Select"
 msgstr "Valitse"
 
-#. I18N: ./data/gui/story_mode_lobby.stkgui
-#: data/po/gui_strings.h:699
-msgid "Select a Player"
-msgstr "Valitse pelaaja"
+#. I18N: ./data/gui/racesetup.stkgui
+msgid "Select a difficulty"
+msgstr "Valitse vaikeustaso"
 
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:786
 msgid "Select a game mode"
 msgstr "Valitse pelimuoto"
 
+#: src/states_screens/edit_track_screen.cpp:238
+msgid "Select a track"
+msgstr "Valitse rata"
+
 #. I18N: ./data/gui/overworld_dialog.stkgui
-#. I18N: Race paused button
-#: data/po/gui_strings.h:480
+#. I18N: In the in-game dialog
 msgid "Select kart"
 msgstr "Valitse auto"
 
-#. I18N: ./data/gui/story_mode_new.stkgui
-#. I18N: In the new story mode game dialog
-#: data/po/gui_strings.h:357
-msgid "Select your identity"
-msgstr "Valitse, kuka olet"
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Send anonymous HW statistics"
+msgstr "Lähetä anonyymeja tietoja laitteistosta"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Server Creation"
+msgstr "Palvelimen luonti"
+
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+msgid "Server Info"
+msgstr "Palvelimen tiedot"
+
+#. I18N: ./data/gui/online/server_selection.stkgui
+msgid "Server Selection"
+msgstr "Palvelinvalinta"
+
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In the networking lobby
+msgid "Server name :"
+msgstr "Palvelimen nimi:"
+
+#: src/states_screens/dialogs/server_info_dialog.cpp:58
+msgid "Server successfully created. You can now join it."
+msgstr "Palvelin luotiin onnistuneesti. Voit liittyä palvelimelle nyt."
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:69
+#: src/states_screens/race_gui_base.cpp:66
 msgid "Set!"
 msgstr "Valmiit!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:146 data/po/gui_strings.h:330
+#: src/states_screens/race_result_gui.cpp:209
 msgid "Setup New Race"
 msgstr "Uusi kilpailu"
 
-#. I18N: ./data/tracks/sandtrack/track.xml
-#: data/po/gui_strings.h:59
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Shadows"
+msgstr "Varjot"
+
+#: src/states_screens/options_screen_video.cpp:470
+#, c-format
+msgid "Shadows: %i"
+msgstr "Varjot: %i"
+
+#: src/states_screens/options_screen_video.cpp:468
+#, c-format
+msgid "Shadows: %s"
+msgstr "Varjot: %s"
+
+#. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
 msgstr "Liikkuvat hiekat"
 
-#. I18N: ./data/tracks/city/track.xml
-#: data/po/gui_strings.h:14
+#. I18N: ../stk-assets/tracks/city/track.xml
 msgid "Shiny Suburbs"
 msgstr "Lähiöiden loisto"
 
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: Tab in login menu
+msgid "Sign In"
+msgstr "Kirjaudu"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: Tab in login menu
+msgid "Sign In As Guest"
+msgstr "Kirjaudu vieraana"
+
+#: src/states_screens/online_profile_friends.cpp:70
+msgid "Since"
+msgstr "Lähtien"
+
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:522
-msgid "Single-player"
+msgid "Singleplayer"
 msgstr "Yksinpeli"
 
-#: src/states_screens/dialogs/addons_loading.cpp:176
+#: src/states_screens/dialogs/addons_loading.cpp:177
 #, c-format
 msgid "Size: %s"
 msgstr "Koko: %s"
 
+#. I18N: ./data/achievements.xml
+msgid "Skid-row"
+msgstr "Luisuttaja"
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:202
+#: src/states_screens/options_screen_input2.cpp:248
 msgid "Skidding"
 msgstr "Sivuluisu"
 
 #. I18N: ./data/gui/options_ui.stkgui
-#. I18N: In the graphics settings
-#: data/po/gui_strings.h:443
+#. I18N: In the ui settings
 msgid "Skin"
 msgstr "Ulkoasu"
 
-#. I18N: ./data/tracks/snowtuxpeak/track.xml
-#: data/po/gui_strings.h:11
+#. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
 msgid "Snow Peak"
 msgstr "Lumihuippu"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:185
+#: src/race/race_manager.hpp:186
 msgid "Soccer"
 msgstr "Jalkapallo"
 
-#. I18N: ./data/tracks/soccer_field/track.xml
-#: data/po/gui_strings.h:26
+#. I18N: ../stk-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
 msgstr "Jalkapallokenttä"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:752
 msgid ""
 "Soccer: Only in multiplayer games. Use your kart to push the ball into the "
 "goal."
-msgstr ""
+msgstr "Jalkapallo: vain moninpelinä. Työnnä autollasi pallo maaliin."
 
-#: src/states_screens/addons_screen.cpp:512
-#: src/states_screens/main_menu_screen.cpp:396
+#: src/states_screens/addons_screen.cpp:514
+#: src/states_screens/main_menu_screen.cpp:550
 msgid ""
-"Sorry, an error occurred while contacting the add-ons website. Make sure you "
-"are connected to the Internet and that SuperTuxKart is not blocked by a "
+"Sorry, an error occurred while contacting the add-ons website. Make sure you"
+" are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr ""
-"Lisäosasivustoon ei saatu yhteyttä. Tarkista, että yhteys Internetiin on "
-"kunnossa ja että palomuuri ei estä SuperTuxKartia ottamasta yhteyttä "
-"verkkoon."
+msgstr "Lisäosasivustoon ei saatu yhteyttä. Tarkista, että yhteys internetiin toimii ja ettei palomuuri estä SuperTuxKartia ottamasta yhteyttä verkkoon."
 
-#: src/states_screens/dialogs/addons_loading.cpp:255
+#: src/states_screens/dialogs/addons_loading.cpp:279
 msgid "Sorry, downloading the add-on failed"
 msgstr "Lisäosan lataaminen epäonnistui"
 
 #. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Section in audio/video settings submenu
-#: data/po/gui_strings.h:155
+#. I18N: In the audio options screen
 msgid "Sound Effects"
 msgstr "Äänitehosteet"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: data/po/gui_strings.h:581
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: track group
+#: src/states_screens/grand_prix_editor_screen.cpp:334
 msgid "Standard"
 msgstr "Vakio"
 
-#. I18N: ./data/gui/story_mode_new.stkgui
-#: data/po/gui_strings.h:372
-msgid "Start Game"
-msgstr "Aloita peli"
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:218
+msgid "Start"
+msgstr "Start"
 
-#: src/states_screens/dialogs/gp_info_dialog.cpp:146
+#: src/states_screens/dialogs/gp_info_dialog.cpp:209
 msgid "Start Grand Prix"
 msgstr "Aloita grand prix"
 
-#. I18N: ./data/gui/track_info_dialog.stkgui
-#: data/po/gui_strings.h:319
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
 msgid "Start Race"
 msgstr "Aloita kilpailu"
 
+#: src/states_screens/online_profile_friends.cpp:71
+msgid "Status"
+msgstr "Tila"
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:184
+#: src/states_screens/options_screen_input2.cpp:230
 msgid "Steer Left"
 msgstr "Ohjaa vasemmalle"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:187
+#: src/states_screens/options_screen_input2.cpp:233
 msgid "Steer Right"
 msgstr "Ohjaa oikealle"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:518
 msgid "Story Mode"
-msgstr "Tarinamoodi"
+msgstr "Tarinatila"
 
-#. I18N: ./data/tracks/subsea/track.xml
-#: data/po/gui_strings.h:50
+#. I18N: ./data/achievements.xml
+msgid "Strike!"
+msgstr "Kaato!"
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+msgid "Submit"
+msgstr "Vaihda salasana"
+
+#. I18N: ../stk-assets/tracks/subsea/track.xml
 msgid "Subsea"
 msgstr "Merenalainen maailma"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:783
 msgid "SuperTux"
 msgstr "SuperTux"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#: data/po/gui_strings.h:553
 msgid "SuperTuxKart Addons"
 msgstr "SuperTuxKartin lisäosat"
 
-#. I18N: ./data/gui/help4.stkgui
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help3.stkgui
-#: data/po/gui_strings.h:219 data/po/gui_strings.h:603
-#: data/po/gui_strings.h:649 data/po/gui_strings.h:713
+#. I18N: ./data/gui/help4.stkgui
 msgid "SuperTuxKart Help"
 msgstr "SuperTuxKartin ohje"
 
 #. I18N: ./data/gui/options_audio.stkgui
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: ./data/gui/options_video.stkgui
 #. I18N: ./data/gui/options_device.stkgui
-#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: ./data/gui/options_input.stkgui
 #. I18N: ./data/gui/options_players.stkgui
-#: data/po/gui_strings.h:135 data/po/gui_strings.h:201
-#: data/po/gui_strings.h:260 data/po/gui_strings.h:386
-#: data/po/gui_strings.h:435 data/po/gui_strings.h:499
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: ./data/gui/user_screen_tab.stkgui
 msgid "SuperTuxKart Options"
 msgstr "SuperTuxKartin valinnat"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:238
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
 msgstr "SuperTuxKartia voi pelata moninpelinä yhdellä tietokoneella"
 
 #. I18N: ./data/gui/help3.stkgui
-#: data/po/gui_strings.h:732
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart sisältää erilaisia pelimuotoja"
 
-#: src/main.cpp:1439
+#: src/main.cpp:1201
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
-"updates. Would you like this feature to be enabled? (To change this setting "
-"at a later time, go to options, select tab 'User Interface', and edit "
-"\"Allow STK to connect to the Internet\")."
-msgstr ""
-"SuperTuxKart voi ottaa yhteyttä Internetiin ladatakseen lisäosia tai "
-"huomauttaakseen päivityksistä. Haluatko sallia tämän? (Voit vaihtaa tätä "
-"asetusta myöhemmin muuttamalla Valinnat-valikossa Käyttöliittymä-"
-"välilehdellä kohtaa \"Salli STK:n ottaa yhteyttä Internetiin\".)"
+"updates. We also collect anonymous hardware statistics to help with the "
+"development of STK. Please read our privacy policy at "
+"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
+"(To change this setting at a later time, go to options, select tab 'User "
+"Interface', and edit \"Connect to the Internet\" and \"Send anonymous HW "
+"statistics\")."
+msgstr "SuperTuxKart voi ottaa yhteyden internetiin lisäosien lataamiseksi ja päivitysten tarkistamiseksi. Laitteistostasi voidaan kerätä anonyymeja tietoja STK:n kehittämiseksi. Lue yksityisyyskäytäntö osoitteessa http://privacy.supertuxkart.net. Sallitko yhteyden muodostamisen internetiin? (Nämä asetukset on mahdollista muuttaa kohdasta Valinnat -> Käyttöliittymä ja poistamalla käytöstä \"Yhdistä internetiin\" sekä \"Lähetä anonyymeja tietoja laitteistosta\")."
 
-#. I18N: ./data/karts/suzanne/kart.xml
-#: data/po/gui_strings.h:831
+#. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
 msgstr "Suzanne"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:690
 msgid ""
-"Swapper - gift boxes are transformed into bananas and vice versa for a short "
-"time."
-msgstr ""
-"Vaihtaja - lahjapaketit muutetaan banaaneiksi ja banaanit lahjapaketeiksi "
-"lyhyeksi aikaa."
+"Swapper - gift boxes are transformed into bananas and vice versa for a short"
+" time."
+msgstr "Vaihtaja - lahjapaketit muutetaan banaaneiksi ja banaanit lahjapaketeiksi lyhyeksi aikaa."
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:696
 msgid "Swatter - will squash karts close by, slowing them down."
 msgstr "Kärpäslätkä - mätkii ja hidastaa lähellä olevia kilpailijoita."
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/options_screen_ui.cpp:162
+#: src/states_screens/options_screen_ui.cpp:186
 msgid "System Language"
 msgstr "Järjestelmän kieli"
 
+#. I18N: ./data/achievements.xml
+msgid ""
+"Take your opponents for mosquitos! With the swatter, squash at least 5 of "
+"them in a race."
+msgstr "Kohtele vastustajia itikoina! Lätkäise kärpäslätkällä vähintään viittä vastustajaa kilpailun aikana."
+
+#. I18N: ../stk-assets/tracks/temple/track.xml
+msgid "Temple"
+msgstr "Temppeli"
+
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+msgid "Terms and Agreement"
+msgstr "Käyttöehdot"
+
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:417
+msgid "Texture compression"
+msgstr "Tekstuuripakkaus"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
 msgid "Texture filtering"
 msgstr "Tekstuurisuodatus"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
-#: data/po/gui_strings.h:642
 msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
 msgstr "Sivuluisu-näppäimellä selvität tiukat mutkat nopeammin."
 
-#. I18N: ./data/tracks/islandtrack/track.xml
-#: data/po/gui_strings.h:53
-msgid "The Island"
-msgstr "Saari"
-
-#: src/items/powerup.cpp:67
-msgid "The Space Shuttle has landed!"
-msgstr "Avaruussukkula on laskeutunut!"
-
-#. I18N: ./data/tracks/stadium/track.xml
-#: data/po/gui_strings.h:35
+#. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
 msgstr "Stadion"
 
-#: src/states_screens/main_menu_screen.cpp:391
+#: src/states_screens/main_menu_screen.cpp:545
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Lisäosamoduuli ei ole tällä hetkellä käytössä Valinnat-valikossa"
 
-#: src/race/highscore_manager.cpp:100
+#: src/race/highscore_manager.cpp:101
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr ""
-"Ennätystiedosto oli liian vanha.\n"
-"Ennätykset on nyt nollattu."
+msgstr "Ennätystiedosto oli liian vanha.\nEnnätykset on nyt nollattu."
 
-#: src/states_screens/dialogs/gp_info_dialog.cpp:151
-msgid "This Grand Prix is broken!"
-msgstr "Tämä grand prix on vioittunut!"
+#: src/states_screens/create_server_screen.cpp:136
+msgid "The maxinum number of players has to be between 2 and 12."
+msgstr "Pelaajien enimmäismäärä on oltava 2-12."
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:177
+#: src/race/race_manager.hpp:178
 msgid "Time Trial"
 msgstr "Aika-ajo"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:740
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr ""
-"Aika-ajo: Käytettävissäsi ei ole apuvälineitä, joten vain ajotaidoillasi on "
-"merkitystä!"
+msgstr "Aika-ajo: Käytettävissäsi ei ole esineitä, joten vain ajotaidoillasi on merkitystä!"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
-"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it "
-"connected and it will appear in the list.\n"
+"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
 "\n"
-"To add a keyboard config, you can use the button below, HOWEVER please note "
-"that most keyboards only support a limited amount of simultaneous keypresses "
-"and are thus inappropriate for multiplayer gameplay. (You can, however, "
-"connect multiple keyboards to the computer. Remember that everyone still "
-"needs different keybindings in this case.)"
-msgstr ""
-"Lisätäksesi uuden peliohjaimen/joystickin, kytke se koneeseen ja käynnistä "
-"SuperTuxKart. Tällöin ohjain ilmestyy listalle.\n"
-"\n"
-"Lisätäksesi uudet näppäinasetukset käytä alla olevaa nappia. Huomaa "
-"kuitenkin, että useimmat näppäimistöt tukevat varsin rajoitettua määrää "
-"yhtäaikaisia näppäimenpainalluksia ja soveltuvat huonosti moninpeliin. (Voit "
-"kytkeä tietokoneeseen useamman näppäimistön, mutta tässäkin tapauksessa "
-"jokaisella pelaajalla täytyy olla eri näppäimet pelin hallintaan.)"
+"To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
+msgstr "Lisätäksesi uuden peliohjaimen/joystickin, kytke se koneeseen ja käynnistä SuperTuxKart. Tällöin ohjain ilmestyy listalle.\n\nLisätäksesi uudet näppäinasetukset käytä alla olevaa nappia. Huomaa kuitenkin, että useimmat näppäimistöt tukevat varsin rajoitettua määrää yhtäaikaisia näppäimenpainalluksia ja soveltuvat huonosti moninpeliin. (Voit kytkeä tietokoneeseen useamman näppäimistön, mutta tässäkin tapauksessa jokaisella pelaajalla täytyy olla eri näppäimet pelin hallintaan.)"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:669
 msgid "To help you win, there are some powerups you can collect :"
 msgstr "Seuraavat kerättävät esineet voivat auttaa sinua voittoon:"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
-#: data/po/gui_strings.h:107 data/po/gui_strings.h:813
 msgid "To the moon and back"
 msgstr "Kuuhun ja takaisin"
 
+#: src/states_screens/dialogs/user_info_dialog.cpp:154
+#: src/states_screens/dialogs/user_info_dialog.cpp:211
+msgid "Today"
+msgstr "Tänään"
+
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:97
+#: src/states_screens/race_gui_base.cpp:103
 #, c-format
 msgid "Top %i"
 msgstr "%i:n kärki"
 
-#. I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
-#: src/states_screens/dialogs/track_info_dialog.cpp:69
+#: src/states_screens/edit_gp_screen.cpp:66
+msgid "Track"
+msgstr "Rata"
+
+#: src/states_screens/race_result_gui.cpp:1130
+#, c-format
+msgid "Track %i/%i"
+msgstr "Rata %i/%i"
+
+#. I18N: when showing who is the author of track '%s'
+#. I18N: (place %s where the name of the author should appear)
+#: src/states_screens/track_info_screen.cpp:107
 #, c-format
 msgid "Track by %s"
 msgstr "Radan tekijä: %s"
 
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+msgid "Track group"
+msgstr "Rataryhmä"
+
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: Section in the addons menu
-#: data/po/gui_strings.h:569
+#. I18N: In the addons screen
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Tracks"
 msgstr "Radat"
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:71
+#: src/states_screens/dialogs/custom_video_settings.cpp:77
 msgid "Trilinear"
-msgstr ""
+msgstr "Trilineaarinen"
 
-#: src/states_screens/dialogs/addons_loading.cpp:338
-#: src/states_screens/dialogs/addons_loading.cpp:378
+#: src/states_screens/dialogs/addons_loading.cpp:369
+#: src/states_screens/dialogs/addons_loading.cpp:406
 msgid "Try again"
 msgstr "Yritä uudelleen"
 
 #. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: src/states_screens/race_gui_overworld.cpp:448 data/po/gui_strings.h:542
+#. I18N: In the main screen
+#: src/states_screens/race_gui_overworld.cpp:455
 msgid "Tutorial"
 msgstr "Opaskierros"
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
-#: data/po/gui_strings.h:593
 msgid "Tutorial : Selection Room"
 msgstr "Opastusvalikko"
 
-#. I18N: ./data/karts/tux/kart.xml
-#: data/po/gui_strings.h:843
+#. I18N: ../stk-assets/karts/tux/kart.xml
 msgid "Tux"
 msgstr "Tux"
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
-#: data/po/gui_strings.h:120
 msgid "Type :"
 msgstr "Tyyppi:"
 
+#: src/states_screens/race_gui_overworld.cpp:502
+msgid "Type: Grand Prix"
+msgstr "Tyyppi: Grand Prix"
+
+#: src/online/xml_request.cpp:83
+msgid ""
+"Unable to connect to the server. Check your internet connection or try again"
+" later."
+msgstr "Palvelimeen yhdistäminen epäonnistui. Tarkista internetyhteyden tila tai yritä myöhemmin uudelleen."
+
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
-#: data/po/gui_strings.h:182
 msgid "Uninstall"
 msgstr "Poista asennus"
 
+#. I18N: ./data/achievements.xml
+msgid "Unstoppable"
+msgstr "Pysäyttämätön"
+
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:216
+#: src/states_screens/options_screen_input2.cpp:262
 msgid "Up"
 msgstr "Ylös"
 
@@ -2209,47 +2968,81 @@ msgid "Update"
 msgstr "Päivitä"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: In addons screen, in the filtering bar, to enable a filter that will show only recently updated items
-#: data/po/gui_strings.h:557
+#. I18N: In addons screen, in the filtering bar, to enable a filter that will
+#. show only recently updated items
 msgid "Updated"
 msgstr "Päivitetty"
 
-#: src/states_screens/addons_screen.cpp:108
+#: src/states_screens/addons_screen.cpp:111
 msgid "Updated date"
-msgstr "Päivityksen aika"
+msgstr "Päivitetty"
 
-#. I18N: ./data/gui/options_video.stkgui
-#. I18N: In the video settings
-#: data/po/gui_strings.h:280
-msgid "Use Frame Buffer Objects (requires restart)"
-msgstr ""
-"Käytä Frame Buffer Object -laajennusta (vaatii uudelleenkäynnistyksen)"
+#. I18N: ./data/achievements.xml
+msgid "Use 10 or more powerups in a race."
+msgstr "Käytä vähintään kymmentä esinettä kilpailussa."
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Use high definition textures"
+msgstr "Käytä tarkkoja tekstuureita"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
-#. I18N: In soccer setup menu
-#: data/po/gui_strings.h:800
-msgid "Use left/right to choose your team"
-msgstr "Käytä vasen/oikea -näppäimiä valitaksesi joukkueesi"
+#. I18N: In soccer setup screen
+msgid "Use left/right to choose your team and press fire"
+msgstr "Käytä vasenta tai oikeaa näppäintä valitaksesi joukkueesi ja paina sitten ampusnäppäintä"
 
-#: src/tracks/track_object_presentation.cpp:644
+#: src/tracks/track_object_presentation.cpp:949
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
 msgstr "Käytä keräämääsi nitroa näppäimellä <%s>!"
 
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog' dialog
+msgid "User Info"
+msgstr "Käyttäjätiedot"
+
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input2.cpp:72
-#: src/states_screens/options_screen_input.cpp:139
-#: src/states_screens/options_screen_players.cpp:72
-#: src/states_screens/options_screen_audio.cpp:64
-#: src/states_screens/options_screen_video.cpp:88 data/po/gui_strings.h:439
+#: src/states_screens/options_screen_audio.cpp:65
+#: src/states_screens/options_screen_input.cpp:140
+#: src/states_screens/options_screen_input2.cpp:87
+#: src/states_screens/options_screen_video.cpp:164
+#: src/states_screens/user_screen.cpp:648
 msgid "User Interface"
 msgstr "Käyttöliittymä"
 
+#: src/states_screens/grand_prix_editor_screen.cpp:335
+msgid "User defined"
+msgstr "Käyttäjän määrittämä"
+
+#. I18N: ./data/gui/online/user_search.stkgui
+msgid "User search"
+msgstr "Käyttäjähaku"
+
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/online_profile_friends.cpp:67
+#: src/states_screens/online_user_search.cpp:74
+msgid "Username"
+msgstr "Käyttäjätunnus"
+
+#: src/states_screens/dialogs/recovery_dialog.cpp:121
+msgid "Username and/or email address invalid."
+msgstr "Virheellinen käyttäjätunnus ja/tai sähköpostiosoite."
+
 #. I18N: ./data/gui/soccer_setup.stkgui
-#: data/po/gui_strings.h:803
 msgid "VS"
 msgstr "vastaan"
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:235
+#: src/states_screens/dialogs/recovery_dialog.cpp:209
+#: src/states_screens/register_screen.cpp:353
+msgid "Validating info"
+msgstr "Varmistetaan tietoja"
 
 #: src/states_screens/dialogs/addons_loading.cpp:108
 #, c-format
@@ -2258,221 +3051,320 @@ msgstr "Versio: %d"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:276
 msgid "Vertical Sync (requires restart)"
 msgstr "Pystytahdistus (vsync) (vaatii uudelleenkäynnistyksen)"
 
+#. I18N: ./data/gui/online/notification_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "View"
+msgstr "Näytä"
+
 #. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Music volume in options
-#. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Sound volume in options
-#: data/po/gui_strings.h:151 data/po/gui_strings.h:163
+#. I18N: In the audio options screen
 msgid "Volume"
 msgstr "Voimakkuus"
 
-#: src/modes/linear_world.cpp:854
+#. I18N: ./data/gui/online/vote_dialog.stkgui
+#. I18N: In the vote dialog
+msgid "Vote"
+msgstr "Äänestä"
+
+#: src/states_screens/dialogs/vote_dialog.cpp:230
+msgid "Vote successful! You can now close the window."
+msgstr "Äänestys onnistui! Voit nyt sulkea ikkunan."
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:85
+msgid "WEIGHT"
+msgstr "PAINO"
+
+#: src/modes/linear_world.cpp:882
 msgid "WRONG WAY!"
 msgstr "VÄÄRÄ SUUNTA!"
 
-#: src/states_screens/options_screen_input2.cpp:410
+#: src/states_screens/options_screen_input2.cpp:479
 msgid ""
 "Warning, 'Shift' is not a recommended key : when shift is pressed down, all "
 "keys that contain a character that is different in upper-case will stop "
 "working."
-msgstr ""
-"Varoitus: vaihtonäppäimen käyttöä ei suositella. Vaihtonäppäintä "
-"painettaessa kaikki ne näppäimet, jotka tuottavat eri merkin yhdessä "
-"vaihtonäppäimen kanssa, eivät toimi."
+msgstr "Varoitus: vaihtonäppäimen käyttöä ei suositella. Vaihtonäppäintä painettaessa kaikki ne näppäimet, jotka tuottavat eri merkin yhdessä vaihtonäppäimen kanssa, eivät toimi."
 
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:227 data/po/gui_strings.h:611
-#: data/po/gui_strings.h:657 data/po/gui_strings.h:721
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
 msgid "Weapons"
 msgstr "Aseet"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-#: data/po/gui_strings.h:409
 msgid "Weather Effects"
 msgstr "Säätehosteet"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:376
+#: src/states_screens/options_screen_video.cpp:447
 #, c-format
 msgid "Weather Effects : %s"
 msgstr "Säätehosteet: %s"
 
-#. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
-#. I18N: ./data/tracks/introcutscene2/scene.xml
-#: data/po/gui_strings.h:74 data/po/gui_strings.h:77
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
 msgstr "Mikä hätänä, pikkukaverit? Onko suuri johtajanne Gnu kadonnut?"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:249
 msgid ""
 "When input devices are configured, you are ready to play. Select the "
 "'multiplayer race' icon in the main menu. When it is time to choose a kart, "
-"each player can press on the 'fire' key of their gamepad or keyboard to join "
-"the game. Each player can use their input device to select their kart. The "
+"each player can press on the 'fire' key of their gamepad or keyboard to join"
+" the game. Each player can use their input device to select their kart. The "
 "game continues when everyone selected their kart. Note that the mouse may "
 "not be used for this operation."
-msgstr ""
-"Kun syöttölaitteiden asetukset on tehty, peli voi alkaa. Valitse Moninpeli-"
-"kuvake päävalikosta. Autoja valitessa pelaajat voivat liittyä peliin "
-"painamalla omaa ampumisnäppäintään. Jokainen pelaaja voi käyttää omia "
-"näppäimiään autonsa valitsemiseen. Peli jatkuu, kun kaikki ovat valinneet "
-"autonsa. Huomaa, että hiirtä ei voi käyttää valitsemiseen."
+msgstr "Kun syöttölaitteiden asetukset on tehty, peli voi alkaa. Valitse Moninpeli päävalikosta. Autoja valitessa pelaajat voivat liittyä peliin painamalla omaa ampumisnäppäintään. Jokainen pelaaja voi käyttää omia näppäimiään autonsa valitsemiseen. Peli jatkuu, kun kaikki ovat valinneet autonsa. Huomaa, että hiirtä ei voi käyttää valitsemiseen."
 
-#. I18N: ./data/karts/wilber/kart.xml
-#: data/po/gui_strings.h:864
+#. I18N: Name of the white button on xbox controller
+#: src/input/gamepad_config.cpp:171
+msgid "White"
+msgstr "Valkoinen"
+
+#. I18N: ../stk-assets/karts/wilber/kart.xml
 msgid "Wilber"
 msgstr "Wilber"
 
-#. I18N: ./data/tracks/xr591/track.xml
-#: data/po/gui_strings.h:32
+#. I18N: ./data/achievements.xml
+msgid "Win 5 single races in a row."
+msgstr "Voita viisi yksittäistä kilpailua putkeen."
+
+#. I18N: ./data/achievements.xml
+msgid "Win in all single player modes, against at least 3 opponents."
+msgstr "Voita kaikissa yksinpelitiloissa vähintään kolmea vastustajaa vastaan."
+
+#. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
 msgstr "XR591"
 
-#. I18N: ./data/karts/xfcemouse/kart.xml
-#: data/po/gui_strings.h:822
+#. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
-msgstr ""
+msgstr "Xue"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: data/po/gui_strings.h:253
+#: src/states_screens/edit_gp_screen.cpp:253
 msgid "Yes"
 msgstr "Kyllä"
 
-#: src/tracks/track_object_presentation.cpp:683
+#: src/tracks/track_object_presentation.cpp:996
 msgid "You are now ready to race. Good luck!"
 msgstr "Olet nyt valmiina kisaamaan. Onnea!"
 
 #. I18N: ./data/gui/options_players.stkgui
-#: data/po/gui_strings.h:506
 msgid "You are playing as"
 msgstr "Pelaajahahmosi on"
 
-#: src/states_screens/dialogs/player_info_dialog.cpp:160
-msgid "You cannot delete this player because it is currently in use."
-msgstr "Et voi poistaa tätä pelaajaa, koska se on tällä hetkellä käytössä."
+#: src/states_screens/dialogs/vote_dialog.cpp:190
+msgid "You can adapt your previous rating by clicking the stars beneath."
+msgstr "Voit muokata aiempaa arvosteluasi napsauttamalla alapuolella olevia tähtiä."
 
-#: src/states_screens/grand_prix_win.cpp:104
-#: src/states_screens/race_result_gui.cpp:112
+#: src/states_screens/main_menu_screen.cpp:513
+msgid ""
+"You can not download addons without internet access. If you want to download"
+" addons, go to options, select  tab 'User Interface', and edit \"Connect to "
+"the Internet\"."
+msgstr "Lisäosia ei voi ladata ilman internetyhteyttä. Jos haluat ladata lisäosia, mene Valinnat -> Käyttöliittymä ja valitse \"Yhdistä internetiin\""
+
+#: src/states_screens/main_menu_screen.cpp:488
+msgid ""
+"You can not play online without internet access. If you want to play online,"
+" go to options, select  tab 'User Interface', and edit \"Connect to the "
+"Internet\"."
+msgstr "Verkossa ei voi pelata ilman internetyhteyttä. Jos haluat ladata lisäosia, mene Valinnat -> Käyttöliittymä ja valitse \"Yhdistä internetiin\""
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid ""
+"You can play without creating an online account by selecting an offline "
+"account. Though then you can not connect to friends, vote for addons etc. "
+"Please read our privacy statement at http://privacy.supertuxkart.net"
+msgstr "Voit pelata luomatta verkkotiliä valitsemalla \"Yhteydetön tili\". Yhteydettömällä tilillä et voi yhdistää kavereidesi kanssa, äänestää lisäosia jne. Lue yksityisyyssuoja osoitteessa http://privacy.supertuxkart.net"
+
+#: src/states_screens/grand_prix_win.cpp:124
+#: src/states_screens/race_result_gui.cpp:175
 msgid "You completed a challenge!"
 msgstr "Suoritit haasteen!"
 
-#: src/states_screens/race_result_gui.cpp:113
+#: src/states_screens/race_result_gui.cpp:176
 msgid "You completed challenges!"
 msgstr "Suoritit haasteet!"
 
-#: src/states_screens/grand_prix_win.cpp:380
+#: src/states_screens/grand_prix_win.cpp:279
 msgid "You completed the Grand Prix!"
 msgstr "Sait grand prixin päätökseen!"
 
-#: src/states_screens/feature_unlocked.cpp:182
-#, c-format
-msgid "You completed the difficult challenge! This trophy is worth %i points"
-msgstr "Suoritit vaikean haasteen! Tämä palkinto on %i pisteen arvoinen"
-
-#: src/states_screens/feature_unlocked.cpp:174
-#, c-format
-msgid "You completed the easy challenge! This trophy is worth %i points"
-msgstr "Suoritit helpon haasteen! Tämä palkinto on %i pisteen arvoinen"
-
-#: src/states_screens/feature_unlocked.cpp:178
+#: src/states_screens/feature_unlocked.cpp:208
 #, c-format
 msgid ""
-"You completed the intermediate challenge! This trophy is worth %i points"
-msgstr "Suoritit keskitason haasteen! Tämä palkinto on %i pisteen arvoinen"
+"You completed the difficult challenge! Points earned on this level: %i/%i"
+msgstr "Suoritit vaikean haasteen! Tässä tasossa ansaittuja pisteitä: %i/%i"
 
-#: src/karts/kart.cpp:825
+#: src/states_screens/feature_unlocked.cpp:200
+#, c-format
+msgid "You completed the easy challenge! Points earned on this level: %i/%i"
+msgstr "Suoritit helpon haasteen! Tässä tasossa ansaittuja pisteitä: %i/%i"
+
+#: src/states_screens/feature_unlocked.cpp:204
+#, c-format
+msgid ""
+"You completed the intermediate challenge! Points earned on this level: %i/%i"
+msgstr "Suoritit keskitason haasteen! Tässä tasossa ansaittuja pisteitä: %i/%i"
+
+#: src/karts/kart.cpp:856
 msgid "You finished the race!"
 msgstr "Saavuit maaliin!"
 
-#: src/modes/world.cpp:1025
+#: src/online/online_player_profile.cpp:466
+#, c-format
+msgid "You have %d new friend request!"
+msgid_plural "You have %d new friend requests!"
+msgstr[0] "Sinulla on %d uusi kaveripyyntö!"
+msgstr[1] "Sinulla on %d uutta kaveripyyntöä!"
+
+#: src/online/online_player_profile.cpp:472
+msgid "You have a new friend request!"
+msgstr "Sinulla on uusi kaveripyyntö!"
+
+#: src/modes/world.cpp:1144
 msgid "You have been eliminated!"
 msgstr "Sinut poistettiin kisasta!"
 
-#: src/karts/kart.cpp:1814
+#: src/states_screens/dialogs/vote_dialog.cpp:195
+msgid ""
+"You have not yet voted for this addon. Select your desired rating by "
+"clicking the stars beneath"
+msgstr "Et ole vielä äänestänyt tätä lisäosaa. Arvostele lisäosa napsauttamalla alla olevia tähtiä"
+
+#: src/karts/kart.cpp:1913
 msgid ""
 "You need more points\n"
-"to enter this challenge!"
-msgstr ""
-"Tarvitset lisää pisteitä\n"
-"päästäksesi suorittamaan tätä haastetta!"
+"to enter this challenge!\n"
+"Check the minimap for\n"
+"available challenges."
+msgstr "Tarvitset enemmän pisteitä\nvoidaksesi ottaa osaa tähän\nhaasteeseen! Katso mini-\nkartasta saatavilla olevat haasteet."
 
-#: src/states_screens/feature_unlocked.cpp:649
+#: src/states_screens/user_screen.cpp:472
+msgid "You need to enter a password."
+msgstr "Salasana vaaditaan."
+
+#: src/states_screens/feature_unlocked.cpp:568
 msgid "You unlocked grand prix %0"
 msgstr "Avasit %0 -grand prixin lukituksen"
 
-#: src/states_screens/feature_unlocked.cpp:611
+#: src/states_screens/feature_unlocked.cpp:530
 msgid "You unlocked track %0"
 msgstr "Avasit radan %0 lukituksen"
 
-#: src/karts/kart.cpp:825 src/karts/kart.cpp:843
+#. I18N: ./data/gui/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+msgid ""
+"You will receive an email with further instructions on how to reset your "
+"password. Please be patient and be sure to check your spam folder."
+msgstr "Saat sähköpostiviestin, jossa on lisäohjeet salasanan nollausta varten. Ole kärsivällinen ja tarvittaessa tarkista roskapostikansiosi."
+
+#: src/states_screens/register_screen.cpp:361
+msgid ""
+"You will receive an email with further instructions regarding account "
+"activation. Please be patient and be sure to check your spam folder."
+msgstr "Saat sähköpostiviestin, jossa on lisäohjeet tilin aktivointia varten. Ole kärsivällinen ja tarvittaessa tarkista roskapostikansiosi."
+
+#: src/karts/kart.cpp:856 src/karts/kart.cpp:875
 msgid "You won the race!"
 msgstr "Voitit kilpailun!"
 
-#: src/config/user_config.cpp:658
+#: src/main.cpp:1375
+msgid ""
+"Your OpenGL version appears to be too old. Please verify if an update for "
+"your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
+msgstr "Käyttämäsi OpenGL-versio vaikuttaa olevan liian vanha. Tarkista onko näytönohjaimesi ajurille saatavilla päivitystä. SuperTuxKart vaatii OpenGL 3.1:n tai uudemman."
+
+#: src/config/user_config.cpp:700
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr ""
-"Asetustiedosto oli viallinen, joten se poistettiin ja uusi luodaan tilalle."
+msgstr "Asetustiedosto oli viallinen, joten se poistettiin ja uusi luodaan tilalle."
 
-#: src/config/user_config.cpp:669
+#: src/config/user_config.cpp:711
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr ""
-"Asetustiedosto oli liian vanha, joten se poistettiin ja uusi luodaan tilalle."
+msgstr "Asetustiedosto oli liian vanha, joten se poistettiin ja uusi luodaan tilalle."
 
-#: src/input/device_manager.cpp:482
+#: src/main.cpp:1367
+msgid ""
+"Your driver version is too old. Please install the latest video drivers."
+msgstr "Ajuriversiosi on liian vanha. Asenna näytönohjaimen uusin ajuri."
+
+#: src/input/device_manager.cpp:501
 msgid "Your input config file is not compatible with this version of STK."
 msgstr "Asetustiedosto ei ole yhteensopiva tämän STK:n version kanssa."
 
-#. I18N: ./data/tracks/zengarden/track.xml
-#: data/po/gui_strings.h:68
+#: src/states_screens/online_profile_base.cpp:105
+#: src/states_screens/online_profile_base.cpp:115
+msgid "Your profile"
+msgstr "Profiilisi"
+
+#. I18N: ../stk-assets/tracks/zengarden/track.xml
 msgid "Zen Garden"
 msgstr "Zen-puutarha"
 
 #. I18N: Unbound key binding
-#: src/input/binding.cpp:100
+#: src/input/binding.cpp:90
 msgid "[none]"
 msgstr "[ei mitään]"
 
-#. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/race_gui_base.cpp:623
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In networking lobby
+msgid "actions"
+msgstr "toiminnot"
+
+#. I18N: track group name
+#: src/states_screens/tracks_screen.cpp:151
+msgid "all"
+msgstr "kaikki"
+
+#. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
+#. "John Doe")
+#: src/states_screens/race_gui_base.cpp:540
 msgid "by"
 msgstr "tekijä:"
 
-#: src/states_screens/dialogs/addons_loading.cpp:138
+#: src/states_screens/dialogs/addons_loading.cpp:139
 msgid "featured"
 msgstr "suositeltu"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:88
+msgid "high"
+msgstr "korkea"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:87
+msgid "low"
+msgstr "matala"
 
 #. I18N: arena group name
 #. I18N: track group name
 #. I18N: kart group name
-#: src/states_screens/arenas_screen.cpp:79
-#: src/states_screens/tracks_screen.cpp:174
-#: src/states_screens/kart_selection.cpp:1040
+#. I18N: track group name
+#: src/states_screens/arenas_screen.cpp:81
+#: src/states_screens/easter_egg_screen.cpp:143
+#: src/states_screens/kart_selection.cpp:284
+#: src/states_screens/tracks_screen.cpp:153
 msgid "standard"
 msgstr "vakio"
 
-#: src/states_screens/credits.cpp:213
+#: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr ""
-"Launchpad Contributions:\n"
-"  Joonas Nurmi https://launchpad.net/~joonas-nurmi\n"
-"  Kristian Laakkonen https://launchpad.net/~kristian-laakkonen\n"
-"  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nJiri Grönroos, 2015\nJoonas Nurmi https://launchpad.net/~joonas-nurmi\nKristian Laakkonen https://launchpad.net/~kristian-laakkonen\nSTK-team https://launchpad.net/~stk"

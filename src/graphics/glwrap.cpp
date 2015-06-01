@@ -1,3 +1,21 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 
 #include "config/user_config.hpp"
@@ -265,7 +283,7 @@ void FrameBuffer::BlitToDefault(size_t x0, size_t y0, size_t x1, size_t y1)
 void draw3DLine(const core::vector3df& start,
                 const core::vector3df& end, irr::video::SColor color)
 {
-    if (!irr_driver->isGLSL()) {
+    if (!CVS->isGLSL()) {
         irr_driver->getVideoDriver()->draw3DLine(start, end, color);
         return;
     }
@@ -343,7 +361,7 @@ const std::string getGLExtensions()
 
 // ----------------------------------------------------------------------------
 /** Adds GL limits to the json data structure.
- *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
+ *  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs
  */
 void getGLLimits(HardwareStats::Json *json)
 {

@@ -7,7 +7,7 @@
 
   <!-- Minimum and maxium track versions that be be read by this binary.
        Older versions will be ignored. -->
-  <track-version min="3" max="6"/>
+  <track-version min="6" max="6"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
@@ -686,8 +686,8 @@
                  time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25"
                  time-reset-steer="0.1"/>
 
-             <engine power="250 300 350 400"  max-speed="15.8 18.8 23.85 30.0" brake-factor="15.0"
-                 max-speed-reverse-ratio="0.3"/>
+             <engine power="250 300 350 400"  max-speed="13 18 21 23.0" brake-factor="15.0"
+                 max-speed-reverse-ratio="0.5"/>
 
              <gear switch-ratio="0.20 0.55 1" power-increase="5 4 3"/>
 
@@ -712,7 +712,7 @@
                     time-full-steer ="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28"
                     time-reset-steer="0.1"/>
 
-              <engine power="425 500 575 600"  max-speed="15 20 23.2 27" brake-factor="11.0"
+              <engine power="375 450 525 550"  max-speed="14 19 22.0 25" brake-factor="11.0"
                   max-speed-reverse-ratio="0.4"/>
 
               <gear switch-ratio="0.30 0.7 1.0" power-increase="2.2 2.2 2.5"/>
@@ -741,7 +741,7 @@
                       time-full-steer ="0:0.23 0.5:0.23 0.5:0.41 1.0:0.41"
                    time-reset-steer="0.1"/>
 
-             <engine power="600 700 800 900"  max-speed="15 20 23 25" brake-factor="10"
+             <engine power="575 675 775 875"  max-speed="15 20 23 25" brake-factor="10"
                    max-speed-reverse-ratio="0.65"/>
 
              <gear switch-ratio="0.45 0.70 1" power-increase="1.5 1.7 2.5"/>

@@ -1,7 +1,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2009-2013  Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2009-2015  Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -184,7 +184,12 @@ private:
 
     /** The list of all nodes that are to be converted into physics,
      *  but not to be drawn (e.g. invisible walls). */
-    std::vector<scene::ISceneNode*> m_all_physics_only_nodes;
+    std::vector<scene::ISceneNode*> m_static_physics_only_nodes;
+
+    /** Same concept but for track objects. stored separately due to different
+      * memory management.
+      */
+    std::vector<scene::ISceneNode*> m_object_physics_only_nodes;
 
     /** The list of all meshes that are loaded from disk, which means
      *  that those meshes are being cached by irrlicht, and need to be freed. */
@@ -518,7 +523,7 @@ public:
     btTransform        getStartTransform (unsigned int index) const
     {
         if (index >= m_start_transforms.size())
-            Log::fatal("Tracj", "No start position for kart %i.", index);
+            Log::fatal("Track", "No start position for kart %i.", index);
         return m_start_transforms[index];
     }
     // ------------------------------------------------------------------------
@@ -650,6 +655,11 @@ public:
     bool hasShadows() const { return m_shadows; }
     // ------------------------------------------------------------------------
     void addNode(scene::ISceneNode* node) { m_all_nodes.push_back(node); }
+    // ------------------------------------------------------------------------
+    void addPhysicsOnlyNode(scene::ISceneNode* node)
+    {
+        m_object_physics_only_nodes.push_back(node);
+    }
     // ------------------------------------------------------------------------
     float getDisplacementSpeed() const { return m_displacement_speed;    }
     // ------------------------------------------------------------------------

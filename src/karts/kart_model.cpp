@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,6 +23,7 @@
 
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -343,7 +344,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
 
         node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh");
         // as animated mesh are not cheap to render use frustum box culling
-        if (irr_driver->isGLSL())
+        if (CVS->isGLSL())
             node->setAutomaticCulling(scene::EAC_OFF);
         else
             node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
@@ -628,19 +629,9 @@ void KartModel::loadWheelInfo(const XMLNode &node,
                               const std::string &wheel_name, int index)
 {
     const XMLNode *wheel_node = node.getNode(wheel_name);
-    if(!wheel_node)
-    {
-        // Only print the warning if a model filename is given. Otherwise the
-        // stk_config file is read (which has no model information).
-        if(m_model_filename!="")
-        {
-            Log::error("Kart_Model", "Missing wheel information '%s' for model "
-                       "'%s'.", wheel_name.c_str(), m_model_filename.c_str());
-            Log::error("Kart_Model", "This can be ignored, but the wheels will "
-                       "not rotate.");
-        }
-        return;
-    }
+    // Ignore in case of karts with missing wheels (e.g. Sara)
+    if(!wheel_node) return;
+
     wheel_node->get("model",            &m_wheel_filename[index]         );
     wheel_node->get("position",         &m_wheel_graphics_position[index]);
     wheel_node->get("min-suspension",   &m_min_suspension[index]         );
@@ -657,8 +648,11 @@ void KartModel::reset()
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
-    // Don't force any LOD
-    ((LODNode*)m_kart->getNode())->forceLevelOfDetail(-1);
+
+    // Don't force any LOD. Non-animated karts are not LOD nodes.
+    LODNode *lod = dynamic_cast<LODNode*>(m_kart->getNode());
+    if (lod)
+        lod->forceLevelOfDetail(-1);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -669,7 +663,9 @@ void KartModel::reset()
 void KartModel::finishedRace()
 {
     // Force the animated model, independent of actual camera distance.
-    ((LODNode*)m_kart->getNode())->forceLevelOfDetail(0);
+    LODNode *lod = dynamic_cast<LODNode*>(m_kart->getNode());
+    if (lod)
+        lod->forceLevelOfDetail(0);
 }   // finishedRace
 
 // ----------------------------------------------------------------------------

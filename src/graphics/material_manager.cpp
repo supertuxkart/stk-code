@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2010-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2010-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -69,16 +69,29 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
     if (t == NULL)
         return m_default_material;
 
-    const std::string image = StringUtils::getBasename(core::stringc(t->getName()).c_str());
-    // Search backward so that temporary (track) textures are found first
-    for(int i = (int)m_materials.size()-1; i>=0; i-- )
+    core::stringc img_path = core::stringc(t->getName());
+    const std::string image = StringUtils::getBasename(img_path.c_str());
+    if (!img_path.empty() && (img_path.findFirst('/') != -1 || img_path.findFirst('\\') != -1))
     {
-        if (m_materials[i]->getTexFname()==image)
+        // Search backward so that temporary (track) textures are found first
+        for (int i = (int)m_materials.size() - 1; i >= 0; i--)
         {
-            return m_materials[i];
+            if (m_materials[i]->getTexFullPath() == img_path.c_str())
+            {
+                return m_materials[i];
+            }
         }
-    }   // for i
-
+    }
+    else
+    {
+        for (int i = (int)m_materials.size() - 1; i >= 0; i--)
+        {
+            if (m_materials[i]->getTexFname() == image)
+            {
+                return m_materials[i];
+            }
+        }   // for i
+    }
     return m_default_material;
 }
 

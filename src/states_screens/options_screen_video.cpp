@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,7 +17,6 @@
 
 #include "states_screens/options_screen_video.hpp"
 
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/user_config.hpp"
@@ -62,6 +61,8 @@ struct GFXPreset
     /** Depth of field */
     bool dof;
     bool global_illumination;
+    bool degraded_ibl;
+    int hd_textures;
 };
 
 static GFXPreset GFX_PRESETS[] =
@@ -70,39 +71,66 @@ static GFXPreset GFX_PRESETS[] =
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
         false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 0 /* hd_textures */
     },
 
     {
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 0 /* hd_textures */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, true /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 1 /* hd_textures */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */, true /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 8 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
     },
 
     {
-        true /* light */, 2 /* shadow */, true /* bloom */, true /* motionblur */,
+        true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
-        true /* depth of field */, true /* global illumination */
+        true /* depth of field */, true /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
     }
 };
 
 static const int  GFX_LEVEL_AMOUNT = 5;
+
+struct Resolution
+{
+    int width, height;
+
+    Resolution()
+    {
+        width = 0;
+        height = 0;
+    }
+
+    Resolution(int w, int h)
+    {
+        width = w;
+        height = h;
+    }
+
+    bool operator< (Resolution r) const
+    {
+        return width < r.width || (width == r.width && height < r.height);
+    }
+
+    float getRatio() const
+    {
+        return (float) width / height;
+    }
+};
 
 // ----------------------------------------------------------------------------
 
@@ -177,6 +205,9 @@ void OptionsScreenVideo::init()
                                                 irr_driver->getVideoModes();
         const int amount = (int)modes.size();
 
+        std::vector<Resolution> resolutions;
+        Resolution r;
+
         bool found_config_res = false;
 
         // for some odd reason, irrlicht sometimes fails to report the good
@@ -191,40 +222,95 @@ void OptionsScreenVideo::init()
 
         for (int n=0; n<amount; n++)
         {
-            const int w = modes[n].getWidth();
-            const int h = modes[n].getHeight();
-            const float ratio = (float)w / h;
+            r.width  = modes[n].getWidth();
+            r.height = modes[n].getHeight();
+            resolutions.push_back(r);
 
-            if (w == UserConfigParams::m_width &&
-                h == UserConfigParams::m_height)
+            if (r.width  == UserConfigParams::m_width &&
+                r.height == UserConfigParams::m_height)
             {
                 found_config_res = true;
             }
 
-            if (w == 800 && h == 600)
-            {
 #ifdef DEBUG
+            if (r.width == 800 && r.height == 600)
+            {
                 found_800_600 = true;
-#else
-                continue;
-#endif
             }
-            else if (w == 1024 && h == 640)
+            else
+#endif
+            if (r.width == 1024 && r.height == 640)
+            // This becomes an 'else if' when DEBUG is defined
             {
                 found_1024_640 = true;
             }
-            else if (w == 1024 && h == 768)
+            else if (r.width == 1024 && r.height == 768)
             {
                 found_1024_768 = true;
             }
+        }
 
+        if (!found_config_res)
+        {
+            r.width  = UserConfigParams::m_width;
+            r.height = UserConfigParams::m_height;
+            resolutions.push_back(r);
+
+#ifdef DEBUG
+            if (r.width == 800 && r.height == 600)
+            {
+                found_800_600 = true;
+            }
+            else
+#endif
+            if (r.width == 1024 && r.height == 640)
+            // This becomes an 'else if' when DEBUG is defined
+            {
+                found_1024_640 = true;
+            }
+            else if (r.width == 1024 && r.height == 768)
+            {
+                found_1024_768 = true;
+            }
+        } // next found resolution
+
+        // Add default resolutions that were not found by irrlicht
+#ifdef DEBUG
+        if (!found_800_600)
+        {
+            r.width  = 800;
+            r.height = 600;
+            resolutions.push_back(r);
+        }
+#endif
+        if (!found_1024_640)
+        {
+            r.width  = 1024;
+            r.height = 640;
+            resolutions.push_back(r);
+        }
+        if (!found_1024_768)
+        {
+            r.width  = 1024;
+            r.height = 768;
+            resolutions.push_back(r);
+        }
+
+        // Sort resolutions by size
+        std::sort(resolutions.begin(), resolutions.end());
+
+        // Add resolutions list
+        for(std::vector<Resolution>::iterator it = resolutions.begin();
+            it != resolutions.end(); it++)
+        {
+            const float ratio = it->getRatio();
             char name[32];
-            sprintf( name, "%ix%i", w, h );
+            sprintf(name, "%ix%i", it->width, it->height);
 
             core::stringw label;
-            label += w;
+            label += it->width;
             label += L"\u00D7";
-            label += h;
+            label += it->height;
 
 #define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
 
@@ -243,71 +329,7 @@ void OptionsScreenVideo::init()
             else
                 res->addItem(label, name, "/gui/screen_other.png");
 #undef ABOUT_EQUAL
-        } // next resolution
-
-        if (!found_config_res)
-        {
-            const int w = UserConfigParams::m_width;
-            const int h = UserConfigParams::m_height;
-            const float ratio = (float)w / h;
-
-            if (w == 800 && h == 600)
-            {
-#ifdef DEBUG
-                found_800_600 = true;
-#endif
-            }
-            else if (w == 1024 && h == 640)
-            {
-                found_1024_640 = true;
-            }
-            else if (w == 1024 && h == 768)
-            {
-                found_1024_768 = true;
-            }
-
-            char name[32];
-            sprintf( name, "%ix%i", w, h );
-
-            core::stringw label;
-            label += w;
-            label += L"\u00D7";
-            label += h;
-
-#define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
-
-            if      (ABOUT_EQUAL( ratio, (5.0f/4.0f)   ))
-                res->addItem(label, name, "/gui/screen54.png");
-            else if (ABOUT_EQUAL( ratio, (4.0f/3.0f)   ))
-                res->addItem(label, name, "/gui/screen43.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/10.0f) ))
-                res->addItem(label, name, "/gui/screen1610.png");
-            else if (ABOUT_EQUAL( ratio, (5.0f/3.0f)   ))
-                res->addItem(label, name, "/gui/screen53.png");
-            else if (ABOUT_EQUAL( ratio, (3.0f/2.0f)   ))
-                res->addItem(label, name, "/gui/screen32.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/9.0f)   ))
-                res->addItem(label, name, "/gui/screen169.png");
-            else
-                res->addItem(label, name, "/gui/screen_other.png");
-#undef ABOUT_EQUAL
-        }
-
-#ifdef DEBUG
-        if (!found_800_600)
-        {
-            res->addItem(L"800\u00D7600", "800x600", "/gui/screen43.png");
-        }
-#endif
-        if (!found_1024_640)
-        {
-            res->addItem(L"1024\u00D7640", "1024x640", "/gui/screen1610.png");
-        }
-        if (!found_1024_768)
-        {
-            res->addItem(L"1024\u00D7768", "1024x768", "/gui/screen43.png");
-        }
-
+        } // add next resolution
     } // end if not inited
 
     res->updateItemDisplay();
@@ -371,11 +393,13 @@ void OptionsScreenVideo::updateGfxSlider()
             GFX_PRESETS[l].mlaa == UserConfigParams::m_mlaa &&
             GFX_PRESETS[l].motionblur == UserConfigParams::m_motionblur &&
             //GFX_PRESETS[l].shaders == UserConfigParams::m_pixel_shaders
-            GFX_PRESETS[l].shadows == UserConfigParams::m_shadows &&
+            GFX_PRESETS[l].shadows == UserConfigParams::m_shadows_resolution &&
             GFX_PRESETS[l].ssao == UserConfigParams::m_ssao &&
             GFX_PRESETS[l].weather == UserConfigParams::m_weather_effects &&
             GFX_PRESETS[l].dof == UserConfigParams::m_dof &&
-            GFX_PRESETS[l].global_illumination == UserConfigParams::m_gi)
+            GFX_PRESETS[l].global_illumination == UserConfigParams::m_gi &&
+            GFX_PRESETS[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
+            GFX_PRESETS[l].hd_textures == (UserConfigParams::m_high_definition_textures & 0x01))
         {
             gfx->setValue(l + 1);
             found = true;
@@ -442,9 +466,11 @@ void OptionsScreenVideo::updateTooltip()
     tooltip = tooltip + L"\n" + _("Ambient occlusion : %s",
         UserConfigParams::m_ssao ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Shadows: %s",
-        UserConfigParams::m_shadows == 1 ? "low" : UserConfigParams::m_shadows == 2 ?
-                                    "high" : disabled);
+    if (UserConfigParams::m_shadows_resolution == 0)
+        tooltip = tooltip + L"\n" + _("Shadows: %s", disabled);
+    else
+        tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
+
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Bloom : %s",
         UserConfigParams::m_bloom ? enabled : disabled);
@@ -464,7 +490,11 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Global illumination : %s",
         UserConfigParams::m_gi ? enabled : disabled);
-
+    
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Use high definition textures") + L" : " +
+        ((UserConfigParams::m_high_definition_textures & 0x1) == 0 ? disabled : enabled);
+    
     gfx->setTooltip(tooltip);
 }   // updateTooltip
 
@@ -540,11 +570,13 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_mlaa = GFX_PRESETS[level].mlaa;
         UserConfigParams::m_motionblur = GFX_PRESETS[level].motionblur;
         //UserConfigParams::m_pixel_shaders = GFX_PRESETS[level].shaders;
-        UserConfigParams::m_shadows = GFX_PRESETS[level].shadows;
+        UserConfigParams::m_shadows_resolution = GFX_PRESETS[level].shadows;
         UserConfigParams::m_ssao = GFX_PRESETS[level].ssao;
         UserConfigParams::m_weather_effects = GFX_PRESETS[level].weather;
         UserConfigParams::m_dof = GFX_PRESETS[level].dof;
         UserConfigParams::m_gi = GFX_PRESETS[level].global_illumination;
+        UserConfigParams::m_degraded_IBL = GFX_PRESETS[level].degraded_ibl;
+        UserConfigParams::m_high_definition_textures = 0x02 | GFX_PRESETS[level].hd_textures;
 
         updateGfxSlider();
     }

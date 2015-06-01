@@ -47,9 +47,11 @@ void main(void)
     mat4 ModelViewProjectionMatrix = ProjectionMatrix * ViewMatrix * ModelMatrix;
     mat4 TransposeInverseModelView = transpose(InverseModelMatrix * InverseViewMatrix);
     gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
+    // Keep orthogonality
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
-    tangent = (TransposeInverseModelView * vec4(Tangent, 1.)).xyz;
-    bitangent = (TransposeInverseModelView * vec4(Bitangent, 1.)).xyz;
+    // Keep direction
+    tangent = (ViewMatrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
+    bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
     uv = (TextureMatrix * vec4(Texcoord, 1., 1.)).xy;
     uv_bis = SecondTexcoord;
 }

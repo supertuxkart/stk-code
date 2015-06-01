@@ -1,3 +1,20 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "graphics/irr_driver.hpp"
 #include "graphics/glwrap.hpp"
 #include "gpuparticles.hpp"
@@ -345,7 +362,7 @@ void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initia
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(3 * sizeof(float)));
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
 
@@ -355,7 +372,7 @@ void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initia
     glEnableVertexAttribArray(5);
     glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(3 * sizeof(float)));
     glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
+    glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
     glEnableVertexAttribArray(7);
     glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
 }
@@ -389,6 +406,24 @@ void ParticleSystemProxy::simulate()
     glBindVertexArray(0);
 
     glDisable(GL_RASTERIZER_DISCARD);
+#ifdef DEBUG_PARTICLES
+    // This code maps the data from the particles (initial data, current data
+    // and output of transform feedback shader) into memory. Useful for debugging.
+    if (std::string(getName()) == std::string("particles(C:/Users/jhenrich/supertuxkart/stk-assets/textures/skid-particle1.png)"))
+    {
+        glBindVertexArray(current_simulation_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
+        ParticleData *p_initial = (ParticleData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, m_count*sizeof(ParticleData), GL_MAP_READ_BIT);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+        ParticleData *p_prev = (ParticleData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, m_count*sizeof(ParticleData), GL_MAP_READ_BIT);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
+        ParticleData *p_new = (ParticleData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, m_count*sizeof(ParticleData), GL_MAP_READ_BIT);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+#endif
+
     std::swap(tfb_buffers[0], tfb_buffers[1]);
     std::swap(current_rendering_vao, non_current_rendering_vao);
     std::swap(current_simulation_vao, non_current_simulation_vao);

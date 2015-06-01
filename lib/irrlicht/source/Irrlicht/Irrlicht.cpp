@@ -48,7 +48,8 @@ namespace irr
 	IRRLICHT_API IrrlichtDevice* IRRCALLCONV createDevice(video::E_DRIVER_TYPE driverType,
 			const core::dimension2d<u32>& windowSize,
 			u32 bits, bool fullscreen,
-			bool stencilbuffer, bool vsync, IEventReceiver* res)
+			bool stencilbuffer, bool vsync, IEventReceiver* res,
+            io::IFileSystem *file_system)
 	{
 		SIrrlichtCreationParameters p;
 		p.DriverType = driverType;
@@ -58,6 +59,7 @@ namespace irr
 		p.Stencilbuffer = stencilbuffer;
 		p.Vsync = vsync;
 		p.EventReceiver = res;
+        p.FileSystem = file_system;
 
 		return createDeviceEx(p);
 	}

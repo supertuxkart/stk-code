@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -181,6 +181,13 @@ bool EventHandler::OnEvent (const SEvent &event)
             World::getWorld()->onMouseClick(event.MouseInput.X, event.MouseInput.Y);
         }
 
+        if (UserConfigParams::m_keyboard_debug)
+        {
+            Log::verbose("keyboard", "char %d key %d ctrl %d down %d shift %d",
+                event.KeyInput.Char, event.KeyInput.Key,
+                event.KeyInput.Control, event.KeyInput.PressedDown, 
+                event.KeyInput.Shift);
+        }
         // FIXME? it may be a bit unclean that all input events go trough
         // the gui module
         const EventPropagation blockPropagation = input_manager->input(event);

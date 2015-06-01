@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014  SuperTuxKart Team
+//  Copyright (C) 2014-2015  SuperTuxKart Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,8 +23,22 @@
 
 namespace Scripting
 {
-
     void RegisterVec3(asIScriptEngine *engine);
 
+    struct SimpleVec3
+    {
+        float x;
+        float y;
+        float z;
+
+        float getX() { return x; }
+        float getY() { return y; }
+        float getZ() { return z; }
+
+        SimpleVec3() : x(0), y(0), z(0) { }
+        SimpleVec3(float p_x, float p_y, float p_z) : x(p_x), y(p_y), z(p_z) { }
+        SimpleVec3(const SimpleVec3& other) : x(other.x), y(other.y), z(other.z) { }
+        ~SimpleVec3() { }
+    };
 }
 #endif

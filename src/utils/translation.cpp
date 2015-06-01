@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006,-2013 2007, 2008 Joerg Henrichs
+//  Copyright (C) 2006,-2015 2007, 2008 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,6 +25,7 @@
 
 #include "utils/translation.hpp"
 
+#include <algorithm>
 #include <assert.h>
 #include <locale.h>
 #include <stdio.h>
@@ -38,14 +39,16 @@
 #  include <fribidi/fribidi.h>
 #endif
 
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
-#include "utils/utf8.h"
 
 
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
+// Define TEST_BIDI to force right-to-left style for all languages
+//#define TEST_BIDI
 
 using namespace tinygettext;
 
@@ -68,53 +71,124 @@ const LanguageList* Translations::getLanguageList() const
     return &g_language_list;
 }
 
-
-char* wide_to_utf8(const wchar_t* input)
+// ----------------------------------------------------------------------------
+/** Frees the memory allocated for the result of toFribidiChar(). */
+#ifdef ENABLE_BIDI
+void freeFribidiChar(FriBidiChar *str)
 {
-    static std::vector<char> utf8line;
-    utf8line.clear();
+#ifdef TEST_BIDI
+    delete[] str;
+#else
+    if (sizeof(wchar_t) != sizeof(FriBidiChar))
+        delete[] str;
+#endif
+}
+#endif
 
-    utf8::utf16to8(input, input + wcslen(input), back_inserter(utf8line));
-    utf8line.push_back(0);
+/** Frees the memory allocated for the result of fromFribidiChar(). */
+#ifdef ENABLE_BIDI
+void freeFribidiChar(wchar_t *str)
+{
+    if (sizeof(wchar_t) != sizeof(FriBidiChar))
+        delete[] str;
+}
+#endif
 
-    return &utf8line[0];
+// ----------------------------------------------------------------------------
+/** Converts a wstring to a FriBidi-string.
+    The caller must take care to free (or not to free) the result after use.
+    Freeing should be done with freeFribidiChar().
+
+    On linux, the string doesn't need to be converted because wchar_t is
+    already UTF-32. On windows the string is converted from UTF-16 by this
+    function. */
+#ifdef ENABLE_BIDI
+FriBidiChar* toFribidiChar(const wchar_t* str)
+{
+    std::size_t length = wcslen(str);
+    FriBidiChar *result;
+    if (sizeof(wchar_t) == sizeof(FriBidiChar))
+        result = (FriBidiChar*) str;
+    else
+    {
+        // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
+        // So we simply copy the characters over here (note that this
+        // is technically incorrect, all characters we use/support fit
+        // in 16 bits, which is what irrlicht supports atm).
+        result = new FriBidiChar[length + 1];
+        for (std::size_t i = 0; i <= length; i++)
+            result[i] = str[i];
+    }
+
+#ifdef TEST_BIDI
+    // Prepend a character in each line that forces RTL style
+    int lines = 1;
+    for (std::size_t i = 0; i <= length; i++)
+    {
+        if (str[i] == L'\n')
+            lines++;
+    }
+    FriBidiChar *tmp = result;
+    length += lines;
+    result = new FriBidiChar[length + 1];
+    lines = 1;
+    result[0] = L'\u202E';
+    for (std::size_t i = 1; i <= length; i++)
+    {
+        result[i] = tmp[i - lines];
+        if (str[i - lines] == L'\n')
+        {
+            lines++;
+            i++;
+            result[i] = L'\u202E';
+        }
+    }
+    if (sizeof(wchar_t) != sizeof(FriBidiChar))
+        delete[] tmp;
+#endif
+
+    return result;
 }
 
-wchar_t* utf8_to_wide(const char* input)
+wchar_t* fromFribidiChar(const FriBidiChar* str)
 {
-    static std::vector<wchar_t> utf16line;
-    utf16line.clear();
+    wchar_t *result;
+    if (sizeof(wchar_t) == sizeof(FriBidiChar))
+        result = (wchar_t*) str;
+    else
+    {
+        std::size_t length = 0;
+        while (str[length])
+            length++;
 
-    utf8::utf8to16(input, input + strlen(input), back_inserter(utf16line));
-    utf16line.push_back(0);
-
-    return &utf16line[0];
+        // Copy back to wchar_t array
+        result = new wchar_t[length + 1];
+        for (std::size_t i = 0; i <= length; i++)
+            result[i] = str[i];
+    }
+    return result;
 }
+#endif
 
 // ----------------------------------------------------------------------------
 Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
-
+    m_dictionary_manager.add_directory(
+                        file_manager->getAsset(FileManager::TRANSLATION,""));
+                        
     if (g_language_list.size() == 0)
     {
-        std::set<std::string> flist;
-        file_manager->listFiles(flist,
-                                file_manager->getAsset(FileManager::TRANSLATION,""));
-
+        std::set<Language> languages = m_dictionary_manager.get_languages();      
+        
         // English is always there but won't be found on file system
         g_language_list.push_back("en");
-
-        std::set<std::string>::iterator it;
-        for ( it=flist.begin() ; it != flist.end(); it++ )
+    
+        std::set<Language>::iterator it;
+        for (it = languages.begin(); it != languages.end(); it++)
         {
-            if (StringUtils::hasSuffix(*it, "po"))
-            {
-                g_language_list.push_back
-                    (m_dictionary_manager.convertFilename2Language(*it) );
-                // printf("Lang : <%s>\n", (*it).c_str());
-            }
-        }   // for it in flist
-    }   // if (g_language_list.size() == 0)
+            g_language_list.push_back((*it).str());
+        }
+    }
 
     // LC_ALL does not work, sscanf will then not always be able
     // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
@@ -147,9 +221,6 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
     textdomain (PACKAGE);
     */
-
-    m_dictionary_manager.add_directory(
-                        file_manager->getAsset(FileManager::TRANSLATION,""));
 
     /*
     const std::set<Language>& languages = m_dictionary_manager.get_languages();
@@ -234,13 +305,20 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         }
         else
         {
-            Log::verbose("translation", "Language '%s'.",
-                          Language::from_env(language).get_name().c_str());
-
-            m_current_language_name = Language::from_env(language).get_name() ;
-
-            m_dictionary = m_dictionary_manager.get_dictionary(
-                                                Language::from_env(language) );
+            const Language& tgtLang = Language::from_env(language);
+            if (!tgtLang)
+            {
+                Log::warn("Translation", "Unsupported langage '%s'", language.c_str());
+                UserConfigParams::m_language = "system";
+                m_current_language_name = "Default language";
+                m_dictionary = m_dictionary_manager.get_dictionary();
+            }
+            else
+            {
+                m_current_language_name = tgtLang.get_name();
+                Log::verbose("translation", "Language '%s'.", m_current_language_name.c_str());
+                m_dictionary = m_dictionary_manager.get_dictionary(tgtLang);
+            }
         }
     }
     else
@@ -274,91 +352,81 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             break;
         }
     }
+#ifdef TEST_BIDI
+    m_rtl = true;
+#endif
 }   // Translations
 
 // ----------------------------------------------------------------------------
 
 const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 {
-#if ENABLE_BIDI
-    if(this->isRTLLanguage())
+    if (isRTLText(in_ptr))
     {
-        const int FRIBIDI_BUFFER_SIZE = 512;
-        FriBidiChar fribidiInput[FRIBIDI_BUFFER_SIZE];
-        int len = 0;
-        int n = 0;
-        //std::cout << "fribidi input : ";
-        for (n = 0; ; n++)
-        {
-            fribidiInput[n] = in_ptr[n];
-            //std::cout << (int)fribidiInput[n] << " ";
-            len++;
+        // Split text into lines
+        std::vector<core::stringw> input_lines = StringUtils::split(in_ptr, '\n');
+        // Reverse lines for RTL strings, irrlicht will reverse them back
+        // This is needed because irrlicht inserts line breaks itself if a text
+        // is too long for one line and then reverses the lines again.
+        std::reverse(input_lines.begin(), input_lines.end());
 
-            if (n == FRIBIDI_BUFFER_SIZE-1) // prevent buffeoverflows
+        // Fribidize and concat lines
+        for (std::vector<core::stringw>::iterator it = input_lines.begin();
+             it != input_lines.end(); it++)
+        {
+            if (it == input_lines.begin())
+                m_converted_string = fribidizeLine(*it);
+            else
             {
-                Log::warn("Translations::fribidize", "translated string too long, truncating");
-                fribidiInput[n] = 0;
-                break;
+                m_converted_string += "\n";
+                m_converted_string += fribidizeLine(*it);
             }
-            if (fribidiInput[n] == 0) break; // stop on '\0'
         }
-        //std::cout << " (len=" << len << ")\n";
-
-        // Assume right to left as start direction.
-#if FRIBIDI_MINOR_VERSION==10
-        // While the doc for older fribidi versions is somewhat sparse,
-        // using the RIGHT-TO-LEFT EMBEDDING character here appears to
-        // work correct.
-        FriBidiCharType pbase_dir = L'\u202B';
-#else
-        FriBidiCharType pbase_dir = FRIBIDI_PAR_ON;
-#endif
-
-        static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
-        for (n = 0; n < 512 ; n++)  { fribidiOutput[n] = 0; }
-        fribidi_boolean result = fribidi_log2vis(fribidiInput,
-                                                 len-1,
-                                                 &pbase_dir,
-                                                 fribidiOutput,
-              /* gint   *position_L_to_V_list */ NULL,
-              /* gint   *position_V_to_L_list */ NULL,
-              /* gint8  *embedding_level_list */ NULL
-                                                               );
-
-        if (!result)
-        {
-            Log::error("Translations::fribidize", "Fribidi failed in 'fribidi_log2vis' =(");
-            m_converted_string = core::stringw(in_ptr);
-            return m_converted_string.c_str();
-        }
-
-#ifdef WIN32
-        // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
-        // So we simply copy the characters over here (note that this
-        // is technically incorrect, all characters we use/support fit
-        // in 16 bits, which is what irrlicht supports atm).
-        static wchar_t out[FRIBIDI_BUFFER_SIZE];
-        for(int i=0; i<len; i++)
-            out[i]=fribidiOutput[i];
-        out[len]=0;
-        return out;
-#else
-        return (const wchar_t*)fribidiOutput;
-#endif //WIND32
+        return m_converted_string.c_str();
     }
+    else
+        return in_ptr;
+}
 
-#endif // ENABLE_BIDI
-    return in_ptr;
+bool Translations::isRTLText(const wchar_t *in_ptr)
+{
+#if ENABLE_BIDI
+    if (this->isRTLLanguage())
+    {
+        std::size_t length = wcslen(in_ptr);
+        FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
+
+        FriBidiCharType *types = new FriBidiCharType[length];
+        fribidi_get_bidi_types(fribidiInput, length, types);
+        freeFribidiChar(fribidiInput);
+
+        // Declare as RTL if one character is RTL
+        for (std::size_t i = 0; i < length; i++)
+        {
+            if (types[i] == FRIBIDI_TYPE_RTL ||
+                types[i] == FRIBIDI_TYPE_RLO)
+            {
+                delete[] types;
+                return true;
+            }
+        }
+        delete[] types;
+    }
+    return false;
+#else
+    return false;
+#endif
 }
 
 /**
-  * \param original Message to translate
-  * \param context  Optional, can be set to differentiate 2 strings that are identical
-  *                 in English but could be different in other languages
-  */
+ * \param original Message to translate
+ * \param context  Optional, can be set to differentiate 2 strings that are identical
+ *                 in English but could be different in other languages
+ */
 const wchar_t* Translations::w_gettext(const wchar_t* original, const char* context)
 {
-    return w_gettext( wide_to_utf8(original), context );
+    std::string in = StringUtils::wide_to_utf8(original);
+    return w_gettext(in.c_str(), context);
 }
 
 /**
@@ -380,7 +448,7 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
 
     if (original_t == original)
     {
-        m_converted_string = utf8_to_wide(original);
+        m_converted_string = StringUtils::utf8_to_wide(original);
 
 #if TRANSLATE_VERBOSE
         std::wcout << L"  translation : " << m_converted_string << std::endl;
@@ -391,9 +459,10 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     // print
     //for (int n=0;; n+=4)
 
-    wchar_t* original_tw = utf8_to_wide(original_t.c_str());
+    static core::stringw original_tw;
+    original_tw = StringUtils::utf8_to_wide(original_t.c_str());
 
-    wchar_t* out_ptr = original_tw;
+    const wchar_t* out_ptr = original_tw.c_str();
     if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE
@@ -403,6 +472,44 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     return out_ptr;
 }
 
+/**
+ * \param singular Message to translate in singular form
+ * \param plural   Message to translate in plural form (can be the same as the singular form)
+ * \param num      Count used to obtain the correct plural form.
+ * \param context  Optional, can be set to differentiate 2 strings that are identical
+ *                 in English but could be different in other languages
+ */
+const wchar_t* Translations::w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context)
+{
+    std::string in = StringUtils::wide_to_utf8(singular);
+    std::string in2 = StringUtils::wide_to_utf8(plural);
+    return w_ngettext(in.c_str(), in2.c_str(), num, context);
+}
+
+/**
+ * \param singular Message to translate in singular form
+ * \param plural   Message to translate in plural form (can be the same as the singular form)
+ * \param num      Count used to obtain the correct plural form.
+ * \param context  Optional, can be set to differentiate 2 strings that are identical
+ *                 in English but could be different in other languages
+ */
+const wchar_t* Translations::w_ngettext(const char* singular, const char* plural, int num, const char* context)
+{
+    const std::string& res = (context == NULL ?
+                              m_dictionary.translate_plural(singular, plural, num) :
+                              m_dictionary.translate_ctxt_plural(context, singular, plural, num));
+
+    static core::stringw str_buffer;
+    str_buffer = StringUtils::utf8_to_wide(res.c_str());
+    const wchar_t* out_ptr = str_buffer.c_str();
+    if (REMOVE_BOM) out_ptr++;
+
+#if TRANSLATE_VERBOSE
+    std::wcout << L"  translation : " << out_ptr << std::endl;
+#endif
+
+    return out_ptr;
+}
 
 
 bool Translations::isRTLLanguage() const
@@ -414,5 +521,55 @@ std::string Translations::getCurrentLanguageName()
 {
     return m_current_language_name;
     //return m_dictionary_manager.get_language().get_name();
+}
+
+core::stringw Translations::fribidizeLine(const core::stringw &str)
+{
+#if ENABLE_BIDI
+    FriBidiChar *fribidiInput = toFribidiChar(str.c_str());
+    std::size_t length = 0;
+    while (fribidiInput[length])
+        length++;
+
+    // Assume right to left as start direction.
+#if FRIBIDI_MINOR_VERSION==10
+    // While the doc for older fribidi versions is somewhat sparse,
+    // using the RIGHT-TO-LEFT EMBEDDING character here appears to
+    // work correct.
+    FriBidiCharType pbase_dir = L'\u202B';
+#else
+    FriBidiCharType pbase_dir = FRIBIDI_PAR_ON;
+#endif
+
+    // Reverse text line by line
+    FriBidiChar *fribidiOutput = new FriBidiChar[length + 1];
+    memset(fribidiOutput, 0, (length + 1) * sizeof(FriBidiChar));
+    fribidi_boolean result = fribidi_log2vis(fribidiInput,
+                                                length,
+                                                &pbase_dir,
+                                                fribidiOutput,
+            /* gint   *position_L_to_V_list */ NULL,
+            /* gint   *position_V_to_L_list */ NULL,
+            /* gint8  *embedding_level_list */ NULL
+                                                            );
+
+    freeFribidiChar(fribidiInput);
+
+    if (!result)
+    {
+        delete[] fribidiOutput;
+        Log::error("Translations::fribidize", "Fribidi failed in 'fribidi_log2vis' =(");
+        return core::stringw(str);
+    }
+
+    wchar_t *convertedString = fromFribidiChar(fribidiOutput);
+    core::stringw converted_string(convertedString);
+    freeFribidiChar(convertedString);
+    delete[] fribidiOutput;
+    return converted_string;
+
+#else
+    return core::stringw(str);
+#endif // ENABLE_BIDI
 }
 

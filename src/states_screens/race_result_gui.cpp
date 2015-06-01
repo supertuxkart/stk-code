@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -62,6 +62,10 @@ DEFINE_SCREEN_SINGLETON( RaceResultGUI );
 RaceResultGUI::RaceResultGUI() : Screen("race_result.stkgui",
                                         /*pause race*/ false)
 {
+    std::string path = file_manager->getAsset(FileManager::MUSIC,
+                                              "race_summary.music");
+    m_race_over_music = music_manager->getMusicInformation(path);
+
 }   // RaceResultGUI
 
 //-----------------------------------------------------------------------------
@@ -83,6 +87,13 @@ void RaceResultGUI::init()
 
     music_manager->stopMusic();
     m_finish_sound = SFXManager::get()->quickSound("race_finish");
+    if (!m_finish_sound)
+    {
+        // If there is no finish sound (because sfx are disabled), start
+        // the race over music here (since the race over music is only started
+        // when the finish sound has been played).
+        music_manager->startMusic(m_race_over_music);
+    }
 
     // Calculate how many track screenshots can fit into the "result-table" widget
     GUIEngine::Widget* result_table = getWidget("result-table");
@@ -278,7 +289,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 StateManager::get()->popMenu();
                 World::deleteWorld();
 
-                CutsceneWorld::setUseDuration(true);
+                CutsceneWorld::setUseDuration(false);
                 StateManager::get()->enterGameState();
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
                 race_manager->setNumKarts(0);
@@ -395,7 +406,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 
 void RaceResultGUI::onConfirm()
 {
-    race_manager->saveGP(); // Save the aborted GP
+    //race_manager->saveGP(); // Save the aborted GP
     GUIEngine::ModalDialog::dismiss();
     cleanupGPProgress();
     StateManager::get()->popMenu();
@@ -515,9 +526,7 @@ void RaceResultGUI::determineTableLayout()
     if(m_distance_between_rows * num_karts > height)
         m_distance_between_rows = height / num_karts;
 
-    m_width_icon = table_area->m_h<600
-                 ? 27
-                 : (int)(40*(table_area->m_w/800.0f));
+    m_width_icon = table_area->m_h / 18;
 
     m_width_column_space  = 10;
 
@@ -602,14 +611,14 @@ void RaceResultGUI::onUpdate(float dt)
 {
     renderGlobal(dt);
 
-    if (m_finish_sound != NULL &&
-        m_finish_sound->getStatus() != SFXBase::SFX_PLAYING)
+    // When the finish sound has been played, start the race over music.
+    if(m_finish_sound && m_finish_sound->getStatus() != SFXBase::SFX_PLAYING)
     {
         try
         {
-            std::string path = file_manager->getAsset(FileManager::MUSIC,
-                                                      "race_summary.music");
-            music_manager->startMusic(music_manager->getMusicInformation(path));
+            // This call is done once each frame, but startMusic() is cheap
+            // if the music is already playing.
+            music_manager->startMusic(m_race_over_music);
         }
         catch (std::exception& e)
         {
@@ -1250,6 +1259,10 @@ void RaceResultGUI::displayHighScores()
 
         // prevent excessive long name
         unsigned int max_characters = 15;
+        unsigned int max_width = (UserConfigParams::m_width / 2 - 200) / 10;
+        if (max_width < 15)
+            max_characters = max_width;
+
         float time;
         for (int i = 0; i < scores->getNumberEntries(); i++)
         {
@@ -1267,7 +1280,7 @@ void RaceResultGUI::displayHighScores()
             }
 
             int current_x = x;
-            int current_y = y+(i+1)*50;
+            int current_y = y + (int) ((i + 1) * m_distance_between_rows * 1.5f);
 
             const KartProperties* prop = kart_properties_manager->getKart(kart_name);
             if (prop != NULL)
@@ -1298,7 +1311,7 @@ void RaceResultGUI::displayHighScores()
                 text_color,
                 false, false, NULL, true /* ignoreRTL */);
 
-            current_x += 180;
+            current_x = (int) (UserConfigParams::m_width * 0.85f);
 
             // Finally draw the time
             std::string time_string = StringUtils::timeToString(time);

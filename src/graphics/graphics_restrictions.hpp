@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Joerg Henrichs
+//  Copyright (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,9 +28,40 @@
 
 namespace GraphicsRestrictions
 {
-    void init();
-    std::vector<std::string> getRestrictions(const std::string &driver_version,
-                                             const std::string &card_name);
+    /** Which graphical restrictions can be defined. Note that
+     *  the variable m_names_of_restrictions in the cpp file contains the
+     *  string representation used in the XML files. Any change to this
+     *  type declaration needs a change in that variable as well. */
+    enum GraphicsRestrictionsType 
+    {
+        GR_UNIFORM_BUFFER_OBJECT,
+        GR_GEOMETRY_SHADER4,
+        GR_DRAW_INDIRECT,
+        GR_TEXTURE_VIEW,
+        GR_TEXTURE_STORAGE,
+        GR_IMAGE_LOAD_STORE,
+        GR_BASE_INSTANCE,
+        GR_COMPUTE_SHADER,
+        GR_SHADER_STORAGE_BUFFER_OBJECT,
+        GR_MULTI_DRAW_INDIRECT,
+        GR_SHADER_ATOMIC_COUNTERS,
+        GR_BUFFER_STORAGE,
+        GR_BINDLESS_TEXTURE,
+        GR_EXT_TEXTURE_COMPRESSION_S3TC,
+        GR_AMD_VERTEX_SHADER_LAYER,
+        GR_DRIVER_RECENT_ENOUGH,
+        GR_HIGHDEFINITION_TEXTURES,
+        GR_ADVANCED_PIPELINE,
+        GR_FRAMEBUFFER_SRGB_WORKING,
+        GR_GI,
+        GR_COUNT  /** MUST be last entry. */
+    } ;
+
+    void init(const std::string &driver_version,
+              const std::string &card_name       );
+    bool isDisabled(GraphicsRestrictionsType type);
+
+    void unitTesting();
 };   // HardwareStats
 
 #endif

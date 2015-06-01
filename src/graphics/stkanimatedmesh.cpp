@@ -1,3 +1,21 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include "central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/stkanimatedmesh.hpp"
 #include <ISceneManager.h>
@@ -155,7 +173,7 @@ void STKAnimatedMesh::updateGL()
             else
                 InitTexturesTransparent(mesh);
 
-            if (irr_driver->hasARB_base_instance())
+            if (CVS->isARBBaseInstanceUsable())
             {
                 std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
                 mesh.vaoBaseVertex = p.first;
@@ -180,7 +198,7 @@ void STKAnimatedMesh::updateGL()
 
             size_t size = mb->getVertexCount() * GLmeshes[i].Stride, offset = GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride;
             void *buf;
-            if (irr_driver->hasBufferStorageExtension())
+            if (CVS->supportsAsyncInstanceUpload())
             {
                 buf = VAOManager::getInstance()->getVBOPtr(mb->getVertexType());
                 buf = (char *)buf + offset;
@@ -188,7 +206,7 @@ void STKAnimatedMesh::updateGL()
             else
             {
                 glBindVertexArray(0);
-                if (irr_driver->hasARB_base_instance())
+                if (CVS->isARBBaseInstanceUsable())
                     glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getVBO(mb->getVertexType()));
                 else
                     glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
@@ -196,7 +214,7 @@ void STKAnimatedMesh::updateGL()
                 buf = glMapBufferRange(GL_ARRAY_BUFFER, offset, size, bitfield);
             }
             memcpy(buf, mb->getVertices(), size);
-            if (!irr_driver->hasBufferStorageExtension())
+            if (!CVS->supportsAsyncInstanceUpload())
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glBindBuffer(GL_ARRAY_BUFFER, 0);

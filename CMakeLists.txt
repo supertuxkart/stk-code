@@ -2,7 +2,7 @@
 project(SuperTuxKart)
 set(PROJECT_VERSION "0.8.1")
 
-cmake_minimum_required(VERSION 2.8.1)
+cmake_minimum_required(VERSION 2.8.4)
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
   cmake_policy(SET CMP0043 OLD)
 endif()
@@ -19,10 +19,7 @@ option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 
-if(UNIX OR MINGW)
-    option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
-endif()
-if(MSVC OR MINGW)
+if(MSVC)
     # Normally hide the option to build wiiuse on VS, since it depends
     # on the installation of the Windows DDK (Driver Developer Kit),
     # which also needs an absolute path :(
@@ -32,7 +29,7 @@ else()
     set(WIIUSE_BUILD ON)
 endif()
 
-if(MINGW)
+if(MINGW OR CYGWIN)
     set(USE_WIIUSE OFF)
 endif()
 
@@ -51,6 +48,14 @@ set(STK_INSTALL_BINARY_DIR "bin" CACHE
 set(STK_INSTALL_DATA_DIR "share/supertuxkart" CACHE
     STRING "Install data folder to this directory, absolute or relative to CMAKE_INSTALL_PREFIX")
 
+# These variables enable MSVC to find libraries located in "dependencies"
+if(WIN32)
+    set(ENV{PATH} "$ENV{PATH};${PROJECT_SOURCE_DIR}/dependencies/include")
+    set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
+    set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
+    add_definitions(-D_IRR_STATIC_LIB_)
+endif()
+
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
@@ -63,6 +68,33 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
 include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
 
+if((WIN32 AND NOT MINGW) OR APPLE)
+    if (NOT APPLE)
+    # Build zlib library
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/zlib")
+
+    set(ZLIB_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/zlib" "${PROJECT_BINARY_DIR}/lib/zlib/")
+    set(ZLIB_LIBRARY zlibstatic)
+    endif()
+
+    # Build png library
+    set (SKIP_INSTALL_ALL TRUE)
+    set (PNG_STATIC TRUE)
+    set (PNG_TESTS FALSE)
+    set (PNG_SHARED FALSE)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
+
+    #build jpeg library
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+
+    set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
+    set(PNG_LIBRARY png15_static)
+    set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
+    set(JPEG_LIBRARY jpeglib)
+endif()
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
@@ -81,15 +113,6 @@ endif()
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
 
-# These variables enable MSVC to find libraries located in "dependencies"
-if(WIN32)
-    set(ENV{PATH} "$ENV{PATH};${PROJECT_SOURCE_DIR}/dependencies/include")
-    set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
-    set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
-    add_definitions(-D_IRR_STATIC_LIB_)
-endif()
-
-
 if(APPLE)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
@@ -98,9 +121,15 @@ elseif(MSVC)
 endif()
 
 
-# Build the angelscript library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
-include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+# Build the angelscript library if not in system
+find_package(Angelscript)
+if(ANGELSCRIPT_FOUND)
+    include_directories(${Angelscript_INCLUDE_DIRS})
+else()
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+    set(Angelscript_LIBRARIES angelscript)
+endif()
 
 # OpenAL
 if(APPLE)
@@ -146,18 +175,14 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-
-if(UNIX OR MINGW)
-#    if(USE_CPP2011)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
-#    endif()
-endif()
-
 # OpenGL
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 if(UNIX AND NOT APPLE)
+    find_package(X11 REQUIRED)
+    include_directories(${X11_INCLUDE_DIR})
+
     if(USE_XRANDR)
         find_package(Xrandr REQUIRED)
         if(NOT XRANDR_FOUND)
@@ -169,10 +194,14 @@ if(UNIX AND NOT APPLE)
     endif()
 endif()
 
-
 # Set some compiler options
 if(UNIX OR MINGW)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endif()
+
+if(MINGW AND CMAKE_BUILD_TYPE MATCHES Release)
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--subsystem,windows")
 endif()
 
 if(WIN32)
@@ -246,15 +275,24 @@ if(APPLE)
             COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources)
     endif()
 else()
-    find_library(PTHREAD_LIBRARY NAMES pthread pthreadVC2 PATHS ${PROJECT_SOURCE_DIR}/dependencies/lib)
+    if(MSVC)
+        set(PTHREAD_NAMES pthreadVC2)
+    elseif(MINGW)
+        set(PTHREAD_NAMES "winpthread-1" "libwinpthread-1" "pthreadGC2")
+    endif()
+    find_library(PTHREAD_LIBRARY NAMES pthread ${PTHREAD_NAMES} PATHS ${PROJECT_SOURCE_DIR}/dependencies/lib)
     mark_as_advanced(PTHREAD_LIBRARY)
 
     # Set data dir (absolute or relative to CMAKE_INSTALL_PREFIX)
-    get_filename_component(STK_INSTALL_DATA_DIR_ABSOLUTE ${STK_INSTALL_DATA_DIR} ABSOLUTE)
-    if(${STK_INSTALL_DATA_DIR_ABSOLUTE} STREQUAL ${STK_INSTALL_DATA_DIR})
-        add_definitions(-DSUPERTUXKART_DATADIR=\"${STK_INSTALL_DATA_DIR_ABSOLUTE}\")
+    if(NOT STK_INSTALL_DATA_DIR_ABSOLUTE)
+        get_filename_component(STK_INSTALL_DATA_DIR_ABSOLUTE ${STK_INSTALL_DATA_DIR} ABSOLUTE)
+        if(${STK_INSTALL_DATA_DIR_ABSOLUTE} STREQUAL ${STK_INSTALL_DATA_DIR})
+            add_definitions(-DSUPERTUXKART_DATADIR=\"${STK_INSTALL_DATA_DIR_ABSOLUTE}\")
+        else()
+            add_definitions(-DSUPERTUXKART_DATADIR=\"${CMAKE_INSTALL_PREFIX}/${STK_INSTALL_DATA_DIR}\")
+        endif()
     else()
-        add_definitions(-DSUPERTUXKART_DATADIR=\"${CMAKE_INSTALL_PREFIX}/${STK_INSTALL_DATA_DIR}\")
+        add_definitions(-DSUPERTUXKART_DATADIR=\"${STK_INSTALL_DATA_DIR_ABSOLUTE}\")
     endif()
 
     # Build the final executable
@@ -278,7 +316,7 @@ target_link_libraries(supertuxkart
     enet
     glew
     stkirrlicht
-    angelscript
+    ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
@@ -286,6 +324,7 @@ target_link_libraries(supertuxkart
     )
 
 if(UNIX AND NOT APPLE)
+    target_link_libraries(supertuxkart ${X11_LIBRARIES})
     if(USE_XRANDR)
         target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
     else()
@@ -338,6 +377,25 @@ if(MSVC OR MINGW)
         "${PROJECT_SOURCE_DIR}/dependencies/dll"
         $<TARGET_FILE_DIR:supertuxkart>)
   add_custom_target(stkshaders SOURCES ${STK_SHADERS})
+endif()
+
+if(MINGW)
+    find_library(LIBGCC NAMES "libgcc_s_dw2-1.dll" "libgcc_s_sjlj-1.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
+    if(LIBGCC)
+        file(COPY ${LIBGCC} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
+    endif()
+    find_library(LIBSTDCPP NAMES "libstdc++-6.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
+    if(LIBSTDCPP)
+        file(COPY ${LIBSTDCPP} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
+    endif()
+    find_library(LIBOPENMP NAMES "libgomp-1.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
+    if(LIBOPENMP)
+        file(COPY ${LIBOPENMP} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
+    endif()
+    find_library(LIBPTHREAD NAMES "winpthread-1.dll" "libwinpthread-1.dll" "pthreadGC2.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
+    if(LIBPTHREAD)
+        file(COPY ${LIBPTHREAD} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
+    endif()
 endif()
 
 # Optional tools
@@ -398,7 +456,12 @@ if(STK_ASSETS_DIR AND CHECK_ASSETS)
   install(DIRECTORY ${STK_ASSETS_DIR} DESTINATION ${STK_INSTALL_DATA_DIR}/data PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
 endif()
 install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/applications)
-install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32 RENAME supertuxkart.png)
-install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128 RENAME supertuxkart.png)
+install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32/apps RENAME supertuxkart.png)
+install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
 install(FILES data/supertuxkart.appdata.xml DESTINATION share/appdata)
+
+if(MINGW)
+    install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION ${STK_INSTALL_BINARY_DIR}
+            FILES_MATCHING PATTERN "*.dll")
+endif()

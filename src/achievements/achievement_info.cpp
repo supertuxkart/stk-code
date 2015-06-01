@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2014 Glenn De Jonghe
-//                     2014 Joerg Henrichs
+//  Copyright (C) 2013-2015 Glenn De Jonghe
+//            (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,9 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "achievements/achievement_info.hpp"
-
 #include "utils/log.hpp"
-#include "utils/translation.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -33,19 +31,19 @@ AchievementInfo::AchievementInfo(const XMLNode * input)
 {
     m_reset_type       = NEVER;
     m_id               = 0;
-    m_title            = "";
+    m_name            = "";
     m_description      = "";
     m_is_secret        = false;
     bool all;
     all = input->get("id",               &m_id              ) &&
-          input->get("title",            &m_title           ) &&
+          input->get("name",             &m_name            ) &&
           input->get("description",      &m_description     );
     if (!all)
     {
         Log::error("AchievementInfo",
                    "Not all necessary values for achievement defined.");
         Log::error("AchievementInfo",
-                   "ID %d title '%s' description '%s'", m_id, m_title.c_str(),
+                   "ID %d name '%s' description '%s'", m_id, m_name.c_str(),
                                                         m_description.c_str());
     }
 

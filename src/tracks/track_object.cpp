@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2013 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2013-2015 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
 #include "utils/helpers.hpp"
-
+#include <ISceneManager.h>
 
 /** A track object: any additional object on the track. This object implements
  *  a graphics-only representation, i.e. there is no physical representation.
@@ -65,6 +65,11 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_physical_object = NULL;
     m_interaction     = interaction;
     m_presentation    = presentation;
+    m_is_driveable    = false;
+    m_soccer_ball     = false;
+    m_garage          = false;
+    m_distance        = 0;
+    m_type            = "";
 
     if (m_interaction != "ghost" && m_interaction != "none" &&
         physics_settings )
@@ -178,7 +183,21 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                 new TrackObjectPresentationLOD(xml_node, parent, model_def_loader);
             m_presentation = lod_node;
 
-            glownode = ((LODNode*)lod_node->getNode())->getAllNodes()[0];
+            LODNode* node = (LODNode*)lod_node->getNode();
+            if (type == "movable" && parent != NULL)
+            {
+                // HACK: unparent movables from their parent library object if any,
+                // because bullet provides absolute transforms, not transforms relative
+                // to the parent object
+                node->updateAbsolutePosition();
+                core::matrix4 absTransform = node->getAbsoluteTransformation();
+                node->setParent(irr_driver->getSceneManager()->getRootSceneNode());
+                node->setPosition(absTransform.getTranslation());
+                node->setRotation(absTransform.getRotationDegrees());
+                node->setScale(absTransform.getScale());
+            }
+
+            glownode = node->getAllNodes()[0];
         }
         else
         {
@@ -186,7 +205,21 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
             m_presentation = new TrackObjectPresentationMesh(xml_node,
                                                              m_enabled,
                                                              parent);
-            glownode = ((TrackObjectPresentationMesh *) m_presentation)->getNode();
+            scene::ISceneNode* node = ((TrackObjectPresentationMesh *)m_presentation)->getNode();
+            if (type == "movable" && parent != NULL)
+            {
+                // HACK: unparent movables from their parent library object if any,
+                // because bullet provides absolute transforms, not transforms relative
+                // to the parent object
+                node->updateAbsolutePosition();
+                core::matrix4 absTransform = node->getAbsoluteTransformation();
+                node->setParent(irr_driver->getSceneManager()->getRootSceneNode());
+                node->setPosition(absTransform.getTranslation());
+                node->setRotation(absTransform.getRotationDegrees());
+                node->setScale(absTransform.getScale());
+            }
+
+            glownode = node;
         }
 
         std::string render_pass;
@@ -306,9 +339,12 @@ bool TrackObject::castRay(const btVector3 &from,
 // ----------------------------------------------------------------------------
 
 void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
-                       const core::vector3df& scale, bool update_rigid_body)
+                       const core::vector3df& scale, bool update_rigid_body,
+                       bool isAbsoluteCoord)
 {
-    if (m_presentation != NULL) m_presentation->move(xyz, hpr, scale);
+    if (m_presentation != NULL)
+        m_presentation->move(xyz, hpr, scale, isAbsoluteCoord);
+
     if (update_rigid_body && m_physical_object != NULL)
     {
         // If we set a bullet position from an irrlicht position, we need to

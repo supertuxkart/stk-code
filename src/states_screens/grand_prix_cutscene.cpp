@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 konstin
+//  Copyright (C) 2014-2015 konstin
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -32,7 +32,7 @@ typedef GUIEngine::ButtonWidget Button;
 /** A Button to save the GP if it was a random GP */
 void GrandPrixCutscene::saveGPButton()
 {
-    if (race_manager->getGrandPrix().getId() != "random")
+    if (race_manager->getGrandPrix().getId() != GrandPrixData::getRandomGPID())
         getWidget<Button>("save")->setVisible(false);
 }   // saveGPButton
 

@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -155,9 +155,6 @@ namespace GUIEngine
         /** PROP_TEXT is a special case : since it can be translated it can't
          *  go in the map above, which uses narrow strings */
         irr::core::stringw m_text;
-
-        /** Whether the text in m_text is right-to-left */
-        bool m_is_text_rtl;
 
         /** When true, this widget shall use a bigger and more colourful font */
         bool m_title_font;

@@ -14,7 +14,7 @@
                 <label text="Updated" align="center" I18N="In addons screen, in the filtering bar, to enable a filter that will show only recently updated items"/>
                 <spinner id="filter_date" proportion="8" align="center" min_value="0" wrap_around="true"/>
                 <label text="Rating >=" align="center" I18N="In addons screen, in the filtering bar, to enable a filter that will show only items with good rating"/>
-                <spinner id="filter_rating" proportion="3" align="center" min_value="0" wrap_around="true"/>
+                <spinner id="filter_rating" proportion="5" align="center" min_value="0" wrap_around="true"/>
                 <icon-button id="filter_search" height="100%" icon="gui/search.png"/>
             </div>
         </box>

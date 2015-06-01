@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -145,7 +145,8 @@ void SpinnerWidget::add()
     else
     {
         rect<s32> subsize_label = rect<s32>(m_h, 0, m_w - m_h, m_h);
-        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(stringw(m_value).c_str(), subsize_label,
+        const wchar_t *text = stringw(m_value).c_str();
+        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(text, subsize_label,
                                                                       false /* border */, true /* word wrap */,
                                                                       btn, getNewNoFocusID());
         m_children[1].m_element = label;
@@ -155,6 +156,7 @@ void SpinnerWidget::add()
         label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         label->setTabStop(false);
         label->setNotClipped(true);
+        label->setRightToLeft(translations->isRTLText(text));
 
 
         if (m_labels.size() > 0)
@@ -326,6 +328,7 @@ void SpinnerWidget::addLabel(stringw label)
 void SpinnerWidget::setValue(const int new_value)
 {
     m_value = new_value;
+    m_customText = "";
 
     if (m_graphical)
     {
@@ -397,7 +400,14 @@ void SpinnerWidget::setActivated()
     Widget::setActivated();
 
     setText(L"");
-    setValue( getValue() ); // Update the display
+    if (m_customText.empty())
+    {
+        setValue( getValue() ); // Update the display
+    }
+    else
+    {
+        setCustomText(m_customText);
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -406,14 +416,56 @@ void SpinnerWidget::setDeactivated()
 {
     Widget::setDeactivated();
 
+    // Save it temporary because setValue(which is uses for update in this case) overwrites it
+    core::stringw customText = m_customText; 
     setText(L"-");
     setValue( getValue() ); // Update the display
+    m_customText = customText;
 }
 
 // -----------------------------------------------------------------------------
 
 void SpinnerWidget::setCustomText(const core::stringw& text)
 {
-    m_children[1].m_element->setText(text.c_str());
+    m_customText = text;
+    if (m_children.size() > 0)
+    {
+        m_children[1].m_element->setText(text.c_str());
+    }
 }
 
+// -----------------------------------------------------------------------------
+
+void SpinnerWidget::onClick()
+{
+    if (m_children[1].m_deactivated || 
+        m_children[1].m_properties[PROP_ID] != "spinnerbody"  || 
+        !isGauge()) 
+    { 
+        return; 
+    }
+
+    const core::position2di mouse_position
+        = irr_driver->getDevice()->getCursorControl()->getPosition();
+
+    core::recti body_rect 
+        = m_children[1].getIrrlichtElement()->getAbsolutePosition();
+
+    if (body_rect.isPointInside(mouse_position))
+    {
+        float exact_hover = (float)((mouse_position.X -
+            body_rect.UpperLeftCorner.X) /
+            (float)body_rect.getWidth()) * (m_max-m_min);
+
+        float new_value_f = ((exact_hover * (m_max - m_min)) /
+            (m_max - m_min)) + m_min;
+        int new_value = (int)roundf(new_value_f);
+
+        if (new_value > m_max) new_value = m_max;
+        if (new_value < m_min) new_value = m_min;
+
+        setValue(new_value);
+    }
+}
+
+// -----------------------------------------------------------------------------

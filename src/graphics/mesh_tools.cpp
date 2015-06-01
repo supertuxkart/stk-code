@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/mesh_tools.hpp"
+#include "graphics/central_settings.hpp"
 #include <irrlicht.h>
 #include <IMesh.h>
 #include <IMeshBuffer.h>
@@ -325,7 +326,7 @@ void recalculateTangents(scene::IMesh* mesh, bool recalculateNormals, bool smoot
 
 bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
 {
-    if (!irr_driver->isGLSL())
+    if (!CVS->isGLSL())
         return false;
     return (mb->getMaterial().MaterialType == irr_driver->getShader(ES_NORMAL_MAP) &&
         mb->getVertexType() != video::EVT_TANGENTS);
@@ -443,7 +444,7 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predic
     {
         scene::IMeshBuffer* mb = clone->getMeshBuffer(i);
 
-        for (int t = 0; t < video::MATERIAL_MAX_TEXTURES; t++)
+        for (u32 t = 0; t < video::MATERIAL_MAX_TEXTURES; t++)
         {
             video::ITexture* texture = mb->getMaterial().TextureLayer[t].Texture;
             if (texture != NULL)

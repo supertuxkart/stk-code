@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2010-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2010-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,6 +28,7 @@
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
 #include "graphics/callbacks.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
@@ -64,11 +65,17 @@ Material::Material(const XMLNode *node, bool deprecated)
         throw std::runtime_error("[Material] No texture name specified "
                                  "in file\n");
     }
+
+    std::string relativePath = file_manager->searchTexture(m_texname);
+    if (relativePath.size() == 0)
+        Log::warn("Material", "Cannot determine texture full path : <%s>", m_texname.c_str());
+    else
+        m_full_path = file_manager->getFileSystem()->getAbsolutePath(relativePath.c_str()).c_str();
     init();
 
     node->get("lazy-load", &m_lazy_load);
     bool b = false;
-
+    
     node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.4 style
     node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.5 style
     b = false;
@@ -403,6 +410,8 @@ Material::Material(const std::string& fname, bool is_full_path,
 
     m_texname = fname;
     init();
+    m_full_path = file_manager->getFileSystem()->getAbsolutePath(
+        file_manager->searchTexture(m_texname).c_str()).c_str();
 
     if (load_texture)
         install(is_full_path, complain_if_not_found);
@@ -436,6 +445,7 @@ void Material::init()
     m_sfx_max_speed             = 30;
     m_sfx_min_pitch             = 1.0f;
     m_sfx_max_pitch             = 1.0f;
+    m_sfx_pitch_per_speed       = 0.0f;
     m_zipper                    = false;
     m_zipper_duration           = -1.0f;
     m_zipper_fade_out_time      = -1.0f;
@@ -548,8 +558,15 @@ void Material::initCustomSFX(const XMLNode *sfx)
     sfx->get("max-pitch", &m_sfx_max_pitch); // 2.4 style
     sfx->get("max_pitch", &m_sfx_max_pitch); // 2.5 style
 
-    m_sfx_pitch_per_speed = (m_sfx_max_pitch - m_sfx_min_pitch)
-                          / (m_sfx_max_speed - m_sfx_min_speed);
+    if (m_sfx_max_speed == m_sfx_min_speed)
+    {
+        m_sfx_pitch_per_speed = 0.0f;
+    }
+    else
+    {
+        m_sfx_pitch_per_speed = (m_sfx_max_pitch - m_sfx_min_pitch)
+            / (m_sfx_max_speed - m_sfx_min_speed);
+    }
 
     if(!SFXManager::get()->soundExist(m_sfx_name))
     {
@@ -586,7 +603,7 @@ void Material::initParticlesEffect(const XMLNode *node)
     ParticleKind* particles = NULL;
     try
     {
-        particles = pkm->getParticles(base.c_str());
+        particles = pkm->getParticles(base);
 
         if (particles == NULL)
         {
@@ -670,6 +687,8 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) con
         return;
     }
 
+    assert(!isnan(speed));
+
     float f = m_sfx_pitch_per_speed*(speed-m_sfx_min_speed) + m_sfx_min_pitch;
     assert(!isnan(f));
     sfx->setSpeed(f);
@@ -689,7 +708,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                   m_texname.c_str());
     }
 
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
     {
         ITexture *tex;
         ITexture *glossytex;
@@ -952,7 +971,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
                             bool use_fog) const
 {
-    if (irr_driver->isGLSL())
+    if (CVS->isGLSL())
     {
         // to disable fog in the new pipeline, we slightly abuse the steps :
         // moving an object into the transparent pass will make it rendered
@@ -982,7 +1001,7 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
 /** Callback from LOD nodes to create some effects */
 void Material::onMadeVisible(scene::IMeshBuffer* who)
 {
-    if (!irr_driver->isGLSL()) return;
+    if (!CVS->isGLSL()) return;
 }
 
 //-----------------------------------------------------------------------------
@@ -990,14 +1009,14 @@ void Material::onMadeVisible(scene::IMeshBuffer* who)
 /** Callback from LOD nodes to create some effects */
 void Material::onHidden(scene::IMeshBuffer* who)
 {
-    if (!irr_driver->isGLSL()) return;
+    if (!CVS->isGLSL()) return;
 }
 
 //-----------------------------------------------------------------------------
 
 void Material::isInitiallyHidden(scene::IMeshBuffer* who)
 {
-    if (!irr_driver->isGLSL()) return;
+    if (!CVS->isGLSL()) return;
 }
 
 //-----------------------------------------------------------------------------

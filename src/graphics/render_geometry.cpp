@@ -1,5 +1,22 @@
-#include "graphics/irr_driver.hpp"
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "graphics/irr_driver.hpp"
+#include "central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/glwrap.hpp"
@@ -410,14 +427,14 @@ void renderMeshes1stPass()
 {
     auto &meshes = T::List::getInstance()->SolidPass;
     glUseProgram(T::FirstPassShader::getInstance()->Program);
-    if (irr_driver->hasARB_base_instance())
+    if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
         std::vector<GLuint> Textures;
         std::vector<uint64_t> Handles;
         GLMesh &mesh = *(STK::tuple_get<0>(meshes.at(i)));
-        if (!irr_driver->hasARB_base_instance())
+        if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
         if (mesh.VAOType != T::VertexType)
         {
@@ -427,7 +444,7 @@ void renderMeshes1stPass()
             continue;
         }
 
-        if (irr_driver->useAZDO())
+        if (CVS->isAZDOEnabled())
             HandleExpander<typename T::FirstPassShader>::template Expand(mesh.TextureHandles, T::FirstPassTextures);
         else
             TexExpander<typename T::FirstPassShader>::template ExpandTex(mesh, T::FirstPassTextures);
@@ -481,7 +498,7 @@ void IrrDriver::renderSolidFirstPass()
 {
     windDir = getWindDir();
 
-    if (irr_driver->hasARB_draw_indirect())
+    if (CVS->supportsIndirectInstancingRendering())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
 
     {
@@ -500,7 +517,7 @@ void IrrDriver::renderSolidFirstPass()
         renderMeshes1stPass<SphereMap, 2, 1>();
         renderMeshes1stPass<DetailMat, 2, 1>();
 
-        if (irr_driver->useAZDO())
+        if (CVS->isAZDOEnabled())
         {
             multidraw1stPass<DefaultMaterial>();
             multidraw1stPass<AlphaRef>();
@@ -511,7 +528,7 @@ void IrrDriver::renderSolidFirstPass()
             multidraw1stPass<NormalMat>();
             multidraw1stPass<DetailMat>();
         }
-        else if (irr_driver->hasARB_draw_indirect())
+        else if (CVS->supportsIndirectInstancingRendering())
         {
             renderInstancedMeshes1stPass<DefaultMaterial>();
             renderInstancedMeshes1stPass<AlphaRef>();
@@ -530,12 +547,12 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
 {
     auto &meshes = T::List::getInstance()->SolidPass;
     glUseProgram(T::SecondPassShader::getInstance()->Program);
-    if (irr_driver->hasARB_base_instance())
+    if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
         GLMesh &mesh = *(STK::tuple_get<0>(meshes.at(i)));
-        if (!irr_driver->hasARB_base_instance())
+        if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
 
         if (mesh.VAOType != T::VertexType)
@@ -546,7 +563,7 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
             continue;
         }
 
-        if (irr_driver->useAZDO())
+        if (CVS->isAZDOEnabled())
             HandleExpander<typename T::SecondPassShader>::template Expand(mesh.TextureHandles, T::SecondPassTextures, Prefilled_Handle[0], Prefilled_Handle[1], Prefilled_Handle[2]);
         else
             TexExpander<typename T::SecondPassShader>::template ExpandTex(mesh, T::SecondPassTextures, Prefilled_Tex[0], Prefilled_Tex[1], Prefilled_Tex[2]);
@@ -595,7 +612,7 @@ void IrrDriver::renderSolidSecondPass()
 
     uint64_t DiffuseHandle = 0, SpecularHandle = 0, SSAOHandle = 0, DepthHandle = 0;
 
-    if (irr_driver->useAZDO())
+    if (CVS->isAZDOEnabled())
     {
         DiffuseHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
         if (!glIsTextureHandleResidentARB(DiffuseHandle))
@@ -613,6 +630,9 @@ void IrrDriver::renderSolidSecondPass()
         if (!glIsTextureHandleResidentARB(DepthHandle))
             glMakeTextureHandleResidentARB(DepthHandle);
     }
+
+    if (CVS->supportsIndirectInstancingRendering())
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
 
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS2));
@@ -633,7 +653,7 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<GrassMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<NormalMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
 
-        if (irr_driver->useAZDO())
+        if (CVS->isAZDOEnabled())
         {
             multidraw2ndPass<DefaultMaterial>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
             multidraw2ndPass<AlphaRef>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
@@ -658,7 +678,7 @@ void IrrDriver::renderSolidSecondPass()
                 }
             }
         }
-        else if (irr_driver->hasARB_draw_indirect())
+        else if (CVS->supportsIndirectInstancingRendering())
         {
             renderInstancedMeshes2ndPass<DefaultMaterial>(DiffSpecSSAOTex);
             renderInstancedMeshes2ndPass<AlphaRef>(DiffSpecSSAOTex);
@@ -714,7 +734,7 @@ static void renderMultiMeshNormals()
 
 void IrrDriver::renderNormalsVisualisation()
 {
-    if (irr_driver->useAZDO()) {
+    if (CVS->isAZDOEnabled()) {
         renderMultiMeshNormals<DefaultMaterial>();
         renderMultiMeshNormals<AlphaRef>();
         renderMultiMeshNormals<UnlitMat>();
@@ -722,7 +742,7 @@ void IrrDriver::renderNormalsVisualisation()
         renderMultiMeshNormals<DetailMat>();
         renderMultiMeshNormals<NormalMat>();
     }
-    else if (irr_driver->hasARB_draw_indirect())
+    else if (CVS->supportsIndirectInstancingRendering())
     {
         renderInstancedMeshNormals<DefaultMaterial>();
         renderInstancedMeshNormals<AlphaRef>();
@@ -737,12 +757,12 @@ template<typename Shader, enum video::E_VERTEX_TYPE VertexType, int...List, type
 void renderTransparenPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     glUseProgram(Shader::getInstance()->Program);
-    if (irr_driver->hasARB_base_instance())
+    if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
-        if (!irr_driver->hasARB_base_instance())
+        if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
         if (mesh.VAOType != VertexType)
         {
@@ -752,7 +772,7 @@ void renderTransparenPass(const std::vector<TexUnit> &TexUnits, std::vector<STK:
             continue;
         }
 
-        if (irr_driver->useAZDO())
+        if (CVS->isAZDOEnabled())
             Shader::getInstance()->SetTextureHandles(mesh.TextureHandles[0]);
         else
             Shader::getInstance()->SetTextureUnits(getTextureGLuint(mesh.textures[0]));
@@ -775,7 +795,7 @@ void IrrDriver::renderTransparent()
     for (unsigned i = 0; i < ImmediateDrawList::getInstance()->size(); i++)
         ImmediateDrawList::getInstance()->at(i)->render();
 
-    if (irr_driver->hasARB_base_instance())
+    if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
 
     if (World::getWorld() && World::getWorld()->isFogEnabled())
@@ -800,7 +820,7 @@ void IrrDriver::renderTransparent()
     for (unsigned i = 0; i < BillBoardList::getInstance()->size(); i++)
         BillBoardList::getInstance()->at(i)->render();
 
-    if (!UserConfigParams::m_dynamic_lights)
+    if (!CVS->isDefferedEnabled())
         return;
 
     // Render displacement nodes
@@ -820,7 +840,7 @@ void IrrDriver::renderTransparent()
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-    if (irr_driver->hasARB_base_instance())
+    if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_2TCOORDS));
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
@@ -828,7 +848,7 @@ void IrrDriver::renderTransparent()
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh = *(STK::tuple_get<0>(ListDisplacement::getInstance()->at(i)));
-        if (!irr_driver->hasARB_base_instance())
+        if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
         const core::matrix4 &AbsoluteTransformation = STK::tuple_get<1>(ListDisplacement::getInstance()->at(i));
         if (mesh.VAOType != video::EVT_2TCOORDS)
@@ -855,7 +875,7 @@ void IrrDriver::renderTransparent()
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh = *(STK::tuple_get<0>(ListDisplacement::getInstance()->at(i)));
-        if (!irr_driver->hasARB_base_instance())
+        if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
         const core::matrix4 &AbsoluteTransformation = STK::tuple_get<1>(ListDisplacement::getInstance()->at(i));
         if (mesh.VAOType != video::EVT_2TCOORDS)
@@ -880,7 +900,7 @@ void IrrDriver::renderTransparent()
 
     irr_driver->getFBO(FBO_COLORS).Bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
-    m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE));
+    m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE), irr_driver->getFBO(FBO_COLORS).getWidth(), irr_driver->getFBO(FBO_COLORS).getHeight());
     glDisable(GL_STENCIL_TEST);
 
 }
@@ -925,14 +945,14 @@ void renderShadow(unsigned cascade)
 {
     auto &t = T::List::getInstance()->Shadows[cascade];
     glUseProgram(T::ShadowPassShader::getInstance()->Program);
-    if (irr_driver->hasARB_base_instance())
+    if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < t.size(); i++)
     {
         GLMesh *mesh = STK::tuple_get<0>(t.at(i));
-        if (!irr_driver->hasARB_base_instance())
+        if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh->vao);
-        if (irr_driver->useAZDO())
+        if (CVS->isAZDOEnabled())
             HandleExpander<typename T::ShadowPassShader>::template Expand(mesh->TextureHandles, T::ShadowTextures);
         else
             TexExpander<typename T::ShadowPassShader>::template ExpandTex(*mesh, T::ShadowTextures);
@@ -979,8 +999,12 @@ void IrrDriver::renderShadows()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
     m_rtts->getShadowFBO().Bind();
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.5, 0.);
+    if (!CVS->isESMEnabled())
+    {
+        glDrawBuffer(GL_NONE);
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.5, 50.);
+    }
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
 
@@ -1001,10 +1025,10 @@ void IrrDriver::renderShadows()
         renderShadow<UnlitMat, 1>(cascade);
         renderShadow<GrassMat, 3, 1>(cascade);
 
-        if (irr_driver->hasARB_draw_indirect())
+        if (CVS->supportsIndirectInstancingRendering())
             glBindBuffer(GL_DRAW_INDIRECT_BUFFER, ShadowPassCmd::getInstance()->drawindirectcmd);
 
-        if (irr_driver->useAZDO())
+        if (CVS->isAZDOEnabled())
         {
             multidrawShadow<DefaultMaterial>(cascade);
             multidrawShadow<DetailMat>(cascade);
@@ -1013,7 +1037,7 @@ void IrrDriver::renderShadows()
             multidrawShadow<UnlitMat>(cascade);
             multidrawShadow<GrassMat>(cascade, windDir);
         }
-        else if (irr_driver->hasARB_draw_indirect())
+        else if (CVS->supportsIndirectInstancingRendering())
         {
             renderInstancedShadow<DefaultMaterial>(cascade);
             renderInstancedShadow<DetailMat>(cascade);
@@ -1026,10 +1050,11 @@ void IrrDriver::renderShadows()
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
+    if (CVS->isESMEnabled())
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SHADOW_POSTPROCESS));
 
-        if (irr_driver->hasARBTextureView())
+        if (CVS->isARBTextureViewUsable())
         {
             for (unsigned i = 0; i < 2; i++)
             {
@@ -1039,8 +1064,8 @@ void IrrDriver::renderShadows()
             }
         }
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_rtts->getShadowFBO().getRTT()[0]);
+        glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
     }
-    glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
 
 
@@ -1072,16 +1097,16 @@ template<typename T, int... Selector>
 void drawRSM(const core::matrix4 & rsm_matrix)
 {
     glUseProgram(T::RSMShader::getInstance()->Program);
-    if (irr_driver->hasARB_base_instance())
+    if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     auto t = T::List::getInstance()->RSM;
     for (unsigned i = 0; i < t.size(); i++)
     {
         std::vector<GLuint> Textures;
         GLMesh *mesh = STK::tuple_get<0>(t.at(i));
-        if (!irr_driver->hasARB_base_instance())
+        if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh->vao);
-        if (irr_driver->useAZDO())
+        if (CVS->isAZDOEnabled())
             HandleExpander<typename T::RSMShader>::template Expand(mesh->TextureHandles, T::RSMTextures);
         else
             TexExpander<typename T::RSMShader>::template ExpandTex(*mesh, T::RSMTextures);
@@ -1135,10 +1160,10 @@ void IrrDriver::renderRSM()
     drawRSM<DetailMat, 3, 1>(rsm_matrix);
     drawRSM<SplattingMat, 1>(rsm_matrix);
 
-    if (irr_driver->hasARB_draw_indirect())
+    if (CVS->supportsIndirectInstancingRendering())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, RSMPassCmd::getInstance()->drawindirectcmd);
 
-    if (irr_driver->useAZDO())
+    if (CVS->isAZDOEnabled())
     {
         multidrawRSM<DefaultMaterial>(rsm_matrix);
         multidrawRSM<NormalMat>(rsm_matrix);
@@ -1146,7 +1171,7 @@ void IrrDriver::renderRSM()
         multidrawRSM<UnlitMat>(rsm_matrix);
         multidrawRSM<DetailMat>(rsm_matrix);
     }
-    else if (irr_driver->hasARB_draw_indirect())
+    else if (CVS->supportsIndirectInstancingRendering())
     {
         renderRSMShadow<DefaultMaterial>(rsm_matrix);
         renderRSMShadow<AlphaRef>(rsm_matrix);

@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -344,6 +344,7 @@ void PlayerKartWidget::add()
         name = m_associated_player->getProfile()->getName();
     if (m_associated_user)
         name = m_associated_user->getUserName();
+    core::stringw label = translations->fribidize(name);
 
     if (m_parent_screen->m_multiplayer)
     {
@@ -355,22 +356,23 @@ void PlayerKartWidget::add()
             m_player_ident_spinner->addLabel(label);
             if (UserConfigParams::m_per_player_difficulty)
             {
-                // The second player is the same, but with handicap
-                label = _("%s (handicapped)", label);
+                // I18N: 'handicapped' indicates that per-player handicaps are
+                //       activated for this kart (i.e. it will drive slower)
+                label = _("%s (handicapped)", name);
                 m_player_ident_spinner->addLabel(label);
             }
         }
 
         // select the right player profile in the spinner
-        m_player_ident_spinner->setValue(name);
+        m_player_ident_spinner->setValue(label);
     }
     else
     {
-        m_player_ident_spinner->addLabel(name);
+        m_player_ident_spinner->addLabel(label);
         m_player_ident_spinner->setVisible(false);
     }
 
-    assert(m_player_ident_spinner->getStringValue() == name);
+    assert(m_player_ident_spinner->getStringValue() == label);
 }   // add
 
 // ------------------------------------------------------------------------

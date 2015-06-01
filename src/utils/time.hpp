@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2013  SuperTuxKart-Team
+//  Copyright (C) 2013-2015  SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,6 +18,9 @@
 
 #ifndef HEADER_TIME_HPP
 #define HEADER_TIME_HPP
+
+#include "ITimer.h"
+
 #include <stdexcept>
 
 #ifdef WIN32
@@ -36,9 +39,16 @@
 
 class StkTime
 {
+private:
+    /** This objects keeps a copy of irrlicht's null-device timer. This is
+    *  important otherwise we can't get the time when resolution is switched
+    *  (and the sfx threads needs real time at that time). */
+    static irr::ITimer *m_timer;
+
 public:
     typedef time_t TimeType;
 
+    static void init();
     static void getDate(int *day=NULL, int *month=NULL, int *year=NULL);
 
         /** Converts the time in this object to a human readable string. */

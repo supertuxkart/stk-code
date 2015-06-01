@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -171,7 +171,7 @@ namespace Online
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
         //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
-        if (m_filename.size() == 0)
+        if (m_url.substr(0, 8) == "https://")
         {
             // https, load certificate info
             struct curl_slist *chunk = NULL;
@@ -361,11 +361,9 @@ namespace Online
     {
         HTTPRequest *request = (HTTPRequest *)clientp;
 
-        RequestManager* request_manager = RequestManager::get();
-
         // Check if we are asked to abort the download. If so, signal this
         // back to libcurl by returning a non-zero status.
-        if ((request_manager->getAbort() || request->isCancelled()) &&
+        if ((RequestManager::get()->getAbort() || request->isCancelled()) &&
              request->isAbortable()                                     )
         {
             // Indicates to abort the current download, which means that this

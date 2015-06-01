@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 the SuperTuxKart-Team
+//  Copyright (C) 2011-2015 the SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -75,7 +75,6 @@ public:
 
     /** Generate diffuse and specular map */
     void         renderSunlight(const core::vector3df &direction, const video::SColorf &col);
-    void         renderShadowedSunlight(const core::vector3df &direction, const video::SColorf &col, const std::vector<core::matrix4> &sun_ortho_matrix, unsigned depthtex);
 
     void renderSSAO();
     void renderEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff, unsigned skycubemap);
@@ -92,7 +91,7 @@ public:
     void renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
 
     /** Render tex. Used for blit/texture resize */
-    void renderPassThrough(unsigned tex);
+    void renderPassThrough(unsigned tex, unsigned width, unsigned height);
     void renderTextureLayer(unsigned tex, unsigned layer);
     void applyMLAA();
 

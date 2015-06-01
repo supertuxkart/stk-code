@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -482,8 +482,10 @@ static asQWORD CallThisCallFunction_objLast(const void *obj, const asDWORD* pArg
 	return ppcFunc( ppcArgs, PPC_STACK_SIZE(numTotalArgs), func );
 }
 
-asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/)
+asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/, void */*secondObject*/)
 {
+	// TODO: PPC does not yet support THISCALL_OBJFIRST/LAST
+
 	// use a working array of types, we'll configure the final one in stackArgs
 	asBYTE argsType[2*AS_PPC_MAX_ARGS + 1 + 1 + 1];
 	memset( argsType, 0, sizeof(argsType));

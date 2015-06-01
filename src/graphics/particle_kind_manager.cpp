@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013  Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2011-2015  Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -76,7 +76,6 @@ void ParticleKindManager::cleanUpTrackSpecificGfx()
 
 ParticleKind* ParticleKindManager::getParticles(const std::string &name)
 {
-    Track* t = track_manager->getTrack(race_manager->getTrackName());
     std::map<std::string, ParticleKind*>::iterator i;
     i = m_per_track_kinds.find(name);
     if (i != m_per_track_kinds.end())
@@ -87,9 +86,13 @@ ParticleKind* ParticleKindManager::getParticles(const std::string &name)
     {
         try
         {
-            ParticleKind* newkind = new ParticleKind(t->getTrackFile(name));
-            m_per_track_kinds[name] = newkind;
-            return newkind;
+            Track* t = track_manager->getTrack(race_manager->getTrackName());
+            if (t)
+            {
+                ParticleKind* newkind = new ParticleKind(t->getTrackFile(name));
+                m_per_track_kinds[name] = newkind;
+                return newkind;
+            }
         }
         catch (std::runtime_error& e)
         {
