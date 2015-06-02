@@ -440,30 +440,30 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw none = _LTR("None");
 
     //I18N: in graphical options
-//    tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
+//    tooltip = tooltip + L"\n" + _("Pixel shaders: %s",
 //                                  UserConfigParams::m_pixel_shaders ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = _("Animated Scenery : %s",
+    tooltip = _("Animated Scenery: %s",
         UserConfigParams::m_graphical_effects ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Weather Effects : %s",
+    tooltip = tooltip + L"\n" + _("Weather Effects: %s",
         UserConfigParams::m_weather_effects ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Animated Characters : %s",
+    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
         UserConfigParams::m_show_steering_animations == 2
         ? all
         : (UserConfigParams::m_show_steering_animations == 1 ? me : none));
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Dynamic lights : %s",
+    tooltip = tooltip + L"\n" + _("Dynamic lights: %s",
         UserConfigParams::m_dynamic_lights ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Motion blur: %s",
         UserConfigParams::m_motionblur ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing : %s",
+    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
         UserConfigParams::m_mlaa ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Ambient occlusion : %s",
+    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
         UserConfigParams::m_ssao ? enabled : disabled);
     //I18N: in graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
@@ -472,28 +472,28 @@ void OptionsScreenVideo::updateTooltip()
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Bloom : %s",
+    tooltip = tooltip + L"\n" + _("Bloom: %s",
         UserConfigParams::m_bloom ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Glow (outlines) : %s",
+    tooltip = tooltip + L"\n" + _("Glow (outlines): %s",
         UserConfigParams::m_glow ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light shaft (God rays) : %s",
+    tooltip = tooltip + L"\n" + _("Light shaft (God rays): %s",
         UserConfigParams::m_light_shaft ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Depth of field : %s",
+    tooltip = tooltip + L"\n" + _("Depth of field: %s",
         UserConfigParams::m_dof ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Global illumination : %s",
+    tooltip = tooltip + L"\n" + _("Global illumination: %s",
         UserConfigParams::m_gi ? enabled : disabled);
     
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Use high definition textures") + L" : " +
-        ((UserConfigParams::m_high_definition_textures & 0x1) == 0 ? disabled : enabled);
+    tooltip = tooltip + L"\n" + _("Use high definition textures: %s",
+        (UserConfigParams::m_high_definition_textures & 0x1) == 0 ? disabled : enabled);
     
     gfx->setTooltip(tooltip);
 }   // updateTooltip

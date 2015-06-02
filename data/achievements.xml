@@ -40,7 +40,7 @@
     <skidding goal="5"/>
   </achievement>
   <achievement id="6" check-type="all-at-least" reset-type="never"
-               name="Gold driver" description="Win in all single player modes, against at least 3 opponents.">
+               name="Gold driver" description="Win against at least 3 opponents in all single player modes.">
     <standard goal="1"/>
     <std_timetrial goal="1"/>
     <follow_leader goal="1"/>
