@@ -98,7 +98,7 @@ public:
     // ------------------------------------------------------------------------
     void render(GLuint layer_tex, int width, int height, float sigma_v)
     {
-        Gaussian6VBlurShader::getInstance()->setTextureUnits(layer_tex);
+        setTextureUnits(layer_tex);
         drawFullScreenEffect(core::vector2df(1.f / width, 1.f / height),
                              sigma_v);
     }   // render
@@ -106,7 +106,7 @@ public:
 
 // ============================================================================
 class Gaussian3VBlurShader : public TextureShader<Gaussian3VBlurShader, 1,
-                                           core::vector2df>
+                                                  core::vector2df>
 {
 public:
     Gaussian3VBlurShader()
@@ -118,7 +118,7 @@ public:
         assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian3VBlurShader
     // ------------------------------------------------------------------------
-    void render(FrameBuffer in_fbo, float inv_width, float inv_height)
+    void render(const FrameBuffer &in_fbo, float inv_width, float inv_height)
     {
         setTextureUnits(in_fbo.getRTT()[0]);
         drawFullScreenEffect(core::vector2df(inv_width, inv_height));
@@ -394,7 +394,7 @@ public:
         assignSamplerNames(0, "text", ST_NEAREST_FILTERED);
     }   // ToneMapShader
     // ----------------------------------------------------------------------------
-    void render(FrameBuffer &fbo, GLuint rtt, float vignette_weight)
+    void render(const FrameBuffer &fbo, GLuint rtt, float vignette_weight)
     {
         fbo.bind();
         setTextureUnits(rtt);
@@ -1081,8 +1081,8 @@ static std::vector<float> getGaussianWeight(float sigma, size_t count)
 }   // getGaussianWeight
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo, 
-                                         FrameBuffer &auxiliary)
+void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo, 
+                                         const FrameBuffer &auxiliary)
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() && 
            in_fbo.getHeight() == auxiliary.getHeight());
@@ -1161,8 +1161,8 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
 }   // renderGaussian6BlurLayer
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo,
-                                         FrameBuffer &auxiliary, float sigma_v,
+void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
+                                         const FrameBuffer &auxiliary, float sigma_v,
                                          float sigma_h)
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() && 
@@ -1218,8 +1218,8 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo,
 }   // renderGaussian6Blur
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo,
-                                          FrameBuffer &auxiliary)
+void PostProcessing::renderHorizontalBlur(const FrameBuffer &in_fbo,
+                                          const FrameBuffer &auxiliary)
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
@@ -1236,8 +1236,8 @@ void PostProcessing::renderHorizontalBlur(FrameBuffer &in_fbo,
 
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo,
-                                             FrameBuffer &auxiliary)
+void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
+                                             const FrameBuffer &auxiliary)
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
@@ -1324,7 +1324,7 @@ void PostProcessing::renderSSAO()
 }   // renderSSAO
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderMotionBlur(unsigned , FrameBuffer &in_fbo,
+void PostProcessing::renderMotionBlur(unsigned , const FrameBuffer &in_fbo,
                                       FrameBuffer &out_fbo)
 {
     MotionBlurProvider * const cb =

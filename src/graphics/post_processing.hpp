@@ -88,22 +88,22 @@ public:
                   const core::vector3df &rh_extend,
                   const FrameBuffer &fb);
     /** Blur the in texture */
-    void renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
+    void renderGaussian3Blur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
 
-    void renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary,
+    void renderGaussian6Blur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary,
                               float sigmaV, float sigmaH);
-	void renderHorizontalBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
+	void renderHorizontalBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
 
     void renderGaussian6BlurLayer(FrameBuffer &in_fbo, size_t layer,
                                   float sigmaH, float sigmaV);
-    void renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
+    void renderGaussian17TapBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
 
     /** Render tex. Used for blit/texture resize */
     void renderPassThrough(unsigned tex, unsigned width, unsigned height);
     void renderTextureLayer(unsigned tex, unsigned layer);
     void applyMLAA();
 
-    void renderMotionBlur(unsigned cam, FrameBuffer &in_fbo,
+    void renderMotionBlur(unsigned cam, const FrameBuffer &in_fbo,
                           FrameBuffer &out_fbo);
     void renderGlow(unsigned tex);
 
