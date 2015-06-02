@@ -1067,7 +1067,7 @@ msgid "Email"
 msgstr ""
 
 #: src/states_screens/register_screen.cpp:292
-msgid "Email has to be between 4 and 50 characters long!"
+msgid "Email has to be between 5 and 254 characters long!"
 msgstr ""
 
 #: src/states_screens/register_screen.cpp:298
