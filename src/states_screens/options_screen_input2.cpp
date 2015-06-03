@@ -476,8 +476,8 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
                      sensed_input.m_button_id == irr::KEY_LSHIFT ||
                      sensed_input.m_button_id == irr::KEY_RSHIFT))
     {
-        new MessageDialog(_("Warning, 'Shift' is not a recommended key : when "
-                            "shift is pressed down, all keys that contain a "
+        new MessageDialog(_("Warning: The 'Shift' is not a recommended key. When "
+                            "'Shift' is pressed down, all keys that contain a "
                             "character that is different in upper-case will "
                             "stop working."));
     }

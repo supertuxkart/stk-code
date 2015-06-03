@@ -4,7 +4,7 @@
 
     <div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
 
-        <header I18N="Title for tutorials screen" text="Tutorial : Selection Room" text_align="center" width="100%" />
+        <header I18N="Title for tutorials screen" text="Tutorial - Selection Room" text_align="center" width="100%" />
 
         <spacer proportion="1" width="100%"/>
 
