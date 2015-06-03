@@ -24,6 +24,7 @@
 #include "graphics/texture_manager.hpp"
 #include "graphics/vao_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 #include <vector>
@@ -59,7 +60,7 @@ public:
     unsigned elapsedTimeus();
 };
 
-class FrameBuffer
+class FrameBuffer : public NoCopy
 {
 private:
     GLuint fbo, fbolayer;
