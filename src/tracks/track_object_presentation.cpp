@@ -157,9 +157,10 @@ TrackObjectPresentationEmpty::~TrackObjectPresentationEmpty()
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
-                                       const XMLNode& xml_node,
-                                       ModelDefinitionLoader& model_def_loader)
-                                  : TrackObjectPresentationSceneNode(xml_node)
+    TrackObject* parent,
+    const XMLNode& xml_node,
+    ModelDefinitionLoader& model_def_loader)
+    : TrackObjectPresentationSceneNode(xml_node)
 {
     std::string name;
     xml_node.get("name", &name);
@@ -243,7 +244,7 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
 
     assert(libroot != NULL);
     World::getWorld()->getTrack()->loadObjects(libroot, lib_path, model_def_loader,
-        create_lod_definitions, m_node);
+        create_lod_definitions, m_node, parent);
 }   // TrackObjectPresentationLibraryNode
 
 // ----------------------------------------------------------------------------

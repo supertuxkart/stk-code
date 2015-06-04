@@ -38,6 +38,7 @@ class ThreeDAnimation;
 class ModelDefinitionLoader;
 class STKInstancedSceneNode;
 class XMLNode;
+class TrackObject;
 
 namespace irr
 {
@@ -170,7 +171,8 @@ public:
 class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNode
 {
 public:
-    TrackObjectPresentationLibraryNode(const XMLNode& xml_node,
+    TrackObjectPresentationLibraryNode(TrackObject* parent,
+        const XMLNode& xml_node,
         ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLibraryNode();
 };   // TrackObjectPresentationLibraryNode

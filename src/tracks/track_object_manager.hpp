@@ -57,7 +57,8 @@ public:
     void reset();
     void init();
     void add(const XMLNode &xml_node, scene::ISceneNode* parent,
-             ModelDefinitionLoader& model_def_loader);
+             ModelDefinitionLoader& model_def_loader,
+             TrackObject* parent_library);
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);
