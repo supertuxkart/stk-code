@@ -85,7 +85,12 @@ stackargsloop:
     bne     stackargsloop
     mov     sp, r12
 nomoreargs:
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
+    mov    pc, r4
+#else
     blx     r4
+#endif
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
 
@@ -133,7 +138,12 @@ stackargslooparmFuncObjLast:
     bne     stackargslooparmFuncObjLast
     mov     sp, r12
 nomoreargsarmFuncObjLast:
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
+    mov    pc, r4
+#else
     blx     r4
+#endif
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
 
@@ -180,7 +190,12 @@ stackargslooparmFuncR0ObjLast:
     bne     stackargslooparmFuncR0ObjLast
     mov     sp, r12
 nomoreargsarmFuncR0ObjLast:
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
+    mov    pc, r4
+#else
     blx     r4
+#endif
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
 
@@ -218,7 +233,12 @@ stackargslooparmFuncR0:
     bne     stackargslooparmFuncR0
     mov     sp, r12
 nomoreargsarmFuncR0:
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
+    mov    pc, r4
+#else
     blx     r4
+#endif
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
 
@@ -255,7 +275,12 @@ stackargslooparmFuncR0R1:
     bne     stackargslooparmFuncR0R1
     mov     sp, r12
 nomoreargsarmFuncR0R1:
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
+    mov    pc, r4
+#else
     blx     r4
+#endif
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
 
@@ -340,7 +365,7 @@ stackargsloop:
     mov     sp, r12
 
 nomoreargs:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
     mov    lr, pc   /* older ARM didn't support blx */
     mov    pc, r4
 #else
@@ -427,7 +452,7 @@ stackargslooparmFuncObjLast:
     mov     sp, r12
 
 nomoreargsarmFuncObjLast:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
     mov    lr, pc
     mov    pc, r4
 #else
@@ -520,7 +545,7 @@ stackargslooparmFuncR0ObjLast:
     mov     sp, r12
 
 nomoreargsarmFuncR0ObjLast:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
     mov    lr, pc
     mov    pc, r4
 #else
@@ -596,7 +621,7 @@ stackargslooparmFuncR0:
     mov     sp, r12
 
 nomoreargsarmFuncR0:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
     mov    lr, pc
     mov    pc, r4
 #else
@@ -676,7 +701,7 @@ stackargslooparmFuncR0R1:
     mov     sp, r12
 
 nomoreargsarmFuncR0R1:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
     mov    lr, pc
     mov    pc, r4
 #else
