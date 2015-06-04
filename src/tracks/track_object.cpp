@@ -39,9 +39,10 @@
  * \param lod_node Lod node (defaults to NULL).
  */
 TrackObject::TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent,
-                         ModelDefinitionLoader& model_def_loader)
+                         ModelDefinitionLoader& model_def_loader,
+                         TrackObject* parent_library)
 {
-    init(xml_node, parent, model_def_loader);
+    init(xml_node, parent, model_def_loader, parent_library);
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
@@ -63,6 +64,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_presentation    = NULL;
     m_animator        = NULL;
     m_physical_object = NULL;
+    m_parent_library  = NULL;
     m_interaction     = interaction;
     m_presentation    = presentation;
     m_is_driveable    = false;
@@ -89,7 +91,8 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
  *  \param model_def_loader Used to load level-of-detail nodes.
  */
 void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
-                       ModelDefinitionLoader& model_def_loader)
+                       ModelDefinitionLoader& model_def_loader,
+                       TrackObject* parent_library)
 {
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
@@ -97,7 +100,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_enabled    = true;
     m_presentation = NULL;
     m_animator = NULL;
-
+    m_parent_library = parent_library;
     m_physical_object = NULL;
 
     xml_node.get("id",      &m_id        );
@@ -141,7 +144,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     }
     else if (xml_node.getName() == "library")
     {
-        m_presentation = new TrackObjectPresentationLibraryNode(xml_node, model_def_loader);
+        m_presentation = new TrackObjectPresentationLibraryNode(this, xml_node, model_def_loader);
     }
     else if (type == "sfx-emitter")
     {

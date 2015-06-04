@@ -44,11 +44,12 @@ TrackObjectManager::~TrackObjectManager()
  *  in the xml_node.
  */
 void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
-                             ModelDefinitionLoader& model_def_loader)
+                             ModelDefinitionLoader& model_def_loader,
+                             TrackObject* parent_library)
 {
     try
     {
-        TrackObject *obj = new TrackObject(xml_node, parent, model_def_loader);
+        TrackObject *obj = new TrackObject(xml_node, parent, model_def_loader, parent_library);
         m_all_objects.push_back(obj);
         if(obj->isDriveable())
             m_driveable_objects.push_back(obj);

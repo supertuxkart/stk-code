@@ -89,11 +89,18 @@ protected:
     PhysicalObject*                m_physical_object;
 
     ThreeDAnimation*               m_animator;
+
+    TrackObject* m_parent_library;
     
-    void init(const XMLNode &xml_node, scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader);
+    void init(const XMLNode &xml_node, scene::ISceneNode* parent,
+        ModelDefinitionLoader& model_def_loader,
+        TrackObject* parent_library);
 
 public:
-                 TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader);
+                 TrackObject(const XMLNode &xml_node,
+                             scene::ISceneNode* parent,
+                             ModelDefinitionLoader& model_def_loader,
+                             TrackObject* parent_library);
 
                  TrackObject(const core::vector3df& xyz,
                              const core::vector3df& hpr,
