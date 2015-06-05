@@ -87,11 +87,9 @@ namespace Scripting
     */
     std::string getScript(std::string fileName)
     {
-        std::string script_dir = file_manager->getAsset(FileManager::SCRIPT, "");
-        script_dir += World::getWorld()->getTrack()->getIdent() + "/";
+        std::string script_path = World::getWorld()->getTrack()->getTrackFile(fileName);
 
-        script_dir += fileName;
-        FILE *f = fopen(script_dir.c_str(), "rb");
+        FILE *f = fopen(script_path.c_str(), "rb");
         if (f == NULL)
         {
             Log::debug("Scripting", "File does not exist : {0}.as", fileName.c_str());

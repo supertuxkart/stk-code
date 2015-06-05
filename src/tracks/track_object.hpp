@@ -125,6 +125,11 @@ public:
                  const Material **material, btVector3 *normal,
                  bool interpolate_normal) const;
 
+    TrackObject* getParentLibrary()
+    {
+        return m_parent_library;
+    }
+
     // ------------------------------------------------------------------------
     /** To finish object constructions. Called after the track model
      *  is ready. */
