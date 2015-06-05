@@ -207,7 +207,7 @@ public:
       */
     PhysicalObject* getPhysics() { return m_physical_object; }
     /** Hide or show the object */
-    void setEnable(bool mode);
+    void setEnabled(bool mode);
     /* @} */
     /* @} */
     /* @} */

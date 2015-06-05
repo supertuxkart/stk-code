@@ -57,33 +57,9 @@ namespace Scripting
           * Get a track object by ID.
           * @return An object of type @ref Scripting_TrackObject
           */
-        TrackObject* getTrackObject(std::string* objID)
+        TrackObject* getTrackObject(std::string* libraryInstance, std::string* objID)
         {
-            return World::getWorld()->getTrack()->getTrackObjectManager()->getTrackObject(*objID);
-        }
-
-        /** Hide/disable a track object */
-        void disableTrackObject(std::string* objID)
-        {
-            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*objID);
-        }
-
-        /** Show/enable a track objects */
-        void enableTrackObject(std::string* objID)
-        {
-            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*objID);
-        }
-
-        /** Disables an action trigger of specified ID */
-        void disableTrigger(std::string* triggerID)
-        {
-            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*triggerID);
-        }
-
-        /** Enables an action trigger of specified ID */
-        void enableTrigger(std::string* triggerID)
-        {
-            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*triggerID);
+            return World::getWorld()->getTrack()->getTrackObjectManager()->getTrackObject(*libraryInstance, *objID);
         }
 
         /** Creates a trigger at the specified location */
@@ -250,18 +226,18 @@ namespace Scripting
             r = engine->RegisterObjectType("SoundEmitter", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectType("Animator", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
 
-            r = engine->RegisterGlobalFunction("void disableTrackObject(const string &in)", asFUNCTION(disableTrackObject), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void enableTrackObject(const string &in)", asFUNCTION(enableTrackObject), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void enableTrigger(const string &in)", asFUNCTION(enableTrigger), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void disableTrigger(const string &in)", asFUNCTION(disableTrigger), asCALL_CDECL); assert(r >= 0);
+            //r = engine->RegisterGlobalFunction("void disableTrackObject(const string &in)", asFUNCTION(disableTrackObject), asCALL_CDECL); assert(r >= 0);
+            //r = engine->RegisterGlobalFunction("void enableTrackObject(const string &in)", asFUNCTION(enableTrackObject), asCALL_CDECL); assert(r >= 0);
+            //r = engine->RegisterGlobalFunction("void enableTrigger(const string &in)", asFUNCTION(enableTrigger), asCALL_CDECL); assert(r >= 0);
+            //r = engine->RegisterGlobalFunction("void disableTrigger(const string &in)", asFUNCTION(disableTrigger), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void createTrigger(const string &in, const Vec3 &in, float distance)",
                 asFUNCTION(createTrigger), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in)", asFUNCTION(getTrackObject), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in, const string &in)", asFUNCTION(getTrackObject), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void exitRace()", asFUNCTION(exitRace), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void pauseRace()", asFUNCTION(pauseRace), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
-            r = engine->RegisterObjectMethod("TrackObject", "void setEnable(bool status)", asMETHOD(TrackObject, setEnable), asCALL_THISCALL); assert(r >= 0);
+            r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "SoundEmitter@ getSoundEmitter()", asMETHOD(TrackObject, getSoundEmitter), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "PhysicalObject@ getPhysics()", asMETHOD(TrackObject, getPhysics), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Mesh@ getMesh()", asMETHOD(TrackObject, getMesh), asCALL_THISCALL); assert(r >= 0);

@@ -196,14 +196,12 @@ void Physics::update(float dt)
             std::string lib_id;
             std::string* lib_id_ptr = NULL;
             if (library != NULL)
-            {
                 lib_id = library->getID();
-                lib_id_ptr = &lib_id;
-            }
+            lib_id_ptr = &lib_id;
 
             if (scripting_function.size() > 0)
             {
-                script_engine->runFunction("void " + scripting_function + "(int, const string,  const string)",
+                script_engine->runFunction("void " + scripting_function + "(int, const string, const string)",
                     [&](asIScriptContext* ctx) {
                         ctx->SetArgDWord(0, kartId);
                         ctx->SetArgObject(1, lib_id_ptr);

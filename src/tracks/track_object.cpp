@@ -284,9 +284,9 @@ TrackObject::~TrackObject()
  */
 void TrackObject::reset()
 {
-    if (m_presentation  ) m_presentation->reset();
-    if (m_animator      ) m_animator->reset();
-    if(m_physical_object) m_physical_object->reset();
+    if (m_presentation   ) m_presentation->reset();
+    if (m_animator       ) m_animator->reset();
+    if (m_physical_object) m_physical_object->reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -294,10 +294,29 @@ void TrackObject::reset()
  *  disabled objects will not be displayed anymore.
  *  \param mode Enable (true) or disable (false) this object.
  */
-void TrackObject::setEnable(bool mode)
+void TrackObject::setEnabled(bool enabled)
 {
-    m_enabled = mode;
-    if (m_presentation != NULL) m_presentation->setEnable(m_enabled);
+    if (m_enabled == enabled)
+        return;
+
+    m_enabled = enabled;
+
+    if (m_presentation != NULL)
+        m_presentation->setEnable(m_enabled);
+
+    if (enabled)
+        reset(); // TODO: not sure why there is a reset here
+
+    if (getType() == "mesh")
+    {
+        if (m_physical_object != NULL)
+        {
+            if (enabled)
+                m_physical_object->addBody();
+            else
+                m_physical_object->removeBody();
+        }
+    }
 }   // setEnable
 
 // ----------------------------------------------------------------------------

@@ -62,9 +62,6 @@ public:
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);
-	void disable(std::string name);
-	void enable (std::string name);
-	bool getStatus(std::string name);
     void castRay(const btVector3 &from,
                  const btVector3 &to, btVector3 *hit_point,
                  const Material **material, btVector3 *normal = NULL,
@@ -77,7 +74,7 @@ public:
 
     void removeObject(TrackObject* who);
 
-    TrackObject* getTrackObject(std::string name);
+    TrackObject* getTrackObject(const std::string& libraryInstance, const std::string& name);
 
           PtrVector<TrackObject>& getObjects()       { return m_all_objects; }
     const PtrVector<TrackObject>& getObjects() const { return m_all_objects; }
