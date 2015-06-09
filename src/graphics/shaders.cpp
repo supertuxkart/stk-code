@@ -360,7 +360,8 @@ Shaders::TransparentShader::TransparentShader()
 Shaders::TransparentFogShader::TransparentFogShader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                        GL_FRAGMENT_SHADER, "transparentfog.frag");
+						GL_FRAGMENT_SHADER, "transparentfog.frag",
+                        GL_FRAGMENT_SHADER, "utils/SunMRP.frag");
     assignUniforms("ModelMatrix", "TextureMatrix", "fogmax", "startH",
                    "endH", "start", "end", "col");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
