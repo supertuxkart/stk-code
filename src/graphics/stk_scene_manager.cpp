@@ -293,10 +293,10 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
             tmpcol.getBlue() / 255.0f);
 
         for (GLMesh *mesh : node->TransparentMesh[TM_DEFAULT])
-            pushVector(ListBlendTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
+            pushVector(ListBlendTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, mesh->TextureMatrix,
             fogmax, startH, endH, start, end, col);
         for (GLMesh *mesh : node->TransparentMesh[TM_ADDITIVE])
-            pushVector(ListAdditiveTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
+            pushVector(ListAdditiveTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, mesh->TextureMatrix,
             fogmax, startH, endH, start, end, col);
     }
     else

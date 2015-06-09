@@ -205,7 +205,7 @@ class ListAdditiveTransparent : public MiscList<ListAdditiveTransparent,
 
 // ----------------------------------------------------------------------------
 class ListBlendTransparentFog : public MiscList<ListBlendTransparentFog,
-                                                GLMesh *, core::matrix4,
+                                                GLMesh *, core::matrix4, core::matrix4,
                                                 core::matrix4, float, float,
                                                 float, float, float,
                                                 video::SColorf>
@@ -213,7 +213,7 @@ class ListBlendTransparentFog : public MiscList<ListBlendTransparentFog,
 
 // ----------------------------------------------------------------------------
 class ListAdditiveTransparentFog : public MiscList<ListAdditiveTransparentFog,
-                                                   GLMesh *, core::matrix4,
+                                                   GLMesh *, core::matrix4, core::matrix4,
                                                    core::matrix4, float, float,
                                                    float, float, float,
                                                    video::SColorf>

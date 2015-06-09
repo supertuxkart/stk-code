@@ -1532,12 +1532,12 @@ void IrrDriver::renderTransparent()
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         renderTransparenPass<Shaders::TransparentFogShader, video::EVT_STANDARD,
-                             8, 7, 6, 5, 4, 3, 2, 1>(
+                             9, 8, 7, 6, 5, 4, 3, 2, 1>(
                              TexUnits(RenderGeometry::TexUnit(0, true)),
                               ListBlendTransparentFog::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
         renderTransparenPass<Shaders::TransparentFogShader, 
-                             video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(
+                             video::EVT_STANDARD, 9, 8, 7, 6, 5, 4, 3, 2, 1>(
                              TexUnits(RenderGeometry::TexUnit(0, true)), 
                                        ListAdditiveTransparentFog::getInstance());
     }

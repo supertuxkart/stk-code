@@ -473,7 +473,7 @@ void STKMeshSceneNode::render()
                             ->setTextureUnits(getTextureGLuint(mesh.textures[0]));
                     }
                     Shaders::TransparentFogShader::getInstance()
-                           ->setUniforms(AbsoluteTransformation, mesh.TextureMatrix,
+                           ->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, mesh.TextureMatrix,
                                          fogmax, startH, endH, start, end, col);
 
                     assert(mesh.vao);
