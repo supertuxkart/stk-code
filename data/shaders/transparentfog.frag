@@ -17,8 +17,16 @@ in vec4 color;
 in vec3 nor;
 out vec4 FragColor;
 
-vec3 DiffuseIBL(vec3 normal, vec3 V, float roughness, vec3 color);
-vec3 SpecularIBL(vec3 normal, vec3 V, float roughness, vec3 F0);
+// vec3 DiffuseIBL(vec3 normal, vec3 V, float roughness, vec3 color); // TODO implement this properly
+vec3 DiffuseIBL(vec3 normal);
+
+//vec3 SpecularIBL(vec3 normal, vec3 V, float roughness, vec3 transparency);
+vec3 SpecularIBL(vec3 normal, vec3 V, float roughness)
+{
+    return vec3(0., 0., 0.);
+}
+
+
 vec3 SpecularBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 vec3 DiffuseBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 vec3 SunMRP(vec3 normal, vec3 eyedir);
@@ -44,6 +52,15 @@ void main()
 
     vec3 Lightdir = SunMRP(normal, eyedir);
     float NdotL = clamp(dot(normal, Lightdir), 0., 1.);
+
+    //diffusecolor.rgb = DiffuseIBL(normal);
+    //diffusecolor.rgb = SpecularIBL(normal, eyedir, 0.); // TODO add transparency vec3(0.04) * diffusecolor.a
+    
+    diffusecolor.rgb =
+        0.2 * (DiffuseIBL(normal) + SpecularIBL(normal, eyedir, 0.)) +
+        sun_col * NdotL * 
+        (DiffuseBRDF(normal, eyedir, Lightdir, diffusecolor.rgb, 0.) + SpecularBRDF(normal, eyedir, Lightdir, vec3(.04) * diffusecolor.a, 0.));
+
     /* End of light computation -----*/
 
 
@@ -53,6 +70,6 @@ void main()
     fog = min(fog, fogmax);
 
     vec4 finalcolor = vec4(col, 0.) * fog + diffusecolor *(1. - fog);
-    finalcolor.rgb = vec3(NdotL);
+    //finalcolor.rgb = vec3(NdotL);
     FragColor = vec4(finalcolor.rgb * finalcolor.a, finalcolor.a);
 }

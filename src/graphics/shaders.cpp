@@ -361,7 +361,11 @@ Shaders::TransparentFogShader::TransparentFogShader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
 						GL_FRAGMENT_SHADER, "transparentfog.frag",
-                        GL_FRAGMENT_SHADER, "utils/SunMRP.frag");
+                        GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
+						/*GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",*/
+						GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
+						GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
+						GL_FRAGMENT_SHADER, "utils/SunMRP.frag");
     assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix", "fogmax", "startH",
                    "endH", "start", "end", "col");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
