@@ -287,16 +287,18 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         const float start = track->getFogStart();
         const float end = track->getFogEnd();
         const video::SColor tmpcol = track->getFogColor();
+		core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
+		ModelMatrix.getInverse(InvModelMatrix);
 
         video::SColorf col(tmpcol.getRed() / 255.0f,
             tmpcol.getGreen() / 255.0f,
             tmpcol.getBlue() / 255.0f);
 
         for (GLMesh *mesh : node->TransparentMesh[TM_DEFAULT])
-            pushVector(ListBlendTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, mesh->TextureMatrix,
+            pushVector(ListBlendTransparentFog::getInstance(), mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix,
             fogmax, startH, endH, start, end, col);
         for (GLMesh *mesh : node->TransparentMesh[TM_ADDITIVE])
-            pushVector(ListAdditiveTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, mesh->TextureMatrix,
+            pushVector(ListAdditiveTransparentFog::getInstance(), mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix,
             fogmax, startH, endH, start, end, col);
     }
     else
