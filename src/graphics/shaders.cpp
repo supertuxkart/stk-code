@@ -146,7 +146,8 @@ void Shaders::destroy()
     for (i = 0; i < ES_COUNT; i++)
     {
         if (i == ES_GAUSSIAN3V || !m_callbacks[i]) continue;
-        delete m_callbacks[i];
+        m_callbacks[i]->drop();
+        m_callbacks[i] = NULL;
     }
     m_has_been_initialised = false;
 }   // destroy
