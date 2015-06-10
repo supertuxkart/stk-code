@@ -465,12 +465,12 @@ void STKMeshSceneNode::render()
                         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
                         Shaders::TransparentFogShader::getInstance()
-                                    ->setTextureHandles(mesh.TextureHandles[0]);
+                                    ->setTextureHandles(mesh.TextureHandles[0], mesh.TextureHandles[0]);
                     }
                     else
                     {
                         Shaders::TransparentFogShader::getInstance()
-                            ->setTextureUnits(getTextureGLuint(mesh.textures[0]));
+                            ->setTextureUnits(getTextureGLuint(mesh.textures[0]),  irr_driver->SkyboxSpecularProbe);
                     }
                     Shaders::TransparentFogShader::getInstance()
                            ->setUniforms(AbsoluteTransformation, AbsoluteTransformation, mesh.TextureMatrix,

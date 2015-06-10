@@ -128,7 +128,7 @@ public:
     };   // TransparentShader
 
     // ========================================================================
-    class TransparentFogShader : public TextureShader<TransparentFogShader, 1,
+    class TransparentFogShader : public TextureShader<TransparentFogShader, 2,
                                      core::matrix4, core::matrix4, core::matrix4, float, float,
                                      float, float, float, video::SColorf >
     {

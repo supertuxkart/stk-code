@@ -368,7 +368,8 @@ Shaders::TransparentFogShader::TransparentFogShader()
 						GL_FRAGMENT_SHADER, "utils/SunMRP.frag");
     assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix", "fogmax", "startH",
                    "endH", "start", "end", "col");
-    assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+					   1, "probe", ST_TRILINEAR_CUBEMAP);
 }   // TransparentFogShader
 
 // ============================================================================
