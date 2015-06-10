@@ -32,4 +32,5 @@ void generateSphericalHarmonics(Color *CubemapFace[6], size_t edge_size,
                                 float *red_sh_coeff);
 
 GLuint generateSpecularCubemap(GLuint probe);
+GLuint generateSpecularDFGLUT();
 #endif

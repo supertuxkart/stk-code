@@ -311,6 +311,37 @@ std::pair<float, float> getHammersleySequence(int index, int samples)
                           InvertedBinaryRepresentation);
 }   // HammersleySequence
 
+/** Returns a pseudo random (theta, phi) generated from a probability density function modeled after cos distribtion function.
+\param a pseudo random float pair from a uniform density function between 0 and 1. */
+std::pair<float, float> ImportanceSamplingCos(std::pair<float, float> Seeds)
+{    return std::make_pair(acosf(Seeds.first), 2.f * 3.14f * Seeds.second);
+}
+
+/** Returns a pseudo random (theta, phi) generated from a probability density function modeled after GGX distribtion function.
+    From "Real Shading in Unreal Engine 4" paper
+\param a pseudo random float pair from a uniform density function between 0 and 1.
+\param exponent from the Phong formula. */
+std::pair<float, float> ImportanceSamplingGGX(std::pair<float, float> Seeds, float roughness)
+{
+    float a = roughness * roughness;
+    float CosTheta = sqrtf((1.f - Seeds.second) / (1.f + (a * a - 1.f) * Seeds.second));
+    return std::make_pair(acosf(CosTheta), 2.f * 3.14f * Seeds.first);
+}
+
+static float G1_Schlick(const core::vector3df &V, const core::vector3df &normal, float k)
+{
+    float NdotV = V.dotProduct(normal);
+    NdotV = NdotV > 0.f ? NdotV : 0.f;
+    NdotV = NdotV < 1.f ? NdotV : 1.f;
+    return 1.f / (NdotV * (1.f - k) + k);
+}
+
+float G_Smith(const core::vector3df &lightdir, const core::vector3df &viewdir, const core::vector3df &normal, float roughness)
+{
+    float k = (roughness + 1.f) * (roughness + 1.f) / 8.f;
+    return G1_Schlick(lightdir, normal, k) * G1_Schlick(viewdir, normal, k);
+}
+
 
 // ----------------------------------------------------------------------------
 /** Returns a pseudo random (theta, phi) generated from a probability density
@@ -442,3 +473,88 @@ GLuint generateSpecularCubemap(GLuint probe)
     glDeleteFramebuffers(1, &fbo);
     return cubemap_texture;
 }   // generateSpecularCubemap
+
+
+
+static
+std::pair<float, float> getSpecularDFG(float roughness, float NdotV)
+{
+    // We assume a local referential where N points in Y direction
+    core::vector3df V(sqrtf(1.f - NdotV * NdotV), NdotV, 0.f);
+
+    float DFG1 = 0., DFG2 = 0.;
+    for (unsigned sample = 0; sample < 1024; sample++)
+    {
+        std::pair<float, float> ThetaPhi = ImportanceSamplingGGX(getHammersleySequence(sample, 1024), roughness);
+        float Theta = ThetaPhi.first, Phi = ThetaPhi.second;
+        core::vector3df H(sinf(Theta) * cosf(Phi), cosf(Theta), sinf(Theta) * sinf(Phi));
+        core::vector3df L = 2 * H.dotProduct(V) * H - V;
+        float NdotL = L.Y;
+        if (NdotL > 0.)
+        {
+            float VdotH = V.dotProduct(H);
+            VdotH = VdotH > 0.f ? VdotH : 0.f;
+            VdotH = VdotH < 1.f ? VdotH : 1.f;
+            float Fc = powf(1.f - VdotH, 5.f);
+            float G = G_Smith(L, V, core::vector3df(0.f, 1.f, 0.f), roughness);
+            DFG1 += (1.f - Fc) * G * VdotH;
+            DFG2 += Fc * G * VdotH;
+        }
+    }
+    return std::make_pair(DFG1 / 1024, DFG2 / 1024);
+}
+
+
+static float getDiffuseDFG(float roughness, float NdotV)
+{
+    // We assume a local referential where N points in Y direction
+    core::vector3df V(sqrtf(1.f - NdotV * NdotV), NdotV, 0.f);
+    float DFG = 0.f;
+    for (unsigned sample = 0; sample < 1024; sample++)
+    {
+        std::pair<float, float> ThetaPhi = ImportanceSamplingCos(getHammersleySequence(sample, 1024));
+        float Theta = ThetaPhi.first, Phi = ThetaPhi.second;
+        core::vector3df L(sinf(Theta) * cosf(Phi), cosf(Theta), sinf(Theta) * sinf(Phi));
+        float NdotL = L.Y;
+        if (NdotL > 0.f)
+        {
+            core::vector3df H = (L + V).normalize();
+            float LdotH = L.dotProduct(H);
+            float f90 = .5f + 2.f * LdotH * LdotH * roughness * roughness;
+            DFG += (1.f + (f90 - 1.f) * (1.f - powf(NdotL, 5.f))) * (1.f + (f90 - 1.f) * (1.f - powf(NdotV, 5.f)));
+        }
+    }
+    return DFG / 1024;
+}
+
+
+GLuint generateSpecularDFGLUT()
+{
+    size_t DFG_LUT_size = 128;
+    float *texture_content = new float[4 * DFG_LUT_size * DFG_LUT_size];
+
+#pragma omp parallel for
+    for (int i = 0; i < int(DFG_LUT_size); i++)
+    {
+        float roughness = .05f + .95f * float(i) / float(DFG_LUT_size - 1);
+        for (unsigned j = 0; j < DFG_LUT_size; j++)
+        {
+            float NdotV = float(j) / float(DFG_LUT_size - 1);
+            std::pair<float, float> DFG = getSpecularDFG(roughness, NdotV);
+            texture_content[4 * (i * DFG_LUT_size + j)] = DFG.first;
+            texture_content[4 * (i * DFG_LUT_size + j) + 1] = DFG.second;
+            texture_content[4 * (i * DFG_LUT_size + j) + 2] = getDiffuseDFG(roughness, NdotV);
+            texture_content[4 * (i * DFG_LUT_size + j) + 3] = 0.;
+        }
+    }
+
+    GLuint DFG_LUT_texture;
+    glGenTextures(1, &DFG_LUT_texture);
+    glBindTexture(GL_TEXTURE_2D, DFG_LUT_texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, DFG_LUT_size, DFG_LUT_size, 0, GL_RGBA, GL_FLOAT, texture_content);
+
+    delete[] texture_content;
+    return DFG_LUT_texture;
+
+}
