@@ -49,6 +49,7 @@ private:
 
 public:
     static void init();
+    static void reset();
     // ------------------------------------------------------------------------
     static GLuint getBillboardVBO() 
     {

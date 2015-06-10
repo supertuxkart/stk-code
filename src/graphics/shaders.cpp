@@ -150,6 +150,7 @@ void Shaders::destroy()
         m_callbacks[i] = NULL;
     }
     m_has_been_initialised = false;
+    SharedGPUObjects::reset();
 }   // destroy
 
 // ----------------------------------------------------------------------------
