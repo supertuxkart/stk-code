@@ -120,7 +120,7 @@ public:
     };   // class ColoredLine
 
     // ========================================================================
-    class TransparentShader : public TextureShader<TransparentShader, 1,
+    class TransparentShader : public TextureShader<TransparentShader, 2,
                                                    core::matrix4, core::matrix4 >
     {
     public:

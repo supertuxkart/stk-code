@@ -11,6 +11,7 @@ uniform float endH;
 uniform float start;
 uniform float end;
 uniform vec3 col;
+uniform samplerCube probe;
 
 in vec2 uv;
 in vec4 color;
@@ -21,11 +22,7 @@ out vec4 FragColor;
 vec3 DiffuseIBL(vec3 normal);
 
 //vec3 SpecularIBL(vec3 normal, vec3 V, float roughness, vec3 transparency);
-vec3 SpecularIBL(vec3 normal, vec3 V, float roughness)
-{
-    return vec3(0., 0., 0.);
-}
-
+vec3 SpecularIBL(vec3 normal, vec3 V, float roughness);
 
 vec3 SpecularBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 vec3 DiffuseBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
@@ -70,6 +67,5 @@ void main()
     fog = min(fog, fogmax);
 
     vec4 finalcolor = vec4(col, 0.) * fog + diffusecolor *(1. - fog);
-    //finalcolor.rgb = vec3(NdotL);
     FragColor = vec4(finalcolor.rgb * finalcolor.a, finalcolor.a);
 }
