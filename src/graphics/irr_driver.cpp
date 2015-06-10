@@ -798,7 +798,7 @@ void IrrDriver::applyResolutionSettings()
     // FIXME: this load sequence is (mostly) duplicated from main.cpp!!
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
-    Shaders::destroy();
+    ShaderBase::updateShaders();
     VAOManager::getInstance()->kill();
     SolidPassCmd::getInstance()->kill();
     ShadowPassCmd::getInstance()->kill();
@@ -806,6 +806,7 @@ void IrrDriver::applyResolutionSettings()
     GlowPassCmd::getInstance()->kill();
     resetTextureTable();
     // initDevice will drop the current device.
+    Shaders::destroy();
     initDevice();
 
     // Re-init GUI engine
