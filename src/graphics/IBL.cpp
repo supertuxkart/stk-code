@@ -483,7 +483,7 @@ std::pair<float, float> getSpecularDFG(float roughness, float NdotV)
     core::vector3df V(sqrtf(1.f - NdotV * NdotV), NdotV, 0.f);
 
     float DFG1 = 0., DFG2 = 0.;
-    for (unsigned sample = 0; sample < 1024; sample++)
+    for (unsigned sample = 0; sample < 256; sample++)
     {
         std::pair<float, float> ThetaPhi = ImportanceSamplingGGX(getHammersleySequence(sample, 1024), roughness);
         float Theta = ThetaPhi.first, Phi = ThetaPhi.second;
@@ -501,7 +501,7 @@ std::pair<float, float> getSpecularDFG(float roughness, float NdotV)
             DFG2 += Fc * G * VdotH;
         }
     }
-    return std::make_pair(DFG1 / 1024, DFG2 / 1024);
+    return std::make_pair(DFG1 / 256, DFG2 / 256);
 }
 
 
@@ -510,7 +510,7 @@ static float getDiffuseDFG(float roughness, float NdotV)
     // We assume a local referential where N points in Y direction
     core::vector3df V(sqrtf(1.f - NdotV * NdotV), NdotV, 0.f);
     float DFG = 0.f;
-    for (unsigned sample = 0; sample < 1024; sample++)
+    for (unsigned sample = 0; sample < 256; sample++)
     {
         std::pair<float, float> ThetaPhi = ImportanceSamplingCos(getHammersleySequence(sample, 1024));
         float Theta = ThetaPhi.first, Phi = ThetaPhi.second;
@@ -524,7 +524,7 @@ static float getDiffuseDFG(float roughness, float NdotV)
             DFG += (1.f + (f90 - 1.f) * (1.f - powf(NdotL, 5.f))) * (1.f + (f90 - 1.f) * (1.f - powf(NdotV, 5.f)));
         }
     }
-    return DFG / 1024;
+    return DFG / 256;
 }
 
 
