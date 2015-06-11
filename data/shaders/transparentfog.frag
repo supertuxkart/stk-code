@@ -68,5 +68,8 @@ void main()
     vec4 finalcolor = vec4(col, 0.) * fog + diffusecolor *(1. - fog);
     
     diffusecolor.rgb = SpecularIBL(normal, eyedir, 0., vec3(0.04) * diffusecolor.a);
-    FragColor = vec4(finalcolor.rgb * finalcolor.a, finalcolor.a);
+    
+    //FragColor = vec4(finalcolor.rgb * finalcolor.a, finalcolor.a);
+    
+    FragColor = vec4(fog * diffusecolor.a + diffusecolor.rgb, diffusecolor.a);
 }
