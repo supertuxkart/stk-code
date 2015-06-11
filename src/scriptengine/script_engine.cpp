@@ -380,7 +380,7 @@ namespace Scripting
     bool ScriptEngine::compileLoadedScripts()
     {
         int r;
-        asIScriptModule *mod = m_engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE, asGM_ONLY_IF_EXISTS);
+        asIScriptModule *mod = m_engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE, asGM_CREATE_IF_NOT_EXISTS);
 
         // Compile the script. If there are any compiler messages they will
         // be written to the message stream that we set right after creating the 
