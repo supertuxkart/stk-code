@@ -365,8 +365,8 @@ Shaders::TransparentFogShader::TransparentFogShader()
 						GL_FRAGMENT_SHADER, "transparentfog.frag",
                         GL_FRAGMENT_SHADER, "utils/DiffuseIBL_PBR.frag",
 						GL_FRAGMENT_SHADER, "utils/SpecularIBL_PBR.frag",
-						GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
-						GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
+						GL_FRAGMENT_SHADER, "utils/SpecularBRDF_PBR.frag",
+						GL_FRAGMENT_SHADER, "utils/DiffuseBRDF_PBR.frag",
 						GL_FRAGMENT_SHADER, "utils/SunMRP.frag");
     assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix", "fogmax", "startH",
                    "endH", "start", "end", "col");
