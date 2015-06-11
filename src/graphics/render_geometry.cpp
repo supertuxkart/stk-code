@@ -1501,9 +1501,9 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
         }
 
         if (CVS->isAZDOEnabled())
-            Shader::getInstance()->setTextureHandles(mesh.TextureHandles[0], mesh.TextureHandles[0]);
+            Shader::getInstance()->setTextureHandles(mesh.TextureHandles[0], mesh.TextureHandles[0], mesh.TextureHandles[0]);
         else
-            Shader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]), irr_driver->SkyboxSpecularProbe);
+            Shader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]), irr_driver->SkyboxSpecularProbe, irr_driver->DFG_LUT);
         custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
 }   // renderTransparenPass

@@ -120,7 +120,7 @@ public:
     };   // class ColoredLine
 
     // ========================================================================
-    class TransparentShader : public TextureShader<TransparentShader, 2,
+    class TransparentShader : public TextureShader<TransparentShader, 3,
                                                    core::matrix4, core::matrix4 >
     {
     public:
@@ -128,7 +128,7 @@ public:
     };   // TransparentShader
 
     // ========================================================================
-    class TransparentFogShader : public TextureShader<TransparentFogShader, 2,
+    class TransparentFogShader : public TextureShader<TransparentFogShader, 3,
                                      core::matrix4, core::matrix4, core::matrix4, float, float,
                                      float, float, float, video::SColorf >
     {
