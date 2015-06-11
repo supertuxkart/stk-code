@@ -196,3 +196,10 @@ void SharedGPUObjects::init()
 
     m_has_been_initialised = true;
 }   // SharedGPUObjects
+
+// ----------------------------------------------------------------------------
+
+void SharedGPUObjects::reset()
+{
+    m_has_been_initialised = false;
+}

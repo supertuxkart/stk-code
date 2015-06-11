@@ -183,18 +183,27 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
         if (world != NULL)
             track = world->getTrack();
         std::string local_lib_node_path;
+        std::string local_script_file_path;
         if (track != NULL)
+        {
             local_lib_node_path = track->getTrackFile("library/" + name + "/node.xml");
+            local_script_file_path = track->getTrackFile("library/" + name + "/scripting.as");
+        }
         std::string lib_node_path = lib_path + "node.xml";
+        std::string lib_script_file_path = lib_path + "scripting.as";
 
         if (local_lib_node_path.size() > 0 && file_manager->fileExists(local_lib_node_path))
         {
             lib_path = track->getTrackFile("library/" + name);
             libroot = file_manager->createXMLTree(local_lib_node_path);
+            if (track != NULL)
+                World::getWorld()->getScriptEngine()->loadScript(lib_script_file_path, false);
         }
         else if (file_manager->fileExists(lib_node_path))
         {
             libroot = file_manager->createXMLTree(lib_node_path);
+            if (track != NULL)
+                World::getWorld()->getScriptEngine()->loadScript(lib_script_file_path, false);
         }
         else
         {

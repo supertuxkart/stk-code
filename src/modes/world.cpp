@@ -163,6 +163,9 @@ void World::init()
         throw std::runtime_error(msg.str());
     }
 
+    std::string script_path = World::getWorld()->getTrack()->getTrackFile("scripting.as");
+    m_script_engine->loadScript(script_path, true);
+
     // Create the physics
     m_physics = new Physics();
 
@@ -207,6 +210,8 @@ void World::init()
         m_weather = new Weather(m_track->getWeatherLightning(),
                           m_track->getWeatherSound());
     }
+
+    m_script_engine->compileLoadedScripts();
 }   // init
 
 //-----------------------------------------------------------------------------
