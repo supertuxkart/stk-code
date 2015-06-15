@@ -90,8 +90,10 @@ protected:
 
     ThreeDAnimation*               m_animator;
 
-    TrackObject* m_parent_library;
+    TrackObject*                   m_parent_library;
     
+    std::vector<TrackObject*>      m_movable_children;
+
     void init(const XMLNode &xml_node, scene::ISceneNode* parent,
         ModelDefinitionLoader& model_def_loader,
         TrackObject* parent_library);
@@ -220,6 +222,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if a kart can drive on this object. */
     bool isDriveable() const { return m_is_driveable; }
+    // ------------------------------------------------------------------------
+    /** Used along the "extract movable nodes out of library objects" hack, used
+      * to still preserve the parent-child relationship
+      */
+    void addMovableChild(TrackObject* child);
 
     LEAK_CHECK()
 };   // TrackObject

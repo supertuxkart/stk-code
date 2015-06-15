@@ -24,8 +24,10 @@
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
+#include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "utils/helpers.hpp"
 #include <ISceneManager.h>
 
@@ -220,6 +222,11 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                 node->setPosition(absTransform.getTranslation());
                 node->setRotation(absTransform.getRotationDegrees());
                 node->setScale(absTransform.getScale());
+
+                if (parent_library != NULL)
+                {
+                    parent_library->addMovableChild(this);
+                }
             }
 
             glownode = node;
@@ -265,6 +272,27 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     }
 
     reset();
+
+    // some static meshes are conditional
+    std::string condition;
+    xml_node.get("if", &condition);
+    if (condition == "false")
+    {
+        // TODO: doesn't work (in all cases), probably it's a bit too early, children are not loaded yet
+        setEnabled(false);
+    }
+    else if (condition.size() > 0)
+    {
+        unsigned char result = -1;
+        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+        std::function<void(asIScriptContext*)> null_callback;
+        script_engine->runFunction("bool " + condition + "()", null_callback,
+            [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
+
+        // TODO: doesn't work (in all cases), probably it's a bit too early, children are not loaded yet
+        if (result == 0)
+            setEnabled(false);
+    }
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
@@ -316,6 +344,11 @@ void TrackObject::setEnabled(bool enabled)
             else
                 m_physical_object->removeBody();
         }
+    }
+
+    for (int i = 0; i < m_movable_children.size(); i++)
+    {
+        m_movable_children[i]->setEnabled(enabled);
     }
 }   // setEnable
 
@@ -426,3 +459,10 @@ const core::vector3df& TrackObject::getScale() const
     else
         return m_init_xyz;
 }   // getScale
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::addMovableChild(TrackObject* child)
+{
+    m_movable_children.push_back(child);
+}
