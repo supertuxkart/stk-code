@@ -281,6 +281,8 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera->setTarget(core::vector3df(0, 10, 0.0f));
     m_camera->setFOV(DEGREE_TO_RAD*50.0f);
     m_camera->updateAbsolutePosition();
+
+    m_rtt_provider->prepareRender(m_camera);
 }
 
 void ModelViewWidget::setRotateOff()

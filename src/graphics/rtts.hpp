@@ -52,6 +52,8 @@ public:
 
     FrameBuffer* render(irr::scene::ICameraSceneNode* camera, float dt);
 
+    void prepareRender(scene::ICameraSceneNode* camera);
+
 private:
     unsigned RenderTargetTextures[RTT_COUNT];
     PtrVector<FrameBuffer> FrameBuffers;
