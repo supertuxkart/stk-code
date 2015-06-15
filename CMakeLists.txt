@@ -18,6 +18,7 @@ endif()
 option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
+option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 
 if(MSVC)
     # Normally hide the option to build wiiuse on VS, since it depends
@@ -123,7 +124,7 @@ endif()
 
 # Build the angelscript library if not in system
 find_package(Angelscript)
-if(ANGELSCRIPT_FOUND)
+if(USE_SYSTEM_ANGELSCRIPT AND ANGELSCRIPT_FOUND)
     include_directories(${Angelscript_INCLUDE_DIRS})
 else()
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
