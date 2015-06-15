@@ -56,6 +56,7 @@ RTT::RTT(size_t width, size_t height)
     m_RH_FBO = NULL;
     m_RSM = NULL;
     m_RH_FBO = NULL;
+    m_diffuse_coefficients_calculated = false;
     using namespace video;
     using namespace core;
 
@@ -294,7 +295,12 @@ void RTT::prepareRender(scene::ICameraSceneNode* camera)
 {
     irr_driver->setRTT(this);
     irr_driver->getSceneManager()->setActiveCamera(camera);
-    irr_driver->generateDiffuseCoefficients();
+
+    if (!m_diffuse_coefficients_calculated)
+    {
+        irr_driver->generateDiffuseCoefficients();
+        m_diffuse_coefficients_calculated = true;
+    }
 }
 
 FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)

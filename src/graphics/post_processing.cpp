@@ -31,6 +31,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
 #include "modes/world.hpp"
+#include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
@@ -1416,7 +1417,11 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
-    if (isRace && UserConfigParams::m_dof)
+    World *world = World::getWorld();
+    Physics *physics = world ? world->getPhysics() : NULL;
+
+
+    if (isRace && UserConfigParams::m_dof && (physics == NULL || !physics->isDebug()))
     {
         PROFILER_PUSH_CPU_MARKER("- DoF", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_DOF));
@@ -1509,7 +1514,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_BLOOM));
-        if (isRace && UserConfigParams::m_bloom)
+
+        if (isRace && UserConfigParams::m_bloom && (physics == NULL || !physics->isDebug()))
         {
             glClear(GL_STENCIL_BUFFER_BIT);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
