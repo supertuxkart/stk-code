@@ -24,6 +24,7 @@
 #include "items/item.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/log.hpp"
 #include "utils/vec3.hpp"
 
 #include <vector3d.h>
