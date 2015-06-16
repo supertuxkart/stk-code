@@ -254,16 +254,17 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 35, 35, 35));
 	
 	    std::vector<ITexture*> textures;
-    textures.push_back(irr_driver->getTexture("sky3.jpg"));
-    textures.push_back(irr_driver->getTexture("sky3.jpg"));
-    textures.push_back(irr_driver->getTexture("sky3.jpg"));
-    textures.push_back(irr_driver->getTexture("sky3.jpg"));
-    textures.push_back(irr_driver->getTexture("sky3.jpg"));
-    textures.push_back(irr_driver->getTexture("sky3.jpg"));
+    textures.push_back(irr_driver->getTexture("sky_genericKartPreviewSky_side_a.png"));
+	textures.push_back(irr_driver->getTexture("sky_genericKartPreviewSky_side_a.png"));
+	textures.push_back(irr_driver->getTexture("sky_genericKartPreviewSky_side_a.png"));
+	textures.push_back(irr_driver->getTexture("sky_genericKartPreviewSky_side_a.png"));
+	textures.push_back(irr_driver->getTexture("sky_genericKartPreviewSky_side_a.png"));
+	textures.push_back(irr_driver->getTexture("sky_genericKartPreviewSky_side_a.png"));
     irr_driver->addSkyBox(textures, textures);
+	irr_driver->setSkyboxVisible(false);
     
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
-    m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
+    m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 0.9f /* g */, 0.7f /* b*/, true, NULL);
     
     m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
     m_rtt_main_node->setMaterialFlag(video::EMF_LIGHTING, true);

@@ -272,6 +272,9 @@ private:
     std::vector<VideoMode> m_modes;
 
     void                  setupViewports();
+	
+	/** Used to hide the sky in particular cases (like kart preview) **/
+	bool				 m_is_skybox_visible;
 
     /** Whether the mouse cursor is currently shown */
     bool                  m_pointer_shown;
@@ -437,6 +440,15 @@ public:
     void                  setLastLightBucketDistance(unsigned d) { m_last_light_bucket_distance = d; }
     bool                  isPointerShown() const { return m_pointer_shown; }
     core::position2di     getMouseLocation();
+	
+	bool				  isSkyboxVisible()
+	{
+		return m_is_skybox_visible;
+	}
+	void				  setSkyboxVisible(bool is_skybox_visible)
+	{
+		m_is_skybox_visible = is_skybox_visible;
+	}
 
     void                  printRenderStats();
     bool                  supportsSplatting();

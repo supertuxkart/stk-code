@@ -312,7 +312,7 @@ void IrrDriver::generateDiffuseCoefficients()
 // ----------------------------------------------------------------------------
 void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 {
-    if (SkyboxTextures.empty())
+    if (SkyboxTextures.empty() || !irr_driver->isSkyboxVisible())
         return;
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);

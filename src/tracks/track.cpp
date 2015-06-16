@@ -1845,6 +1845,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     {
         //if (m_spherical_harmonics_textures.size() > 0)
             m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures, m_spherical_harmonics_textures));
+			irr_driver->setSkyboxVisible(true);
         //else
         //    m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures, m_sky_textures));
     }
