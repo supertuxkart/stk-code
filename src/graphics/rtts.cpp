@@ -19,6 +19,7 @@
 #include "central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/IBL.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"
 #include "utils/log.hpp"
@@ -296,9 +297,13 @@ void RTT::prepareRender(scene::ICameraSceneNode* camera)
     irr_driver->setRTT(this);
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
+	// Prepare some of the texture for the rendering of the IBL/reflection
     if (!m_diffuse_coefficients_calculated)
     {
         irr_driver->generateDiffuseCoefficients();
+		irr_driver->DFG_LUT = irr_driver->SkyboxSpecularProbe;
+		// TODO using generateSpecularDFGLUT or prepareSkybox() is way too slow
+		//irr_driver->DFG_LUT = generateSpecularDFGLUT();
         m_diffuse_coefficients_calculated = true;
     }
 }
