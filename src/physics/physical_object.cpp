@@ -144,6 +144,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_reset_height       = settings.m_reset_height;
     m_on_kart_collision  = settings.m_on_kart_collision;
     m_on_item_collision  = settings.m_on_item_collision;
+    m_body_added = false;
 
     m_init_pos.setIdentity();
     Vec3 radHpr(m_init_hpr);
@@ -483,6 +484,7 @@ void PhysicalObject::init()
     }
 
     World::getWorld()->getPhysics()->addBody(m_body);
+    m_body_added = true;
     if(m_triangle_mesh)
         m_triangle_mesh->setBody(m_body);
 }   // init
@@ -611,14 +613,22 @@ void PhysicalObject::setInteraction(std::string interaction){
 /** Remove body from physics dynamic world interaction type for object*/
 void PhysicalObject::removeBody()
 {
-    World::getWorld()->getPhysics()->removeBody(m_body);
+    if (m_body_added)
+    {
+        World::getWorld()->getPhysics()->removeBody(m_body);
+        m_body_added = false;
+    }
 }   // Remove body
 
 // ----------------------------------------------------------------------------
 /** Add body to physics dynamic world */
 void PhysicalObject::addBody()
 {
-    World::getWorld()->getPhysics()->addBody(m_body);
+    if (!m_body_added)
+    {
+        m_body_added = true;
+        World::getWorld()->getPhysics()->addBody(m_body);
+    }
 }   // Add body
 
 // ----------------------------------------------------------------------------

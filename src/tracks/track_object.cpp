@@ -133,6 +133,26 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 
     m_type = type;
 
+    m_initially_visible = true;
+    std::string condition;
+    xml_node.get("if", &condition);
+    if (condition == "false")
+    {
+        m_initially_visible = false;
+    }
+    else if (condition.size() > 0)
+    {
+        unsigned char result = -1;
+        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+        std::function<void(asIScriptContext*)> null_callback;
+        script_engine->runFunction("bool " + condition + "()", null_callback,
+            [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
+
+        if (result == 0)
+            m_initially_visible = false;
+    }
+    if (!m_initially_visible)
+        setEnabled(false);
 
     if (xml_node.getName() == "particle-emitter")
     {
@@ -180,7 +200,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     else
     {
         scene::ISceneNode *glownode = NULL;
-
+        bool is_movable = false;
         if (lod_instance)
         {
             m_type = "lod";
@@ -222,11 +242,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                 node->setPosition(absTransform.getTranslation());
                 node->setRotation(absTransform.getRotationDegrees());
                 node->setScale(absTransform.getScale());
-
-                if (parent_library != NULL)
-                {
-                    parent_library->addMovableChild(this);
-                }
+                is_movable = true;
             }
 
             glownode = node;
@@ -241,6 +257,11 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
             m_physical_object = PhysicalObject::fromXML(type == "movable",
                                                    xml_node,
                                                    this);
+        }
+
+        if (is_movable && parent_library != NULL)
+        {
+            parent_library->addMovableChild(this);
         }
 
         video::SColor glow;
@@ -273,26 +294,10 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 
     reset();
 
-    // some static meshes are conditional
-    std::string condition;
-    xml_node.get("if", &condition);
-    if (condition == "false")
-    {
-        // TODO: doesn't work (in all cases), probably it's a bit too early, children are not loaded yet
+    if (!m_initially_visible)
         setEnabled(false);
-    }
-    else if (condition.size() > 0)
-    {
-        unsigned char result = -1;
-        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        std::function<void(asIScriptContext*)> null_callback;
-        script_engine->runFunction("bool " + condition + "()", null_callback,
-            [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
-
-        // TODO: doesn't work (in all cases), probably it's a bit too early, children are not loaded yet
-        if (result == 0)
-            setEnabled(false);
-    }
+    if (parent_library != NULL && !parent_library->isEnabled())
+        setEnabled(false);
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
@@ -324,16 +329,16 @@ void TrackObject::reset()
  */
 void TrackObject::setEnabled(bool enabled)
 {
-    if (m_enabled == enabled)
-        return;
-
+    //if (m_enabled == enabled)
+    //    return;
+    
     m_enabled = enabled;
 
     if (m_presentation != NULL)
         m_presentation->setEnable(m_enabled);
 
-    if (enabled)
-        reset(); // TODO: not sure why there is a reset here
+    //if (enabled)
+    //    reset();
 
     if (getType() == "mesh")
     {
@@ -353,6 +358,14 @@ void TrackObject::setEnabled(bool enabled)
 }   // setEnable
 
 // ----------------------------------------------------------------------------
+
+void TrackObject::resetEnabled()
+{
+    setEnabled(m_initially_visible);
+}
+
+// ----------------------------------------------------------------------------
+
 void TrackObject::update(float dt)
 {
     if (m_presentation) m_presentation->update(dt);
@@ -464,5 +477,7 @@ const core::vector3df& TrackObject::getScale() const
 
 void TrackObject::addMovableChild(TrackObject* child)
 {
+    if (!m_enabled)
+        child->setEnabled(false);
     m_movable_children.push_back(child);
 }

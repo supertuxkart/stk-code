@@ -81,7 +81,7 @@ void TrackObjectManager::reset()
     for (TrackObject* curr : m_all_objects)
     {
         curr->reset();
-        curr->setEnabled(true);
+        curr->resetEnabled();
     }
 }   // reset
 // ----------------------------------------------------------------------------

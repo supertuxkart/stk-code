@@ -113,6 +113,8 @@ private:
     /** The mass of this object. */
     float                 m_mass;
 
+    bool                  m_body_added;
+
     /** The pointer that is stored in the bullet rigid body back to
      *  this object. */
     UserPointer           m_user_pointer;

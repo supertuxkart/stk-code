@@ -94,6 +94,8 @@ protected:
     
     std::vector<TrackObject*>      m_movable_children;
 
+    bool                           m_initially_visible = true;
+
     void init(const XMLNode &xml_node, scene::ISceneNode* parent,
         ModelDefinitionLoader& model_def_loader,
         TrackObject* parent_library);
@@ -213,6 +215,8 @@ public:
     /* @} */
     /* @} */
     /* @} */
+
+    void resetEnabled();
     // ------------------------------------------------------------------------
     ThreeDAnimation* getAnimator() { return m_animator; }
     // ------------------------------------------------------------------------
