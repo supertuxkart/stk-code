@@ -22,12 +22,12 @@
 #ifndef HEADER_STKSCENEMANAGER_HPP
 #define HEADER_STKSCENEMANAGER_HPP
 
+#include "graphics/central_settings.hpp"
+#include "graphics/gl_headers.hpp"
+#include "graphics/gpu_particles.hpp"
+#include "graphics/stk_billboard.hpp"
+#include "graphics/stk_mesh.hpp"
 #include "utils/singleton.hpp"
-#include "central_settings.hpp"
-#include "gl_headers.hpp"
-#include "stkmesh.hpp"
-#include "gpuparticles.hpp"
-#include "stkbillboard.hpp"
 
 template<typename T>
 class CommandBuffer : public Singleton<T>

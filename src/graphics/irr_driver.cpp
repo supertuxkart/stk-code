@@ -31,13 +31,14 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stkanimatedmesh.hpp"
-#include "graphics/stkbillboard.hpp"
-#include "graphics/stkmeshscenenode.hpp"
-#include "graphics/stkscenemanager.hpp"
+#include "graphics/shadow_matrices.hpp"
+#include "graphics/stk_animated_mesh.hpp"
+#include "graphics/stk_billboard.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_scene_manager.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/texturemanager.hpp"
+#include "graphics/texture_manager.hpp"
 #include "graphics/water.hpp"
 #include "graphics/wind.hpp"
 #include "guiengine/engine.hpp"
@@ -105,6 +106,7 @@ const int MIN_SUPPORTED_WIDTH  = 800;
  */
 IrrDriver::IrrDriver()
 {
+    m_shadow_matrices     = NULL;
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
     m_device              = createDevice(video::EDT_NULL,
@@ -115,17 +117,12 @@ IrrDriver::IrrDriver()
                                          /*event receiver*/ NULL,
                                          file_manager->getFileSystem());
     m_request_screenshot = false;
-    m_shaders             = NULL;
     m_rtts                = NULL;
     m_post_processing     = NULL;
     m_wind                = new Wind();
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
         m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = m_boundingboxesviz = false;
     SkyboxCubeMap = m_last_light_bucket_distance = 0;
-    m_shadow_camnodes[0] = NULL;
-    m_shadow_camnodes[1] = NULL;
-    m_shadow_camnodes[2] = NULL;
-    m_shadow_camnodes[3] = NULL;
     memset(object_count, 0, sizeof(object_count));
 }   // IrrDriver
 
@@ -153,7 +150,9 @@ IrrDriver::~IrrDriver()
     m_device = NULL;
     m_modes.clear();
 
-    delete m_shaders;
+    delete m_shadow_matrices;
+    m_shadow_matrices = NULL;
+    Shaders::destroy();
     delete m_wind;
 }   // ~IrrDriver
 
@@ -194,6 +193,14 @@ GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 {
     return m_perf_query[i];
 }
+
+// ----------------------------------------------------------------------------
+void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
+                                          size_t width, size_t height)
+{
+    m_current_screen_size = core::vector2df(float(width), float(height));
+    m_shadow_matrices->computeMatrixesAndCameras(camnode, width, height);
+}   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
 
@@ -527,14 +534,11 @@ void IrrDriver::initDevice()
     // m_glsl might be reset in rtt if an error occurs.
     if (CVS->isGLSL())
     {
-        m_shaders = new Shaders();
+        Shaders::init();
 
         m_mrt.clear();
         m_mrt.reallocate(2);
 
-        m_suncam = m_scene_manager->addCameraSceneNode(0, vector3df(0), vector3df(0), -1, false);
-        m_suncam->grab();
-        m_suncam->setParent(NULL);
     }
     else
     {
@@ -601,6 +605,7 @@ void IrrDriver::initDevice()
     // so let's decide ourselves...)
     m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
+    m_shadow_matrices = new ShadowMatrices();
 }   // initDevice
 
 // ----------------------------------------------------------------------------
@@ -640,7 +645,7 @@ void IrrDriver::createSunInterposer()
     m_sun_interposer->getMaterial(0).Lighting = false;
     m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
     m_sun_interposer->getMaterial(0).ZWriteEnable = false;
-    m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
+    m_sun_interposer->getMaterial(0).MaterialType = Shaders::getShader(ES_OBJECTPASS);
 
     sphere->drop();
 }
@@ -793,7 +798,7 @@ void IrrDriver::applyResolutionSettings()
     // FIXME: this load sequence is (mostly) duplicated from main.cpp!!
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
-    m_shaders->killShaders();
+    ShaderBase::updateShaders();
     VAOManager::getInstance()->kill();
     SolidPassCmd::getInstance()->kill();
     ShadowPassCmd::getInstance()->kill();
@@ -801,6 +806,7 @@ void IrrDriver::applyResolutionSettings()
     GlowPassCmd::getInstance()->kill();
     resetTextureTable();
     // initDevice will drop the current device.
+    Shaders::destroy();
     initDevice();
 
     // Re-init GUI engine
@@ -1714,7 +1720,7 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
 // ----------------------------------------------------------------------------
 void IrrDriver::setRTT(RTT* rtt)
 {
-    memset(m_shadow_camnodes, 0, 4 * sizeof(void*));
+    m_shadow_matrices->resetShadowCamNodes();
     m_rtts = rtt;
 }
 // ----------------------------------------------------------------------------
@@ -1723,7 +1729,8 @@ void IrrDriver::onLoadWorld()
     if (CVS->isGLSL())
     {
         const core::recti &viewport = Camera::getCamera(0)->getViewport();
-        size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+        size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
+        size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
         m_rtts = new RTT(width, height);
     }
 }
@@ -2437,13 +2444,13 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
 
     const u32 mcount = node->getMaterialCount();
     u32 i;
-    const video::E_MATERIAL_TYPE ref = rimlit ? m_shaders->getShader(ES_OBJECTPASS_RIMLIT):
-                                       m_shaders->getShader(ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE pass = rimlit ? m_shaders->getShader(ES_OBJECTPASS_RIMLIT):
-                                        m_shaders->getShader(ES_OBJECTPASS);
+    const video::E_MATERIAL_TYPE ref = Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT
+                                                                 : ES_OBJECTPASS_REF);
+    const video::E_MATERIAL_TYPE pass = Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT 
+                                                                  : ES_OBJECTPASS);
 
-    const video::E_MATERIAL_TYPE origref = m_shaders->getShader(ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE origpass = m_shaders->getShader(ES_OBJECTPASS);
+    const video::E_MATERIAL_TYPE origref = Shaders::getShader(ES_OBJECTPASS_REF);
+    const video::E_MATERIAL_TYPE origpass = Shaders::getShader(ES_OBJECTPASS);
 
     bool viamb = false;
     scene::IMesh *mesh = NULL;
@@ -2527,13 +2534,9 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
         {
             //m_sun_interposer->setPosition(pos);
             //m_sun_interposer->updateAbsolutePosition();
+            m_shadow_matrices->addLight(pos);
 
-            m_suncam->setPosition(pos);
-            m_suncam->updateAbsolutePosition();
-
-            m_rsm_matrix_initialized = false;
-
-            ((WaterShaderProvider *) m_shaders->m_callbacks[ES_WATER])->setSunPosition(pos);
+            ((WaterShaderProvider *) Shaders::getCallback(ES_WATER) )->setSunPosition(pos);
         }
 
         return light;

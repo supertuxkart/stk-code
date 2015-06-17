@@ -17,18 +17,19 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tracks/track_object_presentation.hpp"
-#include "graphics/central_settings.hpp"
+
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_buffer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -156,9 +157,10 @@ TrackObjectPresentationEmpty::~TrackObjectPresentationEmpty()
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
-                                       const XMLNode& xml_node,
-                                       ModelDefinitionLoader& model_def_loader)
-                                  : TrackObjectPresentationSceneNode(xml_node)
+    TrackObject* parent,
+    const XMLNode& xml_node,
+    ModelDefinitionLoader& model_def_loader)
+    : TrackObjectPresentationSceneNode(xml_node)
 {
     std::string name;
     xml_node.get("name", &name);
@@ -181,18 +183,27 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
         if (world != NULL)
             track = world->getTrack();
         std::string local_lib_node_path;
+        std::string local_script_file_path;
         if (track != NULL)
+        {
             local_lib_node_path = track->getTrackFile("library/" + name + "/node.xml");
+            local_script_file_path = track->getTrackFile("library/" + name + "/scripting.as");
+        }
         std::string lib_node_path = lib_path + "node.xml";
+        std::string lib_script_file_path = lib_path + "scripting.as";
 
         if (local_lib_node_path.size() > 0 && file_manager->fileExists(local_lib_node_path))
         {
             lib_path = track->getTrackFile("library/" + name);
             libroot = file_manager->createXMLTree(local_lib_node_path);
+            if (track != NULL)
+                World::getWorld()->getScriptEngine()->loadScript(lib_script_file_path, false);
         }
         else if (file_manager->fileExists(lib_node_path))
         {
             libroot = file_manager->createXMLTree(lib_node_path);
+            if (track != NULL)
+                World::getWorld()->getScriptEngine()->loadScript(lib_script_file_path, false);
         }
         else
         {
@@ -242,7 +253,7 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
 
     assert(libroot != NULL);
     World::getWorld()->getTrack()->loadObjects(libroot, lib_path, model_def_loader,
-        create_lod_definitions, m_node);
+        create_lod_definitions, m_node, parent);
 }   // TrackObjectPresentationLibraryNode
 
 // ----------------------------------------------------------------------------

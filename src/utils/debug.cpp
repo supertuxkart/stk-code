@@ -22,6 +22,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
+#include "graphics/shaders.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
@@ -299,7 +300,7 @@ bool onEvent(const SEvent &event)
                 if(cmdID == DEBUG_GRAPHICS_RELOAD_SHADERS)
                 {
                     Log::info("Debug", "Reloading shaders...");
-                    irr_driver->updateShaders();
+                    ShaderBase::updateShaders();
                 }
                 else if (cmdID == DEBUG_GRAPHICS_RESET)
                 {

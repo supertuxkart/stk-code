@@ -15,26 +15,28 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/glwrap.hpp"
-#include "graphics/stkscenemanager.hpp"
-#include "graphics/stkmesh.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/stk_scene_manager.hpp"
+
+#include "graphics/callbacks.hpp"
 #include "graphics/central_settings.hpp"
-#include "stkanimatedmesh.hpp"
-#include "stkmeshscenenode.hpp"
-#include "utils/ptr_vector.hpp"
-#include <ICameraSceneNode.h>
-#include <SViewFrustum.h>
-#include "callbacks.hpp"
-#include "utils/cpp2011.hpp"
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/lod_node.hpp"
+#include "graphics/shadow_matrices.hpp"
+#include "graphics/stk_animated_mesh.hpp"
+#include "graphics/stk_mesh.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
-#include "lod_node.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/profiler.hpp"
+#include "utils/ptr_vector.hpp"
 #include "utils/time.hpp"
 
+#include <ICameraSceneNode.h>
 #include <ISceneManager.h>
 #include <ISceneNode.h>
+#include <SViewFrustum.h>
 
 #include <unordered_map>
 #include <SViewFrustum.h>
@@ -601,7 +603,11 @@ PROFILER_PUSH_CPU_MARKER("- culling", 0xFF, 0xFF, 0x0);
 
     bool cam = false, rsmcam = false;
     bool shadowcam[4] = { false, false, false, false };
-    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam, cam, shadowcam, rsmcam, !m_rsm_map_available);
+    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, 
+                      getShadowMatrices()->getShadowCamNodes(),
+                      getShadowMatrices()->getSunCam(), cam,
+                      shadowcam, rsmcam,
+                      !getShadowMatrices()->isRSMMapAvail());
 PROFILER_POP_CPU_MARKER();
 
     // Add a 1 s timeout
@@ -809,7 +815,7 @@ PROFILER_POP_CPU_MARKER();
             }
         }
 #pragma omp section
-        if (!m_rsm_map_available)
+        if (!getShadowMatrices()->isRSMMapAvail())
         {
             size_t offset = 0, current_cmd = 0;
             if (!CVS->supportsAsyncInstanceUpload())

@@ -26,7 +26,7 @@
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/screenquad.hpp"
+#include "graphics/screen_quad.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/rtts.hpp"
 #include "io/file_manager.hpp"

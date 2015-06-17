@@ -52,6 +52,8 @@ public:
 
     FrameBuffer* render(irr::scene::ICameraSceneNode* camera, float dt);
 
+    void prepareRender(scene::ICameraSceneNode* camera);
+
 private:
     unsigned RenderTargetTextures[RTT_COUNT];
     PtrVector<FrameBuffer> FrameBuffers;
@@ -59,6 +61,8 @@ private:
 
     int m_width;
     int m_height;
+
+    bool m_diffuse_coefficients_calculated;
 
     unsigned shadowColorTex, shadowNormalTex, shadowDepthTex;
     unsigned RSM_Color, RSM_Normal, RSM_Depth;

@@ -15,17 +15,105 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/irr_driver.hpp"
-#include "graphics/glwrap.hpp"
-#include "gpuparticles.hpp"
-#include "io/file_manager.hpp"
+#include "graphics/gpu_particles.hpp"
+
 #include "config/user_config.hpp"
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/particle_emitter.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/shared_gpu_objects.hpp"
+#include "graphics/texture_shader.hpp"
+#include "guiengine/engine.hpp"
+#include "io/file_manager.hpp"
+
 #include <ICameraSceneNode.h>
 #include <IParticleSystemSceneNode.h>
-#include "guiengine/engine.hpp"
-#include "graphics/particle_emitter.hpp"
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
 #define COMPONENTCOUNT 8
+
+
+// ============================================================================
+/** Transform feedback shader that simulates the particles on GPU.
+*/
+class PointEmitterShader : public Shader
+                           < PointEmitterShader, core::matrix4, int, int, float >
+{
+public:
+    PointEmitterShader()
+    {
+        const char *varyings[] = { "new_particle_position", "new_lifetime",
+                                   "new_particle_velocity",  "new_size"     };
+        loadTFBProgram("pointemitter.vert", varyings, 4);
+        assignUniforms("sourcematrix", "dt", "level", "size_increase_factor");
+    }   // PointEmitterShader
+
+};   // PointEmitterShader
+
+// ============================================================================
+
+/** A Shader to render particles.
+*/
+class SimpleParticleRender : public TextureShader<SimpleParticleRender, 2,
+                                                video::SColorf, video::SColorf>
+{
+public:
+    SimpleParticleRender()
+    {
+        loadProgram(PARTICLES_RENDERING,
+                    GL_VERTEX_SHADER,   "particle.vert",
+                    GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                    GL_FRAGMENT_SHADER, "particle.frag");
+
+        assignUniforms("color_from", "color_to");
+        assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED);
+    }   // SimpleParticleRender
+
+};   // SimpleParticleRender
+
+// ============================================================================
+
+class FlipParticleRender : public TextureShader<FlipParticleRender, 2>
+{
+public:
+    FlipParticleRender()
+    {
+        loadProgram(PARTICLES_RENDERING,
+                    GL_VERTEX_SHADER,   "flipparticle.vert",
+                    GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                    GL_FRAGMENT_SHADER, "particle.frag");
+        assignUniforms();
+        assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED);
+    }
+
+};   // FlipParticleShader
+
+// ============================================================================
+/** */
+class HeightmapSimulationShader : public Shader <HeightmapSimulationShader,
+                                                 core::matrix4, int, int,
+                                                 float,float,float,float,float>
+{
+public:
+    GLuint m_TU_heightmap;
+
+    HeightmapSimulationShader()
+    {
+        const char *varyings[] = {"new_particle_position", "new_lifetime",
+                                  "new_particle_velocity", "new_size"      };
+        loadTFBProgram("particlesimheightmap.vert", varyings, 4);
+        assignUniforms("sourcematrix", "dt", "level", "size_increase_factor",
+                       "track_x", "track_x_len", "track_z", "track_z_len");
+        m_TU_heightmap = 2;
+        assignTextureUnit(m_TU_heightmap, "heightmap");
+    }   // HeightmapSimulationShader
+
+
+};   // class HeightmapSimulationShader
+
+// ============================================================================
 
 scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
     bool withDefaultEmitter, bool randomize_initial_y, ISceneNode* parent, s32 id,
@@ -323,7 +411,7 @@ void ParticleSystemProxy::cleanGL()
 
 void ParticleSystemProxy::CommonRenderingVAO(GLuint PositionBuffer)
 {
-    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::ParticleQuadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getParticleQuadVBO());
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glEnableVertexAttribArray(3);
@@ -386,15 +474,15 @@ void ParticleSystemProxy::simulate()
     glEnable(GL_RASTERIZER_DISCARD);
     if (has_height_map)
     {
-        glUseProgram(ParticleShader::HeightmapSimulationShader::getInstance()->Program);
-        glActiveTexture(GL_TEXTURE0 + ParticleShader::HeightmapSimulationShader::getInstance()->TU_heightmap);
+        HeightmapSimulationShader::getInstance()->use();
+        glActiveTexture(GL_TEXTURE0 + HeightmapSimulationShader::getInstance()->m_TU_heightmap);
         glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
-        ParticleShader::HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
+        HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
     }
     else
     {
-        glUseProgram(ParticleShader::SimpleSimulationShader::getInstance()->Program);
-        ParticleShader::SimpleSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor);
+        PointEmitterShader::getInstance()->use();
+        PointEmitterShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor);
     }
 
     glBindVertexArray(current_simulation_vao);
@@ -432,10 +520,10 @@ void ParticleSystemProxy::simulate()
 void ParticleSystemProxy::drawFlip()
 {
     glBlendFunc(GL_ONE, GL_ONE);
-    glUseProgram(ParticleShader::FlipParticleRender::getInstance()->Program);
+    FlipParticleRender::getInstance()->use();
 
-    ParticleShader::FlipParticleRender::getInstance()->SetTextureUnits(texture, irr_driver->getDepthStencilTexture());
-    ParticleShader::FlipParticleRender::getInstance()->setUniforms();
+    FlipParticleRender::getInstance()->setTextureUnits(texture, irr_driver->getDepthStencilTexture());
+    FlipParticleRender::getInstance()->setUniforms();
 
     glBindVertexArray(current_rendering_vao);
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_count);
@@ -447,13 +535,13 @@ void ParticleSystemProxy::drawNotFlip()
         glBlendFunc(GL_ONE, GL_ONE);
     else
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glUseProgram(ParticleShader::SimpleParticleRender::getInstance()->Program);
+    SimpleParticleRender::getInstance()->use();
 
-    ParticleShader::SimpleParticleRender::getInstance()->SetTextureUnits(texture, irr_driver->getDepthStencilTexture());
+    SimpleParticleRender::getInstance()->setTextureUnits(texture, irr_driver->getDepthStencilTexture());
     video::SColorf ColorFrom = video::SColorf(getColorFrom()[0], getColorFrom()[1], getColorFrom()[2]);
     video::SColorf ColorTo = video::SColorf(getColorTo()[0], getColorTo()[1], getColorTo()[2]);
 
-    ParticleShader::SimpleParticleRender::getInstance()->setUniforms(ColorFrom, ColorTo);
+    SimpleParticleRender::getInstance()->setUniforms(ColorFrom, ColorTo);
 
     glBindVertexArray(current_rendering_vao);
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_count);

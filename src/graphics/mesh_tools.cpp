@@ -17,14 +17,17 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/mesh_tools.hpp"
+
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/shaders.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
+#include "utils/log.hpp"
+
 #include <irrlicht.h>
 #include <IMesh.h>
 #include <IMeshBuffer.h>
-#include "utils/log.hpp"
-#include "graphics/irr_driver.hpp"
-#include "modes/world.hpp"
-#include "tracks/track.hpp"
 
 void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
 
@@ -328,8 +331,8 @@ bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
 {
     if (!CVS->isGLSL())
         return false;
-    return (mb->getMaterial().MaterialType == irr_driver->getShader(ES_NORMAL_MAP) &&
-        mb->getVertexType() != video::EVT_TANGENTS);
+    return (mb->getMaterial().MaterialType == Shaders::getShader(ES_NORMAL_MAP) &&
+            mb->getVertexType() != video::EVT_TANGENTS);
 }
 
 // Copied from irrlicht

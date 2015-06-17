@@ -15,24 +15,31 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "graphics/stk_mesh.hpp"
+
+#include "config/user_config.hpp"
 #include "central_settings.hpp"
+#include "graphics/callbacks.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stkmesh.hpp"
+#include "graphics/shaders.hpp"
+#include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "utils/helpers.hpp"
+
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
-#include "config/user_config.hpp"
-#include "graphics/callbacks.hpp"
-#include "utils/helpers.hpp"
-#include "graphics/camera.hpp"
-#include "modes/world.hpp"
 
 
-Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp,
-    Material* material, Material* layer2Material)
+// ============================================================================
+Material::ShaderType getMeshMaterialFromType(video::E_MATERIAL_TYPE material_type,
+                                              video::E_VERTEX_TYPE tp,
+                                              Material* material,
+                                              Material* layer2_material)
 {
-    if (layer2Material != NULL && layer2Material->getShaderType() == Material::SHADERTYPE_SPLATTING)
+    if (layer2_material != NULL && 
+        layer2_material->getShaderType() == Material::SHADERTYPE_SPLATTING)
         return Material::SHADERTYPE_SPLATTING;
 
     switch (material->getShaderType())
@@ -40,23 +47,27 @@ Material::ShaderType MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialT
     default:
         return material->getShaderType();   
     case Material::SHADERTYPE_SOLID:
-        if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
+        if (material_type == Shaders::getShader(ES_NORMAL_MAP))
             return Material::SHADERTYPE_NORMAL_MAP;
         else if (tp == video::EVT_2TCOORDS)
             return Material::SHADERTYPE_DETAIL_MAP;
         return Material::SHADERTYPE_SOLID;
     }
-}
+}   // getMeshMaterialFromType
 
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam, Material* material)
+// ----------------------------------------------------------------------------
+TransparentMaterial getTransparentMaterialFromType(video::E_MATERIAL_TYPE type,
+                                                   f32 MaterialTypeParam,
+                                                   Material* material)
 {
-    if (type == irr_driver->getShader(ES_DISPLACE))
+    if (type == Shaders::getShader(ES_DISPLACE))
         return TM_DISPLACEMENT;
     if (material->getShaderType() == Material::SHADERTYPE_ADDITIVE)
         return TM_ADDITIVE;
     return TM_DEFAULT;
 }
 
+// ----------------------------------------------------------------------------
 video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride)
 {
     if (stride == sizeof(video::S3DVertex))
@@ -65,8 +76,9 @@ video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride)
         return video::EVT_2TCOORDS;
     assert(stride == sizeof(video::S3DVertexTangents));
     return video::EVT_TANGENTS;
-}
+}   // getVTXTYPEFromStride
 
+// ----------------------------------------------------------------------------
 GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
 {
     GLuint vao;
@@ -79,53 +91,68 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
     case video::EVT_STANDARD:
         // Position
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), 0);
         // Normal
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), (GLvoid*)12);
         // Color
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
+        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE,
+                              getVertexPitchFromType(type), (GLvoid*)24);
         // Texcoord
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), (GLvoid*)28);
         break;
     case video::EVT_2TCOORDS:
         // Position
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), 0);
         // Normal
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), (GLvoid*)12);
         // Color
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
+        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, 
+                              getVertexPitchFromType(type), (GLvoid*)24);
         // Texcoord
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), (GLvoid*)28);
         // SecondTexcoord
         glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)36);
+        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, 
+                              getVertexPitchFromType(type), (GLvoid*)36);
         break;
     case video::EVT_TANGENTS:
         // Position
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), 0);
         // Normal
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), (GLvoid*)12);
         // Color
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
+        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE,
+                              getVertexPitchFromType(type), (GLvoid*)24);
         // Texcoord
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), (GLvoid*)28);
         // Tangent
         glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)36);
+        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), (GLvoid*)36);
         // Bitangent
         glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)48);
+        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE,
+                              getVertexPitchFromType(type), (GLvoid*)48);
         break;
     default:
         assert(0 && "Wrong vertex type");
@@ -133,8 +160,9 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
     assert(idx);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
     return vao;
-}
+}   // createVAO
 
+// ----------------------------------------------------------------------------
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name)
 {
     GLMesh result = {};
@@ -199,10 +227,10 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name)
     result.TextureMatrix = 0;
     result.VAOType = mb->getVertexType();
     return result;
-}
+}   // allocateMeshBuffer
 
-static
-size_t getUnsignedSize(unsigned tp)
+// ----------------------------------------------------------------------------
+static size_t getUnsignedSize(unsigned tp)
 {
     switch (tp)
     {
@@ -214,8 +242,9 @@ size_t getUnsignedSize(unsigned tp)
         assert(0 && "Unsupported index type");
         return 0;
     }
-}
+}   // getUnsignedSize
 
+// ----------------------------------------------------------------------------
 void fillLocalBuffer(GLMesh &mesh, scene::IMeshBuffer* mb)
 {
     glBindVertexArray(0);
@@ -227,58 +256,62 @@ void fillLocalBuffer(GLMesh &mesh, scene::IMeshBuffer* mb)
     const u32 vertexCount = mb->getVertexCount();
 
     const c8* vbuf = static_cast<const c8*>(vertices);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * mesh.Stride, vbuf, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * mesh.Stride, vbuf,
+                 GL_STREAM_DRAW);
     assert(vertexCount);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.index_buffer);
     const void* indices = mb->getIndices();
     mesh.IndexCount = mb->getIndexCount();
 
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.IndexCount * getUnsignedSize(mesh.IndexType), indices, GL_STREAM_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 mesh.IndexCount * getUnsignedSize(mesh.IndexType),
+                 indices, GL_STREAM_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
+}   // fillLocalBuffer
 
-
-core::matrix4 computeMVP(const core::matrix4 &ModelMatrix)
+// ----------------------------------------------------------------------------
+core::matrix4 computeMVP(const core::matrix4 &model_matrix)
 {
     core::matrix4 ModelViewProjectionMatrix = irr_driver->getProjMatrix();
     ModelViewProjectionMatrix *= irr_driver->getViewMatrix();
-    ModelViewProjectionMatrix *= ModelMatrix;
+    ModelViewProjectionMatrix *= model_matrix;
     return ModelViewProjectionMatrix;
-}
+}   // computeMVP
 
+// ----------------------------------------------------------------------------
 core::vector3df getWindDir()
 {
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
-    float m_speed = gsp->getSpeed();
+    GrassShaderProvider *gsp = 
+        (GrassShaderProvider *)Shaders::getCallback(ES_GRASS);
+    return (gsp->getSpeed() * cos(time)) * vector3df(1., 0., 0.);
+}   // getWindDir
 
-    return m_speed * vector3df(1., 0., 0.) * cos(time);
-}
-
+// ----------------------------------------------------------------------------
 bool isObject(video::E_MATERIAL_TYPE type)
 {
-    if (type == irr_driver->getShader(ES_OBJECTPASS))
+    if (type == Shaders::getShader(ES_OBJECTPASS))
         return true;
-    if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+    if (type == Shaders::getShader(ES_OBJECTPASS_REF))
         return true;
-    if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
+    if (type == Shaders::getShader(ES_OBJECTPASS_RIMLIT))
         return true;
-    if (type == irr_driver->getShader(ES_NORMAL_MAP))
+    if (type == Shaders::getShader(ES_NORMAL_MAP))
         return true;
-    if (type == irr_driver->getShader(ES_SPHERE_MAP))
+    if (type == Shaders::getShader(ES_SPHERE_MAP))
         return true;
-    if (type == irr_driver->getShader(ES_SPLATTING))
+    if (type == Shaders::getShader(ES_SPLATTING))
         return true;
-    if (type == irr_driver->getShader(ES_GRASS))
+    if (type == Shaders::getShader(ES_GRASS))
         return true;
-    if (type == irr_driver->getShader(ES_GRASS_REF))
+    if (type == Shaders::getShader(ES_GRASS_REF))
         return true;
-    if (type == irr_driver->getShader(ES_DISPLACE))
+    if (type == Shaders::getShader(ES_DISPLACE))
         return true;
-    if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
+    if (type == Shaders::getShader(ES_OBJECT_UNLIT))
         return true;
     if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
         return true;
@@ -293,31 +326,38 @@ bool isObject(video::E_MATERIAL_TYPE type)
     if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF)
         return true;
     return false;
-}
+}   // isObject
 
-static void
-SetTexture(GLMesh &mesh, unsigned i, bool isSrgb, const std::string &matname)
+// ----------------------------------------------------------------------------
+static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
+                       const std::string &mat_name)
 {
     if (!mesh.textures[i])
     {
-        Log::error("STKMesh", "Missing texture %d for material %s", i, matname.c_str());
+        Log::error("STKMesh", "Missing texture %d for material %s", i,
+                   mat_name.c_str());
         // use unicolor texture to replace missing texture
-        mesh.textures[i] = getUnicolorTexture(video::SColor(255, 127, 127, 127));
+        mesh.textures[i] = 
+                      getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
-    compressTexture(mesh.textures[i], isSrgb);
+    compressTexture(mesh.textures[i], is_srgb);
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[i])
-            mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[i]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
+        {
+            mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(
+                getTextureGLuint(mesh.textures[i]),
+                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
+        }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
     }
-}
+}   // setTexture
 
-static std::string
-getShaderTypeName(Material::ShaderType Mat)
+// ----------------------------------------------------------------------------
+static std::string getShaderTypeName(Material::ShaderType mat)
 {
-    switch (Mat)
+    switch (mat)
     {
     default:
     case Material::SHADERTYPE_SOLID:
@@ -337,11 +377,12 @@ getShaderTypeName(Material::ShaderType Mat)
     case Material::SHADERTYPE_SPLATTING:
         return "Splatting";
     }
-}
+}   // getShaderTypeName
 
-void InitTextures(GLMesh &mesh, Material::ShaderType Mat)
+// ----------------------------------------------------------------------------
+void initTextures(GLMesh &mesh, Material::ShaderType mat)
 {
-    switch (Mat)
+    switch (mat)
     {
     default:
     case Material::SHADERTYPE_SOLID:
@@ -349,28 +390,29 @@ void InitTextures(GLMesh &mesh, Material::ShaderType Mat)
     case Material::SHADERTYPE_VEGETATION:
     case Material::SHADERTYPE_SPHERE_MAP:
     case Material::SHADERTYPE_SOLID_UNLIT:
-        SetTexture(mesh, 0, true, getShaderTypeName(Mat));
-        SetTexture(mesh, 1, false, getShaderTypeName(Mat));
+        setTexture(mesh, 0, true, getShaderTypeName(mat));
+        setTexture(mesh, 1, false, getShaderTypeName(mat));
         break;
     case Material::SHADERTYPE_DETAIL_MAP:
     case Material::SHADERTYPE_NORMAL_MAP:
-        SetTexture(mesh, 0, true, getShaderTypeName(Mat));
-        SetTexture(mesh, 1, false, getShaderTypeName(Mat));
-        SetTexture(mesh, 2, false, getShaderTypeName(Mat));
+        setTexture(mesh, 0, true, getShaderTypeName(mat));
+        setTexture(mesh, 1, false, getShaderTypeName(mat));
+        setTexture(mesh, 2, false, getShaderTypeName(mat));
         break;
     case Material::SHADERTYPE_SPLATTING:
-        SetTexture(mesh, 0, true, getShaderTypeName(Mat));
-        SetTexture(mesh, 1, false, getShaderTypeName(Mat));
-        SetTexture(mesh, 2, true, getShaderTypeName(Mat));
-        SetTexture(mesh, 3, true, getShaderTypeName(Mat));
-        SetTexture(mesh, 4, true, getShaderTypeName(Mat));
-        SetTexture(mesh, 5, true, getShaderTypeName(Mat));
-        SetTexture(mesh, 6, false, getShaderTypeName(Mat));
+        setTexture(mesh, 0, true, getShaderTypeName(mat));
+        setTexture(mesh, 1, false, getShaderTypeName(mat));
+        setTexture(mesh, 2, true, getShaderTypeName(mat));
+        setTexture(mesh, 3, true, getShaderTypeName(mat));
+        setTexture(mesh, 4, true, getShaderTypeName(mat));
+        setTexture(mesh, 5, true, getShaderTypeName(mat));
+        setTexture(mesh, 6, false, getShaderTypeName(mat));
         break;
     }
-}
+}   // initTextures
 
-void InitTexturesTransparent(GLMesh &mesh)
+// ----------------------------------------------------------------------------
+void initTexturesTransparent(GLMesh &mesh)
 {
     if (!mesh.textures[0])
     {
@@ -381,8 +423,12 @@ void InitTexturesTransparent(GLMesh &mesh)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[0])
-            mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
+        {
+            mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(
+                getTextureGLuint(mesh.textures[0]),
+                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
+        }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
     }
-}
+}   // initTexturesTransparent

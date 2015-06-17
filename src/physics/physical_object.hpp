@@ -213,6 +213,8 @@ public:
     // ------------------------------------------------------------------------
     const std::string& getOnItemCollisionFunction() const { return m_on_item_collision; }
     // ------------------------------------------------------------------------
+    TrackObject* getTrackObject() { return m_object; }
+
     // Methods usable by scripts
 
     /**

@@ -56,6 +56,7 @@ RTT::RTT(size_t width, size_t height)
     m_RH_FBO = NULL;
     m_RSM = NULL;
     m_RH_FBO = NULL;
+    m_diffuse_coefficients_calculated = false;
     using namespace video;
     using namespace core;
 
@@ -257,11 +258,11 @@ RTT::RTT(size_t width, size_t height)
     }
 
     // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
-    getFBO(FBO_HALF1_R).Bind();
+    getFBO(FBO_HALF1_R).bind();
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
+    getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
     glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -290,6 +291,18 @@ RTT::~RTT()
     }
 }
 
+void RTT::prepareRender(scene::ICameraSceneNode* camera)
+{
+    irr_driver->setRTT(this);
+    irr_driver->getSceneManager()->setActiveCamera(camera);
+
+    if (!m_diffuse_coefficients_calculated)
+    {
+        irr_driver->generateDiffuseCoefficients();
+        m_diffuse_coefficients_calculated = true;
+    }
+}
+
 FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
 {
     irr_driver->setRTT(this);
@@ -298,9 +311,9 @@ FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
 
     std::vector<IrrDriver::GlowData> glows;
     // TODO: put this outside of the rendering loop
-    irr_driver->generateDiffuseCoefficients();
+    //irr_driver->generateDiffuseCoefficients();
     irr_driver->computeMatrixesAndCameras(camera, m_width, m_height);
-    unsigned plc = irr_driver->UpdateLightsInfo(camera, dt);
+    unsigned plc = irr_driver->updateLightsInfo(camera, dt);
     irr_driver->uploadLightingData();
     irr_driver->renderScene(camera, plc, glows, dt, false, true);
     FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);

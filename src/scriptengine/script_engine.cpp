@@ -85,16 +85,14 @@ namespace Scripting
     *  \param string scriptname = name of script to get
     *  \return      The corresponding script
     */
-    std::string getScript(std::string fileName)
+    std::string getScript(std::string script_path)
     {
-        std::string script_dir = file_manager->getAsset(FileManager::SCRIPT, "");
-        script_dir += World::getWorld()->getTrack()->getIdent() + "/";
+        //std::string script_path = World::getWorld()->getTrack()->getTrackFile(fileName);
 
-        script_dir += fileName;
-        FILE *f = fopen(script_dir.c_str(), "rb");
+        FILE *f = fopen(script_path.c_str(), "rb");
         if (f == NULL)
         {
-            Log::debug("Scripting", "File does not exist : {0}.as", fileName.c_str());
+            Log::debug("Scripting", "File does not exist : {0}", script_path.c_str());
             return "";
         }
 
@@ -207,29 +205,7 @@ namespace Scripting
 
         // TODO: allow splitting in multiple files
         std::string script_filename = "scripting.as";
-        auto cached_script = m_loaded_files.find(script_filename);
         auto cached_function = m_functions_cache.find(function_name);
-
-        if (cached_script == m_loaded_files.end())
-        {
-            // Compile the script code
-            Log::info("Scripting", "Checking for script file '%s'", script_filename.c_str());
-            r = compileScript(m_engine, script_filename);
-            if (r < 0)
-            {
-                Log::info("Scripting", "Script '%s' is not available", script_filename.c_str());
-                m_loaded_files[script_filename] = false;
-                m_functions_cache[function_name] = NULL; // remember that this script is unavailable
-                return;
-            }
-
-            m_loaded_files[script_filename] = true;
-        }
-        else if (cached_script->second == false)
-        {
-            return; // script file unavailable
-        }
-
         if (cached_function == m_functions_cache.end())
         {
             // Find the function for the function we want to execute.
@@ -241,7 +217,7 @@ namespace Scripting
             if (func == NULL)
             {
                 Log::debug("Scripting", "Scripting function was not found : %s", function_name.c_str());
-                m_loaded_files[function_name] = NULL; // remember that this script is unavailable
+                m_functions_cache[function_name] = NULL; // remember that this function is unavailable
                 return;
             }
 
@@ -339,7 +315,7 @@ namespace Scripting
                 curr.second->Release();
         }
         m_functions_cache.clear();
-        m_loaded_files.clear();
+        m_engine->DiscardModule(MODULE_ID_MAIN_SCRIPT_FILE);
     }
 
     //-----------------------------------------------------------------------------
@@ -371,15 +347,15 @@ namespace Scripting
 
     //-----------------------------------------------------------------------------
 
-    int ScriptEngine::compileScript(asIScriptEngine *engine, std::string scriptName)
+    bool ScriptEngine::loadScript(std::string script_path, bool clear_previous)
     {
         int r;
 
-        std::string script = getScript(scriptName);
+        std::string script = getScript(script_path);
         if (script.size() == 0)
         {
             // No such file
-            return -1;
+            return false;
         }
 
         // Add the script sections that will be compiled into executable code.
@@ -387,14 +363,25 @@ namespace Scripting
         // we can call AddScriptSection() several times for the same module and
         // the script engine will treat them all as if they were one. The script
         // section name, will allow us to localize any errors in the script code.
-        asIScriptModule *mod = engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE, asGM_ALWAYS_CREATE);
+        asIScriptModule *mod = m_engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE,
+            clear_previous ? asGM_ALWAYS_CREATE : asGM_ONLY_IF_EXISTS);
         r = mod->AddScriptSection("script", &script[0], script.size());
         if (r < 0)
         {
             Log::error("Scripting", "AddScriptSection() failed");
-            return -1;
+            return false;
         }
     
+        return true;
+    }
+
+    //-----------------------------------------------------------------------------
+
+    bool ScriptEngine::compileLoadedScripts()
+    {
+        int r;
+        asIScriptModule *mod = m_engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE, asGM_CREATE_IF_NOT_EXISTS);
+
         // Compile the script. If there are any compiler messages they will
         // be written to the message stream that we set right after creating the 
         // script engine. If there are no errors, and no warnings, nothing will
@@ -403,7 +390,7 @@ namespace Scripting
         if (r < 0)
         {
             Log::error("Scripting", "Build() failed");
-            return -1;
+            return false;
         }
 
         // The engine doesn't keep a copy of the script sections after Build() has
@@ -416,6 +403,6 @@ namespace Scripting
         // scope, so function names, and global variables will not conflict with
         // each other.
 
-        return 0;
+        return true;
     }
 }

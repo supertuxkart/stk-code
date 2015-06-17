@@ -24,7 +24,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/screenquad.hpp"
+#include "graphics/screen_quad.hpp"
 #include "graphics/shaders.hpp"
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"

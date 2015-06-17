@@ -15,11 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "central_settings.hpp"
+#include "graphics/central_settings.hpp"
+
+#include "config/user_config.hpp"
 #include "modes/profile_world.hpp"
-#include "gl_headers.hpp"
-#include "glwrap.hpp"
-#include "graphics_restrictions.hpp"
+#include "graphics/gl_headers.hpp"
+#include "graphics/glwrap.hpp"
+#include "graphics/graphics_restrictions.hpp"
 
 CentralVideoSettings *CVS = new CentralVideoSettings();
 

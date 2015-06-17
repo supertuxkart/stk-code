@@ -15,14 +15,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef GPUPARTICLES_H
-#define GPUPARTICLES_H
+#ifndef HEADER_GPU_PARTICLES_HPP
+#define HEADER_GPU_PARTICLES_HPP
+
+#include "graphics/shader.hpp"
 
 #include "../lib/irrlicht/source/Irrlicht/CParticleSystemSceneNode.h"
 #include <ISceneManager.h>
 #include <IParticleSystemSceneNode.h>
 
 namespace irr { namespace video{ class ITexture; } }
+
+using namespace irr;
 
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode
 {

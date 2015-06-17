@@ -663,7 +663,13 @@ void btKart::updateSuspension(btScalar deltaTime)
         btScalar length_diff    = (susp_length - current_length);
         if(m_kart->getKartProperties()->getExpSpringResponse())
             length_diff *= fabsf(length_diff)/susp_length;
-
+        float f = (1.0f + fabsf(length_diff) / susp_length);
+        // Scale the length diff. This results that in uphill sections, when
+        // the suspension is more compressed (i.e. length is bigger), more
+        // force is used, which makes it much less likely for the kart to hit
+        // the terrain, while when driving on flat terrain (length small),
+        // there is hardly any difference
+        length_diff *= f*f;
         force = wheel_info.m_suspensionStiffness * length_diff
               * wheel_info.m_clippedInvContactDotSuspension;
 

@@ -27,12 +27,9 @@ struct Color
     float Blue;
 };
 
-/** Generate the 9 first SH coefficients for each color channel
-using the cubemap provided by CubemapFace.
-*  \param textures sequence of 6 square textures.
-*  \param row/columns count of textures.
-*/
-void SphericalHarmonics(Color *CubemapFace[6], size_t edge_size, float *blueSHCoeff, float *greenSHCoeff, float *redSHCoeff);
+void generateSphericalHarmonics(Color *CubemapFace[6], size_t edge_size,
+                                float *blue_sh_coeff, float *green_sh_coeff,
+                                float *red_sh_coeff);
 
 GLuint generateSpecularCubemap(GLuint probe);
 #endif

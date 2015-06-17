@@ -22,12 +22,15 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
-#include <algorithm>
+
 #include <IAnimatedMesh.h>
 #include <IAnimatedMeshSceneNode.h>
 #include <ICameraSceneNode.h>
 #include <ILightSceneNode.h>
 #include <ISceneManager.h>
+#include <IMeshSceneNode.h>
+
+#include <algorithm>
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -278,6 +281,8 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera->setTarget(core::vector3df(0, 10, 0.0f));
     m_camera->setFOV(DEGREE_TO_RAD*50.0f);
     m_camera->updateAbsolutePosition();
+
+    m_rtt_provider->prepareRender(m_camera);
 }
 
 void ModelViewWidget::setRotateOff()

@@ -60,6 +60,8 @@ class TrackObjectManager;
 class TriangleMesh;
 class World;
 class XMLNode;
+class TrackObject;
+
 namespace Scripting
 {
     class ScriptEngine;
@@ -481,8 +483,9 @@ public:
     /** Returns true if this track has easter eggs. */
     bool hasEasterEggs() const { return m_has_easter_eggs; }
     // ------------------------------------------------------------------------
-    void loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& lod_loader,
-        bool create_lod_definitions, scene::ISceneNode* parent);
+    void loadObjects(const XMLNode* root, const std::string& path,
+        ModelDefinitionLoader& lod_loader, bool create_lod_definitions,
+        scene::ISceneNode* parent, TrackObject* parent_library);
     // ------------------------------------------------------------------------
     bool               isSoccer             () const { return m_is_soccer; }
     // ------------------------------------------------------------------------

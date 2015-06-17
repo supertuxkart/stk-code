@@ -16,10 +16,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "guiengine/widgets/player_kart_widget.hpp"
+
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
-#include "guiengine/widgets/player_kart_widget.hpp"
 #include "guiengine/widgets/player_name_spinner.hpp"
 #include "input/input_device.hpp"
 #include "karts/kart_properties.hpp"

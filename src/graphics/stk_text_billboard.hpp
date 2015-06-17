@@ -18,13 +18,14 @@
 #ifndef STK_TEXT_BILLBOARD_HPP
 #define STK_TEXT_BILLBOARD_HPP
 
+#include "graphics/stk_mesh_scene_node.hpp"
+#include "guiengine/scalable_font.hpp"
+#include "utils/cpp2011.hpp"
+
 #include "../lib/irrlicht/source/Irrlicht/CBillboardSceneNode.h"
 #include <IBillboardSceneNode.h>
 #include <irrTypes.h>
 #include <IMesh.h>
-#include "graphics/stkmeshscenenode.hpp"
-#include "guiengine/scalable_font.hpp"
-#include "utils/cpp2011.hpp"
 
 class STKTextBillboardChar
 {

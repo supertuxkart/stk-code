@@ -890,7 +890,7 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
                 const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject((int)i);
                 w3->addModel(obj.m_model, obj.m_position);
             }
-            w3->update(0);
+            //w3->update(0);
 
             m_kart_widgets[widget_id].m_kart_name
             ->setText( selectionText.c_str(), false );

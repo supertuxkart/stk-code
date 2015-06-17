@@ -1,70 +1,4 @@
-﻿//I18N: ./data/achievements.xml
-_("Christoffel Columbus")
-
-//I18N: ./data/achievements.xml
-_("Play every official track at least once.")
-
-//I18N: ./data/achievements.xml
-_("Strike!")
-
-//I18N: ./data/achievements.xml
-_("Hit 10 karts with a bowling-ball.")
-
-//I18N: ./data/achievements.xml
-_("Arch Enemy")
-
-//I18N: ./data/achievements.xml
-_("Hit the same kart at least 5 times in one race.")
-
-//I18N: ./data/achievements.xml
-_("Marathoner")
-
-//I18N: ./data/achievements.xml
-_("Make a race with 5 laps or more.")
-
-//I18N: ./data/achievements.xml
-_("Skid-row")
-
-//I18N: ./data/achievements.xml
-_("Make 5 skidding in a single lap.")
-
-//I18N: ./data/achievements.xml
-_("Gold driver")
-
-//I18N: ./data/achievements.xml
-_("Win in all single player modes, against at least 3 opponents.")
-
-//I18N: ./data/achievements.xml
-_("Powerup Love")
-
-//I18N: ./data/achievements.xml
-_("Use 10 or more powerups in a race.")
-
-//I18N: ./data/achievements.xml
-_("Unstoppable")
-
-//I18N: ./data/achievements.xml
-_("Win 5 single races in a row.")
-
-//I18N: ./data/achievements.xml
-_("Banana Lover")
-
-//I18N: ./data/achievements.xml
-_("Collect at least 5 bananas in one race.")
-
-//I18N: ./data/achievements.xml
-_("It's secret")
-
-//I18N: ./data/achievements.xml
-_("Really ... a secret.")
-
-//I18N: ./data/achievements.xml
-_("Mosquito Hunter")
-
-//I18N: ./data/achievements.xml
-_("Take your opponents for mosquitos! With the swatter, squash at least 5 of them in a race.")
-
-//I18N: ./data/grandprix/1_penguinplayground.grandprix
+﻿//I18N: ./data/grandprix/1_penguinplayground.grandprix
 _("Penguin Playground")
 
 //I18N: ./data/grandprix/2_offthebeatentrack.grandprix
@@ -126,10 +60,6 @@ _("Add-Ons");
 //I18N: ./data/gui/arenas.stkgui
 //I18N: track group
 _("All");
-
-//I18N: ./data/gui/challenges.stkgui
-//I18N: Title for challenges screen
-_("Challenges : Trophy Room");
 
 //I18N: ./data/gui/confirm_dialog.stkgui
 //I18N: In a 'are you sure?' dialog
@@ -286,6 +216,30 @@ _("Cancel");
 //I18N: ./data/gui/feature_unlocked.stkgui
 _("Continue")
 
+//I18N: ./data/gui/gp_info.stkgui
+//I18N: In the grand prix info screen
+_("AI karts");
+
+//I18N: ./data/gui/gp_info.stkgui
+//I18N: In the grand prix info screen
+_("Reverse");
+
+//I18N: ./data/gui/gp_info.stkgui
+//I18N: In the grand prix info screen
+_("Tracks");
+
+//I18N: ./data/gui/gp_info.stkgui
+//I18N: In the grand prix info screen
+_("Track group");
+
+//I18N: ./data/gui/gp_info.stkgui
+//I18N: In the grand prix info screen
+_("Start Race");
+
+//I18N: ./data/gui/gp_info.stkgui
+//I18N: In the grand prix info screen
+_("Continue saved GP");
+
 //I18N: ./data/gui/gpedit.stkgui
 //I18N: Title in edit grand prix screen
 _("Edit Grand Prix");
@@ -338,30 +292,6 @@ _("Remove");
 //I18N: Menu item
 _("Rename");
 
-//I18N: ./data/gui/gp_info.stkgui
-//I18N: In the grand prix info screen
-_("AI karts");
-
-//I18N: ./data/gui/gp_info.stkgui
-//I18N: In the grand prix info screen
-_("Reverse");
-
-//I18N: ./data/gui/gp_info.stkgui
-//I18N: In the grand prix info screen
-_("Tracks");
-
-//I18N: ./data/gui/gp_info.stkgui
-//I18N: In the grand prix info screen
-_("Track group");
-
-//I18N: ./data/gui/gp_info.stkgui
-//I18N: In the grand prix info screen
-_("Start Race");
-
-//I18N: ./data/gui/gp_info.stkgui
-//I18N: In the grand prix info screen
-_("Continue saved GP");
-
 //I18N: ./data/gui/grand_prix_lose.stkgui
 _("Continue")
 
@@ -373,152 +303,6 @@ _("Continue")
 
 //I18N: ./data/gui/grand_prix_win.stkgui
 _("Save Grand Prix")
-
-//I18N: ./data/gui/help1.stkgui
-_("SuperTuxKart Help")
-
-//I18N: ./data/gui/help1.stkgui
-//I18N: Tab in help menu
-_("General");
-
-//I18N: ./data/gui/help1.stkgui
-//I18N: Tab in help menu
-_("Weapons");
-
-//I18N: ./data/gui/help1.stkgui
-//I18N: Tab in help menu
-_("Game Modes");
-
-//I18N: ./data/gui/help1.stkgui
-//I18N: Tab in help menu
-_("Multi­player");
-
-//I18N: ./data/gui/help1.stkgui
-_("Click here to play the tutorial")
-
-//I18N: ./data/gui/help1.stkgui
-//I18N: In the help menu
-_("Collect blue boxes : they will give you weapons or other powerups");
-
-//I18N: ./data/gui/help1.stkgui
-//I18N: In the help menu
-_("Avoid bananas!");
-
-//I18N: ./data/gui/help1.stkgui
-//I18N: In the help menu
-_("Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen.");
-
-//I18N: ./data/gui/help1.stkgui
-//I18N: In the help menu
-_("If you see a button with a lock like this one, you need to complete a challenge to unlock it.");
-
-//I18N: ./data/gui/help1.stkgui
-//I18N: in the help menu
-_("The 'skidding' key allows you to skid in sharp turns and get a boost.");
-
-//I18N: ./data/gui/help1.stkgui
-//I18N: in the help screen
-_("* Current key bindings can be seen/changed in menu Options");
-
-//I18N: ./data/gui/help2.stkgui
-_("SuperTuxKart Help")
-
-//I18N: ./data/gui/help2.stkgui
-//I18N: Tab in help menu
-_("General");
-
-//I18N: ./data/gui/help2.stkgui
-//I18N: Tab in help menu
-_("Weapons");
-
-//I18N: ./data/gui/help2.stkgui
-//I18N: Tab in help menu
-_("Game Modes");
-
-//I18N: ./data/gui/help2.stkgui
-//I18N: Tab in help menu
-_("Multi­player");
-
-//I18N: ./data/gui/help2.stkgui
-//I18N: In the help menu
-_("To help you win, there are some powerups you can collect :");
-
-//I18N: ./data/gui/help2.stkgui
-_("BubbleGum - protect yourself with a shield, or use while looking back to leave a sticky pink puddle behind you.")
-
-//I18N: ./data/gui/help2.stkgui
-_("Cake - thrown at the closest rival, best on short ranges and long straights.")
-
-//I18N: ./data/gui/help2.stkgui
-_("Plunger - throw straight to pull an opponent back, or throw while looking back to make one lose sight.")
-
-//I18N: ./data/gui/help2.stkgui
-_("Bowling Ball - bounces off walls. If you are looking back, it will be thrown backwards.")
-
-//I18N: ./data/gui/help2.stkgui
-_("Parachute - slows down all karts in a better position.")
-
-//I18N: ./data/gui/help2.stkgui
-_("Anchor - slows down greatly the kart in the first position.")
-
-//I18N: ./data/gui/help2.stkgui
-_("Swapper - gift boxes are transformed into bananas and vice versa for a short time.")
-
-//I18N: ./data/gui/help2.stkgui
-_("Basket Ball - bounces after the leader, and might squash and slow down karts down on the way.")
-
-//I18N: ./data/gui/help2.stkgui
-_("Swatter - will squash karts close by, slowing them down.")
-
-//I18N: ./data/gui/help3.stkgui
-_("SuperTuxKart Help")
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: Tab in help menu
-_("General");
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: Tab in help menu
-_("Weapons");
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: Tab in help menu
-_("Game Modes");
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: Tab in help menu
-_("Multi­player");
-
-//I18N: ./data/gui/help3.stkgui
-_("SuperTuxKart features several game modes")
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: In the help menu
-_("Regular Race: All blows allowed, so catch weapons and make clever use of them!");
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: In the help menu
-_("Time Trial: Contains no powerups, so only your driving skills matter!");
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: In the help menu
-_("Follow the leader: Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!");
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: In the help menu
-_("3 Strikes Battle: Only in multiplayer games. Hit others with weapons until they lose all their lives.");
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: In the help menu
-_("Soccer: Only in multiplayer games. Use your kart to push the ball into the goal.");
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: In the help menu
-_("Egg hunt: Explore tracks to find all hidden eggs.");
-
-//I18N: ./data/gui/help3.stkgui
-//I18N: In the help menu
-_("* Most of these game modes can also be played in a Grand Prix fashion: instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup.");
 
 //I18N: ./data/gui/help4.stkgui
 _("SuperTuxKart Help")
@@ -684,22 +468,6 @@ _("Log In");
 //I18N: In the login dialog
 _("Close");
 
-//I18N: ./data/gui/online/lobby.stkgui
-//I18N: In networking lobby
-_("Lobby");
-
-//I18N: ./data/gui/online/lobby.stkgui
-//I18N: In the networking lobby
-_("Server name :");
-
-//I18N: ./data/gui/online/lobby.stkgui
-//I18N: In networking lobby
-_("actions");
-
-//I18N: ./data/gui/online/lobby.stkgui
-//I18N: In the networking lobby
-_("Exit");
-
 //I18N: ./data/gui/online/lobby_settings.stkgui
 //I18N: In the lobby settings screen
 _("Lobby Settings");
@@ -774,20 +542,6 @@ _("...")
 //I18N: ./data/gui/online/profile_overview.stkgui
 //I18N: Section in the profile screen
 _("Overview");
-
-//I18N: ./data/gui/online/profile_settings.stkgui
-_("...")
-
-//I18N: ./data/gui/online/profile_settings.stkgui
-//I18N: Section in the profile screen
-_("Account Settings");
-
-//I18N: ./data/gui/online/profile_settings.stkgui
-//I18N: In the online account settings screen
-_("Password :");
-
-//I18N: ./data/gui/online/profile_settings.stkgui
-_("Change")
 
 //I18N: ./data/gui/online/recovery_info.stkgui
 //I18N: In the recovery dialog
@@ -953,6 +707,36 @@ _("Vote");
 //I18N: Vote dialog
 _("Close");
 
+//I18N: ./data/gui/online/lobby.stkgui
+//I18N: In networking lobby
+_("Lobby");
+
+//I18N: ./data/gui/online/lobby.stkgui
+//I18N: In the networking lobby
+_("Server name:");
+
+//I18N: ./data/gui/online/lobby.stkgui
+//I18N: In networking lobby
+_("actions");
+
+//I18N: ./data/gui/online/lobby.stkgui
+//I18N: In the networking lobby
+_("Exit");
+
+//I18N: ./data/gui/online/profile_settings.stkgui
+_("...")
+
+//I18N: ./data/gui/online/profile_settings.stkgui
+//I18N: Section in the profile screen
+_("Account Settings");
+
+//I18N: ./data/gui/online/profile_settings.stkgui
+//I18N: In the online account settings screen
+_("Password:");
+
+//I18N: ./data/gui/online/profile_settings.stkgui
+_("Change")
+
 //I18N: ./data/gui/options_audio.stkgui
 _("SuperTuxKart Options")
 
@@ -1015,7 +799,8 @@ _("Press enter or double-click on a device to configure it");
 _("Add a device");
 
 //I18N: ./data/gui/options_input.stkgui
-_("* Which config to use will be inferred from which 'Select' key is pressed to join the game.")
+//I18N: In the input configuration screen
+_("* Which config to use will be inferred from which 'Select' key is pressed to join the game.");
 
 //I18N: ./data/gui/options_players.stkgui
 _("SuperTuxKart Options")
@@ -1139,31 +924,6 @@ _("Assign nothing");
 //I18N: When configuring input
 _("Press ESC to cancel");
 
-//I18N: ./data/gui/racesetup.stkgui
-_("Race Setup")
-
-//I18N: ./data/gui/racesetup.stkgui
-_("Select a difficulty")
-
-//I18N: ./data/gui/racesetup.stkgui
-//I18N: Difficulty
-_("Novice");
-
-//I18N: ./data/gui/racesetup.stkgui
-//I18N: Difficulty
-_("Intermediate");
-
-//I18N: ./data/gui/racesetup.stkgui
-//I18N: Difficulty
-_("Expert");
-
-//I18N: ./data/gui/racesetup.stkgui
-//I18N: Difficulty
-_("SuperTux");
-
-//I18N: ./data/gui/racesetup.stkgui
-_("Select a game mode")
-
 //I18N: ./data/gui/race_paused_dialog.stkgui
 _("Paused")
 
@@ -1195,24 +955,30 @@ _("Help");
 //I18N: Race paused button
 _("Exit Race");
 
-//I18N: ./data/gui/select_challenge.stkgui
+//I18N: ./data/gui/racesetup.stkgui
 _("Race Setup")
 
-//I18N: ./data/gui/select_challenge.stkgui
-//I18N: Type of race, in a challenge
-_("Type :");
+//I18N: ./data/gui/racesetup.stkgui
+_("Select a difficulty")
 
-//I18N: ./data/gui/select_challenge.stkgui
+//I18N: ./data/gui/racesetup.stkgui
 //I18N: Difficulty
 _("Novice");
 
-//I18N: ./data/gui/select_challenge.stkgui
+//I18N: ./data/gui/racesetup.stkgui
 //I18N: Difficulty
 _("Intermediate");
 
-//I18N: ./data/gui/select_challenge.stkgui
+//I18N: ./data/gui/racesetup.stkgui
 //I18N: Difficulty
 _("Expert");
+
+//I18N: ./data/gui/racesetup.stkgui
+//I18N: Difficulty
+_("SuperTux");
+
+//I18N: ./data/gui/racesetup.stkgui
+_("Select a game mode")
 
 //I18N: ./data/gui/soccer_setup.stkgui
 _("Race Setup")
@@ -1239,14 +1005,6 @@ _("VS")
 //I18N: ./data/gui/soccer_setup.stkgui
 //I18N: In soccer setup screen
 _("Continue");
-
-//I18N: ./data/gui/tracks.stkgui
-//I18N: In the track selection screen
-_("Grand Prix");
-
-//I18N: ./data/gui/tracks.stkgui
-//I18N: In the track selection screen
-_("All Tracks");
 
 //I18N: ./data/gui/track_info.stkgui
 _("= Highscores =")
@@ -1276,12 +1034,13 @@ _("Drive in reverse");
 //I18N: In the track info screen
 _("Start Race");
 
-//I18N: ./data/gui/tutorial.stkgui
-//I18N: Title for tutorials screen
-_("Tutorial : Selection Room");
+//I18N: ./data/gui/tracks.stkgui
+//I18N: In the track selection screen
+_("Grand Prix");
 
-//I18N: ./data/gui/tutorial.stkgui
-_("Play all")
+//I18N: ./data/gui/tracks.stkgui
+//I18N: In the track selection screen
+_("All Tracks");
 
 //I18N: ./data/gui/tutorial_message_dialog.stkgui
 //I18N: Button in tutorial
@@ -1369,74 +1128,343 @@ _("Rename");
 //I18N: In the user screen
 _("Cancel");
 
-//I18N: ../stk-assets/tracks/battleisland/track.xml
-_("Battle Island")
+//I18N: ./data/gui/challenges.stkgui
+//I18N: Title for challenges screen
+_("Challenges - Trophy Room");
 
-//I18N: ../stk-assets/tracks/cave/track.xml
-_("Cave X")
+//I18N: ./data/gui/tutorial.stkgui
+//I18N: Title for tutorials screen
+_("Tutorial - Selection Room");
 
-//I18N: ../stk-assets/tracks/city/track.xml
-_("Shiny Suburbs")
+//I18N: ./data/gui/tutorial.stkgui
+_("Play all")
 
-//I18N: ../stk-assets/tracks/cocoa_temple/track.xml
-_("Cocoa Temple")
+//I18N: ./data/gui/help1.stkgui
+_("SuperTuxKart Help")
 
-//I18N: ../stk-assets/tracks/farm/track.xml
-_("Bovine Barnyard")
+//I18N: ./data/gui/help1.stkgui
+//I18N: Tab in help menu
+_("General");
 
-//I18N: ../stk-assets/tracks/fortmagma/track.xml
-_("Fort Magma")
+//I18N: ./data/gui/help1.stkgui
+//I18N: Tab in help menu
+_("Weapons");
 
-//I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
-_("Gran Paradiso Island")
+//I18N: ./data/gui/help1.stkgui
+//I18N: Tab in help menu
+_("Game Modes");
 
-//I18N: ../stk-assets/tracks/greenvalley/track.xml
-_("Green Valley")
+//I18N: ./data/gui/help1.stkgui
+//I18N: Tab in help menu
+_("Multi­player");
 
-//I18N: ../stk-assets/tracks/hacienda/track.xml
-_("Hacienda")
+//I18N: ./data/gui/help1.stkgui
+_("Click here to play the tutorial")
 
-//I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-_("What's wrong, little hippies? Your great gnu leader is missing?")
+//I18N: ./data/gui/help1.stkgui
+//I18N: In the help menu
+_("Collect blue boxes. They will give you weapons or other powerups.");
 
-//I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-_("What's wrong, little hippies? Your great gnu leader is missing?")
+//I18N: ./data/gui/help1.stkgui
+//I18N: In the help menu
+_("Avoid bananas!");
 
-//I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-_("Oh yes, see, he's in my castle now and will be served for supper...")
+//I18N: ./data/gui/help1.stkgui
+//I18N: In the help menu
+_("Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen.");
 
-//I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-_("Oh yes, see, he's in my castle now and will be served for supper...")
+//I18N: ./data/gui/help1.stkgui
+//I18N: In the help menu
+_("If you see a button with a lock like this one, you need to complete a challenge to unlock it.");
 
-//I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-_("But I'm a fair creature, so I'll make you a deal.")
+//I18N: ./data/gui/help1.stkgui
+//I18N: in the help menu
+_("The 'skidding' key allows you to skid in sharp turns and get a boost.");
 
-//I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-_("But I'm a fair creature, so I'll make you a deal.")
+//I18N: ./data/gui/help1.stkgui
+//I18N: in the help screen
+_("* Current key bindings can be seen/changed in menu Options");
 
-//I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-_("If you can beat me at racing, I will free the old codger.")
+//I18N: ./data/gui/help2.stkgui
+_("SuperTuxKart Help")
 
-//I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-_("If you can beat me at racing, I will free the old codger.")
+//I18N: ./data/gui/help2.stkgui
+//I18N: Tab in help menu
+_("General");
 
-//I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-_(" But you pathetic little twerps will never be able to beat me - King of the Karts!")
+//I18N: ./data/gui/help2.stkgui
+//I18N: Tab in help menu
+_("Weapons");
 
-//I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-_(" But you pathetic little twerps will never be able to beat me - King of the Karts!")
+//I18N: ./data/gui/help2.stkgui
+//I18N: Tab in help menu
+_("Game Modes");
 
-//I18N: ../stk-assets/tracks/lighthouse/track.xml
-_("Around the lighthouse")
+//I18N: ./data/gui/help2.stkgui
+//I18N: Tab in help menu
+_("Multi­player");
+
+//I18N: ./data/gui/help2.stkgui
+//I18N: In the help menu
+_("To help you win, there are some powerups you can collect:");
+
+//I18N: ./data/gui/help2.stkgui
+_("BubbleGum - protect yourself with a shield, or use while looking back to leave a sticky pink puddle behind you.")
+
+//I18N: ./data/gui/help2.stkgui
+_("Cake - thrown at the closest rival, best on short ranges and long straights.")
+
+//I18N: ./data/gui/help2.stkgui
+_("Plunger - throw straight to pull an opponent back, or throw while looking back to make one lose sight.")
+
+//I18N: ./data/gui/help2.stkgui
+_("Bowling Ball - bounces off walls. If you are looking back, it will be thrown backwards.")
+
+//I18N: ./data/gui/help2.stkgui
+_("Parachute - slows down all karts in a better position.")
+
+//I18N: ./data/gui/help2.stkgui
+_("Anchor - greatly slows down the kart in the first position.")
+
+//I18N: ./data/gui/help2.stkgui
+_("Swapper - gift boxes are transformed into bananas and vice versa for a short time.")
+
+//I18N: ./data/gui/help2.stkgui
+_("Basket Ball - bounces after the leader, and might squash and slow down karts down on the way.")
+
+//I18N: ./data/gui/help2.stkgui
+_("Swatter - will squash karts close by, slowing them down.")
+
+//I18N: ./data/gui/help3.stkgui
+_("SuperTuxKart Help")
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: Tab in help menu
+_("General");
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: Tab in help menu
+_("Weapons");
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: Tab in help menu
+_("Game Modes");
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: Tab in help menu
+_("Multi­player");
+
+//I18N: ./data/gui/help3.stkgui
+_("SuperTuxKart features several game modes")
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: In the help menu
+_("Regular Race: All blows allowed, so catch weapons and make clever use of them!");
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: In the help menu
+_("Time Trial: Contains no powerups, so only your driving skills matter!");
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: In the help menu
+_("Follow the leader: Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware: going in front of the leader will get you eliminated too!");
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: In the help menu
+_("3 Strikes Battle: Only in multiplayer games. Hit others with weapons until they lose all their lives.");
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: In the help menu
+_("Soccer: Only in multiplayer games. Use your kart to push the ball into the goal.");
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: In the help menu
+_("Egg hunt: Explore tracks to find all hidden eggs.");
+
+//I18N: ./data/gui/help3.stkgui
+//I18N: In the help menu
+_("* Most of these game modes can also be played in a Grand Prix fashion: instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup.");
+
+//I18N: ./data/gui/select_challenge.stkgui
+_("Race Setup")
+
+//I18N: ./data/gui/select_challenge.stkgui
+//I18N: Type of race, in a challenge
+_("Type:");
+
+//I18N: ./data/gui/select_challenge.stkgui
+//I18N: Difficulty
+_("Novice");
+
+//I18N: ./data/gui/select_challenge.stkgui
+//I18N: Difficulty
+_("Intermediate");
+
+//I18N: ./data/gui/select_challenge.stkgui
+//I18N: Difficulty
+_("Expert");
+
+//I18N: ./data/achievements.xml
+_("Christoffel Columbus")
+
+//I18N: ./data/achievements.xml
+_("Play every official track at least once.")
+
+//I18N: ./data/achievements.xml
+_("Strike!")
+
+//I18N: ./data/achievements.xml
+_("Hit 10 karts with a bowling-ball.")
+
+//I18N: ./data/achievements.xml
+_("Arch Enemy")
+
+//I18N: ./data/achievements.xml
+_("Hit the same kart at least 5 times in one race.")
+
+//I18N: ./data/achievements.xml
+_("Marathoner")
+
+//I18N: ./data/achievements.xml
+_("Make a race with 5 laps or more.")
+
+//I18N: ./data/achievements.xml
+_("Skid-row")
+
+//I18N: ./data/achievements.xml
+_("Make 5 skidding in a single lap.")
+
+//I18N: ./data/achievements.xml
+_("Gold driver")
+
+//I18N: ./data/achievements.xml
+_("Win against at least 3 opponents in all single player modes.")
+
+//I18N: ./data/achievements.xml
+_("Powerup Love")
+
+//I18N: ./data/achievements.xml
+_("Use 10 or more powerups in a race.")
+
+//I18N: ./data/achievements.xml
+_("Unstoppable")
+
+//I18N: ./data/achievements.xml
+_("Win 5 single races in a row.")
+
+//I18N: ./data/achievements.xml
+_("Banana Lover")
+
+//I18N: ./data/achievements.xml
+_("Collect at least 5 bananas in one race.")
+
+//I18N: ./data/achievements.xml
+_("It's secret")
+
+//I18N: ./data/achievements.xml
+_("Really ... a secret.")
+
+//I18N: ./data/achievements.xml
+_("Mosquito Hunter")
+
+//I18N: ./data/achievements.xml
+_("Take your opponents for mosquitos! With the swatter, squash at least 5 of them in a race.")
+
+//I18N: ../stk-assets/tracks/soccer_field/track.xml
+_("Soccer field")
+
+//I18N: ../stk-assets/tracks/subsea/track.xml
+_("Subsea")
+
+//I18N: ../stk-assets/tracks/snowmountain/track.xml
+_("Northern Resort")
+
+//I18N: ../stk-assets/tracks/minigolf/track.xml
+_("Minigolf")
 
 //I18N: ../stk-assets/tracks/mansion/track.xml
 _("Blackhill Mansion")
 
+//I18N: ../stk-assets/tracks/stadium/track.xml
+_("The Stadium")
+
+//I18N: ../stk-assets/tracks/battleisland/track.xml
+_("Battle Island")
+
+//I18N: ../stk-assets/tracks/scotland/track.xml
+_("Nessie's pond")
+
+//I18N: ../stk-assets/tracks/city/track.xml
+_("Shiny Suburbs")
+
+//I18N: ../stk-assets/tracks/lighthouse/track.xml
+_("Around the lighthouse")
+
 //I18N: ../stk-assets/tracks/mines/track.xml
 _("Old Mine")
 
-//I18N: ../stk-assets/tracks/minigolf/track.xml
-_("Minigolf")
+//I18N: ../stk-assets/tracks/zengarden/track.xml
+_("Zen Garden")
+
+//I18N: ../stk-assets/tracks/greenvalley/track.xml
+_("Green Valley")
+
+//I18N: ../stk-assets/tracks/fortmagma/track.xml
+_("Fort Magma")
+
+//I18N: ../stk-assets/tracks/farm/track.xml
+_("Bovine Barnyard")
+
+//I18N: ../stk-assets/tracks/temple/track.xml
+_("Temple")
+
+//I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
+_("Snow Peak")
+
+//I18N: ../stk-assets/tracks/xr591/track.xml
+_("XR591")
+
+//I18N: ../stk-assets/tracks/cocoa_temple/track.xml
+_("Cocoa Temple")
+
+//I18N: ../stk-assets/tracks/hacienda/track.xml
+_("Hacienda")
+
+//I18N: ../stk-assets/tracks/stk_enterprise/track.xml
+_("STK Enterprise")
+
+//I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
+_("Gran Paradiso Island")
+
+//I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+_("What's wrong, little hippies? Your great gnu leader is missing?")
+
+//I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+_("What's wrong, little hippies? Your great gnu leader is missing?")
+
+//I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+_("Oh yes, see, he's in my castle now and will be served for supper...")
+
+//I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+_("Oh yes, see, he's in my castle now and will be served for supper...")
+
+//I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+_("But I'm a fair creature, so I'll make you a deal.")
+
+//I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+_("But I'm a fair creature, so I'll make you a deal.")
+
+//I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+_("If you can beat me at racing, I will free the old codger.")
+
+//I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+_("If you can beat me at racing, I will free the old codger.")
+
+//I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+_(" But you pathetic little twerps will never be able to beat me - King of the Karts!")
+
+//I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+_(" But you pathetic little twerps will never be able to beat me - King of the Karts!")
 
 //I18N: ../stk-assets/tracks/olivermath/track.xml
 _("Oliver's Math Class")
@@ -1444,56 +1472,17 @@ _("Oliver's Math Class")
 //I18N: ../stk-assets/tracks/sandtrack/track.xml
 _("Shifting Sands")
 
-//I18N: ../stk-assets/tracks/scotland/track.xml
-_("Nessie's pond")
+//I18N: ../stk-assets/tracks/cave/track.xml
+_("Cave X")
 
-//I18N: ../stk-assets/tracks/snowmountain/track.xml
-_("Northern Resort")
-
-//I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
-_("Snow Peak")
-
-//I18N: ../stk-assets/tracks/soccer_field/track.xml
-_("Soccer field")
-
-//I18N: ../stk-assets/tracks/stadium/track.xml
-_("The Stadium")
-
-//I18N: ../stk-assets/tracks/stk_enterprise/track.xml
-_("STK Enterprise")
-
-//I18N: ../stk-assets/tracks/subsea/track.xml
-_("Subsea")
-
-//I18N: ../stk-assets/tracks/temple/track.xml
-_("Temple")
-
-//I18N: ../stk-assets/tracks/xr591/track.xml
-_("XR591")
-
-//I18N: ../stk-assets/tracks/zengarden/track.xml
-_("Zen Garden")
-
-//I18N: ../stk-assets/karts/adiumy/kart.xml
-_("Adiumy")
-
-//I18N: ../stk-assets/karts/amanda/kart.xml
-_("Amanda")
-
-//I18N: ../stk-assets/karts/beastie/kart.xml
-_("Beastie")
+//I18N: ../stk-assets/karts/tux/kart.xml
+_("Tux")
 
 //I18N: ../stk-assets/karts/elephpant/kart.xml
 _("Elephpant")
 
-//I18N: ../stk-assets/karts/emule/kart.xml
-_("Emule")
-
-//I18N: ../stk-assets/karts/gnu/kart.xml
-_("Gnu")
-
-//I18N: ../stk-assets/karts/hexley/kart.xml
-_("Hexley")
+//I18N: ../stk-assets/karts/amanda/kart.xml
+_("Amanda")
 
 //I18N: ../stk-assets/karts/konqi/kart.xml
 _("Konqi")
@@ -1501,11 +1490,29 @@ _("Konqi")
 //I18N: ../stk-assets/karts/nolok/kart.xml
 _("Nolok")
 
-//I18N: ../stk-assets/karts/pidgin/kart.xml
-_("Pidgin")
+//I18N: ../stk-assets/karts/suzanne/kart.xml
+_("Suzanne")
+
+//I18N: ../stk-assets/karts/wilber/kart.xml
+_("Wilber")
+
+//I18N: ../stk-assets/karts/adiumy/kart.xml
+_("Adiumy")
+
+//I18N: ../stk-assets/karts/gnu/kart.xml
+_("Gnu")
 
 //I18N: ../stk-assets/karts/puffy/kart.xml
 _("Puffy")
+
+//I18N: ../stk-assets/karts/gavroche/kart.xml
+_("Gavroche")
+
+//I18N: ../stk-assets/karts/hexley/kart.xml
+_("Hexley")
+
+//I18N: ../stk-assets/karts/xue/kart.xml
+_("Xue")
 
 //I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 _("Sara the Racer")
@@ -1513,15 +1520,12 @@ _("Sara the Racer")
 //I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 _("Sara the Wizard")
 
-//I18N: ../stk-assets/karts/suzanne/kart.xml
-_("Suzanne")
+//I18N: ../stk-assets/karts/emule/kart.xml
+_("Emule")
 
-//I18N: ../stk-assets/karts/tux/kart.xml
-_("Tux")
+//I18N: ../stk-assets/karts/pidgin/kart.xml
+_("Pidgin")
 
-//I18N: ../stk-assets/karts/wilber/kart.xml
-_("Wilber")
-
-//I18N: ../stk-assets/karts/xue/kart.xml
-_("Xue")
+//I18N: ../stk-assets/karts/beastie/kart.xml
+_("Beastie")
 

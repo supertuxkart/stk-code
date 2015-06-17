@@ -44,11 +44,12 @@ TrackObjectManager::~TrackObjectManager()
  *  in the xml_node.
  */
 void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
-                             ModelDefinitionLoader& model_def_loader)
+                             ModelDefinitionLoader& model_def_loader,
+                             TrackObject* parent_library)
 {
     try
     {
-        TrackObject *obj = new TrackObject(xml_node, parent, model_def_loader);
+        TrackObject *obj = new TrackObject(xml_node, parent, model_def_loader, parent_library);
         m_all_objects.push_back(obj);
         if(obj->isDriveable())
             m_driveable_objects.push_back(obj);
@@ -80,95 +81,42 @@ void TrackObjectManager::reset()
     for (TrackObject* curr : m_all_objects)
     {
         curr->reset();
-        if (!curr->isEnabled())
-        {
-            //PhysicalObjects may need to be added
-            if (curr->getType() == "mesh")
-            {
-                if (curr->getPhysicalObject() != NULL)
-                    curr->getPhysicalObject()->addBody();
-            }
-        }
-        curr->setEnable(true);
+        curr->setEnabled(true);
     }
 }   // reset
-
-// ----------------------------------------------------------------------------
-/** disables all track objects with a particular ID
- *  \param name Name or ID for disabling
- */
-void TrackObjectManager::disable(std::string name)
-{
-     for (TrackObject* curr : m_all_objects)
-     {
-        if (curr->getName() == (name) || curr->getID() == (name))
-        {
-
-			curr->setEnable(false);
-            if (curr->getType() == "mesh")
-            {
-                if (curr->getPhysicalObject()!=NULL)
-                    curr->getPhysicalObject()->removeBody();
-            }
-        }
-     }
-}
-// ----------------------------------------------------------------------------
-/** enables all track objects with a particular ID
- *  \param name Name or ID for enabling
- */
-void TrackObjectManager::enable(std::string name)
-{
-    for (TrackObject* curr : m_all_objects)
-    {
-        if (curr->getName() == (name) || curr->getID() == (name))
-        {
-            curr->reset();
-            curr->setEnable(true);
-            if (curr->getType() == "mesh")
-            {
-                if (curr->getPhysicalObject() != NULL)
-                curr->getPhysicalObject()->addBody();
-            }
-        }
-    }
-}
-
-// ----------------------------------------------------------------------------
-/**  returns activation status for all track objects
- *   with a particular ID
- *   \param name Name or ID of track object
- */
-bool TrackObjectManager::getStatus(std::string name)
-{
-     for (TrackObject* curr : m_all_objects){
-            if (curr->getName() == (name)||curr->getID()==(name))
-            {
-
-				return curr->isEnabled();
-            
-            }
-     }
-     //object not found
-     return false;
-}
 // ----------------------------------------------------------------------------
 /** returns a reference to the track object
  *  with a particular ID
  *  \param name Name or ID of track object
  */
-TrackObject* TrackObjectManager::getTrackObject(std::string name)
+TrackObject* TrackObjectManager::getTrackObject(const std::string& libraryInstance,
+    const std::string& name)
 {
     for (TrackObject* curr : m_all_objects)
     {
-        if (curr->getName() == (name) || curr->getID() == (name))
+        //if (curr->getParentLibrary() != NULL)
+        //    Log::info("TrackObjectManager", "Found %s::%s", curr->getParentLibrary()->getID().c_str(), curr->getID().c_str());
+        //else
+        //    Log::info("TrackObjectManager", "Found ::%s", curr->getID().c_str());
+
+        if (curr->getParentLibrary() == NULL)
         {
+            if (libraryInstance.size() > 0)
+                continue;
+        }
+        else
+        {
+            if (libraryInstance != curr->getParentLibrary()->getID())
+                continue;
+        }
 
+        if (curr->getID() == name)
+        {
             return curr;
-
         }
     }
     //object not found
+    Log::warn("TrackObjectManager", "Object not found : %s::%s", libraryInstance.c_str(), name.c_str());
     return NULL;
 }
 /** Handles an explosion, i.e. it makes sure that all physical objects are

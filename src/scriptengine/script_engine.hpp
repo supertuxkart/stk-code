@@ -43,13 +43,14 @@ namespace Scripting
         void evalScript(std::string script_fragment);
         void cleanupCache();
 
+        bool loadScript(std::string script_path, bool clear_previous);
+        bool compileLoadedScripts();
+
     private:
         asIScriptEngine *m_engine;
-        std::map<std::string, bool> m_loaded_files;
         std::map<std::string, asIScriptFunction*> m_functions_cache;
 
         void configureEngine(asIScriptEngine *engine);
-        int  compileScript(asIScriptEngine *engine,std::string scriptName);
     };   // class ScriptEngine
 
 }

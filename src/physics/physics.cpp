@@ -40,6 +40,7 @@
 #include "race/race_manager.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_object.hpp"
 #include "utils/profiler.hpp"
 
 // ----------------------------------------------------------------------------
@@ -189,12 +190,22 @@ void Physics::update(float dt)
             PhysicalObject* obj = p->getUserPointer(0)->getPointerPhysicalObject();
             std::string obj_id = obj->getID();
             std::string scripting_function = obj->getOnKartCollisionFunction();
+
+            TrackObject* to = obj->getTrackObject();
+            TrackObject* library = to->getParentLibrary();
+            std::string lib_id;
+            std::string* lib_id_ptr = NULL;
+            if (library != NULL)
+                lib_id = library->getID();
+            lib_id_ptr = &lib_id;
+
             if (scripting_function.size() > 0)
             {
-                script_engine->runFunction("void " + scripting_function + "(int, const string)",
+                script_engine->runFunction("void " + scripting_function + "(int, const string, const string)",
                     [&](asIScriptContext* ctx) {
                         ctx->SetArgDWord(0, kartId);
-                        ctx->SetArgObject(1, &obj_id);
+                        ctx->SetArgObject(1, lib_id_ptr);
+                        ctx->SetArgObject(2, &obj_id);
                     });
             }
             if (obj->isCrashReset())

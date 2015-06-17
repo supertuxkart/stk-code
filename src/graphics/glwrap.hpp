@@ -21,8 +21,11 @@
 #include "graphics/gl_headers.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/vaomanager.hpp"
+#include "graphics/texture_manager.hpp"
+#include "graphics/vao_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/vec3.hpp"
 
 #include <vector>
 
@@ -57,7 +60,7 @@ public:
     unsigned elapsedTimeus();
 };
 
-class FrameBuffer
+class FrameBuffer : public NoCopy
 {
 private:
     GLuint fbo, fbolayer;
@@ -69,8 +72,8 @@ public:
     FrameBuffer(const std::vector <GLuint> &RTTs, size_t w, size_t h, bool layered = false);
     FrameBuffer(const std::vector <GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered = false);
     ~FrameBuffer();
-    void Bind();
-    void BindLayer(unsigned);
+    void bind() const;
+    void bindLayer(unsigned);
     const std::vector<GLuint> &getRTT() const { return RenderTargets; }
     GLuint &getDepthTexture() { assert(DepthTexture); return DepthTexture; }
     size_t getWidth() const { return width; }
@@ -142,9 +145,6 @@ public:
         }
     }
 };
-
-#include "utils/vec3.hpp"
-#include "texturemanager.hpp"
 
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);

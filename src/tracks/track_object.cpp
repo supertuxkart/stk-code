@@ -24,8 +24,10 @@
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
+#include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "utils/helpers.hpp"
 #include <ISceneManager.h>
 
@@ -39,9 +41,10 @@
  * \param lod_node Lod node (defaults to NULL).
  */
 TrackObject::TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent,
-                         ModelDefinitionLoader& model_def_loader)
+                         ModelDefinitionLoader& model_def_loader,
+                         TrackObject* parent_library)
 {
-    init(xml_node, parent, model_def_loader);
+    init(xml_node, parent, model_def_loader, parent_library);
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
@@ -63,6 +66,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_presentation    = NULL;
     m_animator        = NULL;
     m_physical_object = NULL;
+    m_parent_library  = NULL;
     m_interaction     = interaction;
     m_presentation    = presentation;
     m_is_driveable    = false;
@@ -89,7 +93,8 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
  *  \param model_def_loader Used to load level-of-detail nodes.
  */
 void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
-                       ModelDefinitionLoader& model_def_loader)
+                       ModelDefinitionLoader& model_def_loader,
+                       TrackObject* parent_library)
 {
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
@@ -97,7 +102,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_enabled    = true;
     m_presentation = NULL;
     m_animator = NULL;
-
+    m_parent_library = parent_library;
     m_physical_object = NULL;
 
     xml_node.get("id",      &m_id        );
@@ -141,7 +146,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     }
     else if (xml_node.getName() == "library")
     {
-        m_presentation = new TrackObjectPresentationLibraryNode(xml_node, model_def_loader);
+        m_presentation = new TrackObjectPresentationLibraryNode(this, xml_node, model_def_loader);
     }
     else if (type == "sfx-emitter")
     {
@@ -217,6 +222,11 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                 node->setPosition(absTransform.getTranslation());
                 node->setRotation(absTransform.getRotationDegrees());
                 node->setScale(absTransform.getScale());
+
+                if (parent_library != NULL)
+                {
+                    parent_library->addMovableChild(this);
+                }
             }
 
             glownode = node;
@@ -262,6 +272,27 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     }
 
     reset();
+
+    // some static meshes are conditional
+    std::string condition;
+    xml_node.get("if", &condition);
+    if (condition == "false")
+    {
+        // TODO: doesn't work (in all cases), probably it's a bit too early, children are not loaded yet
+        setEnabled(false);
+    }
+    else if (condition.size() > 0)
+    {
+        unsigned char result = -1;
+        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+        std::function<void(asIScriptContext*)> null_callback;
+        script_engine->runFunction("bool " + condition + "()", null_callback,
+            [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
+
+        // TODO: doesn't work (in all cases), probably it's a bit too early, children are not loaded yet
+        if (result == 0)
+            setEnabled(false);
+    }
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
@@ -281,9 +312,9 @@ TrackObject::~TrackObject()
  */
 void TrackObject::reset()
 {
-    if (m_presentation  ) m_presentation->reset();
-    if (m_animator      ) m_animator->reset();
-    if(m_physical_object) m_physical_object->reset();
+    if (m_presentation   ) m_presentation->reset();
+    if (m_animator       ) m_animator->reset();
+    if (m_physical_object) m_physical_object->reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -291,10 +322,34 @@ void TrackObject::reset()
  *  disabled objects will not be displayed anymore.
  *  \param mode Enable (true) or disable (false) this object.
  */
-void TrackObject::setEnable(bool mode)
+void TrackObject::setEnabled(bool enabled)
 {
-    m_enabled = mode;
-    if (m_presentation != NULL) m_presentation->setEnable(m_enabled);
+    if (m_enabled == enabled)
+        return;
+
+    m_enabled = enabled;
+
+    if (m_presentation != NULL)
+        m_presentation->setEnable(m_enabled);
+
+    if (enabled)
+        reset(); // TODO: not sure why there is a reset here
+
+    if (getType() == "mesh")
+    {
+        if (m_physical_object != NULL)
+        {
+            if (enabled)
+                m_physical_object->addBody();
+            else
+                m_physical_object->removeBody();
+        }
+    }
+
+    for (int i = 0; i < m_movable_children.size(); i++)
+    {
+        m_movable_children[i]->setEnabled(enabled);
+    }
 }   // setEnable
 
 // ----------------------------------------------------------------------------
@@ -404,3 +459,10 @@ const core::vector3df& TrackObject::getScale() const
     else
         return m_init_xyz;
 }   // getScale
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::addMovableChild(TrackObject* child)
+{
+    m_movable_children.push_back(child);
+}

@@ -723,7 +723,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         switch (m_shader_type)
         {
         case SHADERTYPE_SOLID_UNLIT:
-            m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+            m->MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
             m->setTexture(1, glossytex);
             return;
         case SHADERTYPE_ALPHA_TEST:
@@ -747,7 +747,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 video::EAS_VERTEX_COLOR);
             return;
         case SHADERTYPE_SPHERE_MAP:
-            m->MaterialType = irr_driver->getShader(ES_SPHERE_MAP);
+            m->MaterialType = Shaders::getShader(ES_SPHERE_MAP);
             m->setTexture(1, glossytex);
             return;
         case SHADERTYPE_SPLATTING:
@@ -774,7 +774,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(6, glossytex);
 
             // Material and shaders
-            m->MaterialType = irr_driver->getShader(ES_SPLATTING);
+            m->MaterialType = Shaders::getShader(ES_SPLATTING);
             return;
         case SHADERTYPE_WATER:
             m->setTexture(1, irr_driver->getTexture(FileManager::TEXTURE,
@@ -782,18 +782,18 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(2, irr_driver->getTexture(FileManager::TEXTURE,
                 "waternormals2.jpg"));
 
-            ((WaterShaderProvider *)irr_driver->getCallback(ES_WATER))->
+            ((WaterShaderProvider *)Shaders::getCallback(ES_WATER))->
                 setSpeed(m_water_shader_speed_1 / 100.0f, m_water_shader_speed_2 / 100.0f);
 
-            m->MaterialType = irr_driver->getShader(ES_WATER);
+            m->MaterialType = Shaders::getShader(ES_WATER);
             return;
         case SHADERTYPE_VEGETATION:
             // Only one grass speed & amplitude per map for now
-            ((GrassShaderProvider *)irr_driver->getCallback(ES_GRASS))->
+            ((GrassShaderProvider *)Shaders::getCallback(ES_GRASS))->
                 setSpeed(m_grass_speed);
-            ((GrassShaderProvider *)irr_driver->getCallback(ES_GRASS))->
+            ((GrassShaderProvider *)Shaders::getCallback(ES_GRASS))->
                 setAmplitude(m_grass_amplitude);
-            m->MaterialType = irr_driver->getShader(ES_GRASS_REF);
+            m->MaterialType = Shaders::getShader(ES_GRASS_REF);
             m->setTexture(1, glossytex);
             return;
         }
@@ -807,7 +807,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(2, tex);
 
             // Material and shaders
-            m->MaterialType = irr_driver->getShader(ES_NORMAL_MAP);
+            m->MaterialType = Shaders::getShader(ES_NORMAL_MAP);
             m->setTexture(1, glossytex);
             return;
         }

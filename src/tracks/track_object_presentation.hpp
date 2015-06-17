@@ -24,6 +24,7 @@
 #include "items/item.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/log.hpp"
 #include "utils/vec3.hpp"
 
 #include <vector3d.h>
@@ -38,6 +39,7 @@ class ThreeDAnimation;
 class ModelDefinitionLoader;
 class STKInstancedSceneNode;
 class XMLNode;
+class TrackObject;
 
 namespace irr
 {
@@ -79,7 +81,10 @@ public:
     // ------------------------------------------------------------------------
 
     virtual void reset() {}
-    virtual void setEnable(bool enabled) {}
+    virtual void setEnable(bool enabled)
+    {
+        Log::warn("TrackObjectPresentation", "setEnable unimplemented for this presentation type");
+    }
     virtual void update(float dt) {}
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
         const core::vector3df& scale, bool isAbsoluteCoord) {}
@@ -170,7 +175,8 @@ public:
 class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNode
 {
 public:
-    TrackObjectPresentationLibraryNode(const XMLNode& xml_node,
+    TrackObjectPresentationLibraryNode(TrackObject* parent,
+        const XMLNode& xml_node,
         ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLibraryNode();
 };   // TrackObjectPresentationLibraryNode
