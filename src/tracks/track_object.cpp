@@ -329,16 +329,10 @@ void TrackObject::reset()
  */
 void TrackObject::setEnabled(bool enabled)
 {
-    //if (m_enabled == enabled)
-    //    return;
-    
     m_enabled = enabled;
 
     if (m_presentation != NULL)
         m_presentation->setEnable(m_enabled);
-
-    //if (enabled)
-    //    reset();
 
     if (getType() == "mesh")
     {
@@ -361,7 +355,26 @@ void TrackObject::setEnabled(bool enabled)
 
 void TrackObject::resetEnabled()
 {
-    setEnabled(m_initially_visible);
+    m_enabled = m_initially_visible;
+
+    if (m_presentation != NULL)
+        m_presentation->setEnable(m_initially_visible);
+
+    if (getType() == "mesh")
+    {
+        if (m_physical_object != NULL)
+        {
+            if (m_initially_visible)
+                m_physical_object->addBody();
+            else
+                m_physical_object->removeBody();
+        }
+    }
+
+    for (int i = 0; i < m_movable_children.size(); i++)
+    {
+        m_movable_children[i]->resetEnabled();
+    }
 }
 
 // ----------------------------------------------------------------------------
