@@ -197,7 +197,7 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
             lib_path = track->getTrackFile("library/" + name);
             libroot = file_manager->createXMLTree(local_lib_node_path);
             if (track != NULL)
-                World::getWorld()->getScriptEngine()->loadScript(lib_script_file_path, false);
+                World::getWorld()->getScriptEngine()->loadScript(local_script_file_path, false);
         }
         else if (file_manager->fileExists(lib_node_path))
         {
