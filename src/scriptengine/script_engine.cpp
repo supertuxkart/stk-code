@@ -21,6 +21,7 @@
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
+#include "scriptengine/script_audio.hpp"
 #include "scriptengine/script_challenges.hpp"
 #include "scriptengine/script_kart.hpp"
 #include "scriptengine/script_engine.hpp"
@@ -336,7 +337,8 @@ namespace Scripting
         Scripting::Utils::registerScriptFunctions(m_engine);
         Scripting::GUI::registerScriptFunctions(m_engine);
         Scripting::GUI::registerScriptEnums(m_engine);
-    
+        Scripting::Audio::registerScriptFunctions(m_engine);
+
         // It is possible to register the functions, properties, and types in 
         // configuration groups as well. When compiling the scripts it can then
         // be defined which configuration groups should be available for that

@@ -939,7 +939,7 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
 {
     if (!sfxAllowed()) return NULL;
 
-    m_quick_sounds.lock();
+    MutexLockerHelper lock(m_quick_sounds);
     std::map<std::string, SFXBase*>::iterator sound = 
                                      m_quick_sounds.getData().find(sound_type);
 
@@ -950,14 +950,12 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
         if (new_sound == NULL) return NULL;
         new_sound->play();
         m_quick_sounds.getData()[sound_type] = new_sound;
-        m_quick_sounds.unlock();
         return new_sound;
     }
     else
     {
         SFXBase *base_sound = sound->second;
         base_sound->play();
-        m_quick_sounds.unlock();
         return base_sound;
     }
 
