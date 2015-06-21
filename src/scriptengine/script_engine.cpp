@@ -407,4 +407,27 @@ namespace Scripting
 
         return true;
     }
+
+    //-----------------------------------------------------------------------------
+
+    void ScriptEngine::addPendingTimeout(double time, const std::string& callback_name)
+    {
+        m_pending_timeouts.push_back(PendingTimeout(time, callback_name));
+    }
+
+    //-----------------------------------------------------------------------------
+
+    void ScriptEngine::update(double dt)
+    {
+        for (int i = m_pending_timeouts.size() - 1; i >= 0; i--)
+        {
+            PendingTimeout& curr = m_pending_timeouts[i];
+            curr.m_time -= dt;
+            if (curr.m_time <= 0.0)
+            {
+                runFunction("void " + curr.m_callback_name + "()");
+                m_pending_timeouts.erase(m_pending_timeouts.begin() + i);
+            }
+        }
+    }
 }

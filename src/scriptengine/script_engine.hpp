@@ -27,6 +27,19 @@ class TrackObjectPresentation;
 
 namespace Scripting
 {
+    /** Represents a scripting function to execute after a given time */
+    struct PendingTimeout
+    {
+        double m_time;
+        std::string m_callback_name;
+
+        PendingTimeout(double time, const std::string& callback_name)
+        {
+            m_time = time;
+            m_callback_name = callback_name;
+        }
+    };
+
     class ScriptEngine
     {
     public:
@@ -46,9 +59,13 @@ namespace Scripting
         bool loadScript(std::string script_path, bool clear_previous);
         bool compileLoadedScripts();
 
+        void addPendingTimeout(double time, const std::string& callback_name);
+        void update(double dt);
+
     private:
         asIScriptEngine *m_engine;
         std::map<std::string, asIScriptFunction*> m_functions_cache;
+        std::vector<PendingTimeout> m_pending_timeouts;
 
         void configureEngine(asIScriptEngine *engine);
     };   // class ScriptEngine

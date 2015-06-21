@@ -108,6 +108,25 @@ namespace Scripting
             script_engine->runFunction(*str);
         }
 
+        /** Generate a random integer value */
+        int randomInt(int min, int maxExclusive)
+        {
+            return min + (rand() % (maxExclusive - min));
+        }
+
+        /** Generate a random floating-point value */
+        float randomFloat(int min, int maxExclusive)
+        {
+            int val = min * 100 + (rand() % ((maxExclusive - min) * 100));
+            return val / 100.0f;
+        }
+
+        /** Call a function after the specified delay */
+        void setTimeout(const std::string* callback_name, float delay)
+        {
+            World::getWorld()->getScriptEngine()->addPendingTimeout(delay, *callback_name);
+        }
+
         /** Log to the console */
         void logInfo(std::string* log)
         {
@@ -162,6 +181,10 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues4), asCALL_CDECL); assert(r >= 0);
             
             r = engine->RegisterGlobalFunction("void runScript(string &in)", asFUNCTION(runScript), asCALL_CDECL); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("int randomInt(int, int)", asFUNCTION(randomInt), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("float randomFloat(int, int)", asFUNCTION(randomFloat), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setTimeout(const string &in, float)", asFUNCTION(setTimeout), asCALL_CDECL); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("void logInfo(const string &in)", asFUNCTION(logInfo), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void logWarning(const string &in)", asFUNCTION(logWarning), asCALL_CDECL); assert(r >= 0);
