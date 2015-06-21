@@ -44,12 +44,14 @@ namespace Scripting
         * @{
         */
 
+        /** Get number of challenges that were completed at any difficulty */
         int getCompletedChallengesCount()
         {
             ::Track* track = World::getWorld()->getTrack();
             return track->getNumOfCompletedChallenges();
         }
 
+        /** Get total number of challenges */
         int getChallengeCount()
         {
             ::Track* track = World::getWorld()->getTrack();
@@ -69,8 +71,9 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("int getChallengeCount()", asFUNCTION(getChallengeCount), asCALL_CDECL); assert(r >= 0);
         }
 
-/** \cond DOXYGEN_IGNORE */
     }
+
+    /** \cond DOXYGEN_IGNORE */
 }
 /** \endcond */
 

@@ -32,13 +32,17 @@ namespace Scripting
         /** \addtogroup Scripting
         * @{
         */
-        /** \addtogroup Audio
+        /** \addtogroup Scripting_Audio Audio
         * @{
         */
+
+        /** Plays a sound by name */
+
         void playSound(const std::string* sound_name)
         {
             SFXManager::get()->quickSound(*sound_name);
         }
+
         /** @}*/
         /** @}*/
 
