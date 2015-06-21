@@ -72,6 +72,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_is_driveable    = false;
     m_soccer_ball     = false;
     m_garage          = false;
+    m_initially_visible = false;
     m_distance        = 0;
     m_type            = "";
 
@@ -100,6 +101,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_init_hpr   = core::vector3df(0,0,0);
     m_init_scale = core::vector3df(1,1,1);
     m_enabled    = true;
+    m_initially_visible = false;
     m_presentation = NULL;
     m_animator = NULL;
     m_parent_library = parent_library;

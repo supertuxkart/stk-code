@@ -94,7 +94,7 @@ protected:
     
     std::vector<TrackObject*>      m_movable_children;
 
-    bool                           m_initially_visible = true;
+    bool                           m_initially_visible;
 
     void init(const XMLNode &xml_node, scene::ISceneNode* parent,
         ModelDefinitionLoader& model_def_loader,
