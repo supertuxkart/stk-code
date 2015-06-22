@@ -31,9 +31,9 @@ namespace Scripting
         float y;
         float z;
 
-        float getX() { return x; }
-        float getY() { return y; }
-        float getZ() { return z; }
+        float getX() const { return x; }
+        float getY() const { return y; }
+        float getZ() const { return z; }
 
         SimpleVec3() : x(0), y(0), z(0) { }
         SimpleVec3(float p_x, float p_y, float p_z) : x(p_x), y(p_y), z(p_z) { }

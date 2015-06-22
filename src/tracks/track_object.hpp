@@ -23,6 +23,7 @@
 
 #include "items/item.hpp"
 #include "physics/physical_object.hpp"
+#include "scriptengine/scriptvec3.hpp"
 #include "tracks/track_object_presentation.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
@@ -212,6 +213,15 @@ public:
     PhysicalObject* getPhysics() { return m_physical_object; }
     /** Hide or show the object */
     void setEnabled(bool mode);
+
+    void moveTo(const Scripting::SimpleVec3* pos, bool isAbsoluteCoord)
+    {
+        move(core::vector3df(pos->getX(), pos->getY(), pos->getZ()),
+            core::vector3df(0.0f, 0.0f, 0.0f), // TODO: preserve rotation
+            core::vector3df(1.0f, 1.0f, 1.0f), // TODO: preserve scale
+            true, // updateRigidBody
+            isAbsoluteCoord);
+    }
     /* @} */
     /* @} */
     /* @} */

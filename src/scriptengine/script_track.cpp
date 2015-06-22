@@ -243,7 +243,8 @@ namespace Scripting
             r = engine->RegisterObjectMethod("TrackObject", "Mesh@ getMesh()", asMETHOD(TrackObject, getMesh), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "ParticleEmitter@ getParticleEmitter()", asMETHOD(TrackObject, getParticleEmitter), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Animator@ getIPOAnimator()", asMETHOD(TrackObject, getIPOAnimator), asCALL_THISCALL); assert(r >= 0);
-            // TODO: add move method
+            r = engine->RegisterObjectMethod("TrackObject", "void moveTo(const Vec3 &in, bool)", asMETHOD(TrackObject, moveTo), asCALL_THISCALL); assert(r >= 0);
+
 
             // PhysicalObject
             r = engine->RegisterObjectMethod("PhysicalObject", "bool isFlattenKartObject()", asMETHOD(PhysicalObject, isFlattenKartObject), asCALL_THISCALL); assert(r >= 0);
