@@ -63,10 +63,10 @@ std::string
 Dictionary::translate_plural(const Entries& dict, const std::string& msgid, const std::string& msgid_plural, int count)
 {
   Entries::const_iterator i = dict.find(msgid);
-  const std::vector<std::string>& msgstrs = i->second;
 
   if (i != dict.end())
   {
+    const std::vector<std::string>& msgstrs = i->second;
     unsigned int n = 0;
     n = plural_forms.get_plural(count);
     assert(/*n >= 0 &&*/ n < msgstrs.size());
