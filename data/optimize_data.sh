@@ -20,8 +20,9 @@ jpegtran=true
 advdef=true
 advzip=true
 optipng=true
+convert=true
 
-#WARNING! SETTING TO TRUE MAY POSSIBLY INCREASE LOAD TIMES ON A SLOW CPU (UNTESTED) OR LEAD TO FILE NOT FOUND ERRORS WHEN RUNNING SUPERTUXKART! 
+#WARNING! SETTING TO TRUE MAY POSSIBLY INCREASE LOAD TIMES ON A SLOW CPU (UNTESTED) OR LEAD TO FILE NOT FOUND ERRORS WHEN RUNNING SUPERTUXKART!
 compress_b3d=false
 
 
@@ -58,10 +59,17 @@ then
 	sleep 2
 fi
 
+#check for convert
+if [ ! $(which convert) ]
+then
+	echo "convert is not installed, therefore it will not be used."; convert=false
+	sleep 2
+fi
+
 #check for optipng
 if [ ! $(which optipng) ]
 then
-        echo "optipng is not installed, therefore it will not be used."; optipng=false
+	echo "optipng is not installed, therefore it will not be used."; optipng=false
 	sleep 2
 fi
 
@@ -83,10 +91,18 @@ BEFORE=`du -sk | awk '{print $1}'`
 #functions for xargs multithreading, used instead of GNU parallel for cross-compatibility
 #TODO: let next set of optimization scripts run if one set is stuck on a single file at the end to decrease total runtime
 
+#strip ICC information off PNG's
+strippng () {
+for arg; do
+	convert "$arg" -strip "$arg"
+done
+}
+export -f strippng
+
 #optimize PNG's
 optimpng () {
 for arg; do
-        optipng -quiet -o3 "$arg"
+	optipng -quiet -o3 "$arg"
 #level 3 = 16 trials, which according to http://optipng.sourceforge.net/pngtech/optipng.html (retrieved October 2014) should be satisfactory for all users
 done
 }
@@ -96,7 +112,7 @@ export -f optimpng
 #compress PNG in-stream data
 comprpng () {
 for arg; do
-        advdef -z4 "$arg"
+	advdef -z4 "$arg"
 done
 }
 export -f comprpng
@@ -121,6 +137,12 @@ done
 export -f recomprb3dz
 #END MULTITHREADING FUNCTIONS
 
+#strip png icc information
+if [ "$convert" = true ]; then
+	find . -path .svn -prune -o -name "*.png" -print0 | xargs -0 -n 1 -P "$threads" bash -c 'strippng "$@"' -- #multithread the png stripping
+else echo "convert not installed. Ignoring commands using convert..."; sleep 1
+fi
+
 #lossless png image optimization
 if [ "$optipng" = true ]; then
 	find . -path .svn -prune -o -name "*.png" -print0 | xargs -0 -n 1 -P "$threads" bash -c 'optimpng "$@"' -- #multithread the png optimization
@@ -142,7 +164,7 @@ else echo "jpegtran not installed. Ignoring commands using jpegtran..."; sleep 1
 fi
 
 
-#b3dz to b3dz compression 
+#b3dz to b3dz compression
 #WARNING: BETA, MAY CAUSE MISSING FILE WARNINGS!
 if [ "$compress_b3d" = true ]; then
 	for xmls in $(find . -name "*.xml"); do
