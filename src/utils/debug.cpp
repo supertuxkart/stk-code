@@ -561,10 +561,12 @@ bool onEvent(const SEvent &event)
                             );
                     }
                 }
+#ifdef DEBUG
                 else if (cmdID == DEBUG_SFX_LOG && UserConfigParams::m_sfx_logging)
                 {
                     SFXManager::get()->dumpLogData();
                 }
+#endif
                 else if (cmdID == DEBUG_VISUAL_VALUES)
                 {
 #if !defined(__APPLE__)

@@ -243,13 +243,13 @@ void SFXManager::queue(SFXCommands command, MusicInformation *mi, float f)
 
 void SFXManager::queueCommand(SFXCommand *command)
 {
+#ifdef DEBUG
     // Don't accept any commands while data is being dumped, since the
     // updates will arrive faster than the data is written, so the 
     // dumping will never end
     if (m_currently_dumping)
         return;
 
-#ifdef DEBUG
     if (UserConfigParams::m_sfx_logging && command->m_command!=SFX_EXIT)
     {
         SFXLogData *p = &(m_sfx_log_data[m_sfx_log_data_index]);
