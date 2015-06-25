@@ -69,7 +69,7 @@ private:
     unsigned int m_sfx_log_data_index;
     bool m_currently_dumping;
 public:
-    void SFXManager::dumpLogData();
+    void dumpLogData();
 
 #endif
 
