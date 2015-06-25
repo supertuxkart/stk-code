@@ -261,9 +261,12 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                                                    this);
         }
 
-        if (is_movable && parent_library != NULL)
+        if (parent_library != NULL)
         {
-            parent_library->addMovableChild(this);
+            if (is_movable)
+                parent_library->addMovableChild(this);
+            else
+                parent_library->addChild(this);
         }
 
         video::SColor glow;
@@ -430,24 +433,31 @@ void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
 
     if (update_rigid_body && m_physical_object != NULL)
     {
-        // If we set a bullet position from an irrlicht position, we need to
-        // get the absolute transform from the presentation object (as set in
-        // the line before), since xyz etc here are only relative to a
-        // potential parent scene node.
-        TrackObjectPresentationSceneNode *tops =
-            dynamic_cast<TrackObjectPresentationSceneNode*>(m_presentation);
-        if(tops)
-        {
-            const core::matrix4 &m = tops->getNode()
-                                   ->getAbsoluteTransformation();
-            m_physical_object->move(m.getTranslation(),m.getRotationDegrees());
-        }
-        else
-        {
-            m_physical_object->move(xyz, hpr);
-        }
+        movePhysicalBodyToGraphicalNode(xyz, hpr);
     }
 }   // move
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::movePhysicalBodyToGraphicalNode(const core::vector3df& xyz, const core::vector3df& hpr)
+{
+    // If we set a bullet position from an irrlicht position, we need to
+    // get the absolute transform from the presentation object (as set in
+    // the line before), since xyz etc here are only relative to a
+    // potential parent scene node.
+    TrackObjectPresentationSceneNode *tops =
+        dynamic_cast<TrackObjectPresentationSceneNode*>(m_presentation);
+    if (tops)
+    {
+        const core::matrix4 &m = tops->getNode()
+            ->getAbsoluteTransformation();
+        m_physical_object->move(m.getTranslation(), m.getRotationDegrees());
+    }
+    else
+    {
+        m_physical_object->move(xyz, hpr);
+    }
+}
 
 // ----------------------------------------------------------------------------
 const core::vector3df& TrackObject::getPosition() const
@@ -495,4 +505,38 @@ void TrackObject::addMovableChild(TrackObject* child)
     if (!m_enabled)
         child->setEnabled(false);
     m_movable_children.push_back(child);
+}
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::addChild(TrackObject* child)
+{
+    if (!m_enabled)
+        child->setEnabled(false);
+    m_children.push_back(child);
+}
+
+// ----------------------------------------------------------------------------
+
+// scripting function
+void TrackObject::moveTo(const Scripting::SimpleVec3* pos, bool isAbsoluteCoord)
+{
+    TrackObjectPresentationLibraryNode *libnode =
+        dynamic_cast<TrackObjectPresentationLibraryNode*>(m_presentation);
+    if (libnode != NULL)
+    {
+        libnode->move(core::vector3df(pos->getX(), pos->getY(), pos->getZ()),
+            core::vector3df(0.0f, 0.0f, 0.0f), // TODO: preserve rotation
+            core::vector3df(1.0f, 1.0f, 1.0f), // TODO: preserve scale
+            isAbsoluteCoord,
+            true /* moveChildrenPhysicalBodies */);
+    }
+    else
+    {
+        move(core::vector3df(pos->getX(), pos->getY(), pos->getZ()),
+            core::vector3df(0.0f, 0.0f, 0.0f), // TODO: preserve rotation
+            core::vector3df(1.0f, 1.0f, 1.0f), // TODO: preserve scale
+            true, // updateRigidBody
+            isAbsoluteCoord);
+    }
 }

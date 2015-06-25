@@ -174,11 +174,14 @@ public:
  */
 class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNode
 {
+    TrackObject* m_parent;
 public:
     TrackObjectPresentationLibraryNode(TrackObject* parent,
         const XMLNode& xml_node,
         ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLibraryNode();
+    void move(const core::vector3df& xyz, const core::vector3df& hpr,
+        const core::vector3df& scale, bool isAbsoluteCoord, bool moveChildrenPhysicalBodies);
 };   // TrackObjectPresentationLibraryNode
 
 // ============================================================================

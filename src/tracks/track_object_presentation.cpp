@@ -254,6 +254,7 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     assert(libroot != NULL);
     World::getWorld()->getTrack()->loadObjects(libroot, lib_path, model_def_loader,
         create_lod_definitions, m_node, parent);
+    m_parent = parent;
 }   // TrackObjectPresentationLibraryNode
 
 // ----------------------------------------------------------------------------
@@ -261,7 +262,24 @@ TrackObjectPresentationLibraryNode::~TrackObjectPresentationLibraryNode()
 {
     irr_driver->removeNode(m_node);
 }   // TrackObjectPresentationLibraryNode
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLibraryNode::move(const core::vector3df& xyz, const core::vector3df& hpr,
+    const core::vector3df& scale, bool isAbsoluteCoord, bool moveChildrenPhysicalBodies)
+{
+    TrackObjectPresentationSceneNode::move(xyz, hpr, scale, isAbsoluteCoord);
 
+    if (moveChildrenPhysicalBodies)
+    {
+        for (TrackObject* obj : m_parent->getChildren())
+        {
+            obj->reset();
+            if (obj->getPhysicalObject() != NULL)
+            {
+                obj->movePhysicalBodyToGraphicalNode(obj->getAbsolutePosition(), obj->getRotation());
+            }
+        }
+    }
+}
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
                                        scene::ISceneNode* parent,

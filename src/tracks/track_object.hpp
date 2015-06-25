@@ -94,6 +94,7 @@ protected:
     TrackObject*                   m_parent_library;
     
     std::vector<TrackObject*>      m_movable_children;
+    std::vector<TrackObject*>      m_children;
 
     bool                           m_initially_visible;
 
@@ -214,14 +215,7 @@ public:
     /** Hide or show the object */
     void setEnabled(bool mode);
 
-    void moveTo(const Scripting::SimpleVec3* pos, bool isAbsoluteCoord)
-    {
-        move(core::vector3df(pos->getX(), pos->getY(), pos->getZ()),
-            core::vector3df(0.0f, 0.0f, 0.0f), // TODO: preserve rotation
-            core::vector3df(1.0f, 1.0f, 1.0f), // TODO: preserve scale
-            true, // updateRigidBody
-            isAbsoluteCoord);
-    }
+    void moveTo(const Scripting::SimpleVec3* pos, bool isAbsoluteCoord);
     /* @} */
     /* @} */
     /* @} */
@@ -241,7 +235,14 @@ public:
       * to still preserve the parent-child relationship
       */
     void addMovableChild(TrackObject* child);
-
+    // ------------------------------------------------------------------------
+    void addChild(TrackObject* child);
+    // ------------------------------------------------------------------------
+    std::vector<TrackObject*>& getMovableChildren() { return m_movable_children; }
+    // ------------------------------------------------------------------------
+    std::vector<TrackObject*>& getChildren() { return m_children; }
+    // ------------------------------------------------------------------------
+    void movePhysicalBodyToGraphicalNode(const core::vector3df& xyz, const core::vector3df& hpr);
     LEAK_CHECK()
 };   // TrackObject
 
