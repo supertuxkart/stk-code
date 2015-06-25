@@ -57,6 +57,22 @@ private:
     /** Singleton pointer. */
     static SFXManager *m_sfx_manager;
 
+#ifdef DEBUG
+    struct SFXLogData
+    {
+        int              m_command;
+        std::string      m_normal_filename;
+        const SFXBase   *m_sfx_base;
+        const SFXBuffer *m_sfx_buffer;
+    };
+    std::vector<SFXLogData>  m_sfx_log_data;
+    unsigned int m_sfx_log_data_index;
+    bool m_currently_dumping;
+public:
+    void SFXManager::dumpLogData();
+
+#endif
+
 public:
 
     /** The various commands to be executed by the sfx manager thread

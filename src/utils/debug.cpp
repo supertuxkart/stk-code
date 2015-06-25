@@ -18,6 +18,7 @@
 
 #include "debug.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
@@ -104,6 +105,7 @@ enum DebugMenuCommand
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
+    DEBUG_SFX_LOG,
     DEBUG_ADJUST_LIGHTS,
     DEBUG_SCRIPT_CONSOLE
 };   // DebugMenuCommand
@@ -267,6 +269,8 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
             mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
+            if(UserConfigParams::m_sfx_logging)
+                mnu->addItem(L"Dump sfx data", DEBUG_SFX_LOG);
             mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
             mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
 
@@ -556,6 +560,10 @@ bool onEvent(const SEvent &event)
                             kart->getXYZ().getZ(),kart->getHeading()*RAD_TO_DEGREE
                             );
                     }
+                }
+                else if (cmdID == DEBUG_SFX_LOG && UserConfigParams::m_sfx_logging)
+                {
+                    SFXManager::get()->dumpLogData();
                 }
                 else if (cmdID == DEBUG_VISUAL_VALUES)
                 {

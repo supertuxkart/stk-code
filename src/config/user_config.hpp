@@ -490,6 +490,9 @@ namespace UserConfigParams
     /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool m_unit_testing PARAM_DEFAULT(false);
 
+    /** If sfx logging is enabled. */
+    PARAM_PREFIX bool m_sfx_logging PARAM_DEFAULT(false);
+
     /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool m_gamepad_debug PARAM_DEFAULT( false );
 

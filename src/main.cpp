@@ -737,6 +737,8 @@ int handleCmdLine()
 
     if (CommandLine::has("--unit-testing"))
         UserConfigParams::m_unit_testing = true;
+    if (CommandLine::has("--log-sfx"))
+        UserConfigParams::m_sfx_logging = true;
     if (CommandLine::has("--gamepad-debug"))
         UserConfigParams::m_gamepad_debug=true;
     if (CommandLine::has("--keyboard-debug"))

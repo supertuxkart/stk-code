@@ -71,6 +71,13 @@ void SFXManager::destroy()
  */
 SFXManager::SFXManager()
 {
+#ifdef DEBUG
+    // These need to be initialised, even if no --log-sfx flag is specified,
+    // since at this stage the command line has not been handled.
+    m_sfx_log_data.resize(100000);
+    m_sfx_log_data_index = 0;
+    m_currently_dumping  = false;
+#endif
 
     // The sound manager initialises OpenAL
     m_initialized = music_manager->initialized();
@@ -233,8 +240,38 @@ void SFXManager::queue(SFXCommands command, MusicInformation *mi, float f)
  *  sfx manager to wake up.
  *  \param command Pointer to the command to queue up.
  */
+
 void SFXManager::queueCommand(SFXCommand *command)
 {
+    // Don't accept any commands while data is being dumped, since the
+    // updates will arrive faster than the data is written, so the 
+    // dumping will never end
+    if (m_currently_dumping)
+        return;
+
+#ifdef DEBUG
+    if (UserConfigParams::m_sfx_logging && command->m_command!=SFX_EXIT)
+    {
+        SFXLogData *p = &(m_sfx_log_data[m_sfx_log_data_index]);
+        p->m_command = command->m_command;
+        if (command->m_command < SFX_MUSIC_START)
+        {
+            p->m_sfx_base = command->m_sfx;
+            if (command->m_sfx)
+            {
+                p->m_normal_filename = command->m_sfx->getBuffer()->getFileName();
+                p->m_sfx_buffer      = command->m_sfx->getBuffer();
+            }
+        }
+        else
+        {
+            p->m_normal_filename = command->m_music_information->getNormalFilename();
+        }
+        m_sfx_log_data_index++;
+        if (m_sfx_log_data_index >= (int)m_sfx_log_data.size())
+            m_sfx_log_data_index = 0;
+    }
+#endif
     m_sfx_commands.lock();
     if(World::getWorld() && 
         m_sfx_commands.getData().size() > 20*race_manager->getNumberOfKarts()+20 &&
@@ -259,6 +296,31 @@ void SFXManager::queueCommand(SFXCommand *command)
     m_sfx_commands.unlock();
 }   // queueCommand
 
+//----------------------------------------------------------------------------
+#ifdef DEBUG
+void SFXManager::dumpLogData()
+{
+    // Don't bother locking m_currently_dumping, only the main thread sets it
+    m_currently_dumping = true;
+    for (unsigned int i = 0; i < m_sfx_log_data_index; i++)
+    {
+        const SFXLogData &p = m_sfx_log_data[i];
+        if (p.m_command <= SFX_MUSIC_START)
+        {
+
+            if (p.m_sfx_base)
+                Log::info("SFX", "SFX %d %s sfx %lx buffer %lx",
+                p.m_command, p.m_normal_filename.c_str(),
+                p.m_sfx_base, p.m_sfx_buffer);
+            else
+                Log::info("SFX", "NoSFX %d", p.m_command);
+        }
+        else
+            Log::info("SFX", "Music %d %s", p.m_command, p.m_normal_filename.c_str());
+    }
+    m_currently_dumping = false;
+}   // dumpLogData
+#endif
 //----------------------------------------------------------------------------
 /** Puts a NULL request into the queue, which will trigger the thread to
  *  exit.
