@@ -784,6 +784,9 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
     xml_node.get("clip_distance", &clip_distance);
     xml_node.get("conditions",    &m_trigger_condition);
 
+    bool auto_emit = true;
+    xml_node.get("auto_emit", &auto_emit);
+
     try
     {
         ParticleKind* kind = ParticleKindManager::get()->getParticles(path);
@@ -810,7 +813,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
             m_emitter = emitter;
         }
 
-        if (m_trigger_condition.size() > 0)
+        if (m_trigger_condition.size() > 0 || !auto_emit)
         {
             m_emitter->setCreationRateAbsolute(0.0f);
         }

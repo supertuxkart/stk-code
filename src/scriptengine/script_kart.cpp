@@ -100,7 +100,7 @@ namespace Scripting
         }
 
         /** Sets the kart's velocity to the specified value. */
-        void setVelocity(int idKart, Vec3* position)
+        void setVelocity(int idKart, SimpleVec3* position)
         {
             float x = position->getX();
             float y = position->getY();
@@ -108,6 +108,14 @@ namespace Scripting
 
             AbstractKart* kart = World::getWorld()->getKart(idKart);
             kart->setVelocity(btVector3(x, y, z));
+        }
+
+        /** Gets the kart's velocity */
+        SimpleVec3 getVelocity(int idKart)
+        {
+            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            btVector3 velocity = kart->getVelocity();
+            return SimpleVec3(velocity.getX(), velocity.getY(), velocity.getZ());
         }
 
         /** @}*/
@@ -122,6 +130,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void setVelocity(int id, const Vec3 &in)", asFUNCTION(setVelocity), asCALL_CDECL); assert(r >= 0);
             //r = engine->RegisterGlobalFunction("void jumpTo(int id, float x, float y)", asFUNCTION(jumpTo), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("Vec3 getLocation(int id)", asFUNCTION(getLocation), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("Vec3 getVelocity(int id)", asFUNCTION(getVelocity), asCALL_CDECL); assert(r >= 0);
         }
 
         void registerScriptEnums(asIScriptEngine *engine)
