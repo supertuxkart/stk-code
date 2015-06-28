@@ -787,6 +787,9 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
     bool auto_emit = true;
     xml_node.get("auto_emit", &auto_emit);
 
+    m_delayed_stop = false;
+    m_delayed_stop_time = 0.0;
+
     try
     {
         ParticleKind* kind = ParticleKindManager::get()->getParticles(path);
@@ -846,6 +849,16 @@ void TrackObjectPresentationParticles::update(float dt)
     {
         m_emitter->update(dt);
     }
+
+    if (m_delayed_stop)
+    {
+        if (m_delayed_stop_time < 0.0f)
+        {
+            m_delayed_stop = false;
+            stop();
+        }
+        m_delayed_stop_time -= dt;
+    }
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -865,6 +878,12 @@ void TrackObjectPresentationParticles::stop()
         m_emitter->setCreationRateAbsolute(0.0f);
         m_emitter->clearParticles();
     }
+}
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationParticles::stopIn(double delay)
+{
+    m_delayed_stop = true;
+    m_delayed_stop_time = delay;
 }
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationParticles::setRate(float rate)

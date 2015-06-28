@@ -313,6 +313,8 @@ private:
     ParticleEmitter* m_emitter;
     LODNode* m_lod_emitter_node;
     std::string m_trigger_condition;
+    bool m_delayed_stop;
+    double m_delayed_stop_time;
 
 public:
     TrackObjectPresentationParticles(const XMLNode& xml_node,
@@ -322,6 +324,7 @@ public:
     virtual void update(float dt) OVERRIDE;
     void triggerParticles();
     void stop();
+    void stopIn(double delay);
     void setRate(float rate);
     // ------------------------------------------------------------------------
     /** Returns the trigger condition for this object. */
