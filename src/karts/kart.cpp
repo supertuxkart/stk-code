@@ -1218,7 +1218,6 @@ void Kart::update(float dt)
      */
 
     m_beep_sound->setPosition   ( getXYZ() );
-    m_engine_sound->setPosition ( getXYZ() );
     m_crash_sound->setPosition  ( getXYZ() );
     m_skid_sound->setPosition   ( getXYZ() );
     m_boing_sound->setPosition  ( getXYZ() );
@@ -1961,12 +1960,14 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             if (isShielded() || (k != NULL && k->isShielded()))
             {
                 if (m_boing_sound->getStatus() != SFXBase::SFX_PLAYING)
-                    m_boing_sound->play();
+                    m_boing_sound->play(getXYZ());
             }
             else
             {
-                if(m_crash_sound->getStatus() != SFXBase::SFX_PLAYING)
-                    m_crash_sound->play();
+                if (m_crash_sound->getStatus() != SFXBase::SFX_PLAYING)
+                {
+                    m_crash_sound->play(getXYZ());
+                }
             }
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_time <= 0
@@ -1979,7 +1980,9 @@ void Kart::beep()
 {
     // If the custom horn can't play (isn't defined) then play the default one
     if (!playCustomSFX(SFXManager::CUSTOM_HORN))
-        m_beep_sound->play();
+    {
+        m_beep_sound->play(getXYZ());
+    }
 
 } // beep
 
@@ -2085,7 +2088,7 @@ void Kart::updatePhysics(float dt)
         m_skidding->getGraphicalJumpOffset()==0)
     {
         if(m_skid_sound->getStatus()!=SFXBase::SFX_PLAYING && !isWheeless())
-            m_skid_sound->play();
+            m_skid_sound->play(getXYZ());
     }
     else if(m_skid_sound->getStatus()==SFXBase::SFX_PLAYING)
     {
@@ -2192,15 +2195,14 @@ void Kart::updateEngineSFX()
 
         float gears = 3.0f * fmod(f, 0.333334f);
         assert(!isnan(f));
-        m_engine_sound->setSpeed(0.6f + (f + gears) * 0.35f);
+        m_engine_sound->setSpeedPosition(0.6f + (f + gears) * 0.35f, getXYZ());
     }
     else
     {
         // When flying, fixed value but not too high pitch
         // This gives some variation (vs previous "on wheels" one)
-        m_engine_sound->setSpeed(0.9f);
+        m_engine_sound->setSpeedPosition(0.9f, getXYZ());
     }
-    m_engine_sound->setPosition(getXYZ());
 }   // updateEngineSFX
 
 //-----------------------------------------------------------------------------

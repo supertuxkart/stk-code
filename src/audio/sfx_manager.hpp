@@ -64,6 +64,7 @@ public:
     enum SFXCommands
     {
         SFX_PLAY = 1,
+        SFX_PLAY_POSITION,
         SFX_STOP,
         SFX_PAUSE,
         SFX_PAUSE_ALL,
@@ -72,6 +73,7 @@ public:
         SFX_DELETE,
         SFX_SPEED,
         SFX_POSITION,
+        SFX_SPEED_POSITION,
         SFX_VOLUME,
         SFX_MASTER_VOLUME,
         SFX_LOOP,
@@ -163,6 +165,18 @@ private:
             m_sfx       = base;
             m_parameter = parameter;
         }   // SFXCommand(Vec3)
+        // --------------------------------------------------------------------
+        /** Store a float and vec3 parameter. The float is stored as W
+         *  component of the vector. A bit hacky, but this class is used
+         *  very frequently, so should remain as small as possible). */
+        SFXCommand(SFXCommands command, SFXBase *base, float f,
+                   const Vec3 &parameter)
+        {
+            m_command   = command;
+            m_sfx       = base;
+            m_parameter = parameter;
+            m_parameter.setW(f);
+        }   // SFXCommand(Vec3)
     };   // SFXCommand
     // ========================================================================
 
@@ -220,8 +234,9 @@ public:
     void queue(SFXCommands command,  SFXBase *sfx=NULL);
     void queue(SFXCommands command,  SFXBase *sfx, float f);
     void queue(SFXCommands command,  SFXBase *sfx, const Vec3 &p);
+    void queue(SFXCommands command,  SFXBase *sfx, float f, const Vec3 &p);
     void queue(SFXCommands command,  MusicInformation *mi);
-    void queue(SFXCommands command, MusicInformation *mi, float f);
+    void queue(SFXCommands command,  MusicInformation *mi, float f);
     // ------------------------------------------------------------------------
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()

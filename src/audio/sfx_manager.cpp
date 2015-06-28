@@ -208,6 +208,22 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 }   // queue (Vec3)
 
 //----------------------------------------------------------------------------
+/** Adds a sound effect command with a float and a Vec3 parameter to the queue
+ *  of the sfx manager. Openal commands can sometimes cause a 5ms delay, so it
+ *   is done in a separate thread.
+ *  \param command The command to execute.
+ *  \param sfx The sound effect to be started.
+ *  \param f A float parameter for the command.
+ *  \param p A Vec3 parameter for the command.
+ */
+void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f,
+                       const Vec3 &p)
+{
+    SFXCommand *sfx_command = new SFXCommand(command, sfx, f, p);
+    queueCommand(sfx_command);
+}   // queue(float, Vec3)
+
+//----------------------------------------------------------------------------
 /** Queues a command for the music manager.
  *  \param mi The music for which the command is.
  */
@@ -310,20 +326,26 @@ void* SFXManager::mainLoop(void *obj)
         switch (current->m_command)
         {
         case SFX_PLAY:     current->m_sfx->reallyPlayNow();       break;
+        case SFX_PLAY_POSITION:
+            current->m_sfx->reallyPlayNow(current->m_parameter);  break;
         case SFX_STOP:     current->m_sfx->reallyStopNow();       break;
         case SFX_PAUSE:    current->m_sfx->reallyPauseNow();      break;
         case SFX_RESUME:   current->m_sfx->reallyResumeNow();     break;
         case SFX_SPEED:    current->m_sfx->reallySetSpeed(
-            current->m_parameter.getX());   break;
+                                  current->m_parameter.getX());   break;
         case SFX_POSITION: current->m_sfx->reallySetPosition(
-            current->m_parameter);   break;
+                                         current->m_parameter);   break;
+        case SFX_SPEED_POSITION: current->m_sfx->reallySetSpeedPosition(
+                                         // Extract float from W component
+                                         current->m_parameter.getW(),
+                                         current->m_parameter);   break;
         case SFX_VOLUME:   current->m_sfx->reallySetVolume(
-            current->m_parameter.getX());   break;
+                                  current->m_parameter.getX());   break;
         case SFX_MASTER_VOLUME:
             current->m_sfx->reallySetMasterVolumeNow(
-                current->m_parameter.getX());   break;
+                                  current->m_parameter.getX());   break;
         case SFX_LOOP:     current->m_sfx->reallySetLoop(
-            current->m_parameter.getX() != 0);   break;
+                             current->m_parameter.getX() != 0);   break;
         case SFX_DELETE:     me->deleteSFX(current->m_sfx);       break;
         case SFX_PAUSE_ALL:  me->reallyPauseAllNow();             break;
         case SFX_RESUME_ALL: me->reallyResumeAllNow();            break;
