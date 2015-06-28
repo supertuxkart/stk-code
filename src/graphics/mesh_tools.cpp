@@ -148,7 +148,7 @@ static inline core::vector3df getAngleWeight(const core::vector3df& v1,
 
 // Copied from irrlicht
 template <typename T>
-void recalculateTangentsT(scene::IMeshBuffer* buffer, bool recalculateNormals, bool smooth, bool angleWeighted)
+void recalculateTangentsT(scene::IMeshBuffer* buffer, bool recalculate_normals, bool smooth, bool angle_weighted)
 {
     if (!buffer || (buffer->getVertexType() != video::EVT_TANGENTS))
         return;
@@ -166,7 +166,7 @@ void recalculateTangentsT(scene::IMeshBuffer* buffer, bool recalculateNormals, b
 
         for (i = 0; i != vtxCnt; ++i)
         {
-            if (recalculateNormals)
+            if (recalculate_normals)
                 v[i].Normal.set(0.f, 0.f, 0.f);
             v[i].Tangent.set(0.f, 0.f, 0.f);
             v[i].Binormal.set(0.f, 0.f, 0.f);
@@ -188,7 +188,7 @@ void recalculateTangentsT(scene::IMeshBuffer* buffer, bool recalculateNormals, b
 
             //Angle-weighted normals look better, but are slightly more CPU intensive to calculate
             core::vector3df weight(1.f, 1.f, 1.f);
-            if (angleWeighted)
+            if (angle_weighted)
                 weight = getAngleWeight(v[i + 0].Pos, v[i + 1].Pos, v[i + 2].Pos);
             core::vector3df localNormal;
             core::vector3df localTangent;
@@ -205,7 +205,7 @@ void recalculateTangentsT(scene::IMeshBuffer* buffer, bool recalculateNormals, b
                 v[idx[i + 1]].TCoords,
                 v[idx[i + 2]].TCoords);
 
-            if (recalculateNormals)
+            if (recalculate_normals)
                 v[idx[i + 0]].Normal += localNormal * weight.X;
             v[idx[i + 0]].Tangent += localTangent * weight.X;
             v[idx[i + 0]].Binormal += localBinormal * weight.X;
@@ -221,7 +221,7 @@ void recalculateTangentsT(scene::IMeshBuffer* buffer, bool recalculateNormals, b
                 v[idx[i + 2]].TCoords,
                 v[idx[i + 0]].TCoords);
 
-            if (recalculateNormals)
+            if (recalculate_normals)
                 v[idx[i + 1]].Normal += localNormal * weight.Y;
             v[idx[i + 1]].Tangent += localTangent * weight.Y;
             v[idx[i + 1]].Binormal += localBinormal * weight.Y;
@@ -237,14 +237,14 @@ void recalculateTangentsT(scene::IMeshBuffer* buffer, bool recalculateNormals, b
                 v[idx[i + 0]].TCoords,
                 v[idx[i + 1]].TCoords);
 
-            if (recalculateNormals)
+            if (recalculate_normals)
                 v[idx[i + 2]].Normal += localNormal * weight.Z;
             v[idx[i + 2]].Tangent += localTangent * weight.Z;
             v[idx[i + 2]].Binormal += localBinormal * weight.Z;
         }
 
         // Normalize the tangents and binormals
-        if (recalculateNormals)
+        if (recalculate_normals)
         {
             for (i = 0; i != vtxCnt; ++i)
                 v[i].Normal.normalize();
@@ -270,7 +270,7 @@ void recalculateTangentsT(scene::IMeshBuffer* buffer, bool recalculateNormals, b
                 v[idx[i + 0]].TCoords,
                 v[idx[i + 1]].TCoords,
                 v[idx[i + 2]].TCoords);
-            if (recalculateNormals)
+            if (recalculate_normals)
                 v[idx[i + 0]].Normal = localNormal;
 
             calculateTangents(
@@ -283,7 +283,7 @@ void recalculateTangentsT(scene::IMeshBuffer* buffer, bool recalculateNormals, b
                 v[idx[i + 1]].TCoords,
                 v[idx[i + 2]].TCoords,
                 v[idx[i + 0]].TCoords);
-            if (recalculateNormals)
+            if (recalculate_normals)
                 v[idx[i + 1]].Normal = localNormal;
 
             calculateTangents(
@@ -296,34 +296,34 @@ void recalculateTangentsT(scene::IMeshBuffer* buffer, bool recalculateNormals, b
                 v[idx[i + 2]].TCoords,
                 v[idx[i + 0]].TCoords,
                 v[idx[i + 1]].TCoords);
-            if (recalculateNormals)
+            if (recalculate_normals)
                 v[idx[i + 2]].Normal = localNormal;
         }
     }
 }
 
 // Copied from irrlicht
-void recalculateTangents(scene::IMeshBuffer* buffer, bool recalculateNormals, bool smooth, bool angleWeighted)
+void recalculateTangents(scene::IMeshBuffer* buffer, bool recalculate_normals, bool smooth, bool angle_weighted)
 {
     if (buffer && (buffer->getVertexType() == video::EVT_TANGENTS))
     {
         if (buffer->getIndexType() == video::EIT_16BIT)
-            recalculateTangentsT<u16>(buffer, recalculateNormals, smooth, angleWeighted);
+            recalculateTangentsT<u16>(buffer, recalculate_normals, smooth, angle_weighted);
         else
-            recalculateTangentsT<u32>(buffer, recalculateNormals, smooth, angleWeighted);
+            recalculateTangentsT<u32>(buffer, recalculate_normals, smooth, angle_weighted);
     }
 }
 
 // Copied from irrlicht
-void recalculateTangents(scene::IMesh* mesh, bool recalculateNormals, bool smooth, bool angleWeighted)
+void recalculateTangents(scene::IMesh* mesh, bool recalculate_normals, bool smooth, bool angle_weighted)
 {
     if (!mesh)
         return;
 
-    const u32 meshBufferCount = mesh->getMeshBufferCount();
-    for (u32 b = 0; b<meshBufferCount; ++b)
+    const u32 mesh_buffer_count = mesh->getMeshBufferCount();
+    for (u32 b = 0; b<mesh_buffer_count; ++b)
     {
-        recalculateTangents(mesh->getMeshBuffer(b), recalculateNormals, smooth, angleWeighted);
+        recalculateTangents(mesh->getMeshBuffer(b), recalculate_normals, smooth, angle_weighted);
     }
 }
 
@@ -336,8 +336,11 @@ bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
 }
 
 // Copied from irrlicht
-scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predicate)(scene::IMeshBuffer*),
-    bool recalculateNormals, bool smooth, bool angleWeighted, bool calculateTangents)
+scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
+                                                bool(*predicate)(scene::IMeshBuffer*),
+                                                bool recalculate_normals, bool smooth,
+                                                bool angle_weighted,
+                                                bool calculate_tangents)
 {
     if (!mesh)
         return 0;
@@ -345,25 +348,25 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predic
     // copy mesh and fill data into SMeshBufferTangents
 
     scene::SMesh* clone = new scene::SMesh();
-    const u32 meshBufferCount = mesh->getMeshBufferCount();
+    const u32 mesh_buffer_count = mesh->getMeshBufferCount();
 
-    bool needsNormalMap = false;
-    for (u32 b = 0; b < meshBufferCount; ++b)
+    bool needs_normal_map = false;
+    for (u32 b = 0; b < mesh_buffer_count; ++b)
     {
         scene::IMeshBuffer* original = mesh->getMeshBuffer(b);
         if (predicate(original))
         {
-            needsNormalMap = true;
+            needs_normal_map = true;
             break;
         }
     }
 
-    if (!needsNormalMap)
+    if (!needs_normal_map)
     {
         return mesh;
     }
 
-    for (u32 b = 0; b<meshBufferCount; ++b)
+    for (u32 b = 0; b<mesh_buffer_count; ++b)
     {
         scene::IMeshBuffer* original = mesh->getMeshBuffer(b);
         const u32 idxCnt = original->getIndexCount();
@@ -439,8 +442,8 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh, bool(*predic
     }
 
     clone->recalculateBoundingBox();
-    if (calculateTangents)
-        recalculateTangents(clone, recalculateNormals, smooth, angleWeighted);
+    if (calculate_tangents)
+        recalculateTangents(clone, recalculate_normals, smooth, angle_weighted);
     
     int mbcount = clone->getMeshBufferCount();
     for (int i = 0; i < mbcount; i++)
