@@ -35,6 +35,11 @@ namespace Scripting
         float getY() const { return y; }
         float getZ() const { return z; }
 
+        float getLength() const
+        {
+            return sqrt(x*x + y*y + z*z);
+        }
+
         SimpleVec3() : x(0), y(0), z(0) { }
         SimpleVec3(float p_x, float p_y, float p_z) : x(p_x), y(p_y), z(p_z) { }
         SimpleVec3(const SimpleVec3& other) : x(other.x), y(other.y), z(other.z) { }

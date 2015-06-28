@@ -57,6 +57,7 @@ namespace Scripting
     float getX(SimpleVec3* v) { return v->getX(); }
     float getY(SimpleVec3* v) { return v->getY(); }
     float getZ(SimpleVec3* v) { return v->getZ(); }
+    float getLength(SimpleVec3* v) { return v->getLength(); }
 
     void RegisterVec3(asIScriptEngine *engine)
     {
@@ -71,5 +72,6 @@ namespace Scripting
         r = engine->RegisterObjectMethod("Vec3", "float getX()", asFUNCTION(getX), asCALL_CDECL_OBJLAST); assert(r >= 0);
         r = engine->RegisterObjectMethod("Vec3", "float getY()", asFUNCTION(getY), asCALL_CDECL_OBJLAST); assert(r >= 0);
         r = engine->RegisterObjectMethod("Vec3", "float getZ()", asFUNCTION(getZ), asCALL_CDECL_OBJLAST); assert(r >= 0);
+        r = engine->RegisterObjectMethod("Vec3", "float getLength()", asFUNCTION(getLength), asCALL_CDECL_OBJLAST); assert(r >= 0);
     }
 }
