@@ -347,7 +347,6 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
 
     // copy mesh and fill data into SMeshBufferTangents
 
-    scene::SMesh* clone = new scene::SMesh();
     const u32 mesh_buffer_count = mesh->getMeshBufferCount();
 
     bool needs_normal_map = false;
@@ -365,6 +364,7 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
     {
         return mesh;
     }
+    scene::SMesh* clone = new scene::SMesh();
 
     for (u32 b = 0; b<mesh_buffer_count; ++b)
     {
