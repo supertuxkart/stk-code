@@ -350,7 +350,7 @@ void TrackObject::setEnabled(bool enabled)
         }
     }
 
-    for (int i = 0; i < m_movable_children.size(); i++)
+    for (unsigned int i = 0; i < m_movable_children.size(); i++)
     {
         m_movable_children[i]->setEnabled(enabled);
     }
@@ -376,7 +376,7 @@ void TrackObject::resetEnabled()
         }
     }
 
-    for (int i = 0; i < m_movable_children.size(); i++)
+    for (unsigned int i = 0; i < m_movable_children.size(); i++)
     {
         m_movable_children[i]->resetEnabled();
     }
