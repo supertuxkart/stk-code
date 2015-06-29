@@ -67,10 +67,7 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     setupCamera();
     if (kart != NULL)
     {
-        if(UserConfigParams::m_camera_debug==2)
-            m_distance = kart->getKartModel()->getLength();
-        else
-            m_distance = kart->getKartProperties()->getCameraDistance();
+        m_distance = kart->getKartProperties()->getCameraDistance();
         setKart(kart);
     }
     else
@@ -466,11 +463,13 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
             {
                 *above_kart = 0;
                 *cam_angle  = 0;
+                *distance   = -m_kart->getKartModel()->getLength();
             }
             else
             {
                 *above_kart    = 0.75f;
                 *cam_angle     = kp->getCameraForwardUpAngle();
+                *distance      = -m_distance;
             }
             float steering = m_kart->getSteerPercent()
                            * (1.0f + (m_kart->getSkidding()->getSkidFactor()
@@ -478,7 +477,6 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
             // quadratically to dampen small variations (but keep sign)
             float dampened_steer = fabsf(steering) * steering;
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
-            *distance            = -m_distance;
             *smoothing           = true;
             break;
         }   // CM_FALLING
@@ -723,7 +721,14 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
         btQuaternion q(m_kart->getSkidding()->getVisualSkidRotation(), 0, 0);
         t.setBasis(t.getBasis() * btMatrix3x3(q));
     }
-    wanted_position = t(relative_position);
+    if (UserConfigParams::m_camera_debug == 2)
+    {
+        wanted_position = t(relative_position);
+        // Make sure that the Y position is a the same height as the wheel.
+        wanted_position.setY(wanted_target.getY());
+    }
+    else
+        wanted_position = t(relative_position);
 
     if (smoothing && UserConfigParams::m_camera_debug==0)
     {
