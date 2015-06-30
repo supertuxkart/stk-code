@@ -24,18 +24,18 @@
 
 class ScreenQuad;
 
-// The actual rain node
+// The actual sun node
 class SunNode: public LightNode
 {
+
 public:
-    SunNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float r, float g, float b);
+    SunNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, 
+            float r, float g, float b);
     virtual ~SunNode();
 
     virtual void render() OVERRIDE;
     virtual bool isPointLight() OVERRIDE { return false; }
 
-private:
-    ScreenQuad *sq;
-};
+};   // SunNode
 
 #endif
