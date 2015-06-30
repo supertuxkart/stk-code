@@ -243,13 +243,12 @@ void KartGFX::setCreationRateRelative(KartGFXType type, float f)
  *  we want the particles to be emitted in a smooth, continuous flame and not
  *  in blobs.
  *  \param type The particle effect for which to resize the emitting box.
- *  \param speed Current speed of the kart.
- *  \param dt Time step size.
+ *  \param new_size New size of the box, typically speed*dt.
  */
-void KartGFX::resizeBox(KartGFXType type, float speed, float dt)
+void KartGFX::resizeBox(KartGFXType type, float new_size)
 {
     if(m_all_emitters[type])
-        m_all_emitters[type]->resizeBox(std::max(0.25f, speed*dt));
+        m_all_emitters[type]->resizeBox(std::max(0.25f, new_size));
 }   // resizeBox
 
 // ----------------------------------------------------------------------------
@@ -304,11 +303,44 @@ void KartGFX::update(float dt)
 {
     m_wheel_toggle = 1 - m_wheel_toggle;
 
-    for(unsigned int i=0; i<m_all_emitters.size(); i++)
+    for (unsigned int i = 0; i < m_all_emitters.size(); i++)
     {
-        if(m_all_emitters[i])
+        if (m_all_emitters[i])
             m_all_emitters[i]->update(dt);
     }
 
 }  // update
+
+// ----------------------------------------------------------------------------
+/** Updates nitro dependent particle effects (and box sizes).
+ *  \param nitro_frac Nitro fraction/
+ *  \param new_size New size of the box in which new particles are emitted.
+ */
+void KartGFX::updateNitroGraphics(float nitro_frac, float new_size)
+{
+    // Upate particle effects (creation rate, and emitter size
+    // depending on speed)
+    // --------------------------------------------------------
+    if (nitro_frac > 0)
+    {
+        setCreationRateRelative(KartGFX::KGFX_NITRO1, nitro_frac);
+        setCreationRateRelative(KartGFX::KGFX_NITRO2, nitro_frac);
+        setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, nitro_frac);
+        setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, nitro_frac);
+    }
+    else
+    {
+        setCreationRateAbsolute(KartGFX::KGFX_NITRO1,      0);
+        setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
+
+    }
+    resizeBox(KartGFX::KGFX_NITRO1,      new_size);
+    resizeBox(KartGFX::KGFX_NITRO2,      new_size);
+    resizeBox(KartGFX::KGFX_NITROSMOKE1, new_size);
+    resizeBox(KartGFX::KGFX_NITROSMOKE2, new_size);
+    resizeBox(KartGFX::KGFX_ZIPPER,      new_size);
+
+}  // updateGraphics
 

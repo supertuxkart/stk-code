@@ -2538,36 +2538,25 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // Upate particle effects (creation rate, and emitter size
     // depending on speed)
     // --------------------------------------------------------
+    float nitro_frac = 0;
     if ( (m_controls.m_nitro || m_min_nitro_time > 0.0f) &&
          isOnGround() &&  m_collected_energy > 0            )
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
-        float f = fabsf(getSpeed())/(m_kart_properties->getMaxSpeed() *
-                  m_difficulty->getMaxSpeed());
+        nitro_frac = fabsf(getSpeed())/(m_kart_properties->getMaxSpeed() *
+                                        m_difficulty->getMaxSpeed()       );
         // The speed of the kart can be higher (due to powerups) than
         // the normal maximum speed of the kart.
-        if(f>1.0f) f = 1.0f;
-        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO1, f);
-        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO2, f);
-        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, f);
-        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, f);
+        if(nitro_frac>1.0f) nitro_frac = 1.0f;
         m_nitro_light->setVisible(true);
     }
     else
     {
-        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO1, 0);
-        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO2, 0);
-        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
-        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
         m_nitro_light->setVisible(false);
     }
-    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO1, getSpeed(), dt);
-    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO2, getSpeed(), dt);
-    m_kart_gfx->resizeBox(KartGFX::KGFX_NITROSMOKE1, getSpeed(), dt);
-    m_kart_gfx->resizeBox(KartGFX::KGFX_NITROSMOKE2, getSpeed(), dt);
-
-    m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
+    // speed * dt is the new size of the box in which particles start
+    m_kart_gfx->updateNitroGraphics(nitro_frac, getSpeed()*dt);
 
     // Handle leaning of karts
     // -----------------------

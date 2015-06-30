@@ -71,6 +71,7 @@ private:
 
     void addEffect(KartGFXType type, const std::string &file_name,
                    const Vec3 &position, bool important);
+    void resizeBox(const KartGFXType type, float new_size);
 
 public:
          KartGFX(const AbstractKart *kart);
@@ -81,8 +82,8 @@ public:
     void setXYZ(const KartGFXType type, const Vec3 &xyz);
     void setCreationRateAbsolute(const KartGFXType type, float f);
     void setCreationRateRelative(const KartGFXType type, float f);
-    void resizeBox(const KartGFXType type, float speed, float dt);
     void updateTerrain(const ParticleKind *pk);
     void update(float dt);
+    void updateNitroGraphics(float f, float new_size);
 };   // KartWGFX
 #endif
