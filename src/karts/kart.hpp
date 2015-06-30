@@ -219,9 +219,6 @@ private:
     /** To prevent using nitro in too short bursts */
     float         m_min_nitro_time;
 
-    /** A light that's shown when the kart uses nitro. */
-    scene::ISceneNode* m_nitro_light;
-
     /** Lights that are shown when the kart is skidding. */
     scene::ISceneNode* m_skidding_light_1;
     /** A light that's shown on the second skid-level with another color. */

@@ -129,7 +129,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_min_nitro_time       = 0.0f;
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
-    m_nitro_light          = NULL;
     m_skidding_light_1     = NULL;
     m_skidding_light_2     = NULL;
     m_type                 = RaceManager::KT_AI;
@@ -2408,12 +2407,6 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
     m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
-    // Create nitro light
-    m_nitro_light = irr_driver->addLight(core::vector3df(0.0f, 0.5f, m_kart_model->getLength()*-0.5f - 0.05f),
-        0.4f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
-    m_nitro_light->setVisible(false);
-    m_nitro_light->setName( ("nitro emitter (" + getIdent() + ")").c_str() );
-
     // Create skidding lights
     // For the first skidding level
     m_skidding_light_1 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
@@ -2549,11 +2542,6 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         // The speed of the kart can be higher (due to powerups) than
         // the normal maximum speed of the kart.
         if(nitro_frac>1.0f) nitro_frac = 1.0f;
-        m_nitro_light->setVisible(true);
-    }
-    else
-    {
-        m_nitro_light->setVisible(false);
     }
     // speed * dt is the new size of the box in which particles start
     m_kart_gfx->updateNitroGraphics(nitro_frac, getSpeed()*dt);

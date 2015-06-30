@@ -30,6 +30,12 @@ class ParticleEmitter;
 class ParticleKind;
 class Vec3;
 
+namespace irr {
+    namespace scene {
+        class ISceneNode;
+    }
+}
+
 class KartGFX
 {
 public:
@@ -68,6 +74,10 @@ private:
 
     /** Used to alternate particle effects from the rear wheels. */
     int         m_wheel_toggle;
+
+    /** A light that's shown when the kart uses nitro. */
+    irr::scene::ISceneNode* m_nitro_light;
+
 
     void addEffect(KartGFXType type, const std::string &file_name,
                    const Vec3 &position, bool important);

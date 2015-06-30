@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
@@ -43,6 +44,17 @@ KartGFX::KartGFX(const AbstractKart *kart)
     //}
 
     m_kart = kart;
+
+    // Create nitro light
+    core::vector3df location(0.0f, 0.5f,
+                             m_kart->getKartModel()->getLength()*-0.5f - 0.05f);
+    m_nitro_light = irr_driver->addLight(location, /*force*/ 0.4f,
+                                         /*radius*/5.0f, 0.0f, 0.4f, 1.0f,
+                                         false, m_kart->getNode());
+    m_nitro_light->setVisible(false);
+#ifdef DEBUG
+    m_nitro_light->setName( ("nitro emitter (" + m_kart->getIdent() + ")").c_str() );
+#endif
 
     Vec3 rear_left(kart->getWheelGraphicsPosition(3).getX(), 0.05f,
                    kart->getWheelGraphicsPosition(3).getZ()-0.1f    );
@@ -327,6 +339,7 @@ void KartGFX::updateNitroGraphics(float nitro_frac, float new_size)
         setCreationRateRelative(KartGFX::KGFX_NITRO2, nitro_frac);
         setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, nitro_frac);
         setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, nitro_frac);
+        m_nitro_light->setVisible(true);
     }
     else
     {
@@ -334,7 +347,7 @@ void KartGFX::updateNitroGraphics(float nitro_frac, float new_size)
         setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
-
+        m_nitro_light->setVisible(false);
     }
     resizeBox(KartGFX::KGFX_NITRO1,      new_size);
     resizeBox(KartGFX::KGFX_NITRO2,      new_size);
