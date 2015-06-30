@@ -75,7 +75,8 @@
 #if IRRLICHT_VERSION_MAJOR < 1 || IRRLICHT_VERSION_MINOR < 7 || \
     _IRR_MATERIAL_MAX_TEXTURES_ < 8 || !defined(_IRR_COMPILE_WITH_OPENGL_) || \
     !defined(_IRR_COMPILE_WITH_B3D_LOADER_)
-#error "Building against an incompatible Irrlicht. Distros, please use the included version."
+#error "Building against an incompatible Irrlicht. Distros, \
+please use the included version."
 #endif
 
 using namespace irr;
@@ -120,8 +121,9 @@ IrrDriver::IrrDriver()
     m_rtts                = NULL;
     m_post_processing     = NULL;
     m_wind                = new Wind();
-    m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
-        m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = m_boundingboxesviz = false;
+    m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
+    m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
+    m_boundingboxesviz = false;
     SkyboxCubeMap = m_last_light_bucket_distance = 0;
     memset(object_count, 0, sizeof(object_count));
 }   // IrrDriver
@@ -507,7 +509,8 @@ void IrrDriver::initDevice()
         (UserConfigParams::m_shadows_resolution < 512 ||
          UserConfigParams::m_shadows_resolution > 2048))
     {
-        Log::warn("IrrDriver", "Invalid value for UserConfigParams::m_shadows_resolution : %i",
+        Log::warn("IrrDriver", 
+               "Invalid value for UserConfigParams::m_shadows_resolution : %i",
             (int)UserConfigParams::m_shadows_resolution);
         UserConfigParams::m_shadows_resolution = 0;
     }
@@ -542,7 +545,8 @@ void IrrDriver::initDevice()
     }
     else
     {
-        Log::warn("irr_driver", "Using the fixed pipeline (old GPU, or shaders disabled in options)");
+        Log::warn("irr_driver", "Using the fixed pipeline (old GPU, or "
+                                "shaders disabled in options)");
     }
 
     // Only change video driver settings if we are showing graphics
@@ -627,16 +631,21 @@ void IrrDriver::cleanSunInterposer()
 // ----------------------------------------------------------------------------
 void IrrDriver::createSunInterposer()
 {
-    scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
+    scene::IMesh * sphere = m_scene_manager->getGeometryCreator()
+                                           ->createSphereMesh(1, 16, 16);
     for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
     {
         scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
         if (!mb)
             continue;
-        mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
-        mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        mb->getMaterial().setTexture(0, 
+                        getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+        mb->getMaterial().setTexture(1,
+                                getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
-    m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1, "sun_interposer");
+    m_sun_interposer = new STKMeshSceneNode(sphere, 
+                                            m_scene_manager->getRootSceneNode(),
+                                            NULL, -1, "sun_interposer");
 
     m_sun_interposer->grab();
     m_sun_interposer->setParent(NULL);
@@ -819,7 +828,8 @@ void IrrDriver::applyResolutionSettings()
     input_manager->setMode(InputManager::MENU);
 
     GUIEngine::addLoadingIcon(
-        irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"options_video.png"))
+        irr_driver->getTexture(file_manager
+                               ->getAsset(FileManager::GUI,"options_video.png"))
                              );
 
     file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""));
@@ -1109,7 +1119,9 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
 
-    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, m_scene_manager, -1, debug_name);
+    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, 
+                                                       m_scene_manager, -1,
+                                                       debug_name);
     node->drop();
 
     return node;
@@ -1132,7 +1144,8 @@ PerCameraNode *IrrDriver::addPerCameraNode(scene::ISceneNode* node,
  */
 scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
                                            video::ITexture *texture,
-                                           scene::ISceneNode* parent, bool alphaTesting)
+                                           scene::ISceneNode* parent,
+                                           bool alphaTesting)
 {
     scene::IBillboardSceneNode* node;
     if (CVS->isGLSL())
@@ -1140,7 +1153,8 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
         if (!parent)
             parent = m_scene_manager->getRootSceneNode();
 
-        node = new STKBillboard(parent, m_scene_manager, -1, vector3df(0., 0., 0.), size);
+        node = new STKBillboard(parent, m_scene_manager, -1, 
+                                vector3df(0., 0., 0.), size);
         node->drop();
     }
     else
@@ -1821,8 +1835,10 @@ void IrrDriver::displayFPS()
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        fpsString = _("FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d",
-            min, fps, max, poly_count[SOLID_NORMAL_AND_DEPTH_PASS], poly_count[SHADOW_PASS], m_last_light_bucket_distance);
+        fpsString = _("FPS: %d/%d/%d  - PolyCount: %d Solid, "
+                      "%d Shadows - LightDist : %d",
+                    min, fps, max, poly_count[SOLID_NORMAL_AND_DEPTH_PASS],
+                    poly_count[SHADOW_PASS], m_last_light_bucket_distance);
         poly_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         poly_count[SHADOW_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
@@ -2046,7 +2062,8 @@ void IrrDriver::doScreenShot()
 
     std::string track_name = race_manager->getTrackName();
     if (World::getWorld() == NULL) track_name = "menu";
-    std::string path = file_manager->getScreenshotDir()+track_name+"-"+time_buffer+".png";
+    std::string path = file_manager->getScreenshotDir()+track_name+"-"
+                     + time_buffer+".png";
 
     if (irr_driver->getVideoDriver()->writeImageToFile(image, path.c_str(), 0))
     {
@@ -2444,10 +2461,10 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
 
     const u32 mcount = node->getMaterialCount();
     u32 i;
-    const video::E_MATERIAL_TYPE ref = Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT
-                                                                 : ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE pass = Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT 
-                                                                  : ES_OBJECTPASS);
+    const video::E_MATERIAL_TYPE ref = 
+        Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT : ES_OBJECTPASS_REF);
+    const video::E_MATERIAL_TYPE pass = 
+        Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT : ES_OBJECTPASS);
 
     const video::E_MATERIAL_TYPE origref = Shaders::getShader(ES_OBJECTPASS_REF);
     const video::E_MATERIAL_TYPE origpass = Shaders::getShader(ES_OBJECTPASS);
@@ -2473,7 +2490,8 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
     for (i = 0; i < mcount; i++)
     {
         video::SMaterial &nodemat = node->getMaterial(i);
-        video::SMaterial &mbmat = mesh ? mesh->getMeshBuffer(i)->getMaterial() : nodemat;
+        video::SMaterial &mbmat = mesh ? mesh->getMeshBuffer(i)->getMaterial() 
+                                       : nodemat;
         video::SMaterial *mat = &nodemat;
 
         if (viamb)
@@ -2510,8 +2528,10 @@ void IrrDriver::applyObjectPassShader()
 
 // ----------------------------------------------------------------------------
 
-scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy, float radius,
-    float r, float g, float b, bool sun, scene::ISceneNode* parent)
+scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
+                                       float energy, float radius,
+                                       float r, float g, float b,
+                                       bool sun, scene::ISceneNode* parent)
 {
     if (CVS->isGLSL())
     {
@@ -2519,7 +2539,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
         LightNode *light = NULL;
 
         if (!sun)
-            light = new LightNode(m_scene_manager, parent, energy, radius, r, g, b);
+            light = new LightNode(m_scene_manager, parent, energy, radius,
+                                  r, g, b);
         else
             light = new SunNode(m_scene_manager, parent, r, g, b);
 
@@ -2536,17 +2557,19 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
             //m_sun_interposer->updateAbsolutePosition();
             m_shadow_matrices->addLight(pos);
 
-            ((WaterShaderProvider *) Shaders::getCallback(ES_WATER) )->setSunPosition(pos);
+            ((WaterShaderProvider *) Shaders::getCallback(ES_WATER) )
+                                                         ->setSunPosition(pos);
         }
 
         return light;
     }
     else
     {
-        return m_scene_manager->addLightSceneNode(m_scene_manager->getRootSceneNode(),
-                                                  pos, video::SColorf(1.0f, r, g, b));
+        return m_scene_manager
+               ->addLightSceneNode(m_scene_manager->getRootSceneNode(),
+                                   pos, video::SColorf(1.0f, r, g, b));
     }
-}
+}   // addLight
 
 // ----------------------------------------------------------------------------
 
@@ -2560,26 +2583,26 @@ void IrrDriver::clearLights()
     }
 
     m_lights.clear();
-}
+}   // clearLights
 
 // ----------------------------------------------------------------------------
 
 GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
 {
     return m_rtts->getRenderTarget(which);
-}
+}   // getRenderTargetTexture
 
 // ----------------------------------------------------------------------------
 
 FrameBuffer& IrrDriver::getFBO(TypeFBO which)
 {
     return m_rtts->getFBO(which);
-}
+}   // getFBO
 
 // ----------------------------------------------------------------------------
 
 GLuint IrrDriver::getDepthStencilTexture()
 {
     return m_rtts->getDepthStencilTexture();
-}
+}   // getDepthStencilTexture
 
