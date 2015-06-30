@@ -256,6 +256,8 @@ Kart::~Kart()
     m_goo_sound   ->deleteSFX();
     m_beep_sound  ->deleteSFX();
     m_boing_sound ->deleteSFX();
+    m_skidding_light_1->drop();
+    m_skidding_light_2->drop();
     delete m_kart_gfx;
     if(m_terrain_sound)          m_terrain_sound->deleteSFX();
     if(m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();

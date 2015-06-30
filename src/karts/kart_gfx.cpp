@@ -100,7 +100,7 @@ KartGFX::~KartGFX()
         if(m_all_emitters[i])
             delete m_all_emitters[i];
     }   // for i < KGFX_COUNT
-
+    m_nitro_light->drop();
 }   // ~KartGFX
 
 // ----------------------------------------------------------------------------
