@@ -219,11 +219,6 @@ private:
     /** To prevent using nitro in too short bursts */
     float         m_min_nitro_time;
 
-    /** Lights that are shown when the kart is skidding. */
-    scene::ISceneNode* m_skidding_light_1;
-    /** A light that's shown on the second skid-level with another color. */
-    scene::ISceneNode* m_skidding_light_2;
-
     void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);
     void          handleMaterialGFX();
@@ -447,9 +442,9 @@ public:
     // ------------------------------------------------------------------------
     /** Counter which is used for displaying wrong way message after a delay */
     float getWrongwayCounter() { return m_wrongway_counter; }
+    // ------------------------------------------------------------------------
     void setWrongwayCounter(float counter) { m_wrongway_counter = counter; }
 
-    void activateSkidLight(unsigned int level);
 };   // Kart
 
 

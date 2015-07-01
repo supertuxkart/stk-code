@@ -78,6 +78,11 @@ private:
     /** A light that's shown when the kart uses nitro. */
     irr::scene::ISceneNode* m_nitro_light;
 
+    /** Light that is shown when the kart is skidding. */
+    irr::scene::ISceneNode* m_skidding_light_1;
+
+    /** A light that's shown on the second skid-level with another color. */
+    irr::scene::ISceneNode* m_skidding_light_2;
 
     void addEffect(KartGFXType type, const std::string &file_name,
                    const Vec3 &position, bool important);
@@ -95,5 +100,7 @@ public:
     void updateTerrain(const ParticleKind *pk);
     void update(float dt);
     void updateNitroGraphics(float f, float new_size);
+    void updateSkidLight(unsigned int level);
+
 };   // KartWGFX
 #endif

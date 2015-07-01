@@ -129,8 +129,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_min_nitro_time       = 0.0f;
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
-    m_skidding_light_1     = NULL;
-    m_skidding_light_2     = NULL;
     m_type                 = RaceManager::KT_AI;
 
     m_view_blocked_by_plunger = 0;
@@ -256,8 +254,6 @@ Kart::~Kart()
     m_goo_sound   ->deleteSFX();
     m_beep_sound  ->deleteSFX();
     m_boing_sound ->deleteSFX();
-    m_skidding_light_1->drop();
-    m_skidding_light_2->drop();
     delete m_kart_gfx;
     if(m_terrain_sound)          m_terrain_sound->deleteSFX();
     if(m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
@@ -2409,18 +2405,6 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
     m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
-    // Create skidding lights
-    // For the first skidding level
-    m_skidding_light_1 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
-        0.3f /* force */, 3.0f /* radius */, 1.0f, 0.6f, 0.0f, false, m_node);
-    m_skidding_light_1->setVisible(false);
-    m_skidding_light_1->setName( ("skidding emitter 1 (" + getIdent() + ")").c_str() );
-    // For the second skidding level
-    m_skidding_light_2 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
-        0.4f /* force */, 4.0f /* radius */, 1.0f, 0.0f, 0.0f, false, m_node);
-    m_skidding_light_2->setVisible(false);
-    m_skidding_light_2->setName( ("skidding emitter 2 (" + getIdent() + ")").c_str() );
-
 #ifdef DEBUG
     m_node->setName( (getIdent()+"(lod-node)").c_str() );
 #endif
@@ -2711,7 +2695,8 @@ void Kart::setOnScreenText(const wchar_t *text)
 
     if (CVS->isGLSL())
     {
-        gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont() : GUIEngine::getTitleFont();
+        gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont() 
+                                                       : GUIEngine::getTitleFont();
         new STKTextBillboard(text, font,
             video::SColor(255, 255, 225, 0),
             video::SColor(255, 255, 89, 0),
@@ -2723,7 +2708,7 @@ void Kart::setOnScreenText(const wchar_t *text)
     {
         scene::ISceneManager* sm = irr_driver->getSceneManager();
         sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
-            : GUIEngine::getTitleFont(),
+                                                           : GUIEngine::getTitleFont(),
             text,
             getNode(),
             core::dimension2df(textsize.Width/55.0f,
@@ -2738,12 +2723,5 @@ void Kart::setOnScreenText(const wchar_t *text)
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.
 }   // setOnScreenText
-
-// ----------------------------------------------------------------------------
-void Kart::activateSkidLight(unsigned int level)
-{
-    m_skidding_light_1->setVisible(level == 1);
-    m_skidding_light_2->setVisible(level > 1);
-}   // activateSkidLight
 
 /* EOF */
