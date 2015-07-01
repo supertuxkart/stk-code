@@ -583,7 +583,6 @@ void Kart::createPhysics()
         kart_height = kart_length*0.6f;
     }
 
-    btCollisionShape *shape;
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
     Vec3 wheel_pos[4];
     assert(bevel.getX() || bevel.getY() || bevel.getZ());
@@ -641,14 +640,13 @@ void Kart::createPhysics()
 
     // This especially enables proper drawing of the point cloud
     hull->initializePolyhedralFeatures();
-    shape = hull;
 
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
     // Shift center of gravity downwards, so that the kart
     // won't topple over too easy.
     shiftCenterOfGravity.setOrigin(m_kart_properties->getGravityCenterShift());
-    m_kart_chassis.addChildShape(shiftCenterOfGravity, shape);
+    m_kart_chassis.addChildShape(shiftCenterOfGravity, hull);
 
     // Set mass and inertia
     // --------------------
