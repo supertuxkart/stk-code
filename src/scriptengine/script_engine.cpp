@@ -366,7 +366,7 @@ namespace Scripting
         // the script engine will treat them all as if they were one. The script
         // section name, will allow us to localize any errors in the script code.
         asIScriptModule *mod = m_engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE,
-            clear_previous ? asGM_ALWAYS_CREATE : asGM_ONLY_IF_EXISTS);
+            clear_previous ? asGM_ALWAYS_CREATE : asGM_CREATE_IF_NOT_EXISTS);
         r = mod->AddScriptSection("script", &script[0], script.size());
         if (r < 0)
         {
