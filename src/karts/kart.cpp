@@ -2636,6 +2636,10 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         //    );
     }
 
+    center_shift.setY(m_skidding->getGraphicalJumpOffset()
+                      + lean_height
+                      - m_kart_model->getLowestPoint());
+
     center_shift = getTrans().getBasis() * center_shift;
 
     Moveable::updateGraphics(dt, center_shift,

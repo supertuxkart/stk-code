@@ -803,6 +803,8 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
 
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
         pos.Y -= rel_suspension;
+        const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+        pos.Y = -m_kart->getXYZ().getY() + wi.m_raycastInfo.m_contactPointWS.getY() + wi.m_wheelsRadius;
 
         m_wheel_node[i]->setPosition(pos);
 
