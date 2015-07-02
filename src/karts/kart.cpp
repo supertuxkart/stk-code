@@ -2451,13 +2451,15 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
                          ->isFogEnabled() );
     }
 
-    m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
-                          m_node,
-                          m_kart_properties->getShadowScale(),
-                          m_kart_properties->getShadowXOffset(),
-                          m_kart_properties->getGraphicalYOffset(),
-                          m_kart_properties->getShadowZOffset());
-
+    if (!CVS->supportsShadows())
+    {
+        m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
+                              m_node,
+                              m_kart_properties->getShadowScale(),
+                              m_kart_properties->getShadowXOffset(),
+                              m_kart_properties->getGraphicalYOffset(),
+                              m_kart_properties->getShadowZOffset());
+    }
     World::getWorld()->kartAdded(this, m_node);
 }   // loadData
 
