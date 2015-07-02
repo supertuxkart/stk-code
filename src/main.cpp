@@ -766,6 +766,8 @@ int handleCmdLine()
            UserConfigParams::m_camera_debug=2;
         if(CommandLine::has("--camera-debug"))
             UserConfigParams::m_camera_debug=1;
+        if(CommandLine::has("--camera-kart-debug"))
+            UserConfigParams::m_camera_debug=4;
         if(CommandLine::has("--physics-debug"))
             UserConfigParams::m_physics_debug=1;
         if(CommandLine::has("--check-debug"))
