@@ -465,6 +465,13 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
                 *cam_angle  = 0;
                 *distance   = -m_kart->getKartModel()->getLength();
             }
+            else if(UserConfigParams::m_camera_debug==4)
+            {
+                *above_kart = 0;
+                *cam_angle  = 0;
+                *distance   = -0.5f*m_kart->getKartModel()->getLength()-1.0f;
+                *smoothing  = false;
+            }
             else
             {
                 *above_kart    = 0.75f;
