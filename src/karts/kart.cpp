@@ -1398,12 +1398,12 @@ void Kart::update(float dt)
     //                         irr_driver->isGLSL();
 
     // Disable the fake shadow if we're flying
-    if((!isOnGround() || emergency) && m_shadow_enabled)
+    if(m_shadow && (!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
         m_shadow->disableShadow();
     }
-    if(!m_shadow_enabled && isOnGround() && !emergency)
+    if(m_shadow && !m_shadow_enabled && isOnGround() && !emergency)
     {
         m_shadow->enableShadow();
         m_shadow_enabled = true;

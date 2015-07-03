@@ -148,7 +148,7 @@ void TrackInfoScreen::init()
     getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
     if (has_AI)
     {
-        m_ai_kart_spinner->setActivated();
+        m_ai_kart_spinner->setActive(true);
 
         // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.

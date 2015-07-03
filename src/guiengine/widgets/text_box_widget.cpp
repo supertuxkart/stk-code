@@ -174,30 +174,16 @@ void TextBoxWidget::elementRemoved()
 
 // -----------------------------------------------------------------------------
 
-void TextBoxWidget::setActivated()
+void TextBoxWidget::setActive(bool active)
 {
-    Widget::setActivated();
+    Widget::setActive(active);
 
     if (m_element != NULL)
     {
         IGUIEditBox* textCtrl = Widget::getIrrlichtElement<IGUIEditBox>();
         assert(textCtrl != NULL);
-        textCtrl->setEnabled(true);
+        textCtrl->setEnabled(active);
     }
-}
-
-// -----------------------------------------------------------------------------
-
-void TextBoxWidget::setDeactivated()
-{
-    Widget::setDeactivated();
-
-    if (m_element != NULL)
-    {
-        IGUIEditBox* textCtrl = Widget::getIrrlichtElement<IGUIEditBox>();
-        assert(textCtrl != NULL);
-        textCtrl->setEnabled(false);
-    }
-}
+}   // setActive
 
 // -----------------------------------------------------------------------------

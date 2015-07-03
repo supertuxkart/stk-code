@@ -156,14 +156,8 @@ void OptionsScreenInput::init()
     eventCallback(devices, name2, PLAYER_ID_GAME_MASTER);
      */
     // Disable adding keyboard configurations
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        getWidget<ButtonWidget>("add_device")->setDeactivated();
-    }
-    else
-    {
-        getWidget<ButtonWidget>("add_device")->setActivated();
-    }
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    getWidget<ButtonWidget>("add_device")->setActive(!in_game);
 }   // init
 
 // -----------------------------------------------------------------------------

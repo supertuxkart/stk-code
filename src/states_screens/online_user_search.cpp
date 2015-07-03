@@ -206,9 +206,9 @@ void OnlineUserSearch::search()
         m_user_list_widget->clear();
         m_user_list_widget->addItem("spacer", L"");
         m_user_list_widget->addItem("loading", StringUtils::loadingDots(_("Searching")));
-        m_back_widget->setDeactivated();
-        m_search_box_widget->setDeactivated();
-        m_search_button_widget->setDeactivated();
+        m_back_widget->setActive(false);
+        m_search_box_widget->setActive(false);
+        m_search_button_widget->setActive(false);
     }
 }   // search
 
@@ -278,9 +278,9 @@ void OnlineUserSearch::onUpdate(float dt)
 
             delete m_search_request;
             m_search_request = NULL;
-            m_back_widget->setActivated();
-            m_search_box_widget->setActivated();
-            m_search_button_widget->setActivated();
+            m_back_widget->setActive(true);
+            m_search_box_widget->setActive(true);
+            m_search_button_widget->setActive(true);
         }
         else
         {

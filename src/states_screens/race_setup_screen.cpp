@@ -289,7 +289,7 @@ void RaceSetupScreen::init()
         int index = w->findItemNamed("best");
         Widget* hardestWidget = &w->getChildren()[index];
         hardestWidget->setBadge(LOCKED_BADGE);
-        hardestWidget->setDeactivated();
+        hardestWidget->setActive(false);
     }
 }   // init
 

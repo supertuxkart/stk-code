@@ -326,7 +326,7 @@ void RegisterScreen::doRegister()
  */
 void RegisterScreen::acceptTerms()
 {
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
 
     core::stringw username = getWidget<TextBoxWidget>("username")->getText().trim();
     core::stringw password = m_password_widget->getText().trim();
@@ -374,7 +374,7 @@ void RegisterScreen::onUpdate(float dt)
             }
             delete m_signup_request;
             m_signup_request = NULL;
-            m_options_widget->setActivated();
+            m_options_widget->setActive(true);
         }
     }
     else if(m_info_message_shown && !ModalDialog::isADialogActive())

@@ -109,16 +109,9 @@ void OptionsScreenInput2::init()
     else
     {
         delete_button->setLabel(_("Delete Configuration"));
-
-        if (input_manager->getDeviceManager()->getKeyboardAmount() < 2)
-        {
-            // don't allow deleting the last config
-            delete_button->setDeactivated();
-        }
-        else
-        {
-            delete_button->setActivated();
-        }
+        // Don't allow deleting the last config
+        delete_button->setActive(
+                   input_manager->getDeviceManager()->getKeyboardAmount() > 1);
     }
 
     // Make the two buttons the same length, not strictly needed but will
@@ -166,13 +159,8 @@ void OptionsScreenInput2::init()
     updateInputButtons();
 
     // Disable deletion keyboard configurations
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        getWidget<ButtonWidget>("delete")->setDeactivated();
-    } else
-    {
-        getWidget<ButtonWidget>("delete")->setActivated();
-    }
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    getWidget<ButtonWidget>("delete")->setActive(!in_game);
 }   // init
 
 // -----------------------------------------------------------------------------

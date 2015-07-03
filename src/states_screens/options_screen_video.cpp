@@ -192,9 +192,7 @@ void OptionsScreenVideo::init()
     CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
     rememberWinpos->setState(UserConfigParams::m_remember_window_location);
 
-    if (UserConfigParams::m_fullscreen) rememberWinpos->setDeactivated();
-    else rememberWinpos->setActivated();
-
+    rememberWinpos->setActive(UserConfigParams::m_fullscreen);
 
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
@@ -353,23 +351,13 @@ void OptionsScreenVideo::init()
     // ---- forbid changing resolution or animation settings from in-game
     // (we need to disable them last because some items can't be edited when
     // disabled)
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        res->setDeactivated();
-        full->setDeactivated();
-        applyBtn->setDeactivated();
-        gfx->setDeactivated();
-        getWidget<ButtonWidget>("custom")->setDeactivated();
-    }
-    else
-    {
-        // Enable back widgets if they were visited in-game previously
-        res->setActivated();
-        full->setActivated();
-        applyBtn->setActivated();
-        gfx->setActivated();
-        getWidget<ButtonWidget>("custom")->setActivated();
-    }
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+
+    res->setActive(!in_game);
+    full->setActive(!in_game);
+    applyBtn->setActive(!in_game);
+    gfx->setActive(!in_game);
+    getWidget<ButtonWidget>("custom")->setActive(!in_game);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -597,8 +585,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         CheckBoxWidget* fullscreen = getWidget<CheckBoxWidget>("fullscreen");
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
-        if (fullscreen->getState()) rememberWinpos->setDeactivated();
-        else rememberWinpos->setActivated();
+        rememberWinpos->setActive(!fullscreen->getState());
     }
 }   // eventCallback
 

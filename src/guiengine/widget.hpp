@@ -322,7 +322,7 @@ namespace GUIEngine
         /**
          * \brief Sets the widget (and its children, if any) visible or not.
          * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
-         * it visible implicitely calls setActivated(). If you mix visiblity and (de)activated calls,
+         * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
          * undefined behavior may ensue (like invisible but clickable buttons).
          */
         void setVisible(bool visible);
@@ -352,12 +352,11 @@ namespace GUIEngine
          * \{
          */
 
-        /** \brief undos setDeactivated() */
-        virtual void setActivated();
-
-        /** \brief greys out the widget, making it not clickable for the user */
-        virtual void setDeactivated();
-
+        /** \brief Sets an widget to be either activated or deactivated 
+         *  (i.e. greyed out)
+         *  \param active Active (true) or deactive (false). Defaults to 
+         *         true. */
+        virtual void setActive(bool active=true);
 
         /**
           * \}

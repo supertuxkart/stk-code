@@ -159,7 +159,7 @@ void EditGPScreen::init()
 
         IconButtonWidget* button = getWidget<IconButtonWidget>("save");
         assert(button != NULL);
-        button->setDeactivated();
+        button->setActive(false);
 
         loadList(0);
         setModified(false);
@@ -274,10 +274,7 @@ void EditGPScreen::setModified(const bool modified)
 
     IconButtonWidget* save_button = getWidget<IconButtonWidget>("save");
     assert(save_button != NULL);
-    if (modified)
-        save_button->setActivated();
-    else
-        save_button->setDeactivated();
+    save_button->setActive(modified);
 
     LabelWidget* header = getWidget<LabelWidget>("title");
     assert(header != NULL);
@@ -359,25 +356,10 @@ void EditGPScreen::enableButtons()
     assert(edit_button != NULL);
     assert(remove_button != NULL);
 
-    if (m_selected >= 0 && m_list->getItemCount() > 1)
-    {
-        up_button->setActivated();
-        down_button->setActivated();
-    }
-    else
-    {
-        up_button->setDeactivated();
-        down_button->setDeactivated();
-    }
+    bool b = m_selected >= 0 && m_list->getItemCount() > 1;
+    up_button->setActive(b);
+    down_button->setActive(b);
 
-    if (m_selected >= 0)
-    {
-        edit_button->setActivated();
-        remove_button->setActivated();
-    }
-    else
-    {
-        edit_button->setDeactivated();
-        remove_button->setDeactivated();
-    }
+    edit_button->setActive(m_selected >= 0);
+    remove_button->setActive(m_selected >= 0);
 }
