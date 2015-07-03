@@ -1,9 +1,28 @@
-#include "graphics/central_settings.hpp"
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "graphics/glwrap.hpp"
 
-#include "config/user_config.hpp"
+
 #include "config/hardware_stats.hpp"
-#include "graphics/stkmesh.hpp"
+#include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/stk_mesh.hpp"
 #include "utils/profiler.hpp"
 #include "utils/cpp2011.hpp"
 
@@ -225,7 +244,7 @@ FrameBuffer::~FrameBuffer()
         glDeleteFramebuffers(1, &fbolayer);
 }
 
-void FrameBuffer::Bind()
+void FrameBuffer::bind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glViewport(0, 0, (int)width, (int)height);
@@ -233,7 +252,7 @@ void FrameBuffer::Bind()
     glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
-void FrameBuffer::BindLayer(unsigned i)
+void FrameBuffer::bindLayer(unsigned i)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbolayer);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, RenderTargets[0], 0, i);
@@ -276,12 +295,13 @@ void draw3DLine(const core::vector3df& start,
         end.X, end.Y, end.Z
     };
 
-    glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
-    glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
+    Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
+    line->bindVertexArray();
+    line->bindBuffer();
     glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * sizeof(float), vertex);
 
-    glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
-    UtilShader::ColoredLine::getInstance()->setUniforms(color);
+    line->use();
+    line->setUniforms(color);
     glDrawArrays(GL_LINES, 0, 2);
 
     glGetError();
@@ -344,7 +364,7 @@ const std::string getGLExtensions()
 
 // ----------------------------------------------------------------------------
 /** Adds GL limits to the json data structure.
- *  (C) 2014 by Wildfire Games (0 A.D.), ported by Joerg Henrichs
+ *  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs
  */
 void getGLLimits(HardwareStats::Json *json)
 {

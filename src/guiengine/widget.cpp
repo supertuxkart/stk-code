@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -76,7 +76,6 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_supports_multiplayer  = false;
     m_is_bounding_box_round = false;
     m_has_tooltip           = false;
-    m_is_text_rtl           = false;
 
     m_absolute_x = m_absolute_y = m_absolute_w = m_absolute_h = -1;
     m_relative_x = m_relative_y = m_relative_w = m_relative_h = -1;
@@ -149,29 +148,15 @@ void Widget::elementRemoved()
 
 // -----------------------------------------------------------------------------
 
-void Widget::setActivated()
+void Widget::setActive(bool active)
 {
     // even if this one is already active, do it anyway on purpose, maybe the
     // children widgets need to be updated
-    m_deactivated = false;
+    m_deactivated = !active;
     const int count = m_children.size();
     for (int n=0; n<count; n++)
     {
-        m_children[n].setActivated();
-    }
-}
-
-// -----------------------------------------------------------------------------
-
-void Widget::setDeactivated()
-{
-    // even if this one is already inactive, do it anyway on purpose, maybe the
-    // children widgets need to be updated
-    m_deactivated = true;
-    const int count = m_children.size();
-    for (int n=0; n<count; n++)
-    {
-        m_children[n].setDeactivated();
+        m_children[n].setActive(active);
     }
 }
 

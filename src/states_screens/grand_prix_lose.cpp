@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -133,7 +133,7 @@ void GrandPrixLose::onUpdate(float dt)
                 core::vector3df kart_pos(m_kart_x + n*DISTANCE_BETWEEN_KARTS,
                     m_kart_y,
                     m_kart_z);
-                m_kart_node[n]->move(kart_pos, kart_rot, kart_scale, false);
+                m_kart_node[n]->move(kart_pos, kart_rot, kart_scale, false, true);
             }
         }
     }

@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2014 Marianne Gagnon
-//                2014      Joerg Henrichs
+//  Copyright (C) 2009-2015 Marianne Gagnon
+//            (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -100,7 +100,7 @@ void TrackInfoScreen::init()
     const bool has_laps       = race_manager->modeHasLaps();
     const bool has_highscores = race_manager->modeHasHighscores();
 
-    getWidget<LabelWidget>("name")->setText(m_track->getName(), false);
+    getWidget<LabelWidget>("name")->setText(translations->fribidize(m_track->getName()), false);
 
     //I18N: when showing who is the author of track '%s'
     //I18N: (place %s where the name of the author should appear)
@@ -148,7 +148,7 @@ void TrackInfoScreen::init()
     getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
     if (has_AI)
     {
-        m_ai_kart_spinner->setActivated();
+        m_ai_kart_spinner->setActive(true);
 
         // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.
@@ -194,6 +194,7 @@ void TrackInfoScreen::init()
     RibbonWidget* bt_start = getWidget<GUIEngine::RibbonWidget>("buttons");
     bt_start->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
+    updateHighScores();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -322,6 +323,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         const int num_ai = m_ai_kart_spinner->getValue();
         race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
         UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() + num_ai;
+        updateHighScores();
     }
 }   // eventCallback
 

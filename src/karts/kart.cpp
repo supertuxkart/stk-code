@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -32,6 +32,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
 #include "graphics/stk_text_billboard.hpp"
@@ -116,6 +117,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_squash_time          = 0.0f;
     m_shadow_enabled       = false;
 
+    m_shadow               = NULL;
     m_wheel_box            = NULL;
     m_collision_particles  = NULL;
     m_slipstream           = NULL;
@@ -129,9 +131,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_min_nitro_time       = 0.0f;
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
-    m_nitro_light          = NULL;
-    m_skidding_light_1     = NULL;
-    m_skidding_light_2     = NULL;
     m_type                 = RaceManager::KT_AI;
 
     m_view_blocked_by_plunger = 0;
@@ -266,6 +265,7 @@ Kart::~Kart()
     if(m_attachment)             delete m_attachment;
     if(m_stars_effect)          delete m_stars_effect;
 
+    delete m_shadow;
     if (m_wheel_box) m_wheel_box->remove();
     if(m_skidmarks) delete m_skidmarks ;
 
@@ -586,7 +586,6 @@ void Kart::createPhysics()
         kart_height = kart_length*0.6f;
     }
 
-    btCollisionShape *shape;
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
     Vec3 wheel_pos[4];
     assert(bevel.getX() || bevel.getY() || bevel.getZ());
@@ -644,14 +643,13 @@ void Kart::createPhysics()
 
     // This especially enables proper drawing of the point cloud
     hull->initializePolyhedralFeatures();
-    shape = hull;
 
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
     // Shift center of gravity downwards, so that the kart
     // won't topple over too easy.
     shiftCenterOfGravity.setOrigin(m_kart_properties->getGravityCenterShift());
-    m_kart_chassis.addChildShape(shiftCenterOfGravity, shape);
+    m_kart_chassis.addChildShape(shiftCenterOfGravity, hull);
 
     // Set mass and inertia
     // --------------------
@@ -1218,7 +1216,6 @@ void Kart::update(float dt)
      */
 
     m_beep_sound->setPosition   ( getXYZ() );
-    m_engine_sound->setPosition ( getXYZ() );
     m_crash_sound->setPosition  ( getXYZ() );
     m_skid_sound->setPosition   ( getXYZ() );
     m_boing_sound->setPosition  ( getXYZ() );
@@ -1401,12 +1398,14 @@ void Kart::update(float dt)
     //                         irr_driver->isGLSL();
 
     // Disable the fake shadow if we're flying
-    if((!isOnGround() || emergency) && m_shadow_enabled)
+    if(m_shadow && (!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
+        m_shadow->disableShadow();
     }
-    if(!m_shadow_enabled && isOnGround() && !emergency)
+    if(m_shadow && !m_shadow_enabled && isOnGround() && !emergency)
     {
+        m_shadow->enableShadow();
         m_shadow_enabled = true;
     }
 }   // update
@@ -1825,8 +1824,11 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
             impulse.normalize();
         else
             impulse = Vec3(0, 0, -1); // Arbitrary
-        // impulse depends of kart speed - and speed can be negative
-        impulse *= sqrt(fabsf(getSpeed()))
+        // Impulse depends of kart speed - and speed can be negative
+        // If the speed is too low, karts can still get stuck into a wall
+        // so make sure there is always enough impulse to avoid this
+        float abs_speed = fabsf(getSpeed());
+        impulse *= ( abs_speed<10 ? 10.0f : sqrt(abs_speed) )
                  * m_kart_properties->getCollisionTerrainImpulse();
         m_bounce_back_time = 0.2f;
         m_vehicle->setTimedCentralImpulse(0.1f, impulse);
@@ -1958,12 +1960,14 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             if (isShielded() || (k != NULL && k->isShielded()))
             {
                 if (m_boing_sound->getStatus() != SFXBase::SFX_PLAYING)
-                    m_boing_sound->play();
+                    m_boing_sound->play(getXYZ());
             }
             else
             {
-                if(m_crash_sound->getStatus() != SFXBase::SFX_PLAYING)
-                    m_crash_sound->play();
+                if (m_crash_sound->getStatus() != SFXBase::SFX_PLAYING)
+                {
+                    m_crash_sound->play(getXYZ());
+                }
             }
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_time <= 0
@@ -1976,7 +1980,9 @@ void Kart::beep()
 {
     // If the custom horn can't play (isn't defined) then play the default one
     if (!playCustomSFX(SFXManager::CUSTOM_HORN))
-        m_beep_sound->play();
+    {
+        m_beep_sound->play(getXYZ());
+    }
 
 } // beep
 
@@ -2082,7 +2088,7 @@ void Kart::updatePhysics(float dt)
         m_skidding->getGraphicalJumpOffset()==0)
     {
         if(m_skid_sound->getStatus()!=SFXBase::SFX_PLAYING && !isWheeless())
-            m_skid_sound->play();
+            m_skid_sound->play(getXYZ());
     }
     else if(m_skid_sound->getStatus()==SFXBase::SFX_PLAYING)
     {
@@ -2189,15 +2195,14 @@ void Kart::updateEngineSFX()
 
         float gears = 3.0f * fmod(f, 0.333334f);
         assert(!isnan(f));
-        m_engine_sound->setSpeed(0.6f + (f + gears) * 0.35f);
+        m_engine_sound->setSpeedPosition(0.6f + (f + gears) * 0.35f, getXYZ());
     }
     else
     {
         // When flying, fixed value but not too high pitch
         // This gives some variation (vs previous "on wheels" one)
-        m_engine_sound->setSpeed(0.9f);
+        m_engine_sound->setSpeedPosition(0.9f, getXYZ());
     }
-    m_engine_sound->setPosition(getXYZ());
 }   // updateEngineSFX
 
 //-----------------------------------------------------------------------------
@@ -2403,24 +2408,6 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
     m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
-    // Create nitro light
-    m_nitro_light = irr_driver->addLight(core::vector3df(0.0f, 0.5f, m_kart_model->getLength()*-0.5f - 0.05f),
-        0.4f /* force */, 5.0f /* radius */, 0.0f, 0.4f, 1.0f, false, m_node);
-    m_nitro_light->setVisible(false);
-    m_nitro_light->setName( ("nitro emitter (" + getIdent() + ")").c_str() );
-
-    // Create skidding lights
-    // For the first skidding level
-    m_skidding_light_1 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
-        0.3f /* force */, 3.0f /* radius */, 1.0f, 0.6f, 0.0f, false, m_node);
-    m_skidding_light_1->setVisible(false);
-    m_skidding_light_1->setName( ("skidding emitter 1 (" + getIdent() + ")").c_str() );
-    // For the second skidding level
-    m_skidding_light_2 = irr_driver->addLight(core::vector3df(0.0f, 0.1f, m_kart_model->getLength()*-0.5f - 0.05f),
-        0.4f /* force */, 4.0f /* radius */, 1.0f, 0.0f, 0.0f, false, m_node);
-    m_skidding_light_2->setVisible(false);
-    m_skidding_light_2->setName( ("skidding emitter 2 (" + getIdent() + ")").c_str() );
-
 #ifdef DEBUG
     m_node->setName( (getIdent()+"(lod-node)").c_str() );
 #endif
@@ -2464,6 +2451,15 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
                          ->isFogEnabled() );
     }
 
+    if (!CVS->supportsShadows())
+    {
+        m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
+                              m_node,
+                              m_kart_properties->getShadowScale(),
+                              m_kart_properties->getShadowXOffset(),
+                              m_kart_properties->getGraphicalYOffset(),
+                              m_kart_properties->getShadowZOffset());
+    }
     World::getWorld()->kartAdded(this, m_node);
 }   // loadData
 
@@ -2533,36 +2529,20 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // Upate particle effects (creation rate, and emitter size
     // depending on speed)
     // --------------------------------------------------------
+    float nitro_frac = 0;
     if ( (m_controls.m_nitro || m_min_nitro_time > 0.0f) &&
          isOnGround() &&  m_collected_energy > 0            )
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
-        float f = fabsf(getSpeed())/(m_kart_properties->getMaxSpeed() *
-                  m_difficulty->getMaxSpeed());
+        nitro_frac = fabsf(getSpeed())/(m_kart_properties->getMaxSpeed() *
+                                        m_difficulty->getMaxSpeed()       );
         // The speed of the kart can be higher (due to powerups) than
         // the normal maximum speed of the kart.
-        if(f>1.0f) f = 1.0f;
-        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO1, f);
-        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO2, f);
-        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, f);
-        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, f);
-        m_nitro_light->setVisible(true);
+        if(nitro_frac>1.0f) nitro_frac = 1.0f;
     }
-    else
-    {
-        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO1, 0);
-        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO2, 0);
-        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
-        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
-        m_nitro_light->setVisible(false);
-    }
-    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO1, getSpeed(), dt);
-    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO2, getSpeed(), dt);
-    m_kart_gfx->resizeBox(KartGFX::KGFX_NITROSMOKE1, getSpeed(), dt);
-    m_kart_gfx->resizeBox(KartGFX::KGFX_NITROSMOKE2, getSpeed(), dt);
-
-    m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
+    // speed * dt is the new size of the box in which particles start
+    m_kart_gfx->updateNitroGraphics(nitro_frac, getSpeed()*dt);
 
     // Handle leaning of karts
     // -----------------------
@@ -2727,7 +2707,8 @@ void Kart::setOnScreenText(const wchar_t *text)
 
     if (CVS->isGLSL())
     {
-        gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont() : GUIEngine::getTitleFont();
+        gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont() 
+                                                       : GUIEngine::getTitleFont();
         new STKTextBillboard(text, font,
             video::SColor(255, 255, 225, 0),
             video::SColor(255, 255, 89, 0),
@@ -2739,7 +2720,7 @@ void Kart::setOnScreenText(const wchar_t *text)
     {
         scene::ISceneManager* sm = irr_driver->getSceneManager();
         sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
-            : GUIEngine::getTitleFont(),
+                                                           : GUIEngine::getTitleFont(),
             text,
             getNode(),
             core::dimension2df(textsize.Width/55.0f,
@@ -2754,11 +2735,5 @@ void Kart::setOnScreenText(const wchar_t *text)
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.
 }   // setOnScreenText
-
-void Kart::activateSkidLight(unsigned int level)
-{
-    m_skidding_light_1->setVisible(level == 1);
-    m_skidding_light_2->setVisible(level > 1);
-}
 
 /* EOF */

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -80,13 +80,9 @@ void LabelWidget::add()
     {
         irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
                                                           false, word_wrap, m_parent, -1);
-#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
         irrwidget->setTextRestrainedInside(false);
-#endif
     }
-#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
-    irrwidget->setRightToLeft( m_is_text_rtl );
-#endif
+    irrwidget->setRightToLeft(translations->isRTLText(message));
 
     m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
@@ -155,6 +151,8 @@ void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
     }
 
     Widget::setText(text);
+    if (m_element)
+        getIrrlichtElement<IGUIStaticText>()->setRightToLeft(translations->isRTLText(getText()));
 }   // setText
 
 // ----------------------------------------------------------------------------

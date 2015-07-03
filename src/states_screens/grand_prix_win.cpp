@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -204,7 +204,7 @@ void GrandPrixWin::onUpdate(float dt)
                 core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
                 core::vector3df kart_rot(0, m_kart_rotation[k], 0);
                 core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
-                m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
+                m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false, true);
             }
         } // end for
 
@@ -227,11 +227,11 @@ void GrandPrixWin::onUpdate(float dt)
                     core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
                     core::vector3df kart_rot(0, m_kart_rotation[k], 0);
                     core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
-                    m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
+                    m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false, true);
 
                     core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
                     core::vector3df podium_rot(0, m_kart_rotation[k], 0);
-                    m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false);
+                    m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false, true);
 
                     karts_not_yet_done++;
                 }
@@ -256,13 +256,13 @@ void GrandPrixWin::onUpdate(float dt)
                     core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
                     core::vector3df kart_rot(0, m_kart_rotation[k], 0);
                     core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
-                    m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
+                    m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false, true);
 
 
                     core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
                     core::vector3df podium_rot(0, m_kart_rotation[k], 0);
                     podium_pos.Y = INITIAL_PODIUM_Y - (INITIAL_Y - m_kart_y[k]) - KARTS_DELTA_Y;
-                    m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false);
+                    m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false, true);
                 }
             }
         } // end for

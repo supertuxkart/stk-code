@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2013-2013 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2013-2015 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,29 +17,32 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tracks/track_object_presentation.hpp"
-#include "graphics/central_settings.hpp"
+
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_buffer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "items/item_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
-#include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "tracks/track_object_manager.hpp"
 
 #include <IBillboardSceneNode.h>
@@ -99,11 +102,12 @@ const core::vector3df& TrackObjectPresentationSceneNode::getScale() const
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz,
                                             const core::vector3df& hpr,
-                                            const core::vector3df& scale)
+                                            const core::vector3df& scale,
+                                            bool isAbsoluteCoord)
 {
     if (m_node == NULL) return;
 
-    if (m_node->getParent() != NULL)
+    if (m_node->getParent() != NULL && isAbsoluteCoord)
     {
         scene::ISceneNode* parent = m_node->getParent();
         m_node->setPosition((xyz - parent->getAbsolutePosition())
@@ -153,9 +157,10 @@ TrackObjectPresentationEmpty::~TrackObjectPresentationEmpty()
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
-                                       const XMLNode& xml_node,
-                                       ModelDefinitionLoader& model_def_loader)
-                                  : TrackObjectPresentationSceneNode(xml_node)
+    TrackObject* parent,
+    const XMLNode& xml_node,
+    ModelDefinitionLoader& model_def_loader)
+    : TrackObjectPresentationSceneNode(xml_node)
 {
     std::string name;
     xml_node.get("name", &name);
@@ -168,12 +173,45 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     XMLNode* libroot;
     std::string lib_path =
         file_manager->getAsset(FileManager::LIBRARY, name) + "/";
+
     bool create_lod_definitions = true;
 
     if (!model_def_loader.containsLibraryNode(name))
     {
+        World* world = World::getWorld();
+        Track* track = NULL;
+        if (world != NULL)
+            track = world->getTrack();
+        std::string local_lib_node_path;
+        std::string local_script_file_path;
+        if (track != NULL)
+        {
+            local_lib_node_path = track->getTrackFile("library/" + name + "/node.xml");
+            local_script_file_path = track->getTrackFile("library/" + name + "/scripting.as");
+        }
         std::string lib_node_path = lib_path + "node.xml";
-        libroot = file_manager->createXMLTree(lib_node_path);
+        std::string lib_script_file_path = lib_path + "scripting.as";
+
+        if (local_lib_node_path.size() > 0 && file_manager->fileExists(local_lib_node_path))
+        {
+            lib_path = track->getTrackFile("library/" + name);
+            libroot = file_manager->createXMLTree(local_lib_node_path);
+            if (track != NULL)
+                World::getWorld()->getScriptEngine()->loadScript(local_script_file_path, false);
+        }
+        else if (file_manager->fileExists(lib_node_path))
+        {
+            libroot = file_manager->createXMLTree(lib_node_path);
+            if (track != NULL)
+                World::getWorld()->getScriptEngine()->loadScript(lib_script_file_path, false);
+        }
+        else
+        {
+            Log::error("TrackObjectPresentationLibraryNode",
+                "Cannot find library '%s'", lib_node_path.c_str());
+            return;
+        }
+
         if (libroot == NULL)
         {
             Log::error("TrackObjectPresentationLibraryNode",
@@ -215,7 +253,8 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
 
     assert(libroot != NULL);
     World::getWorld()->getTrack()->loadObjects(libroot, lib_path, model_def_loader,
-        create_lod_definitions, m_node);
+        create_lod_definitions, m_node, parent);
+    m_parent = parent;
 }   // TrackObjectPresentationLibraryNode
 
 // ----------------------------------------------------------------------------
@@ -223,7 +262,24 @@ TrackObjectPresentationLibraryNode::~TrackObjectPresentationLibraryNode()
 {
     irr_driver->removeNode(m_node);
 }   // TrackObjectPresentationLibraryNode
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLibraryNode::move(const core::vector3df& xyz, const core::vector3df& hpr,
+    const core::vector3df& scale, bool isAbsoluteCoord, bool moveChildrenPhysicalBodies)
+{
+    TrackObjectPresentationSceneNode::move(xyz, hpr, scale, isAbsoluteCoord);
 
+    if (moveChildrenPhysicalBodies)
+    {
+        for (TrackObject* obj : m_parent->getChildren())
+        {
+            obj->reset();
+            if (obj->getPhysicalObject() != NULL)
+            {
+                obj->movePhysicalBodyToGraphicalNode(obj->getAbsolutePosition(), obj->getRotation());
+            }
+        }
+    }
+}
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
                                        scene::ISceneNode* parent,
@@ -358,14 +414,28 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
     bool displacing = false;
-    if(xml_node)
+    std::string interaction;
+    if (xml_node)
+    {
         xml_node->get("displacing", &displacing);
+        xml_node->get("interaction", &interaction);
+    }
     animated &= !displacing;
 
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
 
-    if (m_is_in_skybox)
+    if (interaction == "physicsonly")
+    {
+        m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
+        enabled = false;
+        m_frame_start = 0;
+        m_frame_end = 0;
+
+        if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
+            World::getWorld()->getTrack()->addPhysicsOnlyNode(m_node);
+    }
+    else if (m_is_in_skybox)
     {
         // Tell the driver that this mesh is a part of the background
         scene::IMeshSceneNode * const node =
@@ -615,7 +685,8 @@ TrackObjectPresentationSound::~TrackObjectPresentationSound()
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::move(const core::vector3df& xyz, 
                                         const core::vector3df& hpr,
-                                        const core::vector3df& scale)
+                                        const core::vector3df& scale,
+                                        bool isAbsoluteCoord)
 {
     m_xyz = xyz;
     if (m_sound != NULL) m_sound->setPosition(xyz);
@@ -713,6 +784,12 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
     xml_node.get("clip_distance", &clip_distance);
     xml_node.get("conditions",    &m_trigger_condition);
 
+    bool auto_emit = true;
+    xml_node.get("auto_emit", &auto_emit);
+
+    m_delayed_stop = false;
+    m_delayed_stop_time = 0.0;
+
     try
     {
         ParticleKind* kind = ParticleKindManager::get()->getParticles(path);
@@ -739,7 +816,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
             m_emitter = emitter;
         }
 
-        if (m_trigger_condition.size() > 0)
+        if (m_trigger_condition.size() > 0 || !auto_emit)
         {
             m_emitter->setCreationRateAbsolute(0.0f);
         }
@@ -772,6 +849,16 @@ void TrackObjectPresentationParticles::update(float dt)
     {
         m_emitter->update(dt);
     }
+
+    if (m_delayed_stop)
+    {
+        if (m_delayed_stop_time < 0.0f)
+        {
+            m_delayed_stop = false;
+            stop();
+        }
+        m_delayed_stop_time -= dt;
+    }
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -783,7 +870,30 @@ void TrackObjectPresentationParticles::triggerParticles()
         m_emitter->setParticleType(m_emitter->getParticlesInfo());
     }
 }   // triggerParticles
-
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationParticles::stop()
+{
+    if (m_emitter != NULL)
+    {
+        m_emitter->setCreationRateAbsolute(0.0f);
+        m_emitter->clearParticles();
+    }
+}
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationParticles::stopIn(double delay)
+{
+    m_delayed_stop = true;
+    m_delayed_stop_time = delay;
+}
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationParticles::setRate(float rate)
+{
+    if (m_emitter != NULL)
+    {
+        m_emitter->setCreationRateAbsolute(rate);
+        m_emitter->setParticleType(m_emitter->getParticlesInfo());
+    }
+}
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLight::TrackObjectPresentationLight(
                                                      const XMLNode& xml_node, 
@@ -854,166 +964,13 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 {
     if (!m_action_active) return;
 
-    // TODO: replace all of these hardcoded actions with scripting
-
-    if (m_action == "garage")
-    {
-        m_action_active = false;
-
-        new RacePausedDialog(0.8f, 0.6f);
-        //dynamic_cast<OverWorld*>(World::getWorld())->scheduleSelectKart();
-    }
-    //action trigger near big doors in the overword to notify players that
-    // they'll open once they finish all the challenges
-    else if (m_action == "big_door")
-    {
-        m_action_active = false;
-
-        Track* m_track = World::getWorld()->getTrack();
-        unsigned int unlocked_challenges = m_track->getNumOfCompletedChallenges();
-        std::vector<OverworldChallenge> m_challenges = m_track->getChallengeList();
-
-        // allow ONE unsolved challenge : the last one
-        if (unlocked_challenges < m_challenges.size() - 1)
-        {
-            new TutorialMessageDialog(
-                  _("Complete all challenges to unlock the big door!"), true);
-        }
-    }
-    else if (m_action == "tutorial_drive")
-    {
-        //if (World::getWorld()->getPhase() == World::RACE_PHASE)
-        {
-            m_action_active = false;
-            //World::getWorld()->getRaceGUI()->clearAllMessages();
-
-            InputDevice* device = input_manager->getDeviceManager()
-                                               ->getLatestUsedDevice();
-            DeviceConfig* config = device->getConfiguration();
-            irr::core::stringw accel = config->getBindingAsString(PA_ACCEL);
-            irr::core::stringw left = config->getBindingAsString(PA_STEER_LEFT);
-            irr::core::stringw right = config->getBindingAsString(PA_STEER_RIGHT);
-
-            new TutorialMessageDialog(_("Accelerate with <%s> and steer with "
-                                        "<%s> and <%s>", accel, left, right),
-                false);
-        }
-    }
-    else if (m_action == "tutorial_bananas")
-    {
-        m_action_active = false;
-
-        new TutorialMessageDialog(_("Avoid bananas!"), true);
-    }
-    else if (m_action == "tutorial_giftboxes")
-    {
-        m_action_active = false;
-        InputDevice* device = input_manager->getDeviceManager()
-                                           ->getLatestUsedDevice();
-        DeviceConfig* config = device->getConfiguration();
-        irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
-
-        new TutorialMessageDialog(_("Collect gift boxes, and fire the weapon "
-                                    "with <%s> to blow away these boxes!",
-                                    fire),true);
-    }
-    else if (m_action == "tutorial_backgiftboxes")
-    {
-        m_action_active = false;
-        InputDevice* device = input_manager->getDeviceManager()
-                                           ->getLatestUsedDevice();
-        DeviceConfig* config = device->getConfiguration();
-        irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
-        irr::core::stringw back = config->getBindingAsString(PA_LOOK_BACK);
-
-    new TutorialMessageDialog(
-           _("Press <%s> to look behind, and fire the weapon with <%s> while "
-             "pressing <%s> to fire behind!", back, fire, back),
-            true);
-    }
-    else if (m_action == "tutorial_nitro_collect")
-    {
-        m_action_active = false;
-
-        new TutorialMessageDialog(_("Collect nitro bottles (we will use them "
-                                    "after the curve)"), true);
-    }
-    else if (m_action == "tutorial_nitro_use")
-    {
-        m_action_active = false;
-        InputDevice* device = input_manager->getDeviceManager()
-                                           ->getLatestUsedDevice();
-        DeviceConfig* config = device->getConfiguration();
-        irr::core::stringw nitro = config->getBindingAsString(PA_NITRO);
-
-        new TutorialMessageDialog(_("Use the nitro you collected by "
-                                    "pressing <%s>!", nitro), true);
-    }
-    else if (m_action == "tutorial_rescue")
-    {
-        m_action_active = false;
-        InputDevice* device = input_manager->getDeviceManager()
-                                           ->getLatestUsedDevice();
-        DeviceConfig* config = device->getConfiguration();
-        irr::core::stringw rescue = config->getBindingAsString(PA_RESCUE);
-
-        new TutorialMessageDialog(_("Oops! When you're in trouble, press <%s> "
-                                    "to be rescued", rescue),
-                                  false);
-    }
-    else if (m_action == "tutorial_skidding")
-    {
-        m_action_active = false;
-        //World::getWorld()->getRaceGUI()->clearAllMessages();
-
-        InputDevice* device = input_manager->getDeviceManager()
-                                           ->getLatestUsedDevice();
-        DeviceConfig* config = device->getConfiguration();
-        irr::core::stringw skid = config->getBindingAsString(PA_DRIFT);
-
-
-        new TutorialMessageDialog(_("Accelerate and press the <%s> key while "
-                                    "turning to skid. Skidding for a short "
-                                    "while can help you turn faster to take "
-                                    "sharp turns.", skid),
-            true);
-    }
-    else if (m_action == "tutorial_skidding2")
-    {
-        m_action_active = false;
-        World::getWorld()->getRaceGUI()->clearAllMessages();
-
-        new TutorialMessageDialog(_("Note that if you manage to skid for "
-                                    "several seconds, you will receive a bonus "
-                                    "speedup as a reward!"),
-            true);
-    }
-    else if (m_action == "tutorial_endmessage")
-    {
-        m_action_active = false;
-        World::getWorld()->getRaceGUI()->clearAllMessages();
-
-        new TutorialMessageDialog(_("You are now ready to race. Good luck!"),
-            true);
-    }
-    else if (m_action == "tutorial_exit")
-    {
-        World::getWorld()->scheduleExitRace();
-        return;
-    }
-    else
-    {	
-        //TODO move all above functions into scripts and remove the ifs
-        Scripting::ScriptEngine* m_script_engine =
-            World::getWorld()->getScriptEngine();
-        m_action_active = false;
-        m_script_engine->runScript(m_action);
-        
-        /*
-        Catch exception -> script not found
-        fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
-                m_action.c_str());
-        
-         */
-    }
+    Scripting::ScriptEngine* script_engine =
+        World::getWorld()->getScriptEngine();
+    m_action_active = false; // TODO: allow auto re-activating?
+    int idKart = 0;
+    Camera* camera = Camera::getActiveCamera();
+    if (camera != NULL && camera->getKart() != NULL)
+        idKart = camera->getKart()->getWorldKartId();
+    script_engine->runFunction("void " + m_action + "(int)",
+        [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
 }   // onTriggerItemApproached

@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -268,7 +268,7 @@ void RaceGUI::drawScores()
                                      offsetX + (int)(m_minimap_player_size/1.25f),
                                      offsetY + (int)(m_minimap_player_size/1.25f));
         core::rect<s32> sourceRect(core::position2d<s32>(0,0),
-                                                   team_icon->getOriginalSize());
+                                                   team_icon->getSize());
         draw2DImage(team_icon,indicatorPos,sourceRect,
             NULL,NULL,true);
         numLeader++;
@@ -357,7 +357,7 @@ void RaceGUI::drawGlobalMiniMap()
     if (old_rtt_mini_map != NULL)
     {
         core::rect<s32> source(core::position2di(0, 0),
-                               old_rtt_mini_map->getOriginalSize());
+                               old_rtt_mini_map->getSize());
         draw2DImage(old_rtt_mini_map, dest, source,
                     NULL, NULL, true);
     }
@@ -380,7 +380,7 @@ void RaceGUI::drawGlobalMiniMap()
 
         video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
 
-        // int marker_height = m_marker->getOriginalSize().Height;
+        // int marker_height = m_marker->getSize().Height;
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
         int marker_half_size = (kart->getController()->isPlayerController()
                                 ? m_minimap_player_size
@@ -720,7 +720,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                     (int)offset.Y);
     video::ITexture *meter_texture = m_speed_meter_icon->getTexture();
     const core::rect<s32> meter_texture_coords(core::position2d<s32>(0,0),
-                                               meter_texture->getOriginalSize());
+                                               meter_texture->getSize());
     draw2DImage(meter_texture, meter_pos, meter_texture_coords, NULL,
                        NULL, true);
     // TODO: temporary workaround, shouldn't have to use

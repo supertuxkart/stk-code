@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,6 +28,7 @@
 #include <pthread.h>
 #include <stdexcept>
 #include <algorithm>
+#include <cerrno>
 #include <map>
 
 #include <stdio.h>
@@ -74,6 +75,7 @@ SFXManager::SFXManager()
     // The sound manager initialises OpenAL
     m_initialized = music_manager->initialized();
     m_master_gain = UserConfigParams::m_sfx_volume;
+    m_last_update_time = -1.0f;
     // Init position, since it can be used before positionListener is called.
     // No need to use lock here, since the thread will be created later.
     m_listener_position.getData() = Vec3(0, 0, 0);
@@ -206,6 +208,22 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 }   // queue (Vec3)
 
 //----------------------------------------------------------------------------
+/** Adds a sound effect command with a float and a Vec3 parameter to the queue
+ *  of the sfx manager. Openal commands can sometimes cause a 5ms delay, so it
+ *   is done in a separate thread.
+ *  \param command The command to execute.
+ *  \param sfx The sound effect to be started.
+ *  \param f A float parameter for the command.
+ *  \param p A Vec3 parameter for the command.
+ */
+void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f,
+                       const Vec3 &p)
+{
+    SFXCommand *sfx_command = new SFXCommand(command, sfx, f, p);
+    queueCommand(sfx_command);
+}   // queue(float, Vec3)
+
+//----------------------------------------------------------------------------
 /** Queues a command for the music manager.
  *  \param mi The music for which the command is.
  */
@@ -308,20 +326,26 @@ void* SFXManager::mainLoop(void *obj)
         switch (current->m_command)
         {
         case SFX_PLAY:     current->m_sfx->reallyPlayNow();       break;
+        case SFX_PLAY_POSITION:
+            current->m_sfx->reallyPlayNow(current->m_parameter);  break;
         case SFX_STOP:     current->m_sfx->reallyStopNow();       break;
         case SFX_PAUSE:    current->m_sfx->reallyPauseNow();      break;
         case SFX_RESUME:   current->m_sfx->reallyResumeNow();     break;
         case SFX_SPEED:    current->m_sfx->reallySetSpeed(
-            current->m_parameter.getX());   break;
+                                  current->m_parameter.getX());   break;
         case SFX_POSITION: current->m_sfx->reallySetPosition(
-            current->m_parameter);   break;
+                                         current->m_parameter);   break;
+        case SFX_SPEED_POSITION: current->m_sfx->reallySetSpeedPosition(
+                                         // Extract float from W component
+                                         current->m_parameter.getW(),
+                                         current->m_parameter);   break;
         case SFX_VOLUME:   current->m_sfx->reallySetVolume(
-            current->m_parameter.getX());   break;
+                                  current->m_parameter.getX());   break;
         case SFX_MASTER_VOLUME:
             current->m_sfx->reallySetMasterVolumeNow(
-                current->m_parameter.getX());   break;
+                                  current->m_parameter.getX());   break;
         case SFX_LOOP:     current->m_sfx->reallySetLoop(
-            current->m_parameter.getX() != 0);   break;
+                             current->m_parameter.getX() != 0);   break;
         case SFX_DELETE:     me->deleteSFX(current->m_sfx);       break;
         case SFX_PAUSE_ALL:  me->reallyPauseAllNow();             break;
         case SFX_RESUME_ALL: me->reallyResumeAllNow();            break;
@@ -364,8 +388,10 @@ void* SFXManager::mainLoop(void *obj)
         {
             // Wait some time to let other threads run, then queue an
             // update event to keep music playing.
+            double t = StkTime::getRealTime();
             StkTime::sleep(1);
-            me->queue(SFX_UPDATE, (SFXBase*)NULL, 0.01f);
+            t = StkTime::getRealTime() - t;
+            me->queue(SFX_UPDATE, (SFXBase*)NULL, float(t));
         }
         me->m_sfx_commands.lock();
 
@@ -667,9 +693,9 @@ void SFXManager::deleteSFXMapping(const std::string &name)
  *  adds an update command for the music manager.
  *  \param dt Time step size.
  */
-void SFXManager::update(float dt)
+void SFXManager::update()
 {
-    queue(SFX_UPDATE, (SFXBase*)NULL, dt);
+    queue(SFX_UPDATE, (SFXBase*)NULL);
     // Wake up the sfx thread to handle all queued up audio commands.
     pthread_cond_signal(&m_cond_request);
 }   // update
@@ -681,8 +707,17 @@ void SFXManager::update(float dt)
 */
 void SFXManager::reallyUpdateNow(SFXCommand *current)
 {
+    if (m_last_update_time < 0.0)
+    {
+        // first time
+        m_last_update_time = StkTime::getRealTime();
+    }
+
+    double previous_update_time = m_last_update_time;
+    m_last_update_time = StkTime::getRealTime();
+    float dt = float(m_last_update_time - previous_update_time);
+
     assert(current->m_command==SFX_UPDATE);
-    float dt = current->m_parameter.getX();
     if (music_manager->getCurrentMusic())
         music_manager->getCurrentMusic()->update(dt);
     m_all_sfx.lock();
@@ -926,7 +961,7 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
 {
     if (!sfxAllowed()) return NULL;
 
-    m_quick_sounds.lock();
+    MutexLockerHelper lock(m_quick_sounds);
     std::map<std::string, SFXBase*>::iterator sound = 
                                      m_quick_sounds.getData().find(sound_type);
 
@@ -937,14 +972,12 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
         if (new_sound == NULL) return NULL;
         new_sound->play();
         m_quick_sounds.getData()[sound_type] = new_sound;
-        m_quick_sounds.unlock();
         return new_sound;
     }
     else
     {
         SFXBase *base_sound = sound->second;
         base_sound->play();
-        m_quick_sounds.unlock();
         return base_sound;
     }
 

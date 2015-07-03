@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2015 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -65,7 +65,7 @@ void ServerSelection::refresh()
     m_server_list_widget->addItem("spacer", L"");
     m_server_list_widget->addItem("loading",
                               StringUtils::loadingDots(_("Fetching servers")));
-    m_reload_widget->setDeactivated();
+    m_reload_widget->setActive(false);
 }
 
 
@@ -202,7 +202,7 @@ void ServerSelection::onUpdate(float dt)
             }
             delete m_refresh_request;
             m_refresh_request = NULL;
-            m_reload_widget->setActivated();
+            m_reload_widget->setActive(true);
         }
         else
         {
@@ -214,6 +214,6 @@ void ServerSelection::onUpdate(float dt)
     {
         loadList();
         m_fake_refresh = false;
-        m_reload_widget->setActivated();
+        m_reload_widget->setActive(true);
     }
 }   // onUpdate

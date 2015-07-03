@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Ingo Ruhnke <grumbel@gmx.de>
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -154,7 +154,7 @@ void MainLoop::run()
             // can use as many threads as possible without interfering
             // with audia
             PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
-            SFXManager::get()->update(dt);
+            SFXManager::get()->update();
             PROFILER_POP_CPU_MARKER();
 
             PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);

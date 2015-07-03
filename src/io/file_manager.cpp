@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2008-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2008-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -160,19 +160,19 @@ FileManager::FileManager()
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
-    else if(m_file_system->existFile("data"))
+    else if(m_file_system->existFile("data/stk_config.xml"))
         root_dir = "data/" ;
-    else if(m_file_system->existFile("../data"))
+    else if(m_file_system->existFile("../data/stk_config.xml"))
         root_dir = "../data/" ;
-    else if(m_file_system->existFile("../../data"))
+    else if(m_file_system->existFile("../../data/stk_config.xml"))
         root_dir = "../../data/" ;
     // Test for old style build environment, with executable in root of stk
-    else if(m_file_system->existFile(exe_path+"data"))
+    else if(m_file_system->existFile(exe_path+"data/stk_config.xml"))
         root_dir = (exe_path+"data/").c_str();
     // Check for windows cmake style: bld/Debug/bin/supertuxkart.exe
-    else if (m_file_system->existFile(exe_path + "../../../data"))
+    else if (m_file_system->existFile(exe_path + "../../../data/stk_config.xml"))
         root_dir = (exe_path + "../../../data/").c_str();
-    else if (m_file_system->existFile(exe_path + "../data"))
+    else if (m_file_system->existFile(exe_path + "../data/stk_config.xml"))
     {
         root_dir = exe_path.c_str();
         root_dir += "../data/";

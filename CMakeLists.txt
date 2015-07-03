@@ -2,7 +2,7 @@
 project(SuperTuxKart)
 set(PROJECT_VERSION "0.8.1")
 
-cmake_minimum_required(VERSION 2.8.1)
+cmake_minimum_required(VERSION 2.8.4)
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
   cmake_policy(SET CMP0043 OLD)
 endif()
@@ -18,11 +18,9 @@ endif()
 option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
+option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 
-if(UNIX OR MINGW)
-    option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
-endif()
-if(MSVC OR MINGW)
+if(MSVC)
     # Normally hide the option to build wiiuse on VS, since it depends
     # on the installation of the Windows DDK (Driver Developer Kit),
     # which also needs an absolute path :(
@@ -32,7 +30,7 @@ else()
     set(WIIUSE_BUILD ON)
 endif()
 
-if(MINGW)
+if(MINGW OR CYGWIN)
     set(USE_WIIUSE OFF)
 endif()
 
@@ -124,9 +122,15 @@ elseif(MSVC)
 endif()
 
 
-# Build the angelscript library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
-include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+# Build the angelscript library if not in system
+find_package(Angelscript)
+if(USE_SYSTEM_ANGELSCRIPT AND ANGELSCRIPT_FOUND)
+    include_directories(${Angelscript_INCLUDE_DIRS})
+else()
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+    set(Angelscript_LIBRARIES angelscript)
+endif()
 
 # OpenAL
 if(APPLE)
@@ -172,13 +176,6 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-
-if(UNIX OR MINGW)
-#    if(USE_CPP2011)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
-#    endif()
-endif()
-
 # OpenGL
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
@@ -198,10 +195,14 @@ if(UNIX AND NOT APPLE)
     endif()
 endif()
 
-
 # Set some compiler options
 if(UNIX OR MINGW)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endif()
+
+if(MINGW AND CMAKE_BUILD_TYPE MATCHES Release)
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--subsystem,windows")
 endif()
 
 if(WIN32)
@@ -316,7 +317,7 @@ target_link_libraries(supertuxkart
     enet
     glew
     stkirrlicht
-    angelscript
+    ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -156,14 +156,8 @@ void OptionsScreenInput::init()
     eventCallback(devices, name2, PLAYER_ID_GAME_MASTER);
      */
     // Disable adding keyboard configurations
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        getWidget<ButtonWidget>("add_device")->setDeactivated();
-    }
-    else
-    {
-        getWidget<ButtonWidget>("add_device")->setActivated();
-    }
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    getWidget<ButtonWidget>("add_device")->setActive(!in_game);
 }   // init
 
 // -----------------------------------------------------------------------------

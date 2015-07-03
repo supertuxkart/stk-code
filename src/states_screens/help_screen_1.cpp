@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -118,14 +118,8 @@ void HelpScreen1::init()
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
     ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
 
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        tutorial->setDeactivated();
-    }
-    else
-    {
-        tutorial->setActivated();
-    }
+    tutorial->setActive(StateManager::get()->getGameState() != 
+                                                       GUIEngine::INGAME_MENU);
 
     if (w != NULL)  w->select( "page1", PLAYER_ID_GAME_MASTER );
 }   //init

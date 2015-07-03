@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2013-2013 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2013-2015 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@
 #include "items/item.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/log.hpp"
 #include "utils/vec3.hpp"
 
 #include <vector3d.h>
@@ -38,6 +39,7 @@ class ThreeDAnimation;
 class ModelDefinitionLoader;
 class STKInstancedSceneNode;
 class XMLNode;
+class TrackObject;
 
 namespace irr
 {
@@ -79,10 +81,13 @@ public:
     // ------------------------------------------------------------------------
 
     virtual void reset() {}
-    virtual void setEnable(bool enabled) {}
+    virtual void setEnable(bool enabled)
+    {
+        Log::warn("TrackObjectPresentation", "setEnable unimplemented for this presentation type");
+    }
     virtual void update(float dt) {}
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
-                      const core::vector3df& scale) {}
+        const core::vector3df& scale, bool isAbsoluteCoord) {}
 
     // ------------------------------------------------------------------------
     /** Returns the position of this TrackObjectPresentation. */
@@ -139,7 +144,7 @@ public:
     virtual const core::vector3df& getRotation() const OVERRIDE;
     virtual const core::vector3df& getScale() const OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
-                      const core::vector3df& scale) OVERRIDE;
+        const core::vector3df& scale, bool isAbsoluteCoord) OVERRIDE;
     virtual void setEnable(bool enabled) OVERRIDE;
     virtual void reset() OVERRIDE;
 
@@ -169,10 +174,14 @@ public:
  */
 class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNode
 {
+    TrackObject* m_parent;
 public:
-    TrackObjectPresentationLibraryNode(const XMLNode& xml_node,
+    TrackObjectPresentationLibraryNode(TrackObject* parent,
+        const XMLNode& xml_node,
         ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLibraryNode();
+    void move(const core::vector3df& xyz, const core::vector3df& hpr,
+        const core::vector3df& scale, bool isAbsoluteCoord, bool moveChildrenPhysicalBodies);
 };   // TrackObjectPresentationLibraryNode
 
 // ============================================================================
@@ -264,7 +273,7 @@ public:
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
     virtual void update(float dt) OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
-                      const core::vector3df& scale) OVERRIDE;
+        const core::vector3df& scale, bool isAbsoluteCoord) OVERRIDE;
     void triggerSound(bool loop);
     void stopSound();
 
@@ -304,6 +313,8 @@ private:
     ParticleEmitter* m_emitter;
     LODNode* m_lod_emitter_node;
     std::string m_trigger_condition;
+    bool m_delayed_stop;
+    double m_delayed_stop_time;
 
 public:
     TrackObjectPresentationParticles(const XMLNode& xml_node,
@@ -312,6 +323,9 @@ public:
 
     virtual void update(float dt) OVERRIDE;
     void triggerParticles();
+    void stop();
+    void stopIn(double delay);
+    void setRate(float rate);
     // ------------------------------------------------------------------------
     /** Returns the trigger condition for this object. */
     std::string& getTriggerCondition() { return m_trigger_condition; }

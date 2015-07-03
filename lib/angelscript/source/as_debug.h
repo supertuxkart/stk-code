@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -38,12 +38,16 @@
 
 #include "as_config.h"
 
+#if defined(AS_DEBUG)
+
 #ifndef AS_WII
 // The Wii SDK doesn't have these, we'll survive without AS_DEBUG
 
 #ifndef _WIN32_WCE
 // Neither does WinCE
 
+#ifndef AS_PSVITA
+// Possible on PSVita, but requires SDK access
 
 #if defined(__GNUC__) || defined( AS_MARMALADE )
 
@@ -256,9 +260,16 @@ END_AS_NAMESPACE
 
 
 
-
+#endif // AS_PSVITA
 #endif // _WIN32_WCE
 #endif // AS_WII
+
+#else // !defined(AS_DEBUG)
+
+// Define it so nothing is done
+#define TimeIt(x) 
+
+#endif // !defined(AS_DEBUG)
 
 #endif
 

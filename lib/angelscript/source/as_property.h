@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -54,11 +54,14 @@ class asCObjectProperty
 {
 public:
 	asCObjectProperty() {accessMask = 0xFFFFFFFF;}
+	asCObjectProperty(const asCObjectProperty &o) : name(o.name), type(o.type), byteOffset(o.byteOffset), accessMask(o.accessMask), isPrivate(o.isPrivate), isProtected(o.isProtected), isInherited(o.isInherited) {}
 	asCString   name;
 	asCDataType type;
 	int         byteOffset;
-	bool		isPrivate;
 	asDWORD     accessMask;
+	bool        isPrivate;
+	bool        isProtected;
+	bool        isInherited;
 };
 
 class asCGlobalProperty
@@ -69,7 +72,7 @@ public:
 
 	void AddRef();
 	void Release();
-	int  GetRefCount();
+	void DestroyInternal();
 
 	void *GetAddressOfValue();
 	void  AllocateMemory();
@@ -84,16 +87,7 @@ public:
 	void SetInitFunc(asCScriptFunction *initFunc);
 	asCScriptFunction *GetInitFunc();
 
-	static void RegisterGCBehaviours(asCScriptEngine *engine);
-
 //protected:
-	void SetGCFlag();
-	bool GetGCFlag();
-	void EnumReferences(asIScriptEngine *);
-	void ReleaseAllHandles(asIScriptEngine *);
-
-	void Orphan(asCModule *module);
-
 	// This is only stored for registered properties, and keeps the pointer given by the application
 	void       *realAddress;
 
@@ -108,7 +102,6 @@ public:
 	// The global property structure is reference counted, so that the
 	// engine can keep track of how many references to the property there are.
 	asCAtomic refCount;
-	bool      gcFlag;
 };
 
 class asCCompGlobPropType : public asIFilter

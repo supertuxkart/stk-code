@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Patrick Ammann <pammann@aro.ch>
-//  Copyright (C) 2008-2013 Patrick Ammann <pammann@aro.ch>, Joerg Henrichs
+//  Copyright (C) 2006-2015 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2008-2015 Patrick Ammann <pammann@aro.ch>, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

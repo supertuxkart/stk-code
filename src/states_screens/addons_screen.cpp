@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2015 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -143,7 +143,7 @@ void AddonsScreen::init()
     m_sort_default = true;
     m_sort_col = 0;
 
-    getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
+    getWidget<GUIEngine::RibbonWidget>("category")->setActive(false);
 
     if(UserConfigParams::logAddons())
         Log::info("addons", "Using directory <%s>", file_manager->getAddonsDir().c_str());
@@ -157,10 +157,8 @@ void AddonsScreen::init()
     w_list->setIcons(m_icon_bank, (int)(m_icon_height));
 
     m_type = "kart";
-    if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED)
-        getWidget<GUIEngine::IconButtonWidget>("reload")->setDeactivated();
-    else
-        getWidget<GUIEngine::IconButtonWidget>("reload")->setActivated();
+    bool ip = UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED;
+    getWidget<GUIEngine::IconButtonWidget>("reload")->setActive(ip);
 
     // Reset filter.
     GUIEngine::TextBoxWidget* w_filter_name =
@@ -371,7 +369,7 @@ void AddonsScreen::loadList()
         }
     }
 
-    getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
+    getWidget<GUIEngine::RibbonWidget>("category")->setActive(true);
     if(m_type == "kart")
         getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart",
                                                         PLAYER_ID_GAME_MASTER);

@@ -7,7 +7,7 @@
 
   <!-- Minimum and maxium track versions that be be read by this binary.
        Older versions will be ignored. -->
-  <track-version min="3" max="6"/>
+  <track-version min="6" max="6"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start

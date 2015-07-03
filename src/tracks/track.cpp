@@ -1,7 +1,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2004-2013  Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2009-2013  Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2015  Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2009-2015  Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -142,7 +142,7 @@ Track::Track(const std::string &filename)
     m_startup_run = false;
     m_default_number_of_laps= 3;
     m_all_nodes.clear();
-    m_all_physics_only_nodes.clear();
+    m_static_physics_only_nodes.clear();
     m_all_cached_meshes.clear();
     loadTrackInfo();
 }   // Track
@@ -182,7 +182,7 @@ bool Track::operator<(const Track &other) const
     \note this is the LTR name, invoke fribidi as needed. */
 core::stringw Track::getName() const
 {
-    core::stringw translated = translations->w_gettext(m_name.c_str());
+    core::stringw translated = _LTR(m_name.c_str());
     int index = translated.find("|");
     if(index>-1)
     {
@@ -293,7 +293,7 @@ void Track::cleanup()
         irr_driver->removeNode(m_all_nodes[i]);
     }
     m_all_nodes.clear();
-    m_all_physics_only_nodes.clear();
+    m_static_physics_only_nodes.clear();
 
     m_all_emitters.clearAndDeleteAll();
 
@@ -302,8 +302,14 @@ void Track::cleanup()
     delete m_track_object_manager;
     m_track_object_manager = NULL;
 
-    irr_driver->removeNode(m_sun);
+    for (unsigned int i = 0; i < m_object_physics_only_nodes.size(); i++)
+    {
+        m_object_physics_only_nodes[i]->drop();
+    }
+    m_object_physics_only_nodes.clear();
 
+    irr_driver->removeNode(m_sun);
+    m_sun->drop();
     delete m_track_mesh;
     m_track_mesh = NULL;
 
@@ -442,6 +448,10 @@ void Track::cleanup()
         Log::info("CACHE", "[%i] %s", i, path.getPath().c_str());
     }
 #endif
+
+    Scripting::ScriptEngine* script_engine =
+        World::getWorld()->getScriptEngine();
+    script_engine->cleanupCache();
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -720,6 +730,24 @@ void Track::createPhysicsModel(unsigned int main_track_count)
         return;
     }
 
+
+    // Now convert all objects that are only used for the physics
+    // (like invisible walls).
+    for (unsigned int i = 0; i<m_static_physics_only_nodes.size(); i++)
+    {
+        convertTrackToBullet(m_static_physics_only_nodes[i]);
+        irr_driver->removeNode(m_static_physics_only_nodes[i]);
+    }
+    m_static_physics_only_nodes.clear();
+
+    for (unsigned int i = 0; i<m_object_physics_only_nodes.size(); i++)
+    {
+        convertTrackToBullet(m_object_physics_only_nodes[i]);
+        m_object_physics_only_nodes[i]->setVisible(false);
+        m_object_physics_only_nodes[i]->grab();
+        irr_driver->removeNode(m_object_physics_only_nodes[i]);
+    }
+
     m_track_mesh->removeAll();
     m_gfx_effect_mesh->removeAll();
     for(unsigned int i=main_track_count; i<m_all_nodes.size(); i++)
@@ -963,6 +991,8 @@ bool Track::loadMainTrack(const XMLNode &root)
     // and configure the path to them before loading the mesh.
     if ( (UserConfigParams::m_high_definition_textures & 0x01) == 0x00)
     {
+#undef USE_RESIZE_CACHE
+#ifdef USE_RESIZE_CACHE
         std::string cached_textures_dir =
             irr_driver->generateSmallerTextures(m_root);
 
@@ -972,10 +1002,11 @@ bool Track::loadMainTrack(const XMLNode &root)
         std::string texture_default_path =
             scene_params->getAttributeAsString(scene::B3D_TEXTURE_PATH).c_str();
         scene_params->setAttribute(scene::B3D_TEXTURE_PATH, cached_textures_dir.c_str());
-
+#endif
         mesh = irr_driver->getMesh(full_path);
-
+#ifdef USE_RESIZE_CACHE
         scene_params->setAttribute(scene::B3D_TEXTURE_PATH, texture_default_path.c_str());
+#endif
     }
     else // Load mesh with default (hd) textures
     {
@@ -1085,6 +1116,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         // some static meshes are conditional
         std::string condition;
         n->get("if", &condition);
+
+        // TODO: convert "if" and "ifnot" to scripting.
         if (condition == "splatting")
         {
             if (!irr_driver->supportsSplatting()) continue;
@@ -1162,15 +1195,15 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             if (!shown) continue;
         }
-        else if (condition == "allchallenges")
-        {
-            // allow ONE unsolved challenge : the last one
-            if (getNumOfCompletedChallenges() < m_challenges.size() - 1)
-                continue;
-        }
         else if (condition.size() > 0)
         {
-            Log::error("track", "Unknown condition <%s>\n", condition.c_str());
+            unsigned char result = -1;
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            std::function<void(asIScriptContext*)> null_callback;
+            script_engine->runFunction("bool " + condition + "()", null_callback,
+                [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
+            if (result == 0)
+                continue;
         }
 
         std::string neg_condition;
@@ -1179,17 +1212,17 @@ bool Track::loadMainTrack(const XMLNode &root)
         {
             if (irr_driver->supportsSplatting()) continue;
         }
-        else if (neg_condition == "allchallenges")
-        {
-            // allow ONE unsolved challenge : the last one
-            if (getNumOfCompletedChallenges() >= m_challenges.size() - 1)
-                continue;
-        }
         else if (neg_condition.size() > 0)
         {
-            Log::error("track", "Unknown condition <%s>\n",
-                       neg_condition.c_str());
+            unsigned char result = -1;
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            std::function<void(asIScriptContext*)> null_callback;
+            script_engine->runFunction("bool " + neg_condition + "()", null_callback,
+                [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
+            if (result != 0)
+                continue;
         }
+
 
         bool tangent = false;
         n->get("tangents", &tangent);
@@ -1374,7 +1407,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             else
             {
                 if(interaction=="physics-only")
-                    m_all_physics_only_nodes.push_back( scene_node );
+                    m_static_physics_only_nodes.push_back(scene_node);
                 else
                     m_all_nodes.push_back( scene_node );
             }
@@ -1387,15 +1420,6 @@ bool Track::loadMainTrack(const XMLNode &root)
     {
         convertTrackToBullet(m_all_nodes[i]);
     }
-
-    // Now convert all objects that are only used for the physics
-    // (like invisible walls).
-    for(unsigned int i=0; i<m_all_physics_only_nodes.size(); i++)
-    {
-        convertTrackToBullet(m_all_physics_only_nodes[i]);
-        irr_driver->removeNode(m_all_physics_only_nodes[i]);
-    }
-    m_all_physics_only_nodes.clear();
 
     if (m_track_mesh == NULL)
     {
@@ -1464,7 +1488,7 @@ void Track::update(float dt)
     if (!m_startup_run) // first time running update = good point to run startup script
     {
         Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        script_engine->runScript("start");
+        script_engine->runFunction("void onStart()");
         m_startup_run = true;
     }
     m_track_object_manager->update(dt);
@@ -1475,8 +1499,10 @@ void Track::update(float dt)
     }
     CheckManager::get()->update(dt);
     ItemManager::get()->update(dt);
-    Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-    script_engine->runScript("update");
+
+    // TODO: enable onUpdate scripts if we ever find a compelling use for them
+    //Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+    //script_engine->runScript("void onUpdate()");
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -1637,6 +1663,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     file_manager->pushTextureSearchPath(m_root);
     file_manager->pushModelSearchPath  (m_root);
 
+    // For now ignore the resize cache, since atm it only handles texturs in
+    // the track directory.
+#undef USE_RESIZE_CACHE
+#ifdef USE_RESIZE_CACHE
     // If the hd texture option is disabled, we generate smaller textures
     // and we also add the cache directory to the texture search path
     if ( (UserConfigParams::m_high_definition_textures & 0x01) == 0x00)
@@ -1645,7 +1675,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             irr_driver->generateSmallerTextures(m_root);
         file_manager->pushTextureSearchPath(cached_textures_dir);
     }
-
+#endif
     // First read the temporary materials.xml file if it exists
     try
     {
@@ -1757,7 +1787,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
     }
 
-    loadObjects(root, path, model_def_loader, true, NULL);
+    loadObjects(root, path, model_def_loader, true, NULL, NULL);
 
     model_def_loader.cleanLibraryNodesAfterLoad();
 
@@ -1823,10 +1853,12 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         World::getWorld()->setClearbackBufferColor(m_sky_color);
     }
 
+#ifdef USE_RESIZE_CACHE
     if (!UserConfigParams::m_high_definition_textures)
     {
         file_manager->popTextureSearchPath();
     }
+#endif
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
@@ -1926,7 +1958,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 //-----------------------------------------------------------------------------
 
 void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& model_def_loader,
-                        bool create_lod_definitions, scene::ISceneNode* parent)
+                        bool create_lod_definitions, scene::ISceneNode* parent,
+                        TrackObject* parent_library)
 {
     unsigned int start_position_counter = 0;
 
@@ -1940,7 +1973,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         if (name == "track" || name == "default-start") continue;
         if (name == "object" || name == "library")
         {
-            m_track_object_manager->add(*node, parent, model_def_loader);
+            m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
         else if (name == "water")
         {
@@ -1984,7 +2017,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                m_track_object_manager->add(*node, parent, model_def_loader);
+                m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
             }
         }
         else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
@@ -1997,7 +2030,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "light")
         {
-            m_track_object_manager->add(*node, parent, model_def_loader);
+            m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
         else if (name == "weather")
         {

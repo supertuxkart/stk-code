@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Lionel Fuentes
+//  Copyright (C) 2013-2015 Lionel Fuentes
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
+#include "graphics/shaders.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
@@ -33,6 +34,7 @@
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
+#include "states_screens/dialogs/scripting_console.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -95,13 +97,16 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_FREE,
     DEBUG_GUI_CAM_TOP,
     DEBUG_GUI_CAM_WHEEL,
+    DEBUG_GUI_CAM_BEHIND_KART,
     DEBUG_GUI_CAM_NORMAL,
     DEBUG_GUI_CAM_SMOOTH,
+    DEBUG_GUI_CAM_ATTACH,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
     DEBUG_ADJUST_LIGHTS,
+    DEBUG_SCRIPT_CONSOLE
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -153,24 +158,14 @@ void addAttachment(Attachment::AttachmentType type)
  * nitro emitters) */
 LightNode* findNearestLight()
 {
-    World* world = World::getWorld();
-    if (!world) return NULL;
 
-    AbstractKart* player_kart = NULL;
-    for (unsigned int i = 0; i < world->getNumKarts(); i++)
-    {
-        AbstractKart *kart = world->getKart(i);
-        if (kart->getController()->isPlayerController())
-            player_kart = kart;
-    }
-
-    if (!player_kart)
-    {
-        Log::error("Debug", "No player kart found.");
+    Camera* camera = Camera::getActiveCamera();
+    if (camera == NULL) {
+        Log::error("[Debug Menu]", "No camera found.");
         return NULL;
     }
 
-    core::vector3df kart_pos = player_kart->getNode()->getAbsolutePosition();
+    core::vector3df cam_pos = camera->getCameraSceneNode()->getAbsolutePosition();
     LightNode* nearest = 0;
     float nearest_dist = 1000000.0; // big enough
     for (unsigned int i = 0; i < irr_driver->getLights().size(); i++)
@@ -182,10 +177,10 @@ LightNode* findNearestLight()
             continue;
 
         core::vector3df light_pos = light->getAbsolutePosition();
-        if ( kart_pos.getDistanceFrom(light_pos) < nearest_dist)
+        if ( cam_pos.getDistanceFrom(light_pos) < nearest_dist)
         {
             nearest      = irr_driver->getLights()[i];
-            nearest_dist = kart_pos.getDistanceFrom(light_pos);
+            nearest_dist = cam_pos.getDistanceFrom(light_pos);
         }
     }
 
@@ -257,9 +252,11 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Hide karts", DEBUG_GUI_HIDE_KARTS);
             sub->addItem(L"Top view", DEBUG_GUI_CAM_TOP);
             sub->addItem(L"Wheel view", DEBUG_GUI_CAM_WHEEL);
+            sub->addItem(L"Behind kart view", DEBUG_GUI_CAM_BEHIND_KART);
             sub->addItem(L"First person view", DEBUG_GUI_CAM_FREE);
             sub->addItem(L"Normal view", DEBUG_GUI_CAM_NORMAL);
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
+            sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 
@@ -273,6 +270,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
             mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
             mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
+            mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();
@@ -304,7 +302,7 @@ bool onEvent(const SEvent &event)
                 if(cmdID == DEBUG_GRAPHICS_RELOAD_SHADERS)
                 {
                     Log::info("Debug", "Reloading shaders...");
-                    irr_driver->updateShaders();
+                    ShaderBase::updateShaders();
                 }
                 else if (cmdID == DEBUG_GRAPHICS_RESET)
                 {
@@ -524,10 +522,19 @@ bool onEvent(const SEvent &event)
                     UserConfigParams::m_camera_debug = 2;
                     irr_driver->getDevice()->getCursorControl()->setVisible(true);
                 }
+                else if (cmdID == DEBUG_GUI_CAM_BEHIND_KART)
+                {
+                    UserConfigParams::m_camera_debug = 4;
+                    irr_driver->getDevice()->getCursorControl()->setVisible(true);
+                }
                 else if (cmdID == DEBUG_GUI_CAM_FREE)
                 {
                     UserConfigParams::m_camera_debug = 3;
                     irr_driver->getDevice()->getCursorControl()->setVisible(false);
+                    // Reset camera rotation
+                    Camera *cam = Camera::getActiveCamera();
+                    cam->setDirection(vector3df(0, 0, 1));
+                    cam->setUpVector(vector3df(0, 1, 0));
                 }
                 else if (cmdID == DEBUG_GUI_CAM_NORMAL)
                 {
@@ -538,6 +545,11 @@ bool onEvent(const SEvent &event)
                 {
                     Camera *cam = Camera::getActiveCamera();
                     cam->setSmoothMovement(!cam->getSmoothMovement());
+                }
+                else if (cmdID == DEBUG_GUI_CAM_ATTACH)
+                {
+                    Camera *cam = Camera::getActiveCamera();
+                    cam->setAttachedFpsCam(!cam->getAttachedFpsCam());
                 }
                 else if (cmdID == DEBUG_PRINT_START_POS)
                 {
@@ -648,6 +660,10 @@ bool onEvent(const SEvent &event)
                     );
                     dsd->changeLabel("SSAO Sigma", "[None]");
 #endif
+                }
+                else if (cmdID == DEBUG_SCRIPT_CONSOLE)
+                {
+                    ScriptingConsole* console = new ScriptingConsole();
                 }
             }
 

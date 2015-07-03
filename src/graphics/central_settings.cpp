@@ -1,8 +1,27 @@
-#include "central_settings.hpp"
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include "graphics/central_settings.hpp"
+
+#include "config/user_config.hpp"
 #include "modes/profile_world.hpp"
-#include "gl_headers.hpp"
-#include "glwrap.hpp"
-#include "graphics_restrictions.hpp"
+#include "graphics/gl_headers.hpp"
+#include "graphics/glwrap.hpp"
+#include "graphics/graphics_restrictions.hpp"
 
 CentralVideoSettings *CVS = new CentralVideoSettings();
 
@@ -46,7 +65,8 @@ void CentralVideoSettings::init()
         Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
         Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
     }
-    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
+    m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1))
+           && !UserConfigParams::m_force_legacy_device;
     if (!ProfileWorld::isNoGraphics())
         initGL();
 

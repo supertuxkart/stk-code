@@ -1,8 +1,8 @@
 
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2011-2013 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2011-2015 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -152,6 +152,7 @@
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -395,7 +396,6 @@ void handleXmasMode()
  */
 bool isEasterMode(int day, int month, int year, int before_after_days)
 {
-    bool ears = false;
     switch (UserConfigParams::m_easter_ear_mode)
     {
     case 0:
@@ -547,6 +547,8 @@ void cmdLineHelp()
     "                          stdout.log.\n"
     "       --console          Write messages in the console and files\n"
     "  -h,  --help             Show this help.\n"
+    "       --log=N            Set the verbosity to a value between\n"
+    "                          0 (Debug) and 5 (Only Fatal messages)\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "http://supertuxkart.sourceforge.net\n\n",
@@ -555,14 +557,10 @@ void cmdLineHelp()
 }   // cmdLineHelp
 
 //=============================================================================
-/** For base options that don't need much to be inited (and, in some cases,
- *  that need to be read before initing stuff) - it only assumes that
- *  user config is loaded (necessary to check for blacklisted screen
- *  resolutions), but nothing else (esp. not kart_properties_manager and
- *  track_manager, since their search path might be extended by command
- *  line options).
+/** For base options that modify the output (loglevel/color) or exit right
+ * after being processed (version/help).
  */
-int handleCmdLinePreliminary()
+int handleCmdLineOutputModifier()
 {
     if (CommandLine::has("--help") || CommandLine::has("-help") ||
         CommandLine::has("-h"))
@@ -585,7 +583,36 @@ int handleCmdLinePreliminary()
         exit(0);
     }
 
-    if(CommandLine::has("--gamepad-visualisation") ||   // only BE
+    int n;
+    if(CommandLine::has("--log", &n))
+        Log::setLogLevel(n);
+
+    if(CommandLine::has("--log=nocolor"))
+    {
+        Log::disableColor();
+        Log::verbose("main", "Colours disabled.");
+    }
+
+    if(CommandLine::has("--console"))
+        UserConfigParams::m_log_errors_to_console=true;
+    if(CommandLine::has("--no-console"))
+        UserConfigParams::m_log_errors_to_console=false;
+
+
+    return 0;
+}
+
+//=============================================================================
+/** For base options that don't need much to be inited (and, in some cases,
+ *  that need to be read before initing stuff) - it only assumes that
+ *  user config is loaded (necessary to check for blacklisted screen
+ *  resolutions), but nothing else (esp. not kart_properties_manager and
+ *  track_manager, since their search path might be extended by command
+ *  line options).
+ */
+int handleCmdLinePreliminary()
+{
+   if(CommandLine::has("--gamepad-visualisation") ||   // only BE
        CommandLine::has("--gamepad-visualization")    ) // both AE and BE
         UserConfigParams::m_gamepad_visualisation=true;
     if(CommandLine::has("--debug=memory"))
@@ -600,17 +627,8 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
     if(CommandLine::has("--debug=all") )
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
-    if(CommandLine::has("--console"))
-        UserConfigParams::m_log_errors_to_console=true;
-    if(CommandLine::has("--no-console"))
-        UserConfigParams::m_log_errors_to_console=false;
     if(CommandLine::has("--online"))
         MainMenuScreen::m_enable_online=true;
-    if(CommandLine::has("--log=nocolor"))
-    {
-        Log::disableColor();
-        Log::verbose("main", "Colours disabled.");
-    }
 
     std::string s;
     if(CommandLine::has("--stk-config", &s))
@@ -700,8 +718,6 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_xmas_mode = n;
     if (CommandLine::has("--easter", &n))
         UserConfigParams::m_easter_ear_mode = n;
-    if(CommandLine::has("--log", &n))
-        Log::setLogLevel(n);
 
     return 0;
 }   // handleCmdLinePreliminary
@@ -750,6 +766,8 @@ int handleCmdLine()
            UserConfigParams::m_camera_debug=2;
         if(CommandLine::has("--camera-debug"))
             UserConfigParams::m_camera_debug=1;
+        if(CommandLine::has("--camera-kart-debug"))
+            UserConfigParams::m_camera_debug=4;
         if(CommandLine::has("--physics-debug"))
             UserConfigParams::m_physics_debug=1;
         if(CommandLine::has("--check-debug"))
@@ -1085,6 +1103,7 @@ void initRest()
     stk_config->load(file_manager->getAsset("stk_config.xml"));
 
     irr_driver = new IrrDriver();
+    StkTime::init();   // grabs the timer object from the irrlicht device
 
     // Now create the actual non-null device in the irrlicht driver
     irr_driver->initDevice();
@@ -1128,6 +1147,10 @@ void initRest()
     powerup_manager         = new PowerupManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
+
+    // The maximum texture size can not be set earlier, since
+    // e.g. the background image needs to be loaded in high res.
+    irr_driver->setMaxTextureSize();
     KartPropertiesManager::addKartSearchDir(
                  file_manager->getAddonsFile("karts/"));
     track_manager->addTrackSearchDir(
@@ -1201,12 +1224,13 @@ void askForInternetPermission()
     new MessageDialog(_("SuperTuxKart may connect to a server "
         "to download add-ons and notify you of updates. We also collect "
         "anonymous hardware statistics to help with the development of STK. "
+        "Please read our privacy policy at http://privacy.supertuxkart.net. "
         "Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
         "'User Interface', and edit \"Connect to the "
         "Internet\" and \"Send anonymous HW statistics\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
-        new ConfirmServer(), true, true);
+        new ConfirmServer(), true, true, 0.7f, 0.7f);
     GUIEngine::DialogQueue::get()->pushDialog(dialog, false);
 }   // askForInternetPermission
 
@@ -1232,6 +1256,9 @@ int main(int argc, char *argv[] )
     try
     {
         std::string s;
+
+        handleCmdLineOutputModifier();
+
         if(CommandLine::has("--root", &s))
         {
             FileManager::addRootDirs(s);
@@ -1360,13 +1387,30 @@ int main(int argc, char *argv[] )
             exit(0);
         }
 
-        if (!ProfileWorld::isNoGraphics() && GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+        if (!ProfileWorld::isNoGraphics() &&
+            GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
         {
-            MessageDialog *dialog =
-                new MessageDialog(_("Your driver version is too old. Please install "
-                "the latest video drivers."),
-                /*from queue*/ true);
-            GUIEngine::DialogQueue::get()->pushDialog(dialog);
+            if (UserConfigParams::m_old_driver_popup)
+            {
+                MessageDialog *dialog =
+                    new MessageDialog(_("Your driver version is too old. Please install "
+                    "the latest video drivers."),
+                    /*from queue*/ true);
+                GUIEngine::DialogQueue::get()->pushDialog(dialog);
+            }
+            Log::warn("OpenGL", "Driver is too old!");
+        }
+        else if (!CVS->isGLSL())
+        {
+            if (UserConfigParams::m_old_driver_popup)
+            {
+                MessageDialog *dialog =
+                    new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
+                    "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
+                    /*from queue*/ true);
+                GUIEngine::DialogQueue::get()->pushDialog(dialog);
+            }
+            Log::warn("OpenGL", "OpenGL version is too old!");
         }
 
         // Note that on the very first run of STK internet status is set to

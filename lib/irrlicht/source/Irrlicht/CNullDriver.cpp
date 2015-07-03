@@ -298,6 +298,11 @@ const io::IAttributes& CNullDriver::getDriverAttributes() const
 	return *DriverAttributes;
 }
 
+//! Get attributes of the actual video driver
+io::IAttributes& CNullDriver::getNonConstDriverAttributes()
+{
+    return *DriverAttributes;
+}
 
 //! sets transformation
 void CNullDriver::setTransform(E_TRANSFORMATION_STATE state, const core::matrix4& mat)

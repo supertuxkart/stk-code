@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -40,8 +40,9 @@ using namespace GUIEngine;
 MessageDialog::MessageDialog(const irr::core::stringw &msg,
                              MessageDialogType type,
                              IConfirmDialogListener* listener,
-                             bool own_listener, bool from_queue)
-             : ModalDialog(0.6f, 0.6f)
+                             bool own_listener, bool from_queue,
+                             float width, float height)
+             : ModalDialog(width, height)
 {
     m_msg          = msg;
     m_type         = type;

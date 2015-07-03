@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -46,7 +46,7 @@ RegistrationDialog::RegistrationDialog() :
         L"these terms. If you have any questions or comments regarding these "
         L"terms, one of the members of the development team would gladly "
         L"assist you.",
-        L"http://supertuxkart.net/terms");
+        L"http://terms.supertuxkart.net");
     terms_widget->setText(terms, false);
 
    // showRegistrationTerms();

@@ -1,8 +1,5 @@
 ##TODO
 
-THIS IS A 2nd TEST.
-THIS IS A TEST.
-
 SuperTuxKart is looking for additional man power to make this
 one of the best free linux games out there :) We need (in 
 no particular order):
@@ -15,17 +12,13 @@ no particular order):
    - Create additional art work for tracks,
      background images
 3. Developers
-   - See todo list below - it's rather long at the moment :)
-4. Web master
+   - Check our bug and enhancement request tracker on
+     https://github.com/supertuxkart/stk-code/issues
    - Extend the current web page, keep it up to date
-5. Tester
+4. Tester
    - For just about everything
-   - Esp. different platforms
-6. Package creators
-   - Create packages for 
-     - most common Linux distributions
-     - Windows
-7. Writers
+   - Esp. different platforms and graphics cards
+5. Writers
    - Write documentation, ranging from man page, to
      a description for the web, to a design document, ...
 

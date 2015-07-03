@@ -1,4 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -51,6 +52,8 @@ public:
 
     FrameBuffer* render(irr::scene::ICameraSceneNode* camera, float dt);
 
+    void prepareRender(scene::ICameraSceneNode* camera);
+
 private:
     unsigned RenderTargetTextures[RTT_COUNT];
     PtrVector<FrameBuffer> FrameBuffers;
@@ -58,6 +61,8 @@ private:
 
     int m_width;
     int m_height;
+
+    bool m_diffuse_coefficients_calculated;
 
     unsigned shadowColorTex, shadowDepthTex;
     unsigned RSM_Color, RSM_Normal, RSM_Depth;

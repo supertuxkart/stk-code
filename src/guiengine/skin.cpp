@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -1380,9 +1380,9 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         const core::recti source_area(0, 0, texture_w, texture_h);
 
         draw2DImage(texture,
-                                            dest_area, source_area,
-                                            0 /* no clipping */, 0,
-                                            true /* alpha */);
+                    dest_area, source_area,
+                    0 /* no clipping */, 0,
+                    true /* alpha */);
 
     }
 
@@ -1604,15 +1604,28 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
                              SColor(100,255,255,255),
                              SColor(100,255,255,255),
                              SColor(100,255,255,255) };
-        draw2DImage( texture, rect, source_area,
-                                            0 /* no clipping */, colors,
-                                            true /* alpha */);
+        draw2DImage(texture, rect, source_area,
+                    0 /* no clipping */, colors,
+                    true /* alpha */);
     }
     else
     {
-        draw2DImage( texture, rect, source_area,
-                                             0 /* no clipping */, 0,
-                                             true /* alpha */);
+        draw2DImage(texture, rect, source_area,
+                    0 /* no clipping */, 0,
+                    true /* alpha */);
+    }
+
+
+    if (focused && widget->hasTooltip())
+    {
+        const core::position2di mouse_position =
+            irr_driver->getDevice()->getCursorControl()->getPosition();
+
+        if (rect.isPointInside(mouse_position))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
     }
 }   // drawCheckBox
 
@@ -1848,7 +1861,7 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
     if (atMouse)
     {
         pos = irr_driver->getDevice()->getCursorControl()->getPosition()
-            + core::position2di(15, 15);
+            + core::position2di(10 - size.Width / 2, 20);
     }
 
     core::recti r(pos, size);

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014  SuperTuxKart Team
+//  Copyright (C) 2014-2015  SuperTuxKart Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,34 +27,11 @@ namespace Scripting
     
     namespace Physics
     {
-        
-        //IDs of kart collisions
-        int m_collidingkartid1;
-        int m_collidingkartid2;
-
-        //Details of collision
-        std::string m_collider1;
-        std::string m_collider2;
-        std::string m_collisionType;
-        
+       
         //script engine functions
         void registerScriptFunctions(asIScriptEngine *engine);
         asIScriptFunction* 
             registerScriptCallbacks(asIScriptEngine *engine);
-
-
-        //game engine functions
-        void setCollision(int collider1, int collider2);
-        void setCollisionType(std::string);
-
-
-
-        //script-bound functions
-        void getCollidingKart1(asIScriptGeneric *gen);
-        void getCollidingKart2(asIScriptGeneric *gen);
-        void getCollsionType(asIScriptGeneric *gen);
-        void getCollidingID(asIScriptGeneric *gen);
-
     }
     
     

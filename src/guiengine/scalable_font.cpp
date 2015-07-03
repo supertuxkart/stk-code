@@ -1,19 +1,20 @@
-// Copyright (C) 2002-2013 Nikolaus Gebhardt
+// Copyright (C) 2002-2015 Nikolaus Gebhardt
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
 #include "guiengine/scalable_font.hpp"
 
-#include <IGUIEnvironment.h>
-#include <IXMLReader.h>
-#include <IReadFile.h>
-#include <IVideoDriver.h>
-#include <IGUISpriteBank.h>
-
+#include "graphics/2dutils.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "utils/translation.hpp"
-#include "graphics/2dutils.hpp"
+
+#include <IAttributes.h>
+#include <IGUIEnvironment.h>
+#include <IGUISpriteBank.h>
+#include <IReadFile.h>
+#include <IVideoDriver.h>
+#include <IXMLReader.h>
 
 namespace irr
 {
@@ -732,7 +733,16 @@ void ScalableFont::lazyLoadTexture(int texID)
 
     // load texture
     assert(m_texture_files[texID].m_file_name.size() > 0);
+
+    // Font textures can not be resized (besides the impact on quality in
+    // this case, the indices in the xml files would become wrong).
+    core::dimension2du old_max_size = Driver->getDriverAttributes()
+                                     .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+    Driver->getNonConstDriverAttributes().setAttribute("MAX_TEXTURE_SIZE",
+                                                       core::dimension2du(0, 0));
+
     SpriteBank->setTexture(texID, Driver->getTexture( m_texture_files[texID].m_file_name ));
+    Driver->getNonConstDriverAttributes().setAttribute("MAX_TEXTURE_SIZE", old_max_size);
 
     // set previous mip-map+filter state
     //Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, mipmap);

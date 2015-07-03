@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2006-2015 Patrick Ammann <pammann@aro.ch>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -84,6 +84,8 @@ public:
     virtual bool      init();
     virtual void      play();
     virtual void      reallyPlayNow();
+    virtual void      play(const Vec3 &xyz);
+    virtual void      reallyPlayNow(const Vec3 &xyz);
     virtual void      setLoop(bool status);
     virtual void      reallySetLoop(bool status);
     virtual void      stop();
@@ -97,6 +99,8 @@ public:
     virtual void      reallySetSpeed(float factor);
     virtual void      setPosition(const Vec3 &position);
     virtual void      reallySetPosition(const Vec3 &p);
+    virtual void      setSpeedPosition(float factor, const Vec3 &p);
+    virtual void      reallySetSpeedPosition(float f,const Vec3 &p);
     virtual void      setVolume(float volume);
     virtual void      reallySetVolume(float volume);
     virtual void      setMasterVolume(float volume);

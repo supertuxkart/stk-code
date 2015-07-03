@@ -1,8 +1,8 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2004-2013  Steve Baker <sjbaker1@airmail.net>,
-//  Copyright (C) 2004-2013  Ingo Ruhnke <grumbel@gmx.de>
-//  Copyright (C) 2006-2013  SuperTuxKart-Team
+//  Copyright (C) 2004-2015  Steve Baker <sjbaker1@airmail.net>,
+//  Copyright (C) 2004-2015  Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015  SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
 
 #include "utils/log.hpp"
 #include "utils/time.hpp"
-
+#include "utils/utf8.h"
 #include "coreutil.h"
 
 #include <math.h>
@@ -683,6 +683,32 @@ namespace StringUtils
         }
         return output.str();
     }   // xmlEncode
+
+    // ------------------------------------------------------------------------
+
+    std::string wide_to_utf8(const wchar_t* input)
+    {
+        static std::vector<char> utf8line;
+        utf8line.clear();
+
+        utf8::utf16to8(input, input + wcslen(input), back_inserter(utf8line));
+        utf8line.push_back(0);
+
+        return std::string(&utf8line[0]);
+    }
+
+    // ------------------------------------------------------------------------
+
+    irr::core::stringw utf8_to_wide(const char* input)
+    {
+        static std::vector<wchar_t> utf16line;
+        utf16line.clear();
+
+        utf8::utf8to16(input, input + strlen(input), back_inserter(utf16line));
+        utf16line.push_back(0);
+
+        return irr::core::stringw(&utf16line[0]);
+    }
 
     // ------------------------------------------------------------------------
     /** Converts a version string (in the form of 'X.Y.Za-rcU' into an

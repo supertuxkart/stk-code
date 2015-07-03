@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -148,7 +148,7 @@ void ChangePasswordDialog::submit()
     }
     else
     {
-        m_options_widget->setDeactivated();
+        m_options_widget->setActive(false);
         m_info_widget->setDefaultColor();
 
         // We don't need to use password 2 anymore, it was already confirmed
@@ -208,7 +208,7 @@ void ChangePasswordDialog::success()
 {
     m_info_widget->setDefaultColor();
     m_info_widget->setText(_("Password successfully changed."), false);
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
     m_current_password_widget->setText("");
     m_new_password1_widget->setText("");
     m_new_password2_widget->setText("");
@@ -220,7 +220,7 @@ void ChangePasswordDialog::error(const irr::core::stringw & error)
     SFXManager::get()->quickSound("anvil");
     m_info_widget->setErrorColor();
     m_info_widget->setText(error, false);
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
     m_current_password_widget->setText("");
     m_new_password1_widget->setText("");
     m_new_password2_widget->setText("");

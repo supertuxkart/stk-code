@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -163,6 +163,9 @@ void World::init()
         throw std::runtime_error(msg.str());
     }
 
+    std::string script_path = World::getWorld()->getTrack()->getTrackFile("scripting.as");
+    m_script_engine->loadScript(script_path, true);
+
     // Create the physics
     m_physics = new Physics();
 
@@ -207,6 +210,8 @@ void World::init()
         m_weather = new Weather(m_track->getWeatherLightning(),
                           m_track->getWeatherSound());
     }
+
+    m_script_engine->compileLoadedScripts();
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -928,6 +933,7 @@ void World::update(float dt)
     if(ReplayPlay::get()) ReplayPlay::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
+    if (m_script_engine) m_script_engine->update(dt);
     PROFILER_POP_CPU_MARKER();
 
     if (!history->dontDoPhysics())
@@ -1145,7 +1151,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
                                        2.0f);
             else
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
-                                       core::stringw(kart->getName())),
+                                       kart->getName()),
                                        camera->getKart(),
                                        2.0f);
         }  // for i < number of cameras

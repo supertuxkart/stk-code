@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -330,7 +330,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
     if (old_rtt_mini_map != NULL)
     {
-        core::rect<s32> source(core::position2di(0, 0), old_rtt_mini_map->getOriginalSize());
+        core::rect<s32> source(core::position2di(0, 0), old_rtt_mini_map->getSize());
         draw2DImage(old_rtt_mini_map, dest, source, 0, 0, true);
     }
     else if (new_rtt_mini_map != NULL)
@@ -381,7 +381,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                     colors[i]=kart->getKartProperties()->getColor();
                 }
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                           m_icons_frame->getTexture()->getOriginalSize());
+                                           m_icons_frame->getTexture()->getSize());
 
                 draw2DImage(m_icons_frame->getTexture(), position,
                                                           rect, NULL, colors, true);
@@ -410,7 +410,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         else if (c->isSolved(RaceManager::DIFFICULTY_EASY))   state = COMPLETED_EASY;
 
         const core::rect<s32> source(core::position2d<s32>(0,0),
-                                     m_icons[state]->getOriginalSize());
+                                     m_icons[state]->getSize());
 
         int marker_size = m_minimap_challenge_size;
         core::position2di mouse = irr_driver->getMouseLocation();
@@ -435,7 +435,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     // ---- Draw nearby challenge if any
     core::rect<s32> pos(15,
                         10,
-                        15 + irr_driver->getActualScreenSize().Width/2,
+                        irr_driver->getActualScreenSize().Width - 200,
                         10 + GUIEngine::getTitleFontHeight());
 
     m_close_to_a_challenge = false;
@@ -490,16 +490,15 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 }
 
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
-                font->draw(gp->getName(), pos, video::SColor(255,255,255,255),
+                font->draw(translations->fribidize(gp->getName()), pos, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
 
-                core::rect<s32> pos(15,
-                                    20 + GUIEngine::getTitleFontHeight(),
-                                    15 + irr_driver->getActualScreenSize().Width/2,
-                                    20 + 2*GUIEngine::getTitleFontHeight());
+                core::rect<s32> pos2(pos);
+                pos2.UpperLeftCorner.Y += 10 + GUIEngine::getTitleFontHeight();
+                pos2.LowerRightCorner.Y += 10 + GUIEngine::getTitleFontHeight();
 
                 //just below GP name
-                font->draw(_("Type: Grand Prix"), pos, video::SColor(255,255,255,255),
+                font->draw(_("Type: Grand Prix"), pos2, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
             }
             else
@@ -515,7 +514,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 }
 
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
-                font->draw(track->getName(), pos, video::SColor(255,255,255,255),
+                font->draw(translations->fribidize(track->getName()),
+                           pos, video::SColor(255, 255, 255, 255),
                            false, true /* vcenter */, NULL);
             }
 

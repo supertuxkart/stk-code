@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -89,7 +89,7 @@ void OptionsScreenUI::loadedFromFile()
     {
         Log::warn("OptionsScreenUI", "Could not find a single skin, make sure that "
                                      "the data files are correctly installed");
-        skinSelector->setDeactivated();
+        skinSelector->setActive(false);
         return;
     }
 
@@ -151,6 +151,7 @@ void OptionsScreenUI::init()
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
     difficulty->setState( UserConfigParams::m_per_player_difficulty );
+    difficulty->setTooltip(_("Players can select handicapped (more difficult) profiles on the kart selection screen"));
 
     CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
     assert( show_login!= NULL );
@@ -210,14 +211,7 @@ void OptionsScreenUI::init()
 
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        list_widget->setDeactivated();
-    }
-    else
-    {
-        list_widget->setActivated();
-    }
+    list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
 
 }   // init
 

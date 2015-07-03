@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -36,9 +36,8 @@
 #include <SColor.h>
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
-//#include "graphics/rtts.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/wind.hpp"
+#include "graphics/gl_headers.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
@@ -63,6 +62,7 @@ class PerCameraNode;
 class PostProcessing;
 class LightNode;
 class ShadowImportance;
+class ShadowMatrices;
 
 enum STKRenderingPass
 {
@@ -100,7 +100,6 @@ enum TypeFBO
     FBO_DISPLACE,
     FBO_BLOOM_1024,
     FBO_SCALAR_1024,
-    FBO_TMP_1024,
     FBO_BLOOM_512,
     FBO_TMP_512,
     FBO_LENS_512,
@@ -163,7 +162,6 @@ enum TypeRTT
 
     RTT_BLOOM_1024,
     RTT_SCALAR_1024,
-    RTT_TMP_1024,
     RTT_BLOOM_512,
     RTT_TMP_512,
     RTT_LENS_512,
@@ -198,18 +196,11 @@ private:
     gui::IGUIFont              *m_race_font;
     /** Post-processing. */
     PostProcessing             *m_post_processing;
-    /** Shaders. */
-    Shaders              *m_shaders;
+
     /** Wind. */
     Wind                 *m_wind;
     /** RTTs. */
     RTT                *m_rtts;
-    std::vector<core::matrix4> sun_ortho_matrix;
-    core::vector3df    rh_extend;
-    core::matrix4      rh_matrix;
-    core::matrix4      rsm_matrix;
-    bool               m_rsm_matrix_initialized;
-    bool               m_rsm_map_available;
     core::vector2df    m_current_screen_size;
     core::dimension2du m_actual_screen_size;
 
@@ -221,7 +212,7 @@ private:
     core::array<video::IRenderTarget> m_mrt;
 
     /** Matrixes used in several places stored here to avoid recomputation. */
-    core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_previousProjViewMatrix, m_InvProjViewMatrix;
+    core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
     std::vector<video::ITexture *> SkyboxTextures;
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
@@ -243,6 +234,8 @@ private:
      *  one), but no confirmation dialog. */
     enum {RES_CHANGE_NONE, RES_CHANGE_YES,
           RES_CHANGE_CANCEL}                m_resolution_changing;
+
+    ShadowMatrices *m_shadow_matrices;
 
 public:
     GLuint SkyboxCubeMap;
@@ -302,12 +295,8 @@ private:
     unsigned             poly_count[PASS_COUNT];
     u32                  m_renderpass;
     class STKMeshSceneNode *m_sun_interposer;
-    scene::ICameraSceneNode *m_suncam;
-    core::vector3df m_sundirection;
+    core::vector3df m_sun_direction;
     video::SColorf m_suncolor;
-    std::pair<float, float> m_shadow_scales[4];
-    scene::ICameraSceneNode *m_shadow_camnodes[4];
-    float m_shadows_cam[4][24];
 
     std::vector<GlowData> m_glowing;
 
@@ -355,6 +344,7 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
+    void setMaxTextureSize();
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
@@ -363,10 +353,6 @@ public:
     void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;
-    const std::vector<core::matrix4> &getShadowViewProj() const
-    {
-        return sun_ortho_matrix;
-    }
     void IncreaseObjectCount();
     void IncreasePolyCount(unsigned);
     core::array<video::IRenderTarget> &getMainSetup();
@@ -545,11 +531,11 @@ public:
     // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
     // -----------------------------------------------------------------------
-    core::vector3df getSunDirection() const { return m_sundirection; };
+    const core::vector3df& getSunDirection() const { return m_sun_direction; };
     // -----------------------------------------------------------------------
     void setSunDirection(const core::vector3df &SunPos)
     {
-        m_sundirection = SunPos;
+        m_sun_direction = SunPos;
     }
     // -----------------------------------------------------------------------
     video::SColorf getSunColor() const { return m_suncolor; }
@@ -557,15 +543,6 @@ public:
     void setSunColor(const video::SColorf &col)
     {
         m_suncolor = col;
-    }
-    // -----------------------------------------------------------------------
-    inline video::E_MATERIAL_TYPE getShader(const ShaderType num)  {return m_shaders->getShader(num);}
-    // -----------------------------------------------------------------------
-    inline void updateShaders()  {m_shaders->killShaders();}
-    // ------------------------------------------------------------------------
-    inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num)
-    {
-        return (m_shaders == NULL ? NULL : m_shaders->m_callbacks[num]);
     }
     // ------------------------------------------------------------------------
     GLuint getRenderTargetTexture(TypeRTT which);
@@ -631,7 +608,8 @@ public:
     // ------------------------------------------------------------------------
     std::vector<LightNode *> getLights() { return m_lights; }
     // ------------------------------------------------------------------------
-    void addGlowingNode(scene::ISceneNode *n, float r = 1.0f, float g = 1.0f, float b = 1.0f)
+    void addGlowingNode(scene::ISceneNode *n, float r = 1.0f, float g = 1.0f,
+                        float b = 1.0f)
     {
         GlowData dat;
         dat.node = n;
@@ -655,62 +633,109 @@ public:
     // ------------------------------------------------------------------------
     void clearForcedBloom() { m_forcedbloom.clear(); }
     // ------------------------------------------------------------------------
-    const std::vector<BloomData> &getForcedBloom() const { return m_forcedbloom; }
+    const std::vector<BloomData> &getForcedBloom() const
+    { 
+        return m_forcedbloom;
+    }
     // ------------------------------------------------------------------------
     void clearBackgroundNodes() { m_background.clear(); }
     // ------------------------------------------------------------------------
-    void addBackgroundNode(scene::ISceneNode * const n) { m_background.push_back(n); }
+    void addBackgroundNode(scene::ISceneNode * const n) 
+    {
+        m_background.push_back(n);
+    }
     // ------------------------------------------------------------------------
     void applyObjectPassShader();
-    void applyObjectPassShader(scene::ISceneNode * const node, bool rimlit = false);
+    void applyObjectPassShader(scene::ISceneNode * const node,
+                               bool rimlit = false);
     // ------------------------------------------------------------------------
-    scene::ISceneNode *addLight(const core::vector3df &pos, float energy, float radius, float r,
-                  float g, float b, bool sun = false, scene::ISceneNode* parent = NULL);
+    scene::ISceneNode *addLight(const core::vector3df &pos, float energy,
+                                float radius, float r, float g, float b,
+                                bool sun = false, 
+                                scene::ISceneNode* parent = NULL);
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
     class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
+    // ------------------------------------------------------------------------
+    ShadowMatrices *getShadowMatrices() { return m_shadow_matrices;  }
+    // ------------------------------------------------------------------------
+    
     void cleanSunInterposer();
     void createSunInterposer();
     // ------------------------------------------------------------------------
-    void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; matrix.getInverse(m_InvViewMatrix); }
+    void setViewMatrix(core::matrix4 matrix)
+    {
+        m_ViewMatrix = matrix; matrix.getInverse(m_InvViewMatrix);
+    }
+    // ------------------------------------------------------------------------
     const core::matrix4 &getViewMatrix() const { return m_ViewMatrix; }
+    // ------------------------------------------------------------------------
     const core::matrix4 &getInvViewMatrix() const { return m_InvViewMatrix; }
-    void setProjMatrix(core::matrix4 matrix) { m_ProjMatrix = matrix; matrix.getInverse(m_InvProjMatrix); }
+    // ------------------------------------------------------------------------
+    void setProjMatrix(core::matrix4 matrix)
+    {
+        m_ProjMatrix = matrix; matrix.getInverse(m_InvProjMatrix);
+    }
+    // ------------------------------------------------------------------------
     const core::matrix4 &getProjMatrix() const { return m_ProjMatrix; }
+    // ------------------------------------------------------------------------
     const core::matrix4 &getInvProjMatrix() const { return m_InvProjMatrix; }
-    void genProjViewMatrix() { m_previousProjViewMatrix = m_ProjViewMatrix; m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; m_InvProjViewMatrix = m_ProjViewMatrix; m_InvProjViewMatrix.makeInverse(); }
-    const core::matrix4 & getPreviousPVMatrix() { return m_previousProjViewMatrix; }
+    // ------------------------------------------------------------------------
+    void genProjViewMatrix() 
+    {
+        m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; 
+        m_InvProjViewMatrix = m_ProjViewMatrix; 
+        m_InvProjViewMatrix.makeInverse(); 
+    }
+    // ------------------------------------------------------------------------
     const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
-    const core::matrix4 &getInvProjViewMatrix() const { return m_InvProjViewMatrix; }
-    const core::vector2df &getCurrentScreenSize() const { return m_current_screen_size; }
-    const core::dimension2du getActualScreenSize() const { return m_actual_screen_size; }
+    // ------------------------------------------------------------------------
+    const core::matrix4 &getInvProjViewMatrix() const 
+    {
+        return m_InvProjViewMatrix;
+    }
+    // ------------------------------------------------------------------------
+    const core::vector2df &getCurrentScreenSize() const
+    {
+        return m_current_screen_size;
+    }
+    // ------------------------------------------------------------------------
+    const core::dimension2du getActualScreenSize() const
+    { 
+        return m_actual_screen_size;
+    }
     // ------------------------------------------------------------------------
     float getSSAORadius() const
     {
         return m_ssao_radius;
     }
 
+    // ------------------------------------------------------------------------
     void setSSAORadius(float v)
     {
         m_ssao_radius = v;
     }
 
+    // ------------------------------------------------------------------------
     float getSSAOK() const
     {
         return m_ssao_k;
     }
 
+    // ------------------------------------------------------------------------
     void setSSAOK(float v)
     {
         m_ssao_k = v;
     }
 
+    // ------------------------------------------------------------------------
     float getSSAOSigma() const
     {
         return m_ssao_sigma;
     }
 
+    // ------------------------------------------------------------------------
     void setSSAOSigma(float v)
     {
         m_ssao_sigma = v;
@@ -730,10 +755,15 @@ public:
     void onLoadWorld();
     void onUnloadWorld();
 
-    void renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadows, bool forceRTT);
-    unsigned UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
-    void UpdateSplitAndLightcoordRangeFromComputeShaders(size_t width, size_t height);
-    void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
+    void renderScene(scene::ICameraSceneNode * const camnode,
+                     unsigned pointlightcount, std::vector<GlowData>& glows,
+                     float dt, bool hasShadows, bool forceRTT);
+    unsigned updateLightsInfo(scene::ICameraSceneNode * const camnode,
+                              float dt);
+    void updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
+                                                         size_t height);
+    void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
+                                   size_t width, size_t height);
     void uploadLightingData();
 
     // --------------------- OLD RTT --------------------
