@@ -105,21 +105,8 @@ void LabelWidget::add()
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
 
-    if (m_scroll_speed > 0)
-    {
-        /*IGUIFont* font = m_title_font ? GUIEngine::getTitleFont()
-                                      : GUIEngine::getFont();
-        core::dimension2du r = font->getDimension(getText().c_str());
-
-        m_scroll_offset = (float)r.Width;
-
-        // start scrolled off
-        m_scroll_offset = -999;*/
-    }
-    else
-    {
+    if (m_scroll_speed <= 0)
         m_element->setNotClipped(true);
-    }
 }   // add
 
 // ----------------------------------------------------------------------------
@@ -139,16 +126,11 @@ void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
             rect.LowerRightCorner.X = rect.UpperLeftCorner.X + fwidth;
             m_element->setRelativePosition(rect);
             m_element->updateAbsolutePosition();
-
-            //((IGUIStaticText*)m_element)->setBackgroundColor( video::SColor(255,255,0,0) );
         }
     }
 
     if (m_scroll_speed > 0)
-    {
-        //m_scroll_offset = (float)m_element->getAbsolutePosition().getWidth();
         m_scroll_offset = (float)m_w;
-    }
 
     Widget::setText(text);
     if (m_element)
@@ -181,7 +163,6 @@ bool LabelWidget::scrolledOff() const
 
 void LabelWidget::setScrollSpeed(float speed)
 {
-    //m_scroll_offset = 0;
     m_scroll_speed  = speed;
 }   // setScrollSpeed
 
