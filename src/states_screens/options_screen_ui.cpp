@@ -89,7 +89,7 @@ void OptionsScreenUI::loadedFromFile()
     {
         Log::warn("OptionsScreenUI", "Could not find a single skin, make sure that "
                                      "the data files are correctly installed");
-        skinSelector->setDeactivated();
+        skinSelector->setActive(false);
         return;
     }
 
@@ -211,14 +211,7 @@ void OptionsScreenUI::init()
 
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        list_widget->setDeactivated();
-    }
-    else
-    {
-        list_widget->setActivated();
-    }
+    list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
 
 }   // init
 

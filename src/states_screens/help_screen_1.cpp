@@ -118,14 +118,8 @@ void HelpScreen1::init()
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
     ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
 
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        tutorial->setDeactivated();
-    }
-    else
-    {
-        tutorial->setActivated();
-    }
+    tutorial->setActive(StateManager::get()->getGameState() != 
+                                                       GUIEngine::INGAME_MENU);
 
     if (w != NULL)  w->select( "page1", PLAYER_ID_GAME_MASTER );
 }   //init

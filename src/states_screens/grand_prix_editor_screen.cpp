@@ -271,23 +271,13 @@ void GrandPrixEditorScreen::enableButtons()
     assert(remove_button != NULL);
     assert(rename_button != NULL);
 
-    if (m_selection != NULL && m_selection->getNumberOfTracks() > 0)
-        copy_button->setActivated();
-    else
-        copy_button->setDeactivated();
+    bool b = m_selection && m_selection->getNumberOfTracks() > 0;
+    copy_button->setActive(b);
 
-    if (m_selection != NULL && m_selection->isEditable())
-    {
-        edit_button->setActivated();
-        remove_button->setActivated();
-        rename_button->setActivated();
-    }
-    else
-    {
-        edit_button->setDeactivated();
-        remove_button->setDeactivated();
-        rename_button->setDeactivated();
-    }
+    b = m_selection && m_selection->isEditable();
+    edit_button->setActive(b);
+    remove_button->setActive(b);
+    rename_button->setActive(b);
 }
 
 // -----------------------------------------------------------------------------

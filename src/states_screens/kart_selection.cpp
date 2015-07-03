@@ -332,7 +332,7 @@ void KartSelectionScreen::init()
 
     m_game_master_confirmed = false;
 
-    tabs->setActivated();
+    tabs->setActive(true);
 
     m_kart_widgets.clearAndDeleteAll();
     StateManager::get()->resetActivePlayers();
@@ -775,7 +775,7 @@ void KartSelectionScreen::playerConfirm(const int player_id)
         m_game_master_confirmed = true;
         RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
         assert( tabs != NULL );
-        tabs->setDeactivated();
+        tabs->setActive(false);
     }
 
     // validate choices to notify player of duplicates

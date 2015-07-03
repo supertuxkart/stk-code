@@ -193,10 +193,7 @@ namespace GUIEngine
         
         // --------------------------------------------------------------------
         /** Override method from base class Widget */
-        virtual void setActivated();
-
-        /** Override method from base class Widget */
-        virtual void setDeactivated();
+        virtual void setActive(bool active = true);
 
         /** Display custom text in spinner */
         void setCustomText(const core::stringw& text);

@@ -109,7 +109,7 @@ void CreateServerScreen::onUpdate(float delta)
             }
             delete m_server_creation_request;
             m_server_creation_request = NULL;
-            //m_options_widget->setActivated();
+            //m_options_widget->setActive(true);
         }
         else
         {

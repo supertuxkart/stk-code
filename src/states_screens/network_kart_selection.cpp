@@ -55,7 +55,7 @@ void NetworkKartSelectionScreen::init()
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
     tabs->select( "standard", PLAYER_ID_GAME_MASTER); // select standard kart group
-    tabs->setDeactivated();
+    tabs->setActive(false);
     tabs->setVisible(false);
 
     // change the back button image (because it makes the game quit)
