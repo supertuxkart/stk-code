@@ -781,31 +781,22 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
     for(unsigned int i=0; i<4; i++)
     {
         if(!m_kart || !m_wheel_node[i]) continue;
-        float rel_suspension = 0;
+#ifdef DEBUG
         if (!dynamic_cast<GhostKart*>(m_kart))
         {
             const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
-#ifdef DEBUG
             if (UserConfigParams::m_physics_debug && m_kart)
             {
                 // Make wheels that are not touching the ground invisible
                 m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
             }
-#endif
-            rel_suspension = wi.m_raycastInfo.m_suspensionLength
-                           - m_default_physics_suspension[i];
         }
-        // If the suspension is too compressed
-        if(rel_suspension< m_min_suspension[i])
-            rel_suspension = m_min_suspension[i];
-        else if(rel_suspension > m_max_suspension[i])
-            rel_suspension = m_max_suspension[i];
+#endif
 
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        pos.Y -= rel_suspension;
-        const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
-        pos.Y = -m_kart->getXYZ().getY() + wi.m_raycastInfo.m_contactPointWS.getY() + wi.m_wheelsRadius;
 
+        const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+        pos.Y = -wi.m_raycastInfo.m_suspensionLength + m_wheel_graphics_radius[i] + getLowestPoint();
         m_wheel_node[i]->setPosition(pos);
 
         // Now calculate the new rotation: (old + change) mod 360
