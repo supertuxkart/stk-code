@@ -51,6 +51,7 @@ public:
         ~Shadow();
     void enableShadow();
     void disableShadow();
+    void update(float hot);
 };   // Shadow
 #endif
 

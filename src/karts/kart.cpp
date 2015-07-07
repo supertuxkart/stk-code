@@ -2457,7 +2457,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
                               m_node,
                               m_kart_properties->getShadowScale(),
                               m_kart_properties->getShadowXOffset(),
-                              m_kart_properties->getGraphicalYOffset(),
+                              -m_kart_model->getLowestPoint(),
                               m_kart_properties->getShadowZOffset());
     }
     World::getWorld()->kartAdded(this, m_node);
@@ -2624,8 +2624,13 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
             if (susp_len < min_susp_len)
                 min_susp_len = susp_len;
         }   // for i<num_wheels
-
         const btWheelInfo &w = getVehicle()->getWheelInfo(0);
+
+        // Determine the shadow position from the terrain Y position. This
+        // leaves the shadow on the ground even if the kart is jumping because
+        // of skidding (shadows are disabled when wheel are not on the track).
+        m_shadow->update(m_terrain_info->getHoT() - getXYZ().getY()
+                         -m_skidding->getGraphicalJumpOffset());
         // Recompute the default average suspension length, see
         // kartIsInRestNow() how to get from y-offset to susp. len.
         float av_sus_len = -m_graphical_y_offset

@@ -85,3 +85,9 @@ void Shadow::enableShadow()
     m_node->setVisible(true);
 }
 // ----------------------------------------------------------------------------
+void Shadow::update(float hot)
+{
+    core::vector3df pos = m_node->getPosition();
+    pos.Y = hot;
+    m_node->setPosition(pos);
+}   // update
