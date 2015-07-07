@@ -49,30 +49,38 @@ float KartModel::UNDEFINED = -99.9f;
 
 SpeedWeightedObject::Properties::Properties()
 {
-    m_strength_factor = m_speed_factor = m_texture_speed.X = m_texture_speed.Y = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
-}
+    m_strength_factor = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+    m_speed_factor    = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+    m_texture_speed.X = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+    m_texture_speed.Y = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+}   // SpeedWeightedObject::Properties::Properties
 
+// ----------------------------------------------------------------------------
 void SpeedWeightedObject::Properties::loadFromXMLNode(const XMLNode* xml_node)
 {
     xml_node->get("strength-factor", &m_strength_factor);
     xml_node->get("speed-factor",    &m_speed_factor);
     xml_node->get("texture-speed-x", &m_texture_speed.X);
     xml_node->get("texture-speed-y", &m_texture_speed.Y);
-}
+}   // SpeedWeightedObject::Properties::loadFromXMLNode
 
+// ----------------------------------------------------------------------------
 void SpeedWeightedObject::Properties::checkAllSet()
 {
-#define CHECK_NEG(  a,strA) if(a<=SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED) {                   \
-            Log::fatal("SpeedWeightedObject", "Missing default value for '%s'.",    \
-                        strA);              \
+#define CHECK_NEG(  a,strA) if(a<=SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED)  \
+        {                                                                    \
+            Log::fatal("SpeedWeightedObject",                                \
+                       "Missing default value for '%s'.",                    \
+                       strA);                                                \
         }
-    CHECK_NEG(m_strength_factor, "speed-weighted strength-factor"    );
-    CHECK_NEG(m_speed_factor,    "speed-weighted speed-factor"    );
+    CHECK_NEG(m_strength_factor,  "speed-weighted strength-factor"    );
+    CHECK_NEG(m_speed_factor,     "speed-weighted speed-factor"       );
     CHECK_NEG(m_texture_speed.X,  "speed-weighted texture speed X"    );
     CHECK_NEG(m_texture_speed.Y,  "speed-weighted texture speed Y"    );
 #undef CHECK_NEG
-}
+}   // SpeedWeightedObject::Properties::checkAllSet
 
+// ============================================================================
 /** Default constructor which initialises all variables with defaults.
  *  Note that the KartModel is copied, so make sure to update makeCopy
  *  if any more variables are added to this object.
@@ -158,8 +166,8 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
         animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP] );
         animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_END]  );
-        animation_node->get("start-speed-weighted",     &m_animation_frame[AF_SPEED_WEIGHTED_START]     );
-        animation_node->get("end-speed-weighted",       &m_animation_frame[AF_SPEED_WEIGHTED_END]       );
+        animation_node->get("start-speed-weighted", &m_animation_frame[AF_SPEED_WEIGHTED_START]);
+        animation_node->get("end-speed-weighted",   &m_animation_frame[AF_SPEED_WEIGHTED_END]  );
         animation_node->get("speed",          &m_animation_speed               );
     }
 
