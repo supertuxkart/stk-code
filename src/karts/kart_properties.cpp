@@ -281,7 +281,13 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     {
         m_gravity_center_shift.setX(0);
         // Default: center at the very bottom of the kart.
-        m_gravity_center_shift.setY(m_kart_model->getHeight()*0.5f);
+        // If the kart is 'too high', its height will be changed in
+        // kart.cpp, the same adjustment needs to be made here.
+       if (m_kart_model->getHeight() > m_kart_model->getLength()*0.6f)
+            m_gravity_center_shift.setY(m_kart_model->getLength()*0.6f*0.5f);
+        else
+            m_gravity_center_shift.setY(m_kart_model->getHeight()*0.5f);
+
         m_gravity_center_shift.setZ(0);
     }
 
