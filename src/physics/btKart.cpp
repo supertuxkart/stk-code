@@ -83,7 +83,7 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     ci.m_wheelsDampingCompression = tuning.m_suspensionCompression;
     ci.m_wheelsDampingRelaxation  = tuning.m_suspensionDamping;
     ci.m_frictionSlip             = tuning.m_frictionSlip;
-    ci.m_maxSuspensionTravelCm    = tuning.m_maxSuspensionTravelCm;
+    ci.m_maxSuspensionTravel      = tuning.m_maxSuspensionTravel;
     ci.m_maxSuspensionForce       = tuning.m_maxSuspensionForce;
 
     m_wheelInfo.push_back( btWheelInfo(ci));
@@ -236,7 +236,7 @@ btScalar btKart::rayCast(unsigned int index)
     updateWheelTransformsWS( wheel,false);
 
     btScalar max_susp_len = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius
-                          + wheel.m_maxSuspensionTravelCm*0.01f;
+                          + wheel.m_maxSuspensionTravel;
 
     // Do a slightly longer raycast to see if the kart might soon hit the 
     // ground and some 'cushioning' is needed to avoid that the chassis
@@ -270,9 +270,9 @@ btScalar btKart::rayCast(unsigned int index)
 
         //clamp on max suspension travel
         btScalar minSuspensionLength = wheel.getSuspensionRestLength()
-                                - wheel.m_maxSuspensionTravelCm*btScalar(0.01);
+                                - wheel.m_maxSuspensionTravel;
         btScalar maxSuspensionLength = wheel.getSuspensionRestLength()
-                                + wheel.m_maxSuspensionTravelCm*btScalar(0.01);
+                                + wheel.m_maxSuspensionTravel;
         if (wheel.m_raycastInfo.m_suspensionLength < minSuspensionLength)
         {
             wheel.m_raycastInfo.m_suspensionLength = minSuspensionLength;

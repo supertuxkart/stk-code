@@ -324,7 +324,7 @@ private:
     bool  m_exp_spring_response;
 
     float m_suspension_rest;
-    float m_suspension_travel_cm;
+    float m_suspension_travel;
 
 public:
     /** STK can add an impulse to push karts away from the track in case
@@ -685,7 +685,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the amount the suspension can extend. */
-    float getSuspensionTravelCM     () const {return m_suspension_travel_cm;  }
+    float getSuspensionTravel     () const {return m_suspension_travel;  }
 
     // ------------------------------------------------------------------------
     /** Returns if the spring should be exponentially dampened. */

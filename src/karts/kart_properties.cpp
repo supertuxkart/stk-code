@@ -74,7 +74,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = m_rescue_vert_offset =
         m_collision_terrain_impulse = m_collision_impulse = m_restitution =
-        m_collision_impulse_time = m_suspension_travel_cm =
+        m_collision_impulse_time = m_suspension_travel =
         m_track_connection_accel = m_rubber_band_max_length =
         m_rubber_band_force = m_rubber_band_duration =
         m_rubber_band_speed_increase = m_rubber_band_fade_out_time =
@@ -283,9 +283,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         // Default: center at the very bottom of the kart.
         // If the kart is 'too high', its height will be changed in
         // kart.cpp, the same adjustment needs to be made here.
-       if (m_kart_model->getHeight() > m_kart_model->getLength()*0.6f)
+//       if (m_kart_model->getHeight() > m_kart_model->getLength()*0.6f)
             m_gravity_center_shift.setY(m_kart_model->getLength()*0.6f*0.5f);
-        else
+//        else
             m_gravity_center_shift.setY(m_kart_model->getHeight()*0.5f);
 
         m_gravity_center_shift.setZ(0);
@@ -363,7 +363,7 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         suspension_node->get("stiffness",            &m_suspension_stiffness);
         suspension_node->get("rest",                 &m_suspension_rest     );
-        suspension_node->get("travel-cm",            &m_suspension_travel_cm);
+        suspension_node->get("travel",               &m_suspension_travel   );
         suspension_node->get("exp-spring-response",  &m_exp_spring_response );
         suspension_node->get("max-force",            &m_max_suspension_force);
     }
@@ -700,7 +700,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_brake_time_increase,        "engine brake-time-increase"    );
     CHECK_NEG(m_suspension_stiffness,       "suspension stiffness"          );
     CHECK_NEG(m_suspension_rest,            "suspension rest"               );
-    CHECK_NEG(m_suspension_travel_cm,       "suspension travel-cm"          );
+    CHECK_NEG(m_suspension_travel,          "suspension travel"             );
     CHECK_NEG(m_max_suspension_force,       "suspension max-force"          );
     CHECK_NEG(m_collision_impulse,          "collision impulse"             );
     CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );

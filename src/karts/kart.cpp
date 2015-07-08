@@ -690,8 +690,8 @@ void Kart::createPhysics()
     btVector3 wheel_axle(-1.0f, 0.0f, 0.0f);
 
     btKart::btVehicleTuning tuning;
-    tuning.m_maxSuspensionTravelCm =
-        m_kart_properties->getSuspensionTravelCM();
+    tuning.m_maxSuspensionTravel =
+        m_kart_properties->getSuspensionTravel();
     tuning.m_maxSuspensionForce    =
         m_kart_properties->getMaxSuspensionForce();
 
@@ -2132,11 +2132,11 @@ void Kart::updatePhysics(float dt)
     // Only apply if near ground instead of purely based on speed avoiding
     // the "parachute on top" look.
     const Vec3 &v = m_body->getLinearVelocity();
-    if(/*isNearGround() &&*/ v.getY() < - m_kart_properties->getSuspensionTravelCM()*0.01f*60)
+    if(/*isNearGround() &&*/ v.getY() < - m_kart_properties->getSuspensionTravel()*60)
     {
         Vec3 v_clamped = v;
         // clamp the speed to 99% of the maxium falling speed.
-        v_clamped.setY(-m_kart_properties->getSuspensionTravelCM()*0.01f*60 * 0.99f);
+        v_clamped.setY(-m_kart_properties->getSuspensionTravel()*60 * 0.99f);
         //m_body->setLinearVelocity(v_clamped);
     }
 
