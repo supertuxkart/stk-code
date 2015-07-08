@@ -390,7 +390,7 @@
          exp-string-response: dampen the suspension spring reaction
             exponentially.
          max-force: Maximum suspension force -->
-    <suspension stiffness="140" rest="0.3" travel="29"
+    <suspension stiffness="140" rest="0.3" travel="0.29"
          exp-spring-response="false" max-force="12000"/>
 
     <!-- Wheel related parameters: damping-relaxation/compression: for
