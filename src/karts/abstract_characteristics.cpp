@@ -518,14 +518,14 @@ float AbstractCharacteristics::getStabilitySmoothFlyingImpulse() const
     return result;
 }
 
-InterpolationArray&& AbstractCharacteristics::getTurnRadius() const
+InterpolationArray AbstractCharacteristics::getTurnRadius() const
 {
     InterpolationArray result;
     bool is_set = false;
     process(TURN_RADIUS, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(TURN_RADIUS).c_str());
-    return std::move(result);
+    return result;
 }
 
 float AbstractCharacteristics::getTurnTimeResetSteer() const
@@ -538,14 +538,14 @@ float AbstractCharacteristics::getTurnTimeResetSteer() const
     return result;
 }
 
-InterpolationArray&& AbstractCharacteristics::getTurnTimeFullSteer() const
+InterpolationArray AbstractCharacteristics::getTurnTimeFullSteer() const
 {
     InterpolationArray result;
     bool is_set = false;
     process(TURN_TIME_FULL_STEER, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(TURN_TIME_FULL_STEER).c_str());
-    return std::move(result);
+    return result;
 }
 
 float AbstractCharacteristics::getEnginePower() const
@@ -598,24 +598,24 @@ float AbstractCharacteristics::getEngineMaxSpeedReverseRatio() const
     return result;
 }
 
-std::vector<float>&& AbstractCharacteristics::getGearSwitchRatio() const
+std::vector<float> AbstractCharacteristics::getGearSwitchRatio() const
 {
     std::vector<float> result;
     bool is_set = false;
     process(GEAR_SWITCH_RATIO, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(GEAR_SWITCH_RATIO).c_str());
-    return std::move(result);
+    return result;
 }
 
-std::vector<float>&& AbstractCharacteristics::getGearPowerIncrease() const
+std::vector<float> AbstractCharacteristics::getGearPowerIncrease() const
 {
     std::vector<float> result;
     bool is_set = false;
     process(GEAR_POWER_INCREASE, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(GEAR_POWER_INCREASE).c_str());
-    return std::move(result);
+    return result;
 }
 
 float AbstractCharacteristics::getMass() const
@@ -658,14 +658,14 @@ float AbstractCharacteristics::getWheelsRadius() const
     return result;
 }
 
-std::vector<float>&& AbstractCharacteristics::getWheelsPosition() const
+std::vector<float> AbstractCharacteristics::getWheelsPosition() const
 {
     std::vector<float> result;
     bool is_set = false;
     process(WHEELS_POSITION, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(WHEELS_POSITION).c_str());
-    return std::move(result);
+    return result;
 }
 
 float AbstractCharacteristics::getCameraDistance() const
@@ -1018,24 +1018,24 @@ float AbstractCharacteristics::getPlungerInFaceTime() const
     return result;
 }
 
-std::vector<float>&& AbstractCharacteristics::getStartupTime() const
+std::vector<float> AbstractCharacteristics::getStartupTime() const
 {
     std::vector<float> result;
     bool is_set = false;
     process(STARTUP_TIME, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(STARTUP_TIME).c_str());
-    return std::move(result);
+    return result;
 }
 
-std::vector<float>&& AbstractCharacteristics::getStartupBoost() const
+std::vector<float> AbstractCharacteristics::getStartupBoost() const
 {
     std::vector<float> result;
     bool is_set = false;
     process(STARTUP_BOOST, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(STARTUP_BOOST).c_str());
-    return std::move(result);
+    return result;
 }
 
 float AbstractCharacteristics::getRescueDuration() const

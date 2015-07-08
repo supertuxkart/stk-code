@@ -205,12 +205,16 @@ public:
     virtual const SkiddingProperties* getSkiddingProperties() const;
 
     /**
-     * TODO
+     * The process function is the core of this characteristics system.
+     * Any computation of the properties should happen here and modify the
+     * values of the value-pointer (be sure to use the right type!) and the
+     * is_set parameter when the value was set by the call (and wasn't set
+     * before).
      *
      * \param type The characteristic that should be modified.
      * \param value The current value and result at the same time.
      * \param is_set If the current value was already set (so it can be used
-     *              for computations.
+     *              for computations).
      */
     virtual void process(CharacteristicType type, Value value, bool *is_set) const;
 
@@ -231,9 +235,9 @@ public:
     float getStabilityTrackConnectionAccel() const;
     float getStabilitySmoothFlyingImpulse() const;
 
-    InterpolationArray&& getTurnRadius() const;
+    InterpolationArray getTurnRadius() const;
     float getTurnTimeResetSteer() const;
-    InterpolationArray&& getTurnTimeFullSteer() const;
+    InterpolationArray getTurnTimeFullSteer() const;
 
     float getEnginePower() const;
     float getEngineMaxSpeed() const;
@@ -241,15 +245,15 @@ public:
     float getEngineBrakeTimeIncrease() const;
     float getEngineMaxSpeedReverseRatio() const;
 
-    std::vector<float>&& getGearSwitchRatio() const;
-    std::vector<float>&& getGearPowerIncrease() const;
+    std::vector<float> getGearSwitchRatio() const;
+    std::vector<float> getGearPowerIncrease() const;
 
     float getMass() const;
 
     float getWheelsDampingRelaxation() const;
     float getWheelsDampingCompression() const;
     float getWheelsRadius() const;
-    std::vector<float>&& getWheelsPosition() const;
+    std::vector<float> getWheelsPosition() const;
 
     float getCameraDistance() const;
     float getCameraForwardUpAngle() const;
@@ -295,8 +299,8 @@ public:
     float getPlungerFadeOutTime() const;
     float getPlungerInFaceTime() const;
 
-    std::vector<float>&& getStartupTime() const;
-    std::vector<float>&& getStartupBoost() const;
+    std::vector<float> getStartupTime() const;
+    std::vector<float> getStartupBoost() const;
 
     float getRescueDuration() const;
     float getRescueVertOffset() const;

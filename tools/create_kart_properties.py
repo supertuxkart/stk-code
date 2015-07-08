@@ -24,7 +24,7 @@
 import sys
 
 # Input data
-#FIXME is wheelPosition needed??
+#FIXME is wheelPosition needed?
 characteristics = """Suspension: stiffness, rest, travelCm, expSpringResponse, maxForce
 Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, smoothFlyingImpulse
 Turn: radius(InterpolationArray), timeResetSteer, timeFullSteer(InterpolationArray)
@@ -53,9 +53,6 @@ class GroupMember:
         self.name = name
         self.typeC = typeC
         self.typeStr = typeStr
-
-    def shouldMove(self):
-        return self.typeC != "float"
 
     """E.g. power(std::vector<float>/floatVector)
        or speed(InterpolationArray)
@@ -163,10 +160,7 @@ def main():
             for m in g.members:
                 nameTitle = joinSubName(g, m, True)
                 nameUnderscore = joinSubName(g, m, False)
-                if m.shouldMove():
-                    typeC = m.typeC + "&&"
-                else:
-                    typeC = m.typeC
+                typeC = m.typeC
 
                 print("    {0} get{1}() const;".
                     format(typeC, nameTitle, nameUnderscore))
@@ -175,12 +169,8 @@ def main():
             for m in g.members:
                 nameTitle = joinSubName(g, m, True)
                 nameUnderscore = joinSubName(g, m, False)
-                if m.shouldMove():
-                    typeC = m.typeC + "&&"
-                    result = "std::move(result)"
-                else:
-                    typeC = m.typeC
-                    result = "result"
+                typeC = m.typeC
+                result = "result"
 
                 print("""{3} AbstractCharacteristics::get{1}() const
 {{

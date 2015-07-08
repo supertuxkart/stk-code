@@ -101,8 +101,8 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
                 for (std::vector<std::string>::const_iterator it = processors.begin();
                      it != processors.end(); it++)
                 {
-                    std::vector<std::string> pair = StringUtils::split(*it,':');
-                    if (!pair.size() == 2)
+                    std::vector<std::string> pair = StringUtils::split(*it, ':');
+                    if (pair.size() != 2)
                         Log::error("XmlCharacteristics::process",
                             "Can't process %s: Wrong format", getName(type).c_str());
                     else
@@ -140,7 +140,7 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
                  it != processors.end(); it++)
             {
                 std::vector<std::string> pair = StringUtils::split(*it,':');
-                if (!pair.size() == 2)
+                if (pair.size() != 2)
                     Log::error("XmlCharacteristics::process",
                         "Can't process %s: Wrong format", getName(type).c_str());
                 else
@@ -229,6 +229,9 @@ void XmlCharacteristics::processFloat(const std::string &processor, float *value
             *value += val;
         else if (operations[index - 1] == "-")
             *value -= val;
+        else
+            Log::fatal("XmlCharacteristics::processFloat",
+                "Unknown operator (%s)", operations[index - 1].c_str());
     }
     *is_set = true;
 }
