@@ -459,10 +459,12 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             obj.m_node = NULL;
             if(obj.m_model)
             {
-                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, "speedweighted", node);
+                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
+                                                         "speedweighted", node);
                 obj.m_node->grab();
 
-                obj.m_node->setFrameLoop(m_animation_frame[AF_SPEED_WEIGHTED_START], m_animation_frame[AF_SPEED_WEIGHTED_END]);
+                obj.m_node->setFrameLoop(m_animation_frame[AF_SPEED_WEIGHTED_START],
+                                         m_animation_frame[AF_SPEED_WEIGHTED_END]);
 
         #ifdef DEBUG
                 std::string debug_name = obj.m_name+" (speed-weighted)";
