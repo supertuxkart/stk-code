@@ -37,6 +37,7 @@ using namespace irr;
 #include "utils/interpolation_array.hpp"
 #include "utils/vec3.hpp"
 
+class AbstractCharacteristic;
 class AIProperties;
 class Material;
 class SkiddingProperties;
@@ -119,6 +120,10 @@ private:
                                        *   status bar and on the track-view. */
     int  m_shape;                     /**< Number of vertices in polygon when
                                        *   drawing the dot on the mini map. */
+
+    /** The physical, item, etc. characteristics of this kart. */
+    AbstractCharacteristic *m_characteristic;
+
     // Physic properties
     // -----------------
     /** Weight of kart.  */

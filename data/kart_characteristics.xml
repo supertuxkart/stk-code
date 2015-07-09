@@ -9,8 +9,8 @@
             travel-cm: maximum movement of suspension - in cm!!
             exp-string-response: dampen the suspension spring reaction
                 exponentially. See
-			    http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7369\&p=25236&hilit=vehicle#p25236 
-			    for details.
+                http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7369\&p=25236&hilit=vehicle#p25236
+                for details.
             max-force: Maximum suspension force -->
         <suspension stiffness="140" rest="0.3" travel-cm="29"
             exp-spring-response="false" max-force="12000" />
@@ -65,12 +65,12 @@
                 pressed, the harder the kart will brake.
             max-speed-reverse-ratio is the percentage of max speed for reverse gear.
           -->
-        <engine power="450 475 500 510"  max-speed="17 21 23 25" brake-factor="11.0"
+        <engine power="450 475 500 510" max-speed="17 21 23 25" brake-factor="11.0"
                 brake-time-increase="6" max-speed-reverse-ratio="0.3" />
 
         <!-- Simulated gears
-            switch-ratio defines at what ratio of the maximum
                 speed what gear is selected, e.g. 0.25 means that if the speed is
+            switch-ratio defines at what ratio of the maximum
                 bigger or equal to 0.25 x maxSpeed then use gear 1, 0.5 means if
                 the speed is bigger or equal to 0.5 x maxSpeed then gear 2.
                 gear-power-increase contains the increase in max power (to simulate
@@ -218,10 +218,10 @@
                  squash-slowdown="0.5" />
 
         <!-- Plunger and rubber band handling
-            max-length: Te maximum length of rubber band before it snaps.
-            force: The force a plunger/rubber band applies to the kart(s).
-            duration: The duration a rubber band acts.
-                in-face-time determines how long it takes before a plunger
+            band-max-length: The maximum length of rubber band before it snaps.
+            band-force: The force a plunger/rubber band applies to the kart(s).
+            band-duration: The duration a rubber band acts.
+            in-face-time determines how long it takes before a plunger
                 in your face is removed. -->
         <plunger band-max-length="50" band-force="1500" band-duration="1"
                  band-speed-increase="7" band-fade-out-time="3"
@@ -291,6 +291,61 @@
                     add-power="3" min-speed="10" max-speed-increase="5"
                     duration="1" fade-out-time="2" />
     </characteristic>
+
+    <kart-types>
+        <characteristic name="light">
+            <turn turn-radius="0:3.0 10:10.0 25:20.0 45:40.0"
+                  time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25"
+                  time-reset-steer="0.1" />
+            <engine power="250 300 350 400" max-speed="13 18 21 23.0" brake-factor="15.0"
+                 max-speed-reverse-ratio="0.5" />
+            <gear switch-ratio="0.20 0.55 1" power-increase="5 4 3" />
+            <mass value="195" />
+            <startup time="0.3 0.5"
+                     boost="8.5 4.5" />
+            <explosion time="2.1" radius="5.5"
+                       invulnerability-time="7" />
+            <nitro engine-force="350" max-speed-increase="4.5" duration="1.5"
+                   fade-out-time="2.5" />
+            <slipstream length="11" collect-time="1.5" use-time="2.5" add-power="3.2"
+                        min-speed="9" max-speed-increase="4" duration="1.2"
+                        fade-out-time="2.3" />
+        </characteristic>
+        <characteristic name="medium">
+            <turn turn-radius="0:4.5 10:16.0 25:30.0 45:60.0"
+                  time-full-steer ="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28"
+                  time-reset-steer="0.1" />
+            <engine power="375 450 525 550" max-speed="14 19 22.0 25" />
+            <gear switch-ratio="0.30 0.7 1.0" power-increase="2.2 2.2 2.5" />
+            <mass value="250" />
+            <startup time="0.3 0.5"
+                     boost="4.2 2.6" />
+            <explosion time="1.8" radius="5"
+                       invulnerability-time="6" />
+            <nitro engine-force="425" consumption="1.4" duration="1" />
+            <slipstream use-time="3.3" add-power="2.8" duration="0.9"
+                        fade-out-time="1.6" />
+        </characteristic>
+            <turn turn-radius="0:4.0 10:18.5 25:43.0 45:72.5"
+                  time-full-steer ="0:0.23 0.5:0.23 0.5:0.41 1.0:0.41"
+                  time-reset-steer="0.1" />
+            <engine power="575 675 775 875" max-speed="15 20 23 25" brake-factor="10"
+                    max-speed-reverse-ratio="0.65" />
+            <gear switch-ratio="0.45 0.70 1" power-increase="1.5 1.7 2.5" />
+            <mass value="350" />
+            <swatter duration="10" distance="3" squash-duration="5"
+                     squash-slowdown="0.5" />
+            <startup time="0.3 0.5"
+                     boost="3.8 2" />
+            <explosion time="1.5" radius="4"
+                       invulnerability-time="6" />
+            <nitro engine-force="600" consumption="2" max-speed-increase="8"
+                   duration="0.7" fade-out-time="1.3" />
+            <slipstream length="8.5" use-time="4" add-power="2.7" min-speed="10.5"
+                   max-speed-increase="8" duration="0.7" fade-out-time="1" />
+        <characteristic name="heavy">
+        </characteristic>
+    </kart-types>
 
     <!-- Per-player settings/handicaps (or boosts) -->
     <player-characteristics>

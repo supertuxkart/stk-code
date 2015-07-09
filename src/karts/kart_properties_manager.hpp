@@ -62,7 +62,6 @@ private:
 
     std::unique_ptr<AbstractCharacteristic>               m_base_characteristic;
     std::vector<std::unique_ptr<AbstractCharacteristic> > m_kart_type_characteristics;
-    std::vector<std::unique_ptr<AbstractCharacteristic> > m_kart_characteristics;
     std::vector<std::unique_ptr<AbstractCharacteristic> > m_player_characteristics;
 
 protected:

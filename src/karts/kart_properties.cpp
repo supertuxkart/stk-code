@@ -25,6 +25,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding_properties.hpp"
@@ -58,6 +59,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_shadow_scale    = 1.0f;
     m_shadow_x_offset = 0.0f;
     m_shadow_z_offset = 0.0f;
+    m_characteristic  = NULL;
 
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
@@ -136,6 +138,8 @@ KartProperties::~KartProperties()
     delete m_kart_model;
     if(m_skidding_properties)
         delete m_skidding_properties;
+    if (m_characteristic)
+        delete m_characteristic;
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         if(m_ai_properties[i])
             delete m_ai_properties[i];
