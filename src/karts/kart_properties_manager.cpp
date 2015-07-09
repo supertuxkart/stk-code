@@ -27,6 +27,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"

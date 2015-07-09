@@ -22,12 +22,14 @@
 
 #include "utils/ptr_vector.hpp"
 #include <map>
+#include <memory>
 
 #include "network/remote_kart_info.hpp"
 #include "utils/no_copy.hpp"
 
 #define ALL_KART_GROUPS_ID  "all"
 
+class AbstractCharacteristic;
 class KartProperties;
 
 /**
@@ -57,6 +59,11 @@ private:
     /** Contains a flag for each kart indicating wether it is available on
      *  all clients or not. */
     std::vector<bool>        m_kart_available;
+
+    std::unique_ptr<AbstractCharacteristic>               m_base_characteristic;
+    std::vector<std::unique_ptr<AbstractCharacteristic> > m_kart_type_characteristics;
+    std::vector<std::unique_ptr<AbstractCharacteristic> > m_kart_characteristics;
+    std::vector<std::unique_ptr<AbstractCharacteristic> > m_player_characteristics;
 
 protected:
 

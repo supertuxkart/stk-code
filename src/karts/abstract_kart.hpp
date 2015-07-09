@@ -33,6 +33,7 @@ namespace irr
     }
 }
 
+class AbstractCharacteristics;
 class AbstractKartAnimation;
 class Attachment;
 class btKart;
@@ -74,6 +75,8 @@ protected:
 
     /** The per-player difficulty. */
     const PlayerDifficulty *m_difficulty;
+    /** The combined properties of the kart and the player. */
+    const AbstractCharacteristics *m_characteristics;
 
     /** This stores a copy of the kart model. It has to be a copy
      *  since otherwise incosistencies can happen if the same kart

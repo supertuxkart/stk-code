@@ -19,13 +19,13 @@
 #ifndef HEADER_XML_CHARACTERISTICS_HPP
 #define HEADER_XML_CHARACTERISTICS_HPP
 
-#include "karts/abstract_characteristics.hpp"
+#include "karts/abstract_characteristic.hpp"
 
 #include <string>
 
 class XMLNode;
 
-class XmlCharacteristics : public AbstractCharacteristics
+class XmlCharacteristic : public AbstractCharacteristic
 {
 private:
     /** The computation that was read from an xml file */
@@ -33,7 +33,7 @@ private:
     SkiddingProperties *m_skidding;
 
 public:
-    XmlCharacteristics(const XMLNode *node = nullptr);
+    XmlCharacteristic(const XMLNode *node = nullptr);
 
     virtual const SkiddingProperties* getSkiddingProperties() const;
     virtual void process(CharacteristicType type, Value value, bool *is_set) const;

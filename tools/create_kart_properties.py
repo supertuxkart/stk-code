@@ -172,13 +172,13 @@ def main():
                 typeC = m.typeC
                 result = "result"
 
-                print("""{3} AbstractCharacteristics::get{1}() const
+                print("""{3} AbstractCharacteristic::get{1}() const
 {{
     {0} result;
     bool is_set = false;
     process({2}, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName({2}).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName({2}).c_str());
     return {4};
 }}
 """.format(m.typeC, nameTitle, nameUnderscore.upper(), typeC, result))

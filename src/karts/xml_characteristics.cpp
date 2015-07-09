@@ -24,7 +24,7 @@
 
 #include "io/xml_node.hpp"
 
-XmlCharacteristics::XmlCharacteristics(const XMLNode *node) :
+XmlCharacteristic::XmlCharacteristic(const XMLNode *node) :
     m_values(CHARACTERISTIC_COUNT),
     m_skidding(nullptr)
 {
@@ -32,12 +32,12 @@ XmlCharacteristics::XmlCharacteristics(const XMLNode *node) :
         load(node);
 }
 
-const SkiddingProperties* XmlCharacteristics::getSkiddingProperties() const
+const SkiddingProperties* XmlCharacteristic::getSkiddingProperties() const
 {
     return m_skidding;
 }
 
-void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_set) const
+void XmlCharacteristic::process(CharacteristicType type, Value value, bool *is_set) const
 {
     switch (getType(type))
     {
@@ -52,7 +52,7 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
         {
             if (processors.size() != value.fv->size())
             {
-                Log::error("XmlCharacteristics::process",
+                Log::error("XmlCharacteristic::process",
                     "FloatVectors have different sizes for %s",
                     getName(type).c_str());
                 break;
@@ -74,7 +74,7 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
 
                 if (!*is_set)
                 {
-                    Log::error("XmlCharacteristics::process", "Can't process %s",
+                    Log::error("XmlCharacteristic::process", "Can't process %s",
                         getName(type).c_str());
                     value.fv->clear();
                     break;
@@ -91,7 +91,7 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
         {
             if (processors.size() != value.fv->size())
             {
-                Log::error("XmlCharacteristics::process",
+                Log::error("XmlCharacteristic::process",
                     "InterpolationArrays have different sizes for %s",
                     getName(type).c_str());
                 break;
@@ -103,13 +103,13 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
                 {
                     std::vector<std::string> pair = StringUtils::split(*it, ':');
                     if (pair.size() != 2)
-                        Log::error("XmlCharacteristics::process",
+                        Log::error("XmlCharacteristic::process",
                             "Can't process %s: Wrong format", getName(type).c_str());
                     else
                     {
                         float x;
                         if (!StringUtils::fromString(pair[0], x))
-                            Log::error("XmlCharacteristics::process",
+                            Log::error("XmlCharacteristic::process",
                                 "Can't process %s: Not a float", getName(type).c_str());
                         else
                         {
@@ -126,7 +126,7 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
                                 }
                             }
                             if (!found)
-                                Log::error("XmlCharacteristics::process",
+                                Log::error("XmlCharacteristic::process",
                                     "Can't find the %f in %s", x,
                                     getName(type).c_str());
                         }
@@ -141,13 +141,13 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
             {
                 std::vector<std::string> pair = StringUtils::split(*it,':');
                 if (pair.size() != 2)
-                    Log::error("XmlCharacteristics::process",
+                    Log::error("XmlCharacteristic::process",
                         "Can't process %s: Wrong format", getName(type).c_str());
                 else
                 {
                     float x;
                     if (!StringUtils::fromString(pair[0], x))
-                        Log::error("XmlCharacteristics::process",
+                        Log::error("XmlCharacteristic::process",
                             "Can't process %s: Not a float", getName(type).c_str());
                     else
                     {
@@ -156,7 +156,7 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
                         processFloat(pair[1], &val, is_set);
                         if (!*is_set)
                         {
-                            Log::error("XmlCharacteristics::process", "Can't process %s",
+                            Log::error("XmlCharacteristic::process", "Can't process %s",
                                 getName(type).c_str());
                             value.ia->clear();
                             break;
@@ -171,7 +171,7 @@ void XmlCharacteristics::process(CharacteristicType type, Value value, bool *is_
     }
 }
 
-void XmlCharacteristics::processFloat(const std::string &processor, float *value, bool *is_set)
+void XmlCharacteristic::processFloat(const std::string &processor, float *value, bool *is_set)
 {
     // Split the string by operators
     static const std::string operators = "*/+-";
@@ -189,7 +189,7 @@ void XmlCharacteristics::processFloat(const std::string &processor, float *value
 
     if (parts.empty())
     {
-        Log::error("XmlCharacteristics::processFloat", "no content to process");
+        Log::error("XmlCharacteristic::processFloat", "no content to process");
         return;
     }
 
@@ -201,7 +201,7 @@ void XmlCharacteristics::processFloat(const std::string &processor, float *value
     {
         if (!*is_set)
         {
-            Log::error("XmlCharacteristics::processFloat", "x is unknown");
+            Log::error("XmlCharacteristic::processFloat", "x is unknown");
             return;
         }
         else
@@ -217,7 +217,7 @@ void XmlCharacteristics::processFloat(const std::string &processor, float *value
             val = x;
         else if (!StringUtils::fromString(parts[index], val))
         {
-            Log::fatal("XmlCharacteristics::processFloat",
+            Log::fatal("XmlCharacteristic::processFloat",
                 "Can't process %s: Not a float", parts[index].c_str());
             return;
         }
@@ -230,13 +230,13 @@ void XmlCharacteristics::processFloat(const std::string &processor, float *value
         else if (operations[index - 1] == "-")
             *value -= val;
         else
-            Log::fatal("XmlCharacteristics::processFloat",
+            Log::fatal("XmlCharacteristic::processFloat",
                 "Unknown operator (%s)", operations[index - 1].c_str());
     }
     *is_set = true;
 }
 
-void XmlCharacteristics::load(const XMLNode *node)
+void XmlCharacteristic::load(const XMLNode *node)
 {
     // Script-generated content
     if (const XMLNode *sub_node = node->getNode("Suspension"))

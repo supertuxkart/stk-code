@@ -16,34 +16,34 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "karts/abstract_characteristics.hpp"
+#include "karts/abstract_characteristic.hpp"
 
 #include "utils/log.hpp"
 #include "utils/interpolation_array.hpp"
 
 #include <cmath>
 
-AbstractCharacteristics::AbstractCharacteristics()
+AbstractCharacteristic::AbstractCharacteristic()
 {
 }
 
-const SkiddingProperties* AbstractCharacteristics::getSkiddingProperties() const
+const SkiddingProperties* AbstractCharacteristic::getSkiddingProperties() const
 {
     return nullptr;
 }
 
-void AbstractCharacteristics::process(CharacteristicType type, Value value, bool *is_set) const
+void AbstractCharacteristic::process(CharacteristicType type, Value value, bool *is_set) const
 {
-    Log::warn("AbstractCharacteristics", "This type does not do anything");
+    Log::warn("AbstractCharacteristic", "This type does not do anything");
 }
 
 
-AbstractCharacteristics::ValueType AbstractCharacteristics::getType(CharacteristicType type)
+AbstractCharacteristic::ValueType AbstractCharacteristic::getType(CharacteristicType type)
 {
     switch (type)
     {
     case CHARACTERISTIC_COUNT:
-        Log::fatal("AbstractCharacteristics::getType", "Can't get type of COUNT");
+        Log::fatal("AbstractCharacteristic::getType", "Can't get type of COUNT");
         break;
     // Script-generated content
     case SUSPENSION_STIFFNESS:
@@ -219,11 +219,11 @@ AbstractCharacteristics::ValueType AbstractCharacteristics::getType(Characterist
     case SLIPSTREAM_FADE_OUT_TIME:
         return TYPE_FLOAT;
     }
-    Log::fatal("AbstractCharacteristics::getType", "Unknown type");
+    Log::fatal("AbstractCharacteristic::getType", "Unknown type");
     return TYPE_FLOAT;
 }
 
-std::string AbstractCharacteristics::getName(CharacteristicType type)
+std::string AbstractCharacteristic::getName(CharacteristicType type)
 {
     switch (type)
     {
@@ -403,868 +403,868 @@ std::string AbstractCharacteristics::getName(CharacteristicType type)
     case SLIPSTREAM_FADE_OUT_TIME:
         return "SLIPSTREAM_FADE_OUT_TIME";
     }
-    Log::error("AbstractCharacteristics::getName", "Unknown type");
+    Log::error("AbstractCharacteristic::getName", "Unknown type");
     return "Unknown type";
 }
 
 // Script-generated getter
-float AbstractCharacteristics::getSuspensionStiffness() const
+float AbstractCharacteristic::getSuspensionStiffness() const
 {
     float result;
     bool is_set = false;
     process(SUSPENSION_STIFFNESS, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SUSPENSION_STIFFNESS).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SUSPENSION_STIFFNESS).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSuspensionRest() const
+float AbstractCharacteristic::getSuspensionRest() const
 {
     float result;
     bool is_set = false;
     process(SUSPENSION_REST, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SUSPENSION_REST).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SUSPENSION_REST).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSuspensionTravelCm() const
+float AbstractCharacteristic::getSuspensionTravelCm() const
 {
     float result;
     bool is_set = false;
     process(SUSPENSION_TRAVEL_CM, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SUSPENSION_TRAVEL_CM).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SUSPENSION_TRAVEL_CM).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSuspensionExpSpringResponse() const
+float AbstractCharacteristic::getSuspensionExpSpringResponse() const
 {
     float result;
     bool is_set = false;
     process(SUSPENSION_EXP_SPRING_RESPONSE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SUSPENSION_EXP_SPRING_RESPONSE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SUSPENSION_EXP_SPRING_RESPONSE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSuspensionMaxForce() const
+float AbstractCharacteristic::getSuspensionMaxForce() const
 {
     float result;
     bool is_set = false;
     process(SUSPENSION_MAX_FORCE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SUSPENSION_MAX_FORCE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SUSPENSION_MAX_FORCE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getStabilityRollInfluence() const
+float AbstractCharacteristic::getStabilityRollInfluence() const
 {
     float result;
     bool is_set = false;
     process(STABILITY_ROLL_INFLUENCE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(STABILITY_ROLL_INFLUENCE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(STABILITY_ROLL_INFLUENCE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getStabilityChassisLinearDamping() const
+float AbstractCharacteristic::getStabilityChassisLinearDamping() const
 {
     float result;
     bool is_set = false;
     process(STABILITY_CHASSIS_LINEAR_DAMPING, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(STABILITY_CHASSIS_LINEAR_DAMPING).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(STABILITY_CHASSIS_LINEAR_DAMPING).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getStabilityChassisAngularDamping() const
+float AbstractCharacteristic::getStabilityChassisAngularDamping() const
 {
     float result;
     bool is_set = false;
     process(STABILITY_CHASSIS_ANGULAR_DAMPING, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(STABILITY_CHASSIS_ANGULAR_DAMPING).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(STABILITY_CHASSIS_ANGULAR_DAMPING).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getStabilityDownwardImpulseFactor() const
+float AbstractCharacteristic::getStabilityDownwardImpulseFactor() const
 {
     float result;
     bool is_set = false;
     process(STABILITY_DOWNWARD_IMPULSE_FACTOR, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(STABILITY_DOWNWARD_IMPULSE_FACTOR).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(STABILITY_DOWNWARD_IMPULSE_FACTOR).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getStabilityTrackConnectionAccel() const
+float AbstractCharacteristic::getStabilityTrackConnectionAccel() const
 {
     float result;
     bool is_set = false;
     process(STABILITY_TRACK_CONNECTION_ACCEL, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(STABILITY_TRACK_CONNECTION_ACCEL).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(STABILITY_TRACK_CONNECTION_ACCEL).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getStabilitySmoothFlyingImpulse() const
+float AbstractCharacteristic::getStabilitySmoothFlyingImpulse() const
 {
     float result;
     bool is_set = false;
     process(STABILITY_SMOOTH_FLYING_IMPULSE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(STABILITY_SMOOTH_FLYING_IMPULSE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(STABILITY_SMOOTH_FLYING_IMPULSE).c_str());
     return result;
 }
 
-InterpolationArray AbstractCharacteristics::getTurnRadius() const
+InterpolationArray AbstractCharacteristic::getTurnRadius() const
 {
     InterpolationArray result;
     bool is_set = false;
     process(TURN_RADIUS, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(TURN_RADIUS).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(TURN_RADIUS).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getTurnTimeResetSteer() const
+float AbstractCharacteristic::getTurnTimeResetSteer() const
 {
     float result;
     bool is_set = false;
     process(TURN_TIME_RESET_STEER, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(TURN_TIME_RESET_STEER).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(TURN_TIME_RESET_STEER).c_str());
     return result;
 }
 
-InterpolationArray AbstractCharacteristics::getTurnTimeFullSteer() const
+InterpolationArray AbstractCharacteristic::getTurnTimeFullSteer() const
 {
     InterpolationArray result;
     bool is_set = false;
     process(TURN_TIME_FULL_STEER, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(TURN_TIME_FULL_STEER).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(TURN_TIME_FULL_STEER).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getEnginePower() const
+float AbstractCharacteristic::getEnginePower() const
 {
     float result;
     bool is_set = false;
     process(ENGINE_POWER, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ENGINE_POWER).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ENGINE_POWER).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getEngineMaxSpeed() const
+float AbstractCharacteristic::getEngineMaxSpeed() const
 {
     float result;
     bool is_set = false;
     process(ENGINE_MAX_SPEED, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ENGINE_MAX_SPEED).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ENGINE_MAX_SPEED).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getEngineBrakeFactor() const
+float AbstractCharacteristic::getEngineBrakeFactor() const
 {
     float result;
     bool is_set = false;
     process(ENGINE_BRAKE_FACTOR, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ENGINE_BRAKE_FACTOR).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ENGINE_BRAKE_FACTOR).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getEngineBrakeTimeIncrease() const
+float AbstractCharacteristic::getEngineBrakeTimeIncrease() const
 {
     float result;
     bool is_set = false;
     process(ENGINE_BRAKE_TIME_INCREASE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ENGINE_BRAKE_TIME_INCREASE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ENGINE_BRAKE_TIME_INCREASE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getEngineMaxSpeedReverseRatio() const
+float AbstractCharacteristic::getEngineMaxSpeedReverseRatio() const
 {
     float result;
     bool is_set = false;
     process(ENGINE_MAX_SPEED_REVERSE_RATIO, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ENGINE_MAX_SPEED_REVERSE_RATIO).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ENGINE_MAX_SPEED_REVERSE_RATIO).c_str());
     return result;
 }
 
-std::vector<float> AbstractCharacteristics::getGearSwitchRatio() const
+std::vector<float> AbstractCharacteristic::getGearSwitchRatio() const
 {
     std::vector<float> result;
     bool is_set = false;
     process(GEAR_SWITCH_RATIO, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(GEAR_SWITCH_RATIO).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(GEAR_SWITCH_RATIO).c_str());
     return result;
 }
 
-std::vector<float> AbstractCharacteristics::getGearPowerIncrease() const
+std::vector<float> AbstractCharacteristic::getGearPowerIncrease() const
 {
     std::vector<float> result;
     bool is_set = false;
     process(GEAR_POWER_INCREASE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(GEAR_POWER_INCREASE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(GEAR_POWER_INCREASE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getMass() const
+float AbstractCharacteristic::getMass() const
 {
     float result;
     bool is_set = false;
     process(MASS, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(MASS).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(MASS).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getWheelsDampingRelaxation() const
+float AbstractCharacteristic::getWheelsDampingRelaxation() const
 {
     float result;
     bool is_set = false;
     process(WHEELS_DAMPING_RELAXATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(WHEELS_DAMPING_RELAXATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(WHEELS_DAMPING_RELAXATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getWheelsDampingCompression() const
+float AbstractCharacteristic::getWheelsDampingCompression() const
 {
     float result;
     bool is_set = false;
     process(WHEELS_DAMPING_COMPRESSION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(WHEELS_DAMPING_COMPRESSION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(WHEELS_DAMPING_COMPRESSION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getWheelsRadius() const
+float AbstractCharacteristic::getWheelsRadius() const
 {
     float result;
     bool is_set = false;
     process(WHEELS_RADIUS, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(WHEELS_RADIUS).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(WHEELS_RADIUS).c_str());
     return result;
 }
 
-std::vector<float> AbstractCharacteristics::getWheelsPosition() const
+std::vector<float> AbstractCharacteristic::getWheelsPosition() const
 {
     std::vector<float> result;
     bool is_set = false;
     process(WHEELS_POSITION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(WHEELS_POSITION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(WHEELS_POSITION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getCameraDistance() const
+float AbstractCharacteristic::getCameraDistance() const
 {
     float result;
     bool is_set = false;
     process(CAMERA_DISTANCE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(CAMERA_DISTANCE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(CAMERA_DISTANCE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getCameraForwardUpAngle() const
+float AbstractCharacteristic::getCameraForwardUpAngle() const
 {
     float result;
     bool is_set = false;
     process(CAMERA_FORWARD_UP_ANGLE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(CAMERA_FORWARD_UP_ANGLE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(CAMERA_FORWARD_UP_ANGLE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getCameraBackwardUpAngle() const
+float AbstractCharacteristic::getCameraBackwardUpAngle() const
 {
     float result;
     bool is_set = false;
     process(CAMERA_BACKWARD_UP_ANGLE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(CAMERA_BACKWARD_UP_ANGLE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(CAMERA_BACKWARD_UP_ANGLE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getJumpAnimationTime() const
+float AbstractCharacteristic::getJumpAnimationTime() const
 {
     float result;
     bool is_set = false;
     process(JUMP_ANIMATION_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(JUMP_ANIMATION_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(JUMP_ANIMATION_TIME).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getLeanMax() const
+float AbstractCharacteristic::getLeanMax() const
 {
     float result;
     bool is_set = false;
     process(LEAN_MAX, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(LEAN_MAX).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(LEAN_MAX).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getLeanSpeed() const
+float AbstractCharacteristic::getLeanSpeed() const
 {
     float result;
     bool is_set = false;
     process(LEAN_SPEED, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(LEAN_SPEED).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(LEAN_SPEED).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getAnvilDuration() const
+float AbstractCharacteristic::getAnvilDuration() const
 {
     float result;
     bool is_set = false;
     process(ANVIL_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ANVIL_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ANVIL_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getAnvilWeight() const
+float AbstractCharacteristic::getAnvilWeight() const
 {
     float result;
     bool is_set = false;
     process(ANVIL_WEIGHT, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ANVIL_WEIGHT).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ANVIL_WEIGHT).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getAnvilSpeedFactor() const
+float AbstractCharacteristic::getAnvilSpeedFactor() const
 {
     float result;
     bool is_set = false;
     process(ANVIL_SPEED_FACTOR, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ANVIL_SPEED_FACTOR).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ANVIL_SPEED_FACTOR).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getParachuteFriction() const
+float AbstractCharacteristic::getParachuteFriction() const
 {
     float result;
     bool is_set = false;
     process(PARACHUTE_FRICTION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PARACHUTE_FRICTION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PARACHUTE_FRICTION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getParachuteDuration() const
+float AbstractCharacteristic::getParachuteDuration() const
 {
     float result;
     bool is_set = false;
     process(PARACHUTE_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PARACHUTE_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PARACHUTE_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getParachuteDurationOther() const
+float AbstractCharacteristic::getParachuteDurationOther() const
 {
     float result;
     bool is_set = false;
     process(PARACHUTE_DURATION_OTHER, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PARACHUTE_DURATION_OTHER).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PARACHUTE_DURATION_OTHER).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getParachuteLboundFranction() const
+float AbstractCharacteristic::getParachuteLboundFranction() const
 {
     float result;
     bool is_set = false;
     process(PARACHUTE_LBOUND_FRANCTION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PARACHUTE_LBOUND_FRANCTION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PARACHUTE_LBOUND_FRANCTION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getParachuteUboundFranction() const
+float AbstractCharacteristic::getParachuteUboundFranction() const
 {
     float result;
     bool is_set = false;
     process(PARACHUTE_UBOUND_FRANCTION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PARACHUTE_UBOUND_FRANCTION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PARACHUTE_UBOUND_FRANCTION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getParachuteMaxSpeed() const
+float AbstractCharacteristic::getParachuteMaxSpeed() const
 {
     float result;
     bool is_set = false;
     process(PARACHUTE_MAX_SPEED, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PARACHUTE_MAX_SPEED).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PARACHUTE_MAX_SPEED).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getBubblegumDuration() const
+float AbstractCharacteristic::getBubblegumDuration() const
 {
     float result;
     bool is_set = false;
     process(BUBBLEGUM_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(BUBBLEGUM_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(BUBBLEGUM_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getBubblegumSpeedFraction() const
+float AbstractCharacteristic::getBubblegumSpeedFraction() const
 {
     float result;
     bool is_set = false;
     process(BUBBLEGUM_SPEED_FRACTION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(BUBBLEGUM_SPEED_FRACTION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(BUBBLEGUM_SPEED_FRACTION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getBubblegumTorque() const
+float AbstractCharacteristic::getBubblegumTorque() const
 {
     float result;
     bool is_set = false;
     process(BUBBLEGUM_TORQUE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(BUBBLEGUM_TORQUE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(BUBBLEGUM_TORQUE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getBubblegumFadeInTime() const
+float AbstractCharacteristic::getBubblegumFadeInTime() const
 {
     float result;
     bool is_set = false;
     process(BUBBLEGUM_FADE_IN_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(BUBBLEGUM_FADE_IN_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(BUBBLEGUM_FADE_IN_TIME).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getBubblegumShieldDuration() const
+float AbstractCharacteristic::getBubblegumShieldDuration() const
 {
     float result;
     bool is_set = false;
     process(BUBBLEGUM_SHIELD_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(BUBBLEGUM_SHIELD_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(BUBBLEGUM_SHIELD_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getZipperDuration() const
+float AbstractCharacteristic::getZipperDuration() const
 {
     float result;
     bool is_set = false;
     process(ZIPPER_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ZIPPER_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ZIPPER_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getZipperForce() const
+float AbstractCharacteristic::getZipperForce() const
 {
     float result;
     bool is_set = false;
     process(ZIPPER_FORCE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ZIPPER_FORCE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ZIPPER_FORCE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getZipperSpeedGain() const
+float AbstractCharacteristic::getZipperSpeedGain() const
 {
     float result;
     bool is_set = false;
     process(ZIPPER_SPEED_GAIN, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ZIPPER_SPEED_GAIN).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ZIPPER_SPEED_GAIN).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getZipperSpeedIncrease() const
+float AbstractCharacteristic::getZipperSpeedIncrease() const
 {
     float result;
     bool is_set = false;
     process(ZIPPER_SPEED_INCREASE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ZIPPER_SPEED_INCREASE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ZIPPER_SPEED_INCREASE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getZipperFadeOutTime() const
+float AbstractCharacteristic::getZipperFadeOutTime() const
 {
     float result;
     bool is_set = false;
     process(ZIPPER_FADE_OUT_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(ZIPPER_FADE_OUT_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ZIPPER_FADE_OUT_TIME).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSwatterDuration() const
+float AbstractCharacteristic::getSwatterDuration() const
 {
     float result;
     bool is_set = false;
     process(SWATTER_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SWATTER_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SWATTER_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSwatterDistance() const
+float AbstractCharacteristic::getSwatterDistance() const
 {
     float result;
     bool is_set = false;
     process(SWATTER_DISTANCE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SWATTER_DISTANCE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SWATTER_DISTANCE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSwatterSquashDuration() const
+float AbstractCharacteristic::getSwatterSquashDuration() const
 {
     float result;
     bool is_set = false;
     process(SWATTER_SQUASH_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SWATTER_SQUASH_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SWATTER_SQUASH_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSwatterSquashSlowdown() const
+float AbstractCharacteristic::getSwatterSquashSlowdown() const
 {
     float result;
     bool is_set = false;
     process(SWATTER_SQUASH_SLOWDOWN, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SWATTER_SQUASH_SLOWDOWN).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SWATTER_SQUASH_SLOWDOWN).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getPlungerMaxLength() const
+float AbstractCharacteristic::getPlungerMaxLength() const
 {
     float result;
     bool is_set = false;
     process(PLUNGER_MAX_LENGTH, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PLUNGER_MAX_LENGTH).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_MAX_LENGTH).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getPlungerForce() const
+float AbstractCharacteristic::getPlungerForce() const
 {
     float result;
     bool is_set = false;
     process(PLUNGER_FORCE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PLUNGER_FORCE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_FORCE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getPlungerDuration() const
+float AbstractCharacteristic::getPlungerDuration() const
 {
     float result;
     bool is_set = false;
     process(PLUNGER_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PLUNGER_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getPlungerSpeedIncrease() const
+float AbstractCharacteristic::getPlungerSpeedIncrease() const
 {
     float result;
     bool is_set = false;
     process(PLUNGER_SPEED_INCREASE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PLUNGER_SPEED_INCREASE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_SPEED_INCREASE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getPlungerFadeOutTime() const
+float AbstractCharacteristic::getPlungerFadeOutTime() const
 {
     float result;
     bool is_set = false;
     process(PLUNGER_FADE_OUT_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PLUNGER_FADE_OUT_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_FADE_OUT_TIME).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getPlungerInFaceTime() const
+float AbstractCharacteristic::getPlungerInFaceTime() const
 {
     float result;
     bool is_set = false;
     process(PLUNGER_IN_FACE_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(PLUNGER_IN_FACE_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_IN_FACE_TIME).c_str());
     return result;
 }
 
-std::vector<float> AbstractCharacteristics::getStartupTime() const
+std::vector<float> AbstractCharacteristic::getStartupTime() const
 {
     std::vector<float> result;
     bool is_set = false;
     process(STARTUP_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(STARTUP_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(STARTUP_TIME).c_str());
     return result;
 }
 
-std::vector<float> AbstractCharacteristics::getStartupBoost() const
+std::vector<float> AbstractCharacteristic::getStartupBoost() const
 {
     std::vector<float> result;
     bool is_set = false;
     process(STARTUP_BOOST, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(STARTUP_BOOST).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(STARTUP_BOOST).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getRescueDuration() const
+float AbstractCharacteristic::getRescueDuration() const
 {
     float result;
     bool is_set = false;
     process(RESCUE_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(RESCUE_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(RESCUE_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getRescueVertOffset() const
+float AbstractCharacteristic::getRescueVertOffset() const
 {
     float result;
     bool is_set = false;
     process(RESCUE_VERT_OFFSET, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(RESCUE_VERT_OFFSET).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(RESCUE_VERT_OFFSET).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getRescueHeight() const
+float AbstractCharacteristic::getRescueHeight() const
 {
     float result;
     bool is_set = false;
     process(RESCUE_HEIGHT, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(RESCUE_HEIGHT).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(RESCUE_HEIGHT).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getExplosionDuration() const
+float AbstractCharacteristic::getExplosionDuration() const
 {
     float result;
     bool is_set = false;
     process(EXPLOSION_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(EXPLOSION_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(EXPLOSION_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getExplosionRadius() const
+float AbstractCharacteristic::getExplosionRadius() const
 {
     float result;
     bool is_set = false;
     process(EXPLOSION_RADIUS, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(EXPLOSION_RADIUS).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(EXPLOSION_RADIUS).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getExplosionInvulnerabilityTime() const
+float AbstractCharacteristic::getExplosionInvulnerabilityTime() const
 {
     float result;
     bool is_set = false;
     process(EXPLOSION_INVULNERABILITY_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(EXPLOSION_INVULNERABILITY_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(EXPLOSION_INVULNERABILITY_TIME).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getNitroDuration() const
+float AbstractCharacteristic::getNitroDuration() const
 {
     float result;
     bool is_set = false;
     process(NITRO_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(NITRO_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(NITRO_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getNitroEngineForce() const
+float AbstractCharacteristic::getNitroEngineForce() const
 {
     float result;
     bool is_set = false;
     process(NITRO_ENGINE_FORCE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(NITRO_ENGINE_FORCE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(NITRO_ENGINE_FORCE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getNitroConsumption() const
+float AbstractCharacteristic::getNitroConsumption() const
 {
     float result;
     bool is_set = false;
     process(NITRO_CONSUMPTION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(NITRO_CONSUMPTION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(NITRO_CONSUMPTION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getNitroSmallContainer() const
+float AbstractCharacteristic::getNitroSmallContainer() const
 {
     float result;
     bool is_set = false;
     process(NITRO_SMALL_CONTAINER, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(NITRO_SMALL_CONTAINER).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(NITRO_SMALL_CONTAINER).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getNitroBigContainer() const
+float AbstractCharacteristic::getNitroBigContainer() const
 {
     float result;
     bool is_set = false;
     process(NITRO_BIG_CONTAINER, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(NITRO_BIG_CONTAINER).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(NITRO_BIG_CONTAINER).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getNitroMaxSpeedIncrease() const
+float AbstractCharacteristic::getNitroMaxSpeedIncrease() const
 {
     float result;
     bool is_set = false;
     process(NITRO_MAX_SPEED_INCREASE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(NITRO_MAX_SPEED_INCREASE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(NITRO_MAX_SPEED_INCREASE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getNitroFadeOutTime() const
+float AbstractCharacteristic::getNitroFadeOutTime() const
 {
     float result;
     bool is_set = false;
     process(NITRO_FADE_OUT_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(NITRO_FADE_OUT_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(NITRO_FADE_OUT_TIME).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getNitroMax() const
+float AbstractCharacteristic::getNitroMax() const
 {
     float result;
     bool is_set = false;
     process(NITRO_MAX, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(NITRO_MAX).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(NITRO_MAX).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSlipstreamDuration() const
+float AbstractCharacteristic::getSlipstreamDuration() const
 {
     float result;
     bool is_set = false;
     process(SLIPSTREAM_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SLIPSTREAM_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SLIPSTREAM_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSlipstreamLength() const
+float AbstractCharacteristic::getSlipstreamLength() const
 {
     float result;
     bool is_set = false;
     process(SLIPSTREAM_LENGTH, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SLIPSTREAM_LENGTH).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SLIPSTREAM_LENGTH).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSlipstreamWidth() const
+float AbstractCharacteristic::getSlipstreamWidth() const
 {
     float result;
     bool is_set = false;
     process(SLIPSTREAM_WIDTH, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SLIPSTREAM_WIDTH).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SLIPSTREAM_WIDTH).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSlipstreamCollectTime() const
+float AbstractCharacteristic::getSlipstreamCollectTime() const
 {
     float result;
     bool is_set = false;
     process(SLIPSTREAM_COLLECT_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SLIPSTREAM_COLLECT_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SLIPSTREAM_COLLECT_TIME).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSlipstreamUseTime() const
+float AbstractCharacteristic::getSlipstreamUseTime() const
 {
     float result;
     bool is_set = false;
     process(SLIPSTREAM_USE_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SLIPSTREAM_USE_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SLIPSTREAM_USE_TIME).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSlipstreamAddPower() const
+float AbstractCharacteristic::getSlipstreamAddPower() const
 {
     float result;
     bool is_set = false;
     process(SLIPSTREAM_ADD_POWER, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SLIPSTREAM_ADD_POWER).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SLIPSTREAM_ADD_POWER).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSlipstreamMinSpeed() const
+float AbstractCharacteristic::getSlipstreamMinSpeed() const
 {
     float result;
     bool is_set = false;
     process(SLIPSTREAM_MIN_SPEED, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SLIPSTREAM_MIN_SPEED).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SLIPSTREAM_MIN_SPEED).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSlipstreamMaxSpeedIncrease() const
+float AbstractCharacteristic::getSlipstreamMaxSpeedIncrease() const
 {
     float result;
     bool is_set = false;
     process(SLIPSTREAM_MAX_SPEED_INCREASE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SLIPSTREAM_MAX_SPEED_INCREASE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SLIPSTREAM_MAX_SPEED_INCREASE).c_str());
     return result;
 }
 
-float AbstractCharacteristics::getSlipstreamFadeOutTime() const
+float AbstractCharacteristic::getSlipstreamFadeOutTime() const
 {
     float result;
     bool is_set = false;
     process(SLIPSTREAM_FADE_OUT_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristics", "Can't get characteristic %s", getName(SLIPSTREAM_FADE_OUT_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(SLIPSTREAM_FADE_OUT_TIME).c_str());
     return result;
 }
 

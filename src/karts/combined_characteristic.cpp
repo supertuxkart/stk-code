@@ -16,16 +16,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "karts/combined_characteristics.hpp"
+#include "karts/combined_characteristic.hpp"
 
-void CombinedCharacteristics::addCharacteristic(const AbstractCharacteristics *characteristic)
+void CombinedCharacteristic::addCharacteristic(const AbstractCharacteristic *characteristic)
 {
     m_childs.push_back(characteristic);
 }
 
-const SkiddingProperties* CombinedCharacteristics::getSkiddingProperties() const
+const SkiddingProperties* CombinedCharacteristic::getSkiddingProperties() const
 {
-    for (const AbstractCharacteristics *characteristic : m_childs)
+    for (const AbstractCharacteristic *characteristic : m_childs)
     {
         const SkiddingProperties *skid = characteristic->getSkiddingProperties();
         if (skid)
@@ -34,9 +34,9 @@ const SkiddingProperties* CombinedCharacteristics::getSkiddingProperties() const
     return nullptr;
 }
 
-void CombinedCharacteristics::process(CharacteristicType type, Value value, bool *is_set) const
+void CombinedCharacteristic::process(CharacteristicType type, Value value, bool *is_set) const
 {
-    for (const AbstractCharacteristics *characteristic : m_childs)
+    for (const AbstractCharacteristic *characteristic : m_childs)
         characteristic->process(type, value, is_set);
 }
 

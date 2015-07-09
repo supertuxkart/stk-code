@@ -16,18 +16,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "karts/cached_characteristics.hpp"
+#include "karts/cached_characteristic.hpp"
 
 #include "utils/interpolation_array.hpp"
 
-CachedCharacteristics::CachedCharacteristics(const AbstractCharacteristics *origin) :
+CachedCharacteristic::CachedCharacteristic(const AbstractCharacteristic *origin) :
     m_values(CHARACTERISTIC_COUNT),
     m_origin(origin)
 {
     updateSource();
 }
 
-CachedCharacteristics::~CachedCharacteristics()
+CachedCharacteristic::~CachedCharacteristic()
 {
     // Delete all not-null values
     for (int i = 0; i < CHARACTERISTIC_COUNT; i++)
@@ -52,7 +52,7 @@ CachedCharacteristics::~CachedCharacteristics()
     }
 }
 
-void CachedCharacteristics::updateSource()
+void CachedCharacteristic::updateSource()
 {
     for (int i = 0; i < CHARACTERISTIC_COUNT; i++)
     {
@@ -142,12 +142,12 @@ void CachedCharacteristics::updateSource()
     }
 }
 
-const SkiddingProperties* CachedCharacteristics::getSkiddingProperties() const
+const SkiddingProperties* CachedCharacteristic::getSkiddingProperties() const
 {
     return m_origin->getSkiddingProperties();
 }
 
-void CachedCharacteristics::process(CharacteristicType type, Value value, bool *is_set) const
+void CachedCharacteristic::process(CharacteristicType type, Value value, bool *is_set) const
 {
     void *v = m_values[type].content;
     if (v)

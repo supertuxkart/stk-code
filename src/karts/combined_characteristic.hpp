@@ -16,36 +16,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CACHED_CHARACTERISTICS_HPP
-#define HEADER_CACHED_CHARACTERISTICS_HPP
+#ifndef HEADER_COMBINDED_CHARACTERISTICS_HPP
+#define HEADER_COMBINDED_CHARACTERISTICS_HPP
 
-#include "karts/abstract_characteristics.hpp"
+#include "karts/abstract_characteristic.hpp"
 
-class CachedCharacteristics : public AbstractCharacteristics
+class CombinedCharacteristic : public AbstractCharacteristic
 {
 private:
-    /** Used to store a value. */
-    struct SaveValue
-    {
-        void *content;
-
-        SaveValue() : content(nullptr) {}
-        SaveValue(void *content) : content(content) {}
-    };
-
-    /** All values for a characteristic. A nullptr means it is not set. */
-    std::vector<SaveValue> m_values;
-
-    /** The characteristics that hold the original values. */
-    const AbstractCharacteristics *m_origin;
+    std::vector<const AbstractCharacteristic*> m_childs;
 
 public:
-    CachedCharacteristics(const AbstractCharacteristics *origin);
-    CachedCharacteristics(const CachedCharacteristics &characteristics) = delete;
-    virtual ~CachedCharacteristics();
-
-    /** Fetches all cached values from the original source. */
-    void updateSource();
+    void addCharacteristic(const AbstractCharacteristic *characteristic);
 
     virtual const SkiddingProperties* getSkiddingProperties() const;
     virtual void process(CharacteristicType type, Value value, bool *is_set) const;
