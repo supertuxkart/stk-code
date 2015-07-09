@@ -288,7 +288,6 @@ private:
     float m_max_suspension_force;
     float m_friction_slip;
     float m_roll_influence;
-    float m_wheel_radius;
 
     /** Parameters for the speed-weighted objects */
     SpeedWeightedObject::Properties   m_speed_weighted_object_properties;
@@ -570,10 +569,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns roll influence. */
     float getRollInfluence          () const {return m_roll_influence;        }
-
-    // ------------------------------------------------------------------------
-    /** Returns wheel radius. */
-    float getWheelRadius            () const {return m_wheel_radius;          }
 
     // ------------------------------------------------------------------------
     /** Return the additional Y offset added to the y position of the graphical

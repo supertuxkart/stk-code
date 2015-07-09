@@ -118,7 +118,7 @@ void	btRaycastVehicle::updateWheelTransform( int wheelIndex , bool interpolatedT
 	btQuaternion steeringOrn(up,steering);//wheel.m_steering);
 	btMatrix3x3 steeringMat(steeringOrn);
 
-	btQuaternion rotatingOrn(right,-wheel.m_rotation);
+	btQuaternion rotatingOrn(right,0);
 	btMatrix3x3 rotatingMat(rotatingOrn);
 
 	btMatrix3x3 basis2(
@@ -345,17 +345,7 @@ void btRaycastVehicle::updateVehicle( btScalar step )
 			fwd -= wheel.m_raycastInfo.m_contactNormalWS * proj;
 
 			btScalar proj2 = fwd.dot(vel);
-			
-			wheel.m_deltaRotation = (proj2 * step) / (wheel.m_wheelsRadius);
-			wheel.m_rotation += wheel.m_deltaRotation;
-
-		} else
-		{
-			wheel.m_rotation += wheel.m_deltaRotation;
-		}
-		
-		wheel.m_deltaRotation *= btScalar(0.99);//damping of rotation when not in contact
-
+		} 
 	}
 
 

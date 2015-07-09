@@ -188,12 +188,6 @@ private:
     /** Handles all slipstreaming. */
     SlipStream      *m_slipstream;
 
-    /** Rotation compared to the start position, same for all wheels */
-    float           m_wheel_rotation;
-
-    /** Rotation change in the last time delta, same for all wheels */
-    float           m_wheel_rotation_dt;
-
     /** The skidmarks object for this kart. */
     SkidMarks      *m_skidmarks;
 

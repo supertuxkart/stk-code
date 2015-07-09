@@ -185,6 +185,14 @@ private:
         of wheels in bullet is too large and looks strange). 1=no change, 2=half the amplitude */
     float         m_dampen_suspension_amplitude[4];
 
+    /** Rotation compared to the start position, same for all wheels */
+    float           m_wheel_rotation[4];
+
+    /** Rotation change in the last time delta, same for all wheels */
+    float           m_wheel_rotation_dt[4];
+
+
+
     /** Which animation is currently being played. This is used to overwrite
      *  the default steering animations while being in race. If this is set
      *  to AF_DEFAULT the default steering animation is shown. */
@@ -232,7 +240,7 @@ public:
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     void          setDefaultSuspension();
-    void          update(float dt, float rotation_dt, float steer,
+    void          update(float dt, float distance, float steer,
                          float speed);
     void          finishedRace();
     scene::ISceneNode*

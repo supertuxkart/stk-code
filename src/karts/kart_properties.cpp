@@ -70,7 +70,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_nitro_max_speed_increase = m_nitro_duration = m_nitro_fade_out_time =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
-        m_wheel_radius = m_chassis_linear_damping = m_max_suspension_force =
+        m_chassis_linear_damping = m_max_suspension_force =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = m_rescue_vert_offset =
         m_collision_terrain_impulse = m_collision_impulse = m_restitution =
@@ -298,7 +298,10 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // moved to be on the corner of the shape. In order to retain the same
     // steering behaviour, the wheel base (which in turn determines the
     // turn angle at certain speeds) is shortened by 2*wheel_radius
-    m_wheel_base = fabsf(m_kart_model->getLength() - 2*m_wheel_radius);
+    // Wheel radius was always 0.25, and is now not used anymore, but in order
+    // to keep existing steering behaviour, the same formula is still
+    // used.
+    m_wheel_base = fabsf(m_kart_model->getLength() - 2*0.25f);
 
     // Now convert the turn radius into turn angle:
     for(unsigned int i=0; i<m_turn_angle_at_speed.size(); i++)
@@ -372,7 +375,6 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         wheels_node->get("damping-relaxation",  &m_wheel_damping_relaxation );
         wheels_node->get("damping-compression", &m_wheel_damping_compression);
-        wheels_node->get("radius",              &m_wheel_radius             );
     }
 
     if(const XMLNode *speed_weighted_objects_node = root->getNode("speed-weighted-objects"))
@@ -687,7 +689,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_time_reset_steer,           "turn time-reset-steer"         );
     CHECK_NEG(m_wheel_damping_relaxation,   "wheels damping-relaxation"     );
     CHECK_NEG(m_wheel_damping_compression,  "wheels damping-compression"    );
-    CHECK_NEG(m_wheel_radius,               "wheels radius"                 );
     CHECK_NEG(m_friction_slip,              "friction slip"                 );
     CHECK_NEG(m_roll_influence,             "stability roll-influence"      );
     CHECK_NEG(m_chassis_linear_damping,  "stability chassis-linear-damping" );

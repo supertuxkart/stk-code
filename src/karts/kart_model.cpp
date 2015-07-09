@@ -654,6 +654,15 @@ void KartModel::loadWheelInfo(const XMLNode &node,
  */
 void KartModel::reset()
 {
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        m_wheel_rotation[i] = btScalar(rand() % 360);
+        m_wheel_rotation_dt[i] = 0.0f;
+        core::vector3df wheel_rotation(0, 0, 0);
+        if (m_wheel_node[i])
+            m_wheel_node[i]->setRotation(wheel_rotation);
+
+    }
     update(0.0f, 0.0f, 0.0f, 0.0f);
 
     // Stop any animations currently being played.
@@ -784,7 +793,7 @@ void KartModel::setDefaultSuspension()
  *  \param speed The speed of the kart in meters/sec, used for the
  *         speed-weighted objects' animations
  */
-void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
+void KartModel::update(float dt, float distance, float steer,  float speed)
 {
    core::vector3df wheel_steer(0, steer*30.0f, 0);
 
@@ -802,6 +811,10 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
             }
         }
 #endif
+        //m_wheel_rotation gives the rotation around the X-axis
+        m_wheel_rotation_dt[i] = distance / m_wheel_graphics_radius[i];
+        m_wheel_rotation[i] += m_wheel_rotation_dt[i];
+        m_wheel_rotation[i]    = fmodf(m_wheel_rotation[i], 2 * M_PI);
 
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
 
@@ -811,7 +824,7 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
 
         // Now calculate the new rotation: (old + change) mod 360
         float new_rotation = m_wheel_node[i]->getRotation().X
-                             + rotation_dt * RAD_TO_DEGREE;
+                             + m_wheel_rotation_dt[i] * RAD_TO_DEGREE;
         new_rotation = fmodf(new_rotation, 360);
         core::vector3df wheel_rotation(new_rotation, 0, 0);
         // Only apply steer to first 2 wheels.

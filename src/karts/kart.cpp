@@ -142,8 +142,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     // Set position and heading:
     m_reset_transform         = init_transform;
     m_speed                   = 0.0f;
-    m_wheel_rotation          = 0;
-    m_wheel_rotation_dt       = 0;
 
     m_kart_model->setKart(this);
 
@@ -347,7 +345,6 @@ void Kart::reset()
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     m_collected_energy     = 0;
     m_has_started          = false;
-    m_wheel_rotation       = 0;
     m_bounce_back_time     = 0.0f;
     m_brake_time           = 0.0f;
     m_time_last_crash      = 0.0f;
@@ -385,22 +382,6 @@ void Kart::reset()
     {
         m_vehicle->reset();
     }
-    // Randomize wheel rotation if needed
-    if (m_kart_properties->hasRandomWheels() && m_vehicle && m_kart_model)
-    {
-        scene::ISceneNode** graphic_wheels = m_kart_model->getWheelNodes();
-        // FIXME Hardcoded i < 4 comes from the arrays in KartModel
-        for (int i = 0; i < m_vehicle->getNumWheels() && i < 4; i++)
-        {
-            // Physics
-            btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
-            wheel.m_rotation = btScalar(rand() % 360);
-            // And graphics
-            core::vector3df wheel_rotation(wheel.m_rotation, 0, 0);
-            if (graphic_wheels[i])
-                graphic_wheels[i]->setRotation(wheel_rotation);
-        } // for wheels
-    } // if random wheel rotation
 
     setTrans(m_reset_transform);
 
@@ -618,17 +599,12 @@ void Kart::createPhysics()
                         // All wheel positions are relative to the center of
                         // the collision shape.
                         wheel_pos[index].setX(x*0.5f*kart_width);
-                        float radius = getKartProperties()->getWheelRadius();
                         // The y position of the wheels (i.e. the points where
                         // the suspension is attached to) is just at the
                         // bottom of the kart. That is half the kart height
-                        // down. The wheel radius is added to the suspension
-                        // length in the physics, so we move the connection
-                        // point 'radius' up. That means that if the suspension
-                        // is fully compressed (0), the wheel will just be at
-                        // the bottom of the kart chassis and touch the ground
-                        wheel_pos[index].setY(- 0.5f*kart_height + radius);
-                        wheel_pos[index].setZ((0.5f*kart_length - radius)* z);
+                        // down. 
+                        wheel_pos[index].setY(- 0.5f*kart_height);
+                        wheel_pos[index].setZ((0.5f*kart_length-0.25f)* z);
 
                     }
                     else
@@ -683,7 +659,6 @@ void Kart::createPhysics()
 
     // Add wheels
     // ----------
-    float wheel_radius    = m_kart_properties->getWheelRadius();
     float suspension_rest = m_kart_properties->getSuspensionRest();
 
     btVector3 wheel_direction(0.0f, -1.0f, 0.0f);
@@ -702,7 +677,8 @@ void Kart::createPhysics()
         btWheelInfo& wheel = m_vehicle->addWheel(
                             wheel_pos[i]+cs,
                             wheel_direction, wheel_axle, suspension_rest,
-                            wheel_radius, tuning, is_front_wheel);
+                            m_kart_model->getWheelGraphicsRadius(i),
+                            tuning, is_front_wheel);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
         wheel.m_wheelsDampingRelaxation  = m_kart_properties->getWheelDampingRelaxation();
         wheel.m_wheelsDampingCompression = m_kart_properties->getWheelDampingCompression();
@@ -1179,11 +1155,6 @@ void Kart::update(float dt)
         m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
                            m_kart_properties->getChassisAngularDamping());
     }
-
-    //m_wheel_rotation gives the rotation around the X-axis
-    m_wheel_rotation_dt = m_speed*dt / m_kart_properties->getWheelRadius();
-    m_wheel_rotation   += m_wheel_rotation_dt;
-    m_wheel_rotation    = fmodf(m_wheel_rotation, 2*M_PI);
 
     if(m_kart_animation)
         m_kart_animation->update(dt);
@@ -2601,7 +2572,9 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         }
     }
 
-    m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(), m_speed);
+    // m_speed*dt is the distance the kart has moved, which determines
+    // how much the wheels need to rotate.
+    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed);
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
