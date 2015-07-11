@@ -412,6 +412,9 @@ private:
 
 
 public:
+    /** Returns the string representation of a per-player difficulty. */
+    static std::string      getPerPlayerDifficultyAsString(PerPlayerDifficulty d);
+
           KartProperties    (const std::string &filename="");
          ~KartProperties    ();
     void  copyFrom          (const KartProperties *source);

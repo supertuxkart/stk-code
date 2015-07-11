@@ -34,7 +34,6 @@
 #include <map>
 
 class KartProperties;
-class PlayerDifficulty;
 class MusicInformation;
 class XMLNode;
 
@@ -51,8 +50,6 @@ protected:
     /** Default kart properties. */
     KartProperties *m_default_kart_properties;
     std::map<std::string, KartProperties*> m_kart_properties;
-    /** Per-player difficulties. */
-    PlayerDifficulty* m_player_difficulties[PLAYER_DIFFICULTY_COUNT];
 
 public:
     /** What to do if a kart already has a powerup when it hits a bonus box:
@@ -187,10 +184,6 @@ public:
     {
         return *m_kart_properties.at(type); 
     }   // getKartProperties
-
-    // ------------------------------------------------------------------------
-    const PlayerDifficulty * getPlayerDifficulty(PerPlayerDifficulty difficulty)
-        { return m_player_difficulties[difficulty]; }
 }
 ;   // STKConfig
 

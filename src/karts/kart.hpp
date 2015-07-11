@@ -31,7 +31,6 @@
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/player_difficulty.hpp"
 #include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
 
@@ -237,7 +236,7 @@ private:
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
-                        const PlayerDifficulty *difficulty);
+                        PerPlayerDifficulty difficulty);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();

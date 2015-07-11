@@ -45,6 +45,17 @@
 
 float KartProperties::UNDEFINED = -99.9f;
 
+std::string KartProperties::getPerPlayerDifficultyAsString(PerPlayerDifficulty d)
+{
+    switch(d)
+    {
+    case PLAYER_DIFFICULTY_NORMAL:   return "normal";   break;
+    case PLAYER_DIFFICULTY_HANDICAP: return "handicap"; break;
+    default:  assert(false);
+    }
+    return "";
+}
+
 /** The constructor initialises all values with invalid values. It can later
  *  then be checked (for STKConfig) that all values are indeed defined.
  *  Otherwise the defaults are taken from STKConfig (and since they are all

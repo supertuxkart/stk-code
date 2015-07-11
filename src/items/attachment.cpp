@@ -266,8 +266,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
         float f = std::max(item->getDisableTime(),
-                         m_kart->getKartProperties()->getExplosionTime() *
-                         m_kart->getPlayerDifficulty()->getExplosionTime() + 2.0f);
+                         m_kart->getKartProperties()->getExplosionTime() + 2.0f);
         item->setDisableTime(f);
         break;
         }

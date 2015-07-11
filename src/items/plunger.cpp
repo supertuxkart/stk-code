@@ -178,8 +178,7 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
     }
     else
     {
-        m_keep_alive = m_owner->getKartProperties()->getRubberBandDuration() *
-                       m_owner->getPlayerDifficulty()->getRubberBandDuration();
+        m_keep_alive = m_owner->getKartProperties()->getRubberBandDuration();
 
         // Make this object invisible by placing it faaar down. Not that if this
         // objects is simply removed from the scene graph, it might be auto-deleted

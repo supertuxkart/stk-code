@@ -107,7 +107,7 @@ protected:
     virtual AbstractKart *createKart(const std::string &kart_ident, int index,
                              int local_player_id, int global_player_id,
                              RaceManager::KartType type,
-                             const PlayerDifficulty *difficulty);
+                             PerPlayerDifficulty difficulty);
 };   // SoccerWorld
 
 

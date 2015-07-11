@@ -24,7 +24,6 @@
 #include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
 #include "karts/controller/kart_control.hpp"
-#include "karts/player_difficulty.hpp"
 #include "race/race_manager.hpp"
 
 namespace irr
@@ -77,7 +76,7 @@ protected:
     const KartProperties *m_kart_properties;
 
     /** The per-player difficulty. */
-    const PlayerDifficulty *m_difficulty;
+    PerPlayerDifficulty m_difficulty;
     /** The combined properties of the kart, the player, etc. */
     std::unique_ptr<CombinedCharacteristic> m_characteristic;
 
@@ -101,7 +100,7 @@ public:
                    AbstractKart(const std::string& ident,
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
-                                const PlayerDifficulty *difficulty);
+                                PerPlayerDifficulty difficulty);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();
@@ -138,11 +137,11 @@ public:
     // Access to the per-player difficulty.
     // ------------------------------------------------------------------------
     /** Returns the per-player difficulty of this kart. */
-    const PlayerDifficulty* getPlayerDifficulty() const
+    const PerPlayerDifficulty getPerPlayerDifficulty() const
                             { return m_difficulty; }
     // ------------------------------------------------------------------------
     /** Sets the per-player difficulty. */
-    void setPlayerDifficulty(const PlayerDifficulty *pd) { m_difficulty=pd; }
+    void setPerPlayerDifficulty(const PerPlayerDifficulty d) { m_difficulty=d; }
 
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this kart (name of the directory the

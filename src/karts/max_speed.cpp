@@ -62,8 +62,7 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
  */
 void MaxSpeed::reset()
 {
-    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed() *
-                          m_kart->getPlayerDifficulty()->getMaxSpeed();
+    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed();
     m_min_speed         = -1.0f;
 
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
@@ -243,8 +242,7 @@ void MaxSpeed::update(float dt)
     }
 
     m_add_engine_force  = 0;
-    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed() *
-                          m_kart->getPlayerDifficulty()->getMaxSpeed();
+    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed();
 
     // Then add the speed increase from each category
     // ----------------------------------------------

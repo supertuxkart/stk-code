@@ -26,7 +26,7 @@
 KartWithStats::KartWithStats(const std::string& ident,
                              unsigned int world_kart_id,
                              int position, const btTransform& init_transform,
-                             const PlayerDifficulty *difficulty)
+                             PerPlayerDifficulty difficulty)
              : Kart(ident, world_kart_id, position,
                     init_transform, difficulty)
 {

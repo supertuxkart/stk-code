@@ -222,8 +222,7 @@ void Powerup::use()
     case PowerupManager::POWERUP_SWATTER:
         m_owner->getAttachment()
                 ->set(Attachment::ATTACH_SWATTER,
-                      m_owner->getKartProperties()->getSwatterDuration() *
-                      m_owner->getPlayerDifficulty()->getSwatterDuration());
+                      m_owner->getKartProperties()->getSwatterDuration());
         break;
 
     case PowerupManager::POWERUP_BUBBLEGUM:

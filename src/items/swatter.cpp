@@ -293,8 +293,7 @@ void Swatter::squashThingsAround()
 
         if(dist2 >= min_dist2) continue;   // too far away, ignore this kart
 
-        kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
-            kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
+        kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
 
         //Handle achievement if the swatter is used by the current player
         const StateManager::ActivePlayer *const ap = m_kart->getController()

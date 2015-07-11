@@ -27,7 +27,6 @@
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/player_difficulty.hpp"
 #include "utils/log.hpp"
 
 STKConfig* stk_config=0;
@@ -395,15 +394,6 @@ void STKConfig::getAllData(const XMLNode * root)
         m_kart_properties[type->getName()] = new KartProperties();
         m_kart_properties[type->getName()]->copyFrom(m_default_kart_properties);
         m_kart_properties[type->getName()]->getAllData(type);
-    }
-
-    child_node = node->getNode("difficulties");
-    for (unsigned int i = 0; i < child_node->getNumNodes(); ++i)
-    {
-        const XMLNode* type = child_node->getNode(i);
-        m_player_difficulties[i] = new PlayerDifficulty();
-        m_player_difficulties[i]->getAllData(type);
-        m_player_difficulties[i]->setDifficulty((PerPlayerDifficulty) i);
     }
 }   // getAllData
 

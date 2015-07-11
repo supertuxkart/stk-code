@@ -36,7 +36,7 @@
 AbstractKart::AbstractKart(const std::string& ident,
                            int world_kart_id, int position,
                            const btTransform& init_transform,
-                           const PlayerDifficulty *difficulty)
+                           PerPlayerDifficulty difficulty)
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
@@ -69,7 +69,8 @@ AbstractKart::AbstractKart(const std::string& ident,
     m_characteristic->addCharacteristic(kart_properties_manager->
         getKartTypeCharacteristic(m_kart_properties->getKartType()));
     m_characteristic->addCharacteristic(kart_properties_manager->
-        getPlayerCharacteristic(m_difficulty->getIdent()));
+        getPlayerCharacteristic(KartProperties::getPerPlayerDifficultyAsString(
+            m_difficulty)));
     m_characteristic->addCharacteristic(m_kart_properties->getCharacteristic());
 }   // AbstractKart
 
