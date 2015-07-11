@@ -1368,13 +1368,13 @@ void SkiddingAI::handleItems(const float dt)
 
     case PowerupManager::POWERUP_PARACHUTE:
         // Wait one second more than a previous parachute
-        if(m_time_since_last_shot > stk_config->m_parachute_time_other+1.0f)
+        if(m_time_since_last_shot > m_kart->getCharacteristic()->getParachuteDurationOther() + 1.0f)
             m_controls->m_fire = true;
         break;   // POWERUP_PARACHUTE
 
     case PowerupManager::POWERUP_ANVIL:
         // Wait one second more than a previous anvil
-        if(m_time_since_last_shot < stk_config->m_anvil_time+1.0f) break;
+        if(m_time_since_last_shot < m_kart->getCharacteristic()->getAnvilDuration() + 1.0f) break;
 
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {

@@ -128,8 +128,8 @@ public:
         PARACHUTE_FRICTION,
         PARACHUTE_DURATION,
         PARACHUTE_DURATION_OTHER,
-        PARACHUTE_LBOUND_FRANCTION,
-        PARACHUTE_UBOUND_FRANCTION,
+        PARACHUTE_LBOUND_FRACTION,
+        PARACHUTE_UBOUND_FRACTION,
         PARACHUTE_MAX_SPEED,
 
         // Bubblegum
@@ -278,8 +278,8 @@ public:
     float getParachuteFriction() const;
     float getParachuteDuration() const;
     float getParachuteDurationOther() const;
-    float getParachuteLboundFranction() const;
-    float getParachuteUboundFranction() const;
+    float getParachuteLboundFraction() const;
+    float getParachuteUboundFraction() const;
     float getParachuteMaxSpeed() const;
 
     float getBubblegumDuration() const;

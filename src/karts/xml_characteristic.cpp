@@ -354,8 +354,8 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("friction", &m_values[PARACHUTE_FRICTION]);
         sub_node->get("duration", &m_values[PARACHUTE_DURATION]);
         sub_node->get("duration-other", &m_values[PARACHUTE_DURATION_OTHER]);
-        sub_node->get("lbound-franction", &m_values[PARACHUTE_LBOUND_FRANCTION]);
-        sub_node->get("ubound-franction", &m_values[PARACHUTE_UBOUND_FRANCTION]);
+        sub_node->get("lbound-fraction", &m_values[PARACHUTE_LBOUND_FRACTION]);
+        sub_node->get("ubound-fraction", &m_values[PARACHUTE_UBOUND_FRACTION]);
         sub_node->get("max-speed", &m_values[PARACHUTE_MAX_SPEED]);
     }
 

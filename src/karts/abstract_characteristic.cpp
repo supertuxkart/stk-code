@@ -122,9 +122,9 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(Characteristic
         return TYPE_FLOAT;
     case PARACHUTE_DURATION_OTHER:
         return TYPE_FLOAT;
-    case PARACHUTE_LBOUND_FRANCTION:
+    case PARACHUTE_LBOUND_FRACTION:
         return TYPE_FLOAT;
-    case PARACHUTE_UBOUND_FRANCTION:
+    case PARACHUTE_UBOUND_FRACTION:
         return TYPE_FLOAT;
     case PARACHUTE_MAX_SPEED:
         return TYPE_FLOAT;
@@ -306,10 +306,10 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "PARACHUTE_DURATION";
     case PARACHUTE_DURATION_OTHER:
         return "PARACHUTE_DURATION_OTHER";
-    case PARACHUTE_LBOUND_FRANCTION:
-        return "PARACHUTE_LBOUND_FRANCTION";
-    case PARACHUTE_UBOUND_FRANCTION:
-        return "PARACHUTE_UBOUND_FRANCTION";
+    case PARACHUTE_LBOUND_FRACTION:
+        return "PARACHUTE_LBOUND_FRACTION";
+    case PARACHUTE_UBOUND_FRACTION:
+        return "PARACHUTE_UBOUND_FRACTION";
     case PARACHUTE_MAX_SPEED:
         return "PARACHUTE_MAX_SPEED";
     case BUBBLEGUM_DURATION:
@@ -788,23 +788,23 @@ float AbstractCharacteristic::getParachuteDurationOther() const
     return result;
 }
 
-float AbstractCharacteristic::getParachuteLboundFranction() const
+float AbstractCharacteristic::getParachuteLboundFraction() const
 {
     float result;
     bool is_set = false;
-    process(PARACHUTE_LBOUND_FRANCTION, &result, &is_set);
+    process(PARACHUTE_LBOUND_FRACTION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PARACHUTE_LBOUND_FRANCTION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PARACHUTE_LBOUND_FRACTION).c_str());
     return result;
 }
 
-float AbstractCharacteristic::getParachuteUboundFranction() const
+float AbstractCharacteristic::getParachuteUboundFraction() const
 {
     float result;
     bool is_set = false;
-    process(PARACHUTE_UBOUND_FRANCTION, &result, &is_set);
+    process(PARACHUTE_UBOUND_FRACTION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PARACHUTE_UBOUND_FRANCTION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PARACHUTE_UBOUND_FRACTION).c_str());
     return result;
 }
 

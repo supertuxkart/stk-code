@@ -258,12 +258,12 @@ void Powerup::use()
                 if (m_owner->getIdent() == "nolok")
                 {
                     m_owner->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                                   stk_config->m_bubblegum_shield_time);
+                                                  m_owner->getCharacteristic()->getBubblegumShieldDuration());
                 }
                 else
                 {
                     m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                                   stk_config->m_bubblegum_shield_time);
+                                                   m_owner->getCharacteristic()->getBubblegumShieldDuration());
                 }
             }
             else // using a bubble gum while still having a shield
@@ -271,12 +271,12 @@ void Powerup::use()
                 if (m_owner->getIdent() == "nolok")
                 {
                     m_owner->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                                  stk_config->m_bubblegum_shield_time + m_owner->getShieldTime());
+                                                  m_owner->getCharacteristic()->getBubblegumShieldDuration() + m_owner->getShieldTime());
                 }
                 else
                 {
                     m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                                  stk_config->m_bubblegum_shield_time + m_owner->getShieldTime());
+                                                  m_owner->getCharacteristic()->getBubblegumShieldDuration() + m_owner->getShieldTime());
                 }
             }
 
@@ -300,9 +300,9 @@ void Powerup::use()
             if(kart->getPosition() == 1)
             {
                 kart->getAttachment()->set(Attachment::ATTACH_ANVIL,
-                                           stk_config->m_anvil_time);
+                                           m_owner->getCharacteristic()->getAnvilDuration());
                 kart->updateWeight();
-                kart->adjustSpeed(stk_config->m_anvil_speed_factor*0.5f);
+                kart->adjustSpeed(m_owner->getCharacteristic()->getAnvilSpeedFactor() * 0.5f);
 
                 // should we position the sound at the kart that is hit,
                 // or the kart "throwing" the anvil? Ideally it should be both.
@@ -339,7 +339,7 @@ void Powerup::use()
                 {
                     kart->getAttachment()
                         ->set(Attachment::ATTACH_PARACHUTE,
-                              stk_config->m_parachute_time_other);
+                              m_owner->getCharacteristic()->getParachuteDurationOther());
 
                     if(kart->getController()->isPlayerController())
                         player_kart = kart;

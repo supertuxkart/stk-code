@@ -295,7 +295,8 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         switch (new_attachment)
         {
         case 0:
-            set( ATTACH_PARACHUTE,stk_config->m_parachute_time+leftover_time);
+            set(ATTACH_PARACHUTE, m_kart->getCharacteristic()->
+                getParachuteDuration() + leftover_time);
             m_initial_speed = m_kart->getSpeed();
 
             // if going very slowly or backwards,
@@ -309,12 +310,13 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             break ;
         case 2:
-            set( ATTACH_ANVIL, stk_config->m_anvil_time+leftover_time);
+            set(ATTACH_ANVIL, m_kart->getCharacteristic()->
+                getAnvilDuration() + leftover_time);
             // if ( m_kart == m_kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             // Reduce speed once (see description above), all other changes are
             // handled in Kart::updatePhysics
-            m_kart->adjustSpeed(stk_config->m_anvil_speed_factor);
+            m_kart->adjustSpeed(m_kart->getCharacteristic()->getAnvilSpeedFactor());
             m_kart->updateWeight();
             break ;
         }   // switch
@@ -419,12 +421,12 @@ void Attachment::update(float dt)
         // This percentage is based on the ratio of
         // initial_speed / initial_max_speed
 
-        float f = m_initial_speed / stk_config->m_parachute_max_speed;
+        float f = m_initial_speed / m_kart->getCharacteristic()->getParachuteMaxSpeed();
         if (f > 1.0f) f = 1.0f;   // cap fraction
         if (m_kart->getSpeed() <= m_initial_speed *
-                                 (stk_config->m_parachute_lbound_fraction +
-                                  f * (  stk_config->m_parachute_ubound_fraction
-                                       - stk_config->m_parachute_lbound_fraction)))
+                                 (m_kart->getCharacteristic()->getParachuteLboundFraction() +
+                                  f * (  m_kart->getCharacteristic()->getParachuteUboundFraction()
+                                       - m_kart->getCharacteristic()->getParachuteLboundFraction())))
         {
             m_time_left = -1;
         }
@@ -505,6 +507,12 @@ void Attachment::update(float dt)
     if ( m_time_left <= 0.0f)
         clear();
 }   // update
+
+// ----------------------------------------------------------------------------
+float Attachment::weightAdjust() const
+{
+    return m_type == ATTACH_ANVIL ? m_kart->getCharacteristic()->getAnvilWeight() : 0.0f;
+}
 
 // ----------------------------------------------------------------------------
 /** Inform any eventual plugin when an animation is done. */

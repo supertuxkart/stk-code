@@ -151,18 +151,13 @@ void STKConfig::load(const std::string &filename)
  */
 void STKConfig::init_defaults()
 {
-    m_anvil_weight               = m_parachute_friction        =
-        m_parachute_time         = m_parachute_lbound_fraction =
-        m_parachute_time_other   = m_anvil_speed_factor        =
-        m_bomb_time              = m_bomb_time_increase        =
-        m_anvil_time             = m_music_credit_time         =
+    m_bomb_time                  = m_bomb_time_increase        =
+        m_explosion_impulse_objects = m_music_credit_time      =
         m_delay_finish_time      = m_skid_fadeout_time         =
         m_near_ground            = m_item_switch_time          =
-        m_smooth_angle_limit     = m_parachute_ubound_fraction =
-        m_penalty_time           = m_explosion_impulse_objects =
-        m_parachute_max_speed    = UNDEFINED;
+        m_smooth_angle_limit     = m_penalty_time              =
+        UNDEFINED;
     m_bubblegum_counter          = -100;
-    m_bubblegum_shield_time      = -100;
     m_shield_restrict_weapos     = false;
     m_max_karts                  = -100;
     m_max_skidmarks              = -100;
@@ -290,23 +285,6 @@ void STKConfig::getAllData(const XMLNode * root)
         credits_node->get("music", &m_music_credit_time);
 
 
-    if(const XMLNode *anvil_node= root->getNode("anvil"))
-    {
-        anvil_node->get("weight",       &m_anvil_weight      );
-        anvil_node->get("speed-factor", &m_anvil_speed_factor);
-        anvil_node->get("time",         &m_anvil_time        );
-    }
-
-    if(const XMLNode *parachute_node= root->getNode("parachute"))
-    {
-        parachute_node->get("friction",         &m_parachute_friction       );
-        parachute_node->get("time",             &m_parachute_time           );
-        parachute_node->get("time-other",       &m_parachute_time_other     );
-        parachute_node->get("lbound-fraction",  &m_parachute_lbound_fraction);
-        parachute_node->get("ubound-fraction",  &m_parachute_ubound_fraction);
-        parachute_node->get("max-speed",        &m_parachute_max_speed      );
-    }
-
     if(const XMLNode *bomb_node= root->getNode("bomb"))
     {
         bomb_node->get("time", &m_bomb_time);
@@ -339,7 +317,6 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *bubblegum_node= root->getNode("bubblegum"))
     {
         bubblegum_node->get("disappear-counter", &m_bubblegum_counter     );
-        bubblegum_node->get("shield-time",       &m_bubblegum_shield_time );
         bubblegum_node->get("restrict-weapons",  &m_shield_restrict_weapos);
     }
 
