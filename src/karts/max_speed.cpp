@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <assert.h>
 
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
@@ -62,7 +63,7 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
  */
 void MaxSpeed::reset()
 {
-    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed();
+    m_current_max_speed = m_kart->getCharacteristic()->getEngineMaxSpeed();
     m_min_speed         = -1.0f;
 
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
@@ -242,7 +243,7 @@ void MaxSpeed::update(float dt)
     }
 
     m_add_engine_force  = 0;
-    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed();
+    m_current_max_speed = m_kart->getCharacteristic()->getEngineMaxSpeed();
 
     // Then add the speed increase from each category
     // ----------------------------------------------

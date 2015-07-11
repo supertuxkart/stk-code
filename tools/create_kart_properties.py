@@ -25,7 +25,7 @@ import sys
 
 # Input data
 #FIXME is wheelPosition needed?
-characteristics = """Suspension: stiffness, rest, travelCm, expSpringResponse, maxForce
+characteristics = """Suspension: stiffness, rest, travelCm, expSpringResponse(bool), maxForce
 Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, smoothFlyingImpulse
 Turn: radius(InterpolationArray), timeResetSteer, timeFullSteer(InterpolationArray)
 Engine: power, maxSpeed, brakeFactor, brakeTimeIncrease, maxSpeedReverseRatio
@@ -38,9 +38,9 @@ Lean: max, speed
 Anvil: duration, weight, speedFactor
 Parachute: friction, duration, durationOther, lboundFranction, uboundFranction, maxSpeed
 Bubblegum: duration, speedFraction, torque, fadeInTime, shieldDuration
-Zipper: duration, force, speedGain, speedIncrease, fadeOutTime
+Zipper: duration, force, speedGain, maxSpeedIncrease, fadeOutTime
 Swatter: duration, distance, squashDuration, squashSlowdown
-Plunger: maxLength, force, duration, speedIncrease, fadeOutTime, inFaceTime
+Plunger: bandMaxLength, bandForce, bandDuration, bandSpeedIncrease, bandFadeOutTime, inFaceTime
 Startup: time(std::vector<float>/floatVector), boost(std::vector<float>/floatVector)
 Rescue: duration, vertOffset, height
 Explosion: duration, radius, invulnerabilityTime
@@ -51,12 +51,19 @@ Slipstream: duration, length, width, collectTime, useTime, addPower, minSpeed, m
 class GroupMember:
     def __init__(self, name, typeC, typeStr):
         self.name = name
+        if name == "value":
+            self.getName = ""
+        else:
+            self.getName = name
         self.typeC = typeC
         self.typeStr = typeStr
 
     """E.g. power(std::vector<float>/floatVector)
        or speed(InterpolationArray)
-       The default type is float"""
+       The default type is float
+       The name 'value' is special: Only the group name will be used to access
+           the member but in the xml file it will be still value (because we
+           need a name)."""
     def parse(content):
         typeC = "float"
         typeStr = typeC
@@ -84,8 +91,6 @@ class Group:
         self.members.append(GroupMember.parse(content))
 
     def getBaseName(self):
-        if len(self.baseName) == 0 and len(self.members) > 0:
-            return self.members[0].name
         return self.baseName
 
     """E.g. engine: power, gears(std::vector<Gear>/Gears)
@@ -93,8 +98,8 @@ class Group:
     def parse(content):
         pos = content.find(":")
         if pos == -1:
-            group = Group("")
-            group.addMember(content)
+            group = Group(content)
+            group.addMember("value")
             return group
         else:
             group = Group(content[:pos].strip())
@@ -118,7 +123,7 @@ def toList(name):
 """titleCase: true  = result is titlecase
               false = result has underscores"""
 def joinSubName(group, member, titleCase):
-    words = toList(group.baseName) + toList(member.name)
+    words = toList(group.baseName) + toList(member.getName)
     first = True
     if titleCase:
         words = [w.title() for w in words]
@@ -129,7 +134,7 @@ def joinSubName(group, member, titleCase):
 def main():
     # Find out what to do
     if len(sys.argv) == 1:
-        print("Please specify what you want to know [enum/defs/getter/getProp/getXml]")
+        print("Please specify what you want to know [enum|defs|getter|getProp|getXml]")
         return
     task = sys.argv[1]
 

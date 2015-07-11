@@ -30,6 +30,7 @@
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "items/swatter.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
@@ -266,7 +267,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
         float f = std::max(item->getDisableTime(),
-                         m_kart->getKartProperties()->getExplosionTime() + 2.0f);
+                         m_kart->getCharacteristic()->getExplosionDuration() + 2.0f);
         item->setDisableTime(f);
         break;
         }

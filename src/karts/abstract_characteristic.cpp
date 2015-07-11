@@ -45,7 +45,7 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(Characteristic
     case CHARACTERISTIC_COUNT:
         Log::fatal("AbstractCharacteristic::getType", "Can't get type of COUNT");
         break;
-    // Script-generated content
+    // Script-generated content get-prop first part
     case SUSPENSION_STIFFNESS:
         return TYPE_FLOAT;
     case SUSPENSION_REST:
@@ -53,7 +53,7 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(Characteristic
     case SUSPENSION_TRAVEL_CM:
         return TYPE_FLOAT;
     case SUSPENSION_EXP_SPRING_RESPONSE:
-        return TYPE_FLOAT;
+        return TYPE_BOOL;
     case SUSPENSION_MAX_FORCE:
         return TYPE_FLOAT;
     case STABILITY_ROLL_INFLUENCE:
@@ -144,7 +144,7 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(Characteristic
         return TYPE_FLOAT;
     case ZIPPER_SPEED_GAIN:
         return TYPE_FLOAT;
-    case ZIPPER_SPEED_INCREASE:
+    case ZIPPER_MAX_SPEED_INCREASE:
         return TYPE_FLOAT;
     case ZIPPER_FADE_OUT_TIME:
         return TYPE_FLOAT;
@@ -156,15 +156,15 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(Characteristic
         return TYPE_FLOAT;
     case SWATTER_SQUASH_SLOWDOWN:
         return TYPE_FLOAT;
-    case PLUNGER_MAX_LENGTH:
+    case PLUNGER_BAND_MAX_LENGTH:
         return TYPE_FLOAT;
-    case PLUNGER_FORCE:
+    case PLUNGER_BAND_FORCE:
         return TYPE_FLOAT;
-    case PLUNGER_DURATION:
+    case PLUNGER_BAND_DURATION:
         return TYPE_FLOAT;
-    case PLUNGER_SPEED_INCREASE:
+    case PLUNGER_BAND_SPEED_INCREASE:
         return TYPE_FLOAT;
-    case PLUNGER_FADE_OUT_TIME:
+    case PLUNGER_BAND_FADE_OUT_TIME:
         return TYPE_FLOAT;
     case PLUNGER_IN_FACE_TIME:
         return TYPE_FLOAT;
@@ -229,7 +229,7 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
     {
     case CHARACTERISTIC_COUNT:
         return "CHARACTERISTIC_COUNT";
-    // Script-generated content
+    // Script-generated content get-prop second part
     case SUSPENSION_STIFFNESS:
         return "SUSPENSION_STIFFNESS";
     case SUSPENSION_REST:
@@ -328,8 +328,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "ZIPPER_FORCE";
     case ZIPPER_SPEED_GAIN:
         return "ZIPPER_SPEED_GAIN";
-    case ZIPPER_SPEED_INCREASE:
-        return "ZIPPER_SPEED_INCREASE";
+    case ZIPPER_MAX_SPEED_INCREASE:
+        return "ZIPPER_MAX_SPEED_INCREASE";
     case ZIPPER_FADE_OUT_TIME:
         return "ZIPPER_FADE_OUT_TIME";
     case SWATTER_DURATION:
@@ -340,16 +340,16 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SWATTER_SQUASH_DURATION";
     case SWATTER_SQUASH_SLOWDOWN:
         return "SWATTER_SQUASH_SLOWDOWN";
-    case PLUNGER_MAX_LENGTH:
-        return "PLUNGER_MAX_LENGTH";
-    case PLUNGER_FORCE:
-        return "PLUNGER_FORCE";
-    case PLUNGER_DURATION:
-        return "PLUNGER_DURATION";
-    case PLUNGER_SPEED_INCREASE:
-        return "PLUNGER_SPEED_INCREASE";
-    case PLUNGER_FADE_OUT_TIME:
-        return "PLUNGER_FADE_OUT_TIME";
+    case PLUNGER_BAND_MAX_LENGTH:
+        return "PLUNGER_BAND_MAX_LENGTH";
+    case PLUNGER_BAND_FORCE:
+        return "PLUNGER_BAND_FORCE";
+    case PLUNGER_BAND_DURATION:
+        return "PLUNGER_BAND_DURATION";
+    case PLUNGER_BAND_SPEED_INCREASE:
+        return "PLUNGER_BAND_SPEED_INCREASE";
+    case PLUNGER_BAND_FADE_OUT_TIME:
+        return "PLUNGER_BAND_FADE_OUT_TIME";
     case PLUNGER_IN_FACE_TIME:
         return "PLUNGER_IN_FACE_TIME";
     case STARTUP_TIME:
@@ -438,9 +438,9 @@ float AbstractCharacteristic::getSuspensionTravelCm() const
     return result;
 }
 
-float AbstractCharacteristic::getSuspensionExpSpringResponse() const
+bool AbstractCharacteristic::getSuspensionExpSpringResponse() const
 {
-    float result;
+    bool result;
     bool is_set = false;
     process(SUSPENSION_EXP_SPRING_RESPONSE, &result, &is_set);
     if (!is_set)
@@ -898,13 +898,13 @@ float AbstractCharacteristic::getZipperSpeedGain() const
     return result;
 }
 
-float AbstractCharacteristic::getZipperSpeedIncrease() const
+float AbstractCharacteristic::getZipperMaxSpeedIncrease() const
 {
     float result;
     bool is_set = false;
-    process(ZIPPER_SPEED_INCREASE, &result, &is_set);
+    process(ZIPPER_MAX_SPEED_INCREASE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ZIPPER_SPEED_INCREASE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(ZIPPER_MAX_SPEED_INCREASE).c_str());
     return result;
 }
 
@@ -958,53 +958,53 @@ float AbstractCharacteristic::getSwatterSquashSlowdown() const
     return result;
 }
 
-float AbstractCharacteristic::getPlungerMaxLength() const
+float AbstractCharacteristic::getPlungerBandMaxLength() const
 {
     float result;
     bool is_set = false;
-    process(PLUNGER_MAX_LENGTH, &result, &is_set);
+    process(PLUNGER_BAND_MAX_LENGTH, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_MAX_LENGTH).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_BAND_MAX_LENGTH).c_str());
     return result;
 }
 
-float AbstractCharacteristic::getPlungerForce() const
+float AbstractCharacteristic::getPlungerBandForce() const
 {
     float result;
     bool is_set = false;
-    process(PLUNGER_FORCE, &result, &is_set);
+    process(PLUNGER_BAND_FORCE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_FORCE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_BAND_FORCE).c_str());
     return result;
 }
 
-float AbstractCharacteristic::getPlungerDuration() const
+float AbstractCharacteristic::getPlungerBandDuration() const
 {
     float result;
     bool is_set = false;
-    process(PLUNGER_DURATION, &result, &is_set);
+    process(PLUNGER_BAND_DURATION, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_DURATION).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_BAND_DURATION).c_str());
     return result;
 }
 
-float AbstractCharacteristic::getPlungerSpeedIncrease() const
+float AbstractCharacteristic::getPlungerBandSpeedIncrease() const
 {
     float result;
     bool is_set = false;
-    process(PLUNGER_SPEED_INCREASE, &result, &is_set);
+    process(PLUNGER_BAND_SPEED_INCREASE, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_SPEED_INCREASE).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_BAND_SPEED_INCREASE).c_str());
     return result;
 }
 
-float AbstractCharacteristic::getPlungerFadeOutTime() const
+float AbstractCharacteristic::getPlungerBandFadeOutTime() const
 {
     float result;
     bool is_set = false;
-    process(PLUNGER_FADE_OUT_TIME, &result, &is_set);
+    process(PLUNGER_BAND_FADE_OUT_TIME, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_FADE_OUT_TIME).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(PLUNGER_BAND_FADE_OUT_TIME).c_str());
     return result;
 }
 

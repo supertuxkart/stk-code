@@ -34,6 +34,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
@@ -156,7 +157,7 @@ bool Swatter::updateAndTestFinished(float dt)
                 (m_target->getXYZ()- Vec3(m_scene_node->getAbsolutePosition()))
                 .length2();
             float min_dist2
-                 = m_kart->getKartProperties()->getSwatterDistance2();
+                 = m_kart->getCharacteristic()->getSwatterDistance();
             if(dist_to_target2 < min_dist2)
             {
                 // Start squashing
@@ -264,10 +265,10 @@ void Swatter::pointToTarget()
  */
 void Swatter::squashThingsAround()
 {
-    const KartProperties*  kp           = m_kart->getKartProperties();
+    const AbstractCharacteristic *ch = m_kart->getCharacteristic();
     // Square of the minimum distance
-    float                  min_dist2    = kp->getSwatterDistance2();
-    const World*           world        = World::getWorld();
+    float                  min_dist2 = ch->getSwatterDistance();
+    const World*           world     = World::getWorld();
 
     // Get the node corresponding to the joint at the center of the swatter
     // (by swatter, I mean the thing hold in the hand, not the whole thing)
@@ -279,7 +280,7 @@ void Swatter::squashThingsAround()
     m_swat_sound->play();
 
     // Squash karts around
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
+    for(unsigned int i = 0; i < world->getNumKarts(); i++)
     {
         AbstractKart *kart = world->getKart(i);
         // TODO: isSwatterReady()
@@ -293,7 +294,7 @@ void Swatter::squashThingsAround()
 
         if(dist2 >= min_dist2) continue;   // too far away, ignore this kart
 
-        kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
+        kart->setSquash(ch->getSwatterSquashDuration(), ch->getSwatterSquashSlowdown());
 
         //Handle achievement if the swatter is used by the current player
         const StateManager::ActivePlayer *const ap = m_kart->getController()

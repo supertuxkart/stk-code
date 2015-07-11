@@ -31,6 +31,7 @@
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
@@ -810,9 +811,12 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
                     kart_properties_manager->getKart(selection);
     if (kp != NULL)
     {
-        w->setValue(KartStatsWidget::SKILL_MASS, (int)(kp->getMass()/5));
-        w->setValue(KartStatsWidget::SKILL_SPEED, (int)((kp->getAbsMaxSpeed()-20)*9));
-        w->setValue(KartStatsWidget::SKILL_POWER, (int)(kp->getAvgPower()));
+        w->setValue(KartStatsWidget::SKILL_MASS, (int)
+            (kp->getCombinedCharacteristic()->getMass() / 5));
+        w->setValue(KartStatsWidget::SKILL_SPEED, (int)
+            ((kp->getCombinedCharacteristic()->getEngineMaxSpeed() - 20) * 9));
+        w->setValue(KartStatsWidget::SKILL_POWER, (int)
+            kp->getCombinedCharacteristic()->getEnginePower());
         w->update(0);
     }
 }

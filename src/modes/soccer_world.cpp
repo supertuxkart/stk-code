@@ -21,6 +21,7 @@
 #include "audio/sfx_base.hpp"
 #include "io/file_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
@@ -386,7 +387,7 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
     if (kart_over_ground)
     {
         //add vertical offset so that the kart starts off above the track
-        float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
+        float vertical_offset = kart->getCharacteristic()->getRescueVertOffset() *
                                 kart->getKartHeight();
         kart->getBody()->translate(btVector3(0, vertical_offset, 0));
     }

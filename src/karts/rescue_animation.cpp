@@ -22,6 +22,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/referee.hpp"
 #include "items/attachment.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
@@ -39,8 +40,8 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
 {
     m_referee     = new Referee(*m_kart);
     m_kart->getNode()->addChild(m_referee->getSceneNode());
-    m_timer       = m_kart->getKartProperties()->getRescueTime();
-    m_velocity    = m_kart->getKartProperties()->getRescueHeight() / m_timer;
+    m_timer       = m_kart->getCharacteristic()->getRescueDuration();
+    m_velocity    = m_kart->getCharacteristic()->getRescueHeight() / m_timer;
     m_xyz         = m_kart->getXYZ();
 
     m_kart->getAttachment()->clear();

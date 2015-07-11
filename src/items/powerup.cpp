@@ -28,6 +28,7 @@
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "items/rubber_ball.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
@@ -222,7 +223,7 @@ void Powerup::use()
     case PowerupManager::POWERUP_SWATTER:
         m_owner->getAttachment()
                 ->set(Attachment::ATTACH_SWATTER,
-                      m_owner->getKartProperties()->getSwatterDuration());
+                      m_owner->getCharacteristic()->getSwatterDuration());
         break;
 
     case PowerupManager::POWERUP_BUBBLEGUM:

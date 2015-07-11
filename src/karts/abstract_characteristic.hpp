@@ -46,10 +46,12 @@ public:
     union Value
     {
         float *f;
+        bool *b;
         std::vector<float> *fv;
         InterpolationArray *ia;
 
         Value(float *f) : f(f) {}
+        Value(bool *b) : b(b) {}
         Value(std::vector<float> *fv) : fv(fv) {}
         Value(InterpolationArray *ia) : ia(ia) {}
     };
@@ -57,6 +59,7 @@ public:
     enum ValueType
     {
         TYPE_FLOAT,
+        TYPE_BOOL,
         TYPE_FLOAT_VECTOR,
         TYPE_INTERPOLATION_ARRAY
     };
@@ -81,8 +84,8 @@ public:
 
         // Turn
         TURN_RADIUS,
-        TURN_TIME_FULL_STEER,
         TURN_TIME_RESET_STEER,
+        TURN_TIME_FULL_STEER,
 
         // Engine
         ENGINE_POWER,
@@ -140,7 +143,7 @@ public:
         ZIPPER_DURATION,
         ZIPPER_FORCE,
         ZIPPER_SPEED_GAIN,
-        ZIPPER_SPEED_INCREASE,
+        ZIPPER_MAX_SPEED_INCREASE,
         ZIPPER_FADE_OUT_TIME,
 
         // Swatter
@@ -150,11 +153,11 @@ public:
         SWATTER_SQUASH_SLOWDOWN,
 
         // Plunger
-        PLUNGER_MAX_LENGTH,
-        PLUNGER_FORCE,
-        PLUNGER_DURATION,
-        PLUNGER_SPEED_INCREASE,
-        PLUNGER_FADE_OUT_TIME,
+        PLUNGER_BAND_MAX_LENGTH,
+        PLUNGER_BAND_FORCE,
+        PLUNGER_BAND_DURATION,
+        PLUNGER_BAND_SPEED_INCREASE,
+        PLUNGER_BAND_FADE_OUT_TIME,
         PLUNGER_IN_FACE_TIME,
 
         // Startup
@@ -229,7 +232,7 @@ public:
     float getSuspensionStiffness() const;
     float getSuspensionRest() const;
     float getSuspensionTravelCm() const;
-    float getSuspensionExpSpringResponse() const;
+    bool getSuspensionExpSpringResponse() const;
     float getSuspensionMaxForce() const;
 
     float getStabilityRollInfluence() const;
@@ -288,7 +291,7 @@ public:
     float getZipperDuration() const;
     float getZipperForce() const;
     float getZipperSpeedGain() const;
-    float getZipperSpeedIncrease() const;
+    float getZipperMaxSpeedIncrease() const;
     float getZipperFadeOutTime() const;
 
     float getSwatterDuration() const;
@@ -296,11 +299,11 @@ public:
     float getSwatterSquashDuration() const;
     float getSwatterSquashSlowdown() const;
 
-    float getPlungerMaxLength() const;
-    float getPlungerForce() const;
-    float getPlungerDuration() const;
-    float getPlungerSpeedIncrease() const;
-    float getPlungerFadeOutTime() const;
+    float getPlungerBandMaxLength() const;
+    float getPlungerBandForce() const;
+    float getPlungerBandDuration() const;
+    float getPlungerBandSpeedIncrease() const;
+    float getPlungerBandFadeOutTime() const;
     float getPlungerInFaceTime() const;
 
     std::vector<float> getStartupTime() const;

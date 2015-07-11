@@ -33,10 +33,17 @@ XmlCharacteristic::XmlCharacteristic(const XMLNode *node) :
 
 void XmlCharacteristic::process(CharacteristicType type, Value value, bool *is_set) const
 {
+    if (m_values[type].empty())
+        // That value was not changed in this configuration
+        return;
+
     switch (getType(type))
     {
     case TYPE_FLOAT:
         processFloat(m_values[type], value.f, is_set);
+        break;
+    case TYPE_BOOL:
+        processBool(m_values[type], value.b, is_set);
         break;
     case TYPE_FLOAT_VECTOR:
     {
@@ -162,15 +169,13 @@ void XmlCharacteristic::process(CharacteristicType type, Value value, bool *is_s
         }
         break;
     }
+    default:
+        Log::fatal("XmlCharacteristic::process", "Unknown type for %s", getName(type).c_str());
     }
 }
 
 void XmlCharacteristic::processFloat(const std::string &processor, float *value, bool *is_set)
 {
-    if (processor.empty())
-        // That value was not changed in this configuration
-        return;
-
     // Split the string by operators
     static const std::string operators = "*/+-";
     std::vector<std::string> parts;
@@ -223,7 +228,7 @@ void XmlCharacteristic::processFloat(const std::string &processor, float *value,
         else if (!StringUtils::fromString(parts[index], val))
         {
             Log::fatal("XmlCharacteristic::processFloat",
-                "Can't process %s: Not a float", parts[index].c_str());
+                "Can't parse %s: Not a float", parts[index].c_str());
             return;
         }
         if (operations[index - 1] == "*")
@@ -241,9 +246,25 @@ void XmlCharacteristic::processFloat(const std::string &processor, float *value,
     *is_set = true;
 }
 
+void XmlCharacteristic::processBool(const std::string &processor, bool *value, bool *is_set)
+{
+    if (processor == "true")
+    {
+        *value = true;
+        *is_set = true;
+    }
+    else if (processor == "false")
+    {
+        *value = false;
+        *is_set = true;
+    }
+    else
+        Log::error("XmlCharacteristic::processBool", "Can't parse %s: Not a bool", processor);
+}
+
 void XmlCharacteristic::load(const XMLNode *node)
 {
-    // Script-generated content
+    // Script-generated content getXml
     if (const XMLNode *sub_node = node->getNode("suspension"))
     {
         sub_node->get("stiffness", &m_values[SUSPENSION_STIFFNESS]);
@@ -285,9 +306,9 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("power-increase", &m_values[GEAR_POWER_INCREASE]);
     }
 
-    if (const XMLNode *sub_node = node->getNode(""))
+    if (const XMLNode *sub_node = node->getNode("mass"))
     {
-        sub_node->get("mass", &m_values[MASS]);
+        sub_node->get("value", &m_values[MASS]);
     }
 
     if (const XMLNode *sub_node = node->getNode("wheels"))
@@ -347,7 +368,7 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("duration", &m_values[ZIPPER_DURATION]);
         sub_node->get("force", &m_values[ZIPPER_FORCE]);
         sub_node->get("speed-gain", &m_values[ZIPPER_SPEED_GAIN]);
-        sub_node->get("speed-increase", &m_values[ZIPPER_SPEED_INCREASE]);
+        sub_node->get("max-speed-increase", &m_values[ZIPPER_MAX_SPEED_INCREASE]);
         sub_node->get("fade-out-time", &m_values[ZIPPER_FADE_OUT_TIME]);
     }
 
@@ -361,11 +382,11 @@ void XmlCharacteristic::load(const XMLNode *node)
 
     if (const XMLNode *sub_node = node->getNode("plunger"))
     {
-        sub_node->get("max-length", &m_values[PLUNGER_MAX_LENGTH]);
-        sub_node->get("force", &m_values[PLUNGER_FORCE]);
-        sub_node->get("duration", &m_values[PLUNGER_DURATION]);
-        sub_node->get("speed-increase", &m_values[PLUNGER_SPEED_INCREASE]);
-        sub_node->get("fade-out-time", &m_values[PLUNGER_FADE_OUT_TIME]);
+        sub_node->get("band-max-length", &m_values[PLUNGER_BAND_MAX_LENGTH]);
+        sub_node->get("band-force", &m_values[PLUNGER_BAND_FORCE]);
+        sub_node->get("band-duration", &m_values[PLUNGER_BAND_DURATION]);
+        sub_node->get("band-speed-increase", &m_values[PLUNGER_BAND_SPEED_INCREASE]);
+        sub_node->get("band-fade-out-time", &m_values[PLUNGER_BAND_FADE_OUT_TIME]);
         sub_node->get("in-face-time", &m_values[PLUNGER_IN_FACE_TIME]);
     }
 

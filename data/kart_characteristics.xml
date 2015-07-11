@@ -61,7 +61,7 @@
                 0.5 * 0.25 + 0.5 * 0.15 = 0.2 ... which is overall the same
                 time we had previously. -->
         <turn turn-radius="0:2.0 10:7.5 25:15 45:30"
-              time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25"
+              time-full-steer=""
               time-reset-steer="0.1" />
 
         <!-- Speed and acceleration
@@ -233,7 +233,7 @@
                 in your face is removed. -->
         <plunger band-max-length="50" band-force="1500" band-duration="1"
                  band-speed-increase="7" band-fade-out-time="3"
-                 in-face-time="3 4 4.5 4.5" />
+                 in-face-time="4" />
 
 
         <!-- ********** Miscellaneous ********** -->
@@ -304,14 +304,17 @@
     <difficulties>
         <characteristic name="easy">
             <engine power="450" max-speed="17" />
+            <plunger in-face-time="3" />
         </characteristic>
         <characteristic name="medium">
         </characteristic>
         <characteristic name="hard">
             <engine power="500" max-speed="23" />
+            <plunger in-face-time="4.5" />
         </characteristic>
         <characteristic name="best">
             <engine power="510" max-speed="25" />
+            <plunger in-face-time="4.5" />
         </characteristic>
     </difficulties>
 

@@ -25,6 +25,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
@@ -67,7 +68,7 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     setupCamera();
     if (kart != NULL)
     {
-        m_distance = kart->getKartProperties()->getCameraDistance();
+        m_distance = kart->getCharacteristic()->getCameraDistance();
         setKart(kart);
     }
     else
@@ -378,9 +379,9 @@ void Camera::smoothMoveCamera(float dt)
 
     core::vector3df current_position  =  m_camera->getPosition();
     // Smoothly interpolate towards the position and target
-    const KartProperties *kp = m_kart->getKartProperties();
-    float max_increase_with_zipper = kp->getZipperMaxSpeedIncrease();
-    float max_speed_without_zipper = kp->getMaxSpeed();
+    const AbstractCharacteristic *ch = m_kart->getCharacteristic();
+    float max_increase_with_zipper   = ch->getZipperMaxSpeedIncrease();
+    float max_speed_without_zipper   = ch->getEngineMaxSpeed();
     float current_speed = m_kart->getSpeed();
 
     const Skidding *ks = m_kart->getSkidding();
@@ -452,7 +453,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
                                float *sideway, float *distance,
                                bool *smoothing)
 {
-    const KartProperties *kp = m_kart->getKartProperties();
+    const AbstractCharacteristic *ch = m_kart->getCharacteristic();
 
     switch(m_mode)
     {
@@ -475,7 +476,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
             else
             {
                 *above_kart    = 0.75f;
-                *cam_angle     = kp->getCameraForwardUpAngle();
+                *cam_angle     = ch->getCameraForwardUpAngle();
                 *distance      = -m_distance;
             }
             float steering = m_kart->getSteerPercent()
@@ -490,7 +491,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
         {
             *above_kart = 0.75f;
-            *cam_angle  = kp->getCameraBackwardUpAngle();
+            *cam_angle  = ch->getCameraBackwardUpAngle();
             *sideway    = 0;
             *distance   = 2.0f*m_distance;
             *smoothing  = false;
@@ -822,8 +823,8 @@ void Camera::handleEndCamera(float dt)
         }
     case EndCameraInformation::EC_AHEAD_OF_KART:
         {
-            const KartProperties *kp=m_kart->getKartProperties();
-            float cam_angle  = kp->getCameraBackwardUpAngle();
+            const AbstractCharacteristic *ch = m_kart->getCharacteristic();
+            float cam_angle = ch->getCameraBackwardUpAngle();
 
             positionCamera(dt, /*above_kart*/0.75f,
                            cam_angle, /*side_way*/0,

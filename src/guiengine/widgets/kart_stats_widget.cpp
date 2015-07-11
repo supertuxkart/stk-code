@@ -15,21 +15,19 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
-#include "utils/string_utils.hpp"
-#include <string.h>
+#include "karts/abstract_characteristic.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
-
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
-
-#include "config/user_config.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIElement.h>
 #include <IGUIButton.h>
+#include <string>
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -81,15 +79,15 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
         m_children.push_back(skill_bar);
     }
 
-    m_skills[SKILL_MASS]->setValue((int)(props->getMass()/5));
+    m_skills[SKILL_MASS]->setValue((int)(props->getCombinedCharacteristic()->getMass()/5));
     m_skills[SKILL_MASS]->setLabel(_("WEIGHT"));
     m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
 
-    m_skills[SKILL_SPEED]->setValue((int)((props->getAbsMaxSpeed()-20)*9));
+    m_skills[SKILL_SPEED]->setValue((int)((props->getCombinedCharacteristic()->getEngineMaxSpeed()-20)*9));
     m_skills[SKILL_SPEED]->setLabel(_("SPEED"));
     m_skills[SKILL_SPEED]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
 
-    m_skills[SKILL_POWER]->setValue((int)(props->getAvgPower()));
+    m_skills[SKILL_POWER]->setValue((int)(props->getCombinedCharacteristic()->getEnginePower()));
     m_skills[SKILL_POWER]->setLabel(_("POWER"));
     m_skills[SKILL_POWER]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_power", m_player_id);
 

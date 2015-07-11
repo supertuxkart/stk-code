@@ -45,6 +45,7 @@
 #include "items/item_manager.hpp"
 #include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/ai_properties.hpp"
@@ -1065,8 +1066,8 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
         case Item::ITEM_NITRO_BIG:
             // Only collect nitro, if it can actually be stored.
             if(m_kart->getEnergy() +
-                    m_kart->getKartProperties()->getNitroBigContainer()
-                  > m_kart->getKartProperties()->getNitroMax())
+                    m_kart->getCharacteristic()->getNitroBigContainer()
+                  > m_kart->getCharacteristic()->getNitroMax())
                   return;
             // fall through: if we have enough space to store a big
             // container, we can also store a small container, and
@@ -1074,8 +1075,8 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
         case Item::ITEM_NITRO_SMALL: avoid = false;
             // Only collect nitro, if it can actually be stored.
             if (m_kart->getEnergy() +
-                    m_kart->getKartProperties()->getNitroSmallContainer()
-                  > m_kart->getKartProperties()->getNitroMax())
+                    m_kart->getCharacteristic()->getNitroSmallContainer()
+                  > m_kart->getCharacteristic()->getNitroMax())
                   return;
         case Item::ITEM_BONUS_BOX:
             break;
@@ -1105,7 +1106,7 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
         // be if the kart would need to turn sharper, therefore stops
         // skidding, and will get the bonus speed.
         bool high_speed = (m_kart->getCurrentMaxSpeed() >
-                             m_kart->getKartProperties()->getMaxSpeed() ) ||
+                             m_kart->getCharacteristic()->getEngineMaxSpeed() ) ||
                           m_kart->getSkidding()->getSkidBonusReady();
         float max_angle = high_speed
                         ? m_ai_properties->m_max_item_angle_high_speed
@@ -1390,7 +1391,7 @@ void SkiddingAI::handleItems(const float dt)
     case PowerupManager::POWERUP_SWATTER:
         {
             // Squared distance for which the swatter works
-            float d2 = m_kart->getKartProperties()->getSwatterDistance2();
+            float d2 = m_kart->getCharacteristic()->getSwatterDistance();
             // if the kart has a shield, do not break it by using a swatter.
             if(m_kart->getShieldTime() > min_bubble_time)
                 break;

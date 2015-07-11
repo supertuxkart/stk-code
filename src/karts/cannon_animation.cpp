@@ -21,6 +21,7 @@
 #include "animations/animation_base.hpp"
 #include "animations/ipo.hpp"
 #include "animations/three_d_animation.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
@@ -69,7 +70,7 @@ CannonAnimation::~CannonAnimation()
                                  m_kart->getHeading()        ));
 
     m_kart->getBody()->setCenterOfMassTransform(pos);
-    Vec3 v(0, 0, m_kart->getKartProperties()->getMaxSpeed());
+    Vec3 v(0, 0, m_kart->getCharacteristic()->getEngineMaxSpeed());
     m_kart->setVelocity(pos.getBasis()*v);
 }   // ~CannonAnimation
 

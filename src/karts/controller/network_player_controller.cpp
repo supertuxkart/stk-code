@@ -7,6 +7,7 @@
 #include "items/attachment.hpp"
 #include "items/item.hpp"
 #include "items/powerup.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
@@ -197,7 +198,7 @@ void NetworkPlayerController::steer(float dt, int steer_val)
     // change speed is used.
     const float STEER_CHANGE = ( (steer_val<=0 && m_controls->m_steer<0) ||
                                  (steer_val>=0 && m_controls->m_steer>0)   )
-                     ? dt/m_kart->getKartProperties()->getTimeResetSteer()
+                     ? dt/m_kart->getCharacteristic()->getTurnTimeResetSteer()
                      : dt/m_kart->getTimeFullSteer(fabsf(m_controls->m_steer));
     if (steer_val < 0)
     {

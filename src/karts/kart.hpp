@@ -259,6 +259,8 @@ public:
                                float fade_in_time);
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
     virtual void  collectedItem(Item *item, int random_attachment);
+    virtual float getStartupBoost() const;
+
     virtual const Material *getMaterial() const;
     virtual const Material *getLastMaterial() const;
     /** Returns the pitch of the terrain depending on the heading. */
@@ -339,10 +341,7 @@ public:
     /** Returns the time till full steering is reached for this kart.
      *  \param steer Current steer value (must be >=0), on which the time till
      *         full steer depends. */
-    virtual float getTimeFullSteer(float steer) const
-    {
-        return m_kart_properties->getTimeFullSteer(steer);
-    }   // getTimeFullSteer
+    virtual float getTimeFullSteer(float steer) const;
     // ------------------------------------------------------------------------
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */

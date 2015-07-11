@@ -29,6 +29,7 @@
 #include "items/attachment.hpp"
 #include "items/item.hpp"
 #include "items/powerup.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
@@ -254,7 +255,7 @@ void PlayerController::steer(float dt, int steer_val)
     // change speed is used.
     const float STEER_CHANGE = ( (steer_val<=0 && m_controls->m_steer<0) ||
                                  (steer_val>=0 && m_controls->m_steer>0)   )
-                     ? dt/m_kart->getKartProperties()->getTimeResetSteer()
+                     ? dt/m_kart->getCharacteristic()->getTurnTimeResetSteer()
                      : dt/m_kart->getTimeFullSteer(fabsf(m_controls->m_steer));
     if (steer_val < 0)
     {
@@ -464,8 +465,8 @@ void PlayerController::handleZipper(bool play_sound)
  */
 void PlayerController::collectedItem(const Item &item, int add_info, float old_energy)
 {
-    if (old_energy < m_kart->getKartProperties()->getNitroMax() &&
-        m_kart->getEnergy() == m_kart->getKartProperties()->getNitroMax())
+    if (old_energy < m_kart->getCharacteristic()->getNitroMax() &&
+        m_kart->getEnergy() == m_kart->getCharacteristic()->getNitroMax())
     {
         m_full_sound->play();
     }

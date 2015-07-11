@@ -38,6 +38,7 @@ using namespace irr;
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
@@ -412,7 +413,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     int gauge_height       = (int)(GAUGEWIDTH*min_ratio);
 
     float state = (float)(kart->getEnergy())
-                / kart->getKartProperties()->getNitroMax();
+                / kart->getCharacteristic()->getNitroMax();
     if (state < 0.0f) state = 0.0f;
     else if (state > 1.0f) state = 1.0f;
 
@@ -435,7 +436,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     if (race_manager->getCoinTarget() > 0)
     {
         float coin_target = (float)race_manager->getCoinTarget()
-                          / kart->getKartProperties()->getNitroMax();
+                          / kart->getCharacteristic()->getNitroMax();
 
         video::S3DVertex vertices[5];
         unsigned int count=2;

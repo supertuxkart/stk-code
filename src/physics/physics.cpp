@@ -26,6 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/stars.hpp"
 #include "items/flyable.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/controller/player_controller.hpp"
@@ -218,9 +219,9 @@ void Physics::update(float dt)
             }
             else if (obj->isFlattenKartObject())
             {
-                const KartProperties* kp = kart->getKartProperties();
-                kart->setSquash(kp->getSquashDuration(),
-                    kp->getSquashSlowdown());
+                const AbstractCharacteristic *ch = kart->getCharacteristic();
+                kart->setSquash(ch->getSwatterSquashDuration(),
+                    ch->getSwatterSquashSlowdown());
             }
             else if(obj->isSoccerBall() && 
                     race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
@@ -248,9 +249,9 @@ void Physics::update(float dt)
             else if (anim->isFlattenKartObject())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                const KartProperties* kp = kart->getKartProperties();
-                kart->setSquash(kp->getSquashDuration(),
-                    kp->getSquashSlowdown());
+                const AbstractCharacteristic *ch = kart->getCharacteristic();
+                kart->setSquash(ch->getSwatterSquashDuration(),
+                    ch->getSwatterSquashSlowdown());
             }
             continue;
 
@@ -397,9 +398,9 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
     // Add a scaling factor depending on the mass (avoid div by zero).
     // The value of f_right is applied to the right kart, and f_left
     // to the left kart. f_left = 1 / f_right
-    float f_right =  right_kart->getKartProperties()->getMass() > 0
-                     ? left_kart->getKartProperties()->getMass()
-                       / right_kart->getKartProperties()->getMass()
+    float f_right =  right_kart->getCharacteristic()->getMass() > 0
+                     ? left_kart->getCharacteristic()->getMass()
+                       / right_kart->getCharacteristic()->getMass()
                      : 1.5f;
     // Add a scaling factor depending on speed (avoid div by 0)
     f_right *= right_kart->getSpeed() > 0
