@@ -38,6 +38,7 @@
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/stars.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/rescue_animation.hpp"
@@ -1753,8 +1754,7 @@ void Kart::updateNitro(float dt)
         m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
                                      m_kart_properties->getNitroMaxSpeedIncrease() *
                                      m_difficulty->getNitroMaxSpeedIncrease(),
-                                     m_kart_properties->getNitroEngineForce() *
-                                     m_difficulty->getNitroEngineForce(),
+                                     getCharacteristic()->getNitroEngineForce(),
                                      m_kart_properties->getNitroDuration() *
                                      m_difficulty->getNitroDuration(),
                                      m_kart_properties->getNitroFadeOutTime() *

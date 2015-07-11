@@ -25,10 +25,12 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_characteristic.hpp"
+#include "karts/combined_characteristic.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_model.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "karts/skidding_properties.hpp"
+#include "karts/xml_characteristic.hpp"
 #include "modes/world.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
@@ -162,6 +164,13 @@ void KartProperties::copyFrom(const KartProperties *source)
     assert(m_skidding_properties);
     *m_skidding_properties = *source->m_skidding_properties;
 
+    if (source->m_characteristic)
+    {
+        m_characteristic = new XmlCharacteristic();
+        assert(m_characteristic);
+        *m_characteristic = *source->m_characteristic;
+    }
+
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
     {
         m_ai_properties[i] = new AIProperties((RaceManager::Difficulty)i);
@@ -222,6 +231,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             throw std::runtime_error(msg.str());
         }
         getAllData(root);
+        m_characteristic = new XmlCharacteristic(root);
     }
     catch(std::exception& err)
     {
@@ -791,6 +801,12 @@ bool KartProperties::operator<(const KartProperties &other) const
 }  // operator<
 
 // ----------------------------------------------------------------------------
+const AbstractCharacteristic* KartProperties::getCharacteristic() const
+{
+    return m_characteristic;
+}
+
+// ----------------------------------------------------------------------------
 bool KartProperties::isInGroup(const std::string &group) const
 {
     return std::find(m_groups.begin(), m_groups.end(), group) != m_groups.end();
@@ -825,4 +841,3 @@ const float KartProperties::getAvgPower() const
     return sum/m_gear_power_increase.size();
 }   // getAvgPower
 
-/* EOF */

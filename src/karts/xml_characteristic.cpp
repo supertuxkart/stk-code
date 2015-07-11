@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "karts/xml_characteristics.hpp"
+#include "karts/xml_characteristic.hpp"
 
 #include "utils/interpolation_array.hpp"
 #include "utils/log.hpp"
@@ -25,16 +25,10 @@
 #include "io/xml_node.hpp"
 
 XmlCharacteristic::XmlCharacteristic(const XMLNode *node) :
-    m_values(CHARACTERISTIC_COUNT),
-    m_skidding(nullptr)
+    m_values(CHARACTERISTIC_COUNT)
 {
     if (node)
         load(node);
-}
-
-const SkiddingProperties* XmlCharacteristic::getSkiddingProperties() const
-{
-    return m_skidding;
 }
 
 void XmlCharacteristic::process(CharacteristicType type, Value value, bool *is_set) const
@@ -173,6 +167,10 @@ void XmlCharacteristic::process(CharacteristicType type, Value value, bool *is_s
 
 void XmlCharacteristic::processFloat(const std::string &processor, float *value, bool *is_set)
 {
+    if (processor.empty())
+        // That value was not changed in this configuration
+        return;
+
     // Split the string by operators
     static const std::string operators = "*/+-";
     std::vector<std::string> parts;
@@ -187,12 +185,6 @@ void XmlCharacteristic::processFloat(const std::string &processor, float *value,
     }
     parts.push_back(processor.substr(pos));
 
-    if (parts.empty())
-    {
-        Log::error("XmlCharacteristic::processFloat", "no content to process");
-        return;
-    }
-
     // Compute the result
     float x = *value;
     std::size_t index = 0;
@@ -204,12 +196,25 @@ void XmlCharacteristic::processFloat(const std::string &processor, float *value,
             Log::error("XmlCharacteristic::processFloat", "x is unknown");
             return;
         }
+        // - is a special case: We don't take e.g. "-5" as relative, it
+        // describes a negative number
+        else if (operations[index] == "-")
+            *value = 0;
         else
-        {
             *value = x;
-            index++;
-        }
     }
+    else
+    {
+        float val;
+    	if (!StringUtils::fromString(parts[index], val))
+        {
+            Log::fatal("XmlCharacteristic::processFloat",
+                "Can't parse %s: Not a float", parts[index].c_str());
+            return;
+        }
+        *value = val;
+    }
+    index++;
     for (; index < parts.size(); index++)
     {
         float val;
@@ -239,7 +244,7 @@ void XmlCharacteristic::processFloat(const std::string &processor, float *value,
 void XmlCharacteristic::load(const XMLNode *node)
 {
     // Script-generated content
-    if (const XMLNode *sub_node = node->getNode("Suspension"))
+    if (const XMLNode *sub_node = node->getNode("suspension"))
     {
         sub_node->get("stiffness", &m_values[SUSPENSION_STIFFNESS]);
         sub_node->get("rest", &m_values[SUSPENSION_REST]);
@@ -248,7 +253,7 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("max-force", &m_values[SUSPENSION_MAX_FORCE]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Stability"))
+    if (const XMLNode *sub_node = node->getNode("stability"))
     {
         sub_node->get("roll-influence", &m_values[STABILITY_ROLL_INFLUENCE]);
         sub_node->get("chassis-linear-damping", &m_values[STABILITY_CHASSIS_LINEAR_DAMPING]);
@@ -258,14 +263,14 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("smooth-flying-impulse", &m_values[STABILITY_SMOOTH_FLYING_IMPULSE]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Turn"))
+    if (const XMLNode *sub_node = node->getNode("turn"))
     {
         sub_node->get("radius", &m_values[TURN_RADIUS]);
         sub_node->get("time-reset-steer", &m_values[TURN_TIME_RESET_STEER]);
         sub_node->get("time-full-steer", &m_values[TURN_TIME_FULL_STEER]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Engine"))
+    if (const XMLNode *sub_node = node->getNode("engine"))
     {
         sub_node->get("power", &m_values[ENGINE_POWER]);
         sub_node->get("max-speed", &m_values[ENGINE_MAX_SPEED]);
@@ -274,7 +279,7 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("max-speed-reverse-ratio", &m_values[ENGINE_MAX_SPEED_REVERSE_RATIO]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Gear"))
+    if (const XMLNode *sub_node = node->getNode("gear"))
     {
         sub_node->get("switch-ratio", &m_values[GEAR_SWITCH_RATIO]);
         sub_node->get("power-increase", &m_values[GEAR_POWER_INCREASE]);
@@ -285,7 +290,7 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("mass", &m_values[MASS]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Wheels"))
+    if (const XMLNode *sub_node = node->getNode("wheels"))
     {
         sub_node->get("damping-relaxation", &m_values[WHEELS_DAMPING_RELAXATION]);
         sub_node->get("damping-compression", &m_values[WHEELS_DAMPING_COMPRESSION]);
@@ -293,32 +298,32 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("position", &m_values[WHEELS_POSITION]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Camera"))
+    if (const XMLNode *sub_node = node->getNode("camera"))
     {
         sub_node->get("distance", &m_values[CAMERA_DISTANCE]);
         sub_node->get("forward-up-angle", &m_values[CAMERA_FORWARD_UP_ANGLE]);
         sub_node->get("backward-up-angle", &m_values[CAMERA_BACKWARD_UP_ANGLE]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Jump"))
+    if (const XMLNode *sub_node = node->getNode("jump"))
     {
         sub_node->get("animation-time", &m_values[JUMP_ANIMATION_TIME]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Lean"))
+    if (const XMLNode *sub_node = node->getNode("lean"))
     {
         sub_node->get("max", &m_values[LEAN_MAX]);
         sub_node->get("speed", &m_values[LEAN_SPEED]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Anvil"))
+    if (const XMLNode *sub_node = node->getNode("anvil"))
     {
         sub_node->get("duration", &m_values[ANVIL_DURATION]);
         sub_node->get("weight", &m_values[ANVIL_WEIGHT]);
         sub_node->get("speed-factor", &m_values[ANVIL_SPEED_FACTOR]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Parachute"))
+    if (const XMLNode *sub_node = node->getNode("parachute"))
     {
         sub_node->get("friction", &m_values[PARACHUTE_FRICTION]);
         sub_node->get("duration", &m_values[PARACHUTE_DURATION]);
@@ -328,7 +333,7 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("max-speed", &m_values[PARACHUTE_MAX_SPEED]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Bubblegum"))
+    if (const XMLNode *sub_node = node->getNode("bubblegum"))
     {
         sub_node->get("duration", &m_values[BUBBLEGUM_DURATION]);
         sub_node->get("speed-fraction", &m_values[BUBBLEGUM_SPEED_FRACTION]);
@@ -337,7 +342,7 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("shield-duration", &m_values[BUBBLEGUM_SHIELD_DURATION]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Zipper"))
+    if (const XMLNode *sub_node = node->getNode("zipper"))
     {
         sub_node->get("duration", &m_values[ZIPPER_DURATION]);
         sub_node->get("force", &m_values[ZIPPER_FORCE]);
@@ -346,7 +351,7 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("fade-out-time", &m_values[ZIPPER_FADE_OUT_TIME]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Swatter"))
+    if (const XMLNode *sub_node = node->getNode("swatter"))
     {
         sub_node->get("duration", &m_values[SWATTER_DURATION]);
         sub_node->get("distance", &m_values[SWATTER_DISTANCE]);
@@ -354,7 +359,7 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("squash-slowdown", &m_values[SWATTER_SQUASH_SLOWDOWN]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Plunger"))
+    if (const XMLNode *sub_node = node->getNode("plunger"))
     {
         sub_node->get("max-length", &m_values[PLUNGER_MAX_LENGTH]);
         sub_node->get("force", &m_values[PLUNGER_FORCE]);
@@ -364,27 +369,27 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("in-face-time", &m_values[PLUNGER_IN_FACE_TIME]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Startup"))
+    if (const XMLNode *sub_node = node->getNode("startup"))
     {
         sub_node->get("time", &m_values[STARTUP_TIME]);
         sub_node->get("boost", &m_values[STARTUP_BOOST]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Rescue"))
+    if (const XMLNode *sub_node = node->getNode("rescue"))
     {
         sub_node->get("duration", &m_values[RESCUE_DURATION]);
         sub_node->get("vert-offset", &m_values[RESCUE_VERT_OFFSET]);
         sub_node->get("height", &m_values[RESCUE_HEIGHT]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Explosion"))
+    if (const XMLNode *sub_node = node->getNode("explosion"))
     {
         sub_node->get("duration", &m_values[EXPLOSION_DURATION]);
         sub_node->get("radius", &m_values[EXPLOSION_RADIUS]);
         sub_node->get("invulnerability-time", &m_values[EXPLOSION_INVULNERABILITY_TIME]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Nitro"))
+    if (const XMLNode *sub_node = node->getNode("nitro"))
     {
         sub_node->get("duration", &m_values[NITRO_DURATION]);
         sub_node->get("engine-force", &m_values[NITRO_ENGINE_FORCE]);
@@ -396,7 +401,7 @@ void XmlCharacteristic::load(const XMLNode *node)
         sub_node->get("max", &m_values[NITRO_MAX]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("Slipstream"))
+    if (const XMLNode *sub_node = node->getNode("slipstream"))
     {
         sub_node->get("duration", &m_values[SLIPSTREAM_DURATION]);
         sub_node->get("length", &m_values[SLIPSTREAM_LENGTH]);

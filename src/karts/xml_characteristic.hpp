@@ -30,12 +30,10 @@ class XmlCharacteristic : public AbstractCharacteristic
 private:
     /** The computation that was read from an xml file */
     std::vector<std::string> m_values;
-    SkiddingProperties *m_skidding;
 
 public:
     XmlCharacteristic(const XMLNode *node = nullptr);
 
-    virtual const SkiddingProperties* getSkiddingProperties() const;
     virtual void process(CharacteristicType type, Value value, bool *is_set) const;
 
     void load(const XMLNode *node);

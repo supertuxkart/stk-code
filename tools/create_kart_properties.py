@@ -199,7 +199,7 @@ def main():
     elif task == "getXml":
         for g in groups:
             print("    if (const XMLNode *sub_node = node->getNode(\"{0}\"))\n    {{".
-                format(g.baseName))
+                format(g.baseName.lower()))
             for m in g.members:
                 nameUnderscore = joinSubName(g, m, False)
                 nameMinus = "-".join(toList(m.name))

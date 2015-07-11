@@ -403,6 +403,7 @@ void STKConfig::getAllData(const XMLNode * root)
         const XMLNode* type = child_node->getNode(i);
         m_player_difficulties[i] = new PlayerDifficulty();
         m_player_difficulties[i]->getAllData(type);
+        m_player_difficulties[i]->setDifficulty((PerPlayerDifficulty) i);
     }
 }   // getAllData
 

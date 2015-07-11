@@ -28,7 +28,8 @@
 /**
  * The constructor initialises all values with default values.
  */
-PlayerDifficulty::PlayerDifficulty(const std::string &filename)
+PlayerDifficulty::PlayerDifficulty(const std::string &filename) :
+    m_difficulty(PLAYER_DIFFICULTY_NORMAL)
 {
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.

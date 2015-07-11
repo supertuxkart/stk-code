@@ -31,6 +31,7 @@
 
 class AbstractCharacteristic;
 class KartProperties;
+class XMLNode;
 
 /**
   * \ingroup karts
@@ -60,9 +61,10 @@ private:
      *  all clients or not. */
     std::vector<bool>        m_kart_available;
 
-    std::unique_ptr<AbstractCharacteristic>               m_base_characteristic;
-    std::vector<std::unique_ptr<AbstractCharacteristic> > m_kart_type_characteristics;
-    std::vector<std::unique_ptr<AbstractCharacteristic> > m_player_characteristics;
+    std::unique_ptr<AbstractCharacteristic>                         m_base_characteristic;
+    std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_difficulty_characteristics;
+    std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_kart_type_characteristics;
+    std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_player_characteristics;
 
 protected:
 
@@ -80,6 +82,7 @@ public:
     int                      getKartByGroup(const std::string& group,
                                            int i) const;
 
+    void                     loadCharacteristics    (const XMLNode *root);
     bool                     loadKart               (const std::string &dir);
     void                     loadAllKarts           (bool loading_icon = true);
     void                     unloadAllKarts         ();
@@ -94,6 +97,18 @@ public:
                                            RemoteKartInfoList& existing_karts,
                                            std::vector<std::string> *ai_list);
     void                     setHatMeshName(const std::string &hat_name);
+    // ------------------------------------------------------------------------
+    /** Get the characteristic that holds the base values. */
+    const AbstractCharacteristic* getBaseCharacteristic() const { return &(*m_base_characteristic); }
+    // ------------------------------------------------------------------------
+    /** Get a characteristic that holds the values for a certain difficulty. */
+    const AbstractCharacteristic* getDifficultyCharacteristic(const std::string &type) const;
+    // ------------------------------------------------------------------------
+    /** Get a characteristic that holds the values for a kart type. */
+    const AbstractCharacteristic* getKartTypeCharacteristic(const std::string &type) const;
+    // ------------------------------------------------------------------------
+    /** Get a characteristic that holds the values for a player difficulty. */
+    const AbstractCharacteristic* getPlayerCharacteristic(const std::string &type) const;
     // ------------------------------------------------------------------------
     /** Returns a list of all groups. */
     const std::vector<std::string>& getAllGroups() const {return m_all_groups;}

@@ -41,6 +41,7 @@ class AbstractCharacteristic;
 class AIProperties;
 class Material;
 class SkiddingProperties;
+class XmlCharacteristic;
 class XMLNode;
 
 /**
@@ -48,7 +49,7 @@ class XMLNode;
  *  This includes size, name, identifier, physical properties etc.
  *  It is atm also the base class for STKConfig, which stores the default values
  *  for all physics constants.
- *  Note that KartProperies is copied (when setting the default values from
+ *  Note that KartProperties is copied (when setting the default values from
  *  stk_config.
  *
  * \ingroup karts
@@ -121,8 +122,10 @@ private:
     int  m_shape;                     /**< Number of vertices in polygon when
                                        *   drawing the dot on the mini map. */
 
-    /** The physical, item, etc. characteristics of this kart. */
-    AbstractCharacteristic *m_characteristic;
+    /** The physical, item, etc. characteristics of this kart that are loaded
+     *  from the xml file.
+     */
+    XmlCharacteristic *m_characteristic;
 
     // Physic properties
     // -----------------
@@ -419,6 +422,10 @@ public:
     bool operator<(const KartProperties &other) const;
 
     // ------------------------------------------------------------------------
+    /** Returns the characteristics for this kart. */
+    const AbstractCharacteristic* getCharacteristic() const;
+
+    // ------------------------------------------------------------------------
     /** Returns the (maximum) speed for a given turn radius.
      *  \param radius The radius for which the speed needs to be computed. */
     float getSpeedForTurnRadius(float radius) const {
@@ -472,6 +479,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the internal identifier of this kart. */
     const std::string& getIdent      () const {return m_ident;                }
+
+    // ------------------------------------------------------------------------
+    /** Returns the type of this kart. */
+    const std::string& getKartType   () const { return m_kart_type;           }
 
     // ------------------------------------------------------------------------
     /** Returns the shadow texture to use. */

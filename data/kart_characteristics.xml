@@ -1,4 +1,11 @@
 <?xml version="1.0"?>
+<!-- Format
+    ATTENTION: - is a special case if it is the first character of a number-
+    string. It means that the number is negative and NOT that the following
+    float will be substracted from the base value. So if x = 10 and the string
+    "-5" is processed, the result will be -5 and not the same as "x-5", which
+    would result in 10 - 5 = 5.
+-->
 <characteristics>
     <characteristic name="base">
         <!-- ********** Physics ********** -->
@@ -58,23 +65,24 @@
               time-reset-steer="0.1" />
 
         <!-- Speed and acceleration
-            power and max-speed (in m/s) have 3 values, one for low, medium, and hard.
+            power: The power of the kart
+            max-speed: The base maximum speed of the kart in m/s
             brake-factor: Value used when braking.
             brake-time-increase: The brake force is multiplied by
-                (1+brake_time*brake_time_increase - i.e. the longer the brake was
+                (1 + brake_time) * brake_time_increase - i.e. the longer the brake was
                 pressed, the harder the kart will brake.
             max-speed-reverse-ratio is the percentage of max speed for reverse gear.
           -->
-        <engine power="450 475 500 510" max-speed="17 21 23 25" brake-factor="11.0"
+        <engine power="475" max-speed="21" brake-factor="11.0"
                 brake-time-increase="6" max-speed-reverse-ratio="0.3" />
 
         <!-- Simulated gears
-                speed what gear is selected, e.g. 0.25 means that if the speed is
             switch-ratio defines at what ratio of the maximum
-                bigger or equal to 0.25 x maxSpeed then use gear 1, 0.5 means if
+                speed what gear is selected, e.g. 0.25 means that if the speed is
+                bigger or equal to 0.25 * maxSpeed then use gear 1, 0.5 means if
                 the speed is bigger or equal to 0.5 x maxSpeed then gear 2.
                 gear-power-increase contains the increase in max power (to simulate
-                different gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
+                different gears), e.g. 2.5 as first entry means: 2.5 * maxPower in gear 1
                 | first  | second |  third | . -->
         <gear switch-ratio="0.25 0.7 1.0" power-increase="2.2 1.7 1.3" />
 
@@ -292,6 +300,22 @@
                     duration="1" fade-out-time="2" />
     </characteristic>
 
+    <!-- The different difficulties (like easy, medium, hard) -->
+    <difficulties>
+        <characteristic name="easy">
+            <engine power="450" max-speed="17" />
+        </characteristic>
+        <characteristic name="medium">
+        </characteristic>
+        <characteristic name="hard">
+            <engine power="500" max-speed="23" />
+        </characteristic>
+        <characteristic name="best">
+            <engine power="510" max-speed="25" />
+        </characteristic>
+    </difficulties>
+
+    <!-- The different kart types, that can be specified in the kart.xml file -->
     <kart-types>
         <characteristic name="light">
             <turn turn-radius="0:3.0 10:10.0 25:20.0 45:40.0"

@@ -161,8 +161,10 @@ private:
 public:
     PlayerDifficulty  (const std::string &filename="");
     ~PlayerDifficulty  ();
+    void  setDifficulty     (PerPlayerDifficulty difficulty) { m_difficulty = difficulty; }
+    PerPlayerDifficulty getDifficulty() const                { return m_difficulty;       }
     void  getAllData        (const XMLNode * root);
-    std::string getIdent() const;
+    std::string getIdent    () const;
     float getStartupBoost   () const;
 
     // ------------------------------------------------------------------------

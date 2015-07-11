@@ -200,10 +200,11 @@ private:
     /** The skididing properties for this kart, as a separate object in order
      *  to reduce dependencies (and therefore compile time) when changing
      *  any skidding property. */
-    //SkiddingProperties *m_skidding;
+    //TODO SkiddingProperties *m_skidding;
 
 public:
     AbstractCharacteristic();
+    virtual ~AbstractCharacteristic() {}
 
     virtual const SkiddingProperties* getSkiddingProperties() const;
 
