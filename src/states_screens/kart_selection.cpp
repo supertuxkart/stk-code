@@ -811,11 +811,13 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
                     kart_properties_manager->getKart(selection);
     if (kp != NULL)
     {
+        // Scale the values so they look better
         w->setValue(KartStatsWidget::SKILL_MASS, (int)
-            (kp->getCombinedCharacteristic()->getMass() / 5));
+            ((kp->getCombinedCharacteristic()->getMass() - 20) / 4));
         w->setValue(KartStatsWidget::SKILL_SPEED, (int)
-            ((kp->getCombinedCharacteristic()->getEngineMaxSpeed() - 20) * 9));
-        w->setValue(KartStatsWidget::SKILL_POWER, (int) kp->getAvgPower());
+            ((kp->getCombinedCharacteristic()->getEngineMaxSpeed() - 15) * 6));
+        w->setValue(KartStatsWidget::SKILL_POWER, (int)
+            ((kp->getAvgPower() - 30) / 20));
         w->update(0);
     }
 }

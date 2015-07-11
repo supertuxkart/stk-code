@@ -554,9 +554,9 @@ float KartProperties::getAvgPower() const
 {
     float sum = 0;
     std::vector<float> gear_power_increase = m_combined_characteristic->getGearPowerIncrease();
-    float max_speed = m_combined_characteristic->getEngineMaxSpeed();
+    float power = m_combined_characteristic->getEnginePower();
     for (unsigned int i = 0; i < gear_power_increase.size(); ++i)
-        sum += gear_power_increase[i] * max_speed;
+        sum += gear_power_increase[i] * power;
     return sum / gear_power_increase.size();
 }   // getAvgPower
 
