@@ -88,15 +88,13 @@ void XmlCharacteristic::process(CharacteristicType type, Value value, bool *is_s
     {
         const std::vector<std::string> processors =
             StringUtils::split(m_values[type], ' ');
+        // If the interpolation array should be completely replaced
+        // That has to happen when the format is not the same
+        bool shouldReplace = false;
         if (*is_set)
         {
             if (processors.size() != value.fv->size())
-            {
-                Log::error("XmlCharacteristic::process",
-                    "InterpolationArrays have different sizes for %s",
-                    getName(type).c_str());
-                break;
-            }
+                shouldReplace = true;
             else
             {
                 for (std::vector<std::string>::const_iterator it = processors.begin();
@@ -127,16 +125,23 @@ void XmlCharacteristic::process(CharacteristicType type, Value value, bool *is_s
                                 }
                             }
                             if (!found)
-                                Log::error("XmlCharacteristic::process",
-                                    "Can't find the %f in %s", x,
-                                    getName(type).c_str());
+                            {
+                                // The searched value was not found so we have
+                                // a different format
+                                shouldReplace = true;
+                                break;
+                            }
                         }
                     }
                 }
             }
-        }
-        else
+        } else
+            // It's not yet set, so we will the current content
+            shouldReplace = true;
+
+        if (shouldReplace)
         {
+            // Replace all values
             for (std::vector<std::string>::const_iterator it = processors.begin();
                  it != processors.end(); it++)
             {

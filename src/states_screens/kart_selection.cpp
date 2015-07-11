@@ -815,8 +815,7 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
             (kp->getCombinedCharacteristic()->getMass() / 5));
         w->setValue(KartStatsWidget::SKILL_SPEED, (int)
             ((kp->getCombinedCharacteristic()->getEngineMaxSpeed() - 20) * 9));
-        w->setValue(KartStatsWidget::SKILL_POWER, (int)
-            kp->getCombinedCharacteristic()->getEnginePower());
+        w->setValue(KartStatsWidget::SKILL_POWER, (int) kp->getAvgPower());
         w->update(0);
     }
 }

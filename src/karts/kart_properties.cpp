@@ -215,6 +215,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             throw std::runtime_error(msg.str());
         }
         getAllData(root);
+        if (m_characteristic)
+            delete m_characteristic;
         m_characteristic = new XmlCharacteristic(root);
         combineCharacteristics();
     }
@@ -317,6 +319,8 @@ void KartProperties::combineCharacteristics()
     m_combined_characteristic = new CombinedCharacteristic();
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getBaseCharacteristic());
+    m_combined_characteristic->addCharacteristic(kart_properties_manager->
+        getKartTypeCharacteristic(m_kart_type));
     m_combined_characteristic->addCharacteristic(m_characteristic);
 }   // combineCharacteristics
 
@@ -397,7 +401,7 @@ void KartProperties::getAllData(const XMLNode * root)
         }
     }
 
-    if(const XMLNode *turn_node = root->getNode("turn"))
+    if (const XMLNode *turn_node = root->getNode("turn"))
     {
         turn_node->get("turn-radius",          &m_turn_angle_at_speed );
         // For now store the turn radius in turn angle, the correct
@@ -544,4 +548,15 @@ bool KartProperties::isInGroup(const std::string &group) const
 {
     return std::find(m_groups.begin(), m_groups.end(), group) != m_groups.end();
 }   // isInGroups
+
+// ----------------------------------------------------------------------------
+float KartProperties::getAvgPower() const
+{
+    float sum = 0;
+    std::vector<float> gear_power_increase = m_combined_characteristic->getGearPowerIncrease();
+    float max_speed = m_combined_characteristic->getEngineMaxSpeed();
+    for (unsigned int i = 0; i < gear_power_increase.size(); ++i)
+        sum += gear_power_increase[i] * max_speed;
+    return sum / gear_power_increase.size();
+}   // getAvgPower
 

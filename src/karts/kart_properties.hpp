@@ -453,6 +453,9 @@ public:
     {
         return m_physical_wheel_position;
     }   // getPhysicalWheelPosition
+
+    // ------------------------------------------------------------------------
+    float getAvgPower() const;
 };   // KartProperties
 
 #endif

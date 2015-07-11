@@ -476,7 +476,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
             else
             {
                 *above_kart    = 0.75f;
-                *cam_angle     = ch->getCameraForwardUpAngle();
+                *cam_angle     = ch->getCameraForwardUpAngle() * DEGREE_TO_RAD;
                 *distance      = -m_distance;
             }
             float steering = m_kart->getSteerPercent()
@@ -491,7 +491,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
         {
             *above_kart = 0.75f;
-            *cam_angle  = ch->getCameraBackwardUpAngle();
+            *cam_angle  = ch->getCameraBackwardUpAngle() * DEGREE_TO_RAD;
             *sideway    = 0;
             *distance   = 2.0f*m_distance;
             *smoothing  = false;
@@ -824,7 +824,7 @@ void Camera::handleEndCamera(float dt)
     case EndCameraInformation::EC_AHEAD_OF_KART:
         {
             const AbstractCharacteristic *ch = m_kart->getCharacteristic();
-            float cam_angle = ch->getCameraBackwardUpAngle();
+            float cam_angle = ch->getCameraBackwardUpAngle() * DEGREE_TO_RAD;
 
             positionCamera(dt, /*above_kart*/0.75f,
                            cam_angle, /*side_way*/0,
