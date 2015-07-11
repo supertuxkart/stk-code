@@ -118,19 +118,8 @@ void STKConfig::load(const std::string &filename)
     }
 
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
-    CHECK_NEG(m_parachute_friction,        "parachute-friction"         );
-    CHECK_NEG(m_parachute_lbound_fraction, "parachute-lbound-fraction"  );
-    CHECK_NEG(m_parachute_ubound_fraction, "parachute-ubound-fraction"  );
-    CHECK_NEG(m_parachute_max_speed,       "parachute-max-speed"        );
-    CHECK_NEG(m_parachute_time,            "parachute-time"             );
-    CHECK_NEG(m_parachute_time_other,      "parachute-time-other"       );
-    CHECK_NEG(m_bomb_time,                 "bomb-time"                  );
-    CHECK_NEG(m_bomb_time_increase,        "bomb-time-increase"         );
-    CHECK_NEG(m_anvil_time,                "anvil-time"                 );
-    CHECK_NEG(m_anvil_weight,              "anvil-weight"               );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
-    CHECK_NEG(m_bubblegum_shield_time,     "bubblegum shield-time"      );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
     CHECK_NEG(m_min_kart_version,          "<kart-version min...>"      );
