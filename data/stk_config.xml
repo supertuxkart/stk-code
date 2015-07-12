@@ -408,86 +408,9 @@
      <lean    max="8.6"  speed="5.0" />
 
      <kart-type>
-         <light>
-             <startup time   = "0.3 0.5"
-                 boost  = "8.5 4.5"  />
-
-             <nitro engine-force="350" consumption="1" small-container="1" big-container="3"
-                 max-speed-increase="4.5" duration="1.5" fade-out-time="2.5" max="20"/>
-
-             <slipstream length="11" width="2" collect-time="1.5" use-time="2.5"
-                 add-power="3.2" min-speed="9"
-                 max-speed-increase="4" duration="1.2" fade-out-time="2.3"/>
-
-             <turn turn-radius="0:3.0 10:10.0 25:20.0 45:40.0"
-                 time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25"
-                 time-reset-steer="0.1"/>
-
-             <engine power="250 300 350 400"  max-speed="13 18 21 23.0" brake-factor="15.0"
-                 max-speed-reverse-ratio="0.5"/>
-
-             <gear switch-ratio="0.20 0.55 1" power-increase="5 4 3"/>
-
-             <mass value="195"/>
-
-             <explosion time="2.1" radius="5.5"
-                 invulnerability-time="7" />
-         </light>
-
-         <medium>
-             <startup time   = "0.3 0.5"
-                 boost  = "4.2 2.6"  />
-
-              <nitro engine-force="425" consumption="1.4" small-container="1" big-container="3"
-                    max-speed-increase="5" duration="1.2" fade-out-time="2" max="20"/>
-
-              <slipstream length="10" width="2" collect-time="2" use-time="3.3"
-                  add-power="2.8" min-speed="10"
-                  max-speed-increase="5" duration="0.9" fade-out-time="1.6"/>
-
-              <turn turn-radius="0:4.5 10:16.0 25:30.0 45:60.0"
-                    time-full-steer ="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28"
-                    time-reset-steer="0.1"/>
-
-              <engine power="375 450 525 550"  max-speed="14 19 22.0 25" brake-factor="11.0"
-                  max-speed-reverse-ratio="0.4"/>
-
-              <gear switch-ratio="0.30 0.7 1.0" power-increase="2.2 2.2 2.5"/>
-
-              <mass value="250"/>
-
-             <explosion time="1.8" radius="5"
-                  invulnerability-time="6" />
-         </medium>
-
-         <heavy>
-             <startup time   = "0.3 0.5"
-                   boost  = "3.8 2"  />
-
-             <nitro engine-force="600" consumption="2" small-container="1" big-container="3"
-                   max-speed-increase="8" duration="0.7" fade-out-time="1.3" max="20"/>
-
-             <slipstream length="8.5" width="2" collect-time="2" use-time="4"
-                   add-power="2.7" min-speed="10.5"
-                   max-speed-increase="8" duration="0.7" fade-out-time="1"/>
-
-             <swatter duration="10" distance="3" squash-duration="5"
-                   squash-slowdown="0.5"/>
-
-             <turn turn-radius="0:4.0 10:18.5 25:43.0 45:72.5"
-                      time-full-steer ="0:0.23 0.5:0.23 0.5:0.41 1.0:0.41"
-                   time-reset-steer="0.1"/>
-
-             <engine power="575 675 775 875"  max-speed="15 20 23 25" brake-factor="10"
-                   max-speed-reverse-ratio="0.65"/>
-
-             <gear switch-ratio="0.45 0.70 1" power-increase="1.5 1.7 2.5"/>
-
-             <mass value="350"/>
-
-             <explosion time="1.5" radius="4"
-                   invulnerability-time="6" />
-         </heavy>
+         <light />
+         <medium />
+         <heavy />
      </kart-type>
   </general-kart-defaults>
 </config>
