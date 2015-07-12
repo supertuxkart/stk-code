@@ -49,21 +49,34 @@ void XmlCharacteristic::process(CharacteristicType type, Value value, bool *is_s
     {
         const std::vector<std::string> processors =
             StringUtils::split(m_values[type], ' ');
+        // If the array should be completely replaced
+        // That has to happen when the size is not the same or it is not yet set
+        bool shouldReplace = false;
         if (*is_set)
         {
             if (processors.size() != value.fv->size())
+                shouldReplace = true;
+            else
             {
-                Log::error("XmlCharacteristic::process",
-                    "FloatVectors have different sizes for %s",
-                    getName(type).c_str());
-                break;
+                std::vector<float>::iterator fit = value.fv->begin();
+                for (std::vector<std::string>::const_iterator it = processors.begin();
+                     it != processors.end(); it++, fit++)
+                {
+                    processFloat(*it, &*fit, is_set);
+                    if (!*is_set)
+                    {
+                        Log::error("XmlCharacteristic::process", "Can't process %s",
+                            it->c_str());
+                        value.fv->clear();
+                        break;
+                    }
+                }
             }
-            std::vector<float>::iterator fit = value.fv->begin();
-            for (std::vector<std::string>::const_iterator it = processors.begin();
-                 it != processors.end(); it++, fit++)
-                processFloat(*it, &*fit, is_set);
         }
         else
+            shouldReplace = true;
+
+        if (shouldReplace)
         {
             value.fv->resize(processors.size());
             std::vector<float>::iterator fit = value.fv->begin();
@@ -121,6 +134,13 @@ void XmlCharacteristic::process(CharacteristicType type, Value value, bool *is_s
                                     float val;
                                     processFloat(pair[1], &val, is_set);
                                     value.ia->setY(i, val);
+                                    break;
+                                }
+                                if (!*is_set)
+                                {
+                                    Log::error("XmlCharacteristic::process", "Can't process %s",
+                                        pair[1].c_str());
+                                    value.fv->clear();
                                     break;
                                 }
                             }

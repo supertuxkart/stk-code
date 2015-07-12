@@ -132,9 +132,6 @@ private:
 
     // Physic properties
     // -----------------
-    /** The turn angle depending on speed. */
-    InterpolationArray m_turn_angle_at_speed;
-
     /** If != 0 a bevelled box shape is used by using a point cloud as a
      *  collision shape. */
     Vec3  m_bevel_factor;
@@ -242,19 +239,6 @@ public:
      *  difficulty is missing, but it can be used e.g. for the kart stats widget.
      */
     const AbstractCharacteristic* getCombinedCharacteristic() const;
-
-    // ------------------------------------------------------------------------
-    /** Returns the (maximum) speed for a given turn radius.
-     *  \param radius The radius for which the speed needs to be computed. */
-    float getSpeedForTurnRadius(float radius) const {
-        float angle = sin(m_wheel_base / radius);
-        return m_turn_angle_at_speed.getReverse(angle);
-    }   // getSpeedForTurnRadius
-    // ------------------------------------------------------------------------
-    /** Returns the maximum steering angle (depending on speed). */
-    float getMaxSteerAngle(float speed) const {
-        return m_turn_angle_at_speed.get(speed);
-    }   // getMaxSteerAngle
 
     // ------------------------------------------------------------------------
     /** Returns the material for the kart icons. */

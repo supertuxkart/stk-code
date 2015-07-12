@@ -807,6 +807,34 @@ void Kart::updateWeight()
     m_body->setMassProps(mass, inertia);
 }   // updateWeight
 
+// ------------------------------------------------------------------------
+/** Returns the (maximum) speed for a given turn radius.
+ *  \param radius The radius for which the speed needs to be computed. */
+float Kart::getSpeedForTurnRadius(float radius) const
+{
+    InterpolationArray turn_angle_at_speed = m_characteristic->getTurnRadius();
+    // Convert the turn radius into turn angle
+    for(std::size_t i = 0; i < turn_angle_at_speed.size(); i++)
+        turn_angle_at_speed.setY(i, sin(m_kart_properties->getWheelBase() /
+            turn_angle_at_speed.getY(i)));
+
+    float angle = sin(m_kart_properties->getWheelBase() / radius);
+    return turn_angle_at_speed.getReverse(angle);
+}   // getSpeedForTurnRadius
+
+// ------------------------------------------------------------------------
+/** Returns the maximum steering angle (depending on speed). */
+float Kart::getMaxSteerAngle(float speed) const
+{
+    InterpolationArray turn_angle_at_speed = m_characteristic->getTurnRadius();
+    // Convert the turn radius into turn angle
+    for(std::size_t i = 0; i < turn_angle_at_speed.size(); i++)
+        turn_angle_at_speed.setY(i, sin(m_kart_properties->getWheelBase() /
+            turn_angle_at_speed.getY(i)));
+
+    return turn_angle_at_speed.get(speed);
+}   // getMaxSteerAngle
+
 //-----------------------------------------------------------------------------
 /** Sets that this kart has finished the race and finishing time. It also
  *  notifies the race_manager about the race completion for this kart.

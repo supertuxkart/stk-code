@@ -152,6 +152,10 @@ public:
      *  speed. */
     virtual float getMaxSteerAngle () const = 0;
     // ------------------------------------------------------------------------
+    /** Returns the (maximum) speed for a given turn radius.
+     *  \param radius The radius for which the speed needs to be computed. */
+    virtual float  getSpeedForTurnRadius(float radius) const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the time till full steering is reached for this kart.
      *  This can depend on the current steering value, which must be >= 0.
      */

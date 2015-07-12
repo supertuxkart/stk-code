@@ -219,8 +219,6 @@ void KartPropertiesManager::loadCharacteristics(const XMLNode *root)
         (*type)->get("name", &name);
         m_kart_type_characteristics.emplace(name,
             std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(*type)));
-        XmlCharacteristic *c = (XmlCharacteristic*) &(*((--m_kart_type_characteristics.end())->second));
-        c->getMass();
     }
     // Load player difficulties
     nodes.clear();

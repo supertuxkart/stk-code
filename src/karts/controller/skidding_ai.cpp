@@ -443,8 +443,7 @@ void SkiddingAI::handleBraking()
        m_current_track_direction==GraphNode::DIR_RIGHT   )
     {
         float max_turn_speed =
-            m_kart->getKartProperties()
-                   ->getSpeedForTurnRadius(m_current_curve_radius);
+            m_kart->getSpeedForTurnRadius(m_current_curve_radius);
 
         if(m_kart->getSpeed() > 1.5f*max_turn_speed  &&
             m_kart->getSpeed()>MIN_SPEED             &&

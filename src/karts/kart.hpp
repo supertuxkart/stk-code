@@ -244,6 +244,8 @@ public:
                                   const btQuaternion& off_rotation);
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
+    virtual float  getSpeedForTurnRadius(float radius) const;
+    virtual float  getMaxSteerAngle(float speed) const;
     virtual bool   isInRest         () const;
     virtual void   applyEngineForce (float force);
 
@@ -346,7 +348,7 @@ public:
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */
     virtual float getMaxSteerAngle () const
-                    { return m_kart_properties->getMaxSteerAngle(getSpeed()); }
+                    { return getMaxSteerAngle(getSpeed()); }
     // ------------------------------------------------------------------------
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values). */

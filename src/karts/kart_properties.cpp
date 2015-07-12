@@ -296,13 +296,6 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     m_wheel_base = fabsf(m_kart_model->getLength() - 2 *
         m_combined_characteristic->getWheelsRadius());
 
-    // Now convert the turn radius into turn angle:
-    for(unsigned int i=0; i<m_turn_angle_at_speed.size(); i++)
-    {
-        m_turn_angle_at_speed.setY( i,
-                            sin(m_wheel_base/m_turn_angle_at_speed.getY(i)) );
-    }
-
     m_shadow_texture = irr_driver->getTexture(m_shadow_file);
 
     irr_driver->unsetTextureErrorMessage();
@@ -399,13 +392,6 @@ void KartProperties::getAllData(const XMLNode * root)
                        "Missing or incorrect value for impulse-type: '%s'.",
                        s.c_str());
         }
-    }
-
-    if (const XMLNode *turn_node = root->getNode("turn"))
-    {
-        turn_node->get("turn-radius",          &m_turn_angle_at_speed );
-        // For now store the turn radius in turn angle, the correct
-        // value can only be determined later in ::load
     }
 
     //TODO: wheel front right and wheel front left is not loaded, yet is
