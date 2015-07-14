@@ -658,7 +658,7 @@ void KartModel::reset()
     {
         if (m_wheel_node[i])
         {
-            core::vector3df rotation(btScalar(rand() % 360)*DEGREE_TO_RAD, 0, 0);
+            core::vector3df rotation(btScalar(rand() % 360), 0, 0);
             m_wheel_node[i]->setRotation(rotation);
         }
     }
