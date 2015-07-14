@@ -40,6 +40,7 @@
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
+#include "tracks/check_cylinder.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/check_sphere.hpp"
 #include "tracks/model_definition_loader.hpp"
@@ -961,11 +962,12 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     {
         // TODO: rewrite as a sphere check structure?
         ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
+        // CheckManager::get()->add(new CheckSphere(xml_node, 0 /* TODO what is this? */));
     }
     else if (m_type == TRIGGER_TYPE_CYLINDER)
     {
         // TODO: create the right check structure
-        CheckManager::get()->add(new CheckSphere(xml_node, 0 /* TODO what is this? */));
+        CheckManager::get()->add(new CheckCylinder(xml_node, 0 /* TODO what is this? */));
     }
     else
     {

@@ -198,13 +198,6 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
  */
 void CheckStructure::trigger(unsigned int kart_index)
 {
-    World* w = World::getWorld();
-    LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
-    if (lw != NULL)
-    {
-        lw->getTrackSector(kart_index).setLastTriggeredCheckline(m_index);
-    }
-
     switch(m_check_type)
     {
     case CT_NEW_LAP :
