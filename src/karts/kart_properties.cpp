@@ -111,7 +111,6 @@ KartProperties::KartProperties(const std::string &filename)
     m_shape                      = 32;  // close enough to a circle.
     m_engine_sfx_type            = "engine_small";
     m_kart_model                 = NULL;
-    m_has_rand_wheels            = false;
     m_nitro_min_consumption      = 0.53f;
     // The default constructor for stk_config uses filename=""
     if (filename != "")
@@ -338,8 +337,6 @@ void KartProperties::getAllData(const XMLNode * root)
     m_color.set(255, (int)(255*c.getX()), (int)(255*c.getY()), (int)(255*c.getZ()));
 
     root->get("groups",            &m_groups           );
-
-    root->get("random-wheel-rot",  &m_has_rand_wheels  );
 
     root->get("shadow-scale",      &m_shadow_scale     );
     root->get("shadow-x-offset",   &m_shadow_x_offset  );

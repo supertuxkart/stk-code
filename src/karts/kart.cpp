@@ -2572,10 +2572,6 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         }
     }
 
-    // m_speed*dt is the distance the kart has moved, which determines
-    // how much the wheels need to rotate.
-    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed);
-
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
     float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
@@ -2636,6 +2632,10 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, m_current_lean));
+
+    // m_speed*dt is the distance the kart has moved, which determines
+    // how much the wheels need to rotate.
+    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed);
 
 #ifdef XX
     // cheap wheelie effect

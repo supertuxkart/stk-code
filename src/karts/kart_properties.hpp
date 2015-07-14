@@ -211,8 +211,6 @@ private:
     /** A hard flag that moves the graphical chassis higher if it's insde
       * the track. Might cause stuttering. */
     bool        m_prevent_chassis_in_terrain;
-    /** If the kart is supposed to have random wheel rotation at start. */
-    bool        m_has_rand_wheels;
     /** Max. length of plunger rubber band. */
     float       m_rubber_band_max_length;
     /** Force of an attached rubber band. */
@@ -920,9 +918,6 @@ public:
     /** Return show long a jump must last in order to play the jump
      *  animation. */
     float getJumpAnimationTime() const { return m_jump_animation_time; }
-    // ------------------------------------------------------------------------
-    /** Returns true if wheels should have random rotation at start. */
-    bool hasRandomWheels() const { return m_has_rand_wheels; }
     // ------------------------------------------------------------------------
     /** Returns minimum time during which nitro is consumed when pressing nitro
      *  key, to prevent using nitro in very short bursts

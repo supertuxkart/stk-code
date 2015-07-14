@@ -656,12 +656,11 @@ void KartModel::reset()
 {
     for (unsigned int i = 0; i < 4; i++)
     {
-        m_wheel_rotation[i] = btScalar(rand() % 360);
-        m_wheel_rotation_dt[i] = 0.0f;
-        core::vector3df wheel_rotation(0, 0, 0);
         if (m_wheel_node[i])
-            m_wheel_node[i]->setRotation(wheel_rotation);
-
+        {
+            core::vector3df rotation(btScalar(rand() % 360)*DEGREE_TO_RAD, 0, 0);
+            m_wheel_node[i]->setRotation(rotation);
+        }
     }
     update(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -787,7 +786,7 @@ void KartModel::setDefaultSuspension()
 /** Rotates and turns the wheels appropriately, and adjust for suspension
     + updates the speed-weighted objects' animations.
  *  \param dt time since last frame
- *  \param rotation_dt How far the wheels have rotated since last time.
+ *  \param distance How far the wheels have rotated since last time.
  *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
  *  \param speed The speed of the kart in meters/sec, used for the
@@ -811,11 +810,6 @@ void KartModel::update(float dt, float distance, float steer,  float speed)
             }
         }
 #endif
-        //m_wheel_rotation gives the rotation around the X-axis
-        m_wheel_rotation_dt[i] = distance / m_wheel_graphics_radius[i];
-        m_wheel_rotation[i] += m_wheel_rotation_dt[i];
-        m_wheel_rotation[i]    = fmodf(m_wheel_rotation[i], 2 * M_PI);
-
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
 
         const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
@@ -824,7 +818,7 @@ void KartModel::update(float dt, float distance, float steer,  float speed)
 
         // Now calculate the new rotation: (old + change) mod 360
         float new_rotation = m_wheel_node[i]->getRotation().X
-                             + m_wheel_rotation_dt[i] * RAD_TO_DEGREE;
+                           + distance / m_wheel_graphics_radius[i] * RAD_TO_DEGREE;
         new_rotation = fmodf(new_rotation, 360);
         core::vector3df wheel_rotation(new_rotation, 0, 0);
         // Only apply steer to first 2 wheels.
