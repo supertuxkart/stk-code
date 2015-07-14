@@ -158,16 +158,13 @@ void btKart::updateWheelTransform(int wheelIndex, bool interpolatedTransform)
     btQuaternion steeringOrn(up,steering);//wheel.m_steering);
     btMatrix3x3 steeringMat(steeringOrn);
 
-    btQuaternion rotatingOrn(right,0);
-    btMatrix3x3 rotatingMat(rotatingOrn);
-
     btMatrix3x3 basis2(
         right[0],fwd[0],up[0],
         right[1],fwd[1],up[1],
         right[2],fwd[2],up[2]
     );
 
-    wheel.m_worldTransform.setBasis(steeringMat * rotatingMat * basis2);
+    wheel.m_worldTransform.setBasis(steeringMat * basis2);
     wheel.m_worldTransform.setOrigin(
                                      wheel.m_raycastInfo.m_hardPointWS
                                     + wheel.m_raycastInfo.m_wheelDirectionWS
