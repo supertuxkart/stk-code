@@ -71,9 +71,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_presentation    = presentation;
     m_is_driveable    = false;
     m_soccer_ball     = false;
-    m_garage          = false;
     m_initially_visible = false;
-    m_distance        = 0;
     m_type            = "";
 
     if (m_interaction != "ghost" && m_interaction != "none" &&
@@ -127,9 +125,6 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_soccer_ball = false;
     xml_node.get("soccer_ball", &m_soccer_ball);
     
-    m_garage = false;
-    m_distance = 0;
-
     std::string type;
     xml_node.get("type",    &type );
 
@@ -179,16 +174,9 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     }
     else if (type == "action-trigger")
     {
-        std::string m_action;
-        xml_node.get("action", &m_action);
-        xml_node.get("distance", &m_distance);
-        m_name = m_action;
-        //adds action as name so that it can be found by using getName()
-        if (m_action == "garage")
-        {
-            m_garage = true;
-        }
-
+        std::string action;
+        xml_node.get("action", &action);
+        m_name = action; //adds action as name so that it can be found by using getName()
         m_presentation = new TrackObjectPresentationActionTrigger(xml_node);
     }
     else if (type == "billboard")

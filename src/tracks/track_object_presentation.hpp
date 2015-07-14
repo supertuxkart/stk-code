@@ -349,6 +349,13 @@ public:
 };   // TrackObjectPresentationLight
 
 // ============================================================================
+
+enum ActionTriggerType
+{
+    TRIGGER_TYPE_POINT = 0,
+    TRIGGER_TYPE_CYLINDER = 1
+};
+
 /** \ingroup tracks
  *  A track object representation that consists of an action trigger
  */
@@ -360,6 +367,8 @@ private:
     std::string m_action;
 
     bool m_action_active;
+
+    ActionTriggerType m_type;
 
 public:
     TrackObjectPresentationActionTrigger(const XMLNode& xml_node);

@@ -128,6 +128,7 @@ void OverWorld::update(float dt)
         m_karts[n]->setEnergy(100.0f);
     }
 
+    /*
     TrackObjectManager* tom = getTrack()->getTrackObjectManager();
     PtrVector<TrackObject>& objects = tom->getObjects();
     for(unsigned int i=0; i<objects.size(); i++)
@@ -145,6 +146,7 @@ void OverWorld::update(float dt)
             obj->reset();
         }
     }
+    */
 
     if (m_return_to_garage)
     {

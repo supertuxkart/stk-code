@@ -80,12 +80,8 @@ protected:
 
     bool                           m_soccer_ball;
     
-    bool                           m_garage;
-
     /** True if a kart can drive on this object. This will */
     bool                           m_is_driveable;
-
-    float                          m_distance;
 
     PhysicalObject*                m_physical_object;
 
@@ -160,10 +156,6 @@ public:
 	bool isEnabled() const { return m_enabled; }
     // ------------------------------------------------------------------------
     bool isSoccerBall() const { return m_soccer_ball; }
-    // ------------------------------------------------------------------------
-    bool isGarage() const { return m_garage; }
-    // ------------------------------------------------------------------------
-    float getDistance() const { return m_distance; }
     // ------------------------------------------------------------------------
     const PhysicalObject* getPhysicalObject() const { return m_physical_object; }
     // ------------------------------------------------------------------------
