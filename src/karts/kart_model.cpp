@@ -813,7 +813,9 @@ void KartModel::update(float dt, float distance, float steer,  float speed)
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
 
         const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
-        pos.Y = -wi.m_raycastInfo.m_suspensionLength + m_wheel_graphics_radius[i] + getLowestPoint();
+        pos.Y +=   m_default_physics_suspension[i] 
+                 - wi.m_raycastInfo.m_suspensionLength
+                 - getLowestPoint();
         m_wheel_node[i]->setPosition(pos);
 
         // Now calculate the new rotation: (old + change) mod 360

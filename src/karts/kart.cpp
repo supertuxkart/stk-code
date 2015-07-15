@@ -2476,11 +2476,12 @@ void Kart::kartIsInRestNow()
     for(int i=0; i<m_vehicle->getNumWheels(); i++)
     {
         const btWheelInfo &wi = m_vehicle->getWheelInfo(i);
-        f +=  wi.m_chassisConnectionPointCS.getY()
-            - wi.m_raycastInfo.m_suspensionLength - wi.m_wheelsRadius;
+        f += wi.m_raycastInfo.m_suspensionLength;
     }
+    m_terrain_info->update(getTrans());
     m_graphical_y_offset = f/m_vehicle->getNumWheels()
                          + getKartProperties()->getGraphicalYOffset();
+    m_graphical_y_offset = m_kart_model->getLowestPoint() - (getXYZ().getY() - m_terrain_info->getHoT());
 
     m_kart_model->setDefaultSuspension();
 }   // kartIsInRestNow
@@ -2595,11 +2596,6 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         }   // for i<num_wheels
         const btWheelInfo &w = getVehicle()->getWheelInfo(0);
 
-        // Determine the shadow position from the terrain Y position. This
-        // leaves the shadow on the ground even if the kart is jumping because
-        // of skidding (shadows are disabled when wheel are not on the track).
-        m_shadow->update(m_terrain_info->getHoT() - getXYZ().getY()
-                         -m_skidding->getGraphicalJumpOffset());
         // Recompute the default average suspension length, see
         // kartIsInRestNow() how to get from y-offset to susp. len.
         float av_sus_len = -m_graphical_y_offset
@@ -2628,6 +2624,9 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
                       + lean_height
                       - m_kart_model->getLowestPoint());
 
+    center_shift.setY(m_skidding->getGraphicalJumpOffset()
+                      + lean_height
+                      +m_graphical_y_offset);
     center_shift = getTrans().getBasis() * center_shift;
 
     Moveable::updateGraphics(dt, center_shift,
@@ -2636,6 +2635,14 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // m_speed*dt is the distance the kart has moved, which determines
     // how much the wheels need to rotate.
     m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed);
+
+    // Determine the shadow position from the terrain Y position. This
+    // leaves the shadow on the ground even if the kart is jumping because
+    // of skidding (shadows are disabled when wheel are not on the track).
+    m_shadow->update(  m_terrain_info->getHoT() - getXYZ().getY()
+                     - m_skidding->getGraphicalJumpOffset()
+                     - m_graphical_y_offset
+                     - m_kart_model->getLowestPoint());
 
 #ifdef XX
     // cheap wheelie effect
