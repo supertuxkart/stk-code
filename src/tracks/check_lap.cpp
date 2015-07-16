@@ -86,5 +86,11 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
 
     m_previous_distance[kart_index] = current_distance;
 
+    if (result)
+    {
+        LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
+        if (lw != NULL)
+            lw->setLastTriggeredCheckline(kart_index, m_index);
+    }
     return result;
 }   // isTriggered

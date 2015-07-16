@@ -155,12 +155,6 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     unsigned int kart_index)
 {
     World* w = World::getWorld();
-    LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
-    if (lw != NULL)
-    {
-        lw->getTrackSector(kart_index).setLastTriggeredCheckline(m_index);
-    }
-    
     core::vector2df p=new_pos.toIrrVector2d();
     bool sign = m_line.getPointOrientation(p)>=0;
     bool result;
@@ -195,5 +189,12 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     else
         result = false;
     m_previous_sign[kart_index] = sign;
+
+    if (result)
+    {
+        LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
+        if (lw != NULL)
+            lw->setLastTriggeredCheckline(kart_index, m_index);
+    }
     return result;
 }   // isTriggered
