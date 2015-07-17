@@ -23,6 +23,7 @@
 
 class XMLNode;
 class CheckManager;
+class TriggerItemListener;
 
 /** This class implements a check sphere that is used to change the ambient
  *  light if a kart is inside this sphere. Besides a normal radius this
@@ -45,8 +46,10 @@ private:
     /** Stores the distance of each kart from the center of this sphere.
      *  This saves some computations. */
     std::vector<float> m_distance2;
+    TriggerItemListener* m_listener;
 public:
-                 CheckCylinder(const XMLNode &node, unsigned int index);
+                 CheckCylinder(const XMLNode &node, unsigned int index,
+                     TriggerItemListener* listener);
     virtual     ~CheckCylinder() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int kart_id);

@@ -652,7 +652,7 @@ void TrackObjectPresentationSound::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationSound::onTriggerItemApproached(Item* who)
+void TrackObjectPresentationSound::onTriggerItemApproached()
 {
     if (m_sound != NULL && m_sound->getStatus() != SFXBase::SFX_PLAYING)
     {
@@ -966,8 +966,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     }
     else if (m_type == TRIGGER_TYPE_CYLINDER)
     {
-        // TODO: create the right check structure
-        CheckManager::get()->add(new CheckCylinder(xml_node, 0 /* TODO what is this? */));
+        CheckManager::get()->add(new CheckCylinder(xml_node, 0 /* TODO what is this? */, this));
     }
     else
     {
@@ -993,7 +992,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
 }   // TrackObjectPresentationActionTrigger
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
+void TrackObjectPresentationActionTrigger::onTriggerItemApproached()
 {
     if (!m_action_active) return;
 
@@ -1004,6 +1003,6 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     Camera* camera = Camera::getActiveCamera();
     if (camera != NULL && camera->getKart() != NULL)
         idKart = camera->getKart()->getWorldKartId();
-    script_engine->runFunction("void " + m_action + "(int)",
+    script_engine->runFunction(true, "void " + m_action + "(int)",
         [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
 }   // onTriggerItemApproached

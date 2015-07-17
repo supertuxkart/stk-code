@@ -142,7 +142,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         unsigned char result = -1;
         Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
         std::function<void(asIScriptContext*)> null_callback;
-        script_engine->runFunction("bool " + condition + "()", null_callback,
+        script_engine->runFunction(true, "bool " + condition + "()", null_callback,
             [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
 
         if (result == 0)

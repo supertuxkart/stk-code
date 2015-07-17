@@ -22,14 +22,16 @@
 #include <stdio.h>
 
 #include "io/xml_node.hpp"
+#include "items/item.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 
-CheckCylinder::CheckCylinder(const XMLNode &node, unsigned int index)
+CheckCylinder::CheckCylinder(const XMLNode &node, unsigned int index, TriggerItemListener* listener)
            : CheckStructure(node, index)
 {
     m_radius2 = 1;
     m_height = 0;
+    m_listener = listener;
     node.get("height", &m_height);
     node.get("radius", &m_radius2);
     m_radius2 *= m_radius2;
@@ -56,12 +58,20 @@ bool CheckCylinder::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                                 unsigned int kart_id)
 {
     // TODO: this is the code for a sphere, rewrite for cylinder
-    float old_dist2   = (old_pos-m_center_point).length2();
-    float new_dist2   = (new_pos-m_center_point).length2();
+    Vec3 old_pos_xz(old_pos.x(), 0.0f, old_pos.z());
+    Vec3 new_pos_xz(new_pos.x(), 0.0f, new_pos.z());
+    Vec3 center_xz(m_center_point.x(), 0.0f, m_center_point.z());
+    float old_dist2 = (old_pos_xz - center_xz).length2();
+    float new_dist2 = (new_pos_xz - center_xz).length2();
     m_is_inside[kart_id] = new_dist2<m_radius2;
     m_distance2[kart_id] = new_dist2;
     // Trigger if the kart goes from outside (or border) to inside,
     // or inside ro outside (or border).
-    return (old_dist2>=m_radius2 && new_dist2 < m_radius2) ||
+    bool triggered = (old_dist2>=m_radius2 && new_dist2 < m_radius2) ||
            (old_dist2< m_radius2 && new_dist2 >=m_radius2);
+
+    if (triggered && m_listener != NULL)
+        m_listener->onTriggerItemApproached();
+
+    return triggered;
 }   // isTriggered
