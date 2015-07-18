@@ -154,15 +154,6 @@
                  otherwise obstricts too much of the view.  -->
     <camera distance="1.0" forward-up-angle="15"
             backward-up-angle="5"/>
-    <!-- Options to affect the graphical chassis:
-         y-offset: Additional offset to move graphical chassis with regards
-                   to the physics, used to reduce frequencey of graphical
-                   chassis in terrain.
-         prevent-chassis-in-terrain: a hard flag to prevent nearly all instances
-                   of chassis in terrain. Can (atm) cause some stuttering. -->
-    <graphics y-offset="0.0"
-              prevent-chassis-in-terrain="true"
-    />
 
    <!-- Jump animation related values:
         animation-time: only if the estimated time for a jump is larger

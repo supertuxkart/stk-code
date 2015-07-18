@@ -563,14 +563,6 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         }
     }
 
-    float y_off = kart_properties.getGraphicalYOffset();
-    if(y_off!=0)
-    {
-        for (unsigned int i = 0; i < 4; i++)
-            m_wheel_graphics_position[i].setY(
-                                  m_wheel_graphics_position[i].getY() - y_off);
-    }
-
     // Load the wheel models. This can't be done early, since the default
     // values for the graphical position must be defined, which in turn
     // depend on the size of the model.

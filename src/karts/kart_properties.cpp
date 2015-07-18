@@ -93,7 +93,6 @@ KartProperties::KartProperties(const std::string &filename)
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
         m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time =
         m_smooth_flying_impulse = m_physical_wheel_position =
-        m_graphical_y_offset =
             UNDEFINED;
 
     m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
@@ -105,7 +104,6 @@ KartProperties::KartProperties(const std::string &filename)
     m_gravity_center_shift       = Vec3(UNDEFINED);
     m_bevel_factor               = Vec3(UNDEFINED);
     m_exp_spring_response        = false;
-    m_prevent_chassis_in_terrain = false;
     m_version                    = 0;
     m_color                      = video::SColor(255, 0, 0, 0);
     m_shape                      = 32;  // close enough to a circle.
@@ -632,13 +630,6 @@ void KartProperties::getAllData(const XMLNode * root)
         startup_node->get("boost", &m_startup_boost);
     }
 
-    if(const XMLNode *graphics_node = root->getNode("graphics"))
-    {
-        graphics_node->get("y-offset",          &m_graphical_y_offset);
-        graphics_node->get("prevent-chassis-in-terrain",
-                                                &m_prevent_chassis_in_terrain);
-    }
-
     if(m_kart_model)
         m_kart_model->loadInfo(*root);
 }   // getAllData
@@ -758,7 +749,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_explosion_invulnerability_time,
                                             "explosion invulnerability-time");
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
-    CHECK_NEG(m_graphical_y_offset,         "graphics y-offset"             );
+
     for(unsigned int i=RaceManager::DIFFICULTY_FIRST;
         i<=RaceManager::DIFFICULTY_LAST; i++)
     {
