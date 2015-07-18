@@ -2690,10 +2690,11 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // Determine the shadow position from the terrain Y position. This
     // leaves the shadow on the ground even if the kart is jumping because
     // of skidding (shadows are disabled when wheel are not on the track).
-    m_shadow->update(  m_terrain_info->getHoT() - getXYZ().getY()
-                     - m_skidding->getGraphicalJumpOffset()
-                     - m_graphical_y_offset
-                     - m_kart_model->getLowestPoint());
+    if (m_shadow)
+        m_shadow->update(  m_terrain_info->getHoT() - getXYZ().getY()
+                         - m_skidding->getGraphicalJumpOffset()
+                         - m_graphical_y_offset
+                         - m_kart_model->getLowestPoint());
 
 #ifdef XX
     // cheap wheelie effect
