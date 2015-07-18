@@ -2463,11 +2463,12 @@ void Kart::applyEngineForce(float force)
 //-----------------------------------------------------------------------------
 /** Computes the transform of the graphical kart chasses with regards to the
  *  physical chassis. This function is called once the kart comes to rest
- *  before the race starts. Based on the current physical kart position, it
- *  computes an (at this stage Y-only) offset by which the graphical chassis
- *  is moved so that it appears the way it is designed in blender. This means
- *  that the distance of the wheels from the chassis (i.e. suspension) appears
- *  as in blender when karts are in rest.
+ *  before the race starts (see World::resetAllKarts). Based on the current
+ *  physical kart position it computes an (at this stage Y-only) offset by
+ *  which the graphical chassis is moved so that it appears the way it is
+ *  designed in blender. This means that the distance of the wheels from the
+ *  chassis (i.e. suspension) appears as in blender when karts are in rest.
+ *  See updateGraphics for more details.
  */
 void Kart::kartIsInRestNow()
 {
@@ -2478,20 +2479,88 @@ void Kart::kartIsInRestNow()
         const btWheelInfo &wi = m_vehicle->getWheelInfo(i);
         f += wi.m_raycastInfo.m_suspensionLength;
     }
-    m_terrain_info->update(getTrans());
-    m_graphical_y_offset = f/m_vehicle->getNumWheels()
-                         + getKartProperties()->getGraphicalYOffset();
-    m_graphical_y_offset = m_kart_model->getLowestPoint() - (getXYZ().getY() - m_terrain_info->getHoT());
+    m_graphical_y_offset = -f / m_vehicle->getNumWheels();
 
     m_kart_model->setDefaultSuspension();
 }   // kartIsInRestNow
 
 //-----------------------------------------------------------------------------
-/** Updates the graphics model. Mainly set the graphical position to be the
- *  same as the physics position, but uses offsets to position and rotation
- *  for special gfx effects (e.g. skidding will turn the karts more). These
- *  variables are actually not used here atm, but are defined here and then
- *  used in Moveable.
+/** Updates the graphics model. It is responsible for positioning the graphical
+ *  chasses at an 'appropriate' position: typically, the physical model has
+ *  much longer suspension, so if the graphical chassis would be at the same
+ *  location as the physical chassis, the wheels would be too far away.
+ *  Instead the default suspension length is saved once the kart have been
+ *  settled at start up (see World::resetAllKarts, which just runs several
+ *  physics-only simulation steps so that karts come to a rest). Then at
+ *  race time, only the difference between the current suspension length and
+ *  this default suspension length is used. The graphical kart chassis will be
+ *  offset so that when the kart is in rest, i.e. suspension length == 
+ *  default suspension length, the kart will look the way it was modelled in
+ *  blender. To explain the various offsets used, here a view from the side
+ *  focusing on the Y axis only (X/Z position of the graphical chassis is
+ *  identical to the physical chassis):
+ *
+ * Y|     | visual kart                |       physical kart
+ *  |     |                            |
+ *  |     |                            |
+ *  |     |                            |
+ *  |     |                            +-------------COG---------------
+ *  |     |                            :
+ *  |     +---------low------          :
+ *  |     O                            :
+ *  +--------------------------------------------------------------------------
+ *                                                                            X
+ *  'O'   : visual wheel                ':'  : raycast from physics
+ *  'low' : lowest Y coordinate of      COG  : Center of gravity (at bottom of
+ *          model                              chassis)
+ *
+ *  The visual kart is stored so that if it is shown at (0,0,0) it would be
+ *  the same as in blender. This on the other hand means, if the kart is shown
+ *  at the position of the physical chassis (which is at COG in the picture
+ *  above), the kart and its wheels would be floating in the air (exactly by
+ *  as much as the suspension length), and the wheels would be exactly at the
+ *  bottom of the physical chassis (i.e. just on the plane going through COG
+ *  and parallel to the ground).
+ *  If we want to align the visual chassis to be the same as the physical
+ *  chassis, we would need to subtract 'low' from the physical position.
+ *  If the kart is then displayed at COG.y-low, the bottom of the kart (which
+ *  is at 'low' above ground) would be at COG.y-low + low = COG.y --> visual
+ *  and physical chassis are identical.
+ *
+ *  Unfortunately, the suspension length used in the physics is much too high,
+ *  the karts would be way above their wheels, basically disconneccted
+ *  (typical physical suspension length is around 0.28, while the distance
+ *  between wheel and chassis in blender is in the order of 0.10 --> so there
+ *  would be an additional distance of around 0.18 between wheel chassis as
+ *  designed in blender and in stk - even more if the kart is driving downhill
+ *  when the suspension extends further to keep contact with the ground).
+ *  To make the visuals look closer to what they are in blender, an additional
+ *  offset is added: before the start of a race the physics simulation is run
+ *  to find a stable position for each kart (see World::resetAllKarts). Once
+ *  a kart is stable, we save this suspension length in m_graphical_y_offset.
+ *  This offset is subtracted from the COG of the kart. So if the kart is in
+ *  rest (i.e. suspenion == default_suspension == m_graphical_y_offset),
+ *  The kart is showen exactly at the same height above ground as it is in
+ *  blender. If the suspension is shorter by DY (because the kart is
+ *  accelerating, the ground goes up, ...), the visual chassis is lowered by
+ *  DY as well.
+ *
+ *  Of course this means that the Y position of the wheels (relative to the
+ *  visual kart chassis) needs to be adjusted: if the kart is in rest, the 
+ *  wheels are exactly on the ground. If the suspension is shorter, that wheel
+ *  would appear to be partly in the ground, and if the suspension is longer,
+ *  the wheel would not touch the ground.
+ *
+ *  The wheels must be offset by how much the current suspension length is
+ *  longer or shorter than the default (i.e. at rest) suspension length.
+ *  This is done in KartModel (pos is the position of the wheel relative
+ *  to the visual kart chassis): 
+ *          pos.Y += m_default_physics_suspension[i]
+ *                  - wi.m_raycastInfo.m_suspensionLength
+ *
+ *
+ *  This function also takes additional graphical effects into account, e.g.
+ *  a (visual only) jump when skidding, and leaning of the kart.
  *  \param offset_xyz Offset to be added to the position.
  *  \param rotation Additional rotation.
  */
@@ -2577,58 +2646,14 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // To avoid this, raise the kart enough to offset the leaning.
     float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
 
-    float heading = m_skidding->getVisualSkidRotation();
-    float xx = fabsf(m_speed)* getKartProperties()->getDownwardImpulseFactor()*0.0006f;
-    Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset()
-                              + lean_height +m_graphical_y_offset+xx, 0);
-
-    // Try to prevent the graphical chassis to be inside of the terrain:
-    if(m_kart_properties->getPreventChassisInTerrain())
-    {
-        // Get the shortest suspension length (=closest point to terrain).
-        float min_susp_len = 99.9f;
-        for (int i = 0; i < getVehicle()->getNumWheels(); i++)
-        {
-            float susp_len = getVehicle()->getWheelInfo(i).m_raycastInfo
-                                                          .m_suspensionLength;
-            if (susp_len < min_susp_len)
-                min_susp_len = susp_len;
-        }   // for i<num_wheels
-        const btWheelInfo &w = getVehicle()->getWheelInfo(0);
-
-        // Recompute the default average suspension length, see
-        // kartIsInRestNow() how to get from y-offset to susp. len.
-        float av_sus_len = -m_graphical_y_offset
-                         + w.m_chassisConnectionPointCS.getY()
-                         - w.m_wheelsRadius;
-
-        float delta = av_sus_len - min_susp_len;
-        // If the suspension length is so short, that it is less than the
-        // lowest point of the kart, it indicates that the graphical chassis
-        // would be inside of the track:
-        if (delta > m_kart_model->getLowestPoint())
-        {
-            center_shift.setY(center_shift.getY() + delta - m_kart_model->getLowestPoint());
-        }
-
-        // FIXME: for now, debug output in case we have to debug it
-        //Log::verbose("kart", "min %f y off %f overall off %f lowest %f delta %f asl %f",
-        //    min_susp_len, m_graphical_y_offset, center_shift.getY(),
-        //    m_kart_model->getLowestPoint(),
-        //    delta,
-        //    av_sus_len
-        //    );
-    }
-
-    center_shift.setY(m_skidding->getGraphicalJumpOffset()
-                      + lean_height
-                      - m_kart_model->getLowestPoint());
+    Vec3 center_shift(0, 0, 0);
 
     center_shift.setY(m_skidding->getGraphicalJumpOffset()
                       + lean_height
                       +m_graphical_y_offset);
     center_shift = getTrans().getBasis() * center_shift;
 
+    float heading = m_skidding->getVisualSkidRotation();
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, m_current_lean));
 

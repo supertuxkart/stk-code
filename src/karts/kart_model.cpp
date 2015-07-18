@@ -784,7 +784,8 @@ void KartModel::setDefaultSuspension()
 
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension
-    + updates the speed-weighted objects' animations.
+ *  updates the speed-weighted objects' animations. 
+ *
  *  \param dt time since last frame
  *  \param distance How far the wheels have rotated since last time.
  *  \param steer The actual steer settings.
@@ -794,28 +795,27 @@ void KartModel::setDefaultSuspension()
  */
 void KartModel::update(float dt, float distance, float steer,  float speed)
 {
-   core::vector3df wheel_steer(0, steer*30.0f, 0);
+    core::vector3df wheel_steer(0, steer*30.0f, 0);
 
     for(unsigned int i=0; i<4; i++)
     {
-        if(!m_kart || !m_wheel_node[i]) continue;
+       if (!m_kart || !m_wheel_node[i]) continue;
 #ifdef DEBUG
-        if (!dynamic_cast<GhostKart*>(m_kart))
-        {
-            const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
-            if (UserConfigParams::m_physics_debug && m_kart)
-            {
-                // Make wheels that are not touching the ground invisible
-                m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
-            }
-        }
+       if (UserConfigParams::m_physics_debug && 
+           !dynamic_cast<GhostKart*>(m_kart)     )
+       {
+           const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+           // Make wheels that are not touching the ground invisible
+           m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
+       }
 #endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
 
         const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+
+        // Check documentation of Kart::updateGraphics for the following line
         pos.Y +=   m_default_physics_suspension[i] 
-                 - wi.m_raycastInfo.m_suspensionLength
-                 - getLowestPoint();
+                 - wi.m_raycastInfo.m_suspensionLength;
         m_wheel_node[i]->setPosition(pos);
 
         // Now calculate the new rotation: (old + change) mod 360
