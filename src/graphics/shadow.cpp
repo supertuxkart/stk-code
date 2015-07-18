@@ -18,23 +18,27 @@
 
 #include "graphics/shadow.hpp"
 #include "graphics/irr_driver.hpp"
+#include "karts/kart_properties.hpp"
 
 #include <IMesh.h>
 #include <IMeshSceneNode.h>
 #include <ISceneNode.h>
 
-Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node,
-               float scale = 1.0, float x_offset = 0.0, float y_offset = 0.0,
-               float z_offset = 0.0)
+Shadow::Shadow(const KartProperties *kart_properties,
+               scene::ISceneNode *node,
+               float y_offset = 0.0)
 {
     video::SMaterial m;
-    m.setTexture(0, texture);
+    m.setTexture(0, kart_properties->getShadowTexture());
     m.BackfaceCulling = false;
     m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     m.setFlag(video::EMF_ZWRITE_ENABLE , false);
     m_mesh   = irr_driver->createQuadMesh(&m, /*create_one_quad*/true);
     scene::IMeshBuffer *buffer = m_mesh->getMeshBuffer(0);
     irr::video::S3DVertex* v=(video::S3DVertex*)buffer->getVertices();
+    float scale = kart_properties->getShadowScale();
+    float x_offset = kart_properties->getShadowXOffset();
+    float z_offset = kart_properties->getShadowXOffset();
     v[0].Pos.X = -scale+x_offset; v[0].Pos.Z =  scale+z_offset; v[0].Pos.Y = 0.01f-y_offset;
     v[1].Pos.X =  scale+x_offset; v[1].Pos.Z =  scale+z_offset; v[1].Pos.Y = 0.01f-y_offset;
     v[2].Pos.X =  scale+x_offset; v[2].Pos.Z = -scale+z_offset; v[2].Pos.Y = 0.01f-y_offset;

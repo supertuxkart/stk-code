@@ -21,7 +21,7 @@
 
 #include "utils/no_copy.hpp"
 
-#include <string>
+class KartProperties;
 
 namespace irr
 {
@@ -46,8 +46,8 @@ private:
     /** The scene node of the kart to which this shadow belongs. */
     scene::ISceneNode  *m_parent_kart_node;
 public:
-         Shadow(video::ITexture *texture, scene::ISceneNode *node,
-                float scale, float x_offset, float y_offset,float z_offset);
+         Shadow(const KartProperties *kart_properties,
+                scene::ISceneNode *node, float y_offset);
         ~Shadow();
     void enableShadow();
     void disableShadow();
