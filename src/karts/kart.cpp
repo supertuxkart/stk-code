@@ -2479,7 +2479,14 @@ void Kart::kartIsInRestNow()
         const btWheelInfo &wi = m_vehicle->getWheelInfo(i);
         f += wi.m_raycastInfo.m_suspensionLength;
     }
-    m_graphical_y_offset = -f / m_vehicle->getNumWheels();
+
+    // The offset 'lowest point' is added to avoid that the
+    // visual chassis appears in the ground (it could be any
+    // constant, there is no real reason to use the lowest point
+    // but that value has worked good in the past). See documentation
+    // for updateGraphics() for full details.
+    m_graphical_y_offset = -f / m_vehicle->getNumWheels()
+                         + m_kart_model->getLowestPoint();
 
     m_kart_model->setDefaultSuspension();
 }   // kartIsInRestNow
@@ -2545,6 +2552,22 @@ void Kart::kartIsInRestNow()
  *  accelerating, the ground goes up, ...), the visual chassis is lowered by
  *  DY as well.
  *
+ *  While the above algorithm indeed results in the right position of the
+ *  visual chassis, in reality the visual chassis is too low. For example,
+ *  nolok's chassis has its lowest point at the rear at around 0.10 above the
+ *  ground (and the lowest point overall is 0.05, though this is at the front
+ *  and so not easily visible), so if the suspension is compressed by more than
+ *  that, the chassiswill appear to be in the ground. Testing on the sand track
+ *  shows that the suspension is compressed by 0.12 (and up to 0.16 in some
+ *  extreme points), which means that the chassis will appear to be in the 
+ *  ground quite easily. Therefore the chassis is actually moved up a bit to
+ *  avoid this problem. Historically (due to never sorting out that formula
+ *  properly) the chassis was moved twice as high as its lowest point, e.g.
+ *  nolok's lowest point is at 0.05, so the whole chassis was raised by 0.05
+ *  (this was not done by design, but because of a bug ;)  ). Since this visual
+ *  offset has worked well in the past, the visual chassis is moved by the
+ *  same amount higher.
+ *
  *  Of course this means that the Y position of the wheels (relative to the
  *  visual kart chassis) needs to be adjusted: if the kart is in rest, the 
  *  wheels are exactly on the ground. If the suspension is shorter, that wheel
@@ -2557,8 +2580,11 @@ void Kart::kartIsInRestNow()
  *  to the visual kart chassis): 
  *          pos.Y += m_default_physics_suspension[i]
  *                  - wi.m_raycastInfo.m_suspensionLength
- *
- *
+ *  But since the chassis is raised an additional 'getLowestPoint' (see
+ *  desctiption two paragraphs above), the wheels need to be lowered by that
+ *  amount so that they still touch the ground (the wheel nodes are child of
+ *  the chassis scene node, so if the chassis is raised by X, the wheels need
+ *  to be lowered by X).
  *  This function also takes additional graphical effects into account, e.g.
  *  a (visual only) jump when skidding, and leaning of the kart.
  *  \param offset_xyz Offset to be added to the position.
