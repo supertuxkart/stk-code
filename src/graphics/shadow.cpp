@@ -28,6 +28,7 @@ Shadow::Shadow(const KartProperties *kart_properties,
                scene::ISceneNode *node,
                float y_offset = 0.0)
 {
+    m_shadow_enabled = false;
     video::SMaterial m;
     m.setTexture(0, kart_properties->getShadowTexture());
     m.BackfaceCulling = false;
@@ -74,24 +75,17 @@ Shadow::~Shadow()
 }   // ~Shadow
 
 // ----------------------------------------------------------------------------
-/** Removes the shadow, used for the simplified shadow when the kart is in
- *  the air.
+/** Updates the simulated shadow. It takes the offset (distance from visual
+ *  chassis to ground) to position the shadow quad exactly on the ground.
+ *  It also disables the shadow if requested (e.g. if the kart is in the air).
+ *  \param enabled If the shadow should be shown or not.
+ *  \param offset Distance from visual chassis to ground = position of the
+ *         shadow to make sure it is exactly on the ground.
  */
-void Shadow::disableShadow()
+void Shadow::update(bool enabled, float offset)
 {
-    m_node->setVisible(false);
-}
-// ----------------------------------------------------------------------------
-/** Enables the shadow again, after it was disabled with disableShadow().
- */
-void Shadow::enableShadow()
-{
-    m_node->setVisible(true);
-}
-// ----------------------------------------------------------------------------
-void Shadow::update(float hot)
-{
+    m_node->setVisible(enabled);
     core::vector3df pos = m_node->getPosition();
-    pos.Y = hot;
+    pos.Y = offset;
     m_node->setPosition(pos);
 }   // update

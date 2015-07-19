@@ -115,7 +115,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_bubblegum_torque     = 0.0f;
     m_invulnerable_time    = 0.0f;
     m_squash_time          = 0.0f;
-    m_shadow_enabled       = false;
 
     m_shadow               = NULL;
     m_wheel_box            = NULL;
@@ -1364,21 +1363,6 @@ void Kart::update(float dt)
         }
     }
 
-    //const bool dyn_shadows = World::getWorld()->getTrack()->hasShadows() &&
-    //                         UserConfigParams::m_shadows &&
-    //                         irr_driver->isGLSL();
-
-    // Disable the fake shadow if we're flying
-    if(m_shadow && (!isOnGround() || emergency) && m_shadow_enabled)
-    {
-        m_shadow_enabled = false;
-        m_shadow->disableShadow();
-    }
-    if(m_shadow && !m_shadow_enabled && isOnGround() && !emergency)
-    {
-        m_shadow->enableShadow();
-        m_shadow_enabled = true;
-    }
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -2687,11 +2671,14 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // leaves the shadow on the ground even if the kart is jumping because
     // of skidding (shadows are disabled when wheel are not on the track).
     if (m_shadow)
-        m_shadow->update(  m_terrain_info->getHoT() - getXYZ().getY()
-                         - m_skidding->getGraphicalJumpOffset()
-                         - m_graphical_y_offset
-                         - m_kart_model->getLowestPoint());
-
+    {
+        const bool emergency = getKartAnimation() != NULL;
+        m_shadow->update(isOnGround() && !emergency, 
+            m_terrain_info->getHoT() - getXYZ().getY()
+            - m_skidding->getGraphicalJumpOffset()
+            - m_graphical_y_offset
+            - m_kart_model->getLowestPoint());
+    }
 #ifdef XX
     // cheap wheelie effect
     if (m_controls.m_nitro)
