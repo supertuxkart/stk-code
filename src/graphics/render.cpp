@@ -189,12 +189,6 @@ void IrrDriver::renderGLSL(float dt)
         if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && !SphericalHarmonicsTextures.empty())
             irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
-        // TODO: put this outside of the rendering loop
-        if (!m_skybox_ready)
-        {
-            prepareSkybox();
-            m_skybox_ready = true;
-        }
         if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);
 
