@@ -38,6 +38,7 @@
 #include "ISkinnedMesh.h"
 #include "graphics/wind.hpp"
 #include "graphics/gl_headers.hpp"
+#include "graphics/skybox.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
@@ -217,6 +218,8 @@ private:
     std::vector<video::ITexture *> SkyboxTextures;
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
     bool m_skybox_ready;
+    
+    Skybox *m_skybox;
 
 public:
     float blueSHCoeff[9];

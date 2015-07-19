@@ -121,6 +121,8 @@ IrrDriver::IrrDriver()
     m_rtts                = NULL;
     m_post_processing     = NULL;
     m_wind                = new Wind();
+    m_skybox              = NULL;
+
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
     m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
     m_boundingboxesviz = false;
@@ -1366,7 +1368,20 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     SphericalHarmonicsTextures = sphericalHarmonics;
     SkyboxCubeMap = 0;
     SkyboxSpecularProbe = 0;
-    m_skybox_ready = false;
+    
+    
+    //TODO
+    prepareSkybox();
+    m_skybox_ready = true;
+    /*m_skybox = new Skybox(m_video_driver,
+                          texture,
+                          sphericalHarmonics, 
+                          m_scene_manager->getAmbientLight().toSColor());*/
+    
+
+
+
+    
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
