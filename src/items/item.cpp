@@ -374,7 +374,7 @@ void Item::collected(const AbstractKart *kart, float t)
 
     if (m_listener != NULL)
     {
-        m_listener->onTriggerItemApproached(this);
+        m_listener->onTriggerItemApproached();
     }
 
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)

@@ -270,7 +270,7 @@ public:
     TrackObjectPresentationSound(const XMLNode& xml_node,
                                  scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationSound();
-    virtual void onTriggerItemApproached(Item* who) OVERRIDE;
+    virtual void onTriggerItemApproached() OVERRIDE;
     virtual void update(float dt) OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
         const core::vector3df& scale, bool isAbsoluteCoord) OVERRIDE;
@@ -349,6 +349,13 @@ public:
 };   // TrackObjectPresentationLight
 
 // ============================================================================
+
+enum ActionTriggerType
+{
+    TRIGGER_TYPE_POINT = 0,
+    TRIGGER_TYPE_CYLINDER = 1
+};
+
 /** \ingroup tracks
  *  A track object representation that consists of an action trigger
  */
@@ -361,6 +368,8 @@ private:
 
     bool m_action_active;
 
+    ActionTriggerType m_type;
+
 public:
     TrackObjectPresentationActionTrigger(const XMLNode& xml_node);
     TrackObjectPresentationActionTrigger(const core::vector3df& xyz,
@@ -369,7 +378,7 @@ public:
 
     virtual ~TrackObjectPresentationActionTrigger() {}
 
-    virtual void onTriggerItemApproached(Item* who) OVERRIDE;
+    virtual void onTriggerItemApproached() OVERRIDE;
     // ------------------------------------------------------------------------
     /** Reset the trigger (i.e. sets it to active again). */
     virtual void reset() OVERRIDE { m_action_active = true; }

@@ -154,15 +154,6 @@
                  otherwise obstricts too much of the view.  -->
     <camera distance="1.0" forward-up-angle="15"
             backward-up-angle="5"/>
-    <!-- Options to affect the graphical chassis:
-         y-offset: Additional offset to move graphical chassis with regards
-                   to the physics, used to reduce frequencey of graphical
-                   chassis in terrain.
-         prevent-chassis-in-terrain: a hard flag to prevent nearly all instances
-                   of chassis in terrain. Can (atm) cause some stuttering. -->
-    <graphics y-offset="0.0"
-              prevent-chassis-in-terrain="true"
-    />
 
    <!-- Jump animation related values:
         animation-time: only if the estimated time for a jump is larger
@@ -386,20 +377,20 @@
 
     <!-- Suspension related values. stiffness: kart's suspension stiffness.
          rest: Length of suspension when at rest.
-         travel-cm: maximum movement of suspension - in cm!!
+         travel: maximum movement of suspension!!
          exp-string-response: dampen the suspension spring reaction
             exponentially.
          max-force: Maximum suspension force -->
-    <suspension stiffness="140" rest="0.3" travel-cm="29"
+    <suspension stiffness="140" rest="0.3" travel="0.29"
          exp-spring-response="false" max-force="12000"/>
 
     <!-- Wheel related parameters: damping-relaxation/compression: for
-         bullet, damping parameters. Radius and width of wheel.
+         bullet, damping parameters.
          front-right, front-left, rear-right and rear-left give the
          position of the physics raycast wheels relative to the center of
          gravity. Default is to use the corners of the chassis to attach
          the wheels to. -->
-    <wheels damping-relaxation="35"  damping-compression="5" radius="0.25">
+    <wheels damping-relaxation="35"  damping-compression="5">
       <front-right position="0.38 0 0.6"  />
       <front-left  position="-0.38 0 0.6" />
       <rear-right  position="0.38 0 -0.6" />

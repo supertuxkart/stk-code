@@ -83,7 +83,7 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     ci.m_wheelsDampingCompression = tuning.m_suspensionCompression;
     ci.m_wheelsDampingRelaxation  = tuning.m_suspensionDamping;
     ci.m_frictionSlip             = tuning.m_frictionSlip;
-    ci.m_maxSuspensionTravelCm    = tuning.m_maxSuspensionTravelCm;
+    ci.m_maxSuspensionTravel      = tuning.m_maxSuspensionTravel;
     ci.m_maxSuspensionForce       = tuning.m_maxSuspensionForce;
 
     m_wheelInfo.push_back( btWheelInfo(ci));
@@ -112,7 +112,6 @@ void btKart::reset()
     {
         btWheelInfo &wheel                     = m_wheelInfo[i];
         wheel.m_raycastInfo.m_suspensionLength = 0;
-        wheel.m_rotation                       = 0;
         updateWheelTransform(i, true);
     }
     m_visual_wheels_touch_ground = false;
@@ -159,16 +158,13 @@ void btKart::updateWheelTransform(int wheelIndex, bool interpolatedTransform)
     btQuaternion steeringOrn(up,steering);//wheel.m_steering);
     btMatrix3x3 steeringMat(steeringOrn);
 
-    btQuaternion rotatingOrn(right,-wheel.m_rotation);
-    btMatrix3x3 rotatingMat(rotatingOrn);
-
     btMatrix3x3 basis2(
         right[0],fwd[0],up[0],
         right[1],fwd[1],up[1],
         right[2],fwd[2],up[2]
     );
 
-    wheel.m_worldTransform.setBasis(steeringMat * rotatingMat * basis2);
+    wheel.m_worldTransform.setBasis(steeringMat * basis2);
     wheel.m_worldTransform.setOrigin(
                                      wheel.m_raycastInfo.m_hardPointWS
                                     + wheel.m_raycastInfo.m_wheelDirectionWS
@@ -235,8 +231,8 @@ btScalar btKart::rayCast(unsigned int index)
 
     updateWheelTransformsWS( wheel,false);
 
-    btScalar max_susp_len = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius
-                          + wheel.m_maxSuspensionTravelCm*0.01f;
+    btScalar max_susp_len = wheel.getSuspensionRestLength()
+                          + wheel.m_maxSuspensionTravel;
 
     // Do a slightly longer raycast to see if the kart might soon hit the 
     // ground and some 'cushioning' is needed to avoid that the chassis
@@ -266,13 +262,13 @@ btScalar btKart::rayCast(unsigned int index)
         wheel.m_raycastInfo.m_triangle_index = rayResults.m_triangle_index;;
         wheel.m_raycastInfo.m_groundObject = &getFixedBody();
 
-        wheel.m_raycastInfo.m_suspensionLength = depth - wheel.m_wheelsRadius;
+        wheel.m_raycastInfo.m_suspensionLength = depth;
 
         //clamp on max suspension travel
         btScalar minSuspensionLength = wheel.getSuspensionRestLength()
-                                - wheel.m_maxSuspensionTravelCm*btScalar(0.01);
+                                - wheel.m_maxSuspensionTravel;
         btScalar maxSuspensionLength = wheel.getSuspensionRestLength()
-                                + wheel.m_maxSuspensionTravelCm*btScalar(0.01);
+                                + wheel.m_maxSuspensionTravel;
         if (wheel.m_raycastInfo.m_suspensionLength < minSuspensionLength)
         {
             wheel.m_raycastInfo.m_suspensionLength = minSuspensionLength;
@@ -524,15 +520,8 @@ void btKart::updateVehicle( btScalar step )
 
             btScalar proj2 = fwd.dot(vel);
 
-            wheel.m_deltaRotation = (proj2 * step) / (wheel.m_wheelsRadius);
-            wheel.m_rotation += wheel.m_deltaRotation;
 
-        } else
-        {
-            wheel.m_rotation += wheel.m_deltaRotation;
-        }
-        //damping of rotation when not in contact
-        wheel.m_deltaRotation *= btScalar(0.99);
+        } 
 
     }
 

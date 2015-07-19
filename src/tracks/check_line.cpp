@@ -22,6 +22,7 @@
 #include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 
@@ -151,14 +152,15 @@ void CheckLine::changeDebugColor(bool is_active)
  *                  additional data.
  */
 bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                            unsigned int indx)
+    unsigned int kart_index)
 {
+    World* w = World::getWorld();
     core::vector2df p=new_pos.toIrrVector2d();
     bool sign = m_line.getPointOrientation(p)>=0;
     bool result;
     // If the sign has changed, i.e. the infinite line was crossed somewhere,
     // check if the finite line was actually crossed:
-    if(sign!=m_previous_sign[indx] &&
+    if (sign != m_previous_sign[kart_index] &&
         m_line.intersectWith(core::line2df(old_pos.toIrrVector2d(),
                                            new_pos.toIrrVector2d()),
                              m_cross_point) )
@@ -175,17 +177,24 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
             if(World::getWorld()->getNumKarts()>0)
                 Log::info("CheckLine", "Kart %s crosses line, but wrong height "
                           "(%f vs %f).",
-                          World::getWorld()->getKart(indx)->getIdent().c_str(),
+                          World::getWorld()->getKart(kart_index)->getIdent().c_str(),
                           new_pos.getY(), m_min_height);
             else
                 Log::info("CheckLine", "Kart %d crosses line, but wrong height "
                           "(%f vs %f).",
-                          indx, new_pos.getY(), m_min_height);
+                          kart_index, new_pos.getY(), m_min_height);
 
         }
     }
     else
         result = false;
-    m_previous_sign[indx] = sign;
+    m_previous_sign[kart_index] = sign;
+
+    if (result)
+    {
+        LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
+        if (lw != NULL)
+            lw->setLastTriggeredCheckline(kart_index, m_index);
+    }
     return result;
 }   // isTriggered

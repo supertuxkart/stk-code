@@ -172,7 +172,7 @@ void Physics::update(float dt)
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
             int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
-            script_engine->runFunction("void onKartKartCollision(int, int)",
+            script_engine->runFunction(false, "void onKartKartCollision(int, int)",
                 [=](asIScriptContext* ctx) {
                     ctx->SetArgDWord(0, kartid1);
                     ctx->SetArgDWord(1, kartid2);
@@ -201,7 +201,7 @@ void Physics::update(float dt)
 
             if (scripting_function.size() > 0)
             {
-                script_engine->runFunction("void " + scripting_function + "(int, const string, const string)",
+                script_engine->runFunction(true, "void " + scripting_function + "(int, const string, const string)",
                     [&](asIScriptContext* ctx) {
                         ctx->SetArgDWord(0, kartId);
                         ctx->SetArgObject(1, lib_id_ptr);
@@ -274,7 +274,7 @@ void Physics::update(float dt)
             std::string scripting_function = obj->getOnItemCollisionFunction();
             if (scripting_function.size() > 0)
             {
-                script_engine->runFunction("void " + scripting_function + "(int, int, const string)",
+                script_engine->runFunction(true, "void " + scripting_function + "(int, int, const string)",
                         [&](asIScriptContext* ctx) {
                         ctx->SetArgDWord(0, (int)flyable->getType());
                         ctx->SetArgDWord(1, flyable->getOwnerId());

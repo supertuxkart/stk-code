@@ -257,7 +257,8 @@ void SFXManager::queueCommand(SFXCommand *command)
         race_manager->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
     {
         if(command->m_command==SFX_POSITION || command->m_command==SFX_LOOP ||
-           command->m_command==SFX_SPEED                                       )
+           command->m_command==SFX_SPEED    || 
+           command->m_command==SFX_SPEED_POSITION                               )
         {
             delete command;
             static int count_messages = 0;
