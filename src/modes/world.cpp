@@ -123,6 +123,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
     m_weather            = NULL;
+    m_force_disable_fog  = false;
 
     m_stop_music_when_dialog_open = true;
 
