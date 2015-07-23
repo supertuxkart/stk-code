@@ -20,6 +20,7 @@
 #define HEADER_SKYBOX_HPP
 
 #include "graphics/gl_headers.hpp"
+#include <ICameraSceneNode.h>
 #include <ITexture.h>
 #include <IVideoDriver.h>
 #include <vector>
@@ -27,8 +28,15 @@
 class Skybox
 {
 private:
-    /** The cube map texture id */
+    /** The 6 skybox textures */
+    std::vector<irr::video::ITexture *> m_skybox_textures;
+    
+    /** The skybox texture id */
     GLuint m_cube_map;
+
+    /** The 6 specular probe textures */
+    std::vector<irr::video::ITexture *> m_spherical_harmonics_textures;
+    
     /** The specular probe texture id */
     GLuint m_specular_probe;   
 
@@ -36,16 +44,14 @@ private:
     float m_blue_SH_coeff[9];
     float m_green_SH_coeff[9];
     float m_red_SH_coeff[9];
+    //TODO : move spherical harmonic in a separate class (IBL?)
     
 
+    GLuint generateCubeMapFromTextures (irr::video::IVideoDriver *video_driver);
 
-    void generateDiffuseCoefficients(irr::video::IVideoDriver *video_driver,
-                                     const std::vector<irr::video::ITexture *> &spherical_harmonics_textures,
-                                     const irr::video::SColor &ambient);
-                                     
-    GLuint generateCubeMapFromTextures(const std::vector<irr::video::ITexture *> &skybox_textures);
-
-    
+public:
+    void generateDiffuseCoefficients   (irr::video::IVideoDriver *video_driver,
+                                        const irr::video::SColor &ambient);
     
     
 public:
@@ -54,11 +60,15 @@ public:
            const std::vector<irr::video::ITexture *> &spherical_harmonics_textures,
            const irr::video::SColor &ambient);
     ~Skybox();
+
+    void render(const irr::scene::ICameraSceneNode *camera) const;
+
     
     inline const float* getBlueSHCoeff()  const     {return m_blue_SH_coeff;  }
     inline const float* getGreenSHCoeff() const     {return m_green_SH_coeff; }
     inline const float* getRedSHCoeff()   const     {return m_red_SH_coeff;   }
 
+    inline GLuint getSpecularProbe()      const     {return m_specular_probe; }
 
 
 };

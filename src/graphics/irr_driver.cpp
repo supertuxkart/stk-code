@@ -126,7 +126,7 @@ IrrDriver::IrrDriver()
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
     m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
     m_boundingboxesviz = false;
-    SkyboxCubeMap = m_last_light_bucket_distance = 0;
+    m_last_light_bucket_distance = 0;
     memset(object_count, 0, sizeof(object_count));
 }   // IrrDriver
 
@@ -1364,19 +1364,19 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     const std::vector<video::ITexture*> &sphericalHarmonics)
 {
     assert(texture.size() == 6);
-    SkyboxTextures = texture;
+    /*SkyboxTextures = texture;
     SphericalHarmonicsTextures = sphericalHarmonics;
     SkyboxCubeMap = 0;
-    SkyboxSpecularProbe = 0;
+    SkyboxSpecularProbe = 0;*/
     
-    
+    //m_skybox_ready = false;
     //TODO
-    prepareSkybox();
-    m_skybox_ready = true;
-    /*m_skybox = new Skybox(m_video_driver,
+    //prepareSkybox();
+    //m_skybox_ready = true;
+    m_skybox = new Skybox(m_video_driver,
                           texture,
                           sphericalHarmonics, 
-                          m_scene_manager->getAmbientLight().toSColor());*/
+                          m_scene_manager->getAmbientLight().toSColor());
     
 
 
@@ -1389,7 +1389,8 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
 
 void IrrDriver::suppressSkyBox()
 {
-    SkyboxTextures.clear();
+    //TODO!
+    /*SkyboxTextures.clear();
     SphericalHarmonicsTextures.clear();
     m_skybox_ready = false;
     if ((SkyboxCubeMap) && (!ProfileWorld::isNoGraphics()))
@@ -1398,7 +1399,9 @@ void IrrDriver::suppressSkyBox()
         glDeleteTextures(1, &SkyboxSpecularProbe);
     }
     SkyboxCubeMap = 0;
-    SkyboxSpecularProbe = 0;
+    SkyboxSpecularProbe = 0;*/
+    delete m_skybox;
+    m_skybox = NULL;
 }
 
 // ----------------------------------------------------------------------------
@@ -1778,7 +1781,11 @@ void IrrDriver::onUnloadWorld()
 void IrrDriver::setAmbientLight(const video::SColorf &light)
 {
     m_scene_manager->setAmbientLight(light);
-    m_skybox_ready = false;
+    //TODO!
+    
+    
+    
+    //m_skybox_ready = false;
 }   // setAmbientLight
 
 video::SColorf IrrDriver::getAmbientLight() const

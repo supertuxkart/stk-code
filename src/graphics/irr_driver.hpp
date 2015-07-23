@@ -215,16 +215,16 @@ private:
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
-    std::vector<video::ITexture *> SkyboxTextures;
-    std::vector<video::ITexture *> SphericalHarmonicsTextures;
-    bool m_skybox_ready;
+    //std::vector<video::ITexture *> SkyboxTextures;
+    //std::vector<video::ITexture *> SphericalHarmonicsTextures;
+    //bool m_skybox_ready;
     
     Skybox *m_skybox;
 
 public:
-    float blueSHCoeff[9];
-    float greenSHCoeff[9];
-    float redSHCoeff[9];
+    //float blueSHCoeff[9];
+    //float greenSHCoeff[9];
+    //float redSHCoeff[9];
 private:
 
     /** Keep a trace of the origin file name of a texture. */
@@ -241,8 +241,8 @@ private:
     ShadowMatrices *m_shadow_matrices;
 
 public:
-    GLuint SkyboxCubeMap;
-    GLuint SkyboxSpecularProbe;
+    //GLuint SkyboxCubeMap;
+    //GLuint SkyboxSpecularProbe;
     /** A simple class to store video resolutions. */
     class VideoMode
     {
@@ -534,6 +534,9 @@ public:
     // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
     // -----------------------------------------------------------------------
+    /** Returns a pointer to the skybox. */
+    inline Skybox *getSkybox()  {return m_skybox;}
+    // -----------------------------------------------------------------------    
     const core::vector3df& getSunDirection() const { return m_sun_direction; };
     // -----------------------------------------------------------------------
     void setSunDirection(const core::vector3df &SunPos)
