@@ -222,7 +222,7 @@ void Camera::setupCamera()
                                      irr_driver->getActualScreenSize().Width,
                                      irr_driver->getActualScreenSize().Height);
             m_scaling  = core::vector2df(1.0f, 1.0f);
-            m_fov      = DEGREE_TO_RAD*75.0f;
+            m_fov      = DEGREE_TO_RAD*stk_config->m_camera_fov[0];
             break;
     case 2: m_viewport = core::recti(0,
                                      m_index==0 ? 0
@@ -232,7 +232,7 @@ void Camera::setupCamera()
                                                 : irr_driver->getActualScreenSize().Height);
             m_scaling  = core::vector2df(1.0f, 0.5f);
             m_aspect  *= 2.0f;
-            m_fov      = DEGREE_TO_RAD*65.0f;
+            m_fov      = DEGREE_TO_RAD*stk_config->m_camera_fov[1];
             break;
     case 3:
             /*
@@ -265,7 +265,7 @@ void Camera::setupCamera()
             const int y2 = (m_index<2    ? irr_driver->getActualScreenSize().Height>>1 : irr_driver->getActualScreenSize().Height);
             m_viewport = core::recti(x1, y1, x2, y2);
             m_scaling  = core::vector2df(0.5f, 0.5f);
-            m_fov      = DEGREE_TO_RAD*50.0f;
+            m_fov      = DEGREE_TO_RAD*stk_config->m_camera_fov[3];
             }
             break;
     default:
