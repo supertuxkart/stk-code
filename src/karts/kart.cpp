@@ -1234,7 +1234,7 @@ void Kart::update(float dt)
     
     Vec3 from(0, 0, 0);
     for (unsigned int i = 0; i < 4; i++)
-        from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS;
+        from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS;
 
     // Add a certain epsilon (0.3) to the height of the kart. This avoids
     // problems of the ray being cast from under the track (which happened

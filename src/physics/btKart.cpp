@@ -362,12 +362,19 @@ const btTransform& btKart::getChassisWorldTransform() const
 }   // getChassisWorldTransform
 
 // ----------------------------------------------------------------------------
-void btKart::updateVehicle( btScalar step )
+void btKart::updateAllWheelPositions()
 {
     for (int i=0;i<getNumWheels();i++)
     {
         updateWheelTransform(i,false);
     }
+
+}   // updateAllWheelPositions
+
+// ----------------------------------------------------------------------------
+void btKart::updateVehicle( btScalar step )
+{
+    updateAllWheelPositions();
 
     const btTransform& chassisTrans = getChassisWorldTransform();
 
