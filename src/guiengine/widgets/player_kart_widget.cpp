@@ -30,8 +30,6 @@
 #include "states_screens/kart_selection.hpp"
 #include <IGUIEnvironment.h>
 
-static const char RANDOM_KART_ID[] = "randomkart";
-
 using namespace GUIEngine;
 
 PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,

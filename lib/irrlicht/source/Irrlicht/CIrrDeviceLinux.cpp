@@ -547,12 +547,6 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
 			None
 		};
-	int legacyctx[] =
-		{
-			GLX_CONTEXT_MAJOR_VERSION_ARB, 2,
-			GLX_CONTEXT_MINOR_VERSION_ARB, 1,
-			None
-		};
 	PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );

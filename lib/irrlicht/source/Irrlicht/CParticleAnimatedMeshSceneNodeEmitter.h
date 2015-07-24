@@ -146,7 +146,6 @@ private:
 	core::dimension2df MaxStartSize, MinStartSize;
 
 	u32 Time;
-	u32 Emitted;
 	s32 MaxAngleDegrees;
 
 	bool EveryMeshVertex;
