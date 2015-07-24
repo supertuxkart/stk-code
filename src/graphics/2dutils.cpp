@@ -469,8 +469,6 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
 
     Primitive2DList::getInstance()->use();
     Primitive2DList::getInstance()->setUniforms();
-    const video::SOverrideMaterial &m = irr_driver->getVideoDriver()
-                                                  ->getOverrideMaterial();
     compressTexture(tex, false);
     Primitive2DList::getInstance()->setTextureUnits(getTextureGLuint(tex));
     glDrawElements(GL_TRIANGLE_FAN, primitiveCount, GL_UNSIGNED_SHORT, 0);

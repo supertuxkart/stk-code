@@ -53,7 +53,10 @@ public:
 };   // SkyboxShader
 
 // ============================================================================
-static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height,
+//***************************************************************************
+// Currently unused functions, they will be used later so please DON'T remove
+//***************************************************************************
+/*static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height,
                            float *Coeff, float *Y00, float *Y1minus1,
                            float *Y10, float *Y11, float *Y2minus2, 
                            float * Y2minus1, float * Y20, float *Y21,
@@ -70,10 +73,10 @@ static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height,
                       + Y21[idx] * Coeff[7] + Y22[idx] * Coeff[8];
     reconstructedVal /= solidangle;
     return MAX2(255.0f * reconstructedVal, 0.f);
-}   // getTexelValue
+}*/   // getTexelValue
 
 // ----------------------------------------------------------------------------
-static void unprojectSH(float *output[], size_t width, size_t height,
+/*static void unprojectSH(float *output[], size_t width, size_t height,
                         float *Y00[], float *Y1minus1[], float *Y10[],
                         float *Y11[], float *Y2minus2[], float *Y2minus1[],
                         float * Y20[], float *Y21[], float *Y22[],
@@ -108,16 +111,16 @@ static void unprojectSH(float *output[], size_t width, size_t height,
             }
         }
     }
-}   // unprojectSH
+}*/   // unprojectSH
 
 // ----------------------------------------------------------------------------
-static void displayCoeff(float *SHCoeff)
+/*static void displayCoeff(float *SHCoeff)
 {
     printf("L00:%f\n", SHCoeff[0]);
     printf("L1-1:%f, L10:%f, L11:%f\n", SHCoeff[1], SHCoeff[2], SHCoeff[3]);
     printf("L2-2:%f, L2-1:%f, L20:%f, L21:%f, L22:%f\n",
             SHCoeff[4], SHCoeff[5], SHCoeff[6], SHCoeff[7], SHCoeff[8]);
-}   // displayCoeff
+}*/   // displayCoeff
 
 // ----------------------------------------------------------------------------
 void swapPixels(char *old_img, char *new_img, unsigned stride, unsigned old_i,

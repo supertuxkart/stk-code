@@ -52,16 +52,7 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
-const float INITIAL_Y = -3.0f;
-
 const float DURATION = 15.0f;
-
-const float CAMERA_END_X = -15.0f;
-const float CAMERA_END_Y = 1.5f;
-const float CAMERA_END_Z = 5.0f;
-const float CAMERA_START_X = -17.0f;
-const float CAMERA_START_Y = 2.0f;
-const float CAMERA_START_Z = 5.5f;
 
 const float DISTANCE_BETWEEN_KARTS = 2.0f;
 
@@ -71,9 +62,6 @@ const float KART_START_X = -17.0f;
 const float KART_END_X = -5.0f;
 const float KART_Y = 0.0f;
 const float KART_Z = 0.0f;
-
-
-const float GARAGE_DOOR_OPEN_TIME = 6.0f;
 
 const int MAX_KART_COUNT = 4;
 

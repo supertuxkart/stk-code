@@ -46,9 +46,6 @@ private:
 
     // Minimap related variables
     // -------------------------
-    /** The mini map of the track. */
-    video::ITexture *m_mini_map;
-
     /** The size of a single marker on the screen for AI karts,
      *  need not be a power of 2. */
     int              m_minimap_ai_size;
