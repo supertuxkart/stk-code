@@ -25,6 +25,7 @@
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "tracks/terrain_info.hpp"
 #include "tracks/track.hpp"
 
 #define ROLLING_INFLUENCE_FIX
