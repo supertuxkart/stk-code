@@ -312,8 +312,17 @@ void KartProperties::combineCharacteristics()
     m_combined_characteristic = new CombinedCharacteristic();
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getBaseCharacteristic());
-    m_combined_characteristic->addCharacteristic(kart_properties_manager->
-        getKartTypeCharacteristic(m_kart_type));
+
+    // Try to get the kart type
+    const AbstractCharacteristic *characteristic = kart_properties_manager->
+        getKartTypeCharacteristic(m_kart_type);
+    if (!characteristic)
+        Log::warn("KartProperties", "Can't find kart type '%s' for kart '%s'",
+            m_kart_type.c_str(), m_name.c_str());
+    else
+        // Kart type found
+        m_combined_characteristic->addCharacteristic(characteristic);
+
     m_combined_characteristic->addCharacteristic(m_characteristic);
 }   // combineCharacteristics
 

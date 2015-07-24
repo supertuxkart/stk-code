@@ -66,8 +66,13 @@ AbstractKart::AbstractKart(const std::string& ident,
     m_characteristic->addCharacteristic(kart_properties_manager->
         getDifficultyCharacteristic(race_manager->getDifficultyAsString(
             race_manager->getDifficulty())));
-    m_characteristic->addCharacteristic(kart_properties_manager->
-        getKartTypeCharacteristic(m_kart_properties->getKartType()));
+
+    // Try to get the kart type
+    const AbstractCharacteristic *characteristic = kart_properties_manager->
+            getKartTypeCharacteristic(m_kart_properties->getKartType());
+    if (characteristic)
+        m_characteristic->addCharacteristic(characteristic);
+
     m_characteristic->addCharacteristic(kart_properties_manager->
         getPlayerCharacteristic(KartProperties::getPerPlayerDifficultyAsString(
             m_difficulty)));
