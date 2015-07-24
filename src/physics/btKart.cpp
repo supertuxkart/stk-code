@@ -980,6 +980,10 @@ void btKart::updateFriction(btScalar timeStep)
 // ----------------------------------------------------------------------------
 void btKart::debugDraw(btIDebugDraw* debugDrawer)
 {
+    const btVector3 &from = m_kart->getTerrainInfo()->getOrigin();
+    const btVector3 &to = m_kart->getTerrainInfo()->getHitPoint();
+    debugDrawer->drawLine(from, to, btVector3(0.5, 0.5, 0));
+
     for (int v=0;v<getNumWheels();v++)
     {
         btVector3 wheelColor(0,1,1);
