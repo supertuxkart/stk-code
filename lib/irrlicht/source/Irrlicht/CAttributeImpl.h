@@ -1867,6 +1867,9 @@ public:
 // Attribute implemented for texture references
 class CTextureAttribute : public IAttribute
 {
+	// Explicitly hide base method
+	using IAttribute::setTexture;
+
 public:
 
 	CTextureAttribute(const char* name, video::ITexture* value, video::IVideoDriver* driver, const io::path& filename)

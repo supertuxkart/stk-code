@@ -150,7 +150,6 @@ private:
 	f32 Length;
 
 	u32 Time;
-	u32 Emitted;
 	s32 MaxAngleDegrees;
 
 	bool OutlineOnly;

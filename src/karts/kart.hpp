@@ -32,7 +32,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/player_difficulty.hpp"
-#include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
 
 class btKart;
@@ -52,6 +51,7 @@ class Skidding;
 class SkidMarks;
 class SlipStream;
 class Stars;
+class TerrainInfo;
 
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a

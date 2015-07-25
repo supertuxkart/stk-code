@@ -25,6 +25,7 @@
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "tracks/terrain_info.hpp"
 #include "tracks/track.hpp"
 
 #define ROLLING_INFLUENCE_FIX
@@ -361,12 +362,19 @@ const btTransform& btKart::getChassisWorldTransform() const
 }   // getChassisWorldTransform
 
 // ----------------------------------------------------------------------------
-void btKart::updateVehicle( btScalar step )
+void btKart::updateAllWheelPositions()
 {
     for (int i=0;i<getNumWheels();i++)
     {
         updateWheelTransform(i,false);
     }
+
+}   // updateAllWheelPositions
+
+// ----------------------------------------------------------------------------
+void btKart::updateVehicle( btScalar step )
+{
+    updateAllWheelPositions();
 
     const btTransform& chassisTrans = getChassisWorldTransform();
 
@@ -980,6 +988,10 @@ void btKart::updateFriction(btScalar timeStep)
 // ----------------------------------------------------------------------------
 void btKart::debugDraw(btIDebugDraw* debugDrawer)
 {
+    const btVector3 &from = m_kart->getTerrainInfo()->getOrigin();
+    const btVector3 &to = m_kart->getTerrainInfo()->getHitPoint();
+    debugDrawer->drawLine(from, to, btVector3(0.5, 0.5, 0));
+
     for (int v=0;v<getNumWheels();v++)
     {
         btVector3 wheelColor(0,1,1);

@@ -34,7 +34,6 @@ namespace Online { class HTTPRequest; }
 class AddonsLoading : public GUIEngine::ModalDialog
 {
 private:
-    GUIEngine::LabelWidget       *m_state;
     GUIEngine::ProgressBarWidget *m_progress;
     GUIEngine::IconButtonWidget  *m_back_button;
     GUIEngine::IconButtonWidget  *m_install_button;

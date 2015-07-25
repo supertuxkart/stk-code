@@ -67,7 +67,7 @@ Skidding::~Skidding()
 void Skidding::reset()
 {
     m_skid_time           = 0.0f;
-    m_skid_state          = m_skid_visual_time<=0 ? SKID_OLD : SKID_NONE;
+    m_skid_state          = SKID_NONE;
     m_skid_factor         = 1.0f;
     m_real_steering       = 0.0f;
     m_visual_rotation     = 0.0f;
@@ -95,20 +95,8 @@ void Skidding::reset()
  */
 void Skidding::updateSteering(float steer, float dt)
 {
-    if(m_skid_state==SKID_OLD)
-    {
-        float speed             = m_kart->getSpeed();
-        float current_max_speed = m_kart->getCurrentMaxSpeed();
-        float speed_ratio       = speed / current_max_speed;
-        m_real_steering         = steer * m_skid_factor;
-        m_visual_rotation       = m_real_steering /m_skid_max * speed_ratio;
-        return;
-    }
-    // Now only new skidding is happening
     switch(m_skid_state)
     {
-    case SKID_OLD: assert(false);
-        break;
     case SKID_SHOW_GFX_LEFT:
     case SKID_SHOW_GFX_RIGHT:
     case SKID_NONE:
@@ -178,7 +166,6 @@ float Skidding::getSteeringWhenSkidding(float steering) const
 {
     switch(m_skid_state)
     {
-    case SKID_OLD:            assert(false); break;
     case SKID_SHOW_GFX_LEFT:
     case SKID_SHOW_GFX_RIGHT:
     case SKID_BREAK:
@@ -256,13 +243,6 @@ void Skidding::update(float dt, bool is_on_ground,
         m_skid_factor = m_skid_max;
     else
         if(m_skid_factor<1.0f) m_skid_factor = 1.0f;
-
-    // FIXME hiker: remove once the new skidding code is finished.
-    if(m_skid_state == SKID_OLD)
-    {
-        updateSteering(steering, dt);
-        return;
-    }
 
     // If skidding was started and a graphical jump should still
     // be displayed, update the data

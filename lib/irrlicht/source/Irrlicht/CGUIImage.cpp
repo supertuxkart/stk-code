@@ -74,7 +74,6 @@ void CGUIImage::draw()
 		return;
 
 	IGUISkin* skin = Environment->getSkin();
-	video::IVideoDriver* driver = Environment->getVideoDriver();
 
 	if (Texture)
 	{
@@ -88,7 +87,7 @@ void CGUIImage::draw()
 		//}
 		//else
 		//{
-		//	driver->draw2DImage(Texture, AbsoluteRect.UpperLeftCorner,
+		//	Environment->getVideoDriver()->draw2DImage(Texture, AbsoluteRect.UpperLeftCorner,
 		//		core::rect<s32>(core::position2d<s32>(0,0), core::dimension2di(Texture->getOriginalSize())),
 		//		&AbsoluteClippingRect, Color, UseAlphaChannel);
 		//}

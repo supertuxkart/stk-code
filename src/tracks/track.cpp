@@ -2440,7 +2440,7 @@ bool Track::findGround(AbstractKart *kart)
 
     btTransform t = kart->getBody()->getCenterOfMassTransform();
     // The computer offset is slightly too large, it should take
-    // the default suspension rest insteat of suspension rest (i.e. the
+    // the default suspension rest instead of suspension rest (i.e. the
     // length of the suspension with the weight of the kart resting on
     // it). On the other hand this initial bouncing looks nice imho
     // - so I'll leave it in for now.

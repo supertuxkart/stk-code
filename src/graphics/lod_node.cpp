@@ -153,7 +153,7 @@ void LODNode::updateVisibility(bool* shown)
 
 void LODNode::OnRegisterSceneNode()
 {
-    bool shown;
+    bool shown = false;
     updateVisibility(&shown);
 
     const u32 now = irr_driver->getDevice()->getTimer()->getTime();

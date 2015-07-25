@@ -180,6 +180,7 @@ public:
     void               setSliding(bool active);
     void               instantSpeedIncreaseTo(float speed);
     void               capSpeed(float max_speed);
+    void               updateAllWheelPositions();
     // ------------------------------------------------------------------------
     /** Returns true if both rear visual wheels touch the ground. */
     bool visualWheelsTouchGround() const

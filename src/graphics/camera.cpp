@@ -548,6 +548,14 @@ void Camera::update(float dt)
         // - the kart should not be visible, but it works)
         m_camera->setNearValue(27.0);
     }
+    else if (UserConfigParams::m_camera_debug==5)
+    {
+        core::vector3df xyz = m_kart->getXYZ().toIrrVector();
+        Vec3 offset(3, 0, 0);
+        offset = m_kart->getTrans()(offset);
+        m_camera->setTarget(xyz);
+        m_camera->setPosition(offset.toIrrVector());
+    }
     // Update the first person camera
     else if (UserConfigParams::m_camera_debug == 3)
     {

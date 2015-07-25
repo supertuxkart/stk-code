@@ -123,6 +123,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
     m_weather            = NULL;
+    m_force_disable_fog  = false;
 
     m_stop_music_when_dialog_open = true;
 
@@ -740,6 +741,12 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     kart->setRotation(pos.getRotation());
 
     kart->getBody()->setCenterOfMassTransform(pos);
+    // The raycast to determine the terrain underneath the kart is done from
+    // the centre point of the 4 wheel positions. After a rescue, the wheel
+    // positions need to be updated (otherwise the raycast will be done from
+    // the previous position, which might be the position that triggered
+    // the rescue in the first place).
+    kart->getVehicle()->updateAllWheelPositions();
 
     // Project kart to surface of track
     // This will set the physics transform

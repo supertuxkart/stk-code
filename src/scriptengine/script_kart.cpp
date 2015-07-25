@@ -55,7 +55,6 @@ namespace Scripting
             kart->setXYZ(v);
             unsigned int index = World::getWorld()->getRescuePositionIndex(kart);
             btTransform s = World::getWorld()->getRescueTransform(index);
-            const btVector3 &xyz = s.getOrigin();
             s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0.0f));
             World::getWorld()->moveKartTo(kart, s);
         }

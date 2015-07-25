@@ -98,6 +98,7 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_TOP,
     DEBUG_GUI_CAM_WHEEL,
     DEBUG_GUI_CAM_BEHIND_KART,
+    DEBUG_GUI_CAM_SIDE_OF_KART,
     DEBUG_GUI_CAM_NORMAL,
     DEBUG_GUI_CAM_SMOOTH,
     DEBUG_GUI_CAM_ATTACH,
@@ -251,8 +252,9 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Toggle GUI", DEBUG_GUI_TOGGLE);
             sub->addItem(L"Hide karts", DEBUG_GUI_HIDE_KARTS);
             sub->addItem(L"Top view", DEBUG_GUI_CAM_TOP);
-            sub->addItem(L"Wheel view", DEBUG_GUI_CAM_WHEEL);
+            sub->addItem(L"Behind wheel view", DEBUG_GUI_CAM_WHEEL);
             sub->addItem(L"Behind kart view", DEBUG_GUI_CAM_BEHIND_KART);
+            sub->addItem(L"Side of kart view", DEBUG_GUI_CAM_SIDE_OF_KART);
             sub->addItem(L"First person view", DEBUG_GUI_CAM_FREE);
             sub->addItem(L"Normal view", DEBUG_GUI_CAM_NORMAL);
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
@@ -525,6 +527,11 @@ bool onEvent(const SEvent &event)
                 else if (cmdID == DEBUG_GUI_CAM_BEHIND_KART)
                 {
                     UserConfigParams::m_camera_debug = 4;
+                    irr_driver->getDevice()->getCursorControl()->setVisible(true);
+                }
+                else if (cmdID == DEBUG_GUI_CAM_SIDE_OF_KART)
+                {
+                    UserConfigParams::m_camera_debug = 5;
                     irr_driver->getDevice()->getCursorControl()->setVisible(true);
                 }
                 else if (cmdID == DEBUG_GUI_CAM_FREE)

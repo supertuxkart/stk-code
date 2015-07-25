@@ -233,7 +233,6 @@ void CGUIButton::draw()
 		return;
 
 	IGUISkin* skin = Environment->getSkin();
-	video::IVideoDriver* driver = Environment->getVideoDriver();
 
 	// todo:	move sprite up and text down if the pressed state has a sprite
 	const core::position2di spritePos = AbsoluteRect.getCenter();
@@ -254,6 +253,7 @@ void CGUIButton::draw()
                 core::recti(pos, ImageRect.getSize()),
                 ImageRect, &AbsoluteClippingRect,
                 0, UseAlphaChannel);
+			//video::IVideoDriver* driver = Environment->getVideoDriver();
 			//driver->draw2DImage(Image,
 			//		ScaleImage? AbsoluteRect :
 			//			core::recti(pos, ImageRect.getSize()),

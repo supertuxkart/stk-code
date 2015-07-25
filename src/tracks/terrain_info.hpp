@@ -40,6 +40,9 @@ private:
     /** The point that was hit. */
     Vec3              m_hit_point;
 
+    /** DEBUG only: origin of raycast. */
+    Vec3 m_origin_ray;
+
 public:
              TerrainInfo();
              TerrainInfo(const Vec3 &pos);
@@ -47,14 +50,14 @@ public:
 
     bool     getSurfaceInfo(const Vec3 &from, Vec3 *position,
                             const Material **m);
-    virtual void update(const btTransform &trans, const Vec3 &offset);
+    virtual void update(const btMatrix3x3 &rotation, const Vec3 &from);
     virtual void update(const Vec3 &from);
 
     // ------------------------------------------------------------------------
     /** Simple wrapper with no offset. */
-    virtual void update(const btTransform &trans)
+    virtual void update(const btMatrix3x3 &rotation)
     {
-        update(trans, Vec3(0,0,0));
+        update(rotation, Vec3(0,0,0));
     }
     // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
@@ -75,6 +78,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the hit point of the raycast. */
     const btVector3& getHitPoint() const { return m_hit_point; }
+    const Vec3& getOrigin() const { return m_origin_ray;  }
 
 };  // TerrainInfo
 
