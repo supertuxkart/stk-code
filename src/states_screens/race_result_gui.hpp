@@ -249,9 +249,6 @@ public:
                             bool important=true,
                             bool big_font=false) { }
 
-    /** Should not be called anymore. */
-    virtual void clearAllMessages() {assert(false); }
-
     void nextPhase();
 
     /** Show no highscore */
