@@ -450,21 +450,21 @@ void RaceResultGUI::determineTableLayout()
     m_width_kart_name     = 0;
     float max_finish_time = 0;
 
-    for (unsigned int sourcePos = 1, destPos = 0;
-        destPos < num_karts; sourcePos++, destPos++)
+    for (unsigned int source_pos = 1, dest_pos = 0;
+        dest_pos < num_karts; source_pos++, dest_pos++)
     {
-        const AbstractKart *kart = rank_world->getKartAtPosition(sourcePos);
+        const AbstractKart *kart = rank_world->getKartAtPosition(source_pos);
 
         // Don't take the leader
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
             kart == rank_world->getKart(0))
         {
-            destPos--;
+            dest_pos--;
             continue;
         }
 
         // Save a pointer to the current row_info entry
-        RowInfo *ri              = &(m_all_row_infos[destPos]);
+        RowInfo *ri              = &(m_all_row_infos[dest_pos]);
         ri->m_is_player_kart     = kart->getController()->isPlayerController();
         ri->m_kart_name          = translations->fribidize(kart->getName());
         ri->m_player             = ri->m_is_player_kart
