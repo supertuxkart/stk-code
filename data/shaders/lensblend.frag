@@ -16,9 +16,12 @@ void main()
     col += .25 * texture(tex_256, uv);
     col += .5 * texture(tex_512, uv);
     
-    float final = max(col.r,max(col.g,col.b));
+    //col *= 0.5;
+
+
+    //float final = max(col.r,max(col.g,col.b));
     //final = final * 2;
-    vec3 blue = vec3(final * 0.1, final * 0.2, final);
+    //vec3 blue = vec3(final * 0.1, final * 0.2, final);
     
-    FragColor = vec4(blue, 1.);
+    FragColor = vec4(col.rgb, 1.);
 }
