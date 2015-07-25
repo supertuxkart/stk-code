@@ -167,11 +167,34 @@ void IconButtonWidget::add()
 
         if (m_properties[PROP_LABELS_LOCATION] == "hover")
         {
-            widget_size = rect<s32>(m_x - label_extra_size/2,
-                                    m_y - (word_wrap ? GUIEngine::getFontHeight()*2 :
-                                                 GUIEngine::getFontHeight()) - 15,
-                                    m_x + m_w + label_extra_size/2,
-                                    m_y - 15);
+            core::dimension2du text_size = GUIEngine::getFont()->getDimension(message.c_str());
+            core::recti pos = btn->getAbsolutePosition();
+            int center_x = pos.UpperLeftCorner.X + pos.getWidth() / 2;
+            int x1 = center_x - text_size.Width / 2 - label_extra_size / 2;
+            int y1 = pos.UpperLeftCorner.Y - (word_wrap ? GUIEngine::getFontHeight() * 2 :
+                GUIEngine::getFontHeight()) - 15;
+            int x2 = center_x + text_size.Width / 2 + label_extra_size / 2;
+            int y2 = pos.UpperLeftCorner.Y - 15;
+
+            if (x1 < 0)
+            {
+                int diff = -x1;
+                x1 += diff;
+                x2 += diff;
+            }
+            else if (x2 > irr_driver->getActualScreenSize().Width)
+            {
+                int diff = x2 - irr_driver->getActualScreenSize().Width;
+                x2 -= diff;
+                x1 -= diff;
+            }
+
+            core::recti parent_pos = m_parent->getAbsolutePosition();
+            x1 -= parent_pos.UpperLeftCorner.X;
+            x2 -= parent_pos.UpperLeftCorner.X;
+            y1 -= parent_pos.UpperLeftCorner.Y;
+            y2 -= parent_pos.UpperLeftCorner.Y;
+            widget_size = rect<s32>(x1, y1, x2, y2);
         }
         else
         {
