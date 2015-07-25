@@ -450,8 +450,8 @@ void RaceResultGUI::determineTableLayout()
     m_width_kart_name     = 0;
     float max_finish_time = 0;
 
-    for (unsigned int source_pos = 1, dest_pos = 0;
-        dest_pos < num_karts; source_pos++, dest_pos++)
+    for (int source_pos = 1, dest_pos = 0;
+         dest_pos < num_karts; source_pos++, dest_pos++)
     {
         const AbstractKart *kart = rank_world->getKartAtPosition(source_pos);
 
