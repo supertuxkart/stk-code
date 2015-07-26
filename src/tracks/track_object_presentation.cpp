@@ -940,7 +940,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
 
     std::string trigger_type;
     xml_node.get("trigger-type", &trigger_type);
-    if (trigger_type == "point")
+    if (trigger_type == "point" || trigger_type.empty())
     {
         m_type = TRIGGER_TYPE_POINT;
     }
