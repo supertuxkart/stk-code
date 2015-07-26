@@ -167,7 +167,8 @@ class NetworkString
             T result = 0;
             while(a--)
             {
-                result <<= 8; // offset one byte
+                result <<= 7; // offset one byte
+                result <<= 1;
                 result += ((uint8_t)(m_string[pos+n-1-a]) & 0xff); // add the data to result
             }
             return result;
@@ -219,7 +220,8 @@ class NetworkString
             T result = 0;
             while(a--)
             {
-                result <<= 8; // offset one byte
+                result <<= 7; // offset one byte
+                result <<= 1;
                 result += ((uint8_t)(m_string[pos+n-1-a]) & 0xff); // add the data
             }
             remove(pos,n);
