@@ -21,8 +21,11 @@
 
 #include "items/flyable.hpp"
 
+#if defined(__APPLE__)
+#include <cmath>
+#else
 #include <math.h>
-
+#endif
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 

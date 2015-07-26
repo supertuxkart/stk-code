@@ -73,7 +73,11 @@
 
 #include <algorithm> // for min and max
 #include <iostream>
+#if defined(__APPLE__)
+#include <cmath>
+#else
 #include <math.h>
+#endif
 
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
