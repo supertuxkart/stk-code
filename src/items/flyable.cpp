@@ -21,7 +21,7 @@
 
 #include "items/flyable.hpp"
 
-#include <math.h>
+#include <cmath>
 
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
