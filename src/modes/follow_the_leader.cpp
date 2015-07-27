@@ -54,8 +54,11 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 void FollowTheLeaderRace::init()
 {
     LinearWorld::init();
+    // WorldWithRank determines the score based on getNumKarts(), but since
+    // we ignore the leader, the points need to be based on number of karts -1
+    stk_config->getAllScores(&m_score_for_position, getNumKarts() - 1);
     getKart(0)->setOnScreenText(_("Leader"));
-}
+}    // init
 
 #if 0
 #pragma mark -
@@ -82,6 +85,20 @@ void FollowTheLeaderRace::reset()
                               
     m_is_over_delay = 2.0f;
 }   // reset
+
+//-----------------------------------------------------------------------------
+/** Returns the number of points for a kart at a specified position.
+ *  \param p Position (starting with 1).
+ */
+int FollowTheLeaderRace::getScoreForPosition(int p)
+{
+    // Kart 0 (the leader) does not get any points
+    if (p == 1) return 0;
+
+    assert(p-2 >= 0);
+    assert(p - 2 <(int) m_score_for_position.size());
+    return m_score_for_position[p - 2];
+}   // getScoreForPosition
 
 //-----------------------------------------------------------------------------
 /** Returns the original time at which the countdown timer started. This is
@@ -232,6 +249,36 @@ bool FollowTheLeaderRace::isRaceOver()
         return false;
     }
 }   // isRaceOver
+
+//-----------------------------------------------------------------------------
+/** Called at the end of a race. Updates highscores, pauses the game, and
+ *  informs the unlock manager about the finished race. This function must
+ *  be called after all other stats were updated from the different game
+ *  modes.
+ */
+void FollowTheLeaderRace::terminateRace()
+{
+    int pos_leader = m_karts[0]->getPosition();
+
+    // Any kart that has overtaken the leader must be placed one position
+    // back, and the leader must be set to be number 1.
+    const unsigned int kart_amount = getNumKarts();
+    for (unsigned int i = 0; i < kart_amount; i++)
+    {
+        if (!m_karts[i]->hasFinishedRace() && !m_karts[i]->isEliminated())
+        {
+            if (m_karts[i]->getPosition() < pos_leader)
+            {
+                m_karts[i]->setPosition(m_karts[i]->getPosition() + 1);
+            }
+            // Update the estimated finishing time for all karts that haven't
+            // finished yet.
+            m_karts[i]->finishedRace(0.0f);
+        }
+    }   // i<kart_amount
+    m_karts[0]->setPosition(1);
+    World::terminateRace();
+}   // terminateRace
 
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this kind of race.

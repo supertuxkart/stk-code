@@ -27,8 +27,11 @@
 class FollowTheLeaderRace : public LinearWorld
 {
 private:
-    std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
-    float m_is_over_delay; //!< A timer used before terminating the race
+        // time till elimination in follow leader
+    std::vector<float>  m_leader_intervals;
+
+    /** A timer used before terminating the race. */
+    float m_is_over_delay;
 
 public:
 
@@ -37,6 +40,7 @@ public:
 
     // clock events
     virtual void countdownReachedZero() OVERRIDE;
+    virtual int  getScoreForPosition(int p) OVERRIDE;
 
     // overriding World methods
     virtual void reset() OVERRIDE;
@@ -46,10 +50,9 @@ public:
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual void init() OVERRIDE;
-
+    virtual void terminateRace() OVERRIDE;
     virtual bool isRaceOver() OVERRIDE;
     virtual bool raceHasLaps() OVERRIDE { return false; }
-
 };   // FollowTheLeader
 
 

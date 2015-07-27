@@ -416,7 +416,6 @@ void RaceManager::startNextRace()
     // Uncomment to debug audio leaks
     // sfx_manager->dump();
 
-    stk_config->getAllScores(&m_score_for_position, m_num_karts);
     IrrlichtDevice* device = irr_driver->getDevice();
     GUIEngine::renderLoading();
     device->getVideoDriver()->endScene();
@@ -760,7 +759,17 @@ void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
     assert(pos-1 < (int)m_kart_status.size());
 
     m_kart_status[id].m_last_score    = m_kart_status[id].m_score;
-    m_kart_status[id].m_score        += m_score_for_position[pos-1];
+
+    // In follow the leader mode, the winner is actually the kart with
+    // position 2, so adjust the points (#points for leader do not matter)
+    WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+    if (wwr)
+        m_kart_status[id].m_score += wwr->getScoreForPosition(pos);
+    else
+    {
+        Log::error("RaceManager", "World with scores that is not a WorldWithRank??");
+    }
+
     m_kart_status[id].m_overall_time += time;
     m_kart_status[id].m_last_time     = time;
     m_num_finished_karts ++;
