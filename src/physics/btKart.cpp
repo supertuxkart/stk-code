@@ -447,7 +447,8 @@ void btKart::updateVehicle( btScalar step )
         btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
         btVector3 terrain_up(0,1,0);
         btVector3 axis = kart_up.cross(terrain_up);
-        axis.normalize();
+        if(!axis.fuzzyZero())
+            axis.normalize();
 
         // To avoid the kart going backwards/forwards (or rolling sideways),
         // set the pitch/roll to 0 before applying the 'straightening' impulse.
