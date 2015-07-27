@@ -987,8 +987,7 @@ static void renderBloom(GLuint in)
 }   // renderBloom
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff,
-                                  const float *rSHCoeff, GLuint skybox)
+void PostProcessing::renderEnvMap(GLuint skybox)
 {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);

@@ -418,10 +418,10 @@ void IrrDriver::uploadLightingData()
     Lighting[6] = m_suncolor.getBlue();
     Lighting[7] = 0.54f;
 
-    if(m_skybox) {
-        memcpy(&Lighting[8], m_skybox->getBlueSHCoeff(), 9 * sizeof(float));
-        memcpy(&Lighting[17], m_skybox->getGreenSHCoeff(), 9 * sizeof(float));
-        memcpy(&Lighting[26], m_skybox->getRedSHCoeff(), 9 * sizeof(float));
+    if(m_spherical_harmonic) {
+        memcpy(&Lighting[8], m_spherical_harmonic->getBlueSHCoeff(), 9 * sizeof(float));
+        memcpy(&Lighting[17], m_spherical_harmonic->getGreenSHCoeff(), 9 * sizeof(float));
+        memcpy(&Lighting[26], m_spherical_harmonic->getRedSHCoeff(), 9 * sizeof(float));
     }
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getLightingDataUBO());
@@ -491,10 +491,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
         if(m_skybox) {
-            m_post_processing->renderEnvMap(m_skybox->getBlueSHCoeff(),
-                                            m_skybox->getGreenSHCoeff(),
-                                            m_skybox->getRedSHCoeff(),
-                                            m_skybox->getSpecularProbe());
+            m_post_processing->renderEnvMap(m_skybox->getSpecularProbe());
         }
         //TODO: move in skybox (or IBL?) class
     }

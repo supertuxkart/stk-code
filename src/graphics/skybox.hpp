@@ -33,40 +33,20 @@ private:
     
     /** The skybox texture id */
     GLuint m_cube_map;
-
-    /** The 6 specular probe textures */
-    std::vector<irr::video::ITexture *> m_spherical_harmonics_textures;
     
     /** The specular probe texture id */
     GLuint m_specular_probe;   
 
-    /** The spherical harmonic coefficients */
-    float m_blue_SH_coeff[9];
-    float m_green_SH_coeff[9];
-    float m_red_SH_coeff[9];
-    //TODO : move spherical harmonic in a separate class (IBL?)
     
 
-    GLuint generateCubeMapFromTextures (irr::video::IVideoDriver *video_driver);
+    GLuint generateCubeMapFromTextures ();
 
-public:
-    void generateDiffuseCoefficients   (irr::video::IVideoDriver *video_driver,
-                                        const irr::video::SColor &ambient);
-    
     
 public:
-    Skybox(irr::video::IVideoDriver *video_driver,
-           const std::vector<irr::video::ITexture *> &skybox_textures,
-           const std::vector<irr::video::ITexture *> &spherical_harmonics_textures,
-           const irr::video::SColor &ambient);
+    Skybox(const std::vector<irr::video::ITexture *> &skybox_textures);
     ~Skybox();
 
     void render(const irr::scene::ICameraSceneNode *camera) const;
-
-    
-    inline const float* getBlueSHCoeff()  const     {return m_blue_SH_coeff;  }
-    inline const float* getGreenSHCoeff() const     {return m_green_SH_coeff; }
-    inline const float* getRedSHCoeff()   const     {return m_red_SH_coeff;   }
 
     inline GLuint getSpecularProbe()      const     {return m_specular_probe; }
 

@@ -19,6 +19,7 @@
 #include "graphics/skybox.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/IBL.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
 
 
@@ -56,16 +57,17 @@ public:
 };   // SkyboxShader
 
 
-// ----------------------------------------------------------------------------
-void swapPixels(char *old_img, char *new_img, unsigned stride, unsigned old_i,
-                unsigned old_j, unsigned new_i, unsigned new_j)
-{
-    new_img[4 * (stride * new_i + new_j)] = old_img[4 * (stride * old_i + old_j)];
-    new_img[4 * (stride * new_i + new_j) + 1] = old_img[4 * (stride * old_i + old_j) + 1];
-    new_img[4 * (stride * new_i + new_j) + 2] = old_img[4 * (stride * old_i + old_j) + 2];
-    new_img[4 * (stride * new_i + new_j) + 3] = old_img[4 * (stride * old_i + old_j) + 3];
-}   // swapPixels
-
+namespace {
+    // ----------------------------------------------------------------------------
+    void swapPixels(char *old_img, char *new_img, unsigned stride, unsigned old_i,
+                    unsigned old_j, unsigned new_i, unsigned new_j)
+    {
+        new_img[4 * (stride * new_i + new_j)] = old_img[4 * (stride * old_i + old_j)];
+        new_img[4 * (stride * new_i + new_j) + 1] = old_img[4 * (stride * old_i + old_j) + 1];
+        new_img[4 * (stride * new_i + new_j) + 2] = old_img[4 * (stride * old_i + old_j) + 2];
+        new_img[4 * (stride * new_i + new_j) + 3] = old_img[4 * (stride * old_i + old_j) + 3];
+    }   // swapPixels
+}
 
 // ----------------------------------------------------------------------------
 /** Generate an opengl cubemap texture from 6 2d textures.
@@ -78,7 +80,7 @@ Out of legacy the sequence of textures maps to :
 - 6th texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_Z
 *  \param textures sequence of 6 textures.
 */
-GLuint Skybox::generateCubeMapFromTextures(video::IVideoDriver *video_driver)
+GLuint Skybox::generateCubeMapFromTextures()
 {
     assert(m_skybox_textures.size() == 6);
 
@@ -100,7 +102,7 @@ GLuint Skybox::generateCubeMapFromTextures(video::IVideoDriver *video_driver)
     {
         unsigned idx = texture_permutation[i];
 
-        video::IImage* image = video_driver
+        video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(m_skybox_textures[idx]->getColorFormat(),
                                   m_skybox_textures[idx]->getSize(),
                                   m_skybox_textures[idx]->lock(), false   );
@@ -144,123 +146,19 @@ GLuint Skybox::generateCubeMapFromTextures(video::IVideoDriver *video_driver)
 }   // generateCubeMapFromTextures
 
 
-void Skybox::generateDiffuseCoefficients(video::IVideoDriver *video_driver,
-                                         const video::SColor &ambient)
-{
-    const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
-
-    unsigned sh_w = 0, sh_h = 0;
-    unsigned char *sh_rgba[6];
-
-    if (m_spherical_harmonics_textures.size() == 6)
-    {
-
-        for (unsigned i = 0; i < 6; i++)
-        {
-            sh_w = std::max(sh_w, m_spherical_harmonics_textures[i]->getSize().Width);
-            sh_h = std::max(sh_h, m_spherical_harmonics_textures[i]->getSize().Height);
-        }
-
-        for (unsigned i = 0; i < 6; i++)
-            sh_rgba[i] = new unsigned char[sh_w * sh_h * 4];
-        for (unsigned i = 0; i < 6; i++)
-        {
-            unsigned idx = texture_permutation[i];
-
-            video::IImage* image = video_driver->createImageFromData(
-                m_spherical_harmonics_textures[idx]->getColorFormat(),
-                m_spherical_harmonics_textures[idx]->getSize(),
-                m_spherical_harmonics_textures[idx]->lock(),
-                false
-                );
-            m_spherical_harmonics_textures[idx]->unlock();
-
-            image->copyToScaling(sh_rgba[i], sh_w, sh_h);
-            delete image;
-        }
-
-    }
-    else
-    {
-        sh_w = 16;
-        sh_h = 16;
-
-        for (unsigned i = 0; i < 6; i++)
-        {
-            sh_rgba[i] = new unsigned char[sh_w * sh_h * 4];
-
-            for (unsigned j = 0; j < sh_w * sh_h * 4; j += 4)
-            {
-                sh_rgba[i][j] = ambient.getBlue();
-                sh_rgba[i][j + 1] = ambient.getGreen();
-                sh_rgba[i][j + 2] = ambient.getRed();
-                sh_rgba[i][j + 3] = 255;
-            }
-        }
-    }
-
-    // Convert to float texture
-    Color *FloatTexCube[6];
-    for (unsigned i = 0; i < 6; i++)
-    {
-        FloatTexCube[i] = new Color[sh_w * sh_h];
-        for (unsigned j = 0; j < sh_w * sh_h; j++)
-        {
-            FloatTexCube[i][j].Blue = powf(float(0xFF & sh_rgba[i][4 * j]) / 255.f, 2.2f);
-            FloatTexCube[i][j].Green = powf(float(0xFF & sh_rgba[i][4 * j + 1]) / 255.f, 2.2f);
-            FloatTexCube[i][j].Red = powf(float(0xFF & sh_rgba[i][4 * j + 2]) / 255.f, 2.2f);
-        }
-    }
-
-    generateSphericalHarmonics(FloatTexCube, sh_w, m_blue_SH_coeff, m_green_SH_coeff, m_red_SH_coeff);
-    Log::debug("Skybox", "Blue_SH: %f, %f, %f, %f, %f, %f, %f, %f, %f",
-                m_blue_SH_coeff[0], m_blue_SH_coeff[1], m_blue_SH_coeff[2],
-                m_blue_SH_coeff[3], m_blue_SH_coeff[4], m_blue_SH_coeff[5],
-                m_blue_SH_coeff[6], m_blue_SH_coeff[7], m_blue_SH_coeff[8]);
-    Log::debug("Skybox", "Green_SH: %f, %f, %f, %f, %f, %f, %f, %f, %f",
-                m_green_SH_coeff[0], m_green_SH_coeff[1], m_green_SH_coeff[2],
-                m_green_SH_coeff[3], m_green_SH_coeff[4], m_green_SH_coeff[5],
-                m_green_SH_coeff[6], m_green_SH_coeff[7], m_green_SH_coeff[8]);
-    Log::debug("Skybox", "Red_SH: %f, %f, %f, %f, %f, %f, %f, %f, %f",
-                m_red_SH_coeff[0], m_red_SH_coeff[1], m_red_SH_coeff[2],
-                m_red_SH_coeff[3], m_red_SH_coeff[4], m_red_SH_coeff[5],
-                m_red_SH_coeff[6], m_red_SH_coeff[7], m_red_SH_coeff[8]);
-
-    for (unsigned i = 0; i < 6; i++)
-    {
-        delete[] sh_rgba[i];
-        delete[] FloatTexCube[i];
-    }
-
-    if (m_spherical_harmonics_textures.size() != 6)
-    {
-        // Diffuse env map is x 0.25, compensate
-        for (unsigned i = 0; i < 9; i++)
-        {
-            m_blue_SH_coeff[i] *= 4;
-            m_green_SH_coeff[i] *= 4;
-            m_red_SH_coeff[i] *= 4;
-        }
-    }
-}   // generateDiffuseCoefficients
 
 
 
 
-Skybox::Skybox(video::IVideoDriver *video_driver,
-               const std::vector<video::ITexture *> &skybox_textures,
-               const std::vector<video::ITexture *> &spherical_harmonics_textures,
-               const video::SColor &ambient)
+Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
 {
     m_skybox_textures = skybox_textures;
-    m_spherical_harmonics_textures = spherical_harmonics_textures;
     
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-    generateDiffuseCoefficients(video_driver, ambient);
     if (!skybox_textures.empty())
     {
-        m_cube_map = generateCubeMapFromTextures(video_driver);
+        m_cube_map = generateCubeMapFromTextures();
         m_specular_probe = generateSpecularCubemap(m_cube_map);
     }
     

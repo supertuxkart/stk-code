@@ -79,8 +79,7 @@ public:
                                 const video::SColorf &col);
 
     void renderSSAO();
-    void renderEnvMap(const float *bSHCoeff, const float *gSHCoeff,
-                      const float *rSHCoeff, unsigned skycubemap);
+    void renderEnvMap(unsigned skycubemap);
     void renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB, 
                        const core::matrix4 &rh_matrix,
                        const core::vector3df &rh_extend);

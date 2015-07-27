@@ -36,9 +36,10 @@
 #include <SColor.h>
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
-#include "graphics/wind.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/skybox.hpp"
+#include "graphics/sphericalHarmonic.hpp"
+#include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
@@ -220,6 +221,7 @@ private:
     //bool m_skybox_ready;
     
     Skybox *m_skybox;
+    SphericalHarmonic *m_spherical_harmonic;
 
 public:
     //float blueSHCoeff[9];
@@ -536,7 +538,10 @@ public:
     // -----------------------------------------------------------------------
     /** Returns a pointer to the skybox. */
     inline Skybox *getSkybox()  {return m_skybox;}
-    // -----------------------------------------------------------------------    
+    // -----------------------------------------------------------------------
+    /** Returns a pointer to spherical harmonic. */
+    inline SphericalHarmonic *getSphericalHarmonic()  {return m_spherical_harmonic;}
+    // -----------------------------------------------------------------------
     const core::vector3df& getSunDirection() const { return m_sun_direction; };
     // -----------------------------------------------------------------------
     void setSunDirection(const core::vector3df &SunPos)

@@ -122,6 +122,7 @@ IrrDriver::IrrDriver()
     m_post_processing     = NULL;
     m_wind                = new Wind();
     m_skybox              = NULL;
+    m_spherical_harmonic  = NULL;
 
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
     m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
@@ -1373,14 +1374,20 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     //TODO
     //prepareSkybox();
     //m_skybox_ready = true;
-    m_skybox = new Skybox(m_video_driver,
-                          texture,
-                          sphericalHarmonics, 
-                          m_scene_manager->getAmbientLight().toSColor());
+    m_skybox = new Skybox(texture);
     
-
-
-
+    if(sphericalHarmonics.size() == 6)
+    {
+        if(m_spherical_harmonic != NULL)
+        {
+            delete m_spherical_harmonic;
+        }
+        m_spherical_harmonic = new SphericalHarmonic(sphericalHarmonics);
+    }
+    else
+    {
+        m_spherical_harmonic = new SphericalHarmonic(m_scene_manager->getAmbientLight().toSColor());
+    }
     
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
@@ -1402,6 +1409,8 @@ void IrrDriver::suppressSkyBox()
     SkyboxSpecularProbe = 0;*/
     delete m_skybox;
     m_skybox = NULL;
+    delete m_spherical_harmonic;
+    m_spherical_harmonic = NULL;
 }
 
 // ----------------------------------------------------------------------------
@@ -1783,7 +1792,8 @@ void IrrDriver::setAmbientLight(const video::SColorf &light)
     m_scene_manager->setAmbientLight(light);
     //TODO!
     
-    
+    if(m_spherical_harmonic == NULL) 
+        m_spherical_harmonic = new SphericalHarmonic(light.toSColor());
     
     //m_skybox_ready = false;
 }   // setAmbientLight
