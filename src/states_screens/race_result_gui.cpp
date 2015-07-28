@@ -766,15 +766,20 @@ void RaceResultGUI::renderGlobal(float dt)
             {
                 WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
                 assert(wwr);
+                int most_points;
+                if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+                    most_points = wwr->getScoreForPosition(2);
+                else
+                    most_points = wwr->getScoreForPosition(1);
                 ri->m_current_displayed_points +=
-                    dt*wwr->getScoreForPosition(1) / m_time_for_points;
+                    dt*most_points / m_time_for_points;
                 if (ri->m_current_displayed_points > ri->m_new_overall_points)
                 {
                     ri->m_current_displayed_points =
                         (float)ri->m_new_overall_points;
                 }
                 ri->m_new_points -=
-                    dt*wwr->getScoreForPosition(1) / m_time_for_points;
+                    dt*most_points / m_time_for_points;
                 if (ri->m_new_points < 0)
                     ri->m_new_points = 0;
                 break;
