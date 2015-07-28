@@ -186,43 +186,6 @@ void FollowTheLeaderRace::countdownReachedZero()
         music_manager->switchToFastMusic();
     }
 
-    if (isRaceOver())
-    {
-        // Handle special FTL situation: the leader is kart number 3 when
-        // the last kart gets eliminated. In this case kart on position 1
-        // is eliminated, and the kart formerly on position 2 is on
-        // position 1, the leader now position 2. In this case the kart
-        // on position 1 would get more points for this victory. So if
-        // this is the case, change the position
-        if(m_karts[0]->getPosition()!=1)
-        {
-            // Adjust the position of all still driving karts that
-            // are ahead of the leader by +1, and move the leader
-            // to position 1.
-            for (unsigned int i=1; i<m_karts.size(); i++)
-            {
-                if(!m_karts[i]->hasFinishedRace() &&
-                    !m_karts[i]->isEliminated()   &&
-                    m_karts[i]->getPosition()<m_karts[0]->getPosition())
-                {
-                        m_karts[i]->setPosition(m_karts[i]->getPosition()+1);
-                }
-            }
-            m_karts[0]->setPosition(1);
-        }
-
-        // Mark all still racing karts to be finished.
-        for (unsigned int n=0; n<m_karts.size(); n++)
-        {
-            if (!m_karts[n]->isEliminated() &&
-                !m_karts[n]->hasFinishedRace())
-            {
-                m_karts[n]->finishedRace(getTime());
-            }
-        }
-    }
-    // End of race is detected from World::updateWorld()
-
 }   // countdownReachedZero
 
 //-----------------------------------------------------------------------------
@@ -260,23 +223,43 @@ void FollowTheLeaderRace::terminateRace()
 {
     int pos_leader = m_karts[0]->getPosition();
 
-    // Any kart that has overtaken the leader must be placed one position
-    // back, and the leader must be set to be number 1.
-    const unsigned int kart_amount = getNumKarts();
-    for (unsigned int i = 0; i < kart_amount; i++)
+    // Handle special FTL situations: the leader is kart number 3 when
+    // the last kart gets eliminated. In this case kart on position 1
+    // is eliminated, and the kart formerly on position 2 is on
+    // position 1, the leader now position 2, but the point distribution
+    // depends on the 'first' (non-leader) kart to be on position 2.
+    // That situation can also occur during the delay after eliminating
+    // the last kart before the race result is shown.
+    // To avoid this problem, adjust the position of any kart that is
+    // ahead of the leader.
+    beginSetKartPositions();
+    for (unsigned int i = 0; i < getNumKarts(); i++)
     {
         if (!m_karts[i]->hasFinishedRace() && !m_karts[i]->isEliminated())
         {
             if (m_karts[i]->getPosition() < pos_leader)
             {
-                m_karts[i]->setPosition(m_karts[i]->getPosition() + 1);
+                setKartPosition(i, m_karts[i]->getPosition() + 1);
             }
             // Update the estimated finishing time for all karts that haven't
             // finished yet.
             m_karts[i]->finishedRace(0.0f);
         }
-    }   // i<kart_amount
-    m_karts[0]->setPosition(1);
+    }   // i < number of karts
+    setKartPosition(/*kart id*/0, /*position*/1);
+    endSetKartPositions();
+
+    // Mark all still racing karts to be finished.
+    for (unsigned int n = 0; n < m_karts.size(); n++)
+    {
+        if (!m_karts[n]->isEliminated() &&
+            !m_karts[n]->hasFinishedRace())
+        {
+            m_karts[n]->finishedRace(getTime());
+        }
+    }
+
+
     World::terminateRace();
 }   // terminateRace
 
