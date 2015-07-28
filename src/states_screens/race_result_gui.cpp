@@ -434,11 +434,13 @@ void RaceResultGUI::determineTableLayout()
     m_font->setMonospaceDigits(true);
     WorldWithRank *rank_world = (WorldWithRank*)World::getWorld();
 
+    unsigned int first_position = 1;
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        first_position = 2;
+
     // Use only the karts that are supposed to be displayed (and
     // ignore e.g. the leader in a FTL race).
-    unsigned int num_karts = race_manager->getNumberOfKarts();
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        num_karts--;
+    unsigned int num_karts =race_manager->getNumberOfKarts()-first_position+1;
 
     // In FTL races the leader kart is not displayed
     m_all_row_infos.resize(num_karts);
@@ -450,21 +452,13 @@ void RaceResultGUI::determineTableLayout()
     m_width_kart_name     = 0;
     float max_finish_time = 0;
 
-    for (int source_pos = 1, dest_pos = 0;
-         dest_pos < (int)num_karts; source_pos++, dest_pos++)
+    for(unsigned int position=first_position;
+        position<=race_manager->getNumberOfKarts(); position++)
     {
-        const AbstractKart *kart = rank_world->getKartAtPosition(source_pos);
-
-        // Don't take the leader
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-            kart == rank_world->getKart(0))
-        {
-            dest_pos--;
-            continue;
-        }
+        const AbstractKart *kart = rank_world->getKartAtPosition(position);
 
         // Save a pointer to the current row_info entry
-        RowInfo *ri              = &(m_all_row_infos[dest_pos]);
+        RowInfo *ri              = &(m_all_row_infos[position-first_position]);
         ri->m_is_player_kart     = kart->getController()->isPlayerController();
         ri->m_kart_name          = translations->fribidize(kart->getName());
         ri->m_player             = ri->m_is_player_kart
