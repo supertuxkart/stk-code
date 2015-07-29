@@ -33,6 +33,9 @@ private:
     /** A timer used before terminating the race. */
     float m_is_over_delay;
 
+    /** Time the last kart was eliminated. It is used to assign each
+     *  kart a 'finish' time (i.e. how long they lasted). */
+    float m_last_eliminated_time;
 public:
 
              FollowTheLeaderRace();

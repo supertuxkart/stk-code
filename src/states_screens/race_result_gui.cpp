@@ -468,7 +468,9 @@ void RaceResultGUI::determineTableLayout()
             kart->getKartProperties()->getIconMaterial()->getTexture();
         ri->m_kart_icon          = icon;
 
-        if (kart->isEliminated())
+        // FTL karts will get a time assigned, they are not shown as eliminated
+        if (kart->isEliminated() && 
+            race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             ri->m_finish_time_string = core::stringw(_("Eliminated"));
         }
@@ -830,15 +832,18 @@ void RaceResultGUI::determineGPLayout()
         ri->m_player         = ri->m_is_player_kart
                              ? kart->getController()->getPlayer() : NULL;
 
-        if (!kart->isEliminated())
+        // In FTL karts do have a time, which is shown even when the kart
+        // is eliminated
+        if (kart->isEliminated() &&
+            race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            ri->m_finish_time_string = core::stringw(_("Eliminated"));
+        }
+        else
         {
             float time           = race_manager->getOverallTime(kart_id);
             ri->m_finish_time_string
                                  = StringUtils::timeToString(time).c_str();
-        }
-        else
-        {
-            ri->m_finish_time_string = core::stringw(_("Eliminated"));
         }
         ri->m_start_at       = m_time_between_rows * rank;
         ri->m_x_pos          = (float)UserConfigParams::m_width;
@@ -916,15 +921,10 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     current_x += m_width_kart_name + m_width_column_space;
 
 
-    // Draw the time except in FTL mode
-    // --------------------------------
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
-    {
-        core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
-        m_font->draw(ri->m_finish_time_string, dest_rect, color, false, false,
-                     NULL, true /* ignoreRTL */);
-        current_x += m_width_finish_time + m_width_column_space;
-    }
+    core::recti dest_rect = core::recti(current_x, y, current_x + 100, y + 10);
+    m_font->draw(ri->m_finish_time_string, dest_rect, color, false, false,
+                 NULL, true /* ignoreRTL */);
+    current_x += m_width_finish_time + m_width_column_space;
 
     // Only display points in GP mode and when the GP results are displayed.
     // =====================================================================
