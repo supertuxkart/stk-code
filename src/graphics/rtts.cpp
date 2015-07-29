@@ -296,7 +296,14 @@ void RTT::prepareRender(scene::ICameraSceneNode* camera)
     irr_driver->setRTT(this);
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
-    m_diffuse_coefficients_calculated = true;
+    //m_diffuse_coefficients_calculated = true;
+    
+    if (!m_diffuse_coefficients_calculated)
+    {
+        m_diffuse_coefficients_calculated = true;
+        Log::debug("RTT", "hophophop");
+    }
+        
     //TODO!
     /*if (!m_diffuse_coefficients_calculated)
     {

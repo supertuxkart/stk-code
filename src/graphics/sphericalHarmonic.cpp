@@ -23,6 +23,9 @@
 #include <algorithm> 
 #include <cassert>
 
+
+#include <irrlicht.h>
+
 using namespace irr;
 
 namespace 
@@ -102,13 +105,7 @@ SphericalHarmonic::SphericalHarmonic(const std::vector<video::ITexture *> &spher
         delete[] float_tex_cube[i];
     }
 
-    // Diffuse env map is x 0.25, compensate
-    for (unsigned i = 0; i < 9; i++)
-    {
-        m_blue_SH_coeff[i] *= 4;
-        m_green_SH_coeff[i] *= 4;
-        m_red_SH_coeff[i] *= 4;
-    }
+    printCoeff();
     
 }// SphericalHarmonic(const std::vector<video::ITexture *> &spherical_harmonics_textures)
 
@@ -140,8 +137,26 @@ SphericalHarmonic::SphericalHarmonic(const video::SColor &ambient)
         delete[] sh_rgba[i];
         delete[] float_tex_cube[i];
     }
+
+    // Diffuse env map is x 0.25, compensate
+    for (unsigned i = 0; i < 9; i++)
+    {
+        m_blue_SH_coeff[i] *= 4;
+        m_green_SH_coeff[i] *= 4;
+        m_red_SH_coeff[i] *= 4;
+    }
     
+    printCoeff();
+    Log::debug("SphericalHarmonic", "%f %f %f", ambient.getBlue(), ambient.getGreen(), ambient.getRed());
+
+        
 }// SphericalHarmonic(const video::SColor &ambient)
+
+int SphericalHarmonic::getNbTex()
+{
+    return m_spherical_harmonics_textures.size();
+    
+}
 
 
 

@@ -1386,7 +1386,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     }
     else
     {
-        m_spherical_harmonic = new SphericalHarmonic(m_scene_manager->getAmbientLight().toSColor());
+        //m_spherical_harmonic = new SphericalHarmonic(m_scene_manager->getAmbientLight().toSColor());
     }
     
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
@@ -1791,7 +1791,7 @@ void IrrDriver::setAmbientLight(const video::SColorf &light)
 {
     m_scene_manager->setAmbientLight(light);
     //TODO!
-    
+        
     if(m_spherical_harmonic == NULL) 
         m_spherical_harmonic = new SphericalHarmonic(light.toSColor());
     

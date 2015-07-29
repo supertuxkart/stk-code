@@ -1864,7 +1864,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // ---- Set ambient color
     m_ambient_color = m_default_ambient_color;
-    irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
+    irr_driver->setAmbientLight(m_ambient_color);
 
     // ---- Create sun (non-ambient directional light)
     if (m_sun_position.getLengthSQ() < 0.03f)

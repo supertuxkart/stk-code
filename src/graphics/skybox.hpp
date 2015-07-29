@@ -36,11 +36,9 @@ private:
     
     /** The specular probe texture id */
     GLuint m_specular_probe;   
-
     
 
     GLuint generateCubeMapFromTextures ();
-
     
 public:
     Skybox(const std::vector<irr::video::ITexture *> &skybox_textures);

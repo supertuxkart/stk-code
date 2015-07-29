@@ -777,6 +777,7 @@ public:
                                    size_t width, size_t height);
     void uploadLightingData();
 
+
     // --------------------- OLD RTT --------------------
     /**
       * THIS IS THE OLD OPENGL 1 RTT PROVIDER, USE THE SHADER-BASED
