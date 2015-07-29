@@ -89,7 +89,7 @@ void OptionsScreenInput2::init()
 
 
     ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
-    if (m_config->isKeyboard())
+    if (!m_config->isKeyboard())
     {
         core::stringw label = (m_config->isEnabled()
                             ? //I18N: button to disable a gamepad configuration
