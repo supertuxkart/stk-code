@@ -31,7 +31,6 @@
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
 
 class btKart;
@@ -51,6 +50,7 @@ class Skidding;
 class SkidMarks;
 class SlipStream;
 class Stars;
+class TerrainInfo;
 
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a
@@ -172,10 +172,6 @@ private:
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 
-    /** If a kart is flying, the shadow is disabled (since it is
-     *  stuck to the kart, i.e. the shadow would be flying, too). */
-    bool             m_shadow_enabled;
-
     ParticleEmitter *m_sky_particles_emitter;
 
     /** All particle effects. */
@@ -186,12 +182,6 @@ private:
 
     /** Handles all slipstreaming. */
     SlipStream      *m_slipstream;
-
-    /** Rotation compared to the start position, same for all wheels */
-    float           m_wheel_rotation;
-
-    /** Rotation change in the last time delta, same for all wheels */
-    float           m_wheel_rotation_dt;
 
     /** The skidmarks object for this kart. */
     SkidMarks      *m_skidmarks;

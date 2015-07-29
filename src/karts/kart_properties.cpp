@@ -82,19 +82,16 @@ KartProperties::KartProperties(const std::string &filename)
     // if everything is defined properly.
     m_wheel_base = m_friction_slip = m_collision_terrain_impulse =
         m_collision_impulse = m_restitution = m_collision_impulse_time =
-        m_max_lean = m_lean_speed = m_physical_wheel_position =
-        m_graphical_y_offset = UNDEFINED;
+        m_max_lean = m_lean_speed = m_physical_wheel_position = UNDEFINED;
 
     m_terrain_impulse_type       = IMPULSE_NONE;
     m_gravity_center_shift       = Vec3(UNDEFINED);
     m_bevel_factor               = Vec3(UNDEFINED);
-    m_prevent_chassis_in_terrain = false;
     m_version                    = 0;
     m_color                      = video::SColor(255, 0, 0, 0);
     m_shape                      = 32;  // close enough to a circle.
     m_engine_sfx_type            = "engine_small";
     m_kart_model                 = NULL;
-    m_has_rand_wheels            = false;
     m_nitro_min_consumption      = 0.53f;
     // The default constructor for stk_config uses filename=""
     if (filename != "")
@@ -282,7 +279,13 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     {
         m_gravity_center_shift.setX(0);
         // Default: center at the very bottom of the kart.
-        m_gravity_center_shift.setY(m_kart_model->getHeight()*0.5f);
+        // If the kart is 'too high', its height will be changed in
+        // kart.cpp, the same adjustment needs to be made here.
+        if (m_kart_model->getHeight() > m_kart_model->getLength()*0.6f)
+            m_gravity_center_shift.setY(m_kart_model->getLength()*0.6f*0.5f);
+        else
+            m_gravity_center_shift.setY(m_kart_model->getHeight()*0.5f);
+
         m_gravity_center_shift.setZ(0);
     }
 
@@ -292,9 +295,11 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // stable, the physical wheel position (i.e. location of raycast) were
     // moved to be on the corner of the shape. In order to retain the same
     // steering behaviour, the wheel base (which in turn determines the
-    // turn angle at certain speeds) is shortened by 2 * wheel_radius
-    m_wheel_base = fabsf(m_kart_model->getLength() - 2 *
-        m_combined_characteristic->getWheelsRadius());
+    // turn angle at certain speeds) is shortened by 2*wheel_radius
+    // Wheel radius was always 0.25, and is now not used anymore, but in order
+    // to keep existing steering behaviour, the same formula is still
+    // used.
+    m_wheel_base = fabsf(m_kart_model->getLength() - 2*0.25f);
 
     m_shadow_texture = irr_driver->getTexture(m_shadow_file);
 
@@ -346,8 +351,6 @@ void KartProperties::getAllData(const XMLNode * root)
     m_color.set(255, (int)(255*c.getX()), (int)(255*c.getY()), (int)(255*c.getZ()));
 
     root->get("groups",            &m_groups           );
-
-    root->get("random-wheel-rot",  &m_has_rand_wheels  );
 
     root->get("shadow-scale",      &m_shadow_scale     );
     root->get("shadow-x-offset",   &m_shadow_x_offset  );
@@ -467,13 +470,6 @@ void KartProperties::getAllData(const XMLNode * root)
         m_lean_speed *= DEGREE_TO_RAD;
     }
 
-    if(const XMLNode *graphics_node = root->getNode("graphics"))
-    {
-        graphics_node->get("y-offset",          &m_graphical_y_offset);
-        graphics_node->get("prevent-chassis-in-terrain",
-                                                &m_prevent_chassis_in_terrain);
-    }
-
     if(m_kart_model)
         m_kart_model->loadInfo(*root);
 }   // getAllData
@@ -501,7 +497,6 @@ void KartProperties::checkAllSet(const std::string &filename)
 
     CHECK_NEG(m_max_lean,                   "lean max"                      );
     CHECK_NEG(m_lean_speed,                 "lean speed"                    );
-    CHECK_NEG(m_graphical_y_offset,         "graphics y-offset"             );
 
     m_speed_weighted_object_properties.checkAllSet();
 
@@ -554,4 +549,3 @@ float KartProperties::getAvgPower() const
         sum += gear_power_increase[i] * power;
     return sum / gear_power_increase.size();
 }   // getAvgPower
-

@@ -37,6 +37,8 @@ void WorldWithRank::init()
     m_position_used.resize(m_karts.size());
     m_position_setting_initialised = false;
 #endif
+    stk_config->getAllScores(&m_score_for_position, getNumKarts());
+
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -173,3 +175,13 @@ btTransform WorldWithRank::getRescueTransform(unsigned int rescue_pos) const
     return getTrack()->getStartTransform(rescue_pos);
 }   // getRescueTransform
 
+//-----------------------------------------------------------------------------
+/** Returns the number of points for a kart at a specified position.
+ *  \param p Position (starting with 1).
+ */
+int WorldWithRank::getScoreForPosition(int p)
+{
+    assert(p-1 >= 0);
+    assert(p - 1 <(int) m_score_for_position.size());
+    return m_score_for_position[p - 1];
+}   // getScoreForPosition

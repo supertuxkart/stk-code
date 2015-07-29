@@ -67,11 +67,3 @@ void CutsceneGUI::renderGlobal(float dt)
     }
 }
 
-// -----------------------------------------------------------------------------
-
-void CutsceneGUI::renderPlayerView(const AbstractKart *kart)
-{
-
-}
-
-// -----------------------------------------------------------------------------

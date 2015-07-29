@@ -140,6 +140,9 @@ public:
      *  be generated. */
     float m_replay_delta_angle;
 
+    /** The field of view for 1, 2, 3, 4 player split screen. */
+    float m_camera_fov[4];
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid

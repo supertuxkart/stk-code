@@ -173,7 +173,13 @@ public:
     {
         return m_kart_info[kart_index].m_track_sector;
     }   // getTrackSector
-
+    // ------------------------------------------------------------------------
+    void setLastTriggeredCheckline(unsigned int kart_index, int index)
+    {
+        if (m_kart_info.size() == 0)
+            return;
+        m_kart_info[kart_index].m_track_sector.setLastTriggeredCheckline(index);
+    }
     // ------------------------------------------------------------------------
     /** Returns how far the kart has driven so far (i.e.
      *  number-of-laps-finished times track-length plus distance-on-track.

@@ -62,9 +62,6 @@ private:
 
     // Minimap related variables
     // -------------------------
-    /** The mini map of the track. */
-    video::ITexture *m_mini_map;
-
     video::ITexture *m_trophy1;
     video::ITexture *m_trophy2;
     video::ITexture *m_trophy3;

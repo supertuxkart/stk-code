@@ -47,6 +47,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
     uint32_t sequence = data.gui32(6);
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    assert(peers.size() > 0);
 
     if (m_listener->isServer())
     {
@@ -57,7 +58,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         }
     }
 
-    uint8_t peer_id;
+    uint8_t peer_id = 0;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         if (peers[i]->isSamePeer(*event->peer))

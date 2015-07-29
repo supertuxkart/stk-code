@@ -101,11 +101,11 @@ namespace Scripting
             return StringUtils::wide_to_utf8(out.c_str());
         }
 
-        /** Runs the script specified by the given string */
+        /** Runs the script function specified by the given string */
         void runScript(const std::string* str)
         {
             ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-            script_engine->runFunction(*str);
+            script_engine->runFunction(true, *str);
         }
 
         /** Generate a random integer value */

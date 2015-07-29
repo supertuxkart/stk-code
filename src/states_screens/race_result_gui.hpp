@@ -233,7 +233,7 @@ public:
                   { assert(false); return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
-    virtual void renderPlayerView(const AbstractKart *kart) {}
+    virtual void renderPlayerView(const Camera *camera, float dt) {}
 
     virtual void onUpdate(float dt) OVERRIDE;
 
@@ -246,10 +246,8 @@ public:
                             float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
-                            bool important=true) { }
-
-    /** Should not be called anymore. */
-    virtual void clearAllMessages() {assert(false); }
+                            bool important=true,
+                            bool big_font=false) { }
 
     void nextPhase();
 

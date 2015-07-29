@@ -27,7 +27,7 @@ CParticleCylinderEmitter::CParticleCylinderEmitter(
 	MaxParticlesPerSecond(maxParticlesPerSecond),
 	MinStartColor(minStartColor), MaxStartColor(maxStartColor),
 	MinLifeTime(lifeTimeMin), MaxLifeTime(lifeTimeMax),
-	Radius(radius), Length(length), Time(0), Emitted(0),
+	Radius(radius), Length(length), Time(0),
 	MaxAngleDegrees(maxAngleDegrees), OutlineOnly(outlineOnly)
 {
 	#ifdef _DEBUG

@@ -115,6 +115,11 @@
       work anymore - so for now don't enable this. -->
   <networking enable="false"/>
 
+  <!-- The field od views for 1-4 player split screen. fov-3 is
+       actually not used (since 3 player split screen uses the
+       same layout as 4 player split screen) -->
+  <camera fov-1="80" fov-2="65" fov-3="50" fov-4="75" />
+
   <!-- disable-while-unskid: Disable steering when stop skidding during
            the time it takes to adjust the physical body with the graphics.
        camera-follow-skid: If true the camera will stay behind the kart,
@@ -126,15 +131,6 @@
   <!-- Default values for all karts
        ============================ -->
   <general-kart-defaults>
-    <!-- Options to affect the graphical chassis:
-         y-offset: Additional offset to move graphical chassis with regards
-                   to the physics, used to reduce frequencey of graphical
-                   chassis in terrain.
-         prevent-chassis-in-terrain: a hard flag to prevent nearly all instances
-                   of chassis in terrain. Can (atm) cause some stuttering. -->
-    <graphics y-offset="0.0"
-              prevent-chassis-in-terrain="true"
-    />
 
     <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
          decrease: multiplicative decrease of skidding factor in each frame.

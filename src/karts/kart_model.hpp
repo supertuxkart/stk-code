@@ -232,7 +232,7 @@ public:
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     void          setDefaultSuspension();
-    void          update(float dt, float rotation_dt, float steer,
+    void          update(float dt, float distance, float steer,
                          float speed);
     void          finishedRace();
     scene::ISceneNode*

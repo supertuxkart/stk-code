@@ -39,31 +39,31 @@
             <spacer width="10" height="10" />
 
             <buttonbar id="menu_bottomrow" x="0" y="0" width="38%" height="100%" align="center">
-                <icon-button id="test_gpwin" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                <icon-button id="test_gpwin" width="64" height="64" icon="gui/main_options.png"
                              raw_text="TEST: GPWin" label_location="hover"/>
-                <icon-button id="test_gplose" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                <icon-button id="test_gplose" width="64" height="64" icon="gui/main_options.png"
                              raw_text="TEST: GPLose" label_location="hover"/>
-                <icon-button id="test_unlocked" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                <icon-button id="test_unlocked" width="64" height="64" icon="gui/main_options.png"
                              raw_text="TEST: Unlocked" label_location="hover"/>
-                <icon-button id="test_unlocked2" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                <icon-button id="test_unlocked2" width="64" height="64" icon="gui/main_options.png"
                              raw_text="TEST: Unlocked 2" label_location="hover"/>
-                <icon-button id="test_intro" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                <icon-button id="test_intro" width="64" height="64" icon="gui/main_options.png"
                              raw_text="TEST: Intro" label_location="hover"/>
-                <icon-button id="test_outro" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                <icon-button id="test_outro" width="64" height="64" icon="gui/main_options.png"
                              raw_text="TEST: Outro" label_location="hover"/>     
-                <icon-button id="options" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                <icon-button id="options" width="64" height="64" icon="gui/main_options.png"
                              I18N="In the main screen"  text="Options" label_location="hover"/>
-                <icon-button id="help" width="64" height="64" icon="gui/main_help.png"  extend_label="50"
+                <icon-button id="help" width="64" height="64" icon="gui/main_help.png"
                              I18N="In the main screen" text="Help" label_location="hover"/>
-                <icon-button id="startTutorial" width="64" height="64" icon="gui/tutorial.png" extend_label="150"
+                <icon-button id="startTutorial" width="64" height="64" icon="gui/tutorial.png"
                              I18N="In the main screen" text="Tutorial" label_location="hover"/>
-                <icon-button id="achievements" width="64" height="64" icon="gui/gp_copy.png" extend_label="150"
+                <icon-button id="achievements" width="64" height="64" icon="gui/gp_copy.png"
                              I18N="In the main screen" text="Achievements" label_location="hover"/>
-                <icon-button id="gpEditor" width="64" height="64" icon="gui/gpeditor.png" extend_label="150"
+                <icon-button id="gpEditor" width="64" height="64" icon="gui/gpeditor.png"
                              I18N="In the main screen" text="Grand Prix Editor" label_location="hover"/>
-                <icon-button id="about" width="64" height="64" icon="gui/main_about.png"  extend_label="50"
+                <icon-button id="about" width="64" height="64" icon="gui/main_about.png"
                              I18N="In the main screen" text="About" label_location="hover"/>
-                <icon-button id="quit" width="64" height="64" icon="gui/main_quit.png"  extend_label="50"
+                <icon-button id="quit" width="64" height="64" icon="gui/main_quit.png"
                              I18N="In the main screen" text="Quit" label_location="hover"/>
             </buttonbar>
         </bottombar>

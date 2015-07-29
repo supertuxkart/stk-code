@@ -59,8 +59,7 @@ void CheckManager::load(const XMLNode &node)
         }
         else if(type=="check-sphere")
         {
-            AmbientLightSphere *cs = new AmbientLightSphere(*check_node,
-                                                            i);
+            CheckSphere *cs = new CheckSphere(*check_node, i);
             m_all_checks.push_back(cs);
         }   // checksphere
         else

@@ -452,7 +452,6 @@ void RaceResultGUI::determineTableLayout()
     m_width_kart_name     = 0;
     float max_finish_time = 0;
 
-
     for(unsigned int position=first_position;
         position<=race_manager->getNumberOfKarts(); position++)
     {
@@ -764,18 +763,27 @@ void RaceResultGUI::renderGlobal(float dt)
                  }
                  break;
             case RR_INCREASE_POINTS:
+            {
+                WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+                assert(wwr);
+                int most_points;
+                if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+                    most_points = wwr->getScoreForPosition(2);
+                else
+                    most_points = wwr->getScoreForPosition(1);
                 ri->m_current_displayed_points +=
-                    dt*race_manager->getPositionScore(1)/m_time_for_points;
-                if(ri->m_current_displayed_points>ri->m_new_overall_points)
+                    dt*most_points / m_time_for_points;
+                if (ri->m_current_displayed_points > ri->m_new_overall_points)
                 {
                     ri->m_current_displayed_points =
-                       (float)ri->m_new_overall_points;
+                        (float)ri->m_new_overall_points;
                 }
                 ri->m_new_points -=
-                    dt*race_manager->getPositionScore(1)/m_time_for_points;
-                if(ri->m_new_points<0)
+                    dt*most_points / m_time_for_points;
+                if (ri->m_new_points < 0)
                     ri->m_new_points = 0;
                 break;
+            }
             case RR_RESORT_TABLE:
                 x = ri->m_x_pos
                   - ri->m_radius*sin(m_timer/m_time_rotation*M_PI);
@@ -837,8 +845,18 @@ void RaceResultGUI::determineGPLayout()
         ri->m_y_pos          = (float)(m_top+rank*m_distance_between_rows);
         int p                = race_manager->getKartPrevScore(kart_id);
         ri->m_current_displayed_points = (float)p;
-        ri->m_new_points     =
-            (float)race_manager->getPositionScore(kart->getPosition());
+        if (kart->isEliminated() && 
+            race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            ri->m_new_points = 0;
+        }
+        else
+        {
+            WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+            assert(wwr);
+            ri->m_new_points =
+                (float)wwr->getScoreForPosition(kart->getPosition());
+        }
     }
 
     // Now update the GP ranks, and determine the new position

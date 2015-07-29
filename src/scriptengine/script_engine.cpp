@@ -175,20 +175,20 @@ namespace Scripting
     /** runs the specified script
     *  \param string scriptName = name of script to run
     */
-    void ScriptEngine::runFunction(std::string function_name)
+    void ScriptEngine::runFunction(bool warn_if_not_found, std::string function_name)
     {
         std::function<void(asIScriptContext*)> callback;
         std::function<void(asIScriptContext*)> get_return_value;
-        runFunction(function_name, callback, get_return_value);
+        runFunction(warn_if_not_found, function_name, callback, get_return_value);
     }
 
     //-----------------------------------------------------------------------------
 
-    void ScriptEngine::runFunction(std::string function_name,
+    void ScriptEngine::runFunction(bool warn_if_not_found, std::string function_name,
         std::function<void(asIScriptContext*)> callback)
     {
         std::function<void(asIScriptContext*)> get_return_value;
-        runFunction(function_name, callback, get_return_value);
+        runFunction(warn_if_not_found, function_name, callback, get_return_value);
     }
 
     //-----------------------------------------------------------------------------
@@ -196,7 +196,7 @@ namespace Scripting
     /** runs the specified script
     *  \param string scriptName = name of script to run
     */
-    void ScriptEngine::runFunction(std::string function_name,
+    void ScriptEngine::runFunction(bool warn_if_not_found, std::string function_name,
         std::function<void(asIScriptContext*)> callback,
         std::function<void(asIScriptContext*)> get_return_value)
     {
@@ -217,7 +217,10 @@ namespace Scripting
         
             if (func == NULL)
             {
-                Log::debug("Scripting", "Scripting function was not found : %s", function_name.c_str());
+                if (warn_if_not_found)
+                    Log::warn("Scripting", "Scripting function was not found : %s", function_name.c_str());
+                else
+                    Log::debug("Scripting", "Scripting function was not found : %s", function_name.c_str());
                 m_functions_cache[function_name] = NULL; // remember that this function is unavailable
                 return;
             }
@@ -233,6 +236,8 @@ namespace Scripting
 
         if (func == NULL)
         {
+            if (warn_if_not_found)
+                Log::warn("Scripting", "Scripting function was not found : %s", function_name.c_str());
             return; // function unavailable
         }
 
@@ -425,7 +430,7 @@ namespace Scripting
             curr.m_time -= dt;
             if (curr.m_time <= 0.0)
             {
-                runFunction("void " + curr.m_callback_name + "()");
+                runFunction(true, "void " + curr.m_callback_name + "()");
                 m_pending_timeouts.erase(m_pending_timeouts.begin() + i);
             }
         }

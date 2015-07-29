@@ -40,6 +40,9 @@
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
+#include "tracks/check_cylinder.hpp"
+#include "tracks/check_manager.hpp"
+#include "tracks/check_sphere.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -649,7 +652,7 @@ void TrackObjectPresentationSound::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationSound::onTriggerItemApproached(Item* who)
+void TrackObjectPresentationSound::onTriggerItemApproached()
 {
     if (m_sound != NULL && m_sound->getStatus() != SFXBase::SFX_PLAYING)
     {
@@ -935,12 +938,40 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     xml_node.get("distance", &trigger_distance);
     xml_node.get("action",   &m_action        );
 
+    std::string trigger_type;
+    xml_node.get("trigger-type", &trigger_type);
+    if (trigger_type == "point" || trigger_type.empty())
+    {
+        m_type = TRIGGER_TYPE_POINT;
+    }
+    else if (trigger_type == "cylinder")
+    {
+        m_type = TRIGGER_TYPE_CYLINDER;
+    }
+    else
+    {
+        assert(false);
+    }
+
     m_action_active = true;
 
     if (m_action.size() == 0)
         Log::warn("TrackObject", "Action-trigger has no action defined.");
 
-    ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
+    if (m_type == TRIGGER_TYPE_POINT)
+    {
+        // TODO: rewrite as a sphere check structure?
+        ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
+        // CheckManager::get()->add(new CheckSphere(xml_node, 0 /* TODO what is this? */));
+    }
+    else if (m_type == TRIGGER_TYPE_CYLINDER)
+    {
+        CheckManager::get()->add(new CheckCylinder(xml_node, 0 /* TODO what is this? */, this));
+    }
+    else
+    {
+        assert(false);
+    }
 }   // TrackObjectPresentationActionTrigger
 
 // ----------------------------------------------------------------------------
@@ -956,11 +987,12 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     float trigger_distance = distance;
     m_action               = script_name;
     m_action_active        = true;
+    m_type                 = TRIGGER_TYPE_POINT;
     ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
 }   // TrackObjectPresentationActionTrigger
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
+void TrackObjectPresentationActionTrigger::onTriggerItemApproached()
 {
     if (!m_action_active) return;
 
@@ -971,6 +1003,6 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     Camera* camera = Camera::getActiveCamera();
     if (camera != NULL && camera->getKart() != NULL)
         idKart = camera->getKart()->getWorldKartId();
-    script_engine->runFunction("void " + m_action + "(int)",
+    script_engine->runFunction(true, "void " + m_action + "(int)",
         [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
 }   // onTriggerItemApproached

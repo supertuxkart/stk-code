@@ -58,8 +58,6 @@ Plunger::Plunger(AbstractKart *kart)
 
     btTransform kart_transform = kart->getAlignedTransform();
     btMatrix3x3 kart_rotation = kart_transform.getBasis();
-    // The current forward vector is rotation*(0,0,1), or:
-    btVector3 forward(kart_rotation.getColumn(2));
 
     float heading =kart->getHeading();
     float pitch  = kart->getTerrainPitch(heading);

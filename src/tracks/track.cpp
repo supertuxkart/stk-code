@@ -1201,7 +1201,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             unsigned char result = -1;
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             std::function<void(asIScriptContext*)> null_callback;
-            script_engine->runFunction("bool " + condition + "()", null_callback,
+            script_engine->runFunction(true, "bool " + condition + "()", null_callback,
                 [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
             if (result == 0)
                 continue;
@@ -1218,7 +1218,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             unsigned char result = -1;
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             std::function<void(asIScriptContext*)> null_callback;
-            script_engine->runFunction("bool " + neg_condition + "()", null_callback,
+            script_engine->runFunction(true, "bool " + neg_condition + "()", null_callback,
                 [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
             if (result != 0)
                 continue;
@@ -1489,7 +1489,7 @@ void Track::update(float dt)
     if (!m_startup_run) // first time running update = good point to run startup script
     {
         Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        script_engine->runFunction("void onStart()");
+        script_engine->runFunction(false, "void onStart()");
         m_startup_run = true;
     }
     m_track_object_manager->update(dt);
@@ -2441,16 +2441,14 @@ bool Track::findGround(AbstractKart *kart)
 
     btTransform t = kart->getBody()->getCenterOfMassTransform();
     // The computer offset is slightly too large, it should take
-    // the default suspension rest insteat of suspension rest (i.e. the
+    // the default suspension rest instead of suspension rest (i.e. the
     // length of the suspension with the weight of the kart resting on
     // it). On the other hand this initial bouncing looks nice imho
     // - so I'll leave it in for now.
-    float offset = kart->getCharacteristic()->getSuspensionRest() +
-                   kart->getCharacteristic()->getWheelsRadius();
+    float offset = kart->getCharacteristic()->getSuspensionRest();
     t.setOrigin(hit_point+Vec3(0, offset, 0) );
     kart->getBody()->setCenterOfMassTransform(t);
     kart->setTrans(t);
 
     return true;
 }   // findGround
-

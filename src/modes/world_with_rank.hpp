@@ -43,6 +43,10 @@ protected:
     /** Whether to display the rank in the race GUI */
     bool m_display_rank;
 
+    /** The points given to a kart on a given position (index is
+     *  0 based, so using race-position - 1. */
+    std::vector<int> m_score_for_position;
+
 #ifdef DEBUG
     /** Used for debugging to help detect if the same kart position
      *  is used more than once. */
@@ -70,6 +74,8 @@ public:
                                  unsigned int position);
     void          endSetKartPositions();
     AbstractKart* getKartAtPosition(unsigned int p) const;
+    virtual int   getScoreForPosition(int p);
+
 
     virtual unsigned int getNumberOfRescuePositions() const OVERRIDE;
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;

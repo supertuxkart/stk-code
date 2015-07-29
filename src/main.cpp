@@ -549,6 +549,9 @@ void cmdLineHelp()
     "  -h,  --help             Show this help.\n"
     "       --log=N            Set the verbosity to a value between\n"
     "                          0 (Debug) and 5 (Only Fatal messages)\n"
+    "       --root=DIR         Path to add to the list of STK root directories.\n"
+    "                          You can specify more than one by separating them\n"
+    "                          with colons (:).\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "http://supertuxkart.sourceforge.net\n\n",
