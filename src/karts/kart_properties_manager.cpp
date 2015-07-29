@@ -207,8 +207,9 @@ void KartPropertiesManager::loadCharacteristics(const XMLNode *root)
          type != nodes.cend(); type++)
     {
         (*type)->get("name", &name);
-        m_difficulty_characteristics.emplace(name,
-            std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(*type)));
+        m_difficulty_characteristics.insert(std::pair<const std::string,
+            std::unique_ptr<AbstractCharacteristic> >(name,
+            std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(*type))));
     }
     // Load kart type characteristics
     nodes.clear();
@@ -217,8 +218,9 @@ void KartPropertiesManager::loadCharacteristics(const XMLNode *root)
          type != nodes.cend(); type++)
     {
         (*type)->get("name", &name);
-        m_kart_type_characteristics.emplace(name,
-            std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(*type)));
+        m_kart_type_characteristics.insert(std::pair<const std::string,
+            std::unique_ptr<AbstractCharacteristic> >(name,
+            std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(*type))));
     }
     // Load player difficulties
     nodes.clear();
@@ -227,8 +229,9 @@ void KartPropertiesManager::loadCharacteristics(const XMLNode *root)
          type != nodes.cend(); type++)
     {
         (*type)->get("name", &name);
-        m_player_characteristics.emplace(name,
-            std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(*type)));
+        m_player_characteristics.insert(std::pair<const std::string,
+            std::unique_ptr<AbstractCharacteristic> >(name,
+            std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(*type))));
     }
 }
 

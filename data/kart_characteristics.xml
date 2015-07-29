@@ -1,6 +1,19 @@
 <?xml version="1.0"?>
 <!-- Format
-    ATTENTION: - is a special case if it is the first character of a number-
+    It is possible to give relative values (factors and more) for each property.
+
+    The format as a regex is: ([+-*/](%d+|x))*
+    An empty value means no change, a value without sign or with a '-' replaces
+    the previous value. If an operator prefixes the string, e.g. *1.5 (- doesn't
+    work because it's a sign). x will get replaced by the previous value which
+    means *1.5 is equal to x*1.5. It's also possible to combine operations:
+    +1.5*20 means "add 1.5 to the previous value and then multiply by 20".
+    Note that it's computed sequentially from left to right and there is no
+    operator precedence. Also whitespaces aren't allowed because they are used
+    to split arrays.
+    If you want to return the square of something use x*x or only *x.
+
+    ATTENTION: '-' is a special case if it is the first character of a number-
     string. It means that the number is negative and NOT that the following
     float will be substracted from the base value. So if x = 10 and the string
     "-5" is processed, the result will be -5 and not the same as "x-5", which
@@ -49,8 +62,8 @@
                 speed 10 the radius is 7.5 etc.
                 The actual turn radius is piece-wise linearly interpolated. This
                 allows for tighter turning at lower speeds, and also avoids that
-                the kart becomes too hard to control at high speed (speeds of higher
-                than 23 can only be reached with powerups).
+                the kart becomes too hard to control at high speed (speeds of
+                higher than 23 can only be reached with powerups).
             time-full-steer: This is the amount of change in steering depending
                 on current steering. So if the steering is between 0 and 0.5,
                 the time-for-steering-change is 0.15. If the current steering is
@@ -71,9 +84,10 @@
             max-speed: The base maximum speed of the kart in m/s
             brake-factor: Value used when braking.
             brake-time-increase: The brake force is multiplied by
-                (1 + brake_time) * brake_time_increase - i.e. the longer the brake was
-                pressed, the harder the kart will brake.
-            max-speed-reverse-ratio is the percentage of max speed for reverse gear.
+                (1 + brake_time) * brake_time_increase - i.e. the longer the
+                brake was pressed, the harder the kart will brake.
+            max-speed-reverse-ratio is the percentage of max speed for reverse
+                gear.
           -->
         <engine power="875" max-speed="25" brake-factor="15"
                 brake-time-increase="6" max-speed-reverse-ratio="0.65" />
@@ -317,6 +331,8 @@
         <characteristic name="hard">
             <engine power="*0.89" max-speed="*0.92" />
         </characteristic>
+        <!-- This doesn't need to be changed because the most fast/heavy/extreme
+            values should also be the default ones. -->
         <characteristic name="best" />
     </difficulties>
 
