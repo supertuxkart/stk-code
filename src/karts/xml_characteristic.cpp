@@ -284,7 +284,7 @@ void XmlCharacteristic::processBool(const std::string &processor, bool *value, b
         *is_set = true;
     }
     else
-        Log::error("XmlCharacteristic::processBool", "Can't parse %s: Not a bool", processor);
+        Log::error("XmlCharacteristic::processBool", "Can't parse %s: Not a bool", processor.c_str());
 }
 
 void XmlCharacteristic::load(const XMLNode *node)
