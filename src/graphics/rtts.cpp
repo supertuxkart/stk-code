@@ -56,7 +56,6 @@ RTT::RTT(size_t width, size_t height)
     m_RH_FBO = NULL;
     m_RSM = NULL;
     m_RH_FBO = NULL;
-    m_diffuse_coefficients_calculated = false;
     using namespace video;
     using namespace core;
 
@@ -296,23 +295,6 @@ void RTT::prepareRender(scene::ICameraSceneNode* camera)
     irr_driver->setRTT(this);
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
-    //m_diffuse_coefficients_calculated = true;
-    
-    if (!m_diffuse_coefficients_calculated)
-    {
-        m_diffuse_coefficients_calculated = true;
-        Log::debug("RTT", "hophophop");
-    }
-        
-    //TODO!
-    /*if (!m_diffuse_coefficients_calculated)
-    {
-        //irr_driver->generateDiffuseCoefficients();
-        if(irr_driver->getSkybox() != NULL) {
-            irr_driver->getSkybox()->generateDiffuseCoefficients(irr_driver->getVideoDriver(), irr_driver->getSceneManager()->getAmbientLight().toSColor());
-            m_diffuse_coefficients_calculated = true;
-        }
-    }*/
 }
 
 FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
@@ -322,11 +304,6 @@ FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
     std::vector<IrrDriver::GlowData> glows;
-    // TODO: put this outside of the rendering loop
-    //irr_driver->generateDiffuseCoefficients();
-    //if(irr_driver->getSkybox() != NULL) 
-    //    irr_driver->getSkybox()->generateDiffuseCoefficients(irr_driver->getVideoDriver(), irr_driver->getSceneManager()->getAmbientLight().toSColor());
-
     irr_driver->computeMatrixesAndCameras(camera, m_width, m_height);
     unsigned plc = irr_driver->updateLightsInfo(camera, dt);
     irr_driver->uploadLightingData();
