@@ -497,7 +497,7 @@ unsigned int ThreeStrikesBattle::getRescuePositionIndex(AbstractKart *kart)
 
     for(int n=0; n<start_spots_amount; n++)
     {
-        const btTransform &s = getTrack()->getStartTransform(n);
+        const btTransform &s = getStartTransform(n);
         const Vec3 &v=s.getOrigin();
         float accumulated_distance = .0f;
         bool spawn_point_clear = true;

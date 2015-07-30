@@ -102,10 +102,22 @@ int FollowTheLeaderRace::getScoreForPosition(int p)
 }   // getScoreForPosition
 
 //-----------------------------------------------------------------------------
+const btTransform &FollowTheLeaderRace::getStartTransform(int index)
+{
+    if (index == 0)   // Leader start position
+        return m_track->getStartTransform(index);
+
+    // Otherwise the karts will start at the rear starting positions
+    int start_index = stk_config->m_max_karts
+                    - race_manager->getNumberOfKarts() + index;
+    return m_track->getStartTransform(start_index);
+}   // getStartTransform
+
+//-----------------------------------------------------------------------------
 /** Returns the original time at which the countdown timer started. This is
  *  used by the race_gui to display the music credits in FTL mode correctly.
  */
-float FollowTheLeaderRace::getClockStartTime()
+float FollowTheLeaderRace::getClockStartTime() const
 {
     return m_leader_intervals[0];
 }   // getClockStartTime

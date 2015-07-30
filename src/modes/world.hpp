@@ -294,6 +294,7 @@ public:
                                     PhysicalObject *object);
     AbstractKart*   getPlayerKart(unsigned int player) const;
     AbstractKart*   getLocalPlayerKart(unsigned int n) const;
+    virtual const btTransform &getStartTransform(int index);
     // ------------------------------------------------------------------------
     /** Returns a pointer to the race gui. */
     RaceGUIBase    *getRaceGUI() const { return m_race_gui;}

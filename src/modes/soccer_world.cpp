@@ -336,7 +336,7 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
     {
         // no need for the overhead to compute exact distance with sqrt(),
         // so using the 'manhattan' heuristic which will do fine enough.
-        const btTransform &s = world->getTrack()->getStartTransform(n);
+        const btTransform &s = getStartTransform(n);
         const Vec3 &v=s.getOrigin();
         float accumulatedDistance = .0f;
         bool spawnPointClear = true;
@@ -368,7 +368,7 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
     }
 
     assert(furthest_id_found != -1);
-    const btTransform &s = world->getTrack()->getStartTransform(furthest_id_found);
+    const btTransform &s = getStartTransform(furthest_id_found);
     const Vec3 &xyz = s.getOrigin();
     kart->setXYZ(xyz);
     kart->setRotation(s.getRotation());
@@ -481,7 +481,7 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
         if(index % 2 != 0) posIndex += 1;
     }
 
-    btTransform init_pos = m_track->getStartTransform(posIndex);
+    btTransform init_pos = getStartTransform(posIndex);
 
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
             difficulty);

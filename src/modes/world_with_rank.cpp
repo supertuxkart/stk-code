@@ -149,7 +149,7 @@ unsigned int WorldWithRank::getRescuePositionIndex(AbstractKart *kart)
 
     for (int n=0; n<start_spots_amount; n++)
     {
-        const btTransform &s = getTrack()->getStartTransform(n);
+        const btTransform &s = getStartTransform(n);
         const Vec3 &v = s.getOrigin();
 
         float abs_distance = (v - kart->getXYZ()).length();
