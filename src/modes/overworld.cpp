@@ -160,6 +160,37 @@ void OverWorld::update(float dt)
     }
 }   // update
 
+// ----------------------------------------------------------------------------
+/** Finds the starting position which is closest to the kart.
+ *  \param kart The kart for which a rescue position needs to be determined.
+ */
+unsigned int OverWorld::getRescuePositionIndex(AbstractKart *kart)
+{
+    // find closest point to drop kart on
+    const int start_spots_amount = getNumberOfRescuePositions();
+    assert(start_spots_amount > 0);
+
+    int closest_id = -1;
+    float closest_distance = 999999999.0f;
+
+    for (int n=0; n<start_spots_amount; n++)
+    {
+        const btTransform &s = getStartTransform(n);
+        const Vec3 &v = s.getOrigin();
+
+        float abs_distance = (v - kart->getXYZ()).length();
+
+        if (abs_distance < closest_distance)
+        {
+            closest_distance = abs_distance;
+            closest_id = n;
+        }
+    }
+
+    assert(closest_id != -1);
+    return closest_id;
+}   // getRescuePositionIndex
+
 //-----------------------------------------------------------------------------
 /** This function is not used in the overworld race gui.
  */

@@ -76,8 +76,7 @@ public:
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
     int getScore(unsigned int i);
-    virtual bool raceHasLaps(){ return false; }
-    virtual void moveKartAfterRescue(AbstractKart* kart);
+    virtual bool raceHasLaps() { return false; }
 
     virtual const std::string& getIdent() const;
 
