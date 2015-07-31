@@ -181,12 +181,20 @@ FileManager::FileManager()
     {
 #ifdef SUPERTUXKART_DATADIR
         root_dir = SUPERTUXKART_DATADIR"/data/";
-        if(root_dir.size()==0 || root_dir[root_dir.size()-1]!='/')
-            root_dir+='/';
-
 #else
         root_dir = "/usr/local/share/games/supertuxkart/";
 #endif
+    }
+
+    if (!m_file_system->existFile((root_dir + "stk_config.xml").c_str()))
+    {
+        Log::error("FileManager", "Could not file stk_config.xml in any "
+                                  "standard location (esp. ../data).");
+        Log::error("FileManager", 
+                   "Last location checked '%s'.", root_dir.c_str());
+        Log::fatal("FileManager", 
+                   "Set $SUPERTUXKART_DATADIR to point to the data directory.");
+        // fatal will exit the application
     }
 
     addRootDirs(root_dir);
