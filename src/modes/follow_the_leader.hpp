@@ -48,14 +48,19 @@ public:
     // overriding World methods
     virtual void reset() OVERRIDE;
     virtual const std::string& getIdent() const OVERRIDE;
-    virtual float getClockStartTime();
-    virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
+    virtual const btTransform &getStartTransform(int index);
+    virtual float getClockStartTime() const;
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual void init() OVERRIDE;
     virtual void terminateRace() OVERRIDE;
     virtual bool isRaceOver() OVERRIDE;
+    // ------------------------------------------------------------------------
+    /** Returns if this type of race has laps. */
     virtual bool raceHasLaps() OVERRIDE { return false; }
+    // ------------------------------------------------------------------------
+    /** Returns if faster music should be used at the end. */
+    virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
 };   // FollowTheLeader
 
 

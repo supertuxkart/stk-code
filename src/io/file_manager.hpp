@@ -134,6 +134,14 @@ public:
     std::string searchTexture(const std::string& fname) const;
     std::string getUserConfigFile(const std::string& fname) const;
     bool        fileExists(const std::string& path) const;
+    // ------------------------------------------------------------------------
+    /** Convenience function to save some typing in the 
+     *  file manager constructor. */
+    bool        fileExists(const char *prefix, const std::string& path) const
+    {
+        return fileExists(std::string(prefix) + path);
+    }
+    // ------------------------------------------------------------------------
     void        listFiles        (std::set<std::string>& result,
                                   const std::string& dir,
                                   bool make_full_path=false) const;

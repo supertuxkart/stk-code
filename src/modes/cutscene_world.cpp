@@ -77,13 +77,8 @@ void CutsceneWorld::init()
 
     m_duration = -1.0f;
 
-    //const btTransform &s = getTrack()->getStartTransform(0);
-    //const Vec3 &v = s.getOrigin();
     Camera* stk_cam = Camera::createCamera(NULL);
     m_camera = stk_cam->getCameraSceneNode();
-    //m_camera = irr_driver->getSceneManager()
-    //         ->addCameraSceneNode(NULL, core::vector3df(0.0f, 0.0f, 0.0f),
-    //                              core::vector3df(0.0f, 0.0f, 0.0f));
     m_camera->setFOV(0.61f);
     m_camera->bindTargetAndRotation(true); // no "look-at"
 

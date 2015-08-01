@@ -1736,7 +1736,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene)
     {
-        m_start_transforms.resize(race_manager->getNumberOfKarts());
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            // In a FTL race the non-leader karts are placed at the end of the
+            // field, so we need all start positions.
+            m_start_transforms.resize(stk_config->m_max_karts);
+        }
+        else
+            m_start_transforms.resize(race_manager->getNumberOfKarts());
         QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
                                                    karts_per_row,
                                                    forwards_distance,
