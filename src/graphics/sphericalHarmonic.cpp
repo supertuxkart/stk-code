@@ -19,6 +19,7 @@
 #include "graphics/IBL.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/sphericalHarmonic.hpp"
+#include "utils/log.hpp"
 
 #include <algorithm> 
 #include <cassert>
@@ -152,11 +153,6 @@ SphericalHarmonic::SphericalHarmonic(const video::SColor &ambient)
         
 }// SphericalHarmonic(const video::SColor &ambient)
 
-int SphericalHarmonic::getNbTex()
-{
-    return m_spherical_harmonics_textures.size();
-    
-}
 
 
 

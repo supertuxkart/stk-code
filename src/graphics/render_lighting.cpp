@@ -490,9 +490,15 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
-        if(m_skybox) {
+        if(m_skybox)
+        {
             m_post_processing->renderEnvMap(m_skybox->getSpecularProbe());
         }
+        else 
+        {
+            m_post_processing->renderEnvMap(0);
+        }
+           
         //TODO: move in skybox (or IBL?) class
     }
 

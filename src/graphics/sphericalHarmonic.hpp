@@ -46,7 +46,6 @@ public:
     inline const float* getRedSHCoeff()   const     {return m_red_SH_coeff;   }    
     
     
-    int getNbTex();
 };
 
 #endif //HEADER_SPHERICAL_HARMONIC_HPP
