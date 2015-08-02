@@ -34,18 +34,22 @@ private:
     float m_green_SH_coeff[9];
     float m_red_SH_coeff[9];    
     
-    /** Print spherical harmonic coefficients (debug) */
-    void printCoeff();
     
 public:
     SphericalHarmonic(const std::vector<irr::video::ITexture *> &spherical_harmonics_textures);
     SphericalHarmonic(const irr::video::SColor &ambient);
     
-    inline const float* getBlueSHCoeff()  const     {return m_blue_SH_coeff;  }
+    inline const float* getBlueSHCoeff () const     {return m_blue_SH_coeff;  }
     inline const float* getGreenSHCoeff() const     {return m_green_SH_coeff; }
-    inline const float* getRedSHCoeff()   const     {return m_red_SH_coeff;   }    
+    inline const float* getRedSHCoeff  () const     {return m_red_SH_coeff;   }    
     
+    /** Print spherical harmonic coefficients (debug) */
+    void printCoeff();
     
+    void unprojectSH (float *output[], size_t width, size_t height,
+                      float *Y00[], float *Y1minus1[], float *Y10[],
+                      float *Y11[], float *Y2minus2[], float *Y2minus1[],
+                      float * Y20[], float *Y21[], float *Y22[]);
 };
 
 #endif //HEADER_SPHERICAL_HARMONIC_HPP

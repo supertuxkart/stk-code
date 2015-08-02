@@ -618,6 +618,17 @@ void IrrDriver::renderFixed(float dt)
     m_video_driver->endScene();
 }
 
+
+
+// ----------------------------------------------------------------------------
+void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
+{
+    if(m_skybox)
+    {
+        m_skybox->render(camera);
+    }
+}   // renderSkybox
+
 // ----------------------------------------------------------------------------
 
 void IrrDriver::renderParticles()

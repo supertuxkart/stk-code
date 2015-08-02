@@ -353,8 +353,6 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void prepareSkybox();
-    void generateDiffuseCoefficients();
     void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;

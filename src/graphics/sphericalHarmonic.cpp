@@ -31,7 +31,8 @@ using namespace irr;
 
 namespace 
 { 
-    void convertToFloatTexture(unsigned char *sh_rgba[6], unsigned sh_w, unsigned sh_h, Color *float_tex_cube[6]) {
+    void convertToFloatTexture(unsigned char *sh_rgba[6], unsigned sh_w, unsigned sh_h, Color *float_tex_cube[6])
+    {
         for (unsigned i = 0; i < 6; i++)
         {
             float_tex_cube[i] = new Color[sh_w * sh_h];
@@ -44,23 +45,39 @@ namespace
         }    
     } //convertToFloatTexture
 
-}
+    // ----------------------------------------------------------------------------
+    void displayCoeff(float *SH_coeff)
+    {
+        Log::debug("SphericalHarmonic", "L00:%f", SH_coeff[0]);
+        Log::debug("SphericalHarmonic", "L1-1:%f, L10:%f, L11:%f", SH_coeff[1], SH_coeff[2], SH_coeff[3]);
+        Log::debug("SphericalHarmonic", "L2-2:%f, L2-1:%f, L20:%f, L21:%f, L22:%f",
+                SH_coeff[4], SH_coeff[5], SH_coeff[6], SH_coeff[7], SH_coeff[8]);
+    }   // displayCoeff
 
-void SphericalHarmonic::printCoeff() {
-    Log::debug("Skybox", "Blue_SH: %f, %f, %f, %f, %f, %f, %f, %f, %f",
-                m_blue_SH_coeff[0], m_blue_SH_coeff[1], m_blue_SH_coeff[2],
-                m_blue_SH_coeff[3], m_blue_SH_coeff[4], m_blue_SH_coeff[5],
-                m_blue_SH_coeff[6], m_blue_SH_coeff[7], m_blue_SH_coeff[8]);
-    Log::debug("Skybox", "Green_SH: %f, %f, %f, %f, %f, %f, %f, %f, %f",
-                m_green_SH_coeff[0], m_green_SH_coeff[1], m_green_SH_coeff[2],
-                m_green_SH_coeff[3], m_green_SH_coeff[4], m_green_SH_coeff[5],
-                m_green_SH_coeff[6], m_green_SH_coeff[7], m_green_SH_coeff[8]);
-    Log::debug("Skybox", "Red_SH: %f, %f, %f, %f, %f, %f, %f, %f, %f",
-                m_red_SH_coeff[0], m_red_SH_coeff[1], m_red_SH_coeff[2],
-                m_red_SH_coeff[3], m_red_SH_coeff[4], m_red_SH_coeff[5],
-                m_red_SH_coeff[6], m_red_SH_coeff[7], m_red_SH_coeff[8]);    
-}
+    // ----------------------------------------------------------------------------
+    float getTexelValue(unsigned i, unsigned j, size_t width, size_t height,
+                        float *Coeff, float *Y00, float *Y1minus1,
+                        float *Y10, float *Y11, float *Y2minus2, 
+                        float * Y2minus1, float * Y20, float *Y21,
+                        float *Y22)
+    {
+        float solidangle = 1.;
+        size_t idx = i * height + j;
+        float reconstructedVal = Y00[idx] * Coeff[0];
+        reconstructedVal += Y1minus1[i * height + j] * Coeff[1] 
+                         +  Y10[i * height + j] * Coeff[2] 
+                         +  Y11[i * height + j] * Coeff[3];
+        reconstructedVal += Y2minus2[idx] * Coeff[4] 
+                         + Y2minus1[idx] * Coeff[5] + Y20[idx] * Coeff[6]
+                         + Y21[idx] * Coeff[7] + Y22[idx] * Coeff[8];
+        reconstructedVal /= solidangle;
+        return std::max(255.0f * reconstructedVal, 0.f);
+    }   // getTexelValue
+    
+} //namespace
 
+
+// ----------------------------------------------------------------------------
 SphericalHarmonic::SphericalHarmonic(const std::vector<video::ITexture *> &spherical_harmonics_textures)
 {
     assert(spherical_harmonics_textures.size() == 6);
@@ -105,11 +122,10 @@ SphericalHarmonic::SphericalHarmonic(const std::vector<video::ITexture *> &spher
         delete[] sh_rgba[i];
         delete[] float_tex_cube[i];
     }
-
-    printCoeff();
     
 }// SphericalHarmonic(const std::vector<video::ITexture *> &spherical_harmonics_textures)
 
+// ----------------------------------------------------------------------------
 SphericalHarmonic::SphericalHarmonic(const video::SColor &ambient)
 {
     unsigned char *sh_rgba[6];
@@ -146,13 +162,54 @@ SphericalHarmonic::SphericalHarmonic(const video::SColor &ambient)
         m_green_SH_coeff[i] *= 4;
         m_red_SH_coeff[i] *= 4;
     }
-    
-    printCoeff();
-    Log::debug("SphericalHarmonic", "%f %f %f", ambient.getBlue(), ambient.getGreen(), ambient.getRed());
-
-        
+ 
 }// SphericalHarmonic(const video::SColor &ambient)
 
+// ----------------------------------------------------------------------------
+void SphericalHarmonic::printCoeff() {
+    Log::debug("SphericalHarmonic", "Blue_SH:");
+    displayCoeff(m_blue_SH_coeff);
+    Log::debug("SphericalHarmonic", "Green_SH:");
+    displayCoeff(m_green_SH_coeff);
+    Log::debug("SphericalHarmonic", "Red_SH:");
+    displayCoeff(m_red_SH_coeff);  
+} //printCoeff
 
+
+// ----------------------------------------------------------------------------
+void SphericalHarmonic::unprojectSH(float *output[], size_t width, size_t height,
+                                    float *Y00[], float *Y1minus1[], float *Y10[],
+                                    float *Y11[], float *Y2minus2[], float *Y2minus1[],
+                                    float * Y20[], float *Y21[], float *Y22[])
+{
+    for (unsigned face = 0; face < 6; face++)
+    {
+        for (unsigned i = 0; i < width; i++)
+        {
+            for (unsigned j = 0; j < height; j++)
+            {
+                float fi = float(i), fj = float(j);
+                fi /= width, fj /= height;
+                fi = 2 * fi - 1, fj = 2 * fj - 1;
+
+                output[face][4 * height * i + 4 * j + 2] =
+                    getTexelValue(i, j, width, height, m_red_SH_coeff, Y00[face],
+                                  Y1minus1[face], Y10[face], Y11[face],
+                                  Y2minus2[face], Y2minus1[face], Y20[face],
+                                  Y21[face], Y22[face]);
+                output[face][4 * height * i + 4 * j + 1] = 
+                    getTexelValue(i, j, width, height, m_green_SH_coeff, Y00[face],
+                                  Y1minus1[face], Y10[face], Y11[face],
+                                  Y2minus2[face], Y2minus1[face], Y20[face],
+                                  Y21[face], Y22[face]);
+                output[face][4 * height * i + 4 * j] = 
+                    getTexelValue(i, j, width, height, m_blue_SH_coeff, Y00[face],
+                                  Y1minus1[face], Y10[face], Y11[face],
+                                  Y2minus2[face], Y2minus1[face], Y20[face],
+                                  Y21[face], Y22[face]);
+            }
+        }
+    }
+}   // unprojectSH
 
 
