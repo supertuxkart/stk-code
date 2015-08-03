@@ -173,7 +173,7 @@ void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
             {
                 if(kart_list[x].m_local_player_id == m_karts[i].m_local_player_id)
                 {
-                    kart_list[x].m_ident        = m_karts[i].m_ident;
+                    if(kp) kart_list[x].m_ident        = m_karts[i].m_ident;
                     kart_list[x].m_score        = m_karts[i].m_score;
                     kart_list[x].m_overall_time = m_karts[i].m_overall_time;
                 }   // if kart_list[x].m_local_player_id == m_karts[i].local
