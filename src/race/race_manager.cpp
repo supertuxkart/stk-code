@@ -546,7 +546,7 @@ void RaceManager::saveGP()
         m_saved_gp->setKarts(m_kart_status);
         m_saved_gp->setNextTrack(m_track_number);
     }
-    else  if (m_grand_prix.getId() != "random")
+    else  if(!m_grand_prix.isRandomGP())
     {
         m_saved_gp = new SavedGrandPrix(
             StateManager::get()->getActivePlayerProfile(0)->getUniqueID(),
