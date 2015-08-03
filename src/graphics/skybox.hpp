@@ -38,11 +38,11 @@ private:
     GLuint m_specular_probe;   
     
 
-    GLuint generateCubeMapFromTextures ();
+    void generateCubeMapFromTextures ();
+    void generateSpecularCubemap ();
     
 public:
     Skybox(const std::vector<irr::video::ITexture *> &skybox_textures);
-    ~Skybox();
 
     void render(const irr::scene::ICameraSceneNode *camera) const;
 
