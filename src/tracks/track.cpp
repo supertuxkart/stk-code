@@ -885,6 +885,18 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         if (mb->getVertexType() == video::EVT_STANDARD)
         {
             irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
+            if (race_manager->getReverseTrack() &&
+                material->getMirrorAxisInReverse() != ' ')
+            {
+                for (unsigned int i = 0; i < mb->getVertexCount(); i++)
+                {
+                    core::vector2df &tc = mb->getTCoords(i);
+                    if (material->getMirrorAxisInReverse() == 'V')
+                        tc.Y = 1 - tc.Y;
+                    else
+                        tc.X = 1 - tc.X;
+                }
+            }   // reverse track and texture needs mirroring
             for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
             {
                 for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
