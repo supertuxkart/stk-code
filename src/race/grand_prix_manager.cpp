@@ -39,8 +39,6 @@ GrandPrixManager::GrandPrixManager()
 // ----------------------------------------------------------------------------
 GrandPrixManager::~GrandPrixManager()
 {
-    for(unsigned int i=0; i<m_gp_data.size(); i++)
-        delete m_gp_data[i];
 }   // ~GrandPrixManager
 
 // ----------------------------------------------------------------------------
@@ -84,9 +82,10 @@ void GrandPrixManager::loadDir(const std::string& dir, enum GrandPrixData::GPGro
 // ----------------------------------------------------------------------------
 void GrandPrixManager::load(const std::string& filename, enum GrandPrixData::GPGroupType group)
 {
+    GrandPrixData* gp = NULL;
     try
     {
-        GrandPrixData* gp = new GrandPrixData(filename, group);
+        gp = new GrandPrixData(filename, group);
         m_gp_data.push_back(gp);
         Log::debug("GrandPrixManager",
                    "Grand Prix '%s' loaded from %s",
@@ -94,6 +93,8 @@ void GrandPrixManager::load(const std::string& filename, enum GrandPrixData::GPG
     }
     catch (std::runtime_error& e)
     {
+        if (gp != NULL)
+            delete gp;
         Log::error("GrandPrixManager",
                    "Ignoring Grand Prix %s (%s)\n", filename.c_str(), e.what());
     }
@@ -102,9 +103,7 @@ void GrandPrixManager::load(const std::string& filename, enum GrandPrixData::GPG
 // ----------------------------------------------------------------------------
 void GrandPrixManager::reload()
 {
-    for(unsigned int i=0; i<m_gp_data.size(); i++)
-        delete m_gp_data[i];
-    m_gp_data.clear();
+    m_gp_data.clearAndDeleteAll();
 
     loadFiles();
 }   // reload
@@ -124,7 +123,7 @@ std::string GrandPrixManager::generateId()
         unique = true;
         for (unsigned int i = 0; i < m_gp_data.size(); i++)
         {
-            if (m_gp_data[i]->getId() == s.str())
+            if (m_gp_data[i].getId() == s.str())
             {
                 unique = false;
                 break;
@@ -139,25 +138,31 @@ std::string GrandPrixManager::generateId()
 bool GrandPrixManager::existsName(const irr::core::stringw& name) const
 {
     for (unsigned int i = 0; i < m_gp_data.size(); i++)
-        if (m_gp_data[i]->getName() == name)
+        if (m_gp_data[i].getName() == name)
             return true;
 
     return false;
 }   // existsName
 
 // ----------------------------------------------------------------------------
-GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
+const GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
 {
-    return editGrandPrix(s);
+    for (unsigned int i = 0; i<m_gp_data.size(); i++)
+    {
+        if (m_gp_data[i].getId() == s)
+            return m_gp_data.get(i);
+    }   // for i in m_gp_data
+
+    return NULL;
 }   // getGrandPrix
 
 // ----------------------------------------------------------------------------
-GrandPrixData* GrandPrixManager::editGrandPrix(const std::string& s) const
+GrandPrixData* GrandPrixManager::editGrandPrix(const std::string& s)
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
     {
-        if(m_gp_data[i]->getId() == s)
-            return m_gp_data[i];
+        if (m_gp_data[i].getId() == s)
+            return m_gp_data.get(i);
     }   // for i in m_gp_data
 
     return NULL;
@@ -166,13 +171,12 @@ GrandPrixData* GrandPrixManager::editGrandPrix(const std::string& s) const
 // ----------------------------------------------------------------------------
 void GrandPrixManager::checkConsistency()
 {
-    for(unsigned int i=0; i<m_gp_data.size(); i++)
+    for (int i = (int)m_gp_data.size() - 1; i >= 0; i--)
     {
-        if(!m_gp_data[i]->checkConsistency())
+        if (!m_gp_data[i].checkConsistency())
         {
             // delete this GP, since a track is missing
-            delete *(m_gp_data.erase(m_gp_data.begin()+i));
-            i--;
+            m_gp_data.erase(i);
         }
     }
 }   // checkConsistency
