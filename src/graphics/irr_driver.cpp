@@ -2376,8 +2376,8 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         }
     }
 
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 35, 35, 35) );
-
+    irr_driver->setAmbientLight(video::SColor(255, 35, 35, 35) );
+    
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
     m_light = irr_driver->getSceneManager()
         ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f,1.0f,1.0f),
