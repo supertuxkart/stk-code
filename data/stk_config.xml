@@ -426,7 +426,7 @@
                chassis-angular-damping="0"
                downward-impulse-factor="5"
                track-connection-accel="2"
-               smooth-flying-impulse="25"/>
+               smooth-flying-impulse="250"/>
 
     <!-- collision
          impulse-type: STK can apply an additional impulse in case of
