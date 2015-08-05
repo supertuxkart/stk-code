@@ -20,15 +20,6 @@
 
 #include "gl_headers.hpp"
 
-struct Color
-{
-    float Red;
-    float Green;
-    float Blue;
-};
 
-void generateSphericalHarmonics(Color *CubemapFace[6], size_t edge_size,
-                                float *blue_sh_coeff, float *green_sh_coeff,
-                                float *red_sh_coeff);
 
 #endif
