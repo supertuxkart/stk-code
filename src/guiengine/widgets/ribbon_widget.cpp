@@ -561,7 +561,7 @@ EventPropagation RibbonWidget::focused(const int playerID)
         if (m_selection[playerID] != -1)
         {
             int selection = m_selection[playerID];
-            if (selection < m_active_children.size())
+            if (selection < (int)m_active_children.size())
                 m_active_children.get(selection)->focused(playerID);
         }
     }
