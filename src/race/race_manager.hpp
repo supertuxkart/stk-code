@@ -313,10 +313,6 @@ private:
     /** Whether a track should be reversed */
     std::vector<bool>                m_reverse_track;
 
-    /** The points given to a kart on a given position (index is
-     *  0 based, so using race-position - 1. */
-    std::vector<int>                 m_score_for_position;
-
     /** The list of default AI karts to use. This is from the command line. */
     std::vector<std::string>         m_default_ai_list;
 
@@ -591,8 +587,6 @@ public:
     int getCoinTarget() const { return m_coin_target; }
     // ------------------------------------------------------------------------
     float getTimeTarget() const { return m_time_target; }
-    // ------------------------------------------------------------------------
-    int getPositionScore(int p) const { return m_score_for_position[p-1]; }
     // ------------------------------------------------------------------------
     int getTrackNumber() const { return m_track_number; }
     // ------------------------------------------------------------------------

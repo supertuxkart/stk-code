@@ -73,7 +73,7 @@
 
 #include <algorithm> // for min and max
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
@@ -1077,11 +1077,8 @@ void Kart::update(float dt)
         m_max_speed->getCurrentMaxSpeed());
 #endif
 
-    if ( UserConfigParams::m_graphical_effects )
-    {
-        // update star effect (call will do nothing if stars are not activated)
-        m_stars_effect->update(dt);
-    }
+    // update star effect (call will do nothing if stars are not activated)
+    m_stars_effect->update(dt);
 
     if(m_squash_time>=0)
     {

@@ -523,7 +523,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the start coordinates for a kart with a given index.
      *  \param index Index of kart ranging from 0 to kart_num-1. */
-    btTransform        getStartTransform (unsigned int index) const
+    const btTransform& getStartTransform (unsigned int index) const
     {
         if (index >= m_start_transforms.size())
             Log::fatal("Track", "No start position for kart %i.", index);

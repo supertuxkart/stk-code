@@ -885,6 +885,18 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         if (mb->getVertexType() == video::EVT_STANDARD)
         {
             irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
+            if (race_manager->getReverseTrack() &&
+                material->getMirrorAxisInReverse() != ' ')
+            {
+                for (unsigned int i = 0; i < mb->getVertexCount(); i++)
+                {
+                    core::vector2df &tc = mb->getTCoords(i);
+                    if (material->getMirrorAxisInReverse() == 'V')
+                        tc.Y = 1 - tc.Y;
+                    else
+                        tc.X = 1 - tc.X;
+                }
+            }   // reverse track and texture needs mirroring
             for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
             {
                 for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
@@ -1736,7 +1748,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene)
     {
-        m_start_transforms.resize(race_manager->getNumberOfKarts());
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            // In a FTL race the non-leader karts are placed at the end of the
+            // field, so we need all start positions.
+            m_start_transforms.resize(stk_config->m_max_karts);
+        }
+        else
+            m_start_transforms.resize(race_manager->getNumberOfKarts());
         QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
                                                    karts_per_row,
                                                    forwards_distance,

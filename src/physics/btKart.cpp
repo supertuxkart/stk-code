@@ -446,8 +446,12 @@ void btKart::updateVehicle( btScalar step )
     {
         btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
         btVector3 terrain_up(0,1,0);
+        // Length of axis depends on the angle - i.e. the further awat
+        // the kart is from being upright, the larger the applied impulse
+        // will be, resulting in fast changes when the kart is on its
+        // side, but not overcompensating (and therefore shaking) when
+        // the kart is not much away from being upright.
         btVector3 axis = kart_up.cross(terrain_up);
-        axis.normalize();
 
         // To avoid the kart going backwards/forwards (or rolling sideways),
         // set the pitch/roll to 0 before applying the 'straightening' impulse.

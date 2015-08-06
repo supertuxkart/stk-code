@@ -79,8 +79,8 @@ void OptionsScreenInput2::init()
 {
     Screen::init();
     RibbonWidget* tabBar = getWidget<RibbonWidget>("options_choice");
-    if (tabBar != NULL)  tabBar->select( "tab_controls",
-                                        PLAYER_ID_GAME_MASTER );
+    assert(tabBar != NULL);
+    tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
 
     tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
@@ -89,7 +89,7 @@ void OptionsScreenInput2::init()
 
 
     ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
-    if (m_config->isKeyboard())
+    if (!m_config->isKeyboard())
     {
         core::stringw label = (m_config->isEnabled()
                             ? //I18N: button to disable a gamepad configuration

@@ -159,7 +159,8 @@ void OptionsScreenVideo::init()
 {
     Screen::init();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
+    assert(ribbon != NULL);
+    ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
 
     ribbon->getRibbonChildren()[1].setTooltip( _("Audio") );
     ribbon->getRibbonChildren()[2].setTooltip( _("User Interface") );

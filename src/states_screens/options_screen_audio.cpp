@@ -59,7 +59,8 @@ void OptionsScreenAudio::init()
 {
     Screen::init();
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "tab_audio", PLAYER_ID_GAME_MASTER );
+    assert(ribbon != NULL);
+    ribbon->select( "tab_audio", PLAYER_ID_GAME_MASTER );
 
     ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
     ribbon->getRibbonChildren()[2].setTooltip( _("User Interface") );

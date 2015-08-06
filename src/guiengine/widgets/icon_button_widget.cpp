@@ -182,7 +182,7 @@ void IconButtonWidget::add()
                 x1 += diff;
                 x2 += diff;
             }
-            else if (x2 > irr_driver->getActualScreenSize().Width)
+            else if (x2 > (int)irr_driver->getActualScreenSize().Width)
             {
                 int diff = x2 - irr_driver->getActualScreenSize().Width;
                 x2 -= diff;
