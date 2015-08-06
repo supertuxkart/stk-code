@@ -44,7 +44,7 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_texture = NULL;
     m_deactivated_texture = NULL;
     m_highlight_texture = NULL;
-    
+
     m_custom_aspect_ratio = 1.0f;
 
     m_texture_w = 0;
@@ -112,7 +112,7 @@ void IconButtonWidget::add()
     // irrlicht widgets don't support scaling while keeping aspect ratio
     // so, happily, let's implement it ourselves
     float useAspectRatio = -1.0f;
-    
+
     if (m_properties[PROP_CUSTOM_RATIO] != "")
     {
         StringUtils::fromString(m_properties[PROP_CUSTOM_RATIO],
@@ -227,7 +227,7 @@ void IconButtonWidget::add()
     m_id = m_element->getID();
     if (m_tab_stop) m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
-    
+
     if (!m_is_visible)
         m_element->setVisible(false);
 }
@@ -334,7 +334,7 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
 
     std::string name = texture->getName().getPath().c_str();
     name += "_disabled";
-    t = irr_driver->getTexture(name, /*premul*/false, /*prediv*/false, 
+    t = irr_driver->getTexture(name, /*premul*/false, /*prediv*/false,
                                      /*compain_if_not_found*/false);
     if (t == NULL)
     {
@@ -342,7 +342,7 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
         u32 g;
 
         video::IVideoDriver* driver = irr_driver->getVideoDriver();
-        std::auto_ptr<video::IImage> image (driver->createImageFromData (texture->getColorFormat(),
+        std::unique_ptr<video::IImage> image (driver->createImageFromData (texture->getColorFormat(),
             texture->getSize(), texture->lock(), false));
         texture->unlock();
 

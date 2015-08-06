@@ -53,7 +53,7 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     // we are using auto_ptr to make sure the XML node is released when leaving
     // the scope
-    std::auto_ptr<XMLNode> root(new XMLNode( filename ));
+    std::unique_ptr<XMLNode> root(new XMLNode( filename ));
 
     if(root.get() == NULL || root->getName()!="challenge")
     {
