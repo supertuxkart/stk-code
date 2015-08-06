@@ -156,6 +156,11 @@ private:
 
     bool             m_fog;
 
+    /** Either ' ' (no mirroring), 'U' or 'V' if a texture needs to be 
+     *  mirrored when driving in reverse. Typically used for arrows indicating
+     *  the direction. */
+    char             m_mirror_axis_when_reverse;
+
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
 
     /** For normal maps */
@@ -372,6 +377,9 @@ public:
     float getZipperMinSpeed() const { return m_zipper_min_speed; }
     // ------------------------------------------------------------------------
     ShaderType getShaderType() const { return m_shader_type; }
+    // ------------------------------------------------------------------------
+    /** True if this texture should have the U coordinates mirrored. */
+    char getMirrorAxisInReverse() const { return m_mirror_axis_when_reverse; }
     // ------------------------------------------------------------------------
 } ;
 

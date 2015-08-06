@@ -48,6 +48,7 @@ public:
     static void enterOverWorld();
 
     virtual void  update(float delta) OVERRIDE;
+    unsigned int  getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
     virtual void  getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     // ------------------------------------------------------------------------

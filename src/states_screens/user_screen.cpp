@@ -631,7 +631,8 @@ void BaseUserScreen::unloaded()
 void TabbedUserScreen::init()
 {
     RibbonWidget* tab_bar = getWidget<RibbonWidget>("options_choice");
-    if (tab_bar) tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
+    assert(tab_bar != NULL);
+    tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
     tab_bar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tab_bar->getRibbonChildren()[1].setTooltip( _("Audio") );
     tab_bar->getRibbonChildren()[2].setTooltip( _("User Interface") );

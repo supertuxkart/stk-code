@@ -109,11 +109,8 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime() *
               m_kart->getPlayerDifficulty()->getExplosionInvulnerabilityTime();
     m_kart->setInvulnerableTime(t);
-    if ( UserConfigParams::m_graphical_effects )
-    {
-        m_kart->showStarEffect(t);
-    }
-
+    m_kart->showStarEffect(t);
+    
     m_kart->getAttachment()->clear();
 
  };   // ExplosionAnimation

@@ -11,6 +11,9 @@
 #include "IVideoDriver.h"
 #include "rect.h"
 
+#define CJK_START 12287
+#define CJK_END 40960
+
 namespace irr
 {
 namespace gui
@@ -360,6 +363,20 @@ void CGUIStaticText::breakText()
 			{
 				// part of a word
 				word += c;
+
+                //Check for CJK, show them first if out of range of displaying area
+                if (Text[i] > CJK_START && Text[i] < CJK_END)
+                {
+                    const s32 cjklgth = font->getDimension(word.c_str()).Width;
+                    if (cjklgth > (elWidth - 23))
+                    {
+                        BrokenText.push_back(line);
+                        length = cjklgth;
+                        line = word;
+                        word = L"";
+                        whitespace = L"";
+                    }
+                }
 			}
 
 			if ( isWhitespace || i == (size-1))

@@ -426,7 +426,7 @@
                chassis-angular-damping="0"
                downward-impulse-factor="5"
                track-connection-accel="2"
-               smooth-flying-impulse="25"/>
+               smooth-flying-impulse="250"/>
 
     <!-- collision
          impulse-type: STK can apply an additional impulse in case of
@@ -623,7 +623,7 @@
          time-reset-steer="0.1" />
 
      <!-- Speed and acceleration related values: power and max-speed (in m/s)
-          have 3 values, one for low, medium, and hard.
+          have 4 values, one for low, medium, hard, and supertux.
           brake-factor: Value used when braking. 
           brake-time-increase: The brake force is multiplied by
             (1+brake_time*brake_time_increase - i.e. the longer the brake was
