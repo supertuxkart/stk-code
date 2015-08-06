@@ -328,6 +328,13 @@ Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
     }
 }
 
+Skybox::~Skybox()
+{
+    glDeleteTextures(1, &m_cube_map);
+    glDeleteTextures(1, &m_specular_probe);    
+}
+
+
 // ----------------------------------------------------------------------------
 void Skybox::render(const scene::ICameraSceneNode *camera) const
 {

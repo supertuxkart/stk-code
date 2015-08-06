@@ -43,7 +43,8 @@ private:
     
 public:
     Skybox(const std::vector<irr::video::ITexture *> &skybox_textures);
-
+    ~Skybox();
+    
     void render(const irr::scene::ICameraSceneNode *camera) const;
 
     inline GLuint getSpecularProbe()      const     {return m_specular_probe; }
