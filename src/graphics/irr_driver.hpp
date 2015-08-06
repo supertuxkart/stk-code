@@ -38,7 +38,7 @@
 #include "ISkinnedMesh.h"
 #include "graphics/gl_headers.hpp"
 #include "graphics/skybox.hpp"
-#include "graphics/sphericalHarmonic.hpp"
+#include "graphics/sphericalHarmonics.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
@@ -221,7 +221,7 @@ private:
     //bool m_skybox_ready;
     
     Skybox *m_skybox;
-    SphericalHarmonic *m_spherical_harmonic;
+    SphericalHarmonics *m_spherical_harmonics;
 
 public:
     //float blueSHCoeff[9];
@@ -410,7 +410,7 @@ public:
                                      int vert_res, float texture_percent,
                                      float sphere_percent);
     scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names,
-                                    const std::vector<video::ITexture*> &sphericalHarmonics);
+                                    const std::vector<video::ITexture*> &spherical_harmonics_textures);
     void suppressSkyBox();
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMeshFromCache(scene::IMesh *mesh);
@@ -537,8 +537,8 @@ public:
     /** Returns a pointer to the skybox. */
     inline Skybox *getSkybox()  {return m_skybox;}
     // -----------------------------------------------------------------------
-    /** Returns a pointer to spherical harmonic. */
-    inline SphericalHarmonic *getSphericalHarmonic()  {return m_spherical_harmonic;}
+    /** Returns a pointer to spherical harmonics. */
+    inline SphericalHarmonics *getSphericalHarmonics()  {return m_spherical_harmonics;}
     // -----------------------------------------------------------------------
     const core::vector3df& getSunDirection() const { return m_sun_direction; };
     // -----------------------------------------------------------------------

@@ -18,7 +18,6 @@
 
 #include "graphics/skybox.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/IBL.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
 

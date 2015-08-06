@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_SPHERICAL_HARMONIC_HPP
-#define HEADER_SPHERICAL_HARMONIC_HPP
+#ifndef HEADER_SPHERICAL_HARMONICS_HPP
+#define HEADER_SPHERICAL_HARMONICS_HPP
 
 #include <ITexture.h>
 #include <vector>
@@ -30,7 +30,7 @@ struct Color
 };
 
 
-class SphericalHarmonic
+class SphericalHarmonics
 {
 private:
     /** The 6 spherical harmonics textures */
@@ -41,20 +41,16 @@ private:
     float m_green_SH_coeff[9];
     float m_red_SH_coeff[9];    
 
-
     void projectSH(Color *cubemap_face[6], size_t edge_size, float *Y00[],
                       float *Y1minus1[], float *Y10[], float *Y11[],
                       float *Y2minus2[], float *Y2minus1[], float * Y20[],
-                      float *Y21[], float *Y22[], float *blue_sh_coeff,
-                      float *green_sh_coeff, float *red_sh_coeff);
+                      float *Y21[], float *Y22[]);
     
-    void generateSphericalHarmonics(Color *cubemap_face[6], size_t edge_size,
-                                    float *blue_sh_coeff, float *green_sh_coeff,
-                                    float *red_sh_coeff);
+    void generateSphericalHarmonics(Color *cubemap_face[6], size_t edge_size);
     
 public:
-    SphericalHarmonic(const std::vector<irr::video::ITexture *> &spherical_harmonics_textures);
-    SphericalHarmonic(const irr::video::SColor &ambient);
+    SphericalHarmonics(const std::vector<irr::video::ITexture *> &spherical_harmonics_textures);
+    SphericalHarmonics(const irr::video::SColor &ambient);
     
     inline const float* getBlueSHCoeff () const     {return m_blue_SH_coeff;  }
     inline const float* getGreenSHCoeff() const     {return m_green_SH_coeff; }
@@ -63,10 +59,12 @@ public:
     /** Print spherical harmonics coefficients (debug) */
     void printCoeff();
     
-    void unprojectSH (float *output[], size_t width, size_t height,
+    /** Compute environment map from the spherical harmonics */
+    void unprojectSH (size_t width, size_t height,
                       float *Y00[], float *Y1minus1[], float *Y10[],
                       float *Y11[], float *Y2minus2[], float *Y2minus1[],
-                      float * Y20[], float *Y21[], float *Y22[]);
+                      float * Y20[], float *Y21[], float *Y22[],
+                      float *output[]);
 };
 
-#endif //HEADER_SPHERICAL_HARMONIC_HPP
+#endif //HEADER_SPHERICAL_HARMONICS_HPP

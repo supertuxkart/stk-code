@@ -174,15 +174,15 @@ void ShaderBase::bypassUBO() const
                         irr_driver->getCurrentScreenSize().Y);
 
     GLint bLmn = glGetUniformLocation(m_program, "blueLmn[0]");
-    const float*  blue_SH_coeff = irr_driver->getSphericalHarmonic()->getBlueSHCoeff();
+    const float*  blue_SH_coeff = irr_driver->getSphericalHarmonics()->getBlueSHCoeff();
     glUniform1fv(bLmn, 9, blue_SH_coeff);
 
     GLint gLmn = glGetUniformLocation(m_program, "greenLmn[0]");
-    const float*  green_SH_coeff = irr_driver->getSphericalHarmonic()->getGreenSHCoeff();
+    const float*  green_SH_coeff = irr_driver->getSphericalHarmonics()->getGreenSHCoeff();
     glUniform1fv(gLmn, 9, green_SH_coeff);
 
     GLint rLmn = glGetUniformLocation(m_program, "redLmn[0]");
-    const float*  red_SH_coeff = irr_driver->getSphericalHarmonic()->getRedSHCoeff();
+    const float*  red_SH_coeff = irr_driver->getSphericalHarmonics()->getRedSHCoeff();
     glUniform1fv(rLmn, 9, red_SH_coeff);
 
     GLint sun_dir = glGetUniformLocation(m_program, "sun_direction");
