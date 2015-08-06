@@ -211,6 +211,11 @@ if(WIN32)
 
     # And shut up about unsafe stuff
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
+    # Avoid timespec structure redeclaration on Visual Studio 2015
+    if (MSVC_VERSION EQUAL 1900)
+        add_definitions(-DHAVE_STRUCT_TIMESPEC)
+    endif()
 endif()
 
 if(MSVC)
