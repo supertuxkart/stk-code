@@ -1367,32 +1367,12 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     const std::vector<video::ITexture*> &spherical_harmonics_textures)
 {
     assert(texture.size() == 6);
-    /*SkyboxTextures = texture;
-    SphericalHarmonicsTextures = sphericalHarmonics;
-    SkyboxCubeMap = 0;
-    SkyboxSpecularProbe = 0;*/
-    
-    //m_skybox_ready = false;
-    //TODO
-    //prepareSkybox();
-    //m_skybox_ready = true;
+
     m_skybox = new Skybox(texture);
     if(spherical_harmonics_textures.size() == 6)
     {
         m_spherical_harmonics->setTextures(spherical_harmonics_textures);
     }
-    /*if(spherical_harmonics_textures.size() == 6)
-    {
-        if(m_spherical_harmonics != NULL)
-        {
-            delete m_spherical_harmonics;
-        }
-        m_spherical_harmonics = new SphericalHarmonics(spherical_harmonics_textures);
-    }
-    else
-    {
-        //m_spherical_harmonic = new SphericalHarmonic(m_scene_manager->getAmbientLight().toSColor());
-    }*/
     
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
@@ -1401,21 +1381,8 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
 
 void IrrDriver::suppressSkyBox()
 {
-    //TODO!
-    /*SkyboxTextures.clear();
-    SphericalHarmonicsTextures.clear();
-    m_skybox_ready = false;
-    if ((SkyboxCubeMap) && (!ProfileWorld::isNoGraphics()))
-    {
-        glDeleteTextures(1, &SkyboxCubeMap);
-        glDeleteTextures(1, &SkyboxSpecularProbe);
-    }
-    SkyboxCubeMap = 0;
-    SkyboxSpecularProbe = 0;*/
     delete m_skybox;
     m_skybox = NULL;
-    //delete m_spherical_harmonics;
-    //m_spherical_harmonics = NULL;
 }
 
 // ----------------------------------------------------------------------------
@@ -1796,9 +1763,6 @@ void IrrDriver::setAmbientLight(const video::SColorf &light)
 {
     m_scene_manager->setAmbientLight(light);
     m_spherical_harmonics->setAmbientLight(light.toSColor());
-    //TODO!
-        
-
 }   // setAmbientLight
 
 video::SColorf IrrDriver::getAmbientLight() const

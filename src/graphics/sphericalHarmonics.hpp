@@ -63,6 +63,8 @@ public:
     inline const float* getGreenSHCoeff() const     {return m_green_SH_coeff; }
     inline const float* getRedSHCoeff  () const     {return m_red_SH_coeff;   }    
     
+    inline bool has6Textures() const {return m_spherical_harmonics_textures.size()==6;}
+    
     void printCoeff();
     
     void unprojectSH (size_t width, size_t height,

@@ -186,9 +186,8 @@ void IrrDriver::renderGLSL(float dt)
 
         const core::recti &viewport = camera->getViewport();
 
-        //if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && !SphericalHarmonicsTextures.empty())
-            //irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
-            //TODO!
+        if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && m_spherical_harmonics->has6Textures())
+            irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
         if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);

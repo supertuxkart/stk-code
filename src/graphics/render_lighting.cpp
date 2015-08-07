@@ -497,9 +497,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         else 
         {
             m_post_processing->renderEnvMap(0);
-        }
-           
-        //TODO: move in skybox (or IBL?) class
+        }           
     }
 
     // Render sunlight if and only if track supports shadow

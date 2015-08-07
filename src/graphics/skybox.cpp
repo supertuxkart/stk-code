@@ -74,8 +74,6 @@ public:
 };   // SpecularIBLGenerator
 
 
-
-
 namespace {
     // ----------------------------------------------------------------------------
     void swapPixels(char *old_img, char *new_img, unsigned stride, unsigned old_i,
@@ -141,16 +139,7 @@ namespace {
 }  //namespace
 
 // ----------------------------------------------------------------------------
-/** Generate an opengl cubemap texture from 6 2d textures.
-Out of legacy the sequence of textures maps to :
-- 1st texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_Y
-- 2nd texture maps to GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
-- 3rd texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_X
-- 4th texture maps to GL_TEXTURE_CUBE_MAP_NEGATIVE_X
-- 5th texture maps to GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-- 6th texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-*  \param textures sequence of 6 textures.
-*/
+/** Generate an opengl cubemap texture from 6 2d textures */
 void Skybox::generateCubeMapFromTextures()
 {
     assert(m_skybox_textures.size() == 6);
@@ -218,7 +207,6 @@ void Skybox::generateCubeMapFromTextures()
 // ----------------------------------------------------------------------------
 void Skybox::generateSpecularCubemap()
 {
-
     glGenTextures(1, &m_specular_probe);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_specular_probe);
     size_t cubemap_size = 256;
@@ -315,6 +303,16 @@ void Skybox::generateSpecularCubemap()
 
 
 // ----------------------------------------------------------------------------
+/** Generate a skybox from 6 2d textures.
+Out of legacy the sequence of textures maps to:
+- 1st texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_Y
+- 2nd texture maps to GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+- 3rd texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_X
+- 4th texture maps to GL_TEXTURE_CUBE_MAP_NEGATIVE_X
+- 5th texture maps to GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+- 6th texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+*  \param skybox_textures sequence of 6 textures.
+*/
 Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
 {
     m_skybox_textures = skybox_textures;
