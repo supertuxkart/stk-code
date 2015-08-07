@@ -84,21 +84,19 @@ Material::Material(const XMLNode *node, bool deprecated)
 
 
     std::string s;
-    //node->get("adjust-image",     &s                   );
-    //if(s=="premultiply")
-    //    m_adjust_image = ADJ_PREMUL;
-    //else if (s=="divide")
-    //    m_adjust_image = ADJ_DIV;
-    //else if (s=="" || s=="none")
-    //    m_adjust_image = ADJ_NONE;
-    //else
-    //    Log::warn("material",
-    //              "Incorrect adjust-image specification: '%s' - ignored.",
-    //              s.c_str());
 
-    node->get("high-adhesion",    &m_high_tire_adhesion);
-    node->get("reset",            &m_drive_reset       );
-
+    node->get("high-adhesion",    &m_high_tire_adhesion      );
+    node->get("reset",            &m_drive_reset             );
+    s = "";
+    node->get("mirror-axis", &s);
+    if (s == "u")
+        s = "U";
+    else if (s == "v")
+        s = "V";
+    if (s != "U" && s != "V")
+        m_mirror_axis_when_reverse = ' ';
+    else
+        m_mirror_axis_when_reverse = s[0];
     // backwards compatibility
     bool crash_reset = false;
     node->get("crash-reset",      &crash_reset         );
@@ -433,6 +431,7 @@ void Material::init()
     m_surface                   = false;
     m_ignore                    = false;
     m_drive_reset               = false;
+    m_mirror_axis_when_reverse  = ' ';
     m_collision_reaction        = NORMAL;
     m_disable_z_write           = false;
     m_water_shader_speed_1      = 6.6667f;

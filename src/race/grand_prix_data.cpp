@@ -106,7 +106,7 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
             // Ignore no-racing tracks:
             if(!track->isRaceTrack())
                 continue;
-                
+
             if (PlayerManager::getCurrentPlayer()->isLocked(track->getIdent()))
                 continue;
 
@@ -132,10 +132,10 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
 
             const Track *track = track_manager->getTrack(track_index);
             std::string id = track->getIdent();
-            
+
             if (PlayerManager::getCurrentPlayer()->isLocked(track->getIdent()))
                 continue;
-            
+
             bool is_already_added = false;
             for (unsigned int i = 0; i < m_tracks.size(); i++)
             {
@@ -145,7 +145,7 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
                     break;
                 }
             }
-            
+
             if (!is_already_added)
             {
                 m_tracks.push_back(id);
@@ -251,7 +251,7 @@ void GrandPrixData::reload()
     m_laps.clear();
     m_reversed.clear();
 
-    std::auto_ptr<XMLNode> root(file_manager->createXMLTree(m_filename));
+    std::unique_ptr<XMLNode> root(file_manager->createXMLTree(m_filename));
     if (root.get() == NULL)
     {
         Log::error("GrandPrixData",
