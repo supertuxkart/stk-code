@@ -216,17 +216,9 @@ private:
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
-    //std::vector<video::ITexture *> SkyboxTextures;
-    //std::vector<video::ITexture *> SphericalHarmonicsTextures;
-    //bool m_skybox_ready;
-    
     Skybox *m_skybox;
     SphericalHarmonics *m_spherical_harmonics;
 
-public:
-    //float blueSHCoeff[9];
-    //float greenSHCoeff[9];
-    //float redSHCoeff[9];
 private:
 
     /** Keep a trace of the origin file name of a texture. */
@@ -243,8 +235,6 @@ private:
     ShadowMatrices *m_shadow_matrices;
 
 public:
-    //GLuint SkyboxCubeMap;
-    //GLuint SkyboxSpecularProbe;
     /** A simple class to store video resolutions. */
     class VideoMode
     {
