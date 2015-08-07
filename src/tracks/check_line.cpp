@@ -120,10 +120,11 @@ CheckLine::~CheckLine()
 void CheckLine::reset(const Track &track)
 {
     CheckStructure::reset(track);
-    for(unsigned int i=0; i<m_previous_sign.size(); i++)
+
+    for (unsigned int i = 0; i<m_previous_sign.size(); i++)
     {
         core::vector2df p = m_previous_position[i].toIrrVector2d();
-        m_previous_sign[i] = m_line.getPointOrientation(p)>=0;
+        m_previous_sign[i] = m_line.getPointOrientation(p) >= 0;
     }
 }   // reset
 
@@ -158,9 +159,22 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     core::vector2df p=new_pos.toIrrVector2d();
     bool sign = m_line.getPointOrientation(p)>=0;
     bool result;
+
+    bool previous_sign;
+
+    if (kart_index == -1)
+    {
+        core::vector2df p = old_pos.toIrrVector2d();
+        previous_sign = (m_line.getPointOrientation(p) >= 0);
+    }
+    else
+    {
+        previous_sign = m_previous_sign[kart_index];
+    }
+
     // If the sign has changed, i.e. the infinite line was crossed somewhere,
     // check if the finite line was actually crossed:
-    if (sign != m_previous_sign[kart_index] &&
+    if (sign != previous_sign &&
         m_line.intersectWith(core::line2df(old_pos.toIrrVector2d(),
                                            new_pos.toIrrVector2d()),
                              m_cross_point) )
@@ -188,9 +202,11 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     }
     else
         result = false;
-    m_previous_sign[kart_index] = sign;
 
-    if (result)
+    if (kart_index != -1)
+        m_previous_sign[kart_index] = sign;
+
+    if (result && kart_index != -1)
     {
         LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
         if (lw != NULL)

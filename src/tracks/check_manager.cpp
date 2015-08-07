@@ -168,7 +168,7 @@ int CheckManager::getChecklineTriggering(const Vec3 &from,
         // FIXME: why is the lapline skipped?
         if (dynamic_cast<CheckLap*>(c) != NULL) continue;
 
-        if (c->isTriggered(from, to, 0 /* kart id */))
+        if (c->isTriggered(from, to, -1 /* kart id */))
             return i;
     }
     return -1;
