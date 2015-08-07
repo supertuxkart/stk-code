@@ -1798,10 +1798,7 @@ void IrrDriver::setAmbientLight(const video::SColorf &light)
     m_spherical_harmonics->setAmbientLight(light.toSColor());
     //TODO!
         
-    //if(m_spherical_harmonics == NULL) 
-    //    m_spherical_harmonics = new SphericalHarmonics(light.toSColor());
-    
-    //m_skybox_ready = false;
+
 }   // setAmbientLight
 
 video::SColorf IrrDriver::getAmbientLight() const
@@ -2382,7 +2379,7 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         }
     }
 
-    irr_driver->setAmbientLight(video::SColor(255, 35, 35, 35) );
+    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 35, 35, 35) );
     
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
     m_light = irr_driver->getSceneManager()

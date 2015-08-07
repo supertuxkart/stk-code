@@ -1824,6 +1824,12 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     m_track_object_manager->enableFog(m_use_fog);
 
+    // ---- Set ambient color
+    // We need to define ambient color before adding Skybox because we will use
+    // ambient light if the track do not have spherical harmonics textures.
+    m_ambient_color = m_default_ambient_color;
+    irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
+    
     // Sky dome and boxes support
     // --------------------------
     irr_driver->suppressSkyBox();
@@ -1854,6 +1860,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures, m_spherical_harmonics_textures));
         //else
         //    m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures, m_sky_textures));
+        if (m_spherical_harmonics_textures.size() != 6)
+            irr_driver->getSphericalHarmonics()->setAmbientLight(m_ambient_color);
     }
     else if(m_sky_type==SKY_COLOR)
     {
@@ -1868,10 +1876,6 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 #endif
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
-
-    // ---- Set ambient color
-    m_ambient_color = m_default_ambient_color;
-    irr_driver->setAmbientLight(m_ambient_color);
 
     // ---- Create sun (non-ambient directional light)
     if (m_sun_position.getLengthSQ() < 0.03f)
