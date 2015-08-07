@@ -265,6 +265,8 @@ private:
 
     core::vector3df m_xyz;
 
+    bool m_enabled;
+
 public:
 
     TrackObjectPresentationSound(const XMLNode& xml_node,
@@ -276,6 +278,8 @@ public:
         const core::vector3df& scale, bool isAbsoluteCoord) OVERRIDE;
     void triggerSound(bool loop);
     void stopSound();
+
+    virtual void setEnable(bool enabled) OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Currently used for sound effects only, in cutscenes only atm */
