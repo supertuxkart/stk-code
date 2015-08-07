@@ -159,6 +159,7 @@ IrrDriver::~IrrDriver()
     m_shadow_matrices = NULL;
     Shaders::destroy();
     delete m_wind;
+    delete m_spherical_harmonics;
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -507,6 +508,7 @@ void IrrDriver::initDevice()
 
     CVS->init();
 
+    m_spherical_harmonics = new SphericalHarmonics(m_scene_manager->getAmbientLight().toSColor());
 
     if (UserConfigParams::m_shadows_resolution != 0 &&
         (UserConfigParams::m_shadows_resolution < 512 ||
@@ -1375,8 +1377,11 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     //prepareSkybox();
     //m_skybox_ready = true;
     m_skybox = new Skybox(texture);
-    
     if(spherical_harmonics_textures.size() == 6)
+    {
+        m_spherical_harmonics->setTextures(spherical_harmonics_textures);
+    }
+    /*if(spherical_harmonics_textures.size() == 6)
     {
         if(m_spherical_harmonics != NULL)
         {
@@ -1387,7 +1392,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     else
     {
         //m_spherical_harmonic = new SphericalHarmonic(m_scene_manager->getAmbientLight().toSColor());
-    }
+    }*/
     
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
@@ -1409,8 +1414,8 @@ void IrrDriver::suppressSkyBox()
     SkyboxSpecularProbe = 0;*/
     delete m_skybox;
     m_skybox = NULL;
-    delete m_spherical_harmonics;
-    m_spherical_harmonics = NULL;
+    //delete m_spherical_harmonics;
+    //m_spherical_harmonics = NULL;
 }
 
 // ----------------------------------------------------------------------------
@@ -1790,10 +1795,11 @@ void IrrDriver::onUnloadWorld()
 void IrrDriver::setAmbientLight(const video::SColorf &light)
 {
     m_scene_manager->setAmbientLight(light);
+    m_spherical_harmonics->setAmbientLight(light.toSColor());
     //TODO!
         
-    if(m_spherical_harmonics == NULL) 
-        m_spherical_harmonics = new SphericalHarmonics(light.toSColor());
+    //if(m_spherical_harmonics == NULL) 
+    //    m_spherical_harmonics = new SphericalHarmonics(light.toSColor());
     
     //m_skybox_ready = false;
 }   // setAmbientLight

@@ -358,6 +358,23 @@ void SphericalHarmonics::generateSphericalHarmonics(Color *cubemap_face[6], size
 // ----------------------------------------------------------------------------
 SphericalHarmonics::SphericalHarmonics(const std::vector<video::ITexture *> &spherical_harmonics_textures)
 {
+    setTextures(spherical_harmonics_textures);
+}
+
+// ----------------------------------------------------------------------------
+/** When spherical harmonics textures are not defined, SH coefficents are computed
+ *  from ambient light
+ */
+SphericalHarmonics::SphericalHarmonics(const video::SColor &ambient)
+{
+    //make sure m_ambient and ambient are not equal
+    m_ambient = (ambient==0) ? 1 : 0;
+    setAmbientLight(ambient);
+}
+
+/** Compute spherical harmonics coefficients from 6 textures */
+void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spherical_harmonics_textures)
+{
     assert(spherical_harmonics_textures.size() == 6);
     
     m_spherical_harmonics_textures = spherical_harmonics_textures;
@@ -399,16 +416,19 @@ SphericalHarmonics::SphericalHarmonics(const std::vector<video::ITexture *> &sph
     {
         delete[] sh_rgba[i];
         delete[] float_tex_cube[i];
-    }
-    
-}// SphericalHarmonics(const std::vector<video::ITexture *> &spherical_harmonics_textures)
+    }    
+} //setSphericalHarmonicsTextures
 
-// ----------------------------------------------------------------------------
-/** When spherical harmonics textures are not defined, SH coefficents are computed
- *  from ambient light
- */
-SphericalHarmonics::SphericalHarmonics(const video::SColor &ambient)
-{
+/** Compute spherical harmonics coefficients from ambient light */
+void SphericalHarmonics::setAmbientLight(const video::SColor &ambient)
+{    
+    //do not recompute SH coefficients if we already use the same ambient light
+    if((m_spherical_harmonics_textures.size() != 6) && (ambient == m_ambient))
+        return;
+        
+    m_spherical_harmonics_textures.clear();
+    m_ambient = ambient;
+    
     unsigned char *sh_rgba[6];
     unsigned sh_w = 16;
     unsigned sh_h = 16;
@@ -442,11 +462,11 @@ SphericalHarmonics::SphericalHarmonics(const video::SColor &ambient)
         m_blue_SH_coeff[i] *= 4;
         m_green_SH_coeff[i] *= 4;
         m_red_SH_coeff[i] *= 4;
-    }
- 
-}// SphericalHarmonics(const video::SColor &ambient)
+    }    
+} //setAmbientLight
 
 // ----------------------------------------------------------------------------
+/** Print spherical harmonics coefficients (debug) */
 void SphericalHarmonics::printCoeff() {
     Log::debug("SphericalHarmonics", "Blue_SH:");
     displayCoeff(m_blue_SH_coeff);
