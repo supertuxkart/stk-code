@@ -45,31 +45,6 @@
 #endif
 #include <sys/types.h>
 
-
-int stunRand()
-{
-    static bool init = false;
-    if (!init)
-    {
-        srand((unsigned int)time(NULL));
-        init = true;
-    }
-    return rand();
-}
-
-GetPublicAddress::GetPublicAddress(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT)
-{
-}
-
-GetPublicAddress::~GetPublicAddress()
-{
-}
-
-void GetPublicAddress::setup()
-{
-    m_state = NOTHING_DONE;
-}
-
 /**
  * Gets the response from the STUN server, checks it for its validity and
  * then parses the answer into address and port
@@ -122,7 +97,7 @@ std::string GetPublicAddress::parseResponse()
     // Those are the port and the address to be detected
     uint16_t port;
     uint32_t address;
-    while(true)
+    while (true)
     {
         int type = attributes[0]*256+attributes[1];
         int size = attributes[2]*256+attributes[3];
@@ -131,8 +106,12 @@ std::string GetPublicAddress::parseResponse()
             assert(size == 8);
             assert(attributes[5] == 0x01); // IPv4 only
             port = attributes[6]*256+attributes[7];
-            // The (IPv4) address was sent as 4 distinct bytes, but needs to be packed into one 4-byte int
-            address = (attributes[8]<<24 & 0xFF000000) + (attributes[9]<<16 & 0x00FF0000) + (attributes[10]<<8 & 0x0000FF00) + (attributes[11] & 0x000000FF);
+            // The (IPv4) address was sent as 4 distinct bytes,
+            // but needs to be packed into one 4-byte int
+            address = (attributes[8]<<24 & 0xFF000000) +
+                      (attributes[9]<<16 & 0x00FF0000) +
+                      (attributes[10]<<8 & 0x0000FF00) +
+                      (attributes[11]    & 0x000000FF);
             break;
         }
         attributes = attributes + 4 + size;
@@ -144,7 +123,8 @@ std::string GetPublicAddress::parseResponse()
     }
 
     // finished parsing, we know our public transport address
-    Log::debug("GetPublicAddress", "The public address has been found: %i.%i.%i.%i:%i", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
+    Log::debug("GetPublicAddress", "The public address has been found: %i.%i.%i.%i:%i",
+               address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
     TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
     addr->ip = address;
     addr->port = port;
@@ -158,7 +138,7 @@ std::string GetPublicAddress::parseResponse()
 }
 
 
-/** Creates a request and sends it to a random STUN server randomly slected
+/** Creates a request and sends it to a random STUN server randomly selected
  *  from the list saved in the config file
  *  The request is send through m_transaction_host, from which the answer
  *  will be retrieved by parseResponse()
@@ -167,9 +147,9 @@ void GetPublicAddress::createStunRequest()
 {
     // format :               00MMMMMCMMMCMMMM (cf rfc 5389)
     uint16_t message_type = 0x0001; // binding request
-    m_stun_tansaction_id[0] = stunRand();
-    m_stun_tansaction_id[1] = stunRand();
-    m_stun_tansaction_id[2] = stunRand();
+    m_stun_tansaction_id[0] = rand();
+    m_stun_tansaction_id[1] = rand();
+    m_stun_tansaction_id[2] = rand();
     uint16_t message_length = 0x0000;
 
     uint8_t bytes[21]; // the message to be sent
@@ -210,32 +190,28 @@ void GetPublicAddress::createStunRequest()
     Log::verbose("GetPublicAddress", "Using STUN server %s",
                  stun_servers[rand_result].c_str());
 
-    // resolve the name into an IP address
-    struct addrinfo hints, *res, *p;
-    int status;
+    struct addrinfo hints, *res;
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
     hints.ai_socktype = SOCK_STREAM;
 
-    if ((status = getaddrinfo(stun_servers[rand_result].c_str(), NULL, &hints, &res)) != 0) {
-        Log::error("getaddrinfo", gai_strerror(status));
-        return;
-    }
-    for (p = res; p != NULL; p = p->ai_next)
+    // Resolve the stun server name so we can send it a STUN request
+    int status = getaddrinfo(stun_servers[rand_result].c_str(), NULL, &hints, &res);
+    if (status != 0)
     {
-        struct sockaddr_in* current_interface = (struct sockaddr_in*)(p->ai_addr);
-
-        m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
-        m_transaction_host = new STKHost();
-        m_transaction_host->setupClient(1,1,0,0);
-        m_transaction_host->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, 3478));
-        m_state = TEST_SENT;
-
-        freeaddrinfo(res); // free the linked list
+        Log::error("GetPublicAddress", "Error in getaddrinfo: %s", gai_strerror(status));
         return;
     }
-    freeaddrinfo(res); // free the linked list
+    assert (res != NULL) // documentation says it points to "one or more addrinfo structures"
+
+    struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
+    m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
+    m_transaction_host = new STKHost();
+    m_transaction_host->setupClient(1, 1, 0, 0);
+    m_transaction_host->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, 3478));
+    m_state = TEST_SENT;
+    freeaddrinfo(res);
 }
 
 

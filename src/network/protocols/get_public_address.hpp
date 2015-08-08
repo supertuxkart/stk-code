@@ -26,12 +26,12 @@
 class GetPublicAddress : public Protocol
 {
     public:
-        GetPublicAddress(CallbackObject* callback_object);
-        virtual ~GetPublicAddress();
+        GetPublicAddress(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT) {}
+        virtual ~GetPublicAddress() {}
 
         virtual bool notifyEvent(Event* event) { return true; }
         virtual bool notifyEventAsynchronous(Event* event) { return true; }
-        virtual void setup();
+        virtual void setup() { m_state = NOTHING_DONE; }
         virtual void update() {}
         virtual void asynchronousUpdate();
 
