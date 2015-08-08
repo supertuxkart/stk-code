@@ -73,7 +73,7 @@ void GetPublicAddress::setup()
 /**
  * Gets the response from the STUN server, checks it for its validity and
  * then parses the answer into address and port
- * \return "" if the adress could be parsed or an error message
+ * \return "" if the address could be parsed or an error message
 */
 std::string GetPublicAddress::parseResponse()
 {
@@ -158,90 +158,93 @@ std::string GetPublicAddress::parseResponse()
 }
 
 
+/** Creates a request and sends it to a random STUN server randomly slected
+ *  from the list saved in the config file
+ *  The request is send through m_transaction_host, from which the answer
+ *  will be retrieved by parseResponse()
+ */
+void GetPublicAddress::createStunRequest()
+{
+    // format :               00MMMMMCMMMCMMMM (cf rfc 5389)
+    uint16_t message_type = 0x0001; // binding request
+    m_stun_tansaction_id[0] = stunRand();
+    m_stun_tansaction_id[1] = stunRand();
+    m_stun_tansaction_id[2] = stunRand();
+    uint16_t message_length = 0x0000;
+
+    uint8_t bytes[21]; // the message to be sent
+    // bytes 0-1 : the type of the message,
+    bytes[0] = (uint8_t)(message_type>>8);
+    bytes[1] = (uint8_t)(message_type);
+
+    // bytes 2-3 : message length added to header (attributes)
+    bytes[2] = (uint8_t)(message_length>>8);
+    bytes[3] = (uint8_t)(message_length);
+
+    // bytes 4-7 : magic cookie to recognize the stun protocol
+    bytes[4] = (uint8_t)(m_stun_magic_cookie>>24);
+    bytes[5] = (uint8_t)(m_stun_magic_cookie>>16);
+    bytes[6] = (uint8_t)(m_stun_magic_cookie>>8);
+    bytes[7] = (uint8_t)(m_stun_magic_cookie);
+
+    // bytes 8-19 : the transaction id
+    bytes[8] = (uint8_t)(m_stun_tansaction_id[0]>>24);
+    bytes[9] = (uint8_t)(m_stun_tansaction_id[0]>>16);
+    bytes[10] = (uint8_t)(m_stun_tansaction_id[0]>>8);
+    bytes[11] = (uint8_t)(m_stun_tansaction_id[0]);
+    bytes[12] = (uint8_t)(m_stun_tansaction_id[1]>>24);
+    bytes[13] = (uint8_t)(m_stun_tansaction_id[1]>>16);
+    bytes[14] = (uint8_t)(m_stun_tansaction_id[1]>>8);
+    bytes[15] = (uint8_t)(m_stun_tansaction_id[1]);
+    bytes[16] = (uint8_t)(m_stun_tansaction_id[2]>>24);
+    bytes[17] = (uint8_t)(m_stun_tansaction_id[2]>>16);
+    bytes[18] = (uint8_t)(m_stun_tansaction_id[2]>>8);
+    bytes[19] = (uint8_t)(m_stun_tansaction_id[2]);
+    bytes[20] = '\0';
+
+    // time to pick a random stun server
+    std::vector<std::string> stun_servers = UserConfigParams::m_stun_servers;
+
+    RandomGenerator random_gen;
+    int rand_result = random_gen.get((int)stun_servers.size());
+    Log::verbose("GetPublicAddress", "Using STUN server %s",
+                 stun_servers[rand_result].c_str());
+
+    // resolve the name into an IP address
+    struct addrinfo hints, *res, *p;
+    int status;
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
+    hints.ai_socktype = SOCK_STREAM;
+
+    if ((status = getaddrinfo(stun_servers[rand_result].c_str(), NULL, &hints, &res)) != 0) {
+        Log::error("getaddrinfo", gai_strerror(status));
+        return;
+    }
+    for (p = res; p != NULL; p = p->ai_next)
+    {
+        struct sockaddr_in* current_interface = (struct sockaddr_in*)(p->ai_addr);
+
+        m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
+        m_transaction_host = new STKHost();
+        m_transaction_host->setupClient(1,1,0,0);
+        m_transaction_host->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, 3478));
+        m_state = TEST_SENT;
+
+        freeaddrinfo(res); // free the linked list
+        return;
+    }
+    freeaddrinfo(res); // free the linked list
+}
+
+
 /** Detects public IP-address and port by first sending a request to a randomly
  * selected STUN server and then parsing and validating the response */
 void GetPublicAddress::asynchronousUpdate()
 {
-    // Creates a request and sends it to a random STUN server randomly slected
-    // from the list saved in the config file
-    // The request is send through m_transaction_host, from which the answer
-    // can be retrieved
     if (m_state == NOTHING_DONE)
-    {
-        // format :               00MMMMMCMMMCMMMM (cf rfc 5389)
-        uint16_t message_type = 0x0001; // binding request
-        m_stun_tansaction_id[0] = stunRand();
-        m_stun_tansaction_id[1] = stunRand();
-        m_stun_tansaction_id[2] = stunRand();
-        uint16_t message_length = 0x0000;
-
-        uint8_t bytes[21]; // the message to be sent
-        // bytes 0-1 : the type of the message,
-        bytes[0] = (uint8_t)(message_type>>8);
-        bytes[1] = (uint8_t)(message_type);
-
-        // bytes 2-3 : message length added to header (attributes)
-        bytes[2] = (uint8_t)(message_length>>8);
-        bytes[3] = (uint8_t)(message_length);
-
-        // bytes 4-7 : magic cookie to recognize the stun protocol
-        bytes[4] = (uint8_t)(m_stun_magic_cookie>>24);
-        bytes[5] = (uint8_t)(m_stun_magic_cookie>>16);
-        bytes[6] = (uint8_t)(m_stun_magic_cookie>>8);
-        bytes[7] = (uint8_t)(m_stun_magic_cookie);
-
-        // bytes 8-19 : the transaction id
-        bytes[8] = (uint8_t)(m_stun_tansaction_id[0]>>24);
-        bytes[9] = (uint8_t)(m_stun_tansaction_id[0]>>16);
-        bytes[10] = (uint8_t)(m_stun_tansaction_id[0]>>8);
-        bytes[11] = (uint8_t)(m_stun_tansaction_id[0]);
-        bytes[12] = (uint8_t)(m_stun_tansaction_id[1]>>24);
-        bytes[13] = (uint8_t)(m_stun_tansaction_id[1]>>16);
-        bytes[14] = (uint8_t)(m_stun_tansaction_id[1]>>8);
-        bytes[15] = (uint8_t)(m_stun_tansaction_id[1]);
-        bytes[16] = (uint8_t)(m_stun_tansaction_id[2]>>24);
-        bytes[17] = (uint8_t)(m_stun_tansaction_id[2]>>16);
-        bytes[18] = (uint8_t)(m_stun_tansaction_id[2]>>8);
-        bytes[19] = (uint8_t)(m_stun_tansaction_id[2]);
-        bytes[20] = '\0';
-
-        // time to pick a random stun server
-        std::vector<std::string> stun_servers = UserConfigParams::m_stun_servers;
-
-        RandomGenerator random_gen;
-        int rand_result = random_gen.get((int)stun_servers.size());
-        Log::verbose("GetPublicAddress", "Using STUN server %s",
-                     stun_servers[rand_result].c_str());
-
-        // resolve the name into an IP address
-        struct addrinfo hints, *res, *p;
-        int status;
-
-        memset(&hints, 0, sizeof hints);
-        hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
-        hints.ai_socktype = SOCK_STREAM;
-
-        if ((status = getaddrinfo(stun_servers[rand_result].c_str(), NULL, &hints, &res)) != 0) {
-            Log::error("getaddrinfo", gai_strerror(status));
-            return;
-        }
-        for (p = res; p != NULL; p = p->ai_next)
-        {
-            struct sockaddr_in* current_interface = (struct sockaddr_in*)(p->ai_addr);
-
-            m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
-            m_transaction_host = new STKHost();
-            m_transaction_host->setupClient(1,1,0,0);
-            m_transaction_host->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, 3478));
-            m_state = TEST_SENT;
-
-            freeaddrinfo(res); // free the linked list
-            return;
-        }
-        freeaddrinfo(res); // free the linked list
-
-    }
-
+        createStunRequest();
     if (m_state == TEST_SENT)
     {
         std::string message = parseResponse();

@@ -51,6 +51,7 @@ class GetPublicAddress : public Protocol
 
     private:
         std::string parseResponse();
+        void createStunRequest();
 };
 
 #endif // GET_PUBLIC_ADDRESS_HPP
