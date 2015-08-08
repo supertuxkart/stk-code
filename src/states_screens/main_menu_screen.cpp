@@ -175,7 +175,7 @@ void MainMenuScreen::onUpdate(float delta)
         m_online->setLabel( _("Login" ));
         m_user_id->setText(player->getName());
     }
-    else 
+    else
     {
         // now must be either logging in or logging out
         m_online->setActive(false);
@@ -297,7 +297,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         StoryModeStatus* sms = PlayerManager::getCurrentPlayer()->getStoryModeStatus();
         sms->unlockFeature(const_cast<ChallengeStatus*>(sms->getChallengeStatus("gp1")),
             RaceManager::DIFFICULTY_HARD);
-        
+
         StateManager::get()->enterGameState();
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
@@ -307,7 +307,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
         FeatureUnlockedCutScene* scene =
             FeatureUnlockedCutScene::getInstance();
-        
+
         std::vector<std::string> parts;
         parts.push_back("featunlocked");
         ((CutsceneWorld*)World::getWorld())->setParts(parts);

@@ -35,23 +35,24 @@ class GetPublicAddress : public Protocol
         virtual void update() {}
         virtual void asynchronousUpdate();
 
-    protected:
+    private:
+        void createStunRequest();
+        std::string parseStunResponse();
+
+        // Constants
+        static constexpr uint8_t m_stun_magic_cookie[4] = {0x21, 0x12, 0xA4, 0x42};
+        static const int m_stun_server_port = 3478;
+
         enum STATE
         {
             NOTHING_DONE,
-            TEST_SENT,
-            ADDRESS_KNOWN,
+            STUN_REQUEST_SENT,
             EXITING
         };
         STATE m_state;
-        uint32_t m_stun_tansaction_id[3];
-        static const uint32_t m_stun_magic_cookie = 0x2112A442;
+        uint8_t m_stun_tansaction_id[12];
         uint32_t m_stun_server_ip;
         STKHost* m_transaction_host;
-
-    private:
-        std::string parseResponse();
-        void createStunRequest();
 };
 
 #endif // GET_PUBLIC_ADDRESS_HPP

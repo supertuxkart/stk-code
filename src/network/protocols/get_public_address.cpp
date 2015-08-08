@@ -24,7 +24,6 @@
 #include "network/protocols/connect_to_server.hpp"
 #include "network/network_interface.hpp"
 #include "utils/log.hpp"
-#include "utils/random_generator.hpp"
 
 #include <assert.h>
 
@@ -44,57 +43,46 @@
 #endif
 #include <sys/types.h>
 
-/** Creates a request and sends it to a random STUN server randomly selected
- *  from the list saved in the config file
+constexpr uint8_t GetPublicAddress::m_stun_magic_cookie[4]; // make the linker happy
+
+/** Creates a STUN request and sends it to a random STUN server selected from
+ *  the list stored in the config file. See https://tools.ietf.org/html/rfc5389#section-6
+ *  for details on the message structure.
  *  The request is send through m_transaction_host, from which the answer
- *  will be retrieved by parseResponse()
+ *  will be retrieved by parseStunResponse()
  */
 void GetPublicAddress::createStunRequest()
 {
-    // format :               00MMMMMCMMMCMMMM (cf rfc 5389)
-    uint16_t message_type = 0x0001; // binding request
-    m_stun_tansaction_id[0] = rand();
-    m_stun_tansaction_id[1] = rand();
-    m_stun_tansaction_id[2] = rand();
-    uint16_t message_length = 0x0000;
-
     uint8_t bytes[21]; // the message to be sent
-    // bytes 0-1 : the type of the message,
+    // bytes 0-1: the type of the message
+    uint16_t message_type = 0x0001; // binding request
     bytes[0] = (uint8_t)(message_type>>8);
     bytes[1] = (uint8_t)(message_type);
 
-    // bytes 2-3 : message length added to header (attributes)
+    // bytes 2-3: message length added to header (attributes)
+    uint16_t message_length = 0x0000;
     bytes[2] = (uint8_t)(message_length>>8);
     bytes[3] = (uint8_t)(message_length);
 
-    // bytes 4-7 : magic cookie to recognize the stun protocol
-    bytes[4] = (uint8_t)(m_stun_magic_cookie>>24);
-    bytes[5] = (uint8_t)(m_stun_magic_cookie>>16);
-    bytes[6] = (uint8_t)(m_stun_magic_cookie>>8);
-    bytes[7] = (uint8_t)(m_stun_magic_cookie);
+    // bytes 4-7: magic cookie to recognize the stun protocol
+    for (int i = 0; i < 4; i++)
+        bytes[i + 4] = m_stun_magic_cookie[i];
 
-    // bytes 8-19 : the transaction id
-    bytes[8] = (uint8_t)(m_stun_tansaction_id[0]>>24);
-    bytes[9] = (uint8_t)(m_stun_tansaction_id[0]>>16);
-    bytes[10] = (uint8_t)(m_stun_tansaction_id[0]>>8);
-    bytes[11] = (uint8_t)(m_stun_tansaction_id[0]);
-    bytes[12] = (uint8_t)(m_stun_tansaction_id[1]>>24);
-    bytes[13] = (uint8_t)(m_stun_tansaction_id[1]>>16);
-    bytes[14] = (uint8_t)(m_stun_tansaction_id[1]>>8);
-    bytes[15] = (uint8_t)(m_stun_tansaction_id[1]);
-    bytes[16] = (uint8_t)(m_stun_tansaction_id[2]>>24);
-    bytes[17] = (uint8_t)(m_stun_tansaction_id[2]>>16);
-    bytes[18] = (uint8_t)(m_stun_tansaction_id[2]>>8);
-    bytes[19] = (uint8_t)(m_stun_tansaction_id[2]);
+
+    // bytes 8-19: the transaction id
+    for (int i = 0; i < 12; i++)
+    {
+        uint8_t random_byte = rand() % 256;
+        bytes[i+8] = random_byte;
+        m_stun_tansaction_id[i] = random_byte;
+    }
     bytes[20] = '\0';
 
     // time to pick a random stun server
     std::vector<std::string> stun_servers = UserConfigParams::m_stun_servers;
 
-    RandomGenerator random_gen;
-    int rand_result = random_gen.get((int)stun_servers.size());
-    Log::debug("GetPublicAddress", "Using STUN server %s",
-               stun_servers[rand_result].c_str());
+    const char* server_name = stun_servers[rand() % stun_servers.size()].c_str();
+    Log::debug("GetPublicAddress", "Using STUN server %s", server_name);
 
     struct addrinfo hints, *res;
 
@@ -103,21 +91,21 @@ void GetPublicAddress::createStunRequest()
     hints.ai_socktype = SOCK_STREAM;
 
     // Resolve the stun server name so we can send it a STUN request
-    int status = getaddrinfo(stun_servers[rand_result].c_str(), NULL, &hints, &res);
+    int status = getaddrinfo(server_name, NULL, &hints, &res);
     if (status != 0)
     {
         Log::error("GetPublicAddress", "Error in getaddrinfo: %s", gai_strerror(status));
         return;
     }
-    assert (res != NULL) // documentation says it points to "one or more addrinfo structures"
+    assert (res != NULL); // documentation says it points to "one or more addrinfo structures"
 
     struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
     m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
     m_transaction_host = new STKHost();
     m_transaction_host->setupClient(1, 1, 0, 0);
-    m_transaction_host->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, 3478));
-    m_state = TEST_SENT;
+    m_transaction_host->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, m_stun_server_port));
     freeaddrinfo(res);
+    m_state = STUN_REQUEST_SENT;
 }
 
 /**
@@ -125,40 +113,29 @@ void GetPublicAddress::createStunRequest()
  * then parses the answer into address and port
  * \return "" if the address could be parsed or an error message
 */
-std::string GetPublicAddress::parseResponse()
+std::string GetPublicAddress::parseStunResponse()
 {
-    uint8_t* data = m_transaction_host->receiveRawPacket(TransportAddress(m_stun_server_ip, 3478), 2000);
+    uint8_t* data = m_transaction_host->receiveRawPacket(TransportAddress(m_stun_server_ip, m_stun_server_port), 2000);
     if (!data)
         return "STUN response contains no data at all";
 
     // check that the stun response is a response, contains the magic cookie and the transaction ID
-    if (data[0] != 0x01 ||
-        data[1] != 0x01 ||
-        data[4] !=  (uint8_t)(m_stun_magic_cookie>>24)     ||
-        data[5] !=  (uint8_t)(m_stun_magic_cookie>>16)     ||
-        data[6] !=  (uint8_t)(m_stun_magic_cookie>>8)      ||
-        data[7] !=  (uint8_t)(m_stun_magic_cookie))
-    {
+    if (data[0] != 0x01 || data[1] != 0x01)
         return "STUN response doesn't contain the magic cookie";
-    }
 
-    if (data[8] !=  (uint8_t)(m_stun_tansaction_id[0]>>24) ||
-        data[9] !=  (uint8_t)(m_stun_tansaction_id[0]>>16) ||
-        data[10] != (uint8_t)(m_stun_tansaction_id[0]>>8 ) ||
-        data[11] != (uint8_t)(m_stun_tansaction_id[0]    ) ||
-        data[12] != (uint8_t)(m_stun_tansaction_id[1]>>24) ||
-        data[13] != (uint8_t)(m_stun_tansaction_id[1]>>16) ||
-        data[14] != (uint8_t)(m_stun_tansaction_id[1]>>8 ) ||
-        data[15] != (uint8_t)(m_stun_tansaction_id[1]    ) ||
-        data[16] != (uint8_t)(m_stun_tansaction_id[2]>>24) ||
-        data[17] != (uint8_t)(m_stun_tansaction_id[2]>>16) ||
-        data[18] != (uint8_t)(m_stun_tansaction_id[2]>>8 ) ||
-        data[19] != (uint8_t)(m_stun_tansaction_id[2]    ))
+    for (int i = 0; i < 4; i++)
     {
-        return "STUN response doesn't contain the transaction ID";
+        if (data[i + 4] != m_stun_magic_cookie[i])
+            return "STUN response doesn't contain the magic cookie";
     }
 
-    Log::verbose("GetPublicAddress", "The STUN server responded with a valid answer");
+    for (int i = 0; i < 12; i++)
+    {
+        if (data[i+8] != m_stun_tansaction_id[i])
+            return "STUN response doesn't contain the transaction ID";
+    }
+
+    Log::debug("GetPublicAddress", "The STUN server responded with a valid answer");
     int message_size = data[2]*256+data[3];
 
     // The stun message is valid, so we parse it now:
@@ -199,14 +176,13 @@ std::string GetPublicAddress::parseResponse()
 
     // finished parsing, we know our public transport address
     Log::debug("GetPublicAddress", "The public address has been found: %i.%i.%i.%i:%i",
-               address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
+                 address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
     TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
     addr->ip = address;
     addr->port = port;
 
     // The address and the port are known, so the connection can be closed
     m_state = EXITING;
-    // terminate the protocol
     m_listener->requestTerminate(this);
 
     return "";
@@ -219,7 +195,10 @@ void GetPublicAddress::asynchronousUpdate()
     if (m_state == NOTHING_DONE)
     {
         createStunRequest();
-        std::string message = parseResponse();
+    }
+    if (m_state == STUN_REQUEST_SENT)
+    {
+        std::string message = parseStunResponse();
         if (message != "")
         {
             Log::warn("GetPublicAddress", "%s", message.c_str());
