@@ -19,6 +19,7 @@ option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
+option(ENABLE_NETWORK_MULTIPLAYER "Option description" OFF)
 
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
@@ -193,6 +194,11 @@ if(UNIX AND NOT APPLE)
         find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
         mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
     endif()
+endif()
+
+# Netwowk Multiplayer
+if(ENABLE_NETWORK_MULTIPLAYER)
+  add_definitions(-DENABLE_NETWORK_MULTIPLAYER_SCREEN)
 endif()
 
 # Set some compiler options
