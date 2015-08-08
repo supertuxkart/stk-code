@@ -29,6 +29,8 @@
 
 #include <assert.h>
 
+#include <string>
+
 #ifdef __MINGW32__
 #  undef _WIN32_WINNT
 #  define _WIN32_WINNT 0x501
@@ -67,6 +69,94 @@ void GetPublicAddress::setup()
 {
     m_state = NOTHING_DONE;
 }
+
+/**
+ * Gets the response from the STUN server, checks it for its validity and
+ * then parses the answer into address and port
+ * \return "" if the adress could be parsed or an error message
+*/
+std::string GetPublicAddress::parseResponse()
+{
+    uint8_t* data = m_transaction_host->receiveRawPacket(TransportAddress(m_stun_server_ip, 3478), 2000);
+    if (!data)
+        return "STUN response contains no data at all";
+
+    // check that the stun response is a response, contains the magic cookie and the transaction ID
+    if (data[0] != 0x01 ||
+        data[1] != 0x01 ||
+        data[4] !=  (uint8_t)(m_stun_magic_cookie>>24)     ||
+        data[5] !=  (uint8_t)(m_stun_magic_cookie>>16)     ||
+        data[6] !=  (uint8_t)(m_stun_magic_cookie>>8)      ||
+        data[7] !=  (uint8_t)(m_stun_magic_cookie))
+    {
+        return "STUN response doesn't contain the magic cookie";
+    }
+
+    if (data[8] !=  (uint8_t)(m_stun_tansaction_id[0]>>24) ||
+        data[9] !=  (uint8_t)(m_stun_tansaction_id[0]>>16) ||
+        data[10] != (uint8_t)(m_stun_tansaction_id[0]>>8 ) ||
+        data[11] != (uint8_t)(m_stun_tansaction_id[0]    ) ||
+        data[12] != (uint8_t)(m_stun_tansaction_id[1]>>24) ||
+        data[13] != (uint8_t)(m_stun_tansaction_id[1]>>16) ||
+        data[14] != (uint8_t)(m_stun_tansaction_id[1]>>8 ) ||
+        data[15] != (uint8_t)(m_stun_tansaction_id[1]    ) ||
+        data[16] != (uint8_t)(m_stun_tansaction_id[2]>>24) ||
+        data[17] != (uint8_t)(m_stun_tansaction_id[2]>>16) ||
+        data[18] != (uint8_t)(m_stun_tansaction_id[2]>>8 ) ||
+        data[19] != (uint8_t)(m_stun_tansaction_id[2]    ))
+    {
+        return "STUN response doesn't contain the transaction ID";
+    }
+
+    Log::verbose("GetPublicAddress", "The STUN server responded with a valid answer");
+    int message_size = data[2]*256+data[3];
+
+    // The stun message is valid, so we parse it now:
+    uint8_t* attributes = data+20;
+    if (message_size == 0)
+        return "STUN response does not contain any information.";
+    if (message_size < 4) // cannot even read the size
+        return "STUN response is too short.";
+
+
+    // Those are the port and the address to be detected
+    uint16_t port;
+    uint32_t address;
+    while(true)
+    {
+        int type = attributes[0]*256+attributes[1];
+        int size = attributes[2]*256+attributes[3];
+        if (type == 0 || type == 1)
+        {
+            assert(size == 8);
+            assert(attributes[5] == 0x01); // IPv4 only
+            port = attributes[6]*256+attributes[7];
+            // The (IPv4) address was sent as 4 distinct bytes, but needs to be packed into one 4-byte int
+            address = (attributes[8]<<24 & 0xFF000000) + (attributes[9]<<16 & 0x00FF0000) + (attributes[10]<<8 & 0x0000FF00) + (attributes[11] & 0x000000FF);
+            break;
+        }
+        attributes = attributes + 4 + size;
+        message_size -= 4 + size;
+        if (message_size == 0)
+            return "STUN response is invalid.";
+        if (message_size < 4) // cannot even read the size
+            return "STUN response is invalid.";
+    }
+
+    // finished parsing, we know our public transport address
+    Log::debug("GetPublicAddress", "The public address has been found: %i.%i.%i.%i:%i", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
+    TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
+    addr->ip = address;
+    addr->port = port;
+
+    // The address and the port are known, so the connection can be closed
+    m_state = EXITING;
+    // terminate the protocol
+    m_listener->requestTerminate(this);
+
+    return "";
+}
+
 
 /** Detects public IP-address and port by first sending a request to a randomly
  * selected STUN server and then parsing and validating the response */
@@ -151,112 +241,14 @@ void GetPublicAddress::asynchronousUpdate()
         freeaddrinfo(res); // free the linked list
 
     }
-    // Gets the response from the STUN server, checks it for its validity and
-    // then parses the answer into address and port
+
     if (m_state == TEST_SENT)
     {
-        uint8_t* data = m_transaction_host->receiveRawPacket(TransportAddress(m_stun_server_ip, 3478), 2000);
-        if (!data)
+        std::string message = parseResponse();
+        if (message != "")
         {
-            m_state = NOTHING_DONE; // will send the test again to an other server
-            return;
+            Log::warn("GetPublicAddress", "%s", message.c_str());
+            m_state = NOTHING_DONE;
         }
-
-        // check that the stun response is a response, contains the magic cookie and the transaction ID
-        if (data[0] != 0x01 ||
-            data[1] != 0x01 ||
-            data[4] !=  (uint8_t)(m_stun_magic_cookie>>24)     ||
-            data[5] !=  (uint8_t)(m_stun_magic_cookie>>16)     ||
-            data[6] !=  (uint8_t)(m_stun_magic_cookie>>8)      ||
-            data[7] !=  (uint8_t)(m_stun_magic_cookie))
-        {
-            return; // invalid data -> try again
-        }
-
-        if (data[8] !=  (uint8_t)(m_stun_tansaction_id[0]>>24) ||
-            data[9] !=  (uint8_t)(m_stun_tansaction_id[0]>>16) ||
-            data[10] != (uint8_t)(m_stun_tansaction_id[0]>>8 ) ||
-            data[11] != (uint8_t)(m_stun_tansaction_id[0]    ) ||
-            data[12] != (uint8_t)(m_stun_tansaction_id[1]>>24) ||
-            data[13] != (uint8_t)(m_stun_tansaction_id[1]>>16) ||
-            data[14] != (uint8_t)(m_stun_tansaction_id[1]>>8 ) ||
-            data[15] != (uint8_t)(m_stun_tansaction_id[1]    ) ||
-            data[16] != (uint8_t)(m_stun_tansaction_id[2]>>24) ||
-            data[17] != (uint8_t)(m_stun_tansaction_id[2]>>16) ||
-            data[18] != (uint8_t)(m_stun_tansaction_id[2]>>8 ) ||
-            data[19] != (uint8_t)(m_stun_tansaction_id[2]    ))
-        {
-            m_state = NOTHING_DONE; // need to re-send the stun request
-            Log::warn("GetPublicAddress", "The STUN server responded with a invalid answer");
-            return;
-        }
-
-        Log::verbose("GetPublicAddress", "The STUN server responded with a valid answer");
-        int message_size = data[2]*256+data[3];
-
-        // The stun message is valid, so we parse it now:
-        bool finish = false;
-        uint8_t* attributes = data+20;
-        if (message_size == 0)
-        {
-            Log::error("GetPublicAddress", "STUN answer does not contain any information.");
-            finish = true;
-        }
-        if (message_size < 4) // cannot even read the size
-        {
-            Log::error("GetPublicAddress", "STUN message is not valid.");
-            finish = true;
-        }
-
-        // This are the address and port that is wanted
-        uint16_t port;
-        uint32_t address;
-        bool valid = false;
-        while(!finish)
-        {
-            int type = attributes[0]*256+attributes[1];
-            int size = attributes[2]*256+attributes[3];
-            if (type == 0 || type == 1)
-            {
-                assert(size == 8);
-                assert(attributes[5] == 0x01); // IPv4 only
-                port = attributes[6]*256+attributes[7];
-                // The (IPv4) address was sent as 4 distinct bytes, but needs to be pack into one 4-byte int
-                address = (attributes[8]<<24 & 0xFF000000) + (attributes[9]<<16 & 0x00FF0000) + (attributes[10]<<8 & 0x0000FF00) + (attributes[11] & 0x000000FF);
-                finish = true;
-                valid = true;
-                continue;
-            }
-            attributes = attributes + 4 + size;
-            message_size -= 4 + size;
-            if (message_size == 0)
-                finish = true;
-            if (message_size < 4) // cannot even read the size
-                finish = true;
-        }
-        // finished parsing, we know our public transport address
-        if (valid)
-        {
-            Log::debug("GetPublicAddress", "The public address has been found: %i.%i.%i.%i:%i", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
-            m_state = ADDRESS_KNOWN;
-            TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
-            addr->ip = address;
-            addr->port = port;
-        }
-        else
-        {
-            Log::error("GetPublicAddress", "STUN message is not valid.");
-            m_state = NOTHING_DONE; // need to re-send the stun request
-        }
-    }
-    // The address and the port are known, so the connection can be closed
-    if (m_state == ADDRESS_KNOWN)
-    {
-        m_state = EXITING;
-        // terminate the protocol
-        m_listener->requestTerminate(this);
-    }
-    if (m_state == EXITING)
-    {
     }
 }

@@ -21,6 +21,8 @@
 
 #include "network/protocol.hpp"
 
+#include <string>
+
 class GetPublicAddress : public Protocol
 {
     public:
@@ -46,6 +48,9 @@ class GetPublicAddress : public Protocol
         static const uint32_t m_stun_magic_cookie = 0x2112A442;
         uint32_t m_stun_server_ip;
         STKHost* m_transaction_host;
+
+    private:
+        std::string parseResponse();
 };
 
 #endif // GET_PUBLIC_ADDRESS_HPP
