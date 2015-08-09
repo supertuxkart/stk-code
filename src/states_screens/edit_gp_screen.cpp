@@ -171,16 +171,19 @@ void EditGPScreen::init()
 
         if (edit->getResult())
         {
+            bool reverse = edit->getTrack()->reverseAvailable() ? 
+                           edit->getReverse() : false;
+            
             if (m_action == "add")
             {
-                m_gp->addTrack(edit->getTrack(), edit->getLaps(), edit->getReverse(),
-                    m_selected);
+                m_gp->addTrack(edit->getTrack(), edit->getLaps(), reverse,
+                               m_selected);
                 setSelected(m_selected + 1);
             }
             else if (m_action == "edit")
             {
                 m_gp->editTrack(m_selected, edit->getTrack(), edit->getLaps(),
-                    edit->getReverse());
+                                reverse);
             }
             setModified(true);
         }
