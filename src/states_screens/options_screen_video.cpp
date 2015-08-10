@@ -96,6 +96,13 @@ static GFXPreset GFX_PRESETS[] =
     },
 
     {
+        true /* light */, 512 /* shadow */, true /* bloom */, true /* motionblur */,
+        true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
+        true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
+        true /* depth of field */, false /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
+    },
+
+    {
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
@@ -103,7 +110,7 @@ static GFXPreset GFX_PRESETS[] =
     }
 };
 
-static const int  GFX_LEVEL_AMOUNT = 5;
+static const int  GFX_LEVEL_AMOUNT = 6;
 
 struct Resolution
 {
