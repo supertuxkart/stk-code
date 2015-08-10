@@ -131,22 +131,10 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_type = type;
 
     m_initially_visible = true;
-    std::string condition;
-    xml_node.get("if", &condition);
-    if (condition == "false")
+    xml_node.get("if", &m_visibility_condition);
+    if (m_visibility_condition == "false")
     {
         m_initially_visible = false;
-    }
-    else if (condition.size() > 0)
-    {
-        unsigned char result = -1;
-        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        std::function<void(asIScriptContext*)> null_callback;
-        script_engine->runFunction(true, "bool " + condition + "()", null_callback,
-            [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
-
-        if (result == 0)
-            m_initially_visible = false;
     }
     if (!m_initially_visible)
         setEnabled(false);
@@ -292,6 +280,68 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     if (parent_library != NULL && !parent_library->isEnabled())
         setEnabled(false);
 }   // TrackObject
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::onWorldReady()
+{
+    if (m_visibility_condition == "false")
+    {
+        m_initially_visible = false;
+    }
+    else if (m_visibility_condition.size() > 0)
+    {
+        unsigned char result = -1;
+        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+
+        std::ostringstream fn_signature;
+        std::vector<std::string> arguments;
+        if (m_visibility_condition.find("(") != std::string::npos && 
+            m_visibility_condition.find(")") != std::string::npos)
+        {
+            // There are arguments to pass to the function
+            // TODO: For the moment we only support string arguments
+            // TODO: this parsing could be improved
+            unsigned first = m_visibility_condition.find("(");
+            unsigned last = m_visibility_condition.find_last_of(")");
+            std::string fn_name = m_visibility_condition.substr(0, first);
+            std::string str_arguments = m_visibility_condition.substr(first + 1, last - first - 1);
+            arguments = StringUtils::split(str_arguments, ',');
+
+            fn_signature << "bool " << fn_name << "(";
+
+            for (int i = 0; i < arguments.size(); i++)
+            {
+                if (i > 0)
+                    fn_signature << ",";
+                fn_signature << "string";
+            }
+
+            fn_signature << ",Track::TrackObject@)";
+        }
+        else
+        {
+            fn_signature << "bool " << m_visibility_condition << "(Track::TrackObject@)";
+        }
+
+        TrackObject* self = this;
+        script_engine->runFunction(true, fn_signature.str(),
+            [&](asIScriptContext* ctx) 
+            {
+                for (int i = 0; i < arguments.size(); i++)
+                {
+                    ctx->SetArgObject(i, &arguments[i]);
+                }
+                ctx->SetArgObject(arguments.size(), self);
+            },
+            [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
+
+        if (result == 0)
+            m_initially_visible = false;
+    }
+    if (!m_initially_visible)
+        setEnabled(false);
+}
 
 // ----------------------------------------------------------------------------
 
@@ -455,6 +505,17 @@ const core::vector3df& TrackObject::getPosition() const
     else
         return m_init_xyz;
 }   // getPosition
+
+// ----------------------------------------------------------------------------
+
+const core::vector3df TrackObject::getAbsoluteCenterPosition() const
+{
+    if (m_presentation != NULL)
+        return m_presentation->getAbsoluteCenterPosition();
+    else
+        return m_init_xyz;
+}   // getAbsolutePosition
+
 
 // ----------------------------------------------------------------------------
 

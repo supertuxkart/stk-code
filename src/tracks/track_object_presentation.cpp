@@ -89,6 +89,16 @@ const core::vector3df TrackObjectPresentationSceneNode::getAbsolutePosition() co
 }   // getAbsolutePosition
 
 // ----------------------------------------------------------------------------
+
+const core::vector3df& TrackObjectPresentationSceneNode::getAbsoluteCenterPosition() const
+{
+    if (m_node == NULL) return m_init_xyz;
+    m_node->updateAbsolutePosition();
+    core::aabbox3d<f32> bounds = m_node->getTransformedBoundingBox();
+    return bounds.getCenter();
+}
+
+// ----------------------------------------------------------------------------
 const core::vector3df& TrackObjectPresentationSceneNode::getRotation() const
 {
     if (m_node == NULL) return m_init_hpr;
