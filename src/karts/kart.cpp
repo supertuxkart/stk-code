@@ -164,6 +164,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_boing_sound   = SFXManager::get()->createSoundSource( "boing" );
     m_goo_sound     = SFXManager::get()->createSoundSource( "goo"   );
     m_skid_sound    = SFXManager::get()->createSoundSource( "skid"  );
+    m_nitro_sound   = SFXManager::get()->createSoundSource( "nitro" );
     m_terrain_sound          = NULL;
     m_previous_terrain_sound = NULL;
 
@@ -190,6 +191,7 @@ void Kart::init(RaceManager::KartType type)
             m_crash_sound->setVolume( 1.0f / factor );
             m_boing_sound->setVolume( 1.0f / factor );
             m_beep_sound->setVolume( 1.0f / factor );
+            m_nitro_sound->setVolume( 1.0f / factor );
         }
         else
         {
@@ -198,6 +200,7 @@ void Kart::init(RaceManager::KartType type)
             m_crash_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
             m_beep_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
             m_boing_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
+            m_nitro_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
         }
     }
 
@@ -254,6 +257,7 @@ Kart::~Kart()
     m_goo_sound   ->deleteSFX();
     m_beep_sound  ->deleteSFX();
     m_boing_sound ->deleteSFX();
+    m_nitro_sound ->deleteSFX();
     delete m_kart_gfx;
     if(m_terrain_sound)          m_terrain_sound->deleteSFX();
     if(m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
@@ -602,7 +606,7 @@ void Kart::createPhysics()
                         // The y position of the wheels (i.e. the points where
                         // the suspension is attached to) is just at the
                         // bottom of the kart. That is half the kart height
-                        // down. 
+                        // down.
                         wheel_pos[index].setY(- 0.5f*kart_height);
                         wheel_pos[index].setZ((0.5f*kart_length-0.25f)* z);
 
@@ -1187,6 +1191,7 @@ void Kart::update(float dt)
     m_crash_sound->setPosition  ( getXYZ() );
     m_skid_sound->setPosition   ( getXYZ() );
     m_boing_sound->setPosition  ( getXYZ() );
+    m_nitro_sound->setPosition  ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much -->
     // automatic rescue
@@ -1216,19 +1221,19 @@ void Kart::update(float dt)
     m_xyz_front = getTrans()(front);
 
     // After the physics step was done, the position of the wheels (as stored
-    // in wheelInfo) is actually outdated, since the chassis was moved 
+    // in wheelInfo) is actually outdated, since the chassis was moved
     // according to the force acting from the wheels. So the cnter of the
     // chassis is not at the center of the wheels anymore, it is somewhat
     // moved forward (depending on speed and fps). In very extreme cases
     // (see bug 2246) the center of the chassis can actually be ahead of the
     // front wheels. So if we do a raycast to detect the terrain from the
-    // current chassis, that raycast might be ahead of the wheels - which 
+    // current chassis, that raycast might be ahead of the wheels - which
     // results in incorrect rescues (the wheels are still on the ground,
     // but the raycast happens ahead of the front wheels and are over
     // a rescue texture).
     // To avoid this problem, we do the raycast for terrain detection from
     // the center of the 4 wheel positions (in world coordinates).
-    
+
     Vec3 from(0, 0, 0);
     for (unsigned int i = 0; i < 4; i++)
         from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS;
@@ -1710,18 +1715,25 @@ void Kart::updateNitro(float dt)
     bool increase_speed = (m_controls.m_nitro && isOnGround());
     if (!increase_speed && m_min_nitro_time <= 0.0f)
     {
+        if(m_nitro_sound->getStatus()==SFXBase::SFX_PLAYING)
+            m_nitro_sound->stop();
         return;
     }
+
     m_collected_energy -= dt * m_kart_properties->getNitroConsumption() *
                           m_difficulty->getNitroConsumption();
     if (m_collected_energy < 0)
     {
+        if(m_nitro_sound->getStatus()==SFXBase::SFX_PLAYING)
+            m_nitro_sound->stop();
         m_collected_energy = 0;
         return;
     }
 
     if (increase_speed)
     {
+        if(m_nitro_sound->getStatus()!=SFXBase::SFX_PLAYING)
+            m_nitro_sound->play();
         m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
                                      m_kart_properties->getNitroMaxSpeedIncrease() *
                                      m_difficulty->getNitroMaxSpeedIncrease(),
@@ -1731,6 +1743,11 @@ void Kart::updateNitro(float dt)
                                      m_difficulty->getNitroDuration(),
                                      m_kart_properties->getNitroFadeOutTime() *
                                      m_difficulty->getNitroFadeOutTime());
+    }
+    else
+    {
+        if(m_nitro_sound->getStatus()==SFXBase::SFX_PLAYING)
+            m_nitro_sound->stop();
     }
 }   // updateNitro
 
@@ -2475,7 +2492,7 @@ void Kart::kartIsInRestNow()
  *  physics-only simulation steps so that karts come to a rest). Then at
  *  race time, only the difference between the current suspension length and
  *  this default suspension length is used. The graphical kart chassis will be
- *  offset so that when the kart is in rest, i.e. suspension length == 
+ *  offset so that when the kart is in rest, i.e. suspension length ==
  *  default suspension length, the kart will look the way it was modelled in
  *  blender. To explain the various offsets used, here a view from the side
  *  focusing on the Y axis only (X/Z position of the graphical chassis is
@@ -2533,7 +2550,7 @@ void Kart::kartIsInRestNow()
  *  and so not easily visible), so if the suspension is compressed by more than
  *  that, the chassiswill appear to be in the ground. Testing on the sand track
  *  shows that the suspension is compressed by 0.12 (and up to 0.16 in some
- *  extreme points), which means that the chassis will appear to be in the 
+ *  extreme points), which means that the chassis will appear to be in the
  *  ground quite easily. Therefore the chassis is actually moved up a bit to
  *  avoid this problem. Historically (due to never sorting out that formula
  *  properly) the chassis was moved twice as high as its lowest point, e.g.
@@ -2543,7 +2560,7 @@ void Kart::kartIsInRestNow()
  *  same amount higher.
  *
  *  Of course this means that the Y position of the wheels (relative to the
- *  visual kart chassis) needs to be adjusted: if the kart is in rest, the 
+ *  visual kart chassis) needs to be adjusted: if the kart is in rest, the
  *  wheels are exactly on the ground. If the suspension is shorter, that wheel
  *  would appear to be partly in the ground, and if the suspension is longer,
  *  the wheel would not touch the ground.
@@ -2551,7 +2568,7 @@ void Kart::kartIsInRestNow()
  *  The wheels must be offset by how much the current suspension length is
  *  longer or shorter than the default (i.e. at rest) suspension length.
  *  This is done in KartModel (pos is the position of the wheel relative
- *  to the visual kart chassis): 
+ *  to the visual kart chassis):
  *          pos.Y += m_default_physics_suspension[i]
  *                  - wi.m_raycastInfo.m_suspensionLength
  *  But since the chassis is raised an additional 'getLowestPoint' (see
@@ -2667,7 +2684,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     if (m_shadow)
     {
         const bool emergency = getKartAnimation() != NULL;
-        m_shadow->update(isOnGround() && !emergency, 
+        m_shadow->update(isOnGround() && !emergency,
             m_terrain_info->getHoT() - getXYZ().getY()
             - m_skidding->getGraphicalJumpOffset()
             - m_graphical_y_offset
@@ -2725,7 +2742,7 @@ void Kart::setOnScreenText(const wchar_t *text)
 
     if (CVS->isGLSL())
     {
-        gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont() 
+        gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont()
                                                        : GUIEngine::getTitleFont();
         new STKTextBillboard(text, font,
             video::SColor(255, 255, 225, 0),
