@@ -100,7 +100,7 @@ public:
         return m_init_xyz;
     }   // getAbsolutePosition
     // ------------------------------------------------------------------------
-    virtual const core::vector3df& getAbsoluteCenterPosition() const
+    virtual const core::vector3df getAbsoluteCenterPosition() const
     {
         return m_init_xyz;
     }
@@ -146,7 +146,7 @@ public:
     // ------------------------------------------------------------------------
     virtual const core::vector3df& getPosition() const OVERRIDE;
     virtual const core::vector3df  getAbsolutePosition() const OVERRIDE;
-    virtual const core::vector3df& getAbsoluteCenterPosition() const OVERRIDE;
+    virtual const core::vector3df getAbsoluteCenterPosition() const OVERRIDE;
     virtual const core::vector3df& getRotation() const OVERRIDE;
     virtual const core::vector3df& getScale() const OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,

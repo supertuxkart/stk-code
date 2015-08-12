@@ -90,7 +90,7 @@ const core::vector3df TrackObjectPresentationSceneNode::getAbsolutePosition() co
 
 // ----------------------------------------------------------------------------
 
-const core::vector3df& TrackObjectPresentationSceneNode::getAbsoluteCenterPosition() const
+const core::vector3df TrackObjectPresentationSceneNode::getAbsoluteCenterPosition() const
 {
     if (m_node == NULL) return m_init_xyz;
     m_node->updateAbsolutePosition();
