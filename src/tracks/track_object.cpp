@@ -544,7 +544,7 @@ const core::vector3df& TrackObject::getScale() const
     if (m_presentation != NULL)
         return m_presentation->getScale();
     else
-        return m_init_xyz;
+        return m_init_scale;
 }   // getScale
 
 // ----------------------------------------------------------------------------
