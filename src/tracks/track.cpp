@@ -71,6 +71,7 @@
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
+#include <SMeshBuffer.h>
 
 #include <iostream>
 #include <stdexcept>
@@ -293,6 +294,11 @@ void Track::cleanup()
         irr_driver->removeNode(m_all_nodes[i]);
     }
     m_all_nodes.clear();
+
+    for (unsigned int i = 0; i < m_static_physics_only_nodes.size(); i++)
+    {
+        m_static_physics_only_nodes[i]->remove();
+    }
     m_static_physics_only_nodes.clear();
 
     m_all_emitters.clearAndDeleteAll();
@@ -736,9 +742,32 @@ void Track::createPhysicsModel(unsigned int main_track_count)
     for (unsigned int i = 0; i<m_static_physics_only_nodes.size(); i++)
     {
         convertTrackToBullet(m_static_physics_only_nodes[i]);
-        irr_driver->removeNode(m_static_physics_only_nodes[i]);
+        if (UserConfigParams::m_physics_debug &&
+            m_static_physics_only_nodes[i]->getType() == scene::ESNT_MESH)
+        {
+            const video::SColor color(255, 255, 105, 180);
+
+            scene::IMesh *mesh = ((scene::IMeshSceneNode*)m_static_physics_only_nodes[i])->getMesh();
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(0);
+            mb->getMaterial().BackfaceCulling = false;
+            video::S3DVertex * const verts = (video::S3DVertex *) mb->getVertices();
+            const u32 max = mb->getVertexCount();
+            for (i = 0; i < max; i++)
+            {
+                verts[i].Color = color;
+            }
+
+            // Color
+            mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 105, 180)));
+            irr_driver->grabAllTextures(mesh);
+            // Gloss
+            mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        }
+        else
+            irr_driver->removeNode(m_static_physics_only_nodes[i]);
     }
-    m_static_physics_only_nodes.clear();
+    if (!UserConfigParams::m_physics_debug)
+        m_static_physics_only_nodes.clear();
 
     for (unsigned int i = 0; i<m_object_physics_only_nodes.size(); i++)
     {
@@ -834,7 +863,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
     {
-        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);    
         // FIXME: take translation/rotation into account
         if (mb->getVertexType() != video::EVT_STANDARD &&
             mb->getVertexType() != video::EVT_2TCOORDS &&
