@@ -326,8 +326,8 @@ void PlayerController::update(float dt)
     // if automatic reverse camera is active
     if (m_camera->getMode() != Camera::CM_FINAL)
     {
-        if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold>0 &&
-            m_kart->getSpeed()<-UserConfigParams::m_reverse_look_threshold))
+        if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold > 0 &&
+            m_kart->getSpeed() < -UserConfigParams::m_reverse_look_threshold))
         {
             m_camera->setMode(Camera::CM_REVERSE);
         }
