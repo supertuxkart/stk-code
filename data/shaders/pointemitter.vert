@@ -1,4 +1,5 @@
 uniform int dt;
+uniform mat4 previous_frame_sourcematrix;
 uniform mat4 sourcematrix;
 uniform int level;
 uniform float size_increase_factor;
@@ -32,31 +33,44 @@ out float new_size;
 
 void main(void)
 {
-  float updated_lifetime = lifetime  + (float(dt)/lifetime_initial);
-  if (updated_lifetime > 1.)
-  {
-    if (gl_VertexID < level)
+    float updated_lifetime = lifetime  + (float(dt)/lifetime_initial);
+    if (updated_lifetime > 1.)
     {
-      float dt_from_last_frame = fract(updated_lifetime) * lifetime_initial;
-      vec4 updated_initialposition = sourcematrix * vec4(particle_position_initial, 1.0);
-      vec4 updated_initial_velocity = sourcematrix * vec4(particle_position_initial + particle_velocity_initial, 1.0) - updated_initialposition;
-      new_particle_position = updated_initialposition.xyz + updated_initial_velocity.xyz * float(dt_from_last_frame);
-      new_particle_velocity = updated_initial_velocity.xyz;
-      new_lifetime = fract(updated_lifetime);
-      new_size = mix(size_initial, size_initial * size_increase_factor, fract(updated_lifetime));
+        if (gl_VertexID < level)
+        {
+            float dt_from_last_frame = fract(updated_lifetime) * lifetime_initial;
+            float coeff = 1. - dt_from_last_frame / dt;
+            
+            vec4 previous_frame_position = previous_frame_sourcematrix * vec4(particle_position_initial, 1.0);
+            vec4 current_frame_position  = sourcematrix * vec4(particle_position_initial, 1.0);
+            
+            vec4 updated_initialposition  = mix(previous_frame_position,
+                                                current_frame_position,
+                                                coeff);
+                                                
+            vec4 updated_initial_velocity = mix(previous_frame_sourcematrix * vec4(particle_velocity_initial, 0.0),
+                                                sourcematrix * vec4(particle_velocity_initial, 0.0),
+                                                coeff) ; //TODO: add emitter speed
+                                          //+ (current_frame_position - previous_frame_position) / dt;
+                                                
+            new_particle_position = updated_initialposition.xyz + dt_from_last_frame * updated_initial_velocity.xyz;
+            new_particle_velocity = updated_initial_velocity.xyz;
+            
+            new_lifetime = fract(updated_lifetime);
+            new_size = mix(size_initial, size_initial * size_increase_factor, fract(updated_lifetime));                                                                       
+        }
+        else
+        {
+            new_lifetime = fract(updated_lifetime);
+            new_size = 0;
+        }
     }
     else
     {
-        new_lifetime = fract(updated_lifetime);
-        new_size = 0;
+        new_particle_position = particle_position + particle_velocity.xyz * float(dt);
+        new_particle_velocity = particle_velocity;
+        new_lifetime = updated_lifetime;
+        new_size = (size == 0) ? 0. : mix(size_initial, size_initial * size_increase_factor, updated_lifetime);
     }
-  }
-  else
-  {
-    new_particle_position = particle_position + particle_velocity.xyz * float(dt);
-    new_particle_velocity = particle_velocity;
-    new_lifetime = updated_lifetime;
-    new_size = (size == 0) ? 0. : mix(size_initial, size_initial * size_increase_factor, updated_lifetime);
-  }
-  gl_Position = vec4(0.);
+    gl_Position = vec4(0.);
 }
