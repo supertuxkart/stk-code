@@ -53,10 +53,9 @@ namespace Scripting
         {
             InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
             DeviceConfig* config = device->getConfiguration();
-            irr::core::stringw control;
             PlayerAction ScriptAction = (PlayerAction)Enum_value;
-            control = config->getBindingAsString(ScriptAction);
-            std::string key = std::string(irr::core::stringc(control).c_str());
+            irr::core::stringw control = config->getBindingAsString(ScriptAction);
+            std::string key = StringUtils::wide_to_utf8(control.c_str());
             return key;
         }
 
