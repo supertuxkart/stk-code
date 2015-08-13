@@ -211,8 +211,6 @@ void World::init()
         m_weather = new Weather(m_track->getWeatherLightning(),
                           m_track->getWeatherSound());
     }
-
-    m_script_engine->compileLoadedScripts();
 }   // init
 
 //-----------------------------------------------------------------------------

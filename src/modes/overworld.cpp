@@ -224,10 +224,6 @@ void OverWorld::onFirePressed(Controller* who)
 
     for (unsigned int n=0; n<challenges.size(); n++)
     {
-        if ( challenges[n].isForceFieldSet() &&
-             challenges[n].getForceField().m_is_locked )
-            continue;
-
         if ( (kart_xyz - Vec3(challenges[n].m_position)).length2_2d()
               < CHALLENGE_DISTANCE_SQUARED)
         {
@@ -238,9 +234,22 @@ void OverWorld::onFirePressed(Controller* who)
             }
             else
             {
-                race_manager->setKartLastPositionOnOverworld(kart_xyz);
-                new SelectChallengeDialog(0.8f, 0.8f,
-                                          challenges[n].m_challenge_id);
+                const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
+                if (challenge == NULL)
+                {
+                    Log::error("track", "Cannot find challenge named '%s'\n",
+                        challenges[n].m_challenge_id.c_str());
+                    continue;
+                }
+
+                const unsigned int val = challenge->getNumTrophies();
+                bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+                if (unlocked)
+                {
+                    race_manager->setKartLastPositionOnOverworld(kart_xyz);
+                    new SelectChallengeDialog(0.8f, 0.8f,
+                        challenges[n].m_challenge_id);
+                }
             }
         } // end if
     } // end for

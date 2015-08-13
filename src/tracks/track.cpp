@@ -71,6 +71,7 @@
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
+#include <SMeshBuffer.h>
 
 #include <iostream>
 #include <stdexcept>
@@ -293,6 +294,11 @@ void Track::cleanup()
         irr_driver->removeNode(m_all_nodes[i]);
     }
     m_all_nodes.clear();
+
+    for (unsigned int i = 0; i < m_static_physics_only_nodes.size(); i++)
+    {
+        m_static_physics_only_nodes[i]->remove();
+    }
     m_static_physics_only_nodes.clear();
 
     m_all_emitters.clearAndDeleteAll();
@@ -736,9 +742,32 @@ void Track::createPhysicsModel(unsigned int main_track_count)
     for (unsigned int i = 0; i<m_static_physics_only_nodes.size(); i++)
     {
         convertTrackToBullet(m_static_physics_only_nodes[i]);
-        irr_driver->removeNode(m_static_physics_only_nodes[i]);
+        if (UserConfigParams::m_physics_debug &&
+            m_static_physics_only_nodes[i]->getType() == scene::ESNT_MESH)
+        {
+            const video::SColor color(255, 255, 105, 180);
+
+            scene::IMesh *mesh = ((scene::IMeshSceneNode*)m_static_physics_only_nodes[i])->getMesh();
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(0);
+            mb->getMaterial().BackfaceCulling = false;
+            video::S3DVertex * const verts = (video::S3DVertex *) mb->getVertices();
+            const u32 max = mb->getVertexCount();
+            for (i = 0; i < max; i++)
+            {
+                verts[i].Color = color;
+            }
+
+            // Color
+            mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 105, 180)));
+            irr_driver->grabAllTextures(mesh);
+            // Gloss
+            mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        }
+        else
+            irr_driver->removeNode(m_static_physics_only_nodes[i]);
     }
-    m_static_physics_only_nodes.clear();
+    if (!UserConfigParams::m_physics_debug)
+        m_static_physics_only_nodes.clear();
 
     for (unsigned int i = 0; i<m_object_physics_only_nodes.size(); i++)
     {
@@ -834,7 +863,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
     {
-        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);    
         // FIXME: take translation/rotation into account
         if (mb->getVertexType() != video::EVT_STANDARD &&
             mb->getVertexType() != video::EVT_2TCOORDS &&
@@ -988,7 +1017,6 @@ bool Track::loadMainTrack(const XMLNode &root)
     assert(m_gfx_effect_mesh==NULL);
 
     m_challenges.clear();
-    m_force_fields.clear();
 
     m_track_mesh      = new TriangleMesh();
     m_gfx_effect_mesh = new TriangleMesh();
@@ -1117,124 +1145,12 @@ bool Track::loadMainTrack(const XMLNode &root)
             continue;
         }
 
-
         core::vector3df xyz(0,0,0);
         n->get("xyz", &xyz);
         core::vector3df hpr(0,0,0);
         n->get("hpr", &hpr);
         core::vector3df scale(1.0f, 1.0f, 1.0f);
         n->get("scale", &scale);
-
-        // some static meshes are conditional
-        std::string condition;
-        n->get("if", &condition);
-
-        // TODO: convert "if" and "ifnot" to scripting.
-        if (condition == "splatting")
-        {
-            if (!irr_driver->supportsSplatting()) continue;
-        }
-        else if (condition == "trophies")
-        {
-            // Associate force fields and challenges
-            // FIXME: this assumes that challenges will appear before force fields in scene.xml
-            //        (which however seems to be the case atm)
-            int closest_challenge_id = -1;
-            float closest_distance = 99999.0f;
-            for (unsigned int c=0; c<m_challenges.size(); c++)
-            {
-
-                float dist = xyz.getDistanceFromSQ(m_challenges[c].m_position);
-                if (closest_challenge_id == -1 || dist < closest_distance)
-                {
-                    closest_challenge_id = c;
-                    closest_distance = dist;
-                }
-            }
-
-            assert(closest_challenge_id >= 0);
-            assert(closest_challenge_id < (int)m_challenges.size());
-
-            const std::string &s = m_challenges[closest_challenge_id].m_challenge_id;
-            const ChallengeData* challenge = unlock_manager->getChallengeData(s);
-            if (challenge == NULL)
-            {
-                if (s != "tutorial")
-                    Log::error("track", "Cannot find challenge named '%s'\n",
-                        m_challenges[closest_challenge_id].m_challenge_id.c_str());
-                continue;
-            }
-
-            const unsigned int val = challenge->getNumTrophies();
-            bool shown = (PlayerManager::getCurrentPlayer()->getPoints() < val);
-            m_force_fields.push_back(OverworldForceField(xyz, shown, val));
-
-            m_challenges[closest_challenge_id].setForceField(
-                                 m_force_fields[m_force_fields.size() - 1]);
-
-            core::stringw msg = StringUtils::toWString(val);
-            core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()
-                                                   ->getDimension(msg.c_str());
-
-            assert(GUIEngine::getHighresDigitFont() != NULL);
-
-            if (CVS->isGLSL())
-            {
-                gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-                STKTextBillboard* tb = new STKTextBillboard(msg.c_str(), font,
-                    video::SColor(255, 255, 225, 0),
-                    video::SColor(255, 255, 89, 0),
-                    irr_driver->getSceneManager()->getRootSceneNode(),
-                    irr_driver->getSceneManager(), -1, xyz,
-                    core::vector3df(1.5f, 1.5f, 1.5f));
-                m_all_nodes.push_back(tb);
-            }
-            else
-            {
-                scene::ISceneManager* sm = irr_driver->getSceneManager();
-                scene::ISceneNode* sn =
-                    sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
-                    msg.c_str(),
-                    NULL,
-                    core::dimension2df(textsize.Width / 35.0f,
-                    textsize.Height / 35.0f),
-                    xyz,
-                    -1, // id
-                    video::SColor(255, 255, 225, 0),
-                    video::SColor(255, 255, 89, 0));
-                m_all_nodes.push_back(sn);
-            }
-
-            if (!shown) continue;
-        }
-        else if (condition.size() > 0)
-        {
-            unsigned char result = -1;
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-            std::function<void(asIScriptContext*)> null_callback;
-            script_engine->runFunction(true, "bool " + condition + "()", null_callback,
-                [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
-            if (result == 0)
-                continue;
-        }
-
-        std::string neg_condition;
-        n->get("ifnot", &neg_condition);
-        if (neg_condition == "splatting")
-        {
-            if (irr_driver->supportsSplatting()) continue;
-        }
-        else if (neg_condition.size() > 0)
-        {
-            unsigned char result = -1;
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-            std::function<void(asIScriptContext*)> null_callback;
-            script_engine->runFunction(true, "bool " + neg_condition + "()", null_callback,
-                [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
-            if (result != 0)
-                continue;
-        }
-
 
         bool tangent = false;
         n->get("tangents", &tangent);
@@ -1253,49 +1169,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         bool lod_instance = false;
         n->get("lod_instance", &lod_instance);
 
-        /*
-        if (tangent)
-        {
-            scene::IMesh* original_mesh = irr_driver->getMesh(full_path);
-
-            if (std::find(m_detached_cached_meshes.begin(),
-                          m_detached_cached_meshes.end(),
-                          original_mesh) == m_detached_cached_meshes.end())
-            {
-                m_detached_cached_meshes.push_back(original_mesh);
-            }
-
-            // create a node out of this mesh just for bullet; delete it after, normal maps are special
-            // and require tangent meshes
-            scene_node = irr_driver->addMesh(original_mesh, "original_mesh");
-
-            scene_node->setPosition(xyz);
-            scene_node->setRotation(hpr);
-            scene_node->setScale(scale);
-
-            convertTrackToBullet(scene_node);
-            scene_node->remove();
-            irr_driver->grabAllTextures(original_mesh);
-
-            scene::IMesh* mesh = MeshTools::createMeshWithTangents(original_mesh, &MeshTools::isNormalMap);
-            mesh->grab();
-            irr_driver->grabAllTextures(mesh);
-
-            m_all_cached_meshes.push_back(mesh);
-            scene_node = irr_driver->addMesh(mesh, "original_mesh_with_tangents");
-            scene_node->setPosition(xyz);
-            scene_node->setRotation(hpr);
-            scene_node->setScale(scale);
-
-#ifdef DEBUG
-            std::string debug_name = model_name+" (tangent static track-object)";
-            scene_node->setName(debug_name.c_str());
-#endif
-
-            handleAnimatedTextures(scene_node, *n);
-            m_all_nodes.push_back( scene_node );
-        }
-        else*/
         if (lod_instance)
         {
             LODNode* node = lodLoader.instanciateAsLOD(n, NULL);
@@ -1345,6 +1218,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             handleAnimatedTextures(scene_node, *n);
 
             // for challenge orbs, a bit more work to do
+            // TODO: this is hardcoded for the overworld, convert to scripting
             if (challenge.size() > 0)
             {
                 const ChallengeData* c = NULL;
@@ -1809,6 +1683,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadObjects(root, path, model_def_loader, true, NULL, NULL);
 
     model_def_loader.cleanLibraryNodesAfterLoad();
+
+    World::getWorld()->getScriptEngine()->compileLoadedScripts();
 
     // Init all track objects
     m_track_object_manager->init();

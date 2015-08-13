@@ -94,6 +94,8 @@ protected:
 
     bool                           m_initially_visible;
 
+    std::string                     m_visibility_condition;
+
     void init(const XMLNode &xml_node, scene::ISceneNode* parent,
         ModelDefinitionLoader& model_def_loader,
         TrackObject* parent_library);
@@ -120,6 +122,7 @@ public:
     virtual void reset();
     const core::vector3df& getPosition() const;
     const core::vector3df  getAbsolutePosition() const;
+    const core::vector3df  getAbsoluteCenterPosition() const;
     const core::vector3df& getRotation() const;
     const core::vector3df& getScale() const;
     bool castRay(const btVector3 &from, 
@@ -135,7 +138,7 @@ public:
     // ------------------------------------------------------------------------
     /** To finish object constructions. Called after the track model
      *  is ready. */
-    virtual void init() {};
+    virtual void onWorldReady();
     // ------------------------------------------------------------------------
     /** Called when an explosion happens. As a default does nothing, will
      *  e.g. be overwritten by physical objects etc. */

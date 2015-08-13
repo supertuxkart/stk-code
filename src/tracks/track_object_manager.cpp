@@ -66,11 +66,9 @@ void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
  */
 void TrackObjectManager::init()
 {
-
-    TrackObject* curr;
-    for_in (curr, m_all_objects)
+    for_var_in(TrackObject*, curr, m_all_objects)
     {
-        curr->init();
+        curr->onWorldReady();
     }
 }   // reset
 // ----------------------------------------------------------------------------

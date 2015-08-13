@@ -291,6 +291,7 @@ void GrandPrixEditorScreen::onNewGPWithName(const stringw& newName)
     {
         m_selection->setName(newName);
         m_selection->writeToFile();
+        setSelection(grand_prix_manager->getGrandPrix(m_selection->getId()));
     }
     else if (m_action == "new")
     {
