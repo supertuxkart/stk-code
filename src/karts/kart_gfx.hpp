@@ -99,7 +99,7 @@ public:
     void setCreationRateRelative(const KartGFXType type, float f);
     void updateTerrain(const ParticleKind *pk);
     void update(float dt);
-    void updateNitroGraphics(float f, float new_size);
+    void updateNitroGraphics(float f);
     void updateSkidLight(unsigned int level);
 
 };   // KartWGFX

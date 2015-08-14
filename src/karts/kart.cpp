@@ -2582,9 +2582,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         // the normal maximum speed of the kart.
         if(nitro_frac>1.0f) nitro_frac = 1.0f;
     }
-    // speed * dt is the new size of the box in which particles start
-    m_kart_gfx->updateNitroGraphics(nitro_frac, getSpeed()*dt);
-
+    m_kart_gfx->updateNitroGraphics(nitro_frac);
+    
     // Handle leaning of karts
     // -----------------------
     // Note that we compare with maximum speed of the kart, not
