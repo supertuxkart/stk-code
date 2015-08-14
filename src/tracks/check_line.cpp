@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/glwrap.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
@@ -77,6 +78,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         scene::IMesh *mesh = irr_driver->createQuadMesh(&material,
                                                         /*create mesh*/true);
         scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
+
         assert(buffer->getVertexType()==video::EVT_STANDARD);
         irr::video::S3DVertex* vertices
             = (video::S3DVertex*)buffer->getVertices();
@@ -95,11 +97,14 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         for(unsigned int i=0; i<4; i++)
         {
             vertices[i].Color = m_active_at_reset
-                              ? video::SColor(0, 255, 0, 0)
-                              : video::SColor(0, 128, 128, 128);
+                              ? video::SColor(128, 255, 0, 0)
+                              : video::SColor(128, 128, 128, 128);
         }
         buffer->recalculateBoundingBox();
-        mesh->setBoundingBox(buffer->getBoundingBox());
+        buffer->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().BackfaceCulling = false;
+        //mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_node = irr_driver->addMesh(mesh, "checkdebug");
         mesh->drop();
     }
@@ -137,11 +142,14 @@ void CheckLine::changeDebugColor(bool is_active)
     scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
     irr::video::S3DVertex* vertices
                                = (video::S3DVertex*)buffer->getVertices();
+    video::SColor color = is_active ? video::SColor(192, 255, 0, 0)
+                                    : video::SColor(192, 128, 128, 128);
     for(unsigned int i=0; i<4; i++)
     {
-        vertices[i].Color = is_active ? video::SColor(0, 255, 0, 0)
-                                      : video::SColor(0, 128, 128, 128);
+        vertices[i].Color = color;
     }
+    buffer->getMaterial().setTexture(0, getUnicolorTexture(color));
+
 }   // changeDebugColor
 
 // ----------------------------------------------------------------------------
