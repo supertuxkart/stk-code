@@ -40,7 +40,7 @@ class GetPublicAddress : public Protocol
         std::string parseStunResponse();
 
         // Constants
-        static constexpr uint8_t m_stun_magic_cookie[4] = {0x21, 0x12, 0xA4, 0x42};
+        static const uint8_t m_stun_magic_cookie[4];
         static const int m_stun_server_port = 3478;
 
         enum STATE

@@ -43,7 +43,7 @@
 #endif
 #include <sys/types.h>
 
-constexpr uint8_t GetPublicAddress::m_stun_magic_cookie[4]; // make the linker happy
+const uint8_t GetPublicAddress::m_stun_magic_cookie[4] = {0x21, 0x12, 0xA4, 0x42}; // make the linker happy
 
 /** Creates a STUN request and sends it to a random STUN server selected from
  *  the list stored in the config file. See https://tools.ietf.org/html/rfc5389#section-6
