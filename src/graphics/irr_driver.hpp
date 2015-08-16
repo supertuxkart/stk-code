@@ -36,8 +36,10 @@
 #include <SColor.h>
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
-#include "graphics/wind.hpp"
 #include "graphics/gl_headers.hpp"
+#include "graphics/skybox.hpp"
+#include "graphics/sphericalHarmonics.hpp"
+#include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
@@ -214,14 +216,9 @@ private:
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
-    std::vector<video::ITexture *> SkyboxTextures;
-    std::vector<video::ITexture *> SphericalHarmonicsTextures;
-    bool m_skybox_ready;
+    Skybox *m_skybox;
+    SphericalHarmonics *m_spherical_harmonics;
 
-public:
-    float blueSHCoeff[9];
-    float greenSHCoeff[9];
-    float redSHCoeff[9];
 private:
 
     /** Keep a trace of the origin file name of a texture. */
@@ -238,8 +235,6 @@ private:
     ShadowMatrices *m_shadow_matrices;
 
 public:
-    GLuint SkyboxCubeMap;
-    GLuint SkyboxSpecularProbe;
     /** A simple class to store video resolutions. */
     class VideoMode
     {
@@ -348,8 +343,6 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void prepareSkybox();
-    void generateDiffuseCoefficients();
     void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;
@@ -407,7 +400,7 @@ public:
                                      int vert_res, float texture_percent,
                                      float sphere_percent);
     scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names,
-                                    const std::vector<video::ITexture*> &sphericalHarmonics);
+                                    const std::vector<video::ITexture*> &spherical_harmonics_textures);
     void suppressSkyBox();
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMeshFromCache(scene::IMesh *mesh);
@@ -530,6 +523,12 @@ public:
     inline PostProcessing* getPostProcessing()  {return m_post_processing;}
     // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
+    // -----------------------------------------------------------------------
+    /** Returns a pointer to the skybox. */
+    inline Skybox *getSkybox()  {return m_skybox;}
+    // -----------------------------------------------------------------------
+    /** Returns a pointer to spherical harmonics. */
+    inline SphericalHarmonics *getSphericalHarmonics()  {return m_spherical_harmonics;}
     // -----------------------------------------------------------------------
     const core::vector3df& getSunDirection() const { return m_sun_direction; };
     // -----------------------------------------------------------------------
@@ -765,6 +764,7 @@ public:
     void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
                                    size_t width, size_t height);
     void uploadLightingData();
+
 
     // --------------------- OLD RTT --------------------
     /**

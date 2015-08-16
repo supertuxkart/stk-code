@@ -418,9 +418,11 @@ void IrrDriver::uploadLightingData()
     Lighting[6] = m_suncolor.getBlue();
     Lighting[7] = 0.54f;
 
-    memcpy(&Lighting[8], blueSHCoeff, 9 * sizeof(float));
-    memcpy(&Lighting[17], greenSHCoeff, 9 * sizeof(float));
-    memcpy(&Lighting[26], redSHCoeff, 9 * sizeof(float));
+    if(m_spherical_harmonics) {
+        memcpy(&Lighting[8], m_spherical_harmonics->getBlueSHCoeff(), 9 * sizeof(float));
+        memcpy(&Lighting[17], m_spherical_harmonics->getGreenSHCoeff(), 9 * sizeof(float));
+        memcpy(&Lighting[26], m_spherical_harmonics->getRedSHCoeff(), 9 * sizeof(float));
+    }
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getLightingDataUBO());
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 36 * sizeof(float), Lighting);
@@ -488,8 +490,14 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
-        m_post_processing->renderEnvMap(blueSHCoeff, greenSHCoeff,
-                                        redSHCoeff, SkyboxSpecularProbe);
+        if(m_skybox)
+        {
+            m_post_processing->renderEnvMap(m_skybox->getSpecularProbe());
+        }
+        else 
+        {
+            m_post_processing->renderEnvMap(0);
+        }           
     }
 
     // Render sunlight if and only if track supports shadow

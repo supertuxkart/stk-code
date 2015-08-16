@@ -26,3 +26,29 @@ TutorialWorld::TutorialWorld()
 {
     m_stop_music_when_dialog_open = false;
 }   // TutorialWorld
+
+unsigned int TutorialWorld::getRescuePositionIndex(AbstractKart *kart)
+{
+    const int start_spots_amount = getTrack()->getNumberOfStartPositions();
+    assert(start_spots_amount > 0);
+
+    float closest_distance = 999999.0f;
+    int   closest_id_found = 0;
+
+    Vec3 kart_pos = kart->getFrontXYZ();
+
+    for (int n = 0; n<start_spots_amount; n++)
+    {
+        const btTransform &s = getStartTransform(n);
+        const Vec3 &v = s.getOrigin();
+        float distance = (v - kart_pos).length2_2d();
+
+        if (n == 0 || distance < closest_distance)
+        {
+            closest_id_found = n;
+            closest_distance = distance;
+        }
+    }
+
+    return closest_id_found;
+}

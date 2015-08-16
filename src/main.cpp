@@ -1078,7 +1078,7 @@ int handleCmdLine()
 void initUserConfig()
 {
     file_manager = new FileManager();
-    user_config             = new UserConfig();     // needs file_manager
+    user_config  = new UserConfig();     // needs file_manager
     user_config->loadConfig();
     // Some parts of the file manager needs user config (paths for models
     // depend on artist debug flag). So init the rest of the file manager

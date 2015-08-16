@@ -107,7 +107,7 @@ namespace Scripting
         script.resize(len);
         int c = fread(&script[0], len, 1, f);
         fclose(f);
-        if (c == NULL)
+        if (c != 1)
         {
             Log::error("Scripting", "Failed to load script file.");
             return "";

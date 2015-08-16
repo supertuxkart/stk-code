@@ -2081,11 +2081,13 @@ void CIrrDeviceLinux::pollJoysticks()
 	for (u32 j= 0; j< ActiveJoysticks.size(); ++j)
 	{
 		JoystickInfo & info =  ActiveJoysticks[j];
+		bool event_received = false;
 
 #ifdef __FreeBSD__
 		struct joystick js;
 		if (read(info.fd, &js, sizeof(js)) == sizeof(js))
 		{
+			event_received = true;
 			info.persistentData.JoystickEvent.ButtonStates = js.b1 | (js.b2 << 1); /* should be a two-bit field */
 			info.persistentData.JoystickEvent.Axis[0] = js.x; /* X axis */
 			info.persistentData.JoystickEvent.Axis[1] = js.y; /* Y axis */
@@ -2098,14 +2100,23 @@ void CIrrDeviceLinux::pollJoysticks()
 			{
 			case JS_EVENT_BUTTON:
 				if (event.value)
-						info.persistentData.JoystickEvent.ButtonStates |= (1 << event.number);
+				{
+					event_received = true;
+					info.persistentData.JoystickEvent.ButtonStates |= (1 << event.number);
+				}
 				else
-						info.persistentData.JoystickEvent.ButtonStates &= ~(1 << event.number);
+				{
+					event_received = true;
+					info.persistentData.JoystickEvent.ButtonStates &= ~(1 << event.number);
+				}
 				break;
 
 			case JS_EVENT_AXIS:
 				if (event.number < SEvent::SJoystickEvent::NUMBER_OF_AXES)
+				{
+					event_received = true;
 					info.persistentData.JoystickEvent.Axis[event.number] = event.value;
+				}
 				break;
 
 			default:
@@ -2116,6 +2127,13 @@ void CIrrDeviceLinux::pollJoysticks()
 
 		// Send an irrlicht joystick event once per ::run() even if no new data were received.
 		(void)postEventFromUser(info.persistentData);
+		
+#ifdef _IRR_COMPILE_WITH_X11_
+		if (event_received)
+		{
+			XResetScreenSaver(display);
+		}
+#endif
 	}
 #endif // _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 }

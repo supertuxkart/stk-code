@@ -332,25 +332,32 @@ public:
     }   // render
 };   // BloomShader
 
+static video::ITexture *lensDustTex = 0;
+
 // ============================================================================
-class BloomBlendShader : public TextureShader<BloomBlendShader, 3>
+class BloomBlendShader : public TextureShader<BloomBlendShader, 4>
 {
 public:
     BloomBlendShader()
     {
+		if (!lensDustTex)
+			lensDustTex = irr_driver->getTexture(FileManager::TEXTURE, "gfx_lensDust_a.png");
+
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "bloomblend.frag");
         assignUniforms();
         assignSamplerNames(0, "tex_128", ST_BILINEAR_FILTERED,
                            1, "tex_256", ST_BILINEAR_FILTERED,
-                           2, "tex_512", ST_BILINEAR_FILTERED);
+                           2, "tex_512", ST_BILINEAR_FILTERED,
+						   3, "tex_dust", ST_BILINEAR_FILTERED);
     }   // BloomBlendShader
     // ------------------------------------------------------------------------
     void render()
     {
         setTextureUnits(irr_driver->getRenderTargetTexture(RTT_BLOOM_128),
                         irr_driver->getRenderTargetTexture(RTT_BLOOM_256),
-                        irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
+                        irr_driver->getRenderTargetTexture(RTT_BLOOM_512),
+						getTextureGLuint(lensDustTex));
         drawFullScreenEffect();
     }   // render
 };   // BloomBlendShader
@@ -987,8 +994,7 @@ static void renderBloom(GLuint in)
 }   // renderBloom
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderEnvMap(const float *bSHCoeff, const float *gSHCoeff,
-                                  const float *rSHCoeff, GLuint skybox)
+void PostProcessing::renderEnvMap(GLuint skybox)
 {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);

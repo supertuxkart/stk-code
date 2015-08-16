@@ -69,30 +69,10 @@ namespace Scripting
 
 const int HEIGHT_MAP_RESOLUTION = 256;
 
-struct OverworldForceField
-{
-    core::vector3df m_position;
-    bool m_is_locked;
-    int m_required_points;
-
-    OverworldForceField()
-    {
-    }
-
-    OverworldForceField(core::vector3df position, bool is_locked, int required_points)
-    {
-        m_position = position;
-        m_is_locked = is_locked;
-        m_required_points = required_points;
-    }
-};
+// TODO: eventually remove this and fully replace with scripting
 struct OverworldChallenge
 {
-private:
-    OverworldForceField m_force_field;
-    bool m_force_field_set;
 public:
-
     core::vector3df m_position;
     std::string m_challenge_id;
 
@@ -100,27 +80,6 @@ public:
     {
         m_position = position;
         m_challenge_id = challenge_id;
-        m_force_field_set = false;
-    }
-
-    void setForceField(OverworldForceField f)
-    {
-        m_force_field = f;
-        m_force_field_set = true;
-    }
-
-    OverworldForceField& getForceField()
-    {
-        assert(m_force_field_set);
-        return m_force_field;
-    }
-
-    bool isForceFieldSet() const { return m_force_field_set; }
-
-    const OverworldForceField& getForceField() const
-    {
-        assert(m_force_field_set);
-        return m_force_field;
     }
 };
 
@@ -159,8 +118,6 @@ private:
 
     /** Will only be used on overworld */
     std::vector<OverworldChallenge> m_challenges;
-
-    std::vector<OverworldForceField> m_force_fields;
 
     std::vector<Subtitle> m_subtitles;
 
@@ -523,7 +480,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the start coordinates for a kart with a given index.
      *  \param index Index of kart ranging from 0 to kart_num-1. */
-    btTransform        getStartTransform (unsigned int index) const
+    const btTransform& getStartTransform (unsigned int index) const
     {
         if (index >= m_start_transforms.size())
             Log::fatal("Track", "No start position for kart %i.", index);

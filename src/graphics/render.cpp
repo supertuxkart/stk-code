@@ -186,15 +186,9 @@ void IrrDriver::renderGLSL(float dt)
 
         const core::recti &viewport = camera->getViewport();
 
-        if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && !SphericalHarmonicsTextures.empty())
+        if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && m_spherical_harmonics->has6Textures())
             irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
-        // TODO: put this outside of the rendering loop
-        if (!m_skybox_ready)
-        {
-            prepareSkybox();
-            m_skybox_ready = true;
-        }
         if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);
 
@@ -622,6 +616,17 @@ void IrrDriver::renderFixed(float dt)
 
     m_video_driver->endScene();
 }
+
+
+
+// ----------------------------------------------------------------------------
+void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
+{
+    if(m_skybox)
+    {
+        m_skybox->render(camera);
+    }
+}   // renderSkybox
 
 // ----------------------------------------------------------------------------
 

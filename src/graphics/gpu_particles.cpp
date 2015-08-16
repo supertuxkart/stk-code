@@ -37,7 +37,7 @@
 /** Transform feedback shader that simulates the particles on GPU.
 */
 class PointEmitterShader : public Shader
-                           < PointEmitterShader, core::matrix4, int, int, float >
+                           < PointEmitterShader, core::matrix4, core::matrix4, int, int, float >
 {
 public:
     PointEmitterShader()
@@ -45,7 +45,8 @@ public:
         const char *varyings[] = { "new_particle_position", "new_lifetime",
                                    "new_particle_velocity",  "new_size"     };
         loadTFBProgram("pointemitter.vert", varyings, 4);
-        assignUniforms("sourcematrix", "dt", "level", "size_increase_factor");
+        assignUniforms("previous_frame_sourcematrix", "sourcematrix",
+                       "dt", "level", "size_increase_factor");
     }   // PointEmitterShader
 
 };   // PointEmitterShader
@@ -262,7 +263,7 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
         ParticleParams[i].PositionZ = 0;
         // Initial lifetime is >1
         InitialValues[i].Lifetime = 2.;
-
+        
         memcpy(&(InitialValues[i].PositionX), &(ParticleParams[i].PositionX), 3 * sizeof(float));
 
         generateLifetimeSizeDirection(emitter, ParticleParams[i].Lifetime, ParticleParams[i].Size,
@@ -466,11 +467,11 @@ void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initia
 }
 
 void ParticleSystemProxy::simulate()
-{
+{    
     int timediff = int(GUIEngine::getLatestDt() * 1000.f);
     int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
     core::matrix4 matrix = getAbsoluteTransformation();
-
+    
     glEnable(GL_RASTERIZER_DISCARD);
     if (has_height_map)
     {
@@ -482,9 +483,10 @@ void ParticleSystemProxy::simulate()
     else
     {
         PointEmitterShader::getInstance()->use();
-        PointEmitterShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor);
+        PointEmitterShader::getInstance()->setUniforms(m_previous_frame_matrix, matrix, timediff, active_count, size_increase_factor);
     }
-
+    m_previous_frame_matrix = matrix;
+    
     glBindVertexArray(current_simulation_vao);
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
@@ -617,8 +619,14 @@ void ParticleSystemProxy::render() {
         return;
     }
     if (m_first_execution)
+    {
         generateVAOs();
-    m_first_execution = false;
-    simulate();
-    draw();
+        m_previous_frame_matrix = getAbsoluteTransformation();
+        m_first_execution = false;
+    }
+    else
+    {
+        simulate();
+        draw();
+    }
 }

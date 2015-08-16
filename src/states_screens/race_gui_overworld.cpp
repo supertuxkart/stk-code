@@ -400,9 +400,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         Vec3 draw_at;
         track->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
 
-        //const ChallengeData* c = unlock_manager->getChallenge(challenges[n].m_challenge_id);
-       // bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
-        int state = (challenges[n].getForceField().m_is_locked ? LOCKED : OPEN);
+        const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
+        const unsigned int val = challenge->getNumTrophies();
+        bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+        int state = (unlocked ? OPEN : LOCKED);
 
         const ChallengeStatus* c = PlayerManager::getCurrentPlayer()
                                   ->getChallengeStatus(challenges[n].m_challenge_id);
@@ -442,8 +443,14 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     m_close_to_a_challenge = false;
     for (unsigned int n=0; n<challenges.size(); n++)
     {
-        if (challenges[n].m_challenge_id != "tutorial" &&
-            challenges[n].getForceField().m_is_locked) continue;
+        if (challenges[n].m_challenge_id != "tutorial")
+        {
+            const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
+            const unsigned int val = challenge->getNumTrophies();
+            bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+            if (!unlocked)
+                continue;
+        }
 
         if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED &&
             fabsf(kart_xyz[1] - challenges[n].m_position.Y) < CHALLENGE_HEIGHT)

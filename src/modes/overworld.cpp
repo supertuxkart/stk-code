@@ -160,6 +160,37 @@ void OverWorld::update(float dt)
     }
 }   // update
 
+// ----------------------------------------------------------------------------
+/** Finds the starting position which is closest to the kart.
+ *  \param kart The kart for which a rescue position needs to be determined.
+ */
+unsigned int OverWorld::getRescuePositionIndex(AbstractKart *kart)
+{
+    // find closest point to drop kart on
+    const int start_spots_amount = getNumberOfRescuePositions();
+    assert(start_spots_amount > 0);
+
+    int closest_id = -1;
+    float closest_distance = 999999999.0f;
+
+    for (int n=0; n<start_spots_amount; n++)
+    {
+        const btTransform &s = getStartTransform(n);
+        const Vec3 &v = s.getOrigin();
+
+        float abs_distance = (v - kart->getXYZ()).length();
+
+        if (abs_distance < closest_distance)
+        {
+            closest_distance = abs_distance;
+            closest_id = n;
+        }
+    }
+
+    assert(closest_id != -1);
+    return closest_id;
+}   // getRescuePositionIndex
+
 //-----------------------------------------------------------------------------
 /** This function is not used in the overworld race gui.
  */
@@ -193,10 +224,6 @@ void OverWorld::onFirePressed(Controller* who)
 
     for (unsigned int n=0; n<challenges.size(); n++)
     {
-        if ( challenges[n].isForceFieldSet() &&
-             challenges[n].getForceField().m_is_locked )
-            continue;
-
         if ( (kart_xyz - Vec3(challenges[n].m_position)).length2_2d()
               < CHALLENGE_DISTANCE_SQUARED)
         {
@@ -207,9 +234,22 @@ void OverWorld::onFirePressed(Controller* who)
             }
             else
             {
-                race_manager->setKartLastPositionOnOverworld(kart_xyz);
-                new SelectChallengeDialog(0.8f, 0.8f,
-                                          challenges[n].m_challenge_id);
+                const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
+                if (challenge == NULL)
+                {
+                    Log::error("track", "Cannot find challenge named '%s'\n",
+                        challenges[n].m_challenge_id.c_str());
+                    continue;
+                }
+
+                const unsigned int val = challenge->getNumTrophies();
+                bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+                if (unlocked)
+                {
+                    race_manager->setKartLastPositionOnOverworld(kart_xyz);
+                    new SelectChallengeDialog(0.8f, 0.8f,
+                        challenges[n].m_challenge_id);
+                }
             }
         } // end if
     } // end for

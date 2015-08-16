@@ -978,7 +978,8 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
     else
     {
         SFXBase *base_sound = sound->second;
-        base_sound->play();
+        if (base_sound->getStatus() != SFXBase::SFX_PLAYING)
+            base_sound->play();
         return base_sound;
     }
 

@@ -182,6 +182,8 @@ void History::Save()
     fprintf(fd, "numkarts: %d\n",   num_karts);
     fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
+    fprintf(fd, "reverse: %c\n", race_manager->getReverseTrack() ? 'y' : 'n');
+
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
 
     assert(num_karts > 0);
@@ -269,7 +271,17 @@ void History::Load()
         Log::fatal("History", "No difficulty found in history file.");
     race_manager->setDifficulty((RaceManager::Difficulty)n);
 
+
+    // Optional (not supported in older history files): include reverse
     fgets(s, 1023, fd);
+    char r;
+    if (!sscanf(s, "reverse: %c", &r) != 1)
+    {
+        fgets(s, 1023, fd);
+        race_manager->setReverseTrack(r == 'y');
+    }
+
+
     if(sscanf(s, "track: %1023s",s1)!=1)
         Log::warn("History", "Track not found in history file.");
     race_manager->setTrack(s1);

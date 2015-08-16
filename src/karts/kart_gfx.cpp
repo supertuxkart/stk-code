@@ -350,11 +350,10 @@ void KartGFX::update(float dt)
 }  // update
 
 // ----------------------------------------------------------------------------
-/** Updates nitro dependent particle effects (and box sizes).
+/** Updates nitro dependent particle effects.
  *  \param nitro_frac Nitro fraction/
- *  \param new_size New size of the box in which new particles are emitted.
  */
-void KartGFX::updateNitroGraphics(float nitro_frac, float new_size)
+void KartGFX::updateNitroGraphics(float nitro_frac)
 {
     // Upate particle effects (creation rate, and emitter size
     // depending on speed)
@@ -375,11 +374,6 @@ void KartGFX::updateNitroGraphics(float nitro_frac, float new_size)
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
         m_nitro_light->setVisible(false);
     }
-    resizeBox(KartGFX::KGFX_NITRO1,      new_size);
-    resizeBox(KartGFX::KGFX_NITRO2,      new_size);
-    resizeBox(KartGFX::KGFX_NITROSMOKE1, new_size);
-    resizeBox(KartGFX::KGFX_NITROSMOKE2, new_size);
-    resizeBox(KartGFX::KGFX_ZIPPER,      new_size);
 
 }  // updateGraphics
 

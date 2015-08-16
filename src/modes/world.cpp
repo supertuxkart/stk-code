@@ -209,8 +209,6 @@ void World::init()
         m_weather = new Weather(m_track->getWeatherLightning(),
                           m_track->getWeatherSound());
     }
-
-    m_script_engine->compileLoadedScripts();
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -303,9 +301,9 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
                                 PerPlayerDifficulty difficulty)
 {
     int position           = index+1;
-    btTransform init_pos   = m_track->getStartTransform(index);
+    btTransform init_pos   = getStartTransform(index);
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-            difficulty);
+                                      difficulty);
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)
@@ -334,6 +332,14 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
 
     return new_kart;
 }   // createKart
+
+//-----------------------------------------------------------------------------
+/** Returns the start coordinates for a kart with a given index.
+ *  \param index Index of kart ranging from 0 to kart_num-1. */
+const btTransform &World::getStartTransform(int index)
+{
+    return m_track->getStartTransform(index);
+}   // getStartTransform
 
 //-----------------------------------------------------------------------------
 /** Creates an AI controller for the kart.

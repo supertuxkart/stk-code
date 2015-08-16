@@ -53,6 +53,7 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
  */
 void FollowTheLeaderRace::init()
 {
+    m_last_eliminated_time = 0;
     LinearWorld::init();
     // WorldWithRank determines the score based on getNumKarts(), but since
     // we ignore the leader, the points need to be based on number of karts -1
@@ -101,10 +102,22 @@ int FollowTheLeaderRace::getScoreForPosition(int p)
 }   // getScoreForPosition
 
 //-----------------------------------------------------------------------------
+const btTransform &FollowTheLeaderRace::getStartTransform(int index)
+{
+    if (index == 0)   // Leader start position
+        return m_track->getStartTransform(index);
+
+    // Otherwise the karts will start at the rear starting positions
+    int start_index = stk_config->m_max_karts
+                    - race_manager->getNumberOfKarts() + index;
+    return m_track->getStartTransform(start_index);
+}   // getStartTransform
+
+//-----------------------------------------------------------------------------
 /** Returns the original time at which the countdown timer started. This is
  *  used by the race_gui to display the music credits in FTL mode correctly.
  */
-float FollowTheLeaderRace::getClockStartTime()
+float FollowTheLeaderRace::getClockStartTime() const
 {
     return m_leader_intervals[0];
 }   // getClockStartTime
@@ -114,6 +127,7 @@ float FollowTheLeaderRace::getClockStartTime()
  */
 void FollowTheLeaderRace::countdownReachedZero()
 {
+    m_last_eliminated_time += m_leader_intervals[0];
     if(m_leader_intervals.size()>1)
         m_leader_intervals.erase(m_leader_intervals.begin());
     WorldStatus::setTime(m_leader_intervals[0]);
@@ -162,7 +176,7 @@ void FollowTheLeaderRace::countdownReachedZero()
             updateRacePosition();
         }
         // Time doesn't make any sense in FTL (and it is not displayed)
-        kart->finishedRace(-1.0f);
+        kart->finishedRace(m_last_eliminated_time);
 
         // Move any camera for this kart to the leader, facing backwards,
         // so that the eliminated player has something to watch.
@@ -229,34 +243,31 @@ void FollowTheLeaderRace::terminateRace()
     // position 1, the leader now position 2, but the point distribution
     // depends on the 'first' (non-leader) kart to be on position 2.
     // That situation can also occur during the delay after eliminating
-    // the last kart before the race result is shown.
-    // To avoid this problem, adjust the position of any kart that is
-    // ahead of the leader.
+    // the last kart before the race result is shown (when the leader
+    // is overtaken during that time). To avoid this problem, adjust the
+    // position of any kart that is ahead of the leader.
     beginSetKartPositions();
     for (unsigned int i = 0; i < getNumKarts(); i++)
     {
-        if (!m_karts[i]->hasFinishedRace() && !m_karts[i]->isEliminated())
+        if (!m_karts[i]->hasFinishedRace() && !m_karts[i]->isEliminated() &&
+            m_karts[i]->getPosition() < pos_leader)
         {
-            if (m_karts[i]->getPosition() < pos_leader)
-            {
-                setKartPosition(i, m_karts[i]->getPosition() + 1);
-            }
-            // Update the estimated finishing time for all karts that haven't
-            // finished yet.
-            m_karts[i]->finishedRace(0.0f);
+            setKartPosition(i, m_karts[i]->getPosition() + 1);
         }
     }   // i < number of karts
     setKartPosition(/*kart id*/0, /*position*/1);
     endSetKartPositions();
 
     // Mark all still racing karts to be finished.
-    for (unsigned int n = 0; n < m_karts.size(); n++)
+    for (int i = m_karts.size(); i>0; i--)
     {
-        if (!m_karts[n]->isEliminated() &&
-            !m_karts[n]->hasFinishedRace())
-        {
-            m_karts[n]->finishedRace(getTime());
-        }
+        AbstractKart *kart = getKartAtPosition(i);
+        if (kart->isEliminated() || kart->hasFinishedRace())
+            continue;
+        m_last_eliminated_time += m_leader_intervals[0];
+        if (m_leader_intervals.size() > 1)
+            m_leader_intervals.erase(m_leader_intervals.begin());
+        kart->finishedRace(m_last_eliminated_time);
     }
 
 

@@ -52,7 +52,7 @@
                    chassis-angular-damping="0"
                    downward-impulse-factor="5"
                    track-connection-accel="2"
-                   smooth-flying-impulse="25" />
+                   smooth-flying-impulse="250" />
 
         <!-- Turning
             radius: The turn radius of the kart at

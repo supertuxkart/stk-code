@@ -63,10 +63,6 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
 {
     World* w = World::getWorld();
     LinearWorld* lin_world = dynamic_cast<LinearWorld*>(w);
-    if (lin_world != NULL)
-    {
-        lin_world->getTrackSector(kart_index).setLastTriggeredCheckline(m_index);
-    }
 
     float track_length = w->getTrack()->getTrackLength();
     // Can happen if a non-lap based race mode is used with a scene file that
@@ -87,10 +83,7 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     m_previous_distance[kart_index] = current_distance;
 
     if (result)
-    {
-        LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
-        if (lw != NULL)
-            lw->setLastTriggeredCheckline(kart_index, m_index);
-    }
+        lin_world->setLastTriggeredCheckline(kart_index, m_index);
+
     return result;
 }   // isTriggered

@@ -89,6 +89,16 @@ const core::vector3df TrackObjectPresentationSceneNode::getAbsolutePosition() co
 }   // getAbsolutePosition
 
 // ----------------------------------------------------------------------------
+
+const core::vector3df TrackObjectPresentationSceneNode::getAbsoluteCenterPosition() const
+{
+    if (m_node == NULL) return m_init_xyz;
+    m_node->updateAbsolutePosition();
+    core::aabbox3d<f32> bounds = m_node->getTransformedBoundingBox();
+    return bounds.getCenter();
+}
+
+// ----------------------------------------------------------------------------
 const core::vector3df& TrackObjectPresentationSceneNode::getRotation() const
 {
     if (m_node == NULL) return m_init_hpr;
@@ -583,6 +593,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(
 {
     // TODO: respect 'parent' if any
 
+    m_enabled = true;
     m_sound = NULL;
     m_xyz   = m_init_xyz;
 
@@ -642,7 +653,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::update(float dt)
 {
-    if (m_sound != NULL)
+    if (m_sound != NULL && m_enabled)
     {
         // muting when too far is implemented manually since not supported by
         // OpenAL so need to call this every frame to update the muting state
@@ -654,7 +665,7 @@ void TrackObjectPresentationSound::update(float dt)
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::onTriggerItemApproached()
 {
-    if (m_sound != NULL && m_sound->getStatus() != SFXBase::SFX_PLAYING)
+    if (m_sound != NULL && m_sound->getStatus() != SFXBase::SFX_PLAYING && m_enabled)
     {
         m_sound->play();
     }
@@ -663,7 +674,7 @@ void TrackObjectPresentationSound::onTriggerItemApproached()
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::triggerSound(bool loop)
 {
-    if (m_sound != NULL)
+    if (m_sound != NULL && m_enabled)
     {
         m_sound->setLoop(loop);
         m_sound->play();
@@ -673,7 +684,8 @@ void TrackObjectPresentationSound::triggerSound(bool loop)
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::stopSound()
 {
-    if (m_sound != NULL) m_sound->stop();
+    if (m_sound != NULL) 
+        m_sound->stop();
 }   // stopSound
 
 // ----------------------------------------------------------------------------
@@ -692,8 +704,23 @@ void TrackObjectPresentationSound::move(const core::vector3df& xyz,
                                         bool isAbsoluteCoord)
 {
     m_xyz = xyz;
-    if (m_sound != NULL) m_sound->setPosition(xyz);
+    if (m_sound != NULL && m_enabled)
+        m_sound->setPosition(xyz);
 }   // move
+
+// ----------------------------------------------------------------------------
+
+void TrackObjectPresentationSound::setEnable(bool enabled)
+{
+    if (enabled != m_enabled)
+    {
+        m_enabled = enabled;
+        if (enabled)
+            triggerSound(true);
+        else
+            stopSound();
+    }
+}
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(

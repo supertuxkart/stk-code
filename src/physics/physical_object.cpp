@@ -129,7 +129,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
 
     m_object = object;
 
-    m_init_xyz   = object->getAbsolutePosition();
+    m_init_xyz = object->getAbsoluteCenterPosition();
     m_init_hpr   = object->getRotation();
     m_init_scale = object->getScale();
 
@@ -252,8 +252,14 @@ void PhysicalObject::init()
         Log::fatal("PhysicalObject", "Unknown node type");
     }
 
-    max = max * Vec3(m_init_scale);
-    min = min * Vec3(m_init_scale);
+    Vec3 parent_scale(1.0f, 1.0f, 1.0f);
+    if (m_object->getParentLibrary() != NULL)
+    {
+        parent_scale = m_object->getParentLibrary()->getScale();
+    }
+
+    max = max * (Vec3(m_init_scale) * parent_scale);
+    min = min * (Vec3(m_init_scale) * parent_scale);
 
     Vec3 extend = max-min;
     // Adjust the mesth of the graphical object so that its center is where it
@@ -461,8 +467,31 @@ void PhysicalObject::init()
     // 2. Create the rigid object
     // --------------------------
     // m_init_pos is the point on the track - add the offset
-    m_init_pos.setOrigin(m_init_pos.getOrigin() +
-                         btVector3(0,extend.getY()*0.5f, 0));
+    if (m_is_dynamic)
+    {
+        m_init_pos.setOrigin(m_init_pos.getOrigin() +
+            btVector3(0, extend.getY()*0.5f, 0));
+    }
+
+
+    // If this object has a parent, apply the parent's rotation
+    if (m_object->getParentLibrary() != NULL)
+    {
+        core::vector3df parent_rot_hpr = m_object->getParentLibrary()->getInitRotation();
+        core::matrix4 parent_rot_matrix;
+        parent_rot_matrix.setRotationDegrees(parent_rot_hpr);
+
+        btQuaternion child_rot_quat = m_init_pos.getRotation();
+        core::matrix4 child_rot_matrix;
+        Vec3 axis = child_rot_quat.getAxis();
+        child_rot_matrix.setRotationAxisRadians(child_rot_quat.getAngle(), axis.toIrrVector());
+
+        irr::core::quaternion tempQuat(parent_rot_matrix * child_rot_matrix);
+        btQuaternion q(tempQuat.X, tempQuat.Y, tempQuat.Z, tempQuat.W);
+
+        m_init_pos.setRotation(q);
+    }
+
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia(1,1,1);
     if (m_body_type != MP_EXACT)

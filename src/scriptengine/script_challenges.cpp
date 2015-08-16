@@ -19,10 +19,14 @@
 #include "script_track.hpp"
 
 #include "animations/three_d_animation.hpp"
-#include "input/device_manager.hpp"
-#include "input/input_device.hpp"
-#include "input/input_manager.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/stk_text_billboard.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "modes/world.hpp"
+#include "config/player_manager.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
@@ -30,6 +34,8 @@
 
 #include <angelscript.h>
 #include <assert.h>
+#include <ISceneManager.h>
+#include <IBillboardTextSceneNode.h>
 
 /** \cond DOXYGEN_IGNORE */
 namespace Scripting
@@ -58,6 +64,38 @@ namespace Scripting
             return track->getChallengeList().size();
         }
 
+        int getChallengeRequiredPoints(std::string* challenge_name)
+        {
+            ::Track* track = World::getWorld()->getTrack();
+            const ChallengeData* challenge = unlock_manager->getChallengeData(*challenge_name);
+            if (challenge == NULL)
+            {
+                if (*challenge_name != "tutorial")
+                    Log::error("track", "Cannot find challenge named '%s'\n",
+                    challenge_name->c_str());
+                return false;
+            }
+
+            return challenge->getNumTrophies();
+        }
+
+        bool isChallengeUnlocked(std::string* challenge_name)
+        {
+            ::Track* track = World::getWorld()->getTrack();
+            const ChallengeData* challenge = unlock_manager->getChallengeData(*challenge_name);
+            if (challenge == NULL)
+            {
+                if (*challenge_name != "tutorial")
+                    Log::error("track", "Cannot find challenge named '%s'\n",
+                    challenge_name->c_str());
+                return false;
+            }
+
+            const unsigned int val = challenge->getNumTrophies();
+            bool shown = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+            return shown;
+        }
+
         /** @}*/
         /** @}*/
 
@@ -69,6 +107,8 @@ namespace Scripting
 
             r = engine->RegisterGlobalFunction("int getCompletedChallengesCount()", asFUNCTION(getCompletedChallengesCount), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("int getChallengeCount()", asFUNCTION(getChallengeCount), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("bool isChallengeUnlocked(string &in)", asFUNCTION(isChallengeUnlocked), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getChallengeRequiredPoints(string &in)", asFUNCTION(getChallengeRequiredPoints), asCALL_CDECL); assert(r >= 0);
         }
 
     }

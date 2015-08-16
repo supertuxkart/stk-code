@@ -251,7 +251,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         }
     }
     
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 35, 35, 35));
+    irr_driver->setAmbientLight(video::SColor(255, 35, 35, 35));
     
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
     m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
