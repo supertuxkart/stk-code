@@ -385,25 +385,22 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
         std::reverse(input_lines.begin(), input_lines.end());
 
         // Fribidize and concat lines
+        core::stringw converted_string;
         for (std::vector<core::stringw>::iterator it = input_lines.begin();
              it != input_lines.end(); it++)
         {
             if (it == input_lines.begin())
-                m_converted_string = fribidizeLine(*it);
+                converted_string = fribidizeLine(*it);
             else
             {
-                m_converted_string += "\n";
-                m_converted_string += fribidizeLine(*it);
+                converted_string += "\n";
+                converted_string += fribidizeLine(*it);
             }
         }
-
-        wchar_t *converted_string = fromFribidiChar(fribidiOutput);
-        delete[] fribidiOutput;
 
         // Save it in the map
         m_fribidized_strings.insert(std::pair<const irr::core::stringw, const irr::core::stringw>(
             in_ptr, converted_string));
-        freeFribidiChar(converted_string);
         found = m_fribidized_strings.find(in_ptr);
 
         return found->second.c_str();
@@ -473,7 +470,7 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     if (original_t == original)
     {
         static irr::core::stringw converted_string;
-        converted_string = utf8_to_wide(original);
+        converted_string = StringUtils::utf8_to_wide(original);
 
 #if TRANSLATE_VERBOSE
         std::wcout << L"  translation : " << converted_string << std::endl;
