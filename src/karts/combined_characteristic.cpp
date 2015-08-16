@@ -36,8 +36,7 @@ const SkiddingProperties* CombinedCharacteristic::getSkiddingProperties() const
 
 void CombinedCharacteristic::process(CharacteristicType type, Value value, bool *is_set) const
 {
-    for (std::vector<const AbstractCharacteristic*>::const_iterator it = m_childs.cbegin();
-         it != m_childs.cend(); it++)
-        (*it)->process(type, value, is_set);
+    for (const AbstractCharacteristic *characteristic : m_childs)
+        characteristic->process(type, value, is_set);
 }
 

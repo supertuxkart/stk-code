@@ -17,21 +17,20 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-# This script creates the output for the AbstractCharacteristics
+# This script creates code for the characteristics.
 # It takes an argument that specifies what the output of the script should be.
 # The output options can be seen by running this script without arguments.
 
 import sys
 
 # Input data
-#FIXME is wheelPosition needed?
-characteristics = """Suspension: stiffness, rest, travelCm, expSpringResponse(bool), maxForce
+characteristics = """Suspension: stiffness, rest, travel, expSpringResponse(bool), maxForce
 Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, smoothFlyingImpulse
 Turn: radius(InterpolationArray), timeResetSteer, timeFullSteer(InterpolationArray)
 Engine: power, maxSpeed, brakeFactor, brakeTimeIncrease, maxSpeedReverseRatio
 Gear: switchRatio(std::vector<float>/floatVector), powerIncrease(std::vector<float>/floatVector)
 Mass
-Wheels: dampingRelaxation, dampingCompression, radius, position(std::vector<float>/floatVector)
+Wheels: dampingRelaxation, dampingCompression, position(std::vector<float>/floatVector)
 Camera: distance, forwardUpAngle, backwardUpAngle
 Jump: animationTime
 Lean: max, speed
@@ -58,12 +57,12 @@ class GroupMember:
         self.typeC = typeC
         self.typeStr = typeStr
 
-    """E.g. power(std::vector<float>/floatVector)
-       or speed(InterpolationArray)
-       The default type is float
-       The name 'value' is special: Only the group name will be used to access
-           the member but in the xml file it will be still value (because we
-           need a name)."""
+    """ E.g. power(std::vector<float>/floatVector)
+        or speed(InterpolationArray)
+        The default type is float
+        The name 'value' is special: Only the group name will be used to access
+            the member but in the xml file it will be still value (because we
+            need a name). """
     def parse(content):
         typeC = "float"
         typeStr = typeC
@@ -93,8 +92,8 @@ class Group:
     def getBaseName(self):
         return self.baseName
 
-    """E.g. engine: power, gears(std::vector<Gear>/Gears)
-       or mass(float) or only mass"""
+    """ E.g. engine: power, gears(std::vector<Gear>/Gears)
+        or mass(float) or only mass """
     def parse(content):
         pos = content.find(":")
         if pos == -1:
@@ -107,7 +106,7 @@ class Group:
                 group.addMember(m)
             return group
 
-"""Creates a list of words from a titlecase string"""
+""" Creates a list of words from a titlecase string """
 def toList(name):
     result = []
     cur = ""
@@ -120,8 +119,8 @@ def toList(name):
         result.append(cur)
     return result
 
-"""titleCase: true  = result is titlecase
-              false = result has underscores"""
+""" titleCase: true  = result is titlecase
+               false = result has underscores """
 def joinSubName(group, member, titleCase):
     words = toList(group.baseName) + toList(member.getName)
     first = True
@@ -134,7 +133,14 @@ def joinSubName(group, member, titleCase):
 def main():
     # Find out what to do
     if len(sys.argv) == 1:
-        print("Please specify what you want to know [enum|defs|getter|getProp|getXml]")
+        print("""Usage: ./create_kart_properties.py <operation>
+Operations:
+    enum     List the enum values for all characteristics in abstract_characteristic.hpp
+    defs     Create the headers in abstract_characteristic.hpp
+    getter   The getter implementations in abstract_characteristic.cpp
+    getProp1 Creates the getType function in abstract_characteristic.cpp
+    getProp2 Creates the getName funciton in abstract_characteristic.cpp
+    getXml   Used to load the characteristics from an xml file in xml_characteristic.cpp""")
         return
     task = sys.argv[1]
 
@@ -187,14 +193,14 @@ def main():
     return {4};
 }}
 """.format(m.typeC, nameTitle, nameUnderscore.upper(), typeC, result))
-    elif task == "getProp":
+    elif task == "getProp1":
         for g in groups:
             for m in g.members:
                 nameTitle = joinSubName(g, m, True)
                 nameUnderscore = joinSubName(g, m, False)
                 print("    case {0}:\n        return TYPE_{1};".
                     format(nameUnderscore.upper(), "_".join(toList(m.typeStr)).upper()))
-        print("\n\n-------------------- END --------------------\n")
+    elif task == "getProp2":
         for g in groups:
             for m in g.members:
                 nameTitle = joinSubName(g, m, True)
@@ -213,24 +219,6 @@ def main():
             print("    }\n")
     else:
         print("Unknown task")
-
-    #print("Constructor ****************************************")
-    #lineLength = 4;
-    #line = "    "
-    #for g in groups:
-    #    for n in g.subNames:
-    #        name = "m_{0} = ".format(joinSubName(g, n, False))
-    #        l = len(name)
-    #        if lineLength + l > 80 and lineLength > 4:
-    #            print(line)
-    #            line = "    " + name
-    #            lineLength = l + 4
-    #        else:
-    #            line += name
-    #            lineLength += l
-    #if lineLength > 4:
-    #    line += "1;"
-    #    print(line)
 
 if __name__ == '__main__':
     main()

@@ -99,7 +99,7 @@ public:
     void                     setHatMeshName(const std::string &hat_name);
     // ------------------------------------------------------------------------
     /** Get the characteristic that holds the base values. */
-    const AbstractCharacteristic* getBaseCharacteristic() const { return &(*m_base_characteristic); }
+    const AbstractCharacteristic* getBaseCharacteristic() const { return m_base_characteristic.get(); }
     // ------------------------------------------------------------------------
     /** Get a characteristic that holds the values for a certain difficulty. */
     const AbstractCharacteristic* getDifficultyCharacteristic(const std::string &type) const;

@@ -101,7 +101,7 @@ void AbstractKart::reset()
 // ----------------------------------------------------------------------------
 const AbstractCharacteristic* AbstractKart::getCharacteristic() const
 {
-    return &(*m_characteristic);
+    return m_characteristic.get();
 }
 
 // ----------------------------------------------------------------------------
