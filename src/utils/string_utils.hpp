@@ -143,27 +143,32 @@ namespace StringUtils
 
     // ------------------------------------------------------------------------
     /** Intermediate struct to fill a vector using variadic templates */
-    struct __FillStringVector
+    struct FillStringVector
     {
+        /** FillS takes a vector as the first argument and a variadic list of
+         * arguments. The arguments are recursively inserted into the vector
+         * which will contain all the arguments converted to strings in the end.
+         */
         template<typename T, typename...Args>
-        static void __FillS(std::vector<std::string> &all_vals, T&& v, Args &&...args)
+        static void FillS(std::vector<std::string> &all_vals, T&& v, Args &&...args)
         {
             std::ostringstream oss;
             oss << v;
             all_vals.push_back(oss.str());
-            __FillS(all_vals, std::forward<Args>(args)...);
+            FillS(all_vals, std::forward<Args>(args)...);
         }
 
-        static void __FillS(std::vector<std::string>&) {}
+        static void FillS(std::vector<std::string>&) {}
 
+        /** This functions does the same as FillS but for wide strings. */
         template<typename T, typename...Args>
-        static void __FillW(std::vector<irr::core::stringw> &all_vals, T&& v, Args &&...args)
+        static void FillW(std::vector<irr::core::stringw> &all_vals, T&& v, Args &&...args)
         {
             all_vals.push_back(irr::core::stringw(std::forward<T>(v)));
-            __FillW(all_vals, std::forward<Args>(args)...);
+            FillW(all_vals, std::forward<Args>(args)...);
         }
 
-        static void __FillW(std::vector<irr::core::stringw>&) {}
+        static void FillW(std::vector<irr::core::stringw>&) {}
     };
 
     template <typename...Args>
@@ -171,7 +176,7 @@ namespace StringUtils
     {
         std::vector<std::string> all_vals;
         all_vals.reserve(sizeof...(args));
-        __FillStringVector::__FillS(all_vals, std::forward<Args>(args)...);
+        FillStringVector::FillS(all_vals, std::forward<Args>(args)...);
         return insertValues(s, all_vals);
     }
 
@@ -187,7 +192,7 @@ namespace StringUtils
     {
         std::vector<irr::core::stringw> all_vals;
         all_vals.reserve(sizeof...(args));
-        __FillStringVector::__FillW(all_vals, std::forward<Args>(args)...);
+        FillStringVector::FillW(all_vals, std::forward<Args>(args)...);
         return insertValues(s, all_vals);
     }
 
