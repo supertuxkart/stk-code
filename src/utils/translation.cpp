@@ -414,20 +414,14 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 
         wchar_t *converted_string = fromFribidiChar(fribidiOutput);
         delete[] fribidiOutput;
-        // Copy strings to save it in the map
-        std::size_t fribidized_length = wcslen(converted_string) + 1;
-        wchar_t *fribidized_string = new wchar_t[fribidized_length];
-        std::wmemcpy(fribidized_string, converted_string, fribidized_length);
-        freeFribidiChar(converted_string);
-        std::size_t original_length = wcslen(in_ptr) + 1;
-        wchar_t *original_string = new wchar_t[original_length];
-        std::wmemcpy(original_string, in_ptr, original_length);
 
         // Save it in the map
         m_fribidized_strings.insert(std::pair<const irr::core::stringw, const irr::core::stringw>(
-            original_string, fribidized_string));
+            in_ptr, converted_string));
+        freeFribidiChar(converted_string);
+        found = m_fribidized_strings.find(in_ptr);
 
-        return fribidized_string;
+        return found->second.c_str();
     }
 
 #endif // ENABLE_BIDI
