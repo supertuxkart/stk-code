@@ -21,102 +21,135 @@
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "script_kart.hpp"
+#include "scriptvec3.hpp"
 
 //debug
 #include <iostream>
 
-
+/** \cond DOXYGEN_IGNORE */
 namespace Scripting
 {
+/** \endcond */
 
     namespace Kart
     {
-        //Squashes the specified kart, specified time
-        void squashKart(asIScriptGeneric *gen)
+        /** \addtogroup Scripting
+          * @{
+          */
+        /** \addtogroup Kart
+        * @{
+        */
+
+        /** Squashes the specified kart, for the specified time */
+        void squash(int idKart, float time)
         {
-            int id = (int)gen->GetArgDWord(0);
-            float time = gen->GetArgFloat(1);
-            AbstractKart* kart = World::getWorld()->getKart(id);
+            AbstractKart* kart = World::getWorld()->getKart(idKart);
             kart->setSquash(time, 0.5);  //0.5 * max speed is new max for squashed duration
         }
-        //Teleports the kart to the specified Vec3 location
-        void teleportKart(asIScriptGeneric *gen)
+
+        /** Teleports the kart to the specified Vec3 location */
+        void teleport(int idKart, SimpleVec3* position)
         {
-            int id = (int)gen->GetArgDWord(0);
-            Vec3 *position = (Vec3*)gen->GetArgAddress(1);
-
-            float x = position->getX();
-            float y = position->getY();
-            float z = position->getZ();
-
-            AbstractKart* kart = World::getWorld()->getKart(id);
-            kart->setXYZ(btVector3(x, y, z));
+            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            Vec3 v(position->getX(), position->getY(), position->getZ());
+            kart->setXYZ(v);
             unsigned int index = World::getWorld()->getRescuePositionIndex(kart);
             btTransform s = World::getWorld()->getRescueTransform(index);
-            const btVector3 &xyz = s.getOrigin();
             s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0.0f));
             World::getWorld()->moveKartTo(kart, s);
         }
-        //Attempts to project kart to the given 2D location, to the position
-        //with height 0, at a 45 degree angle.
-        void jumpKartTo(asIScriptGeneric *gen)
-        {
-            //attempts to project kart to target destination
-            //at present, assumes both initial and target location are
-            //on the same horizontal plane (z=k plane) and projects
-            //at a 45 degree angle.
-            int id = (int)gen->GetArgDWord(0);
 
-            float x = gen->GetArgFloat(1);
-            float y = gen->GetArgFloat(2);
-            //float velocity = gen->GetArgFloat(3);
-            //angle = pi/4 so t = v/(root 2 * g)
-            //d = t * v/root 2 so d = v^2/(2g) => v = root(2dg)
-            //component in x = component in y = root (dg)
-            AbstractKart* kart = World::getWorld()->getKart(id);
-            Vec3 pos = kart->getXYZ();
-            float dx = x - pos[0];
-            float dy = y - pos[2]; //blender uses xyz, bullet xzy
-            float d = (sqrtf(dx*dx + dy*dy));
-            float normalized_dx = dx / d;
-            float normalized_dy = dy / d;
-            float g = 9.81f;
-            float velocity = sqrtf(d * g);
-            
-            kart->setVelocity(btVector3(velocity * normalized_dx, velocity, velocity * normalized_dy));
+        /** Attempts to project kart to the given 2D location, to the position
+          * with height 0, at a 45 degree angle.
+          */
+        // TODO: not sure what this function is for
+        //void jumpTo(asIScriptGeneric *gen)
+        //{
+        //    //attempts to project kart to target destination
+        //    //at present, assumes both initial and target location are
+        //    //on the same horizontal plane (z=k plane) and projects
+        //    //at a 45 degree angle.
+        //    int id = (int)gen->GetArgDWord(0);
+        //
+        //    float x = gen->GetArgFloat(1);
+        //    float y = gen->GetArgFloat(2);
+        //    //float velocity = gen->GetArgFloat(3);
+        //    //angle = pi/4 so t = v/(root 2 * g)
+        //    //d = t * v/root 2 so d = v^2/(2g) => v = root(2dg)
+        //    //component in x = component in y = root (dg)
+        //    AbstractKart* kart = World::getWorld()->getKart(id);
+        //    Vec3 pos = kart->getXYZ();
+        //    float dx = x - pos[0];
+        //    float dy = y - pos[2]; //blender uses xyz, bullet xzy
+        //    float d = (sqrtf(dx*dx + dy*dy));
+        //    float normalized_dx = dx / d;
+        //    float normalized_dy = dy / d;
+        //    float g = 9.81f;
+        //    float velocity = sqrtf(d * g);
+        //    
+        //    kart->setVelocity(btVector3(velocity * normalized_dx, velocity, velocity * normalized_dy));
+        //}
+        
+        /** Returns the location of the corresponding kart. */
+        SimpleVec3 getLocation(int idKart)
+        {
+            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            Vec3 v = kart->getXYZ();
+            return SimpleVec3(v.getX(), v.getY(), v.getZ());
         }
-        //Bind kart location
-        void getKartLocation(asIScriptGeneric *gen)
+
+        /** Sets the kart's velocity to the specified value. */
+        void setVelocity(int idKart, SimpleVec3* position)
         {
-            int id = (int)gen->GetArgDWord(0);
-
-            AbstractKart* kart = World::getWorld()->getKart(id);
-            Vec3 kart_loc = kart->getXYZ();
-            void *pointer = &kart_loc;
-
-            gen->SetReturnObject(pointer);
-        }
-        //Bind setter for velocity
-        void setVelocity(asIScriptGeneric *gen)
-        {
-            int id = (int)gen->GetArgDWord(0);
-            Vec3 *position = (Vec3*)gen->GetArgAddress(1);
-
             float x = position->getX();
             float y = position->getY();
             float z = position->getZ();
 
-            AbstractKart* kart = World::getWorld()->getKart(id);
+            AbstractKart* kart = World::getWorld()->getKart(idKart);
             kart->setVelocity(btVector3(x, y, z));
         }
+
+        /** Gets the kart's velocity */
+        SimpleVec3 getVelocity(int idKart)
+        {
+            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            btVector3 velocity = kart->getVelocity();
+            return SimpleVec3(velocity.getX(), velocity.getY(), velocity.getZ());
+        }
+
+        /** @}*/
+        /** @}*/
+
         void registerScriptFunctions(asIScriptEngine *engine)
         {
-            int r;
-            r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void teleportKart(int id, Vec3 &in)", asFUNCTION(teleportKart), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void setVelocity(int id, Vec3 &in)", asFUNCTION(setVelocity), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void jumpKartTo(int id, float x, float y)", asFUNCTION(jumpKartTo), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("Vec3 getKartLocation(int id)", asFUNCTION(getKartLocation), asCALL_GENERIC); assert(r >= 0);
+            int r; // of type asERetCodes
+            engine->SetDefaultNamespace("Kart");
+            r = engine->RegisterGlobalFunction("void squash(int id, float time)", asFUNCTION(squash), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", asFUNCTION(teleport), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setVelocity(int id, const Vec3 &in)", asFUNCTION(setVelocity), asCALL_CDECL); assert(r >= 0);
+            //r = engine->RegisterGlobalFunction("void jumpTo(int id, float x, float y)", asFUNCTION(jumpTo), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("Vec3 getLocation(int id)", asFUNCTION(getLocation), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("Vec3 getVelocity(int id)", asFUNCTION(getVelocity), asCALL_CDECL); assert(r >= 0);
+        }
+
+        void registerScriptEnums(asIScriptEngine *engine)
+        {
+            // TODO: document enum in doxygen-generated scripting docs
+            engine->SetDefaultNamespace("Kart");
+            engine->RegisterEnum("PowerupType");
+            engine->RegisterEnumValue("PowerupType", "ANVIL", PowerupManager::PowerupType::POWERUP_ANVIL);
+            engine->RegisterEnumValue("PowerupType", "BOWLING", PowerupManager::PowerupType::POWERUP_BOWLING);
+            engine->RegisterEnumValue("PowerupType", "BUBBLEGUM", PowerupManager::PowerupType::POWERUP_BUBBLEGUM);
+            engine->RegisterEnumValue("PowerupType", "CAKE", PowerupManager::PowerupType::POWERUP_CAKE);
+            engine->RegisterEnumValue("PowerupType", "PARACHUTE", PowerupManager::PowerupType::POWERUP_PARACHUTE);
+            engine->RegisterEnumValue("PowerupType", "PLUNGER", PowerupManager::PowerupType::POWERUP_PLUNGER);
+            engine->RegisterEnumValue("PowerupType", "RUBBERBALL", PowerupManager::PowerupType::POWERUP_RUBBERBALL);
+            engine->RegisterEnumValue("PowerupType", "SWATTER", PowerupManager::PowerupType::POWERUP_SWATTER);
+            engine->RegisterEnumValue("PowerupType", "SWITCH", PowerupManager::PowerupType::POWERUP_SWITCH);
+            engine->RegisterEnumValue("PowerupType", "ZIPPER", PowerupManager::PowerupType::POWERUP_ZIPPER);
         }
     }
+
+/** \cond DOXYGEN_IGNORE */
 }
+/** \endcond */

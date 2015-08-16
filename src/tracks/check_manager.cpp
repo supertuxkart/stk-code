@@ -59,8 +59,7 @@ void CheckManager::load(const XMLNode &node)
         }
         else if(type=="check-sphere")
         {
-            AmbientLightSphere *cs = new AmbientLightSphere(*check_node,
-                                                            i);
+            CheckSphere *cs = new CheckSphere(*check_node, i);
             m_all_checks.push_back(cs);
         }   // checksphere
         else
@@ -169,7 +168,7 @@ int CheckManager::getChecklineTriggering(const Vec3 &from,
         // FIXME: why is the lapline skipped?
         if (dynamic_cast<CheckLap*>(c) != NULL) continue;
 
-        if (c->isTriggered(from, to, 0 /* kart id */))
+        if (c->isTriggered(from, to, -1 /* kart id */))
             return i;
     }
     return -1;

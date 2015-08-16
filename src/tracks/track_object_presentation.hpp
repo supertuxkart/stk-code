@@ -24,6 +24,7 @@
 #include "items/item.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/log.hpp"
 #include "utils/vec3.hpp"
 
 #include <vector3d.h>
@@ -38,6 +39,7 @@ class ThreeDAnimation;
 class ModelDefinitionLoader;
 class STKInstancedSceneNode;
 class XMLNode;
+class TrackObject;
 
 namespace irr
 {
@@ -79,7 +81,10 @@ public:
     // ------------------------------------------------------------------------
 
     virtual void reset() {}
-    virtual void setEnable(bool enabled) {}
+    virtual void setEnable(bool enabled)
+    {
+        Log::warn("TrackObjectPresentation", "setEnable unimplemented for this presentation type");
+    }
     virtual void update(float dt) {}
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
         const core::vector3df& scale, bool isAbsoluteCoord) {}
@@ -94,6 +99,11 @@ public:
     { 
         return m_init_xyz;
     }   // getAbsolutePosition
+    // ------------------------------------------------------------------------
+    virtual const core::vector3df getAbsoluteCenterPosition() const
+    {
+        return m_init_xyz;
+    }
     // ------------------------------------------------------------------------
     /** Returns the initial rotation. */
     virtual const core::vector3df& getRotation() const { return m_init_hpr; }
@@ -136,6 +146,7 @@ public:
     // ------------------------------------------------------------------------
     virtual const core::vector3df& getPosition() const OVERRIDE;
     virtual const core::vector3df  getAbsolutePosition() const OVERRIDE;
+    virtual const core::vector3df getAbsoluteCenterPosition() const OVERRIDE;
     virtual const core::vector3df& getRotation() const OVERRIDE;
     virtual const core::vector3df& getScale() const OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
@@ -169,10 +180,14 @@ public:
  */
 class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNode
 {
+    TrackObject* m_parent;
 public:
-    TrackObjectPresentationLibraryNode(const XMLNode& xml_node,
+    TrackObjectPresentationLibraryNode(TrackObject* parent,
+        const XMLNode& xml_node,
         ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLibraryNode();
+    void move(const core::vector3df& xyz, const core::vector3df& hpr,
+        const core::vector3df& scale, bool isAbsoluteCoord, bool moveChildrenPhysicalBodies);
 };   // TrackObjectPresentationLibraryNode
 
 // ============================================================================
@@ -256,17 +271,21 @@ private:
 
     core::vector3df m_xyz;
 
+    bool m_enabled;
+
 public:
 
     TrackObjectPresentationSound(const XMLNode& xml_node,
                                  scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationSound();
-    virtual void onTriggerItemApproached(Item* who) OVERRIDE;
+    virtual void onTriggerItemApproached() OVERRIDE;
     virtual void update(float dt) OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
         const core::vector3df& scale, bool isAbsoluteCoord) OVERRIDE;
     void triggerSound(bool loop);
     void stopSound();
+
+    virtual void setEnable(bool enabled) OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Currently used for sound effects only, in cutscenes only atm */
@@ -304,6 +323,8 @@ private:
     ParticleEmitter* m_emitter;
     LODNode* m_lod_emitter_node;
     std::string m_trigger_condition;
+    bool m_delayed_stop;
+    double m_delayed_stop_time;
 
 public:
     TrackObjectPresentationParticles(const XMLNode& xml_node,
@@ -312,6 +333,9 @@ public:
 
     virtual void update(float dt) OVERRIDE;
     void triggerParticles();
+    void stop();
+    void stopIn(double delay);
+    void setRate(float rate);
     // ------------------------------------------------------------------------
     /** Returns the trigger condition for this object. */
     std::string& getTriggerCondition() { return m_trigger_condition; }
@@ -335,6 +359,13 @@ public:
 };   // TrackObjectPresentationLight
 
 // ============================================================================
+
+enum ActionTriggerType
+{
+    TRIGGER_TYPE_POINT = 0,
+    TRIGGER_TYPE_CYLINDER = 1
+};
+
 /** \ingroup tracks
  *  A track object representation that consists of an action trigger
  */
@@ -347,6 +378,8 @@ private:
 
     bool m_action_active;
 
+    ActionTriggerType m_type;
+
 public:
     TrackObjectPresentationActionTrigger(const XMLNode& xml_node);
     TrackObjectPresentationActionTrigger(const core::vector3df& xyz,
@@ -355,7 +388,7 @@ public:
 
     virtual ~TrackObjectPresentationActionTrigger() {}
 
-    virtual void onTriggerItemApproached(Item* who) OVERRIDE;
+    virtual void onTriggerItemApproached() OVERRIDE;
     // ------------------------------------------------------------------------
     /** Reset the trigger (i.e. sets it to active again). */
     virtual void reset() OVERRIDE { m_action_active = true; }

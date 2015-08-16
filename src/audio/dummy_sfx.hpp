@@ -42,8 +42,14 @@ public:
     virtual void       reallySetLoop(bool status)       {}
     virtual void       setPosition(const Vec3 &p)       {}
     virtual void       reallySetPosition(const Vec3 &p) {}
+    virtual void       setSpeedPosition(float factor,
+                                        const Vec3 &p)  {}
+    virtual void       reallySetSpeedPosition(float f,
+                                         const Vec3 &p) {}
     virtual void       play()                           {}
     virtual void       reallyPlayNow()                  {}
+    virtual void       play(const Vec3 &xyz)            {}
+    virtual void       reallyPlayNow(const Vec3 &xyz)   {}
     virtual void       stop()                           {}
     virtual void       reallyStopNow()                  {}
     virtual void       pause()                          {}

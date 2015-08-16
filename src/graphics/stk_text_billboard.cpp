@@ -19,8 +19,8 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stkbillboard.hpp"
-#include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stk_billboard.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "glwrap.hpp"
@@ -111,7 +111,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
             buffer = new scene::SMeshBuffer();
             buffer->getMaterial().setTexture(0, m_chars[i].m_texture);
             buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-            buffer->getMaterial().MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+            buffer->getMaterial().MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
             buffers[m_chars[i].m_texture] = buffer;
         }
         else
@@ -166,7 +166,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
         map_itr->second->drop();
     }
 
-    getMaterial(0).MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+    getMaterial(0).MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
 
     return Mesh;
 }

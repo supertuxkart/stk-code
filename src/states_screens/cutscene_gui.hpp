@@ -53,7 +53,7 @@ public:
     void setSubtitle(const core::stringw& subtitle) { m_subtitle = subtitle; }
 
     virtual void renderGlobal(float dt);
-    virtual void renderPlayerView(const AbstractKart *kart);
+    virtual void renderPlayerView(const Camera *camera, float dt){}
 
     virtual const core::dimension2du getMiniMapSize() const OVERRIDE
     {

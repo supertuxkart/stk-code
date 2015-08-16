@@ -31,13 +31,14 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stkanimatedmesh.hpp"
-#include "graphics/stkbillboard.hpp"
-#include "graphics/stkmeshscenenode.hpp"
-#include "graphics/stkscenemanager.hpp"
+#include "graphics/shadow_matrices.hpp"
+#include "graphics/stk_animated_mesh.hpp"
+#include "graphics/stk_billboard.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_scene_manager.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/texturemanager.hpp"
+#include "graphics/texture_manager.hpp"
 #include "graphics/water.hpp"
 #include "graphics/wind.hpp"
 #include "guiengine/engine.hpp"
@@ -74,7 +75,8 @@
 #if IRRLICHT_VERSION_MAJOR < 1 || IRRLICHT_VERSION_MINOR < 7 || \
     _IRR_MATERIAL_MAX_TEXTURES_ < 8 || !defined(_IRR_COMPILE_WITH_OPENGL_) || \
     !defined(_IRR_COMPILE_WITH_B3D_LOADER_)
-#error "Building against an incompatible Irrlicht. Distros, please use the included version."
+#error "Building against an incompatible Irrlicht. Distros, \
+please use the included version."
 #endif
 
 using namespace irr;
@@ -105,27 +107,27 @@ const int MIN_SUPPORTED_WIDTH  = 800;
  */
 IrrDriver::IrrDriver()
 {
+    m_shadow_matrices     = NULL;
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
     m_device              = createDevice(video::EDT_NULL,
                                          irr::core::dimension2d<u32>(640, 480),
-                                         /*bits*/16U, /**fullscreen*/ false, 
+                                         /*bits*/16U, /**fullscreen*/ false,
                                          /*stencilBuffer*/ false,
                                          /*vsync*/false,
                                          /*event receiver*/ NULL,
                                          file_manager->getFileSystem());
     m_request_screenshot = false;
-    m_shaders             = NULL;
     m_rtts                = NULL;
     m_post_processing     = NULL;
     m_wind                = new Wind();
-    m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
-        m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = m_boundingboxesviz = false;
-    SkyboxCubeMap = m_last_light_bucket_distance = 0;
-    m_shadow_camnodes[0] = NULL;
-    m_shadow_camnodes[1] = NULL;
-    m_shadow_camnodes[2] = NULL;
-    m_shadow_camnodes[3] = NULL;
+    m_skybox              = NULL;
+    m_spherical_harmonics = NULL;
+
+    m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
+    m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
+    m_boundingboxesviz = false;
+    m_last_light_bucket_distance = 0;
     memset(object_count, 0, sizeof(object_count));
 }   // IrrDriver
 
@@ -153,8 +155,11 @@ IrrDriver::~IrrDriver()
     m_device = NULL;
     m_modes.clear();
 
-    delete m_shaders;
+    delete m_shadow_matrices;
+    m_shadow_matrices = NULL;
+    Shaders::destroy();
     delete m_wind;
+    delete m_spherical_harmonics;
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -194,6 +199,14 @@ GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 {
     return m_perf_query[i];
 }
+
+// ----------------------------------------------------------------------------
+void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
+                                          size_t width, size_t height)
+{
+    m_current_screen_size = core::vector2df(float(width), float(height));
+    m_shadow_matrices->computeMatrixesAndCameras(camnode, width, height);
+}   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
 
@@ -349,8 +362,13 @@ void IrrDriver::initDevice()
 
         video::IVideoModeList* modes = m_device->getVideoModeList();
         const core::dimension2d<u32> ssize = modes->getDesktopResolution();
-        if (UserConfigParams::m_width > (int)ssize.Width ||
-            UserConfigParams::m_height > (int)ssize.Height)
+
+        if (ssize.Width < 1 || ssize.Height < 1)
+        {
+            Log::warn("irr_driver", "Unknown desktop resolution.");
+        }
+        else if (UserConfigParams::m_width > (int)ssize.Width ||
+                 UserConfigParams::m_height > (int)ssize.Height)
         {
             Log::warn("irr_driver", "The window size specified in "
                       "user config is larger than your screen!");
@@ -358,13 +376,13 @@ void IrrDriver::initDevice()
             UserConfigParams::m_height = (int)ssize.Height;
         }
 
-        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width,
-                                                    UserConfigParams::m_height);
-
         if (UserConfigParams::m_fullscreen)
         {
             if (modes->getVideoModeCount() > 0)
             {
+                core::dimension2d<u32> res = core::dimension2du(
+                                                    UserConfigParams::m_width,
+                                                    UserConfigParams::m_height);
                 res = modes->getVideoModeResolution(res, res);
 
                 UserConfigParams::m_width = res.Width;
@@ -372,11 +390,18 @@ void IrrDriver::initDevice()
             }
             else
             {
-                Log::verbose("irr_driver", "Cannot get information about "
-                             "resolutions. Try to use the default one.");
-                UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
-                UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
+                Log::warn("irr_driver", "Cannot get information about "
+                          "resolutions. Disable fullscreen.");
+                UserConfigParams::m_fullscreen = false;
             }
+        }
+
+        if (UserConfigParams::m_width < 1 || UserConfigParams::m_height < 1)
+        {
+            Log::warn("irr_driver", "Invalid window size. "
+                         "Try to use the default one.");
+            UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
+            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
         }
 
         m_device->closeDevice();
@@ -483,12 +508,14 @@ void IrrDriver::initDevice()
 
     CVS->init();
 
+    m_spherical_harmonics = new SphericalHarmonics(m_scene_manager->getAmbientLight().toSColor());
 
     if (UserConfigParams::m_shadows_resolution != 0 &&
         (UserConfigParams::m_shadows_resolution < 512 ||
          UserConfigParams::m_shadows_resolution > 2048))
     {
-        Log::warn("IrrDriver", "Invalid value for UserConfigParams::m_shadows_resolution : %i",
+        Log::warn("IrrDriver", 
+               "Invalid value for UserConfigParams::m_shadows_resolution : %i",
             (int)UserConfigParams::m_shadows_resolution);
         UserConfigParams::m_shadows_resolution = 0;
     }
@@ -515,18 +542,16 @@ void IrrDriver::initDevice()
     // m_glsl might be reset in rtt if an error occurs.
     if (CVS->isGLSL())
     {
-        m_shaders = new Shaders();
+        Shaders::init();
 
         m_mrt.clear();
         m_mrt.reallocate(2);
 
-        m_suncam = m_scene_manager->addCameraSceneNode(0, vector3df(0), vector3df(0), -1, false);
-        m_suncam->grab();
-        m_suncam->setParent(NULL);
     }
     else
     {
-        Log::warn("irr_driver", "Using the fixed pipeline (old GPU, or shaders disabled in options)");
+        Log::warn("irr_driver", "Using the fixed pipeline (old GPU, or "
+                                "shaders disabled in options)");
     }
 
     // Only change video driver settings if we are showing graphics
@@ -589,6 +614,7 @@ void IrrDriver::initDevice()
     // so let's decide ourselves...)
     m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
+    m_shadow_matrices = new ShadowMatrices();
 }   // initDevice
 
 // ----------------------------------------------------------------------------
@@ -610,16 +636,21 @@ void IrrDriver::cleanSunInterposer()
 // ----------------------------------------------------------------------------
 void IrrDriver::createSunInterposer()
 {
-    scene::IMesh * sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
+    scene::IMesh * sphere = m_scene_manager->getGeometryCreator()
+                                           ->createSphereMesh(1, 16, 16);
     for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
     {
         scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
         if (!mb)
             continue;
-        mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
-        mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        mb->getMaterial().setTexture(0, 
+                        getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+        mb->getMaterial().setTexture(1,
+                                getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
-    m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1, "sun_interposer");
+    m_sun_interposer = new STKMeshSceneNode(sphere, 
+                                            m_scene_manager->getRootSceneNode(),
+                                            NULL, -1, "sun_interposer");
 
     m_sun_interposer->grab();
     m_sun_interposer->setParent(NULL);
@@ -628,7 +659,7 @@ void IrrDriver::createSunInterposer()
     m_sun_interposer->getMaterial(0).Lighting = false;
     m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
     m_sun_interposer->getMaterial(0).ZWriteEnable = false;
-    m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
+    m_sun_interposer->getMaterial(0).MaterialType = Shaders::getShader(ES_OBJECTPASS);
 
     sphere->drop();
 }
@@ -703,7 +734,7 @@ bool IrrDriver::moveWindow(int x, int y)
     }
 #elif defined(__linux__) && !defined(ANDROID)
     const video::SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
-    
+
     Display* display = (Display*)videoData.OpenGLLinux.X11Display;
     int screen = DefaultScreen(display);
     int screen_w = DisplayWidth(display, screen);
@@ -713,7 +744,7 @@ bool IrrDriver::moveWindow(int x, int y)
     {
         x = screen_w - UserConfigParams::m_width;
     }
-    
+
     if (y + UserConfigParams::m_height > screen_h)
     {
         y = screen_h - UserConfigParams::m_height;
@@ -781,7 +812,7 @@ void IrrDriver::applyResolutionSettings()
     // FIXME: this load sequence is (mostly) duplicated from main.cpp!!
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
-    m_shaders->killShaders();
+    ShaderBase::updateShaders();
     VAOManager::getInstance()->kill();
     SolidPassCmd::getInstance()->kill();
     ShadowPassCmd::getInstance()->kill();
@@ -789,6 +820,7 @@ void IrrDriver::applyResolutionSettings()
     GlowPassCmd::getInstance()->kill();
     resetTextureTable();
     // initDevice will drop the current device.
+    Shaders::destroy();
     initDevice();
 
     // Re-init GUI engine
@@ -801,7 +833,8 @@ void IrrDriver::applyResolutionSettings()
     input_manager->setMode(InputManager::MENU);
 
     GUIEngine::addLoadingIcon(
-        irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"options_video.png"))
+        irr_driver->getTexture(file_manager
+                               ->getAsset(FileManager::GUI,"options_video.png"))
                              );
 
     file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""));
@@ -1091,7 +1124,9 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
 
-    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, m_scene_manager, -1, debug_name);
+    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, 
+                                                       m_scene_manager, -1,
+                                                       debug_name);
     node->drop();
 
     return node;
@@ -1114,7 +1149,8 @@ PerCameraNode *IrrDriver::addPerCameraNode(scene::ISceneNode* node,
  */
 scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
                                            video::ITexture *texture,
-                                           scene::ISceneNode* parent, bool alphaTesting)
+                                           scene::ISceneNode* parent,
+                                           bool alphaTesting)
 {
     scene::IBillboardSceneNode* node;
     if (CVS->isGLSL())
@@ -1122,7 +1158,8 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
         if (!parent)
             parent = m_scene_manager->getRootSceneNode();
 
-        node = new STKBillboard(parent, m_scene_manager, -1, vector3df(0., 0., 0.), size);
+        node = new STKBillboard(parent, m_scene_manager, -1, 
+                                vector3df(0., 0., 0.), size);
         node->drop();
     }
     else
@@ -1327,14 +1364,16 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
  *  \param back: Texture for the back plane of the box.
  */
 scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &texture,
-    const std::vector<video::ITexture*> &sphericalHarmonics)
+    const std::vector<video::ITexture*> &spherical_harmonics_textures)
 {
     assert(texture.size() == 6);
-    SkyboxTextures = texture;
-    SphericalHarmonicsTextures = sphericalHarmonics;
-    SkyboxCubeMap = 0;
-    SkyboxSpecularProbe = 0;
-    m_skybox_ready = false;
+
+    m_skybox = new Skybox(texture);
+    if(spherical_harmonics_textures.size() == 6)
+    {
+        m_spherical_harmonics->setTextures(spherical_harmonics_textures);
+    }
+    
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
@@ -1342,16 +1381,8 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
 
 void IrrDriver::suppressSkyBox()
 {
-    SkyboxTextures.clear();
-    SphericalHarmonicsTextures.clear();
-    m_skybox_ready = false;
-    if ((SkyboxCubeMap) && (!ProfileWorld::isNoGraphics()))
-    {
-        glDeleteTextures(1, &SkyboxCubeMap);
-        glDeleteTextures(1, &SkyboxSpecularProbe);
-    }
-    SkyboxCubeMap = 0;
-    SkyboxSpecularProbe = 0;
+    delete m_skybox;
+    m_skybox = NULL;
 }
 
 // ----------------------------------------------------------------------------
@@ -1702,7 +1733,7 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
 // ----------------------------------------------------------------------------
 void IrrDriver::setRTT(RTT* rtt)
 {
-    memset(m_shadow_camnodes, 0, 4 * sizeof(void*));
+    m_shadow_matrices->resetShadowCamNodes();
     m_rtts = rtt;
 }
 // ----------------------------------------------------------------------------
@@ -1711,7 +1742,8 @@ void IrrDriver::onLoadWorld()
     if (CVS->isGLSL())
     {
         const core::recti &viewport = Camera::getCamera(0)->getViewport();
-        size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+        size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
+        size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
         m_rtts = new RTT(width, height);
     }
 }
@@ -1730,7 +1762,7 @@ void IrrDriver::onUnloadWorld()
 void IrrDriver::setAmbientLight(const video::SColorf &light)
 {
     m_scene_manager->setAmbientLight(light);
-    m_skybox_ready = false;
+    m_spherical_harmonics->setAmbientLight(light.toSColor());
 }   // setAmbientLight
 
 video::SColorf IrrDriver::getAmbientLight() const
@@ -1802,8 +1834,10 @@ void IrrDriver::displayFPS()
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        fpsString = _("FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d",
-            min, fps, max, poly_count[SOLID_NORMAL_AND_DEPTH_PASS], poly_count[SHADOW_PASS], m_last_light_bucket_distance);
+        fpsString = _("FPS: %d/%d/%d  - PolyCount: %d Solid, "
+                      "%d Shadows - LightDist : %d",
+                    min, fps, max, poly_count[SOLID_NORMAL_AND_DEPTH_PASS],
+                    poly_count[SHADOW_PASS], m_last_light_bucket_distance);
         poly_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         poly_count[SHADOW_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
@@ -2027,7 +2061,8 @@ void IrrDriver::doScreenShot()
 
     std::string track_name = race_manager->getTrackName();
     if (World::getWorld() == NULL) track_name = "menu";
-    std::string path = file_manager->getScreenshotDir()+track_name+"-"+time_buffer+".png";
+    std::string path = file_manager->getScreenshotDir()+track_name+"-"
+                     + time_buffer+".png";
 
     if (irr_driver->getVideoDriver()->writeImageToFile(image, path.c_str(), 0))
     {
@@ -2309,7 +2344,7 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     }
 
     irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 35, 35, 35) );
-
+    
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
     m_light = irr_driver->getSceneManager()
         ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f,1.0f,1.0f),
@@ -2425,13 +2460,13 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
 
     const u32 mcount = node->getMaterialCount();
     u32 i;
-    const video::E_MATERIAL_TYPE ref = rimlit ? m_shaders->getShader(ES_OBJECTPASS_RIMLIT):
-                                       m_shaders->getShader(ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE pass = rimlit ? m_shaders->getShader(ES_OBJECTPASS_RIMLIT):
-                                        m_shaders->getShader(ES_OBJECTPASS);
+    const video::E_MATERIAL_TYPE ref = 
+        Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT : ES_OBJECTPASS_REF);
+    const video::E_MATERIAL_TYPE pass = 
+        Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT : ES_OBJECTPASS);
 
-    const video::E_MATERIAL_TYPE origref = m_shaders->getShader(ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE origpass = m_shaders->getShader(ES_OBJECTPASS);
+    const video::E_MATERIAL_TYPE origref = Shaders::getShader(ES_OBJECTPASS_REF);
+    const video::E_MATERIAL_TYPE origpass = Shaders::getShader(ES_OBJECTPASS);
 
     bool viamb = false;
     scene::IMesh *mesh = NULL;
@@ -2454,7 +2489,8 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
     for (i = 0; i < mcount; i++)
     {
         video::SMaterial &nodemat = node->getMaterial(i);
-        video::SMaterial &mbmat = mesh ? mesh->getMeshBuffer(i)->getMaterial() : nodemat;
+        video::SMaterial &mbmat = mesh ? mesh->getMeshBuffer(i)->getMaterial() 
+                                       : nodemat;
         video::SMaterial *mat = &nodemat;
 
         if (viamb)
@@ -2491,8 +2527,10 @@ void IrrDriver::applyObjectPassShader()
 
 // ----------------------------------------------------------------------------
 
-scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy, float radius,
-    float r, float g, float b, bool sun, scene::ISceneNode* parent)
+scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
+                                       float energy, float radius,
+                                       float r, float g, float b,
+                                       bool sun, scene::ISceneNode* parent)
 {
     if (CVS->isGLSL())
     {
@@ -2500,7 +2538,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
         LightNode *light = NULL;
 
         if (!sun)
-            light = new LightNode(m_scene_manager, parent, energy, radius, r, g, b);
+            light = new LightNode(m_scene_manager, parent, energy, radius,
+                                  r, g, b);
         else
             light = new SunNode(m_scene_manager, parent, r, g, b);
 
@@ -2515,23 +2554,21 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
         {
             //m_sun_interposer->setPosition(pos);
             //m_sun_interposer->updateAbsolutePosition();
+            m_shadow_matrices->addLight(pos);
 
-            m_suncam->setPosition(pos);
-            m_suncam->updateAbsolutePosition();
-
-            m_rsm_matrix_initialized = false;
-
-            ((WaterShaderProvider *) m_shaders->m_callbacks[ES_WATER])->setSunPosition(pos);
+            ((WaterShaderProvider *) Shaders::getCallback(ES_WATER) )
+                                                         ->setSunPosition(pos);
         }
 
         return light;
     }
     else
     {
-        return m_scene_manager->addLightSceneNode(m_scene_manager->getRootSceneNode(),
-                                                  pos, video::SColorf(1.0f, r, g, b));
+        return m_scene_manager
+               ->addLightSceneNode(m_scene_manager->getRootSceneNode(),
+                                   pos, video::SColorf(1.0f, r, g, b));
     }
-}
+}   // addLight
 
 // ----------------------------------------------------------------------------
 
@@ -2545,26 +2582,26 @@ void IrrDriver::clearLights()
     }
 
     m_lights.clear();
-}
+}   // clearLights
 
 // ----------------------------------------------------------------------------
 
 GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
 {
     return m_rtts->getRenderTarget(which);
-}
+}   // getRenderTargetTexture
 
 // ----------------------------------------------------------------------------
 
 FrameBuffer& IrrDriver::getFBO(TypeFBO which)
 {
     return m_rtts->getFBO(which);
-}
+}   // getFBO
 
 // ----------------------------------------------------------------------------
 
 GLuint IrrDriver::getDepthStencilTexture()
 {
     return m_rtts->getDepthStencilTexture();
-}
+}   // getDepthStencilTexture
 

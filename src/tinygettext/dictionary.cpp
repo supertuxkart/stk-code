@@ -16,8 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <assert.h>
-#include "log_stream.hpp"
 #include "dictionary.hpp"
+
+#include "utils/log.hpp"
 
 namespace tinygettext {
 
@@ -62,10 +63,10 @@ std::string
 Dictionary::translate_plural(const Entries& dict, const std::string& msgid, const std::string& msgid_plural, int count)
 {
   Entries::const_iterator i = dict.find(msgid);
-  const std::vector<std::string>& msgstrs = i->second;
 
   if (i != dict.end())
   {
+    const std::vector<std::string>& msgstrs = i->second;
     unsigned int n = 0;
     n = plural_forms.get_plural(count);
     assert(/*n >= 0 &&*/ n < msgstrs.size());
@@ -168,8 +169,9 @@ Dictionary::add_translation(const std::string& msgid, const std::string& msgstr)
   }
   else
   {
-    log_warning << "collision in add_translation: '"
-                << msgid << "' -> '" << msgstr << "' vs '" << vec[0] << "'" << std::endl;
+    Log::warn("tinygettext",
+              "Collision in add translation: '%s' -> '%s' vs '%s'.",
+              msgid.c_str(), msgstr.c_str(), vec[0].c_str());
     vec[0] = msgstr;
   }
 }
@@ -186,7 +188,9 @@ Dictionary::add_translation(const std::string& msgctxt,
   }
   else
   {
-    log_warning << "collision in add_translation(\"" << msgctxt << "\", \"" << msgid << "\", \"" << msgid_plural << "\")" << std::endl;
+      Log::warn("tinygettext",
+          "collision in add_translation(\"%s\", \"%s\", \"%s\")",
+          msgctxt.c_str(), msgid.c_str(), msgid_plural.c_str());
     vec = msgstrs;
   }
 }
@@ -201,7 +205,8 @@ Dictionary::add_translation(const std::string& msgctxt, const std::string& msgid
   }
   else
   {
-    log_warning << "collision in add_translation(\"" << msgctxt << "\", \"" << msgid << "\")" << std::endl;
+    Log::warn("tinygettext", "collision in add_translation(\"%s\", \"%s\")",
+              msgctxt.c_str(), msgid.c_str());
     vec[0] = msgstr;
   }
 }

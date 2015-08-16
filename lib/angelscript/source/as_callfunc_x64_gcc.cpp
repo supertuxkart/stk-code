@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -34,8 +34,14 @@
  * Author: Ionut "gargltk" Leonte <ileonte@bitdefender.com>
  *
  * Initial author: niteice
+ *
+ * Added support for functor methods by Jordi Oliveras Rovira in April, 2014.
  */
 
+// Useful references for the System V AMD64 ABI:
+// http://eli.thegreenplace.net/2011/09/06/stack-frame-layout-on-x86-64/
+// http://math-atlas.sourceforge.net/devel/assembly/abi_sysV_amd64.pdf
+ 
 #include "as_config.h"
 
 #ifndef AS_MAX_PORTABILITY
@@ -73,6 +79,8 @@ static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, i
 
 	// Backup stack pointer in R15 that is guaranteed to maintain its value over function calls
 		"  movq %%rsp, %%r15 \n"
+	// Make sure the stack unwind logic knows we've backed up the stack pointer in register r15
+		" .cfi_def_cfa_register r15 \n"
 
 	// Skip the first 128 bytes on the stack frame, called "red zone",  
 	// that might be used by the compiler to store temporary values
@@ -124,6 +132,8 @@ static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, i
 
 	// Restore stack pointer
 		"  mov %%r15, %%rsp \n"
+	// Inform the stack unwind logic that the stack pointer has been restored
+		" .cfi_def_cfa_register rsp \n"
 
 	// Put return value in retQW1 and retQW2, using either RAX:RDX or XMM0:XMM1 depending on type of return value
 		"  movl %5, %%ecx \n"
@@ -152,7 +162,7 @@ static inline bool IsVariableArgument( asCDataType type )
 	return ( type.GetTokenType() == ttQuestion ) ? true : false;
 }
 
-asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &retQW2)
+asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &retQW2, void *secondObject)
 {
 	asCScriptEngine            *engine             = context->m_engine;
 	asSSystemFunctionInterface *sysFunc            = descr->sysFuncIntf;
@@ -172,8 +182,17 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		callConv++;
 	}
 
+#ifdef AS_NO_THISCALL_FUNCTOR_METHOD
 	// Determine the real function pointer in case of virtual method
 	if ( obj && ( callConv == ICC_VIRTUAL_THISCALL || callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM ) ) 
+#else
+	if ( obj && ( callConv == ICC_VIRTUAL_THISCALL ||
+		callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJFIRST ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJLAST ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM) )
+#endif
 	{
 		vftable = *((funcptr_t**)obj);
 		func = vftable[FuncPtrToUInt(asFUNCTION_t(func)) >> 3];
@@ -195,6 +214,11 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 			break;
 		}
+#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
+		case ICC_THISCALL_OBJLAST:
+		case ICC_VIRTUAL_THISCALL_OBJLAST:
+			param_post = 2;
+#endif
 		case ICC_THISCALL:
 		case ICC_VIRTUAL_THISCALL:
 		case ICC_CDECL_OBJFIRST: 
@@ -206,6 +230,11 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 			break;
 		}
+#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
+		case ICC_THISCALL_OBJLAST_RETURNINMEM:
+		case ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM:
+			param_post = 2;
+#endif
 		case ICC_THISCALL_RETURNINMEM:
 		case ICC_VIRTUAL_THISCALL_RETURNINMEM:
 		case ICC_CDECL_OBJFIRST_RETURNINMEM: 
@@ -219,7 +248,33 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 			break;
 		}
-		case ICC_CDECL_OBJLAST: 
+#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
+		case ICC_THISCALL_OBJFIRST:
+		case ICC_VIRTUAL_THISCALL_OBJFIRST:
+		{
+			paramBuffer[0] = (asPWORD)obj;
+			paramBuffer[1] = (asPWORD)secondObject;
+			argsType[0] = x64INTARG;
+			argsType[1] = x64INTARG;
+
+			argIndex = 2;
+			break;
+		}
+		case ICC_THISCALL_OBJFIRST_RETURNINMEM:
+		case ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM:
+		{
+			paramBuffer[0] = (asPWORD)retPointer;
+			paramBuffer[1] = (asPWORD)obj;
+			paramBuffer[2] = (asPWORD)secondObject;
+			argsType[0] = x64INTARG;
+			argsType[1] = x64INTARG;
+			argsType[2] = x64INTARG;
+
+			argIndex = 3;
+			break;
+		}
+#endif
+		case ICC_CDECL_OBJLAST:
 			param_post = 1;
 			break;
 		case ICC_CDECL_OBJLAST_RETURNINMEM: 
@@ -337,7 +392,11 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	// For the CDECL_OBJ_LAST calling convention we need to add the object pointer as the last argument
 	if( param_post )
 	{
+#ifdef AS_NO_THISCALL_FUNCTOR_METHOD
 		paramBuffer[argIndex] = (asPWORD)obj;
+#else
+		paramBuffer[argIndex] = (asPWORD)(param_post > 1 ? secondObject : obj);
+#endif
 		argsType[argIndex] = x64INTARG;
 		argIndex++;
 	}

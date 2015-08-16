@@ -40,8 +40,9 @@ using namespace GUIEngine;
 MessageDialog::MessageDialog(const irr::core::stringw &msg,
                              MessageDialogType type,
                              IConfirmDialogListener* listener,
-                             bool own_listener, bool from_queue)
-             : ModalDialog(0.6f, 0.6f)
+                             bool own_listener, bool from_queue,
+                             float width, float height)
+             : ModalDialog(width, height)
 {
     m_msg          = msg;
     m_type         = type;

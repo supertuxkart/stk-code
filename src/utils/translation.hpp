@@ -75,6 +75,9 @@ public:
     const std::vector<std::string>* getLanguageList() const;
 
     std::string        getCurrentLanguageName();
+
+private:
+    irr::core::stringw fribidizeLine(const irr::core::stringw &str);
 };   // Translations
 
 

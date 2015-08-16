@@ -71,6 +71,7 @@
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
+#include <SMeshBuffer.h>
 
 #include <iostream>
 #include <stdexcept>
@@ -293,6 +294,11 @@ void Track::cleanup()
         irr_driver->removeNode(m_all_nodes[i]);
     }
     m_all_nodes.clear();
+
+    for (unsigned int i = 0; i < m_static_physics_only_nodes.size(); i++)
+    {
+        m_static_physics_only_nodes[i]->remove();
+    }
     m_static_physics_only_nodes.clear();
 
     m_all_emitters.clearAndDeleteAll();
@@ -309,7 +315,7 @@ void Track::cleanup()
     m_object_physics_only_nodes.clear();
 
     irr_driver->removeNode(m_sun);
-
+    m_sun->drop();
     delete m_track_mesh;
     m_track_mesh = NULL;
 
@@ -448,6 +454,10 @@ void Track::cleanup()
         Log::info("CACHE", "[%i] %s", i, path.getPath().c_str());
     }
 #endif
+
+    Scripting::ScriptEngine* script_engine =
+        World::getWorld()->getScriptEngine();
+    script_engine->cleanupCache();
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -732,9 +742,32 @@ void Track::createPhysicsModel(unsigned int main_track_count)
     for (unsigned int i = 0; i<m_static_physics_only_nodes.size(); i++)
     {
         convertTrackToBullet(m_static_physics_only_nodes[i]);
-        irr_driver->removeNode(m_static_physics_only_nodes[i]);
+        if (UserConfigParams::m_physics_debug &&
+            m_static_physics_only_nodes[i]->getType() == scene::ESNT_MESH)
+        {
+            const video::SColor color(255, 255, 105, 180);
+
+            scene::IMesh *mesh = ((scene::IMeshSceneNode*)m_static_physics_only_nodes[i])->getMesh();
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(0);
+            mb->getMaterial().BackfaceCulling = false;
+            video::S3DVertex * const verts = (video::S3DVertex *) mb->getVertices();
+            const u32 max = mb->getVertexCount();
+            for (i = 0; i < max; i++)
+            {
+                verts[i].Color = color;
+            }
+
+            // Color
+            mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 105, 180)));
+            irr_driver->grabAllTextures(mesh);
+            // Gloss
+            mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        }
+        else
+            irr_driver->removeNode(m_static_physics_only_nodes[i]);
     }
-    m_static_physics_only_nodes.clear();
+    if (!UserConfigParams::m_physics_debug)
+        m_static_physics_only_nodes.clear();
 
     for (unsigned int i = 0; i<m_object_physics_only_nodes.size(); i++)
     {
@@ -830,7 +863,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
     {
-        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);    
         // FIXME: take translation/rotation into account
         if (mb->getVertexType() != video::EVT_STANDARD &&
             mb->getVertexType() != video::EVT_2TCOORDS &&
@@ -881,6 +914,18 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         if (mb->getVertexType() == video::EVT_STANDARD)
         {
             irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
+            if (race_manager->getReverseTrack() &&
+                material->getMirrorAxisInReverse() != ' ')
+            {
+                for (unsigned int i = 0; i < mb->getVertexCount(); i++)
+                {
+                    core::vector2df &tc = mb->getTCoords(i);
+                    if (material->getMirrorAxisInReverse() == 'V')
+                        tc.Y = 1 - tc.Y;
+                    else
+                        tc.X = 1 - tc.X;
+                }
+            }   // reverse track and texture needs mirroring
             for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
             {
                 for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
@@ -972,7 +1017,6 @@ bool Track::loadMainTrack(const XMLNode &root)
     assert(m_gfx_effect_mesh==NULL);
 
     m_challenges.clear();
-    m_force_fields.clear();
 
     m_track_mesh      = new TriangleMesh();
     m_gfx_effect_mesh = new TriangleMesh();
@@ -1101,122 +1145,12 @@ bool Track::loadMainTrack(const XMLNode &root)
             continue;
         }
 
-
         core::vector3df xyz(0,0,0);
         n->get("xyz", &xyz);
         core::vector3df hpr(0,0,0);
         n->get("hpr", &hpr);
         core::vector3df scale(1.0f, 1.0f, 1.0f);
         n->get("scale", &scale);
-
-        // some static meshes are conditional
-        std::string condition;
-        n->get("if", &condition);
-        if (condition == "splatting")
-        {
-            if (!irr_driver->supportsSplatting()) continue;
-        }
-        else if (condition == "trophies")
-        {
-            // Associate force fields and challenges
-            // FIXME: this assumes that challenges will appear before force fields in scene.xml
-            //        (which however seems to be the case atm)
-            int closest_challenge_id = -1;
-            float closest_distance = 99999.0f;
-            for (unsigned int c=0; c<m_challenges.size(); c++)
-            {
-
-                float dist = xyz.getDistanceFromSQ(m_challenges[c].m_position);
-                if (closest_challenge_id == -1 || dist < closest_distance)
-                {
-                    closest_challenge_id = c;
-                    closest_distance = dist;
-                }
-            }
-
-            assert(closest_challenge_id >= 0);
-            assert(closest_challenge_id < (int)m_challenges.size());
-
-            const std::string &s = m_challenges[closest_challenge_id].m_challenge_id;
-            const ChallengeData* challenge = unlock_manager->getChallengeData(s);
-            if (challenge == NULL)
-            {
-                if (s != "tutorial")
-                    Log::error("track", "Cannot find challenge named '%s'\n",
-                        m_challenges[closest_challenge_id].m_challenge_id.c_str());
-                continue;
-            }
-
-            const unsigned int val = challenge->getNumTrophies();
-            bool shown = (PlayerManager::getCurrentPlayer()->getPoints() < val);
-            m_force_fields.push_back(OverworldForceField(xyz, shown, val));
-
-            m_challenges[closest_challenge_id].setForceField(
-                                 m_force_fields[m_force_fields.size() - 1]);
-
-            core::stringw msg = StringUtils::toWString(val);
-            core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()
-                                                   ->getDimension(msg.c_str());
-
-            assert(GUIEngine::getHighresDigitFont() != NULL);
-
-            if (CVS->isGLSL())
-            {
-                gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-                STKTextBillboard* tb = new STKTextBillboard(msg.c_str(), font,
-                    video::SColor(255, 255, 225, 0),
-                    video::SColor(255, 255, 89, 0),
-                    irr_driver->getSceneManager()->getRootSceneNode(),
-                    irr_driver->getSceneManager(), -1, xyz,
-                    core::vector3df(1.5f, 1.5f, 1.5f));
-                m_all_nodes.push_back(tb);
-            }
-            else
-            {
-                scene::ISceneManager* sm = irr_driver->getSceneManager();
-                scene::ISceneNode* sn =
-                    sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
-                    msg.c_str(),
-                    NULL,
-                    core::dimension2df(textsize.Width / 35.0f,
-                    textsize.Height / 35.0f),
-                    xyz,
-                    -1, // id
-                    video::SColor(255, 255, 225, 0),
-                    video::SColor(255, 255, 89, 0));
-                m_all_nodes.push_back(sn);
-            }
-
-            if (!shown) continue;
-        }
-        else if (condition == "allchallenges")
-        {
-            // allow ONE unsolved challenge : the last one
-            if (getNumOfCompletedChallenges() < m_challenges.size() - 1)
-                continue;
-        }
-        else if (condition.size() > 0)
-        {
-            Log::error("track", "Unknown condition <%s>\n", condition.c_str());
-        }
-
-        std::string neg_condition;
-        n->get("ifnot", &neg_condition);
-        if (neg_condition == "splatting")
-        {
-            if (irr_driver->supportsSplatting()) continue;
-        }
-        else if (neg_condition == "allchallenges")
-        {
-            // allow ONE unsolved challenge : the last one
-            if (getNumOfCompletedChallenges() >= m_challenges.size() - 1)
-                continue;
-        }
-        else if (neg_condition.size() > 0)
-        {
-            Log::error("track", "Unknown condition <%s>\n",
-                       neg_condition.c_str());
-        }
 
         bool tangent = false;
         n->get("tangents", &tangent);
@@ -1235,49 +1169,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         bool lod_instance = false;
         n->get("lod_instance", &lod_instance);
 
-        /*
-        if (tangent)
-        {
-            scene::IMesh* original_mesh = irr_driver->getMesh(full_path);
-
-            if (std::find(m_detached_cached_meshes.begin(),
-                          m_detached_cached_meshes.end(),
-                          original_mesh) == m_detached_cached_meshes.end())
-            {
-                m_detached_cached_meshes.push_back(original_mesh);
-            }
-
-            // create a node out of this mesh just for bullet; delete it after, normal maps are special
-            // and require tangent meshes
-            scene_node = irr_driver->addMesh(original_mesh, "original_mesh");
-
-            scene_node->setPosition(xyz);
-            scene_node->setRotation(hpr);
-            scene_node->setScale(scale);
-
-            convertTrackToBullet(scene_node);
-            scene_node->remove();
-            irr_driver->grabAllTextures(original_mesh);
-
-            scene::IMesh* mesh = MeshTools::createMeshWithTangents(original_mesh, &MeshTools::isNormalMap);
-            mesh->grab();
-            irr_driver->grabAllTextures(mesh);
-
-            m_all_cached_meshes.push_back(mesh);
-            scene_node = irr_driver->addMesh(mesh, "original_mesh_with_tangents");
-            scene_node->setPosition(xyz);
-            scene_node->setRotation(hpr);
-            scene_node->setScale(scale);
-
-#ifdef DEBUG
-            std::string debug_name = model_name+" (tangent static track-object)";
-            scene_node->setName(debug_name.c_str());
-#endif
-
-            handleAnimatedTextures(scene_node, *n);
-            m_all_nodes.push_back( scene_node );
-        }
-        else*/
         if (lod_instance)
         {
             LODNode* node = lodLoader.instanciateAsLOD(n, NULL);
@@ -1327,6 +1218,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             handleAnimatedTextures(scene_node, *n);
 
             // for challenge orbs, a bit more work to do
+            // TODO: this is hardcoded for the overworld, convert to scripting
             if (challenge.size() > 0)
             {
                 const ChallengeData* c = NULL;
@@ -1482,7 +1374,7 @@ void Track::update(float dt)
     if (!m_startup_run) // first time running update = good point to run startup script
     {
         Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        script_engine->runScript("start");
+        script_engine->runFunction(false, "void onStart()");
         m_startup_run = true;
     }
     m_track_object_manager->update(dt);
@@ -1493,8 +1385,10 @@ void Track::update(float dt)
     }
     CheckManager::get()->update(dt);
     ItemManager::get()->update(dt);
-    Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-    script_engine->runScript("update");
+
+    // TODO: enable onUpdate scripts if we ever find a compelling use for them
+    //Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+    //script_engine->runScript("void onUpdate()");
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -1728,7 +1622,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene)
     {
-        m_start_transforms.resize(race_manager->getNumberOfKarts());
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            // In a FTL race the non-leader karts are placed at the end of the
+            // field, so we need all start positions.
+            m_start_transforms.resize(stk_config->m_max_karts);
+        }
+        else
+            m_start_transforms.resize(race_manager->getNumberOfKarts());
         QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
                                                    karts_per_row,
                                                    forwards_distance,
@@ -1779,9 +1680,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
     }
 
-    loadObjects(root, path, model_def_loader, true, NULL);
+    loadObjects(root, path, model_def_loader, true, NULL, NULL);
 
     model_def_loader.cleanLibraryNodesAfterLoad();
+
+    World::getWorld()->getScriptEngine()->compileLoadedScripts();
 
     // Init all track objects
     m_track_object_manager->init();
@@ -1857,7 +1760,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // ---- Set ambient color
     m_ambient_color = m_default_ambient_color;
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
-
+    if (m_spherical_harmonics_textures.size() != 6)
+        irr_driver->getSphericalHarmonics()->setAmbientLight(m_ambient_color);
+    
     // ---- Create sun (non-ambient directional light)
     if (m_sun_position.getLengthSQ() < 0.03f)
     {
@@ -1950,7 +1855,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 //-----------------------------------------------------------------------------
 
 void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& model_def_loader,
-                        bool create_lod_definitions, scene::ISceneNode* parent)
+                        bool create_lod_definitions, scene::ISceneNode* parent,
+                        TrackObject* parent_library)
 {
     unsigned int start_position_counter = 0;
 
@@ -1964,7 +1870,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         if (name == "track" || name == "default-start") continue;
         if (name == "object" || name == "library")
         {
-            m_track_object_manager->add(*node, parent, model_def_loader);
+            m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
         else if (name == "water")
         {
@@ -2008,7 +1914,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                m_track_object_manager->add(*node, parent, model_def_loader);
+                m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
             }
         }
         else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
@@ -2021,7 +1927,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "light")
         {
-            m_track_object_manager->add(*node, parent, model_def_loader);
+            m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
         else if (name == "weather")
         {
@@ -2431,12 +2337,11 @@ bool Track::findGround(AbstractKart *kart)
 
     btTransform t = kart->getBody()->getCenterOfMassTransform();
     // The computer offset is slightly too large, it should take
-    // the default suspension rest insteat of suspension rest (i.e. the
+    // the default suspension rest instead of suspension rest (i.e. the
     // length of the suspension with the weight of the kart resting on
     // it). On the other hand this initial bouncing looks nice imho
     // - so I'll leave it in for now.
-    float offset = kart->getKartProperties()->getSuspensionRest() +
-                   kart->getKartProperties()->getWheelRadius();
+    float offset = kart->getKartProperties()->getSuspensionRest();
     t.setOrigin(hit_point+Vec3(0, offset, 0) );
     kart->getBody()->setCenterOfMassTransform(t);
     kart->setTrans(t);

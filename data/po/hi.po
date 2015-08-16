@@ -3367,4 +3367,4 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Akela https://launchpad.net/~sdakela\n  STK-team https://launchpad.net/~stk\n  sid https://launchpad.net/~sidchat1"
+msgstr "Launchpad Contributions:\nAkela https://launchpad.net/~sdakela\nsid https://launchpad.net/~sidchat1\nSTK-team https://launchpad.net/~stk"

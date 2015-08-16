@@ -7,7 +7,7 @@
             <div width="100%" proportion="2" layout="horizontal-row">
                 <box id="info" proportion="2" height="100%" layout="vertical-row">
                     <div width="100%" height="fit" layout="horizontal-row" >
-                        <label proportion="1" text_align="left" I18N="In the networking lobby" text="Server name :"/>
+                        <label proportion="1" text_align="left" I18N="In the networking lobby" text="Server name:"/>
                         <label proportion="2" text_align="left" id="server_name" text=""/>
                     </div>
                 </box>

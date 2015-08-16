@@ -115,7 +115,7 @@ void BaseUserScreen::init()
     m_sign_in_name  = "";
 
     // It should always be activated ... but just in case
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
     // Clean any error message still shown
     m_info_widget->setText("", true);
     m_info_widget->setErrorColor();
@@ -148,20 +148,12 @@ void BaseUserScreen::init()
         selectUser(0);
 
     // Disable changing the user while in game
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        getWidget<IconButtonWidget>("ok")->setDeactivated();
-        getWidget<IconButtonWidget>("new_user")->setDeactivated();
-        getWidget<IconButtonWidget>("rename")->setDeactivated();
-        getWidget<IconButtonWidget>("delete")->setDeactivated();
-    }
-    else
-    {
-        getWidget<IconButtonWidget>("ok")->setActivated();
-        getWidget<IconButtonWidget>("new_user")->setActivated();
-        getWidget<IconButtonWidget>("rename")->setActivated();
-        getWidget<IconButtonWidget>("delete")->setActivated();
-    }
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    getWidget<IconButtonWidget>("ok")->setActive(!in_game);
+    getWidget<IconButtonWidget>("new_user")->setActive(!in_game);
+    getWidget<IconButtonWidget>("rename")->setActive(!in_game);
+    getWidget<IconButtonWidget>("delete")->setActive(!in_game);
+
     m_new_registered_data = false;
     if (m_auto_login)
     {
@@ -229,10 +221,7 @@ void BaseUserScreen::selectUser(int index)
     makeEntryFieldsVisible();
     getWidget<CheckBoxWidget>("remember-user")->setState(
         profile->rememberPassword());
-    if(profile->getLastOnlineName().size() > 0)
-        m_username_tb->setDeactivated();
-    else
-        m_username_tb->setActivated();
+    m_username_tb->setActive(profile->getLastOnlineName().size() == 0);
 
     // And make the password invisible if the session is saved (i.e
     // the user does not need to enter a password).
@@ -282,7 +271,7 @@ void BaseUserScreen::makeEntryFieldsVisible()
         m_password_tb->setVisible(online);
         // Is user has no online name, make sure the user can enter one
         if (player->getLastOnlineName().empty())
-            m_username_tb->setActivated();
+            m_username_tb->setActive(true);
 
     }
 }   // makeEntryFieldsVisible
@@ -348,7 +337,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
             // Make sure the new user will have an empty online name field
             // that can also be edited.
             m_username_tb->setText("");
-            m_username_tb->setActivated();
+            m_username_tb->setActive(true);
         }
         else if (button == "cancel")
         {
@@ -403,7 +392,7 @@ void BaseUserScreen::login()
 {
     // If an error occurs, the callback informing this screen about the
     // problem will activate the widget again.
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
     m_state = STATE_NONE;
 
     PlayerProfile *player = getSelectedPlayer();
@@ -471,7 +460,7 @@ void BaseUserScreen::login()
         {
             m_info_widget->setText(_("You need to enter a password."), true);
             SFXManager::get()->quickSound("anvil");
-            m_options_widget->setActivated();
+            m_options_widget->setActive(true);
             return;
         }
         m_sign_in_name = m_username_tb->getText();
@@ -504,7 +493,7 @@ void BaseUserScreen::loginSuccessful()
 {
     PlayerProfile *player  = getSelectedPlayer();
     player->setWasOnlineLastTime(true);
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
     // Clean any error message still shown
     m_info_widget->setText("", true);
     m_info_widget->setErrorColor();
@@ -530,7 +519,7 @@ void BaseUserScreen::loginError(const irr::core::stringw & error_message)
     SFXManager::get()->quickSound("anvil");
     m_info_widget->setErrorColor();
     m_info_widget->setText(error_message, false);
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
 }   // loginError
 
 // ----------------------------------------------------------------------------
@@ -560,7 +549,7 @@ void BaseUserScreen::logoutError(const irr::core::stringw & error_message)
     SFXManager::get()->quickSound("anvil");
     m_info_widget->setErrorColor();
     m_info_widget->setText(error_message, false);
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
 }   // logoutError
 
 // ----------------------------------------------------------------------------
@@ -642,7 +631,8 @@ void BaseUserScreen::unloaded()
 void TabbedUserScreen::init()
 {
     RibbonWidget* tab_bar = getWidget<RibbonWidget>("options_choice");
-    if (tab_bar) tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
+    assert(tab_bar != NULL);
+    tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
     tab_bar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tab_bar->getRibbonChildren()[1].setTooltip( _("Audio") );
     tab_bar->getRibbonChildren()[2].setTooltip( _("User Interface") );

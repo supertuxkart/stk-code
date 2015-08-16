@@ -18,8 +18,9 @@ endif()
 option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
+option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 
-if(MSVC)
+if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
     # on the installation of the Windows DDK (Driver Developer Kit),
     # which also needs an absolute path :(
@@ -121,9 +122,15 @@ elseif(MSVC)
 endif()
 
 
-# Build the angelscript library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
-include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+# Build the angelscript library if not in system
+find_package(Angelscript)
+if(USE_SYSTEM_ANGELSCRIPT AND ANGELSCRIPT_FOUND)
+    include_directories(${Angelscript_INCLUDE_DIRS})
+else()
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+    set(Angelscript_LIBRARIES angelscript)
+endif()
 
 # OpenAL
 if(APPLE)
@@ -204,6 +211,11 @@ if(WIN32)
 
     # And shut up about unsafe stuff
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
+    # Avoid timespec structure redeclaration on Visual Studio 2015
+    if (MSVC_VERSION EQUAL 1900)
+        add_definitions(-DHAVE_STRUCT_TIMESPEC)
+    endif()
 endif()
 
 if(MSVC)
@@ -310,7 +322,7 @@ target_link_libraries(supertuxkart
     enet
     glew
     stkirrlicht
-    angelscript
+    ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}

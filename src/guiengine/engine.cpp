@@ -1192,8 +1192,6 @@ namespace GUIEngine
         // further render)
         g_env->drawAll();
 
-        MessageQueue::update(elapsed_time);
-
         // ---- some menus may need updating
         if (gamestate != GAME)
         {
@@ -1215,6 +1213,7 @@ namespace GUIEngine
             }
         }
 
+        MessageQueue::update(elapsed_time);
 
         if (gamestate == INGAME_MENU && dynamic_cast<CutsceneWorld*>(World::getWorld()) != NULL)
         {

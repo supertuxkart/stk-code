@@ -45,9 +45,6 @@ private:
         Vec3 m_handle2;
     };   // BezierData
 
-    /** Overall duration. */
-    float m_time;
-
     /** Vector with all control points and handles. */
     AlignedArray<BezierData> m_all_data;
 public:

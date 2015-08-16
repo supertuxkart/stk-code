@@ -3,14 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Capri <musicsuse@gmx.com>, 2015
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
+# GenghisKhan <genghiskhan@gmx.ca>, 2015
+# Ys, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-13 21:42-0400\n"
-"PO-Revision-Date: 2015-03-14 11:00+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2015-04-07 22:59+0000\n"
+"Last-Translator: Ys\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/supertuxkart/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,7 +33,7 @@ msgstr "   Y"
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
-msgstr " אבל הפאנקיסטים הפתטיים שלך לעולם לא יוכלו להביס אותי - מלך המכוניות!"
+msgstr " אבל טיפשים קטנים שכמותכם לא תצליחו להביס אותי - מלך המכוניות!"
 
 #. I18N: Only used for count > 3
 #: src/online/online_player_profile.cpp:429
@@ -147,7 +150,7 @@ msgstr "* התחל מחדש את STK כדי להחיל הגדרות חדשות"
 msgid ""
 "* Which config to use will be inferred from which 'Select' key is pressed to"
 " join the game."
-msgstr ""
+msgstr "*  התצורה שאשתמש בה תוסק מלחיצת מקש ה'בחירה' המוגדר על מנת להצטרף למשחק."
 
 #. I18N: ./data/gui/online/profile_achievements.stkgui
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
@@ -337,7 +340,7 @@ msgstr "אדיומי"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Advanced pipeline (lights, etc.)"
-msgstr "צינור מתקדם (אורות, וכו׳)"
+msgstr "מנוע מתקדם (אורות, וכו.)"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
@@ -378,7 +381,7 @@ msgstr "הצג תמיד מסך התחברות"
 
 #. I18N: ../stk-assets/karts/amanda/kart.xml
 msgid "Amanda"
-msgstr ""
+msgstr "אמנדה"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -447,13 +450,13 @@ msgstr "גרנד פרי אחר בשם זה כבר קיים."
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Anti-aliasing"
-msgstr "Anti-aliasing"
+msgstr "הפחתת מדרג עקומות (Anti-aliasing)"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:461
 #, c-format
 msgid "Anti-aliasing : %s"
-msgstr "Anti-aliasing : %s"
+msgstr "הפחתת מדרג עקומות: %s"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 msgid "Apply"
@@ -518,7 +521,7 @@ msgstr "שמע"
 #. I18N: In the help menu
 #: src/tracks/track_object_presentation.cpp:906
 msgid "Avoid bananas!"
-msgstr "הימנע מן בננות!"
+msgstr "הימנע מבננות!"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:284
@@ -582,7 +585,7 @@ msgstr "חובב בננות"
 msgid ""
 "Basket Ball - bounces after the leader, and might squash and slow down karts"
 " down on the way."
-msgstr "כדורסל - מקפץ אחר המוביל, ועשוי למעוך ולאט מכוניות בדרך."
+msgstr "כדורסל - מקפץ אחרי המוביל, ועשוי למעוך ולהאט מכוניות בדרך."
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
@@ -627,7 +630,7 @@ msgstr "קבוצה כחולה מנצחת"
 
 #. I18N: ../stk-assets/tracks/farm/track.xml
 msgid "Bovine Barnyard"
-msgstr "משק"
+msgstr "משק הפרות"
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
@@ -644,7 +647,7 @@ msgstr "בלימה"
 msgid ""
 "BubbleGum - protect yourself with a shield, or use while looking back to "
 "leave a sticky pink puddle behind you."
-msgstr "גומי לעיסב - הגן על עצמך בעזרת מגן, או השתמש בזה כעת הסתכלות לאחור כדי להותיר שלולית ורודה דביקה מאחוריך."
+msgstr "גומי לעיסה - הגן על עצמך בעזרת מגן, או השתמש בזה כעת הסתכלות לאחור כדי להותיר שלולית ורודה דביקה מאחוריך."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -697,7 +700,7 @@ msgstr "בטל בקשה"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:277
 msgid "Cancel/Back"
-msgstr "ביטול\\חזרה"
+msgstr "ביטול/חזרה"
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
@@ -729,7 +732,7 @@ msgstr "בחר מכונית"
 
 #. I18N: ./data/achievements.xml
 msgid "Christoffel Columbus"
-msgstr "כריסטופר קולומבוס"
+msgstr "כריסטופל קולומבוס"
 
 #. I18N: ./data/gui/help1.stkgui
 msgid "Click here to play the tutorial"
@@ -998,7 +1001,7 @@ msgstr "האם אתה בטוח כי ברצונך לנטוש את הגרנד פר
 #: src/states_screens/user_screen.cpp:583
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr "האם אתה בטוח כי ברצונך למחוק את השחקן '%s'?"
+msgstr "האם אתה בטוח כי ברצונך למחוק את שחקן '%s'?"
 
 #: src/states_screens/edit_gp_screen.cpp:140
 msgid "Do you want to save your changes?"
@@ -1045,7 +1048,7 @@ msgstr "ציד ביצים"
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr "חיפוש ביצים: סייר במסלולים ומצא ביצים חבויות."
+msgstr "חיפוש ביצים: סייר במסלולים ומצא את הביצים המוסתרות."
 
 #: src/modes/easter_egg_hunt.cpp:202
 #, c-format
@@ -1074,7 +1077,7 @@ msgstr "על אורך דוא״ל להיות בין 4 עד 50 תווים!"
 
 #: src/states_screens/register_screen.cpp:298
 msgid "Email is invalid!"
-msgstr "דוא״ל אינו תקף!"
+msgstr "דוא״ל לא חוקי!"
 
 #: src/states_screens/register_screen.cpp:276
 msgid "Emails don't match!"
@@ -1093,7 +1096,7 @@ msgstr "הפעלת התקן"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable per-player handicaps"
-msgstr ""
+msgstr "הפעל הגבלות לכל שחקן"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -1127,7 +1130,7 @@ msgstr "כולם:\nלחצו כעת על 'בחר' כדי להצטרף למשחק!
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Existing Online Account"
-msgstr ""
+msgstr "חשבון מקוון קיים"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In the networking lobby
@@ -1157,37 +1160,37 @@ msgstr "סייר במסלולים ומצא את כל הביצים הנסתרות
 #: src/graphics/irr_driver.cpp:1795
 #, c-format
 msgid "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
-msgstr ""
+msgstr "פריימים לשנייה:  %d/%d/%d - ספירת מצולעים: %d מוצק, %d צללים - הפצת אור: %d"
 
 #: src/graphics/irr_driver.cpp:1804
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris"
-msgstr ""
+msgstr "פריימים לשנייה: %d/%d/%d - %d "
 
 #: src/states_screens/online_profile_achievements.cpp:128
 #: src/states_screens/online_profile_achievements.cpp:168
 msgid "Fetching achievements"
-msgstr ""
+msgstr "מביא הישגים"
 
 #: src/states_screens/online_profile_friends.cpp:88
 #: src/states_screens/online_profile_friends.cpp:174
 msgid "Fetching friends"
-msgstr ""
+msgstr "מביא חברים"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:171
 msgid "Fetching last vote"
-msgstr ""
+msgstr "מביא הצבעה"
 
 #: src/states_screens/server_selection.cpp:67
 #: src/states_screens/server_selection.cpp:210
 msgid "Fetching servers"
-msgstr ""
+msgstr "מביא שרתים"
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
 "able to reset your password."
-msgstr ""
+msgstr "מלא את שם המשתמש וכתובת המייל שסיפקת בהרשמה כדי לאפס את סיסמתך."
 
 #: src/modes/linear_world.cpp:276
 msgid "Final lap!"
@@ -1196,7 +1199,7 @@ msgstr "הקפה אחרונה!"
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Find Server"
-msgstr "מצא שרת"
+msgstr "חפש שרת"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:242
@@ -1239,8 +1242,8 @@ msgstr "מבצר המאגמה"
 #, c-format
 msgid "Found %d wiimote"
 msgid_plural "Found %d wiimotes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "נמצא %d wiimote"
+msgstr[1] "נמצאו %d wiimotes"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:313
 msgid "Friend removed!"
@@ -1330,24 +1333,24 @@ msgstr "נטוש מירוץ"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Global illumination"
-msgstr ""
+msgstr "הארה גלובלית"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:489
 #, c-format
 msgid "Global illumination : %s"
-msgstr ""
+msgstr "הארה גלובלית: %s"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Glow (outlines)"
-msgstr ""
+msgstr "זוהר (מתווה)"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:477
 #, c-format
 msgid "Glow (outlines) : %s"
-msgstr ""
+msgstr "זוהר (מתווה): % s"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
@@ -1423,7 +1426,7 @@ msgstr "אורח %d"
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
 msgid "Guest Log in"
-msgstr ""
+msgstr "התחבר כאורח"
 
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
@@ -1490,7 +1493,7 @@ msgstr "מתעלם מן׳'%s', היה עליך להצטרף מוקדם יותר 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Image-based lighting"
-msgstr ""
+msgstr "הארה מבוססת-תמונות"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
@@ -1544,7 +1547,7 @@ msgstr "היצמדו למכונית המובילה, אבל אל תעקפו או�
 
 #: src/states_screens/options_screen_input2.cpp:72
 msgid "Key binding"
-msgstr ""
+msgstr "מקשי קיצור"
 
 #: src/states_screens/options_screen_input.cpp:97
 #, c-format
@@ -1587,53 +1590,53 @@ msgstr "שמאלה"
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:212
 msgid "Left bumper"
-msgstr ""
+msgstr "פגוש שמאלי"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:220
 msgid "Left thumb button"
-msgstr ""
+msgstr "כפתור אגודל שמאלי"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:235
 msgid "Left thumb down"
-msgstr ""
+msgstr "אגודל שמאלי למטה"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:233
 msgid "Left thumb left"
-msgstr ""
+msgstr "אגודל שמאלי שמאלה"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:231
 msgid "Left thumb right"
-msgstr ""
+msgstr "אגודל שמאלי ימינה"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:237
 msgid "Left thumb up"
-msgstr ""
+msgstr "אגודל שמאלי למעלה"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:179 src/input/gamepad_config.cpp:239
 msgid "Left trigger"
-msgstr ""
+msgstr "הדק שמאלי"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Light shaft (God rays)"
-msgstr ""
+msgstr "פיר אור"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:481
 #, c-format
 msgid "Light shaft (God rays) : %s"
-msgstr ""
+msgstr "פיר אור: %s"
 
 #: src/guiengine/engine.cpp:1330
 msgid "Loading"
-msgstr "כעת טוען"
+msgstr "טוען"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In networking lobby
@@ -1648,7 +1651,7 @@ msgstr "הגדרות לובי"
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Local Name"
-msgstr ""
+msgstr "שם מקומי"
 
 #: src/states_screens/kart_selection.cpp:853
 msgid "Locked"
@@ -1663,7 +1666,7 @@ msgstr "נעול"
 #: src/states_screens/race_setup_screen.cpp:214
 #: src/states_screens/tracks_screen.cpp:283
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr "נעול: השלימו אתגר כדי לקבל גישה ליותר!"
+msgstr "נעול: השלימו אתגרים פעילים כדי לקבל גישה ליותר!"
 
 #: src/states_screens/tracks_screen.cpp:201
 msgid "Locked!"
@@ -1672,26 +1675,26 @@ msgstr "נעול!"
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
 msgid "Log In"
-msgstr ""
+msgstr "התחבר"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Log Out"
-msgstr ""
+msgstr "התנתק"
 
 #: src/states_screens/online_screen.cpp:139
 #, c-format
 msgid "Logged in as: %s."
-msgstr ""
+msgstr "מחובר בתור: %s"
 
 #: src/states_screens/online_screen.cpp:155
 msgid "Logging in"
-msgstr ""
+msgstr "מתחבר"
 
 #: src/states_screens/user_screen.cpp:494
 #, c-format
 msgid "Logging in '%s'"
-msgstr ""
+msgstr "מתחבר כ: %s"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
@@ -1699,16 +1702,16 @@ msgid ""
 "Logging in as a guest allows you to participate in online races, but it does"
 " not allow you to vote for addons, or collect any achievements while being "
 "online."
-msgstr ""
+msgstr "התחברות כאורח מאפשרת לך להשתתף במירוצים, אבל לא מאפשרת  לך לבחור עבור תוספיםת או לאסוף הישגים בהיותך מחובר."
 
 #: src/states_screens/online_screen.cpp:160
 msgid "Logging out"
-msgstr ""
+msgstr "מתנתק"
 
 #: src/states_screens/user_screen.cpp:493
 #, c-format
 msgid "Logging out '%s'"
-msgstr ""
+msgstr "מנתק '%s'"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
@@ -1729,11 +1732,11 @@ msgstr "חפש עוד חברים:"
 
 #. I18N: ./data/achievements.xml
 msgid "Make 5 skidding in a single lap."
-msgstr ""
+msgstr "בצע 5 החלקות בהקפה אחת"
 
 #. I18N: ./data/achievements.xml
 msgid "Make a race with 5 laps or more."
-msgstr ""
+msgstr "צור מירוץ עם 5 הקפות או יותר."
 
 #. I18N: ./data/achievements.xml
 msgid "Marathoner"
@@ -1767,7 +1770,7 @@ msgstr "מיני גולף"
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
-msgstr ""
+msgstr "צייד יתושים"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -1836,7 +1839,7 @@ msgstr "שם"
 
 #: src/states_screens/create_server_screen.cpp:132
 msgid "Name has to be between 4 and 30 characters long!"
-msgstr "על אורך שם להיות בין 4 עד 50 תווים!"
+msgstr "על אורך שם להיות בין 4 עד 30 תווים!"
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:125
 msgid "Name is empty."
@@ -1855,7 +1858,7 @@ msgstr "שם השרת"
 
 #. I18N: ../stk-assets/tracks/scotland/track.xml
 msgid "Nessie's pond"
-msgstr ""
+msgstr "הבריכה של נסי"
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
@@ -1870,7 +1873,7 @@ msgstr "גרנד פרי חדש '%s' זמין כעת"
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "New Online Account"
-msgstr ""
+msgstr "חשבון מקוון חדש"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -2003,7 +2006,7 @@ msgstr "לא מקוון"
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Offline Account"
-msgstr ""
+msgstr "חשבון לא מקוון"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2042,11 +2045,11 @@ msgstr "שם משתמש מקוון"
 
 #: src/states_screens/register_screen.cpp:280
 msgid "Online username has to be between 3 and 30 characters long!"
-msgstr ""
+msgstr "שם משתמש מקוון חייב להיות בין 3 ל 30 תווים!"
 
 #: src/states_screens/register_screen.cpp:284
 msgid "Online username must not start with a number!"
-msgstr ""
+msgstr "אסור ששם משתמש מקוון יתחיל עם סיפרה!"
 
 #: src/input/input_manager.cpp:759
 msgid "Only the Game Master may act at this point!"
@@ -2073,7 +2076,7 @@ msgstr "סיכום"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:93
 msgid "POWER"
-msgstr ""
+msgstr "עוצמה"
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Parachute - slows down all karts in a better position."
@@ -2110,17 +2113,17 @@ msgstr "סיסמה שונתה בהצלחה."
 #: src/states_screens/dialogs/change_password_dialog.cpp:147
 #: src/states_screens/register_screen.cpp:272
 msgid "Passwords don't match!"
-msgstr "סיסמאות לא תואמות."
+msgstr "סיסמאות לא תואמות!"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:257
 msgid "Pause Game"
-msgstr "הקפאת משחק"
+msgstr "השהה משחק"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 msgid "Paused"
-msgstr "מוקפא"
+msgstr "מושהה"
 
 #: src/karts/controller/network_player_controller.cpp:281
 #: src/karts/controller/player_controller.cpp:338
@@ -2129,7 +2132,7 @@ msgstr "זמן עונשין!!"
 
 #: src/states_screens/online_profile_friends.cpp:146
 msgid "Pending"
-msgstr ""
+msgstr "תלוי ועומד"
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
@@ -2137,7 +2140,7 @@ msgstr "חצר הפינגווינים"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:247
 msgid "Performing vote"
-msgstr ""
+msgstr "מבצע הצבעה"
 
 #. I18N: ../stk-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
@@ -2149,7 +2152,7 @@ msgstr "הצג הכל"
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
-msgstr ""
+msgstr "שחק בכול מסלול רשמי לפחות פעם אחת."
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
@@ -2168,7 +2171,7 @@ msgstr "שחקנים"
 msgid ""
 "Players can select handicapped (more difficult) profiles on the kart "
 "selection screen"
-msgstr ""
+msgstr "שחקנים יכולים לבחור פרופילים מוגבלים (יותר קשים) במסך בחירת המכוניות"
 
 #. I18N: ./data/gui/enter_gp_name_dialog.stkgui
 #. I18N: In the 'add new grand prix' dialog
@@ -2182,7 +2185,7 @@ msgstr "אנא הגדירו מחדש את המקשים."
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
 msgid "Please read the terms and conditions "
-msgstr ""
+msgstr "אנא קראו את תנאי השימש "
 
 #: src/states_screens/addons_screen.cpp:437
 msgid "Please wait while addons are updated"
@@ -2200,7 +2203,7 @@ msgstr "טובלן – השליכו קדימה כדי למשוך יריב אחו
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
-msgstr ""
+msgstr "חובב כוחות מדליקים"
 
 #: src/tracks/track_object_presentation.cpp:930
 #, c-format
@@ -2273,7 +2276,7 @@ msgstr "פאפי"
 msgid ""
 "Push the ball to the opposite cage to score goals. (Only in multiplayer "
 "games)"
-msgstr "דחוף את הכדור לכלוב הנגדע כדי להקיע שער (במשחק מרובה משתתפים בלבד)"
+msgstr "דחוף את הכדור לכלוב הנגדי כדי להקיע שער (במשחק מרובה משתתפים בלבד)"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
@@ -2287,7 +2290,7 @@ msgstr "יציאה"
 
 #: src/states_screens/race_result_gui.cpp:159
 msgid "Quit the server."
-msgstr "צא מן השרת"
+msgstr "צא מתוך השרת."
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: ./data/gui/select_challenge.stkgui
@@ -2355,7 +2358,7 @@ msgstr "מירוץ רגיל: הכל מותר, אז תפוס נשקים ועשה 
 #: src/states_screens/gp_info_screen.cpp:153
 #: src/states_screens/gp_info_screen.cpp:178
 msgid "Reload"
-msgstr "טען שוב"
+msgstr "טען מחדש"
 
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
@@ -2443,46 +2446,46 @@ msgstr "ימינה"
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:214
 msgid "Right bumper"
-msgstr ""
+msgstr "פגוש ימני"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:222
 msgid "Right thumb button"
-msgstr ""
+msgstr "כפתור אגודל ימני"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:185 src/input/gamepad_config.cpp:243
 msgid "Right thumb down"
-msgstr ""
+msgstr "אגודל ימני למטה"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:183 src/input/gamepad_config.cpp:249
 msgid "Right thumb left"
-msgstr ""
+msgstr "אגודל ימני שמאלה"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:181 src/input/gamepad_config.cpp:247
 msgid "Right thumb right"
-msgstr ""
+msgstr "אגודל ימני ימינה"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:187 src/input/gamepad_config.cpp:245
 msgid "Right thumb up"
-msgstr ""
+msgstr "אגודל ימני למעלה"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:189 src/input/gamepad_config.cpp:241
 msgid "Right trigger"
-msgstr ""
+msgstr "הדק ימני"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:89
 msgid "SPEED"
-msgstr ""
+msgstr "מהירות"
 
 #. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
@@ -2490,11 +2493,11 @@ msgstr "STK אנטרפרייז"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
-msgstr ""
+msgstr "שרה הרוכבת"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara the Wizard"
-msgstr ""
+msgstr "שרה הקוסמת"
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
@@ -2541,7 +2544,7 @@ msgstr "בחר מכונית"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Send anonymous HW statistics"
-msgstr ""
+msgstr "שלח סטטיסטיקות חומרה אנונימיות"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -2585,7 +2588,7 @@ msgstr "צללים"
 #: src/states_screens/options_screen_video.cpp:470
 #, c-format
 msgid "Shadows: %i"
-msgstr ""
+msgstr "צללים: %i"
 
 #: src/states_screens/options_screen_video.cpp:468
 #, c-format
@@ -2626,7 +2629,7 @@ msgstr "גודל: %s"
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
-msgstr ""
+msgstr "שורת החלקות"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:248
@@ -2664,11 +2667,11 @@ msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr "לצערנו, אירעה שגיאה בחיבור לאתר התוספים. אנא ודא שאתה מחובר לאינטרנט, וכי SuperTuxKart אינו חסום על ידי חומת אש"
+msgstr "מצטערים, אירעה שגיאה בחיבור לאתר התוספים. אנא ודא שאתה מחובר לאינטרנט, וכי SuperTuxKart אינו חסום על ידי חומת אש"
 
 #: src/states_screens/dialogs/addons_loading.cpp:279
 msgid "Sorry, downloading the add-on failed"
-msgstr "לצערנו, הורדת התוסף נכשלה"
+msgstr "מצטערים, הורדת התוסף נכשלה"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -2776,7 +2779,7 @@ msgid ""
 "(To change this setting at a later time, go to options, select tab 'User "
 "Interface', and edit \"Connect to the Internet\" and \"Send anonymous HW "
 "statistics\")."
-msgstr ""
+msgstr "SuperTuxKart יכול להתחבר לשרת על מנת להוריד תוספים ולהודיע לך על עדכונים. אנו אוספים גם סטטיסתיקות חומרה אנונימיות  על נמת לעזור עם הפיתוח של STK. אנא קראו את מדיניות הפרטיות בכתובת http://privacy.supertuxkart.net. האם ברצונכם להפעיל תכונה זו? (כדי לשנות הגדרה זו מאוחר יותר, כנסו להגדרות, בחרו לשונית 'ממשק המשתמש' וערכו \"התחבר לאינטרנט\" ו\"שלח סטטיסטיקות חומרה אנונימיות\")."
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
@@ -2790,7 +2793,7 @@ msgstr "מחליף – קופסאות מתנה ובננות מתחלפות לז�
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Swatter - will squash karts close by, slowing them down."
-msgstr "מחבט – מועך מכוניות סמוכות ומאט אותן."
+msgstr "מחבט זבובים – מועך מכוניות סמוכות ומאט אותן."
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:186
@@ -2801,11 +2804,11 @@ msgstr "שפת המערכת"
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash at least 5 of "
 "them in a race."
-msgstr ""
+msgstr "קח את יריביך כיתושים! עם המחבט, מעך לפחות 5 מהם במירוץ."
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
 msgid "Temple"
-msgstr ""
+msgstr "מקדש"
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -2815,7 +2818,7 @@ msgstr "תנאים והסכמה"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Texture compression"
-msgstr ""
+msgstr "דחיסת מקרם"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -2843,7 +2846,7 @@ msgstr "קובץ השיאים ישן מדי.\nכל השיאים נמחקו."
 
 #: src/states_screens/create_server_screen.cpp:136
 msgid "The maxinum number of players has to be between 2 and 12."
-msgstr ""
+msgstr "המספר המירבי של שחקנים חייב להיות בין 2 עד 12."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:178
@@ -2901,7 +2904,7 @@ msgstr "מסלול מאת %s"
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Track group"
-msgstr ""
+msgstr "קבוצת מסלולים"
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In the addons screen
@@ -2928,7 +2931,7 @@ msgstr "מדריך"
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
 msgid "Tutorial : Selection Room"
-msgstr "מדריך: חדר מבחר"
+msgstr "מדריך: חדר בחירה"
 
 #. I18N: ../stk-assets/karts/tux/kart.xml
 msgid "Tux"
@@ -2937,17 +2940,17 @@ msgstr "טאקס"
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
 msgid "Type :"
-msgstr "טיפוס :"
+msgstr "סוג:"
 
 #: src/states_screens/race_gui_overworld.cpp:502
 msgid "Type: Grand Prix"
-msgstr "טיפוס: גרנד פרי"
+msgstr "סוג: גרנד פרי"
 
 #: src/online/xml_request.cpp:83
 msgid ""
 "Unable to connect to the server. Check your internet connection or try again"
 " later."
-msgstr ""
+msgstr "לא ניתן להתחבר לשרת. אנא בדקו את חיבור האינטרנט או נסו שוב  מאוחר יותר."
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
@@ -2979,17 +2982,17 @@ msgstr "תאריך עדכון"
 
 #. I18N: ./data/achievements.xml
 msgid "Use 10 or more powerups in a race."
-msgstr ""
+msgstr "השתמש ב10 או יותר כוחות מדליקים במירוץ."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Use high definition textures"
-msgstr ""
+msgstr "השתמש במרקמים באיכות גבוהה"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Use left/right to choose your team and press fire"
-msgstr ""
+msgstr "התשמש במקשי החיצים ימין או שמאל כדי לבחור צוות ולחץ אש"
 
 #: src/tracks/track_object_presentation.cpp:949
 #, c-format
@@ -3032,7 +3035,7 @@ msgstr "שם משתמש"
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
-msgstr ""
+msgstr "שם משתמשו/או כתובת מייל לא חוקיים."
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 msgid "VS"
@@ -3073,11 +3076,11 @@ msgstr "הצבע"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:230
 msgid "Vote successful! You can now close the window."
-msgstr ""
+msgstr "ההצבעה הצליחה! ניתן לסגור חלון זה."
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:85
 msgid "WEIGHT"
-msgstr ""
+msgstr "משקל"
 
 #: src/modes/linear_world.cpp:882
 msgid "WRONG WAY!"
@@ -3139,11 +3142,11 @@ msgstr "ווילבר"
 
 #. I18N: ./data/achievements.xml
 msgid "Win 5 single races in a row."
-msgstr ""
+msgstr "נצח 5 מירוצים יחידים ברצף."
 
 #. I18N: ./data/achievements.xml
 msgid "Win in all single player modes, against at least 3 opponents."
-msgstr ""
+msgstr "נצח בכל סוגי המצבים לשחקן יחיד, כנגד לפחות 3 יריבים."
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
@@ -3169,21 +3172,21 @@ msgstr "אתה משחק בתור"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:190
 msgid "You can adapt your previous rating by clicking the stars beneath."
-msgstr ""
+msgstr "אתה יכול להתאים דירוג קודם שלך על ידי לחיצה על הכוכבים למטה."
 
 #: src/states_screens/main_menu_screen.cpp:513
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go to options, select  tab 'User Interface', and edit \"Connect to "
 "the Internet\"."
-msgstr ""
+msgstr "אתה לא יכול להוריד תוספים ללא גישה לאינטרנט. אםפ תרצה להוריד  תוספים, כנס להגדרות, בחר לשונית 'ממשק המשתמש', וערוך \"התחבר לאינטרנט\"."
 
 #: src/states_screens/main_menu_screen.cpp:488
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
-msgstr ""
+msgstr "אתה לא יכול לשחק ברשת בלי גישה לאינטרנט. אם תרצה לשחק ברשת,  כנס להגדרות, בחר לשונית 'ממשק המשתמש', וערוך \"התחבר לאינטרנט\"."
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
@@ -3191,7 +3194,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at http://privacy.supertuxkart.net"
-msgstr ""
+msgstr "אתה יכול לשחק בלי ליצור חשבון מקוון על ידי בחירת חשבון בלתי מקוון. למרות שלא תוכל להתחבר לחבריך, להצביע עבור תוספים אהובים, וכו. אנא קרא את מדיניות הפרטיות שלנו בכתובת http://privacy.supertuxkart.net"
 
 #: src/states_screens/grand_prix_win.cpp:124
 #: src/states_screens/race_result_gui.cpp:175
@@ -3231,8 +3234,8 @@ msgstr "סיימת את המירוץ!"
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "יש לך %d בקשת חברות חדשה!"
+msgstr[1] "יש לך %d בקשות חברות חדשות!"
 
 #: src/online/online_player_profile.cpp:472
 msgid "You have a new friend request!"
@@ -3246,7 +3249,7 @@ msgstr "נפסלת!"
 msgid ""
 "You have not yet voted for this addon. Select your desired rating by "
 "clicking the stars beneath"
-msgstr ""
+msgstr "עוד לא הצבעת עבור תוסף זה. בחר את הדירוג המתאים לך על ידי לחיצה על הכוכבים למטה"
 
 #: src/karts/kart.cpp:1913
 msgid ""
@@ -3273,13 +3276,13 @@ msgstr "פתחת את המסלול %0"
 msgid ""
 "You will receive an email with further instructions on how to reset your "
 "password. Please be patient and be sure to check your spam folder."
-msgstr ""
+msgstr "אתם תקבלו הודעה עם הוראות להמשך על מנת לאפס את הסיסמא שלכם. אנא התאזרו בסבלנות ובדקו את תיקיית הזבל שלכם."
 
 #: src/states_screens/register_screen.cpp:361
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
-msgstr ""
+msgstr "את/ה תקבלו הודעה עם הוראות נוספות לגבי הפעלת החשבון. אנא התאזרו בסבלנות וודאו לבדוק את תיקיית הזבל שלכם."
 
 #: src/karts/kart.cpp:856 src/karts/kart.cpp:875
 msgid "You won the race!"
@@ -3289,7 +3292,7 @@ msgstr "ניצחת במירוץ!"
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
-msgstr ""
+msgstr "גרסת ה-OpenGL נראת כישנה מאוד. אנא בדקו שיש עדכון למנהל ההתקן. SuperTuxKart דורש OpenGl 3.1 או יותר."
 
 #: src/config/user_config.cpp:700
 msgid ""
@@ -3306,7 +3309,7 @@ msgstr "קובץ הגדרות שלך היה ישן מדי, כך שזה נמחק 
 #: src/main.cpp:1367
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
-msgstr ""
+msgstr "גרסת מנהל התקן שלך ישנה מדי. אנא התקן את מנהל התקן העדכני ביותר. "
 
 #: src/input/device_manager.cpp:501
 msgid "Your input config file is not compatible with this version of STK."
@@ -3367,4 +3370,4 @@ msgstr "רגיל"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Asael https://launchpad.net/~asaelr\n  Auria https://launchpad.net/~auria-mg\n  Ddorda https://launchpad.net/~ddorda\n  GenghisKhan https://launchpad.net/~genghiskhan\n  Jorge Mariano https://launchpad.net/~jmariano\n  Leo Juszkiewicz https://launchpad.net/~juszr\n  Reuma Mordechai https://launchpad.net/~reumamordechai\n  STK-team https://launchpad.net/~stk\n  Shai Shapira https://launchpad.net/~shayshap\n  Shimi Chen https://launchpad.net/~shimi-chen\n  Yaron https://launchpad.net/~sh-yaron"
+msgstr "Launchpad Contributions:\nAsael https://launchpad.net/~asaelr\nAuria https://launchpad.net/~auria-mg\nCapri, 2015\nDdorda https://launchpad.net/~ddorda\nGenghisKhan https://launchpad.net/~genghiskhan\nGenghisKhan, 2015\nJorge Mariano https://launchpad.net/~jmariano\nLeo Juszkiewicz https://launchpad.net/~juszr\nReuma Mordechai https://launchpad.net/~reumamordechai\nShai Shapira https://launchpad.net/~shayshap\nShimi Chen https://launchpad.net/~shimi-chen\nSTK-team https://launchpad.net/~stk\nYaron https://launchpad.net/~sh-yaron\nYs, 2015"

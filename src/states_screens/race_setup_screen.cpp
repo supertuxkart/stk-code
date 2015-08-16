@@ -228,7 +228,7 @@ void RaceSetupScreen::init()
         irr::core::stringw name4 = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
         //FIXME: avoid duplicating descriptions from the help menu!
-        name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
+        name4 += _("Hit others with weapons until they lose all their lives (only in multiplayer games).");
         w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
     }
 
@@ -237,7 +237,7 @@ void RaceSetupScreen::init()
     {
         irr::core::stringw name5 = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
-        name5 += _("Push the ball to the opposite cage to score goals. (Only in multiplayer games)");
+        name5 += _("Push the ball to the opposite cage to score goals (only in multiplayer games).");
         w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
     }
 #endif
@@ -289,7 +289,7 @@ void RaceSetupScreen::init()
         int index = w->findItemNamed("best");
         Widget* hardestWidget = &w->getChildren()[index];
         hardestWidget->setBadge(LOCKED_BADGE);
-        hardestWidget->setDeactivated();
+        hardestWidget->setActive(false);
     }
 }   // init
 

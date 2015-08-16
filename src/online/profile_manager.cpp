@@ -253,7 +253,7 @@ bool ProfileManager::inPersistent(const uint32_t id)
  *  the friends, while the other could have fetched the achievements.)
  *  \param profile The profile to make persistent.
  */
-void ProfileManager::addPersistent(OnlineProfile * profile)
+OnlineProfile* ProfileManager::addPersistent(OnlineProfile * profile)
 {
     if (inPersistent(profile->getID()))
     {
@@ -263,6 +263,8 @@ void ProfileManager::addPersistent(OnlineProfile * profile)
     {
         m_profiles_persistent[profile->getID()] = profile;
     }
+
+    return m_profiles_persistent[profile->getID()];
 }   // addPersistent
 
 // ------------------------------------------------------------------------

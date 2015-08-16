@@ -3367,4 +3367,4 @@ msgstr "ստանդարտ"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Aram Palyan https://launchpad.net/~ararat-info"
+msgstr "Launchpad Contributions:\nAram Palyan https://launchpad.net/~ararat-info"

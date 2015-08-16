@@ -22,6 +22,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
+#include "graphics/shaders.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
@@ -33,6 +34,7 @@
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
+#include "states_screens/dialogs/scripting_console.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -95,6 +97,8 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_FREE,
     DEBUG_GUI_CAM_TOP,
     DEBUG_GUI_CAM_WHEEL,
+    DEBUG_GUI_CAM_BEHIND_KART,
+    DEBUG_GUI_CAM_SIDE_OF_KART,
     DEBUG_GUI_CAM_NORMAL,
     DEBUG_GUI_CAM_SMOOTH,
     DEBUG_GUI_CAM_ATTACH,
@@ -103,6 +107,7 @@ enum DebugMenuCommand
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
     DEBUG_ADJUST_LIGHTS,
+    DEBUG_SCRIPT_CONSOLE
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -247,7 +252,9 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Toggle GUI", DEBUG_GUI_TOGGLE);
             sub->addItem(L"Hide karts", DEBUG_GUI_HIDE_KARTS);
             sub->addItem(L"Top view", DEBUG_GUI_CAM_TOP);
-            sub->addItem(L"Wheel view", DEBUG_GUI_CAM_WHEEL);
+            sub->addItem(L"Behind wheel view", DEBUG_GUI_CAM_WHEEL);
+            sub->addItem(L"Behind kart view", DEBUG_GUI_CAM_BEHIND_KART);
+            sub->addItem(L"Side of kart view", DEBUG_GUI_CAM_SIDE_OF_KART);
             sub->addItem(L"First person view", DEBUG_GUI_CAM_FREE);
             sub->addItem(L"Normal view", DEBUG_GUI_CAM_NORMAL);
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
@@ -265,6 +272,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
             mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
             mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
+            mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();
@@ -296,7 +304,7 @@ bool onEvent(const SEvent &event)
                 if(cmdID == DEBUG_GRAPHICS_RELOAD_SHADERS)
                 {
                     Log::info("Debug", "Reloading shaders...");
-                    irr_driver->updateShaders();
+                    ShaderBase::updateShaders();
                 }
                 else if (cmdID == DEBUG_GRAPHICS_RESET)
                 {
@@ -516,6 +524,16 @@ bool onEvent(const SEvent &event)
                     UserConfigParams::m_camera_debug = 2;
                     irr_driver->getDevice()->getCursorControl()->setVisible(true);
                 }
+                else if (cmdID == DEBUG_GUI_CAM_BEHIND_KART)
+                {
+                    UserConfigParams::m_camera_debug = 4;
+                    irr_driver->getDevice()->getCursorControl()->setVisible(true);
+                }
+                else if (cmdID == DEBUG_GUI_CAM_SIDE_OF_KART)
+                {
+                    UserConfigParams::m_camera_debug = 5;
+                    irr_driver->getDevice()->getCursorControl()->setVisible(true);
+                }
                 else if (cmdID == DEBUG_GUI_CAM_FREE)
                 {
                     UserConfigParams::m_camera_debug = 3;
@@ -649,6 +667,10 @@ bool onEvent(const SEvent &event)
                     );
                     dsd->changeLabel("SSAO Sigma", "[None]");
 #endif
+                }
+                else if (cmdID == DEBUG_SCRIPT_CONSOLE)
+                {
+                    ScriptingConsole* console = new ScriptingConsole();
                 }
             }
 

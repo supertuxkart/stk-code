@@ -50,22 +50,22 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
         if (c->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER) r--;
 
         if (label.size() > 0) label.append(L"\n");
-        label.append( _("Required Rank : %i", r) );
+        label.append( _("Required Rank: %i", r) );
     }
     if (c->getTime(difficulty) > 0)
     {
         if (label.size() > 0) label.append(L"\n");
-        label.append( _("Required Time : %i",
+        label.append( _("Required Time: %i",
                         StringUtils::timeToString(c->getTime(difficulty)).c_str()) );
     }
     if (c->getEnergy(difficulty) > 0)
     {
         if (label.size() > 0) label.append(L"\n");
-        label.append( _("Required Nitro Points : %i", c->getEnergy(difficulty)) );
+        label.append( _("Required Nitro Points: %i", c->getEnergy(difficulty)) );
     }
 
     if (label.size() > 0) label.append(L"\n");
-    label.append(_("Number of AI Karts : %i", c->getNumKarts(difficulty) - 1));
+    label.append(_("Number of AI Karts: %i", c->getNumKarts(difficulty) - 1));
 
     return label;
 }

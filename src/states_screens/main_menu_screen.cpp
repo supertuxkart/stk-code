@@ -125,7 +125,7 @@ void MainMenuScreen::init()
     if (addons_manager->isLoading())
     {
         IconButtonWidget* w = getWidget<IconButtonWidget>("addons");
-        w->setDeactivated();
+        w->setActive(false);
         w->resetAllBadges();
         w->setBadge(LOADING_BADGE);
     }
@@ -133,7 +133,7 @@ void MainMenuScreen::init()
     m_online = getWidget<IconButtonWidget>("online");
 
     if(!m_enable_online)
-        m_online->setDeactivated();
+        m_online->setActive(false);
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
@@ -166,19 +166,19 @@ void MainMenuScreen::onUpdate(float delta)
        PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
     {
         m_user_id->setText(player->getLastOnlineName() + "@stk");
-        m_online->setActivated();
+        m_online->setActive(true);
         m_online->setLabel( _("Online"));
     }
     else if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_OUT)
     {
-        m_online->setActivated();
+        m_online->setActive(true);
         m_online->setLabel( _("Login" ));
         m_user_id->setText(player->getName());
     }
     else 
     {
         // now must be either logging in or logging out
-        m_online->setDeactivated();
+        m_online->setActive(false);
         m_user_id->setText(player->getName());
     }
 
@@ -189,7 +189,7 @@ void MainMenuScreen::onUpdate(float delta)
     {
         if (addons_manager->wasError())
         {
-            addons_icon->setActivated();
+            addons_icon->setActive(true);
             addons_icon->resetAllBadges();
             addons_icon->setBadge(BAD_BADGE);
         }
@@ -197,13 +197,13 @@ void MainMenuScreen::onUpdate(float delta)
             == Online::RequestManager::IPERM_ALLOWED)
         {
             // Addons manager is still initialising/downloading.
-            addons_icon->setDeactivated();
+            addons_icon->setActive(false);
             addons_icon->resetAllBadges();
             addons_icon->setBadge(LOADING_BADGE);
         }
         else
         {
-            addons_icon->setActivated();
+            addons_icon->setActive(true);
             addons_icon->resetAllBadges();
         }
         // maybe add a new badge when not allowed to access the net

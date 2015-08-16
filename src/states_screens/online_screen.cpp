@@ -115,16 +115,16 @@ void OnlineScreen::beforeAddingWidget()
         m_recorded_state == PlayerProfile::OS_SIGNING_IN ||
         m_recorded_state == PlayerProfile::OS_SIGNING_OUT)
     {
-        m_quick_play_widget->setDeactivated();
-        m_find_server_widget->setDeactivated();
-        m_create_server_widget->setDeactivated();
+        m_quick_play_widget->setActive(false);
+        m_find_server_widget->setActive(false);
+        m_create_server_widget->setActive(false);
         m_sign_out_widget->setVisible(false);
         m_profile_widget->setVisible(false);
     }
     else if (m_recorded_state == PlayerProfile::OS_GUEST)
     {
-        m_find_server_widget->setDeactivated();
-        m_create_server_widget->setDeactivated();
+        m_find_server_widget->setActive(false);
+        m_create_server_widget->setActive(false);
         m_profile_widget->setVisible(false);
     }
 

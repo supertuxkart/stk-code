@@ -24,8 +24,10 @@
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
+#include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "utils/helpers.hpp"
 #include <ISceneManager.h>
 
@@ -39,9 +41,10 @@
  * \param lod_node Lod node (defaults to NULL).
  */
 TrackObject::TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent,
-                         ModelDefinitionLoader& model_def_loader)
+                         ModelDefinitionLoader& model_def_loader,
+                         TrackObject* parent_library)
 {
-    init(xml_node, parent, model_def_loader);
+    init(xml_node, parent, model_def_loader, parent_library);
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
@@ -63,12 +66,12 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_presentation    = NULL;
     m_animator        = NULL;
     m_physical_object = NULL;
+    m_parent_library  = NULL;
     m_interaction     = interaction;
     m_presentation    = presentation;
     m_is_driveable    = false;
     m_soccer_ball     = false;
-    m_garage          = false;
-    m_distance        = 0;
+    m_initially_visible = false;
     m_type            = "";
 
     if (m_interaction != "ghost" && m_interaction != "none" &&
@@ -89,15 +92,17 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
  *  \param model_def_loader Used to load level-of-detail nodes.
  */
 void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
-                       ModelDefinitionLoader& model_def_loader)
+                       ModelDefinitionLoader& model_def_loader,
+                       TrackObject* parent_library)
 {
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
     m_init_scale = core::vector3df(1,1,1);
     m_enabled    = true;
+    m_initially_visible = false;
     m_presentation = NULL;
     m_animator = NULL;
-
+    m_parent_library = parent_library;
     m_physical_object = NULL;
 
     xml_node.get("id",      &m_id        );
@@ -120,14 +125,19 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_soccer_ball = false;
     xml_node.get("soccer_ball", &m_soccer_ball);
     
-    m_garage = false;
-    m_distance = 0;
-
     std::string type;
     xml_node.get("type",    &type );
 
     m_type = type;
 
+    m_initially_visible = true;
+    xml_node.get("if", &m_visibility_condition);
+    if (m_visibility_condition == "false")
+    {
+        m_initially_visible = false;
+    }
+    if (!m_initially_visible)
+        setEnabled(false);
 
     if (xml_node.getName() == "particle-emitter")
     {
@@ -141,7 +151,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     }
     else if (xml_node.getName() == "library")
     {
-        m_presentation = new TrackObjectPresentationLibraryNode(xml_node, model_def_loader);
+        m_presentation = new TrackObjectPresentationLibraryNode(this, xml_node, model_def_loader);
     }
     else if (type == "sfx-emitter")
     {
@@ -152,16 +162,9 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     }
     else if (type == "action-trigger")
     {
-        std::string m_action;
-        xml_node.get("action", &m_action);
-        xml_node.get("distance", &m_distance);
-        m_name = m_action;
-        //adds action as name so that it can be found by using getName()
-        if (m_action == "garage")
-        {
-            m_garage = true;
-        }
-
+        std::string action;
+        xml_node.get("action", &action);
+        m_name = action; //adds action as name so that it can be found by using getName()
         m_presentation = new TrackObjectPresentationActionTrigger(xml_node);
     }
     else if (type == "billboard")
@@ -175,7 +178,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     else
     {
         scene::ISceneNode *glownode = NULL;
-
+        bool is_movable = false;
         if (lod_instance)
         {
             m_type = "lod";
@@ -217,6 +220,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                 node->setPosition(absTransform.getTranslation());
                 node->setRotation(absTransform.getRotationDegrees());
                 node->setScale(absTransform.getScale());
+                is_movable = true;
             }
 
             glownode = node;
@@ -231,6 +235,14 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
             m_physical_object = PhysicalObject::fromXML(type == "movable",
                                                    xml_node,
                                                    this);
+        }
+
+        if (parent_library != NULL)
+        {
+            if (is_movable)
+                parent_library->addMovableChild(this);
+            else
+                parent_library->addChild(this);
         }
 
         video::SColor glow;
@@ -262,7 +274,74 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     }
 
     reset();
+
+    if (!m_initially_visible)
+        setEnabled(false);
+    if (parent_library != NULL && !parent_library->isEnabled())
+        setEnabled(false);
 }   // TrackObject
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::onWorldReady()
+{
+    if (m_visibility_condition == "false")
+    {
+        m_initially_visible = false;
+    }
+    else if (m_visibility_condition.size() > 0)
+    {
+        unsigned char result = -1;
+        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+
+        std::ostringstream fn_signature;
+        std::vector<std::string> arguments;
+        if (m_visibility_condition.find("(") != std::string::npos && 
+            m_visibility_condition.find(")") != std::string::npos)
+        {
+            // There are arguments to pass to the function
+            // TODO: For the moment we only support string arguments
+            // TODO: this parsing could be improved
+            unsigned first = m_visibility_condition.find("(");
+            unsigned last = m_visibility_condition.find_last_of(")");
+            std::string fn_name = m_visibility_condition.substr(0, first);
+            std::string str_arguments = m_visibility_condition.substr(first + 1, last - first - 1);
+            arguments = StringUtils::split(str_arguments, ',');
+
+            fn_signature << "bool " << fn_name << "(";
+
+            for (int i = 0; i < arguments.size(); i++)
+            {
+                if (i > 0)
+                    fn_signature << ",";
+                fn_signature << "string";
+            }
+
+            fn_signature << ",Track::TrackObject@)";
+        }
+        else
+        {
+            fn_signature << "bool " << m_visibility_condition << "(Track::TrackObject@)";
+        }
+
+        TrackObject* self = this;
+        script_engine->runFunction(true, fn_signature.str(),
+            [&](asIScriptContext* ctx) 
+            {
+                for (int i = 0; i < arguments.size(); i++)
+                {
+                    ctx->SetArgObject(i, &arguments[i]);
+                }
+                ctx->SetArgObject(arguments.size(), self);
+            },
+            [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
+
+        if (result == 0)
+            m_initially_visible = false;
+    }
+    if (!m_initially_visible)
+        setEnabled(false);
+}
 
 // ----------------------------------------------------------------------------
 
@@ -281,9 +360,9 @@ TrackObject::~TrackObject()
  */
 void TrackObject::reset()
 {
-    if (m_presentation  ) m_presentation->reset();
-    if (m_animator      ) m_animator->reset();
-    if(m_physical_object) m_physical_object->reset();
+    if (m_presentation   ) m_presentation->reset();
+    if (m_animator       ) m_animator->reset();
+    if (m_physical_object) m_physical_object->reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -291,13 +370,58 @@ void TrackObject::reset()
  *  disabled objects will not be displayed anymore.
  *  \param mode Enable (true) or disable (false) this object.
  */
-void TrackObject::setEnable(bool mode)
+void TrackObject::setEnabled(bool enabled)
 {
-    m_enabled = mode;
-    if (m_presentation != NULL) m_presentation->setEnable(m_enabled);
+    m_enabled = enabled;
+
+    if (m_presentation != NULL)
+        m_presentation->setEnable(m_enabled);
+
+    if (getType() == "mesh")
+    {
+        if (m_physical_object != NULL)
+        {
+            if (enabled)
+                m_physical_object->addBody();
+            else
+                m_physical_object->removeBody();
+        }
+    }
+
+    for (unsigned int i = 0; i < m_movable_children.size(); i++)
+    {
+        m_movable_children[i]->setEnabled(enabled);
+    }
 }   // setEnable
 
 // ----------------------------------------------------------------------------
+
+void TrackObject::resetEnabled()
+{
+    m_enabled = m_initially_visible;
+
+    if (m_presentation != NULL)
+        m_presentation->setEnable(m_initially_visible);
+
+    if (getType() == "mesh")
+    {
+        if (m_physical_object != NULL)
+        {
+            if (m_initially_visible)
+                m_physical_object->addBody();
+            else
+                m_physical_object->removeBody();
+        }
+    }
+
+    for (unsigned int i = 0; i < m_movable_children.size(); i++)
+    {
+        m_movable_children[i]->resetEnabled();
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 void TrackObject::update(float dt)
 {
     if (m_presentation) m_presentation->update(dt);
@@ -347,24 +471,31 @@ void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
 
     if (update_rigid_body && m_physical_object != NULL)
     {
-        // If we set a bullet position from an irrlicht position, we need to
-        // get the absolute transform from the presentation object (as set in
-        // the line before), since xyz etc here are only relative to a
-        // potential parent scene node.
-        TrackObjectPresentationSceneNode *tops =
-            dynamic_cast<TrackObjectPresentationSceneNode*>(m_presentation);
-        if(tops)
-        {
-            const core::matrix4 &m = tops->getNode()
-                                   ->getAbsoluteTransformation();
-            m_physical_object->move(m.getTranslation(),m.getRotationDegrees());
-        }
-        else
-        {
-            m_physical_object->move(xyz, hpr);
-        }
+        movePhysicalBodyToGraphicalNode(xyz, hpr);
     }
 }   // move
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::movePhysicalBodyToGraphicalNode(const core::vector3df& xyz, const core::vector3df& hpr)
+{
+    // If we set a bullet position from an irrlicht position, we need to
+    // get the absolute transform from the presentation object (as set in
+    // the line before), since xyz etc here are only relative to a
+    // potential parent scene node.
+    TrackObjectPresentationSceneNode *tops =
+        dynamic_cast<TrackObjectPresentationSceneNode*>(m_presentation);
+    if (tops)
+    {
+        const core::matrix4 &m = tops->getNode()
+            ->getAbsoluteTransformation();
+        m_physical_object->move(m.getTranslation(), m.getRotationDegrees());
+    }
+    else
+    {
+        m_physical_object->move(xyz, hpr);
+    }
+}
 
 // ----------------------------------------------------------------------------
 const core::vector3df& TrackObject::getPosition() const
@@ -374,6 +505,17 @@ const core::vector3df& TrackObject::getPosition() const
     else
         return m_init_xyz;
 }   // getPosition
+
+// ----------------------------------------------------------------------------
+
+const core::vector3df TrackObject::getAbsoluteCenterPosition() const
+{
+    if (m_presentation != NULL)
+        return m_presentation->getAbsoluteCenterPosition();
+    else
+        return m_init_xyz;
+}   // getAbsolutePosition
+
 
 // ----------------------------------------------------------------------------
 
@@ -402,5 +544,48 @@ const core::vector3df& TrackObject::getScale() const
     if (m_presentation != NULL)
         return m_presentation->getScale();
     else
-        return m_init_xyz;
+        return m_init_scale;
 }   // getScale
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::addMovableChild(TrackObject* child)
+{
+    if (!m_enabled)
+        child->setEnabled(false);
+    m_movable_children.push_back(child);
+}
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::addChild(TrackObject* child)
+{
+    if (!m_enabled)
+        child->setEnabled(false);
+    m_children.push_back(child);
+}
+
+// ----------------------------------------------------------------------------
+
+// scripting function
+void TrackObject::moveTo(const Scripting::SimpleVec3* pos, bool isAbsoluteCoord)
+{
+    TrackObjectPresentationLibraryNode *libnode =
+        dynamic_cast<TrackObjectPresentationLibraryNode*>(m_presentation);
+    if (libnode != NULL)
+    {
+        libnode->move(core::vector3df(pos->getX(), pos->getY(), pos->getZ()),
+            core::vector3df(0.0f, 0.0f, 0.0f), // TODO: preserve rotation
+            core::vector3df(1.0f, 1.0f, 1.0f), // TODO: preserve scale
+            isAbsoluteCoord,
+            true /* moveChildrenPhysicalBodies */);
+    }
+    else
+    {
+        move(core::vector3df(pos->getX(), pos->getY(), pos->getZ()),
+            core::vector3df(0.0f, 0.0f, 0.0f), // TODO: preserve rotation
+            core::vector3df(1.0f, 1.0f, 1.0f), // TODO: preserve scale
+            true, // updateRigidBody
+            isAbsoluteCoord);
+    }
+}

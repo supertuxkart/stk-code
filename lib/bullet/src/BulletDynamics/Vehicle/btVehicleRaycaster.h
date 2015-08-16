@@ -25,6 +25,8 @@ virtual ~btVehicleRaycaster()
 		btVector3	m_hitPointInWorld;
 		btVector3	m_hitNormalInWorld;
 		btScalar	m_distFraction;
+        /** If a triangle mesh, the index of the triangle, otherwise -1. */
+        int         m_triangle_index;
 	};
 
 	virtual void* castRay(const btVector3& from,const btVector3& to, btVehicleRaycasterResult& result) = 0;

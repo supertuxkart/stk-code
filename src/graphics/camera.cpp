@@ -67,10 +67,7 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     setupCamera();
     if (kart != NULL)
     {
-        if(UserConfigParams::m_camera_debug==2)
-            m_distance = kart->getKartModel()->getLength();
-        else
-            m_distance = kart->getKartProperties()->getCameraDistance();
+        m_distance = kart->getKartProperties()->getCameraDistance();
         setKart(kart);
     }
     else
@@ -225,7 +222,7 @@ void Camera::setupCamera()
                                      irr_driver->getActualScreenSize().Width,
                                      irr_driver->getActualScreenSize().Height);
             m_scaling  = core::vector2df(1.0f, 1.0f);
-            m_fov      = DEGREE_TO_RAD*75.0f;
+            m_fov      = DEGREE_TO_RAD*stk_config->m_camera_fov[0];
             break;
     case 2: m_viewport = core::recti(0,
                                      m_index==0 ? 0
@@ -235,7 +232,7 @@ void Camera::setupCamera()
                                                 : irr_driver->getActualScreenSize().Height);
             m_scaling  = core::vector2df(1.0f, 0.5f);
             m_aspect  *= 2.0f;
-            m_fov      = DEGREE_TO_RAD*65.0f;
+            m_fov      = DEGREE_TO_RAD*stk_config->m_camera_fov[1];
             break;
     case 3:
             /*
@@ -268,7 +265,7 @@ void Camera::setupCamera()
             const int y2 = (m_index<2    ? irr_driver->getActualScreenSize().Height>>1 : irr_driver->getActualScreenSize().Height);
             m_viewport = core::recti(x1, y1, x2, y2);
             m_scaling  = core::vector2df(0.5f, 0.5f);
-            m_fov      = DEGREE_TO_RAD*50.0f;
+            m_fov      = DEGREE_TO_RAD*stk_config->m_camera_fov[3];
             }
             break;
     default:
@@ -466,11 +463,20 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
             {
                 *above_kart = 0;
                 *cam_angle  = 0;
+                *distance   = -m_kart->getKartModel()->getLength()-1.0f;
+            }
+            else if(UserConfigParams::m_camera_debug==4)
+            {
+                *above_kart = 0;
+                *cam_angle  = 0;
+                *distance   = -0.5f*m_kart->getKartModel()->getLength()-1.0f;
+                *smoothing  = false;
             }
             else
             {
                 *above_kart    = 0.75f;
                 *cam_angle     = kp->getCameraForwardUpAngle();
+                *distance      = -m_distance;
             }
             float steering = m_kart->getSteerPercent()
                            * (1.0f + (m_kart->getSkidding()->getSkidFactor()
@@ -478,7 +484,6 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
             // quadratically to dampen small variations (but keep sign)
             float dampened_steer = fabsf(steering) * steering;
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
-            *distance            = -m_distance;
             *smoothing           = true;
             break;
         }   // CM_FALLING
@@ -542,6 +547,14 @@ void Camera::update(float dt)
         // To view inside tunnels (FIXME 27>15 why??? makes no sense
         // - the kart should not be visible, but it works)
         m_camera->setNearValue(27.0);
+    }
+    else if (UserConfigParams::m_camera_debug==5)
+    {
+        core::vector3df xyz = m_kart->getXYZ().toIrrVector();
+        Vec3 offset(3, 0, 0);
+        offset = m_kart->getTrans()(offset);
+        m_camera->setTarget(xyz);
+        m_camera->setPosition(offset.toIrrVector());
     }
     // Update the first person camera
     else if (UserConfigParams::m_camera_debug == 3)
@@ -723,7 +736,14 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
         btQuaternion q(m_kart->getSkidding()->getVisualSkidRotation(), 0, 0);
         t.setBasis(t.getBasis() * btMatrix3x3(q));
     }
-    wanted_position = t(relative_position);
+    if (UserConfigParams::m_camera_debug == 2)
+    {
+        wanted_position = t(relative_position);
+        // Make sure that the Y position is a the same height as the wheel.
+        wanted_position.setY(wanted_target.getY());
+    }
+    else
+        wanted_position = t(relative_position);
 
     if (smoothing && UserConfigParams::m_camera_debug==0)
     {

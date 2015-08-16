@@ -146,7 +146,7 @@ void SFXOpenAL::updatePlayingSFX(float dt)
  */
 void SFXOpenAL::setSpeed(float factor)
 {
-    if(m_status==SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
+    //if(m_status!=SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
     assert(!isnan(factor));
     SFXManager::get()->queue(SFXManager::SFX_SPEED, this, factor);
 }   // setSpeed
@@ -378,12 +378,43 @@ void SFXOpenAL::reallyPlayNow()
 }   // reallyPlayNow
 
 //-----------------------------------------------------------------------------
+/** This actually queues up the sfx in the sfx manager. It will be started
+ *  from a separate thread later (in this frame).
+ */
+void SFXOpenAL::play(const Vec3 &position)
+{
+    if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
+
+    if(m_status==SFX_STOPPED)
+        m_play_time = 0.0f;
+
+    // Technically the sfx is only playing after the sfx thread starts it,
+    // but it is important to set this here since stk might decide to
+    // delete a sfx if it has finished playing (i.e. is in stopped state)
+    // - which can happen if the sfx thread had no time to actually start
+    // it yet.
+    m_status = SFX_PLAYING;
+    SFXManager::get()->queue(SFXManager::SFX_PLAY_POSITION, this, position);
+}   // play(Vec3)
+
+//-----------------------------------------------------------------------------
+/** Plays this sound effect.
+ */
+void SFXOpenAL::reallyPlayNow(const Vec3 &position)
+{
+    reallySetPosition(position);
+    reallyPlayNow();
+}   // reallyPlayNow(Vec3)
+
+//-----------------------------------------------------------------------------
 /** Sets the position where this sound effects is played.
  *  \param position Position of the sound effect.
  */
 void SFXOpenAL::setPosition(const Vec3 &position)
 {
-    if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
+    // Don't send a position command to the thread if the sound is not playing
+    // (or sfx disabled or the sound was not initialised correctly)
+//    if (m_status != SFX_PLAYING|| !SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_POSITION, this, position);
 
 }   // setPosition
@@ -430,6 +461,25 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
     SFXManager::checkError("positioning");
 }   // reallySetPosition
 
+// ----------------------------------------------------------------------------
+/** Shortcut that plays at a specified position. */
+void SFXOpenAL::setSpeedPosition(float factor, const Vec3 &position)
+{
+    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+
+    SFXManager::get()->queue(SFXManager::SFX_SPEED_POSITION, this,
+                             factor, position);
+}   // play(vec3)
+//-----------------------------------------------------------------------------
+/** Set speed and position of a sound effect.
+ *  \param f Speed.
+ *  \param position Position of the sfx.
+ */
+void SFXOpenAL::reallySetSpeedPosition(float f, const Vec3 &position)
+{
+    reallySetSpeed(f);
+    reallySetPosition(position);
+}   // reallySetSpeedPosition
 //-----------------------------------------------------------------------------
 /** Queues up a delete request for this object. This is necessary to avoid
  *  a crash if the sfx manager thread might be delayed and access this object

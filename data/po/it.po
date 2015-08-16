@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Enrico <allin@infinito.it>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-13 21:42-0400\n"
-"PO-Revision-Date: 2015-03-14 11:00+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2015-04-09 17:01+0000\n"
+"Last-Translator: Enrico <allin@infinito.it>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/supertuxkart/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -60,7 +61,7 @@ msgstr "%s MB"
 #: src/online/online_player_profile.cpp:418
 #, c-format
 msgid "%s and %s are now online."
-msgstr ""
+msgstr "%s e %s sono ora in linea."
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:306
@@ -78,7 +79,7 @@ msgstr "%s di %s"
 #: src/online/online_player_profile.cpp:414
 #, c-format
 msgid "%s is now online."
-msgstr ""
+msgstr "%s è ora in linea."
 
 #: src/guiengine/widgets/player_kart_widget.cpp:420
 #, c-format
@@ -88,17 +89,17 @@ msgstr "%s è pronto"
 #: src/states_screens/online_profile_base.cpp:108
 #, c-format
 msgid "%s's profile"
-msgstr ""
+msgstr "profilo di %s"
 
 #: src/states_screens/create_server_screen.cpp:60
 #, c-format
 msgid "%s's server"
-msgstr ""
+msgstr "server di %s"
 
 #: src/online/online_player_profile.cpp:423
 #, c-format
 msgid "%s, %s and %s are now online."
-msgstr ""
+msgstr "%s, %s e %s sono ora in linea."
 
 #: src/modes/world.cpp:1147
 #, c-format
@@ -121,7 +122,7 @@ msgstr "* Un elemento blu indica un conflitto con un'altra configurazione"
 
 #: src/states_screens/options_screen_input2.cpp:377
 msgid "* A red item means a conflict in the current configuration"
-msgstr ""
+msgstr "* Un elemento blu indica un conflitto con la configurazione attuale"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
@@ -140,7 +141,7 @@ msgstr "* La maggior parte di queste modalità può essere giocata in modalità 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "* Restart STK to apply new settings"
-msgstr ""
+msgstr "* Riavvia STK per applicare le nuove impostazioni"
 
 #. I18N: ./data/gui/options_input.stkgui
 msgid ""
@@ -154,7 +155,7 @@ msgstr ""
 #. I18N: ./data/gui/online/profile_overview.stkgui
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "..."
-msgstr ""
+msgstr "..."
 
 #: src/states_screens/addons_screen.cpp:52
 msgid "1 month"
@@ -240,7 +241,7 @@ msgstr "Accelera con <%s> e sterza con <%s> e <%s>"
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept"
-msgstr ""
+msgstr "Accetta"
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -253,7 +254,7 @@ msgstr ""
 #. I18N: Section in the profile screen
 #: src/states_screens/online_profile_base.cpp:101
 msgid "Account Settings"
-msgstr ""
+msgstr "Impostazioni account"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -275,7 +276,7 @@ msgstr ""
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Add Friend"
-msgstr ""
+msgstr "Aggiungi amico"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:111
@@ -3366,4 +3367,4 @@ msgstr "standard"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Alessandro Aragione https://launchpad.net/~layn\n  Andrea Panontin https://launchpad.net/~any-97\n  Andrea Pivetta https://launchpad.net/~vanpivix\n  Dawid Gan https://launchpad.net/~deveee\n  Diego Pierotto https://launchpad.net/~gringo\n  Gigu https://launchpad.net/~pvinci26\n  Guido Barbi https://launchpad.net/~gbar\n  Massimiliano Caniparoli https://launchpad.net/~massic80\n  Max Perkins https://launchpad.net/~maxperkinstoki\n  Oibaf https://launchpad.net/~oibaf\n  STK-team https://launchpad.net/~stk\n  grandefava https://launchpad.net/~grandefava\n  marco https://launchpad.net/~marco97pa\n  nicoelba https://launchpad.net/~nicoelba\n  t3ddy https://launchpad.net/~t3ddy1988"
+msgstr "Launchpad Contributions:\nAlessandro Aragione https://launchpad.net/~layn\nAndrea Panontin https://launchpad.net/~any-97\nAndrea Pivetta https://launchpad.net/~vanpivix\nDawid Gan https://launchpad.net/~deveee\nDiego Pierotto https://launchpad.net/~gringo\nEnrico, 2015\nGigu https://launchpad.net/~pvinci26\ngrandefava https://launchpad.net/~grandefava\nGuido Barbi https://launchpad.net/~gbar\nmarco https://launchpad.net/~marco97pa\nMassimiliano Caniparoli https://launchpad.net/~massic80\nMax Perkins https://launchpad.net/~maxperkinstoki\nnicoelba https://launchpad.net/~nicoelba\nOibaf https://launchpad.net/~oibaf\nSTK-team https://launchpad.net/~stk\nt3ddy https://launchpad.net/~t3ddy1988"

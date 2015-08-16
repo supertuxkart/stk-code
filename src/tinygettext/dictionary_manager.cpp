@@ -17,6 +17,8 @@
 
 #include "dictionary_manager.hpp"
 
+#include "utils/log.hpp"
+
 #include <memory>
 #include <assert.h>
 #include <stdlib.h>
@@ -24,7 +26,6 @@
 #include <fstream>
 #include <algorithm>
 
-#include "log_stream.hpp"
 #include "po_parser.hpp"
 #include "stk_file_system.hpp"
 
@@ -134,7 +135,8 @@ DictionaryManager::get_dictionary(const Language& language)
 
           if (!po_language)
           {
-            log_warning << *filename << ": warning: ignoring, unknown language" << std::endl;
+              Log::warn("tinygettext", "%s: warning: ignoring, unknown language",
+                         filename->c_str());
           }
           else
           {
@@ -154,10 +156,11 @@ DictionaryManager::get_dictionary(const Language& language)
         std::string pofile = *p + "/" + best_filename;
         try
         {
-          std::auto_ptr<std::istream> in = filesystem->open_file(pofile);
+          std::unique_ptr<std::istream> in = filesystem->open_file(pofile);
           if (!in.get())
           {
-            log_error << "error: failure opening: " << pofile << std::endl;
+              Log::error("tinygettext", "error: failure opening: '%s'.",
+                         pofile.c_str());
           }
           else
           {
@@ -166,8 +169,8 @@ DictionaryManager::get_dictionary(const Language& language)
         }
         catch(std::exception& e)
         {
-          log_error << "error: failure parsing: " << pofile << std::endl;
-          log_error << e.what() << "" << std::endl;
+          Log::error("tinygettext", "error: failure parsing: '%s'.", pofile.c_str());
+          Log::error("tinygettext", "%s", e.what());
         }
       }
     }
@@ -249,11 +252,11 @@ DictionaryManager::add_directory(const std::string& pathname)
   search_path.push_back(pathname);
 }
 
-/*void
-DictionaryManager::set_filesystem(std::auto_ptr<FileSystem> filesystem_)
+void
+DictionaryManager::set_filesystem(std::unique_ptr<FileSystem> filesystem_)
 {
-  filesystem = filesystem_;
-}*/
+  filesystem = std::move(filesystem_);
+}
 // ----------------------------------------------------------------------------
 /** This function converts a .po filename (e.g. zh_TW.po) into a language
  *  specification (zh_TW). On case insensitive file systems (think windows)

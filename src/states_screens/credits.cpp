@@ -166,13 +166,14 @@ void CreditsScreen::loadedFromFile()
     }
 
     int lineCount = 0;
-
+#undef DEBUG_TRANSLATIONS    // Enable to only see the translator credits
+#ifdef DEBUG_TRANSLATIONS
+        int my_counter = 0;
+#endif
     // let's assume the file is encoded as UTF-16
     while (getWideLine( file, &line ))
     {
-#undef DEBUG_TRANSLATIONS    // Enable to only see the translator credits
 #ifdef DEBUG_TRANSLATIONS
-        static int my_counter = 0;
         if (my_counter > 0)
             break;
         my_counter++;

@@ -162,18 +162,18 @@ void AddonsLoading::beforeAddingWidgets()
         float f = ((int)(n/1024.0f/1024.0f*10.0f+0.5f))/10.0f;
         char s[32];
         sprintf(s, "%.1f", f);
-        unit=_("%s MB", s);
+        unit = _LTR("%s MB", s);
     }
     else if(n>1024)
     {
         float f = ((int)(n/1024.0f*10.0f+0.5f))/10.0f;
         char s[32];
         sprintf(s, "%.1f", f);
-        unit=_("%s KB", s);
+        unit = _LTR("%s KB", s);
     }
     else
         // Anything smaller just let it be 1 KB
-        unit=_("%s KB", 1);
+        unit = _LTR("%s KB", 1);
     core::stringw size = _("Size: %s", unit.c_str());
     getWidget<LabelWidget>("size")->setText(size, false);
 }   // AddonsLoading
@@ -331,12 +331,15 @@ void AddonsLoading::stopDownload()
     // (and not uninstalling an installed one):
     if(m_download_request)
     {
-        // In case of a cancel we can't free the memory, since
-        // network_http will potentially update the request. So in
-        // order to avoid a memory leak, we let network_http free
-        // the request.
-        //m_download_request->setManageMemory(true);
+        // In case of a cancel we can't free the memory, since the 
+        // request manager thread is potentially working on this request. So 
+        // in order to avoid a memory leak, we let the request manager
+        // free the data. This is thread safe since freeing the data is done
+        // when the request manager handles the result queue - and this is
+        // done by the main thread (i.e. this thread).
+        m_download_request->setManageMemory(true);
         m_download_request->cancel();
+        m_download_request = NULL;
     };
 }   // startDownload
 

@@ -23,6 +23,7 @@
 
 #include "items/item.hpp"
 #include "physics/physical_object.hpp"
+#include "scriptengine/scriptvec3.hpp"
 #include "tracks/track_object_presentation.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
@@ -79,21 +80,31 @@ protected:
 
     bool                           m_soccer_ball;
     
-    bool                           m_garage;
-
     /** True if a kart can drive on this object. This will */
     bool                           m_is_driveable;
-
-    float                          m_distance;
 
     PhysicalObject*                m_physical_object;
 
     ThreeDAnimation*               m_animator;
+
+    TrackObject*                   m_parent_library;
     
-    void init(const XMLNode &xml_node, scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader);
+    std::vector<TrackObject*>      m_movable_children;
+    std::vector<TrackObject*>      m_children;
+
+    bool                           m_initially_visible;
+
+    std::string                     m_visibility_condition;
+
+    void init(const XMLNode &xml_node, scene::ISceneNode* parent,
+        ModelDefinitionLoader& model_def_loader,
+        TrackObject* parent_library);
 
 public:
-                 TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader);
+                 TrackObject(const XMLNode &xml_node,
+                             scene::ISceneNode* parent,
+                             ModelDefinitionLoader& model_def_loader,
+                             TrackObject* parent_library);
 
                  TrackObject(const core::vector3df& xyz,
                              const core::vector3df& hpr,
@@ -109,9 +120,9 @@ public:
               bool isAbsoluteCoord);
 
     virtual void reset();
-    void setEnable(bool mode);
     const core::vector3df& getPosition() const;
     const core::vector3df  getAbsolutePosition() const;
+    const core::vector3df  getAbsoluteCenterPosition() const;
     const core::vector3df& getRotation() const;
     const core::vector3df& getScale() const;
     bool castRay(const btVector3 &from, 
@@ -119,10 +130,15 @@ public:
                  const Material **material, btVector3 *normal,
                  bool interpolate_normal) const;
 
+    TrackObject* getParentLibrary()
+    {
+        return m_parent_library;
+    }
+
     // ------------------------------------------------------------------------
     /** To finish object constructions. Called after the track model
      *  is ready. */
-    virtual void init() {};
+    virtual void onWorldReady();
     // ------------------------------------------------------------------------
     /** Called when an explosion happens. As a default does nothing, will
      *  e.g. be overwritten by physical objects etc. */
@@ -144,15 +160,9 @@ public:
     // ------------------------------------------------------------------------
     bool isSoccerBall() const { return m_soccer_ball; }
     // ------------------------------------------------------------------------
-    bool isGarage() const { return m_garage; }
-    // ------------------------------------------------------------------------
-    float getDistance() const { return m_distance; }
-    // ------------------------------------------------------------------------
     const PhysicalObject* getPhysicalObject() const { return m_physical_object; }
     // ------------------------------------------------------------------------
     PhysicalObject* getPhysicalObject() { return m_physical_object; }
-    //Due to above overload AngelScript cannot decide which function to bind
-    PhysicalObject* getPhysicalObjectForScript() { return m_physical_object; }
     // ------------------------------------------------------------------------
     const core::vector3df getInitXYZ() const { return m_init_xyz; }
     // ------------------------------------------------------------------------
@@ -165,26 +175,69 @@ public:
     // ------------------------------------------------------------------------
     template<typename T>
     const T* getPresentation() const { return dynamic_cast<T*>(m_presentation); }
+    // ------------------------------------------------------------------------
+    // Methods usable by scripts
+    /**
+    * \addtogroup Scripting
+    * @{
+    * \addtogroup Scripting_Track Track
+    * @{
+    * \addtogroup Scripting_TrackObject TrackObject (script binding)
+    * @{
+    */
+    /** Should only be used on mesh track objects.
+    * On the script side, the returned object is of type : @ref Scripting_Mesh
+    */
+    TrackObjectPresentationMesh* getMesh() { return getPresentation<TrackObjectPresentationMesh>(); }
+    /** Should only be used on particle emitter track objects.
+    * On the script side, the returned object is of type : @ref Scripting_ParticleEmitter
+    */
+    TrackObjectPresentationParticles* getParticleEmitter() { return getPresentation<TrackObjectPresentationParticles>(); }
+    /** Should only be used on sound emitter track objects.
+      * On the script side, the returned object is of type : @ref Scripting_SoundEmitter
+      */
+    TrackObjectPresentationSound* getSoundEmitter(){ return getPresentation<TrackObjectPresentationSound>(); }
+    // For angelscript. Needs to be named something different than getAnimator since it's overloaded.
+    /** Should only be used on TrackObjects that use curve-based animation.
+      * On the script side, the returned object is of type : @ref Scripting_Animator
+      */
+    ThreeDAnimation* getIPOAnimator() { return m_animator; }
+    // For angelscript. Needs to be named something different than getPhysicalObject since it's overloaded.
+    /** Get the physics representation of an object.
+      * On the script side, the returned object is of type : @ref Scripting_PhysicalObject
+      */
+    PhysicalObject* getPhysics() { return m_physical_object; }
+    /** Hide or show the object */
+    void setEnabled(bool mode);
 
-    //specialized getters for scripts
-    TrackObjectPresentationMesh* getMesh(){ return getPresentation<TrackObjectPresentationMesh>(); }
+    void moveTo(const Scripting::SimpleVec3* pos, bool isAbsoluteCoord);
+    /* @} */
+    /* @} */
+    /* @} */
 
-    TrackObjectPresentationParticles* getParticles(){ return getPresentation<TrackObjectPresentationParticles>(); }
-
-    TrackObjectPresentationSound* getSound(){ return getPresentation<TrackObjectPresentationSound>(); }
-
+    void resetEnabled();
     // ------------------------------------------------------------------------
     ThreeDAnimation* getAnimator() { return m_animator; }
     // ------------------------------------------------------------------------
     const ThreeDAnimation* getAnimator() const { return m_animator; }
-    //Due to above overload AngelScript cannot decide which function to bind
-    ThreeDAnimation* getAnimatorForScript() { return m_animator; }
     // ------------------------------------------------------------------------
     void setPaused(bool mode){ m_animator->setPaused(mode); }
     // ------------------------------------------------------------------------
     /** Returns if a kart can drive on this object. */
     bool isDriveable() const { return m_is_driveable; }
-
+    // ------------------------------------------------------------------------
+    /** Used along the "extract movable nodes out of library objects" hack, used
+      * to still preserve the parent-child relationship
+      */
+    void addMovableChild(TrackObject* child);
+    // ------------------------------------------------------------------------
+    void addChild(TrackObject* child);
+    // ------------------------------------------------------------------------
+    std::vector<TrackObject*>& getMovableChildren() { return m_movable_children; }
+    // ------------------------------------------------------------------------
+    std::vector<TrackObject*>& getChildren() { return m_children; }
+    // ------------------------------------------------------------------------
+    void movePhysicalBodyToGraphicalNode(const core::vector3df& xyz, const core::vector3df& hpr);
     LEAK_CHECK()
 };   // TrackObject
 

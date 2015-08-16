@@ -96,6 +96,13 @@ static GFXPreset GFX_PRESETS[] =
     },
 
     {
+        true /* light */, 512 /* shadow */, true /* bloom */, true /* motionblur */,
+        true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
+        true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
+        true /* depth of field */, false /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
+    },
+
+    {
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
@@ -103,7 +110,7 @@ static GFXPreset GFX_PRESETS[] =
     }
 };
 
-static const int  GFX_LEVEL_AMOUNT = 5;
+static const int  GFX_LEVEL_AMOUNT = 6;
 
 struct Resolution
 {
@@ -159,7 +166,8 @@ void OptionsScreenVideo::init()
 {
     Screen::init();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
+    assert(ribbon != NULL);
+    ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
 
     ribbon->getRibbonChildren()[1].setTooltip( _("Audio") );
     ribbon->getRibbonChildren()[2].setTooltip( _("User Interface") );
@@ -192,9 +200,7 @@ void OptionsScreenVideo::init()
     CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
     rememberWinpos->setState(UserConfigParams::m_remember_window_location);
 
-    if (UserConfigParams::m_fullscreen) rememberWinpos->setDeactivated();
-    else rememberWinpos->setActivated();
-
+    rememberWinpos->setActive(UserConfigParams::m_fullscreen);
 
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
@@ -353,23 +359,13 @@ void OptionsScreenVideo::init()
     // ---- forbid changing resolution or animation settings from in-game
     // (we need to disable them last because some items can't be edited when
     // disabled)
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        res->setDeactivated();
-        full->setDeactivated();
-        applyBtn->setDeactivated();
-        gfx->setDeactivated();
-        getWidget<ButtonWidget>("custom")->setDeactivated();
-    }
-    else
-    {
-        // Enable back widgets if they were visited in-game previously
-        res->setActivated();
-        full->setActivated();
-        applyBtn->setActivated();
-        gfx->setActivated();
-        getWidget<ButtonWidget>("custom")->setActivated();
-    }
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+
+    res->setActive(!in_game);
+    full->setActive(!in_game);
+    applyBtn->setActive(!in_game);
+    gfx->setActive(!in_game);
+    getWidget<ButtonWidget>("custom")->setActive(!in_game);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -440,30 +436,30 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw none = _LTR("None");
 
     //I18N: in graphical options
-//    tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
+//    tooltip = tooltip + L"\n" + _("Pixel shaders: %s",
 //                                  UserConfigParams::m_pixel_shaders ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = _("Animated Scenery : %s",
+    tooltip = _("Animated Scenery: %s",
         UserConfigParams::m_graphical_effects ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Weather Effects : %s",
+    tooltip = tooltip + L"\n" + _("Weather Effects: %s",
         UserConfigParams::m_weather_effects ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Animated Characters : %s",
+    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
         UserConfigParams::m_show_steering_animations == 2
         ? all
         : (UserConfigParams::m_show_steering_animations == 1 ? me : none));
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Dynamic lights : %s",
+    tooltip = tooltip + L"\n" + _("Dynamic lights: %s",
         UserConfigParams::m_dynamic_lights ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Motion blur: %s",
         UserConfigParams::m_motionblur ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing : %s",
+    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
         UserConfigParams::m_mlaa ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Ambient occlusion : %s",
+    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
         UserConfigParams::m_ssao ? enabled : disabled);
     //I18N: in graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
@@ -472,28 +468,28 @@ void OptionsScreenVideo::updateTooltip()
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Bloom : %s",
+    tooltip = tooltip + L"\n" + _("Bloom: %s",
         UserConfigParams::m_bloom ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Glow (outlines) : %s",
+    tooltip = tooltip + L"\n" + _("Glow (outlines): %s",
         UserConfigParams::m_glow ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light shaft (God rays) : %s",
+    tooltip = tooltip + L"\n" + _("Light shaft (God rays): %s",
         UserConfigParams::m_light_shaft ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Depth of field : %s",
+    tooltip = tooltip + L"\n" + _("Depth of field: %s",
         UserConfigParams::m_dof ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Global illumination : %s",
+    tooltip = tooltip + L"\n" + _("Global illumination: %s",
         UserConfigParams::m_gi ? enabled : disabled);
     
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Use high definition textures") + L" : " +
-        ((UserConfigParams::m_high_definition_textures & 0x1) == 0 ? disabled : enabled);
+    tooltip = tooltip + L"\n" + _("Use high definition textures: %s",
+        (UserConfigParams::m_high_definition_textures & 0x1) == 0 ? disabled : enabled);
     
     gfx->setTooltip(tooltip);
 }   // updateTooltip
@@ -597,8 +593,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         CheckBoxWidget* fullscreen = getWidget<CheckBoxWidget>("fullscreen");
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
-        if (fullscreen->getState()) rememberWinpos->setDeactivated();
-        else rememberWinpos->setActivated();
+        rememberWinpos->setActive(!fullscreen->getState());
     }
 }   // eventCallback
 

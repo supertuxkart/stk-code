@@ -89,7 +89,7 @@ void OptionsScreenUI::loadedFromFile()
     {
         Log::warn("OptionsScreenUI", "Could not find a single skin, make sure that "
                                      "the data files are correctly installed");
-        skinSelector->setDeactivated();
+        skinSelector->setActive(false);
         return;
     }
 
@@ -112,7 +112,8 @@ void OptionsScreenUI::init()
 {
     Screen::init();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
+    assert(ribbon != NULL);
+    ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
 
     ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
     ribbon->getRibbonChildren()[1].setTooltip( _("Audio") );
@@ -211,14 +212,7 @@ void OptionsScreenUI::init()
 
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        list_widget->setDeactivated();
-    }
-    else
-    {
-        list_widget->setActivated();
-    }
+    list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
 
 }   // init
 

@@ -157,6 +157,9 @@ public:
      *  be generated. */
     float m_replay_delta_angle;
 
+    /** The field of view for 1, 2, 3, 4 player split screen. */
+    float m_camera_fov[4];
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid
@@ -178,9 +181,17 @@ public:
     const KartProperties &
          getDefaultKartProperties() const {return *m_default_kart_properties; }
 
-    const KartProperties &
-         getKartProperties(std::string type) { return *m_kart_properties[type]; }
+    // ------------------------------------------------------------------------
+    /** Returns the kart properties for a certain type of kart.
+     *  \throw out_of_range if there is no data for 'type'.
+     *  \param type Type of kart (e.g. heavy, medium, ...).
+     */
+    const KartProperties& getKartProperties(std::string type)
+    {
+        return *m_kart_properties.at(type); 
+    }   // getKartProperties
 
+    // ------------------------------------------------------------------------
     const PlayerDifficulty * getPlayerDifficulty(PerPlayerDifficulty difficulty)
         { return m_player_difficulties[difficulty]; }
 }

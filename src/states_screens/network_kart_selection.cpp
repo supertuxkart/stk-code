@@ -31,7 +31,6 @@
 #include "network/network_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
-static const char RANDOM_KART_ID[] = "randomkart";
 static const char ID_LOCKED[] = "locked/";
 
 using namespace GUIEngine;
@@ -55,7 +54,7 @@ void NetworkKartSelectionScreen::init()
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
     tabs->select( "standard", PLAYER_ID_GAME_MASTER); // select standard kart group
-    tabs->setDeactivated();
+    tabs->setActive(false);
     tabs->setVisible(false);
 
     // change the back button image (because it makes the game quit)

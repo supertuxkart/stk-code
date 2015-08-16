@@ -67,7 +67,7 @@ Skidding::~Skidding()
 void Skidding::reset()
 {
     m_skid_time           = 0.0f;
-    m_skid_state          = m_skid_visual_time<=0 ? SKID_OLD : SKID_NONE;
+    m_skid_state          = SKID_NONE;
     m_skid_factor         = 1.0f;
     m_real_steering       = 0.0f;
     m_visual_rotation     = 0.0f;
@@ -77,7 +77,7 @@ void Skidding::reset()
     m_jump_speed          = 0.0f;
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
-    m_kart->activateSkidLight(0);
+    m_kart->getKartGFX()->updateSkidLight(0);
     m_kart->getControls().m_skid = KartControl::SC_NONE;
     
     btVector3 rot(0, 0, 0);
@@ -95,20 +95,8 @@ void Skidding::reset()
  */
 void Skidding::updateSteering(float steer, float dt)
 {
-    if(m_skid_state==SKID_OLD)
-    {
-        float speed             = m_kart->getSpeed();
-        float current_max_speed = m_kart->getCurrentMaxSpeed();
-        float speed_ratio       = speed / current_max_speed;
-        m_real_steering         = steer * m_skid_factor;
-        m_visual_rotation       = m_real_steering /m_skid_max * speed_ratio;
-        return;
-    }
-    // Now only new skidding is happening
     switch(m_skid_state)
     {
-    case SKID_OLD: assert(false);
-        break;
     case SKID_SHOW_GFX_LEFT:
     case SKID_SHOW_GFX_RIGHT:
     case SKID_NONE:
@@ -178,7 +166,6 @@ float Skidding::getSteeringWhenSkidding(float steering) const
 {
     switch(m_skid_state)
     {
-    case SKID_OLD:            assert(false); break;
     case SKID_SHOW_GFX_LEFT:
     case SKID_SHOW_GFX_RIGHT:
     case SKID_BREAK:
@@ -217,6 +204,12 @@ void Skidding::update(float dt, bool is_on_ground,
         reset();
         return;
     }
+#ifdef SKIDDING_PARTICLE_DEBUG
+    // This code will cause skidmarks to be displayed all the time, even
+    // when the kart is not moving.
+    m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDL, 0.5f);
+    m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDR, 0.5f);
+#endif
 
     // No skidding backwards or while stopped
     if(m_kart->getSpeed() < m_min_skid_speed &&
@@ -250,13 +243,6 @@ void Skidding::update(float dt, bool is_on_ground,
         m_skid_factor = m_skid_max;
     else
         if(m_skid_factor<1.0f) m_skid_factor = 1.0f;
-
-    // FIXME hiker: remove once the new skidding code is finished.
-    if(m_skid_state == SKID_OLD)
-    {
-        updateSteering(steering, dt);
-        return;
-    }
 
     // If skidding was started and a graphical jump should still
     // be displayed, update the data
@@ -393,7 +379,7 @@ void Skidding::update(float dt, bool is_on_ground,
             {
                 m_skid_bonus_ready = true;
                 m_kart->getKartGFX()->setSkidLevel(level);
-                m_kart->activateSkidLight(level);
+                m_kart->getKartGFX()->updateSkidLight(level);
             }
             // If player stops skidding, trigger bonus, and change state to
             // SKID_SHOW_GFX_*
@@ -447,7 +433,7 @@ void Skidding::update(float dt, bool is_on_ground,
                   ->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
             m_kart->getKartGFX()
                   ->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
-            m_kart->activateSkidLight(0);
+            m_kart->getKartGFX()->updateSkidLight(0);
             m_skid_state = SKID_NONE;
         }
     }   // switch

@@ -547,6 +547,11 @@ void cmdLineHelp()
     "                          stdout.log.\n"
     "       --console          Write messages in the console and files\n"
     "  -h,  --help             Show this help.\n"
+    "       --log=N            Set the verbosity to a value between\n"
+    "                          0 (Debug) and 5 (Only Fatal messages)\n"
+    "       --root=DIR         Path to add to the list of STK root directories.\n"
+    "                          You can specify more than one by separating them\n"
+    "                          with colons (:).\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "http://supertuxkart.sourceforge.net\n\n",
@@ -555,14 +560,10 @@ void cmdLineHelp()
 }   // cmdLineHelp
 
 //=============================================================================
-/** For base options that don't need much to be inited (and, in some cases,
- *  that need to be read before initing stuff) - it only assumes that
- *  user config is loaded (necessary to check for blacklisted screen
- *  resolutions), but nothing else (esp. not kart_properties_manager and
- *  track_manager, since their search path might be extended by command
- *  line options).
+/** For base options that modify the output (loglevel/color) or exit right
+ * after being processed (version/help).
  */
-int handleCmdLinePreliminary()
+int handleCmdLineOutputModifier()
 {
     if (CommandLine::has("--help") || CommandLine::has("-help") ||
         CommandLine::has("-h"))
@@ -585,7 +586,36 @@ int handleCmdLinePreliminary()
         exit(0);
     }
 
-    if(CommandLine::has("--gamepad-visualisation") ||   // only BE
+    int n;
+    if(CommandLine::has("--log", &n))
+        Log::setLogLevel(n);
+
+    if(CommandLine::has("--log=nocolor"))
+    {
+        Log::disableColor();
+        Log::verbose("main", "Colours disabled.");
+    }
+
+    if(CommandLine::has("--console"))
+        UserConfigParams::m_log_errors_to_console=true;
+    if(CommandLine::has("--no-console"))
+        UserConfigParams::m_log_errors_to_console=false;
+
+
+    return 0;
+}
+
+//=============================================================================
+/** For base options that don't need much to be inited (and, in some cases,
+ *  that need to be read before initing stuff) - it only assumes that
+ *  user config is loaded (necessary to check for blacklisted screen
+ *  resolutions), but nothing else (esp. not kart_properties_manager and
+ *  track_manager, since their search path might be extended by command
+ *  line options).
+ */
+int handleCmdLinePreliminary()
+{
+   if(CommandLine::has("--gamepad-visualisation") ||   // only BE
        CommandLine::has("--gamepad-visualization")    ) // both AE and BE
         UserConfigParams::m_gamepad_visualisation=true;
     if(CommandLine::has("--debug=memory"))
@@ -600,17 +630,8 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
     if(CommandLine::has("--debug=all") )
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
-    if(CommandLine::has("--console"))
-        UserConfigParams::m_log_errors_to_console=true;
-    if(CommandLine::has("--no-console"))
-        UserConfigParams::m_log_errors_to_console=false;
     if(CommandLine::has("--online"))
         MainMenuScreen::m_enable_online=true;
-    if(CommandLine::has("--log=nocolor"))
-    {
-        Log::disableColor();
-        Log::verbose("main", "Colours disabled.");
-    }
 
     std::string s;
     if(CommandLine::has("--stk-config", &s))
@@ -700,8 +721,6 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_xmas_mode = n;
     if (CommandLine::has("--easter", &n))
         UserConfigParams::m_easter_ear_mode = n;
-    if(CommandLine::has("--log", &n))
-        Log::setLogLevel(n);
 
     return 0;
 }   // handleCmdLinePreliminary
@@ -750,6 +769,8 @@ int handleCmdLine()
            UserConfigParams::m_camera_debug=2;
         if(CommandLine::has("--camera-debug"))
             UserConfigParams::m_camera_debug=1;
+        if(CommandLine::has("--camera-kart-debug"))
+            UserConfigParams::m_camera_debug=4;
         if(CommandLine::has("--physics-debug"))
             UserConfigParams::m_physics_debug=1;
         if(CommandLine::has("--check-debug"))
@@ -1057,7 +1078,7 @@ int handleCmdLine()
 void initUserConfig()
 {
     file_manager = new FileManager();
-    user_config             = new UserConfig();     // needs file_manager
+    user_config  = new UserConfig();     // needs file_manager
     user_config->loadConfig();
     // Some parts of the file manager needs user config (paths for models
     // depend on artist debug flag). So init the rest of the file manager
@@ -1212,7 +1233,7 @@ void askForInternetPermission()
         "'User Interface', and edit \"Connect to the "
         "Internet\" and \"Send anonymous HW statistics\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
-        new ConfirmServer(), true, true);
+        new ConfirmServer(), true, true, 0.7f, 0.7f);
     GUIEngine::DialogQueue::get()->pushDialog(dialog, false);
 }   // askForInternetPermission
 
@@ -1238,6 +1259,9 @@ int main(int argc, char *argv[] )
     try
     {
         std::string s;
+
+        handleCmdLineOutputModifier();
+
         if(CommandLine::has("--root", &s))
         {
             FileManager::addRootDirs(s);

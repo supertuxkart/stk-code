@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-13 21:42-0400\n"
-"PO-Revision-Date: 2015-03-16 08:40+0000\n"
+"PO-Revision-Date: 2015-03-23 14:21+0000\n"
 "Last-Translator: Dawid Gan <deveee@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/supertuxkart/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -1493,7 +1493,7 @@ msgstr "Ignorowanie '%s', powinieneś/powinnaś dołączyć wcześniej go gry!"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Image-based lighting"
-msgstr "Oświetlenie w oparciu o obrazy"
+msgstr "Oświetlenie IBL"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
@@ -2987,7 +2987,7 @@ msgstr "Użyj co najmniej 10 bonusów w wyścigu"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Use high definition textures"
-msgstr "Tekstury wysokiej rozdzielczości"
+msgstr "Tekstury HD"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -3371,4 +3371,4 @@ msgstr "standardowe"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Auria https://launchpad.net/~auria-mg\n  Bill https://launchpad.net/~cges30901\n  Dawid Gan https://launchpad.net/~deveee\n  Kuba Polankowski https://launchpad.net/~tux4-b\n  Kuba Polankowski https://launchpad.net/~tux4-wp\n  Patryk Wychowaniec https://launchpad.net/~p98\n  STK-team https://launchpad.net/~stk\n  Twojwujaszek https://launchpad.net/~twojwujaszek-gmail"
+msgstr "Launchpad Contributions:\nAuria https://launchpad.net/~auria-mg\nBill https://launchpad.net/~cges30901\nDawid Gan https://launchpad.net/~deveee\nDawid Gan, 2015\nKuba Polankowski https://launchpad.net/~tux4-b\nKuba Polankowski https://launchpad.net/~tux4-wp\nPatryk Wychowaniec https://launchpad.net/~p98\nPatryk Wychowaniec, 2015\nSTK-team https://launchpad.net/~stk\nTwojwujaszek https://launchpad.net/~twojwujaszek-gmail"

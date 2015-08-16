@@ -67,6 +67,14 @@ public:
         /** If the item is below that height, it is reset (when
          *  m_reset_when_too_low is true). */
         float                     m_reset_height;
+        /** If non-empty, the name of the scripting function to call
+          * when a kart collides with this object
+          */
+        std::string               m_on_kart_collision;
+        /** If non-empty, the name of the scripting function to call
+        * when a (flyable) item collides with this object
+        */
+        std::string               m_on_item_collision;
     private:
         void init();
     public:
@@ -105,6 +113,8 @@ private:
     /** The mass of this object. */
     float                 m_mass;
 
+    bool                  m_body_added;
+
     /** The pointer that is stored in the bullet rigid body back to
      *  this object. */
     UserPointer           m_user_pointer;
@@ -140,7 +150,14 @@ private:
     /** If m_reset_when_too_low this object is set back to its start
      *  position if its height is below this value. */
     float                 m_reset_height;
-
+    /** If non-empty, the name of the scripting function to call
+    * when a kart collides with this object
+    */
+    std::string           m_on_kart_collision;
+    /** If non-empty, the name of the scripting function to call
+    * when a (flyable) item collides with this object
+    */
+    std::string           m_on_item_collision;
     /** If this body is a bullet dynamic body, i.e. affected by physics
      *  or not (static (not moving) or kinematic (animated outside
      *  of physics). */
@@ -185,10 +202,6 @@ public:
      *  it. */
     bool isExplodeKartObject () const { return m_explode_kart; }
     // ------------------------------------------------------------------------
-    /** Returns true if this object should cause a kart that touches it to
-     *  be flattened. */
-    bool isFlattenKartObject () const { return m_flatten_kart; }
-    // ------------------------------------------------------------------------
     /** Sets the interaction type */
     void setInteraction(std::string interaction);
     // ------------------------------------------------------------------------
@@ -197,6 +210,40 @@ public:
     // ------------------------------------------------------------------------
     /** Add body to dynamic world */
     void addBody();
+    // ------------------------------------------------------------------------
+    const std::string& getOnKartCollisionFunction() const { return m_on_kart_collision; }
+    // ------------------------------------------------------------------------
+    const std::string& getOnItemCollisionFunction() const { return m_on_item_collision; }
+    // ------------------------------------------------------------------------
+    TrackObject* getTrackObject() { return m_object; }
+
+    // Methods usable by scripts
+
+    /**
+    * \addtogroup Scripting
+    * @{
+    * \addtogroup Scripting_Track Track
+    * @{
+    * \addtogroup Scripting_PhysicalObject PhysicalObject (script binding)
+    * Type returned by trackObject.getPhysicalObject()
+    * @{
+    */
+    /** Returns true if this object should cause a kart that touches it to
+    *  be flattened. */
+    bool isFlattenKartObject() const { return m_flatten_kart; }
+    void disable(/** \cond DOXYGEN_IGNORE */void *memory/** \endcond */)
+    {
+        ((PhysicalObject*)(memory))->removeBody();
+    }
+
+    //enables track object passed from the script
+    void enable(/** \cond DOXYGEN_IGNORE */void *memory/** \endcond */)
+    {
+        ((PhysicalObject*)(memory))->addBody();
+    }
+    /** @} */
+    /** @} */
+    /** @} */
 
     LEAK_CHECK()
 };  // PhysicalObject

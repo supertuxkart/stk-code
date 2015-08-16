@@ -23,13 +23,12 @@
 
 namespace Scripting
 {
-
     namespace Kart
     {
-
         void registerScriptFunctions(asIScriptEngine *engine);
-        
+        void registerScriptEnums(asIScriptEngine *engine);
     }
 
 }
+
 #endif

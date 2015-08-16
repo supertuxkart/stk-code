@@ -124,7 +124,7 @@ void RecoveryDialog::processInput()
     else
     {
         m_info_widget->setDefaultColor();
-        m_options_widget->setDeactivated();
+        m_options_widget->setActive(false);
 
         m_recovery_request = new XMLRequest();
 
@@ -197,7 +197,7 @@ void RecoveryDialog::onUpdate(float dt)
                 SFXManager::get()->quickSound( "anvil" );
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_recovery_request->getInfo(), false);
-                m_options_widget->setActivated();
+                m_options_widget->setActive(true);
             }
 
             delete m_recovery_request;

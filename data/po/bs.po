@@ -3370,4 +3370,4 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Kenan Dervišević https://launchpad.net/~kenan3008"
+msgstr "Launchpad Contributions:\nKenan Dervišević https://launchpad.net/~kenan3008"

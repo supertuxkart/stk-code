@@ -44,6 +44,7 @@ private:
            CheckManager()       {m_all_checks.clear();};
           ~CheckManager();
 public:
+    void   add(CheckStructure* strct) { m_all_checks.push_back(strct); }
     void   load(const XMLNode &node);
     void   update(float dt);
     void   reset(const Track &track);

@@ -23,7 +23,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "io/file_manager.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"

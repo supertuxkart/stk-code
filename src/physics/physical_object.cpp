@@ -63,6 +63,8 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
     xml_node.get("reset",   &m_crash_reset );
     xml_node.get("explode", &m_knock_kart  );
     xml_node.get("flatten", &m_flatten_kart);
+    xml_node.get("on-kart-collision", &m_on_kart_collision);
+    xml_node.get("on-item-collision", &m_on_item_collision);
     m_reset_when_too_low =
         xml_node.get("reset-when-below", &m_reset_height) == 1;
 
@@ -127,7 +129,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
 
     m_object = object;
 
-    m_init_xyz   = object->getAbsolutePosition();
+    m_init_xyz = object->getAbsoluteCenterPosition();
     m_init_hpr   = object->getRotation();
     m_init_scale = object->getScale();
 
@@ -140,6 +142,9 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_flatten_kart       = settings.m_flatten_kart;
     m_reset_when_too_low = settings.m_reset_when_too_low;
     m_reset_height       = settings.m_reset_height;
+    m_on_kart_collision  = settings.m_on_kart_collision;
+    m_on_item_collision  = settings.m_on_item_collision;
+    m_body_added = false;
 
     m_init_pos.setIdentity();
     Vec3 radHpr(m_init_hpr);
@@ -247,8 +252,14 @@ void PhysicalObject::init()
         Log::fatal("PhysicalObject", "Unknown node type");
     }
 
-    max = max * Vec3(m_init_scale);
-    min = min * Vec3(m_init_scale);
+    Vec3 parent_scale(1.0f, 1.0f, 1.0f);
+    if (m_object->getParentLibrary() != NULL)
+    {
+        parent_scale = m_object->getParentLibrary()->getScale();
+    }
+
+    max = max * (Vec3(m_init_scale) * parent_scale);
+    min = min * (Vec3(m_init_scale) * parent_scale);
 
     Vec3 extend = max-min;
     // Adjust the mesth of the graphical object so that its center is where it
@@ -456,8 +467,31 @@ void PhysicalObject::init()
     // 2. Create the rigid object
     // --------------------------
     // m_init_pos is the point on the track - add the offset
-    m_init_pos.setOrigin(m_init_pos.getOrigin() +
-                         btVector3(0,extend.getY()*0.5f, 0));
+    if (m_is_dynamic)
+    {
+        m_init_pos.setOrigin(m_init_pos.getOrigin() +
+            btVector3(0, extend.getY()*0.5f, 0));
+    }
+
+
+    // If this object has a parent, apply the parent's rotation
+    if (m_object->getParentLibrary() != NULL)
+    {
+        core::vector3df parent_rot_hpr = m_object->getParentLibrary()->getInitRotation();
+        core::matrix4 parent_rot_matrix;
+        parent_rot_matrix.setRotationDegrees(parent_rot_hpr);
+
+        btQuaternion child_rot_quat = m_init_pos.getRotation();
+        core::matrix4 child_rot_matrix;
+        Vec3 axis = child_rot_quat.getAxis();
+        child_rot_matrix.setRotationAxisRadians(child_rot_quat.getAngle(), axis.toIrrVector());
+
+        irr::core::quaternion tempQuat(parent_rot_matrix * child_rot_matrix);
+        btQuaternion q(tempQuat.X, tempQuat.Y, tempQuat.Z, tempQuat.W);
+
+        m_init_pos.setRotation(q);
+    }
+
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia(1,1,1);
     if (m_body_type != MP_EXACT)
@@ -479,6 +513,7 @@ void PhysicalObject::init()
     }
 
     World::getWorld()->getPhysics()->addBody(m_body);
+    m_body_added = true;
     if(m_triangle_mesh)
         m_triangle_mesh->setBody(m_body);
 }   // init
@@ -607,14 +642,22 @@ void PhysicalObject::setInteraction(std::string interaction){
 /** Remove body from physics dynamic world interaction type for object*/
 void PhysicalObject::removeBody()
 {
-    World::getWorld()->getPhysics()->removeBody(m_body);
+    if (m_body_added)
+    {
+        World::getWorld()->getPhysics()->removeBody(m_body);
+        m_body_added = false;
+    }
 }   // Remove body
 
 // ----------------------------------------------------------------------------
 /** Add body to physics dynamic world */
 void PhysicalObject::addBody()
 {
-    World::getWorld()->getPhysics()->addBody(m_body);
+    if (!m_body_added)
+    {
+        m_body_added = true;
+        World::getWorld()->getPhysics()->addBody(m_body);
+    }
 }   // Add body
 
 // ----------------------------------------------------------------------------

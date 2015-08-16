@@ -3367,4 +3367,4 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Svetoslav Stefanov https://launchpad.net/~svetlisashkov"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nSvetoslav Stefanov https://launchpad.net/~svetlisashkov"

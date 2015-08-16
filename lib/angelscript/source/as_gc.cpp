@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -156,7 +156,14 @@ int asCGarbageCollector::GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj, a
 	return asSUCCESS;
 }
 
-int asCGarbageCollector::GarbageCollect(asDWORD flags)
+// TODO: Should have a flag to tell the garbage collector to automatically determine how many iterations are needed
+//       It should then gather statistics such as how many objects has been created since last run, and how many objects
+//       are destroyed per iteration, and how many objects are detected as cyclic garbage per iteration.
+//       It should try to reach a stable number of objects, i.e. so that on average the number of objects added to 
+//       the garbage collector is the same as the number of objects destroyed. And it should try to minimize the number
+//       of iterations of detections that must be executed per cycle while still identifying the cyclic garbage
+//       These variables should also be available for inspection through the gcstatistics.
+int asCGarbageCollector::GarbageCollect(asDWORD flags, asUINT iterations)
 {
 	// If the GC is already processing in another thread, then don't enter here again
 	if( TRYENTERCRITICALSECTION(gcCollecting) )
@@ -178,9 +185,8 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags)
 			// Reset the state
 			if( doDetect )
 			{
-				// Move all objects to the old list, so we guarantee that all is detected
-				for( asUINT n = (asUINT)gcNewObjects.GetLength(); n-- > 0; )
-					MoveObjectToOldList(n);
+				// Move all new objects to the old list, so we guarantee that all is detected
+				MoveAllObjectsToOldList();
 				detectState  = clearCounters_init;
 			}
 			if( doDestroy )
@@ -189,7 +195,10 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags)
 				destroyOldState = destroyGarbage_init;
 			}
 
-			unsigned int count = (unsigned int)(gcNewObjects.GetLength() + gcOldObjects.GetLength());
+			// The full cycle only works with the objects in the old list so that the
+			// set of objects scanned for garbage is fixed even if new objects are added
+			// by other threads in parallel.
+			unsigned int count = (unsigned int)(gcOldObjects.GetLength());
 			for(;;)
 			{
 				// Detect all garbage with cyclic references
@@ -199,25 +208,16 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags)
 				// Now destroy all known garbage
 				if( doDestroy )
 				{
-					while( DestroyNewGarbage() == 1 ) {}
+					if( !doDetect )
+						while( DestroyNewGarbage() == 1 ) {}
 					while( DestroyOldGarbage() == 1 ) {}
 				}
 
 				// Run another iteration if any garbage was destroyed
-				if( count != (unsigned int)(gcNewObjects.GetLength() + gcOldObjects.GetLength()) )
-					count = (unsigned int)(gcNewObjects.GetLength() + gcOldObjects.GetLength());
+				if( count != (unsigned int)(gcOldObjects.GetLength()) )
+					count = (unsigned int)(gcOldObjects.GetLength());
 				else
-				{
-					// Let the engine destroy the types that reached refCount 0
-					// If none were destroyed, then leave the GC
-					// TODO: The asCObjectType should destroy its content when refCount reaches 0
-					//       since no-one is using them. The registered types should have their
-					//       refcount increased by the config groups. Doing it like that will allow 
-					//       me to remove this call to ClearUnusedTypes() that the GC really 
-					//       shouldn't be calling.
-					if( engine->ClearUnusedTypes() == 0 )
-						break;
-				}
+					break;
 			}
 
 			isProcessing = false;
@@ -226,16 +226,19 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags)
 		}
 		else
 		{
-			// Destroy the garbage that we know of
-			if( doDestroy )
+			while( iterations-- > 0 )
 			{
-				DestroyNewGarbage();
-				DestroyOldGarbage();
-			}
+				// Destroy the garbage that we know of
+				if( doDestroy )
+				{
+					DestroyNewGarbage();
+					DestroyOldGarbage();
+				}
 
-			// Run another incremental step of the identification of cyclic references
-			if( doDetect )
-				IdentifyGarbageWithCyclicRefs();
+				// Run another incremental step of the identification of cyclic references
+				if( doDetect && gcOldObjects.GetLength() > 0 )
+					IdentifyGarbageWithCyclicRefs();
+			}
 		}
 
 		isProcessing = false;
@@ -246,18 +249,32 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags)
 	return 1;
 }
 
+// TODO: Additional statistics to gather
+//
+//       - How many objects are added on average between each destroyed object
+//       - How many objects are added on average between each detected object
+//       - how many iterations are needed for each destroyed object
+//       - how many iterations are needed for each detected object
+//
+//       The average must have a decay so that long running applications will not suffer
+//       from objects being created early on in the application and then never destroyed.
+//
+//       This ought to be possible to accomplish by holding two buckets.
+//       Numbers will be accumulated in one bucket while the other is held fixed.
+//       When returning the average it should use a weighted average between the two buckets using the size as weight.
+//       When a bucket is filled up, the buckets are switched, and then new bucket is emptied to gather new statistics.
 void asCGarbageCollector::GetStatistics(asUINT *currentSize, asUINT *totalDestroyed, asUINT *totalDetected, asUINT *newObjects, asUINT *totalNewDestroyed) const
 {
-	// It's not necessary to protect this access, as
-	// it doesn't matter if another thread is currently
-	// appending a new object.
+	// It is not necessary to protect this with critical sections, however
+	// as it is not protected the variables can be filled in slightly different
+	// moments and might not match perfectly when inspected by the application
+	// afterwards.
+
 	if( currentSize )
 		*currentSize = (asUINT)(gcNewObjects.GetLength() + gcOldObjects.GetLength());
 
 	if( totalDestroyed )
 		*totalDestroyed = numDestroyed;
-
-	asASSERT( numAdded == gcNewObjects.GetLength() + gcOldObjects.GetLength() + numDestroyed );
 
 	if( totalDetected )
 		*totalDetected = numDetected;
@@ -325,6 +342,16 @@ void asCGarbageCollector::MoveObjectToOldList(int idx)
 		gcNewObjects.PopLast();
 	else
 		gcNewObjects[idx] = gcNewObjects.PopLast();
+	LEAVECRITICALSECTION(gcCritical);
+}
+
+void asCGarbageCollector::MoveAllObjectsToOldList()
+{
+	// We need to protect this update with a critical section as
+	// another thread might be appending an object at the same time
+	ENTERCRITICALSECTION(gcCritical);
+	if( gcOldObjects.Concatenate(gcNewObjects) )
+		gcNewObjects.SetLength(0);
 	LEAVECRITICALSECTION(gcCritical);
 }
 
@@ -900,8 +927,15 @@ asCGarbageCollector::asSMapNode_t *asCGarbageCollector::GetNode(void *obj, asSIn
 	if( freeNodes.GetLength() )
 		node = freeNodes.PopLast();
 	else
+	{
 		node = asNEW(asSMapNode_t);
-
+		if( !node )
+		{
+			// Out of memory
+			return 0;
+		}
+	}
+	
 	node->Init(obj, it);
 	return node;
 }

@@ -57,10 +57,16 @@ public:
     virtual void       updatePlayingSFX(float dt)           = 0;
     virtual void       setPosition(const Vec3 &p)           = 0;
     virtual void       reallySetPosition(const Vec3 &p)     = 0;
+    virtual void       setSpeedPosition(float factor, 
+                                        const Vec3 &p)      = 0;
+    virtual void       reallySetSpeedPosition(float f, 
+                                              const Vec3 &p)= 0;
     virtual void       setLoop(bool status)                 = 0;
     virtual void       reallySetLoop(bool status)           = 0;
     virtual void       play()                               = 0;
     virtual void       reallyPlayNow()                      = 0;
+    virtual void       play(const Vec3 &xyz)                = 0;
+    virtual void       reallyPlayNow(const Vec3 &xyz)       = 0;
     virtual void       stop()                               = 0;
     virtual void       reallyStopNow()                      = 0;
     virtual void       pause()                              = 0;

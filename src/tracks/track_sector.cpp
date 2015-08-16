@@ -74,13 +74,13 @@ void TrackSector::update(const Vec3 &xyz)
         }
         else
         {
-            bool has_prerequisite = false;
+            //bool has_prerequisite = false;
 
             for (unsigned int i=0; i<checkline_requirements.size(); i++)
             {
                 if (m_last_triggered_checkline == checkline_requirements[i])
                 {
-                    has_prerequisite = true;
+                    //has_prerequisite = true;
                     m_last_valid_graph_node = m_current_graph_node;
                     break;
                 }

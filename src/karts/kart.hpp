@@ -32,7 +32,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/player_difficulty.hpp"
-#include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
 
 class btKart;
@@ -52,6 +51,7 @@ class Skidding;
 class SkidMarks;
 class SlipStream;
 class Stars;
+class TerrainInfo;
 
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a
@@ -170,9 +170,8 @@ private:
     /** Is time flying activated */
     bool             m_is_jumping;
 
-    /** If a kart is flying, the shadow is disabled (since it is
-     *  stuck to the kart, i.e. the shadow would be flying, too). */
-    bool             m_shadow_enabled;
+    /** The shadow of a kart. */
+    Shadow          *m_shadow;
 
     ParticleEmitter *m_sky_particles_emitter;
 
@@ -184,12 +183,6 @@ private:
 
     /** Handles all slipstreaming. */
     SlipStream      *m_slipstream;
-
-    /** Rotation compared to the start position, same for all wheels */
-    float           m_wheel_rotation;
-
-    /** Rotation change in the last time delta, same for all wheels */
-    float           m_wheel_rotation_dt;
 
     /** The skidmarks object for this kart. */
     SkidMarks      *m_skidmarks;
@@ -218,14 +211,6 @@ private:
 
     /** To prevent using nitro in too short bursts */
     float         m_min_nitro_time;
-
-    /** A light that's shown when the kart uses nitro. */
-    scene::ISceneNode* m_nitro_light;
-
-    /** Lights that are shown when the kart is skidding. */
-    scene::ISceneNode* m_skidding_light_1;
-    /** A light that's shown on the second skid-level with another color. */
-    scene::ISceneNode* m_skidding_light_2;
 
     void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);
@@ -450,9 +435,9 @@ public:
     // ------------------------------------------------------------------------
     /** Counter which is used for displaying wrong way message after a delay */
     float getWrongwayCounter() { return m_wrongway_counter; }
+    // ------------------------------------------------------------------------
     void setWrongwayCounter(float counter) { m_wrongway_counter = counter; }
 
-    void activateSkidLight(unsigned int level);
 };   // Kart
 
 

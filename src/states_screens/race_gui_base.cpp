@@ -410,9 +410,9 @@ void RaceGUIBase::preRenderCallback(const Camera *camera)
 // ----------------------------------------------------------------------------
 void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 {
+#if 0
     const core::recti &viewport = camera->getViewport();
 
-#if 0
     if (m_lightning > 0.0f)
     {
         GLint glviewport[4];

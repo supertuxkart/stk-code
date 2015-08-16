@@ -74,7 +74,6 @@ private:
     float m_jump_speed;
 
 public:
-    /** SKID_OLD: old skidding, will be removed. */
     /** SKID_NONE: Kart is currently not skidding.
      *  SKID_ACCUMULATE_LEFT: Kart is skidding to the left and accumulating
      *             for bonus.
@@ -83,9 +82,8 @@ public:
      *             and the kart was turning left.
      *  SKID_SHOW_GFX_RIGHT: Similar for turning right.
      *  SKID_BREAK: Skidding was stopped without bonus */
-    enum SkidState {SKID_OLD, SKID_NONE, SKID_ACCUMULATE_LEFT,
-                    SKID_ACCUMULATE_RIGHT, SKID_SHOW_GFX_LEFT,
-                    SKID_SHOW_GFX_RIGHT, SKID_BREAK} ;
+    enum SkidState { SKID_NONE, SKID_ACCUMULATE_LEFT, SKID_ACCUMULATE_RIGHT,
+                     SKID_SHOW_GFX_LEFT, SKID_SHOW_GFX_RIGHT, SKID_BREAK} ;
 
 private:
     /** The current skidding state. */

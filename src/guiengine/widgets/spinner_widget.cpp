@@ -395,36 +395,34 @@ void SpinnerWidget::setValue(irr::core::stringw new_value)
 
 // -----------------------------------------------------------------------------
 
-void SpinnerWidget::setActivated()
+void SpinnerWidget::setActive(bool active)
 {
-    Widget::setActivated();
+    Widget::setActive(active);
 
-    setText(L"");
-    if (m_customText.empty())
+    if (active)
     {
-        setValue( getValue() ); // Update the display
+        setText(L"");
+        if (m_customText.empty())
+        {
+            setValue(getValue()); // Update the display
+        }
+        else
+        {
+            setCustomText(m_customText);
+        }
     }
     else
     {
-        setCustomText(m_customText);
+        // Save it temporary because setValue(which is uses for update in
+        // this case) overwrites it
+        core::stringw customText = m_customText;
+        setText(L"-");
+        setValue(getValue()); // Update the display
+        m_customText = customText;
     }
-}
+}   // setActive
 
 // -----------------------------------------------------------------------------
-
-void SpinnerWidget::setDeactivated()
-{
-    Widget::setDeactivated();
-
-    // Save it temporary because setValue(which is uses for update in this case) overwrites it
-    core::stringw customText = m_customText; 
-    setText(L"-");
-    setValue( getValue() ); // Update the display
-    m_customText = customText;
-}
-
-// -----------------------------------------------------------------------------
-
 void SpinnerWidget::setCustomText(const core::stringw& text)
 {
     m_customText = text;

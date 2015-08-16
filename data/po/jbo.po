@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-13 21:42-0400\n"
-"PO-Revision-Date: 2015-03-15 18:15+0000\n"
+"PO-Revision-Date: 2015-03-27 10:37+0000\n"
 "Last-Translator: Wuzzy <almikes@aol.com>\n"
 "Language-Team: Lojban (http://www.transifex.com/projects/p/supertuxkart/language/jbo/)\n"
 "MIME-Version: 1.0\n"
@@ -1861,7 +1861,7 @@ msgstr ""
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
 msgid "New"
-msgstr ""
+msgstr "cnino"
 
 #: src/challenges/challenge_data.cpp:502
 #, c-format
@@ -2298,7 +2298,7 @@ msgstr ""
 
 #: src/states_screens/gp_info_screen.cpp:77
 msgid "Random"
-msgstr ""
+msgstr "cunso"
 
 #: src/states_screens/arenas_screen.cpp:277
 msgid "Random Arena"
@@ -2487,7 +2487,7 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
-msgstr ""
+msgstr "la entyrprais"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
@@ -2806,7 +2806,7 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
 msgid "Temple"
-msgstr ""
+msgstr "la malsi"
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -3368,4 +3368,4 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Willem Sonke https://launchpad.net/~willem-sonke\n  Wuzzy https://launchpad.net/~wuzzy"
+msgstr "Launchpad Contributions:\nWillem Sonke https://launchpad.net/~willem-sonke\nWuzzy https://launchpad.net/~wuzzy\nWuzzy, 2015"

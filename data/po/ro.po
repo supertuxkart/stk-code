@@ -3369,4 +3369,4 @@ msgstr "standard"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Alexandru Guduleasa https://launchpad.net/~gulyan89\n  Daniel Butum https://launchpad.net/~danielcode\n  DimStar https://launchpad.net/~dominique-launchpad-net\n  Dominique Leuenberger aka DimStar https://launchpad.net/~dimstar\n  Matus Michael https://launchpad.net/~m-matus\n  Nicolae Crefelean https://launchpad.net/~kneekoo\n  STK-team https://launchpad.net/~stk\n  Vitalie Ciubotaru https://launchpad.net/~vitalie-ciubotaru"
+msgstr "Launchpad Contributions:\nAlexandru Guduleasa https://launchpad.net/~gulyan89\nDaniel Butum https://launchpad.net/~danielcode\nDimStar https://launchpad.net/~dominique-launchpad-net\nDominique Leuenberger aka DimStar https://launchpad.net/~dimstar\nMatus Michael https://launchpad.net/~m-matus\nNicolae Crefelean https://launchpad.net/~kneekoo\nSTK-team https://launchpad.net/~stk\nVitalie Ciubotaru https://launchpad.net/~vitalie-ciubotaru"

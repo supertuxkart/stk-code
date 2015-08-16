@@ -21,11 +21,11 @@
 #include "graphics/callbacks.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/rtts.hpp"
+#include "graphics/screen_quad.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/screenquad.hpp"
 
 using namespace video;
 using namespace scene;

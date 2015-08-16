@@ -211,7 +211,11 @@ namespace Online
             int userid_fetched      = input->get("userid", &userid);
             setLastOnlineName(username);
 
-            m_profile = new OnlineProfile(userid, username, true);
+            OnlineProfile* profile = new OnlineProfile(userid, username, true);
+            // Note that addPersistent might decide to merge profile with an
+            // existing profile, and then delete profile. Only the returned
+            // pointer is save to use.
+            m_profile = ProfileManager::get()->addPersistent(profile);
             assert(token_fetched && username_fetched && userid_fetched);
             m_online_state = OS_SIGNED_IN;
             if(rememberPassword())
@@ -219,7 +223,6 @@ namespace Online
                 saveSession(getOnlineId(), getToken());
             }
 
-            ProfileManager::get()->addPersistent(m_profile);
             std::string achieved_string("");
 
             // Even if no achievements were sent, we have to call sync

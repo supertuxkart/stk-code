@@ -3372,4 +3372,4 @@ msgstr "уобичајено"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  STK-team https://launchpad.net/~stk\n  dboki89 https://launchpad.net/~dboki89\n  Мирослав Николић https://launchpad.net/~lipek\n  Саша Петровић https://launchpad.net/~salepetronije"
+msgstr "Launchpad Contributions:\ndboki89 https://launchpad.net/~dboki89\nSTK-team https://launchpad.net/~stk\nМирослав Николић https://launchpad.net/~lipek\nМирослав Николић, 2011\nСаша Петровић https://launchpad.net/~salepetronije\nСаша Петровић, 2012-2014"

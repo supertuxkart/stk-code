@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# fedik <fedikw@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-13 21:42-0400\n"
-"PO-Revision-Date: 2015-03-14 11:00+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2015-04-09 20:39+0000\n"
+"Last-Translator: fedik <fedikw@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/supertuxkart/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,7 +30,7 @@ msgstr "   N"
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
-msgstr ""
+msgstr "Але ви, жалюгідний пройдисвіт, ніколи не буде в змозі побити мене - короля картів!"
 
 #. I18N: Only used for count > 3
 #: src/online/online_player_profile.cpp:429
@@ -45,7 +46,7 @@ msgstr[2] "%d друзів у мережі."
 #: src/guiengine/widgets/player_kart_widget.cpp:360
 #, c-format
 msgid "%s (handicapped)"
-msgstr ""
+msgstr "%s (важко)"
 
 #: src/states_screens/dialogs/addons_loading.cpp:172
 #: src/states_screens/dialogs/addons_loading.cpp:176
@@ -136,7 +137,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* У більшу частину цих видів гри можна зіграти в Гран-Прі: замість однієї траси, ти можеш проїжджати декілька одразу. Чим вищий твій рейтинг, тим більше очок ти отримуєш. У результаті гравець з більшою кількістю очок виграє́ кубок."
+msgstr "* У більшу частину цих видів гри можна зіграти у Великому Змаганні: замість однієї траси, можете проїжджати декілька одразу. Чим вищий рейтинг, тим більше очок ви отримуєте. У результаті гравець з більшою кількістю очок виграє́ кубок."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -187,7 +188,7 @@ msgstr "Битва трьох ударів"
 msgid ""
 "3 Strikes Battle: Only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
-msgstr ""
+msgstr "Битва трьох ударів: Лише в багатокористувацькій грі. Атакуйте інших допоки вони втратять всі свої життя."
 
 #: src/states_screens/addons_screen.cpp:53
 msgid "3 months"
@@ -212,7 +213,7 @@ msgstr "ШІ суперників"
 
 #: src/states_screens/race_result_gui.cpp:189
 msgid "Abort Grand Prix"
-msgstr "Покинути Гран-прі"
+msgstr "Покинути Велике Змагання"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -229,7 +230,7 @@ msgstr "Газ"
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "Розженіться та натисніть <%s> під час заносу. Ковзання може допомогти вам пройти гострий поворот швидше."
 
 #: src/tracks/track_object_presentation.cpp:897
 #, c-format
@@ -378,7 +379,7 @@ msgstr "Завжди показувати екран входу"
 
 #. I18N: ../stk-assets/karts/amanda/kart.xml
 msgid "Amanda"
-msgstr ""
+msgstr "Аманда"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -393,7 +394,7 @@ msgstr "Вплив оточення : %s"
 
 #: src/states_screens/edit_gp_screen.cpp:323
 msgid "An error occurred while trying to save your grand prix."
-msgstr "Сталася помилка під час збереження вашого гран-прі."
+msgstr "Сталася помилка під час збереження Великого Змагання."
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Anchor - slows down greatly the kart in the first position."
@@ -442,7 +443,7 @@ msgstr "Анізотропна x8"
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:132
 msgid "Another grand prix with this name already exists."
-msgstr "Інше гран-прі вже існує з такою ж назвою."
+msgstr "Інше Велике Змагання вже існує з такою ж назвою."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -493,7 +494,7 @@ msgstr "Навколо маяка"
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Assign nothing"
-msgstr ""
+msgstr "Нічого не призначено"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -558,7 +559,7 @@ msgstr "Повернутися до гонки"
 
 #: src/states_screens/race_result_gui.cpp:205
 msgid "Back to challenge selection"
-msgstr "Повернутись до вибору виклику"
+msgstr "Повернутись до вибору змагання"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
@@ -582,7 +583,7 @@ msgstr "Любитель бананів"
 msgid ""
 "Basket Ball - bounces after the leader, and might squash and slow down karts"
 " down on the way."
-msgstr ""
+msgstr "Баскетбольний м’яч - стрибає за лідером, та може чавити та сповільняти карти на своєму шляху."
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
@@ -644,12 +645,12 @@ msgstr "Гальма"
 msgid ""
 "BubbleGum - protect yourself with a shield, or use while looking back to "
 "leave a sticky pink puddle behind you."
-msgstr ""
+msgstr "Жувальна гумка - захистіть себе з допомогою щита, або, під час погляду назад, використовуйте щоб залишити рожевий липкий слід на дорозі."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr ""
+msgstr "Але я чесне створіння, тому запропоную Вам угоду."
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
@@ -658,7 +659,7 @@ msgstr "Кекс — кидається в найближчого суперни
 
 #: src/addons/addons_manager.cpp:97 src/addons/news_manager.cpp:315
 msgid "Can't access stkaddons server..."
-msgstr "Немає доступу до сервера додатків stkaddons.net…"
+msgstr "Немає доступу до сервера додатків …"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -705,16 +706,16 @@ msgstr "Секретна печера"
 
 #: src/states_screens/feature_unlocked.cpp:493
 msgid "Challenge Completed"
-msgstr "Виклик завершено"
+msgstr "Змагання завершено"
 
 #: src/states_screens/race_gui.cpp:313 src/states_screens/race_gui.cpp:315
 msgid "Challenge Failed"
-msgstr "Виклик провалено"
+msgstr "Невдача"
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
 msgid "Challenges : Trophy Room"
-msgstr "Змагання: зала призів"
+msgstr "Змагання: Зала призів"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "Change"
@@ -767,7 +768,7 @@ msgstr "Збирай блакитні коробки: вони дадуть то
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
-msgstr ""
+msgstr "Збирайте подарунки, та стріляйте з допомогою <%s> щоб прибрати ці коробки з дороги!"
 
 #: src/tracks/track_object_presentation.cpp:938
 msgid "Collect nitro bottles (we will use them after the curve)"
@@ -787,7 +788,7 @@ msgstr "Збирай заряди „нітро“, що дають можлив
 
 #: src/tracks/track_object_presentation.cpp:880
 msgid "Complete all challenges to unlock the big door!"
-msgstr "Завершіть всі виклики аби відкрити браму!"
+msgstr "Завершіть всі змагання аби відкрити браму!"
 
 #: src/achievements/achievement.cpp:202
 #, c-format
@@ -811,7 +812,7 @@ msgstr "Підтвердь рішення протягом %i секунд"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Connect to the Internet"
-msgstr "З'єднатись з інтернетом"
+msgstr "З'єднання з інтернетом"
 
 #: src/input/wiimote_manager.cpp:387
 msgid ""
@@ -906,7 +907,7 @@ msgstr "Поточний пароль невірний."
 
 #: src/config/player_manager.cpp:91
 msgid "Currently not signed in"
-msgstr ""
+msgstr "Не увійшли"
 
 #. I18N: custom video settings
 #: src/states_screens/options_screen_video.cpp:411
@@ -988,11 +989,11 @@ msgstr "Вимкнено"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Display FPS"
-msgstr "Відображати кад./сек."
+msgstr "Показувати кадр./сек. "
 
 #: src/states_screens/race_result_gui.cpp:354
 msgid "Do you really want to abort the Grand Prix?"
-msgstr "Ви справді бажаєте завершити Гран-прі?"
+msgstr "Ви справді бажаєте завершити Велике Змагання?"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/user_screen.cpp:583
@@ -1035,17 +1036,17 @@ msgstr "Змінити"
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Title in edit grand prix screen
 msgid "Edit Grand Prix"
-msgstr "Змінити гран-прі"
+msgstr "Змінити Велике Змагання"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:184
 msgid "Egg Hunt"
-msgstr ""
+msgstr "Полювання за яйцями"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr ""
+msgstr "Полювання за яйцями: Дослідіть трек та знайдіть всі сховані яйця."
 
 #: src/modes/easter_egg_hunt.cpp:202
 #, c-format
@@ -1070,7 +1071,7 @@ msgstr "Ел. пошта"
 
 #: src/states_screens/register_screen.cpp:292
 msgid "Email has to be between 4 and 50 characters long!"
-msgstr ""
+msgstr "Електронна адреса має містити від 4 до 50 символів!"
 
 #: src/states_screens/register_screen.cpp:298
 msgid "Email is invalid!"
@@ -1093,7 +1094,7 @@ msgstr "Включити пристрій"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable per-player handicaps"
-msgstr ""
+msgstr "Увімкнути труднощі для гравців"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -1122,12 +1123,12 @@ msgstr "Помилка завантаження новин: '%s'."
 msgid ""
 "Everyone:\n"
 "Press 'Select' now to join the game!"
-msgstr ""
+msgstr "Всі:\nНатисніть 'Обрати' зараз, щоб приєднатись до гри!"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Existing Online Account"
-msgstr ""
+msgstr "Існуючий Онлайн екаунт"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In the networking lobby
@@ -1157,12 +1158,12 @@ msgstr "Досліджуйте треки аби знайти всі прихо�
 #: src/graphics/irr_driver.cpp:1795
 #, c-format
 msgid "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
-msgstr ""
+msgstr "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
 
 #: src/graphics/irr_driver.cpp:1804
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris"
-msgstr ""
+msgstr "FPS: %d/%d/%d - %d KTris"
 
 #: src/states_screens/online_profile_achievements.cpp:128
 #: src/states_screens/online_profile_achievements.cpp:168
@@ -1176,7 +1177,7 @@ msgstr "Отримання друзів"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:171
 msgid "Fetching last vote"
-msgstr ""
+msgstr "Отримання останнього голосу"
 
 #: src/states_screens/server_selection.cpp:67
 #: src/states_screens/server_selection.cpp:210
@@ -1187,7 +1188,7 @@ msgstr "Отримання серверів"
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
 "able to reset your password."
-msgstr ""
+msgstr "Вкажіть ім’я користувача та електронну адресу, які ви вказували при реєстрації, щоб мати смогу відоновити пароль."
 
 #: src/modes/linear_world.cpp:276
 msgid "Final lap!"
@@ -1229,7 +1230,7 @@ msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
-msgstr ""
+msgstr "Сілдуй за лідером: Їдьте на другому місці, останній карт буде дискавліфікований кожного разу коли лічильник добігатиме нуля. Обрережно: переганяючи лідера ви будете виключені з гонки також!"
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
@@ -1245,7 +1246,7 @@ msgstr[2] ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:313
 msgid "Friend removed!"
-msgstr ""
+msgstr "Друга вилучено!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:215
 msgid "Friend request accepted!"
@@ -1298,7 +1299,7 @@ msgstr "Режим гри"
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Game type (Goals limit / Time limit)"
-msgstr ""
+msgstr "Тип гри (Ліміт цілей / Ліміт часу)"
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
 #: src/input/binding.cpp:292
@@ -1326,7 +1327,7 @@ msgstr "Головна"
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Give Up Race"
-msgstr ""
+msgstr "Здатися"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -1365,27 +1366,27 @@ msgstr "Золоті руки"
 
 #. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
-msgstr ""
+msgstr "Острів Великий Парадізо"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: In the track selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:145
 msgid "Grand Prix"
-msgstr "Гран-прі"
+msgstr "Велике Змагання"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 msgid "Grand Prix Editor"
-msgstr "Редактор гран-прі"
+msgstr "Редактор Великого Змагання"
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Title in grand prix editor screen
 msgid "Grand Prix editor"
-msgstr "Редактор гран-прі"
+msgstr "Редактор Великого Змагання"
 
 #: src/states_screens/race_result_gui.cpp:1214
 msgid "Grand Prix progress:"
-msgstr "Прогрес Гран-прі:"
+msgstr "Просування у Великому Змаганні:"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -1424,7 +1425,7 @@ msgstr "Гість %d"
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
 msgid "Guest Log in"
-msgstr ""
+msgstr "Увійти як гість"
 
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
@@ -1469,19 +1470,19 @@ msgstr "Тільки люди"
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "I agree to the above terms and am 13 years or older. "
-msgstr ""
+msgstr "Я погоджуюсь з вказаними вище умовами і мені більше ніж 13 років."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
-msgstr ""
+msgstr "Якщо ти зможеш перемогти мене в гонці, тоді я звільню цього старого дивака."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "Зображення замка означає, що тобі необхідно завершити випробування, щоб розблокувати його."
+msgstr "Якщо ви бачите замок як цей, то це означає, що вам необхідно завершити змагання, щоб розблокувати його."
 
 #: src/input/input_manager.cpp:729
 #, c-format
@@ -1491,7 +1492,7 @@ msgstr "„%s“ ігнорується, потрібно було увійти 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Image-based lighting"
-msgstr ""
+msgstr "Освітлення на основі зображення"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
@@ -1508,11 +1509,11 @@ msgstr "Середній рівень"
 #: src/states_screens/register_screen.cpp:401
 #: src/states_screens/user_screen.cpp:328
 msgid "Internet access is disabled, please enable it in the options"
-msgstr ""
+msgstr "Інтернет доступ вимкнено, будь ласка увімкніть його в налаштуваннях"
 
 #: src/states_screens/race_result_gui.cpp:974
 msgid "It's a draw"
-msgstr ""
+msgstr "Це нічия"
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
@@ -1649,7 +1650,7 @@ msgstr "Налаштування лобі"
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Local Name"
-msgstr ""
+msgstr "Локальне ім’я"
 
 #: src/states_screens/kart_selection.cpp:853
 msgid "Locked"
@@ -1664,7 +1665,7 @@ msgstr "Заблоковано"
 #: src/states_screens/race_setup_screen.cpp:214
 #: src/states_screens/tracks_screen.cpp:283
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr "Заблоковано: спершу виконай доступні змагання і тоді отримаєш доступ!"
+msgstr "Заблоковано: спершу виконайте доступні змагання і тоді отримаєте доступ!"
 
 #: src/states_screens/tracks_screen.cpp:201
 msgid "Locked!"
@@ -1673,26 +1674,26 @@ msgstr "Заблоковано!"
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
 msgid "Log In"
-msgstr ""
+msgstr "Вхід"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Log Out"
-msgstr ""
+msgstr "Вихід"
 
 #: src/states_screens/online_screen.cpp:139
 #, c-format
 msgid "Logged in as: %s."
-msgstr ""
+msgstr "Увійшли як: %s."
 
 #: src/states_screens/online_screen.cpp:155
 msgid "Logging in"
-msgstr ""
+msgstr "Вхожу"
 
 #: src/states_screens/user_screen.cpp:494
 #, c-format
 msgid "Logging in '%s'"
-msgstr ""
+msgstr "Вхожу '%s'"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
@@ -1700,16 +1701,16 @@ msgid ""
 "Logging in as a guest allows you to participate in online races, but it does"
 " not allow you to vote for addons, or collect any achievements while being "
 "online."
-msgstr ""
+msgstr "Увійшовши як гість ви можете брати участь в онлайн заїздах, проте не можете голосувати за додатки, або збирати будь які досягнення онлайн."
 
 #: src/states_screens/online_screen.cpp:160
 msgid "Logging out"
-msgstr ""
+msgstr "Виходжу"
 
 #: src/states_screens/user_screen.cpp:493
 #, c-format
 msgid "Logging out '%s'"
-msgstr ""
+msgstr "Виходжу '%s'"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
@@ -1726,15 +1727,15 @@ msgstr "Озирнутись назад"
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: In the profile screen
 msgid "Look for more friends:"
-msgstr ""
+msgstr "Знайти більше друзів:"
 
 #. I18N: ./data/achievements.xml
 msgid "Make 5 skidding in a single lap."
-msgstr ""
+msgstr "Зробити 5 заносів на одному колі."
 
 #. I18N: ./data/achievements.xml
 msgid "Make a race with 5 laps or more."
-msgstr ""
+msgstr "Провести гонку з 5 колами або більше."
 
 #. I18N: ./data/achievements.xml
 msgid "Marathoner"
@@ -1750,7 +1751,7 @@ msgstr "Макс. кількість гравців"
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Maximum time (min.)"
-msgstr ""
+msgstr "Максимальний час (хв.)"
 
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:436
@@ -1768,7 +1769,7 @@ msgstr "Мініґольф"
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
-msgstr ""
+msgstr "Мисливець на комарів"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -1837,7 +1838,7 @@ msgstr "Ім’я"
 
 #: src/states_screens/create_server_screen.cpp:132
 msgid "Name has to be between 4 and 30 characters long!"
-msgstr ""
+msgstr "Ім’я має містити від 4 до 30 символів!"
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:125
 msgid "Name is empty."
@@ -1856,7 +1857,7 @@ msgstr "Назва сервера"
 
 #. I18N: ../stk-assets/tracks/scotland/track.xml
 msgid "Nessie's pond"
-msgstr ""
+msgstr "Лохнеське озеро"
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
@@ -1866,12 +1867,12 @@ msgstr "Новий"
 #: src/challenges/challenge_data.cpp:502
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr "Доступне нове Гран-прі „%s“"
+msgstr "Доступне нове Велике Змагання „%s“"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "New Online Account"
-msgstr ""
+msgstr "Новий Онлайн екаунт"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -1955,7 +1956,7 @@ msgstr "Початківець"
 #: src/states_screens/dialogs/select_challenge.cpp:68
 #, c-format
 msgid "Number of AI Karts : %i"
-msgstr ""
+msgstr "Кількість Картів ШІ : %i"
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
@@ -1965,7 +1966,7 @@ msgstr "Кількість віртуальних картів"
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Number of goals to win"
-msgstr ""
+msgstr "Кількість голів для перемоги"
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
@@ -1995,7 +1996,7 @@ msgstr "Гаразд"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
 msgid "Off the beaten track"
-msgstr ""
+msgstr "По бездоріжжю "
 
 #: src/states_screens/online_profile_friends.cpp:150
 msgid "Offline"
@@ -2004,12 +2005,12 @@ msgstr "Поза мережею"
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Offline Account"
-msgstr ""
+msgstr "Офлайн екаунт"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr ""
+msgstr "О так, дивись, він тепер в моєму замку і будо поданий на супер..."
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
@@ -2034,20 +2035,20 @@ msgstr "У мережі"
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Online Multiplayer"
-msgstr ""
+msgstr "Колективна гра онлайн"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Online Username"
-msgstr ""
+msgstr "Ім’я користувача онлайн "
 
 #: src/states_screens/register_screen.cpp:280
 msgid "Online username has to be between 3 and 30 characters long!"
-msgstr ""
+msgstr "Ім’я онлайн гравця має містити від 4 до 30 символів!"
 
 #: src/states_screens/register_screen.cpp:284
 msgid "Online username must not start with a number!"
-msgstr ""
+msgstr "Ім’я онлайн гравця не повинно починатись з цифри!"
 
 #: src/input/input_manager.cpp:759
 msgid "Only the Game Master may act at this point!"
@@ -2056,7 +2057,7 @@ msgstr "Це може робити лише господар гри!"
 #: src/tracks/track_object_presentation.cpp:960
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
-msgstr ""
+msgstr "Упс! Якщо у вас проблеми тисніть <%s> для порятунку"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -2074,7 +2075,7 @@ msgstr "Огляд"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:93
 msgid "POWER"
-msgstr ""
+msgstr "ПОТУЖНІСТЬ"
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Parachute - slows down all karts in a better position."
@@ -2102,7 +2103,7 @@ msgstr "Зміна пароля"
 #: src/states_screens/dialogs/change_password_dialog.cpp:140
 #: src/states_screens/register_screen.cpp:288
 msgid "Password has to be between 8 and 30 characters long!"
-msgstr ""
+msgstr "Пароль має містити від 8 до 30 символів!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:210
 msgid "Password successfully changed."
@@ -2138,7 +2139,7 @@ msgstr "Ігровий Майданчик Пінгвіна"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:247
 msgid "Performing vote"
-msgstr ""
+msgstr "Виконую голосування"
 
 #. I18N: ../stk-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
@@ -2150,7 +2151,7 @@ msgstr "Відтворити все"
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
-msgstr ""
+msgstr "Зіграйте на всій офіційних треках, хоча б один раз."
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
@@ -2169,12 +2170,12 @@ msgstr "Гравці"
 msgid ""
 "Players can select handicapped (more difficult) profiles on the kart "
 "selection screen"
-msgstr ""
+msgstr "Гравці можуть обрати профілі з троднощами (складніша гра) на екрані вибору карта"
 
 #. I18N: ./data/gui/enter_gp_name_dialog.stkgui
 #. I18N: In the 'add new grand prix' dialog
 msgid "Please enter the name of the grand prix"
-msgstr ""
+msgstr "Будь ласка вкажіть назву Великого Змагання"
 
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:500
@@ -2183,7 +2184,7 @@ msgstr "Будь ласка, переналаштуй клавіатуру."
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
 msgid "Please read the terms and conditions "
-msgstr ""
+msgstr "Будь ласка прочитайте умови та терміни. "
 
 #: src/states_screens/addons_screen.cpp:437
 msgid "Please wait while addons are updated"
@@ -2201,14 +2202,14 @@ msgstr "Вантуз — кидається прямо вперед, щоб за
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
-msgstr ""
+msgstr "Любитель бонусів"
 
 #: src/tracks/track_object_presentation.cpp:930
 #, c-format
 msgid ""
 "Press <%s> to look behind, and fire the weapon with <%s> while pressing <%s>"
 " to fire behind!"
-msgstr ""
+msgstr "Натисніть <%s> щоб озирнутися, та стріляйте в тих хто позаду кнопкою <%s> поки <%s> натиснута!"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -2274,7 +2275,7 @@ msgstr "Паффі"
 msgid ""
 "Push the ball to the opposite cage to score goals. (Only in multiplayer "
 "games)"
-msgstr ""
+msgstr "Забийте м’я  у ворота супернику. (Лише у багатокористувацькій грі)"
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
@@ -2306,7 +2307,7 @@ msgstr "Випадкова арена"
 
 #: src/race/grand_prix_data.hpp:171
 msgid "Random Grand Prix"
-msgstr "Випадкове гран-прі"
+msgstr "Випадкове Велике Змагання"
 
 #: src/states_screens/kart_selection.cpp:839
 #: src/states_screens/kart_selection.cpp:1467
@@ -2351,7 +2352,7 @@ msgstr "Зареєструвати"
 msgid ""
 "Regular Race: All blows allowed, so catch weapons and make clever use of "
 "them!"
-msgstr ""
+msgstr "Звичайна гонка: Усі витівки дозволено, отож пібдирай зброю та використовуй її розумно!"
 
 #: src/states_screens/gp_info_screen.cpp:153
 #: src/states_screens/gp_info_screen.cpp:178
@@ -2487,15 +2488,15 @@ msgstr "ШВИДКІСТЬ"
 
 #. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
-msgstr ""
+msgstr "Космічний корабель"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
-msgstr ""
+msgstr "Гонщик Сара"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara the Wizard"
-msgstr ""
+msgstr "Сара чарівниця"
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
@@ -2505,7 +2506,7 @@ msgstr "Зберегти"
 #. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
 msgid "Save Grand Prix"
-msgstr "Зберегти гран-прі"
+msgstr "Зберегти Велике Змагання"
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: ./data/gui/online/user_search.stkgui
@@ -2542,7 +2543,7 @@ msgstr "Оберіть карт"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Send anonymous HW statistics"
-msgstr ""
+msgstr "Надсилати анонімну статистику обладнання."
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -2586,7 +2587,7 @@ msgstr "Тіні"
 #: src/states_screens/options_screen_video.cpp:470
 #, c-format
 msgid "Shadows: %i"
-msgstr ""
+msgstr "Тіні: %i"
 
 #: src/states_screens/options_screen_video.cpp:468
 #, c-format
@@ -2627,7 +2628,7 @@ msgstr "Розмір: %s"
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
-msgstr ""
+msgstr "Швидкі Ковзани"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:248
@@ -2657,7 +2658,7 @@ msgstr "Футбольне поле"
 msgid ""
 "Soccer: Only in multiplayer games. Use your kart to push the ball into the "
 "goal."
-msgstr ""
+msgstr "Футбол: Лише в багатокористувацькій грі. Використовуйте свій карт щоб забити м’яч у ворота."
 
 #: src/states_screens/addons_screen.cpp:514
 #: src/states_screens/main_menu_screen.cpp:550
@@ -2691,7 +2692,7 @@ msgstr "Почати"
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:209
 msgid "Start Grand Prix"
-msgstr "Почати Гран-прі"
+msgstr "Почати Велике Змагання"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -2777,7 +2778,7 @@ msgid ""
 "(To change this setting at a later time, go to options, select tab 'User "
 "Interface', and edit \"Connect to the Internet\" and \"Send anonymous HW "
 "statistics\")."
-msgstr ""
+msgstr "SuperTuxKart може під’єднуватись до інтернету щоб завантажити додатки та перевірити оновлення. Ми також збираємо анонімну інформацію про обладнання, щоб покращити розробку гри. Будь ласка прочитайте нашу політику приватності на http://privacy.supertuxkart.net. Чи бажаєте щоб ця можливість була увімкнена? (Щоб змінити ці налаштування пізніше, перейдіть в налаштування, оберіть \"Інтерфейс користувача\" та відредагуйте \"З'єднання з інтернетом\" та \"Надсилати анонімну статистику обладнання\")"
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
@@ -2791,7 +2792,7 @@ msgstr "Замінювач — коробки з бонусами перетво
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Swatter - will squash karts close by, slowing them down."
-msgstr "Мухобійка — причавлює проїжджаючі мимо карти, тим самим сповільнюючи їх."
+msgstr "Хлопавка для мух — прихлопне карти, що проїжджають поруч, тим самим сповільнюючи їх."
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:186
@@ -2802,11 +2803,11 @@ msgstr "Мова системи"
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash at least 5 of "
 "them in a race."
-msgstr ""
+msgstr "Уявіть, що ваші суперники це комарі! Прихлопніть принаймні 5 з них в гонці, хлопавкою для мух."
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
 msgid "Temple"
-msgstr ""
+msgstr "Храм"
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -2826,7 +2827,7 @@ msgstr "Фільтрація текстур"
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
 msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
-msgstr ""
+msgstr "Кнопка 'ковзання'  дозволяє ковзати в гострому повороті та отримати прискорення."
 
 #. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
@@ -2844,7 +2845,7 @@ msgstr "Таблиця результатів застаріла,\nусі рез
 
 #: src/states_screens/create_server_screen.cpp:136
 msgid "The maxinum number of players has to be between 2 and 12."
-msgstr ""
+msgstr "Максимальна кількість гравців має бути між 2 та 12."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:178
@@ -2942,13 +2943,13 @@ msgstr "Тип:"
 
 #: src/states_screens/race_gui_overworld.cpp:502
 msgid "Type: Grand Prix"
-msgstr "Type: гран-прі"
+msgstr "Тип: Велике Змагання"
 
 #: src/online/xml_request.cpp:83
 msgid ""
 "Unable to connect to the server. Check your internet connection or try again"
 " later."
-msgstr ""
+msgstr "Не можу під’єднатись до сервера. Перевірте інтернет з’єднання або спробуйте пізніше."
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
@@ -2980,17 +2981,17 @@ msgstr "Дата оновлення"
 
 #. I18N: ./data/achievements.xml
 msgid "Use 10 or more powerups in a race."
-msgstr ""
+msgstr "Використайте 10 або більше бонусів прискорення в гонці."
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Use high definition textures"
-msgstr ""
+msgstr "Текстури високої чіткості"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Use left/right to choose your team and press fire"
-msgstr ""
+msgstr "Використовуйте вліво/вправо щоб обрати команду та натисніть вогонь."
 
 #: src/tracks/track_object_presentation.cpp:949
 #, c-format
@@ -3033,7 +3034,7 @@ msgstr "Користувач"
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
-msgstr ""
+msgstr "Хибне ім’я або електронна адреса."
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 msgid "VS"
@@ -3074,7 +3075,7 @@ msgstr "Голос"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:230
 msgid "Vote successful! You can now close the window."
-msgstr ""
+msgstr "Голос зараховано! Тепер можна закрити це вікно."
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:85
 msgid "WEIGHT"
@@ -3116,7 +3117,7 @@ msgstr "Погодні ефекти: %s"
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
-msgstr ""
+msgstr "Щось не так, маленкі хіппі? Ваш великий ґну лідер зник?"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -3144,7 +3145,7 @@ msgstr "Виграти 5 гонок за раз"
 
 #. I18N: ./data/achievements.xml
 msgid "Win in all single player modes, against at least 3 opponents."
-msgstr ""
+msgstr "Виграйте всі однокористувацькі режими, проти щонайменше 3 суперників."
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
@@ -3152,7 +3153,7 @@ msgstr "Екс Ар 591"
 
 #. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
-msgstr ""
+msgstr "Сюе"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -3170,21 +3171,21 @@ msgstr "Ви граєте як"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:190
 msgid "You can adapt your previous rating by clicking the stars beneath."
-msgstr ""
+msgstr "Ви можете змінити ваш попередньо надісланий рейтинг, для цього клікніть на ці зірочки нижче."
 
 #: src/states_screens/main_menu_screen.cpp:513
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go to options, select  tab 'User Interface', and edit \"Connect to "
 "the Internet\"."
-msgstr ""
+msgstr "Ви не можете завантажувати додатки без інтернет підключення. Якщо бажаєте це робити, перейдіть до налаштувань, оберіть вкладку 'Інтерфейс користувача' та налаштуйте 'Підключення до інтернет'"
 
 #: src/states_screens/main_menu_screen.cpp:488
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
-msgstr ""
+msgstr "Ви не можете грати онлайн без інтернет підключення. Якщо бажаєте це робити, перейдіть до налаштувань, оберіть вкладку 'Інтерфейс користувача' та налаштуйте 'Підключення до інтернет'"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
@@ -3192,7 +3193,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at http://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Ви можете грати без онляйн екаунту вибравши Офлайн екаунт. Проте тоді ви не зможете під’єднятись до друзів, голосувати за додатки та ін. Будь ласка, перегляньте нашу політику конфіденційності на http://privacy.supertuxkart.net"
 
 #: src/states_screens/grand_prix_win.cpp:124
 #: src/states_screens/race_result_gui.cpp:175
@@ -3205,24 +3206,24 @@ msgstr "Ви виконали завдання!"
 
 #: src/states_screens/grand_prix_win.cpp:279
 msgid "You completed the Grand Prix!"
-msgstr "Ти завершив Гран-Прі!"
+msgstr "Ви завершили Велике Змагання!"
 
 #: src/states_screens/feature_unlocked.cpp:208
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
-msgstr ""
+msgstr "Ви виграли у складному змаганні! На цьому рівні здобуто очок: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:200
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
-msgstr ""
+msgstr "Ви виграли у простому змаганні! На цьому рівні здобуто очок: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:204
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
-msgstr ""
+msgstr "Ви виграли у середнє змаганні! На цьому рівні здобуто очок: %i/%i"
 
 #: src/karts/kart.cpp:856
 msgid "You finished the race!"
@@ -3232,9 +3233,9 @@ msgstr "Ти завершив гонку!"
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Ви маєте %d запит товаришувати!"
+msgstr[1] "Ви маєте %d запити товаришувати!"
+msgstr[2] "Ви маєте %d запитів товаришувати!"
 
 #: src/online/online_player_profile.cpp:472
 msgid "You have a new friend request!"
@@ -3248,7 +3249,7 @@ msgstr "Ти дискваліфікований!"
 msgid ""
 "You have not yet voted for this addon. Select your desired rating by "
 "clicking the stars beneath"
-msgstr ""
+msgstr "Ви ще не голосували за цей додаток. Оберіть рейтиг клікнувши на зірочки."
 
 #: src/karts/kart.cpp:1913
 msgid ""
@@ -3256,7 +3257,7 @@ msgid ""
 "to enter this challenge!\n"
 "Check the minimap for\n"
 "available challenges."
-msgstr ""
+msgstr "Вам потрібно більше очок\nщоб розпочати це змагання!\nЗнайдіть доступні змагання\nна міні карті."
 
 #: src/states_screens/user_screen.cpp:472
 msgid "You need to enter a password."
@@ -3264,7 +3265,7 @@ msgstr "Потрібно вказати пароль"
 
 #: src/states_screens/feature_unlocked.cpp:568
 msgid "You unlocked grand prix %0"
-msgstr "Ви відкрили гран-прі %0"
+msgstr "Ви розблокували Велике Змагання %0"
 
 #: src/states_screens/feature_unlocked.cpp:530
 msgid "You unlocked track %0"
@@ -3275,13 +3276,13 @@ msgstr "Ви відкрили трек %0"
 msgid ""
 "You will receive an email with further instructions on how to reset your "
 "password. Please be patient and be sure to check your spam folder."
-msgstr ""
+msgstr "Ви отримаєте електронного листа з подальшими інструкціями для відновлення паролю. Будь ласка, будьте терплячими, ткож перевірте ваш каталог із Спамом."
 
 #: src/states_screens/register_screen.cpp:361
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
-msgstr ""
+msgstr "Ви отримаєте електронного листа з подальшими інструкціями для активаціє екаунту. Будь ласка, будьте терплячими, ткож перевірте ваш каталог із Спамом."
 
 #: src/karts/kart.cpp:856 src/karts/kart.cpp:875
 msgid "You won the race!"
@@ -3291,7 +3292,7 @@ msgstr "Ти виграв гонку!"
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
-msgstr ""
+msgstr "Схоже ваша версія OpenGL застаріла. Будь ласка перевірте оновлення для відео драйверів. SuperTuxKart вимагає OpenGL 3.1 або вище."
 
 #: src/config/user_config.cpp:700
 msgid ""
@@ -3308,7 +3309,7 @@ msgstr "Твій файл з налаштуваннями застарів, то
 #: src/main.cpp:1367
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
-msgstr ""
+msgstr "Ваші відеодрайвер застарів. Будь ласка оновіть відедрайвер."
 
 #: src/input/device_manager.cpp:501
 msgid "Your input config file is not compatible with this version of STK."
@@ -3350,11 +3351,11 @@ msgstr "рекомендований"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
 msgid "high"
-msgstr ""
+msgstr "високі"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 msgid "low"
-msgstr ""
+msgstr "низькі"
 
 #. I18N: arena group name
 #. I18N: track group name
@@ -3369,4 +3370,4 @@ msgstr "стандарт"
 
 #: src/states_screens/credits.cpp:209
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Helen Antonova https://launchpad.net/~vigonett\n  JOker https://launchpad.net/~spenser26\n  Maks Lyashuk aka Ma)(imuM https://launchpad.net/~probel\n  Pasha Sydoryshyn https://launchpad.net/~pandorrarv\n  Pavlo Bilyak https://launchpad.net/~pavlo1997\n  STK-team https://launchpad.net/~stk\n  Volodymyr Bodenchuk https://launchpad.net/~bodenchuk\n  Сергій Дубик https://launchpad.net/~dubyk-library"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nfedik, 2015\nHelen Antonova https://launchpad.net/~vigonett\nJOker https://launchpad.net/~spenser26\nMaks Lyashuk aka Ma)(imuM https://launchpad.net/~probel\nPasha Sydoryshyn https://launchpad.net/~pandorrarv\nPavlo Bilyak https://launchpad.net/~pavlo1997\nSTK-team https://launchpad.net/~stk\nVolodymyr Bodenchuk https://launchpad.net/~bodenchuk\nСергій Дубик https://launchpad.net/~dubyk-library"

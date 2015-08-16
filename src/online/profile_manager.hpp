@@ -103,7 +103,7 @@ public:
     // ----------------------------------------------------------------
 
     void addToCache(OnlineProfile *profile);
-    void addPersistent(OnlineProfile *profile);
+    OnlineProfile* addPersistent(OnlineProfile *profile);
     void deleteFromPersistent(const uint32_t id);
     void clearPersistent();
     void moveToCache(const uint32_t id);

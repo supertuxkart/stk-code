@@ -51,7 +51,7 @@ class TriggerItemListener
 {
 public:
     virtual ~TriggerItemListener() {}
-    virtual void onTriggerItemApproached(Item* who) = 0;
+    virtual void onTriggerItemApproached() = 0;
 };
 
 /**
