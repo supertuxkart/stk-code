@@ -20,6 +20,7 @@
 #define TRANSLATION_HPP
 
 #include <irrString.h>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -49,7 +50,7 @@ private:
     tinygettext::Dictionary        m_dictionary;
 
     /** A map that saves all fribidized strings: Original string, fribidized string */
-    std::vector<std::pair<wchar_t*, wchar_t*> > m_fribidized_strings;
+    std::map<const irr::core::stringw, const irr::core::stringw> m_fribidized_strings;
     bool m_rtl;
 
     std::string m_current_language_name;

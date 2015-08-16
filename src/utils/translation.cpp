@@ -361,14 +361,6 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
 Translations::~Translations()
 {
-    // Remove cached strings
-    for (std::vector<std::pair<wchar_t*, wchar_t*> >::iterator it =
-         m_fribidized_strings.begin(); it != m_fribidized_strings.end(); it++)
-    {
-        delete[] it->first;
-        delete[] it->second;
-    }
-    m_fribidized_strings.clear();
 }   // ~Translations
 
 // ----------------------------------------------------------------------------
@@ -379,12 +371,10 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
     if(this->isRTLLanguage())
     {
         // Test if this string was already fribidized
-        for (std::vector<std::pair<wchar_t*, wchar_t*> >::iterator it =
-             m_fribidized_strings.begin(); it != m_fribidized_strings.end(); it++)
-        {
-            if (wcscmp(it->first, in_ptr) == 0)
-                return it->second;
-        }
+        std::map<const irr::core::stringw, const irr::core::stringw>::const_iterator
+            found = m_fribidized_strings.find(in_ptr);
+        if (found != m_fribidized_strings.cend())
+            return found->second.c_str();
 
         // Use fribidi to fribidize the string
         FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
@@ -434,7 +424,7 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
         std::wmemcpy(original_string, in_ptr, original_length);
 
         // Save it in the map
-        m_fribidized_strings.push_back(std::pair<wchar_t*, wchar_t*>(
+        m_fribidized_strings.insert(std::pair<const irr::core::stringw, const irr::core::stringw>(
             original_string, fribidized_string));
 
         return fribidized_string;
