@@ -54,7 +54,7 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(Characteristic
         return TYPE_FLOAT;
     case SUSPENSION_REST:
         return TYPE_FLOAT;
-    case SUSPENSION_TRAVEL_CM:
+    case SUSPENSION_TRAVEL:
         return TYPE_FLOAT;
     case SUSPENSION_EXP_SPRING_RESPONSE:
         return TYPE_BOOL;
@@ -98,10 +98,6 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(Characteristic
         return TYPE_FLOAT;
     case WHEELS_DAMPING_COMPRESSION:
         return TYPE_FLOAT;
-    case WHEELS_RADIUS:
-        return TYPE_FLOAT;
-    case WHEELS_POSITION:
-        return TYPE_FLOAT_VECTOR;
     case CAMERA_DISTANCE:
         return TYPE_FLOAT;
     case CAMERA_FORWARD_UP_ANGLE:
@@ -222,7 +218,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(Characteristic
         return TYPE_FLOAT;
     case SLIPSTREAM_FADE_OUT_TIME:
         return TYPE_FLOAT;
-    /* <characteristics-start getProp1> */
+
+    /* <characteristics-end getProp1> */
     }
     Log::fatal("AbstractCharacteristic::getType", "Unknown type");
     return TYPE_FLOAT;
@@ -287,8 +284,6 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "WHEELS_DAMPING_RELAXATION";
     case WHEELS_DAMPING_COMPRESSION:
         return "WHEELS_DAMPING_COMPRESSION";
-    case WHEELS_POSITION:
-        return "WHEELS_POSITION";
     case CAMERA_DISTANCE:
         return "CAMERA_DISTANCE";
     case CAMERA_FORWARD_UP_ANGLE:
@@ -658,16 +653,6 @@ float AbstractCharacteristic::getWheelsDampingCompression() const
     process(WHEELS_DAMPING_COMPRESSION, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(WHEELS_DAMPING_COMPRESSION).c_str());
-    return result;
-}
-
-std::vector<float> AbstractCharacteristic::getWheelsPosition() const
-{
-    std::vector<float> result;
-    bool is_set = false;
-    process(WHEELS_POSITION, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName(WHEELS_POSITION).c_str());
     return result;
 }
 

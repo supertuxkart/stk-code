@@ -30,7 +30,7 @@ Turn: radius(InterpolationArray), timeResetSteer, timeFullSteer(InterpolationArr
 Engine: power, maxSpeed, brakeFactor, brakeTimeIncrease, maxSpeedReverseRatio
 Gear: switchRatio(std::vector<float>/floatVector), powerIncrease(std::vector<float>/floatVector)
 Mass
-Wheels: dampingRelaxation, dampingCompression, position(std::vector<float>/floatVector)
+Wheels: dampingRelaxation, dampingCompression
 Camera: distance, forwardUpAngle, backwardUpAngle
 Jump: animationTime
 Lean: max, speed

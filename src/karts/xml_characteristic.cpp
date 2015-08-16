@@ -342,7 +342,6 @@ void XmlCharacteristic::load(const XMLNode *node)
     {
         sub_node->get("damping-relaxation", &m_values[WHEELS_DAMPING_RELAXATION]);
         sub_node->get("damping-compression", &m_values[WHEELS_DAMPING_COMPRESSION]);
-        sub_node->get("position", &m_values[WHEELS_POSITION]);
     }
 
     if (const XMLNode *sub_node = node->getNode("camera"))

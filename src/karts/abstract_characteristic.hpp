@@ -109,7 +109,6 @@ public:
         // Wheels
         WHEELS_DAMPING_RELAXATION,
         WHEELS_DAMPING_COMPRESSION,
-        WHEELS_POSITION,
 
         // Camera
         CAMERA_DISTANCE,
@@ -270,7 +269,6 @@ public:
 
     float getWheelsDampingRelaxation() const;
     float getWheelsDampingCompression() const;
-    std::vector<float> getWheelsPosition() const;
 
     float getCameraDistance() const;
     float getCameraForwardUpAngle() const;
