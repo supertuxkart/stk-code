@@ -22,6 +22,27 @@
 #ifndef HEADER_SKIDDING_AI_HPP
 #define HEADER_SKIDDING_AI_HPP
 
+// Some debugging features for the AI. For example you can visualise the
+// point the AI is aiming at, or visualise the curve the AI is predicting.
+// It works best with just 1 AI kart, so set the number of karts
+// to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
+// Or use --profile-laps=99 and run just one AI. Using the debug camera
+// (top view) is useful, too
+
+#ifdef DEBUG
+   // Enable AI graphical debugging
+#  define AI_DEBUG
+   // Shows left and right lines when using new findNonCrashing function
+#  undef AI_DEBUG_NEW_FIND_NON_CRASHING
+   // Show the predicted turn circles
+#  undef AI_DEBUG_CIRCLES
+   // Show the heading of the kart
+#  undef AI_DEBUG_KART_HEADING
+   // Shows line from kart to its aim point
+#  undef AI_DEBUG_KART_AIM
+#endif
+
+
 #include "karts/controller/ai_base_controller.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/graph_node.hpp"
