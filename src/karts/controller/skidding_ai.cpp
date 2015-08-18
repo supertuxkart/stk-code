@@ -97,7 +97,7 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
         m_debug_sphere[i] = irr_driver->addSphere(1.0f, col_debug);
         m_debug_sphere[i]->setVisible(false);
         m_debug_sphere[i]->setMaterialTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-        m_debug_sphere[i]->setMaterialTexture(1, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        m_debug_sphere[i]->setMaterialTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
     m_debug_sphere[m_point_selection_algorithm]->setVisible(true);
     m_item_sphere  = irr_driver->addSphere(1.0f);
