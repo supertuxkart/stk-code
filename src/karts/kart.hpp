@@ -149,7 +149,7 @@ private:
 
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
-    
+
     /** Counter which is used for displaying wrong way message after a delay */
     float        m_wrongway_counter;
 
@@ -200,6 +200,7 @@ private:
     SFXBase      *m_engine_sound;
     SFXBase      *m_crash_sound;
     SFXBase      *m_terrain_sound;
+    SFXBase      *m_nitro_sound;
     /** A pointer to the previous terrain sound needs to be saved so that an
      *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */
     SFXBase      *m_previous_terrain_sound;
