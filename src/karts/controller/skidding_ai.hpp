@@ -31,7 +31,7 @@
 
 #ifdef DEBUG
    // Enable AI graphical debugging
-#  define AI_DEBUG
+#  undef AI_DEBUG
    // Shows left and right lines when using new findNonCrashing function
 #  undef AI_DEBUG_NEW_FIND_NON_CRASHING
    // Show the predicted turn circles
