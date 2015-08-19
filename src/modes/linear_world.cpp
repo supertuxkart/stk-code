@@ -173,7 +173,14 @@ void LinearWorld::update(float dt)
         // Nothing to do for karts that are currently being
         // rescued or eliminated
         if(kart->getKartAnimation()) continue;
-
+        // If the kart is off road, and 'flying' over a reset plane
+        // don't adjust the distance of the kart, to avoid a jump
+        // in the position of the kart (e.g. while falling the kart
+        // might get too close to another part of the track, shortly
+        // jump to position one, then on reset fall back to last)
+        if (!kart_info.getTrackSector()->isOnRoad() &&
+            kart->getMaterial()->isDriveReset())
+            continue;
         kart_info.getTrackSector()->update(kart->getFrontXYZ());
         kart_info.m_overall_distance = kart_info.m_race_lap
                                      * m_track->getTrackLength()

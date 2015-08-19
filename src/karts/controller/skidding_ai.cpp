@@ -19,24 +19,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-//The AI debugging works best with just 1 AI kart, so set the number of karts
-//to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-#ifdef DEBUG
-   // Enable AI graphical debugging
-#  undef AI_DEBUG
-   // Shows left and right lines when using new findNonCrashing function
-#  undef AI_DEBUG_NEW_FIND_NON_CRASHING
-   // Show the predicted turn circles
-#  undef AI_DEBUG_CIRCLES
-   // Show the heading of the kart
-#  undef AI_DEBUG_KART_HEADING
-   // Shows line from kart to its aim point
-#  undef AI_DEBUG_KART_AIM
-#endif
-
 #include "karts/controller/skidding_ai.hpp"
 
 #ifdef AI_DEBUG
+#  include "graphics/glwrap.hpp"
 #  include "graphics/irr_driver.hpp"
 #endif
 #include "graphics/show_curve.hpp"
@@ -111,6 +97,8 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
                                      i==2 ? 128 : 0);
         m_debug_sphere[i] = irr_driver->addSphere(1.0f, col_debug);
         m_debug_sphere[i]->setVisible(false);
+        m_debug_sphere[i]->setMaterialTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        m_debug_sphere[i]->setMaterialTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
     m_debug_sphere[m_point_selection_algorithm]->setVisible(true);
     m_item_sphere  = irr_driver->addSphere(1.0f);
@@ -167,7 +155,7 @@ SkiddingAI::~SkiddingAI()
     {
         delete m_curve[i];
     }
-    delete m_curve;
+    delete [] m_curve;
 #endif
 }   // ~SkiddingAI
 
@@ -1843,7 +1831,7 @@ void SkiddingAI::findNonCrashingPointNew(Vec3 *result, int *last_node)
     m_curve[CURVE_RIGHT]->addPoint(q[RIGHT_END_POINT]+eps1);
     m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps1);
 #endif
-#ifdef AI_DEBUG_KART_HEADING
+#if defined(AI_DEBUG_KART_HEADING) || defined(AI_DEBUG_NEW_FIND_NON_CRASHING)
     const Vec3 eps(0,0.5f,0);
     m_curve[CURVE_KART]->clear();
     m_curve[CURVE_KART]->addPoint(m_kart->getXYZ()+eps);

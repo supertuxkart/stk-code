@@ -252,13 +252,16 @@ void fillLocalBuffer(GLMesh &mesh, scene::IMeshBuffer* mb)
     glGenBuffers(1, &(mesh.index_buffer));
 
     glBindBuffer(GL_ARRAY_BUFFER, mesh.vertex_buffer);
+
     const void* vertices = mb->getVertices();
     const u32 vertexCount = mb->getVertexCount();
+    // This can happen for certain debug structures, e.g. ShowCurve
+    if (vertexCount == 0)
+        return;
 
     const c8* vbuf = static_cast<const c8*>(vertices);
     glBufferData(GL_ARRAY_BUFFER, vertexCount * mesh.Stride, vbuf,
                  GL_STREAM_DRAW);
-    assert(vertexCount);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.index_buffer);
     const void* indices = mb->getIndices();

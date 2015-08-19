@@ -310,7 +310,7 @@ void TrackObject::onWorldReady()
 
             fn_signature << "bool " << fn_name << "(";
 
-            for (int i = 0; i < arguments.size(); i++)
+            for (unsigned int i = 0; i < arguments.size(); i++)
             {
                 if (i > 0)
                     fn_signature << ",";
@@ -328,7 +328,7 @@ void TrackObject::onWorldReady()
         script_engine->runFunction(true, fn_signature.str(),
             [&](asIScriptContext* ctx) 
             {
-                for (int i = 0; i < arguments.size(); i++)
+                for (unsigned int i = 0; i < arguments.size(); i++)
                 {
                     ctx->SetArgObject(i, &arguments[i]);
                 }

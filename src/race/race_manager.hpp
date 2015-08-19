@@ -168,7 +168,7 @@ public:
     /** Returns a (translated) name of a minor race mode.
      *  \param mode Minor race mode.
      */
-    static const wchar_t* getNameOf(const MinorRaceModeType mode)
+    static const core::stringw getNameOf(const MinorRaceModeType mode)
     {
         switch (mode)
         {
@@ -184,7 +184,7 @@ public:
             case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
             //I18N: Game mode
             case MINOR_MODE_SOCCER:         return _("Soccer");
-            default: assert(false); return NULL;
+            default: assert(false); return L"";
         }
     }   // getNameOf
 
