@@ -621,6 +621,8 @@ public:
     // ------------------------------------------------------------------------
     void clearGlowingNodes() { m_glowing.clear(); }
     // ------------------------------------------------------------------------
+    std::vector<GlowData> getGlowingNodes() { return m_glowing;}
+    // ------------------------------------------------------------------------
     void addForcedBloomNode(scene::ISceneNode *n, float power = 1)
     {
         BloomData dat;
