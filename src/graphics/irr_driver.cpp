@@ -94,8 +94,8 @@ IrrDriver *irr_driver = NULL;
 
 GPUTimer          m_perf_query[Q_LAST];
 
-const int MIN_SUPPORTED_HEIGHT = 600;
-const int MIN_SUPPORTED_WIDTH  = 800;
+const int MIN_SUPPORTED_HEIGHT = 768;
+const int MIN_SUPPORTED_WIDTH  = 1024;
 
 // ----------------------------------------------------------------------------
 /** The constructor creates the irrlicht device. It first creates a NULL
@@ -324,7 +324,8 @@ void IrrDriver::createListOfVideoModes()
         {
             const int w = modes->getVideoModeResolution(i).Width;
             const int h = modes->getVideoModeResolution(i).Height;
-            if (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH)
+            if ( (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) &&
+                ( ! (h==600 && w==800 && UserConfigParams::m_artist_debug_mode) ) )
                 continue;
 
             VideoMode mode(w, h);
