@@ -39,7 +39,7 @@ private:
     void renderPostProcessing(Camera * const camera);
 
 public:
-    
+    ShaderBasedRenderer();
     void render(float dt);
 };
 

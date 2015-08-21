@@ -36,6 +36,7 @@
 #include <SColor.h>
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
+#include "graphics/abstract_renderer.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/skybox.hpp"
 #include "graphics/sphericalHarmonics.hpp"
@@ -198,7 +199,9 @@ private:
     gui::IGUIFont              *m_race_font;
     /** Post-processing. */
     PostProcessing             *m_post_processing;
-
+    /** Renderer. */
+    AbstractRenderer           *m_renderer;
+    
     /** Wind. */
     Wind                 *m_wind;
     /** RTTs. */
@@ -317,8 +320,6 @@ private:
                    irr::scene::ISkinnedMesh* mesh, int id);
 #endif
 
-    void renderFixed(float dt);
-    void renderGLSL(float dt);
     void renderSolidFirstPass();
     void renderSolidSecondPass();
     void renderNormalsVisualisation();

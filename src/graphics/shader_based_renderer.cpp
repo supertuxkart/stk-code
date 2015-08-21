@@ -235,6 +235,12 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     }
 }
 
+ShaderBasedRenderer::ShaderBasedRenderer()
+{
+    m_wireframe = false;
+    m_mipviz = false;
+}
+
 void ShaderBasedRenderer::render(float dt)
 {
     BoundingBoxes.clear(); //TODO: what is it doing here?

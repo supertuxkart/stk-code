@@ -23,6 +23,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/fixed_pipeline_renderer.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/light.hpp"
 #include "graphics/material_manager.hpp"
@@ -30,6 +31,7 @@
 #include "graphics/per_camera_node.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
+#include "graphics/shader_based_renderer.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/stk_animated_mesh.hpp"
@@ -120,6 +122,7 @@ IrrDriver::IrrDriver()
     m_request_screenshot = false;
     m_rtts                = NULL;
     m_post_processing     = NULL;
+    m_renderer            = NULL;
     m_wind                = new Wind();
     m_skybox              = NULL;
     m_spherical_harmonics = NULL;
@@ -507,6 +510,11 @@ void IrrDriver::initDevice()
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
 
     CVS->init();
+    
+    if(CVS->isDefferedEnabled())
+        m_renderer = new ShaderBasedRenderer();
+    else
+        m_renderer = new FixedPipelineRenderer();
 
     m_spherical_harmonics = new SphericalHarmonics(m_scene_manager->getAmbientLight().toSColor());
 
@@ -2136,10 +2144,7 @@ void IrrDriver::update(float dt)
         //                           video::SColor(0,0,0,255));
         //m_scene_manager->drawAll();
 
-        if (CVS->isGLSL())
-            renderGLSL(dt);
-        else
-            renderFixed(dt);
+        m_renderer->render(dt);
 
         GUIEngine::render(dt);
         //m_video_driver->endScene();
@@ -2156,10 +2161,7 @@ void IrrDriver::update(float dt)
         return;
     }
 
-    if (CVS->isGLSL())
-        renderGLSL(dt);
-    else
-        renderFixed(dt);
+    m_renderer->render(dt);
 
 
     if (world != NULL && world->getPhysics() != NULL)
