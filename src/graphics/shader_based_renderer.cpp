@@ -286,11 +286,11 @@ void ShaderBasedRenderer::render(float dt)
             glEnable(GL_FRAMEBUFFER_SRGB);
         
         PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
-        unsigned plc = irr_driver->updateLightsInfo(camnode, dt); //TODO: move updateLightsInfo method
+        unsigned plc = irr_driver->updateLightsInfo(camnode, dt); //TODO: move updateLightsInfo method 
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         irr_driver->computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
-        irr_driver->uploadLightingData();
+        irr_driver->uploadLightingData(); //TODO: move method; update "global" lighting (sun and spherical harmonics)
         PROFILER_POP_CPU_MARKER();
         irr_driver->renderScene(camnode, plc, glows, dt, track->hasShadows(), false); //TODO: move renderScene method in renderer class
         

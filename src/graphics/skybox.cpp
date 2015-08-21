@@ -322,7 +322,8 @@ Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
     if (!skybox_textures.empty())
     {
         generateCubeMapFromTextures();
-        generateSpecularCubemap();
+        if(CVS->isGLSL())
+            generateSpecularCubemap();
     }
 }
 

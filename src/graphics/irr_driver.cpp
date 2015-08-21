@@ -511,7 +511,7 @@ void IrrDriver::initDevice()
 
     CVS->init();
     
-    if(CVS->isDefferedEnabled())
+    if(CVS->isGLSL())
         m_renderer = new ShaderBasedRenderer();
     else
         m_renderer = new FixedPipelineRenderer();
