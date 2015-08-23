@@ -35,6 +35,9 @@ using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( OnlineProfileFriends );
 
+int OnlineProfileFriends::m_sort_column      = 0;
+bool OnlineProfileFriends::m_sort_increasing = true;
+
 // -----------------------------------------------------------------------------
 /** Constructor for a display of all friends.
  */
@@ -55,6 +58,8 @@ void OnlineProfileFriends::loadedFromFile()
     assert(m_search_button_widget != NULL);
     m_search_box_widget = getWidget<TextBoxWidget>("search_box");
     assert(m_search_box_widget != NULL);
+    m_friends_list_widget->setColumnListener(this);
+
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -78,6 +83,8 @@ void OnlineProfileFriends::beforeAddingWidget()
 void OnlineProfileFriends::init()
 {
     OnlineProfileBase::init();
+    m_sort_column     = 0;
+    m_sort_increasing = true;
     m_profile_tabs->select( m_friends_tab->m_properties[PROP_ID],
                             PLAYER_ID_GAME_MASTER );
     assert(m_visiting_profile != NULL);
@@ -111,12 +118,74 @@ void OnlineProfileFriends::eventCallback(Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+void OnlineProfileFriends::onColumnClicked(int column_id)
+{
+    if (column_id == m_sort_column)
+        m_sort_increasing = !m_sort_increasing;
+    else
+    {
+        m_sort_increasing = true;       
+    }
+    m_sort_column = column_id;
+    displayResults();
+}   // onColumnClicked
+
+// ----------------------------------------------------------------------------
+bool OnlineProfileFriends::compareFriends(int f1, int f2)
+{
+    Online::OnlineProfile *p1 = ProfileManager::get()->getProfileByID(f1);
+    Online::OnlineProfile *p2 = ProfileManager::get()->getProfileByID(f2);
+    switch (m_sort_column)
+    {
+    case 0:    // sort by name
+        if (m_sort_increasing)
+            return p1->getUserName().lower_ignore_case(p2->getUserName());
+        else
+            return p2->getUserName().lower_ignore_case(p1->getUserName());
+    case 1:   // sort by date
+    {
+        OnlineProfile::RelationInfo *r1 = p1->getRelationInfo();
+        OnlineProfile::RelationInfo *r2 = p2->getRelationInfo();
+        // While we are comparing dates that are strings, they are normalised
+        // i.e. contain leading 0 etc, so a string compare works as expected.
+        if (m_sort_increasing)
+            return r1->getDate().lower_ignore_case(r2->getDate());
+        else
+            return r2->getDate().lower_ignore_case(r1->getDate());
+    }
+    case 2:   // sort by online status
+    {
+        OnlineProfile::RelationInfo *r1 = p1->getRelationInfo();
+        OnlineProfile::RelationInfo *r2 = p2->getRelationInfo();
+        // In case of same online status, sort by name
+        if (r1->isOnline() == r2->isOnline())
+        {
+            if (m_sort_increasing)
+                return p1->getUserName().lower_ignore_case(p2->getUserName());
+            else
+                return p2->getUserName().lower_ignore_case(p1->getUserName());
+        }
+        else
+            if (m_sort_increasing)
+                return r1->isOnline() < r2->isOnline();
+            else
+                return r2->isOnline() < r1->isOnline();
+    }
+    default:
+        break;
+    }   // switch
+
+    return false;
+}   // compareFriends
+
+// ----------------------------------------------------------------------------
 /** Displays the friends from a given profile.
  */
 void OnlineProfileFriends::displayResults()
 {
     m_friends_list_widget->clear();
-    const OnlineProfile::IDList &friends = m_visiting_profile->getFriends();
+    OnlineProfile::IDList friends = m_visiting_profile->getFriends();
+    std::sort(friends.begin(), friends.end(), compareFriends);
     for (unsigned int i = 0; i < friends.size(); i++)
     {
         std::vector<ListWidget::ListCell> row;
