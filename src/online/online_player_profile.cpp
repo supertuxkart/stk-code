@@ -173,10 +173,13 @@ namespace Online
         // Check if failure happened during automatic (saved) signin.
         else if (!isSuccess())
         {
-            if (GUIEngine::getCurrentScreen() != MainMenuScreen::getInstance())
+            if (GUIEngine::getCurrentScreen() != MainMenuScreen::getInstance() ||
+                GUIEngine::ModalDialog::isADialogActive())
             {
                 // User has already opened another menu, so use message queue
                 // to inform user that login failed.
+                // Same thing if a dialog is active, can't navigate to other
+                // screen when a dialog is active
                 MessageQueue::add(MessageQueue::MT_ERROR, getInfo());
                 return;
             }
