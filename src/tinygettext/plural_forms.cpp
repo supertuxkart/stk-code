@@ -1,5 +1,5 @@
 //  tinygettext - A gettext replacement that works directly on .po files
-//  Copyright (C) 2006-2013 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -58,16 +58,26 @@ PluralForms::from_string(const std::string& str)
     plural_forms["Plural-Forms:nplurals=2;plural=(n!=1);"] = PluralForms(2, plural2_1);
     plural_forms["Plural-Forms:nplurals=2;plural=n!=1;"] = PluralForms(2, plural2_1);
     plural_forms["Plural-Forms:nplurals=2;plural=(n>1);"] = PluralForms(2, plural2_2);
+    plural_forms["Plural-Forms:nplurals=2;plural=n>1;"] = PluralForms(2, plural2_2);
+    plural_forms["Plural-Forms:nplurals=2;plural=(n==1||n%10==1?0:1);"] = PluralForms(2, plural2_mk);
     plural_forms["Plural-Forms:nplurals=2;plural=n==1||n%10==1?0:1;"] = PluralForms(2, plural2_mk);
-    plural_forms["Plural-Forms:nplurals=3;plural=n%10==1&&n%100!=11?0:n!=0?1:2);"] = PluralForms(2, plural3_lv);
+    plural_forms["Plural-Forms:nplurals=3;plural=(n%10==1&&n%100!=11?0:n!=0?1:2);"] = PluralForms(2, plural3_lv);
+    plural_forms["Plural-Forms:nplurals=3;plural=n%10==1&&n%100!=11?0:n!=0?1:2;"] = PluralForms(2, plural3_lv);
+    plural_forms["Plural-Forms:nplurals=3;plural=(n==1?0:n==2?1:2);"] = PluralForms(3, plural3_ga);
     plural_forms["Plural-Forms:nplurals=3;plural=n==1?0:n==2?1:2;"] = PluralForms(3, plural3_ga);
     plural_forms["Plural-Forms:nplurals=3;plural=(n%10==1&&n%100!=11?0:n%10>=2&&(n%100<10||n%100>=20)?1:2);"] = PluralForms(3, plural3_lt);
+    plural_forms["Plural-Forms:nplurals=3;plural=n%10==1&&n%100!=11?0:n%10>=2&&(n%100<10||n%100>=20)?1:2;"] = PluralForms(3, plural3_lt);
     plural_forms["Plural-Forms:nplurals=3;plural=(n%10==1&&n%100!=11?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2);"] = PluralForms(3, plural3_1);
+    plural_forms["Plural-Forms:nplurals=3;plural=n%10==1&&n%100!=11?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2;"] = PluralForms(3, plural3_1);
+    plural_forms["Plural-Forms:nplurals=3;plural=((n==1)?0:(n>=2&&n<=4)?1:2);"] = PluralForms(3, plural3_sk);
     plural_forms["Plural-Forms:nplurals=3;plural=(n==1)?0:(n>=2&&n<=4)?1:2;"] = PluralForms(3, plural3_sk);
     plural_forms["Plural-Forms:nplurals=3;plural=(n==1?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2);"] = PluralForms(3, plural3_pl);
+    plural_forms["Plural-Forms:nplurals=3;plural=n==1?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2;"] = PluralForms(3, plural3_pl);
     plural_forms["Plural-Forms:nplurals=3;plural=(n%100==1?0:n%100==2?1:n%100==3||n%100==4?2:3);"] = PluralForms(3, plural3_sl);
-
+    plural_forms["Plural-Forms:nplurals=3;plural=n%100==1?0:n%100==2?1:n%100==3||n%100==4?2:3;"] = PluralForms(3, plural3_sl);
+    plural_forms["Plural-Forms:nplurals=4;plural=(n==1?0:n==2?1:n>=3&&n<=10?2:3);"]=PluralForms(4, plural4_ar);
     plural_forms["Plural-Forms:nplurals=4;plural=n==1?0:n==2?1:n>=3&&n<=10?2:3;"]=PluralForms(4, plural4_ar);
+    plural_forms["Plural-Forms:nplurals=4;plural=((n==1||n==11)?0:(n==2||n==12)?1:(n>2&&n<20)?2:3);"]=PluralForms(4, plural4_gd);
     plural_forms["Plural-Forms:nplurals=4;plural=(n==1||n==11)?0:(n==2||n==12)?1:(n>2&&n<20)?2:3;"]=PluralForms(4, plural4_gd);
   }
 

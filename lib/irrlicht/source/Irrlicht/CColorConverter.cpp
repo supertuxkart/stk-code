@@ -697,6 +697,8 @@ void CColorConverter::convert_viaFormat(const void* sP, ECOLOR_FORMAT sF, s32 sN
 #endif
 			}
 		break;
+	default:
+		break;
 	}
 }
 

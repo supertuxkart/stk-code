@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -48,6 +48,25 @@ BEGIN_AS_NAMESPACE
 extern asALLOCFUNC_t userAlloc;
 extern asFREEFUNC_t  userFree;
 
+#ifdef WIP_16BYTE_ALIGN
+
+// TODO: This declaration should be in angelscript.h
+//       when the application can register it's own
+//       aligned memory routines
+typedef void *(*asALLOCALIGNEDFUNC_t)(size_t, size_t);
+typedef void (*asFREEALIGNEDFUNC_t)(void *);
+extern asALLOCALIGNEDFUNC_t userAllocAligned;
+extern asFREEALIGNEDFUNC_t  userFreeAligned;
+typedef void *(*asALLOCALIGNEDFUNCDEBUG_t)(size_t, size_t, const char *, unsigned int);
+
+// The maximum type alignment supported.
+const int MAX_TYPE_ALIGNMENT = 16;
+
+// Utility function used for assertions.
+bool isAligned(const void* const pointer, asUINT alignment);
+
+#endif // WIP_16BYTE_ALIGN
+
 // We don't overload the new operator as that would affect the application as well
 
 #ifndef AS_DEBUG
@@ -58,6 +77,11 @@ extern asFREEFUNC_t  userFree;
 	#define asNEWARRAY(x,cnt)  (x*)userAlloc(sizeof(x)*cnt)
 	#define asDELETEARRAY(ptr) userFree(ptr)
 
+#ifdef WIP_16BYTE_ALIGN
+	#define asNEWARRAYALIGNED(x,cnt, alignment)  (x*)userAllocAligned(sizeof(x)*cnt, alignment)
+	#define asDELETEARRAYALIGNED(ptr) userFreeAligned(ptr)
+#endif
+
 #else
 
 	typedef void *(*asALLOCFUNCDEBUG_t)(size_t, const char *, unsigned int);
@@ -67,6 +91,12 @@ extern asFREEFUNC_t  userFree;
 
 	#define asNEWARRAY(x,cnt)  (x*)((asALLOCFUNCDEBUG_t)(userAlloc))(sizeof(x)*cnt, __FILE__, __LINE__)
 	#define asDELETEARRAY(ptr) userFree(ptr)
+
+#ifdef WIP_16BYTE_ALIGN
+	//TODO: Equivalent of debug allocation function with alignment?
+	#define asNEWARRAYALIGNED(x,cnt, alignment)  (x*)userAllocAligned(sizeof(x)*cnt, alignment)
+	#define asDELETEARRAYALIGNED(ptr) userFreeAligned(ptr)
+#endif
 
 #endif
 

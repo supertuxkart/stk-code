@@ -1,8 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2014 Glenn De Jonghe
-//                     2014 Joerg Henrichs
-
+//  Copyright (C) 2013-2015 Glenn De Jonghe
+//            (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -114,7 +113,7 @@ public:
     irr::core::stringw getDescription() const { return _(m_description.c_str()); }
     // ------------------------------------------------------------------------
     /** Returns the name of this achievement. */
-    irr::core::stringw getName() const { return _(m_name.c_str()); }
+    irr::core::stringw getName() const { return _LTR(m_name.c_str()); }
     // ------------------------------------------------------------------------
     bool needsResetAfterRace() const { return m_reset_type == AFTER_RACE; }
     // ------------------------------------------------------------------------

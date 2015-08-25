@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2012-2013 SuperTuxKart-Team
+//  Copyright (C) 2012-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -67,8 +67,7 @@ using GUIEngine::EVENT_BLOCK;
 /** Initialise input
  */
 InputManager::InputManager() : m_mode(BOOTSTRAP),
-                               m_mouse_val_x(-1), m_mouse_val_y(-1),
-                               m_mouse_reset(0)
+                               m_mouse_val_x(-1), m_mouse_val_y(-1)
 {
     m_device_manager = new DeviceManager();
     m_device_manager->initialize();
@@ -204,6 +203,28 @@ void InputManager::handleStaticAction(int key, int value)
             Camera *cam = Camera::getActiveCamera();
             core::vector3df vel(cam->getLinearVelocity());
             vel.X = value ? cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_R:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.Y = value ? cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_F:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.Y = value ? -cam->getMaximumVelocity() : 0;
             cam->setLinearVelocity(vel);
             break;
         }
@@ -545,7 +566,8 @@ int InputManager::getPlayerKeyboardID() const
  */
 void InputManager::dispatchInput(Input::InputType type, int deviceID,
                                  int button,
-                                 Input::AxisDirection axisDirection, int value)
+                                 Input::AxisDirection axisDirection, int value,
+                                 bool shift_mask)
 {
     // Act different in input sensing mode.
     if (m_mode == INPUT_SENSE_KEYBOARD ||
@@ -598,7 +620,17 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         else if (button == KEY_RIGHT)  action = PA_MENU_RIGHT;
         else if (button == KEY_SPACE)  action = PA_MENU_SELECT;
         else if (button == KEY_RETURN) action = PA_MENU_SELECT;
-        else if (button == KEY_TAB)    action = PA_MENU_DOWN;
+        else if (button == KEY_TAB)    
+        {
+            if (shift_mask)
+            {
+                action = PA_MENU_UP;
+            }
+            else
+            {
+                action = PA_MENU_DOWN;
+            }
+        }
 
         if (button == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
         {
@@ -716,8 +748,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                         //I18N: message shown when an input device is used but
                         // is not associated to any player
                         GUIEngine::showMessage(
-                            _("Ignoring '%s', you needed to join earlier to play!",
-                            irr::core::stringw(gp->getName().c_str()).c_str())      );
+                            _("Ignoring '%s'. You needed to join earlier to play!",
+                            core::stringw(gp->getName().c_str())));
                     }
                 }
                 return;
@@ -923,7 +955,8 @@ EventPropagation InputManager::input(const SEvent& event)
             const bool wasInTextBox = GUIEngine::isWithinATextBox();
 
             dispatchInput(Input::IT_KEYBOARD, event.KeyInput.Char, key,
-                          Input::AD_POSITIVE, Input::MAX_VALUE);
+                          Input::AD_POSITIVE, Input::MAX_VALUE,
+                          event.KeyInput.Shift);
 
             // if this action took us into a text box, don't let event continue
             // (FIXME not the cleanest solution)
@@ -952,7 +985,7 @@ EventPropagation InputManager::input(const SEvent& event)
             }
 
             dispatchInput(Input::IT_KEYBOARD, event.KeyInput.Char, key,
-                          Input::AD_POSITIVE, 0);
+                          Input::AD_POSITIVE, 0, event.KeyInput.Shift);
             return EVENT_BLOCK; // Don't propagate key up events
         }
     }
@@ -977,34 +1010,16 @@ EventPropagation InputManager::input(const SEvent& event)
                     UserConfigParams::m_fpscam_direction_speed;
                 float mouse_y = ((float) diff_y) *
                     -UserConfigParams::m_fpscam_direction_speed;
+
                 // No movement the first time it's used
                 // At the moment there's also a hard limit because the mouse
                 // gets reset to the middle of the screen and sometimes there
                 // are more events fired than expected.
-                if (m_mouse_val_x != -1 && m_mouse_reset <= 0)
+                if (m_mouse_val_x != -1 &&
+                   (diff_x + diff_y) < 100 && (diff_x + diff_y) > -100)
                 {
                     // Rotate camera
-                    core::vector3df up(cam->getUpVector());
-                    core::vector3df direction(cam->getDirection());
-                    core::vector3df side(direction.crossProduct(up));
-                    direction.normalize();
-                    up.normalize();
-                    core::quaternion quat;
-                    quat.fromAngleAxis(mouse_x, up);
-
-                    core::quaternion quat_y;
-                    quat_y.fromAngleAxis(mouse_y, side);
-                    quat *= quat_y;
-
-                    direction = quat * direction;
-                    cam->setDirection(direction);
-                    side = direction.crossProduct(up);
-
-                    // Compute new up vector
-                    /*up = side.crossProduct(direction);
-                    up.normalize();
-                    // Don't do that because it looks ugly and is bad to handle ;)
-                    cam->setUpVector(up);*/
+                    cam->applyMouseMovement(mouse_x, mouse_y);
 
                     // Reset mouse position to the middle of the screen when
                     // the mouse is far away
@@ -1016,8 +1031,6 @@ EventPropagation InputManager::input(const SEvent& event)
                         irr_driver->getDevice()->getCursorControl()->setPosition(mid_x, mid_y);
                         m_mouse_val_x = mid_x;
                         m_mouse_val_y = mid_y;
-                        // Ignore the next 2 movements
-                        m_mouse_reset = 2;
                     }
                     else
                     {
@@ -1029,7 +1042,6 @@ EventPropagation InputManager::input(const SEvent& event)
                 {
                     m_mouse_val_x = event.MouseInput.X;
                     m_mouse_val_y = event.MouseInput.Y;
-                    --m_mouse_reset;
                 }
                 return EVENT_BLOCK;
             }

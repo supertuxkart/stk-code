@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,6 +26,7 @@
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
 #include "online/servers_manager.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online_profile_friends.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/change_password_dialog.hpp"
@@ -141,7 +142,6 @@ namespace Online
     {
         PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
-        BaseUserScreen *login = dynamic_cast<BaseUserScreen*>(screen);
 
         // If the login is successful, reset any saved session of other
         // local players using the same online account (which are now invalid)
@@ -160,6 +160,8 @@ namespace Online
             }
         }
 
+        // Test if failure while showing user login screen
+        BaseUserScreen *login = dynamic_cast<BaseUserScreen*>(screen);
         if (login)
         {
             if(isSuccess())
@@ -167,6 +169,29 @@ namespace Online
             else
                 login->loginError(getInfo());
         }   // if dialog
+
+        // Check if failure happened during automatic (saved) signin.
+        else if (!isSuccess())
+        {
+            if (GUIEngine::getCurrentScreen() != MainMenuScreen::getInstance() ||
+                GUIEngine::ModalDialog::isADialogActive())
+            {
+                // User has already opened another menu, so use message queue
+                // to inform user that login failed.
+                // Same thing if a dialog is active, can't navigate to other
+                // screen when a dialog is active
+                MessageQueue::add(MessageQueue::MT_ERROR, getInfo());
+                return;
+            }
+
+            // User still at main menu screen, push user screen. Note that
+            // this function is called from the main thread, so we can 
+            // push screens without synchronisations.
+            UserScreen::getInstance()->push();
+            UserScreen::getInstance()->loginError(getInfo());
+        }
+
+
     }   // SignInRequest::callback
 
     // ------------------------------------------------------------------------
@@ -189,7 +214,11 @@ namespace Online
             int userid_fetched      = input->get("userid", &userid);
             setLastOnlineName(username);
 
-            m_profile = new OnlineProfile(userid, username, true);
+            OnlineProfile* profile = new OnlineProfile(userid, username, true);
+            // Note that addPersistent might decide to merge profile with an
+            // existing profile, and then delete profile. Only the returned
+            // pointer is save to use.
+            m_profile = ProfileManager::get()->addPersistent(profile);
             assert(token_fetched && username_fetched && userid_fetched);
             m_online_state = OS_SIGNED_IN;
             if(rememberPassword())
@@ -197,7 +226,6 @@ namespace Online
                 saveSession(getOnlineId(), getToken());
             }
 
-            ProfileManager::get()->addPersistent(m_profile);
             std::string achieved_string("");
 
             // Even if no achievements were sent, we have to call sync
@@ -441,8 +469,9 @@ namespace Online
             core::stringw message("");
             if (friend_request_count > 1)
             {
-                message = _("You have %d new friend requests!",
-                            friend_request_count);
+                message = _P("You have %d new friend request!",
+                             "You have %d new friend requests!",
+                             friend_request_count);
             }
             else
             {

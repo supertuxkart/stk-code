@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,12 +22,15 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
-#include <algorithm>
+
 #include <IAnimatedMesh.h>
 #include <IAnimatedMeshSceneNode.h>
 #include <ICameraSceneNode.h>
 #include <ILightSceneNode.h>
 #include <ISceneManager.h>
+#include <IMeshSceneNode.h>
+
+#include <algorithm>
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -248,7 +251,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         }
     }
     
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 35, 35, 35));
+    irr_driver->setAmbientLight(video::SColor(255, 35, 35, 35));
     
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
     m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
@@ -278,6 +281,8 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera->setTarget(core::vector3df(0, 10, 0.0f));
     m_camera->setFOV(DEGREE_TO_RAD*50.0f);
     m_camera->updateAbsolutePosition();
+
+    m_rtt_provider->prepareRender(m_camera);
 }
 
 void ModelViewWidget::setRotateOff()

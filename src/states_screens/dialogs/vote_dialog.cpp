@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -64,8 +64,8 @@ VoteDialog::VoteDialog(const std::string & addon_id)
     m_fetch_vote_request->addParameter("addonid", addon_id.substr(6));
     m_fetch_vote_request->queue();
 
-    m_rating_widget->setDeactivated();
-    m_cancel_widget->setDeactivated();
+    m_rating_widget->setActive(false);
+    m_cancel_widget->setActive(false);
 }    // VoteDialog
 
 // -----------------------------------------------------------------------------
@@ -123,8 +123,8 @@ void VoteDialog::sendVote()
     m_perform_vote_request->addParameter("rating", m_rating_widget->getRating());
     m_perform_vote_request->queue();
 
-    m_rating_widget->setDeactivated();
-    m_cancel_widget->setDeactivated();
+    m_rating_widget->setActive(false);
+    m_cancel_widget->setActive(false);
 
 }   // sendVote
 
@@ -196,15 +196,15 @@ void VoteDialog::updateFetchVote()
                                      "Select your desired rating by clicking "
                                      "the stars beneath"),              false);
         }
-        m_cancel_widget->setActivated();
-        m_rating_widget->setActivated();
+        m_cancel_widget->setActive(true);
+        m_rating_widget->setActive(true);
     }   // isSuccess
     else
     {
         SFXManager::get()->quickSound("anvil");
         m_info_widget->setErrorColor();
         m_info_widget->setText(m_fetch_vote_request->getInfo(), false);
-        m_cancel_widget->setActivated();
+        m_cancel_widget->setActive(true);
     }   // !isSuccess
 
     delete m_fetch_vote_request;
@@ -229,15 +229,15 @@ void VoteDialog::onUpdate(float dt)
                 m_info_widget->setDefaultColor();
                 m_info_widget->setText(_("Vote successful! You can now close "
                                          "the window."),                false);
-                m_cancel_widget->setActivated();
+                m_cancel_widget->setActive(true);
             }   // isSuccess
             else
             {
                 SFXManager::get()->quickSound( "anvil" );
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_perform_vote_request->getInfo(), false);
-                m_cancel_widget->setActivated();
-                m_rating_widget->setActivated();
+                m_cancel_widget->setActive(true);
+                m_rating_widget->setActive(true);
             }   // !isSuccess
             delete m_perform_vote_request;
             m_perform_vote_request = NULL;

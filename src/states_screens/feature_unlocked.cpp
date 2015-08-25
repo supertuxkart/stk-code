@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -52,7 +52,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
-const float ANIM_FROM = 3.0f;
 const float ANIM_TO = 7.0f;
 const int GIFT_EXIT_FROM = (int)ANIM_TO;
 const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;

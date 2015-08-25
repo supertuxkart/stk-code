@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -70,11 +70,11 @@ KartProperties::KartProperties(const std::string &filename)
         m_nitro_max_speed_increase = m_nitro_duration = m_nitro_fade_out_time =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
-        m_wheel_radius = m_chassis_linear_damping = m_max_suspension_force =
+        m_chassis_linear_damping = m_max_suspension_force =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = m_rescue_vert_offset =
         m_collision_terrain_impulse = m_collision_impulse = m_restitution =
-        m_collision_impulse_time = m_suspension_travel_cm =
+        m_collision_impulse_time = m_suspension_travel =
         m_track_connection_accel = m_rubber_band_max_length =
         m_rubber_band_force = m_rubber_band_duration =
         m_rubber_band_speed_increase = m_rubber_band_fade_out_time =
@@ -93,7 +93,6 @@ KartProperties::KartProperties(const std::string &filename)
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
         m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time =
         m_smooth_flying_impulse = m_physical_wheel_position =
-        m_graphical_y_offset =
             UNDEFINED;
 
     m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
@@ -105,13 +104,11 @@ KartProperties::KartProperties(const std::string &filename)
     m_gravity_center_shift       = Vec3(UNDEFINED);
     m_bevel_factor               = Vec3(UNDEFINED);
     m_exp_spring_response        = false;
-    m_prevent_chassis_in_terrain = false;
     m_version                    = 0;
     m_color                      = video::SColor(255, 0, 0, 0);
     m_shape                      = 32;  // close enough to a circle.
     m_engine_sfx_type            = "engine_small";
     m_kart_model                 = NULL;
-    m_has_rand_wheels            = false;
     m_nitro_min_consumption      = 0.53f;
     // The default constructor for stk_config uses filename=""
     if (filename != "")
@@ -178,8 +175,19 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
     const XMLNode* root = new XMLNode(filename);
     std::string kart_type;
+
     if (root->get("type", &kart_type))
-        copyFrom(&stk_config->getKartProperties(kart_type));
+    {
+        // Handle the case that kart_type might be incorrect
+        try
+        {
+            copyFrom(&stk_config->getKartProperties(kart_type));
+        }
+        catch (std::out_of_range)
+        {
+            copyFrom(&stk_config->getDefaultKartProperties());
+        }   // try .. catch
+    }
     else
         copyFrom(&stk_config->getDefaultKartProperties());
 
@@ -270,7 +278,13 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     {
         m_gravity_center_shift.setX(0);
         // Default: center at the very bottom of the kart.
-        m_gravity_center_shift.setY(m_kart_model->getHeight()*0.5f);
+        // If the kart is 'too high', its height will be changed in
+        // kart.cpp, the same adjustment needs to be made here.
+        if (m_kart_model->getHeight() > m_kart_model->getLength()*0.6f)
+            m_gravity_center_shift.setY(m_kart_model->getLength()*0.6f*0.5f);
+        else
+            m_gravity_center_shift.setY(m_kart_model->getHeight()*0.5f);
+
         m_gravity_center_shift.setZ(0);
     }
 
@@ -281,7 +295,10 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // moved to be on the corner of the shape. In order to retain the same
     // steering behaviour, the wheel base (which in turn determines the
     // turn angle at certain speeds) is shortened by 2*wheel_radius
-    m_wheel_base = fabsf(m_kart_model->getLength() - 2*m_wheel_radius);
+    // Wheel radius was always 0.25, and is now not used anymore, but in order
+    // to keep existing steering behaviour, the same formula is still
+    // used.
+    m_wheel_base = fabsf(m_kart_model->getLength() - 2*0.25f);
 
     // Now convert the turn radius into turn angle:
     for(unsigned int i=0; i<m_turn_angle_at_speed.size(); i++)
@@ -319,8 +336,6 @@ void KartProperties::getAllData(const XMLNode * root)
 
     root->get("groups",            &m_groups           );
 
-    root->get("random-wheel-rot",  &m_has_rand_wheels  );
-
     root->get("shadow-scale",      &m_shadow_scale     );
     root->get("shadow-x-offset",   &m_shadow_x_offset  );
     root->get("shadow-z-offset",   &m_shadow_z_offset  );
@@ -346,7 +361,7 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         suspension_node->get("stiffness",            &m_suspension_stiffness);
         suspension_node->get("rest",                 &m_suspension_rest     );
-        suspension_node->get("travel-cm",            &m_suspension_travel_cm);
+        suspension_node->get("travel",               &m_suspension_travel   );
         suspension_node->get("exp-spring-response",  &m_exp_spring_response );
         suspension_node->get("max-force",            &m_max_suspension_force);
     }
@@ -355,7 +370,6 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         wheels_node->get("damping-relaxation",  &m_wheel_damping_relaxation );
         wheels_node->get("damping-compression", &m_wheel_damping_compression);
-        wheels_node->get("radius",              &m_wheel_radius             );
     }
 
     if(const XMLNode *speed_weighted_objects_node = root->getNode("speed-weighted-objects"))
@@ -616,13 +630,6 @@ void KartProperties::getAllData(const XMLNode * root)
         startup_node->get("boost", &m_startup_boost);
     }
 
-    if(const XMLNode *graphics_node = root->getNode("graphics"))
-    {
-        graphics_node->get("y-offset",          &m_graphical_y_offset);
-        graphics_node->get("prevent-chassis-in-terrain",
-                                                &m_prevent_chassis_in_terrain);
-    }
-
     if(m_kart_model)
         m_kart_model->loadInfo(*root);
 }   // getAllData
@@ -670,7 +677,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_time_reset_steer,           "turn time-reset-steer"         );
     CHECK_NEG(m_wheel_damping_relaxation,   "wheels damping-relaxation"     );
     CHECK_NEG(m_wheel_damping_compression,  "wheels damping-compression"    );
-    CHECK_NEG(m_wheel_radius,               "wheels radius"                 );
     CHECK_NEG(m_friction_slip,              "friction slip"                 );
     CHECK_NEG(m_roll_influence,             "stability roll-influence"      );
     CHECK_NEG(m_chassis_linear_damping,  "stability chassis-linear-damping" );
@@ -683,7 +689,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_brake_time_increase,        "engine brake-time-increase"    );
     CHECK_NEG(m_suspension_stiffness,       "suspension stiffness"          );
     CHECK_NEG(m_suspension_rest,            "suspension rest"               );
-    CHECK_NEG(m_suspension_travel_cm,       "suspension travel-cm"          );
+    CHECK_NEG(m_suspension_travel,          "suspension travel"             );
     CHECK_NEG(m_max_suspension_force,       "suspension max-force"          );
     CHECK_NEG(m_collision_impulse,          "collision impulse"             );
     CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );
@@ -743,7 +749,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_explosion_invulnerability_time,
                                             "explosion invulnerability-time");
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
-    CHECK_NEG(m_graphical_y_offset,         "graphics y-offset"             );
+
     for(unsigned int i=RaceManager::DIFFICULTY_FIRST;
         i<=RaceManager::DIFFICULTY_LAST; i++)
     {

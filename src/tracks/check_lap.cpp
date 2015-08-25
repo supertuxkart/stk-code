@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013  Joerg Henrichs
+//  Copyright (C) 2010-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -55,27 +55,35 @@ void CheckLap::reset(const Track &track)
  *  is called from update (of the checkline structure).
  *  \param old_pos  Position in previous frame.
  *  \param new_pos  Position in current frame.
- *  \param indx     Index of the kart, can be used to store kart specific
+ *  \param kart_index Index of the kart, can be used to store kart specific
  *                  additional data.
  */
 bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                           unsigned int indx)
+    unsigned int kart_index)
 {
-    float track_length = World::getWorld()->getTrack()->getTrackLength();
-    LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
+    World* w = World::getWorld();
+    LinearWorld* lin_world = dynamic_cast<LinearWorld*>(w);
+
+    float track_length = w->getTrack()->getTrackLength();
     // Can happen if a non-lap based race mode is used with a scene file that
     // has check defined.
     if(!lin_world)
         return false;
-    float current_distance = lin_world->getDistanceDownTrackForKart(indx);
-    bool result =(m_previous_distance[indx]>0.95f*track_length &&
+    float current_distance = lin_world->getDistanceDownTrackForKart(kart_index);
+    bool result = (m_previous_distance[kart_index]>0.95f*track_length &&
                   current_distance<7.0f);
-    if(UserConfigParams::m_check_debug && result)
-        Log::info("CheckLap", "Kart %s crossed start line from %f to %f.",
-                  World::getWorld()->getKart(indx)->getIdent().c_str(),
-                  m_previous_distance[indx], current_distance);
 
-    m_previous_distance[indx] = current_distance;
+    if (UserConfigParams::m_check_debug && result)
+    {
+        Log::info("CheckLap", "Kart %s crossed start line from %f to %f.",
+            World::getWorld()->getKart(kart_index)->getIdent().c_str(),
+            m_previous_distance[kart_index], current_distance);
+    }
+
+    m_previous_distance[kart_index] = current_distance;
+
+    if (result)
+        lin_world->setLastTriggeredCheckline(kart_index, m_index);
 
     return result;
 }   // isTriggered

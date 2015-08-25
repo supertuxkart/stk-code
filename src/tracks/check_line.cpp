@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013  Joerg Henrichs
+//  Copyright (C) 2009-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,8 +20,10 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/glwrap.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 
@@ -76,6 +78,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         scene::IMesh *mesh = irr_driver->createQuadMesh(&material,
                                                         /*create mesh*/true);
         scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
+
         assert(buffer->getVertexType()==video::EVT_STANDARD);
         irr::video::S3DVertex* vertices
             = (video::S3DVertex*)buffer->getVertices();
@@ -94,11 +97,14 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         for(unsigned int i=0; i<4; i++)
         {
             vertices[i].Color = m_active_at_reset
-                              ? video::SColor(0, 255, 0, 0)
-                              : video::SColor(0, 128, 128, 128);
+                              ? video::SColor(128, 255, 0, 0)
+                              : video::SColor(128, 128, 128, 128);
         }
         buffer->recalculateBoundingBox();
-        mesh->setBoundingBox(buffer->getBoundingBox());
+        buffer->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().BackfaceCulling = false;
+        //mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_node = irr_driver->addMesh(mesh, "checkdebug");
         mesh->drop();
     }
@@ -119,10 +125,11 @@ CheckLine::~CheckLine()
 void CheckLine::reset(const Track &track)
 {
     CheckStructure::reset(track);
-    for(unsigned int i=0; i<m_previous_sign.size(); i++)
+
+    for (unsigned int i = 0; i<m_previous_sign.size(); i++)
     {
         core::vector2df p = m_previous_position[i].toIrrVector2d();
-        m_previous_sign[i] = m_line.getPointOrientation(p)>=0;
+        m_previous_sign[i] = m_line.getPointOrientation(p) >= 0;
     }
 }   // reset
 
@@ -135,11 +142,14 @@ void CheckLine::changeDebugColor(bool is_active)
     scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
     irr::video::S3DVertex* vertices
                                = (video::S3DVertex*)buffer->getVertices();
+    video::SColor color = is_active ? video::SColor(192, 255, 0, 0)
+                                    : video::SColor(192, 128, 128, 128);
     for(unsigned int i=0; i<4; i++)
     {
-        vertices[i].Color = is_active ? video::SColor(0, 255, 0, 0)
-                                      : video::SColor(0, 128, 128, 128);
+        vertices[i].Color = color;
     }
+    buffer->getMaterial().setTexture(0, getUnicolorTexture(color));
+
 }   // changeDebugColor
 
 // ----------------------------------------------------------------------------
@@ -151,14 +161,28 @@ void CheckLine::changeDebugColor(bool is_active)
  *                  additional data.
  */
 bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                            unsigned int indx)
+    unsigned int kart_index)
 {
+    World* w = World::getWorld();
     core::vector2df p=new_pos.toIrrVector2d();
     bool sign = m_line.getPointOrientation(p)>=0;
     bool result;
+
+    bool previous_sign;
+
+    if (kart_index == -1)
+    {
+        core::vector2df p = old_pos.toIrrVector2d();
+        previous_sign = (m_line.getPointOrientation(p) >= 0);
+    }
+    else
+    {
+        previous_sign = m_previous_sign[kart_index];
+    }
+
     // If the sign has changed, i.e. the infinite line was crossed somewhere,
     // check if the finite line was actually crossed:
-    if(sign!=m_previous_sign[indx] &&
+    if (sign != previous_sign &&
         m_line.intersectWith(core::line2df(old_pos.toIrrVector2d(),
                                            new_pos.toIrrVector2d()),
                              m_cross_point) )
@@ -175,17 +199,26 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
             if(World::getWorld()->getNumKarts()>0)
                 Log::info("CheckLine", "Kart %s crosses line, but wrong height "
                           "(%f vs %f).",
-                          World::getWorld()->getKart(indx)->getIdent().c_str(),
+                          World::getWorld()->getKart(kart_index)->getIdent().c_str(),
                           new_pos.getY(), m_min_height);
             else
                 Log::info("CheckLine", "Kart %d crosses line, but wrong height "
                           "(%f vs %f).",
-                          indx, new_pos.getY(), m_min_height);
+                          kart_index, new_pos.getY(), m_min_height);
 
         }
     }
     else
         result = false;
-    m_previous_sign[indx] = sign;
+
+    if (kart_index != -1)
+        m_previous_sign[kart_index] = sign;
+
+    if (result && kart_index != -1)
+    {
+        LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
+        if (lw != NULL)
+            lw->setLastTriggeredCheckline(kart_index, m_index);
+    }
     return result;
 }   // isTriggered

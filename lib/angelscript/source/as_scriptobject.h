@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -76,11 +76,11 @@ public:
 //===================================
 // From asIScriptObject
 //===================================
-	asIScriptEngine *GetEngine() const;
 
 	// Memory management
-	int AddRef() const;
-	int Release() const;
+	int                    AddRef() const;
+	int                    Release() const;
+	asILockableSharedBool *GetWeakRefFlag() const;
 
 	// Type info
 	int            GetTypeId() const;
@@ -92,7 +92,13 @@ public:
 	const char *GetPropertyName(asUINT prop) const;
 	void       *GetAddressOfProperty(asUINT prop);
 
-	int         CopyFrom(asIScriptObject *other);
+	// Miscellaneous
+	asIScriptEngine *GetEngine() const;
+	int              CopyFrom(asIScriptObject *other);
+
+	// User data
+	void *SetUserData(void *data, asPWORD type = 0);
+	void *GetUserData(asPWORD type = 0) const;
 
 //====================================
 // Internal
@@ -110,9 +116,6 @@ public:
 	void EnumReferences(asIScriptEngine *engine);
 	void ReleaseAllHandles(asIScriptEngine *engine);
 
-	// Weakref methods
-	asILockableSharedBool *GetWeakRefFlag() const;
-
 	// Used for properties
 	void *AllocateUninitializedObject(asCObjectType *objType, asCScriptEngine *engine);
 	void FreeObject(void *ptr, asCObjectType *objType, asCScriptEngine *engine);
@@ -124,15 +127,26 @@ public:
 //=============================================
 // Properties
 //=============================================
-public:
-	asCObjectType *objType;
-
 protected:
+	friend class asCContext;
+	asCObjectType    *objType;
+
 	mutable asCAtomic refCount;
-	mutable asBYTE gcFlag:1;
-	mutable asBYTE hasRefCountReachedZero:1;
-	bool isDestructCalled;
-	mutable asCLockableSharedBool *weakRefFlag;
+	mutable asBYTE    gcFlag:1;
+	mutable asBYTE    hasRefCountReachedZero:1;
+	bool              isDestructCalled;
+
+	// Most script classes instances won't have neither the weakRefFlags nor
+	// userData so we only allocate this if requested. Even when used it is 
+	// not something that will be accessed all the time so having the extra
+	// indirection will not affect the performance significantly.
+	struct SExtra
+	{
+		SExtra() : weakRefFlag(0) {};
+		asCLockableSharedBool *weakRefFlag;
+		asCArray<asPWORD>      userData;
+	};
+	mutable SExtra *extra;
 };
 
 void ScriptObject_Construct(asCObjectType *objType, asCScriptObject *self);

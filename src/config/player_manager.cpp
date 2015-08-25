@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2014 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -214,7 +214,7 @@ void PlayerManager::load()
     if(current)
     {
         stringw name;
-        current->get("player", &name);
+        current->getAndDecode("player", &name);
         m_current_player = getPlayer(name);
     }
 
@@ -269,7 +269,7 @@ void PlayerManager::save()
         if(m_current_player)
         {
             players_file << L"    <current player=\""
-                         << m_current_player->getName() << L"\"/>\n";
+                         << StringUtils::xmlEncode(m_current_player->getName()) << L"\"/>\n";
         }
 
         // Save all non-guest players

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -92,6 +92,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         shadows->setValue(0);
     getWidget<CheckBoxWidget>("dynamiclight")->setState(UserConfigParams::m_dynamic_lights);
     getWidget<CheckBoxWidget>("lightshaft")->setState(UserConfigParams::m_light_shaft);
+    getWidget<CheckBoxWidget>("ibl")->setState(!UserConfigParams::m_degraded_IBL);
     getWidget<CheckBoxWidget>("global_illumination")->setState(UserConfigParams::m_gi);
     getWidget<CheckBoxWidget>("motionblur")->setState(UserConfigParams::m_motionblur);
     getWidget<CheckBoxWidget>("mlaa")->setState(UserConfigParams::m_mlaa);
@@ -106,13 +107,13 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     {
         CheckBoxWidget* cb_tex_cmp = getWidget<CheckBoxWidget>("texture_compression");
         cb_tex_cmp->setState(false);
-        cb_tex_cmp->setDeactivated();
+        cb_tex_cmp->setActive(false);
     }
 
     if (!CVS->supportsGlobalIllumination())
     {
-        shadows->setDeactivated();
-        getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
+        shadows->setActive(false);
+        getWidget<CheckBoxWidget>("global_illumination")->setActive(false);
     }
 }
 
@@ -149,6 +150,9 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
         UserConfigParams::m_light_shaft =
             advanced_pipeline && getWidget<CheckBoxWidget>("lightshaft")->getState();
+
+        UserConfigParams::m_degraded_IBL =
+            !getWidget<CheckBoxWidget>("ibl")->getState();
 
         UserConfigParams::m_gi =
             advanced_pipeline && CVS->supportsGlobalIllumination() &&
@@ -223,35 +227,22 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
 void CustomVideoSettingsDialog::updateActivation()
 {
-    if(getWidget<CheckBoxWidget>("dynamiclight")->getState())
-    {
-        getWidget<CheckBoxWidget>("motionblur")->setActivated();
-        getWidget<CheckBoxWidget>("dof")->setActivated();
-        getWidget<SpinnerWidget>("shadows")->setActivated();
-        getWidget<CheckBoxWidget>("mlaa")->setActivated();
-        getWidget<CheckBoxWidget>("ssao")->setActivated();
-        getWidget<CheckBoxWidget>("lightshaft")->setActivated();
-        getWidget<CheckBoxWidget>("global_illumination")->setActivated();
-        getWidget<CheckBoxWidget>("glow")->setActivated();
-        getWidget<CheckBoxWidget>("bloom")->setActivated();
-    }
-    else
-    {
-        getWidget<CheckBoxWidget>("motionblur")->setDeactivated();
-        getWidget<CheckBoxWidget>("dof")->setDeactivated();
-        getWidget<SpinnerWidget>("shadows")->setDeactivated();
-        getWidget<CheckBoxWidget>("mlaa")->setDeactivated();
-        getWidget<CheckBoxWidget>("ssao")->setDeactivated();
-        getWidget<CheckBoxWidget>("lightshaft")->setDeactivated();
-        getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
-        getWidget<CheckBoxWidget>("glow")->setDeactivated();
-        getWidget<CheckBoxWidget>("bloom")->setDeactivated();
-    }
+    bool light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
+    getWidget<CheckBoxWidget>("motionblur")->setActive(light);
+    getWidget<CheckBoxWidget>("dof")->setActive(true);
+    getWidget<SpinnerWidget>("shadows")->setActive(light);
+    getWidget<CheckBoxWidget>("mlaa")->setActive(light);
+    getWidget<CheckBoxWidget>("ssao")->setActive(light);
+    getWidget<CheckBoxWidget>("lightshaft")->setActive(light);
+    getWidget<CheckBoxWidget>("ibl")->setActive(light);
+    getWidget<CheckBoxWidget>("global_illumination")->setActive(light);
+    getWidget<CheckBoxWidget>("glow")->setActive(light);
+    getWidget<CheckBoxWidget>("bloom")->setActive(light);
 
     if (!CVS->supportsShadows() && !CVS->supportsGlobalIllumination())
     {
-        getWidget<SpinnerWidget>("shadows")->setDeactivated();
-        getWidget<CheckBoxWidget>("global_illumination")->setDeactivated();
+        getWidget<SpinnerWidget>("shadows")->setActive(false);
+        getWidget<CheckBoxWidget>("global_illumination")->setActive(false);
     }
 }   // updateActivation
 

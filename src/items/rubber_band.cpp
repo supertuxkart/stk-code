@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,9 +20,10 @@
 
 #include <IMeshSceneNode.h>
 
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -32,9 +33,6 @@
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
-#include "graphics/glwrap.hpp"
-
-#include "utils/log.hpp" //TODO: remove after debugging is done
 
 #include <IMesh.h>
 

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -124,7 +124,7 @@ void RecoveryDialog::processInput()
     else
     {
         m_info_widget->setDefaultColor();
-        m_options_widget->setDeactivated();
+        m_options_widget->setActive(false);
 
         m_recovery_request = new XMLRequest();
 
@@ -197,7 +197,7 @@ void RecoveryDialog::onUpdate(float dt)
                 SFXManager::get()->quickSound( "anvil" );
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_recovery_request->getInfo(), false);
-                m_options_widget->setActivated();
+                m_options_widget->setActive(true);
             }
 
             delete m_recovery_request;

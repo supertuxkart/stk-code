@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -103,7 +103,7 @@ public:
     // ----------------------------------------------------------------
 
     void addToCache(OnlineProfile *profile);
-    void addPersistent(OnlineProfile *profile);
+    OnlineProfile* addPersistent(OnlineProfile *profile);
     void deleteFromPersistent(const uint32_t id);
     void clearPersistent();
     void moveToCache(const uint32_t id);

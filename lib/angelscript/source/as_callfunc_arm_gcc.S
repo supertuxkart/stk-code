@@ -1,6 +1,6 @@
 /*
   AngelCode Scripting Library
-  Copyright (c) 2003-2013 Andreas Jonsson
+  Copyright (c) 2003-2014 Andreas Jonsson
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any
@@ -488,6 +488,7 @@ armFuncR0ObjLast:
     strge   r7, [r6, #8]
 
     str     r5, [r6, #12]           /* Put objlast in r6 + 12 */
+    mov     r5, #0
 
     movge   r5, #4                  /* Set r5 with an offset of #4 if there´s one last arg that couldn´t be placed in r registers */
     add     r5, r5, #4              /* Set r5 with an offset of + #4, so objlast can be loaded into the stack */
@@ -687,6 +688,12 @@ nomoreargsarmFuncR0R1:
 
     pop {r4-r8, r10, r11, pc}
 
+#endif /* hard float abi */
+
+#if defined(__linux__) && defined(__ELF__)
+/* ref: http://hardened.gentoo.org/gnu-stack.xml */
+.section .note.GNU-stack,"",%progbits
 #endif
 
-#endif
+#endif /* arm */
+

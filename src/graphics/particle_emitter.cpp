@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013  Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2011-2015  Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,18 +17,19 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/particle_emitter.hpp"
+
 #include "graphics/central_settings.hpp"
+#include "graphics/gpu_particles.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind.hpp"
-#include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/helpers.hpp"
-#include "graphics/gpuparticles.hpp"
 
 #include <SParticle.h>
 #include <IParticleAffector.h>
@@ -36,6 +37,7 @@
 #include <IParticleSystemSceneNode.h>
 #include <IParticleBoxEmitter.h>
 #include <ISceneManager.h>
+
 #include <algorithm>
 
 class FadeAwayAffector : public scene::IParticleAffector
@@ -288,7 +290,8 @@ public:
 ParticleEmitter::ParticleEmitter(const ParticleKind* type,
                                  const Vec3 &position,
                                  scene::ISceneNode* parent,
-                                 bool randomize_initial_y)
+                                 bool randomize_initial_y,
+                                 bool important)
                : m_position(position)
 {
     assert(type != NULL);
@@ -300,6 +303,7 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_emission_decay_rate = 0;
     m_is_glsl = CVS->isGLSL();
     m_randomize_initial_y = randomize_initial_y;
+    m_important = important;
 
 
     setParticleType(type);
@@ -508,6 +512,14 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             m_node->setMaterialTexture(0, material->getTexture());
 
             mat0.ZWriteEnable = !material->isTransparent(); // disable z-buffer writes if material is transparent
+
+            // fallback for old render engine
+            if (material->getShaderType() == Material::SHADERTYPE_ADDITIVE)
+                mat0.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+            else if (material->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND)
+                mat0.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+            else if (material->getShaderType() == Material::SHADERTYPE_ALPHA_TEST)
+                mat0.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
         }
         else
         {

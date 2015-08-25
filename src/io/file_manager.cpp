@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2008-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2008-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -142,7 +142,7 @@ FileManager::FileManager()
 
     m_file_system = irr::io::createFileSystem();
 
-    irr::io::path exe_path;
+    std::string exe_path;
 
     // Search for the root directory
     // =============================
@@ -151,8 +151,11 @@ FileManager::FileManager()
     // This is esp. useful for Visual Studio, since it's not necessary
     // to define the working directory when debugging, it works automatically.
     std::string root_dir;
-    if(m_file_system->existFile(CommandLine::getExecName().c_str()))
-        exe_path = m_file_system->getFileDir(CommandLine::getExecName().c_str());
+    const std::string version = std::string("supertuxkart.") + STK_VERSION;
+    if (fileExists(CommandLine::getExecName()))
+    {
+        exe_path = StringUtils::getPath(CommandLine::getExecName());
+    }
     if(exe_path.size()==0 || exe_path[exe_path.size()-1]!='/')
         exe_path += "/";
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
@@ -160,19 +163,19 @@ FileManager::FileManager()
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
-    else if(m_file_system->existFile("data"))
+    else if(fileExists("data/", version))
         root_dir = "data/" ;
-    else if(m_file_system->existFile("../data"))
+    else if(fileExists("../data/", version))
         root_dir = "../data/" ;
-    else if(m_file_system->existFile("../../data"))
+    else if(fileExists("../../data/", version))
         root_dir = "../../data/" ;
     // Test for old style build environment, with executable in root of stk
-    else if(m_file_system->existFile(exe_path+"data"))
+    else if(fileExists(exe_path+"data/"+version))
         root_dir = (exe_path+"data/").c_str();
     // Check for windows cmake style: bld/Debug/bin/supertuxkart.exe
-    else if (m_file_system->existFile(exe_path + "../../../data"))
-        root_dir = (exe_path + "../../../data/").c_str();
-    else if (m_file_system->existFile(exe_path + "../data"))
+    else if (fileExists(exe_path + "../../../data/"+version))
+        root_dir = exe_path + "../../../data/";
+    else if (fileExists(exe_path + "../data/"+version))
     {
         root_dir = exe_path.c_str();
         root_dir += "../data/";
@@ -181,12 +184,20 @@ FileManager::FileManager()
     {
 #ifdef SUPERTUXKART_DATADIR
         root_dir = SUPERTUXKART_DATADIR"/data/";
-        if(root_dir.size()==0 || root_dir[root_dir.size()-1]!='/')
-            root_dir+='/';
-
 #else
         root_dir = "/usr/local/share/games/supertuxkart/";
 #endif
+    }
+
+    if (!m_file_system->existFile((root_dir + version).c_str()))
+    {
+        Log::error("FileManager", "Could not file '%s'in any "
+                   "standard location (esp. ../data).", version.c_str());
+        Log::error("FileManager", 
+                   "Last location checked '%s'.", root_dir.c_str());
+        Log::fatal("FileManager", 
+                   "Set $SUPERTUXKART_DATADIR to point to the data directory.");
+        // fatal will exit the application
     }
 
     addRootDirs(root_dir);

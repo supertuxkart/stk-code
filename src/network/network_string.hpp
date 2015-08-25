@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -173,22 +173,29 @@ class NetworkString
             return result;
         }
 
+        // Another function for n == 1 to surpress warnings in clang
+        template<typename T>
+        T get(int pos) const
+        {
+            return m_string[pos];
+        }
+
         inline int          getInt(int pos = 0)    const { return get<int,4>(pos);             }
         inline uint32_t     getUInt(int pos = 0)   const { return get<uint32_t,4>(pos);        }
         inline uint32_t     getUInt32(int pos = 0) const { return get<uint32_t,4>(pos);        }
         inline uint16_t     getUInt16(int pos = 0) const { return get<uint16_t,2>(pos);        }
-        inline uint8_t      getUInt8(int pos = 0)  const { return get<uint8_t,1>(pos);         }
-        inline char         getChar(int pos = 0)   const { return get<char,1>(pos);            }
-        inline unsigned char getUChar(int pos = 0) const { return get<unsigned char,1>(pos);   }
+        inline uint8_t      getUInt8(int pos = 0)  const { return get<uint8_t>(pos);         }
+        inline char         getChar(int pos = 0)   const { return get<char>(pos);            }
+        inline unsigned char getUChar(int pos = 0) const { return get<unsigned char>(pos);   }
         std::string         getString(int pos, int len) const { return std::string(m_string.begin()+pos, m_string.begin()+pos+len); }
 
         inline int          gi(int pos = 0)        const { return get<int,4>(pos);             }
         inline uint32_t     gui(int pos = 0)       const { return get<uint32_t,4>(pos);        }
         inline uint32_t     gui32(int pos = 0)     const { return get<uint32_t,4>(pos);        }
         inline uint16_t     gui16(int pos = 0)     const { return get<uint16_t,2>(pos);        }
-        inline uint8_t      gui8(int pos = 0)      const { return get<uint8_t,1>(pos);         }
-        inline char         gc(int pos = 0)        const { return get<char,1>(pos);            }
-        inline unsigned char guc(int pos = 0)      const { return get<unsigned char,1>(pos);   }
+        inline uint8_t      gui8(int pos = 0)      const { return get<uint8_t>(pos);         }
+        inline char         gc(int pos = 0)        const { return get<char>(pos);            }
+        inline unsigned char guc(int pos = 0)      const { return get<unsigned char>(pos);   }
         std::string         gs(int pos, int len)   const { return std::string(m_string.begin()+pos, m_string.begin()+pos+len); }
 
         double getDouble(int pos = 0) //!< BEWARE OF PRECISION
@@ -219,13 +226,22 @@ class NetworkString
             return result;
         }
 
+        // Another function for n == 1 to surpress warnings in clang
+        template<typename T>
+        T getAndRemove(int pos)
+        {
+            T result = m_string[pos];
+            remove(pos, 1);
+            return result;
+        }
+
         inline int          getAndRemoveInt(int pos = 0)     { return getAndRemove<int,4>(pos);             }
         inline uint32_t     getAndRemoveUInt(int pos = 0)    { return getAndRemove<uint32_t,4>(pos);        }
         inline uint32_t     getAndRemoveUInt32(int pos = 0)  { return getAndRemove<uint32_t,4>(pos);        }
         inline uint16_t     getAndRemoveUInt16(int pos = 0)  { return getAndRemove<uint16_t,2>(pos);        }
-        inline uint8_t      getAndRemoveUInt8(int pos = 0)   { return getAndRemove<uint8_t,1>(pos);         }
-        inline char         getAndRemoveChar(int pos = 0)    { return getAndRemove<char,1>(pos);            }
-        inline unsigned char getAndRemoveUChar(int pos = 0)  { return getAndRemove<unsigned char,1>(pos);   }
+        inline uint8_t      getAndRemoveUInt8(int pos = 0)   { return getAndRemove<uint8_t>(pos);         }
+        inline char         getAndRemoveChar(int pos = 0)    { return getAndRemove<char>(pos);            }
+        inline unsigned char getAndRemoveUChar(int pos = 0)  { return getAndRemove<unsigned char>(pos);   }
         double getAndRemoveDouble(int pos = 0) //!< BEWARE OF PRECISION
         {
             for (int i = 0; i < 8; i++)

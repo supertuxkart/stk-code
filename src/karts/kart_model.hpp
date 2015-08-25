@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -232,7 +232,7 @@ public:
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     void          setDefaultSuspension();
-    void          update(float dt, float rotation_dt, float steer,
+    void          update(float dt, float distance, float steer,
                          float speed);
     void          finishedRace();
     scene::ISceneNode*

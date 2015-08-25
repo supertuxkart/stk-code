@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
 
 #include <irrString.h>
 
-#include "guiengine/widgets/CGUISTKListBox.h"
+#include "guiengine/widgets/CGUISTKListBox.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "utils/leak_check.hpp"

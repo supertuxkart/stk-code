@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -273,6 +273,14 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         steer_node->get("disable-while-unskid", &m_disable_steer_while_unskid);
         steer_node->get("camera-follow-skid",   &m_camera_follow_skid        );
+    }
+
+    if (const XMLNode *camera = root->getNode("camera"))
+    {
+        camera->get("fov-1", &m_camera_fov[0]);
+        camera->get("fov-2", &m_camera_fov[1]);
+        camera->get("fov-3", &m_camera_fov[2]);
+        camera->get("fov-4", &m_camera_fov[3]);
     }
 
     if (const XMLNode *music_node = root->getNode("music"))

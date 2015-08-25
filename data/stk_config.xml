@@ -7,7 +7,7 @@
 
   <!-- Minimum and maxium track versions that be be read by this binary.
        Older versions will be ignored. -->
-  <track-version min="3" max="6"/>
+  <track-version min="6" max="6"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
@@ -133,6 +133,11 @@
       work anymore - so for now don't enable this. -->
   <networking enable="false"/>
 
+  <!-- The field od views for 1-4 player split screen. fov-3 is
+       actually not used (since 3 player split screen uses the
+       same layout as 4 player split screen) -->
+  <camera fov-1="80" fov-2="65" fov-3="50" fov-4="75" />
+
   <!-- disable-while-unskid: Disable steering when stop skidding during
            the time it takes to adjust the physical body with the graphics.
        camera-follow-skid: If true the camera will stay behind the kart,
@@ -154,15 +159,6 @@
                  otherwise obstricts too much of the view.  -->
     <camera distance="1.0" forward-up-angle="15"
             backward-up-angle="5"/>
-    <!-- Options to affect the graphical chassis:
-         y-offset: Additional offset to move graphical chassis with regards
-                   to the physics, used to reduce frequencey of graphical
-                   chassis in terrain.
-         prevent-chassis-in-terrain: a hard flag to prevent nearly all instances
-                   of chassis in terrain. Can (atm) cause some stuttering. -->
-    <graphics y-offset="0.0"
-              prevent-chassis-in-terrain="true"
-    />
 
    <!-- Jump animation related values:
         animation-time: only if the estimated time for a jump is larger
@@ -386,20 +382,20 @@
 
     <!-- Suspension related values. stiffness: kart's suspension stiffness.
          rest: Length of suspension when at rest.
-         travel-cm: maximum movement of suspension - in cm!!
+         travel: maximum movement of suspension!!
          exp-string-response: dampen the suspension spring reaction
             exponentially.
          max-force: Maximum suspension force -->
-    <suspension stiffness="140" rest="0.3" travel-cm="29"
+    <suspension stiffness="140" rest="0.3" travel="0.29"
          exp-spring-response="false" max-force="12000"/>
 
     <!-- Wheel related parameters: damping-relaxation/compression: for
-         bullet, damping parameters. Radius and width of wheel.
+         bullet, damping parameters.
          front-right, front-left, rear-right and rear-left give the
          position of the physics raycast wheels relative to the center of
          gravity. Default is to use the corners of the chassis to attach
          the wheels to. -->
-    <wheels damping-relaxation="35"  damping-compression="5" radius="0.25">
+    <wheels damping-relaxation="35"  damping-compression="5">
       <front-right position="0.38 0 0.6"  />
       <front-left  position="-0.38 0 0.6" />
       <rear-right  position="0.38 0 -0.6" />
@@ -430,7 +426,7 @@
                chassis-angular-damping="0"
                downward-impulse-factor="5"
                track-connection-accel="2"
-               smooth-flying-impulse="25"/>
+               smooth-flying-impulse="250"/>
 
     <!-- collision
          impulse-type: STK can apply an additional impulse in case of
@@ -627,7 +623,7 @@
          time-reset-steer="0.1" />
 
      <!-- Speed and acceleration related values: power and max-speed (in m/s)
-          have 3 values, one for low, medium, and hard.
+          have 4 values, one for low, medium, hard, and supertux.
           brake-factor: Value used when braking. 
           brake-time-increase: The brake force is multiplied by
             (1+brake_time*brake_time_increase - i.e. the longer the brake was
@@ -686,8 +682,8 @@
                  time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25"
                  time-reset-steer="0.1"/>
 
-             <engine power="250 300 350 400"  max-speed="15.8 18.8 23.85 30.0" brake-factor="15.0"
-                 max-speed-reverse-ratio="0.3"/>
+             <engine power="250 300 350 400"  max-speed="13 18 21 23.0" brake-factor="15.0"
+                 max-speed-reverse-ratio="0.5"/>
 
              <gear switch-ratio="0.20 0.55 1" power-increase="5 4 3"/>
 
@@ -712,7 +708,7 @@
                     time-full-steer ="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28"
                     time-reset-steer="0.1"/>
 
-              <engine power="425 500 575 600"  max-speed="15 20 23.2 27" brake-factor="11.0"
+              <engine power="375 450 525 550"  max-speed="14 19 22.0 25" brake-factor="11.0"
                   max-speed-reverse-ratio="0.4"/>
 
               <gear switch-ratio="0.30 0.7 1.0" power-increase="2.2 2.2 2.5"/>
@@ -741,7 +737,7 @@
                       time-full-steer ="0:0.23 0.5:0.23 0.5:0.41 1.0:0.41"
                    time-reset-steer="0.1"/>
 
-             <engine power="600 700 800 900"  max-speed="15 20 23 25" brake-factor="10"
+             <engine power="575 675 775 875"  max-speed="15 20 23 25" brake-factor="10"
                    max-speed-reverse-ratio="0.65"/>
 
              <gear switch-ratio="0.45 0.70 1" power-increase="1.5 1.7 2.5"/>

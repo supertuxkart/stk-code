@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -32,7 +32,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/player_difficulty.hpp"
-#include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
 
 class btKart;
@@ -52,6 +51,7 @@ class Skidding;
 class SkidMarks;
 class SlipStream;
 class Stars;
+class TerrainInfo;
 
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a
@@ -149,7 +149,7 @@ private:
 
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
-    
+
     /** Counter which is used for displaying wrong way message after a delay */
     float        m_wrongway_counter;
 
@@ -173,10 +173,6 @@ private:
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 
-    /** If a kart is flying, the shadow is disabled (since it is
-     *  stuck to the kart, i.e. the shadow would be flying, too). */
-    bool             m_shadow_enabled;
-
     ParticleEmitter *m_sky_particles_emitter;
 
     /** All particle effects. */
@@ -187,12 +183,6 @@ private:
 
     /** Handles all slipstreaming. */
     SlipStream      *m_slipstream;
-
-    /** Rotation compared to the start position, same for all wheels */
-    float           m_wheel_rotation;
-
-    /** Rotation change in the last time delta, same for all wheels */
-    float           m_wheel_rotation_dt;
 
     /** The skidmarks object for this kart. */
     SkidMarks      *m_skidmarks;
@@ -210,6 +200,7 @@ private:
     SFXBase      *m_engine_sound;
     SFXBase      *m_crash_sound;
     SFXBase      *m_terrain_sound;
+    SFXBase      *m_nitro_sound;
     /** A pointer to the previous terrain sound needs to be saved so that an
      *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */
     SFXBase      *m_previous_terrain_sound;
@@ -217,11 +208,10 @@ private:
     SFXBase      *m_goo_sound;
     SFXBase      *m_boing_sound;
     float         m_time_last_crash;
+    RaceManager::KartType m_type;
 
     /** To prevent using nitro in too short bursts */
     float         m_min_nitro_time;
-
-    scene::ISceneNode* m_nitro_light;
 
     void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);
@@ -249,8 +239,8 @@ public:
     virtual bool   isInRest         () const;
     virtual void   applyEngineForce (float force);
 
-    virtual void flyUp();
-    virtual void flyDown();
+    virtual void   flyUp();
+    virtual void   flyDown();
 
     virtual void   startEngineSFX   ();
     virtual void   adjustSpeed      (float f);
@@ -359,6 +349,8 @@ public:
      *  skidding related values) - non-const. */
     virtual Skidding *getSkidding() { return m_skidding; }
     // ------------------------------------------------------------------------
+    virtual RaceManager::KartType getType() const { return m_type; }
+    // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
     virtual btKart    *getVehicle() const {return m_vehicle;               }
     // ------------------------------------------------------------------------
@@ -444,7 +436,9 @@ public:
     // ------------------------------------------------------------------------
     /** Counter which is used for displaying wrong way message after a delay */
     float getWrongwayCounter() { return m_wrongway_counter; }
+    // ------------------------------------------------------------------------
     void setWrongwayCounter(float counter) { m_wrongway_counter = counter; }
+
 };   // Kart
 
 

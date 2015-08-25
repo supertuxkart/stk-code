@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,14 +27,13 @@ HitSFX::HitSFX(const Vec3& coord, const char* explosion_sound)
              : HitEffect()
 {
     m_sfx = SFXManager::get()->createSoundSource( explosion_sound );
-    m_sfx->setPosition(coord);
 
     // in multiplayer mode, sounds are NOT positional (because we have
     // multiple listeners) so the sounds of all AIs are constantly heard.
     // Therefore reduce volume of sounds.
     float vol = race_manager->getNumLocalPlayers() > 1 ? 0.5f : 1.0f;
     m_sfx->setVolume(vol);
-    m_sfx->play();
+    m_sfx->play(coord);
 }   // HitSFX
 
 //-----------------------------------------------------------------------------

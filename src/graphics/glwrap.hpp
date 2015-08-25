@@ -1,11 +1,31 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #ifndef GLWRAP_HEADER_H
 #define GLWRAP_HEADER_H
 
 #include "graphics/gl_headers.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/vaomanager.hpp"
+#include "graphics/texture_manager.hpp"
+#include "graphics/vao_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/vec3.hpp"
 
 #include <vector>
 
@@ -40,7 +60,7 @@ public:
     unsigned elapsedTimeus();
 };
 
-class FrameBuffer
+class FrameBuffer : public NoCopy
 {
 private:
     GLuint fbo, fbolayer;
@@ -52,8 +72,8 @@ public:
     FrameBuffer(const std::vector <GLuint> &RTTs, size_t w, size_t h, bool layered = false);
     FrameBuffer(const std::vector <GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered = false);
     ~FrameBuffer();
-    void Bind();
-    void BindLayer(unsigned);
+    void bind() const;
+    void bindLayer(unsigned);
     const std::vector<GLuint> &getRTT() const { return RenderTargets; }
     GLuint &getDepthTexture() { assert(DepthTexture); return DepthTexture; }
     size_t getWidth() const { return width; }
@@ -125,9 +145,6 @@ public:
         }
     }
 };
-
-#include "utils/vec3.hpp"
-#include "texturemanager.hpp"
 
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);

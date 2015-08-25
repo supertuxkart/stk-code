@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -57,7 +57,6 @@ private:
     bool                     m_enable_fast;
 
     float                    m_gain;
-    float                    m_adjusted_gain;
 
     /** Either time for fading faster music in, or time to change pitch. */
     float                    m_faster_time;
@@ -76,6 +75,26 @@ private:
     // The constructor is private so that the
     // static create function must be used.
     MusicInformation (const XMLNode *root, const std::string &filename);
+
+    // Declare the following functions private, but allow the SFXManager 
+    // to access them. This makes sure that only the sfx thread calls
+    // openal/vorbis etc, and so makes it is all thread safe.
+private:
+    friend class SFXManager;
+    void   update(float dt);
+    void   startMusic();
+    void   stopMusic();
+    void   pauseMusic();
+    void   resumeMusic();
+    void   setDefaultVolume();
+    void   switchToFastMusic();
+    void   setTemporaryVolume(float volume);
+    // ------------------------------------------------------------------------
+    /** Sets the music to be waiting, i.e. startMusic still needs to be
+    *  called. Used to pre-load track music during track loading time. */
+    void setMusicWaiting() { m_music_waiting = true; }
+    // ------------------------------------------------------------------------
+
 public:
     LEAK_CHECK()
 
@@ -84,26 +103,23 @@ public:
 #endif
                       ~MusicInformation ();
     static MusicInformation *create(const std::string &filename);
-    const stringw&     getComposer      () const {return m_composer;        }
-    const stringw&     getTitle         () const {return m_title;           }
-    const std::string& getNormalFilename() const {return m_normal_filename; }
-    const std::string& getFastFilename  () const {return m_fast_filename;   }
-    //int              getNumLoops      () const {return m_numLoops;        }
-    float              getFasterTime    () const {return m_faster_time;     }
-    float              getMaxPitch      () const {return m_max_pitch;       }
-    void               setMusicWaiting  () {m_music_waiting = true;}
-    void               addMusicToTracks ();
-    void               update           (float dt);
-    void               startMusic       ();
-    void               stopMusic        ();
-    void               pauseMusic       ();
-    void               resumeMusic      ();
-    void               volumeMusic      (float gain);
-
-    void               setTemporaryVolume(float gain);
-    void               resetTemporaryVolume() { volumeMusic(m_adjusted_gain); }
-
-    void               switchToFastMusic();
+    void               addMusicToTracks();
     bool               isPlaying() const;
+
+    // ------------------------------------------------------------------------
+    /** Returns the composer of the music. */
+    const stringw& getComposer() const { return m_composer; }
+    // ------------------------------------------------------------------------
+    /** Returns the title of the music. */
+    const stringw& getTitle() const { return m_title; }
+    // ------------------------------------------------------------------------
+    /** Returns the filename of the normal speed music. */
+    const std::string& getNormalFilename() const { return m_normal_filename; }
+    // ------------------------------------------------------------------------
+    /** If available, returns the file name of the faster/last-lap music. */
+    const std::string& getFastFilename() const { return m_fast_filename; }
+    // ------------------------------------------------------------------------
+    float getMaxPitch() const { return m_max_pitch; }
+
 };   // MusicInformation
 #endif

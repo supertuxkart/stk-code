@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014  SuperTuxKart Team
+//  Copyright (C) 2014-2015  SuperTuxKart Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,25 +25,10 @@
 
 namespace Scripting
 {
-
     namespace Track
     {
-
         //script engine functions
         void registerScriptFunctions(asIScriptEngine *engine);
-        asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine , std::string scriptName);
-        void registerScriptEnums(asIScriptEngine *engine);
-
-
-        //script-bound functions
-        void displayMessage(asIScriptGeneric *gen);
-        void disableAnimation(asIScriptGeneric *gen);
-        void enableAnimation(asIScriptGeneric *gen);
-        void enableTrigger(asIScriptGeneric *gen);
-        void disableTrigger(asIScriptGeneric *gen);
-        void createTrigger(asIScriptGeneric *gen);
-
     }
 
 }

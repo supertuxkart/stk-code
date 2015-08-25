@@ -27,7 +27,7 @@ CParticleRingEmitter::CParticleRingEmitter(
 		MaxParticlesPerSecond(maxParticlesPerSecond),
 		MinStartColor(minStartColor), MaxStartColor(maxStartColor),
 		MinLifeTime(lifeTimeMin), MaxLifeTime(lifeTimeMax),
-		Time(0), Emitted(0), MaxAngleDegrees(maxAngleDegrees)
+		Time(0), MaxAngleDegrees(maxAngleDegrees)
 {
 	#ifdef _DEBUG
 	setDebugName("CParticleRingEmitter");

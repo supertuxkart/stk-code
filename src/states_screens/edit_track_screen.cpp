@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -220,17 +220,16 @@ void EditTrackScreen::selectTrack(const std::string& id)
     assert(ok_button != NULL);
 
     m_track = track_manager->getTrack(id);
-    if (m_track != NULL)
+    ok_button->setActive(m_track!=NULL);
+    if (m_track)
     {
         tracks->setSelection(m_track->getIdent(), PLAYER_ID_GAME_MASTER, true);
-        selected_track->setText(m_track->getName(), true);
+        selected_track->setText(translations->fribidize(m_track->getName()), true);
 
         laps->setValue(m_laps);
 
         reverse->setVisible(m_track->reverseAvailable());
         label_reverse->setVisible(m_track->reverseAvailable());
-
-        ok_button->setActivated();
     }
     else
     {
@@ -244,6 +243,5 @@ void EditTrackScreen::selectTrack(const std::string& id)
         reverse->setVisible(true);
         reverse->setState(false);
 
-        ok_button->setDeactivated();
     }
 }

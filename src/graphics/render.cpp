@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,26 +20,45 @@
 
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
-#include "central_settings.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/screenquad.hpp"
+#include "graphics/screen_quad.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stkmeshscenenode.hpp"
+#include "graphics/shadow_matrices.hpp"
+#include "graphics/shared_gpu_objects.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_scene_manager.hpp"
 #include "items/item_manager.hpp"
+#include "items/powerup_manager.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
-#include "stkscenemanager.hpp"
-#include "items/powerup_manager.hpp"
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
+
+
+// ============================================================================
+class InstancedColorizeShader : public Shader<InstancedColorizeShader>
+{
+public:
+    InstancedColorizeShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER,   "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER,   "glow_object.vert",
+                            GL_FRAGMENT_SHADER, "glow_object.frag");
+        assignUniforms();
+    }   // InstancedColorizeShader
+};   // InstancedColorizeShader
+
+// ============================================================================
 
 extern std::vector<float> BoundingBoxes;
 
@@ -83,7 +102,7 @@ void IrrDriver::renderGLSL(float dt)
     }
     if (m_mipviz)
     {
-        overridemat.Material.MaterialType = m_shaders->getShader(ES_MIPVIZ);
+        overridemat.Material.MaterialType = Shaders::getShader(ES_MIPVIZ);
         overridemat.EnableFlags |= video::EMF_MATERIAL_TYPE;
         overridemat.EnablePasses = scene::ESNRP_SOLID;
     }
@@ -167,20 +186,14 @@ void IrrDriver::renderGLSL(float dt)
 
         const core::recti &viewport = camera->getViewport();
 
-        if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && !SphericalHarmonicsTextures.empty())
+        if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && m_spherical_harmonics->has6Textures())
             irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
-        // TODO: put this outside of the rendering loop
-        if (!m_skybox_ready)
-        {
-            prepareSkybox();
-            m_skybox_ready = true;
-        }
         if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);
 
         PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
-        unsigned plc = UpdateLightsInfo(camnode, dt);
+        unsigned plc = updateLightsInfo(camnode, dt);
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
@@ -191,10 +204,11 @@ void IrrDriver::renderGLSL(float dt)
         // Render bounding boxes
         if (irr_driver->getBoundingBoxesViz())
         {
-            glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
-            glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
-            glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
-            UtilShader::ColoredLine::getInstance()->setUniforms(SColor(255, 255, 0, 0));
+            Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
+            line->use();
+            line->bindVertexArray();
+            line->bindBuffer();
+            line->setUniforms(SColor(255, 255, 0, 0));
             const float *tmp = BoundingBoxes.data();
             for (unsigned int i = 0; i < BoundingBoxes.size(); i += 1024 * 6)
             {
@@ -220,12 +234,13 @@ void IrrDriver::renderGLSL(float dt)
                 const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
                 std::map<video::SColor, std::vector<float> >::const_iterator it;
 
-                glUseProgram(UtilShader::ColoredLine::getInstance()->Program);
-                glBindVertexArray(UtilShader::ColoredLine::getInstance()->vao);
-                glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::getInstance()->vbo);
+                Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
+                line->use();
+                line->bindVertexArray();
+                line->bindBuffer();
                 for (it = lines.begin(); it != lines.end(); it++)
                 {
-                    UtilShader::ColoredLine::getInstance()->setUniforms(it->first);
+                    line->setUniforms(it->first);
                     const std::vector<float> &vertex = it->second;
                     const float *tmp = vertex.data();
                     for (unsigned int i = 0; i < vertex.size(); i += 1024 * 6)
@@ -253,17 +268,17 @@ void IrrDriver::renderGLSL(float dt)
             {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
-                m_post_processing->renderPassThrough(m_rtts->getFBO(FBO_HALF1_R).getRTT()[0]);
+                m_post_processing->renderPassThrough(m_rtts->getFBO(FBO_HALF1_R).getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
             }
             else if (irr_driver->getRSM())
             {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
-                m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0]);
+                m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
             }
             else if (irr_driver->getShadowViz())
             {
-                renderShadowsDebug();
+                getShadowMatrices()->renderShadowsDebug();
             }
             else
             {
@@ -271,20 +286,24 @@ void IrrDriver::renderGLSL(float dt)
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 if (CVS->isDefferedEnabled())
                     camera->activate();
-                m_post_processing->renderPassThrough(fbo->getRTT()[0]);
+                m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
                 glDisable(GL_FRAMEBUFFER_SRGB);
             }
         }
+        // Save projection-view matrix for the next frame
+        camera->setPreviousPVMatrix(m_ProjViewMatrix);
 
         PROFILER_POP_CPU_MARKER();
     }   // for i<world->getNumKarts()
 
     // Use full screen size
     float tmp[2];
-    tmp[0] = float(UserConfigParams::m_width);
-    tmp[1] = float(UserConfigParams::m_height);
-    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float), 2 * sizeof(float), tmp);
+    tmp[0] = float(m_actual_screen_size.Width);
+    tmp[1] = float(m_actual_screen_size.Height);
+    glBindBuffer(GL_UNIFORM_BUFFER, 
+                 SharedGPUObjects::getViewProjectionMatricesUBO());
+    glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float),
+                    2 * sizeof(float), tmp);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -293,8 +312,8 @@ void IrrDriver::renderGLSL(float dt)
 
     // Set the viewport back to the full screen for race gui
     m_video_driver->setViewPort(core::recti(0, 0,
-                                            UserConfigParams::m_width,
-                                            UserConfigParams::m_height));
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height));
 
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
@@ -337,8 +356,8 @@ void IrrDriver::renderGLSL(float dt)
 
 void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedObject::LightingDataUBO);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
     m_scene_manager->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
@@ -347,7 +366,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     // Shadows
     {
         // To avoid wrong culling, use the largest view possible
-        m_scene_manager->setActiveCamera(m_suncam);
+        m_scene_manager->setActiveCamera(getShadowMatrices()->getSunCam());
         if (CVS->isDefferedEnabled() &&
             CVS->isShadowEnabled() && hasShadow)
         {
@@ -373,10 +392,28 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     glEnable(GL_CULL_FACE);
     if (CVS->isDefferedEnabled() || forceRTT)
     {
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         glClearColor(0., 0., 0., 0.);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderSolidFirstPass();
+    }
+    else
+    {
+        // We need a cleared depth buffer for some effect (eg particles depth blending)
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
+        // Bind() modifies the viewport. In order not to affect anything else,
+        // the viewport is just reset here and not removed in Bind().
+        const core::recti &vp = Camera::getActiveCamera()->getViewport();
+        glViewport(vp.UpperLeftCorner.X,
+                   irr_driver->getActualScreenSize().Height - vp.LowerRightCorner.Y,
+                   vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
+                   vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+            glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     PROFILER_POP_CPU_MARKER();
 
@@ -402,7 +439,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
     if (CVS->isDefferedEnabled() || forceRTT)
     {
-        m_rtts->getFBO(FBO_COLORS).Bind();
+        m_rtts->getFBO(FBO_COLORS).bind();
         SColor clearColor(0, 150, 150, 150);
         if (World::getWorld() != NULL)
             clearColor = World::getWorld()->getClearColor();
@@ -417,9 +454,9 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
 
     if (getNormals())
     {
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         renderNormalsVisualisation();
-        m_rtts->getFBO(FBO_COLORS).Bind();
+        m_rtts->getFBO(FBO_COLORS).bind();
     }
 
     // Render ambient scattering
@@ -452,15 +489,21 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     if (getRH())
     {
         glDisable(GL_BLEND);
-        m_rtts->getFBO(FBO_COLORS).Bind();
-        m_post_processing->renderRHDebug(m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2], rh_matrix, rh_extend);
+        m_rtts->getFBO(FBO_COLORS).bind();
+        m_post_processing->renderRHDebug(m_rtts->getRH().getRTT()[0],
+                                         m_rtts->getRH().getRTT()[1], 
+                                         m_rtts->getRH().getRTT()[2],
+                                         getShadowMatrices()->getRHMatrix(),
+                                         getShadowMatrices()->getRHExtend());
     }
 
     if (getGI())
     {
         glDisable(GL_BLEND);
-        m_rtts->getFBO(FBO_COLORS).Bind();
-        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
+        m_rtts->getFBO(FBO_COLORS).bind();
+        m_post_processing->renderGI(getShadowMatrices()->getRHMatrix(),
+                                    getShadowMatrices()->getRHExtend(),
+                                    m_rtts->getRH());
     }
 
     PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
@@ -471,10 +514,6 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         irr_driver->setPhase(GLOW_PASS);
         renderGlow(glows);
     } // end glow
-    PROFILER_POP_CPU_MARKER();
-
-    PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0x00, 0xFF, 0xFF);
-    computeSunVisibility();
     PROFILER_POP_CPU_MARKER();
 
     // Render transparent
@@ -578,18 +617,18 @@ void IrrDriver::renderFixed(float dt)
     m_video_driver->endScene();
 }
 
+
+
 // ----------------------------------------------------------------------------
-
-void IrrDriver::computeSunVisibility()
+void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 {
-    // Is the lens flare enabled & visible? Check last frame's query.
-    bool hasgodrays = false;
-
-    if (World::getWorld() != NULL)
+    if(m_skybox)
     {
-        hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+        m_skybox->render(camera);
     }
-}
+}   // renderSkybox
+
+// ----------------------------------------------------------------------------
 
 void IrrDriver::renderParticles()
 {
@@ -602,42 +641,12 @@ void IrrDriver::renderParticles()
 //    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 }
 
-static void renderWireFrameFrustrum(float *tmp, unsigned i)
-{
-    glUseProgram(MeshShader::ViewFrustrumShader::getInstance()->Program);
-    glBindVertexArray(MeshShader::ViewFrustrumShader::getInstance()->frustrumvao);
-    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
-
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), (void *)tmp);
-    MeshShader::ViewFrustrumShader::getInstance()->setUniforms(video::SColor(255, 0, 255, 0), i);
-    glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
-}
-
-
-void IrrDriver::renderShadowsDebug()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 0);
-    renderWireFrameFrustrum(m_shadows_cam[0], 0);
-    glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 1);
-    renderWireFrameFrustrum(m_shadows_cam[1], 1);
-    glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 2);
-    renderWireFrameFrustrum(m_shadows_cam[2], 2);
-    glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderTextureLayer(m_rtts->getShadowFBO().getRTT()[0], 3);
-    renderWireFrameFrustrum(m_shadows_cam[3], 3);
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
-}
-
 // ----------------------------------------------------------------------------
 
 void IrrDriver::renderGlow(std::vector<GlowData>& glows)
 {
     m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
-    m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
+    m_rtts->getFBO(FBO_TMP1_WITH_DS).bind();
     glClearStencil(0);
     glClearColor(0, 0, 0, 0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -668,7 +677,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     if (CVS->supportsIndirectInstancingRendering())
     {
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
-        glUseProgram(MeshShader::InstancedColorizeShader::getInstance()->Program);
+        InstancedColorizeShader::getInstance()->use();
 
         glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeGlow));
         if (CVS->isAZDOEnabled())
@@ -704,7 +713,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glStencilFunc(GL_EQUAL, 0, ~0);
     glEnable(GL_STENCIL_TEST);
-    m_rtts->getFBO(FBO_COLORS).Bind();
+    m_rtts->getFBO(FBO_COLORS).bind();
     m_post_processing->renderGlow(m_rtts->getRenderTarget(RTT_QUARTER1));
     glDisable(GL_STENCIL_TEST);
 }

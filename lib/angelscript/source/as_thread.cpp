@@ -109,7 +109,7 @@ AS_API void asReleaseSharedLock()
 
 //======================================================================
 
-#if !defined(AS_NO_THREADS) && defined(_MSC_VER) && defined(AS_WINDOWS_THREADS) && !(WINAPI_FAMILY & WINAPI_PARTITION_DESKTOP)
+#if !defined(AS_NO_THREADS) && defined(_MSC_VER) && defined(AS_WINDOWS_THREADS) && (WINAPI_FAMILY & WINAPI_FAMILY_PHONE_APP)
 __declspec(thread) asCThreadLocalData *asCThreadManager::tld = 0;
 #endif
 
@@ -126,7 +126,7 @@ asCThreadManager::asCThreadManager()
 		pthread_key_create(&pKey, 0);
 		tlsKey = (asDWORD)pKey;
 	#elif defined AS_WINDOWS_THREADS
-		#if defined(_MSC_VER) && !(WINAPI_FAMILY & WINAPI_PARTITION_DESKTOP)
+		#if defined(_MSC_VER) && (WINAPI_FAMILY & WINAPI_FAMILY_PHONE_APP)
 			tld = 0;
 		#else
 			tlsKey = (asDWORD)TlsAlloc();
@@ -211,7 +211,7 @@ asCThreadManager::~asCThreadManager()
 	#if defined AS_POSIX_THREADS
 		pthread_key_delete((pthread_key_t)tlsKey);
 	#elif defined AS_WINDOWS_THREADS
-		#if defined(_MSC_VER) && !(WINAPI_FAMILY & WINAPI_PARTITION_DESKTOP)
+		#if defined(_MSC_VER) && (WINAPI_FAMILY & WINAPI_FAMILY_PHONE_APP)
 			tld = 0;
 		#else
 			TlsFree((DWORD)tlsKey);
@@ -235,7 +235,7 @@ int asCThreadManager::CleanupLocalData()
 #if defined AS_POSIX_THREADS
 	asCThreadLocalData *tld = (asCThreadLocalData*)pthread_getspecific((pthread_key_t)threadManager->tlsKey);
 #elif defined AS_WINDOWS_THREADS
-	#if !defined(_MSC_VER) || (WINAPI_FAMILY & WINAPI_PARTITION_DESKTOP)
+	#if !defined(_MSC_VER) || !(WINAPI_FAMILY & WINAPI_FAMILY_PHONE_APP)
 		asCThreadLocalData *tld = (asCThreadLocalData*)TlsGetValue((DWORD)threadManager->tlsKey);
 	#endif
 #endif
@@ -249,7 +249,7 @@ int asCThreadManager::CleanupLocalData()
 		#if defined AS_POSIX_THREADS
 			pthread_setspecific((pthread_key_t)threadManager->tlsKey, 0);
 		#elif defined AS_WINDOWS_THREADS
-			#if defined(_MSC_VER) && !(WINAPI_FAMILY & WINAPI_PARTITION_DESKTOP)
+			#if defined(_MSC_VER) && (WINAPI_FAMILY & WINAPI_FAMILY_PHONE_APP)
 				tld = 0;
 			#else
 				TlsSetValue((DWORD)threadManager->tlsKey, 0);
@@ -289,7 +289,7 @@ asCThreadLocalData *asCThreadManager::GetLocalData()
 		pthread_setspecific((pthread_key_t)threadManager->tlsKey, tld);
 	}
 #elif defined AS_WINDOWS_THREADS
-	#if defined(_MSC_VER) && !(WINAPI_FAMILY & WINAPI_PARTITION_DESKTOP)
+	#if defined(_MSC_VER) && (WINAPI_FAMILY & WINAPI_FAMILY_PHONE_APP)
 		if( tld == 0 )
 			tld = asNEW(asCThreadLocalData)();
 	#else
@@ -329,10 +329,13 @@ asCThreadCriticalSection::asCThreadCriticalSection()
 #if defined AS_POSIX_THREADS
 	pthread_mutex_init(&cs, 0);
 #elif defined AS_WINDOWS_THREADS
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && (WINAPI_FAMILY & WINAPI_FAMILY_PHONE_APP)
+	// Only the Ex version is available on Windows Store
 	InitializeCriticalSectionEx(&cs, 4000, 0);
 #else
-    InitializeCriticalSection(&cs);
+	// Only the non-Ex version is available on WinXP and older
+	// MinGW also only defines this version
+	InitializeCriticalSection(&cs);
 #endif
 #endif
 }
@@ -382,7 +385,9 @@ asCThreadReadWriteLock::asCThreadReadWriteLock()
 	asASSERT( r == 0 );
 	UNUSED_VAR(r);
 #elif defined AS_WINDOWS_THREADS
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && (WINAPI_FAMILY & WINAPI_FAMILY_PHONE_APP)
+	// Only the Ex versions are available on Windows Store
+
 	// Create a semaphore to allow up to maxReaders simultaneous readers
 	readLocks = CreateSemaphoreExW(NULL, maxReaders, maxReaders, 0, 0, 0);
 	// Create a critical section to synchronize writers

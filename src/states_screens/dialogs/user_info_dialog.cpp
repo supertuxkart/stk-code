@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -179,7 +179,7 @@ void UserInfoDialog::sendFriendRequest()
     request->queue();
 
     m_processing = true;
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
 
 }   // sendFriendRequest
 
@@ -234,7 +234,7 @@ void UserInfoDialog::acceptFriendRequest()
     request->queue();
 
     m_processing = true;
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
 }   // acceptFriendRequest
 
 // -----------------------------------------------------------------------------
@@ -285,7 +285,7 @@ void UserInfoDialog::declineFriendRequest()
     request->queue();
 
     m_processing = true;
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
 
 }   // declineFriendRequest
 
@@ -398,7 +398,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         {
             ProfileManager::get()->setVisiting(m_online_profile->getID());
             m_enter_profile = true;
-            m_options_widget->setDeactivated();
+            m_options_widget->setActive(false);
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_friend_widget->m_properties[PROP_ID])
@@ -415,7 +415,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
                 removeExistingFriend();
 
             m_processing = true;
-            m_options_widget->setDeactivated();
+            m_options_widget->setActive(false);
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_accept_widget->m_properties[PROP_ID])
@@ -435,7 +435,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
 // -----------------------------------------------------------------------------
 void UserInfoDialog::deactivate()
 {
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
 }   // deactivate
 
 // -----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 #include "states_screens/options_screen_input2.hpp"
 
 #include "config/user_config.hpp"
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
@@ -79,8 +79,8 @@ void OptionsScreenInput2::init()
 {
     Screen::init();
     RibbonWidget* tabBar = getWidget<RibbonWidget>("options_choice");
-    if (tabBar != NULL)  tabBar->select( "tab_controls",
-                                        PLAYER_ID_GAME_MASTER );
+    assert(tabBar != NULL);
+    tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
 
     tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
@@ -89,7 +89,7 @@ void OptionsScreenInput2::init()
 
 
     ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
-    if (m_config->isKeyboard())
+    if (!m_config->isKeyboard())
     {
         core::stringw label = (m_config->isEnabled()
                             ? //I18N: button to disable a gamepad configuration
@@ -109,16 +109,9 @@ void OptionsScreenInput2::init()
     else
     {
         delete_button->setLabel(_("Delete Configuration"));
-
-        if (input_manager->getDeviceManager()->getKeyboardAmount() < 2)
-        {
-            // don't allow deleting the last config
-            delete_button->setDeactivated();
-        }
-        else
-        {
-            delete_button->setActivated();
-        }
+        // Don't allow deleting the last config
+        delete_button->setActive(
+                   input_manager->getDeviceManager()->getKeyboardAmount() > 1);
     }
 
     // Make the two buttons the same length, not strictly needed but will
@@ -166,13 +159,8 @@ void OptionsScreenInput2::init()
     updateInputButtons();
 
     // Disable deletion keyboard configurations
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        getWidget<ButtonWidget>("delete")->setDeactivated();
-    } else
-    {
-        getWidget<ButtonWidget>("delete")->setActivated();
-    }
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    getWidget<ButtonWidget>("delete")->setActive(!in_game);
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -476,8 +464,8 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
                      sensed_input.m_button_id == irr::KEY_LSHIFT ||
                      sensed_input.m_button_id == irr::KEY_RSHIFT))
     {
-        new MessageDialog(_("Warning, 'Shift' is not a recommended key : when "
-                            "shift is pressed down, all keys that contain a "
+        new MessageDialog(_("Warning: The 'Shift' is not a recommended key. When "
+                            "'Shift' is pressed down, all keys that contain a "
                             "character that is different in upper-case will "
                             "stop working."));
     }

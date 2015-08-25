@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -44,7 +44,7 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_texture = NULL;
     m_deactivated_texture = NULL;
     m_highlight_texture = NULL;
-    
+
     m_custom_aspect_ratio = 1.0f;
 
     m_texture_w = 0;
@@ -68,16 +68,24 @@ void IconButtonWidget::add()
         }
         else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
         {
-            std::string file = file_manager->getAsset(m_properties[PROP_ICON]);
-            setTexture(irr_driver->getTexture(file));
+            // Avoid warning about missing texture in case of e.g.
+            // screenshot widget
+            if(m_properties[PROP_ICON] != "")
+            {
+                std::string file = file_manager->getAsset(m_properties[PROP_ICON]);
+                setTexture(irr_driver->getTexture(file));
+            }
         }
     }
 
     if (m_texture == NULL)
     {
-        Log::error("icon_button",
-                    "add() : error, cannot find texture '%s'.",
-                   m_properties[PROP_ICON].c_str());
+        if (m_properties[PROP_ICON].size() > 0)
+        {
+            Log::error("icon_button",
+                "add() : error, cannot find texture '%s' in iconbutton '%s'.",
+                m_properties[PROP_ICON].c_str(), m_properties[PROP_ID].c_str());
+        }
         std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
         setTexture(irr_driver->getTexture(file));
         if(!m_texture)
@@ -104,7 +112,7 @@ void IconButtonWidget::add()
     // irrlicht widgets don't support scaling while keeping aspect ratio
     // so, happily, let's implement it ourselves
     float useAspectRatio = -1.0f;
-    
+
     if (m_properties[PROP_CUSTOM_RATIO] != "")
     {
         StringUtils::fromString(m_properties[PROP_CUSTOM_RATIO],
@@ -159,11 +167,34 @@ void IconButtonWidget::add()
 
         if (m_properties[PROP_LABELS_LOCATION] == "hover")
         {
-            widget_size = rect<s32>(m_x - label_extra_size/2,
-                                    m_y - (word_wrap ? GUIEngine::getFontHeight()*2 :
-                                                 GUIEngine::getFontHeight()) - 15,
-                                    m_x + m_w + label_extra_size/2,
-                                    m_y - 15);
+            core::dimension2du text_size = GUIEngine::getFont()->getDimension(message.c_str());
+            core::recti pos = btn->getAbsolutePosition();
+            int center_x = pos.UpperLeftCorner.X + pos.getWidth() / 2;
+            int x1 = center_x - text_size.Width / 2 - label_extra_size / 2;
+            int y1 = pos.UpperLeftCorner.Y - (word_wrap ? GUIEngine::getFontHeight() * 2 :
+                GUIEngine::getFontHeight()) - 15;
+            int x2 = center_x + text_size.Width / 2 + label_extra_size / 2;
+            int y2 = pos.UpperLeftCorner.Y - 15;
+
+            if (x1 < 0)
+            {
+                int diff = -x1;
+                x1 += diff;
+                x2 += diff;
+            }
+            else if (x2 > (int)irr_driver->getActualScreenSize().Width)
+            {
+                int diff = x2 - irr_driver->getActualScreenSize().Width;
+                x2 -= diff;
+                x1 -= diff;
+            }
+
+            core::recti parent_pos = m_parent->getAbsolutePosition();
+            x1 -= parent_pos.UpperLeftCorner.X;
+            x2 -= parent_pos.UpperLeftCorner.X;
+            y1 -= parent_pos.UpperLeftCorner.Y;
+            y2 -= parent_pos.UpperLeftCorner.Y;
+            widget_size = rect<s32>(x1, y1, x2, y2);
         }
         else
         {
@@ -188,17 +219,15 @@ void IconButtonWidget::add()
 
         setLabelFont();
 
-#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
-        m_label->setRightToLeft( translations->isRTLLanguage() );
+        m_label->setRightToLeft(translations->isRTLText(message));
         m_label->setTextRestrainedInside(false);
-#endif
     }
 
     // ---- IDs
     m_id = m_element->getID();
     if (m_tab_stop) m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
-    
+
     if (!m_is_visible)
         m_element->setVisible(false);
 }
@@ -305,7 +334,7 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
 
     std::string name = texture->getName().getPath().c_str();
     name += "_disabled";
-    t = irr_driver->getTexture(name, /*premul*/false, /*prediv*/false, 
+    t = irr_driver->getTexture(name, /*premul*/false, /*prediv*/false,
                                      /*compain_if_not_found*/false);
     if (t == NULL)
     {
@@ -313,7 +342,7 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
         u32 g;
 
         video::IVideoDriver* driver = irr_driver->getVideoDriver();
-        std::auto_ptr<video::IImage> image (driver->createImageFromData (texture->getColorFormat(),
+        std::unique_ptr<video::IImage> image (driver->createImageFromData (texture->getColorFormat(),
             texture->getSize(), texture->lock(), false));
         texture->unlock();
 

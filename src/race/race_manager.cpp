@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -416,7 +416,6 @@ void RaceManager::startNextRace()
     // Uncomment to debug audio leaks
     // sfx_manager->dump();
 
-    stk_config->getAllScores(&m_score_for_position, m_num_karts);
     IrrlichtDevice* device = irr_driver->getDevice();
     GUIEngine::renderLoading();
     device->getVideoDriver()->endScene();
@@ -547,7 +546,7 @@ void RaceManager::saveGP()
         m_saved_gp->setKarts(m_kart_status);
         m_saved_gp->setNextTrack(m_track_number);
     }
-    else
+    else  if(!m_grand_prix.isRandomGP())
     {
         m_saved_gp = new SavedGrandPrix(
             StateManager::get()->getActivePlayerProfile(0)->getUniqueID(),
@@ -557,12 +556,30 @@ void RaceManager::saveGP()
             m_track_number,
             m_grand_prix.getReverseType(),
             m_kart_status);
-            
+
+        // If a new GP is saved, delete any other saved data for this
+        // GP at the same difficulty (even if #karts is different, otherwise
+        // the user has to remember the number of AI karts, with no indication
+        // on which ones are saved).
+        for (unsigned int i = 0;
+            i < UserConfigParams::m_saved_grand_prix_list.size();)
+        {
+            // Delete other save files (and random GP, which should never
+            // have been saved in the first place)
+            const SavedGrandPrix &sgp = UserConfigParams::m_saved_grand_prix_list[i];
+            if (sgp.getGPID() == "random"                          ||
+                (sgp.getGPID() == m_saved_gp->getGPID() &&
+                 sgp.getDifficulty() == m_saved_gp->getDifficulty())    )
+            {
+                UserConfigParams::m_saved_grand_prix_list.erase(i);
+            }
+            else i++;
+        }
         UserConfigParams::m_saved_grand_prix_list.push_back(m_saved_gp);
     }
 
     user_config->saveConfig();
-}
+}   // saveGP
 
 //-----------------------------------------------------------------------------
 
@@ -760,7 +777,17 @@ void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
     assert(pos-1 < (int)m_kart_status.size());
 
     m_kart_status[id].m_last_score    = m_kart_status[id].m_score;
-    m_kart_status[id].m_score        += m_score_for_position[pos-1];
+
+    // In follow the leader mode, the winner is actually the kart with
+    // position 2, so adjust the points (#points for leader do not matter)
+    WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+    if (wwr)
+        m_kart_status[id].m_score += wwr->getScoreForPosition(pos);
+    else
+    {
+        Log::error("RaceManager", "World with scores that is not a WorldWithRank??");
+    }
+
     m_kart_status[id].m_overall_time += time;
     m_kart_status[id].m_last_time     = time;
     m_num_finished_karts ++;

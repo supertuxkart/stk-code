@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2010-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2010-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -155,6 +155,11 @@ private:
     bool             m_ignore;
 
     bool             m_fog;
+
+    /** Either ' ' (no mirroring), 'U' or 'V' if a texture needs to be 
+     *  mirrored when driving in reverse. Typically used for arrows indicating
+     *  the direction. */
+    char             m_mirror_axis_when_reverse;
 
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
 
@@ -372,6 +377,9 @@ public:
     float getZipperMinSpeed() const { return m_zipper_min_speed; }
     // ------------------------------------------------------------------------
     ShaderType getShaderType() const { return m_shader_type; }
+    // ------------------------------------------------------------------------
+    /** True if this texture should have the U coordinates mirrored. */
+    char getMirrorAxisInReverse() const { return m_mirror_axis_when_reverse; }
     // ------------------------------------------------------------------------
 } ;
 

@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -62,9 +62,6 @@ private:
 
     // Minimap related variables
     // -------------------------
-    /** The mini map of the track. */
-    video::ITexture *m_mini_map;
-
     video::ITexture *m_trophy1;
     video::ITexture *m_trophy2;
     video::ITexture *m_trophy3;

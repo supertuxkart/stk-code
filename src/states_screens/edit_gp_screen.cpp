@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 #include "states_screens/edit_gp_screen.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -155,11 +155,11 @@ void EditGPScreen::init()
     {
         LabelWidget* header = getWidget<LabelWidget>("title");
         assert(header != NULL);
-        header->setText(m_gp->getName(), true);
+        header->setText(translations->fribidize(m_gp->getName()), true);
 
         IconButtonWidget* button = getWidget<IconButtonWidget>("save");
         assert(button != NULL);
-        button->setDeactivated();
+        button->setActive(false);
 
         loadList(0);
         setModified(false);
@@ -171,16 +171,19 @@ void EditGPScreen::init()
 
         if (edit->getResult())
         {
+            bool reverse = edit->getTrack()->reverseAvailable() ? 
+                           edit->getReverse() : false;
+            
             if (m_action == "add")
             {
-                m_gp->addTrack(edit->getTrack(), edit->getLaps(), edit->getReverse(),
-                    m_selected);
+                m_gp->addTrack(edit->getTrack(), edit->getLaps(), reverse,
+                               m_selected);
                 setSelected(m_selected + 1);
             }
             else if (m_action == "edit")
             {
                 m_gp->editTrack(m_selected, edit->getTrack(), edit->getLaps(),
-                    edit->getReverse());
+                                reverse);
             }
             setModified(true);
         }
@@ -274,14 +277,12 @@ void EditGPScreen::setModified(const bool modified)
 
     IconButtonWidget* save_button = getWidget<IconButtonWidget>("save");
     assert(save_button != NULL);
-    if (modified)
-        save_button->setActivated();
-    else
-        save_button->setDeactivated();
+    save_button->setActive(modified);
 
     LabelWidget* header = getWidget<LabelWidget>("title");
     assert(header != NULL);
-    header->setText(m_gp->getName() + (modified ? L" (+)" : L""), true);
+    //I18N: Indicate that the grand prix is modified and not saved
+    header->setText(modified ? _(L"%s (+)", m_gp->getName()) : L"", true);
 
     enableButtons();
 }
@@ -358,25 +359,10 @@ void EditGPScreen::enableButtons()
     assert(edit_button != NULL);
     assert(remove_button != NULL);
 
-    if (m_selected >= 0 && m_list->getItemCount() > 1)
-    {
-        up_button->setActivated();
-        down_button->setActivated();
-    }
-    else
-    {
-        up_button->setDeactivated();
-        down_button->setDeactivated();
-    }
+    bool b = m_selected >= 0 && m_list->getItemCount() > 1;
+    up_button->setActive(b);
+    down_button->setActive(b);
 
-    if (m_selected >= 0)
-    {
-        edit_button->setActivated();
-        remove_button->setActivated();
-    }
-    else
-    {
-        edit_button->setDeactivated();
-        remove_button->setDeactivated();
-    }
+    edit_button->setActive(m_selected >= 0);
+    remove_button->setActive(m_selected >= 0);
 }

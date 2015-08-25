@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -689,6 +689,7 @@ namespace GUIEngine
         IGUIEnvironment* g_env;
         Skin* g_skin = NULL;
         ScalableFont *g_font;
+        ScalableFont *g_outline_font;
         ScalableFont *g_large_font;
         ScalableFont *g_title_font;
         ScalableFont *g_small_font;
@@ -974,6 +975,8 @@ namespace GUIEngine
         g_large_font = NULL;
         g_digit_font->drop();
         g_digit_font = NULL;
+        g_outline_font->drop();
+        g_outline_font = NULL;
 
         // nothing else to delete for now AFAIK, irrlicht will automatically
         // kill everything along the device
@@ -1079,6 +1082,9 @@ namespace GUIEngine
         sfont_larger->setScale(normal_text_scale*1.4f);
         sfont_larger->setKerningHeight(-5);
         g_large_font = sfont_larger;
+
+        g_outline_font = sfont->getHollowCopy();
+        g_outline_font->m_black_border = true;
 
         Private::large_font_height = g_large_font->getDimension( L"X" ).Height;
 
@@ -1186,8 +1192,6 @@ namespace GUIEngine
         // further render)
         g_env->drawAll();
 
-        MessageQueue::update(elapsed_time);
-
         // ---- some menus may need updating
         if (gamestate != GAME)
         {
@@ -1209,6 +1213,7 @@ namespace GUIEngine
             }
         }
 
+        MessageQueue::update(elapsed_time);
 
         if (gamestate == INGAME_MENU && dynamic_cast<CutsceneWorld*>(World::getWorld()) != NULL)
         {

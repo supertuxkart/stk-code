@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 Marianne Gagnon
+//  Copyright (C) 2011-2015 Marianne Gagnon
 //  based on code Copyright 2002-2010 Nikolaus Gebhardt
 //
 //  This program is free software; you can redistribute it and/or
@@ -77,12 +77,7 @@ int LODNode::getLevel()
     Camera* camera = Camera::getActiveCamera();
     if (camera == NULL)
         return (int)m_detail.size() - 1;
-    AbstractKart* kart = camera->getKart();
-    // use kart position and not camera position when a kart is available,
-    // because for some effects the camera will be moved to various locations
-    // (for instance shadows), so using camera position for LOD may result
-    // in objects being culled when they shouldn't
-    const Vec3 &pos = (kart != NULL ? kart->getFrontXYZ() : camera->getCameraSceneNode()->getAbsolutePosition());
+    const Vec3 &pos = camera->getCameraSceneNode()->getAbsolutePosition();
 
     const int dist =
         (int)((m_nodes[0]->getAbsolutePosition()).getDistanceFromSQ(pos.toIrrVector() ));
@@ -153,7 +148,7 @@ void LODNode::updateVisibility(bool* shown)
 
 void LODNode::OnRegisterSceneNode()
 {
-    bool shown;
+    bool shown = false;
     updateVisibility(&shown);
 
     const u32 now = irr_driver->getDevice()->getTimer()->getTime();

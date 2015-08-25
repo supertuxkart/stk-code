@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 #ifndef HEADER_SFX_MANAGER_HPP
 #define HEADER_SFX_MANAGER_HPP
 
+#include "utils/can_be_deleted.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/synchronised.hpp"
@@ -38,7 +39,7 @@
   typedef unsigned int ALuint;
 #endif
 
-
+class MusicInformation;
 class SFXBase;
 class SFXBuffer;
 class XMLNode;
@@ -50,7 +51,7 @@ class XMLNode;
  *  on of the (shared) buffers from the sound manager.
  * \ingroup audio
  */
-class SFXManager : public NoCopy
+class SFXManager : public NoCopy, public CanBeDeleted
 {
 private:
     /** Singleton pointer. */
@@ -63,6 +64,7 @@ public:
     enum SFXCommands
     {
         SFX_PLAY = 1,
+        SFX_PLAY_POSITION,
         SFX_STOP,
         SFX_PAUSE,
         SFX_PAUSE_ALL,
@@ -71,11 +73,20 @@ public:
         SFX_DELETE,
         SFX_SPEED,
         SFX_POSITION,
+        SFX_SPEED_POSITION,
         SFX_VOLUME,
         SFX_MASTER_VOLUME,
         SFX_LOOP,
         SFX_LISTENER,
         SFX_UPDATE,
+        SFX_MUSIC_START,
+        SFX_MUSIC_STOP,
+        SFX_MUSIC_PAUSE,
+        SFX_MUSIC_RESUME,
+        SFX_MUSIC_SWITCH_FAST,
+        SFX_MUSIC_SET_TMP_VOLUME,
+        SFX_MUSIC_WAITING,
+        SFX_MUSIC_DEFAULT_VOLUME,
         SFX_EXIT,
     };   // SFXCommands
 
@@ -108,10 +119,15 @@ private:
         LEAK_CHECK()
     public:
         /** The sound effect for which the command should be executed. */
-        SFXBase    *m_sfx;
+        SFXBase *m_sfx;
+
+        /** Stores music information for music commands. */
+        MusicInformation *m_music_information;
+
         /** The command to execute. */
         SFXCommands m_command;
-        /** Optional parameter for commands that need more input. */
+        /** Optional parameter for commands that need more input. Single
+         *  floating point values are stored in the X component. */
         Vec3        m_parameter;
         // --------------------------------------------------------------------
         SFXCommand(SFXCommands command, SFXBase *base)
@@ -119,6 +135,22 @@ private:
             m_command   = command;
             m_sfx       = base;
         }   // SFXCommand()
+        // --------------------------------------------------------------------
+        /** Constructor for music information commands. */
+        SFXCommand(SFXCommands command, MusicInformation *mi)
+        {
+            m_command           = command;
+            m_music_information = mi;
+        }   // SFXCommnd(MusicInformation*)
+        // --------------------------------------------------------------------
+        /** Constructor for music information commands that take a floating
+         *  point parameter (which is stored in the X value of m_parameter). */
+        SFXCommand(SFXCommands command, MusicInformation *mi, float f)
+        {
+            m_command = command;
+            m_parameter.setX(f);
+            m_music_information = mi;
+        }   // SFXCommnd(MusicInformation *, float)
         // --------------------------------------------------------------------
         SFXCommand(SFXCommands command, SFXBase *base, float parameter)
         {
@@ -132,6 +164,18 @@ private:
             m_command   = command;
             m_sfx       = base;
             m_parameter = parameter;
+        }   // SFXCommand(Vec3)
+        // --------------------------------------------------------------------
+        /** Store a float and vec3 parameter. The float is stored as W
+         *  component of the vector. A bit hacky, but this class is used
+         *  very frequently, so should remain as small as possible). */
+        SFXCommand(SFXCommands command, SFXBase *base, float f,
+                   const Vec3 &parameter)
+        {
+            m_command   = command;
+            m_sfx       = base;
+            m_parameter = parameter;
+            m_parameter.setW(f);
         }   // SFXCommand(Vec3)
     };   // SFXCommand
     // ========================================================================
@@ -157,8 +201,9 @@ private:
     /** The list of sound effects to be played in the next update. */
     Synchronised< std::vector<SFXCommand*> > m_sfx_commands;
 
-    /** To play non-positional sounds without having to create a new object for each */
-    std::map<std::string, SFXBase*> m_quick_sounds;
+    /** To play non-positional sounds without having to create a
+     *  new object for each. */
+    Synchronised<std::map<std::string, SFXBase*> > m_quick_sounds;
 
     /** If the sfx manager has been initialised. */
     bool                      m_initialized;
@@ -168,6 +213,8 @@ private:
 
     /** Thread id of the thread running in this object. */
     Synchronised<pthread_t *> m_thread_id;
+
+    double                    m_last_update_time;
 
     /** A conditional variable to wake up the main loop. */
     pthread_cond_t            m_cond_request;
@@ -187,6 +234,9 @@ public:
     void queue(SFXCommands command,  SFXBase *sfx=NULL);
     void queue(SFXCommands command,  SFXBase *sfx, float f);
     void queue(SFXCommands command,  SFXBase *sfx, const Vec3 &p);
+    void queue(SFXCommands command,  SFXBase *sfx, float f, const Vec3 &p);
+    void queue(SFXCommands command,  MusicInformation *mi);
+    void queue(SFXCommands command,  MusicInformation *mi, float f);
     // ------------------------------------------------------------------------
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()
@@ -220,7 +270,7 @@ public:
     void                     reallyPauseAllNow();
     void                     resumeAll();
     void                     reallyResumeAllNow();
-    void                     update(float dt);
+    void                     update();
     void                     reallyUpdateNow(SFXCommand *current);
     bool                     soundExist(const std::string &name);
     void                     setMasterSFXVolume(float gain);

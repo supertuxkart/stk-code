@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -49,30 +49,38 @@ float KartModel::UNDEFINED = -99.9f;
 
 SpeedWeightedObject::Properties::Properties()
 {
-    m_strength_factor = m_speed_factor = m_texture_speed.X = m_texture_speed.Y = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
-}
+    m_strength_factor = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+    m_speed_factor    = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+    m_texture_speed.X = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+    m_texture_speed.Y = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+}   // SpeedWeightedObject::Properties::Properties
 
+// ----------------------------------------------------------------------------
 void SpeedWeightedObject::Properties::loadFromXMLNode(const XMLNode* xml_node)
 {
     xml_node->get("strength-factor", &m_strength_factor);
     xml_node->get("speed-factor",    &m_speed_factor);
     xml_node->get("texture-speed-x", &m_texture_speed.X);
     xml_node->get("texture-speed-y", &m_texture_speed.Y);
-}
+}   // SpeedWeightedObject::Properties::loadFromXMLNode
 
+// ----------------------------------------------------------------------------
 void SpeedWeightedObject::Properties::checkAllSet()
 {
-#define CHECK_NEG(  a,strA) if(a<=SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED) {                   \
-            Log::fatal("SpeedWeightedObject", "Missing default value for '%s'.",    \
-                        strA);              \
+#define CHECK_NEG(  a,strA) if(a<=SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED)  \
+        {                                                                    \
+            Log::fatal("SpeedWeightedObject",                                \
+                       "Missing default value for '%s'.",                    \
+                       strA);                                                \
         }
-    CHECK_NEG(m_strength_factor, "speed-weighted strength-factor"    );
-    CHECK_NEG(m_speed_factor,    "speed-weighted speed-factor"    );
+    CHECK_NEG(m_strength_factor,  "speed-weighted strength-factor"    );
+    CHECK_NEG(m_speed_factor,     "speed-weighted speed-factor"       );
     CHECK_NEG(m_texture_speed.X,  "speed-weighted texture speed X"    );
     CHECK_NEG(m_texture_speed.Y,  "speed-weighted texture speed Y"    );
 #undef CHECK_NEG
-}
+}   // SpeedWeightedObject::Properties::checkAllSet
 
+// ============================================================================
 /** Default constructor which initialises all variables with defaults.
  *  Note that the KartModel is copied, so make sure to update makeCopy
  *  if any more variables are added to this object.
@@ -158,8 +166,8 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
         animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP] );
         animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_END]  );
-        animation_node->get("start-speed-weighted",     &m_animation_frame[AF_SPEED_WEIGHTED_START]     );
-        animation_node->get("end-speed-weighted",       &m_animation_frame[AF_SPEED_WEIGHTED_END]       );
+        animation_node->get("start-speed-weighted", &m_animation_frame[AF_SPEED_WEIGHTED_START]);
+        animation_node->get("end-speed-weighted",   &m_animation_frame[AF_SPEED_WEIGHTED_END]  );
         animation_node->get("speed",          &m_animation_speed               );
     }
 
@@ -451,10 +459,12 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             obj.m_node = NULL;
             if(obj.m_model)
             {
-                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, "speedweighted", node);
+                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
+                                                         "speedweighted", node);
                 obj.m_node->grab();
 
-                obj.m_node->setFrameLoop(m_animation_frame[AF_SPEED_WEIGHTED_START], m_animation_frame[AF_SPEED_WEIGHTED_END]);
+                obj.m_node->setFrameLoop(m_animation_frame[AF_SPEED_WEIGHTED_START],
+                                         m_animation_frame[AF_SPEED_WEIGHTED_END]);
 
         #ifdef DEBUG
                 std::string debug_name = obj.m_name+" (speed-weighted)";
@@ -553,14 +563,6 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         }
     }
 
-    float y_off = kart_properties.getGraphicalYOffset();
-    if(y_off!=0)
-    {
-        for (unsigned int i = 0; i < 4; i++)
-            m_wheel_graphics_position[i].setY(
-                                  m_wheel_graphics_position[i].getY() - y_off);
-    }
-
     // Load the wheel models. This can't be done early, since the default
     // values for the graphical position must be defined, which in turn
     // depend on the size of the model.
@@ -629,19 +631,9 @@ void KartModel::loadWheelInfo(const XMLNode &node,
                               const std::string &wheel_name, int index)
 {
     const XMLNode *wheel_node = node.getNode(wheel_name);
-    if(!wheel_node)
-    {
-        // Only print the warning if a model filename is given. Otherwise the
-        // stk_config file is read (which has no model information).
-        if(m_model_filename!="")
-        {
-            Log::error("Kart_Model", "Missing wheel information '%s' for model "
-                       "'%s'.", wheel_name.c_str(), m_model_filename.c_str());
-            Log::error("Kart_Model", "This can be ignored, but the wheels will "
-                       "not rotate.");
-        }
-        return;
-    }
+    // Ignore in case of karts with missing wheels (e.g. Sara)
+    if(!wheel_node) return;
+
     wheel_node->get("model",            &m_wheel_filename[index]         );
     wheel_node->get("position",         &m_wheel_graphics_position[index]);
     wheel_node->get("min-suspension",   &m_min_suspension[index]         );
@@ -654,12 +646,23 @@ void KartModel::loadWheelInfo(const XMLNode &node,
  */
 void KartModel::reset()
 {
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        if (m_wheel_node[i])
+        {
+            core::vector3df rotation(btScalar(rand() % 360), 0, 0);
+            m_wheel_node[i]->setRotation(rotation);
+        }
+    }
     update(0.0f, 0.0f, 0.0f, 0.0f);
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
-    // Don't force any LOD
-    ((LODNode*)m_kart->getNode())->forceLevelOfDetail(-1);
+
+    // Don't force any LOD. Non-animated karts are not LOD nodes.
+    LODNode *lod = dynamic_cast<LODNode*>(m_kart->getNode());
+    if (lod)
+        lod->forceLevelOfDetail(-1);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -670,7 +673,9 @@ void KartModel::reset()
 void KartModel::finishedRace()
 {
     // Force the animated model, independent of actual camera distance.
-    ((LODNode*)m_kart->getNode())->forceLevelOfDetail(0);
+    LODNode *lod = dynamic_cast<LODNode*>(m_kart->getNode());
+    if (lod)
+        lod->forceLevelOfDetail(0);
 }   // finishedRace
 
 // ----------------------------------------------------------------------------
@@ -771,49 +776,44 @@ void KartModel::setDefaultSuspension()
 
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension
-    + updates the speed-weighted objects' animations.
+ *  updates the speed-weighted objects' animations. 
+ *
  *  \param dt time since last frame
- *  \param rotation_dt How far the wheels have rotated since last time.
+ *  \param distance How far the wheels have rotated since last time.
  *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
  *  \param speed The speed of the kart in meters/sec, used for the
  *         speed-weighted objects' animations
  */
-void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
+void KartModel::update(float dt, float distance, float steer,  float speed)
 {
-   core::vector3df wheel_steer(0, steer*30.0f, 0);
+    core::vector3df wheel_steer(0, steer*30.0f, 0);
 
     for(unsigned int i=0; i<4; i++)
     {
-        if(!m_kart || !m_wheel_node[i]) continue;
-        float rel_suspension = 0;
-        if (!dynamic_cast<GhostKart*>(m_kart))
-        {
-            const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+       if (!m_kart || !m_wheel_node[i]) continue;
 #ifdef DEBUG
-            if (UserConfigParams::m_physics_debug && m_kart)
-            {
-                // Make wheels that are not touching the ground invisible
-                m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
-            }
+       if (UserConfigParams::m_physics_debug && 
+           !dynamic_cast<GhostKart*>(m_kart)     )
+       {
+           const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+           // Make wheels that are not touching the ground invisible
+           m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
+       }
 #endif
-            rel_suspension = wi.m_raycastInfo.m_suspensionLength
-                           - m_default_physics_suspension[i];
-        }
-        // If the suspension is too compressed
-        if(rel_suspension< m_min_suspension[i])
-            rel_suspension = m_min_suspension[i];
-        else if(rel_suspension > m_max_suspension[i])
-            rel_suspension = m_max_suspension[i];
-
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        pos.Y -= rel_suspension;
 
+        const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+
+        // Check documentation of Kart::updateGraphics for the following line
+        pos.Y +=   m_default_physics_suspension[i]
+                 - wi.m_raycastInfo.m_suspensionLength
+                 - m_kart_lowest_point;
         m_wheel_node[i]->setPosition(pos);
 
         // Now calculate the new rotation: (old + change) mod 360
         float new_rotation = m_wheel_node[i]->getRotation().X
-                             + rotation_dt * RAD_TO_DEGREE;
+                           + distance / m_wheel_graphics_radius[i] * RAD_TO_DEGREE;
         new_rotation = fmodf(new_rotation, 360);
         core::vector3df wheel_rotation(new_rotation, 0, 0);
         // Only apply steer to first 2 wheels.

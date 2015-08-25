@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Joerg Henrichs
+//  Copyright (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -39,7 +39,7 @@ namespace GraphicsRestrictions
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
 
-        char *m_names_of_restrictions[] = {
+        const char *m_names_of_restrictions[] = {
             "UniformBufferObject",
             "GeometryShader4",
             "DrawIndirect",
@@ -57,7 +57,9 @@ namespace GraphicsRestrictions
             "AMDVertexShaderLayer",
             "DriverRecentEnough",
             "HighDefinitionTextures",
-            "AdvancedPipeline"
+            "AdvancedPipeline",
+            "FramebufferSRGBWorking",
+            "GI",
         };
     }   // namespace Private
     using namespace Private;
@@ -411,6 +413,11 @@ void unitTesting()
     assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1", 
                    "NVIDIA GeForce GTX 680MX OpenGL Engine")
            == Version("310.90.10.5")                                    );
+
+    assert(Version("4.1 NVIDIA-10.0.43 310.41.05f01",
+                    "NVIDIA GeForce GTX 780M OpenGL Engine")
+        == Version("310.41.05"));
+
     assert(Version("3.1 (Core Profile) Mesa 10.3.0",
                   "Mesa DRI Mobile Intel\u00ae GM45 Express Chipset")
            == Version("10.3.0")                                         );

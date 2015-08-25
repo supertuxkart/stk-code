@@ -1,8 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C)      2014 Joerg Henrichs
-//  Copyright (C) 2006-2014 Patrick Ammann <pammann@aro.ch>
-//  Copyright (C) 2009-2014 Marianne Gagnon
+//  Copyright (C) 2014-2015 Joerg Henrichs
+//  Copyright (C) 2006-2015 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -38,7 +38,7 @@
 #include <stdio.h>
 #include <string>
 
-SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, 
+SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float volume, 
                      bool owns_buffer) 
          : SFXBase()
 {
@@ -46,7 +46,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
     m_sound_source = 0;
     m_status       = SFX_NOT_INITIALISED;
     m_positional   = positional;
-    m_default_gain = gain;
+    m_default_gain = volume;
     m_loop         = false;
     m_gain         = -1.0f;
     m_master_gain  = 1.0f;
@@ -67,7 +67,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
  *  buffer. */
 SFXOpenAL::~SFXOpenAL()
 {
-    if (m_status!=SFX_UNKNOWN)
+    if (m_status!=SFX_UNKNOWN && m_status!=SFX_NOT_INITIALISED)
     {
         alDeleteSources(1, &m_sound_source);
     }
@@ -146,7 +146,7 @@ void SFXOpenAL::updatePlayingSFX(float dt)
  */
 void SFXOpenAL::setSpeed(float factor)
 {
-    if(m_status==SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
+    //if(m_status!=SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
     assert(!isnan(factor));
     SFXManager::get()->queue(SFXManager::SFX_SPEED, this, factor);
 }   // setSpeed
@@ -174,26 +174,27 @@ void SFXOpenAL::reallySetSpeed(float factor)
         factor = 0.5f;
     }
     alSourcef(m_sound_source,AL_PITCH,factor);
+    SFXManager::checkError("setting speed");
 }   // reallySetSpeed
 
 //-----------------------------------------------------------------------------
 /** Changes the volume of a sound effect.
- *  \param gain Volume adjustment between 0.0 (mute) and 1.0 (full volume).
+ *  \param volume Volume adjustment between 0.0 (mute) and 1.0 (full volume).
  */
-void SFXOpenAL::setVolume(float gain)
+void SFXOpenAL::setVolume(float volume)
 {
     if(m_status==SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
-    assert(!isnan(gain)) ;
-    SFXManager::get()->queue(SFXManager::SFX_VOLUME, this, gain);
+    assert(!isnan(volume)) ;
+    SFXManager::get()->queue(SFXManager::SFX_VOLUME, this, volume);
 }   // setVolume
 
 //-----------------------------------------------------------------------------
 /** Changes the volume of a sound effect.
- *  \param gain Volume adjustment between 0.0 (mute) and 1.0 (full volume).
+ *  \param volume Volume adjustment between 0.0 (mute) and 1.0 (full volume).
  */
-void SFXOpenAL::reallySetVolume(float gain)
+void SFXOpenAL::reallySetVolume(float volume)
 {
-    m_gain = m_default_gain * gain;
+    m_gain = m_default_gain * volume;
 
     if(m_status==SFX_UNKNOWN) return;
 
@@ -209,23 +210,23 @@ void SFXOpenAL::reallySetVolume(float gain)
 
 //-----------------------------------------------------------------------------
 /** Schedules setting of the master volume.
- *  \param gain Gain value.
+ *  \param volume Volume value.
  */
-void SFXOpenAL::setMasterVolume(float gain)
+void SFXOpenAL::setMasterVolume(float volume)
 {
     // This needs to be called even if sfx are disabled atm, so only exit
     // in case that the sfx could not be loaded in the first place.
     if(m_status==SFX_UNKNOWN) return;
-    SFXManager::get()->queue(SFXManager::SFX_MASTER_VOLUME, this, gain);
+    SFXManager::get()->queue(SFXManager::SFX_MASTER_VOLUME, this, volume);
 }   // setMasterVolume
 
 //-----------------------------------------------------------------------------
 /** Sets the master volume.
- *  \param gain Master volume.
+ *  \param volume Master volume.
  */
-void SFXOpenAL::reallySetMasterVolumeNow(float gain)
+void SFXOpenAL::reallySetMasterVolumeNow(float volume)
 {
-    m_master_gain = gain;
+    m_master_gain = volume;
     
     if(m_status==SFX_UNKNOWN || m_status == SFX_NOT_INITIALISED) return;
 
@@ -377,12 +378,43 @@ void SFXOpenAL::reallyPlayNow()
 }   // reallyPlayNow
 
 //-----------------------------------------------------------------------------
+/** This actually queues up the sfx in the sfx manager. It will be started
+ *  from a separate thread later (in this frame).
+ */
+void SFXOpenAL::play(const Vec3 &position)
+{
+    if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
+
+    if(m_status==SFX_STOPPED)
+        m_play_time = 0.0f;
+
+    // Technically the sfx is only playing after the sfx thread starts it,
+    // but it is important to set this here since stk might decide to
+    // delete a sfx if it has finished playing (i.e. is in stopped state)
+    // - which can happen if the sfx thread had no time to actually start
+    // it yet.
+    m_status = SFX_PLAYING;
+    SFXManager::get()->queue(SFXManager::SFX_PLAY_POSITION, this, position);
+}   // play(Vec3)
+
+//-----------------------------------------------------------------------------
+/** Plays this sound effect.
+ */
+void SFXOpenAL::reallyPlayNow(const Vec3 &position)
+{
+    reallySetPosition(position);
+    reallyPlayNow();
+}   // reallyPlayNow(Vec3)
+
+//-----------------------------------------------------------------------------
 /** Sets the position where this sound effects is played.
  *  \param position Position of the sound effect.
  */
 void SFXOpenAL::setPosition(const Vec3 &position)
 {
-    if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
+    // Don't send a position command to the thread if the sound is not playing
+    // (or sfx disabled or the sound was not initialised correctly)
+//    if (m_status != SFX_PLAYING|| !SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_POSITION, this, position);
 
 }   // setPosition
@@ -415,7 +447,7 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
     alSource3f(m_sound_source, AL_POSITION, position.getX(),
                position.getY(), -position.getZ());
 
-    if (SFXManager::get()->getListenerPos().distance(position) 
+    if (SFXManager::get()->getListenerPos().distance(position)
         > m_sound_buffer->getMaxDist())
     {
         alSourcef(m_sound_source, AL_GAIN, 0);
@@ -429,6 +461,25 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
     SFXManager::checkError("positioning");
 }   // reallySetPosition
 
+// ----------------------------------------------------------------------------
+/** Shortcut that plays at a specified position. */
+void SFXOpenAL::setSpeedPosition(float factor, const Vec3 &position)
+{
+    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+
+    SFXManager::get()->queue(SFXManager::SFX_SPEED_POSITION, this,
+                             factor, position);
+}   // play(vec3)
+//-----------------------------------------------------------------------------
+/** Set speed and position of a sound effect.
+ *  \param f Speed.
+ *  \param position Position of the sfx.
+ */
+void SFXOpenAL::reallySetSpeedPosition(float f, const Vec3 &position)
+{
+    reallySetSpeed(f);
+    reallySetPosition(position);
+}   // reallySetSpeedPosition
 //-----------------------------------------------------------------------------
 /** Queues up a delete request for this object. This is necessary to avoid
  *  a crash if the sfx manager thread might be delayed and access this object

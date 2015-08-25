@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,8 +18,6 @@
 
 #include "states_screens/grand_prix_lose.hpp"
 
-
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -54,16 +52,7 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
-const float INITIAL_Y = -3.0f;
-
 const float DURATION = 15.0f;
-
-const float CAMERA_END_X = -15.0f;
-const float CAMERA_END_Y = 1.5f;
-const float CAMERA_END_Z = 5.0f;
-const float CAMERA_START_X = -17.0f;
-const float CAMERA_START_Y = 2.0f;
-const float CAMERA_START_Z = 5.5f;
 
 const float DISTANCE_BETWEEN_KARTS = 2.0f;
 
@@ -73,9 +62,6 @@ const float KART_START_X = -17.0f;
 const float KART_END_X = -5.0f;
 const float KART_Y = 0.0f;
 const float KART_Z = 0.0f;
-
-
-const float GARAGE_DOOR_OPEN_TIME = 6.0f;
 
 const int MAX_KART_COUNT = 4;
 
@@ -147,7 +133,7 @@ void GrandPrixLose::onUpdate(float dt)
                 core::vector3df kart_pos(m_kart_x + n*DISTANCE_BETWEEN_KARTS,
                     m_kart_y,
                     m_kart_z);
-                m_kart_node[n]->move(kart_pos, kart_rot, kart_scale, false);
+                m_kart_node[n]->move(kart_pos, kart_rot, kart_scale, false, true);
             }
         }
     }
@@ -201,9 +187,11 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
             core::vector3df kart_rot(0, 90.0f, 0);
             core::vector3df kart_scale(KART_SCALE, KART_SCALE, KART_SCALE);
 
-            //FIXME: it's not ideal that both the track object and the presentation know the initial coordinates of the object
-            TrackObjectPresentationSceneNode* presentation = new TrackObjectPresentationSceneNode(
-                kart_main_node, kart_pos, kart_rot, kart_scale);
+            //FIXME: it's not ideal that both the track object and the
+            // presentation know the initial coordinates of the object
+            TrackObjectPresentationSceneNode* presentation =
+                new TrackObjectPresentationSceneNode(kart_pos, kart_rot,
+                                                     kart_scale, kart_main_node);
             TrackObject* tobj = new TrackObject(kart_pos, kart_rot, kart_scale,
                 "ghost", presentation, false /* isDynamic */, NULL /* physics settings */);
             tobjman->insertObject(tobj);

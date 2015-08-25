@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -231,7 +231,7 @@ public:
     /** Returns the bullet transformation for the specified rescue index. */
     virtual btTransform getRescueTransform(unsigned int index) const = 0;
     // ------------------------------------------------------------------------
-    void moveKartAfterRescue(AbstractKart* kart);
+    virtual void moveKartAfterRescue(AbstractKart* kart);
     // ------------------------------------------------------------------------
     /** Called when it is needed to know whether this kind of race involves
      *  counting laps. */
@@ -294,6 +294,7 @@ public:
                                     PhysicalObject *object);
     AbstractKart*   getPlayerKart(unsigned int player) const;
     AbstractKart*   getLocalPlayerKart(unsigned int n) const;
+    virtual const btTransform &getStartTransform(int index);
     // ------------------------------------------------------------------------
     /** Returns a pointer to the race gui. */
     RaceGUIBase    *getRaceGUI() const { return m_race_gui;}

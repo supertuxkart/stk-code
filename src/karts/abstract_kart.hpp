@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -232,6 +232,8 @@ public:
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values). */
     virtual const Skidding *getSkidding() const = 0;
+    // ------------------------------------------------------------------------
+    virtual RaceManager::KartType getType() const = 0;
     // ------------------------------------------------------------------------
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values), non-const. */

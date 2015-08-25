@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -173,9 +173,10 @@ void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
             {
                 if(kart_list[x].m_local_player_id == m_karts[i].m_local_player_id)
                 {
+                    if(kp) kart_list[x].m_ident        = m_karts[i].m_ident;
                     kart_list[x].m_score        = m_karts[i].m_score;
                     kart_list[x].m_overall_time = m_karts[i].m_overall_time;
-                }   // if kart_list[x].m_local_player_id == m_karts[i].,_local
+                }   // if kart_list[x].m_local_player_id == m_karts[i].local
             }   // for x
         }   // if m_local_player_id == -1
     }   // for i

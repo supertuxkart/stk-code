@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -84,7 +84,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_map_height             = (int)(250.0f * scaling);
 
     m_map_left   = 20;
-    m_map_bottom = UserConfigParams::m_height-10;
+    m_map_bottom = irr_driver->getActualScreenSize().Height-10;
 
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
@@ -95,7 +95,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getNumLocalPlayers() == 3)
     {
-        m_map_left = UserConfigParams::m_width - m_map_width;
+        m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
     }
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
@@ -146,10 +146,10 @@ void RaceGUIOverworld::renderGlobal(float dt)
     {
         static video::SColor black = video::SColor(255,0,0,0);
         GL32_draw2DRectangle(black,
-                          core::rect<s32>(UserConfigParams::m_width/2,
-                                          UserConfigParams::m_height/2,
-                                          UserConfigParams::m_width,
-                                          UserConfigParams::m_height));
+                          core::rect<s32>(irr_driver->getActualScreenSize().Width/2,
+                                          irr_driver->getActualScreenSize().Height/2,
+                                          irr_driver->getActualScreenSize().Width,
+                                          irr_driver->getActualScreenSize().Height));
     }
 
     World *world = World::getWorld();
@@ -216,14 +216,14 @@ void RaceGUIOverworld::drawTrophyPoints()
 
     int dist_from_right = 10 + m_trophy_points_width;
 
-    core::rect<s32> pos(UserConfigParams::m_width - dist_from_right, 10,
-                        UserConfigParams::m_width                  , 50);
+    core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right, 10,
+                        irr_driver->getActualScreenSize().Width                  , 50);
 
     gui::ScalableFont* font = GUIEngine::getFont();
 
     bool vcenter = true;
 
-    const int size = UserConfigParams::m_width/20;
+    const int size = irr_driver->getActualScreenSize().Width/20;
     core::rect<s32> dest(size, pos.UpperLeftCorner.Y,
                          size*2, pos.UpperLeftCorner.Y + size);
     core::rect<s32> source(core::position2di(0, 0), m_trophy3->getSize());
@@ -330,7 +330,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
     if (old_rtt_mini_map != NULL)
     {
-        core::rect<s32> source(core::position2di(0, 0), old_rtt_mini_map->getOriginalSize());
+        core::rect<s32> source(core::position2di(0, 0), old_rtt_mini_map->getSize());
         draw2DImage(old_rtt_mini_map, dest, source, 0, 0, true);
     }
     else if (new_rtt_mini_map != NULL)
@@ -381,7 +381,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                     colors[i]=kart->getKartProperties()->getColor();
                 }
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                           m_icons_frame->getTexture()->getOriginalSize());
+                                           m_icons_frame->getTexture()->getSize());
 
                 draw2DImage(m_icons_frame->getTexture(), position,
                                                           rect, NULL, colors, true);
@@ -399,9 +399,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         Vec3 draw_at;
         track->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
 
-        //const ChallengeData* c = unlock_manager->getChallenge(challenges[n].m_challenge_id);
-       // bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
-        int state = (challenges[n].getForceField().m_is_locked ? LOCKED : OPEN);
+        const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
+        const unsigned int val = challenge->getNumTrophies();
+        bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+        int state = (unlocked ? OPEN : LOCKED);
 
         const ChallengeStatus* c = PlayerManager::getCurrentPlayer()
                                   ->getChallengeStatus(challenges[n].m_challenge_id);
@@ -410,7 +411,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         else if (c->isSolved(RaceManager::DIFFICULTY_EASY))   state = COMPLETED_EASY;
 
         const core::rect<s32> source(core::position2d<s32>(0,0),
-                                     m_icons[state]->getOriginalSize());
+                                     m_icons[state]->getSize());
 
         int marker_size = m_minimap_challenge_size;
         core::position2di mouse = irr_driver->getMouseLocation();
@@ -435,14 +436,20 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     // ---- Draw nearby challenge if any
     core::rect<s32> pos(15,
                         10,
-                        15 + UserConfigParams::m_width/2,
+                        irr_driver->getActualScreenSize().Width - 200,
                         10 + GUIEngine::getTitleFontHeight());
 
     m_close_to_a_challenge = false;
     for (unsigned int n=0; n<challenges.size(); n++)
     {
-        if (challenges[n].m_challenge_id != "tutorial" &&
-            challenges[n].getForceField().m_is_locked) continue;
+        if (challenges[n].m_challenge_id != "tutorial")
+        {
+            const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
+            const unsigned int val = challenge->getNumTrophies();
+            bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+            if (!unlocked)
+                continue;
+        }
 
         if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED &&
             fabsf(kart_xyz[1] - challenges[n].m_position.Y) < CHALLENGE_HEIGHT)
@@ -456,10 +463,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                            false, true /* vcenter */, NULL);
 
                 core::rect<s32> pos2(0,
-                                     UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
-                                     UserConfigParams::m_width,
-                                     UserConfigParams::m_height);
-                GUIEngine::getFont()->draw(_("Press fire to play the tutorial"), pos2,
+                                     irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
+                                     irr_driver->getActualScreenSize().Width,
+                                     irr_driver->getActualScreenSize().Height);
+                GUIEngine::getOutlineFont()->draw(_("Press fire to play the tutorial"), pos2,
                                            video::SColor(255,255,150,60),
                                            true, true /* vcenter */, NULL);
                 continue;
@@ -490,16 +497,15 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 }
 
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
-                font->draw(gp->getName(), pos, video::SColor(255,255,255,255),
+                font->draw(translations->fribidize(gp->getName()), pos, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
 
-                core::rect<s32> pos(15,
-                                    20 + GUIEngine::getTitleFontHeight(),
-                                    15 + UserConfigParams::m_width/2,
-                                    20 + 2*GUIEngine::getTitleFontHeight());
+                core::rect<s32> pos2(pos);
+                pos2.UpperLeftCorner.Y += 10 + GUIEngine::getTitleFontHeight();
+                pos2.LowerRightCorner.Y += 10 + GUIEngine::getTitleFontHeight();
 
                 //just below GP name
-                font->draw(_("Type: Grand Prix"), pos, video::SColor(255,255,255,255),
+                font->draw(_("Type: Grand Prix"), pos2, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
             }
             else
@@ -515,21 +521,22 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 }
 
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
-                font->draw(track->getName(), pos, video::SColor(255,255,255,255),
+                font->draw(translations->fribidize(track->getName()),
+                           pos, video::SColor(255, 255, 255, 255),
                            false, true /* vcenter */, NULL);
             }
 
             pos.UpperLeftCorner.Y += GUIEngine::getTitleFontHeight();
-            pos.LowerRightCorner.Y = UserConfigParams::m_height;
+            pos.LowerRightCorner.Y = irr_driver->getActualScreenSize().Height;
             GUIEngine::getFont()->draw(challenge->getChallengeDescription().c_str(),
                                        pos, video::SColor(255,255,255,255),
                                        false, false /* vcenter */, NULL);
 
             core::rect<s32> pos2(0,
-                                 UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
-                                 UserConfigParams::m_width,
-                                 UserConfigParams::m_height);
-            GUIEngine::getFont()->draw(_("Press fire to start the challenge"), pos2,
+                                 irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
+                                 irr_driver->getActualScreenSize().Width,
+                                 irr_driver->getActualScreenSize().Height);
+            GUIEngine::getOutlineFont()->draw(_("Press fire to start the challenge"), pos2,
                                        video::SColor(255,255,150,60),
                                        true, true /* vcenter */, NULL);
         }

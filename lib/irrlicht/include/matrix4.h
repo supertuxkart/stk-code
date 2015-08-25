@@ -865,9 +865,9 @@ namespace core
 
 		// Deal with the 0 rotation case first
 		// Prior to Irrlicht 1.6, we always returned this value.
-		if(core::iszero(M[1]) && core::iszero(M[2]) &&
-			core::iszero(M[4]) && core::iszero(M[6]) &&
-			core::iszero(M[8]) && core::iszero(M[9]))
+		if (M[1] == 0 && M[2] == 0 &&
+			M[4] == 0 && M[6] == 0 &&
+			M[8] == 0 && M[9] == 0)
 			return vector3d<T>(M[0], M[5], M[10]);
 
 		// We have to do the full calculation.

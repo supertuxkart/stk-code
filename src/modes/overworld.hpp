@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -48,6 +48,7 @@ public:
     static void enterOverWorld();
 
     virtual void  update(float delta) OVERRIDE;
+    unsigned int  getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
     virtual void  getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     // ------------------------------------------------------------------------

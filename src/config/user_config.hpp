@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //  Modelled after Supertux's configfile.h
 //
 //  This program is free software; you can redistribute it and/or
@@ -440,6 +440,10 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_max_fps
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
                        &m_video_group, "Maximum fps, should be at least 60") );
+    PARAM_PREFIX BoolUserConfigParam        m_force_legacy_device
+        PARAM_DEFAULT(BoolUserConfigParam(false, "force_legacy_device",
+        &m_video_group, "Force OpenGL 2 context, even if OpenGL 3 is available."));
+
     PARAM_PREFIX BoolUserConfigParam        m_texture_compression
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
         &m_video_group, "Enable Texture Compression"));
@@ -478,6 +482,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_esm
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_esm",
         &m_video_group, "Enable Exponential Shadow Map (better but slower)"));
+    PARAM_PREFIX BoolUserConfigParam        m_old_driver_popup
+        PARAM_DEFAULT(BoolUserConfigParam(true, "old_driver_popup",
+        &m_video_group, "Determines if popup message about too old drivers should be displayed."));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -506,7 +513,8 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
     /** Special debug camera: 0: normal camera;   1: being high over the kart;
-                              2: on ground level; 3: free first person camera; */
+                              2: on ground level; 3: free first person camera; 
+                              4: straight behind kart */
     PARAM_PREFIX int m_camera_debug PARAM_DEFAULT( false );
 
     /** True if physics debugging should be enabled. */
@@ -606,6 +614,11 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "christmas-mode",
                             &m_graphics_quality, "Christmas hats: 0 use current date, 1 always on, 2 always off") );
 
+    // This saves the actual user preference.
+    PARAM_PREFIX IntUserConfigParam        m_easter_ear_mode
+        PARAM_DEFAULT(IntUserConfigParam(0, "easter-ear-mode",
+        &m_graphics_quality, "Easter Bunny Ears: 0 use current date, 1 always on, 2 always off"));
+
     PARAM_PREFIX BoolUserConfigParam        m_weather_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",
                                      &m_graphics_quality, "Weather effects") );
@@ -649,6 +662,10 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows_resoltion", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
+    PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
+        PARAM_DEFAULT(BoolUserConfigParam(false,
+        "Degraded_IBL", &m_graphics_quality,
+        "Disable specular IBL"));
 
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_cache_overworld

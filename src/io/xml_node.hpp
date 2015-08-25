@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -73,6 +73,7 @@ public:
     unsigned int       getNumNodes() const {return (unsigned int) m_nodes.size(); }
     int get(const std::string &attribute, std::string *value) const;
     int get(const std::string &attribute, core::stringw *value) const;
+    int getAndDecode(const std::string &attribute, core::stringw *value) const;
     int get(const std::string &attribute, int32_t  *value) const;
     int get(const std::string &attribute, uint16_t *value) const;
     int get(const std::string &attribute, uint32_t *value) const;

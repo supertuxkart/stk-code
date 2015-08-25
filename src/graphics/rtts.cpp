@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Lauri Kasanen
+//  Copyright (C) 2013-2015 Lauri Kasanen
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -257,11 +257,11 @@ RTT::RTT(size_t width, size_t height)
     }
 
     // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
-    getFBO(FBO_HALF1_R).Bind();
+    getFBO(FBO_HALF1_R).bind();
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
+    getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
     glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -290,6 +290,13 @@ RTT::~RTT()
     }
 }
 
+void RTT::prepareRender(scene::ICameraSceneNode* camera)
+{
+    irr_driver->setRTT(this);
+    irr_driver->getSceneManager()->setActiveCamera(camera);
+
+}
+
 FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
 {
     irr_driver->setRTT(this);
@@ -297,16 +304,16 @@ FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
     std::vector<IrrDriver::GlowData> glows;
-    // TODO: put this outside of the rendering loop
-    irr_driver->generateDiffuseCoefficients();
     irr_driver->computeMatrixesAndCameras(camera, m_width, m_height);
-    unsigned plc = irr_driver->UpdateLightsInfo(camera, dt);
+    unsigned plc = irr_driver->updateLightsInfo(camera, dt);
     irr_driver->uploadLightingData();
     irr_driver->renderScene(camera, plc, glows, dt, false, true);
     FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
 
     // reset
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    glViewport(0, 0,
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height);
     irr_driver->setRTT(NULL);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

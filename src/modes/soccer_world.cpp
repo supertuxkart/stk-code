@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -316,88 +316,6 @@ void SoccerWorld::getKartsDisplayInfo(
 }   // getKartsDisplayInfo
 
 //-----------------------------------------------------------------------------
-/** Moves a kart to its rescue position.
- *  \param kart The kart that was rescued.
- */
-void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
-{
-    // find closest point to drop kart on
-    World *world = World::getWorld();
-    const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
-    assert(start_spots_amount > 0);
-
-    float largest_accumulated_distance_found = -1;
-    int furthest_id_found = -1;
-
-    const float kart_x = kart->getXYZ().getX();
-    const float kart_z = kart->getXYZ().getZ();
-
-    for(int n=0; n<start_spots_amount; n++)
-    {
-        // no need for the overhead to compute exact distance with sqrt(),
-        // so using the 'manhattan' heuristic which will do fine enough.
-        const btTransform &s = world->getTrack()->getStartTransform(n);
-        const Vec3 &v=s.getOrigin();
-        float accumulatedDistance = .0f;
-        bool spawnPointClear = true;
-
-        for(unsigned int k=0; k<getCurrentNumKarts(); k++)
-        {
-            const AbstractKart *currentKart = World::getWorld()->getKart(k);
-            const float currentKart_x = currentKart->getXYZ().getX();
-            const float currentKartk_z = currentKart->getXYZ().getZ();
-
-            if(kart_x!=currentKart_x && kart_z !=currentKartk_z)
-            {
-                float absDistance = fabs(currentKart_x - v.getX()) +
-                                         fabs(currentKartk_z - v.getZ());
-                if(absDistance < CLEAR_SPAWN_RANGE)
-                {
-                    spawnPointClear = false;
-                    break;
-                }
-                accumulatedDistance += absDistance;
-            }
-        }
-
-        if(largest_accumulated_distance_found < accumulatedDistance && spawnPointClear)
-        {
-            furthest_id_found = n;
-            largest_accumulated_distance_found = accumulatedDistance;
-        }
-    }
-
-    assert(furthest_id_found != -1);
-    const btTransform &s = world->getTrack()->getStartTransform(furthest_id_found);
-    const Vec3 &xyz = s.getOrigin();
-    kart->setXYZ(xyz);
-    kart->setRotation(s.getRotation());
-
-    //position kart from same height as in World::resetAllKarts
-    btTransform pos;
-    pos.setOrigin(kart->getXYZ()+btVector3(0, 0.5f*kart->getKartHeight(), 0.0f));
-    pos.setRotation( btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0 /* angle */) );
-
-    kart->getBody()->setCenterOfMassTransform(pos);
-
-    //project kart to surface of track
-    bool kart_over_ground = m_track->findGround(kart);
-
-    if (kart_over_ground)
-    {
-        //add vertical offset so that the kart starts off above the track
-        float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
-                                kart->getKartHeight();
-        kart->getBody()->translate(btVector3(0, vertical_offset, 0));
-    }
-    else
-    {
-        Log::warn("[SoccerWorld]", " Invalid position after rescue for kart %s on track %s.",
-                kart->getIdent().c_str(), m_track->getIdent().c_str());
-    }
-}   // moveKartAfterRescue
-
-//-----------------------------------------------------------------------------
 /** Set position and team for the karts */
 void SoccerWorld::initKartList()
 {
@@ -481,7 +399,7 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
         if(index % 2 != 0) posIndex += 1;
     }
 
-    btTransform init_pos = m_track->getStartTransform(posIndex);
+    btTransform init_pos = getStartTransform(posIndex);
 
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
             difficulty);

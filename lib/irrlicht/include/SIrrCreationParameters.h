@@ -47,6 +47,7 @@ namespace irr
 			DisplayAdapter(0),
 			DriverMultithreaded(false),
 			UsePerformanceTimer(true),
+            ForceLegacyDevice(false),
 			SDK_version_do_not_use(IRRLICHT_SDK_VERSION)
 		{
 		}
@@ -79,6 +80,7 @@ namespace irr
 			DriverMultithreaded = other.DriverMultithreaded;
 			DisplayAdapter = other.DisplayAdapter;
 			UsePerformanceTimer = other.UsePerformanceTimer;
+            ForceLegacyDevice = other.ForceLegacyDevice;
 			return *this;
 		}
 
@@ -288,6 +290,11 @@ namespace irr
 		problems with speed stepping and other techniques.
 		*/
 		bool UsePerformanceTimer;
+
+        //! For opengl: forces a opengl 2.1 context, even if an 
+        /** opengl 3 context is available.
+        */
+        bool ForceLegacyDevice;
 
 		//! Don't use or change this parameter.
 		/** Always set it to IRRLICHT_SDK_VERSION, which is done by default.
