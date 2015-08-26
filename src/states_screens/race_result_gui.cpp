@@ -1229,14 +1229,14 @@ void RaceResultGUI::addGPProgressWidget(GUIEngine::Widget* widget)
 // ----------------------------------------------------------------------------
 void RaceResultGUI::displayGPProgress()
 {
-    const wchar_t* msg = _("Grand Prix progress:");
+    core::stringw msg = _("Grand Prix progress:");
 
     GUIEngine::Widget* result_table = getWidget("result-table");
     assert(result_table != NULL);
 
     video::SColor color = video::SColor(255,255,0,0);
     core::recti dest_rect(
-        result_table->m_x + result_table->m_w - m_font->getDimension(msg).Width - 5,
+        result_table->m_x + result_table->m_w - m_font->getDimension(msg.c_str()).Width - 5,
         m_top, 0, 0);
 
     m_font->draw(msg, dest_rect, color, false, false, NULL, true);
