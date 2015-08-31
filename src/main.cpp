@@ -848,7 +848,7 @@ int handleCmdLine()
         race_manager->setNumKarts((int)l.size()+1);
     }   // --ai
 
-    if(CommandLine::has( "--mode", &s))
+    if(CommandLine::has( "--mode", &s) || CommandLine::has( "--difficulty", &s))
     {
         int n = atoi(s.c_str());
         if(n<0 || n>RaceManager::DIFFICULTY_LAST)
