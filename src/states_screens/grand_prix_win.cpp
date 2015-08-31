@@ -18,6 +18,7 @@
 
 #include "states_screens/grand_prix_win.hpp"
 
+#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -347,3 +348,12 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
 }   // setKarts
 
 // -------------------------------------------------------------------------------------
+
+MusicInformation* GrandPrixWin::getInGameMenuMusic() const
+{
+    MusicInformation* mi = music_manager->getMusicInformation("win_theme.music");
+    return mi;
+}
+
+// -------------------------------------------------------------------------------------
+
