@@ -213,7 +213,7 @@ if(WIN32)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
     # Avoid timespec structure redeclaration on Visual Studio 2015
-    if (MSVC_VERSION EQUAL 1900)
+    if (NOT (MSVC_VERSION LESS 1900))
         add_definitions(-DHAVE_STRUCT_TIMESPEC)
     endif()
 endif()
