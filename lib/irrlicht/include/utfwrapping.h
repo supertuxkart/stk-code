@@ -17,6 +17,10 @@ bool UtfNoStarting (wchar_t c)
 {
 	switch (c)
 		{
+			case 8217:	//’
+				return true;
+			case 8221:	//”
+				return true;
 			case 12293:	//々
 				return true;
 			case 12297:	//〉
@@ -66,6 +70,10 @@ bool UtfNoEnding (wchar_t c)
 {
 	switch (c)
 		{
+			case 8216:	//‘
+				return true;
+			case 8220:	//“
+				return true;
 			case 12296:	//〈
 				return true;
 			case 12298:	//《
@@ -100,5 +108,5 @@ bool breakable (wchar_t c)
 			return true;
 			return false;
 }
-} // end namespace core
+} // end namespace gui
 } // end namespace irr
