@@ -359,7 +359,7 @@ void ShaderBasedRenderer::render(float dt)
     }
 
 #ifdef DEBUG
-    irr_driver->drawDebugMeshes();
+    drawDebugMeshes();
 #endif
 
     PROFILER_PUSH_CPU_MARKER("EndSccene", 0x45, 0x75, 0x45);
@@ -368,3 +368,5 @@ void ShaderBasedRenderer::render(float dt)
 
     irr_driver->getPostProcessing()->update(dt);    
 }
+
+

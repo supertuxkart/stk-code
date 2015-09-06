@@ -18,8 +18,23 @@
 #ifndef HEADER_ABSTRACT_RENDERER_HPP
 #define HEADER_ABSTRACT_RENDERER_HPP
 
+#include <irrlicht.h>
+#include <vector>
+
 class AbstractRenderer
 {
+protected:
+
+    /** Used to visualise skeletons. */
+    std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
+
+#ifdef DEBUG
+    void drawDebugMeshes();
+    void drawJoint(bool drawline, bool drawname,
+                   irr::scene::ISkinnedMesh::SJoint* joint,
+                   irr::scene::ISkinnedMesh* mesh, int id);
+#endif
+
 public:
     virtual ~AbstractRenderer(){}
     
