@@ -414,24 +414,6 @@ endif()
 add_subdirectory(tools/font_tool)
 
 
-# ==== Make dist target ====
-if(MSVC OR MINGW)
-  # Don't create a dist target for VS
-else()
-  add_custom_target(dist
-    COMMAND rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION} && rm -f ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2
-            && echo "Exporting..."
-            && svn export ${PROJECT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
-            && echo "Compressing..."
-            && cd ${CMAKE_BINARY_DIR}
-            && tar -cjf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2 ./SuperTuxKart-${PROJECT_VERSION}
-            && echo "Done, cleaning up"
-            && rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  )
-endif()
-
-
 # ==== Checking if data folder exists ====
 if(NOT IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)
   message( FATAL_ERROR "${CMAKE_CURRENT_SOURCE_DIR}/data folder doesn't exist" )
