@@ -196,11 +196,6 @@ if(UNIX AND NOT APPLE)
     endif()
 endif()
 
-# Netwowk Multiplayer
-if(ENABLE_NETWORK_MULTIPLAYER)
-  add_definitions(-DENABLE_NETWORK_MULTIPLAYER_SCREEN)
-endif()
-
 # Set some compiler options
 if(UNIX OR MINGW)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
@@ -209,6 +204,11 @@ endif()
 
 if(MINGW AND CMAKE_BUILD_TYPE MATCHES Release)
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--subsystem,windows")
+endif()
+
+# Netwowk Multiplayer
+if(ENABLE_NETWORK_MULTIPLAYER)
+  add_definitions(-DENABLE_NETWORK_MULTIPLAYER_SCREEN)
 endif()
 
 if(WIN32)
