@@ -124,9 +124,15 @@ endif()
 
 
 # Build the angelscript library if not in system
-find_package(Angelscript)
-if(USE_SYSTEM_ANGELSCRIPT AND ANGELSCRIPT_FOUND)
-    include_directories(${Angelscript_INCLUDE_DIRS})
+if(USE_SYSTEM_ANGELSCRIPT)
+    find_package(Angelscript)
+    if(ANGELSCRIPT_FOUND)
+        include_directories(${Angelscript_INCLUDE_DIRS})
+    else()
+        message(FATAL_ERROR "Angelscript not found. "
+            "Either install angelscript or use built-in version using "
+            "-DUSE_SYSTEM_ANGELSCRIPT=0")
+    endif()
 else()
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
     include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
