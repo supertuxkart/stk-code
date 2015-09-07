@@ -25,19 +25,17 @@ class AbstractRenderer
 {
 protected:
 
-    /** Used to visualise skeletons. */
-    std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
-
 #ifdef DEBUG
-    void drawDebugMeshes();
+    void drawDebugMeshes() const;
+
     void drawJoint(bool drawline, bool drawname,
                    irr::scene::ISkinnedMesh::SJoint* joint,
-                   irr::scene::ISkinnedMesh* mesh, int id);
+                   irr::scene::ISkinnedMesh* mesh, int id) const;
 #endif
 
 public:
     virtual ~AbstractRenderer(){}
-    
+
     virtual void render(float dt) = 0;
 };
 

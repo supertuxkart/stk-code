@@ -23,12 +23,13 @@
 using namespace irr;
 
 #ifdef DEBUG
-
-void AbstractRenderer::drawDebugMeshes()
+void AbstractRenderer::drawDebugMeshes() const
 {
-   for (unsigned int n=0; n<m_debug_meshes.size(); n++)
+    std::vector<irr::scene::IAnimatedMeshSceneNode*> debug_meshes = irr_driver->getDebugMeshes();
+    
+    for (unsigned int n=0; n<debug_meshes.size(); n++)
     {
-        scene::IMesh* mesh = m_debug_meshes[n]->getMesh();
+        scene::IMesh* mesh = debug_meshes[n]->getMesh();
         scene::ISkinnedMesh* smesh = static_cast<scene::ISkinnedMesh*>(mesh);
         const core::array< scene::ISkinnedMesh::SJoint * >& joints =
             smesh->getAllJoints();
@@ -50,9 +51,9 @@ void AbstractRenderer::drawDebugMeshes()
     irr_driver->getVideoDriver()->setMaterial(material);
     irr_driver->getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
 
-    for (unsigned int n=0; n<m_debug_meshes.size(); n++)
+    for (unsigned int n=0; n<debug_meshes.size(); n++)
     {
-        scene::IMesh* mesh = m_debug_meshes[n]->getMesh();
+        scene::IMesh* mesh = debug_meshes[n]->getMesh();
 
 
         scene::ISkinnedMesh* smesh = static_cast<scene::ISkinnedMesh*>(mesh);
@@ -61,7 +62,7 @@ void AbstractRenderer::drawDebugMeshes()
 
         for (unsigned int j=0; j<joints.size(); j++)
         {
-            scene::IMesh* mesh = m_debug_meshes[n]->getMesh();
+            scene::IMesh* mesh = debug_meshes[n]->getMesh();
             scene::ISkinnedMesh* smesh = static_cast<scene::ISkinnedMesh*>(mesh);
 
             drawJoint(true, false, joints[j], smesh, j);
@@ -80,7 +81,7 @@ void AbstractRenderer::drawDebugMeshes()
  */
 void AbstractRenderer::drawJoint(bool drawline, bool drawname,
                                  scene::ISkinnedMesh::SJoint* joint,
-                                 scene::ISkinnedMesh* mesh, int id)
+                                 scene::ISkinnedMesh* mesh, int id) const
 {
     scene::ISkinnedMesh::SJoint* parent = NULL;
     const core::array< scene::ISkinnedMesh::SJoint * >& joints
@@ -203,6 +204,5 @@ void AbstractRenderer::drawJoint(bool drawline, bool drawname,
                                          color, false, false );
     }
 } //drawJoint
-
 
 #endif //DEBUG

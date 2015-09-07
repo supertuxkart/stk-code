@@ -313,11 +313,6 @@ private:
 #ifdef DEBUG
     /** Used to visualise skeletons. */
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
-
-    void drawDebugMeshes();
-    void drawJoint(bool drawline, bool drawname,
-                   irr::scene::ISkinnedMesh::SJoint* joint,
-                   irr::scene::ISkinnedMesh* mesh, int id);
 #endif
 
     void renderSolidFirstPass();
@@ -743,6 +738,10 @@ public:
         m_ssao_sigma = v;
     }
 #ifdef DEBUG
+    std::vector<scene::IAnimatedMeshSceneNode*> getDebugMeshes()
+    {
+        return m_debug_meshes;
+    }
     /** Removes debug meshes. */
     void clearDebugMesh() { m_debug_meshes.clear(); }
     // ------------------------------------------------------------------------
