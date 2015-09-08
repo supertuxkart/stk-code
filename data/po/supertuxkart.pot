@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-28 20:07-0400\n"
+"POT-Creation-Date: 2015-09-08 20:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -158,19 +158,21 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:261
+msgctxt "input_key"
 msgid "- (Subtract)"
 msgstr ""
 
+#. I18N: ./data/gui/online/profile_settings.stkgui
+#. I18N: ./data/gui/online/profile_overview.stkgui
 #. I18N: ./data/gui/online/profile_achievements.stkgui
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
 #. I18N: ./data/gui/online/profile_friends.stkgui
-#. I18N: ./data/gui/online/profile_overview.stkgui
-#. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "..."
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:265
+msgctxt "input_key"
 msgid "/ (Divide)"
 msgstr ""
 
@@ -241,8 +243,8 @@ msgstr ""
 msgid "Accelerate"
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:69
 #: ../stk-assets/tracks/tutorial/triggers.as:70
+#: ../stk-assets/tracks/tutorial/scripting.as:69
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
@@ -259,18 +261,22 @@ msgstr ""
 msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
 msgstr ""
 
-#. I18N: ./data/gui/online/registration_terms.stkgui
-#. I18N: In the registration dialog
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
-#. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:157
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
 msgid "Accept"
 msgstr ""
 
-#. I18N: ./data/gui/online/recovery_info.stkgui
-#. I18N: In the recovery dialog
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:157
+msgctxt "input_key"
+msgid "Accept"
+msgstr ""
+
 #. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
 msgid "Account Recovery"
 msgstr ""
@@ -281,10 +287,10 @@ msgstr ""
 msgid "Account Settings"
 msgstr ""
 
-#. I18N: ./data/gui/main.stkgui
-#. I18N: In the main screen
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
 #. I18N: Section in the profile screen
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
 #: src/states_screens/online_profile_base.cpp:100
 msgid "Achievements"
 msgstr ""
@@ -323,25 +329,24 @@ msgstr ""
 msgid "Add a device"
 msgstr ""
 
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 msgid "Add user"
 msgstr ""
 
-#. I18N: ./data/gui/arenas.stkgui
-#. I18N: track group
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: track group
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
 #. I18N: arena group name
-#. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:83
-#: src/states_screens/easter_egg_screen.cpp:145
-#: src/states_screens/grand_prix_editor_screen.cpp:327
 #: src/states_screens/kart_selection.cpp:286
+#: src/states_screens/grand_prix_editor_screen.cpp:327
+#: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/tracks_screen.cpp:155
 msgid "Add-Ons"
 msgstr ""
@@ -364,31 +369,31 @@ msgstr ""
 msgid "Advanced pipeline (lights, etc.)"
 msgstr ""
 
-#. I18N: ./data/gui/arenas.stkgui
-#. I18N: track group
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: track group
-#. I18N: Time filters for add-ons
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#. I18N: if all kart animations are enabled
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
-#. I18N: if all kart animations are enabled
+#. I18N: Time filters for add-ons
 #. I18N: name of the tab that will show tracks from all groups
-#: src/states_screens/addons_screen.cpp:49
-#: src/states_screens/arenas_screen.cpp:75
-#: src/states_screens/easter_egg_screen.cpp:137
-#: src/states_screens/edit_track_screen.cpp:147
-#: src/states_screens/gp_info_screen.cpp:76
-#: src/states_screens/grand_prix_editor_screen.cpp:324
-#: src/states_screens/kart_selection.cpp:278
 #: src/states_screens/options_screen_video.cpp:389
+#: src/states_screens/arenas_screen.cpp:75
+#: src/states_screens/kart_selection.cpp:278
+#: src/states_screens/addons_screen.cpp:49
+#: src/states_screens/edit_track_screen.cpp:147
+#: src/states_screens/grand_prix_editor_screen.cpp:324
+#: src/states_screens/gp_info_screen.cpp:76
+#: src/states_screens/easter_egg_screen.cpp:137
 #: src/states_screens/tracks_screen.cpp:145
 msgid "All"
 msgstr ""
 
-#. I18N: ./data/gui/easter_egg.stkgui
-#. I18N: Section in easter egg tracks selection screen
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: In the track selection screen
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: Section in easter egg tracks selection screen
 msgid "All Tracks"
 msgstr ""
 
@@ -398,6 +403,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:138
+msgctxt "input_key"
 msgid "Alt/Menu"
 msgstr ""
 
@@ -492,6 +498,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:233
+msgctxt "input_key"
 msgid "Apps"
 msgstr ""
 
@@ -504,8 +511,8 @@ msgstr ""
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr ""
 
-#: src/states_screens/edit_gp_screen.cpp:123
 #: src/states_screens/grand_prix_editor_screen.cpp:109
+#: src/states_screens/edit_gp_screen.cpp:123
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
 msgstr ""
@@ -537,23 +544,24 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:311
+msgctxt "input_key"
 msgid "Attn"
 msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input.cpp:140
-#: src/states_screens/options_screen_input2.cpp:86
-#: src/states_screens/options_screen_ui.cpp:119
 #: src/states_screens/options_screen_video.cpp:172
+#: src/states_screens/options_screen_input.cpp:140
+#: src/states_screens/options_screen_ui.cpp:119
+#: src/states_screens/options_screen_input2.cpp:86
 #: src/states_screens/user_screen.cpp:637
 msgid "Audio"
 msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: ../stk-assets/tracks/tutorial/scripting.as:32
 #: ../stk-assets/tracks/tutorial/triggers.as:16
+#: ../stk-assets/tracks/tutorial/scripting.as:32
 msgid "Avoid bananas!"
 msgstr ""
 
@@ -578,8 +586,8 @@ msgstr ""
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:216
 #: src/states_screens/dialogs/addons_loading.cpp:284
+#: src/input/gamepad_config.cpp:216
 msgid "Back"
 msgstr ""
 
@@ -613,6 +621,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:126
+msgctxt "input_key"
 msgid "Backspace"
 msgstr ""
 
@@ -702,33 +711,38 @@ msgstr ""
 msgid "Can't access stkaddons server..."
 msgstr ""
 
-#. I18N: ./data/gui/confirm_dialog.stkgui
-#. I18N: In a 'are you sure?' dialog
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: ./data/gui/enter_gp_name_dialog.stkgui
 #. I18N: In the 'add new grand prix' dialog
-#. I18N: ./data/gui/enter_player_name_dialog.stkgui
-#. I18N: In the 'add new player' dialog
-#. I18N: ./data/gui/online/create_server.stkgui
-#. I18N: In the server creation screen
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
-#. I18N: ./data/gui/online/registration_terms.stkgui
-#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: In the 'add new player' dialog
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:118 src/states_screens/dialogs/addons_loading.cpp:227
+#. I18N: ./data/gui/confirm_dialog.stkgui
+#. I18N: In a 'are you sure?' dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
+#: src/states_screens/dialogs/addons_loading.cpp:227
 #: src/states_screens/user_screen.cpp:112
+msgid "Cancel"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:118
+msgctxt "input_key"
 msgid "Cancel"
 msgstr ""
 
@@ -743,6 +757,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:142
+msgctxt "input_key"
 msgid "Caps Lock"
 msgstr ""
 
@@ -780,6 +795,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:130
+msgctxt "input_key"
 msgid "Clear"
 msgstr ""
 
@@ -793,12 +809,12 @@ msgstr ""
 #. I18N: In the login dialog
 #. I18N: ./data/gui/online/notification_dialog.stkgui
 #. I18N: User info dialog
-#. I18N: ./data/gui/online/recovery_info.stkgui
-#. I18N: In the recovery dialog
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #. I18N: ./data/gui/online/vote_dialog.stkgui
 #. I18N: Vote dialog
+#. I18N: ./data/gui/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
 msgid "Close"
 msgstr ""
 
@@ -815,8 +831,8 @@ msgstr ""
 msgid "Collect blue boxes. They will give you weapons or other powerups."
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:37
 #: ../stk-assets/tracks/tutorial/triggers.as:38
+#: ../stk-assets/tracks/tutorial/scripting.as:37
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
@@ -881,13 +897,13 @@ msgstr ""
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr ""
 
-#. I18N: ./data/gui/feature_unlocked.stkgui
-#. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
-#. I18N: ./data/gui/soccer_setup.stkgui
-#. I18N: In soccer setup screen
+#. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+#. I18N: ./data/gui/feature_unlocked.stkgui
 #: src/states_screens/dialogs/gp_info_dialog.cpp:214
 #: src/states_screens/race_result_gui.cpp:186
 msgid "Continue"
@@ -905,22 +921,24 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:136
+msgctxt "input_key"
 msgid "Control"
 msgstr ""
 
-#. I18N: ./data/gui/options_device.stkgui
-#. I18N: Section in the settings menu
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:68
-#: src/states_screens/options_screen_ui.cpp:121
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
 #: src/states_screens/options_screen_video.cpp:175
+#: src/states_screens/options_screen_ui.cpp:121
+#: src/states_screens/options_screen_audio.cpp:68
 #: src/states_screens/user_screen.cpp:639
 msgid "Controls"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:153
+msgctxt "input_key"
 msgid "Convert"
 msgstr ""
 
@@ -965,6 +983,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:313
+msgctxt "input_key"
 msgid "Crsel"
 msgstr ""
 
@@ -1013,6 +1032,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:263
+msgctxt "input_key"
 msgid "Decimal"
 msgstr ""
 
@@ -1025,12 +1045,16 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+msgid "Delete"
+msgstr ""
+
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:189
+msgctxt "input_key"
 msgid "Delete"
 msgstr ""
 
@@ -1059,9 +1083,9 @@ msgstr ""
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
+#: src/states_screens/options_screen_video.cpp:387
 #: src/states_screens/dialogs/custom_video_settings.cpp:62
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
-#: src/states_screens/options_screen_video.cpp:387
 msgid "Disabled"
 msgstr ""
 
@@ -1089,9 +1113,14 @@ msgstr ""
 msgid "Don't accelerate before go"
 msgstr ""
 
-#. I18N: input configuration screen: keyboard key
 #. I18N: Key binding name
-#: src/input/binding.cpp:177 src/states_screens/options_screen_input2.cpp:253
+#: src/states_screens/options_screen_input2.cpp:253
+msgid "Down"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:177
+msgctxt "input_key"
 msgid "Down"
 msgstr ""
 
@@ -1191,6 +1220,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:167
+msgctxt "input_key"
 msgid "End"
 msgstr ""
 
@@ -1201,6 +1231,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:317
+msgctxt "input_key"
 msgid "Ereof"
 msgstr ""
 
@@ -1211,6 +1242,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:151
+msgctxt "input_key"
 msgid "Escape"
 msgstr ""
 
@@ -1222,6 +1254,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:183
+msgctxt "input_key"
 msgid "Exec"
 msgstr ""
 
@@ -1244,9 +1277,9 @@ msgstr ""
 msgid "Exit game"
 msgstr ""
 
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 msgid "Expert"
 msgstr ""
@@ -1257,6 +1290,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:315
+msgctxt "input_key"
 msgid "Exsel"
 msgstr ""
 
@@ -1298,6 +1332,7 @@ msgstr ""
 #. I18N: input configuration screen: keyboard key
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:149
+msgctxt "input_key"
 msgid "Final"
 msgstr ""
 
@@ -1401,9 +1436,9 @@ msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
@@ -1433,9 +1468,9 @@ msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
@@ -1513,10 +1548,10 @@ msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:65
 #: src/states_screens/options_screen_input.cpp:139
-#: src/states_screens/options_screen_input2.cpp:85
 #: src/states_screens/options_screen_ui.cpp:118
+#: src/states_screens/options_screen_audio.cpp:65
+#: src/states_screens/options_screen_input2.cpp:85
 #: src/states_screens/user_screen.cpp:636
 msgid "Graphics"
 msgstr ""
@@ -1549,14 +1584,18 @@ msgstr ""
 msgid "Hacienda"
 msgstr ""
 
-#. I18N: ./data/gui/main.stkgui
-#. I18N: In the main screen
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+msgid "Help"
+msgstr ""
+
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:191
+msgctxt "input_key"
 msgid "Help"
 msgstr ""
 
@@ -1584,6 +1623,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:169
+msgctxt "input_key"
 msgid "Home"
 msgstr ""
 
@@ -1621,6 +1661,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:187
+msgctxt "input_key"
 msgid "Insert"
 msgstr ""
 
@@ -1629,9 +1670,9 @@ msgstr ""
 msgid "Install"
 msgstr ""
 
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 msgid "Intermediate"
 msgstr ""
@@ -1660,11 +1701,13 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:146
+msgctxt "input_key"
 msgid "Junja"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:144
+msgctxt "input_key"
 msgid "Kana"
 msgstr ""
 
@@ -1720,34 +1763,44 @@ msgstr ""
 msgid "Leader"
 msgstr ""
 
-#. I18N: input configuration screen: keyboard key
 #. I18N: Key binding name
-#: src/input/binding.cpp:171 src/states_screens/options_screen_input2.cpp:256
+#: src/states_screens/options_screen_input2.cpp:256
+msgid "Left"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:171
+msgctxt "input_key"
 msgid "Left"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:299
+msgctxt "input_key"
 msgid "Left Control"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:229
+msgctxt "input_key"
 msgid "Left Logo"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:303
+msgctxt "input_key"
 msgid "Left Menu"
 msgstr ""
 
 #. I18N: input configuration screen: mouse button
 #: src/input/binding.cpp:114
+msgctxt "input_key"
 msgid "Left Mouse Button"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:295
+msgctxt "input_key"
 msgid "Left Shift"
 msgstr ""
 
@@ -1823,10 +1876,10 @@ msgstr ""
 
 #: src/states_screens/arenas_screen.cpp:237
 #: src/states_screens/arenas_screen.cpp:267
-#: src/states_screens/easter_egg_screen.cpp:225
-#: src/states_screens/easter_egg_screen.cpp:256
 #: src/states_screens/kart_selection.cpp:858
 #: src/states_screens/kart_selection.cpp:1452
+#: src/states_screens/easter_egg_screen.cpp:225
+#: src/states_screens/easter_egg_screen.cpp:256
 #: src/states_screens/race_setup_screen.cpp:214
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr ""
@@ -1909,10 +1962,10 @@ msgstr ""
 msgid "Marathoner"
 msgstr ""
 
-#. I18N: ./data/gui/online/create_server.stkgui
-#. I18N: In the server creation screen
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
 msgid "Max. number of players"
 msgstr ""
 
@@ -1933,6 +1986,7 @@ msgstr ""
 
 #. I18N: input configuration screen: mouse button
 #: src/input/binding.cpp:120
+msgctxt "input_key"
 msgid "Middle Mouse Button"
 msgstr ""
 
@@ -1942,6 +1996,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:159
+msgctxt "input_key"
 msgid "Modechange"
 msgstr ""
 
@@ -1989,9 +2044,9 @@ msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
@@ -2003,12 +2058,12 @@ msgstr ""
 msgid "Music"
 msgstr ""
 
-#. I18N: ./data/gui/online/server_info_dialog.stkgui
-#. I18N: In the server info dialog
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
-#: src/states_screens/online_profile_achievements.cpp:73
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
 #: src/states_screens/server_selection.cpp:91
+#: src/states_screens/online_profile_achievements.cpp:73
 msgid "Name"
 msgstr ""
 
@@ -2024,10 +2079,10 @@ msgstr ""
 msgid "Name is too long."
 msgstr ""
 
-#. I18N: ./data/gui/online/create_server.stkgui
-#. I18N: In the server creation screen
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
 msgid "Name of the server"
 msgstr ""
 
@@ -2103,12 +2158,13 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:155
+msgctxt "input_key"
 msgid "Nonconvert"
 msgstr ""
 
 #. I18N: if no kart animations are enabled
-#: src/states_screens/gp_info_screen.cpp:75
 #: src/states_screens/options_screen_video.cpp:393
+#: src/states_screens/gp_info_screen.cpp:75
 msgid "None"
 msgstr ""
 
@@ -2121,22 +2177,23 @@ msgstr ""
 msgid "Northern Resort"
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:77
 #: ../stk-assets/tracks/tutorial/triggers.as:78
+#: ../stk-assets/tracks/tutorial/scripting.as:77
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
 msgstr ""
 
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 msgid "Novice"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:291
+msgctxt "input_key"
 msgid "Num Lock"
 msgstr ""
 
@@ -2167,64 +2224,74 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:237
+msgctxt "input_key"
 msgid "Numpad 0"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:239
+msgctxt "input_key"
 msgid "Numpad 1"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:241
+msgctxt "input_key"
 msgid "Numpad 2"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:243
+msgctxt "input_key"
 msgid "Numpad 3"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:245
+msgctxt "input_key"
 msgid "Numpad 4"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:247
+msgctxt "input_key"
 msgid "Numpad 5"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:249
+msgctxt "input_key"
 msgid "Numpad 6"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:251
+msgctxt "input_key"
 msgid "Numpad 7"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:253
+msgctxt "input_key"
 msgid "Numpad 8"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:255
+msgctxt "input_key"
 msgid "Numpad 9"
 msgstr ""
 
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: ./data/gui/enter_gp_name_dialog.stkgui
 #. I18N: In the 'add new grand prix' dialog
-#. I18N: ./data/gui/enter_player_name_dialog.stkgui
-#. I18N: In the 'add new player' dialog
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: In the 'add new player' dialog
 #. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #: src/states_screens/dialogs/message_dialog.cpp:123
 #: src/states_screens/dialogs/message_dialog.cpp:136
@@ -2233,6 +2300,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:325
+msgctxt "input_key"
 msgid "Oem Clear"
 msgstr ""
 
@@ -2264,13 +2332,13 @@ msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#: src/states_screens/online_profile_friends.cpp:218
 #: src/states_screens/main_menu_screen.cpp:170
 #: src/states_screens/main_menu_screen.cpp:185
-#: src/states_screens/online_profile_friends.cpp:218
 msgid "Online"
 msgstr ""
 
@@ -2306,12 +2374,12 @@ msgstr ""
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
 msgstr ""
 
-#. I18N: ./data/gui/main.stkgui
-#. I18N: In the main screen
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
 msgid "Options"
 msgstr ""
 
@@ -2326,16 +2394,19 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:323
+msgctxt "input_key"
 msgid "Pa1"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:165
+msgctxt "input_key"
 msgid "Page Down"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:163
+msgctxt "input_key"
 msgid "Page Up"
 msgstr ""
 
@@ -2345,10 +2416,10 @@ msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the registration dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
 msgid "Password"
 msgstr ""
 
@@ -2378,6 +2449,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:140
+msgctxt "input_key"
 msgid "Pause"
 msgstr ""
 
@@ -2414,6 +2486,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:319
+msgctxt "input_key"
 msgid "Play"
 msgstr ""
 
@@ -2425,12 +2498,12 @@ msgstr ""
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:67
-#: src/states_screens/options_screen_input.cpp:142
-#: src/states_screens/options_screen_input2.cpp:88
-#: src/states_screens/options_screen_ui.cpp:120
 #: src/states_screens/options_screen_video.cpp:174
+#: src/states_screens/options_screen_input.cpp:142
+#: src/states_screens/options_screen_ui.cpp:120
+#: src/states_screens/options_screen_audio.cpp:67
 #: src/states_screens/server_selection.cpp:92
+#: src/states_screens/options_screen_input2.cpp:88
 msgid "Players"
 msgstr ""
 
@@ -2462,7 +2535,7 @@ msgstr ""
 msgid "Please wait while addons are updated"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:557
+#: src/states_screens/main_menu_screen.cpp:560
 msgid "Please wait while the add-ons are loading"
 msgstr ""
 
@@ -2476,8 +2549,8 @@ msgstr ""
 msgid "Powerup Love"
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:43
 #: ../stk-assets/tracks/tutorial/triggers.as:44
+#: ../stk-assets/tracks/tutorial/scripting.as:43
 #, c-format
 msgid ""
 "Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to "
@@ -2519,11 +2592,13 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:181
+msgctxt "input_key"
 msgid "Print"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:185
+msgctxt "input_key"
 msgid "Print Screen"
 msgstr ""
 
@@ -2574,9 +2649,9 @@ msgstr ""
 msgid "Quit the server."
 msgstr ""
 
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: ./data/gui/racesetup.stkgui
 msgid "Race Setup"
 msgstr ""
 
@@ -2641,9 +2716,9 @@ msgstr ""
 msgid "Reload"
 msgstr ""
 
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 msgid "Remember password"
 msgstr ""
@@ -2653,20 +2728,20 @@ msgstr ""
 msgid "Remember window location"
 msgstr ""
 
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
-#. I18N: ./data/gui/online/user_info_dialog.stkgui
-#. I18N: User info dialog
 msgid "Remove"
 msgstr ""
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 msgid "Rename"
 msgstr ""
@@ -2707,6 +2782,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:132
+msgctxt "input_key"
 msgid "Return"
 msgstr ""
 
@@ -2724,34 +2800,44 @@ msgstr ""
 msgid "Reversed"
 msgstr ""
 
-#. I18N: input configuration screen: keyboard key
 #. I18N: Key binding name
-#: src/input/binding.cpp:175 src/states_screens/options_screen_input2.cpp:259
+#: src/states_screens/options_screen_input2.cpp:259
+msgid "Right"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:175
+msgctxt "input_key"
 msgid "Right"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:301
+msgctxt "input_key"
 msgid "Right Control"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:231
+msgctxt "input_key"
 msgid "Right Logo"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:305
+msgctxt "input_key"
 msgid "Right Menu"
 msgstr ""
 
 #. I18N: input configuration screen: mouse button
 #: src/input/binding.cpp:116
+msgctxt "input_key"
 msgid "Right Mouse Button"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:297
+msgctxt "input_key"
 msgid "Right Shift"
 msgstr ""
 
@@ -2816,13 +2902,14 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
+#. I18N: ./data/gui/grand_prix_lose.stkgui
 msgid "Save Grand Prix"
 msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:293
+msgctxt "input_key"
 msgid "Scroll Lock"
 msgstr ""
 
@@ -2836,9 +2923,14 @@ msgstr ""
 msgid "Searching"
 msgstr ""
 
-#. I18N: input configuration screen: keyboard key
 #. I18N: Key binding name
-#: src/input/binding.cpp:179 src/states_screens/options_screen_input2.cpp:262
+#: src/states_screens/options_screen_input2.cpp:262
+msgid "Select"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:179
+msgctxt "input_key"
 msgid "Select"
 msgstr ""
 
@@ -2866,6 +2958,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:259
+msgctxt "input_key"
 msgid "Separator"
 msgstr ""
 
@@ -2920,6 +3013,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:134
+msgctxt "input_key"
 msgid "Shift"
 msgstr ""
 
@@ -2971,6 +3065,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:235
+msgctxt "input_key"
 msgid "Sleep"
 msgstr ""
 
@@ -2994,8 +3089,8 @@ msgid ""
 "goal."
 msgstr ""
 
+#: src/states_screens/main_menu_screen.cpp:553
 #: src/states_screens/addons_screen.cpp:512
-#: src/states_screens/main_menu_screen.cpp:550
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you "
 "are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3013,12 +3108,13 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:161
+msgctxt "input_key"
 msgid "Space"
 msgstr ""
 
-#. I18N: ./data/gui/arenas.stkgui
-#. I18N: track group
 #. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: track group
+#. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #: src/states_screens/grand_prix_editor_screen.cpp:325
 msgid "Standard"
@@ -3084,18 +3180,18 @@ msgid "SuperTuxKart Addons"
 msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
-#. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help3.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help4.stkgui
 msgid "SuperTuxKart Help"
 msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
-#. I18N: ./data/gui/options_device.stkgui
 #. I18N: ./data/gui/options_input.stkgui
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: ./data/gui/options_video.stkgui
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: ./data/gui/options_ui.stkgui
-#. I18N: ./data/gui/options_video.stkgui
 #. I18N: ./data/gui/user_screen_tab.stkgui
 msgid "SuperTuxKart Options"
 msgstr ""
@@ -3139,6 +3235,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:128
+msgctxt "input_key"
 msgid "Tab"
 msgstr ""
 
@@ -3176,7 +3273,7 @@ msgstr ""
 msgid "The Stadium"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:545
+#: src/states_screens/main_menu_screen.cpp:548
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr ""
 
@@ -3253,10 +3350,10 @@ msgstr ""
 msgid "Track group"
 msgstr ""
 
-#. I18N: ./data/gui/addons_screen.stkgui
-#. I18N: In the addons screen
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#. I18N: ./data/gui/addons_screen.stkgui
+#. I18N: In the addons screen
 msgid "Tracks"
 msgstr ""
 
@@ -3303,9 +3400,14 @@ msgstr ""
 msgid "Unstoppable"
 msgstr ""
 
-#. I18N: input configuration screen: keyboard key
 #. I18N: Key binding name
-#: src/input/binding.cpp:173 src/states_screens/options_screen_input2.cpp:250
+#: src/states_screens/options_screen_input2.cpp:250
+msgid "Up"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:173
+msgctxt "input_key"
 msgid "Up"
 msgstr ""
 
@@ -3342,8 +3444,8 @@ msgstr ""
 msgid "Use left/right to choose your team and press fire"
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:53
 #: ../stk-assets/tracks/tutorial/triggers.as:54
+#: ../stk-assets/tracks/tutorial/scripting.as:53
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
 msgstr ""
@@ -3355,10 +3457,10 @@ msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:66
-#: src/states_screens/options_screen_input.cpp:141
-#: src/states_screens/options_screen_input2.cpp:87
 #: src/states_screens/options_screen_video.cpp:173
+#: src/states_screens/options_screen_input.cpp:141
+#: src/states_screens/options_screen_audio.cpp:66
+#: src/states_screens/options_screen_input2.cpp:87
 #: src/states_screens/user_screen.cpp:638
 msgid "User Interface"
 msgstr ""
@@ -3373,9 +3475,9 @@ msgstr ""
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #: src/states_screens/online_profile_friends.cpp:72
 #: src/states_screens/online_user_search.cpp:74
@@ -3390,8 +3492,8 @@ msgstr ""
 msgid "VS"
 msgstr ""
 
-#: src/states_screens/dialogs/change_password_dialog.cpp:235
 #: src/states_screens/dialogs/recovery_dialog.cpp:209
+#: src/states_screens/dialogs/change_password_dialog.cpp:235
 #: src/states_screens/register_screen.cpp:353
 msgid "Validating info"
 msgstr ""
@@ -3444,9 +3546,9 @@ msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
 #. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
@@ -3499,11 +3601,13 @@ msgstr ""
 
 #. I18N: input configuration screen: mouse button
 #: src/input/binding.cpp:122
+msgctxt "input_key"
 msgid "X1 Mouse Button"
 msgstr ""
 
 #. I18N: input configuration screen: mouse button
 #: src/input/binding.cpp:124
+msgctxt "input_key"
 msgid "X2 Mouse Button"
 msgstr ""
 
@@ -3521,8 +3625,8 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:82
 #: ../stk-assets/tracks/tutorial/triggers.as:83
+#: ../stk-assets/tracks/tutorial/scripting.as:82
 msgid "You are now ready to race. Good luck!"
 msgstr ""
 
@@ -3534,7 +3638,7 @@ msgstr ""
 msgid "You can adapt your previous rating by clicking the stars beneath."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:513
+#: src/states_screens/main_menu_screen.cpp:516
 msgid ""
 "You can not download addons without internet access. If you want to download "
 "addons, go to options, select  tab 'User Interface', and edit \"Connect to "
@@ -3556,7 +3660,7 @@ msgid ""
 "Please read our privacy statement at http://privacy.supertuxkart.net"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:124
+#: src/states_screens/grand_prix_win.cpp:125
 #: src/states_screens/race_result_gui.cpp:175
 msgid "You completed a challenge!"
 msgstr ""
@@ -3565,7 +3669,7 @@ msgstr ""
 msgid "You completed challenges!"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:279
+#: src/states_screens/grand_prix_win.cpp:280
 msgid "You completed the Grand Prix!"
 msgstr ""
 
@@ -3686,6 +3790,7 @@ msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:321
+msgctxt "input_key"
 msgid "Zoom"
 msgstr ""
 
@@ -3722,12 +3827,11 @@ msgid "low"
 msgstr ""
 
 #. I18N: arena group name
-#. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:81
-#: src/states_screens/easter_egg_screen.cpp:143
 #: src/states_screens/kart_selection.cpp:284
+#: src/states_screens/easter_egg_screen.cpp:143
 #: src/states_screens/tracks_screen.cpp:153
 msgid "standard"
 msgstr ""
