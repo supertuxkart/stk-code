@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
-#project(angelscript)
+if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
+  cmake_policy(SET CMP0048 OLD)
+endif()
+
+project(angelscript)
 
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
 
