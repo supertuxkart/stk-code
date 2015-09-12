@@ -18,6 +18,7 @@
 
 #include "states_screens/grand_prix_lose.hpp"
 
+#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -206,6 +207,14 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
         } // if kart != NULL
     }
 }   // setKarts
+
+// -------------------------------------------------------------------------------------
+
+MusicInformation* GrandPrixLose::getInGameMenuMusic() const
+{
+    MusicInformation* mi = music_manager->getMusicInformation("lose_theme.music");
+    return mi;
+}
 
 // -------------------------------------------------------------------------------------
 
