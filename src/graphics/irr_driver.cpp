@@ -422,7 +422,8 @@ void IrrDriver::initDevice()
         m_device  = NULL;
 
         SIrrlichtCreationParameters params;
-        params.ForceLegacyDevice = UserConfigParams::m_force_legacy_device;
+        params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device || 
+            UserConfigParams::m_gamepad_visualisation);
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
