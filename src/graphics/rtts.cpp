@@ -303,11 +303,11 @@ FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
 
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
-    std::vector<IrrDriver::GlowData> glows;
+    std::vector<GlowData> glows;
     irr_driver->computeMatrixesAndCameras(camera, m_width, m_height);
-    unsigned plc = irr_driver->updateLightsInfo(camera, dt);
+    unsigned plc = irr_driver->getRenderer()->updateLightsInfo(camera, dt);
     irr_driver->uploadLightingData();
-    irr_driver->renderScene(camera, plc, glows, dt, false, true);
+    irr_driver->getRenderer()->renderScene(camera, plc, glows, dt, false, true);
     FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
 
     // reset

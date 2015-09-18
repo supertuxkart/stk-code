@@ -131,17 +131,6 @@ void AbstractRenderer::drawJoint(bool drawline, bool drawname,
         }
 
     }
-    else
-    {
-        /*
-        if (drawline)
-        {
-            irr_driver->getVideoDriver()->draw3DLine(jointpos,
-                                                     core::vector3df(0,0,0),
-                                                     color);
-        }
-         */
-    }
 
     if (joint->Children.size() == 0)
     {
@@ -206,3 +195,10 @@ void AbstractRenderer::drawJoint(bool drawline, bool drawname,
 } //drawJoint
 
 #endif //DEBUG
+
+
+AbstractRenderer::AbstractRenderer()
+{
+    m_wireframe = false;
+    m_mipviz = false;
+}

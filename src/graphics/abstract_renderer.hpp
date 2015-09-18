@@ -18,12 +18,17 @@
 #ifndef HEADER_ABSTRACT_RENDERER_HPP
 #define HEADER_ABSTRACT_RENDERER_HPP
 
+#include "graphics/irr_driver.hpp"
 #include <irrlicht.h>
 #include <vector>
+
+struct GlowData;
 
 class AbstractRenderer
 {
 protected:
+    bool                 m_wireframe;
+    bool                 m_mipviz;
 
 #ifdef DEBUG
     void drawDebugMeshes() const;
@@ -34,9 +39,22 @@ protected:
 #endif
 
 public:
+    AbstractRenderer();
     virtual ~AbstractRenderer(){}
 
     virtual void render(float dt) = 0;
+
+    virtual void renderScene(irr::scene::ICameraSceneNode * const camnode,
+                             unsigned pointlightcount, std::vector<GlowData>& glows,
+                             float dt, bool hasShadows, bool forceRTT) = 0;
+                             
+    virtual unsigned updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
+                                      float dt) = 0;
+
+    // ------------------------------------------------------------------------
+    void toggleWireframe() { m_wireframe = !m_wireframe; }
+    // ------------------------------------------------------------------------
+    void toggleMipVisualization() { m_mipviz = !m_mipviz; }
 };
 
 #endif //HEADER_ABSTRACT_RENDERER_HPP

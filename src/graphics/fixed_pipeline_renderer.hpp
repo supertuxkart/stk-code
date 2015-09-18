@@ -25,6 +25,11 @@ class FixedPipelineRenderer: public AbstractRenderer
 public:
     
     void render(float dt);
+    void renderScene(irr::scene::ICameraSceneNode * const camnode,
+                     unsigned pointlightcount, std::vector<GlowData>& glows,
+                     float dt, bool hasShadows, bool forceRTT){}
+    unsigned updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
+                              float dt){}
 };
 
 #endif //HEADER_FIXED_PIPELINE_RENDERER_HPP

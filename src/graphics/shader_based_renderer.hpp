@@ -19,21 +19,22 @@
 #define HEADER_LIGHT_PREPASS_RENDERER_HPP
 
 #include "graphics/abstract_renderer.hpp"
-#include "graphics/irr_driver.hpp"
-
 
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
-    bool                 m_wireframe;
-    bool                 m_mipviz;
-    
-    
     void compressPowerUpTextures();
     void setOverrideMaterial();
-    std::vector<IrrDriver::GlowData> updateGlowingList();
+    std::vector<GlowData> updateGlowingList();
     void prepareForwardRenderer();
-
+    unsigned updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
+                              float dt);
+    void renderLights(unsigned pointlightcount, bool hasShadow);
+    void renderAmbientScatter();
+    void renderLightsScatter(unsigned pointlightCount);
+    void renderScene(irr::scene::ICameraSceneNode * const camnode,
+                     unsigned pointlightcount, std::vector<GlowData>& glows,
+                     float dt, bool hasShadows, bool forceRTT);
     void renderBoundingBoxes();
     void debugPhysics();
     void renderPostProcessing(Camera * const camera);

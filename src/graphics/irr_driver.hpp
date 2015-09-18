@@ -60,6 +60,7 @@ class RTT;
 class FrameBuffer;
 class ShadowImportanceProvider;
 class AbstractKart;
+class AbstractRenderer;
 class Camera;
 class PerCameraNode;
 class PostProcessing;
@@ -178,6 +179,12 @@ enum TypeRTT
     RTT_COUNT
 };
 
+
+    struct GlowData {
+        scene::ISceneNode * node;
+        float r, g, b;
+    };
+
 /**
   * \brief class that creates the irrLicht device and offers higher-level
   *  ways to manage the 3D scene
@@ -185,8 +192,11 @@ enum TypeRTT
   */
 class IrrDriver : public IEventReceiver, public NoCopy
 {
+public:
+    GLsync m_sync; //TODO: set public to fix compile error, find a clean fix
+    
 private:
-    GLsync m_sync;
+    //GLsync m_sync;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -257,10 +267,7 @@ public:
 
     video::SColorf getAmbientLight() const;
 
-    struct GlowData {
-        scene::ISceneNode * node;
-        float r, g, b;
-    };
+
 
 private:
     std::vector<VideoMode> m_modes;
@@ -315,6 +322,7 @@ private:
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
 #endif
 
+public: //TODO: move into renderer class
     void renderSolidFirstPass();
     void renderSolidSecondPass();
     void renderNormalsVisualisation();
@@ -324,11 +332,8 @@ private:
     void renderRSM();
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
-    void renderLights(unsigned pointlightCount, bool hasShadow);
-    void renderAmbientScatter();
-    void renderLightsScatter(unsigned pointlightCount);
     void renderShadowsDebug();
-    void doScreenShot();
+    void doScreenShot();    
     void PrepareDrawCalls(scene::ICameraSceneNode *camnode);
 public:
          IrrDriver();
@@ -492,6 +497,8 @@ public:
     // ------------------------------------------------------------------------
     RTT* getRTT() { return m_rtts; }
     // ------------------------------------------------------------------------
+    AbstractRenderer* getRenderer() { return m_renderer; }
+    // ------------------------------------------------------------------------
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
     // ------------------------------------------------------------------------
@@ -558,10 +565,6 @@ public:
         m_distortviz = false;
         m_boundingboxesviz = false;
     }
-    // ------------------------------------------------------------------------
-    void toggleWireframe() { m_wireframe = !m_wireframe; }
-    // ------------------------------------------------------------------------
-    void toggleMipVisualization() { m_mipviz = !m_mipviz; }
     // ------------------------------------------------------------------------
     void toggleNormals() { m_normals = !m_normals; }
     // ------------------------------------------------------------------------
@@ -756,11 +759,6 @@ public:
     void onLoadWorld();
     void onUnloadWorld();
 
-    void renderScene(scene::ICameraSceneNode * const camnode,
-                     unsigned pointlightcount, std::vector<GlowData>& glows,
-                     float dt, bool hasShadows, bool forceRTT);
-    unsigned updateLightsInfo(scene::ICameraSceneNode * const camnode,
-                              float dt);
     void updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
                                                          size_t height);
     void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,

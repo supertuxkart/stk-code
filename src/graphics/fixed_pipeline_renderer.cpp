@@ -48,7 +48,6 @@ void FixedPipelineRenderer::render(float dt)
         camera->activate();
         rg->preRenderCallback(camera);   // adjusts start referee
 
-        //m_renderpass = ~0; //TODO: is it useful for fixed function pipeline?
         irr_driver->getSceneManager()->drawAll();
 
         PROFILER_POP_CPU_MARKER();

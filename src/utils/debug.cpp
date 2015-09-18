@@ -319,7 +319,7 @@ bool onEvent(const SEvent &event)
                         physics->setDebugMode(IrrDebugDrawer::DM_NONE);
 
                     irr_driver->resetDebugModes();
-                    irr_driver->toggleWireframe();
+                    irr_driver->getRenderer()->toggleWireframe();
                 }
                 else if (cmdID == DEBUG_GRAPHICS_MIPMAP_VIZ)
                 {
@@ -327,7 +327,7 @@ bool onEvent(const SEvent &event)
                         physics->setDebugMode(IrrDebugDrawer::DM_NONE);
 
                     irr_driver->resetDebugModes();
-                    irr_driver->toggleMipVisualization();
+                    irr_driver->getRenderer()->toggleMipVisualization();
                 }
                 else if (cmdID == DEBUG_GRAPHICS_NORMALS_VIZ)
                 {
