@@ -25,12 +25,13 @@
 #include "utils/utf8.h"
 #include "coreutil.h"
 
-#include <math.h>
 #include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdio>
 #include <cstring>
-#include <stdio.h>
+#include <cwchar>
 #include <exception>
-#include <assert.h>
 
 namespace StringUtils
 {
@@ -167,7 +168,7 @@ namespace StringUtils
         try
         {
             std::string::size_type start=0;
-            while(start!=std::string::npos && start<(unsigned int)s.size())
+            while(start < (unsigned int) s.size())
             {
                 std::string::size_type i=s.find(c, start);
                 if (i!=std::string::npos)
@@ -185,11 +186,11 @@ namespace StringUtils
                 }
                 else   // end of string reached
                 {
-                    if (keepSplitChar)
+                    if (keepSplitChar && start != 0)
                         result.push_back(std::string(s,start-1));
                     else
                         result.push_back(std::string(s,start));
-                    start = i;
+                    return result;
                 }
             }
             return result;
@@ -243,14 +244,13 @@ namespace StringUtils
                 }
                 else
                 {
-                    if (keepSplitChar)
+                    if (keepSplitChar && start != 0)
                         result.push_back( s.subString(start - 1,
                                                       s.size()-start + 1) );
                     else
                         result.push_back( s.subString(start, s.size()-start) );
 
                     return result;
-                    //start = i+1;
                 }
             }
             return result;

@@ -124,6 +124,8 @@ class TrackObjectPresentationSceneNode : public TrackObjectPresentation
 protected:
     /** A pointer to the scene node of this object. */
     scene::ISceneNode* m_node;
+
+    bool m_force_always_hidden;
 public:
 
     /** Constructor based on data from xml. */
@@ -131,6 +133,7 @@ public:
         TrackObjectPresentation(xml_node)
     {
         m_node = NULL;
+        m_force_always_hidden = false;
     }   // TrackObjectPresentationSceneNode
     // ------------------------------------------------------------------------
     /** Constructor based on a transform. */

@@ -10,11 +10,11 @@
     </hard>
     <medium>
         <karts number="4"/>
-        <requirements position="2"/>
+        <requirements position="1"/>
     </medium>
     <easy>
         <karts number="3"/>
-        <requirements position="3"/>
+        <requirements position="1"/>
     </easy>
 </challenge>
 

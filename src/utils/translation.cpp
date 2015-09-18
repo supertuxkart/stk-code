@@ -26,12 +26,13 @@
 #include "utils/translation.hpp"
 
 #include <algorithm>
-#include <assert.h>
-#include <locale.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cerrno>
+#include <clocale>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
 #include <iostream>
 #include <vector>
 
@@ -359,10 +360,23 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
 // ----------------------------------------------------------------------------
 
+Translations::~Translations()
+{
+}   // ~Translations
+
+// ----------------------------------------------------------------------------
+
 const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 {
     if (isRTLText(in_ptr))
     {
+        // Test if this string was already fribidized
+        std::map<const irr::core::stringw, const irr::core::stringw>::const_iterator
+            found = m_fribidized_strings.find(in_ptr);
+        if (found != m_fribidized_strings.cend())
+            return found->second.c_str();
+
+        // Use fribidi to fribidize the string
         // Split text into lines
         std::vector<core::stringw> input_lines = StringUtils::split(in_ptr, '\n');
         // Reverse lines for RTL strings, irrlicht will reverse them back
@@ -371,18 +385,25 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
         std::reverse(input_lines.begin(), input_lines.end());
 
         // Fribidize and concat lines
+        core::stringw converted_string;
         for (std::vector<core::stringw>::iterator it = input_lines.begin();
              it != input_lines.end(); it++)
         {
             if (it == input_lines.begin())
-                m_converted_string = fribidizeLine(*it);
+                converted_string = fribidizeLine(*it);
             else
             {
-                m_converted_string += "\n";
-                m_converted_string += fribidizeLine(*it);
+                converted_string += "\n";
+                converted_string += fribidizeLine(*it);
             }
         }
-        return m_converted_string.c_str();
+
+        // Save it in the map
+        m_fribidized_strings.insert(std::pair<const irr::core::stringw, const irr::core::stringw>(
+            in_ptr, converted_string));
+        found = m_fribidized_strings.find(in_ptr);
+
+        return found->second.c_str();
     }
     else
         return in_ptr;
@@ -448,12 +469,13 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
 
     if (original_t == original)
     {
-        m_converted_string = StringUtils::utf8_to_wide(original);
+        static irr::core::stringw converted_string;
+        converted_string = StringUtils::utf8_to_wide(original);
 
 #if TRANSLATE_VERBOSE
-        std::wcout << L"  translation : " << m_converted_string << std::endl;
+        std::wcout << L"  translation : " << converted_string << std::endl;
 #endif
-        return m_converted_string.c_str();
+        return converted_string.c_str();
     }
 
     // print
@@ -572,4 +594,3 @@ core::stringw Translations::fribidizeLine(const core::stringw &str)
     return core::stringw(str);
 #endif // ENABLE_BIDI
 }
-

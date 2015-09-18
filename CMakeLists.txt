@@ -19,6 +19,7 @@ option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
+option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace the online profile GUI in the main menu with the network multiplayer GUI" OFF)
 
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
@@ -123,9 +124,15 @@ endif()
 
 
 # Build the angelscript library if not in system
-find_package(Angelscript)
-if(USE_SYSTEM_ANGELSCRIPT AND ANGELSCRIPT_FOUND)
-    include_directories(${Angelscript_INCLUDE_DIRS})
+if(USE_SYSTEM_ANGELSCRIPT)
+    find_package(Angelscript)
+    if(ANGELSCRIPT_FOUND)
+        include_directories(${Angelscript_INCLUDE_DIRS})
+    else()
+        message(FATAL_ERROR "Angelscript not found. "
+            "Either install angelscript or use built-in version using "
+            "-DUSE_SYSTEM_ANGELSCRIPT=0")
+    endif()
 else()
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
     include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
@@ -205,6 +212,11 @@ if(MINGW AND CMAKE_BUILD_TYPE MATCHES Release)
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--subsystem,windows")
 endif()
 
+# Netwowk Multiplayer
+if(ENABLE_NETWORK_MULTIPLAYER)
+  add_definitions(-DENABLE_NETWORK_MULTIPLAYER_SCREEN)
+endif()
+
 if(WIN32)
     # By default windows.h has macros defined for min and max that screw up everything
     add_definitions(-DNOMINMAX)
@@ -213,7 +225,7 @@ if(WIN32)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
     # Avoid timespec structure redeclaration on Visual Studio 2015
-    if (MSVC_VERSION EQUAL 1900)
+    if (NOT (MSVC_VERSION LESS 1900))
         add_definitions(-DHAVE_STRUCT_TIMESPEC)
     endif()
 endif()
@@ -406,24 +418,6 @@ endif()
 
 # Optional tools
 add_subdirectory(tools/font_tool)
-
-
-# ==== Make dist target ====
-if(MSVC OR MINGW)
-  # Don't create a dist target for VS
-else()
-  add_custom_target(dist
-    COMMAND rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION} && rm -f ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2
-            && echo "Exporting..."
-            && svn export ${PROJECT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
-            && echo "Compressing..."
-            && cd ${CMAKE_BINARY_DIR}
-            && tar -cjf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2 ./SuperTuxKart-${PROJECT_VERSION}
-            && echo "Done, cleaning up"
-            && rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  )
-endif()
 
 
 # ==== Checking if data folder exists ====

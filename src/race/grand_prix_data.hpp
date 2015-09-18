@@ -167,8 +167,8 @@ public:
     // -------------------------------------------------------------------------
     enum GPReverseType getReverseType()
                                       const { return m_reverse_type;           }
-    static const char*    getRandomGPID()   { return "random";                 }
-    static const wchar_t* getRandomGPName() { return _LTR("Random Grand Prix");}
+    static const char*        getRandomGPID()   { return "random";             }
+    static irr::core::stringw getRandomGPName() { return _LTR("Random Grand Prix"); }
 };   // GrandPrixData
 
 #endif

@@ -34,7 +34,10 @@ namespace GUIEngine { class Widget; }
 /** Online profile overview screen.
  * \ingroup states_screens
  */
-class OnlineProfileFriends : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileFriends>
+class OnlineProfileFriends : public OnlineProfileBase,
+                       public GUIEngine::ScreenSingleton<OnlineProfileFriends>,
+                       public GUIEngine::IListWidgetHeaderListener
+
 {
 private:
     OnlineProfileFriends();
@@ -45,8 +48,14 @@ private:
     GUIEngine::TextBoxWidget *m_search_box_widget;
 
     bool                        m_waiting_for_friends;
+    /** Which column to use for sorting. */
+    static int m_sort_column;
+
+    /** True is sorting should be increasing. */
+    static bool m_sort_increasing;
 
     void displayResults();
+    static bool compareFriends(int f1, int f2);
 public:
     friend class GUIEngine::ScreenSingleton<OnlineProfileFriends>;
 
@@ -63,6 +72,7 @@ public:
 
     virtual void onUpdate(float delta) OVERRIDE;
     virtual void beforeAddingWidget() OVERRIDE;
+    virtual void onColumnClicked(int columnId);
 
     // ------------------------------------------------------------------------
     /** Triggers a reload of the friend list next time this menu is shown. */

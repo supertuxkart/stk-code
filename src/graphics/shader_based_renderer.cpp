@@ -474,6 +474,7 @@ unsigned ShaderBasedRenderer::updateLightsInfo(scene::ICameraSceneNode * const c
     }
 
     unsigned lightnum = 0;
+    bool multiplayer = (race_manager->getNumLocalPlayers() > 1);
 
     for (unsigned i = 0; i < 15; i++)
     {
@@ -491,7 +492,12 @@ unsigned ShaderBasedRenderer::updateLightsInfo(scene::ICameraSceneNode * const c
                 float em = light_node->getEnergyMultiplier();
                 if (em < 1.0f)
                 {
-                    light_node->setEnergyMultiplier(std::min(1.0f, em + dt));
+                    // In single-player, fade-in lights.
+                    // In multi-player, can't do that, the light objects are shared by all players
+                    if (multiplayer)
+                        light_node->setEnergyMultiplier(1.0f);
+                    else
+                        light_node->setEnergyMultiplier(std::min(1.0f, em + dt));
                 }
 
                 const core::vector3df &pos = light_node->getAbsolutePosition();

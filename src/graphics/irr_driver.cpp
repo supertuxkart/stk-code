@@ -96,8 +96,8 @@ IrrDriver *irr_driver = NULL;
 
 GPUTimer          m_perf_query[Q_LAST];
 
-const int MIN_SUPPORTED_HEIGHT = 600;
-const int MIN_SUPPORTED_WIDTH  = 800;
+const int MIN_SUPPORTED_HEIGHT = 768;
+const int MIN_SUPPORTED_WIDTH  = 1024;
 
 // ----------------------------------------------------------------------------
 /** The constructor creates the irrlicht device. It first creates a NULL
@@ -327,7 +327,8 @@ void IrrDriver::createListOfVideoModes()
         {
             const int w = modes->getVideoModeResolution(i).Width;
             const int h = modes->getVideoModeResolution(i).Height;
-            if (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH)
+            if ( (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) &&
+                ( ! (h==600 && w==800 && UserConfigParams::m_artist_debug_mode) ) )
                 continue;
 
             VideoMode mode(w, h);
@@ -424,7 +425,8 @@ void IrrDriver::initDevice()
         m_device  = NULL;
 
         SIrrlichtCreationParameters params;
-        params.ForceLegacyDevice = UserConfigParams::m_force_legacy_device;
+        params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device || 
+            UserConfigParams::m_gamepad_visualisation);
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
@@ -1096,16 +1098,29 @@ scene::IMeshSceneNode *IrrDriver::addOctTree(scene::IMesh *mesh)
 scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
                                             const video::SColor &color)
 {
-    scene::IMeshSceneNode *node = m_scene_manager->addSphereSceneNode(radius);
-    node->setMaterialType(video::EMT_SOLID);
-    scene::IMesh *mesh = node->getMesh();
+    scene::IMesh *mesh = m_scene_manager->getGeometryCreator()
+                       ->createSphereMesh(radius);
+    
     mesh->setMaterialFlag(video::EMF_COLOR_MATERIAL, true);
-    video::SMaterial m;
+    video::SMaterial &m = mesh->getMeshBuffer(0)->getMaterial();
     m.AmbientColor    = color;
     m.DiffuseColor    = color;
     m.EmissiveColor   = color;
     m.BackfaceCulling = false;
-    mesh->getMeshBuffer(0)->getMaterial() = m;
+    m.MaterialType    = video::EMT_SOLID;
+    m.setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+    m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+
+    if (CVS->isGLSL())
+    {
+        STKMeshSceneNode *node =
+            new STKMeshSceneNode(mesh,
+                                m_scene_manager->getRootSceneNode(),
+                                NULL, -1, "sphere");
+        return node;
+    }
+
+    scene::IMeshSceneNode *node = m_scene_manager->addMeshSceneNode(mesh);
     return node;
 }   // addSphere
 

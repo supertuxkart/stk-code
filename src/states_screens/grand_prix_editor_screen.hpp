@@ -51,7 +51,7 @@ class GrandPrixEditorScreen :
     void onNewGPWithName(const irr::core::stringw& newName);
     void onConfirm();
 
-    static const wchar_t* getGroupName(enum GrandPrixData::GPGroupType group);
+    static const core::stringw getGroupName(enum GrandPrixData::GPGroupType group);
 
     GrandPrixData*                  m_selection;
     std::string                     m_action;
