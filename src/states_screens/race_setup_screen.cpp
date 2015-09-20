@@ -281,15 +281,23 @@ void RaceSetupScreen::init()
             break;
     }
 
-    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
         RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
         assert(w != NULL);
 
         int index = w->findItemNamed("best");
         Widget* hardestWidget = &w->getChildren()[index];
-        hardestWidget->setBadge(LOCKED_BADGE);
-        hardestWidget->setActive(false);
+
+        if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+        {
+            hardestWidget->setBadge(LOCKED_BADGE);
+            hardestWidget->setActive(false);
+        }
+        else
+        {
+            hardestWidget->unsetBadge(LOCKED_BADGE);
+            hardestWidget->setActive(true);
+        }
     }
 }   // init
 
