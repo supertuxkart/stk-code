@@ -15,40 +15,24 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_LIGHT_PREPASS_RENDERER_HPP
-#define HEADER_LIGHT_PREPASS_RENDERER_HPP
+#ifndef HEADER_LIGHTING_PASSES_HPP
+#define HEADER_LIGHTING_PASSES_HPP
 
-#include "graphics/abstract_renderer.hpp"
-#include "graphics/solid_passes.hpp"
-#include "graphics/lighting_passes.hpp"
+#include <irrlicht.h>
 
-class ShaderBasedRenderer: public AbstractRenderer
+class LightingPasses
 {
 private:
-    SolidPasses     *m_solid_passes;
-    LightingPasses  *m_lighting_passes;
-
-    void compressPowerUpTextures();
-    void setOverrideMaterial();
-    std::vector<GlowData> updateGlowingList();
-    void prepareForwardRenderer();
-    
-    unsigned updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
-                              float dt);
-    
-    void renderScene(irr::scene::ICameraSceneNode * const camnode,
-                     unsigned pointlightcount, std::vector<GlowData>& glows,
-                     float dt, bool hasShadows, bool forceRTT);
-    void renderBoundingBoxes();
-    void debugPhysics();
-    void renderPostProcessing(Camera * const camera);
-
 
 public:
-    ShaderBasedRenderer();
-    ~ShaderBasedRenderer();
-
-    void render(float dt);
+    unsigned updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
+                              float dt);
+    void renderLights(unsigned pointlightcount, bool hasShadow);
+    void renderAmbientScatter();
+    void renderLightsScatter(unsigned pointlightCount);
+    
+    
+    
 };
 
-#endif //HEADER_LIGHT_PREPASS_RENDERER_HPP
+#endif //HEADER_LIGHTING_PASSES_HPP
