@@ -7,6 +7,7 @@
 ** Gran Paradiso
 ** Subsea
 * Tweak to challenges
+* More work on scripting
 
 ## SupertTuxKart 0.9 (April 2015)
 * Fully shader-based rendering engine
