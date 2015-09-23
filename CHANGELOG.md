@@ -1,3 +1,13 @@
+## SupertTuxKart 0.9.1
+* Many bug fixes
+* Smaller tweaks and improvements to several tracks including 
+** Math class
+** XR591
+** Fort Magma
+** Gran Paradiso
+** Subsea
+* Tweak to challenges
+
 ## SupertTuxKart 0.9 (April 2015)
 * Fully shader-based rendering engine
 * New tracks Cocoa Temple and Gran Paradiso
