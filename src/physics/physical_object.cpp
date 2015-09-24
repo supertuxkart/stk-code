@@ -496,6 +496,11 @@ void PhysicalObject::init()
     btVector3 inertia(1,1,1);
     if (m_body_type != MP_EXACT)
         m_shape->calculateLocalInertia(m_mass, inertia);
+    else
+    {
+        if (m_mass == 0)
+            inertia.setValue(0, 0, 0);
+    }
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
 
