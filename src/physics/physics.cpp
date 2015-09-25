@@ -594,10 +594,21 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                     upA, contact_manifold->getContactPoint(0).m_localPointA,
                     upB, contact_manifold->getContactPoint(0).m_localPointB);
             else if(upB->is(UserPointer::UP_PHYSICAL_OBJECT))
+            {
                 // 2.3 kart hits physical object
                 m_all_collisions.push_back(
                     upB, contact_manifold->getContactPoint(0).m_localPointB,
                     upA, contact_manifold->getContactPoint(0).m_localPointA);
+                // If the object is a statical object (e.g. a door in
+                // overworld) add a push back to avoid that karts get stuck
+                if (objB->isStaticObject())
+                {
+                    AbstractKart *kart = upA->getPointerKart();
+                    const btVector3 &normal = contact_manifold->getContactPoint(0)
+                        .m_normalWorldOnB;
+                    kart->crashed((Material*)NULL, normal);
+                }   // isStatiObject
+            }
             else if(upB->is(UserPointer::UP_ANIMATION))
                 m_all_collisions.push_back(
                     upB, contact_manifold->getContactPoint(0).m_localPointB,
