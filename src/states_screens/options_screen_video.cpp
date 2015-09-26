@@ -200,7 +200,7 @@ void OptionsScreenVideo::init()
     CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
     rememberWinpos->setState(UserConfigParams::m_remember_window_location);
 
-    rememberWinpos->setActive(UserConfigParams::m_fullscreen);
+    rememberWinpos->setActive(!UserConfigParams::m_fullscreen);
 
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
