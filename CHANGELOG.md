@@ -1,5 +1,7 @@
 ## SupertTuxKart 0.9.1
 * Many bug fixes
+* Started to use scripting in tracks
+* Significant audio performance improvements
 * Smaller tweaks and improvements to several tracks including 
 ** Math class
 ** XR591
@@ -7,7 +9,7 @@
 ** Gran Paradiso
 ** Subsea
 * Tweak to challenges
-* More work on scripting
+* Better support for driving tracks in reverse
 
 ## SupertTuxKart 0.9 (April 2015)
 * Fully shader-based rendering engine
