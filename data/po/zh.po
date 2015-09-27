@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Froppe123 <edvinn.nilsson@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
@@ -11,20 +10,20 @@ msgstr ""
 "POT-Creation-Date: 2015-09-26 00:20+1000\n"
 "PO-Revision-Date: 2015-09-26 09:35+0000\n"
 "Last-Translator: Auria <auria.mg@gmail.com>\n"
-"Language-Team: Swedish (http://www.transifex.com/supertuxkart/supertuxkart/language/sv/)\n"
+"Language-Team: Chinese (http://www.transifex.com/supertuxkart/supertuxkart/language/zh/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sv\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: zh\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #. I18N: ./data/achievements.xml
 msgid "Christoffel Columbus"
-msgstr "Christofer Columbus"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
-msgstr "Spela varje officiell bana åtminstone en gång."
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
@@ -32,23 +31,23 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
-msgstr "Träffa 10 gokartar med ett bowlingklot."
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Arch Enemy"
-msgstr "Dödsfiende"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Hit the same kart at least 5 times in one race."
-msgstr "Träffa samma gokart minst 5 gånger under ett lopp."
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Marathoner"
-msgstr "Maratonlöpare"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Make a race with 5 laps or more."
-msgstr "Gör ett lopp med 5 varv eller mer."
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
@@ -56,11 +55,11 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Make 5 skidding in a single lap."
-msgstr "Gör 5 sladd i ett enda varv."
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Gold driver"
-msgstr "Guld förare"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Win against at least 3 opponents in all single player modes."
@@ -68,7 +67,7 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
-msgstr "Powerup Älskare"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Use 10 or more powerups in a race."
@@ -84,15 +83,15 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Banana Lover"
-msgstr "Banan älskare"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Collect at least 5 bananas in one race."
-msgstr "Samla minst 5 bananer under ett lopp."
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
-msgstr "Det är hemligt"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
@@ -100,7 +99,7 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
-msgstr "Myggjägare"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid ""
@@ -110,7 +109,7 @@ msgstr ""
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
-msgstr "Pingvinens lekplats"
+msgstr ""
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
 msgid "Off the beaten track"
@@ -122,17 +121,17 @@ msgstr ""
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
 msgid "At World's End"
-msgstr "Vid världens ände"
+msgstr ""
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
 msgid "Install"
-msgstr "Installera"
+msgstr ""
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
 msgid "Uninstall"
-msgstr "Avinstallera"
+msgstr ""
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
@@ -140,11 +139,11 @@ msgstr "Avinstallera"
 #: src/input/gamepad_config.cpp:216
 #: src/states_screens/dialogs/addons_loading.cpp:284
 msgid "Back"
-msgstr "Tillbaka"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 msgid "SuperTuxKart Addons"
-msgstr "Tillägg till SuperTuxKart"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
@@ -161,21 +160,21 @@ msgstr ""
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In the addons screen
 msgid "Karts"
-msgstr "Gokartar"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In the addons screen
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Tracks"
-msgstr "Banor"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In the addons screen
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
 msgid "Arenas"
-msgstr "Arenor"
+msgstr ""
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
@@ -183,7 +182,7 @@ msgstr "Arenor"
 #. I18N: track group
 #: src/states_screens/grand_prix_editor_screen.cpp:325
 msgid "Standard"
-msgstr "Standard"
+msgstr ""
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
@@ -199,7 +198,7 @@ msgstr "Standard"
 #: src/states_screens/kart_selection.cpp:286
 #: src/states_screens/tracks_screen.cpp:155
 msgid "Add-Ons"
-msgstr "Tillägg"
+msgstr ""
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
@@ -220,18 +219,18 @@ msgstr "Tillägg"
 #: src/states_screens/options_screen_video.cpp:389
 #: src/states_screens/tracks_screen.cpp:145
 msgid "All"
-msgstr "Alla"
+msgstr ""
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
 msgid "Challenges - Trophy Room"
-msgstr "Utmaning - Troférummet"
+msgstr ""
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
 #: src/states_screens/edit_gp_screen.cpp:256
 msgid "Yes"
-msgstr "Ja"
+msgstr ""
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -261,27 +260,27 @@ msgstr "Ja"
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
 #: src/states_screens/user_screen.cpp:112
 msgid "Cancel"
-msgstr "Avbryt"
+msgstr ""
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Keep this resolution"
-msgstr "Behåll denna upplösning"
+msgstr ""
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
 msgid "Credits"
-msgstr "Tack till"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 msgid "Graphics Settings"
-msgstr "Grafikinställningar"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Advanced pipeline (lights, etc.)"
-msgstr "Avancerad pipeline (ljus, osv.)"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -291,47 +290,47 @@ msgstr ""
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Image-based lighting"
-msgstr "Image-based lighting"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Bloom"
-msgstr "Bloom"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Light shaft (God rays)"
-msgstr "Light shaft (God rays)"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Ambient Occlusion"
-msgstr "Omgivande ocklusion"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Global illumination"
-msgstr "Global illumination"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Glow (outlines)"
-msgstr "Glow (konturer)"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Anti-aliasing"
-msgstr "Anti-aliasing"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Motion blur"
-msgstr "Motion blur"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Depth of field"
-msgstr "Depth of field"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -341,7 +340,7 @@ msgstr ""
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Animated Scenery"
-msgstr "Animerat Landskap"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -356,7 +355,7 @@ msgstr ""
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Animated Characters"
-msgstr "Animerade Karaktärer"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -366,23 +365,23 @@ msgstr ""
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "* Restart STK to apply new settings"
-msgstr "* Starta om STK för att tillämpa nya inställningar."
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 msgid "Apply"
-msgstr "Tillämpa"
+msgstr ""
 
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: In the track selection screen
 msgid "All Tracks"
-msgstr "Alla banor"
+msgstr ""
 
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: In the edit track screen
 msgid "Number of laps:"
-msgstr "Antal varv:"
+msgstr ""
 
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: In the edit track screen
@@ -403,17 +402,17 @@ msgstr ""
 #: src/states_screens/dialogs/message_dialog.cpp:123
 #: src/states_screens/dialogs/message_dialog.cpp:136
 msgid "OK"
-msgstr "OK"
+msgstr ""
 
 #. I18N: ./data/gui/enter_gp_name_dialog.stkgui
 #. I18N: In the 'add new grand prix' dialog
 msgid "Please enter the name of the grand prix"
-msgstr "Ange namnet på grand prix"
+msgstr ""
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
 msgid "Enter the new player's name"
-msgstr "Ange namnet på nya spelaren"
+msgstr ""
 
 #. I18N: ./data/gui/feature_unlocked.stkgui
 #. I18N: ./data/gui/grand_prix_lose.stkgui
@@ -425,34 +424,34 @@ msgstr "Ange namnet på nya spelaren"
 #: src/states_screens/dialogs/gp_info_dialog.cpp:214
 #: src/states_screens/race_result_gui.cpp:186
 msgid "Continue"
-msgstr "Fortsätt"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Title in edit grand prix screen
 msgid "Edit Grand Prix"
-msgstr "Redigera Grand Prix"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
 msgid "Move up"
-msgstr "Flytta upp"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
 msgid "Move down"
-msgstr "Flytta ner"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
 msgid "Add"
-msgstr "Lägg till"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
 msgid "Edit"
-msgstr "Redigera"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
@@ -461,7 +460,7 @@ msgstr "Redigera"
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove"
-msgstr "Ta bort"
+msgstr ""
 
 #. I18N: ./data/gui/gpedit.stkgui
 #. I18N: Menu item
@@ -471,17 +470,17 @@ msgstr ""
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Title in grand prix editor screen
 msgid "Grand Prix editor"
-msgstr "Grand Prix redigerare"
+msgstr ""
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
 msgid "New"
-msgstr "Ny"
+msgstr ""
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
 msgid "Copy"
-msgstr "Kopia"
+msgstr ""
 
 #. I18N: ./data/gui/gpeditor.stkgui
 #. I18N: Menu item
@@ -490,12 +489,12 @@ msgstr "Kopia"
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Rename"
-msgstr "Byt namn"
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "AI karts"
-msgstr "Datorstyrda gokartar"
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -512,13 +511,13 @@ msgstr ""
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Start Race"
-msgstr "Starta tävling"
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 #: src/states_screens/gp_info_screen.cpp:146
 msgid "Continue saved GP"
-msgstr "Fortsätt sparad GP"
+msgstr ""
 
 #. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
@@ -530,7 +529,7 @@ msgstr ""
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: ./data/gui/help4.stkgui
 msgid "SuperTuxKart Help"
-msgstr "Hjälp för SuperTuxKart"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -541,7 +540,7 @@ msgstr "Hjälp för SuperTuxKart"
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
 msgid "General"
-msgstr "Allmänt"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -552,7 +551,7 @@ msgstr "Allmänt"
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
 msgid "Weapons"
-msgstr "Vapen"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -563,7 +562,7 @@ msgstr "Vapen"
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
 msgid "Game Modes"
-msgstr "Spellägen"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -574,23 +573,23 @@ msgstr "Spellägen"
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
 msgid "Multi­player"
-msgstr "Flera spelare"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 msgid "Click here to play the tutorial"
-msgstr "Klicka här för att spela guiden"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 msgid "Collect blue boxes. They will give you weapons or other powerups."
-msgstr "Samla blå paket. De kommer att ge dig vapen eller andra powerups."
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: ../stk-assets/tracks/tutorial/scripting.as:32
 #: ../stk-assets/tracks/tutorial/triggers.as:16
 msgid "Avoid bananas!"
-msgstr "Undvik bananer!"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -598,14 +597,14 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the"
 " bar at the right of the game screen."
-msgstr "Samla nitro ger dig en hastighetsökning när du önskar genom att trycka lämplig knapp. Du kan se din nitronivå i stapeln till höger om spelskärmen."
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "Om du ser en knapp med ett lås, som den här, måste du klara en utmaning för att låsa upp den."
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
@@ -615,7 +614,7 @@ msgstr ""
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr "* Du kan se och ändra aktuella tangentbordsinställningar under Inställningar"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
@@ -626,34 +625,34 @@ msgstr ""
 msgid ""
 "BubbleGum - protect yourself with a shield, or use while looking back to "
 "leave a sticky pink puddle behind you."
-msgstr "Tuggummi - skydda dig som en sköld eller använda den samtidigt som du tittar tillbaka för att lämna en klibbig rosa pöl bakom dig."
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
-msgstr "Tårta - kastas på närmsta rival, bäst på kort avstånd och långa raksträckor."
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight."
-msgstr "Sugkopp - kasta rakt för att dra en motspelare mot dig, eller kasta medan du tittar bakåt för att förblinda en annan."
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown"
 " backwards."
-msgstr "Bowlingklot - studsar mot väggar. Om du tittar bakåt så kastas den bakåt."
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Parachute - slows down all karts in a better position."
-msgstr "Fallskärm - saktar ner alla bilar framför dig."
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short"
 " time."
-msgstr "Bytare - presenter transformeras till bananer och omvänt för en kort tid."
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
@@ -663,11 +662,11 @@ msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Swatter - will squash karts close by, slowing them down."
-msgstr "Flugsmälla - kommer mosa bilar i närheten, vilket saktar ner dem."
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 msgid "SuperTuxKart features several game modes"
-msgstr "SuperTuxKart innehåller flera olika spellägen"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -679,7 +678,7 @@ msgstr ""
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr "Tidsförsök: innehåller inga powerups så endast dina färdigheter som förare räknas!"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -687,7 +686,7 @@ msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware: going in front of the"
 " leader will get you eliminated too!"
-msgstr "Följ ledaren: Kör för andra plats, som den sista gokart kommer att diskvalificeras varje gång räknaren går ned till noll. Varning: kör du framför ledaren kommer du bli eliminerad!"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -706,7 +705,7 @@ msgstr ""
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr "Äggjakt: Upptäck banor för att hitta alla gömda ägg."
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -715,15 +714,15 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* De flesta spellägen kan även spelas som ett Grand Prix: Istället för att köra ett enda lopp så kan du spela flera på raken. Ju bättre du är rankad, desto fler poäng får du. I slutändan vinner spelaren med flest poäng kuppen."
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
-msgstr "SuperTuxKart kan spelas i flerspelarläget på samma dator"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 msgid "(network play is not yet available)"
-msgstr "(nätverksspel är inte tillgängligt ännu)"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -734,7 +733,7 @@ msgid ""
 "keyboard(s), however each player will need a different set of keys, and keep"
 " in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
-msgstr "Först så behöver du flera inmatningsenheter (att ha flera handkontroller eller styrspakar är bästa sättet att spela flera stycken på). Gå in i Kontrollinställningarna och ställ in din handkontroll, det är även möjligt att använda tangentbord, däremot måste alla spelare ha olika tangenter, kom även ihåg att de flesta tangentbord inte klarar av för många nedtryckningar samtidigt."
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -745,14 +744,14 @@ msgid ""
 " the game. Each player can use their input device to select their kart. The "
 "game continues when everyone selected their kart. Note that the mouse may "
 "not be used for this operation."
-msgstr "När inmatningsenheterna har konfigurerats så är du redo att spela. Välj ikonen \"flerspelartävling\" i huvudmenyn. När det är dags att välja en gokart så kan varje spelare trycka på \"skjut\"-knappen på sina styrspakar eller tangentbord för att gå med i spelet. Varje spelare kan använda sina inmatningsenheter för att välja en gokart. Spelet fortsätter när alla har valt en gokart. Observera att musen inte kan användas för detta."
+msgstr ""
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 #. I18N: ./data/gui/karts_online.stkgui
 #. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
-msgstr "Välj en gokart"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -767,7 +766,7 @@ msgstr ""
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 msgid "Multiplayer"
-msgstr "Flerspelarläge"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -779,12 +778,12 @@ msgstr "Flerspelarläge"
 #: src/states_screens/main_menu_screen.cpp:185
 #: src/states_screens/online_profile_friends.cpp:221
 msgid "Online"
-msgstr "Online"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 msgid "Addons"
-msgstr "Tillägg"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -793,7 +792,7 @@ msgstr "Tillägg"
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Options"
-msgstr "Inställningar"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -802,7 +801,7 @@ msgstr "Inställningar"
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Help"
-msgstr "Hjälp"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
@@ -816,44 +815,44 @@ msgstr ""
 #. I18N: Section in the profile screen
 #: src/states_screens/online_profile_base.cpp:100
 msgid "Achievements"
-msgstr "Presentationer"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 msgid "Grand Prix Editor"
-msgstr "Grand Prix Redigerare"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 msgid "About"
-msgstr "Om"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: In the main screen
 msgid "Quit"
-msgstr "Avsluta"
+msgstr ""
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "Password Change"
-msgstr "Ändra Lösenord"
+msgstr ""
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "Current Password"
-msgstr "Nuvarande Lösenord"
+msgstr ""
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "New Password"
-msgstr "Nytt Lösenord"
+msgstr ""
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Confirm"
-msgstr "Bekräfta"
+msgstr ""
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -875,7 +874,7 @@ msgstr ""
 #. I18N: ./data/gui/online/vote_dialog.stkgui
 #. I18N: Vote dialog
 msgid "Close"
-msgstr "Stäng"
+msgstr ""
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -887,26 +886,26 @@ msgstr ""
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
 msgid "Name of the server"
-msgstr "Namn på servern"
+msgstr ""
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
 msgid "Max. number of players"
-msgstr "Max. antal spelare"
+msgstr ""
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Create"
-msgstr "Skapa"
+msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
 #: src/states_screens/main_menu_screen.cpp:175
 #: src/states_screens/main_menu_screen.cpp:186
 msgid "Login"
-msgstr "Logga in"
+msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
@@ -926,7 +925,7 @@ msgstr ""
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
 msgid "Guest Log in"
-msgstr "Gäst Login"
+msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
@@ -934,17 +933,17 @@ msgid ""
 "Logging in as a guest allows you to participate in online races, but it does"
 " not allow you to vote for addons, or collect any achievements while being "
 "online."
-msgstr "Logga in som gäst kan du delta i onlinelopp, men du kan inte rösta på addons eller få några prestationer medans du är online."
+msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
 msgid "Log In"
-msgstr "Logga in"
+msgstr ""
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In networking lobby
 msgid "Lobby"
-msgstr "Lobby"
+msgstr ""
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In the networking lobby
@@ -954,22 +953,22 @@ msgstr ""
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In networking lobby
 msgid "actions"
-msgstr "åtgårder"
+msgstr ""
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In the networking lobby
 msgid "Exit"
-msgstr "Avsluta"
+msgstr ""
 
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
 msgid "Lobby Settings"
-msgstr "Lobbyinställningar"
+msgstr ""
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Online Multiplayer"
-msgstr "Online Flerspelarläge"
+msgstr ""
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
@@ -979,22 +978,22 @@ msgstr ""
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Find Server"
-msgstr "Hitta Server"
+msgstr ""
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Create Server"
-msgstr "Skapa Server"
+msgstr ""
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Profile"
-msgstr "Profil"
+msgstr ""
 
 #. I18N: ./data/gui/online/main.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Log Out"
-msgstr "Logga ut"
+msgstr ""
 
 #. I18N: ./data/gui/online/notification_dialog.stkgui
 #. I18N: User info dialog
@@ -1009,18 +1008,18 @@ msgstr ""
 #. I18N: ./data/gui/online/profile_overview.stkgui
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "..."
-msgstr "..."
+msgstr ""
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: Section in the profile screen
 #: src/states_screens/online_profile_base.cpp:99
 msgid "Friends"
-msgstr "Vänner"
+msgstr ""
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: In the profile screen
 msgid "Look for more friends:"
-msgstr "Håll utkik efter fler vänner:"
+msgstr ""
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: ./data/gui/online/user_search.stkgui
@@ -1030,29 +1029,29 @@ msgstr ""
 #. I18N: ./data/gui/online/profile_overview.stkgui
 #. I18N: Section in the profile screen
 msgid "Overview"
-msgstr "Översikt"
+msgstr ""
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: Section in the profile screen
 #: src/states_screens/online_profile_base.cpp:101
 msgid "Account Settings"
-msgstr "Konto inställningar"
+msgstr ""
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "Password:"
-msgstr "Lösenord;"
+msgstr ""
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "Change"
-msgstr "Ändra"
+msgstr ""
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Account Recovery"
-msgstr "Konto återställning"
+msgstr ""
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -1065,7 +1064,7 @@ msgstr ""
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
 "able to reset your password."
-msgstr "Fyll i användarnamnet och e-postadressen som du angav vid registreringen för att kunna återställa ditt lösenord."
+msgstr ""
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
@@ -1083,37 +1082,37 @@ msgstr ""
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Email"
-msgstr "E-post"
+msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Create User"
-msgstr "Skapa Användare"
+msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "New Online Account"
-msgstr "Nytt Online-konto"
+msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Existing Online Account"
-msgstr "Befintligt Online-konto"
+msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Offline Account"
-msgstr "Offline-konto"
+msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Local Name"
-msgstr "Lokalt Namn"
+msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Online Username"
-msgstr "Online Användarnamn"
+msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
@@ -1122,7 +1121,7 @@ msgstr "Online Användarnamn"
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the registration dialog
 msgid "Password"
-msgstr "Lösenord"
+msgstr ""
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
@@ -1140,14 +1139,14 @@ msgstr ""
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "I agree to the above terms and am 13 years or older. "
-msgstr "Jag godkänner ovanstående villkor och är 13 år eller äldre."
+msgstr ""
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept"
-msgstr "Acceptera"
+msgstr ""
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
@@ -1161,12 +1160,12 @@ msgstr ""
 #: src/states_screens/online_profile_achievements.cpp:73
 #: src/states_screens/server_selection.cpp:91
 msgid "Name"
-msgstr "Namn"
+msgstr ""
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
 msgid "Join"
-msgstr "Anslut"
+msgstr ""
 
 #. I18N: ./data/gui/online/server_selection.stkgui
 msgid "Server Selection"
@@ -1180,12 +1179,12 @@ msgstr ""
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Add Friend"
-msgstr "Lägg till vän"
+msgstr ""
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline"
-msgstr "Nedgång"
+msgstr ""
 
 #. I18N: ./data/gui/online/user_search.stkgui
 msgid "User search"
@@ -1204,7 +1203,7 @@ msgstr ""
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: ./data/gui/user_screen_tab.stkgui
 msgid "SuperTuxKart Options"
-msgstr "Inställningar för SuperTuxKart"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -1214,12 +1213,12 @@ msgstr "Inställningar för SuperTuxKart"
 #: src/states_screens/options_screen_video.cpp:172
 #: src/states_screens/user_screen.cpp:637
 msgid "Audio"
-msgstr "Ljud"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Music"
-msgstr "Musik"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -1227,17 +1226,17 @@ msgstr "Musik"
 #. indicates a graphical feature is enabled
 #: src/states_screens/options_screen_video.cpp:384
 msgid "Enabled"
-msgstr "Aktiverad"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Volume"
-msgstr "Volym"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Sound Effects"
-msgstr "Ljudeffekter"
+msgstr ""
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: Section in the settings menu
@@ -1248,28 +1247,28 @@ msgstr "Ljudeffekter"
 #: src/states_screens/options_screen_video.cpp:175
 #: src/states_screens/user_screen.cpp:639
 msgid "Controls"
-msgstr "Kontroller"
+msgstr ""
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
 #: src/states_screens/options_screen_input2.cpp:111
 msgid "Delete Configuration"
-msgstr "Radera konfiguration"
+msgstr ""
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
 msgid "Back to device list"
-msgstr "Tillbaka till enhetslistan"
+msgstr ""
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
-msgstr "Tryck Enter eller dubbelklicka på en enhet för att konfigurera den"
+msgstr ""
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Add a device"
-msgstr "Lägg till en enhet"
+msgstr ""
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
@@ -1289,7 +1288,7 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:174
 #: src/states_screens/server_selection.cpp:92
 msgid "Players"
-msgstr "Spelare"
+msgstr ""
 
 #. I18N: ./data/gui/options_players.stkgui
 msgid "You are playing as"
@@ -1298,12 +1297,12 @@ msgstr ""
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
 msgid "Press enter or double-click on a player to edit him/her"
-msgstr "Tryck på Enter eller dubbelklicka på en spelare för att ändra honom/henne"
+msgstr ""
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
 msgid "Add Player"
-msgstr "Lägg till spelare"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
@@ -1313,22 +1312,22 @@ msgstr "Lägg till spelare"
 #: src/states_screens/options_screen_video.cpp:173
 #: src/states_screens/user_screen.cpp:638
 msgid "User Interface"
-msgstr "Användargränssnitt"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Skin"
-msgstr "Skal"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Display FPS"
-msgstr "Visa FPS"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Always show login screen"
-msgstr "Visa alltid inloggningsskärmen"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -1338,12 +1337,12 @@ msgstr ""
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable per-player handicaps"
-msgstr "Aktivera per-spelare handikapp"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Connect to the Internet"
-msgstr "Ansluta till Internet"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
@@ -1353,32 +1352,32 @@ msgstr "Ansluta till Internet"
 #: src/states_screens/options_screen_ui.cpp:118
 #: src/states_screens/user_screen.cpp:636
 msgid "Graphics"
-msgstr "Grafik"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Graphical Effects Level"
-msgstr "Nivå för grafiska effekter"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Custom settings..."
-msgstr "Egna inställningar..."
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync (requires restart)"
-msgstr "Vertikal synkronisering (kräver omstart)"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Resolution"
-msgstr "Upplösning"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Fullscreen"
-msgstr "Helskärm"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -1388,17 +1387,17 @@ msgstr ""
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Apply new resolution"
-msgstr "Tillämpa ny upplösning"
+msgstr ""
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 msgid "Paused"
-msgstr "Pausat"
+msgstr ""
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Back to Game"
-msgstr "Tillbaka till spelet"
+msgstr ""
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
@@ -1408,32 +1407,32 @@ msgstr ""
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Back to menu"
-msgstr "Tillbaka till menyn"
+msgstr ""
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 msgid "Press a key"
-msgstr "Tryck på en tangent"
+msgstr ""
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Assign to ESC key"
-msgstr "Kopplat till Escape-knappen"
+msgstr ""
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Assign nothing"
-msgstr "Inte kopplat"
+msgstr ""
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Press ESC to cancel"
-msgstr "Tryck ESC för att avbryta"
+msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: ./data/gui/soccer_setup.stkgui
 msgid "Race Setup"
-msgstr "Tävlingsinställningar"
+msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 msgid "Select a difficulty"
@@ -1444,21 +1443,21 @@ msgstr ""
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
 msgid "Novice"
-msgstr "Nybörjare"
+msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
 msgid "Intermediate"
-msgstr "Medel"
+msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
 msgid "Expert"
-msgstr "Expert"
+msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -1467,33 +1466,33 @@ msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 msgid "Select a game mode"
-msgstr "Välj ett spelläge"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Back to Race"
-msgstr "Tillbaka till loppet"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: src/states_screens/race_result_gui.cpp:209
 msgid "Setup New Race"
-msgstr "Anordna ny tävling"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Restart Race"
-msgstr "Starta om tävlingen"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Give Up Race"
-msgstr "Ge Upp Lopp"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Exit Race"
-msgstr "Avsluta loppet"
+msgstr ""
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
@@ -1503,17 +1502,17 @@ msgstr ""
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Number of goals to win"
-msgstr "Antal mål för att vinna"
+msgstr ""
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Maximum time (min.)"
-msgstr "Maximal tid (min.)"
+msgstr ""
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Game type (Goals limit / Time limit)"
-msgstr "Speltyp (Mål gräns / Tids gräns)"
+msgstr ""
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -1528,32 +1527,32 @@ msgstr ""
 #. I18N: In the track selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:145
 msgid "Grand Prix"
-msgstr "Grand prix-tävling"
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 msgid "= Highscores ="
-msgstr "= Topplistan ="
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: for empty highscores entries
 #: src/states_screens/track_info_screen.cpp:253
 msgid "(Empty)"
-msgstr "(Tomt)"
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Number of laps"
-msgstr "Antal varv"
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Number of AI karts"
-msgstr "Antal datorstyrda gokartar"
+msgstr ""
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Drive in reverse"
-msgstr "Backa"
+msgstr ""
 
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
@@ -1567,50 +1566,50 @@ msgstr ""
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Add user"
-msgstr "Lägg till användare"
+msgstr ""
 
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Delete"
-msgstr "Radera"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
-msgstr "Stridsön"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
-msgstr "Grotta X"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/city/track.xml
 msgid "Shiny Suburbs"
-msgstr "Glittrande förorter"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
-msgstr "Kakao Tempel"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/farm/track.xml
 msgid "Bovine Barnyard"
-msgstr "Ladugården"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
-msgstr "Fort magma"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
-msgstr "Gran Paradiso ön"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/greenvalley/track.xml
 msgid "Green Valley"
-msgstr "Grön Dal"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
-msgstr "Hacienda"
+msgstr ""
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -1620,17 +1619,17 @@ msgstr ""
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr "Oh ja, se, han är i mitt slott nu och det kommer att serveras till kvällsmat ..."
+msgstr ""
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr "Men jag är en fredlig varelse, så jag ska göra dig en deal."
+msgstr ""
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
-msgstr "Om du kan slå mig i ett lopp, kommer jag att befria gamla codger."
+msgstr ""
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -1641,7 +1640,7 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
-msgstr "Runt fyren"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/mansion/track.xml
 msgid "Blackhill Mansion"
@@ -1649,31 +1648,31 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
-msgstr "Gammal gruva"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/minigolf/track.xml
 msgid "Minigolf"
-msgstr "Minigolf"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
-msgstr "Olivers matematikklass"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
-msgstr "Sand och pyramider"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/scotland/track.xml
 msgid "Nessie's pond"
-msgstr "Nessies damm"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
-msgstr "Nordlig tillflyktsort"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
 msgid "Snow Peak"
-msgstr "Snötopp"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
@@ -1681,7 +1680,7 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
-msgstr "Stadion"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
@@ -1689,7 +1688,7 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/subsea/track.xml
 msgid "Subsea"
-msgstr "Undervatten"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
 msgid "Temple"
@@ -1697,19 +1696,19 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
-msgstr "XR591"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/zengarden/track.xml
 msgid "Zen Garden"
-msgstr "Zenträdgården"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/nolok/kart.xml
 msgid "Nolok"
-msgstr "Nolok"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/tux/kart.xml
 msgid "Tux"
-msgstr "Tux"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
@@ -1718,92 +1717,92 @@ msgstr ""
 #: src/achievements/achievement.cpp:209
 #, c-format
 msgid "Completed achievement \"%s\"."
-msgstr "Klarade prestationen \"%s\"."
+msgstr ""
 
 #: src/addons/addons_manager.cpp:97 src/addons/news_manager.cpp:315
 msgid "Can't access stkaddons server..."
-msgstr "Kan inte komma åt stkaddons-servern..."
+msgstr ""
 
 #: src/addons/news_manager.cpp:172
 #, c-format
 msgid "Error downloading news: '%s'."
-msgstr "Fel vid hämtning av nyheter: '%s'."
+msgstr ""
 
 #. I18N: number of laps to race in a challenge
 #: src/challenges/challenge_data.cpp:249
 #, c-format
 msgid "Laps : %i"
-msgstr "Varv : %i"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:255
 msgid "Follow the leader"
-msgstr "Följ ledaren"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:491
 #, c-format
 msgid "New track '%s' now available"
-msgstr "Nya banan \"%s\" finns tillgänglig"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:496
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr "Nya spelläget \"%s\" finns tillgängligt"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:506
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr "Nya grand prix-tävlingen \"%s\" finns tillgänglig"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:510
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr "Nya svårighetsgraden \"%s\" finns tillgänglig"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:520
 #, c-format
 msgid "New kart '%s' now available"
-msgstr "Nya gokarten \"%s\" finns tillgänglig"
+msgstr ""
 
 #: src/config/player_manager.cpp:91
 msgid "Currently not signed in"
-msgstr "För närvarande inte inloggad"
+msgstr ""
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:392
 msgid "Guest"
-msgstr "Gäst"
+msgstr ""
 
 #. I18N: Name of further guest players, with a 1, 2, ... attached
 #: src/config/player_manager.cpp:397
 #, c-format
 msgid "Guest %d"
-msgstr "Gäst %d"
+msgstr ""
 
 #: src/config/user_config.cpp:700
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr "Din konfigurationsfil innehöll fel så den togs bort och en ny kommer att skapas."
+msgstr ""
 
 #: src/config/user_config.cpp:711
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr "Din konfigurationsfil var för gammal, så den togs bort och en ny kommer att skapas."
+msgstr ""
 
 #: src/graphics/irr_driver.cpp:1852
 #, c-format
 msgid "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
-msgstr "FPS: %d/%d/%d - PolyCount: %d Solid, %d Shadows - LightDist : %d"
+msgstr ""
 
 #: src/graphics/irr_driver.cpp:1863
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris"
-msgstr "FPS: %d/%d/%d - %d KTris"
+msgstr ""
 
 #: src/guiengine/engine.cpp:1329
 msgid "Loading"
-msgstr "Läser in"
+msgstr ""
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:85
 msgid "WEIGHT"
@@ -1815,24 +1814,24 @@ msgstr ""
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:93
 msgid "POWER"
-msgstr "KRAFT"
+msgstr ""
 
 #. I18N: 'handicapped' indicates that per-player handicaps are
 #. activated for this kart (i.e. it will drive slower)
 #: src/guiengine/widgets/player_kart_widget.cpp:361
 #, c-format
 msgid "%s (handicapped)"
-msgstr "%s (handikappad)"
+msgstr ""
 
 #: src/guiengine/widgets/player_kart_widget.cpp:420
 #, c-format
 msgid "%s is ready"
-msgstr "%s är redo"
+msgstr ""
 
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:90
 msgid "[none]"
-msgstr "[ingen]"
+msgstr ""
 
 #. I18N: input configuration screen: mouse button
 #: src/input/binding.cpp:114
@@ -1983,13 +1982,13 @@ msgstr ""
 #: src/input/binding.cpp:163
 msgctxt "input_key"
 msgid "Page Up"
-msgstr "Page Up"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:165
 msgctxt "input_key"
 msgid "Page Down"
-msgstr "Page Down"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:167
@@ -2097,61 +2096,61 @@ msgstr ""
 #: src/input/binding.cpp:237
 msgctxt "input_key"
 msgid "Numpad 0"
-msgstr "Numpad 0"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:239
 msgctxt "input_key"
 msgid "Numpad 1"
-msgstr "Numpad 1"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:241
 msgctxt "input_key"
 msgid "Numpad 2"
-msgstr "Numpad 2"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:243
 msgctxt "input_key"
 msgid "Numpad 3"
-msgstr "Numpad 3"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:245
 msgctxt "input_key"
 msgid "Numpad 4"
-msgstr "Numpad 4"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:247
 msgctxt "input_key"
 msgid "Numpad 5"
-msgstr "Numpad 5"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:249
 msgctxt "input_key"
 msgid "Numpad 6"
-msgstr "Numpad 6"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:251
 msgctxt "input_key"
 msgid "Numpad 7"
-msgstr "Numpad 7"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:253
 msgctxt "input_key"
 msgid "Numpad 8"
-msgstr "Numpad 8"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:255
 msgctxt "input_key"
 msgid "Numpad 9"
-msgstr "Numpad 9"
+msgstr ""
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:259
@@ -2277,59 +2276,59 @@ msgstr ""
 #: src/input/binding.cpp:334 src/input/binding.cpp:339
 #, c-format
 msgid "Gamepad hat %d"
-msgstr "Spelkontrollshatt %d"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:346
 #, c-format
 msgid "Axis %d %s"
-msgstr "Axel %d %s"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:353
 #, c-format
 msgid "Axis %d inverted"
-msgstr "Axel %d inverterad"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:358
 #, c-format
 msgid "Axis %d"
-msgstr "Axel %d"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
 #: src/input/binding.cpp:366
 #, c-format
 msgid "Gamepad button %d"
-msgstr "Spelkontrollsknapp %d"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used
 #. at all)
 #: src/input/binding.cpp:369
 #, c-format
 msgid "Mouse button %d"
-msgstr "Musknapp %d"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used
 #. at all)
 #: src/input/binding.cpp:373
 #, c-format
 msgid "Mouse axis %d %s"
-msgstr "Musaxel %d %s"
+msgstr ""
 
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:500
 msgid "Please re-configure your key bindings."
-msgstr "Konfigurera om dina tangentbindningar."
+msgstr ""
 
 #: src/input/device_manager.cpp:501
 msgid "Your input config file is not compatible with this version of STK."
-msgstr "Din konfigurationsfil är inte kompatibel med denna version av STK."
+msgstr ""
 
 #. I18N: Name of the black button on xbox controller
 #: src/input/gamepad_config.cpp:167
 msgid "Black"
-msgstr "Svart"
+msgstr ""
 
 #. I18N: Name of the white button on xbox controller
 #: src/input/gamepad_config.cpp:171
@@ -2340,7 +2339,7 @@ msgstr ""
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:179 src/input/gamepad_config.cpp:239
 msgid "Left trigger"
-msgstr "Vänster Trigger"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
@@ -2375,27 +2374,27 @@ msgstr ""
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:191 src/input/gamepad_config.cpp:255
 msgid "DPad right"
-msgstr "Styrkors höger"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:193 src/input/gamepad_config.cpp:257
 msgid "DPad left"
-msgstr "Styrkors vänster"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:195 src/input/gamepad_config.cpp:253
 msgid "DPad down"
-msgstr "Styrkors ner"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:197 src/input/gamepad_config.cpp:251
 msgid "DPad up"
-msgstr "Styrkors upp"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:212
 msgid "Left bumper"
-msgstr "Vänster Bumper"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:214
@@ -2410,7 +2409,7 @@ msgstr ""
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:220
 msgid "Left thumb button"
-msgstr "Vänster tumme knapp"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:222
@@ -2420,72 +2419,71 @@ msgstr ""
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:231
 msgid "Left thumb right"
-msgstr "Vänster tumme höger"
+msgstr ""
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:233
 msgid "Left thumb left"
-msgstr "Vänster tumme vänster"
+msgstr ""
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:235
 msgid "Left thumb down"
-msgstr "Vänster tumme ner"
+msgstr ""
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:237
 msgid "Left thumb up"
-msgstr "Vänster tumme höger"
+msgstr ""
 
 #: src/input/input_manager.cpp:751
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
-msgstr "Ignorerar \"%s\", du måste hoppa in tidigare för att spela!"
+msgstr ""
 
 #: src/input/input_manager.cpp:781
 msgid "Only the Game Master may act at this point!"
-msgstr "Endast spelägaren kan agera just nu!"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:387
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed "
 "instructions at supertuxkart.net/Wiimote"
-msgstr "Anslut din Wiimote till Bluetooth hanteraren och klicka sedan på OK. Detaljerade instruktioner på supertuxkart.net/Wiimote"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:390
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
-msgstr "Tryck på knapparna 1+2 samtidigt på din Wiimote för att uttrycka det i identifieringsläge, klicka på OK. Detaljerade instruktioner på supertuxkart.net/Wiimote"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:413
 #, c-format
 msgid "Found %d wiimote"
 msgid_plural "Found %d wiimotes"
-msgstr[0] "Hittade %d Wimote."
-msgstr[1] "Hittade %d Wimotes."
+msgstr[0] ""
 
 #: src/input/wiimote_manager.cpp:418
 msgid "Could not detect any wiimote :/"
-msgstr "Det gick inte att hitta någon Wiimote :/"
+msgstr ""
 
 #: src/karts/controller/network_player_controller.cpp:281
 #: src/karts/controller/player_controller.cpp:356
 msgid "Penalty time!!"
-msgstr "Strafftid!!"
+msgstr ""
 
 #: src/karts/controller/network_player_controller.cpp:283
 #: src/karts/controller/player_controller.cpp:358
 msgid "Don't accelerate before go"
-msgstr "Gasa inte förrän loppet startar"
+msgstr ""
 
 #: src/karts/kart.cpp:834 src/karts/kart.cpp:853
 msgid "You won the race!"
-msgstr "Du vann loppet!"
+msgstr ""
 
 #: src/karts/kart.cpp:834
 msgid "You finished the race!"
-msgstr "Du kom i mål!"
+msgstr ""
 
 #: src/main.cpp:1227
 msgid ""
@@ -2501,7 +2499,7 @@ msgstr ""
 #: src/main.cpp:1399
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
-msgstr "Drivrutinerna är för gammal. Var vänlig installera de senaste grafikdrivrutinerna."
+msgstr ""
 
 #: src/main.cpp:1411
 msgid ""
@@ -2512,73 +2510,71 @@ msgstr ""
 #: src/modes/easter_egg_hunt.cpp:202
 #, c-format
 msgid "Eggs: %d / %d"
-msgstr "Ägg: %d / %d"
+msgstr ""
 
 #: src/modes/follow_the_leader.cpp:61 src/modes/follow_the_leader.cpp:293
 msgid "Leader"
-msgstr "Ledare"
+msgstr ""
 
 #: src/modes/linear_world.cpp:284
 msgid "Final lap!"
-msgstr "Sista varvet!"
+msgstr ""
 
 #: src/modes/linear_world.cpp:311
 #, c-format
 msgid "Lap %i"
-msgstr "Varv %i"
+msgstr ""
 
 #: src/modes/linear_world.cpp:366
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
-msgstr "%s av %s"
+msgstr ""
 
 #: src/modes/linear_world.cpp:371
 msgid "New fastest lap"
-msgstr "Nytt snabbaste varv"
+msgstr ""
 
 #: src/modes/linear_world.cpp:890
 msgid "WRONG WAY!"
-msgstr "FEL VÄG!"
+msgstr ""
 
 #: src/modes/world.cpp:1163
 msgid "You have been eliminated!"
-msgstr "Du har blivit eliminerad!"
+msgstr ""
 
 #: src/modes/world.cpp:1166
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr "\"%s\" har eliminerats."
+msgstr ""
 
 #: src/online/online_player_profile.cpp:420
 #, c-format
 msgid "%s is now online."
-msgstr "%s är nu online."
+msgstr ""
 
 #: src/online/online_player_profile.cpp:424
 #, c-format
 msgid "%s and %s are now online."
-msgstr "%s och %s är nu online."
+msgstr ""
 
 #: src/online/online_player_profile.cpp:429
 #, c-format
 msgid "%s, %s and %s are now online."
-msgstr "%s, %s och %s är nu online."
+msgstr ""
 
 #. I18N: Only used for count > 3
 #: src/online/online_player_profile.cpp:435
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
-msgstr[0] "%d vän är nu på online."
-msgstr[1] "%ds vänner är nu på online."
+msgstr[0] ""
 
 #: src/online/online_player_profile.cpp:472
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
 msgstr[0] ""
-msgstr[1] ""
 
 #: src/online/online_player_profile.cpp:478
 msgid "You have a new friend request!"
@@ -2598,32 +2594,32 @@ msgstr ""
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr "Filen för topplista var för gammal,\n alla rekord har raderats."
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:176
 msgid "Normal Race"
-msgstr "Normal tävling"
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:178
 msgid "Time Trial"
-msgstr "Tidsförsök"
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:180
 msgid "Follow the Leader"
-msgstr "Följ Ledaren"
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:182
 msgid "3 Strikes Battle"
-msgstr "Tre träffar"
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:184
 msgid "Egg Hunt"
-msgstr "Äggjakt"
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:186
@@ -2632,54 +2628,54 @@ msgstr ""
 
 #: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
-msgstr "1 vecka"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:51
 msgid "2 weeks"
-msgstr "2 veckor"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:52
 msgid "1 month"
-msgstr "1 månad"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:53
 msgid "3 months"
-msgstr "3 månader"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:54
 msgid "6 months"
-msgstr "6 månader"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:55
 msgid "9 months"
-msgstr "9 månader"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:56
 msgid "1 year"
-msgstr "1 år"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:57
 msgid "2 years"
-msgstr "2 år"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:110
 msgid "Add-on name"
-msgstr "Tilläggets namn"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:111
 msgid "Updated date"
-msgstr "Datum för uppdatering"
+msgstr ""
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:304
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
-msgstr "%s av %s"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:435
 msgid "Please wait while addons are updated"
-msgstr "Vänta medan tillägg uppdateras"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:512
 #: src/states_screens/main_menu_screen.cpp:553
@@ -2687,7 +2683,7 @@ msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr "Tyvärr inträffade ett fel när tilläggswebbsidan kontaktades. Se till att du är ansluten till Internet, och att SuperTuxKart inte blockeras av en brandvägg."
+msgstr ""
 
 #. I18N: arena group name
 #. I18N: track group name
@@ -2698,7 +2694,7 @@ msgstr "Tyvärr inträffade ett fel när tilläggswebbsidan kontaktades. Se till
 #: src/states_screens/kart_selection.cpp:284
 #: src/states_screens/tracks_screen.cpp:153
 msgid "standard"
-msgstr "standard"
+msgstr ""
 
 #: src/states_screens/arenas_screen.cpp:237
 #: src/states_screens/arenas_screen.cpp:267
@@ -2708,24 +2704,24 @@ msgstr "standard"
 #: src/states_screens/kart_selection.cpp:1452
 #: src/states_screens/race_setup_screen.cpp:214
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr "Låst: lös aktiva utmaningar för att få tillgång till mer!"
+msgstr ""
 
 #: src/states_screens/arenas_screen.cpp:277
 msgid "Random Arena"
-msgstr "Slumpmässig arena"
+msgstr ""
 
 #: src/states_screens/create_server_screen.cpp:60
 #, c-format
 msgid "%s's server"
-msgstr "%ss server"
+msgstr ""
 
 #: src/states_screens/create_server_screen.cpp:117
 msgid "Creating server"
-msgstr "Skapar server"
+msgstr ""
 
 #: src/states_screens/create_server_screen.cpp:132
 msgid "Name has to be between 4 and 30 characters long!"
-msgstr "Namn måste vara mellan 4 och 30 tecken långt!"
+msgstr ""
 
 #: src/states_screens/create_server_screen.cpp:136
 msgid "The maxinum number of players has to be between 2 and 12."
@@ -2733,36 +2729,36 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Anders Carlsson https://launchpad.net/~kk7ntl9af-gk9\n  Arve Eriksson https://launchpad.net/~031299870-telia\n  Daniel Nylander https://launchpad.net/~yeager\n  Dawid Gan https://launchpad.net/~deveee\n  MDxm https://launchpad.net/~mdxm3000\n  Mathias Tillman https://launchpad.net/~master-homer\n  Mikael Mildén https://launchpad.net/~mikael-milden\n  Phoenix https://launchpad.net/~thephoenix\n  Rikard Edgren https://launchpad.net/~rikard-edgren\n  Rikard Johansson https://launchpad.net/~rikard-jo\n  STK-team https://launchpad.net/~stk"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
-msgstr "Uppdatera"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:108
 #, c-format
 msgid "Version: %d"
-msgstr "Version: %d"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:139
 msgid "featured"
-msgstr "rekommenderat"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:165
 #, c-format
 msgid "%s MB"
-msgstr "%s MB"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:172
 #: src/states_screens/dialogs/addons_loading.cpp:176
 #, c-format
 msgid "%s KB"
-msgstr "%s KB"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:177
 #, c-format
 msgid "Size: %s"
-msgstr "Storlek: %s"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:279
 msgid "Sorry, downloading the add-on failed"
@@ -2771,52 +2767,52 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:360
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr "Problem vid installation av tillägget \"%s\"."
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:371
 #: src/states_screens/dialogs/addons_loading.cpp:408
 msgid "Try again"
-msgstr "Försök igen"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:397
 #, c-format
 msgid "Problems removing the addon '%s'."
-msgstr "Problem vid borttagning av tillägget \"%s\"."
+msgstr ""
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
 "To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
 "\n"
 "To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
-msgstr "För att lägga till en ny handkontroll/styrspak, starta helt enkelt SuperTuxKart med den inkopplad och den ska visas i listan.\n\nFör att lägga till en tangentbordskonfiguration, så kan du använda knapparna nedan, MEN observera att de flesta tangentbord inte kan hantera flera knappnedtryckningar samtidigt och är därför inte rekommenderat för flerspelarläget. (Du kan dock koppla in flera tangentbord än ett men kom ihåg att de ska ha olika knappar bundna.)"
+msgstr ""
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:90
 msgid "Add Wiimote"
-msgstr "Lägg till Wiimote"
+msgstr ""
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:111
 msgid "Add Keyboard Configuration"
-msgstr "Lägg till tangentbordsinställningar"
+msgstr ""
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:134
 msgid "Current password invalid."
-msgstr "Nuvarande lösenord ogiltigt."
+msgstr ""
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:140
 #: src/states_screens/register_screen.cpp:288
 msgid "Password has to be between 8 and 30 characters long!"
-msgstr "Lösenord måste vara mellan 8 och 30 tecken långt!"
+msgstr ""
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:147
 #: src/states_screens/register_screen.cpp:272
 msgid "Passwords don't match!"
-msgstr "Lösenorden matchar inte!"
+msgstr ""
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:210
 msgid "Password successfully changed."
-msgstr "Lösenord har ändrats."
+msgstr ""
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:235
 #: src/states_screens/dialogs/recovery_dialog.cpp:209
@@ -2830,8 +2826,7 @@ msgstr ""
 #, c-format
 msgid "Confirm resolution within %i second"
 msgid_plural "Confirm resolution within %i seconds"
-msgstr[0] "Bekräfta upplösningen inom %i sekund"
-msgstr[1] "Bekräfta upplösningen inom %i sekunder"
+msgstr[0] ""
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
@@ -2839,21 +2834,21 @@ msgstr[1] "Bekräfta upplösningen inom %i sekunder"
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
 #: src/states_screens/options_screen_video.cpp:387
 msgid "Disabled"
-msgstr "Inaktiverad"
+msgstr ""
 
 #. I18N: animations setting (only karts with human players are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:64
 msgid "Human players only"
-msgstr "Endast mänskliga spelare"
+msgstr ""
 
 #. I18N: animations setting (all karts are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
 msgid "Enabled for all"
-msgstr "Aktiverad för alla"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:76
 msgid "Bilinear"
-msgstr "Bilinjär"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:77
 msgid "Trilinear"
@@ -2861,48 +2856,48 @@ msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:78
 msgid "Anisotropic x2"
-msgstr "Anisotrop x2"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:79
 msgid "Anisotropic x4"
-msgstr "Anisotrop x4"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:80
 msgid "Anisotropic x8"
-msgstr "Anisotrop x8"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
 msgid "Anisotropic x16"
-msgstr "Anisotrop x16"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 msgid "low"
-msgstr "låg"
+msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
 msgid "high"
-msgstr "hög"
+msgstr ""
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:125
 msgid "Name is empty."
-msgstr "Namnet är tomt."
+msgstr ""
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:132
 msgid "Another grand prix with this name already exists."
-msgstr "Ett annat grand prix med detta namnet finns redan."
+msgstr ""
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:137
 msgid "Name is too long."
-msgstr "Namnet är för långt."
+msgstr ""
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:211
 msgid "Start Grand Prix"
-msgstr "Starta Grand Prix-tävling"
+msgstr ""
 
 #: src/states_screens/dialogs/message_dialog.cpp:129
 #: src/states_screens/edit_gp_screen.cpp:256
 msgid "No"
-msgstr "Nej"
+msgstr ""
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
@@ -2936,11 +2931,11 @@ msgstr ""
 #: src/states_screens/dialogs/select_challenge.cpp:68
 #, c-format
 msgid "Number of AI Karts: %i"
-msgstr "Antal datorstyrda gokartar: %i"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:147
 msgid "Nitro challenge"
-msgstr "Nitro utmaning"
+msgstr ""
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:58
 msgid "Server successfully created. You can now join it."
@@ -2948,11 +2943,11 @@ msgstr ""
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:155
 msgid "Joining server"
-msgstr "Ansluter till serven"
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:56
 msgid "Cancel Request"
-msgstr "Avbryt förfrågan"
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:154
 #: src/states_screens/dialogs/user_info_dialog.cpp:211
@@ -2961,31 +2956,31 @@ msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:158
 msgid "Friend request sent!"
-msgstr "Vänförfrågan skickades!"
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:215
 msgid "Friend request accepted!"
-msgstr "Vänförfrågan accepteras!"
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:267
 msgid "Friend request declined!"
-msgstr "Vänförfrågan avböjdes!"
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:313
 msgid "Friend removed!"
-msgstr "Vän bort tagen!"
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:364
 msgid "Friend request cancelled!"
-msgstr "Vänförfrågan nekas!"
+msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:474
 msgid "Processing"
-msgstr "Bearbetning"
+msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:171
 msgid "Fetching last vote"
-msgstr "Hämtar sista omröstningen"
+msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:190
 msgid "You can adapt your previous rating by clicking the stars beneath."
@@ -3008,7 +3003,7 @@ msgstr ""
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/tracks_screen.cpp:299
 msgid "Random Track"
-msgstr "Slumpmässig bana"
+msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:66
 msgid "Track"
@@ -3016,7 +3011,7 @@ msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:67
 msgid "Laps"
-msgstr "Varv"
+msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:68
 msgid "Reversed"
@@ -3026,21 +3021,21 @@ msgstr ""
 #: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
-msgstr "Är du säker att du vill ta bort  '%s'?"
+msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:140
 msgid "Do you want to save your changes?"
-msgstr "Vill du spara dina ändringar?"
+msgstr ""
 
 #. I18N: Indicate that the grand prix is modified and not saved
 #: src/states_screens/edit_gp_screen.cpp:285
 #, c-format
 msgid "%s (+)"
-msgstr "%s (+)"
+msgstr ""
 
 #: src/states_screens/edit_gp_screen.cpp:324
 msgid "An error occurred while trying to save your grand prix."
-msgstr "Ett fel uppstod när du försökte spara din grand prix."
+msgstr ""
 
 #: src/states_screens/edit_track_screen.cpp:237
 msgid "Select a track"
@@ -3065,7 +3060,7 @@ msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:492
 msgid "Challenge Completed"
-msgstr "Utmaning Avklarad"
+msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:529
 msgid "You unlocked track %0"
@@ -3077,13 +3072,13 @@ msgstr ""
 
 #: src/states_screens/gp_info_screen.cpp:74
 msgid "Default"
-msgstr "Standard"
+msgstr ""
 
 #. I18N: if no kart animations are enabled
 #: src/states_screens/gp_info_screen.cpp:75
 #: src/states_screens/options_screen_video.cpp:393
 msgid "None"
-msgstr "Ingen"
+msgstr ""
 
 #: src/states_screens/gp_info_screen.cpp:77
 msgid "Random"
@@ -3096,7 +3091,7 @@ msgstr ""
 
 #: src/states_screens/grand_prix_editor_screen.cpp:164
 msgid "Please select a Grand Prix"
-msgstr "Välj en Grand Prix"
+msgstr ""
 
 #: src/states_screens/grand_prix_editor_screen.cpp:326
 msgid "User defined"
@@ -3105,7 +3100,7 @@ msgstr ""
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:150
 msgid "Better luck next time!"
-msgstr "Bättre lycka nästa gång!"
+msgstr ""
 
 #: src/states_screens/grand_prix_win.cpp:125
 #: src/states_screens/race_result_gui.cpp:175
@@ -3114,22 +3109,22 @@ msgstr ""
 
 #: src/states_screens/grand_prix_win.cpp:280
 msgid "You completed the Grand Prix!"
-msgstr "Du har slutfört Grand Prix-tävlingen!"
+msgstr ""
 
 #: src/states_screens/kart_selection.cpp:839
 #: src/states_screens/kart_selection.cpp:1470
 msgid "Random Kart"
-msgstr "Slumpmässig gokart"
+msgstr ""
 
 #: src/states_screens/kart_selection.cpp:853
 msgid "Locked"
-msgstr "Låst"
+msgstr ""
 
 #: src/states_screens/kart_selection.cpp:923
 msgid ""
 "Everyone:\n"
 "Press 'Select' now to join the game!"
-msgstr "Alla:\nTryck på \"Välj\" nu för att delta i spelet!"
+msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:488
 msgid ""
@@ -3147,30 +3142,30 @@ msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:548
 msgid "The add-ons module is currently disabled in the Options screen"
-msgstr "Tilläggsmodulen är för närvarande inaktiverad i Alternativskärmen."
+msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:560
 msgid "Please wait while the add-ons are loading"
-msgstr "Vänta medan tillägg laddas in"
+msgstr ""
 
 #: src/states_screens/online_profile_achievements.cpp:79
 msgid "Progress"
-msgstr "Progress"
+msgstr ""
 
 #: src/states_screens/online_profile_achievements.cpp:128
 #: src/states_screens/online_profile_achievements.cpp:168
 msgid "Fetching achievements"
-msgstr "Hämtar prestationer"
+msgstr ""
 
 #: src/states_screens/online_profile_base.cpp:105
 #: src/states_screens/online_profile_base.cpp:115
 msgid "Your profile"
-msgstr "Din profil"
+msgstr ""
 
 #: src/states_screens/online_profile_base.cpp:108
 #, c-format
 msgid "%s's profile"
-msgstr "%ss profil"
+msgstr ""
 
 #: src/states_screens/online_profile_friends.cpp:75
 msgid "Since"
@@ -3183,11 +3178,11 @@ msgstr ""
 #: src/states_screens/online_profile_friends.cpp:95
 #: src/states_screens/online_profile_friends.cpp:246
 msgid "Fetching friends"
-msgstr "Hämtar vänner"
+msgstr ""
 
 #: src/states_screens/online_profile_friends.cpp:217
 msgid "New Request"
-msgstr "Ny Förfrågan"
+msgstr ""
 
 #: src/states_screens/online_profile_friends.cpp:218
 msgid "Pending"
@@ -3195,20 +3190,20 @@ msgstr ""
 
 #: src/states_screens/online_profile_friends.cpp:222
 msgid "Offline"
-msgstr "Offline"
+msgstr ""
 
 #: src/states_screens/online_screen.cpp:139
 #, c-format
 msgid "Logged in as: %s."
-msgstr "Inloggad som: %s."
+msgstr ""
 
 #: src/states_screens/online_screen.cpp:155
 msgid "Logging in"
-msgstr "Loggar in"
+msgstr ""
 
 #: src/states_screens/online_screen.cpp:160
 msgid "Logging out"
-msgstr "Loggar ut"
+msgstr ""
 
 #: src/states_screens/online_user_search.cpp:208
 #: src/states_screens/online_user_search.cpp:288
@@ -3218,67 +3213,67 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:97
 #, c-format
 msgid "Keyboard %i"
-msgstr "Tangentbord %i"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:71
 msgid "Action"
-msgstr "Åtgärd"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:72
 msgid "Key binding"
-msgstr "Tangentkoppling"
+msgstr ""
 
 #. I18N: button to disable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:96
 #: src/states_screens/options_screen_input2.cpp:575
 msgid "Disable Device"
-msgstr "Inaktivera enhet"
+msgstr ""
 
 #. I18N: button to enable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:98
 #: src/states_screens/options_screen_input2.cpp:576
 msgid "Enable Device"
-msgstr "Aktivera enhet"
+msgstr ""
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:137
 msgid "Game Keys"
-msgstr "Speltangenter"
+msgstr ""
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:151
 msgid "Menu Keys"
-msgstr "Menyknappar"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:218
 msgid "Steer Left"
-msgstr "Styr vänster"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:221
 msgid "Steer Right"
-msgstr "Styr höger"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:224
 msgid "Accelerate"
-msgstr "Gasa"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:227
 msgid "Brake"
-msgstr "Bromsa"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:230
 msgid "Fire"
-msgstr "Skjut"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:233
 msgid "Nitro"
-msgstr "Nitro"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:236
@@ -3288,51 +3283,51 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:239
 msgid "Look Back"
-msgstr "Titta bakåt"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:242
 msgid "Rescue"
-msgstr "Rädda"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:245
 msgid "Pause Game"
-msgstr "Pausa spelet"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:250
 msgid "Up"
-msgstr "Upp"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:253
 msgid "Down"
-msgstr "Ner"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:256
 msgid "Left"
-msgstr "Vänster"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:259
 msgid "Right"
-msgstr "Höger"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:262
 msgid "Select"
-msgstr "Välj"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:265
 msgid "Cancel/Back"
-msgstr "Avbryt/Tillbaka"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:360
 msgid "* A blue item means a conflict with another configuration"
-msgstr "* Ett blått objekt betyder att det finns en konflikt med en annan konfiguration"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:365
 msgid "* A red item means a conflict in the current configuration"
@@ -3348,28 +3343,28 @@ msgstr ""
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options_screen_input2.cpp:563
 msgid "Are you sure you want to permanently delete this configuration?"
-msgstr "Vill du verkligen radera de här inställningarna permanent?"
+msgstr ""
 
 #: src/states_screens/options_screen_ui.cpp:155
 msgid ""
 "Players can select handicapped (more difficult) profiles on the kart "
 "selection screen"
-msgstr "Spelare kan välja handikappade (svårare) profiler på gokart väljaren"
+msgstr ""
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:187
 msgid "System Language"
-msgstr "Systemspråk"
+msgstr ""
 
 #. I18N: custom video settings
 #: src/states_screens/options_screen_video.cpp:366
 msgid "Custom"
-msgstr "Egna"
+msgstr ""
 
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:391
 msgid "Me Only"
-msgstr "Bara jag"
+msgstr ""
 
 #. I18N: in graphical options
 #. tooltip = tooltip + L"\n" + _("Pixel shaders: %s",
@@ -3378,7 +3373,7 @@ msgstr "Bara jag"
 #: src/states_screens/options_screen_video.cpp:399
 #, c-format
 msgid "Animated Scenery: %s"
-msgstr "Animerat Landskap: %s"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:402
@@ -3390,31 +3385,31 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:405
 #, c-format
 msgid "Animated Characters: %s"
-msgstr "Animerade Karaktärer: %s"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:410
 #, c-format
 msgid "Dynamic lights: %s"
-msgstr "Dynamiskt ljus: %s"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:413
 #, c-format
 msgid "Motion blur: %s"
-msgstr "Motion blur: %s"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:416
 #, c-format
 msgid "Anti-aliasing: %s"
-msgstr "Anti-aliasing: %s"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:419
 #, c-format
 msgid "Ambient occlusion: %s"
-msgstr "Omgivande ocklusion: %s"
+msgstr ""
 
 #: src/states_screens/options_screen_video.cpp:423
 #, c-format
@@ -3430,31 +3425,31 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:428
 #, c-format
 msgid "Bloom: %s"
-msgstr "Bloom: %s"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:432
 #, c-format
 msgid "Glow (outlines): %s"
-msgstr "Glow (konturer): %s"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:436
 #, c-format
 msgid "Light shaft (God rays): %s"
-msgstr "Light shaft (God rays): %s"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:440
 #, c-format
 msgid "Depth of field: %s"
-msgstr "Depth of field: %s"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:444
 #, c-format
 msgid "Global illumination: %s"
-msgstr "Global illumination: %s"
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:448
@@ -3464,60 +3459,60 @@ msgstr ""
 
 #: src/states_screens/race_gui.cpp:313 src/states_screens/race_gui.cpp:315
 msgid "Challenge Failed"
-msgstr "Utmaningen Misslyckades"
+msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:64
 msgid "Ready!"
-msgstr "Klara!"
+msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:66
 msgid "Set!"
-msgstr "Färdiga!"
+msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:68
 msgid "Go!"
-msgstr "Kör!"
+msgstr ""
 
 #. I18N: Shown when a goal is scored
 #: src/states_screens/race_gui_base.cpp:70
 msgid "GOAL!"
-msgstr "MÅL!"
+msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
 #: src/states_screens/race_gui_base.cpp:536
 msgid "by"
-msgstr "av"
+msgstr ""
 
 #: src/states_screens/race_gui_base.cpp:644
 msgid "Collect nitro!"
-msgstr "Plocka upp nitro!"
+msgstr ""
 
 #: src/states_screens/race_gui_base.cpp:646
 msgid "Follow the leader!"
-msgstr "Följ ledaren!"
+msgstr ""
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
 #: src/states_screens/race_gui_base.cpp:812
 #, c-format
 msgid "Top %i"
-msgstr "Topp %i"
+msgstr ""
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/race_gui_overworld.cpp:108
 msgid "Lap"
-msgstr "Varv"
+msgstr ""
 
 #: src/states_screens/race_gui_overworld.cpp:109
 msgid "Rank"
-msgstr "Ranking"
+msgstr ""
 
 #: src/states_screens/race_gui_overworld.cpp:469
 msgid "Press fire to play the tutorial"
-msgstr "Tryck på sför att spela guiden"
+msgstr ""
 
 #: src/states_screens/race_gui_overworld.cpp:508
 msgid "Type: Grand Prix"
@@ -3525,11 +3520,11 @@ msgstr ""
 
 #: src/states_screens/race_gui_overworld.cpp:539
 msgid "Press fire to start the challenge"
-msgstr "Tryck på skjut för att spela guiden"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:156
 msgid "Continue."
-msgstr "Fortsätt."
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:159
 msgid "Quit the server."
@@ -3541,28 +3536,28 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:189
 msgid "Abort Grand Prix"
-msgstr "Avbryt Grand Prix"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:199
 msgid "Restart"
-msgstr "Starta om"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:205
 msgid "Back to challenge selection"
-msgstr "Tillbaka till utmanings väljaren"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:211
 msgid "Back to the menu"
-msgstr "Tillbaka till menyn"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:354
 msgid "Do you really want to abort the Grand Prix?"
-msgstr "Vill du verkligen avbryta Grand Prix?"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:475
 #: src/states_screens/race_result_gui.cpp:840
 msgid "Eliminated"
-msgstr "Utslagen"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:983
 msgid "Red Team Wins"
@@ -3570,11 +3565,11 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:987
 msgid "Blue Team Wins"
-msgstr "Blåa laget vinner"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:992
 msgid "It's a draw"
-msgstr "Det är oavgjort"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:1148
 #, c-format
@@ -3583,30 +3578,30 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:1232
 msgid "Grand Prix progress:"
-msgstr "Grand Prix progress:"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:1270
 msgid "Highscores"
-msgstr "Topplista"
+msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:202
 msgid "All blows allowed, so catch weapons and make clever use of them!"
-msgstr "Alla faror tillåtna, så plocka vapen och använd dem smart!"
+msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:209
 msgid "Contains no powerups, so only your driving skills matter!"
-msgstr "Innehåller inga powerups, endast dina körfärdigheter spelar roll!"
+msgstr ""
 
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:222
 msgid "Keep up with the leader kart but don't overtake it!"
-msgstr "Följ efter ledarkarten, men kör inte om den!"
+msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:231
 msgid ""
 "Hit others with weapons until they lose all their lives (only in multiplayer"
 " games)."
-msgstr "Träffa andra med vapen tills de förlorar hela sitt liv (endast i flerspelarläge)."
+msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:240
 msgid ""
@@ -3616,33 +3611,33 @@ msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:252
 msgid "Explore tracks to find all hidden eggs"
-msgstr "Upptäck banor för att hitta alla gömda ägg"
+msgstr ""
 
 #: src/states_screens/register_screen.cpp:217
 #: src/states_screens/register_screen.cpp:224
 #, c-format
 msgid "Could not create player '%s'."
-msgstr "Kunde inte skapa spelare \"%s\"."
+msgstr ""
 
 #: src/states_screens/register_screen.cpp:276
 msgid "Emails don't match!"
-msgstr "E-posten matchar inte!"
+msgstr ""
 
 #: src/states_screens/register_screen.cpp:280
 msgid "Online username has to be between 3 and 30 characters long!"
-msgstr "Online användarnamn måste vara mellan 3 och 30 tecken långt!"
+msgstr ""
 
 #: src/states_screens/register_screen.cpp:284
 msgid "Online username must not start with a number!"
-msgstr "Online användarnamn får inte börja med ett nummer!"
+msgstr ""
 
 #: src/states_screens/register_screen.cpp:292
 msgid "Email has to be between 5 and 254 characters long!"
-msgstr "E-post måste vara mellan 5 och 254 tecken långa!"
+msgstr ""
 
 #: src/states_screens/register_screen.cpp:298
 msgid "Email is invalid!"
-msgstr "E-posten är ogiltigt!"
+msgstr ""
 
 #: src/states_screens/register_screen.cpp:361
 msgid ""
@@ -3653,36 +3648,36 @@ msgstr ""
 #: src/states_screens/register_screen.cpp:401
 #: src/states_screens/user_screen.cpp:317
 msgid "Internet access is disabled, please enable it in the options"
-msgstr "Internetanslutningen är inaktiverad, var vänlig aktivera det i inställningar"
+msgstr ""
 
 #: src/states_screens/server_selection.cpp:67
 #: src/states_screens/server_selection.cpp:210
 msgid "Fetching servers"
-msgstr "Hämtar server"
+msgstr ""
 
 #. I18N: track group name
 #: src/states_screens/tracks_screen.cpp:151
 msgid "all"
-msgstr "allt"
+msgstr ""
 
 #: src/states_screens/tracks_screen.cpp:202
 msgid "Locked!"
-msgstr "Låst!"
+msgstr ""
 
 #: src/states_screens/tracks_screen.cpp:285
 msgid "Locked: solve active challenges to gain access to more!"
-msgstr "Låst: lösa aktiva utmaningar att få tillgång till mer!"
+msgstr ""
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
 #: src/states_screens/track_info_screen.cpp:107
 #, c-format
 msgid "Track by %s"
-msgstr "Bana av %s"
+msgstr ""
 
 #: src/states_screens/user_screen.cpp:111
 msgid "Exit game"
-msgstr "Avsluta spelat"
+msgstr ""
 
 #: src/states_screens/user_screen.cpp:461
 msgid "You need to enter a password."
@@ -3691,29 +3686,29 @@ msgstr ""
 #: src/states_screens/user_screen.cpp:482
 #, c-format
 msgid "Logging out '%s'"
-msgstr "Loggar ut '%s'"
+msgstr ""
 
 #: src/states_screens/user_screen.cpp:483
 #, c-format
 msgid "Logging in '%s'"
-msgstr "Loggar in '%s'"
+msgstr ""
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/user_screen.cpp:572
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr "Vill du verkligen ta bort spelaren \"%s\"?"
+msgstr ""
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
 #: src/utils/translation.cpp:341
 msgid "   Is this a RTL language?"
-msgstr "   N"
+msgstr ""
 
 #: ../stk-assets/tracks/overworld/scripting.as:15
 msgid "Complete all challenges to unlock the big door!"
-msgstr "Klara alla utmaningar för att låsa upp den stora dörren!"
+msgstr ""
 
 #: ../stk-assets/tracks/overworld/scripting.as:63
 msgid ""
@@ -3726,14 +3721,14 @@ msgstr ""
 #: ../stk-assets/tracks/tutorial/scripting.as:21
 #, c-format
 msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
-msgstr "Gasa med <%s> och styr med <%s> och <%s>."
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:37
 #: ../stk-assets/tracks/tutorial/triggers.as:38
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
-msgstr "Samla paket och avfyra vapnet med <%s>."
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:43
 #: ../stk-assets/tracks/tutorial/triggers.as:44
@@ -3741,7 +3736,7 @@ msgstr "Samla paket och avfyra vapnet med <%s>."
 msgid ""
 "Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to "
 "fire behind!"
-msgstr "Tryck på <%s> för att titta bakåt. Avfyra vapnet med <%s> samtidigt som du trycker på <%s> att skjuta bakåt!"
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:53
 #: ../stk-assets/tracks/tutorial/triggers.as:54
@@ -3751,12 +3746,12 @@ msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:58
 msgid "Collect nitro bottles (we will use them after the curve)."
-msgstr "Samla nitro flaskor (vi kommer att använda dem efter kurvan)."
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:63
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
-msgstr "Hoppsan! När du är i trubbel, tryck på <%s> att räddas."
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:69
 #: ../stk-assets/tracks/tutorial/triggers.as:70
@@ -3764,14 +3759,14 @@ msgstr "Hoppsan! När du är i trubbel, tryck på <%s> att räddas."
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
-msgstr "Gasa och tryck på <%s> tangenten medans du svänger för att sladda. Att sladda en kort stund kan hjälpa dig att svänga snabbare i skarpa svängar."
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:77
 #: ../stk-assets/tracks/tutorial/triggers.as:78
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
-msgstr "Tänk på att om du lyckas sladda under flera sekunder får du en bonus hastighetsökning som belöning!"
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:82
 #: ../stk-assets/tracks/tutorial/triggers.as:83
@@ -3781,13 +3776,13 @@ msgstr ""
 #: ../stk-assets/tracks/tutorial/triggers.as:28
 #, c-format
 msgid "Accelerate with <%s> and steer with <%s> and <%s>"
-msgstr "Gasa med <%s> och styr med <%s> och <%s>"
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/triggers.as:59
 msgid "Collect nitro bottles (we will use them after the curve)"
-msgstr "Samla nitro flaskor (vi kommer att använda dem efter kurvan)"
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/triggers.as:64
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
-msgstr "Hoppsan! När du är i trubbel, tryck på <%s> att räddas"
+msgstr ""
