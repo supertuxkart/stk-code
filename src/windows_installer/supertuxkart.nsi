@@ -68,14 +68,14 @@
 Function validate_dir
   IfFileExists $INSTDIR\data\*.* 0 return
     IfFileExists $INSTDIR\Uninstall.exe 0 dont_uninstall
-      MessageBox MB_YESNO "You can't install SuperTuxKart 0.8.2 in an existing directory. Do you wish to run the uninstaller in $INSTDIR?"  IDNO dont_uninstall
+      MessageBox MB_YESNO "You can't install SuperTuxKart 0.9.1 in an existing directory. Do you wish to run the uninstaller in $INSTDIR?"  IDNO dont_uninstall
 	; -?=$INSTDIR makes sure that this installer waits for the uninstaller
 	; to finish. The uninstaller (and directory) are not removed, but the
 	; uninstaller will be overwritten by our installer anyway.
         ExecWait '"$INSTDIR\Uninstall.exe" _?=$INSTDIR'
         goto return
     dont_uninstall:
-      MessageBox MB_OK "You can't install SuperTuxKart 0.8.2 in an existing directory. Please select a new directory."
+      MessageBox MB_OK "You can't install SuperTuxKart 0.9.1 in an existing directory. Please select a new directory."
       abort
   return:
 FunctionEnd
