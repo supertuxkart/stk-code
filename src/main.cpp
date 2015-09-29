@@ -762,6 +762,8 @@ int handleCmdLine()
         UserConfigParams::m_rendering_debug=true;
     if(CommandLine::has("--ai-debug"))
         AIBaseController::enableDebug();
+    if (CommandLine::has("--fps-debug"))
+        UserConfigParams::m_fps_debug = true;
 
     if(UserConfigParams::m_artist_debug_mode)
     {

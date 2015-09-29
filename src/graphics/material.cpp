@@ -73,7 +73,7 @@ Material::Material(const XMLNode *node, bool deprecated)
         m_full_path = file_manager->getFileSystem()->getAbsolutePath(relativePath.c_str()).c_str();
     init();
 
-    node->get("lazy-load", &m_lazy_load);
+    node->get("dont-load", &m_dont_load_texture);
     bool b = false;
     
     node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.4 style
@@ -420,7 +420,7 @@ Material::Material(const std::string& fname, bool is_full_path,
  */
 void Material::init()
 {
-    m_lazy_load                 = false;
+    m_dont_load_texture         = false;
     m_texture                   = NULL;
     m_clamp_tex                 = 0;
     m_shader_type               = SHADERTYPE_SOLID;
@@ -465,8 +465,8 @@ void Material::init()
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path, bool complain_if_not_found)
 {
-    // Don't load a texture that is lazily loaded.
-    if(m_lazy_load) return;
+    // Don't load a texture that are not supposed to be loaded automatically
+    if(m_dont_load_texture) return;
 
     const std::string &full_path = is_full_path
                                  ? m_texname
@@ -477,6 +477,7 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
         Log::error("material", "Cannot find texture '%s'.", m_texname.c_str());
         m_texture = NULL;
     }
+
     else
     {
         m_texture = irr_driver->getTexture(full_path,

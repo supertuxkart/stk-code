@@ -912,8 +912,7 @@ bool CIrrDeviceLinux::createWindow()
 				// window is showed in wrong screen. It doesn't matter for vidmode
 				// which displays cloned image in all devices.
 				#ifdef _IRR_LINUX_X11_RANDR_
-				XResizeWindow(display, window, Width, Height);
-				XMoveWindow(display, window, crtc_x, crtc_y);
+				XMoveResizeWindow(display, window, crtc_x, crtc_y, Width, Height);
 				XRaiseWindow(display, window);
 				XFlush(display);
 				#endif

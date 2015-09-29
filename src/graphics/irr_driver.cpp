@@ -160,7 +160,10 @@ IrrDriver::~IrrDriver()
 
     delete m_shadow_matrices;
     m_shadow_matrices = NULL;
-    Shaders::destroy();
+    if (CVS->isGLSL())
+    {
+        Shaders::destroy();
+    }
     delete m_wind;
     delete m_spherical_harmonics;
 }   // ~IrrDriver
@@ -830,7 +833,10 @@ void IrrDriver::applyResolutionSettings()
     GlowPassCmd::getInstance()->kill();
     resetTextureTable();
     // initDevice will drop the current device.
-    Shaders::destroy();
+    if (CVS->isGLSL())
+    {
+        Shaders::destroy();
+    }
     initDevice();
 
     // Re-init GUI engine

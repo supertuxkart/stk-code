@@ -1778,6 +1778,8 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
 // -----------------------------------------------------------------------------
 /** Kart hits the track with a given material.
  *  \param m Material hit, can be NULL if no specific material exists.
+ *  \param normal The normal of the hit (used to push a kart back, which avoids
+ *         that karts sometimes can get stuck).
  */
 void Kart::crashed(const Material *m, const Vec3 &normal)
 {
