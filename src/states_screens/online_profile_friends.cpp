@@ -111,9 +111,12 @@ void OnlineProfileFriends::eventCallback(Widget* widget,
     }
     else if (name == m_friends_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        int index = m_friends_list_widget->getSelectionID();
-        if (index>-1)
-            new UserInfoDialog(m_visiting_profile->getFriends()[index]);
+        std::string str_selection = m_friends_list_widget->getSelectionInternalName();
+        int id;
+        if (StringUtils::parseString(str_selection, &id))
+        {
+            new UserInfoDialog(id);
+        }
     }
 }   // eventCallback
 
@@ -219,7 +222,7 @@ void OnlineProfileFriends::displayResults()
                                                     : _("Offline") );
             row.push_back(ListWidget::ListCell(status, -1, 2, true));
         }
-        m_friends_list_widget->addItem("friend", row);
+        m_friends_list_widget->addItem(StringUtils::toString(friends[i]), row);
     }
     m_waiting_for_friends = false;
 

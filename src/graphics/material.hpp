@@ -91,7 +91,7 @@ private:
      *  at load time, it must be loaded elsewhere. This is used to store
      *  material settings for font textures, without loading fonts for
      *  languages that might not be needed at all. */
-    bool             m_lazy_load;
+    bool             m_dont_load_texture;
 
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */
@@ -267,10 +267,10 @@ public:
     /** Returns the ITexture associated with this material. */
     video::ITexture *getTexture() const
     {
-        // Note that atm lazy load means that the textures are not loaded
-        // via the material. So getTexture should only get called for non
-        // lazily loaded textures (used atm for font textures.
-        assert(!m_lazy_load);
+        // Note that dont load means that the textures are not loaded
+        // via the material. So getTexture should only get called for
+		// automatically loaded textures (used atm for font textures).
+        assert(!m_dont_load_texture);
         return m_texture;
     }   // getTexture
     // ------------------------------------------------------------------------

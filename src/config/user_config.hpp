@@ -520,6 +520,9 @@ namespace UserConfigParams
     /** True if physics debugging should be enabled. */
     PARAM_PREFIX bool m_physics_debug PARAM_DEFAULT( false );
 
+    /** True if fps should be printed each frame. */
+    PARAM_PREFIX bool m_fps_debug PARAM_DEFAULT(false);
+
     /** True if slipstream debugging is activated. */
     PARAM_PREFIX bool m_slipstream_debug  PARAM_DEFAULT( false );
 

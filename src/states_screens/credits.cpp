@@ -143,7 +143,7 @@ void CreditsScreen::loadedFromFile()
 
     std::string creditsfile = file_manager->getAsset("CREDITS");
 
-    std::ifstream file( creditsfile.c_str() ) ;
+    std::ifstream file( creditsfile.c_str(), std::ios::binary ) ;
 
     if (file.fail() || !file.is_open() || file.eof())
     {
