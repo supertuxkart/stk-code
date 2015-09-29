@@ -19,13 +19,13 @@
 #define HEADER_LIGHT_PREPASS_RENDERER_HPP
 
 #include "graphics/abstract_renderer.hpp"
-#include "graphics/solid_passes.hpp"
+#include "graphics/geometry_passes.hpp"
 #include "graphics/lighting_passes.hpp"
 
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
-    SolidPasses     *m_solid_passes;
+    GeometryPasses  *m_geometry_passes;
     LightingPasses  *m_lighting_passes;
 
     void compressPowerUpTextures();

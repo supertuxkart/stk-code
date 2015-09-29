@@ -1,4 +1,4 @@
- //  SuperTuxKart - a fun racing game with go-kart
+//  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
@@ -15,4 +15,28 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/solid_passes.hpp"
+#ifndef HEADER_GEOMETRY_PASSES_HPP
+#define HEADER_GEOMETRY_PASSES_HPP
+
+#include <ITexture.h>
+
+class GeometryPasses
+{
+private:
+
+    irr::core::vector3df m_wind_dir;
+    irr::video::ITexture *m_displace_tex;
+
+
+public:
+    void renderSolidFirstPass();
+    void renderSolidSecondPass();
+    void renderNormalsVisualisation();
+    void renderTransparent();
+    void renderShadows();
+    void renderRSM();
+
+
+};
+
+#endif //HEADER_GEOMETRY_PASSES_HPP

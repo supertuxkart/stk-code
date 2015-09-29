@@ -1,5 +1,5 @@
-//  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014-2015 SuperTuxKart-Team
+ //  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,26 +15,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/irr_driver.hpp"
-
-#include "config/user_config.hpp"
+#include "graphics/geometry_passes.hpp"
 #include "graphics/callbacks.hpp"
-#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp" //TODO: remove dependency
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/stk_scene_manager.hpp"
 #include "modes/world.hpp"
-#include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/tuple.hpp"
-
 #include <S3DVertex.h>
 
+
+
+
 /**
-\page render_geometry Geometry Rendering Overview
+\page geometry_passes Geometry Rendering Overview
 
 \section adding_material Adding a solid material
 
@@ -76,6 +75,7 @@ layout(location = 5) in vec3 Tangent;
 layout(location = 6) in vec3 Bitangent;
 
 */
+
 
 // ============================================================================
 class InstancedObjectPass1Shader : public TextureShader<InstancedObjectPass1Shader, 1>
@@ -220,6 +220,7 @@ public:
 };   // InstancedShadowShader
 
 // ============================================================================
+// reflective shadow map
 class CRSMShader : public TextureShader<CRSMShader, 1, core::matrix4, core::matrix4, 
                                  core::matrix4>
 {
@@ -269,6 +270,7 @@ public:
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // CInstancedRSMShader
 };   // CInstancedRSMShader
+
 
 // ============================================================================
 class SphereMapShader : public TextureShader<SphereMapShader, 4, core::matrix4,
@@ -803,8 +805,6 @@ public:
 
 // ============================================================================
 
-
-
 // ----------------------------------------------------------------------------
 struct GrassMat
 {
@@ -1169,18 +1169,17 @@ void multidraw1stPass(Args...args)
     }
 }   // multidraw1stPass
 
-static core::vector3df windDir;
 
 // ----------------------------------------------------------------------------
-void IrrDriver::renderSolidFirstPass()
+void GeometryPasses::renderSolidFirstPass()
 {
-    windDir = getWindDir();
+    m_wind_dir = getWindDir(); //TODO: why this function instead of Wind::getWind()?
 
     if (CVS->supportsIndirectInstancingRendering())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
 
     {
-        ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
         irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
 
         for (unsigned i = 0; i < ImmediateDrawList::getInstance()->size(); i++)
@@ -1201,7 +1200,7 @@ void IrrDriver::renderSolidFirstPass()
             multidraw1stPass<AlphaRef>();
             multidraw1stPass<SphereMap>();
             multidraw1stPass<UnlitMat>();
-            multidraw1stPass<GrassMat>(windDir);
+            multidraw1stPass<GrassMat>(m_wind_dir);
 
             multidraw1stPass<NormalMat>();
             multidraw1stPass<DetailMat>();
@@ -1212,12 +1211,13 @@ void IrrDriver::renderSolidFirstPass()
             renderInstancedMeshes1stPass<AlphaRef>();
             renderInstancedMeshes1stPass<UnlitMat>();
             renderInstancedMeshes1stPass<SphereMap>();
-            renderInstancedMeshes1stPass<GrassMat>(windDir);
+            renderInstancedMeshes1stPass<GrassMat>(m_wind_dir);
             renderInstancedMeshes1stPass<DetailMat>();
             renderInstancedMeshes1stPass<NormalMat>();
         }
     }
 }   // renderSolidFirstPass
+
 
 // ----------------------------------------------------------------------------
 template<typename T, int...List>
@@ -1301,33 +1301,36 @@ void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
     }
 }   // multidraw2ndPass
 
+
 // ----------------------------------------------------------------------------
-void IrrDriver::renderSolidSecondPass()
+void GeometryPasses::renderSolidSecondPass()
 {
     irr_driver->setPhase(SOLID_LIT_PASS);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
     uint64_t DiffuseHandle = 0, SpecularHandle = 0, SSAOHandle = 0, DepthHandle = 0;
+    RTT *rtts = irr_driver->getRTT();
+
 
     if (CVS->isAZDOEnabled())
     {
-        DiffuseHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_DIFFUSE),
+        DiffuseHandle = glGetTextureSamplerHandleARB(rtts->getRenderTarget(RTT_DIFFUSE),
                           Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
         if (!glIsTextureHandleResidentARB(DiffuseHandle))
             glMakeTextureHandleResidentARB(DiffuseHandle);
 
-        SpecularHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_SPECULAR),
+        SpecularHandle = glGetTextureSamplerHandleARB(rtts->getRenderTarget(RTT_SPECULAR),
                            Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[1]);
         if (!glIsTextureHandleResidentARB(SpecularHandle))
             glMakeTextureHandleResidentARB(SpecularHandle);
 
-        SSAOHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_HALF1_R),
+        SSAOHandle = glGetTextureSamplerHandleARB(rtts->getRenderTarget(RTT_HALF1_R),
                         Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
         if (!glIsTextureHandleResidentARB(SSAOHandle))
             glMakeTextureHandleResidentARB(SSAOHandle);
 
-        DepthHandle = glGetTextureSamplerHandleARB(getDepthStencilTexture(),
+        DepthHandle = glGetTextureSamplerHandleARB(irr_driver->getDepthStencilTexture(),
                      Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[3]);
         if (!glIsTextureHandleResidentARB(DepthHandle))
             glMakeTextureHandleResidentARB(DepthHandle);
@@ -1338,7 +1341,7 @@ void IrrDriver::renderSolidSecondPass()
                     SolidPassCmd::getInstance()->drawindirectcmd);
 
     {
-        ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS2));
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS2));
 
         irr_driver->setPhase(SOLID_LIT_PASS);
 
@@ -1346,9 +1349,9 @@ void IrrDriver::renderSolidSecondPass()
             ImmediateDrawList::getInstance()->at(i)->render();
 
         std::vector<GLuint> DiffSpecSSAOTex = 
-            createVector<GLuint>(m_rtts->getRenderTarget(RTT_DIFFUSE), 
-                                 m_rtts->getRenderTarget(RTT_SPECULAR),
-                                 m_rtts->getRenderTarget(RTT_HALF1_R));
+            createVector<GLuint>(rtts->getRenderTarget(RTT_DIFFUSE), 
+                                 rtts->getRenderTarget(RTT_SPECULAR),
+                                 rtts->getRenderTarget(RTT_HALF1_R));
 
         renderMeshes2ndPass<DefaultMaterial, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<AlphaRef, 3, 1 >(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
@@ -1379,7 +1382,7 @@ void IrrDriver::renderSolidSecondPass()
                     HandleExpander<GrassMat::InstancedSecondPassShader>
                          ::Expand(nulltex, GrassMat::SecondPassTextures, DiffuseHandle,
                                   SpecularHandle, SSAOHandle, DepthHandle);
-                    GrassMat::InstancedSecondPassShader::getInstance()->setUniforms(windDir,
+                    GrassMat::InstancedSecondPassShader::getInstance()->setUniforms(m_wind_dir,
                                                              irr_driver->getSunDirection());
                     glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
                         (const void*)(SolidPassCmd::getInstance()->Offset[GrassMat::MaterialType]
@@ -1412,7 +1415,7 @@ void IrrDriver::renderSolidSecondPass()
                                     DiffSpecSSAOTex[1], DiffSpecSSAOTex[2],
                                     irr_driver->getDepthStencilTexture());
                     GrassMat::InstancedSecondPassShader::getInstance()
-                            ->setUniforms(windDir, irr_driver->getSunDirection());
+                            ->setUniforms(m_wind_dir, irr_driver->getSunDirection());
                     glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
                           (const void*)((SolidPassCmd::getInstance()->Offset[GrassMat::MaterialType] + i)
                                * sizeof(DrawElementsIndirectCommand)));
@@ -1455,7 +1458,7 @@ static void renderMultiMeshNormals()
 }   // renderMultiMeshNormals
 
 // ----------------------------------------------------------------------------
-void IrrDriver::renderNormalsVisualisation()
+void GeometryPasses::renderNormalsVisualisation()
 {
     if (CVS->isAZDOEnabled()) {
         renderMultiMeshNormals<DefaultMaterial>();
@@ -1508,10 +1511,8 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
     }
 }   // renderTransparenPass
 
-static video::ITexture *displaceTex = 0;
-
 // ----------------------------------------------------------------------------
-void IrrDriver::renderTransparent()
+void GeometryPasses::renderTransparent()
 {
 
     glEnable(GL_DEPTH_TEST);
@@ -1610,8 +1611,8 @@ void IrrDriver::renderTransparent()
     }
 
     irr_driver->getFBO(FBO_DISPLACE).bind();
-    if (!displaceTex)
-        displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
+    if (!m_displace_tex)
+        m_displace_tex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png"); //TODO: move in class constructor
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh = 
@@ -1628,7 +1629,7 @@ void IrrDriver::renderTransparent()
         size_t count = mesh.IndexCount;
         // Render the effect
         DisplaceShader::getInstance()->setTextureUnits(
-            getTextureGLuint(displaceTex),
+            getTextureGLuint(m_displace_tex),
             irr_driver->getRenderTargetTexture(RTT_COLOR),
             irr_driver->getRenderTargetTexture(RTT_TMP1),
             getTextureGLuint(mesh.textures[0]));
@@ -1643,9 +1644,9 @@ void IrrDriver::renderTransparent()
 
     irr_driver->getFBO(FBO_COLORS).bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
-    m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE),
-                                         irr_driver->getFBO(FBO_COLORS).getWidth(), 
-                                         irr_driver->getFBO(FBO_COLORS).getHeight());
+    irr_driver->getPostProcessing()->renderPassThrough(irr_driver->getRTT()->getRenderTarget(RTT_DISPLACE),
+                                                       irr_driver->getFBO(FBO_COLORS).getWidth(), 
+                                                       irr_driver->getFBO(FBO_COLORS).getHeight());
     glDisable(GL_STENCIL_TEST);
 
 }   // renderTransparent
@@ -1751,14 +1752,17 @@ static void multidrawShadow(unsigned i, Args ...args)
     }
 }   // multidrawShadow
 
+
 // ----------------------------------------------------------------------------
-void IrrDriver::renderShadows()
+void GeometryPasses::renderShadows()
 {
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
-    m_rtts->getShadowFBO().bind();
+    
+    RTT *rtts = irr_driver->getRTT();
+    rtts->getShadowFBO().bind();
     if (!CVS->isESMEnabled())
     {
         glDrawBuffer(GL_NONE);
@@ -1774,7 +1778,7 @@ void IrrDriver::renderShadows()
 
     for (unsigned cascade = 0; cascade < 4; cascade++)
     {
-        ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
 
         renderShadow<DefaultMaterial, 1>(cascade);
         renderShadow<SphereMap, 1>(cascade);
@@ -1795,7 +1799,7 @@ void IrrDriver::renderShadows()
             multidrawShadow<NormalMat>(cascade);
             multidrawShadow<AlphaRef>(cascade);
             multidrawShadow<UnlitMat>(cascade);
-            multidrawShadow<GrassMat>(cascade, windDir);
+            multidrawShadow<GrassMat>(cascade, m_wind_dir);
         }
         else if (CVS->supportsIndirectInstancingRendering())
         {
@@ -1803,7 +1807,7 @@ void IrrDriver::renderShadows()
             renderInstancedShadow<DetailMat>(cascade);
             renderInstancedShadow<AlphaRef>(cascade);
             renderInstancedShadow<UnlitMat>(cascade);
-            renderInstancedShadow<GrassMat>(cascade, windDir);
+            renderInstancedShadow<GrassMat>(cascade, m_wind_dir);
             renderInstancedShadow<NormalMat>(cascade);
         }
     }
@@ -1812,25 +1816,25 @@ void IrrDriver::renderShadows()
 
     if (CVS->isESMEnabled())
     {
-        ScopedGPUTimer Timer(getGPUTimer(Q_SHADOW_POSTPROCESS));
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOW_POSTPROCESS));
 
         if (CVS->isARBTextureViewUsable())
         {
             const std::pair<float, float>* shadow_scales 
-                = getShadowMatrices()->getShadowScales();
+                = irr_driver->getShadowMatrices()->getShadowScales();
 
             for (unsigned i = 0; i < 2; i++)
             {
-                m_post_processing->renderGaussian6BlurLayer(m_rtts->getShadowFBO(), i,
+                irr_driver->getPostProcessing()->renderGaussian6BlurLayer(
+                    rtts->getShadowFBO(), i,
                     2.f * shadow_scales[0].first / shadow_scales[i].first,
                     2.f * shadow_scales[0].second / shadow_scales[i].second);
             }
         }
-        glBindTexture(GL_TEXTURE_2D_ARRAY, m_rtts->getShadowFBO().getRTT()[0]);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, rtts->getShadowFBO().getRTT()[0]);
         glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
     }
 }   // renderShadows
-
 
 
 // ----------------------------------------------------------------------------
@@ -1922,15 +1926,15 @@ void multidrawRSM(Args...args)
 }   // multidrawRSM
 
 // ----------------------------------------------------------------------------
-void IrrDriver::renderRSM()
+void GeometryPasses::renderRSM()
 {
-    if (getShadowMatrices()->isRSMMapAvail())
+    if (irr_driver->getShadowMatrices()->isRSMMapAvail())
         return;
-    ScopedGPUTimer Timer(getGPUTimer(Q_RSM));
-    m_rtts->getRSM().bind();
+    ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_RSM));
+    irr_driver->getRTT()->getRSM().bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const core::matrix4 &rsm_matrix = getShadowMatrices()->getRSMMatrix();
+    const core::matrix4 &rsm_matrix = irr_driver->getShadowMatrices()->getRSMMatrix();
     drawRSM<DefaultMaterial, 3, 1>(rsm_matrix);
     drawRSM<AlphaRef, 3, 1>(rsm_matrix);
     drawRSM<NormalMat, 3, 1>(rsm_matrix);
@@ -1958,5 +1962,5 @@ void IrrDriver::renderRSM()
         renderRSMShadow<NormalMat>(rsm_matrix);
         renderRSMShadow<DetailMat>(rsm_matrix);
     }
-    getShadowMatrices()->setRSMMapAvail(true);
+    irr_driver->getShadowMatrices()->setRSMMapAvail(true);
 }   // renderRSM

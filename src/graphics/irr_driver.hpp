@@ -323,13 +323,7 @@ private:
 #endif
 
 public: //TODO: move into renderer class
-    void renderSolidFirstPass();
-    void renderSolidSecondPass();
-    void renderNormalsVisualisation();
-    void renderTransparent();
     void renderParticles();
-    void renderShadows();
-    void renderRSM();
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
     void renderShadowsDebug();

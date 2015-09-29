@@ -172,12 +172,12 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
             CVS->isShadowEnabled() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
-            irr_driver->renderShadows();
+            m_geometry_passes->renderShadows();
             PROFILER_POP_CPU_MARKER();
             if (CVS->isGlobalIlluminationEnabled())
             {
                 PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
-                irr_driver->renderRSM();
+                m_geometry_passes->renderRSM();
                 PROFILER_POP_CPU_MARKER();
             }
         }
@@ -198,7 +198,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
         rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         glClearColor(0., 0., 0., 0.);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        irr_driver->renderSolidFirstPass();
+        m_geometry_passes->renderSolidFirstPass();
     }
     else
     {
@@ -252,13 +252,13 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
         glClear(GL_COLOR_BUFFER_BIT);
         glDepthMask(GL_FALSE);
     }
-    irr_driver->renderSolidSecondPass();
+    m_geometry_passes->renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
 
     if (irr_driver->getNormals())
     {
         rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        irr_driver->renderNormalsVisualisation();
+        m_geometry_passes->renderNormalsVisualisation();
         rtts->getFBO(FBO_COLORS).bind();
     }
 
@@ -323,7 +323,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
     {
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TRANSPARENT));
-        irr_driver->renderTransparent();
+        m_geometry_passes->renderTransparent();
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -447,13 +447,13 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
 ShaderBasedRenderer::ShaderBasedRenderer():AbstractRenderer()
 {
-    m_solid_passes = new SolidPasses();
+    m_geometry_passes = new GeometryPasses();
     m_lighting_passes = new LightingPasses();
 }
 
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
-    delete m_solid_passes;
+    delete m_geometry_passes;
     delete m_lighting_passes;
 }
 
