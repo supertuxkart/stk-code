@@ -424,8 +424,7 @@ bool Translations::isRTLText(const wchar_t *in_ptr)
         // Declare as RTL if one character is RTL
         for (std::size_t i = 0; i < length; i++)
         {
-            if (types[i] == FRIBIDI_TYPE_RTL ||
-                types[i] == FRIBIDI_TYPE_RLO)
+            if (types[i] & FRIBIDI_MASK_RTL)
             {
                 delete[] types;
                 return true;
