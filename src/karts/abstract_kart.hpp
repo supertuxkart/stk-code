@@ -39,6 +39,7 @@ class AbstractKartAnimation;
 class Attachment;
 class btKart;
 class btQuaternion;
+class CachedCharacteristic;
 class CombinedCharacteristic;
 class Controller;
 class Item;
@@ -78,7 +79,9 @@ protected:
     /** The per-player difficulty. */
     PerPlayerDifficulty m_difficulty;
     /** The combined properties of the kart, the player, etc. */
-    std::unique_ptr<CombinedCharacteristic> m_characteristic;
+    std::unique_ptr<CombinedCharacteristic> m_combined_characteristic;
+    /** The cached combined characteristics. */
+    std::unique_ptr<CachedCharacteristic> m_characteristic;
 
     /** This stores a copy of the kart model. It has to be a copy
      *  since otherwise incosistencies can happen if the same kart

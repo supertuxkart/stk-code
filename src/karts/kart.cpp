@@ -39,7 +39,7 @@
 #include "graphics/stars.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "karts/abstract_characteristic.hpp"
-#include "karts/combined_characteristic.hpp"
+#include "karts/cached_characteristic.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/rescue_animation.hpp"

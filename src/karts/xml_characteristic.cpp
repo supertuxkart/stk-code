@@ -141,14 +141,6 @@ void XmlCharacteristic::process(CharacteristicType type, Value value,
                                     found = true;
                                     break;
                                 }
-                                if (!*is_set)
-                                {
-                                    Log::error("XmlCharacteristic::process",
-                                               "Can't process %s",
-                                               pair[1].c_str());
-                                    value.fv->clear();
-                                    break;
-                                }
                             }
                             if (!found)
                             {
@@ -168,6 +160,7 @@ void XmlCharacteristic::process(CharacteristicType type, Value value,
 
         if (shouldReplace)
         {
+            value.ia->clear();
             // Replace all values
             for (const std::string &processor : processors)
             {

@@ -20,6 +20,7 @@
 #include "karts/abstract_kart.hpp"
 
 #include "items/powerup.hpp"
+#include "karts/cached_characteristic.hpp"
 #include "karts/combined_characteristic.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
@@ -60,10 +61,10 @@ AbstractKart::AbstractKart(const std::string& ident,
     m_wheel_graphics_position = m_kart_model->getWheelsGraphicsPosition();
 
     // Combine the characteristics for this player
-    m_characteristic.reset(new CombinedCharacteristic());
-    m_characteristic->addCharacteristic(kart_properties_manager->
+    m_combined_characteristic.reset(new CombinedCharacteristic());
+    m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getBaseCharacteristic());
-    m_characteristic->addCharacteristic(kart_properties_manager->
+    m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getDifficultyCharacteristic(race_manager->getDifficultyAsString(
             race_manager->getDifficulty())));
 
@@ -71,12 +72,13 @@ AbstractKart::AbstractKart(const std::string& ident,
     const AbstractCharacteristic *characteristic = kart_properties_manager->
             getKartTypeCharacteristic(m_kart_properties->getKartType());
     if (characteristic)
-        m_characteristic->addCharacteristic(characteristic);
+        m_combined_characteristic->addCharacteristic(characteristic);
 
-    m_characteristic->addCharacteristic(kart_properties_manager->
+    m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getPlayerCharacteristic(KartProperties::getPerPlayerDifficultyAsString(
             m_difficulty)));
-    m_characteristic->addCharacteristic(m_kart_properties->getCharacteristic());
+    m_combined_characteristic->addCharacteristic(m_kart_properties->getCharacteristic());
+    m_characteristic.reset(new CachedCharacteristic(m_combined_characteristic.get()));
 }   // AbstractKart
 
 // ----------------------------------------------------------------------------

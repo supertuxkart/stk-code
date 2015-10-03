@@ -73,9 +73,6 @@ KartProperties::KartProperties(const std::string &filename)
     m_shadow_scale    = 1.0f;
     m_shadow_x_offset = 0.0f;
     m_shadow_z_offset = 0.0f;
-    m_characteristic  = NULL;
-    m_combined_characteristic = NULL;
-    m_cached_characteristic = NULL;
 
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
@@ -118,12 +115,6 @@ KartProperties::~KartProperties()
     delete m_kart_model;
     if(m_skidding_properties)
         delete m_skidding_properties;
-    if (m_characteristic)
-        delete m_characteristic;
-    if (m_combined_characteristic)
-        delete m_combined_characteristic;
-    if (m_cached_characteristic)
-        delete m_cached_characteristic;
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         if(m_ai_properties[i])
             delete m_ai_properties[i];
@@ -148,8 +139,7 @@ void KartProperties::copyFrom(const KartProperties *source)
 
     if (source->m_characteristic)
     {
-        m_characteristic = new XmlCharacteristic();
-        assert(m_characteristic);
+        m_characteristic.reset(new XmlCharacteristic());
         *m_characteristic = *source->m_characteristic;
         // Combine the characteristics for this object. We can't copy it because
         // this object has other pointers (to m_characteristic).
@@ -216,9 +206,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             throw std::runtime_error(msg.str());
         }
         getAllData(root);
-        if (m_characteristic)
-            delete m_characteristic;
-        m_characteristic = new XmlCharacteristic(root);
+        m_characteristic.reset(new XmlCharacteristic(root));
         combineCharacteristics();
     }
     catch(std::exception& err)
@@ -316,11 +304,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 //-----------------------------------------------------------------------------
 void KartProperties::combineCharacteristics()
 {
-    if (m_combined_characteristic)
-        delete m_combined_characteristic;
-    if (m_cached_characteristic)
-        delete m_cached_characteristic;
-    m_combined_characteristic = new CombinedCharacteristic();
+    m_combined_characteristic.reset(new CombinedCharacteristic());
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getBaseCharacteristic());
 
@@ -334,8 +318,7 @@ void KartProperties::combineCharacteristics()
         // Kart type found
         m_combined_characteristic->addCharacteristic(characteristic);
 
-    m_combined_characteristic->addCharacteristic(m_characteristic);
-    m_cached_characteristic = new CachedCharacteristic(m_combined_characteristic);
+    m_combined_characteristic->addCharacteristic(m_characteristic.get());
 }   // combineCharacteristics
 
 //-----------------------------------------------------------------------------
@@ -531,13 +514,13 @@ bool KartProperties::operator<(const KartProperties &other) const
 // ----------------------------------------------------------------------------
 const AbstractCharacteristic* KartProperties::getCharacteristic() const
 {
-    return m_characteristic;
+    return m_characteristic.get();
 }   // getCharacteristic
 
 // ----------------------------------------------------------------------------
 const AbstractCharacteristic* KartProperties::getCombinedCharacteristic() const
 {
-    return m_cached_characteristic;
+    return m_combined_characteristic.get();
 }   // getCombinedCharacteristic
 
 // ----------------------------------------------------------------------------
@@ -550,8 +533,8 @@ bool KartProperties::isInGroup(const std::string &group) const
 float KartProperties::getAvgPower() const
 {
     float sum = 0;
-    std::vector<float> gear_power_increase = m_cached_characteristic->getGearPowerIncrease();
-    float power = m_cached_characteristic->getEnginePower();
+    std::vector<float> gear_power_increase = m_combined_characteristic->getGearPowerIncrease();
+    float power = m_combined_characteristic->getEnginePower();
     for (unsigned int i = 0; i < gear_power_increase.size(); ++i)
         sum += gear_power_increase[i] * power;
     return sum / gear_power_increase.size();

@@ -39,7 +39,6 @@ using namespace irr;
 
 class AbstractCharacteristic;
 class AIProperties;
-class CachedCharacteristic;
 class CombinedCharacteristic;
 class Material;
 class SkiddingProperties;
@@ -126,11 +125,9 @@ private:
     /** The physical, item, etc. characteristics of this kart that are loaded
      *  from the xml file.
      */
-    AbstractCharacteristic *m_characteristic;
+    std::shared_ptr<AbstractCharacteristic> m_characteristic;
     /** The base characteristics combined with the characteristics of this kart. */
-    CombinedCharacteristic *m_combined_characteristic;
-    /** The cached combined characteristics. */
-    CachedCharacteristic *m_cached_characteristic;
+    std::shared_ptr<CombinedCharacteristic> m_combined_characteristic;
 
     // Physic properties
     // -----------------
