@@ -917,25 +917,12 @@ bool CIrrDeviceLinux::createWindow()
 				XFlush(display);
 				#endif
 
-				// Workaround for Gnome which sometimes creates window smaller than display
-				XSizeHints *hints = XAllocSizeHints();
-				hints->flags=PMinSize;
-				hints->min_width=Width;
-				hints->min_height=Height;
-				XSetWMNormalHints(display, window, hints);
-				XFree(hints);
-
 				// Set the fullscreen mode via the window manager. This allows alt-tabing, volume hot keys & others.
 				// Get the needed atom from there freedesktop names
 				Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
 				Atom WMFullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
-				// Set the fullscreen property
-				XChangeProperty(display, window, WMStateAtom, XA_ATOM, 32, PropModeReplace, 
-								reinterpret_cast<unsigned char*>(&WMFullscreenAtom), 1);
 
-				// Notify the root window
 				XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
-
 				xev.type = ClientMessage;
 				xev.xclient.window = window;
 				xev.xclient.message_type = WMStateAtom;
@@ -946,6 +933,47 @@ bool CIrrDeviceLinux::createWindow()
 							SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 
 				XFlush(display);
+				
+				// Wait until window state is already changed to fullscreen
+				bool fullscreen = false;
+				for (int i = 0; i < 500; i++)
+				{
+					Atom type;
+					int format;
+					unsigned long numItems, bytesAfter;
+					unsigned char* data = NULL;
+
+					int s = XGetWindowProperty(display, window, WMStateAtom,
+											0l, 1024, False, XA_ATOM, &type, 
+											&format,  &numItems, &bytesAfter, 
+											&data);
+
+					if (s == Success) 
+					{
+						Atom* atoms = (Atom*)data;
+						
+						for (unsigned int i = 0; i < numItems; ++i) 
+						{
+							if (atoms[i] == WMFullscreenAtom) 
+							{
+								fullscreen = true;
+								break;
+							}
+						}
+					}
+						
+					XFree(data);
+					
+					if (fullscreen == true)
+						break;
+					
+					usleep(1000);
+				}
+					
+				if (!fullscreen)
+				{
+					os::Printer::log("Warning! Got timeout while checking fullscreen sate", ELL_WARNING);
+				}        
 			}
 			else
 			{
