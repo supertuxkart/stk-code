@@ -25,6 +25,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
+#include "karts/cached_characteristic.hpp"
 #include "karts/combined_characteristic.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_model.hpp"
@@ -74,6 +75,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_shadow_z_offset = 0.0f;
     m_characteristic  = NULL;
     m_combined_characteristic = NULL;
+    m_cached_characteristic = NULL;
 
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
@@ -120,6 +122,8 @@ KartProperties::~KartProperties()
         delete m_characteristic;
     if (m_combined_characteristic)
         delete m_combined_characteristic;
+    if (m_cached_characteristic)
+        delete m_cached_characteristic;
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         if(m_ai_properties[i])
             delete m_ai_properties[i];
@@ -314,6 +318,8 @@ void KartProperties::combineCharacteristics()
 {
     if (m_combined_characteristic)
         delete m_combined_characteristic;
+    if (m_cached_characteristic)
+        delete m_cached_characteristic;
     m_combined_characteristic = new CombinedCharacteristic();
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getBaseCharacteristic());
@@ -329,6 +335,7 @@ void KartProperties::combineCharacteristics()
         m_combined_characteristic->addCharacteristic(characteristic);
 
     m_combined_characteristic->addCharacteristic(m_characteristic);
+    m_cached_characteristic = new CachedCharacteristic(m_combined_characteristic);
 }   // combineCharacteristics
 
 //-----------------------------------------------------------------------------
@@ -530,7 +537,7 @@ const AbstractCharacteristic* KartProperties::getCharacteristic() const
 // ----------------------------------------------------------------------------
 const AbstractCharacteristic* KartProperties::getCombinedCharacteristic() const
 {
-    return m_combined_characteristic;
+    return m_cached_characteristic;
 }   // getCombinedCharacteristic
 
 // ----------------------------------------------------------------------------
@@ -543,8 +550,8 @@ bool KartProperties::isInGroup(const std::string &group) const
 float KartProperties::getAvgPower() const
 {
     float sum = 0;
-    std::vector<float> gear_power_increase = m_combined_characteristic->getGearPowerIncrease();
-    float power = m_combined_characteristic->getEnginePower();
+    std::vector<float> gear_power_increase = m_cached_characteristic->getGearPowerIncrease();
+    float power = m_cached_characteristic->getEnginePower();
     for (unsigned int i = 0; i < gear_power_increase.size(); ++i)
         sum += gear_power_increase[i] * power;
     return sum / gear_power_increase.size();

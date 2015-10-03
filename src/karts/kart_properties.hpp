@@ -39,10 +39,10 @@ using namespace irr;
 
 class AbstractCharacteristic;
 class AIProperties;
+class CachedCharacteristic;
 class CombinedCharacteristic;
 class Material;
 class SkiddingProperties;
-class XmlCharacteristic;
 class XMLNode;
 
 /**
@@ -126,9 +126,11 @@ private:
     /** The physical, item, etc. characteristics of this kart that are loaded
      *  from the xml file.
      */
-    XmlCharacteristic *m_characteristic;
+    AbstractCharacteristic *m_characteristic;
     /** The base characteristics combined with the characteristics of this kart. */
     CombinedCharacteristic *m_combined_characteristic;
+    /** The cached combined characteristics. */
+    CachedCharacteristic *m_cached_characteristic;
 
     // Physic properties
     // -----------------

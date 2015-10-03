@@ -49,7 +49,7 @@ CachedCharacteristic::~CachedCharacteristic()
                 delete static_cast<InterpolationArray*>(v.content);
                 break;
             case TYPE_BOOL:
-                delete static_cast<InterpolationArray*>(v.content);
+                delete static_cast<bool*>(v.content);
                 break;
             }
             v.content = nullptr;
