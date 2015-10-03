@@ -138,7 +138,7 @@ void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz,
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSceneNode::setEnable(bool enabled)
 {
-    if (m_node != NULL)
+    if (m_node != NULL && (!enabled || !m_force_always_hidden))
         m_node->setVisible(enabled);
 }   // setEnable
 
@@ -440,13 +440,30 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
 
     if (interaction == "physicsonly")
     {
-        m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
-        enabled = false;
-        m_frame_start = 0;
-        m_frame_end = 0;
+        std::string type;
+        xml_node->get("type", &type);
+        if (type == "animation" || xml_node->hasChildNamed("curve"))
+        {
+            // Animated
+            //m_node = irr_driver->getSceneManager()->addEmptySceneNode();
+            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
+            enabled = false;
+            m_force_always_hidden = true;
+            m_frame_start = 0;
+            m_frame_end = 0;
+        }
+        else
+        {
+            // Static
+            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
+            enabled = false;
+            m_force_always_hidden = true;
+            m_frame_start = 0;
+            m_frame_end = 0;
 
-        if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
-            World::getWorld()->getTrack()->addPhysicsOnlyNode(m_node);
+            if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
+                World::getWorld()->getTrack()->addPhysicsOnlyNode(m_node);
+        }
     }
     else if (m_is_in_skybox)
     {

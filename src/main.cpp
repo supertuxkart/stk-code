@@ -762,6 +762,8 @@ int handleCmdLine()
         UserConfigParams::m_rendering_debug=true;
     if(CommandLine::has("--ai-debug"))
         AIBaseController::enableDebug();
+    if (CommandLine::has("--fps-debug"))
+        UserConfigParams::m_fps_debug = true;
 
     if(UserConfigParams::m_artist_debug_mode)
     {
@@ -848,7 +850,7 @@ int handleCmdLine()
         race_manager->setNumKarts((int)l.size()+1);
     }   // --ai
 
-    if(CommandLine::has( "--mode", &s))
+    if(CommandLine::has( "--mode", &s) || CommandLine::has( "--difficulty", &s))
     {
         int n = atoi(s.c_str());
         if(n<0 || n>RaceManager::DIFFICULTY_LAST)

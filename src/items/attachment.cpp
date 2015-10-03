@@ -140,6 +140,7 @@ void Attachment::set(AttachmentType type, float time,
         break;
     case ATTACH_BOMB:
         m_node->setMesh(attachment_manager->getMesh(type));
+        m_node->setAnimationSpeed(0);
         if (m_bomb_sound) m_bomb_sound->deleteSFX();
         m_bomb_sound = SFXManager::get()->createSoundSource("clock");
         m_bomb_sound->setLoop(true);

@@ -10,9 +10,7 @@
 #include "IGUIFont.h"
 #include "IVideoDriver.h"
 #include "rect.h"
-
-#define CJK_START 12287
-#define CJK_END 40960
+#include "utfwrapping.h"
 
 namespace irr
 {
@@ -357,102 +355,77 @@ void CGUIStaticText::breakText()
 				lineBreak = true;
 				c = '\0';
 			}
+			word += c;
 
-			bool isWhitespace = (c == L' ' || c == 0);
-			if ( !isWhitespace )
+			if (word.size())
 			{
-				// part of a word
-				word += c;
+				const s32 wordlgth = font->getDimension(word.c_str()).Width;
 
-                //Check for CJK, show them first if out of range of displaying area
-                if (Text[i] > CJK_START && Text[i] < CJK_END)
-                {
-                    const s32 cjklgth = font->getDimension(word.c_str()).Width;
-                    if (cjklgth > (elWidth - 23))
-                    {
-                        BrokenText.push_back(line);
-                        length = cjklgth;
-                        line = word;
-                        word = L"";
-                        whitespace = L"";
-                    }
-                }
-			}
-
-			if ( isWhitespace || i == (size-1))
-			{
-				if (word.size())
-				{
-					// here comes the next whitespace, look if
-					// we must break the last word to the next line.
-					const s32 whitelgth = font->getDimension(whitespace.c_str()).Width;
-					const s32 wordlgth = font->getDimension(word.c_str()).Width;
-
-					if (wordlgth > elWidth)
+				if (length && (length + wordlgth > elWidth))
+				{	// too long to fit inside
+					// break to next line
+					unsigned int where = 1;
+					while (where != line.size()) //Find the first breakable position
 					{
-						// This word is too long to fit in the available space, look for
-						// the Unicode Soft HYphen (SHY / 00AD) character for a place to
-						// break the word at
-						int where = word.findFirst( wchar_t(0x00AD) );
-						if (where != -1)
+						if (UtfNoEnding(Text[i - where])   ||   //Prevent unsuitable character from displaying
+							UtfNoStarting(Text[i - where])  ||   //at the position of starting or ending of a line
+							UtfNoStarting(Text[i + 1 - where])) //Handle case which more than one non-newline-starting characters are together
 						{
-							core::stringw first  = word.subString(0, where);
-							core::stringw second = word.subString(where, word.size() - where);
-							BrokenText.push_back(line + first + L"-");
-							const s32 secondLength = font->getDimension(second.c_str()).Width;
-
-							length = secondLength;
-							line = second;
+							where++;
+							continue;
 						}
+						if (breakable(Text[i - where]))
+							break;
 						else
-						{
-							// No soft hyphen found, so there's nothing more we can do
-							// break to next line
-							if (length)
-								BrokenText.push_back(line);
-							length = wordlgth;
-							line = word;
-						}
+							where++;
 					}
-					else if (length && (length + wordlgth + whitelgth > elWidth))
+					if (where != line.size())
 					{
-						// break to next line
-						BrokenText.push_back(line);
-						length = wordlgth;
-						line = word;
+						core::stringw first  = line.subString(0, line.size() + 1 - where);
+						core::stringw second = line.subString(line.size() + 1 - where , where - 1);
+						if (first.lastChar() == wchar_t(0x00AD))
+							BrokenText.push_back(first + L"-"); //Print the Unicode Soft HYphen (SHY / 00AD) character
+						else
+							BrokenText.push_back(first);
+						const s32 secondLength = font->getDimension(second.c_str()).Width;
+
+						length = secondLength + wordlgth;
+						line = second + word;
 					}
+					else if (breakable(c) || UtfNoEnding(c) || UtfNoStarting(c)) //Unusual case
+					{
+						BrokenText.push_back(line);	//Force breaking to next line too if last word is breakable,
+						line = word;						//it happens when someone writes too many non-newline-starting
+						length = wordlgth;				//chars in the first line, so we ignore the rules.
+					}
+					// No suitable place to break words, so there's nothing more we can do
+					// break to next line
 					else
 					{
-						// add word to line
-						line += whitespace;
 						line += word;
-						length += whitelgth + wordlgth;
+						length += wordlgth;
 					}
-
-					word = L"";
-					whitespace = L"";
 				}
-
-				if ( isWhitespace )
+				else
 				{
-					whitespace += c;
-				}
-
-				// compute line break
-				if (lineBreak)
-				{
-					line += whitespace;
 					line += word;
-					BrokenText.push_back(line);
-					line = L"";
-					word = L"";
-					whitespace = L"";
-					length = 0;
+					length += wordlgth;
 				}
+
+				word = L"";
+
+			}
+			// compute line break
+			if (lineBreak)
+			{
+				line += word;
+				BrokenText.push_back(line);
+				line = L"";
+				word = L"";
+				length = 0;
 			}
 		}
 
-		line += whitespace;
 		line += word;
 		BrokenText.push_back(line);
 	}

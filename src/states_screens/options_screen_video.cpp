@@ -200,7 +200,7 @@ void OptionsScreenVideo::init()
     CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
     rememberWinpos->setState(UserConfigParams::m_remember_window_location);
 
-    rememberWinpos->setActive(UserConfigParams::m_fullscreen);
+    rememberWinpos->setActive(!UserConfigParams::m_fullscreen);
 
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
@@ -219,11 +219,6 @@ void OptionsScreenVideo::init()
         // for some odd reason, irrlicht sometimes fails to report the good
         // old standard resolutions
         // those are always useful for windowed mode
-        // allow 800x600 only for debug mode
-#ifdef DEBUG
-        bool found_800_600 = false;
-#endif
-        bool found_1024_640 = false;
         bool found_1024_768 = false;
 
         for (int n=0; n<amount; n++)
@@ -238,19 +233,7 @@ void OptionsScreenVideo::init()
                 found_config_res = true;
             }
 
-#ifdef DEBUG
-            if (r.width == 800 && r.height == 600)
-            {
-                found_800_600 = true;
-            }
-            else
-#endif
-            if (r.width == 1024 && r.height == 640)
-            // This becomes an 'else if' when DEBUG is defined
-            {
-                found_1024_640 = true;
-            }
-            else if (r.width == 1024 && r.height == 768)
+            if (r.width == 1024 && r.height == 768)
             {
                 found_1024_768 = true;
             }
@@ -262,39 +245,13 @@ void OptionsScreenVideo::init()
             r.height = UserConfigParams::m_height;
             resolutions.push_back(r);
 
-#ifdef DEBUG
-            if (r.width == 800 && r.height == 600)
-            {
-                found_800_600 = true;
-            }
-            else
-#endif
-            if (r.width == 1024 && r.height == 640)
-            // This becomes an 'else if' when DEBUG is defined
-            {
-                found_1024_640 = true;
-            }
-            else if (r.width == 1024 && r.height == 768)
+            if (r.width == 1024 && r.height == 768)
             {
                 found_1024_768 = true;
             }
         } // next found resolution
 
         // Add default resolutions that were not found by irrlicht
-#ifdef DEBUG
-        if (!found_800_600)
-        {
-            r.width  = 800;
-            r.height = 600;
-            resolutions.push_back(r);
-        }
-#endif
-        if (!found_1024_640)
-        {
-            r.width  = 1024;
-            r.height = 640;
-            resolutions.push_back(r);
-        }
         if (!found_1024_768)
         {
             r.width  = 1024;

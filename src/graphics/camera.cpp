@@ -434,12 +434,6 @@ void Camera::smoothMoveCamera(float dt)
     assert(!isnan(m_camera->getPosition().Y));
     assert(!isnan(m_camera->getPosition().Z));
 
-    if (race_manager->getNumLocalPlayers() < 2)
-    {
-        SFXManager::get()->positionListener(current_position,
-                                            current_target - current_position,
-                                            Vec3(0,1,0));
-    }
 }   // smoothMoveCamera
 
 //-----------------------------------------------------------------------------
@@ -531,6 +525,14 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
  */
 void Camera::update(float dt)
 {
+    if (race_manager->getNumLocalPlayers() < 2)
+    {
+        Vec3 pos(m_camera->getPosition());
+        SFXManager::get()->positionListener(pos,
+                                            Vec3(m_camera->getTarget()) - pos,
+                                            Vec3(0, 1, 0));
+    }
+
     if (m_kart == NULL) return; // cameras not attached to kart must be positioned manually
 
     float above_kart, cam_angle, side_way, distance;

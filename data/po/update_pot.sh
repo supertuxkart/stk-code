@@ -52,7 +52,7 @@ xgettext  -j  -d supertuxkart --keyword=_ --keyword=N_ --keyword=_LTR \
                                --package-name=supertuxkart
 
 # Angelscript files (xgettext doesn't support AS so pretend it's c++)
-xgettext  -j  -d supertuxkart -s --keyword="translate" --add-comments="I18N:" \
+xgettext  -j  -d supertuxkart --keyword="translate" --add-comments="I18N:" \
                                -p ./data/po -o supertuxkart.pot $ANGELSCRIPT_FILE_LIST \
                                --package-name=supertuxkart --language=c++
 

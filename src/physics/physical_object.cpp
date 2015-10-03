@@ -324,7 +324,6 @@ void PhysicalObject::init()
     }
     case MP_EXACT:
     {
-        m_graphical_offset = Vec3(0,0,0);
         extend.setY(0);
         TriangleMesh* triangle_mesh = new TriangleMesh();
 
@@ -450,7 +449,8 @@ void PhysicalObject::init()
         triangle_mesh->createCollisionShape();
         m_shape = &triangle_mesh->getCollisionShape();
         m_triangle_mesh = triangle_mesh;
-
+        m_init_pos.setOrigin(m_init_pos.getOrigin() + m_graphical_offset);
+        // m_graphical_offset = Vec3(0,0,0);
         break;
     }
     case MP_NONE:
@@ -496,6 +496,11 @@ void PhysicalObject::init()
     btVector3 inertia(1,1,1);
     if (m_body_type != MP_EXACT)
         m_shape->calculateLocalInertia(m_mass, inertia);
+    else
+    {
+        if (m_mass == 0)
+            inertia.setValue(0, 0, 0);
+    }
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
 

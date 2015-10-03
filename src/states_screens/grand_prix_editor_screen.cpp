@@ -54,8 +54,8 @@ void GrandPrixEditorScreen::beforeAddingWidget()
     tabs->clearAllChildren();
     for (int i = 0; i < GrandPrixData::GP_GROUP_COUNT; i++)
     {
-        tabs->addTextChild(getGroupName((enum GrandPrixData::GPGroupType)i),
-            StringUtils::toString(i));
+        core::stringw label = getGroupName((enum GrandPrixData::GPGroupType)i);
+        tabs->addTextChild(label.c_str(), StringUtils::toString(i));
     }
 }
 
@@ -317,7 +317,7 @@ void GrandPrixEditorScreen::onConfirm()
 }
 
 // ----------------------------------------------------------------------------
-const wchar_t* GrandPrixEditorScreen::getGroupName(enum GrandPrixData::GPGroupType group)
+const core::stringw GrandPrixEditorScreen::getGroupName(enum GrandPrixData::GPGroupType group)
 {
     switch (group)
     {

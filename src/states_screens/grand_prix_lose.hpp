@@ -62,6 +62,7 @@ public:
     void onUpdate(float dt) OVERRIDE;
     /** \brief set which karts lost this GP */
     void setKarts(std::vector<std::string> ident);
+    MusicInformation* getInGameMenuMusic() const OVERRIDE;
 };
 
 #endif

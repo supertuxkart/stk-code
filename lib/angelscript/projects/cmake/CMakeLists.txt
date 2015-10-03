@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
+if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
+  cmake_policy(SET CMP0048 OLD)
+endif()
+
 project(angelscript)
 
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
@@ -129,7 +133,7 @@ else()
 endif()
 
 add_library(${ANGELSCRIPT_LIBRARY_NAME} ${ANGELSCRIPT_SOURCE} ${ANGELSCRIPT_HEADERS})
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../../lib)
+#set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../../lib)
 target_link_libraries(${ANGELSCRIPT_LIBRARY_NAME} ${CMAKE_THREAD_LIBS_INIT})
 
 set_target_properties(${ANGELSCRIPT_LIBRARY_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
@@ -150,6 +154,6 @@ if(MSVC)
     set_target_properties(${ANGELSCRIPT_LIBRARY_NAME} PROPERTIES COMPILE_FLAGS "/MP")
 endif()
 
-set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../../bin)
+#set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../../bin)
 
 

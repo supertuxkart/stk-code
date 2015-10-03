@@ -94,8 +94,8 @@ IrrDriver *irr_driver = NULL;
 
 GPUTimer          m_perf_query[Q_LAST];
 
-const int MIN_SUPPORTED_HEIGHT = 600;
-const int MIN_SUPPORTED_WIDTH  = 800;
+const int MIN_SUPPORTED_HEIGHT = 768;
+const int MIN_SUPPORTED_WIDTH  = 1024;
 
 // ----------------------------------------------------------------------------
 /** The constructor creates the irrlicht device. It first creates a NULL
@@ -157,7 +157,10 @@ IrrDriver::~IrrDriver()
 
     delete m_shadow_matrices;
     m_shadow_matrices = NULL;
-    Shaders::destroy();
+    if (CVS->isGLSL())
+    {
+        Shaders::destroy();
+    }
     delete m_wind;
     delete m_spherical_harmonics;
 }   // ~IrrDriver
@@ -324,7 +327,8 @@ void IrrDriver::createListOfVideoModes()
         {
             const int w = modes->getVideoModeResolution(i).Width;
             const int h = modes->getVideoModeResolution(i).Height;
-            if (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH)
+            if ( (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) &&
+                ( ! (h==600 && w==800 && UserConfigParams::m_artist_debug_mode) ) )
                 continue;
 
             VideoMode mode(w, h);
@@ -421,7 +425,8 @@ void IrrDriver::initDevice()
         m_device  = NULL;
 
         SIrrlichtCreationParameters params;
-        params.ForceLegacyDevice = UserConfigParams::m_force_legacy_device;
+        params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device || 
+            UserConfigParams::m_gamepad_visualisation);
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
@@ -820,7 +825,10 @@ void IrrDriver::applyResolutionSettings()
     GlowPassCmd::getInstance()->kill();
     resetTextureTable();
     // initDevice will drop the current device.
-    Shaders::destroy();
+    if (CVS->isGLSL())
+    {
+        Shaders::destroy();
+    }
     initDevice();
 
     // Re-init GUI engine
