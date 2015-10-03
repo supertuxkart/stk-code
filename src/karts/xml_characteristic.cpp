@@ -306,170 +306,254 @@ void XmlCharacteristic::load(const XMLNode *node)
     /* <characteristics-start getXml> */
     if (const XMLNode *sub_node = node->getNode("suspension"))
     {
-        sub_node->get("stiffness", &m_values[SUSPENSION_STIFFNESS]);
-        sub_node->get("rest", &m_values[SUSPENSION_REST]);
-        sub_node->get("travel", &m_values[SUSPENSION_TRAVEL]);
-        sub_node->get("exp-spring-response", &m_values[SUSPENSION_EXP_SPRING_RESPONSE]);
-        sub_node->get("max-force", &m_values[SUSPENSION_MAX_FORCE]);
+        sub_node->get("stiffness",
+            &m_values[SUSPENSION_STIFFNESS]);
+        sub_node->get("rest",
+            &m_values[SUSPENSION_REST]);
+        sub_node->get("travel",
+            &m_values[SUSPENSION_TRAVEL]);
+        sub_node->get("exp-spring-response",
+            &m_values[SUSPENSION_EXP_SPRING_RESPONSE]);
+        sub_node->get("max-force",
+            &m_values[SUSPENSION_MAX_FORCE]);
     }
 
     if (const XMLNode *sub_node = node->getNode("stability"))
     {
-        sub_node->get("roll-influence", &m_values[STABILITY_ROLL_INFLUENCE]);
-        sub_node->get("chassis-linear-damping", &m_values[STABILITY_CHASSIS_LINEAR_DAMPING]);
-        sub_node->get("chassis-angular-damping", &m_values[STABILITY_CHASSIS_ANGULAR_DAMPING]);
-        sub_node->get("downward-impulse-factor", &m_values[STABILITY_DOWNWARD_IMPULSE_FACTOR]);
-        sub_node->get("track-connection-accel", &m_values[STABILITY_TRACK_CONNECTION_ACCEL]);
-        sub_node->get("smooth-flying-impulse", &m_values[STABILITY_SMOOTH_FLYING_IMPULSE]);
+        sub_node->get("roll-influence",
+            &m_values[STABILITY_ROLL_INFLUENCE]);
+        sub_node->get("chassis-linear-damping",
+            &m_values[STABILITY_CHASSIS_LINEAR_DAMPING]);
+        sub_node->get("chassis-angular-damping",
+            &m_values[STABILITY_CHASSIS_ANGULAR_DAMPING]);
+        sub_node->get("downward-impulse-factor",
+            &m_values[STABILITY_DOWNWARD_IMPULSE_FACTOR]);
+        sub_node->get("track-connection-accel",
+            &m_values[STABILITY_TRACK_CONNECTION_ACCEL]);
+        sub_node->get("smooth-flying-impulse",
+            &m_values[STABILITY_SMOOTH_FLYING_IMPULSE]);
     }
 
     if (const XMLNode *sub_node = node->getNode("turn"))
     {
-        sub_node->get("radius", &m_values[TURN_RADIUS]);
-        sub_node->get("time-reset-steer", &m_values[TURN_TIME_RESET_STEER]);
-        sub_node->get("time-full-steer", &m_values[TURN_TIME_FULL_STEER]);
+        sub_node->get("radius",
+            &m_values[TURN_RADIUS]);
+        sub_node->get("time-reset-steer",
+            &m_values[TURN_TIME_RESET_STEER]);
+        sub_node->get("time-full-steer",
+            &m_values[TURN_TIME_FULL_STEER]);
     }
 
     if (const XMLNode *sub_node = node->getNode("engine"))
     {
-        sub_node->get("power", &m_values[ENGINE_POWER]);
-        sub_node->get("max-speed", &m_values[ENGINE_MAX_SPEED]);
-        sub_node->get("brake-factor", &m_values[ENGINE_BRAKE_FACTOR]);
-        sub_node->get("brake-time-increase", &m_values[ENGINE_BRAKE_TIME_INCREASE]);
-        sub_node->get("max-speed-reverse-ratio", &m_values[ENGINE_MAX_SPEED_REVERSE_RATIO]);
+        sub_node->get("power",
+            &m_values[ENGINE_POWER]);
+        sub_node->get("max-speed",
+            &m_values[ENGINE_MAX_SPEED]);
+        sub_node->get("brake-factor",
+            &m_values[ENGINE_BRAKE_FACTOR]);
+        sub_node->get("brake-time-increase",
+            &m_values[ENGINE_BRAKE_TIME_INCREASE]);
+        sub_node->get("max-speed-reverse-ratio",
+            &m_values[ENGINE_MAX_SPEED_REVERSE_RATIO]);
     }
 
     if (const XMLNode *sub_node = node->getNode("gear"))
     {
-        sub_node->get("switch-ratio", &m_values[GEAR_SWITCH_RATIO]);
-        sub_node->get("power-increase", &m_values[GEAR_POWER_INCREASE]);
+        sub_node->get("switch-ratio",
+            &m_values[GEAR_SWITCH_RATIO]);
+        sub_node->get("power-increase",
+            &m_values[GEAR_POWER_INCREASE]);
     }
 
     if (const XMLNode *sub_node = node->getNode("mass"))
     {
-        sub_node->get("value", &m_values[MASS]);
+        sub_node->get("value",
+            &m_values[MASS]);
     }
 
     if (const XMLNode *sub_node = node->getNode("wheels"))
     {
-        sub_node->get("damping-relaxation", &m_values[WHEELS_DAMPING_RELAXATION]);
-        sub_node->get("damping-compression", &m_values[WHEELS_DAMPING_COMPRESSION]);
+        sub_node->get("damping-relaxation",
+            &m_values[WHEELS_DAMPING_RELAXATION]);
+        sub_node->get("damping-compression",
+            &m_values[WHEELS_DAMPING_COMPRESSION]);
     }
 
     if (const XMLNode *sub_node = node->getNode("camera"))
     {
-        sub_node->get("distance", &m_values[CAMERA_DISTANCE]);
-        sub_node->get("forward-up-angle", &m_values[CAMERA_FORWARD_UP_ANGLE]);
-        sub_node->get("backward-up-angle", &m_values[CAMERA_BACKWARD_UP_ANGLE]);
+        sub_node->get("distance",
+            &m_values[CAMERA_DISTANCE]);
+        sub_node->get("forward-up-angle",
+            &m_values[CAMERA_FORWARD_UP_ANGLE]);
+        sub_node->get("backward-up-angle",
+            &m_values[CAMERA_BACKWARD_UP_ANGLE]);
     }
 
     if (const XMLNode *sub_node = node->getNode("jump"))
     {
-        sub_node->get("animation-time", &m_values[JUMP_ANIMATION_TIME]);
+        sub_node->get("animation-time",
+            &m_values[JUMP_ANIMATION_TIME]);
     }
 
     if (const XMLNode *sub_node = node->getNode("lean"))
     {
-        sub_node->get("max", &m_values[LEAN_MAX]);
-        sub_node->get("speed", &m_values[LEAN_SPEED]);
+        sub_node->get("max",
+            &m_values[LEAN_MAX]);
+        sub_node->get("speed",
+            &m_values[LEAN_SPEED]);
     }
 
     if (const XMLNode *sub_node = node->getNode("anvil"))
     {
-        sub_node->get("duration", &m_values[ANVIL_DURATION]);
-        sub_node->get("weight", &m_values[ANVIL_WEIGHT]);
-        sub_node->get("speed-factor", &m_values[ANVIL_SPEED_FACTOR]);
+        sub_node->get("duration",
+            &m_values[ANVIL_DURATION]);
+        sub_node->get("weight",
+            &m_values[ANVIL_WEIGHT]);
+        sub_node->get("speed-factor",
+            &m_values[ANVIL_SPEED_FACTOR]);
     }
 
     if (const XMLNode *sub_node = node->getNode("parachute"))
     {
-        sub_node->get("friction", &m_values[PARACHUTE_FRICTION]);
-        sub_node->get("duration", &m_values[PARACHUTE_DURATION]);
-        sub_node->get("duration-other", &m_values[PARACHUTE_DURATION_OTHER]);
-        sub_node->get("lbound-fraction", &m_values[PARACHUTE_LBOUND_FRACTION]);
-        sub_node->get("ubound-fraction", &m_values[PARACHUTE_UBOUND_FRACTION]);
-        sub_node->get("max-speed", &m_values[PARACHUTE_MAX_SPEED]);
+        sub_node->get("friction",
+            &m_values[PARACHUTE_FRICTION]);
+        sub_node->get("duration",
+            &m_values[PARACHUTE_DURATION]);
+        sub_node->get("duration-other",
+            &m_values[PARACHUTE_DURATION_OTHER]);
+        sub_node->get("lbound-fraction",
+            &m_values[PARACHUTE_LBOUND_FRACTION]);
+        sub_node->get("ubound-fraction",
+            &m_values[PARACHUTE_UBOUND_FRACTION]);
+        sub_node->get("max-speed",
+            &m_values[PARACHUTE_MAX_SPEED]);
     }
 
     if (const XMLNode *sub_node = node->getNode("bubblegum"))
     {
-        sub_node->get("duration", &m_values[BUBBLEGUM_DURATION]);
-        sub_node->get("speed-fraction", &m_values[BUBBLEGUM_SPEED_FRACTION]);
-        sub_node->get("torque", &m_values[BUBBLEGUM_TORQUE]);
-        sub_node->get("fade-in-time", &m_values[BUBBLEGUM_FADE_IN_TIME]);
-        sub_node->get("shield-duration", &m_values[BUBBLEGUM_SHIELD_DURATION]);
+        sub_node->get("duration",
+            &m_values[BUBBLEGUM_DURATION]);
+        sub_node->get("speed-fraction",
+            &m_values[BUBBLEGUM_SPEED_FRACTION]);
+        sub_node->get("torque",
+            &m_values[BUBBLEGUM_TORQUE]);
+        sub_node->get("fade-in-time",
+            &m_values[BUBBLEGUM_FADE_IN_TIME]);
+        sub_node->get("shield-duration",
+            &m_values[BUBBLEGUM_SHIELD_DURATION]);
     }
 
     if (const XMLNode *sub_node = node->getNode("zipper"))
     {
-        sub_node->get("duration", &m_values[ZIPPER_DURATION]);
-        sub_node->get("force", &m_values[ZIPPER_FORCE]);
-        sub_node->get("speed-gain", &m_values[ZIPPER_SPEED_GAIN]);
-        sub_node->get("max-speed-increase", &m_values[ZIPPER_MAX_SPEED_INCREASE]);
-        sub_node->get("fade-out-time", &m_values[ZIPPER_FADE_OUT_TIME]);
+        sub_node->get("duration",
+            &m_values[ZIPPER_DURATION]);
+        sub_node->get("force",
+            &m_values[ZIPPER_FORCE]);
+        sub_node->get("speed-gain",
+            &m_values[ZIPPER_SPEED_GAIN]);
+        sub_node->get("max-speed-increase",
+            &m_values[ZIPPER_MAX_SPEED_INCREASE]);
+        sub_node->get("fade-out-time",
+            &m_values[ZIPPER_FADE_OUT_TIME]);
     }
 
     if (const XMLNode *sub_node = node->getNode("swatter"))
     {
-        sub_node->get("duration", &m_values[SWATTER_DURATION]);
-        sub_node->get("distance", &m_values[SWATTER_DISTANCE]);
-        sub_node->get("squash-duration", &m_values[SWATTER_SQUASH_DURATION]);
-        sub_node->get("squash-slowdown", &m_values[SWATTER_SQUASH_SLOWDOWN]);
+        sub_node->get("duration",
+            &m_values[SWATTER_DURATION]);
+        sub_node->get("distance",
+            &m_values[SWATTER_DISTANCE]);
+        sub_node->get("squash-duration",
+            &m_values[SWATTER_SQUASH_DURATION]);
+        sub_node->get("squash-slowdown",
+            &m_values[SWATTER_SQUASH_SLOWDOWN]);
     }
 
     if (const XMLNode *sub_node = node->getNode("plunger"))
     {
-        sub_node->get("band-max-length", &m_values[PLUNGER_BAND_MAX_LENGTH]);
-        sub_node->get("band-force", &m_values[PLUNGER_BAND_FORCE]);
-        sub_node->get("band-duration", &m_values[PLUNGER_BAND_DURATION]);
-        sub_node->get("band-speed-increase", &m_values[PLUNGER_BAND_SPEED_INCREASE]);
-        sub_node->get("band-fade-out-time", &m_values[PLUNGER_BAND_FADE_OUT_TIME]);
-        sub_node->get("in-face-time", &m_values[PLUNGER_IN_FACE_TIME]);
+        sub_node->get("band-max-length",
+            &m_values[PLUNGER_BAND_MAX_LENGTH]);
+        sub_node->get("band-force",
+            &m_values[PLUNGER_BAND_FORCE]);
+        sub_node->get("band-duration",
+            &m_values[PLUNGER_BAND_DURATION]);
+        sub_node->get("band-speed-increase",
+            &m_values[PLUNGER_BAND_SPEED_INCREASE]);
+        sub_node->get("band-fade-out-time",
+            &m_values[PLUNGER_BAND_FADE_OUT_TIME]);
+        sub_node->get("in-face-time",
+            &m_values[PLUNGER_IN_FACE_TIME]);
     }
 
     if (const XMLNode *sub_node = node->getNode("startup"))
     {
-        sub_node->get("time", &m_values[STARTUP_TIME]);
-        sub_node->get("boost", &m_values[STARTUP_BOOST]);
+        sub_node->get("time",
+            &m_values[STARTUP_TIME]);
+        sub_node->get("boost",
+            &m_values[STARTUP_BOOST]);
     }
 
     if (const XMLNode *sub_node = node->getNode("rescue"))
     {
-        sub_node->get("duration", &m_values[RESCUE_DURATION]);
-        sub_node->get("vert-offset", &m_values[RESCUE_VERT_OFFSET]);
-        sub_node->get("height", &m_values[RESCUE_HEIGHT]);
+        sub_node->get("duration",
+            &m_values[RESCUE_DURATION]);
+        sub_node->get("vert-offset",
+            &m_values[RESCUE_VERT_OFFSET]);
+        sub_node->get("height",
+            &m_values[RESCUE_HEIGHT]);
     }
 
     if (const XMLNode *sub_node = node->getNode("explosion"))
     {
-        sub_node->get("duration", &m_values[EXPLOSION_DURATION]);
-        sub_node->get("radius", &m_values[EXPLOSION_RADIUS]);
-        sub_node->get("invulnerability-time", &m_values[EXPLOSION_INVULNERABILITY_TIME]);
+        sub_node->get("duration",
+            &m_values[EXPLOSION_DURATION]);
+        sub_node->get("radius",
+            &m_values[EXPLOSION_RADIUS]);
+        sub_node->get("invulnerability-time",
+            &m_values[EXPLOSION_INVULNERABILITY_TIME]);
     }
 
     if (const XMLNode *sub_node = node->getNode("nitro"))
     {
-        sub_node->get("duration", &m_values[NITRO_DURATION]);
-        sub_node->get("engine-force", &m_values[NITRO_ENGINE_FORCE]);
-        sub_node->get("consumption", &m_values[NITRO_CONSUMPTION]);
-        sub_node->get("small-container", &m_values[NITRO_SMALL_CONTAINER]);
-        sub_node->get("big-container", &m_values[NITRO_BIG_CONTAINER]);
-        sub_node->get("max-speed-increase", &m_values[NITRO_MAX_SPEED_INCREASE]);
-        sub_node->get("fade-out-time", &m_values[NITRO_FADE_OUT_TIME]);
-        sub_node->get("max", &m_values[NITRO_MAX]);
+        sub_node->get("duration",
+            &m_values[NITRO_DURATION]);
+        sub_node->get("engine-force",
+            &m_values[NITRO_ENGINE_FORCE]);
+        sub_node->get("consumption",
+            &m_values[NITRO_CONSUMPTION]);
+        sub_node->get("small-container",
+            &m_values[NITRO_SMALL_CONTAINER]);
+        sub_node->get("big-container",
+            &m_values[NITRO_BIG_CONTAINER]);
+        sub_node->get("max-speed-increase",
+            &m_values[NITRO_MAX_SPEED_INCREASE]);
+        sub_node->get("fade-out-time",
+            &m_values[NITRO_FADE_OUT_TIME]);
+        sub_node->get("max",
+            &m_values[NITRO_MAX]);
     }
 
     if (const XMLNode *sub_node = node->getNode("slipstream"))
     {
-        sub_node->get("duration", &m_values[SLIPSTREAM_DURATION]);
-        sub_node->get("length", &m_values[SLIPSTREAM_LENGTH]);
-        sub_node->get("width", &m_values[SLIPSTREAM_WIDTH]);
-        sub_node->get("collect-time", &m_values[SLIPSTREAM_COLLECT_TIME]);
-        sub_node->get("use-time", &m_values[SLIPSTREAM_USE_TIME]);
-        sub_node->get("add-power", &m_values[SLIPSTREAM_ADD_POWER]);
-        sub_node->get("min-speed", &m_values[SLIPSTREAM_MIN_SPEED]);
-        sub_node->get("max-speed-increase", &m_values[SLIPSTREAM_MAX_SPEED_INCREASE]);
-        sub_node->get("fade-out-time", &m_values[SLIPSTREAM_FADE_OUT_TIME]);
+        sub_node->get("duration",
+            &m_values[SLIPSTREAM_DURATION]);
+        sub_node->get("length",
+            &m_values[SLIPSTREAM_LENGTH]);
+        sub_node->get("width",
+            &m_values[SLIPSTREAM_WIDTH]);
+        sub_node->get("collect-time",
+            &m_values[SLIPSTREAM_COLLECT_TIME]);
+        sub_node->get("use-time",
+            &m_values[SLIPSTREAM_USE_TIME]);
+        sub_node->get("add-power",
+            &m_values[SLIPSTREAM_ADD_POWER]);
+        sub_node->get("min-speed",
+            &m_values[SLIPSTREAM_MIN_SPEED]);
+        sub_node->get("max-speed-increase",
+            &m_values[SLIPSTREAM_MAX_SPEED_INCREASE]);
+        sub_node->get("fade-out-time",
+            &m_values[SLIPSTREAM_FADE_OUT_TIME]);
     }
 
 
