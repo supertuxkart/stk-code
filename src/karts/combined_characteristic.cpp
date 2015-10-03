@@ -37,6 +37,7 @@ const SkiddingProperties* CombinedCharacteristic::getSkiddingProperties() const
 }   // getSkiddingProperties
 
 // ----------------------------------------------------------------------------
+/** Combines all contained source characteristics. */
 void CombinedCharacteristic::process(CharacteristicType type, Value value,
                                      bool *is_set) const
 {

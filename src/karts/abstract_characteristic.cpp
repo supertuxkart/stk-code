@@ -34,6 +34,11 @@ const SkiddingProperties* AbstractCharacteristic::getSkiddingProperties() const
 }   // getSkiddingProperties
 
 // ----------------------------------------------------------------------------
+/** The process function should change the given value.
+ *  The input and output argument is saved in value.
+ *  is_set describes if the value is already set or if it's undefined.
+ *  The function also has to set is_set if the state changed.
+ */
 void AbstractCharacteristic::process(CharacteristicType type, Value value,
                                      bool *is_set) const
 {
@@ -41,6 +46,7 @@ void AbstractCharacteristic::process(CharacteristicType type, Value value,
 }   // process
 
 // ----------------------------------------------------------------------------
+/** Returns the type of a given characteristic. */
 AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
     CharacteristicType type)
 {
@@ -230,6 +236,7 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
 }   // getType
 
 // ----------------------------------------------------------------------------
+/** Converts the enum value to a string. */
 std::string AbstractCharacteristic::getName(CharacteristicType type)
 {
     switch (type)

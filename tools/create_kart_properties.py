@@ -24,6 +24,8 @@
 import sys
 
 # Input data
+# Each line contains a topic and the attributes of that topic.
+# This model is used for the xml file and to access the kart properties in the code.
 characteristics = """Suspension: stiffness, rest, travel, expSpringResponse(bool), maxForce
 Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, smoothFlyingImpulse
 Turn: radius(InterpolationArray), timeResetSteer, timeFullSteer(InterpolationArray)
@@ -46,7 +48,10 @@ Explosion: duration, radius, invulnerabilityTime
 Nitro: duration, engineForce, consumption, smallContainer, bigContainer, maxSpeedIncrease, fadeOutTime, max
 Slipstream: duration, length, width, collectTime, useTime, addPower, minSpeed, maxSpeedIncrease, fadeOutTime"""
 
-
+""" A GroupMember is an attribute of a group.
+    In the xml files, a value will be assigned to it.
+    If the name of the attribute is 'value', the getter method will only
+    contain the group name and 'value' will be omitted (e.g. used for mass). """
 class GroupMember:
     def __init__(self, name, typeC, typeStr):
         self.name = name
@@ -81,11 +86,14 @@ class GroupMember:
 
         return GroupMember(name, typeC, typeStr)
 
+""" A Group has a base name and can contain GroupMembers.
+    In the xml files, a group is a tag. """
 class Group:
     def __init__(self, baseName):
         self.baseName = baseName
         self.members = []
 
+    """ Parses and adds a member to this group """
     def addMember(self, content):
         self.members.append(GroupMember.parse(content))
 

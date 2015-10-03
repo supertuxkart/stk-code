@@ -28,6 +28,7 @@ CachedCharacteristic::CachedCharacteristic(const AbstractCharacteristic *origin)
 }
 
 // ----------------------------------------------------------------------------
+/** Deletes all allocated values. */
 CachedCharacteristic::~CachedCharacteristic()
 {
     // Delete all not-null values
@@ -47,6 +48,9 @@ CachedCharacteristic::~CachedCharacteristic()
             case TYPE_INTERPOLATION_ARRAY:
                 delete static_cast<InterpolationArray*>(v.content);
                 break;
+            case TYPE_BOOL:
+                delete static_cast<InterpolationArray*>(v.content);
+                break;
             }
             v.content = nullptr;
         }
@@ -54,6 +58,9 @@ CachedCharacteristic::~CachedCharacteristic()
 }   // ~CachedCharacteristic
 
 // ----------------------------------------------------------------------------
+/** Recompute the values of all characteristics based on the list of
+ *  source-characteristics.
+ */
 void CachedCharacteristic::updateSource()
 {
     for (int i = 0; i < CHARACTERISTIC_COUNT; i++)
@@ -113,7 +120,6 @@ void CachedCharacteristic::updateSource()
             }
             break;
         }
-            break;
         case TYPE_INTERPOLATION_ARRAY:
         {
             InterpolationArray value;
@@ -124,6 +130,31 @@ void CachedCharacteristic::updateSource()
                 if (!ptr)
                 {
                     InterpolationArray *newPtr = new InterpolationArray();
+                    v.content = newPtr;
+                    ptr = newPtr;
+                }
+                *ptr = value;
+            }
+            else
+            {
+                if (ptr)
+                {
+                    delete ptr;
+                    v.content = nullptr;
+                }
+            }
+            break;
+        }
+        case TYPE_BOOL:
+        {
+            bool value;
+            bool *ptr = static_cast<bool*>(v.content);
+            m_origin->process(static_cast<CharacteristicType>(i), &value, &is_set);
+            if (is_set)
+            {
+                if (!ptr)
+                {
+                    bool *newPtr = new bool();
                     v.content = newPtr;
                     ptr = newPtr;
                 }
@@ -150,6 +181,7 @@ const SkiddingProperties* CachedCharacteristic::getSkiddingProperties() const
 }   // getSkiddingProperties
 
 // ----------------------------------------------------------------------------
+/** Returns the stored value. */
 void CachedCharacteristic::process(CharacteristicType type, Value value,
                                    bool *is_set) const
 {
@@ -166,6 +198,9 @@ void CachedCharacteristic::process(CharacteristicType type, Value value,
             break;
         case TYPE_INTERPOLATION_ARRAY:
             *value.ia = *static_cast<InterpolationArray*>(v);
+            break;
+        case TYPE_BOOL:
+            *value.f = *static_cast<bool*>(v);
             break;
         }
         *is_set = true;
