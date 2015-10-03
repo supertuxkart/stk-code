@@ -1389,7 +1389,11 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
 {
     assert(texture.size() == 6);
 
-    m_skybox = new Skybox(texture);
+    if (CVS->isGLSL())
+    {
+        m_skybox = new Skybox(texture);
+    }
+
     if(spherical_harmonics_textures.size() == 6)
     {
         m_spherical_harmonics->setTextures(spherical_harmonics_textures);
