@@ -183,15 +183,17 @@ Operations:
                 typeC = m.typeC
                 result = "result"
 
-                print("""{3} AbstractCharacteristic::get{1}() const
+                print("""// ----------------------------------------------------------------------------
+{3} AbstractCharacteristic::get{1}() const
 {{
     {0} result;
     bool is_set = false;
     process({2}, &result, &is_set);
     if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s", getName({2}).c_str());
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName({2}).c_str());
     return {4};
-}}
+}}  // get{1}
 """.format(m.typeC, nameTitle, nameUnderscore.upper(), typeC, result))
     elif task == "getProp1":
         for g in groups:
@@ -214,7 +216,8 @@ Operations:
             for m in g.members:
                 nameUnderscore = joinSubName(g, m, False)
                 nameMinus = "-".join(toList(m.name))
-                print("        sub_node->get(\"{0}\", &m_values[{1}]);".
+                print("""        sub_node->get(\"{0}\",
+            &m_values[{1}]);""".
                     format(nameMinus, nameUnderscore.upper()))
             print("    }\n")
     else:

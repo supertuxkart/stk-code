@@ -27,6 +27,7 @@ CachedCharacteristic::CachedCharacteristic(const AbstractCharacteristic *origin)
     updateSource();
 }
 
+// ----------------------------------------------------------------------------
 CachedCharacteristic::~CachedCharacteristic()
 {
     // Delete all not-null values
@@ -50,8 +51,9 @@ CachedCharacteristic::~CachedCharacteristic()
             v.content = nullptr;
         }
     }
-}
+}   // ~CachedCharacteristic
 
+// ----------------------------------------------------------------------------
 void CachedCharacteristic::updateSource()
 {
     for (int i = 0; i < CHARACTERISTIC_COUNT; i++)
@@ -137,17 +139,19 @@ void CachedCharacteristic::updateSource()
             }
             break;
         }
-            break;
-        }
-    }
-}
+        }   // switch (type)
+    }   // foreach characteristic
+}   // updateSource
 
+// ----------------------------------------------------------------------------
 const SkiddingProperties* CachedCharacteristic::getSkiddingProperties() const
 {
     return m_origin->getSkiddingProperties();
-}
+}   // getSkiddingProperties
 
-void CachedCharacteristic::process(CharacteristicType type, Value value, bool *is_set) const
+// ----------------------------------------------------------------------------
+void CachedCharacteristic::process(CharacteristicType type, Value value,
+                                   bool *is_set) const
 {
     void *v = m_values[type].content;
     if (v)
@@ -166,5 +170,5 @@ void CachedCharacteristic::process(CharacteristicType type, Value value, bool *i
         }
         *is_set = true;
     }
-}
+}   // process
 

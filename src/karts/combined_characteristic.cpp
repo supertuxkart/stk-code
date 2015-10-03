@@ -18,11 +18,13 @@
 
 #include "karts/combined_characteristic.hpp"
 
-void CombinedCharacteristic::addCharacteristic(const AbstractCharacteristic *characteristic)
+void CombinedCharacteristic::addCharacteristic(
+    const AbstractCharacteristic *characteristic)
 {
     m_childs.push_back(characteristic);
-}
+}   // addCharacteristic
 
+// ----------------------------------------------------------------------------
 const SkiddingProperties* CombinedCharacteristic::getSkiddingProperties() const
 {
     for (const AbstractCharacteristic *characteristic : m_childs)
@@ -32,11 +34,13 @@ const SkiddingProperties* CombinedCharacteristic::getSkiddingProperties() const
             return skid;
     }
     return nullptr;
-}
+}   // getSkiddingProperties
 
-void CombinedCharacteristic::process(CharacteristicType type, Value value, bool *is_set) const
+// ----------------------------------------------------------------------------
+void CombinedCharacteristic::process(CharacteristicType type, Value value,
+                                     bool *is_set) const
 {
     for (const AbstractCharacteristic *characteristic : m_childs)
         characteristic->process(type, value, is_set);
-}
+}   // process
 
