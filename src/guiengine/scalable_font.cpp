@@ -16,12 +16,83 @@
 #include <IVideoDriver.h>
 #include <IXMLReader.h>
 
+#include <cmath>
+
+#define cur_face GUIEngine::get_Freetype()->ft_face[fu]
+
 namespace irr
 {
 namespace gui
 {
 
 //! constructor
+#ifdef ENABLE_FREETYPE
+ScalableFont::ScalableFont(IGUIEnvironment *env, TTFLoadingType type)
+            : Driver(0), SpriteBank(0), Environment(env), WrongCharacter(0),
+              MaxHeight(0), GlobalKerningWidth(0), GlobalKerningHeight(0)
+{
+#ifdef _DEBUG
+    setDebugName("ScalableFont");
+#endif
+
+    m_fallback_font          = NULL;
+    m_fallback_kerning_width = 0;
+    m_fallback_font_scale    = 1.0f;
+    m_scale                  = 1.0f;
+    m_is_hollow_copy         = false;
+    m_black_border           = false;
+    m_isTTF                  = true;
+    m_type                   = type;
+    m_shadow                 = false;
+    m_mono_space_digits      = false;
+    m_rtl                    = translations->isRTLLanguage();
+
+    if (Environment)
+    {
+        // don't grab environment, to avoid circular references
+        Driver = Environment->getVideoDriver();
+
+        if (!m_isTTF)
+            Log::fatal("ScalableFont", "Loading TTF font failed");
+        else
+            SpriteBank = Environment->addEmptySpriteBank((std::to_string(type)).c_str());
+        if (SpriteBank)
+            SpriteBank->grab();
+    }
+
+    if (Driver)
+        Driver->grab();
+
+    setInvisibleCharacters ( L" " );
+
+    if (!loadTTF())
+    {
+        Log::fatal("ScalableFont", "Loading TTF font failed");
+    }
+
+    assert(Areas.size() > 0);
+}
+
+void ScalableFont::recreateFromLanguage()
+{
+    //Clean previous font data
+    SpriteBank->clear();
+    Areas.clear();
+    CharacterMap.clear();
+    WrongCharacter = 0;
+    MaxHeight = 0;
+    GlobalKerningWidth = 0;
+    GlobalKerningHeight = 0;
+
+    //Set to default scale to reload font
+    m_scale = 1;
+    //Reload
+    if (!loadTTF())
+    {
+        Log::fatal("ScalableFont", "Recreation of TTF font failed");
+    }
+}
+#else
 ScalableFont::ScalableFont(IGUIEnvironment *env, const std::string &filename)
             : Driver(0), SpriteBank(0), Environment(env), WrongCharacter(0),
               MaxHeight(0), GlobalKerningWidth(0), GlobalKerningHeight(0)
@@ -36,6 +107,7 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const std::string &filename)
     m_scale                  = 1.0f;
     m_is_hollow_copy         = false;
     m_black_border           = false;
+    m_isTTF                  = false;
     m_shadow                 = false;
     m_mono_space_digits      = false;
     m_rtl                    = translations->isRTLLanguage();
@@ -65,6 +137,7 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const std::string &filename)
     assert(Areas.size() > 0);
 }
 
+#endif // ENABLE_FREETYPE
 
 //! destructor
 ScalableFont::~ScalableFont()
@@ -87,6 +160,7 @@ void ScalableFont::setShadow(const irr::video::SColor &col)
     m_shadow_color = col;
 }
 
+#ifndef ENABLE_FREETYPE
 void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
 {
     int trim_top = 0;
@@ -281,6 +355,171 @@ bool ScalableFont::load(io::IXMLReader* xml)
     m_max_digit_area.overhang = 0;m_max_digit_area.underhang=0;
     return true;
 }
+#endif // ENABLE_FREETYPE
+
+#ifdef ENABLE_FREETYPE
+//! loads a font file from a TTF file
+bool ScalableFont::loadTTF()
+{
+    if (!SpriteBank)
+    {
+        Log::error("ScalableFont::loadTTF", "SpriteBank is NULL!!");
+        return false;
+    }
+
+    //Initialize glyph slot
+    FT_GlyphSlot slot;
+    FT_Error     err;
+
+    //Determine which font(face) and size to load,
+    //also get all used char base on current language settings
+    FontUse fu;
+    TTFfile TTF_file = getTTFAndChar(translations->getCurrentLanguageNameCode(), m_type, fu);
+
+    std::vector <s32> offset;
+    std::vector <s32> bx;
+    std::vector <s32> advance;
+    std::vector <s32> height;
+
+    err = FT_Set_Pixel_Sizes(cur_face, 0, TTF_file.size);
+    if (err)
+        Log::error("ScalableFont::loadTTF", "Can't set font size.");
+
+    slot = cur_face->glyph;
+
+    std::set<wchar_t>::iterator it;
+    s32 current_maxheight = 0;
+    s32 t;
+    for (it = TTF_file.usedchar.begin(); it != TTF_file.usedchar.end(); ++it)
+    {
+        // Retrieve glyph index from character code, skip useless glyph.
+        int idx = FT_Get_Char_Index(cur_face, *it);
+        if (idx == 0)  continue;
+
+        // Load glyph image into the slot (erase previous one)
+        err = FT_Load_Glyph(cur_face, idx,
+              FT_LOAD_DEFAULT | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL);
+        if (err)
+            Log::error("ScalableFont::loadTTF", "Can't load a single glyph.");
+
+        // Store vertical offset on line.
+        s32 offset_on_line = (cur_face->glyph->metrics.height >> 6) - cur_face->glyph->bitmap_top;
+        offset.push_back(offset_on_line);
+
+        //This is to be used later.
+        t = cur_face->glyph->metrics.height >> 6;
+        height.push_back(t);
+        if (t > current_maxheight)
+            current_maxheight = t;
+
+        // Store horizontal padding (bearingX).
+        s32 bX = cur_face->glyph->bitmap_left;
+        bx.push_back(bX);
+
+        // Store total width on horizontal line.
+        s32 width = cur_face->glyph->advance.x >> 6;
+        advance.push_back(width);
+
+        // Convert to an anti-aliased bitmap
+        FT_Bitmap bits = slot->bitmap;
+
+        //Generate image of glyph
+        video::IImage* image = generateTTFImage(bits, Driver);
+        if (!image)
+            return false;
+
+        //Add it as texture
+        SpriteBank->addTextureAsSprite(Driver->addTexture("character",image),
+        cur_face->glyph->metrics.width >> 6, t);
+        image->drop();
+        CharacterMap[*it] =  SpriteBank->getSprites().size() - 1;
+    }
+
+    //Fix unused glyphs....
+    if (m_type == Normal || Bold)
+    {
+        CharacterMap[(wchar_t)32] = getAreaIDFromCharacter((wchar_t)160, NULL); //Use non-breaking space glyph to all space/tab characters.
+        CharacterMap[(wchar_t)9] = getAreaIDFromCharacter((wchar_t)160, NULL);
+        CharacterMap[(wchar_t)173] = 0; //Don't need a glyph for the soft hypen, as it only print when not having enough space.
+                                        //And then it will convert to a "-".
+
+        if (m_type == Normal)
+        {
+            CharacterMap[(wchar_t)8204] = 0; //They are zero width chars found in Arabic.
+            CharacterMap[(wchar_t)65279] = 0;
+        }
+    }
+
+    if (m_type == Bold)
+    {
+        setlocale(LC_ALL, "en_US.UTF8");
+        for  (it = TTF_file.usedchar.begin(); it != TTF_file.usedchar.end(); ++it)
+        {
+            if (iswupper((wchar_t)*it))
+                CharacterMap[towlower((wchar_t)*it)] = getAreaIDFromCharacter(*it, NULL);
+        }
+    }
+
+    for (unsigned int n = 0 ; n < SpriteBank->getSprites().size(); ++n)
+    {
+        //Storing now
+        SFontArea a;
+        a.spriteno      = n;
+        a.offsety       = current_maxheight - height.at(n)
+                        + offset.at(n); //Compute the correct offset as ttf texture image is cropped against the glyph fully.
+        if (!n) //Skip soft hypen and space
+            a.bearingx = 0;
+        else
+            a.bearingx = bx.at(n);
+        if (!n) //Skip soft hypen and space
+            a.width = 0;
+        else
+            a.width = advance.at(n);
+        // add character to font
+        Areas.push_back(a);
+    }
+
+    WrongCharacter = getAreaIDFromCharacter(L' ', NULL);
+
+    //Add 5 for ttf bitmap to display Chinese better, 40 for digit font to display separately
+    //Consider fallback font (Bold) too
+    MaxHeight = (int)((current_maxheight + (m_type == Digit ? 40 : 5) +
+                (m_type == Bold ? 20 : 0))*m_scale);
+
+    if (m_type == Digit)
+    {
+        for(wchar_t c='0'; c<='9'; c++)
+        {
+            SFontArea a = getAreaFromCharacter(c, NULL);
+            m_max_digit_area.width     = a.width;
+            m_max_digit_area.offsety   = a.offsety;
+            m_max_digit_area.bearingx  = a.bearingx;
+        }
+    }
+
+    switch (m_type)
+    {
+        case Normal:
+            Log::info("ScalableFont::loadTTF", "Created %d glyphs "
+                       "supporting %d characters for normal font %s at %d dpi."
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size);
+        break;
+        case Digit:
+            Log::info("ScalableFont::loadTTF", "Created %d glyphs "
+                       "supporting %d characters for high-res digits font %s at %d dpi."
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size);
+        break;
+        case Bold:
+            Log::info("ScalableFont::loadTTF", "Created %d glyphs "
+                       "supporting %d characters for bold title font %s at %d dpi."
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size);
+        break;
+    }
+
+    return true;
+}
+#endif // ENABLE_FREETYPE
+
 void ScalableFont::setScale(const float scale)
 {
     m_scale = scale;
@@ -304,7 +543,7 @@ void ScalableFont::setMaxHeight()
         const TextureInfo& info = (*(m_texture_files.find(texID))).second;
         if (info.m_exclude_from_max_height_calculation) continue;
 
-        float char_scale = info.m_scale;
+        float char_scale = (m_isTTF ? 1.0f:info.m_scale);
         t = (int)(t*char_scale);
 
         if (t>MaxHeight)
@@ -328,6 +567,7 @@ s32 ScalableFont::getKerningWidth(const wchar_t* thisLetter, const wchar_t* prev
 {
     s32 ret = GlobalKerningWidth;
 
+#ifndef ENABLE_FREETYPE
     if (thisLetter)
     {
         ret += Areas[getAreaIDFromCharacter(*thisLetter, NULL)].overhang;
@@ -337,7 +577,7 @@ s32 ScalableFont::getKerningWidth(const wchar_t* thisLetter, const wchar_t* prev
             ret += Areas[getAreaIDFromCharacter(*previousLetter, NULL)].underhang;
         }
     }
-
+#endif // ENABLE_FREETYPE
     return ret;
 }
 
@@ -417,6 +657,7 @@ const ScalableFont::SFontArea &ScalableFont::getAreaFromCharacter(const wchar_t 
 }   // getAreaFromCharacter
 
 
+
 void ScalableFont::setInvisibleCharacters( const wchar_t *s )
 {
     Invisible = s;
@@ -448,7 +689,9 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
         bool fallback = false;
         const SFontArea &area = getAreaFromCharacter(*p, &fallback);
 
+#ifndef ENABLE_FREETYPE
         thisLine.Width += area.underhang;
+#endif // ENABLE_FREETYPE
 
         thisLine.Width += getCharWidth(area, fallback);
     }
@@ -552,8 +795,21 @@ void ScalableFont::doDraw(const core::stringw& text,
         bool use_fallback_font = false;
         const SFontArea &area  = getAreaFromCharacter(c, &use_fallback_font);
         fallback[i]            = use_fallback_font;
+#ifdef ENABLE_FREETYPE
+        //floor is used to prevent negligible movement when m_scale changes with resolution
+        int Hpadding = floor((float) area.bearingx*
+                       (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
+        int Vpadding = floor((float) area.offsety*
+                       (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
+        offset.X += Hpadding;
+        offset.Y += Vpadding + floor(m_type == Digit ? 20*m_scale : 0); //Additional offset for digit text
+        offsets.push_back(offset);
+        offset.X -= Hpadding;
+        offset.Y -= Vpadding + floor(m_type == Digit ? 20*m_scale : 0);
+#else
         offset.X              += area.underhang;
         offsets.push_back(offset);
+#endif // ENABLE_FREETYPE
         // Invisible character. add something to the array anyway so that
         // indices from the various arrays remain in sync
         indices.push_back( Invisible.findFirst(c) < 0  ? area.spriteno
@@ -595,12 +851,17 @@ void ScalableFont::doDraw(const core::stringw& text,
                                   (*fallback_positions)[(*fallback_sprites)[spriteID].Frames[0].rectNumber] :
                                   positions[sprites[spriteID].Frames[0].rectNumber]);
 
-        const TextureInfo& info = (fallback[n] ?
-                                   (*(m_fallback_font->m_texture_files.find(texID))).second :
-                                   (*(m_texture_files.find(texID))).second
-                                   );
-        float char_scale = info.m_scale;
-
+        float char_scale;
+        if (!m_isTTF)
+        {
+            const TextureInfo& info = (fallback[n] ?
+                                       (*(m_fallback_font->m_texture_files.find(texID))).second :
+                                       (*(m_texture_files.find(texID))).second
+                                       );
+            char_scale = info.m_scale;
+        }
+        else
+            char_scale = 1.0f;
         core::dimension2d<s32> size = source.getSize();
 
         float scale = (fallback[n] ? m_scale*m_fallback_font_scale : m_scale);
@@ -608,9 +869,13 @@ void ScalableFont::doDraw(const core::stringw& text,
         size.Height = (int)(size.Height * scale * char_scale);
 
         // align vertically if character is smaller
+#ifndef ENABLE_FREETYPE
         int y_shift = (size.Height < MaxHeight*m_scale ? (int)((MaxHeight*m_scale - size.Height)/2.0f) : 0);
 
         core::rect<s32> dest(offsets[n] + core::position2di(0, y_shift), size);
+#else
+        core::rect<s32> dest(offsets[n], size);
+#endif // ENABLE_FREETYPE
 
         video::ITexture* texture = (fallback[n] ?
                                     m_fallback_font->SpriteBank->getTexture(texID) :
@@ -624,8 +889,10 @@ void ScalableFont::doDraw(const core::stringw& text,
                 source.getWidth(), source.getHeight(), offsets[n].X, offsets[n].Y);
         }
         */
-
-        if (texture == NULL)
+#ifdef FONT_DEBUG
+        GL32_draw2DRectangle(video::SColor(255, 255,0,0), dest,clip);
+#endif
+        if (texture == NULL && !m_isTTF)
         {
             // perform lazy loading
 
@@ -666,7 +933,11 @@ void ScalableFont::doDraw(const core::stringw& text,
             }
         }
 
+#ifdef ENABLE_FREETYPE
+        if (fallback[n] || m_type == Bold)
+#else
         if (fallback[n])
+#endif // ENABLE_FREETYPE
         {
             // TODO: don't hardcode colors?
             video::SColor orange(color.getAlpha(), 255, 100, 0);
@@ -707,21 +978,6 @@ void ScalableFont::doDraw(const core::stringw& text,
                     clip,
                     color, true);
             }
-#ifdef FONT_DEBUG
-            video::IVideoDriver* driver = GUIEngine::getDriver();
-            driver->draw2DLine(core::position2d<s32>(dest.UpperLeftCorner.X,  dest.UpperLeftCorner.Y),
-                               core::position2d<s32>(dest.UpperLeftCorner.X,  dest.LowerRightCorner.Y),
-                               video::SColor(255, 255,0,0));
-            driver->draw2DLine(core::position2d<s32>(dest.LowerRightCorner.X, dest.LowerRightCorner.Y),
-                               core::position2d<s32>(dest.LowerRightCorner.X, dest.UpperLeftCorner.Y),
-                               video::SColor(255, 255,0,0));
-            driver->draw2DLine(core::position2d<s32>(dest.LowerRightCorner.X, dest.LowerRightCorner.Y),
-                               core::position2d<s32>(dest.UpperLeftCorner.X,  dest.LowerRightCorner.Y),
-                               video::SColor(255, 255,0,0));
-            driver->draw2DLine(core::position2d<s32>(dest.UpperLeftCorner.X,  dest.UpperLeftCorner.Y),
-                               core::position2d<s32>(dest.LowerRightCorner.X, dest.UpperLeftCorner.Y),
-                               video::SColor(255, 255,0,0));
-#endif
         }
     }
 }
@@ -777,17 +1033,28 @@ int ScalableFont::getCharWidth(const SFontArea& area, const bool fallback) const
                        (*fallback_sprites)[area.spriteno].Frames[0].textureNumber :
                        sprites[area.spriteno].Frames[0].textureNumber);
 
-    const TextureInfo& info = (fallback ?
-                               (*(m_fallback_font->m_texture_files.find(texID))).second :
-                                (*(m_texture_files.find(texID))).second
-                               );
-    assert(info.m_file_name.size() > 0);
-    const float char_scale = info.m_scale;
+    float char_scale;
+    if (!m_isTTF)
+    {
+        const TextureInfo& info = (fallback ?
+                                  (*(m_fallback_font->m_texture_files.find(texID))).second :
+                                  (*(m_texture_files.find(texID))).second
+                                  );
+        assert(info.m_file_name.size() > 0);
+        char_scale = info.m_scale;
+    }
+    else
+        char_scale = 1.0f;
 
     //Log::info("ScalableFont", "area.spriteno = %d, char_scale = %f", area.spriteno, char_scale);
 
+#ifdef ENABLE_FREETYPE
+    if (fallback) return (int)((area.width*m_fallback_font_scale + m_fallback_kerning_width) * m_scale * char_scale);
+    else          return (int)((area.width + GlobalKerningWidth) * m_scale * char_scale);
+#else
     if (fallback) return (int)(((area.width + area.overhang)*m_fallback_font_scale + m_fallback_kerning_width) * m_scale * char_scale);
     else          return (int)((area.width + area.overhang + GlobalKerningWidth) * m_scale * char_scale);
+#endif // ENABLE_FREETYPE
 }
 
 
@@ -802,7 +1069,11 @@ s32 ScalableFont::getCharacterFromPos(const wchar_t* text, s32 pixel_x) const
         bool use_fallback_font = false;
         const SFontArea &a  = getAreaFromCharacter(text[idx], &use_fallback_font);
 
+#ifdef ENABLE_FREETYPE
+        x += getCharWidth(a, use_fallback_font) + GlobalKerningWidth;
+#else
         x += getCharWidth(a, use_fallback_font) + a.overhang + a.underhang + GlobalKerningWidth;
+#endif // ENABLE_FREETYPE
 
         if (x >= pixel_x)
             return idx;

@@ -39,6 +39,10 @@ namespace irr
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
 
+#ifdef ENABLE_FREETYPE
+#include "guiengine/freetype_environment.hpp"
+#endif // ENABLE_FREETYPE
+
 /**
  * \ingroup guiengine
  * \brief Contains all GUI engine related classes and functions
@@ -81,6 +85,9 @@ namespace GUIEngine
     {
         extern irr::gui::IGUIEnvironment* g_env;
         extern Skin* g_skin;
+#ifdef ENABLE_FREETYPE
+        extern irr::gui::Ft_Env*  g_ft_env;
+#endif // ENABLE_FREETYPE
         extern irr::gui::ScalableFont* g_small_font;
         extern irr::gui::ScalableFont* g_font;
         extern irr::gui::ScalableFont* g_outline_font;
@@ -172,6 +179,14 @@ namespace GUIEngine
       */
     inline Skin*                      getSkin()          { return Private::g_skin;           }
 
+#ifdef ENABLE_FREETYPE
+    /**
+      * \pre GUIEngine::init must have been called first
+      * \return       the freetype and library with face
+      */
+    inline irr::gui::Ft_Env*          get_Freetype()     { return Private::g_ft_env;         }
+#endif // ENABLE_FREETYPE
+
     Screen*                           getScreenNamed(const char* name);
 
     /** \return the height of the title font in pixels */
@@ -247,6 +262,14 @@ namespace GUIEngine
       * \brief call when skin in user config was updated
       */
     void reloadSkin();
+
+#ifdef ENABLE_FREETYPE
+    /**
+      * \brief call when translation in user config was updated for freetype rendering STK
+      */
+    void cleanHollowCopyFont();
+    void reloadHollowCopyFont(irr::gui::ScalableFont*);
+#endif // ENABLE_FREETYPE
 }
 
 #endif

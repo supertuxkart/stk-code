@@ -49,7 +49,7 @@ public:
     enum AssetType {ASSET_MIN,
                     CHALLENGE=ASSET_MIN,
                     FONT, GFX, GRANDPRIX, GUI, LIBRARY, MODEL, MUSIC,
-                    SCRIPT, SFX, SHADER, SKIN, TEXTURE, 
+                    SCRIPT, SFX, SHADER, SKIN, TEXTURE, TTF,
                     TRANSLATION, ASSET_MAX = TRANSLATION,
                     ASSET_COUNT};
 private:

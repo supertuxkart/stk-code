@@ -54,6 +54,7 @@ private:
     bool m_rtl;
 
     std::string m_current_language_name;
+    std::string m_current_language_name_code;
 
 public:
                        Translations();
@@ -74,7 +75,11 @@ public:
 
     const std::vector<std::string>* getLanguageList() const;
 
-    std::string        getCurrentLanguageName();
+    std::set<wchar_t>        getCurrentAllChar();
+
+    std::string              getCurrentLanguageName();
+
+    std::string              getCurrentLanguageNameCode();
 
 private:
     irr::core::stringw fribidizeLine(const irr::core::stringw &str);

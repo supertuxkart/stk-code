@@ -7,6 +7,10 @@
 
 #include "utils/leak_check.hpp"
 
+#ifdef ENABLE_FREETYPE
+#include "guiengine/TTF_handling.hpp"
+#endif // ENABLE_FREETYPE
+
 #include "IrrCompileConfig.h"
 #include "IGUIFontBitmap.h"
 #include "irrString.h"
@@ -14,7 +18,6 @@
 #include "IXMLReader.h"
 #include "IReadFile.h"
 #include "irrArray.h"
-
 
 #include <map>
 #include <string>
@@ -77,13 +80,21 @@ public:
     LEAK_CHECK()
 
     bool m_black_border;
+    bool m_isTTF;
+#ifdef ENABLE_FREETYPE
+    TTFLoadingType m_type;
+#endif // ENABLE_FREETYPE
 
     ScalableFont* m_fallback_font;
     float         m_fallback_font_scale;
     int           m_fallback_kerning_width;
 
     //! constructor
+#ifdef ENABLE_FREETYPE
+    ScalableFont(IGUIEnvironment* env, TTFLoadingType type);
+#else
     ScalableFont(IGUIEnvironment* env, const std::string &filename);
+#endif // ENABLE_FREETYPE
 
     /** Creates a hollow copy of this font; i.e. the underlying font data is the *same* for
       * both fonts. The advantage of doing this is that you can change "view" parameters
@@ -104,8 +115,13 @@ public:
     //! destructor
     virtual ~ScalableFont();
 
+#ifdef ENABLE_FREETYPE
+    //! loads a font from a TTF file
+    bool loadTTF();
+#else
     //! loads a font from an XML file
     bool load(io::IXMLReader* xml);
+#endif // ENABLE_FREETYPE
 
     void lazyLoadTexture(int texID);
 
@@ -159,8 +175,23 @@ public:
 
     void updateRTL();
 
+#ifdef ENABLE_FREETYPE
+    //! re-create fonts when language is changed
+    void recreateFromLanguage();
+#endif // ENABLE_FREETYPE
+
 private:
 
+#ifdef ENABLE_FREETYPE
+    struct SFontArea
+    {
+        SFontArea() : width(0), spriteno(0), offsety(0), bearingx(0) {}
+        s32             width;
+        u32             spriteno;
+        s32             offsety;
+        s32             bearingx;
+    };
+#else
     struct SFontArea
     {
         SFontArea() : underhang(0), overhang(0), width(0), spriteno(0) {}
@@ -169,6 +200,7 @@ private:
         s32             width;
         u32             spriteno;
     };
+#endif // ENABLE_FREETYPE
 
     int getCharWidth(const SFontArea& area, const bool fallback) const;
     s32 getAreaIDFromCharacter(const wchar_t c, bool* fallback_font) const;
