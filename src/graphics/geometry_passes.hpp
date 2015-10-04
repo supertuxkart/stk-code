@@ -18,6 +18,7 @@
 #ifndef HEADER_GEOMETRY_PASSES_HPP
 #define HEADER_GEOMETRY_PASSES_HPP
 
+#include "graphics/glwrap.hpp"
 #include <ITexture.h>
 
 class GeometryPasses
@@ -30,11 +31,13 @@ private:
 
 public:
     void renderSolidFirstPass();
-    void renderSolidSecondPass();
+    void renderSolidSecondPass( unsigned renderTargetDiffuse,
+                                unsigned renderTargetSpecular,
+                                unsigned renderTargetHalfRed);
     void renderNormalsVisualisation();
-    void renderTransparent();
-    void renderShadows();
-    void renderRSM();
+    void renderTransparent(unsigned rendertarget);
+    void renderShadows(const FrameBuffer& shadowFrameBuffer);
+    void renderReflectiveShadowMap(const FrameBuffer& reflectiveShadowMapFrameBuffer);
 
 
 };

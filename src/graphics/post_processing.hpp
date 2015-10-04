@@ -93,7 +93,7 @@ public:
                               float sigmaV, float sigmaH);
 	void renderHorizontalBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
 
-    void renderGaussian6BlurLayer(FrameBuffer &in_fbo, size_t layer,
+    void renderGaussian6BlurLayer(const FrameBuffer &in_fbo, size_t layer,
                                   float sigmaH, float sigmaV);
     void renderGaussian17TapBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
 

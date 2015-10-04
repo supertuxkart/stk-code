@@ -172,12 +172,12 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
             CVS->isShadowEnabled() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
-            m_geometry_passes->renderShadows();
+            m_geometry_passes->renderShadows(irr_driver->getRTT()->getShadowFBO());
             PROFILER_POP_CPU_MARKER();
             if (CVS->isGlobalIlluminationEnabled())
             {
                 PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
-                m_geometry_passes->renderRSM();
+                m_geometry_passes->renderReflectiveShadowMap(irr_driver->getRTT()->getRSM()); //TODO: move somewhere else as RSM are computed only once per track
                 PROFILER_POP_CPU_MARKER();
             }
         }
@@ -252,7 +252,9 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
         glClear(GL_COLOR_BUFFER_BIT);
         glDepthMask(GL_FALSE);
     }
-    m_geometry_passes->renderSolidSecondPass();
+    m_geometry_passes->renderSolidSecondPass(rtts->getRenderTarget(RTT_DIFFUSE),
+                                             rtts->getRenderTarget(RTT_SPECULAR),
+                                             rtts->getRenderTarget(RTT_HALF1_R));
     PROFILER_POP_CPU_MARKER();
 
     if (irr_driver->getNormals())
@@ -323,7 +325,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
     {
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TRANSPARENT));
-        m_geometry_passes->renderTransparent();
+        m_geometry_passes->renderTransparent(irr_driver->getRTT()->getRenderTarget(RTT_DISPLACE));
         PROFILER_POP_CPU_MARKER();
     }
 

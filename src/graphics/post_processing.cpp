@@ -1108,7 +1108,7 @@ void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
 }   // renderGaussian3Blur
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
+void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
                                               size_t layer, float sigma_h,
                                               float sigma_v)
 {

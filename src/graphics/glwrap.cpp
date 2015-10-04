@@ -252,7 +252,7 @@ void FrameBuffer::bind() const
     glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
-void FrameBuffer::bindLayer(unsigned i)
+void FrameBuffer::bindLayer(unsigned i) const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbolayer);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, RenderTargets[0], 0, i);
