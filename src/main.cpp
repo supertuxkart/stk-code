@@ -1013,7 +1013,7 @@ int handleCmdLine()
     // Demo mode
     if(CommandLine::has("--demo-mode", &s))
     {
-        float t;
+        float t = 0;
         StringUtils::fromString(s, t);
         DemoWorld::enableDemoMode(t);
         // The default number of laps is taken from ProfileWorld and

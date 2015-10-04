@@ -831,8 +831,8 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     // If the time display in the top right is in this viewport,
     // move the lap/rank display down a little bit so that it is
     // displayed under the time.
-    if(viewport.UpperLeftCorner.Y==0 &&
-        viewport.LowerRightCorner.X==irr_driver->getActualScreenSize().Width &&
+    if (viewport.UpperLeftCorner.Y==0 &&
+        viewport.LowerRightCorner.X==(int)(irr_driver->getActualScreenSize().Width) &&
         race_manager->getNumPlayers()!=3)
         pos.UpperLeftCorner.Y   += m_font_height;
     pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y+20;
