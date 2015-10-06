@@ -1302,10 +1302,10 @@ void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
 
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderSolidSecondPass(unsigned renderTargetDiffuse,
-                                           unsigned renderTargetSpecular,
-                                           unsigned renderTargetHalfRed)
-{
+void GeometryPasses::renderSolidSecondPass( unsigned render_target_diffuse,
+                                            unsigned render_target_specular,
+                                            unsigned render_target_half_red)
+            {
     irr_driver->setPhase(SOLID_LIT_PASS);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
@@ -1314,17 +1314,17 @@ void GeometryPasses::renderSolidSecondPass(unsigned renderTargetDiffuse,
 
     if (CVS->isAZDOEnabled())
     {
-        DiffuseHandle = glGetTextureSamplerHandleARB(renderTargetDiffuse,
+        DiffuseHandle = glGetTextureSamplerHandleARB(render_target_diffuse,
                           Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
         if (!glIsTextureHandleResidentARB(DiffuseHandle))
             glMakeTextureHandleResidentARB(DiffuseHandle);
 
-        SpecularHandle = glGetTextureSamplerHandleARB(renderTargetSpecular,
+        SpecularHandle = glGetTextureSamplerHandleARB(render_target_specular,
                            Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[1]);
         if (!glIsTextureHandleResidentARB(SpecularHandle))
             glMakeTextureHandleResidentARB(SpecularHandle);
 
-        SSAOHandle = glGetTextureSamplerHandleARB(renderTargetHalfRed,
+        SSAOHandle = glGetTextureSamplerHandleARB(render_target_half_red,
                         Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
         if (!glIsTextureHandleResidentARB(SSAOHandle))
             glMakeTextureHandleResidentARB(SSAOHandle);
@@ -1348,9 +1348,9 @@ void GeometryPasses::renderSolidSecondPass(unsigned renderTargetDiffuse,
             ImmediateDrawList::getInstance()->at(i)->render();
 
         std::vector<GLuint> DiffSpecSSAOTex = 
-            createVector<GLuint>(renderTargetDiffuse, 
-                                 renderTargetSpecular,
-                                 renderTargetHalfRed);
+            createVector<GLuint>(render_target_diffuse, 
+                                 render_target_specular,
+                                 render_target_half_red);
 
         renderMeshes2ndPass<DefaultMaterial, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<AlphaRef, 3, 1 >(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
@@ -1511,7 +1511,7 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
 }   // renderTransparenPass
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderTransparent(unsigned rendertarget)
+void GeometryPasses::renderTransparent(unsigned render_target)
 {
 
     glEnable(GL_DEPTH_TEST);
@@ -1643,7 +1643,7 @@ void GeometryPasses::renderTransparent(unsigned rendertarget)
 
     irr_driver->getFBO(FBO_COLORS).bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
-    irr_driver->getPostProcessing()->renderPassThrough(rendertarget,
+    irr_driver->getPostProcessing()->renderPassThrough(render_target,
                                                        irr_driver->getFBO(FBO_COLORS).getWidth(), 
                                                        irr_driver->getFBO(FBO_COLORS).getHeight());
     glDisable(GL_STENCIL_TEST);
@@ -1753,14 +1753,14 @@ static void multidrawShadow(unsigned i, Args ...args)
 
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderShadows(const FrameBuffer& shadowFrameBuffer)
+void GeometryPasses::renderShadows(const FrameBuffer& shadow_framebuffer)
 {
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
     
-    shadowFrameBuffer.bind();
+    shadow_framebuffer.bind();
     if (!CVS->isESMEnabled())
     {
         glDrawBuffer(GL_NONE);
@@ -1824,12 +1824,12 @@ void GeometryPasses::renderShadows(const FrameBuffer& shadowFrameBuffer)
             for (unsigned i = 0; i < 2; i++)
             {
                 irr_driver->getPostProcessing()->renderGaussian6BlurLayer(
-                    shadowFrameBuffer, i,
+                    shadow_framebuffer, i,
                     2.f * shadow_scales[0].first / shadow_scales[i].first,
                     2.f * shadow_scales[0].second / shadow_scales[i].second);
             }
         }
-        glBindTexture(GL_TEXTURE_2D_ARRAY, shadowFrameBuffer.getRTT()[0]);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_framebuffer.getRTT()[0]);
         glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
     }
 }   // renderShadows
@@ -1924,12 +1924,12 @@ void multidrawRSM(Args...args)
 }   // multidrawRSM
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderReflectiveShadowMap(const FrameBuffer& reflectiveShadowMapFrameBuffer)
+void GeometryPasses::renderReflectiveShadowMap(const FrameBuffer& reflective_shadow_map_framebuffer)
 {
     if (irr_driver->getShadowMatrices()->isRSMMapAvail())
         return;
     ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_RSM));
-    reflectiveShadowMapFrameBuffer.bind();
+    reflective_shadow_map_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const core::matrix4 &rsm_matrix = irr_driver->getShadowMatrices()->getRSMMatrix();

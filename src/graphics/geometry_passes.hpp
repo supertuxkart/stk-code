@@ -31,13 +31,13 @@ private:
 
 public:
     void renderSolidFirstPass();
-    void renderSolidSecondPass( unsigned renderTargetDiffuse,
-                                unsigned renderTargetSpecular,
-                                unsigned renderTargetHalfRed);
+    void renderSolidSecondPass( unsigned render_target_diffuse,
+                                unsigned render_target_specular,
+                                unsigned render_target_half_red);
     void renderNormalsVisualisation();
-    void renderTransparent(unsigned rendertarget);
-    void renderShadows(const FrameBuffer& shadowFrameBuffer);
-    void renderReflectiveShadowMap(const FrameBuffer& reflectiveShadowMapFrameBuffer);
+    void renderTransparent(unsigned render_target);
+    void renderShadows(const FrameBuffer& shadow_framebuffer);
+    void renderReflectiveShadowMap(const FrameBuffer& reflective_shadow_map_framebuffer);
 
 
 };
