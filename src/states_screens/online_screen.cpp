@@ -53,7 +53,7 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
 // ----------------------------------------------------------------------------
 
-OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
+OnlineScreen::OnlineScreen() : Screen("online/online_screen.stkgui")
 {
     m_recorded_state = PlayerProfile::OS_SIGNED_OUT;
 }   // OnlineScreen
