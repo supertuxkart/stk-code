@@ -42,9 +42,9 @@ public:
     RTT(size_t width, size_t height);
     ~RTT();
 
-    FrameBuffer &getShadowFBO() { return *m_shadow_FBO; }
-    FrameBuffer &getRH() { return *m_RH_FBO; }
-    FrameBuffer &getRSM() { return *m_RSM; }
+    FrameBuffer &getShadowFrameBuffer() { return *m_shadow_FBO; }
+    FrameBuffer &getRadianceHintFrameBuffer() { return *m_RH_FBO; }
+    FrameBuffer &getReflectiveShadowMapFrameBuffer() { return *m_RSM; }
 
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }

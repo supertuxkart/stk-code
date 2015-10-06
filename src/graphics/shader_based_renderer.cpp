@@ -172,12 +172,12 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
             CVS->isShadowEnabled() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
-            m_geometry_passes->renderShadows(irr_driver->getRTT()->getShadowFBO());
+            m_geometry_passes->renderShadows(irr_driver->getRTT()->getShadowFrameBuffer());
             PROFILER_POP_CPU_MARKER();
             if (CVS->isGlobalIlluminationEnabled())
             {
                 PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
-                m_geometry_passes->renderReflectiveShadowMap(irr_driver->getRTT()->getRSM()); //TODO: move somewhere else as RSM are computed only once per track
+                m_geometry_passes->renderReflectiveShadowMap(irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer()); //TODO: move somewhere else as RSM are computed only once per track
                 PROFILER_POP_CPU_MARKER();
             }
         }
@@ -226,7 +226,13 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
         if (CVS->isDefferedEnabled())
-            m_lighting_passes->renderLights(pointlightcount, hasShadow);
+            m_lighting_passes->renderLights(pointlightcount, hasShadow,
+                                            irr_driver->getShadowMatrices(),
+                                            irr_driver->getRTT()->getShadowFrameBuffer(),
+                                            irr_driver->getRTT()->getRadianceHintFrameBuffer(),
+                                            irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer(),
+                                            irr_driver->getRTT()->getFBO(FBO_DIFFUSE),
+                                            irr_driver->getRTT()->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR));
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -295,9 +301,9 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
     {
         glDisable(GL_BLEND);
         rtts->getFBO(FBO_COLORS).bind();
-        post_processing->renderRHDebug(rtts->getRH().getRTT()[0],
-                                       rtts->getRH().getRTT()[1], 
-                                       rtts->getRH().getRTT()[2],
+        post_processing->renderRHDebug(rtts->getRadianceHintFrameBuffer().getRTT()[0],
+                                       rtts->getRadianceHintFrameBuffer().getRTT()[1], 
+                                       rtts->getRadianceHintFrameBuffer().getRTT()[2],
                                        shadow_matrices->getRHMatrix(),
                                        shadow_matrices->getRHExtend());
     }
@@ -308,7 +314,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
         rtts->getFBO(FBO_COLORS).bind();
         post_processing->renderGI(shadow_matrices->getRHMatrix(),
                                   shadow_matrices->getRHExtend(),
-                                  rtts->getRH());
+                                  rtts->getRadianceHintFrameBuffer());
     }
 
     PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
@@ -430,7 +436,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
-        post_processing->renderPassThrough(irr_driver->getRTT()->getRSM().getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
+        post_processing->renderPassThrough(irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer().getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
     }
     else if (irr_driver->getShadowViz())
     {

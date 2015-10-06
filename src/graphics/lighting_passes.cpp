@@ -17,7 +17,6 @@
 
 #include "graphics/lighting_passes.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/post_processing.hpp"
@@ -252,11 +251,11 @@ public:
         assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res");
     }   // ShadowedSunLightShaderPCF
     // ------------------------------------------------------------------------
-    void render(RTT *rtts)
+    void render(const FrameBuffer& shadowFrameBuffer)
     {
         setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
                         irr_driver->getDepthStencilTexture(),
-                        rtts->getShadowFBO().getDepthTexture()                );
+                        shadowFrameBuffer.getDepthTexture()                );
        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
                             ShadowMatrices::m_shadow_split[2],
                             ShadowMatrices::m_shadow_split[3],
@@ -290,11 +289,11 @@ public:
         assignUniforms("split0", "split1", "split2", "splitmax");
     }   // ShadowedSunLightShaderESM
     // ------------------------------------------------------------------------
-    void render(RTT *rtt)
+    void render(const FrameBuffer& shadowFrameBuffer)
     {
         setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
                         irr_driver->getDepthStencilTexture(),
-                        rtt->getShadowFBO().getRTT()[0]);
+                        shadowFrameBuffer.getRTT()[0]);
         drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
                              ShadowMatrices::m_shadow_split[2],
                              ShadowMatrices::m_shadow_split[3],
@@ -325,6 +324,52 @@ static void renderPointLights(unsigned count)
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 }   // renderPointLights
+
+
+// ----------------------------------------------------------------------------
+void LightingPasses::renderRadianceHints(ShadowMatrices *shadow_matrices,
+                                         const FrameBuffer& radiance_hint_framebuffer,
+                                         const FrameBuffer& reflective_shadow_map_framebuffer)
+{
+    ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
+    glDisable(GL_BLEND);
+    radiance_hint_framebuffer.bind();
+    glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
+    if (CVS->needRHWorkaround())
+    {
+        NVWorkaroundRadianceHintsConstructionShader::getInstance()->use();
+        NVWorkaroundRadianceHintsConstructionShader::getInstance()
+            ->setTextureUnits(
+                reflective_shadow_map_framebuffer.getRTT()[0],
+                reflective_shadow_map_framebuffer.getRTT()[1],
+                reflective_shadow_map_framebuffer.getDepthTexture());
+        for (unsigned i = 0; i < 32; i++)
+        {
+            NVWorkaroundRadianceHintsConstructionShader::getInstance()
+                ->setUniforms(shadow_matrices->getRSMMatrix(), 
+                              shadow_matrices->getRHMatrix(),
+                              shadow_matrices->getRHExtend(), i,
+                              irr_driver->getSunColor());
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        }
+    }
+    else
+    {
+        RadianceHintsConstructionShader::getInstance()->use();
+        RadianceHintsConstructionShader::getInstance()
+            ->setTextureUnits(
+                reflective_shadow_map_framebuffer.getRTT()[0],
+                reflective_shadow_map_framebuffer.getRTT()[1],
+                reflective_shadow_map_framebuffer.getDepthTexture()
+        );
+        RadianceHintsConstructionShader::getInstance()
+            ->setUniforms(shadow_matrices->getRSMMatrix(),
+                          shadow_matrices->getRHMatrix(), 
+                          shadow_matrices->getRHExtend(),
+                          irr_driver->getSunColor());
+        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
+    } 
+}
 
 // ----------------------------------------------------------------------------
 unsigned LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
@@ -409,68 +454,38 @@ unsigned LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnod
 }   // updateLightsInfo
 
 
-void LightingPasses::renderLights(unsigned pointlightcount, bool hasShadow)
+void LightingPasses::renderLights(  unsigned point_light_count, bool has_shadow,
+                                    ShadowMatrices *shadow_matrices,
+                                    const FrameBuffer& shadow_framebuffer,
+                                    const FrameBuffer& radiance_hint_framebuffer,
+                                    const FrameBuffer& reflective_shadow_map_framebuffer,
+                                    const FrameBuffer& diffuse_framebuffer,
+                                    const FrameBuffer& diffuse_specular_framebuffer)
 {
-    RTT *rtts = irr_driver->getRTT();
-    ShadowMatrices *shadow_matrices = irr_driver->getShadowMatrices();
-    
-    //RH
-    if (CVS->isGlobalIlluminationEnabled() && hasShadow)
-    {
-        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
-        glDisable(GL_BLEND);
-        rtts->getRH().bind();
-        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
-        if (CVS->needRHWorkaround())
-        {
-            NVWorkaroundRadianceHintsConstructionShader::getInstance()->use();
-            NVWorkaroundRadianceHintsConstructionShader::getInstance()
-                ->setTextureUnits(
-                    rtts->getRSM().getRTT()[0],
-                    rtts->getRSM().getRTT()[1],
-                    rtts->getRSM().getDepthTexture());
-            for (unsigned i = 0; i < 32; i++)
-            {
-                NVWorkaroundRadianceHintsConstructionShader::getInstance()
-                    ->setUniforms(shadow_matrices->getRSMMatrix(), 
-                                  shadow_matrices->getRHMatrix(),
-                                  shadow_matrices->getRHExtend(), i,
-                                  irr_driver->getSunColor());
-                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-            }
-        }
-        else
-        {
-            RadianceHintsConstructionShader::getInstance()->use();
-            RadianceHintsConstructionShader::getInstance()
-                ->setTextureUnits(
-                    rtts->getRSM().getRTT()[0],
-                    rtts->getRSM().getRTT()[1],
-                    rtts->getRSM().getDepthTexture()
-            );
-            RadianceHintsConstructionShader::getInstance()
-                ->setUniforms(shadow_matrices->getRSMMatrix(),
-                              shadow_matrices->getRHMatrix(), 
-                              shadow_matrices->getRHExtend(),
-                              irr_driver->getSunColor());
-            glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
-        }
-    }
-    shadow_matrices->updateSunOrthoMatrices();
-    rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
-    glClear(GL_COLOR_BUFFER_BIT);
+    //TODO: split this method in several smaller methods
 
-    rtts->getFBO(FBO_DIFFUSE).bind();
+
+    if (CVS->isGlobalIlluminationEnabled() && has_shadow)
+    {    
+        renderRadianceHints(shadow_matrices, radiance_hint_framebuffer, reflective_shadow_map_framebuffer);
+    }
+    
+    
+    shadow_matrices->updateSunOrthoMatrices();
+
+
+    diffuse_framebuffer.bind();
     PostProcessing *post_processing = irr_driver->getPostProcessing();
-    if (CVS->isGlobalIlluminationEnabled() && hasShadow)
+    if (CVS->isGlobalIlluminationEnabled() && has_shadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
         post_processing->renderGI(shadow_matrices->getRHMatrix(),
                                   shadow_matrices->getRHExtend(),
-                                  rtts->getRH());
+                                  radiance_hint_framebuffer);
     }
 
-    rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
+    diffuse_specular_framebuffer.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
 
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
@@ -489,7 +504,7 @@ void LightingPasses::renderLights(unsigned pointlightcount, bool hasShadow)
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
-        if (World::getWorld() && CVS->isShadowEnabled() && hasShadow)
+        if (World::getWorld() && CVS->isShadowEnabled() && has_shadow)
         {
             glEnable(GL_BLEND);
             glDisable(GL_DEPTH_TEST);
@@ -498,20 +513,22 @@ void LightingPasses::renderLights(unsigned pointlightcount, bool hasShadow)
 
             if (CVS->isESMEnabled())
             {
-                ShadowedSunLightShaderESM::getInstance()->render(rtts);
+                ShadowedSunLightShaderESM::getInstance()->render(shadow_framebuffer);
             }
             else
             {
-                ShadowedSunLightShaderPCF::getInstance()->render(rtts);
+                ShadowedSunLightShaderPCF::getInstance()->render(shadow_framebuffer);
             }
         }
         else
             post_processing->renderSunlight(irr_driver->getSunDirection(),
                                             irr_driver->getSunColor());
     }
+    
+    //points lights
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_POINTLIGHTS));
-        renderPointLights(std::min(pointlightcount, LightBaseClass::MAXLIGHT));
+        renderPointLights(std::min(point_light_count, LightBaseClass::MAXLIGHT));
     }
 }   // renderLights    
 
@@ -538,7 +555,7 @@ void LightingPasses::renderAmbientScatter()
 }   // renderAmbientScatter
 
 // ----------------------------------------------------------------------------
-void LightingPasses::renderLightsScatter(unsigned pointlightcount)
+void LightingPasses::renderLightsScatter(unsigned point_light_count)
 {
     irr_driver->getFBO(FBO_HALF1).bind();
     glClearColor(0., 0., 0., 0.);
@@ -571,7 +588,7 @@ void LightingPasses::renderLightsScatter(unsigned pointlightcount)
         ->setUniforms(1.f / (40.f * start), col2);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4,
-                          std::min(pointlightcount, LightBaseClass::MAXLIGHT));
+                          std::min(point_light_count, LightBaseClass::MAXLIGHT));
 
     glDisable(GL_BLEND);
     PostProcessing *post_processing = irr_driver->getPostProcessing();

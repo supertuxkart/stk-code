@@ -75,7 +75,7 @@ public:
     void bind() const;
     void bindLayer(unsigned) const;
     const std::vector<GLuint> &getRTT() const { return RenderTargets; }
-    GLuint &getDepthTexture() { assert(DepthTexture); return DepthTexture; }
+    GLuint getDepthTexture() const { assert(DepthTexture); return DepthTexture; }
     size_t getWidth() const { return width; }
     size_t getHeight() const { return height; }
     static void Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST);

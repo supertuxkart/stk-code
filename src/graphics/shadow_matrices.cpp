@@ -481,18 +481,18 @@ void ShadowMatrices::renderShadowsDebug()
                UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
     PostProcessing *post_processing = irr_driver->getPostProcessing();
     RTT *rtt = irr_driver->getRTT();
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 0);
+    post_processing->renderTextureLayer(rtt->getShadowFrameBuffer().getRTT()[0], 0);
     renderWireFrameFrustrum(m_shadows_cam[0], 0);
     glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2,
                UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 1);
+    post_processing->renderTextureLayer(rtt->getShadowFrameBuffer().getRTT()[0], 1);
     renderWireFrameFrustrum(m_shadows_cam[1], 1);
     glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 2);
+    post_processing->renderTextureLayer(rtt->getShadowFrameBuffer().getRTT()[0], 2);
     renderWireFrameFrustrum(m_shadows_cam[2], 2);
     glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2,
                UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 3);
+    post_processing->renderTextureLayer(rtt->getShadowFrameBuffer().getRTT()[0], 3);
     renderWireFrameFrustrum(m_shadows_cam[3], 3);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
