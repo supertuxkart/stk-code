@@ -23,16 +23,20 @@
 //  http://irrlicht.suckerfreegames.com/
 
 #ifdef ENABLE_FREETYPE
-#include "io/file_manager.hpp"
 #include "guiengine/TTF_handling.hpp"
 #include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
+#include "utils/translation.hpp"
+
 #include <algorithm>
+#include <clocale>
+#include <cwctype>
 
 namespace irr
 {
 namespace gui
 {
-TTFfile getTTFAndChar(const std::string &langname, TTFLoadingType type, FontUse& fu)
+TTFfile getTTFAndChar(const core::stringc &langname, TTFLoadingType type, FontUse& fu)
 {
     //Borrowed from engine.cpp:
     // font size is resolution-dependent.
@@ -69,26 +73,24 @@ TTFfile getTTFAndChar(const std::string &langname, TTFLoadingType type, FontUse&
     return ttf_file;
 }
 
-void loadChar(const std::string langname, TTFfile* ttf_file, FontUse& fu, float scale)
+void loadChar(const core::stringc langname, TTFfile* ttf_file, FontUse& fu, float scale)
 {
     //Determine which ttf file to load first
-    if (langname.compare("ar") == 0 || langname.compare("fa") == 0)
+    if (langname == "ar" || langname == "fa")
         fu = F_AR;
 
-    else if (langname.compare("sq") == 0 || langname.compare("eu") == 0
-          || langname.compare("br") == 0 || langname.compare("da") == 0
-          || langname.compare("nl") == 0 || langname.compare("en") == 0
-          || langname.compare("gd") == 0 || langname.compare("gl") == 0
-          || langname.compare("de") == 0 || langname.compare("is") == 0
-          || langname.compare("id") == 0 || langname.compare("it") == 0
-          || langname.compare("nb") == 0 || langname.compare("nn") == 0
-          || langname.compare("pt") == 0 || langname.compare("es") == 0
-          || langname.compare("sv") == 0 || langname.compare("uz") == 0)
+    else if (langname == "sq" || langname == "eu" || langname == "br" ||
+             langname == "da" || langname == "nl" || langname == "en" ||
+             langname == "gd" || langname == "gl" || langname == "de" ||
+             langname == "is" || langname == "id" || langname == "it" ||
+             langname == "nb" || langname == "nn" || langname == "pt" ||
+             langname == "es" || langname == "sv" || langname == "uz")
         //They are sorted out by running fc-list :lang="name" |grep Layne
+        //But we may get rid of the above by using a font that suitable for most language
+        //Like FreeSans/FreeSerif
         fu = F_LAYNE;
 
-    else if (langname.compare("zh") == 0 || langname.compare("ko") == 0
-          || langname.compare("ja") == 0)
+    else if (langname == "zh" || langname == "ja" || langname == "ko")
         fu = F_CJK;
 
     else
@@ -103,7 +105,7 @@ void loadChar(const std::string langname, TTFfile* ttf_file, FontUse& fu, float 
     ttf_file->usedchar.insert((wchar_t)215);   //Used on resolution selection screen (X).
 
     //There's specific handling for some language, we may need more after more translation are added or problems found out.
-    if (langname.compare("el") == 0)
+    if (langname == "el")
         ttf_file->size = (int)(28*scale); //Set lower size of font for Greek as it uses lots amount of space.
 }
 

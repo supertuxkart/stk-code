@@ -19,6 +19,7 @@
 #include "guiengine/freetype_environment.hpp"
 #include "guiengine/TTF_handling.hpp"
 #include "io/file_manager.hpp"
+#include "utils/log.hpp"
 
 namespace irr
 {

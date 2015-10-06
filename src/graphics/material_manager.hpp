@@ -24,11 +24,12 @@
 
 namespace irr
 {
-    namespace video { class ITexture; enum E_MATERIAL_TYPE; }
+    namespace video { class ITexture; }
     namespace scene { class IMeshBuffer; class ISceneNode; }
 }
 using namespace irr;
 
+#include <irrlicht.h>
 #include <string>
 #include <vector>
 #include <map>

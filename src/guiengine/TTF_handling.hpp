@@ -16,13 +16,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "utils/translation.hpp"
 #include <IVideoDriver.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include <cwctype>
-#include <clocale>
+#include <set>
 
 namespace irr
 {
@@ -37,12 +35,11 @@ typedef struct
 {
     std::set<wchar_t> usedchar;
     unsigned short size;
-    std::string filename;
 }TTFfile;
 
-TTFfile getTTFAndChar(const std::string &langname, TTFLoadingType, FontUse&);
+TTFfile getTTFAndChar(const core::stringc &langname, TTFLoadingType, FontUse&);
 video::IImage* generateTTFImage (FT_Bitmap, video::IVideoDriver*);
-void loadChar(const std::string, TTFfile*, FontUse&, float);
+void loadChar(core::stringc, TTFfile*, FontUse&, float);
 void loadNumber(TTFfile*, float);
 void loadBoldChar(TTFfile*, float);
 

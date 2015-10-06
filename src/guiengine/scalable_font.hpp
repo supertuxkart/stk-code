@@ -19,6 +19,7 @@
 #include "IReadFile.h"
 #include "irrArray.h"
 
+
 #include <map>
 #include <string>
 
@@ -189,6 +190,7 @@ private:
         s32             width;
         u32             spriteno;
         s32             offsety;
+        s32             offsety_bt;
         s32             bearingx;
     };
 #else

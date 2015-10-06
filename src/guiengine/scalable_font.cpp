@@ -16,7 +16,9 @@
 #include <IVideoDriver.h>
 #include <IXMLReader.h>
 
+#include <clocale>
 #include <cmath>
+#include <cwctype>
 
 #define cur_face GUIEngine::get_Freetype()->ft_face[fu]
 
@@ -374,7 +376,7 @@ bool ScalableFont::loadTTF()
     //Determine which font(face) and size to load,
     //also get all used char base on current language settings
     FontUse fu;
-    TTFfile TTF_file = getTTFAndChar(translations->getCurrentLanguageNameCode(), m_type, fu);
+    TTFfile TTF_file = getTTFAndChar(translations->getCurrentLanguageNameCode().c_str(), m_type, fu);
 
     std::vector <s32> offset;
     std::vector <s32> bx;
@@ -467,6 +469,13 @@ bool ScalableFont::loadTTF()
         a.spriteno      = n;
         a.offsety       = current_maxheight - height.at(n)
                         + offset.at(n); //Compute the correct offset as ttf texture image is cropped against the glyph fully.
+
+        a.offsety_bt    = -offset.at(n); //FIXME
+                                         //Specific offset for billboard text as billboard text seems to be drawn bottom-up,
+                                         //as the offset in calculated based on the fact that the characters are drawn all
+                                         //at the bottom line, so no addition is required, but if we can make draw2dimage draw
+                                         //characters close to the bottom line too, than only one offsety is needed.
+
         if (!n) //Skip soft hypen and space
             a.bearingx = 0;
         else
@@ -578,6 +587,7 @@ s32 ScalableFont::getKerningWidth(const wchar_t* thisLetter, const wchar_t* prev
         }
     }
 #endif // ENABLE_FREETYPE
+
     return ret;
 }
 
@@ -796,16 +806,31 @@ void ScalableFont::doDraw(const core::stringw& text,
         const SFontArea &area  = getAreaFromCharacter(c, &use_fallback_font);
         fallback[i]            = use_fallback_font;
 #ifdef ENABLE_FREETYPE
-        //floor is used to prevent negligible movement when m_scale changes with resolution
-        int Hpadding = floor((float) area.bearingx*
-                       (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
-        int Vpadding = floor((float) area.offsety*
-                       (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
-        offset.X += Hpadding;
-        offset.Y += Vpadding + floor(m_type == Digit ? 20*m_scale : 0); //Additional offset for digit text
-        offsets.push_back(offset);
-        offset.X -= Hpadding;
-        offset.Y -= Vpadding + floor(m_type == Digit ? 20*m_scale : 0);
+        if (charCollector == NULL)
+        {
+            //floor is used to prevent negligible movement when m_scale changes with resolution
+            int Hpadding = floor((float) area.bearingx*
+                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
+            int Vpadding = floor((float) area.offsety*
+                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
+            offset.X += Hpadding;
+            offset.Y += Vpadding + floor(m_type == Digit ? 20*m_scale : 0); //Additional offset for digit text
+            offsets.push_back(offset);
+            offset.X -= Hpadding;
+            offset.Y -= Vpadding + floor(m_type == Digit ? 20*m_scale : 0);
+        }
+        else //Billboard text specific
+        {
+            int Hpadding = floor((float) area.bearingx*
+                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
+            int Vpadding = floor((float) area.offsety_bt*
+                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
+            offset.X += Hpadding;
+            offset.Y += Vpadding + floor(m_type == Digit ? 20*m_scale : 0); //Additional offset for digit text
+            offsets.push_back(offset);
+            offset.X -= Hpadding;
+            offset.Y -= Vpadding + floor(m_type == Digit ? 20*m_scale : 0);
+        }
 #else
         offset.X              += area.underhang;
         offsets.push_back(offset);
@@ -862,6 +887,7 @@ void ScalableFont::doDraw(const core::stringw& text,
         }
         else
             char_scale = 1.0f;
+
         core::dimension2d<s32> size = source.getSize();
 
         float scale = (fallback[n] ? m_scale*m_fallback_font_scale : m_scale);
@@ -892,6 +918,7 @@ void ScalableFont::doDraw(const core::stringw& text,
 #ifdef FONT_DEBUG
         GL32_draw2DRectangle(video::SColor(255, 255,0,0), dest,clip);
 #endif
+
         if (texture == NULL && !m_isTTF)
         {
             // perform lazy loading
