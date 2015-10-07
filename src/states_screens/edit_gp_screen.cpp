@@ -35,7 +35,7 @@ using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( EditGPScreen );
 
 // -----------------------------------------------------------------------------
-EditGPScreen::EditGPScreen() : Screen("gpedit.stkgui"), m_gp(NULL),
+EditGPScreen::EditGPScreen() : Screen("edit_gp.stkgui"), m_gp(NULL),
               m_list(NULL), m_icon_bank(NULL),
               m_selected(-1), m_modified(false)
 {
