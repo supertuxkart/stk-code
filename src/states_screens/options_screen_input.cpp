@@ -28,7 +28,7 @@
 #include "input/gamepad_device.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
-#include "states_screens/options_screen_input2.hpp"
+#include "states_screens/options_screen_device.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
@@ -225,8 +225,8 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             read = sscanf( selection.c_str(), "gamepad%i", &i );
             if (read == 1 && i != -1)
             {
-                OptionsScreenInput2::getInstance()->setDevice( input_manager->getDeviceManager()->getGamepadConfig(i) );
-                StateManager::get()->replaceTopMostScreen(OptionsScreenInput2::getInstance());
+                OptionsScreenDevice::getInstance()->setDevice( input_manager->getDeviceManager()->getGamepadConfig(i) );
+                StateManager::get()->replaceTopMostScreen(OptionsScreenDevice::getInstance());
                 //updateInputButtons( input_manager->getDeviceList()->getGamepadConfig(i) );
             }
             else
@@ -242,8 +242,9 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             if (read == 1 && i != -1)
             {
                 // updateInputButtons( input_manager->getDeviceList()->getKeyboardConfig(i) );
-                OptionsScreenInput2::getInstance()->setDevice( input_manager->getDeviceManager()->getKeyboardConfig(i) );
-                StateManager::get()->replaceTopMostScreen(OptionsScreenInput2::getInstance());
+                OptionsScreenDevice::getInstance()
+                    ->setDevice( input_manager->getDeviceManager()->getKeyboardConfig(i) );
+                StateManager::get()->replaceTopMostScreen(OptionsScreenDevice::getInstance());
             }
             else
             {

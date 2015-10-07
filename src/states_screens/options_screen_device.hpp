@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef __HEADER_OPTIONS_SCREEN_INPUT2_HPP__
-#define __HEADER_OPTIONS_SCREEN_INPUT2_HPP__
+#ifndef HEADER_OPTIONS_SCREEN_DEVICE_HPP
+#define HEADER_OPTIONS_SCREEN_DEVICE_HPP
 
 #include <string>
 #include <irrString.h>
@@ -37,11 +37,11 @@ struct Input;
   * \brief Input options screen
   * \ingroup states_screens
   */
-class OptionsScreenInput2 : public GUIEngine::Screen,
-                        public GUIEngine::ScreenSingleton<OptionsScreenInput2>,
+class OptionsScreenDevice : public GUIEngine::Screen,
+                        public GUIEngine::ScreenSingleton<OptionsScreenDevice>,
                         public MessageDialog::IConfirmDialogListener
 {
-    OptionsScreenInput2();
+    OptionsScreenDevice();
 
     void updateInputButtons();
 
@@ -62,7 +62,7 @@ class OptionsScreenInput2 : public GUIEngine::Screen,
         const core::stringw& text);
 
 public:
-    friend class GUIEngine::ScreenSingleton<OptionsScreenInput2>;
+    friend class GUIEngine::ScreenSingleton<OptionsScreenDevice>;
 
     /** Sets the configuration to be used. */
     void setDevice(DeviceConfig* config) { m_config = config; }

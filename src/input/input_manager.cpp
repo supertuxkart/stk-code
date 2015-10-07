@@ -39,7 +39,7 @@
 #include "replay/replay_recorder.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/options_screen_input2.hpp"
+#include "states_screens/options_screen_device.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 
@@ -425,7 +425,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
             sensed_input.m_device_id      = deviceID;
             sensed_input.m_button_id      = button;
             sensed_input.m_character      = deviceID;
-            OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+            OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
             return;
         }
         break;
@@ -437,7 +437,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
             sensed_input.m_device_id      = deviceID;
             sensed_input.m_button_id      = button;
             sensed_input.m_character      = deviceID;
-            OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+            OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
             return;
         }
         break;
@@ -472,7 +472,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
                                                            : Input::AD_NEGATIVE;
                 sensed_input.m_axis_range     = Input::AR_FULL;
                 sensed_input.m_character      = deviceID;
-                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+                OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
 
             }
             else m_sensed_input_high_gamepad.insert(input_id);
@@ -494,7 +494,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
                 sensed_input.m_axis_range     = id_was_zero ? Input::AR_HALF
                                                             : Input::AR_FULL;
                 sensed_input.m_character      = deviceID;
-                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+                OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
             }
             else if( inverse_id_was_high )
             {
@@ -510,7 +510,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
                 sensed_input.m_axis_range     = id_was_zero ? Input::AR_HALF
                                                             : Input::AR_FULL;
                 sensed_input.m_character      = deviceID;
-                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+                OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
             }
             else
             {
