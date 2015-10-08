@@ -1093,7 +1093,7 @@ namespace GUIEngine
 #endif // ENABLE_FREETYPE
 
 #ifdef ENABLE_FREETYPE
-        ScalableFont* sfont =new ScalableFont(g_env,Normal);
+        ScalableFont* sfont =new ScalableFont(g_env,T_NORMAL);
         sfont->setKerningHeight(0);
 #else
         ScalableFont* sfont =
@@ -1106,7 +1106,7 @@ namespace GUIEngine
         g_font = sfont;
 
 #ifdef ENABLE_FREETYPE
-        ScalableFont* digit_font =new ScalableFont(g_env,Digit);
+        ScalableFont* digit_font =new ScalableFont(g_env,T_DIGIT);
 #else
         ScalableFont* digit_font =
             new ScalableFont(g_env,
@@ -1147,7 +1147,7 @@ namespace GUIEngine
 
 
 #ifdef ENABLE_FREETYPE
-        ScalableFont* sfont2 =new ScalableFont(g_env,Bold);
+        ScalableFont* sfont2 =new ScalableFont(g_env,T_BOLD);
         sfont2->setKerningWidth(0);
         // Because the fallback font is much smaller than the title font:
         sfont2->m_fallback_font_scale = 2.0f;

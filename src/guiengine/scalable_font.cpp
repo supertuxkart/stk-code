@@ -20,7 +20,7 @@
 #include <cmath>
 #include <cwctype>
 
-#define cur_face GUIEngine::get_Freetype()->ft_face[fu]
+#define cur_face   GUIEngine::get_Freetype()->ft_face[fu]
 #define gp_creator GUIEngine::get_GP_Creator()
 
 namespace irr
@@ -377,14 +377,14 @@ bool ScalableFont::loadTTF()
     //Determine which font(face) and size to load,
     //also get all used char base on current language settings
     FontUse fu;
-    TTFfile TTF_file = getTTFAndChar(translations->getCurrentLanguageNameCode().c_str(), m_type, fu);
+    getFontProperties cur_prop(translations->getCurrentLanguageNameCode().c_str(), m_type, fu);
 
     std::vector <s32> offset;
     std::vector <s32> bx;
     std::vector <s32> advance;
     std::vector <s32> height;
 
-    err = FT_Set_Pixel_Sizes(cur_face, 0, TTF_file.size);
+    err = FT_Set_Pixel_Sizes(cur_face, 0, cur_prop.size);
     if (err)
         Log::error("ScalableFont::loadTTF", "Can't set font size.");
 
@@ -396,7 +396,7 @@ bool ScalableFont::loadTTF()
     u32 texno = 0;
     SpriteBank->addTexture(NULL);
     gp_creator->createNewGlyphPage();
-    for (it = TTF_file.usedchar.begin(); it != TTF_file.usedchar.end(); ++it)
+    for (it = cur_prop.usedchar.begin(); it != cur_prop.usedchar.end(); ++it)
     {
         SGUISpriteFrame f;
         SGUISprite s;
@@ -463,7 +463,7 @@ bool ScalableFont::loadTTF()
         }
 
         // Check for glyph page which can fit all characters
-        if (it == --TTF_file.usedchar.end())
+        if (it == --cur_prop.usedchar.end())
         {
             SpriteBank->setTexture(texno, Driver->addTexture("Glyph_page", gp_creator->getPage()));
             gp_creator->clearGlyphPage();
@@ -471,24 +471,24 @@ bool ScalableFont::loadTTF()
     }
 
     //Fix unused glyphs....
-    if (m_type == Normal || Bold)
+    if (m_type == T_NORMAL || T_BOLD)
     {
         CharacterMap[(wchar_t)32] = getAreaIDFromCharacter((wchar_t)160, NULL); //Use non-breaking space glyph to all space/tab characters.
         CharacterMap[(wchar_t)9] = getAreaIDFromCharacter((wchar_t)160, NULL);
         CharacterMap[(wchar_t)173] = 0; //Don't need a glyph for the soft hypen, as it only print when not having enough space.
                                         //And then it will convert to a "-".
 
-        if (m_type == Normal)
+        if (m_type == T_NORMAL)
         {
             CharacterMap[(wchar_t)8204] = 0; //They are zero width chars found in Arabic.
             CharacterMap[(wchar_t)65279] = 0;
         }
     }
 
-    if (m_type == Bold)
+    if (m_type == T_BOLD)
     {
         setlocale(LC_ALL, "en_US.UTF8");
-        for  (it = TTF_file.usedchar.begin(); it != TTF_file.usedchar.end(); ++it)
+        for  (it = cur_prop.usedchar.begin(); it != cur_prop.usedchar.end(); ++it)
         {
             if (iswupper((wchar_t)*it))
                 CharacterMap[towlower((wchar_t)*it)] = getAreaIDFromCharacter(*it, NULL);
@@ -524,11 +524,11 @@ bool ScalableFont::loadTTF()
     WrongCharacter = getAreaIDFromCharacter(L' ', NULL);
 
     //Add 5 for ttf bitmap to display Chinese better, 40 for digit font to display separately
-    //Consider fallback font (Bold) too
-    MaxHeight = (int)((current_maxheight + (m_type == Digit ? 40 : 5) +
-                (m_type == Bold ? 20 : 0))*m_scale);
+    //Consider fallback font (bold) too
+    MaxHeight = (int)((current_maxheight + (m_type == T_DIGIT ? 40 : 5) +
+                (m_type == T_BOLD ? 20 : 0))*m_scale);
 
-    if (m_type == Digit)
+    if (m_type == T_DIGIT)
     {
         for(wchar_t c='0'; c<='9'; c++)
         {
@@ -541,20 +541,20 @@ bool ScalableFont::loadTTF()
 
     switch (m_type)
     {
-        case Normal:
+        case T_NORMAL:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
                        "supporting %d characters for normal font %s at %d dpi using %d glyph page(s)."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size, texno + 1);
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, cur_prop.size, texno + 1);
         break;
-        case Digit:
+        case T_DIGIT:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
                        "supporting %d characters for high-res digits font %s at %d dpi using %d glyph page(s)."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size, texno + 1);
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, cur_prop.size, texno + 1);
         break;
-        case Bold:
+        case T_BOLD:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
                        "supporting %d characters for bold title font %s at %d dpi using %d glyph page(s)."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size, texno + 1);
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, cur_prop.size, texno + 1);
         break;
     }
 
@@ -847,10 +847,10 @@ void ScalableFont::doDraw(const core::stringw& text,
             int Vpadding = floor((float) area.offsety*
                            (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
             offset.X += Hpadding;
-            offset.Y += Vpadding + floor(m_type == Digit ? 20*m_scale : 0); //Additional offset for digit text
+            offset.Y += Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0); //Additional offset for digit text
             offsets.push_back(offset);
             offset.X -= Hpadding;
-            offset.Y -= Vpadding + floor(m_type == Digit ? 20*m_scale : 0);
+            offset.Y -= Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0);
         }
         else //Billboard text specific
         {
@@ -859,10 +859,10 @@ void ScalableFont::doDraw(const core::stringw& text,
             int Vpadding = floor((float) area.offsety_bt*
                            (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
             offset.X += Hpadding;
-            offset.Y += Vpadding + floor(m_type == Digit ? 20*m_scale : 0); //Additional offset for digit text
+            offset.Y += Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0); //Additional offset for digit text
             offsets.push_back(offset);
             offset.X -= Hpadding;
-            offset.Y -= Vpadding + floor(m_type == Digit ? 20*m_scale : 0);
+            offset.Y -= Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0);
         }
 #else
         offset.X              += area.underhang;
@@ -994,7 +994,7 @@ void ScalableFont::doDraw(const core::stringw& text,
         }
 
 #ifdef ENABLE_FREETYPE
-        if (fallback[n] || m_type == Bold)
+        if (fallback[n] || m_type == T_BOLD)
 #else
         if (fallback[n])
 #endif // ENABLE_FREETYPE

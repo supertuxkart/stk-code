@@ -8,7 +8,7 @@
 #include "utils/leak_check.hpp"
 
 #ifdef ENABLE_FREETYPE
-#include "guiengine/TTF_handling.hpp"
+#include "guiengine/get_font_properties.hpp"
 #endif // ENABLE_FREETYPE
 
 #include "IrrCompileConfig.h"

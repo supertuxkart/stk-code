@@ -16,9 +16,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <irrlicht.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
 #include <set>
 
 namespace irr
@@ -26,20 +23,28 @@ namespace irr
 namespace gui
 {
 
-enum TTFLoadingType {Normal, Digit, Bold};
-
 enum FontUse {F_DEFAULT, F_CJK, F_AR, F_LAYNE, F_BOLD, F_DIGIT};
 
-typedef struct
-{
-    std::set<wchar_t> usedchar;
-    unsigned short size;
-}TTFfile;
+enum TTFLoadingType {T_NORMAL, T_DIGIT, T_BOLD};
 
-TTFfile getTTFAndChar(const core::stringc &langname, TTFLoadingType, FontUse&);
-void loadChar(core::stringc, TTFfile*, FontUse&, float);
-void loadNumber(TTFfile*, float);
-void loadBoldChar(TTFfile*, float);
+class getFontProperties
+{
+public:
+    getFontProperties (const core::stringc &langname, TTFLoadingType type, FontUse &fu);
+
+    unsigned short           size;
+    std::set<wchar_t>        usedchar;
+
+private:
+    void                     loadChar(core::stringc, FontUse&, float);
+    void                     loadNumber(float);
+    void                     loadBoldChar(float);
+
+    void                     findScale();
+
+    float                    normal_text_scale;
+    float                    title_text_scale;
+};
 
 } // end namespace gui
 } // end namespace irr

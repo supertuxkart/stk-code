@@ -15,9 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef ENABLE_FREETYPE
-#include "guiengine/TTF_handling.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/get_font_properties.hpp"
 #include "utils/translation.hpp"
 
 #include <algorithm>
@@ -28,7 +27,28 @@ namespace irr
 {
 namespace gui
 {
-TTFfile getTTFAndChar(const core::stringc &langname, TTFLoadingType type, FontUse& fu)
+
+getFontProperties::getFontProperties (const core::stringc &langname, TTFLoadingType type, FontUse &fu)
+{
+    findScale();
+
+    switch(type)
+    {
+        case T_NORMAL:
+            loadChar(langname, fu, normal_text_scale);
+            break;
+        case T_DIGIT:
+            fu = F_DIGIT;
+            loadNumber(normal_text_scale);
+            break;
+        case T_BOLD:
+            fu = F_BOLD;
+            loadBoldChar(title_text_scale);
+            break;
+    }
+}
+
+void getFontProperties::findScale()
 {
     //Borrowed from engine.cpp:
     // font size is resolution-dependent.
@@ -44,28 +64,11 @@ TTFfile getTTFAndChar(const core::stringc &langname, TTFLoadingType type, FontUs
     if (screen_width < 1200) scale = std::max(0, screen_width - 640) / 750.0f;
     if (screen_width < 900 || screen_height < 700) scale = std::min(scale, 0.05f);
 
-    float normal_text_scale = 0.7f + 0.2f*scale;
-    float title_text_scale = 0.2f + 0.2f*scale;
-
-    TTFfile ttf_file;
-    switch(type)
-    {
-        case Normal:
-            loadChar(langname, &ttf_file, fu, normal_text_scale);
-            break;
-        case Digit:
-            fu = F_DIGIT;
-            loadNumber(&ttf_file, normal_text_scale);
-            break;
-        case Bold:
-            fu = F_BOLD;
-            loadBoldChar(&ttf_file, title_text_scale);
-            break;
-    }
-    return ttf_file;
+    normal_text_scale = 0.7f + 0.2f*scale;
+    title_text_scale = 0.2f + 0.2f*scale;
 }
 
-void loadChar(const core::stringc langname, TTFfile* ttf_file, FontUse& fu, float scale)
+void getFontProperties::loadChar(const core::stringc langname, FontUse& fu, float scale)
 {
     //Determine which ttf file to load first
     if (langname == "ar" || langname == "fa")
@@ -88,38 +91,38 @@ void loadChar(const core::stringc langname, TTFfile* ttf_file, FontUse& fu, floa
     else
         fu = F_DEFAULT; //Default font file
 
-    ttf_file->size = (int)(29*scale); //Set to default size
+    size = (int)(29*scale); //Set to default size
 
-    ttf_file->usedchar = translations->getCurrentAllChar(); //Loading unique characters
+    usedchar = translations->getCurrentAllChar(); //Loading unique characters
     for (int i = 33; i < 256; ++i)
-        ttf_file->usedchar.insert((wchar_t)i); //Include basic Latin too
-    ttf_file->usedchar.insert((wchar_t)160);   //Non-breaking space
-    ttf_file->usedchar.insert((wchar_t)215);   //Used on resolution selection screen (X).
+        usedchar.insert((wchar_t)i); //Include basic Latin too
+    usedchar.insert((wchar_t)160);   //Non-breaking space
+    usedchar.insert((wchar_t)215);   //Used on resolution selection screen (X).
 
     //There's specific handling for some language, we may need more after more translation are added or problems found out.
     if (langname == "el")
-        ttf_file->size = (int)(28*scale); //Set lower size of font for Greek as it uses lots amount of space.
+        size = (int)(28*scale); //Set lower size of font for Greek as it uses lots amount of space.
 }
 
-void loadNumber(TTFfile* ttf_file, float scale)
+void getFontProperties::loadNumber(float scale)
 {
-    ttf_file->size = (int)(40*scale); //Set default size for Big Digit Text
+    size = (int)(40*scale); //Set default size for Big Digit Text
     for (int i = 46; i < 59; ++i) //Include chars used by timer and laps count only
-        ttf_file->usedchar.insert((wchar_t)i); //FIXME have to load 46 " . " to make 47 " / " display correctly, why?
+        usedchar.insert((wchar_t)i); //FIXME have to load 46 " . " to make 47 " / " display correctly, why?
 }
 
-void loadBoldChar(TTFfile* ttf_file, float scale)
+void getFontProperties::loadBoldChar(float scale)
 {
-    ttf_file->size = (int)(120*scale); //Set default size for Bold Text
+    size = (int)(120*scale); //Set default size for Bold Text
     for (int i = 33; i < 256; ++i)
-        ttf_file->usedchar.insert((wchar_t)i);
+        usedchar.insert((wchar_t)i);
 
     setlocale(LC_ALL, "en_US.UTF8");
-    std::set<wchar_t>::iterator it = ttf_file->usedchar.begin();
-    while (it != ttf_file->usedchar.end())
+    std::set<wchar_t>::iterator it = usedchar.begin();
+    while (it != usedchar.end())
     {
         if (iswlower((wchar_t)*it))
-            it = ttf_file->usedchar.erase(it);
+            it = usedchar.erase(it);
         else
             ++it;
     }
@@ -127,4 +130,3 @@ void loadBoldChar(TTFfile* ttf_file, float scale)
 
 } // end namespace gui
 } // end namespace irr
-#endif // ENABLE_FREETYPE
