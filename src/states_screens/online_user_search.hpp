@@ -86,7 +86,6 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
 
-    void setLastSelected();
     /** Sets the search string to an initial value. */
     void setSearchString(const irr::core::stringw & search_string)
     {

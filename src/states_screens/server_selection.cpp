@@ -168,22 +168,6 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-/** Selects the last selected item on the list (which is the item that
- *  is just being installed) again. This function is used from the
- *  addons_loading screen: when it is closed, it will reset the
- *  select item so that people can keep on installing from that
- *  point on.
-*/
-void ServerSelection::setLastSelected()
-{
-    if(m_selected_index>-1)
-    {
-        m_server_list_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        m_server_list_widget->setSelectionID(m_selected_index);
-    }
-}   // setLastSelected
-
-// ----------------------------------------------------------------------------
 
 void ServerSelection::onUpdate(float dt)
 {

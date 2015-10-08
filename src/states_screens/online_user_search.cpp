@@ -240,22 +240,6 @@ void OnlineUserSearch::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-/** Selects the last selected item on the list (which is the item that
- *  is just being installed) again. This function is used from the
- *  addons_loading screen: when it is closed, it will reset the
- *  select item so that people can keep on installing from that
- *  point on.
-*/
-void OnlineUserSearch::setLastSelected() //FIXME actually use this here and in server selection
-{
-    if(m_selected_index>-1)
-    {
-        m_user_list_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        m_user_list_widget->setSelectionID(m_selected_index);
-    }
-}   // setLastSelected
-
-// ----------------------------------------------------------------------------
 /** Called every frame. It queries the search request for results and
  *  displays them if necessary.
  */
