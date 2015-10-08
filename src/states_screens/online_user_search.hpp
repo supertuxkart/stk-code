@@ -48,9 +48,6 @@ private:
     /** Pointer to the result list. */
     GUIEngine::ListWidget *                     m_user_list_widget;
 
-    /** The currently selected index, used to re-select this item after
-     *  addons_loading is being displayed. */
-    int                                         m_selected_index;
     /** Seach string entered in the search widget. */
     irr::core::stringw                          m_search_string;
     /** Last search string, used to avoid doing the same search again. */

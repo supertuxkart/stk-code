@@ -36,9 +36,7 @@ DEFINE_SCREEN_SINGLETON( ServerSelection );
 
 ServerSelection::ServerSelection() : Screen("online/server_selection.stkgui")
 {
-    m_selected_index = -1;
     m_refresh_request = NULL;
-
 }   // ServerSelection
 
 // ----------------------------------------------------------------------------
@@ -159,9 +157,9 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
 
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        m_selected_index = m_server_list_widget->getSelectionID();
-        uint32_t server_id = ServersManager::get()->getServerBySort(m_selected_index)->getServerId();
-        uint32_t host_id = ServersManager::get()->getServerBySort(m_selected_index)->getHostId();
+        int selected_index = m_server_list_widget->getSelectionID();
+        uint32_t server_id = ServersManager::get()->getServerBySort(selected_index)->getServerId();
+        uint32_t host_id = ServersManager::get()->getServerBySort(selected_index)->getHostId();
         new ServerInfoDialog(server_id, host_id);
     }
 

@@ -43,11 +43,6 @@ private:
     GUIEngine::LabelWidget *                    m_update_status;
     GUIEngine::ListWidget *                     m_server_list_widget;
 
-
-    /** The currently selected index, used to re-select this item after
-     *  addons_loading is being displayed. */
-    int                                         m_selected_index;
-
     /** \brief To check (and set) if sort order is descending **/
     bool                                        m_sort_desc;
 
