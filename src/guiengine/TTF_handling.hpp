@@ -1,4 +1,3 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2015 Ben Au
 //
@@ -16,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <IVideoDriver.h>
+#include <irrlicht.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -38,7 +37,6 @@ typedef struct
 }TTFfile;
 
 TTFfile getTTFAndChar(const core::stringc &langname, TTFLoadingType, FontUse&);
-video::IImage* generateTTFImage (FT_Bitmap, video::IVideoDriver*);
 void loadChar(core::stringc, TTFfile*, FontUse&, float);
 void loadNumber(TTFfile*, float);
 void loadBoldChar(TTFfile*, float);

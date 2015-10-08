@@ -1,4 +1,3 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2015 Ben Au
 //
@@ -15,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #ifdef ENABLE_FREETYPE
 #include "guiengine/freetype_environment.hpp"
 #include "guiengine/TTF_handling.hpp"

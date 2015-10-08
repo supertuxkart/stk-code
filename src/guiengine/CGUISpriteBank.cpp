@@ -168,34 +168,6 @@ s32 STKModifiedSpriteBank::addTextureAsSprite(video::ITexture* texture)
 }   // addTextureAsSprite
 
 // ----------------------------------------------------------------------------
-/** Use for cropping freetype glyph bitmap correctly.
- */
-s32 STKModifiedSpriteBank::addTextureAsSprite(video::ITexture* texture, s32 width, s32 height)
-{
-    assert( m_magic_number == 0xCAFEC001 );
-    if ( !texture )
-        return -1;
-
-    addTexture(texture);
-    u32 textureIndex = getTextureCount() - 1;
-
-    u32 rectangleIndex = Rectangles.size();
-    Rectangles.push_back( core::rect<s32>(0,0, width, height) );
-
-    SGUISprite sprite;
-    sprite.frameTime = 0;
-
-    SGUISpriteFrame frame;
-    frame.textureNumber = textureIndex;
-    frame.rectNumber = rectangleIndex;
-    sprite.Frames.push_back( frame );
-
-    Sprites.push_back( sprite );
-
-    return Sprites.size() - 1;
-}   // addTextureAsSprite
-
-// ----------------------------------------------------------------------------
 //! draws a sprite in 2d with scale and color
 void STKModifiedSpriteBank::draw2DSprite(u32 index,
         const core::position2di& pos,

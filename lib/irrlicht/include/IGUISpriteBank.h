@@ -68,8 +68,6 @@ public:
 	//! The texture and the corresponding rectangle and sprite will all be added to the end of each array.
 	//! returns the index of the sprite or -1 on failure
 	virtual s32 addTextureAsSprite(video::ITexture* texture) = 0;
-	//! Use for cropping freetype glyph bitmap correctly.
-	virtual s32 addTextureAsSprite(video::ITexture* texture, s32 width, s32 height) = 0;
 
 	//! clears sprites, rectangles and textures
 	virtual void clear() = 0;

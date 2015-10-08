@@ -1,6 +1,4 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2010 John Norman
 //  Copyright (C) 2015 Ben Au
 //
 //  This program is free software; you can redistribute it and/or
@@ -16,16 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-//
-//  The image loading function is partially based on CGUITTFont.cpp by John Norman,
-//  original version is located here:
-//
-//  http://irrlicht.suckerfreegames.com/
 
 #ifdef ENABLE_FREETYPE
 #include "guiengine/TTF_handling.hpp"
 #include "graphics/irr_driver.hpp"
-#include "io/file_manager.hpp"
 #include "utils/translation.hpp"
 
 #include <algorithm>
@@ -131,75 +123,6 @@ void loadBoldChar(TTFfile* ttf_file, float scale)
         else
             ++it;
     }
-}
-
-video::IImage* generateTTFImage(FT_Bitmap bits, video::IVideoDriver* Driver)
-{
-    core::dimension2du d(bits.width + 1, bits.rows + 1);
-    core::dimension2du texture_size;
-
-    video::IImage* image = 0;
-    switch (bits.pixel_mode)
-    {
-        case FT_PIXEL_MODE_MONO:
-        {
-            // Create a blank image and fill it with transparent pixels.
-            texture_size = d.getOptimalSize(true, true);
-            image = Driver->createImage(video::ECF_A1R5G5B5, texture_size);
-            image->fill(video::SColor(0, 255, 255, 255));
-
-            // Load the monochrome data in.
-            const u32 image_pitch = image->getPitch() / sizeof(u16);
-            u16* image_data = (u16*)image->lock();
-            u8* glyph_data = bits.buffer;
-            for (u32 y = 0; y < bits.rows; ++y)
-            {
-                u16* row = image_data;
-                for (u32 x = 0; x < bits.width; ++x)
-                {
-                    // Monochrome bitmaps store 8 pixels per byte.  The left-most pixel is the bit 0x80.
-                    // So, we go through the data each bit at a time.
-                    if ((glyph_data[y * bits.pitch + (x / 8)] & (0x80 >> (x % 8))) != 0)
-                        *row = 0xFFFF;
-                    ++row;
-                }
-                image_data += image_pitch;
-            }
-            image->unlock();
-            break;
-        }
-
-        case FT_PIXEL_MODE_GRAY:
-        {
-            // Create our blank image.
-            texture_size = d.getOptimalSize(true, true, true, 0); //Enable force power of 2 texture size to gain performance,
-                                                                  //But may increase vram usage???
-            image = Driver->createImage(video::ECF_A8R8G8B8, texture_size);
-            image->fill(video::SColor(0, 255, 255, 255));
-
-            // Load the grayscale data in.
-            const float gray_count = static_cast<float>(bits.num_grays);
-            const u32 image_pitch = image->getPitch() / sizeof(u32);
-            u32* image_data = (u32*)image->lock();
-            u8* glyph_data = bits.buffer;
-            for (u32 y = 0; y < bits.rows; ++y)
-            {
-                u8* row = glyph_data;
-                for (u32 x = 0; x < bits.width; ++x)
-                {
-                    image_data[y * image_pitch + x] |= static_cast<u32>(255.0f * (static_cast<float>(*row++) / gray_count)) << 24;
-                    //data[y * image_pitch + x] |= ((u32)(*bitsdata++) << 24);
-                }
-                glyph_data += bits.pitch;
-            }
-            image->unlock();
-            break;
-        }
-        default:
-            Log::error("ScalableFont::loadTTF", "Freetype failed to create bitmap!!");
-            return 0;
-    }
-    return image;
 }
 
 } // end namespace gui

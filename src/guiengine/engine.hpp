@@ -41,6 +41,7 @@ namespace irr
 
 #ifdef ENABLE_FREETYPE
 #include "guiengine/freetype_environment.hpp"
+#include "guiengine/glyph_page_creator.hpp"
 #endif // ENABLE_FREETYPE
 
 /**
@@ -87,6 +88,7 @@ namespace GUIEngine
         extern Skin* g_skin;
 #ifdef ENABLE_FREETYPE
         extern irr::gui::Ft_Env*  g_ft_env;
+        extern irr::gui::GlyphPageCreator*  g_gp_creator;
 #endif // ENABLE_FREETYPE
         extern irr::gui::ScalableFont* g_small_font;
         extern irr::gui::ScalableFont* g_font;
@@ -184,7 +186,13 @@ namespace GUIEngine
       * \pre GUIEngine::init must have been called first
       * \return       the freetype and library with face
       */
-    inline irr::gui::Ft_Env*          get_Freetype()     { return Private::g_ft_env;         }
+    inline irr::gui::Ft_Env*           get_Freetype()    { return Private::g_ft_env;         }
+
+    /**
+      * \pre GUIEngine::init must have been called first
+      * \return       the glyph page creator, useful to create a glyph page from individual char
+      */
+    inline irr::gui::GlyphPageCreator* get_GP_Creator()  { return Private::g_gp_creator;     }
 #endif // ENABLE_FREETYPE
 
     Screen*                           getScreenNamed(const char* name);

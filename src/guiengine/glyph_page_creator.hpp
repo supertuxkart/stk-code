@@ -15,27 +15,34 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <IVideoDriver.h>
+#include <irrlicht.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
-
-#define FONTNUM 6
 
 namespace irr
 {
 namespace gui
 {
 
-class Ft_Env
+class GlyphPageCreator
 {
 public:
-    Ft_Env();
-    ~Ft_Env();
-    FT_Face           ft_face[FONTNUM];
+    GlyphPageCreator();
+    ~GlyphPageCreator();
+
+    static bool              checkEnoughSpace(FT_Bitmap);
+    static void              clearGlyphPage();
+    static void              createNewGlyphPage();
+    static video::IImage*    getPage();
+    bool                     insertGlyph(FT_Bitmap, core::rect<s32>&);
 
 private:
-    void loadFont();
-    static FT_Library ft_lib;
-    static FT_Error   ft_err;
+    video::IImage*           image = 0;
+    static  video::IImage*   page;
+    static  u32              temp_height;
+    static  u32              used_width;
+    static  u32              used_height;
 };
 
 } // end namespace gui

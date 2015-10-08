@@ -690,6 +690,7 @@ namespace GUIEngine
         Skin* g_skin = NULL;
 #ifdef ENABLE_FREETYPE
         Ft_Env* g_ft_env = NULL;
+        GlyphPageCreator* g_gp_creator = NULL;
 #endif // ENABLE_FREETYPE
         ScalableFont *g_font;
         ScalableFont *g_outline_font;
@@ -958,6 +959,8 @@ namespace GUIEngine
 #ifdef ENABLE_FREETYPE
         g_ft_env->~Ft_Env();
         g_ft_env = NULL;
+        g_gp_creator->~GlyphPageCreator();
+        g_gp_creator = NULL;
 #endif // ENABLE_FREETYPE
 
         for (unsigned int i=0; i<g_loaded_screens.size(); i++)
@@ -1030,6 +1033,7 @@ namespace GUIEngine
 
 #ifdef ENABLE_FREETYPE
         g_ft_env = new Ft_Env();
+        g_gp_creator = new GlyphPageCreator();
 #endif // ENABLE_FREETYPE
 
         /*

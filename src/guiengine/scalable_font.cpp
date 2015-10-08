@@ -21,6 +21,7 @@
 #include <cwctype>
 
 #define cur_face GUIEngine::get_Freetype()->ft_face[fu]
+#define gp_creator GUIEngine::get_GP_Creator()
 
 namespace irr
 {
@@ -392,49 +393,81 @@ bool ScalableFont::loadTTF()
     std::set<wchar_t>::iterator it;
     s32 current_maxheight = 0;
     s32 t;
+    u32 texno = 0;
+    SpriteBank->addTexture(NULL);
+    gp_creator->createNewGlyphPage();
     for (it = TTF_file.usedchar.begin(); it != TTF_file.usedchar.end(); ++it)
     {
+        SGUISpriteFrame f;
+        SGUISprite s;
+        core::rect<s32> rectangle;
+
         // Retrieve glyph index from character code, skip useless glyph.
         int idx = FT_Get_Char_Index(cur_face, *it);
-        if (idx == 0)  continue;
+        if (idx)
+        {
+            // Load glyph image into the slot (erase previous one)
+            err = FT_Load_Glyph(cur_face, idx,
+                  FT_LOAD_DEFAULT | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL);
+            if (err)
+                Log::error("ScalableFont::loadTTF", "Can't load a single glyph.");
 
-        // Load glyph image into the slot (erase previous one)
-        err = FT_Load_Glyph(cur_face, idx,
-              FT_LOAD_DEFAULT | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL);
-        if (err)
-            Log::error("ScalableFont::loadTTF", "Can't load a single glyph.");
+            // Store vertical offset on line.
+            s32 offset_on_line = (cur_face->glyph->metrics.height >> 6) - cur_face->glyph->bitmap_top;
+            offset.push_back(offset_on_line);
 
-        // Store vertical offset on line.
-        s32 offset_on_line = (cur_face->glyph->metrics.height >> 6) - cur_face->glyph->bitmap_top;
-        offset.push_back(offset_on_line);
+            // This is to be used later.
+            t = cur_face->glyph->metrics.height >> 6;
+            height.push_back(t);
+            if (t > current_maxheight)
+                current_maxheight = t;
 
-        //This is to be used later.
-        t = cur_face->glyph->metrics.height >> 6;
-        height.push_back(t);
-        if (t > current_maxheight)
-            current_maxheight = t;
+            // Store horizontal padding (bearingX).
+            s32 bX = cur_face->glyph->bitmap_left;
+            bx.push_back(bX);
 
-        // Store horizontal padding (bearingX).
-        s32 bX = cur_face->glyph->bitmap_left;
-        bx.push_back(bX);
+            // Store total width on horizontal line.
+            s32 width = cur_face->glyph->advance.x >> 6;
+            advance.push_back(width);
 
-        // Store total width on horizontal line.
-        s32 width = cur_face->glyph->advance.x >> 6;
-        advance.push_back(width);
+            // Convert to an anti-aliased bitmap
+            FT_Bitmap bits = slot->bitmap;
 
-        // Convert to an anti-aliased bitmap
-        FT_Bitmap bits = slot->bitmap;
+            CharacterMap[*it] =  SpriteBank->getSprites().size();
 
-        //Generate image of glyph
-        video::IImage* image = generateTTFImage(bits, Driver);
-        if (!image)
-            return false;
+            if (!gp_creator->checkEnoughSpace(bits))
+            // Glyph page is full, save current one and reset the current page
+            {
+                SpriteBank->setTexture(texno, Driver->addTexture("Glyph_page", gp_creator->getPage()));
+                gp_creator->clearGlyphPage();
+                SpriteBank->addTexture(NULL);
+                gp_creator->createNewGlyphPage();
+                texno++;
+            }
 
-        //Add it as texture
-        SpriteBank->addTextureAsSprite(Driver->addTexture("character",image),
-        cur_face->glyph->metrics.width >> 6, t);
-        image->drop();
-        CharacterMap[*it] =  SpriteBank->getSprites().size() - 1;
+            // Inserting now
+            if (gp_creator->insertGlyph(bits, rectangle))
+            {
+                f.rectNumber = SpriteBank->getPositions().size();
+                f.textureNumber = texno;
+
+                // add frame to sprite
+                s.Frames.push_back(f);
+                s.frameTime = 0;
+
+                SpriteBank->getPositions().push_back(rectangle);
+                SpriteBank->getSprites().push_back(s);
+            }
+            else
+                return false;
+        }
+
+        // Check for glyph page which can fit all characters
+        if (it == --TTF_file.usedchar.end())
+        {
+            SpriteBank->setTexture(texno, Driver->addTexture("Glyph_page", gp_creator->getPage()));
+            gp_creator->clearGlyphPage();
+        }
     }
 
     //Fix unused glyphs....
@@ -510,18 +543,18 @@ bool ScalableFont::loadTTF()
     {
         case Normal:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
-                       "supporting %d characters for normal font %s at %d dpi."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size);
+                       "supporting %d characters for normal font %s at %d dpi using %d glyph page(s)."
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size, texno + 1);
         break;
         case Digit:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
-                       "supporting %d characters for high-res digits font %s at %d dpi."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size);
+                       "supporting %d characters for high-res digits font %s at %d dpi using %d glyph page(s)."
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size, texno + 1);
         break;
         case Bold:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
-                       "supporting %d characters for bold title font %s at %d dpi."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size);
+                       "supporting %d characters for bold title font %s at %d dpi using %d glyph page(s)."
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, TTF_file.size, texno + 1);
         break;
     }
 

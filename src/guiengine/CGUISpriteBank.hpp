@@ -45,8 +45,6 @@ public:
 
     //! Add the texture and use it for a single non-animated sprite.
     virtual s32 addTextureAsSprite(video::ITexture* texture);
-    //! Use for cropping freetype glyph bitmap correctly.
-    virtual s32 addTextureAsSprite(video::ITexture* texture, s32 width, s32 height);
 
     //! clears sprites, rectangles and textures
     virtual void clear();
