@@ -1,30 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
         <header text_align="center" width="80%" align="center" I18N="In the online multiplayer screen" text="Online Multiplayer"/>
-        <spacer height="15" width="10"/>
-        <box proportion="4" width="90%" layout="vertical-row" align="center">
-            <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" id="outer_box" >
-                <!-- TODO: Here will come some information.. or statistics.. or whatever. Yet to be filled in! It will change depending on state. And I'd also like a close button at the right top. -->
-                <label I18N="In the online multiplayer screen" proportion="4"
-                    word_wrap="true" text="" align="center"/>
-            </div>
+
+        <spacer height="5%" width="25"/>
+        <box width="100%" height="38%" padding="10" layout="vertical-row">
+            <bright width="100%" text="Local Networking" align="center" text_align="left" />
+
+            <buttonbar  id="lan" proportion="2" width="90%" align="center">
+                <icon-button id="find_lan_server" width="128" height="128"
+                             icon="gui/online/menu_find_server.png" focus_icon="gui/online/menu_find_server_hover.png"
+                             I18N="In the online multiplayer screen" text="Find Server"/>
+                <icon-button id="create_lan_server" width="128" height="128"
+                             icon="gui/online/menu_create_server.png" focus_icon="gui/online/menu_create_server_hover.png"
+                             I18N="In the online multiplayer screen" text="Create Server"/>
+                <icon-button id="manage_user" width="128" height="128"
+                             icon="gui/options_players.png"
+                             I18N="In the online multiplayer screen" text="Local Users"/>
+            </buttonbar>
         </box>
 
-        <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
-            <icon-button id="quick_play" width="128" height="128"
-                         icon="gui/online/menu_quick_play.png" focus_icon="gui/online/menu_quick_play_hover.png"
-                         I18N="In the online multiplayer screen" text="Quick Play"/>
-            <icon-button id="find_server" width="128" height="128"
-                         icon="gui/online/menu_find_server.png" focus_icon="gui/online/menu_find_server_hover.png"
-                         I18N="In the online multiplayer screen" text="Find Server"/>
-            <icon-button id="create_server" width="128" height="128"
-                         icon="gui/online/menu_create_server.png" focus_icon="gui/online/menu_create_server_hover.png"
-                         I18N="In the online multiplayer screen" text="Create Server"/>
-        </buttonbar>
+        <spacer height="5%" width="25"/>
 
-        <spacer width="10" height="7%"/>
+        <box width="100%" height="38%" padding="10" layout="vertical-row">
+            <bright width="100%" text="Global Networking" align="center" text_align="left" />
+
+            <buttonbar id="menu_top_row" proportion="2" width="90%" align="center">
+                <icon-button id="find_wan_server" width="128" height="128"
+                             icon="gui/online/menu_find_server.png" focus_icon="gui/online/menu_find_server_hover.png"
+                             I18N="In the online multiplayer screen" text="Find Server"/>
+                <icon-button id="create_wan_server" width="128" height="128"
+                             icon="gui/online/menu_create_server.png" focus_icon="gui/online/menu_create_server_hover.png"
+                             I18N="In the online multiplayer screen" text="Create Server"/>
+                <icon-button id="quick_wan_play" width="128" height="128"
+                             icon="gui/online/menu_quick_play.png" focus_icon="gui/online/menu_quick_play_hover.png"
+                             I18N="In the online multiplayer screen" text="Quick Play"/>
+            </buttonbar>
+        </box>
 
         <bottombar x="2%" width="96%" height="10%" layout="horizontal-row">
             <label text_align="left" align="center" height="100%" id="online_status" proportion="1" text=""/>

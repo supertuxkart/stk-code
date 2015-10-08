@@ -43,9 +43,13 @@ private:
     GUIEngine::IconButtonWidget * m_back_widget;
 
     GUIEngine::RibbonWidget * m_top_menu_widget;
-    GUIEngine::IconButtonWidget * m_quick_play_widget;
-    GUIEngine::IconButtonWidget * m_find_server_widget;
-    GUIEngine::IconButtonWidget * m_create_server_widget;
+    GUIEngine::IconButtonWidget * m_find_lan_server_widget;
+    GUIEngine::IconButtonWidget * m_create_lan_server_widget;
+    GUIEngine::IconButtonWidget * m_manage_user;
+
+    GUIEngine::IconButtonWidget * m_find_wan_server_widget;
+    GUIEngine::IconButtonWidget * m_create_wan_server_widget;
+    GUIEngine::IconButtonWidget * m_quick_wan_play_widget;
 
     GUIEngine::LabelWidget * m_online_status_widget;
 
