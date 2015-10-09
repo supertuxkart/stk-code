@@ -131,8 +131,10 @@ Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type
             default_material->setShaderType(Material::SHADERTYPE_SOLID_UNLIT);
         else if (shader_type == Shaders::getShader(ShaderType::ES_OBJECTPASS_REF))
             default_material->setShaderType(Material::SHADERTYPE_ALPHA_TEST);
-        else if (shader_type == Shaders::getShader(ShaderType::ES_OBJECTPASS))
-            default_material->setShaderType(Material::SHADERTYPE_ALPHA_BLEND);
+        //else if (shader_type == Shaders::getShader(ShaderType::ES_OBJECTPASS))
+        //    default_material->setShaderType(Material::SHADERTYPE_ALPHA_BLEND);
+        else
+            default_material->setShaderType(Material::SHADERTYPE_SOLID);
 
         m_default_materials[shader_type] = default_material;
         return default_material;
