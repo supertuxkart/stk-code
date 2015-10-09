@@ -438,6 +438,9 @@ bool ScalableFont::loadTTF()
             if (!gp_creator->checkEnoughSpace(bits))
             // Glyph page is full, save current one and reset the current page
             {
+#ifdef FONT_DEBUG
+                gp_creator->dumpGlyphPage(((std::to_string(m_type)) + "_" + (std::to_string(texno))).c_str());
+#endif
                 SpriteBank->setTexture(texno, Driver->addTexture("Glyph_page", gp_creator->getPage()));
                 gp_creator->clearGlyphPage();
                 SpriteBank->addTexture(NULL);
@@ -465,6 +468,9 @@ bool ScalableFont::loadTTF()
         // Check for glyph page which can fit all characters
         if (it == --cur_prop.usedchar.end())
         {
+#ifdef FONT_DEBUG
+            gp_creator->dumpGlyphPage(((std::to_string(m_type)) + "_" + (std::to_string(texno))).c_str());
+#endif
             SpriteBank->setTexture(texno, Driver->addTexture("Glyph_page", gp_creator->getPage()));
             gp_creator->clearGlyphPage();
         }

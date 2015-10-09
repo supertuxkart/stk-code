@@ -114,18 +114,23 @@ void getFontProperties::loadNumber(float scale)
 void getFontProperties::loadBoldChar(float scale)
 {
     size = (int)(120*scale); //Set default size for Bold Text
-    for (int i = 33; i < 256; ++i)
+    for (int i = 65; i < 640; ++i)
         usedchar.insert((wchar_t)i);
 
     setlocale(LC_ALL, "en_US.UTF8");
     std::set<wchar_t>::iterator it = usedchar.begin();
     while (it != usedchar.end())
     {
-        if (iswlower((wchar_t)*it))
+        if (iswlower((wchar_t)*it) || !iswalpha((wchar_t)*it))
             it = usedchar.erase(it);
         else
             ++it;
     }
+
+    //Final hack to make stk display title properly
+    usedchar.insert((wchar_t)33);
+    usedchar.insert((wchar_t)160);
+    usedchar.erase((wchar_t)304);
 }
 
 } // end namespace gui

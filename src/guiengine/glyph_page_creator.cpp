@@ -42,6 +42,11 @@ GlyphPageCreator::~GlyphPageCreator()
     page = 0;
 }
 
+void GlyphPageCreator::dumpGlyphPage(const core::stringc fn)
+{
+    GUIEngine::getDriver()->writeImageToFile(page, fn + ".png");
+}
+
 bool GlyphPageCreator::checkEnoughSpace(FT_Bitmap bits)
 {
     core::dimension2du d(bits.width + 1, bits.rows + 1);
@@ -63,10 +68,8 @@ void GlyphPageCreator::clearGlyphPage()
 
 void GlyphPageCreator::createNewGlyphPage()
 {
-    video::IImage* blank = GUIEngine::getDriver()->createImage(video::ECF_A8R8G8B8, core::dimension2du(512, 512));
-    blank->copyTo(page, core::position2di(0, 0));
-    blank->drop();
-    blank = 0;
+    //Clean the current glyph page by filling it with transparent content
+    page->fill(video::SColor(0, 0,0,0));
 }
 
 video::IImage* GlyphPageCreator::getPage()

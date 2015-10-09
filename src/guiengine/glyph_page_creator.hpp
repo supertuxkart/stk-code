@@ -31,6 +31,7 @@ public:
     GlyphPageCreator();
     ~GlyphPageCreator();
 
+    static void              dumpGlyphPage(const core::stringc);
     static bool              checkEnoughSpace(FT_Bitmap);
     static void              clearGlyphPage();
     static void              createNewGlyphPage();
