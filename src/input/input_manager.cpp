@@ -41,6 +41,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_device.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/debug.hpp"
 #include "utils/string_utils.hpp"
 
 #include <ISceneManager.h>
@@ -109,6 +110,14 @@ void InputManager::handleStaticAction(int key, int value)
     }
 
 
+    if (world != NULL && UserConfigParams::m_artist_debug_mode && 
+        control_is_pressed && value > 0)
+    {
+        if (Debug::handleStaticAction(key))
+            return;
+    }
+
+    // TODO: move debug shortcuts to Debug::handleStaticAction
     switch (key)
     {
 #ifdef DEBUG
@@ -131,6 +140,7 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         }
 #endif
+
         case KEY_CONTROL:
         case KEY_RCONTROL:
         case KEY_LCONTROL:
@@ -921,20 +931,8 @@ EventPropagation InputManager::input(const SEvent& event)
             // escape is a little special
             if (key == KEY_ESCAPE)
             {
-                // Exit from first person view if activated
-                if (!GUIEngine::ModalDialog::isADialogActive() &&
-                    StateManager::get()->getGameState() == GUIEngine::GAME &&
-                    UserConfigParams::m_camera_debug == 3)
-                {
-                    UserConfigParams::m_camera_debug = 0;
-                    irr_driver->getDevice()->getCursorControl()->setVisible(true);
-                    return EVENT_BLOCK;
-                }
-                else
-                {
-                    StateManager::get()->escapePressed();
-                    return EVENT_BLOCK;
-                }
+                StateManager::get()->escapePressed();
+                return EVENT_BLOCK;
             }
             // 'backspace' in a text control must never be mapped, since user
             // can be in a text area trying to erase text (and if it's mapped
