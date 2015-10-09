@@ -226,12 +226,16 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
         if (CVS->isDefferedEnabled())
+            if (CVS->isGlobalIlluminationEnabled() && hasShadow)
+            {    
+                m_lighting_passes->renderGlobalIllumination(irr_driver->getShadowMatrices(),
+                                                            irr_driver->getRTT()->getRadianceHintFrameBuffer(),
+                                                            irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer(),
+                                                            irr_driver->getRTT()->getFBO(FBO_DIFFUSE));
+            }            
+            
             m_lighting_passes->renderLights(pointlightcount, hasShadow,
-                                            irr_driver->getShadowMatrices(),
                                             irr_driver->getRTT()->getShadowFrameBuffer(),
-                                            irr_driver->getRTT()->getRadianceHintFrameBuffer(),
-                                            irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer(),
-                                            irr_driver->getRTT()->getFBO(FBO_DIFFUSE),
                                             irr_driver->getRTT()->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR));
         PROFILER_POP_CPU_MARKER();
     }
@@ -514,6 +518,7 @@ void ShaderBasedRenderer::render(float dt)
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         irr_driver->computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
+        irr_driver->getShadowMatrices()->updateSunOrthoMatrices();
         irr_driver->uploadLightingData(); //TODO: move method; update "global" lighting (sun and spherical harmonics)
         PROFILER_POP_CPU_MARKER();
         renderScene(camnode, plc, glows, dt, track->hasShadows(), false); 

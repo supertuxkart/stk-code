@@ -24,20 +24,19 @@
 class LightingPasses
 {
 private:
-    void renderRadianceHints(ShadowMatrices *shadow_matrices,
-                             const FrameBuffer& radiance_hint_framebuffer,
-                             const FrameBuffer& reflective_shadow_map_framebuffer);
+
 
 
 public:
     unsigned updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                               float dt);
+    
+    void renderGlobalIllumination(  ShadowMatrices *shadow_matrices,
+                                    const FrameBuffer& radiance_hint_framebuffer,
+                                    const FrameBuffer& reflective_shadow_map_framebuffer,
+                                    const FrameBuffer& diffuse_framebuffer);
     void renderLights(  unsigned point_light_count, bool has_shadow,
-                        ShadowMatrices *shadow_matrices,
                         const FrameBuffer& shadow_framebuffer,
-                        const FrameBuffer& radiance_hint_framebuffer,
-                        const FrameBuffer& reflective_shadow_map_framebuffer,
-                        const FrameBuffer& diffuse_framebuffer,
                         const FrameBuffer& diffuse_specular_framebuffer);
     void renderAmbientScatter();
     void renderLightsScatter(unsigned point_light_count);
