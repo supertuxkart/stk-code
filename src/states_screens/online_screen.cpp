@@ -135,6 +135,14 @@ void OnlineScreen::beforeAddingWidget()
         m_create_wan_server_widget->setActive(false);
         m_profile_widget->setVisible(false);
     }
+    else
+    {
+        m_quick_wan_play_widget->setActive(true);
+        m_find_wan_server_widget->setActive(true);
+        m_create_wan_server_widget->setActive(true);
+        m_sign_out_widget->setVisible(true);
+        m_profile_widget->setVisible(true);
+    }
 
 } // beforeAddingWidget
 
