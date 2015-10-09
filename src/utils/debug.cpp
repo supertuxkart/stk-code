@@ -588,7 +588,7 @@ bool onEvent(const SEvent &event)
 
             // root menu
             gui::IGUIEnvironment* guienv = irr_driver->getGUI();
-            core::rect<s32> r(50, 50, 150, 500);
+            core::rect<s32> r(100, 50, 150, 500);
             IGUIContextMenu* mnu = guienv->addContextMenu(r, NULL);
             int graphicsMenuIndex = mnu->addItem(L"Graphics >",-1,true,true);
 
