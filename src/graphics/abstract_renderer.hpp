@@ -45,10 +45,10 @@ public:
     virtual void render(float dt) = 0;
 
     virtual void renderScene(irr::scene::ICameraSceneNode * const camnode,
-                             unsigned pointlightcount, std::vector<GlowData>& glows,
+                             std::vector<GlowData>& glows,
                              float dt, bool hasShadows, bool forceRTT) = 0;
                              
-    virtual unsigned updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
+    virtual void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                                       float dt) = 0;
 
     // ------------------------------------------------------------------------

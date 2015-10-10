@@ -30,6 +30,8 @@ private:
 
 
 public:
+    GeometryPasses();
+    
     void renderSolidFirstPass();
     void renderSolidSecondPass( unsigned render_target_diffuse,
                                 unsigned render_target_specular,

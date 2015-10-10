@@ -1169,6 +1169,11 @@ void multidraw1stPass(Args...args)
 }   // multidraw1stPass
 
 
+GeometryPasses::GeometryPasses()
+{
+    m_displace_tex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");    
+}
+
 // ----------------------------------------------------------------------------
 void GeometryPasses::renderSolidFirstPass()
 {
@@ -1610,8 +1615,6 @@ void GeometryPasses::renderTransparent(unsigned render_target)
     }
 
     irr_driver->getFBO(FBO_DISPLACE).bind();
-    if (!m_displace_tex)
-        m_displace_tex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png"); //TODO: move in class constructor
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh = 

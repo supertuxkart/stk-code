@@ -145,14 +145,14 @@ void ShaderBasedRenderer::prepareForwardRenderer()
 }
 
 // ----------------------------------------------------------------------------
-unsigned ShaderBasedRenderer::updateLightsInfo(scene::ICameraSceneNode * const camnode,
-                                               float dt)
+void ShaderBasedRenderer::updateLightsInfo(scene::ICameraSceneNode * const camnode,
+                                           float dt)
 {
-    return m_lighting_passes->updateLightsInfo(camnode, dt);
+    m_lighting_passes.updateLightsInfo(camnode, dt);
 }
 
 // ============================================================================
-void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
+void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
     ShadowMatrices *shadow_matrices = irr_driver->getShadowMatrices();
     PostProcessing *post_processing = irr_driver->getPostProcessing();
@@ -172,12 +172,12 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
             CVS->isShadowEnabled() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
-            m_geometry_passes->renderShadows(irr_driver->getRTT()->getShadowFrameBuffer());
+            m_geometry_passes.renderShadows(irr_driver->getRTT()->getShadowFrameBuffer());
             PROFILER_POP_CPU_MARKER();
             if (CVS->isGlobalIlluminationEnabled())
             {
                 PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
-                m_geometry_passes->renderReflectiveShadowMap(irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer()); //TODO: move somewhere else as RSM are computed only once per track
+                m_geometry_passes.renderReflectiveShadowMap(irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer()); //TODO: move somewhere else as RSM are computed only once per track
                 PROFILER_POP_CPU_MARKER();
             }
         }
@@ -198,7 +198,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
         rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         glClearColor(0., 0., 0., 0.);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        m_geometry_passes->renderSolidFirstPass();
+        m_geometry_passes.renderSolidFirstPass();
     }
     else
     {
@@ -228,13 +228,13 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
         if (CVS->isDefferedEnabled())
             if (CVS->isGlobalIlluminationEnabled() && hasShadow)
             {    
-                m_lighting_passes->renderGlobalIllumination(irr_driver->getShadowMatrices(),
+                m_lighting_passes.renderGlobalIllumination(irr_driver->getShadowMatrices(),
                                                             irr_driver->getRTT()->getRadianceHintFrameBuffer(),
                                                             irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer(),
                                                             irr_driver->getRTT()->getFBO(FBO_DIFFUSE));
             }            
             
-            m_lighting_passes->renderLights(pointlightcount, hasShadow,
+            m_lighting_passes.renderLights( hasShadow,
                                             irr_driver->getRTT()->getShadowFrameBuffer(),
                                             irr_driver->getRTT()->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR));
         PROFILER_POP_CPU_MARKER();
@@ -262,7 +262,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
         glClear(GL_COLOR_BUFFER_BIT);
         glDepthMask(GL_FALSE);
     }
-    m_geometry_passes->renderSolidSecondPass(rtts->getRenderTarget(RTT_DIFFUSE),
+    m_geometry_passes.renderSolidSecondPass(rtts->getRenderTarget(RTT_DIFFUSE),
                                              rtts->getRenderTarget(RTT_SPECULAR),
                                              rtts->getRenderTarget(RTT_HALF1_R));
     PROFILER_POP_CPU_MARKER();
@@ -270,7 +270,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
     if (irr_driver->getNormals())
     {
         rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        m_geometry_passes->renderNormalsVisualisation();
+        m_geometry_passes.renderNormalsVisualisation();
         rtts->getFBO(FBO_COLORS).bind();
     }
 
@@ -280,7 +280,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
     {
         PROFILER_PUSH_CPU_MARKER("- Ambient scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
-        m_lighting_passes->renderAmbientScatter();
+        m_lighting_passes.renderAmbientScatter();
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -297,7 +297,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
     {
         PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
-        m_lighting_passes->renderLightsScatter(pointlightcount);
+        m_lighting_passes.renderLightsScatter();
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -335,7 +335,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, u
     {
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TRANSPARENT));
-        m_geometry_passes->renderTransparent(irr_driver->getRTT()->getRenderTarget(RTT_DISPLACE));
+        m_geometry_passes.renderTransparent(irr_driver->getRTT()->getRenderTarget(RTT_DISPLACE));
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -459,14 +459,12 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
 ShaderBasedRenderer::ShaderBasedRenderer():AbstractRenderer()
 {
-    m_geometry_passes = new GeometryPasses();
-    m_lighting_passes = new LightingPasses();
+
 }
 
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
-    delete m_geometry_passes;
-    delete m_lighting_passes;
+
 }
 
 void ShaderBasedRenderer::render(float dt)
@@ -514,14 +512,14 @@ void ShaderBasedRenderer::render(float dt)
             glEnable(GL_FRAMEBUFFER_SRGB);
         
         PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
-        unsigned plc = updateLightsInfo(camnode, dt); //TODO: replace plc by a more explicit name
+        m_lighting_passes.updateLightsInfo(camnode, dt);
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         irr_driver->computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         irr_driver->getShadowMatrices()->updateSunOrthoMatrices();
         irr_driver->uploadLightingData(); //TODO: move method; update "global" lighting (sun and spherical harmonics)
         PROFILER_POP_CPU_MARKER();
-        renderScene(camnode, plc, glows, dt, track->hasShadows(), false); 
+        renderScene(camnode, glows, dt, track->hasShadows(), false); 
         
         if (irr_driver->getBoundingBoxesViz())
         {        

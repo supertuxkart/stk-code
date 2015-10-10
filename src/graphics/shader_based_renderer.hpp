@@ -25,19 +25,19 @@
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
-    GeometryPasses  *m_geometry_passes;
-    LightingPasses  *m_lighting_passes;
+    GeometryPasses  m_geometry_passes;
+    LightingPasses  m_lighting_passes;
 
     void compressPowerUpTextures();
     void setOverrideMaterial();
     std::vector<GlowData> updateGlowingList();
     void prepareForwardRenderer();
     
-    unsigned updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
-                              float dt);
+    void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
+                          float dt);
     
     void renderScene(irr::scene::ICameraSceneNode * const camnode,
-                     unsigned pointlightcount, std::vector<GlowData>& glows,
+                     std::vector<GlowData>& glows,
                      float dt, bool hasShadows, bool forceRTT);
     void renderBoundingBoxes();
     void debugPhysics();

@@ -326,8 +326,8 @@ static void renderPointLights(unsigned count)
 }   // renderPointLights
 
 // ----------------------------------------------------------------------------
-unsigned LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
-                                               float dt)
+void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
+                                      float dt)
 {
     std::vector<LightNode *> lights = irr_driver->getLights();
     const u32 lightcount = (u32)lights.size();
@@ -352,14 +352,14 @@ unsigned LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnod
         BucketedLN[idx].push_back(lights[i]);
     }
 
-    unsigned lightnum = 0;
+    m_point_light_count = 0;
     bool multiplayer = (race_manager->getNumLocalPlayers() > 1);
 
     for (unsigned i = 0; i < 15; i++)
     {
         for (unsigned j = 0; j < BucketedLN[i].size(); j++)
         {
-            if (++lightnum >= LightBaseClass::MAXLIGHT)
+            if (++m_point_light_count >= LightBaseClass::MAXLIGHT)
             {
                 LightNode* light_node = BucketedLN[i].at(j);
                 light_node->setEnergyMultiplier(0.0f);
@@ -380,31 +380,30 @@ unsigned LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnod
                 }
 
                 const core::vector3df &pos = light_node->getAbsolutePosition();
-                m_point_lights_info[lightnum].posX = pos.X;
-                m_point_lights_info[lightnum].posY = pos.Y;
-                m_point_lights_info[lightnum].posZ = pos.Z;
+                m_point_lights_info[m_point_light_count].posX = pos.X;
+                m_point_lights_info[m_point_light_count].posY = pos.Y;
+                m_point_lights_info[m_point_light_count].posZ = pos.Z;
 
-                m_point_lights_info[lightnum].energy = 
+                m_point_lights_info[m_point_light_count].energy = 
                                               light_node->getEffectiveEnergy();
 
                 const core::vector3df &col = light_node->getColor();
-                m_point_lights_info[lightnum].red = col.X;
-                m_point_lights_info[lightnum].green = col.Y;
-                m_point_lights_info[lightnum].blue = col.Z;
+                m_point_lights_info[m_point_light_count].red = col.X;
+                m_point_lights_info[m_point_light_count].green = col.Y;
+                m_point_lights_info[m_point_light_count].blue = col.Z;
 
                 // Light radius
-                m_point_lights_info[lightnum].radius = light_node->getRadius();
+                m_point_lights_info[m_point_light_count].radius = light_node->getRadius();
             }
         }
-        if (lightnum > LightBaseClass::MAXLIGHT)
+        if (m_point_light_count > LightBaseClass::MAXLIGHT)
         {
             irr_driver->setLastLightBucketDistance(i * 10);
             break;
         }
     }
 
-    lightnum++;
-    return lightnum;
+    m_point_light_count++;
 }   // updateLightsInfo
 
 // ----------------------------------------------------------------------------
@@ -463,7 +462,8 @@ void LightingPasses::renderGlobalIllumination(  ShadowMatrices *shadow_matrices,
     }
 }
 
-void LightingPasses::renderLights(  unsigned point_light_count, bool has_shadow,
+// ----------------------------------------------------------------------------
+void LightingPasses::renderLights(  bool has_shadow,
                                     const FrameBuffer& shadow_framebuffer,
                                     const FrameBuffer& diffuse_specular_framebuffer)
 {
@@ -513,7 +513,7 @@ void LightingPasses::renderLights(  unsigned point_light_count, bool has_shadow,
     //points lights
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_POINTLIGHTS));
-        renderPointLights(std::min(point_light_count, LightBaseClass::MAXLIGHT));
+        renderPointLights(std::min(m_point_light_count, LightBaseClass::MAXLIGHT));
     }
 }   // renderLights    
 
@@ -540,7 +540,7 @@ void LightingPasses::renderAmbientScatter()
 }   // renderAmbientScatter
 
 // ----------------------------------------------------------------------------
-void LightingPasses::renderLightsScatter(unsigned point_light_count)
+void LightingPasses::renderLightsScatter()
 {
     irr_driver->getFBO(FBO_HALF1).bind();
     glClearColor(0., 0., 0., 0.);
@@ -573,7 +573,7 @@ void LightingPasses::renderLightsScatter(unsigned point_light_count)
         ->setUniforms(1.f / (40.f * start), col2);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4,
-                          std::min(point_light_count, LightBaseClass::MAXLIGHT));
+                          std::min(m_point_light_count, LightBaseClass::MAXLIGHT));
 
     glDisable(GL_BLEND);
     PostProcessing *post_processing = irr_driver->getPostProcessing();
