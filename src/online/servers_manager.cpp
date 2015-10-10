@@ -90,6 +90,10 @@ namespace Online
     }   // refreshRequest
 
     // ------------------------------------------------------------------------
+    /** Callback from the refresh request.
+     *  \param success If the refresh was successful.
+     *  \param input The XML data describing the server.
+     */
     void ServersManager::refresh(bool success, const XMLNode *input)
     {
         if (!success)
@@ -102,7 +106,7 @@ namespace Online
         cleanUpServers();
         for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
         {
-            addServer(new Server(*servers_xml->getNode(i)));
+            addServer(new Server(*servers_xml->getNode(i), /*is_lan*/false));
         }
         m_last_load_time.setAtomic((float)StkTime::getRealTime());
     }   // refresh

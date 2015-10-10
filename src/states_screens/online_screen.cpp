@@ -67,6 +67,9 @@ OnlineScreen::~OnlineScreen()
 
 void OnlineScreen::loadedFromFile()
 {
+    m_user_id = getWidget<ButtonWidget>("user-id");
+    assert(m_user_id);
+
     m_back_widget = getWidget<IconButtonWidget>("back");
     assert(m_back_widget != NULL);
 
@@ -86,9 +89,6 @@ void OnlineScreen::loadedFromFile()
     assert(m_create_wan_server_widget != NULL);
     m_quick_wan_play_widget = getWidget<IconButtonWidget>("quick_wan_play");
     assert(m_quick_wan_play_widget != NULL);
-
-    m_online_status_widget = getWidget<LabelWidget>("online_status");
-    assert(m_online_status_widget != NULL);
 
     m_bottom_menu_widget = getWidget<RibbonWidget>("menu_bottomrow");
     assert(m_bottom_menu_widget != NULL);
@@ -152,30 +152,28 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    core::stringw m = _("Logged in as: %s.",
-                        PlayerManager::getCurrentOnlineUserName());
-    m_online_status_widget->setText(m, false);
+
 }   // init
 
 // ----------------------------------------------------------------------------
 void OnlineScreen::onUpdate(float delta)
 {
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
+    if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
+    {
+        m_user_id->setText(player->getLastOnlineName() + "@stk");
+    }
+    else
+    {
+        m_user_id->setText(player->getName());
+    }
+
     if (hasStateChanged())
     {
         GUIEngine::reshowCurrentScreen();
         return;
     }
 
-    if (m_recorded_state == PlayerProfile::OS_SIGNING_IN)
-    {
-        m_online_status_widget->setText(StringUtils::loadingDots(_("Logging in")),
-                                        false                                   );
-    }
-    else if (m_recorded_state == PlayerProfile::OS_SIGNING_OUT)
-    {
-        m_online_status_widget->setText(StringUtils::loadingDots(_("Logging out")),
-                                        false                                    );
-    }
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -249,10 +247,13 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == m_create_lan_server_widget->m_properties[PROP_ID])
     {
+        CreateServerScreen::getInstance()->setIsLan(true);
+        CreateServerScreen::getInstance()->push();
         // TODO: create lan server
     }
     else if (selection == m_find_lan_server_widget->m_properties[PROP_ID])
     {
+        ServerSelection::getInstance()->push();
         // TODO: find lan server;
     }
     else if (selection == m_manage_user->m_properties[PROP_ID])
@@ -270,6 +271,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == m_create_wan_server_widget->m_properties[PROP_ID])
     {
+        CreateServerScreen::getInstance()->setIsLan(false);
         CreateServerScreen::getInstance()->push();
     }
     else if (selection == m_quick_wan_play_widget->m_properties[PROP_ID])
