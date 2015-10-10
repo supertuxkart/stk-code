@@ -16,83 +16,82 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef ENABLE_FREETYPE
-#include "guiengine/freetype_environment.hpp"
+#include "guiengine/ft_environment.hpp"
 #include "guiengine/get_font_properties.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
-namespace irr
-{
-namespace gui
+using namespace gui;
+
+namespace GUIEngine
 {
 
-Ft_Env::Ft_Env()
+FTEnvironment::FTEnvironment()
 {
-    Ft_Env::ft_err += FT_Init_FreeType(&(Ft_Env::ft_lib));
+    FTEnvironment::ft_err += FT_Init_FreeType(&(FTEnvironment::ft_lib));
 
     loadFont();
 }
 
-Ft_Env::~Ft_Env()
+FTEnvironment::~FTEnvironment()
 {
     for (int i = 0; i < FONTNUM; ++i)
-        Ft_Env::ft_err += FT_Done_Face((Ft_Env::ft_face[i]));
+        FTEnvironment::ft_err += FT_Done_Face((FTEnvironment::ft_face[i]));
 
-    Ft_Env::ft_err += FT_Done_FreeType(Ft_Env::ft_lib);
+    FTEnvironment::ft_err += FT_Done_FreeType(FTEnvironment::ft_lib);
 
-    if (Ft_Env::ft_err > 0)
+    if (FTEnvironment::ft_err > 0)
         Log::error("Freetype Environment", "Can't destroy all fonts.");
     else
         Log::info("Freetype Environment", "Successfully destroy all fonts.");
 }
 
-void Ft_Env::loadFont()
+void FTEnvironment::loadFont()
 {
-    Ft_Env::ft_err += FT_New_Face(Ft_Env::ft_lib, (file_manager->getAssetChecked
+    FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "FreeSans.ttf",true)).c_str(),
-                                 0, &(Ft_Env::ft_face[F_DEFAULT]));
+                                 0, &(FTEnvironment::ft_face[F_DEFAULT]));
 
-    Ft_Env::ft_err += FT_New_Face(Ft_Env::ft_lib, (file_manager->getAssetChecked
+    FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "wqy-microhei.ttf",true)).c_str(),
-                                 0, &(Ft_Env::ft_face[F_CJK]));
+                                 0, &(FTEnvironment::ft_face[F_CJK]));
 
-    Ft_Env::ft_err += FT_New_Face(Ft_Env::ft_lib, (file_manager->getAssetChecked
+    FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "amiri-bold.ttf",true)).c_str(),
-                                 0, &(Ft_Env::ft_face[F_AR]));
+                                 0, &(FTEnvironment::ft_face[F_AR]));
 
-    Ft_Env::ft_err += FT_New_Face(Ft_Env::ft_lib, (file_manager->getAssetChecked
+    FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "Layne_Hansom.ttf",true)).c_str(),
-                                 0, &(Ft_Env::ft_face[F_LAYNE])); //to be removed?
+                                 0, &(FTEnvironment::ft_face[F_LAYNE])); //to be removed?
 
-    Ft_Env::ft_err += FT_New_Face(Ft_Env::ft_lib, (file_manager->getAssetChecked
+    FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "FreeSansBold.ttf",true)).c_str(),
-                                 0, &(Ft_Env::ft_face[F_BOLD]));
+                                 0, &(FTEnvironment::ft_face[F_BOLD]));
 
-    Ft_Env::ft_err += FT_New_Face(Ft_Env::ft_lib, (file_manager->getAssetChecked
+    FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "FreeMonoBold.ttf",true)).c_str(),
-                                 0, &(Ft_Env::ft_face[F_DIGIT]));
+                                 0, &(FTEnvironment::ft_face[F_DIGIT]));
 
     //Set charmap
     for (int h = 0; h < FONTNUM; ++h)
     {
-        for (int i = 0; i < Ft_Env::ft_face[h]->num_charmaps; ++i)
+        for (int i = 0; i < FTEnvironment::ft_face[h]->num_charmaps; ++i)
         {
-            FT_UShort pid = Ft_Env::ft_face[h]->charmaps[i]->platform_id;
-            FT_UShort eid = Ft_Env::ft_face[h]->charmaps[i]->encoding_id;
+            FT_UShort pid = FTEnvironment::ft_face[h]->charmaps[i]->platform_id;
+            FT_UShort eid = FTEnvironment::ft_face[h]->charmaps[i]->encoding_id;
             if (((pid == 0) && (eid == 3)) || ((pid == 3) && (eid == 1)))
-                Ft_Env::ft_err += FT_Set_Charmap(Ft_Env::ft_face[h], Ft_Env::ft_face[h]->charmaps[i]);
+                FTEnvironment::ft_err += FT_Set_Charmap(FTEnvironment::ft_face[h], FTEnvironment::ft_face[h]->charmaps[i]);
         }
     }
 
-    if (Ft_Env::ft_err > 0)
+    if (FTEnvironment::ft_err > 0)
         Log::error("Freetype Environment", "Can't load all fonts.");
     else
         Log::info("Freetype Environment", "Successfully loaded all fonts.");
 }
 
-FT_Library Ft_Env::ft_lib = NULL;
-FT_Error Ft_Env::ft_err = 0;
+FT_Library FTEnvironment::ft_lib = NULL;
+FT_Error FTEnvironment::ft_err   = 0;
 
-} // end namespace gui
-} // end namespace irr
+}   // guiengine
 #endif // ENABLE_FREETYPE

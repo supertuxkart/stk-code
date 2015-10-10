@@ -20,31 +20,66 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-namespace irr
+using namespace irr;
+
+/**
+ * \ingroup guiengine
+ */
+namespace GUIEngine
 {
-namespace gui
-{
+    /**
+     * \brief Create glyph pages for different fonts.
+     */
+    class GlyphPageCreator
+    {
+    public:
+        GlyphPageCreator();
+        ~GlyphPageCreator();
 
-class GlyphPageCreator
-{
-public:
-    GlyphPageCreator();
-    ~GlyphPageCreator();
+        /** Write the current glyph page into png on current running directory.
+         *  Mainly for debug use.
+         *  \param fn The file name.
+         */
+        static void              dumpGlyphPage(const core::stringc fn);
 
-    static void              dumpGlyphPage(const core::stringc);
-    static bool              checkEnoughSpace(FT_Bitmap);
-    static void              clearGlyphPage();
-    static void              createNewGlyphPage();
-    static video::IImage*    getPage();
-    bool                     insertGlyph(FT_Bitmap, core::rect<s32>&);
+        /** Check whether it is ok the fit the inputted glyph into the current glyph page.
+         *  \param bits The Glyph bitmap inputted.
+         *  \return True if there is enough space.
+         */
+        static bool              checkEnoughSpace(FT_Bitmap bits);
 
-private:
-    video::IImage*           image = 0;
-    static  video::IImage*   page;
-    static  u32              temp_height;
-    static  u32              used_width;
-    static  u32              used_height;
-};
+        /** Reset position of glyph on the current glyph page.
+         */
+        static void              clearGlyphPage();
 
-} // end namespace gui
-} // end namespace irr
+        /** Clear (fill it with transparent content) the current glyph page.
+         */
+        static void              createNewGlyphPage();
+
+        /** Used to get a glyph page which is loaded later for texture
+         *  \return Glyph page image.
+         */
+        static video::IImage*    getPage();
+
+        /** Used to insert a single glyph bitmap into the glyph page
+         *  \param bits The Glyph bitmap inputted.
+         *  \param rect Give the rectangle of the glyph on the page.
+         *  \return True if a glyph is loaded.
+         */
+        bool                     insertGlyph(FT_Bitmap bits, core::rect<s32>& rect);
+
+    private:
+        /** A temporary storage for a single glyph.
+         */
+        video::IImage*           image = 0;
+
+        /** A full glyph page.
+         */
+        static  video::IImage*   page;
+
+        static  u32              temp_height;
+        static  u32              used_width;
+        static  u32              used_height;
+    };
+
+}   // guiengine

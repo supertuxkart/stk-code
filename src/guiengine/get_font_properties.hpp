@@ -30,6 +30,13 @@ enum TTFLoadingType {T_NORMAL, T_DIGIT, T_BOLD};
 class getFontProperties
 {
 public:
+
+    /** Get properties used for load characters with ttf.
+     *  \param langname The current gui language.
+     *  \param type Current loaded font type (normal, bold or digit font).
+     *  \param fu Give a suitable font file.
+     *  \return Font dpi and characters required to preload for current gui language.
+     */
     getFontProperties (const core::stringc &langname, TTFLoadingType type, FontUse &fu);
 
     unsigned short           size;
@@ -40,6 +47,8 @@ private:
     void                     loadNumber(float);
     void                     loadBoldChar(float);
 
+    /** Find a suitable font scale base on current resolution
+     */
     void                     findScale();
 
     float                    normal_text_scale;

@@ -20,23 +20,28 @@
 
 #define FONTNUM 6
 
-namespace irr
+/**
+ * \ingroup guiengine
+ */
+namespace GUIEngine
 {
-namespace gui
-{
+    /**
+     * \brief Initialize a freetype environment with a single freetype library.
+     */
+    class FTEnvironment
+    {
+    public:
+        FTEnvironment();
+        ~FTEnvironment();
+        FT_Face           ft_face[FONTNUM];
 
-class Ft_Env
-{
-public:
-    Ft_Env();
-    ~Ft_Env();
-    FT_Face           ft_face[FONTNUM];
+    private:
+        /** Load font face into memory, but don't create glyph yet.
+         */
+        void              loadFont();
 
-private:
-    void loadFont();
-    static FT_Library ft_lib;
-    static FT_Error   ft_err;
-};
+        static FT_Library ft_lib;
+        static FT_Error   ft_err;
+    };
 
-} // end namespace gui
-} // end namespace irr
+}   // guiengine

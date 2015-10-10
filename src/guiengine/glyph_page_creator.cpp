@@ -25,9 +25,7 @@
 #include <irrlicht.h>
 #include "guiengine/engine.hpp"
 
-namespace irr
-{
-namespace gui
+namespace GUIEngine
 {
 
 GlyphPageCreator::GlyphPageCreator()
@@ -69,7 +67,7 @@ void GlyphPageCreator::clearGlyphPage()
 void GlyphPageCreator::createNewGlyphPage()
 {
     //Clean the current glyph page by filling it with transparent content
-    page->fill(video::SColor(0, 0,0,0));
+    page->fill(video::SColor(0, 255, 255, 255));
 }
 
 video::IImage* GlyphPageCreator::getPage()
@@ -131,6 +129,7 @@ bool GlyphPageCreator::insertGlyph(FT_Bitmap bits, core::rect<s32>& rect)
     //Store the rectangle of current glyph
     rect = core::rect<s32> (used_width, used_height, used_width + bits.width, used_height + bits.rows);
 
+    image->drop();
     image = 0;
 
     //Store used area
@@ -145,6 +144,5 @@ u32 GlyphPageCreator::used_height           = 0;
 u32 GlyphPageCreator::temp_height           = 0;
 video::IImage* GlyphPageCreator::page       = 0;
 
-} // end namespace gui
-} // end namespace irr
+}   // guiengine
 #endif // ENABLE_FREETYPE

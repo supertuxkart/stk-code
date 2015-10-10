@@ -55,6 +55,7 @@ class ScalableFont : public IGUIFontBitmap
     bool m_mono_space_digits;
     irr::video::SColor m_shadow_color;
 
+#ifndef ENABLE_FREETYPE
     struct TextureInfo
     {
         irr::core::stringc m_file_name;
@@ -72,6 +73,7 @@ class ScalableFont : public IGUIFontBitmap
     std::map<int /* texture file ID */, TextureInfo> m_texture_files;
 
     void doReadXmlFile(io::IXMLReader* xml);
+#endif // ENABLE_FREETYPE
 
     bool m_is_hollow_copy;
     bool m_rtl;
@@ -81,7 +83,7 @@ public:
     LEAK_CHECK()
 
     bool m_black_border;
-    bool m_isTTF;
+
 #ifdef ENABLE_FREETYPE
     TTFLoadingType m_type;
 #endif // ENABLE_FREETYPE
@@ -122,9 +124,9 @@ public:
 #else
     //! loads a font from an XML file
     bool load(io::IXMLReader* xml);
-#endif // ENABLE_FREETYPE
 
     void lazyLoadTexture(int texID);
+#endif // ENABLE_FREETYPE
 
     //! draws an text and clips it to the specified rectangle if wanted
     virtual void draw(const core::stringw& text, const core::rect<s32>& position,
@@ -186,7 +188,7 @@ private:
 #ifdef ENABLE_FREETYPE
     struct SFontArea
     {
-        SFontArea() : width(0), spriteno(0), offsety(0), bearingx(0) {}
+        SFontArea() : width(0), spriteno(0), offsety(0), offsety_bt(0), bearingx(0) {}
         s32             width;
         u32             spriteno;
         s32             offsety;
