@@ -193,11 +193,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         virtual void            asynchronousUpdate();
 
         /*!
-         * \brief Get the number of protocols running.
-         * \return The number of protocols that are actually running.
-         */
-        virtual int             runningProtocolsCount();
-        /*!
          * \brief Get the state of a protocol using its id.
          * \param id : The id of the protocol you seek the state.
          * \return The state of the protocol.
@@ -291,10 +286,9 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
 
         // protected members
         /** Contains the running protocols.
-         *   This stores the protocols that are either running or paused, their
-         * state and their unique id.
-         */
-        std::vector<ProtocolInfo>       m_protocols;
+         *  This stores the protocols that are either running or paused, their
+         * state and their unique id. */
+        Synchronised<std::vector<ProtocolInfo> >m_protocols;
 
         /** Contains the network events to pass to protocols. */
         Synchronised<std::vector<EventProcessingInfo> > m_events_to_process;
@@ -309,8 +303,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         uint32_t                        m_next_protocol_id;
 
         // mutexes:
-        /*! Used to ensure that the protocol vector is used thread-safely.   */
-        pthread_mutex_t                 m_protocols_mutex;
         /*! Used to ensure that the protocol vector is used thread-safely.   */
         pthread_mutex_t                 m_asynchronous_protocols_mutex;
         /*! Used to ensure that the request vector is used thread-safely.    */
