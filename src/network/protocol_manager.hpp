@@ -28,6 +28,7 @@
 #include "network/protocol.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
+#include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
 #include <vector>
@@ -289,19 +290,16 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         bool                    propagateEvent(EventProcessingInfo* event, bool synchronous);
 
         // protected members
-        /*!
-         * \brief Contains the running protocols.
-         * This stores the protocols that are either running or paused, their
+        /** Contains the running protocols.
+         *   This stores the protocols that are either running or paused, their
          * state and their unique id.
          */
         std::vector<ProtocolInfo>       m_protocols;
-        /*!
-         * \brief Contains the network events to pass to protocols.
-         */
-        std::vector<EventProcessingInfo>             m_events_to_process;
-        /*!
-         * \brief Contains the requests to start/stop etc... protocols.
-         */
+
+        /** Contains the network events to pass to protocols. */
+        Synchronised<std::vector<EventProcessingInfo> > m_events_to_process;
+
+        /** Contains the requests to start/stop etc... protocols. */
         std::vector<ProtocolRequest>    m_requests;
         /*! \brief The next id to assign to a protocol.
          * This value is incremented by 1 each time a protocol is started.
@@ -311,8 +309,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         uint32_t                        m_next_protocol_id;
 
         // mutexes:
-        /*! Used to ensure that the event queue is used thread-safely.       */
-        pthread_mutex_t                 m_events_mutex;
         /*! Used to ensure that the protocol vector is used thread-safely.   */
         pthread_mutex_t                 m_protocols_mutex;
         /*! Used to ensure that the protocol vector is used thread-safely.   */
