@@ -26,6 +26,7 @@
 #include "network/event.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
 #include "utils/types.hpp"
 
@@ -102,10 +103,11 @@ typedef struct EventProcessingInfo
  * frames per second. Then, the management of protocols is thread-safe: any
  * object can start/pause/stop protocols whithout problems.
  */
-class ProtocolManager : public AbstractSingleton<ProtocolManager>
+class ProtocolManager : public AbstractSingleton<ProtocolManager>,
+                        public NoCopy
 {
     friend class AbstractSingleton<ProtocolManager>;
-    friend void* protocolManagerAsynchronousUpdate(void* data);
+    static void* mainLoop(void *data);
     public:
         
         /*! \brief Stops the protocol manager. */
