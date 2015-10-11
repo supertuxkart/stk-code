@@ -91,8 +91,6 @@ void getFontProperties::loadChar(const core::stringc langname, FontUse& fu, floa
     else
         fu = F_DEFAULT; //Default font file
 
-    size = (int)(29*scale); //Set to default size
-
     usedchar = translations->getCurrentAllChar(); //Loading unique characters
     for (int i = 33; i < 256; ++i)
         usedchar.insert((wchar_t)i); //Include basic Latin too
@@ -100,8 +98,10 @@ void getFontProperties::loadChar(const core::stringc langname, FontUse& fu, floa
     usedchar.insert((wchar_t)215);   //Used on resolution selection screen (X).
 
     //There's specific handling for some language, we may need more after more translation are added or problems found out.
-    if (langname == "el")
-        size = (int)(28*scale); //Set lower size of font for Greek as it uses lots amount of space.
+    if (langname == "el" || langname == "fr" || langname == "gd")
+        size = (int)(27*scale); //Lower scale for them as they're space-consuming.
+    else
+        size = (int)(29*scale); //Set to default size
 }
 
 void getFontProperties::loadNumber(float scale)
