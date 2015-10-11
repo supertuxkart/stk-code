@@ -81,8 +81,6 @@ void CreateServerScreen::beforeAddingWidget()
 
 } // beforeAddingWidget
 
-
-
 // ----------------------------------------------------------------------------
 void CreateServerScreen::init()
 {
@@ -177,7 +175,7 @@ void CreateServerScreen::ServerCreationRequest::callback()
 {
     if (isSuccess())
     {
-        // Must be a LAN server
+        // Must be a WAN server
         Server *server = new Server(*getXMLData()->getNode("server"),
                                     /*is lan*/false);
         ServersManager::get()->addServer(server);
