@@ -537,9 +537,7 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                             align.c_str(), widgets[n].m_properties[PROP_ID].c_str());
                     }
 
-                    //Used to get text in label widget wrapped better
-                    int padding = (int)(irr_driver->getFrameSize().Width*0.05f);
-                    widgets[n].m_w = (int)(left_space*fraction) - padding;
+                    widgets[n].m_w = (int)(left_space*fraction);
                     if (widgets[n].m_properties[PROP_MAX_WIDTH].size() > 0)
                     {
                         const int max_width = atoi_p( widgets[n].m_properties[PROP_MAX_WIDTH].c_str() );
@@ -554,7 +552,7 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                         widgets[n].m_w = 1;
                     }
 
-                    x += widgets[n].m_w + padding;
+                    x += widgets[n].m_w;
                 }
                 else
                 {

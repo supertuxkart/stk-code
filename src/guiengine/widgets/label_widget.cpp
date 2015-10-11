@@ -60,11 +60,7 @@ LabelWidget::LabelWidget(bool title, bool bright) : Widget(WTYPE_LABEL)
 void LabelWidget::add()
 {
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
-    bool word_wrap;  //Enable text wrapping unless explicitly stated not to
-    if (m_properties[PROP_WORD_WRAP] == "false")
-        word_wrap = false;
-    else
-        word_wrap = true;
+    const bool word_wrap = m_properties[PROP_WORD_WRAP] == "true";
     stringw message = getText();
 
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
