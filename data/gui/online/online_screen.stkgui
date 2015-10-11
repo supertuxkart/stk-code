@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
+    <div x="0" y="0" width="100%" height="fit" layout="vertical-row">
+        <button id="user-id" width="20%" height="fit" align="right"/>
+    </div>
+    
     <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
         <header text_align="center" width="80%" align="center" I18N="In the online multiplayer screen" text="Online Multiplayer"/>
@@ -17,7 +21,7 @@
                              I18N="In the online multiplayer screen" text="Create Server"/>
                 <icon-button id="manage_user" width="128" height="128"
                              icon="gui/options_players.png"
-                             I18N="In the online multiplayer screen" text="Local Users"/>
+                             I18N="In the online multiplayer screen" text="Users"/>
             </buttonbar>
         </box>
 

@@ -25,7 +25,7 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "utils/ptr_vector.hpp"
 
-namespace GUIEngine { class Widget; class ListWidget; }
+namespace GUIEngine { class Widget; class ListWidget; class ButtonWidget; }
 
 /**
   * \brief Handles the main menu
@@ -40,23 +40,24 @@ private:
     OnlineScreen();
     ~OnlineScreen();
 
-    GUIEngine::IconButtonWidget * m_back_widget;
+    GUIEngine::IconButtonWidget *m_back_widget;
 
-    GUIEngine::RibbonWidget * m_top_menu_widget;
-    GUIEngine::IconButtonWidget * m_find_lan_server_widget;
-    GUIEngine::IconButtonWidget * m_create_lan_server_widget;
-    GUIEngine::IconButtonWidget * m_manage_user;
+    GUIEngine::RibbonWidget *m_top_menu_widget;
+    GUIEngine::IconButtonWidget *m_find_lan_server_widget;
+    GUIEngine::IconButtonWidget *m_create_lan_server_widget;
+    GUIEngine::IconButtonWidget *m_manage_user;
 
-    GUIEngine::IconButtonWidget * m_find_wan_server_widget;
-    GUIEngine::IconButtonWidget * m_create_wan_server_widget;
-    GUIEngine::IconButtonWidget * m_quick_wan_play_widget;
+    GUIEngine::IconButtonWidget *m_find_wan_server_widget;
+    GUIEngine::IconButtonWidget *m_create_wan_server_widget;
+    GUIEngine::IconButtonWidget *m_quick_wan_play_widget;
 
-    GUIEngine::LabelWidget * m_online_status_widget;
+    GUIEngine::RibbonWidget *m_bottom_menu_widget;
+    GUIEngine::IconButtonWidget *m_register_widget;
+    GUIEngine::IconButtonWidget *m_profile_widget;
+    GUIEngine::IconButtonWidget *m_sign_out_widget;
 
-    GUIEngine::RibbonWidget * m_bottom_menu_widget;
-    GUIEngine::IconButtonWidget * m_register_widget;
-    GUIEngine::IconButtonWidget * m_profile_widget;
-    GUIEngine::IconButtonWidget * m_sign_out_widget;
+    /** Keep the widget to to the user name. */
+    GUIEngine::ButtonWidget *m_user_id;
 
     PlayerProfile::OnlineState m_recorded_state;
 

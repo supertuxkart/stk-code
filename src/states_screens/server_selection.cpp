@@ -64,7 +64,7 @@ void ServerSelection::refresh()
     m_server_list_widget->addItem("loading",
                               StringUtils::loadingDots(_("Fetching servers")));
     m_reload_widget->setActive(false);
-}
+}   // refresh
 
 
 // ----------------------------------------------------------------------------
@@ -88,7 +88,8 @@ void ServerSelection::beforeAddingWidget()
     m_server_list_widget->clearColumns();
     m_server_list_widget->addColumn( _("Name"), 3 );
     m_server_list_widget->addColumn( _("Players"), 1);
-}
+}   // beforeAddingWidget
+
 // ----------------------------------------------------------------------------
 
 void ServerSelection::init()
@@ -110,11 +111,11 @@ void ServerSelection::init()
 void ServerSelection::loadList()
 {
     m_server_list_widget->clear();
-    ServersManager * manager = ServersManager::get();
+    ServersManager *manager = ServersManager::get();
     manager->sort(m_sort_desc);
     for(int i=0; i <  manager->getNumServers(); i++)
     {
-        const Server * server = manager->getServerBySort(i);
+        const Server *server = manager->getServerBySort(i);
         core::stringw num_players;
         num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
         num_players.append("/");

@@ -65,6 +65,9 @@ namespace Online
         /** The score/rating given */
         float m_satisfaction_score;
 
+        /** True if this server is on the LAN, false otherwise. */
+        bool m_is_lan;
+
         /** The sort order to be used in the comparison. */
         static SortOrder m_sort_order;
 
@@ -73,8 +76,9 @@ namespace Online
     public:
 
          /** Initialises the object from an XML node. */
-         Server(const XMLNode & xml);
-
+         Server(const XMLNode &xml, bool is_lan);
+         Server(const core::stringw &name, bool is_lan, int max_players,
+                int current_players);
          // ------------------------------------------------------------------------
         /** Sets the sort order used in the comparison function. It is static, so
          *  that each instance can access the sort order. */
