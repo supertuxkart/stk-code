@@ -114,6 +114,8 @@ void getFontProperties::loadNumber(float scale)
 void getFontProperties::loadBoldChar(float scale)
 {
     size = (int)(120*scale); //Set default size for Bold Text
+
+    //Start to insert from 65 (char code of A) to 640 which is the end+1 of latin-extended-B
     for (int i = 65; i < 640; ++i)
         usedchar.insert((wchar_t)i);
 
@@ -128,6 +130,9 @@ void getFontProperties::loadBoldChar(float scale)
     }
 
     //Final hack to make stk display title properly
+    //33 , 160, 304 is char code to "!", Non-breaking space, and Capital I-dotted
+    //Remove Capital I-dotted with using "I" altogether.
+
     usedchar.insert((wchar_t)33);
     usedchar.insert((wchar_t)160);
     usedchar.erase((wchar_t)304);
