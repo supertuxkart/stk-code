@@ -38,7 +38,6 @@ DEFINE_SCREEN_SINGLETON( OnlineUserSearch );
 
 OnlineUserSearch::OnlineUserSearch() : Screen("online/user_search.stkgui")
 {
-    m_selected_index     = -1;
     m_search_request     = NULL;
     m_search_string      = "";
     m_last_search_string = "";
@@ -226,9 +225,9 @@ void OnlineUserSearch::eventCallback(GUIEngine::Widget* widget,
     }
     else if (name == m_user_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        m_selected_index = m_user_list_widget->getSelectionID();
-        if (m_selected_index != -1)
-            new UserInfoDialog(m_users[m_selected_index]);
+        int selected_index = m_user_list_widget->getSelectionID();
+        if (selected_index != -1)
+            new UserInfoDialog(m_users[selected_index]);
     }
     else if (name == m_search_button_widget->m_properties[GUIEngine::PROP_ID])
     {
@@ -238,22 +237,6 @@ void OnlineUserSearch::eventCallback(GUIEngine::Widget* widget,
     }
 
 }   // eventCallback
-
-// ----------------------------------------------------------------------------
-/** Selects the last selected item on the list (which is the item that
- *  is just being installed) again. This function is used from the
- *  addons_loading screen: when it is closed, it will reset the
- *  select item so that people can keep on installing from that
- *  point on.
-*/
-void OnlineUserSearch::setLastSelected() //FIXME actually use this here and in server selection
-{
-    if(m_selected_index>-1)
-    {
-        m_user_list_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        m_user_list_widget->setSelectionID(m_selected_index);
-    }
-}   // setLastSelected
 
 // ----------------------------------------------------------------------------
 /** Called every frame. It queries the search request for results and

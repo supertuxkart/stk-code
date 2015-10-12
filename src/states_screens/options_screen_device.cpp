@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options_screen_input2.hpp"
+#include "states_screens/options_screen_device.hpp"
 
 #include "config/user_config.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
@@ -45,24 +45,24 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( OptionsScreenInput2 );
+DEFINE_SCREEN_SINGLETON( OptionsScreenDevice );
 
 // ----------------------------------------------------------------------------
 
-OptionsScreenInput2::OptionsScreenInput2() : Screen("options_device.stkgui")
+OptionsScreenDevice::OptionsScreenDevice() : Screen("options_device.stkgui")
 {
     m_config = NULL;
-}   // OptionsScreenInput2
+}   // OptionsScreenDevice
 
 // ----------------------------------------------------------------------------
 
-void OptionsScreenInput2::loadedFromFile()
+void OptionsScreenDevice::loadedFromFile()
 {
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
 
-void OptionsScreenInput2::beforeAddingWidget()
+void OptionsScreenDevice::beforeAddingWidget()
 {
     GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("actions");
@@ -75,7 +75,7 @@ void OptionsScreenInput2::beforeAddingWidget()
 
 // ----------------------------------------------------------------------------
 
-void OptionsScreenInput2::init()
+void OptionsScreenDevice::init()
 {
     Screen::init();
     RibbonWidget* tabBar = getWidget<RibbonWidget>("options_choice");
@@ -165,9 +165,9 @@ void OptionsScreenInput2::init()
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenInput2::addListItemSubheader(GUIEngine::ListWidget* actions,
-                                               const char* id,
-                                               const core::stringw& text)
+void OptionsScreenDevice::addListItemSubheader(GUIEngine::ListWidget* actions,
+                                              const char* id,
+                                              const core::stringw& text)
 {
     std::vector<GUIEngine::ListWidget::ListCell> row;
     row.push_back(GUIEngine::ListWidget::ListCell(text, -1, 1, false));
@@ -177,8 +177,8 @@ void OptionsScreenInput2::addListItemSubheader(GUIEngine::ListWidget* actions,
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenInput2::addListItem(GUIEngine::ListWidget* actions,
-                                      PlayerAction pa)
+void OptionsScreenDevice::addListItem(GUIEngine::ListWidget* actions,
+                                     PlayerAction pa)
 {
     std::vector<GUIEngine::ListWidget::ListCell> row;
     core::stringw s(KartActionStrings[pa].c_str());
@@ -189,10 +189,10 @@ void OptionsScreenInput2::addListItem(GUIEngine::ListWidget* actions,
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenInput2::renameRow(GUIEngine::ListWidget* actions,
-                                    int idRow,
-                                    const irr::core::stringw &translatedName,
-                                    PlayerAction action) const
+void OptionsScreenDevice::renameRow(GUIEngine::ListWidget* actions,
+                                   int idRow,
+                                   const irr::core::stringw &translatedName,
+                                   PlayerAction action) const
 {
     actions->renameCell(idRow, 0, core::stringw("    ") + translatedName);
     actions->renameCell(idRow, 1, m_config->getBindingAsString(action));
@@ -201,7 +201,7 @@ void OptionsScreenInput2::renameRow(GUIEngine::ListWidget* actions,
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenInput2::updateInputButtons()
+void OptionsScreenDevice::updateInputButtons()
 {
     assert(m_config != NULL);
 
@@ -372,7 +372,7 @@ void OptionsScreenInput2::updateInputButtons()
 static PlayerAction binding_to_set;
 static std::string binding_to_set_button;
 
-void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
+void OptionsScreenDevice::gotSensedInput(const Input& sensed_input)
 {
     const bool keyboard = (m_config->isKeyboard() &&
                            sensed_input.m_type == Input::IT_KEYBOARD);
@@ -384,7 +384,7 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     {
         if (UserConfigParams::logMisc())
         {
-            Log::info("OptionsScreenInput2", "Binding %s: setting to keyboard key %d",
+            Log::info("OptionsScreenDevice", "Binding %s: setting to keyboard key %d",
                 KartActionStrings[binding_to_set].c_str(), sensed_input.m_button_id);
         }
 
@@ -401,21 +401,21 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     {
         if (UserConfigParams::logMisc())
         {
-            Log::info("OptionsScreenInput2", "Binding %s: setting to gamepad #%d",
+            Log::info("OptionsScreenDevice", "Binding %s: setting to gamepad #%d",
                 KartActionStrings[binding_to_set].c_str(), sensed_input.m_device_id);
 
             if (sensed_input.m_type == Input::IT_STICKMOTION)
             {
-                Log::info("OptionsScreenInput2", "Axis %d; direction %s", sensed_input.m_button_id,
+                Log::info("OptionsScreenDevice", "Axis %d; direction %s", sensed_input.m_button_id,
                     sensed_input.m_axis_direction == Input::AD_NEGATIVE ? "-" : "+");
             }
             else if (sensed_input.m_type == Input::IT_STICKBUTTON)
             {
-                Log::info("OptionsScreenInput2", "Button %d", sensed_input.m_button_id);
+                Log::info("OptionsScreenDevice", "Button %d", sensed_input.m_button_id);
             }
             else
             {
-                Log::info("OptionsScreenInput2", "Sensed unknown gamepad event type??");
+                Log::info("OptionsScreenDevice", "Sensed unknown gamepad event type??");
             }
         }
 
@@ -439,7 +439,7 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     {
         if (UserConfigParams::logMisc())
         {
-            Log::info("OptionsScreenInput2", "Binding %s: setting to keyboard key NONE",
+            Log::info("OptionsScreenDevice", "Binding %s: setting to keyboard key NONE",
                 KartActionStrings[binding_to_set].c_str());
         }
 
@@ -481,9 +481,9 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
 
 
 // ----------------------------------------------------------------------------
-void OptionsScreenInput2::eventCallback(Widget* widget,
-                                        const std::string& name,
-                                        const int playerID)
+void OptionsScreenDevice::eventCallback(Widget* widget,
+                                       const std::string& name,
+                                       const int playerID)
 {
     //const std::string& screen_name = getName();
 
@@ -529,7 +529,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
                 // we found which one. show the "press a key" dialog.
                 if (UserConfigParams::logMisc())
                 {
-                    Log::info("OptionsScreenInput2", "Entering sensing mode for %s",
+                    Log::info("OptionsScreenDevice", "Entering sensing mode for %s",
                          m_config->getName().c_str());
                 }
 
@@ -547,7 +547,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
                 }
                 else
                 {
-                    Log::error("OptionsScreenInput2", "Unknown selection device in options: %s",
+                    Log::error("OptionsScreenDevice", "Unknown selection device in options: %s",
                         m_config->getName().c_str());
                 }
                 break;
@@ -583,13 +583,13 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenInput2::unloaded()
+void OptionsScreenDevice::unloaded()
 {
 }   // unloaded
 
 // -----------------------------------------------------------------------------
 
-bool OptionsScreenInput2::onEscapePressed()
+bool OptionsScreenDevice::onEscapePressed()
 {
     StateManager::get()
         ->replaceTopMostScreen(OptionsScreenInput::getInstance());
@@ -599,13 +599,13 @@ bool OptionsScreenInput2::onEscapePressed()
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenInput2::onConfirm()
+void OptionsScreenDevice::onConfirm()
 {
     const bool success =
         input_manager->getDeviceManager()->deleteConfig(m_config);
     assert(success);
     if (!success)
-        Log::error("OptionsScreenInput2", "Failed to delete config!");
+        Log::error("OptionsScreenDevice", "Failed to delete config!");
 
     m_config = NULL;
     input_manager->getDeviceManager()->save();
@@ -617,8 +617,9 @@ void OptionsScreenInput2::onConfirm()
 // -----------------------------------------------------------------------------
 
 
-bool OptionsScreenInput2::conflictsBetweenKbdConfig(PlayerAction action,
-        PlayerAction from, PlayerAction to)
+bool OptionsScreenDevice::conflictsBetweenKbdConfig(PlayerAction action,
+                                                   PlayerAction from,
+                                                   PlayerAction to)
 {
     KeyboardConfig* other_kbd_config;
     int id = m_config->getBinding(action).getId();

@@ -45,7 +45,7 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 
 // ----------------------------------------------------------------------------
 
-NetworkingLobby::NetworkingLobby() : Screen("online/lobby.stkgui")
+NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
     m_server = NULL;
 }   // NetworkingLobby

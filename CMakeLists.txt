@@ -398,7 +398,7 @@ if(MSVC OR MINGW)
 endif()
 
 if(MINGW)
-    find_library(LIBGCC NAMES "libgcc_s_dw2-1.dll" "libgcc_s_sjlj-1.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
+    find_library(LIBGCC NAMES "libgcc_s_dw2-1.dll" "libgcc_s_sjlj-1.dll" "libgcc_s_seh-1.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
     if(LIBGCC)
         file(COPY ${LIBGCC} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     endif()

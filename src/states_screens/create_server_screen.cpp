@@ -47,6 +47,7 @@ DEFINE_SCREEN_SINGLETON( CreateServerScreen );
 CreateServerScreen::CreateServerScreen() : Screen("online/create_server.stkgui")
 {
     m_server_creation_request = NULL;
+    m_is_lan                  = false;
 }   // CreateServerScreen
 
 // ----------------------------------------------------------------------------
@@ -80,8 +81,6 @@ void CreateServerScreen::beforeAddingWidget()
 
 } // beforeAddingWidget
 
-
-
 // ----------------------------------------------------------------------------
 void CreateServerScreen::init()
 {
@@ -89,7 +88,12 @@ void CreateServerScreen::init()
     setInitialFocus();
     DemoWorld::resetIdleTime();
     m_info_widget->setText("", false);
-}
+    LabelWidget *title = getWidget<LabelWidget>("title");
+
+    title->setText(m_is_lan ? _("Create LAN Server")
+                            : _("Create Server")    , false);
+}   // init
+
 // ----------------------------------------------------------------------------
 void CreateServerScreen::onUpdate(float delta)
 {
@@ -99,7 +103,8 @@ void CreateServerScreen::onUpdate(float delta)
         {
             if(m_server_creation_request->isSuccess())
             {
-                new ServerInfoDialog(m_server_creation_request->getCreatedServerID(), true);
+                new ServerInfoDialog(m_server_creation_request->getCreatedServerID(),
+                                     true);
             }
             else
             {
@@ -124,22 +129,36 @@ void CreateServerScreen::onUpdate(float delta)
 // ----------------------------------------------------------------------------
 void CreateServerScreen::serverCreationRequest()
 {
+    if (m_is_lan)
+    {
+        const irr::core::stringw name = m_name_widget->getText().trim();
+        const int max_players = m_max_players_widget->getValue();
+        Server *server = new Server(name, /*lan*/true, max_players,
+            /*current_player*/1);
+        ServersManager::get()->addServer(server);
+        return;
+    }
+
+    // Now must be WAN: forward request to the stk server
     const irr::core::stringw name = m_name_widget->getText().trim();
     const int max_players = m_max_players_widget->getValue();
     m_info_widget->setErrorColor();
     if (name.size() < 4 || name.size() > 30)
     {
-        m_info_widget->setText(_("Name has to be between 4 and 30 characters long!"), false);
+        m_info_widget->setText(
+            _("Name has to be between 4 and 30 characters long!"), false);
     }
     else if (max_players < 2 || max_players > 12)
     {
-        m_info_widget->setText(_("The maxinum number of players has to be between 2 and 12."), false);
+        m_info_widget->setText(
+            _("The maxinum number of players has to be between 2 and 12."), false);
     }
     else
     {
 
         m_server_creation_request = new ServerCreationRequest();
-        PlayerManager::setUserDetails(m_server_creation_request, "create", Online::API::SERVER_PATH);
+        PlayerManager::setUserDetails(m_server_creation_request, "create",
+                                      Online::API::SERVER_PATH);
         m_server_creation_request->addParameter("name", name);
         m_server_creation_request->addParameter("max_players", max_players);
         m_server_creation_request->queue();
@@ -147,13 +166,18 @@ void CreateServerScreen::serverCreationRequest()
         return;
     }
     SFXManager::get()->quickSound("anvil");
-}
-// --------------------------------------------------------------------
+}   // serverCreationRequest
+
+// ----------------------------------------------------------------------------
+/** Callbacks from the online create server request.
+ */
 void CreateServerScreen::ServerCreationRequest::callback()
 {
     if (isSuccess())
     {
-        Server *server = new Server(*getXMLData()->getNode("server"));
+        // Must be a WAN server
+        Server *server = new Server(*getXMLData()->getNode("server"),
+                                    /*is lan*/false);
         ServersManager::get()->addServer(server);
         m_created_server_id = server->getServerId();
     }   // isSuccess
@@ -165,7 +189,8 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
 {
     if (name == m_options_widget->m_properties[PROP_ID])
     {
-        const std::string& selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        const std::string& selection =
+            m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             StateManager::get()->escapePressed();
@@ -173,7 +198,7 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
         else if (selection == m_create_widget->m_properties[PROP_ID])
         {
             serverCreationRequest();
-        }
+        }   // is create_widget
     }
 }   // eventCallback
 

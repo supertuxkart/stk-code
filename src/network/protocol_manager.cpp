@@ -18,8 +18,8 @@
 
 #include "network/protocol_manager.hpp"
 
-#include "network/protocol.hpp"
 #include "network/network_manager.hpp"
+#include "network/protocol.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
@@ -28,17 +28,25 @@
 #include <errno.h>
 #include <typeinfo>
 
-void* protocolManagerUpdate(void* data)
+
+ProtocolManager::ProtocolManager()
 {
-    ProtocolManager* manager = static_cast<ProtocolManager*>(data);
-    while(manager && !manager->exit())
-    {
-        manager->update();
-        StkTime::sleep(2);
-    }
-    return NULL;
-}
-void* protocolManagerAsynchronousUpdate(void* data)
+    pthread_mutex_init(&m_asynchronous_protocols_mutex, NULL);
+    pthread_mutex_init(&m_requests_mutex, NULL);
+    pthread_mutex_init(&m_id_mutex, NULL);
+    pthread_mutex_init(&m_exit_mutex, NULL);
+    m_next_protocol_id = 0;
+
+    pthread_mutex_lock(&m_exit_mutex); // will let the update function run
+
+    m_asynchronous_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
+    pthread_create(m_asynchronous_update_thread, NULL,
+                   ProtocolManager::mainLoop, this);
+}   // ProtocolManager
+
+// ----------------------------------------------------------------------------
+
+void* ProtocolManager::mainLoop(void* data)
 {
     ProtocolManager* manager = static_cast<ProtocolManager*>(data);
     manager->m_asynchronous_thread_running = true;
@@ -49,78 +57,56 @@ void* protocolManagerAsynchronousUpdate(void* data)
     }
     manager->m_asynchronous_thread_running = false;
     return NULL;
-}
-
-ProtocolManager::ProtocolManager()
-{
-    pthread_mutex_init(&m_events_mutex, NULL);
-    pthread_mutex_init(&m_protocols_mutex, NULL);
-    pthread_mutex_init(&m_asynchronous_protocols_mutex, NULL);
-    pthread_mutex_init(&m_requests_mutex, NULL);
-    pthread_mutex_init(&m_id_mutex, NULL);
-    pthread_mutex_init(&m_exit_mutex, NULL);
-    m_next_protocol_id = 0;
+}   // protocolManagerAsynchronousUpdate
 
 
-    pthread_mutex_lock(&m_exit_mutex); // will let the update function run
-    /// FIXME used on server because mainloop never running
-    /*if (NetworkManager::getInstance()->isServer())
-    {
-        m_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
-        pthread_create(m_update_thread, NULL, protocolManagerUpdate, this);
-    }*/
-    // always run this one
-    m_asynchronous_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
-    pthread_create(m_asynchronous_update_thread, NULL, protocolManagerAsynchronousUpdate, this);
-}
-
+// ----------------------------------------------------------------------------
 ProtocolManager::~ProtocolManager()
 {
-}
+}   // ~ProtocolManager
 
-
+// ----------------------------------------------------------------------------
 void ProtocolManager::abort()
 {
     pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
     pthread_join(*m_asynchronous_update_thread, NULL); // wait the thread to finish
-    pthread_mutex_lock(&m_events_mutex);
-    pthread_mutex_lock(&m_protocols_mutex);
+    m_events_to_process.lock();
+    m_protocols.lock();
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
     pthread_mutex_lock(&m_requests_mutex);
     pthread_mutex_lock(&m_id_mutex);
-    for (unsigned int i = 0; i < m_protocols.size() ; i++)
-        delete m_protocols[i].protocol;
-    for (unsigned int i = 0; i < m_events_to_process.size() ; i++)
-        delete m_events_to_process[i].event;
-    m_protocols.clear();
+    for (unsigned int i = 0; i < m_protocols.getData().size() ; i++)
+        delete m_protocols.getData()[i].protocol;
+    for (unsigned int i = 0; i < m_events_to_process.getData().size() ; i++)
+        delete m_events_to_process.getData()[i].event;
+    m_protocols.getData().clear();
     m_requests.clear();
-    m_events_to_process.clear();
-    pthread_mutex_unlock(&m_events_mutex);
-    pthread_mutex_unlock(&m_protocols_mutex);
+    m_events_to_process.getData().clear();
+    m_events_to_process.unlock();
+    m_protocols.unlock();
     pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
     pthread_mutex_unlock(&m_requests_mutex);
     pthread_mutex_unlock(&m_id_mutex);
 
-    pthread_mutex_destroy(&m_events_mutex);
-    pthread_mutex_destroy(&m_protocols_mutex);
     pthread_mutex_destroy(&m_asynchronous_protocols_mutex);
     pthread_mutex_destroy(&m_requests_mutex);
     pthread_mutex_destroy(&m_id_mutex);
     pthread_mutex_destroy(&m_exit_mutex);
-}
+}   // abort
 
+// ----------------------------------------------------------------------------
 void ProtocolManager::notifyEvent(Event* event)
 {
-    pthread_mutex_lock(&m_events_mutex);
+    m_events_to_process.lock();
     Event* event2 = new Event(*event);
     // register protocols that will receive this event
     std::vector<unsigned int> protocols_ids;
-    PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
+    PROTOCOL_TYPE searched_protocol = PROTOCOL_NONE;
     if (event2->type == EVENT_TYPE_MESSAGE)
     {
         if (event2->data().size() > 0)
         {
-            searchedProtocol = (PROTOCOL_TYPE)(event2->data()[0]);
+            searched_protocol = (PROTOCOL_TYPE)(event2->data()[0]);
             event2->removeFront(1);
         }
         else
@@ -130,21 +116,26 @@ void ProtocolManager::notifyEvent(Event* event)
     }
     if (event2->type == EVENT_TYPE_CONNECTED)
     {
-        searchedProtocol = PROTOCOL_CONNECTION;
+        searched_protocol = PROTOCOL_CONNECTION;
     }
-    Log::verbose("ProtocolManager", "Received event for protocols of type %d", searchedProtocol);
-    pthread_mutex_lock(&m_protocols_mutex);
-    for (unsigned int i = 0; i < m_protocols.size() ; i++)
+    Log::verbose("ProtocolManager", "Received event for protocols of type %d",
+                  searched_protocol);
+    m_protocols.lock();
+    for (unsigned int i = 0; i < m_protocols.getData().size() ; i++)
     {
-        if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event2->type == EVENT_TYPE_DISCONNECTED) // pass data to protocols even when paused
+        // Pass data to protocols even when paused
+        if (m_protocols.getData()[i].protocol->getProtocolType() == searched_protocol ||
+            event2->type == EVENT_TYPE_DISCONNECTED)
         {
-            protocols_ids.push_back(m_protocols[i].id);
+            protocols_ids.push_back(m_protocols.getData()[i].id);
         }
     }
-    pthread_mutex_unlock(&m_protocols_mutex);
-    if (searchedProtocol == PROTOCOL_NONE) // no protocol was aimed, show the msg to debug
+    m_protocols.unlock();
+    // no protocol was aimed, show the msg to debug
+    if (searched_protocol == PROTOCOL_NONE)
     {
-        Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"", event2->data().std_string().c_str());
+        Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"",
+                    event2->data().std_string().c_str());
     }
 
     if (protocols_ids.size() != 0)
@@ -153,36 +144,47 @@ void ProtocolManager::notifyEvent(Event* event)
         epi.arrival_time = (double)StkTime::getTimeSinceEpoch();
         epi.event = event2;
         epi.protocols_ids = protocols_ids;
-        m_events_to_process.push_back(epi); // add the event to the queue
+        m_events_to_process.getData().push_back(epi); // add the event to the queue
     }
     else
-        Log::warn("ProtocolManager", "Received an event for %d that has no destination protocol.", searchedProtocol);
-    pthread_mutex_unlock(&m_events_mutex);
-}
+        Log::warn("ProtocolManager",
+                  "Received an event for %d that has no destination protocol.",
+                  searched_protocol);
+    m_events_to_process.lock();
+}   // notifyEvent
 
-void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message, bool reliable)
+// ----------------------------------------------------------------------------
+void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message,
+                                  bool reliable)
 {
     NetworkString newMessage;
     newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
     newMessage += message;
     NetworkManager::getInstance()->sendPacket(newMessage, reliable);
-}
+}   // sendMessage
 
-void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer, const NetworkString& message, bool reliable)
+// ----------------------------------------------------------------------------
+void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer,
+                                  const NetworkString& message, bool reliable)
 {
     NetworkString newMessage;
     newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
     newMessage += message;
     NetworkManager::getInstance()->sendPacket(peer, newMessage, reliable);
-}
-void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer, const NetworkString& message, bool reliable)
+}   // sendMessage
+
+// ----------------------------------------------------------------------------
+void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer,
+                                        const NetworkString& message,
+                                        bool reliable)
 {
     NetworkString newMessage;
     newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
     newMessage += message;
     NetworkManager::getInstance()->sendPacketExcept(peer, newMessage, reliable);
-}
+}   // sendMessageExcept
 
+// ----------------------------------------------------------------------------
 uint32_t ProtocolManager::requestStart(Protocol* protocol)
 {
     // create the request
@@ -199,8 +201,9 @@ uint32_t ProtocolManager::requestStart(Protocol* protocol)
     pthread_mutex_unlock(&m_requests_mutex);
 
     return info.id;
-}
+}   // requestStart
 
+// ----------------------------------------------------------------------------
 void ProtocolManager::requestStop(Protocol* protocol)
 {
     if (!protocol)
@@ -213,8 +216,9 @@ void ProtocolManager::requestStop(Protocol* protocol)
     pthread_mutex_lock(&m_requests_mutex);
     m_requests.push_back(req);
     pthread_mutex_unlock(&m_requests_mutex);
-}
+}   // requestStop
 
+// ----------------------------------------------------------------------------
 void ProtocolManager::requestPause(Protocol* protocol)
 {
     if (!protocol)
@@ -227,8 +231,9 @@ void ProtocolManager::requestPause(Protocol* protocol)
     pthread_mutex_lock(&m_requests_mutex);
     m_requests.push_back(req);
     pthread_mutex_unlock(&m_requests_mutex);
-}
+}   // requestPause
 
+// ----------------------------------------------------------------------------
 void ProtocolManager::requestUnpause(Protocol* protocol)
 {
     if (!protocol)
@@ -241,8 +246,9 @@ void ProtocolManager::requestUnpause(Protocol* protocol)
     pthread_mutex_lock(&m_requests_mutex);
     m_requests.push_back(req);
     pthread_mutex_unlock(&m_requests_mutex);
-}
+}   // requestUnpause
 
+// ----------------------------------------------------------------------------
 void ProtocolManager::requestTerminate(Protocol* protocol)
 {
     if (!protocol)
@@ -264,86 +270,111 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
     }
     m_requests.push_back(req);
     pthread_mutex_unlock(&m_requests_mutex);
-}
+}   // requestTerminate
 
+// ----------------------------------------------------------------------------
 void ProtocolManager::startProtocol(ProtocolInfo protocol)
 {
     // add the protocol to the protocol vector so that it's updated
-    pthread_mutex_lock(&m_protocols_mutex);
+    m_protocols.lock();
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
-    Log::info("ProtocolManager", "A %s protocol with id=%u has been started. There are %ld protocols running.", typeid(*protocol.protocol).name(), protocol.id, m_protocols.size()+1);
-    m_protocols.push_back(protocol);
+    Log::info("ProtocolManager",
+        "A %s protocol with id=%u has been started. There are %ld protocols running.", 
+              typeid(*protocol.protocol).name(), protocol.id,
+              m_protocols.getData().size()+1);
+    m_protocols.getData().push_back(protocol);
     // setup the protocol and notify it that it's started
     protocol.protocol->setListener(this);
     protocol.protocol->setup();
-    pthread_mutex_unlock(&m_protocols_mutex);
+    m_protocols.unlock();
     pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
-}
+}   // startProtocol
+
+// ----------------------------------------------------------------------------
 void ProtocolManager::stopProtocol(ProtocolInfo protocol)
 {
+}   // stopProtocol
 
-}
+// ----------------------------------------------------------------------------
 void ProtocolManager::pauseProtocol(ProtocolInfo protocol)
 {
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    // FIXME Does this need to be locked?
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (m_protocols[i].protocol == protocol.protocol && m_protocols[i].state == PROTOCOL_STATE_RUNNING)
+        ProtocolInfo &p = m_protocols.getData()[i];
+        if (p.protocol == protocol.protocol &&
+            p.state == PROTOCOL_STATE_RUNNING)
         {
-            m_protocols[i].state = PROTOCOL_STATE_PAUSED;
-            m_protocols[i].protocol->pause();
+            p.state = PROTOCOL_STATE_PAUSED;
+            p.protocol->pause();
         }
     }
-}
+}   // pauseProtocol
+
+// ----------------------------------------------------------------------------
 void ProtocolManager::unpauseProtocol(ProtocolInfo protocol)
 {
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    // FIXME Does this need to be locked??
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (m_protocols[i].protocol == protocol.protocol && m_protocols[i].state == PROTOCOL_STATE_PAUSED)
+        ProtocolInfo &p = m_protocols.getData()[i];
+        if (p.protocol == protocol.protocol &&
+            p.state == PROTOCOL_STATE_PAUSED)
         {
-            m_protocols[i].state = PROTOCOL_STATE_RUNNING;
-            m_protocols[i].protocol->unpause();
+            p.state = PROTOCOL_STATE_RUNNING;
+            p.protocol->unpause();
         }
     }
-}
+}   // unpauseProtocol
+
+// ----------------------------------------------------------------------------
 void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
 {
-    pthread_mutex_lock(&m_protocols_mutex); // be sure that noone accesses the protocols vector while we erase a protocol
+    // Be sure that noone accesses the protocols vector while we erase a protocol
+    m_protocols.lock();
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
     int offset = 0;
     std::string protocol_type = typeid(*protocol.protocol).name();
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (m_protocols[i-offset].protocol == protocol.protocol)
+        if (m_protocols.getData()[i-offset].protocol == protocol.protocol)
         {
-            delete m_protocols[i].protocol;
-            m_protocols.erase(m_protocols.begin()+(i-offset), m_protocols.begin()+(i-offset)+1);
+            delete m_protocols.getData()[i].protocol;
+            m_protocols.getData().erase(m_protocols.getData().begin()+(i-offset),
+                                        m_protocols.getData().begin()+(i-offset)+1);
             offset++;
         }
     }
-    Log::info("ProtocolManager", "A %s protocol has been terminated. There are %ld protocols running.", protocol_type.c_str(), m_protocols.size());
+    Log::info("ProtocolManager",
+              "A %s protocol has been terminated. There are %ld protocols running.",
+              protocol_type.c_str(), m_protocols.getData().size());
     pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
-    pthread_mutex_unlock(&m_protocols_mutex);
-}
+    m_protocols.unlock();
+}   // protocolTerminated
 
+// ----------------------------------------------------------------------------
 bool ProtocolManager::propagateEvent(EventProcessingInfo* event, bool synchronous)
 {
     int index = 0;
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (event->protocols_ids[index] == m_protocols[i].id)
+        if (event->protocols_ids[index] == m_protocols.getData()[i].id)
         {
             bool result = false;
             if (synchronous)
-                result = m_protocols[i].protocol->notifyEvent(event->event);
+                result = m_protocols.getData()[i].protocol
+                         ->notifyEvent(event->event);
             else
-                result = m_protocols[i].protocol->notifyEventAsynchronous(event->event);
+                result = m_protocols.getData()[i].protocol
+                         ->notifyEventAsynchronous(event->event);
             if (result)
                 event->protocols_ids.pop_back();
             else
                 index++;
         }
     }
-    if (event->protocols_ids.size() == 0 || (StkTime::getTimeSinceEpoch()-event->arrival_time) >= TIME_TO_KEEP_EVENTS)
+    if (event->protocols_ids.size() == 0 || 
+        (StkTime::getTimeSinceEpoch()-event->arrival_time) >= TIME_TO_KEEP_EVENTS)
     {
         // because we made a copy of the event
         delete event->event->peer; // no more need of that
@@ -351,57 +382,64 @@ bool ProtocolManager::propagateEvent(EventProcessingInfo* event, bool synchronou
         return true;
     }
     return false;
-}
+}   // propagateEvent
 
+// ----------------------------------------------------------------------------
 void ProtocolManager::update()
 {
     // before updating, notice protocols that they have received events
-    pthread_mutex_lock(&m_events_mutex); // secure threads
-    int size = (int)m_events_to_process.size();
+    m_events_to_process.lock();
+    int size = (int)m_events_to_process.getData().size();
     int offset = 0;
     for (int i = 0; i < size; i++)
     {
-        bool result = propagateEvent(&m_events_to_process[i+offset], true);
+        bool result = propagateEvent(&m_events_to_process.getData()[i+offset], true);
         if (result)
         {
-            m_events_to_process.erase(m_events_to_process.begin()+i+offset,m_events_to_process.begin()+i+offset+1);
+            m_events_to_process.getData()
+                               .erase(m_events_to_process.getData().begin()+i+offset,
+                                      m_events_to_process.getData().begin()+i+offset+1);
             offset --;
         }
     }
-    pthread_mutex_unlock(&m_events_mutex); // release the mutex
+    m_events_to_process.unlock();
     // now update all protocols
-    pthread_mutex_lock(&m_protocols_mutex);
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    m_protocols.lock();
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (m_protocols[i].state == PROTOCOL_STATE_RUNNING)
-            m_protocols[i].protocol->update();
+        if (m_protocols.getData()[i].state == PROTOCOL_STATE_RUNNING)
+            m_protocols.getData()[i].protocol->update();
     }
-    pthread_mutex_unlock(&m_protocols_mutex);
-}
+    m_protocols.unlock();
+}   // update
 
+// ----------------------------------------------------------------------------
 void ProtocolManager::asynchronousUpdate()
 {
     // before updating, notice protocols that they have received information
-    pthread_mutex_lock(&m_events_mutex); // secure threads
-    int size = (int)m_events_to_process.size();
+    m_events_to_process.lock();
+    int size = (int)m_events_to_process.getData().size();
     int offset = 0;
     for (int i = 0; i < size; i++)
     {
-        bool result = propagateEvent(&m_events_to_process[i+offset], false);
+        bool result = propagateEvent(&m_events_to_process.getData()[i+offset], false);
         if (result)
         {
-            m_events_to_process.erase(m_events_to_process.begin()+i+offset,m_events_to_process.begin()+i+offset+1);
+            m_events_to_process.getData()
+                               .erase(m_events_to_process.getData().begin()+i+offset,
+                                      m_events_to_process.getData().begin()+i+offset+1);
             offset --;
         }
     }
-    pthread_mutex_unlock(&m_events_mutex); // release the mutex
+    m_events_to_process.unlock();
 
     // now update all protocols that need to be updated in asynchronous mode
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    // FIXME: does m_protocols need to be locked???
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (m_protocols[i].state == PROTOCOL_STATE_RUNNING)
-            m_protocols[i].protocol->asynchronousUpdate();
+        if (m_protocols.getData()[i].state == PROTOCOL_STATE_RUNNING)
+            m_protocols.getData()[i].protocol->asynchronousUpdate();
     }
     pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
 
@@ -431,79 +469,90 @@ void ProtocolManager::asynchronousUpdate()
     }
     m_requests.clear();
     pthread_mutex_unlock(&m_requests_mutex);
-}
+}   // asynchronousUpdate
 
-int ProtocolManager::runningProtocolsCount()
-{
-    return (int)m_protocols.size();
-}
-
+// ----------------------------------------------------------------------------
 PROTOCOL_STATE ProtocolManager::getProtocolState(uint32_t id)
 {
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    //FIXME that actually need a lock, but it also can be called from
+    // a locked section anyway
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (m_protocols[i].id == id) // we know a protocol with that id
-            return m_protocols[i].state; // return its state
+        if (m_protocols.getData()[i].id == id) // we know a protocol with that id
+            return m_protocols.getData()[i].state;
     }
     // the protocol isn't running right now
     for (unsigned int i = 0; i < m_requests.size(); i++)
     {
-        if (m_requests[i].protocol_info.id == id) // the protocol is going to be started
+        // the protocol is going to be started
+        if (m_requests[i].protocol_info.id == id)
             return PROTOCOL_STATE_RUNNING; // we can say it's running
     }
     return PROTOCOL_STATE_TERMINATED; // else, it's already finished
-}
+}   // getProtocolState
 
+// ----------------------------------------------------------------------------
 PROTOCOL_STATE ProtocolManager::getProtocolState(Protocol* protocol)
 {
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    // FIXME Does this need to be locked?
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (m_protocols[i].protocol == protocol) // the protocol is known
-            return m_protocols[i].state; // return its state
+        if (m_protocols.getData()[i].protocol == protocol) // the protocol is known
+            return  m_protocols.getData()[i].state;
     }
     for (unsigned int i = 0; i < m_requests.size(); i++)
     {
-        if (m_requests[i].protocol_info.protocol == protocol) // the protocol is going to be started
+        // the protocol is going to be started
+        if (m_requests[i].protocol_info.protocol == protocol)
             return PROTOCOL_STATE_RUNNING; // we can say it's running
     }
-    return PROTOCOL_STATE_TERMINATED; // we don't know this protocol at all, it's finished
-}
+    // we don't know this protocol at all, it's finished
+    return PROTOCOL_STATE_TERMINATED;
+}   // getProtocolState
 
+// ----------------------------------------------------------------------------
 uint32_t ProtocolManager::getProtocolID(Protocol* protocol)
 {
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    // FIXME: Does this need to be locked?
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (m_protocols[i].protocol == protocol)
-            return m_protocols[i].id;
+        if (m_protocols.getData()[i].protocol == protocol)
+            return m_protocols.getData()[i].id;
     }
     return 0;
-}
+}   // getProtocolID
 
+// ----------------------------------------------------------------------------
 Protocol* ProtocolManager::getProtocol(uint32_t id)
 {
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    // FIXME: does m_protocols need to be locked??
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (m_protocols[i].id == id)
-            return m_protocols[i].protocol;
+        if (m_protocols.getData()[i].id == id)
+            return m_protocols.getData()[i].protocol;
     }
     return NULL;
-}
+}   // getProtocol
 
+// ----------------------------------------------------------------------------
 Protocol* ProtocolManager::getProtocol(PROTOCOL_TYPE type)
 {
-    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    // FIXME: Does m_protocols need to be locked?
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
-        if (m_protocols[i].protocol->getProtocolType() == type)
-            return m_protocols[i].protocol;
+        if (m_protocols.getData()[i].protocol->getProtocolType() == type)
+            return m_protocols.getData()[i].protocol;
     }
     return NULL;
-}
+}   // getProtocol
 
+// ----------------------------------------------------------------------------
 bool ProtocolManager::isServer()
 {
     return NetworkManager::getInstance()->isServer();
-}
+}   // isServer
 
+// ----------------------------------------------------------------------------
 int ProtocolManager::exit()
 {
   switch(pthread_mutex_trylock(&m_exit_mutex)) {
@@ -514,14 +563,15 @@ int ProtocolManager::exit()
       return 0;
   }
   return 1;
-}
+}   // exit
 
+// ----------------------------------------------------------------------------
 void ProtocolManager::assignProtocolId(ProtocolInfo* protocol_info)
 {
     pthread_mutex_lock(&m_id_mutex);
     protocol_info->id = m_next_protocol_id;
     m_next_protocol_id++;
     pthread_mutex_unlock(&m_id_mutex);
-}
+}   // assignProtocolId
 
 
