@@ -81,11 +81,11 @@ public:
     // ------------------------------------------------------------------------
     scene::ICameraSceneNode* getSunCam() { return m_sun_cam; }
     // ------------------------------------------------------------------------
-    core::matrix4& getRHMatrix() { return m_rh_matrix;  }
+    const core::matrix4& getRHMatrix() const { return m_rh_matrix;  }
     // ------------------------------------------------------------------------
-    core::vector3df& getRHExtend() { return m_rh_extend;  }
+    const core::vector3df& getRHExtend() const { return m_rh_extend;  }
     // ------------------------------------------------------------------------
-    core::matrix4& getRSMMatrix() { return m_rsm_matrix; }
+    const core::matrix4& getRSMMatrix() const { return m_rsm_matrix; }
     // ------------------------------------------------------------------------
     std::vector<core::matrix4>& getSunOrthoMatrices()
     {

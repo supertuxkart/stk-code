@@ -21,7 +21,6 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/shadow_matrices.hpp"
 #include "graphics/stk_scene_manager.hpp"
 #include "modes/world.hpp"
 #include "utils/profiler.hpp"
@@ -1756,7 +1755,8 @@ static void multidrawShadow(unsigned i, Args ...args)
 
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderShadows(const FrameBuffer& shadow_framebuffer)
+void GeometryPasses::renderShadows(const ShadowMatrices& shadow_matrices,
+                                   const FrameBuffer& shadow_framebuffer)
 {
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
@@ -1822,7 +1822,7 @@ void GeometryPasses::renderShadows(const FrameBuffer& shadow_framebuffer)
         if (CVS->isARBTextureViewUsable())
         {
             const std::pair<float, float>* shadow_scales 
-                = irr_driver->getShadowMatrices()->getShadowScales();
+                = shadow_matrices.getShadowScales();
 
             for (unsigned i = 0; i < 2; i++)
             {
@@ -1927,15 +1927,14 @@ void multidrawRSM(Args...args)
 }   // multidrawRSM
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderReflectiveShadowMap(const FrameBuffer& reflective_shadow_map_framebuffer)
+void GeometryPasses::renderReflectiveShadowMap(const ShadowMatrices& shadow_matrices,
+                                               const FrameBuffer& reflective_shadow_map_framebuffer)
 {
-    if (irr_driver->getShadowMatrices()->isRSMMapAvail())
-        return;
     ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_RSM));
     reflective_shadow_map_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const core::matrix4 &rsm_matrix = irr_driver->getShadowMatrices()->getRSMMatrix();
+    const core::matrix4 &rsm_matrix = shadow_matrices.getRSMMatrix();
     drawRSM<DefaultMaterial, 3, 1>(rsm_matrix);
     drawRSM<AlphaRef, 3, 1>(rsm_matrix);
     drawRSM<NormalMat, 3, 1>(rsm_matrix);
@@ -1963,5 +1962,4 @@ void GeometryPasses::renderReflectiveShadowMap(const FrameBuffer& reflective_sha
         renderRSMShadow<NormalMat>(rsm_matrix);
         renderRSMShadow<DetailMat>(rsm_matrix);
     }
-    irr_driver->getShadowMatrices()->setRSMMapAvail(true);
 }   // renderRSM

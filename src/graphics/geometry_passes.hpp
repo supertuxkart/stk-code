@@ -19,6 +19,7 @@
 #define HEADER_GEOMETRY_PASSES_HPP
 
 #include "graphics/glwrap.hpp"
+#include "graphics/shadow_matrices.hpp"
 #include <ITexture.h>
 
 class GeometryPasses
@@ -38,8 +39,10 @@ public:
                                 unsigned render_target_half_red);
     void renderNormalsVisualisation();
     void renderTransparent(unsigned render_target);
-    void renderShadows(const FrameBuffer& shadow_framebuffer);
-    void renderReflectiveShadowMap(const FrameBuffer& reflective_shadow_map_framebuffer);
+    void renderShadows(const ShadowMatrices& shadow_matrices,
+                       const FrameBuffer& shadow_framebuffer);
+    void renderReflectiveShadowMap(const ShadowMatrices& shadow_matrices,
+                                   const FrameBuffer& reflective_shadow_map_framebuffer);
 
 
 };

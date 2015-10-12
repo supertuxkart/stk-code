@@ -18,7 +18,6 @@
 #ifndef HEADER_ABSTRACT_RENDERER_HPP
 #define HEADER_ABSTRACT_RENDERER_HPP
 
-#include "graphics/irr_driver.hpp"
 #include <irrlicht.h>
 #include <vector>
 
@@ -27,6 +26,8 @@ struct GlowData;
 class AbstractRenderer
 {
 protected:
+    irr::core::vector2df m_current_screen_size;
+    
     bool                 m_wireframe;
     bool                 m_mipviz;
 
@@ -42,6 +43,9 @@ public:
     AbstractRenderer();
     virtual ~AbstractRenderer(){}
 
+    virtual void addSunLight(const irr::core::vector3df &pos){}
+
+    
     virtual void render(float dt) = 0;
 
     virtual void renderScene(irr::scene::ICameraSceneNode * const camnode,
@@ -51,6 +55,18 @@ public:
     virtual void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                                       float dt) = 0;
 
+    virtual void computeMatrixesAndCameras(irr::scene::ICameraSceneNode * const camnode,
+                                   size_t width, size_t height) {}
+
+    virtual void resetShadowCamNodes() {}
+
+ 
+     // ------------------------------------------------------------------------
+    const irr::core::vector2df &getCurrentScreenSize() const
+    {
+        return m_current_screen_size;
+    }
+ 
     // ------------------------------------------------------------------------
     void toggleWireframe() { m_wireframe = !m_wireframe; }
     // ------------------------------------------------------------------------

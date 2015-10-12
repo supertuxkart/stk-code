@@ -21,13 +21,17 @@
 #include "graphics/abstract_renderer.hpp"
 #include "graphics/geometry_passes.hpp"
 #include "graphics/lighting_passes.hpp"
+#include "graphics/shadow_matrices.hpp"
+
 
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
     GeometryPasses  m_geometry_passes;
     LightingPasses  m_lighting_passes;
+    ShadowMatrices  m_shadow_matrices;
 
+    
     void compressPowerUpTextures();
     void setOverrideMaterial();
     std::vector<GlowData> updateGlowingList();
@@ -35,6 +39,11 @@ private:
     
     void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                           float dt);
+
+    void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
+                                   size_t width, size_t height);
+    
+    void resetShadowCamNodes(){m_shadow_matrices.resetShadowCamNodes();}
     
     void renderScene(irr::scene::ICameraSceneNode * const camnode,
                      std::vector<GlowData>& glows,
@@ -46,8 +55,9 @@ private:
 
 public:
     ShaderBasedRenderer();
-    ~ShaderBasedRenderer();
 
+    void addSunLight(const irr::core::vector3df &pos) override;
+    
     void render(float dt);
 };
 

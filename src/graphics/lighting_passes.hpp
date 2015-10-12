@@ -33,7 +33,7 @@ public:
     void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                           float dt);
     
-    void renderGlobalIllumination(  ShadowMatrices *shadow_matrices,
+    void renderGlobalIllumination(  const ShadowMatrices& shadow_matrices,
                                     const FrameBuffer& radiance_hint_framebuffer,
                                     const FrameBuffer& reflective_shadow_map_framebuffer,
                                     const FrameBuffer& diffuse_framebuffer);

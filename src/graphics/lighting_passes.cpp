@@ -407,7 +407,7 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
 }   // updateLightsInfo
 
 // ----------------------------------------------------------------------------
-void LightingPasses::renderGlobalIllumination(  ShadowMatrices *shadow_matrices,
+void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_matrices,
                                                 const FrameBuffer& radiance_hint_framebuffer,
                                                 const FrameBuffer& reflective_shadow_map_framebuffer,
                                                 const FrameBuffer& diffuse_framebuffer)
@@ -428,9 +428,9 @@ void LightingPasses::renderGlobalIllumination(  ShadowMatrices *shadow_matrices,
         for (unsigned i = 0; i < 32; i++)
         {
             NVWorkaroundRadianceHintsConstructionShader::getInstance()
-                ->setUniforms(shadow_matrices->getRSMMatrix(), 
-                              shadow_matrices->getRHMatrix(),
-                              shadow_matrices->getRHExtend(), i,
+                ->setUniforms(shadow_matrices.getRSMMatrix(), 
+                              shadow_matrices.getRHMatrix(),
+                              shadow_matrices.getRHExtend(), i,
                               irr_driver->getSunColor());
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
@@ -445,9 +445,9 @@ void LightingPasses::renderGlobalIllumination(  ShadowMatrices *shadow_matrices,
                 reflective_shadow_map_framebuffer.getDepthTexture()
         );
         RadianceHintsConstructionShader::getInstance()
-            ->setUniforms(shadow_matrices->getRSMMatrix(),
-                          shadow_matrices->getRHMatrix(), 
-                          shadow_matrices->getRHExtend(),
+            ->setUniforms(shadow_matrices.getRSMMatrix(),
+                          shadow_matrices.getRHMatrix(), 
+                          shadow_matrices.getRHExtend(),
                           irr_driver->getSunColor());
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
     }
@@ -456,8 +456,8 @@ void LightingPasses::renderGlobalIllumination(  ShadowMatrices *shadow_matrices,
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
         diffuse_framebuffer.bind();
-        irr_driver->getPostProcessing()->renderGI(  shadow_matrices->getRHMatrix(),
-                                                    shadow_matrices->getRHExtend(),
+        irr_driver->getPostProcessing()->renderGI(  shadow_matrices.getRHMatrix(),
+                                                    shadow_matrices.getRHExtend(),
                                                     radiance_hint_framebuffer);
     }
 }

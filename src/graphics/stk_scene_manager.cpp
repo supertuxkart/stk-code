@@ -563,7 +563,7 @@ static void FixBoundingBoxes(scene::ISceneNode* node)
     }
 }
 
-void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
+void IrrDriver::PrepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICameraSceneNode *camnode)
 {
     windDir = getWindDir();
     ListBlendTransparent::getInstance()->clear();
@@ -604,10 +604,10 @@ PROFILER_PUSH_CPU_MARKER("- culling", 0xFF, 0xFF, 0x0);
     bool cam = false, rsmcam = false;
     bool shadowcam[4] = { false, false, false, false };
     parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, 
-                      getShadowMatrices()->getShadowCamNodes(),
-                      getShadowMatrices()->getSunCam(), cam,
+                      shadow_matrices.getShadowCamNodes(),
+                      shadow_matrices.getSunCam(), cam,
                       shadowcam, rsmcam,
-                      !getShadowMatrices()->isRSMMapAvail());
+                      !shadow_matrices.isRSMMapAvail());
 PROFILER_POP_CPU_MARKER();
 
     // Add a 1 s timeout
@@ -815,7 +815,7 @@ PROFILER_POP_CPU_MARKER();
             }
         }
 #pragma omp section
-        if (!getShadowMatrices()->isRSMMapAvail())
+        if (!shadow_matrices.isRSMMapAvail())
         {
             size_t offset = 0, current_cmd = 0;
             if (!CVS->supportsAsyncInstanceUpload())

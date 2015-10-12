@@ -216,7 +216,6 @@ private:
     Wind                 *m_wind;
     /** RTTs. */
     RTT                *m_rtts;
-    core::vector2df    m_current_screen_size;
     core::dimension2du m_actual_screen_size;
 
     /** Additional details to be shown in case that a texture is not found.
@@ -245,7 +244,6 @@ private:
     enum {RES_CHANGE_NONE, RES_CHANGE_YES,
           RES_CHANGE_CANCEL}                m_resolution_changing;
 
-    ShadowMatrices *m_shadow_matrices;
 
 public:
     /** A simple class to store video resolutions. */
@@ -328,7 +326,7 @@ public: //TODO: move into renderer class
     void renderSSAO();
     void renderShadowsDebug();
     void doScreenShot();    
-    void PrepareDrawCalls(scene::ICameraSceneNode *camnode);
+    void PrepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICameraSceneNode *camnode);
 public:
          IrrDriver();
         ~IrrDriver();
@@ -652,8 +650,6 @@ public:
     // ------------------------------------------------------------------------
     class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
     // ------------------------------------------------------------------------
-    ShadowMatrices *getShadowMatrices() { return m_shadow_matrices;  }
-    // ------------------------------------------------------------------------
     
     void cleanSunInterposer();
     void createSunInterposer();
@@ -692,7 +688,7 @@ public:
     // ------------------------------------------------------------------------
     const core::vector2df &getCurrentScreenSize() const
     {
-        return m_current_screen_size;
+        return m_renderer->getCurrentScreenSize();
     }
     // ------------------------------------------------------------------------
     const core::dimension2du getActualScreenSize() const
@@ -755,8 +751,7 @@ public:
 
     void updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
                                                          size_t height);
-    void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
-                                   size_t width, size_t height);
+
     void uploadLightingData();
 
 

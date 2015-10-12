@@ -109,7 +109,6 @@ const int MIN_SUPPORTED_WIDTH  = 1024;
  */
 IrrDriver::IrrDriver()
 {
-    m_shadow_matrices     = NULL;
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
     m_device              = createDevice(video::EDT_NULL,
@@ -158,8 +157,6 @@ IrrDriver::~IrrDriver()
     m_device = NULL;
     m_modes.clear();
 
-    delete m_shadow_matrices;
-    m_shadow_matrices = NULL;
     if (CVS->isGLSL())
     {
         Shaders::destroy();
@@ -205,14 +202,6 @@ GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 {
     return m_perf_query[i];
 }
-
-// ----------------------------------------------------------------------------
-void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
-                                          size_t width, size_t height)
-{
-    m_current_screen_size = core::vector2df(float(width), float(height));
-    m_shadow_matrices->computeMatrixesAndCameras(camnode, width, height);
-}   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
 
@@ -627,7 +616,6 @@ void IrrDriver::initDevice()
     // so let's decide ourselves...)
     m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
-    m_shadow_matrices = new ShadowMatrices();
 }   // initDevice
 
 // ----------------------------------------------------------------------------
@@ -1762,7 +1750,7 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
 // ----------------------------------------------------------------------------
 void IrrDriver::setRTT(RTT* rtt)
 {
-    m_shadow_matrices->resetShadowCamNodes();
+    m_renderer->resetShadowCamNodes();
     m_rtts = rtt;
 }
 // ----------------------------------------------------------------------------
@@ -2394,7 +2382,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
         {
             //m_sun_interposer->setPosition(pos);
             //m_sun_interposer->updateAbsolutePosition();
-            m_shadow_matrices->addLight(pos);
+            m_renderer->addSunLight(pos);
 
             ((WaterShaderProvider *) Shaders::getCallback(ES_WATER) )
                                                          ->setSunPosition(pos);

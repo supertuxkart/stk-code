@@ -24,7 +24,6 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/shadow_matrices.hpp"
 #include "graphics/stk_scene_manager.hpp"
 #include "graphics/texture_manager.hpp"
 #include "items/item_manager.hpp"
@@ -151,10 +150,17 @@ void ShaderBasedRenderer::updateLightsInfo(scene::ICameraSceneNode * const camno
     m_lighting_passes.updateLightsInfo(camnode, dt);
 }
 
+// ----------------------------------------------------------------------------
+void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
+                                                    size_t width, size_t height)
+{
+    m_current_screen_size = core::vector2df(float(width), float(height));
+    m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height);
+}   // computeMatrixesAndCameras
+
 // ============================================================================
 void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
-    ShadowMatrices *shadow_matrices = irr_driver->getShadowMatrices();
     PostProcessing *post_processing = irr_driver->getPostProcessing();
     
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
@@ -162,23 +168,29 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, s
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
-    irr_driver->PrepareDrawCalls(camnode);
+    irr_driver->PrepareDrawCalls(m_shadow_matrices, camnode);
     PROFILER_POP_CPU_MARKER();
     // Shadows
     {
         // To avoid wrong culling, use the largest view possible
-        irr_driver->getSceneManager()->setActiveCamera(shadow_matrices->getSunCam());
+        irr_driver->getSceneManager()->setActiveCamera(m_shadow_matrices.getSunCam());
         if (CVS->isDefferedEnabled() &&
             CVS->isShadowEnabled() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
-            m_geometry_passes.renderShadows(irr_driver->getRTT()->getShadowFrameBuffer());
+            m_geometry_passes.renderShadows(m_shadow_matrices,
+                                            irr_driver->getRTT()->getShadowFrameBuffer());
             PROFILER_POP_CPU_MARKER();
             if (CVS->isGlobalIlluminationEnabled())
             {
-                PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
-                m_geometry_passes.renderReflectiveShadowMap(irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer()); //TODO: move somewhere else as RSM are computed only once per track
-                PROFILER_POP_CPU_MARKER();
+                if (!m_shadow_matrices.isRSMMapAvail())
+                {
+                    PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
+                    m_geometry_passes.renderReflectiveShadowMap(m_shadow_matrices, 
+                                                                irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer()); //TODO: move somewhere else as RSM are computed only once per track
+                    m_shadow_matrices.setRSMMapAvail(true);
+                    PROFILER_POP_CPU_MARKER();
+                }
             }
         }
         irr_driver->getSceneManager()->setActiveCamera(camnode);
@@ -228,7 +240,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, s
         if (CVS->isDefferedEnabled())
             if (CVS->isGlobalIlluminationEnabled() && hasShadow)
             {    
-                m_lighting_passes.renderGlobalIllumination(irr_driver->getShadowMatrices(),
+                m_lighting_passes.renderGlobalIllumination( m_shadow_matrices,
                                                             irr_driver->getRTT()->getRadianceHintFrameBuffer(),
                                                             irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer(),
                                                             irr_driver->getRTT()->getFBO(FBO_DIFFUSE));
@@ -308,16 +320,16 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, s
         post_processing->renderRHDebug(rtts->getRadianceHintFrameBuffer().getRTT()[0],
                                        rtts->getRadianceHintFrameBuffer().getRTT()[1], 
                                        rtts->getRadianceHintFrameBuffer().getRTT()[2],
-                                       shadow_matrices->getRHMatrix(),
-                                       shadow_matrices->getRHExtend());
+                                       m_shadow_matrices.getRHMatrix(),
+                                       m_shadow_matrices.getRHExtend());
     }
 
     if (irr_driver->getGI())
     {
         glDisable(GL_BLEND);
         rtts->getFBO(FBO_COLORS).bind();
-        post_processing->renderGI(shadow_matrices->getRHMatrix(),
-                                  shadow_matrices->getRHExtend(),
+        post_processing->renderGI(m_shadow_matrices.getRHMatrix(),
+                                  m_shadow_matrices.getRHExtend(),
                                   rtts->getRadianceHintFrameBuffer());
     }
 
@@ -444,7 +456,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     }
     else if (irr_driver->getShadowViz())
     {
-        irr_driver->getShadowMatrices()->renderShadowsDebug();
+        m_shadow_matrices.renderShadowsDebug();
     }
     else
     {
@@ -457,15 +469,15 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 }
 
 
-ShaderBasedRenderer::ShaderBasedRenderer():AbstractRenderer()
+ShaderBasedRenderer::ShaderBasedRenderer():AbstractRenderer(), m_shadow_matrices()
 {
 
 }
 
-ShaderBasedRenderer::~ShaderBasedRenderer()
-{
-
+void ShaderBasedRenderer::addSunLight(const core::vector3df &pos) {
+    m_shadow_matrices.addLight(pos);
 }
+
 
 void ShaderBasedRenderer::render(float dt)
 {
@@ -515,8 +527,8 @@ void ShaderBasedRenderer::render(float dt)
         m_lighting_passes.updateLightsInfo(camnode, dt);
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
-        irr_driver->computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
-        irr_driver->getShadowMatrices()->updateSunOrthoMatrices();
+        computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
+        m_shadow_matrices.updateSunOrthoMatrices();
         irr_driver->uploadLightingData(); //TODO: move method; update "global" lighting (sun and spherical harmonics)
         PROFILER_POP_CPU_MARKER();
         renderScene(camnode, glows, dt, track->hasShadows(), false); 
