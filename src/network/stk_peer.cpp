@@ -80,9 +80,9 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host,
         return false;
     }
     Log::verbose("STKPeer", "Connecting to %i.%i.%i.%i:%i.\nENetPeer address "
-                "is %ld", (peer->address.host>>0)&0xff,
+                "is %p", (peer->address.host>>0)&0xff,
                 (peer->address.host>>8)&0xff,(peer->address.host>>16)&0xff,
-                (peer->address.host>>24)&0xff,peer->address.port, (long int)(peer));
+                (peer->address.host>>24)&0xff,peer->address.port, peer);
     return true;
 }
 
