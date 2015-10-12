@@ -92,7 +92,7 @@ void getFontProperties::loadChar(const core::stringc langname, FontUse& fu, floa
         fu = F_DEFAULT; //Default font file
 
     usedchar = translations->getCurrentAllChar(); //Loading unique characters
-    for (int i = 33; i < 256; ++i)
+    for (int i = 32; i < 256; ++i)
         usedchar.insert((wchar_t)i); //Include basic Latin too
     usedchar.insert((wchar_t)160);   //Non-breaking space
     usedchar.insert((wchar_t)215);   //Used on resolution selection screen (X).
@@ -115,27 +115,28 @@ void getFontProperties::loadBoldChar(float scale)
 {
     size = (int)(120*scale); //Set default size for Bold Text
 
-    //Start to insert from 65 (char code of A) to 640 which is the end+1 of latin-extended-B
-    for (int i = 65; i < 640; ++i)
-        usedchar.insert((wchar_t)i);
+    usedchar = translations->getCurrentAllChar(); //Loading unique characters
+    for (int i = 65; i < 256; ++i)
+        usedchar.insert((wchar_t)i); //Include basic Latin too, starting from A (char code 65)
 
     setlocale(LC_ALL, "en_US.UTF8");
     std::set<wchar_t>::iterator it = usedchar.begin();
     while (it != usedchar.end())
     {
-        if (iswlower((wchar_t)*it) || !iswalpha((wchar_t)*it))
+        //Only use all capital letter for bold char with latin (<640 of char code).
+        if ((iswlower((wchar_t)*it) || !iswalpha((wchar_t)*it)) && *it < 640)
             it = usedchar.erase(it);
         else
             ++it;
     }
 
     //Final hack to make stk display title properly
-    //33 , 160, 304 is char code to "!", Non-breaking space, and Capital I-dotted
-    //Remove Capital I-dotted with using "I" altogether.
-
-    usedchar.insert((wchar_t)33);
-    usedchar.insert((wchar_t)160);
-    usedchar.erase((wchar_t)304);
+    for (int i = 32; i < 65; ++i)
+        usedchar.insert((wchar_t)i); //Include basic symbol (from space (char code 32) to @(char code 64))
+    usedchar.insert((wchar_t)160);   //Non-breaking space
+    usedchar.erase((wchar_t)170);
+    usedchar.erase((wchar_t)186);    //Remove Ordinal indicator (char code 170 and 186)
+    usedchar.erase((wchar_t)304);    //Remove Capital I-dotted (char code 304) with using "I" altogether.
 }
 
 } // end namespace gui

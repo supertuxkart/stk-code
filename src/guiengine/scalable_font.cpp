@@ -391,7 +391,9 @@ bool ScalableFont::loadTTF()
     u32 texno = 0;
     SpriteBank->addTexture(NULL);
     gp_creator->createNewGlyphPage();
-    for (it = cur_prop.usedchar.begin(); it != cur_prop.usedchar.end(); ++it)
+
+    it = cur_prop.usedchar.begin();
+    while (it != cur_prop.usedchar.end())
     {
         SGUISpriteFrame f;
         SGUISprite s;
@@ -469,13 +471,16 @@ bool ScalableFont::loadTTF()
             SpriteBank->setTexture(texno, Driver->addTexture("Glyph_page", gp_creator->getPage()));
             gp_creator->clearGlyphPage();
         }
+
+        if (*it == (wchar_t)32 && SpriteBank->getPositions().size() == 1)
+            continue; //Preventing getAreaIDFromCharacter of whitespace == 0, which make space disappear
+        else ++it;
     }
 
     //Fix unused glyphs....
     if (m_type == T_NORMAL || T_BOLD)
     {
-        CharacterMap[(wchar_t)32]  = getAreaIDFromCharacter((wchar_t)160, NULL); //Use non-breaking space glyph to all space/tab characters.
-        CharacterMap[(wchar_t)9]   = getAreaIDFromCharacter((wchar_t)160, NULL);
+        CharacterMap[(wchar_t)9]   = getAreaIDFromCharacter((wchar_t)160, NULL); //Use non-breaking space glyph to tab.
         CharacterMap[(wchar_t)173] = 0; //Don't need a glyph for the soft hypen, as it only print when not having enough space.
                                         //And then it will convert to a "-".
 
@@ -491,7 +496,7 @@ bool ScalableFont::loadTTF()
         setlocale(LC_ALL, "en_US.UTF8");
         for  (it = cur_prop.usedchar.begin(); it != cur_prop.usedchar.end(); ++it)
         {
-            if (iswupper((wchar_t)*it))
+            if (iswupper((wchar_t)*it) && *it < 640)
                 CharacterMap[towlower((wchar_t)*it)] = getAreaIDFromCharacter(*it, NULL);
         }
     }
@@ -510,11 +515,11 @@ bool ScalableFont::loadTTF()
                                          //at the bottom line, so no addition is required, but if we can make draw2dimage draw
                                          //characters close to the bottom line too, than only one offsety is needed.
 
-        if (!n) //Skip soft hypen and space
+        if (!n) //Skip width-less characters
             a.bearingx  = 0;
         else
             a.bearingx  = bx.at(n);
-        if (!n) //Skip soft hypen and space
+        if (!n) //Skip width-less characters
             a.width     = 0;
         else
             a.width     = advance.at(n);
