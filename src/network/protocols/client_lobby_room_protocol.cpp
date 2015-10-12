@@ -29,17 +29,17 @@
 #include "utils/log.hpp"
 
 ClientLobbyRoomProtocol::ClientLobbyRoomProtocol(const TransportAddress& server_address)
-    : LobbyRoomProtocol(NULL)
+                       : LobbyRoomProtocol(NULL)
 {
     m_server_address = server_address;
     m_server = NULL;
-}
+}   // ClientLobbyRoomProtocol
 
 //-----------------------------------------------------------------------------
 
 ClientLobbyRoomProtocol::~ClientLobbyRoomProtocol()
 {
-}
+}   // ClientLobbyRoomProtocol
 
 //-----------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ void ClientLobbyRoomProtocol::setup()
     m_setup = NetworkManager::getInstance()->setupNewGame(); // create a new setup
     m_setup->getRaceConfig()->setPlayerCount(16); //FIXME : this has to be changed when logging into the server
     m_state = NONE;
-}
+}   // setup
 
 //-----------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ void ClientLobbyRoomProtocol::requestKartSelection(std::string kart_name)
     // 0x02 : kart selection request, size_token (4), token, size kart name, kart name
     request.ai8(0x02).ai8(4).ai32(m_server->getClientServerToken()).ai8(kart_name.size()).as(kart_name);
     m_listener->sendMessage(this, request, true);
-}
+}   // requestKartSelection
 
 //-----------------------------------------------------------------------------
 
@@ -68,7 +68,7 @@ void ClientLobbyRoomProtocol::voteMajor(uint8_t major)
     // 0xc0 : major vote, size_token (4), token, size major(1),major
     request.ai8(0xc0).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(major);
     m_listener->sendMessage(this, request, true);
-}
+}   // voteMajor
 
 //-----------------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
     // 0xc0 : race count vote, size_token (4), token, size race count(1), count
     request.ai8(0xc1).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(count);
     m_listener->sendMessage(this, request, true);
-}
+}   // voteRaceCount
 
 //-----------------------------------------------------------------------------
 
@@ -88,7 +88,7 @@ void ClientLobbyRoomProtocol::voteMinor(uint8_t minor)
     // 0xc0 : minor vote, size_token (4), token, size minor(1),minor
     request.ai8(0xc2).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(minor);
     m_listener->sendMessage(this, request, true);
-}
+}   // voteMinor
 
 //-----------------------------------------------------------------------------
 
@@ -98,7 +98,7 @@ void ClientLobbyRoomProtocol::voteTrack(std::string track, uint8_t track_nb)
     // 0xc0 : major vote, size_token (4), token, size track, track, size #track, #track
     request.ai8(0xc3).ai8(4).ai32(m_server->getClientServerToken()).ai8(track.size()).as(track).ai8(1).ai8(track_nb);
     m_listener->sendMessage(this, request, true);
-}
+}   // voteTrack
 
 //-----------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
     // 0xc0 : major vote, size_token (4), token, size reversed(1),reversed, size #track, #track
     request.ai8(0xc4).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(reversed).ai8(1).ai8(track_nb);
     m_listener->sendMessage(this, request, true);
-}
+}   // voteReversed
 
 //-----------------------------------------------------------------------------
 
@@ -118,7 +118,7 @@ void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
     // 0xc0 : major vote, size_token (4), token, size laps(1),laps, size #track, #track
     request.ai8(0xc5).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(laps).ai8(1).ai8(track_nb);
     m_listener->sendMessage(this, request, true);
-}
+}   // voteLaps
 
 //-----------------------------------------------------------------------------
 
@@ -127,7 +127,7 @@ void ClientLobbyRoomProtocol::leave()
     m_server->disconnect();
     m_server_address.ip = 0;
     m_server_address.port = 0;
-}
+}   // leave
 
 //-----------------------------------------------------------------------------
 
@@ -153,7 +153,7 @@ bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
         return true;
     }
     return false;
-}
+}   // notifyEvent
 
 //-----------------------------------------------------------------------------
 
@@ -215,7 +215,7 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         return true;
     } // disconnection
     return false;
-}
+}   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
 
@@ -269,7 +269,7 @@ void ClientLobbyRoomProtocol::update()
     case EXITING:
         break;
     }
-}
+}   // update
 
 //-----------------------------------------------------------------------------
 
@@ -312,7 +312,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
     {
         Log::error("ClientLobbyRoomProtocol", "One of the player notified in the list is myself.");
     }
-}
+}   // newPlayer
 
 //-----------------------------------------------------------------------------
 
@@ -343,7 +343,7 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
     {
         Log::error("ClientLobbyRoomProtocol", "The disconnected peer wasn't known.");
     }
-}
+}   // disconnectedPlayer
 
 //-----------------------------------------------------------------------------
 
@@ -412,7 +412,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     }
     else
         Log::info("ClientLobbyRoomProtocol", "Failure during the connection acceptation process.");
-}
+}   // connectionAccepted
 
 //-----------------------------------------------------------------------------
 
@@ -447,7 +447,7 @@ void ClientLobbyRoomProtocol::connectionRefused(Event* event)
         Log::info("ClientLobbyRoomProtocol", "Connection refused.");
         break;
     }
-}
+}   // connectionRefused
 
 //-----------------------------------------------------------------------------
 
@@ -482,7 +482,7 @@ void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
         Log::info("ClientLobbyRoomProtocol", "Kart selection refused.");
         break;
     }
-}
+}   // kartSelectionRefused
 
 //-----------------------------------------------------------------------------
 
@@ -518,7 +518,7 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
     }
     m_setup->setPlayerKart(player_id, kart_name);
     NetworkKartSelectionScreen::getInstance()->playerSelected(player_id, kart_name);
-}
+}   // kartSelectionUpdate
 
 //-----------------------------------------------------------------------------
 
@@ -551,7 +551,7 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
     else
         Log::error("ClientLobbyRoomProtocol", "Bad token when starting game");
 
-}
+}   // startGame
 
 //-----------------------------------------------------------------------------
 
@@ -583,7 +583,7 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
     else
         Log::error("ClientLobbyRoomProtocol", "Bad token");
 
-}
+}   // startSelection
 
 //-----------------------------------------------------------------------------
 
@@ -659,7 +659,7 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
     ranked_world->endSetKartPositions();
     m_state = RACE_FINISHED;
     ranked_world->terminateRace();
-}
+}   // raceFinished
 
 //-----------------------------------------------------------------------------
 
@@ -683,9 +683,9 @@ void ClientLobbyRoomProtocol::playerMajorVote(Event* event)
     if (!isByteCorrect(event, 7, 1))
         return;
     m_setup->getRaceConfig()->setPlayerMajorVote(data[6], data[8]);
-}
-//-----------------------------------------------------------------------------
+}   // playerMajorVote
 
+//-----------------------------------------------------------------------------
 /*! \brief Called when a player votes for the number of races in a GP.
  *  \param event : Event providing the information.
  *
@@ -706,9 +706,9 @@ void ClientLobbyRoomProtocol::playerRaceCountVote(Event* event)
     if (!isByteCorrect(event, 7, 1))
         return;
     m_setup->getRaceConfig()->setPlayerRaceCountVote(data[6], data[8]);
-}
-//-----------------------------------------------------------------------------
+}   // playerRaceCountVote
 
+//-----------------------------------------------------------------------------
 /*! \brief Called when a player votes for a minor race mode.
  *  \param event : Event providing the information.
  *
@@ -729,7 +729,8 @@ void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
     if (!isByteCorrect(event, 7, 1))
         return;
     m_setup->getRaceConfig()->setPlayerMinorVote(data[6], data[8]);
-}
+}   // playerMinorVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for a track.
@@ -754,7 +755,8 @@ void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
     if (!isByteCorrect(event, N+8, 1))
         return;
     m_setup->getRaceConfig()->setPlayerTrackVote(data[6], track_name, data[N+9]);
-}
+}   // playerTrackVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for the reverse mode of a race
@@ -779,7 +781,8 @@ void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
     if (!isByteCorrect(event, 9, 1))
         return;
     m_setup->getRaceConfig()->setPlayerReversedVote(data[6], data[8]!=0, data[10]);
-}
+}   // playerReversedVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for a major race mode.
@@ -802,5 +805,6 @@ void ClientLobbyRoomProtocol::playerLapsVote(Event* event)
     if (!isByteCorrect(event, 7, 1))
         return;
     m_setup->getRaceConfig()->setPlayerLapsVote(data[6], data[8], data[10]);
-}
+}   // playerLapsVote
+
 //-----------------------------------------------------------------------------
