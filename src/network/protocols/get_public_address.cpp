@@ -19,14 +19,13 @@
 #include "network/protocols/get_public_address.hpp"
 
 #include "config/user_config.hpp"
-#include "network/network_manager.hpp"
 #include "network/client_network_manager.hpp"
-#include "network/protocols/connect_to_server.hpp"
 #include "network/network_interface.hpp"
+#include "network/network_manager.hpp"
+#include "network/protocols/connect_to_server.hpp"
 #include "utils/log.hpp"
 
 #include <assert.h>
-
 #include <string>
 
 #ifdef __MINGW32__
@@ -43,7 +42,8 @@
 #endif
 #include <sys/types.h>
 
-const uint8_t GetPublicAddress::m_stun_magic_cookie[4] = {0x21, 0x12, 0xA4, 0x42}; // make the linker happy
+// make the linker happy
+const uint8_t GetPublicAddress::m_stun_magic_cookie[4] = {0x21, 0x12, 0xA4, 0x42};
 
 /** Creates a STUN request and sends it to a random STUN server selected from
  *  the list stored in the config file. See https://tools.ietf.org/html/rfc5389#section-6
@@ -106,8 +106,9 @@ void GetPublicAddress::createStunRequest()
     m_transaction_host->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, m_stun_server_port));
     freeaddrinfo(res);
     m_state = STUN_REQUEST_SENT;
-}
+}   // createStunRequest
 
+// ----------------------------------------------------------------------------
 /**
  * Gets the response from the STUN server, checks it for its validity and
  * then parses the answer into address and port
@@ -186,8 +187,9 @@ std::string GetPublicAddress::parseStunResponse()
     m_listener->requestTerminate(this);
 
     return "";
-}
+}   // parseStunResponse
 
+// ----------------------------------------------------------------------------
 /** Detects public IP-address and port by first sending a request to a randomly
  * selected STUN server and then parsing and validating the response */
 void GetPublicAddress::asynchronousUpdate()
@@ -205,4 +207,4 @@ void GetPublicAddress::asynchronousUpdate()
             m_state = NOTHING_DONE;
         }
     }
-}
+}   // asynchronousUpdate
