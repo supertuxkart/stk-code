@@ -11,12 +11,14 @@
 #ifndef SCRIPTSTDSTRING_H
 #define SCRIPTSTDSTRING_H
 
+// String must be included before angelscript.h to avoid some errors during
+// compilation with GetObject function
+#include <string>
+
 #ifndef ANGELSCRIPT_H 
 // Avoid having to inform include path if header is already include before
 #include <angelscript.h>
 #endif
-
-#include <string>
 
 //---------------------------
 // Compilation settings
