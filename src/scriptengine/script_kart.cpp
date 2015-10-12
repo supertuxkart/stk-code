@@ -117,6 +117,14 @@ namespace Scripting
             return SimpleVec3(velocity.getX(), velocity.getY(), velocity.getZ());
         }
 
+        /** Gets the maximum speed (velocity) a kart can reach */
+        float getMaxSpeed(int idKart)
+        {
+            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            return kart->getKartProperties()->getMaxSpeed() *
+                kart->getPlayerDifficulty()->getMaxSpeed();
+        }
+
         /** @}*/
         /** @}*/
 
@@ -130,6 +138,7 @@ namespace Scripting
             //r = engine->RegisterGlobalFunction("void jumpTo(int id, float x, float y)", asFUNCTION(jumpTo), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("Vec3 getLocation(int id)", asFUNCTION(getLocation), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("Vec3 getVelocity(int id)", asFUNCTION(getVelocity), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("float getMaxSpeed(int id)", asFUNCTION(getMaxSpeed), asCALL_CDECL); assert(r >= 0);
         }
 
         void registerScriptEnums(asIScriptEngine *engine)
