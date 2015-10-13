@@ -43,8 +43,15 @@
 #include <sys/types.h>
 
 // make the linker happy
-const uint8_t GetPublicAddress::m_stun_magic_cookie[4] = {0x21, 0x12, 0xA4, 0x42};
+const uint32_t GetPublicAddress::m_stun_magic_cookie = 0x2112A442;
 
+GetPublicAddress::GetPublicAddress(CallbackObject* callback_object)
+                : Protocol(callback_object, PROTOCOL_SILENT)
+{
+    m_state = NOTHING_DONE;
+}   // GetPublicAddress
+
+// ----------------------------------------------------------------------------
 /** Creates a STUN request and sends it to a random STUN server selected from
  *  the list stored in the config file. See https://tools.ietf.org/html/rfc5389#section-6
  *  for details on the message structure.
@@ -53,32 +60,7 @@ const uint8_t GetPublicAddress::m_stun_magic_cookie[4] = {0x21, 0x12, 0xA4, 0x42
  */
 void GetPublicAddress::createStunRequest()
 {
-    uint8_t bytes[21]; // the message to be sent
-    // bytes 0-1: the type of the message
-    uint16_t message_type = 0x0001; // binding request
-    bytes[0] = (uint8_t)(message_type>>8);
-    bytes[1] = (uint8_t)(message_type);
-
-    // bytes 2-3: message length added to header (attributes)
-    uint16_t message_length = 0x0000;
-    bytes[2] = (uint8_t)(message_length>>8);
-    bytes[3] = (uint8_t)(message_length);
-
-    // bytes 4-7: magic cookie to recognize the stun protocol
-    for (int i = 0; i < 4; i++)
-        bytes[i + 4] = m_stun_magic_cookie[i];
-
-
-    // bytes 8-19: the transaction id
-    for (int i = 0; i < 12; i++)
-    {
-        uint8_t random_byte = rand() % 256;
-        bytes[i+8] = random_byte;
-        m_stun_tansaction_id[i] = random_byte;
-    }
-    bytes[20] = '\0';
-
-    // time to pick a random stun server
+    // Pick a random stun server
     std::vector<std::string> stun_servers = UserConfigParams::m_stun_servers;
 
     const char* server_name = stun_servers[rand() % stun_servers.size()].c_str();
@@ -97,13 +79,32 @@ void GetPublicAddress::createStunRequest()
         Log::error("GetPublicAddress", "Error in getaddrinfo: %s", gai_strerror(status));
         return;
     }
-    assert (res != NULL); // documentation says it points to "one or more addrinfo structures"
-
+    assert(res != NULL); // documentation says it points to "one or more addrinfo structures"
     struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
     m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
     m_transaction_host = new STKHost();
     m_transaction_host->setupClient(1, 1, 0, 0);
-    m_transaction_host->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, m_stun_server_port));
+
+    // Assemble the message for the stun server
+    NetworkString s;
+
+    // bytes 0-1: the type of the message
+    // bytes 2-3: message length added to header (attributes)
+    uint16_t message_type = 0x0001; // binding request
+    uint16_t message_length = 0x0000;
+    s.addUInt16(message_type).addUInt16(message_length)
+                             .addInt(0x2112A442);
+    // bytes 8-19: the transaction id
+    for (int i = 0; i < 12; i++)
+    {
+        uint8_t random_byte = rand() % 256;
+        s.addUInt8(random_byte);
+        m_stun_tansaction_id[i] = random_byte;
+    }
+    s.addChar(0);
+
+
+    m_transaction_host->sendRawPacket(s.getBytes(), 20, TransportAddress(m_stun_server_ip, m_stun_server_port));
     freeaddrinfo(res);
     m_state = STUN_REQUEST_SENT;
 }   // createStunRequest
@@ -116,31 +117,38 @@ void GetPublicAddress::createStunRequest()
 */
 std::string GetPublicAddress::parseStunResponse()
 {
-    uint8_t* data = m_transaction_host->receiveRawPacket(TransportAddress(m_stun_server_ip, m_stun_server_port), 2000);
-    if (!data)
+    uint8_t* s = m_transaction_host->receiveRawPacket(TransportAddress(m_stun_server_ip, m_stun_server_port), 2000);
+
+    if (!s)
         return "STUN response contains no data at all";
 
+    // Convert to network string.
+    // FIXME: the length is not known (atm 2048 bytes are allocated in 
+    // receiveRawPacket, and it looks like 32 are actually used in a normal stun reply
+    NetworkString datas(std::string((char*)s, 32));
+
+    // The received data has been copied and can now be deleted
+    delete s;
+
     // check that the stun response is a response, contains the magic cookie and the transaction ID
-    if (data[0] != 0x01 || data[1] != 0x01)
+    if (datas.getUInt16(0) != 0x0101)
         return "STUN response doesn't contain the magic cookie";
 
-    for (int i = 0; i < 4; i++)
+    if (datas.getUInt32(4) != m_stun_magic_cookie)
     {
-        if (data[i + 4] != m_stun_magic_cookie[i])
-            return "STUN response doesn't contain the magic cookie";
+        return "STUN response doesn't contain the magic cookie";
     }
 
     for (int i = 0; i < 12; i++)
     {
-        if (data[i+8] != m_stun_tansaction_id[i])
+        if (datas.getUInt8(i+8) != m_stun_tansaction_id[i])
             return "STUN response doesn't contain the transaction ID";
     }
 
     Log::debug("GetPublicAddress", "The STUN server responded with a valid answer");
-    int message_size = data[2]*256+data[3];
+    int message_size = datas.getUInt16(2);
 
     // The stun message is valid, so we parse it now:
-    uint8_t* attributes = data+20;
     if (message_size == 0)
         return "STUN response does not contain any information.";
     if (message_size < 4) // cannot even read the size
@@ -150,30 +158,26 @@ std::string GetPublicAddress::parseStunResponse()
     // Those are the port and the address to be detected
     uint16_t port;
     uint32_t address;
+    int pos = 20;
     while (true)
     {
-        int type = attributes[0]*256+attributes[1];
-        int size = attributes[2]*256+attributes[3];
+        int type = datas.getUInt16(pos);
+        int size = datas.getUInt16(pos+2);
         if (type == 0 || type == 1)
         {
             assert(size == 8);
-            assert(attributes[5] == 0x01); // IPv4 only
-            port = attributes[6]*256+attributes[7];
-            // The (IPv4) address was sent as 4 distinct bytes,
-            // but needs to be packed into one 4-byte int
-            address = (attributes[8]<<24 & 0xFF000000) +
-                      (attributes[9]<<16 & 0x00FF0000) +
-                      (attributes[10]<<8 & 0x0000FF00) +
-                      (attributes[11]    & 0x000000FF);
+            assert(datas.getUInt8(pos+5) == 0x01); // Family IPv4 only
+            port = datas.getUInt16(pos + 6);
+            address = datas.getUInt32(pos + 8);
             break;
-        }
-        attributes = attributes + 4 + size;
+        }   // type = 0 or 1
+        pos +=  4 + size;
         message_size -= 4 + size;
         if (message_size == 0)
             return "STUN response is invalid.";
         if (message_size < 4) // cannot even read the size
             return "STUN response is invalid.";
-    }
+    }   // while true
 
     // finished parsing, we know our public transport address
     Log::debug("GetPublicAddress", "The public address has been found: %i.%i.%i.%i:%i",

@@ -26,7 +26,7 @@
 class GetPublicAddress : public Protocol
 {
     public:
-        GetPublicAddress(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT) {}
+        GetPublicAddress(CallbackObject* callback_object);
         virtual ~GetPublicAddress() {}
 
         virtual bool notifyEvent(Event* event) { return true; }
@@ -40,7 +40,7 @@ class GetPublicAddress : public Protocol
         std::string parseStunResponse();
 
         // Constants
-        static const uint8_t m_stun_magic_cookie[4];
+        static const uint32_t m_stun_magic_cookie;
         static const int m_stun_server_port = 3478;
 
         enum STATE
