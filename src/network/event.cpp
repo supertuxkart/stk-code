@@ -61,7 +61,7 @@ Event::Event(ENetEvent* event)
         if (peers[i]->m_peer == event->peer)
         {
             *peer = peers[i];
-            Log::verbose("Event", "The peer you sought has been found on %lx", (long int)(peer));
+            Log::verbose("Event", "The peer you sought has been found on %p", peer);
             return;
         }
     }
@@ -70,7 +70,7 @@ Event::Event(ENetEvent* event)
         STKPeer* new_peer = new STKPeer();
         new_peer->m_peer = event->peer;
         *peer = new_peer;
-        Log::debug("Event", "Creating a new peer, address are STKPeer:%lx, Peer:%lx", (long int)(new_peer), (long int)(event->peer));
+        Log::debug("Event", "Creating a new peer, address are STKPeer:%p, Peer:%p", new_peer, event->peer);
     }
 }
 

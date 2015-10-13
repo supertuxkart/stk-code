@@ -4,25 +4,27 @@
     <spreading angle="10"        />
     
     <velocity  x="0.0"
-               y="0.002"
+               y="0.003"
                z="0.0"           />
     
     <material  file="smoke_black.png"  />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="25"
-               max="50"          />
+    <rate      min="7"
+               max="12"          />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
     <lifetime  min="2500"
                max="5000"        />
     
     <!-- Size of the particles -->
-    <size      min="0.6"
-               max="1.5"         />
+    <size      min="1.6"
+               max="2.5"
+               x-increase-factor="2.6"
+               y-increase-factor="2.6"         />
 
-    <color     min="255 255 255"
-               max="255 255 255" />
+    <color     min="50 50 50"
+               max="100 100 100" />
 
     <!-- How much time in milliseconds before the particle is fully faded out  -->
     <fadeout   time="1000"       />

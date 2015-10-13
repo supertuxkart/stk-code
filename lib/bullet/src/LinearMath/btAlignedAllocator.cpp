@@ -58,15 +58,24 @@ static inline void btAlignedFreeDefault(void *ptr)
 	free(ptr);
 }
 #else
+
 static inline void *btAlignedAllocDefault(size_t size, int alignment)
 {
   void *ret;
   char *real;
+#ifdef __MINGW64__
+  uintptr_t offset;
+#else
   unsigned long offset;
+#endif
 
   real = (char *)sAllocFunc(size + sizeof(void *) + (alignment-1));
   if (real) {
+#ifdef __MINGW64__
+    offset = (alignment - (uintptr_t)(real + sizeof(void *))) & (alignment-1);
+#else
     offset = (alignment - (unsigned long)(real + sizeof(void *))) & (alignment-1);
+#endif
     ret = (void *)((real + sizeof(void *)) + offset);
     *((void **)(ret)-1) = (void *)(real);
   } else {
