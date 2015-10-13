@@ -751,7 +751,7 @@ void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
     if (!isByteCorrect(event, 5, 1))
         return;
     int N = data[7];
-    std::string track_name = data.gs(8, N);
+    std::string track_name = data.getString(8, N);
     if (!isByteCorrect(event, N+8, 1))
         return;
     m_setup->getRaceConfig()->setPlayerTrackVote(data[6], track_name, data[N+9]);

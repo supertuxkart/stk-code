@@ -38,238 +38,448 @@ typedef unsigned char uchar;
  */
 class NetworkString
 {
+private:
     union {
-    float f;
-    uint8_t i[4];
+        float f;
+        uint8_t i[4];
     } f_as_i; // float as integer
+
+    // ------------------------------------------------------------------------
     union {
-    double d;
-    uint8_t i[8];
+        double d;
+        uint8_t i[8];
     } d_as_i; // double as integer
-    public:
-        NetworkString() { }
-        NetworkString(const uint8_t& value) { m_string.push_back(value); }
-        NetworkString(NetworkString const& copy) { m_string = copy.m_string; }
-        NetworkString(const std::string & value) { m_string = std::vector<uint8_t>(value.begin(), value.end()); }
 
-        NetworkString& removeFront(int size)
-        {
-            m_string.erase(m_string.begin(), m_string.begin()+size);
-            return *this;
-        }
-        NetworkString& remove(int pos, int size)
-        {
-            m_string.erase(m_string.begin()+pos, m_string.begin()+pos+size);
-            return *this;
-        }
+    // ------------------------------------------------------------------------
 
-        uint8_t operator[](const int& pos) const
-        {
-            return getUInt8(pos);
-        }
+    std::vector<uint8_t> m_string;
 
-        NetworkString& addUInt8(const uint8_t& value)
-        {
-            m_string.push_back(value);
-            return *this;
-        }
-        inline NetworkString& ai8(const uint8_t& value) { return addUInt8(value); }
-        NetworkString& addUInt16(const uint16_t& value)
-        {
-            m_string.push_back((value>>8)&0xff);
-            m_string.push_back(value&0xff);
-            return *this;
-        }
-        inline NetworkString& ai16(const uint16_t& value) { return addUInt16(value); }
-        NetworkString& addUInt32(const uint32_t& value)
-        {
-            m_string.push_back((value>>24)&0xff);
-            m_string.push_back((value>>16)&0xff);
-            m_string.push_back((value>>8)&0xff);
-            m_string.push_back(value&0xff);
-            return *this;
-        }
-        inline NetworkString& ai32(const uint32_t& value) { return addUInt32(value); }
-        NetworkString& addInt(const int& value)
-        {
-            m_string.push_back((value>>24)&0xff);
-            m_string.push_back((value>>16)&0xff);
-            m_string.push_back((value>>8)&0xff);
-            m_string.push_back(value&0xff);
-            return *this;
-        }
-        inline NetworkString& ai(const int& value) { return addInt(value); }
-        NetworkString& addFloat(const float& value) //!< BEWARE OF PRECISION
-        {
-            assert(sizeof(float)==4);
-            f_as_i.f = value;
-            m_string.push_back(f_as_i.i[0]);
-            m_string.push_back(f_as_i.i[1]);
-            m_string.push_back(f_as_i.i[2]);
-            m_string.push_back(f_as_i.i[3]);
-            return *this;
-        }
-        inline NetworkString& af(const float& value) { return addFloat(value); }
-        NetworkString& addDouble(const double& value) //!< BEWARE OF PRECISION
-        {
-            assert(sizeof(double)==8);
-            d_as_i.d = value;
-            m_string.push_back(d_as_i.i[0]);
-            m_string.push_back(d_as_i.i[1]);
-            m_string.push_back(d_as_i.i[2]);
-            m_string.push_back(d_as_i.i[3]);
-            m_string.push_back(d_as_i.i[4]);
-            m_string.push_back(d_as_i.i[5]);
-            m_string.push_back(d_as_i.i[6]);
-            m_string.push_back(d_as_i.i[7]);
-            return *this;
-        }
-        inline NetworkString& ad(const double& value) { return addDouble(value); }
-        NetworkString& addChar(const char& value)
-        {
-            m_string.push_back((uint8_t)(value));
-            return *this;
-        }
-        inline NetworkString& ac(const char& value) { return addChar(value); }
+public:
+    /** Dummy constructor. */
+    NetworkString() { }
 
-        NetworkString& addString(const std::string& value)
+    // ------------------------------------------------------------------------
+    /** Constructor to store one byte. */
+    NetworkString(const uint8_t& value) { m_string.push_back(value); }
+
+    // ------------------------------------------------------------------------
+    /** Copy constructor. */
+    NetworkString(NetworkString const& copy) { m_string = copy.m_string; }
+
+    // ------------------------------------------------------------------------
+    /** Copy the data from a string. */
+    NetworkString(const std::string & value)
+    {
+        m_string = std::vector<uint8_t>(value.begin(), value.end());
+    }   // NetworkString
+
+    // ------------------------------------------------------------------------
+    NetworkString& removeFront(int size)
+    {
+        m_string.erase(m_string.begin(), m_string.begin() + size);
+        return *this;
+    }   // removeFront
+
+    // ------------------------------------------------------------------------
+    NetworkString& remove(int pos, int size)
+    {
+        m_string.erase(m_string.begin() + pos, m_string.begin() + pos + size);
+        return *this;
+    }   // remove
+
+    // ------------------------------------------------------------------------
+    uint8_t operator[](const int& pos) const
+    {
+        return getUInt8(pos);
+    }   // operator[]
+
+    // ------------------------------------------------------------------------
+    /** Add 8 bit unsigned int. */
+    NetworkString& addUInt8(const uint8_t& value)
+    {
+        m_string.push_back(value);
+        return *this;
+    }   // addUInt8
+
+    // ------------------------------------------------------------------------
+    /** Adds 8 bit integer. */
+    inline NetworkString& ai8(const uint8_t& value) { return addUInt8(value); }
+
+    // ------------------------------------------------------------------------
+    /** Adds 16 bit unsigned int. */
+    NetworkString& addUInt16(const uint16_t& value)
+    {
+        m_string.push_back((value >> 8) & 0xff);
+        m_string.push_back(value & 0xff);
+        return *this;
+    }   // addUInt16
+
+    // ------------------------------------------------------------------------
+    /** Adds 16 bit integer. */
+    inline NetworkString& ai16(const uint16_t& value)
+    {
+        return addUInt16(value); 
+    }   // ai16
+
+    // ------------------------------------------------------------------------
+    /** Adds unsigned 32 bit integer. */
+    NetworkString& addUInt32(const uint32_t& value)
+    {
+        m_string.push_back((value >> 24) & 0xff);
+        m_string.push_back((value >> 16) & 0xff);
+        m_string.push_back((value >> 8) & 0xff);
+        m_string.push_back(value & 0xff);
+        return *this;
+    }   // addUInt32
+
+    // ------------------------------------------------------------------------
+    /** Adds 32 bit integer. */
+    inline NetworkString& ai32(const uint32_t& value)
+    {
+        return addUInt32(value); 
+    }   // ai32
+
+    // ------------------------------------------------------------------------
+    NetworkString& addInt(const int& value)
+    {
+        m_string.push_back((value >> 24) & 0xff);
+        m_string.push_back((value >> 16) & 0xff);
+        m_string.push_back((value >> 8) & 0xff);
+        m_string.push_back(value & 0xff);
+        return *this;
+    }   // addInt
+
+    // ------------------------------------------------------------------------
+    inline NetworkString& ai(const int& value) { return addInt(value); }
+    // ------------------------------------------------------------------------
+    /** Adds a 4 byte floating point value. */
+    NetworkString& addFloat(const float& value) //!< BEWARE OF PRECISION
+    {
+        assert(sizeof(float) == 4);
+        f_as_i.f = value;
+        m_string.push_back(f_as_i.i[0]);
+        m_string.push_back(f_as_i.i[1]);
+        m_string.push_back(f_as_i.i[2]);
+        m_string.push_back(f_as_i.i[3]);
+        return *this;
+    }
+    // ------------------------------------------------------------------------
+    /** Adds a 4 byte floating point value. */
+    inline NetworkString& af(const float& value) { return addFloat(value); }
+
+    // ------------------------------------------------------------------------
+    /** Adds a 8 byte floating point value. */
+    NetworkString& addDouble(const double& value) //!< BEWARE OF PRECISION
+    {
+        assert(sizeof(double) == 8);
+        d_as_i.d = value;
+        m_string.push_back(d_as_i.i[0]);
+        m_string.push_back(d_as_i.i[1]);
+        m_string.push_back(d_as_i.i[2]);
+        m_string.push_back(d_as_i.i[3]);
+        m_string.push_back(d_as_i.i[4]);
+        m_string.push_back(d_as_i.i[5]);
+        m_string.push_back(d_as_i.i[6]);
+        m_string.push_back(d_as_i.i[7]);
+        return *this;
+    }   // addDouble
+
+    // ------------------------------------------------------------------------
+    /** Adds n 8 byte floating point value. */
+    inline NetworkString& ad(const double& value) { return addDouble(value); }
+
+    // ------------------------------------------------------------------------
+    /** Adds a single character to the string. */
+    NetworkString& addChar(const char& value)
+    {
+        m_string.push_back((uint8_t)(value));
+        return *this;
+    }   // addChar
+
+    // ------------------------------------------------------------------------
+    /** Adds a single character. */
+    inline NetworkString& ac(const char& value) { return addChar(value); }
+
+    // ------------------------------------------------------------------------
+    /** Adds a string. */
+    NetworkString& addString(const std::string& value)
+    {
+        for (unsigned int i = 0; i < value.size(); i++)
+            m_string.push_back((uint8_t)(value[i]));
+        return *this;
+    }
+
+    // ------------------------------------------------------------------------
+    /** Adds a string. */
+    inline NetworkString& as(const std::string& value)
+    {
+        return addString(value);
+    }   // as
+
+    // ------------------------------------------------------------------------
+    /** Adds the content of another network string. */
+    NetworkString& operator+=(NetworkString const& value)
+    {
+        m_string.insert(m_string.end(), value.m_string.begin(), 
+                                        value.m_string.end()   );
+        return *this;
+    }   // operator+=
+
+    // ------------------------------------------------------------------------
+    /** Returns the content of the network string as a std::string. */
+    const std::string std_string() const
+    {
+        std::string str(m_string.begin(), m_string.end());
+        return str;
+    }   // std_string
+
+    // ------------------------------------------------------------------------
+    /** Returns the current length of the network string. */
+    int size() const { return (int)m_string.size(); }
+
+    // ------------------------------------------------------------------------
+    /** Returns a byte pointer to the content of the network string. */
+    uint8_t* getBytes() { return &m_string[0]; };
+
+    // ------------------------------------------------------------------------
+    /** Returns a byte pointer to the content of the network string. */
+    const uint8_t* getBytes() const { return &m_string[0]; };
+
+    // ------------------------------------------------------------------------
+    template<typename T, size_t n>
+    T get(int pos) const
+    {
+        int a = n;
+        T result = 0;
+        while (a--)
         {
-            for (unsigned int i = 0; i < value.size(); i++)
-                m_string.push_back((uint8_t)(value[i]));
-            return *this;
+            result <<= 8; // offset one byte
+            // add the data to result
+            result += ((uint8_t)(m_string[pos + n - 1 - a]) & 0xff);
         }
-        inline NetworkString& as(const std::string& value) { return addString(value); }
+        return result;
+    }   // get(int pos)
 
-        NetworkString& operator+=(NetworkString const& value)
+    // ------------------------------------------------------------------------
+    // Another function for n == 1 to surpress warnings in clang
+    template<typename T>
+    T get(int pos) const
+    {
+        return m_string[pos];
+    }   // get
+
+    // ------------------------------------------------------------------------
+    /** Returns a standard integer. */
+    inline int getInt(int pos = 0) const { return get<int, 4>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns a standard unsigned integer. */
+    inline uint32_t getUInt(int pos = 0) const { return get<uint32_t, 4>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns a unsigned 32 bit integer. */
+    inline uint32_t getUInt32(int pos = 0) const { return get<uint32_t, 4>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned 16 bit integer. */
+    inline uint16_t getUInt16(int pos=0) const { return get<uint16_t, 2>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned 8-bit integer. */
+    inline uint8_t getUInt8(int pos = 0)  const { return get<uint8_t>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns a character. */
+    inline char getChar(int pos = 0) const { return get<char>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned character. */
+    inline unsigned char getUChar(int pos = 0) const
+    {
+        return get<unsigned char>(pos); 
+    }   // getUChar
+    // ------------------------------------------------------------------------
+    /** Returns a part of the network string as a std::string.
+     *  \param pos First position to be in the string.
+     *  \param len Number of bytes to copy.
+     */
+    std::string getString(int pos, int len) const 
+    {
+        return std::string(m_string.begin() + pos,
+                           m_string.begin() + pos + len); 
+    }   // getString
+
+    // ------------------------------------------------------------------------
+    /** Returns a standard integer. */
+    inline int gi(int pos = 0) const { return get<int, 4>(pos); }
+    // ------------------------------------------------------------------------
+    /** Retrusn an unsigned standard integer. */
+    inline uint32_t gui(int pos = 0) const { return get<uint32_t, 4>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned 32-bit integer. */
+    inline uint32_t gui32(int pos = 0) const { return get<uint32_t, 4>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned 16-bit integer. */
+    inline uint16_t gui16(int pos = 0) const { return get<uint16_t, 2>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned 8-bit integer. */
+    inline uint8_t gui8(int pos = 0) const { return get<uint8_t>(pos); }
+    // ------------------------------------------------------------------------
+    /** Return a character. */
+    inline char gc(int pos = 0) const { return get<char>(pos); }
+    // ------------------------------------------------------------------------
+    /** Return an unsigned character. */
+    inline unsigned char guc(int pos = 0) const
+    {
+        return get<unsigned char>(pos); 
+    }   // guc
+
+    // ------------------------------------------------------------------------
+    /** Returns a 4-byte floating point value. */
+    float getFloat(int pos = 0) //!< BEWARE OF PRECISION
+    {
+        for (int i = 0; i < 4; i++)
+            f_as_i.i[i] = m_string[pos + i];
+        return f_as_i.f;
+    }  // getFloat
+
+    // ------------------------------------------------------------------------
+    //! Functions to get while removing
+    template<typename T, size_t n>
+    T getAndRemove(int pos)
+    {
+        int a = n;
+        T result = 0;
+        while (a--)
         {
-            m_string.insert( m_string.end(), value.m_string.begin(), value.m_string.end() );
-            return *this;
+            result <<= 8; // offset one byte
+            result += ((uint8_t)(m_string[pos + n - 1 - a]) & 0xff); // add the data
         }
+        remove(pos, n);
+        return result;
+    }   // getAndRemove
 
-        const std::string std_string() const
-        {
-            std::string str(m_string.begin(), m_string.end());
-            return str;
-        }
+    // ------------------------------------------------------------------------
+    // Another function for n == 1 to surpress warnings in clang
+    template<typename T>
+    T getAndRemove(int pos)
+    {
+        T result = m_string[pos];
+        remove(pos, 1);
+        return result;
+    }   // getAndRemove
 
-        int size() const
-        {
-            return (int)m_string.size();
-        }
+    // ------------------------------------------------------------------------
+    inline int getAndRemoveInt(int pos = 0)
+    {
+        return getAndRemove<int, 4>(pos);
+    }   // getAndRemoveInt
 
-        uint8_t* getBytes() { return &m_string[0]; };
-        const uint8_t* getBytes() const { return &m_string[0]; };
+    // ------------------------------------------------------------------------
+    inline uint32_t getAndRemoveUInt(int pos = 0)
+    {
+        return getAndRemove<uint32_t, 4>(pos);
+    }   // getAndRemoveUInt
 
-        template<typename T, size_t n>
-        T get(int pos) const
-        {
-            int a = n;
-            T result = 0;
-            while(a--)
-            {
-                result <<= 8; // offset one byte
-                result += ((uint8_t)(m_string[pos+n-1-a]) & 0xff); // add the data to result
-            }
-            return result;
-        }
+    // ------------------------------------------------------------------------
+    inline uint32_t getAndRemoveUInt32(int pos = 0)
+    {
+        return getAndRemove<uint32_t, 4>(pos); 
+    }   // getAndRemoveUInt32
+    
+    // ------------------------------------------------------------------------
+    inline uint16_t getAndRemoveUInt16(int pos = 0)
+    {
+        return getAndRemove<uint16_t, 2>(pos); 
+    }   // getAndRemoveUInt16
 
-        // Another function for n == 1 to surpress warnings in clang
-        template<typename T>
-        T get(int pos) const
-        {
-            return m_string[pos];
-        }
+    // ------------------------------------------------------------------------
+    inline uint8_t getAndRemoveUInt8(int pos = 0)
+    {
+        return getAndRemove<uint8_t>(pos); 
+    }   // getAndRemoveUInt8
+    // ------------------------------------------------------------------------
+    inline char getAndRemoveChar(int pos = 0)
+    {
+        return getAndRemove<char>(pos); 
+    }   // getAndRemoveChar
 
-        inline int          getInt(int pos = 0)    const { return get<int,4>(pos);             }
-        inline uint32_t     getUInt(int pos = 0)   const { return get<uint32_t,4>(pos);        }
-        inline uint32_t     getUInt32(int pos = 0) const { return get<uint32_t,4>(pos);        }
-        inline uint16_t     getUInt16(int pos = 0) const { return get<uint16_t,2>(pos);        }
-        inline uint8_t      getUInt8(int pos = 0)  const { return get<uint8_t>(pos);         }
-        inline char         getChar(int pos = 0)   const { return get<char>(pos);            }
-        inline unsigned char getUChar(int pos = 0) const { return get<unsigned char>(pos);   }
-        std::string         getString(int pos, int len) const { return std::string(m_string.begin()+pos, m_string.begin()+pos+len); }
+    // ------------------------------------------------------------------------
+    inline unsigned char getAndRemoveUChar(int pos = 0)
+    {
+        return getAndRemove<unsigned char>(pos); 
+    }   // getAndRemoveUChar
 
-        inline int          gi(int pos = 0)        const { return get<int,4>(pos);             }
-        inline uint32_t     gui(int pos = 0)       const { return get<uint32_t,4>(pos);        }
-        inline uint32_t     gui32(int pos = 0)     const { return get<uint32_t,4>(pos);        }
-        inline uint16_t     gui16(int pos = 0)     const { return get<uint16_t,2>(pos);        }
-        inline uint8_t      gui8(int pos = 0)      const { return get<uint8_t>(pos);         }
-        inline char         gc(int pos = 0)        const { return get<char>(pos);            }
-        inline unsigned char guc(int pos = 0)      const { return get<unsigned char>(pos);   }
-        std::string         gs(int pos, int len)   const { return std::string(m_string.begin()+pos, m_string.begin()+pos+len); }
+    // ------------------------------------------------------------------------
+    double getAndRemoveDouble(int pos = 0) //!< BEWARE OF PRECISION
+    {
+        for (int i = 0; i < 8; i++)
+            d_as_i.i[i] = m_string[pos + i];
+        return d_as_i.d;
+        remove(pos, 8);
+    }   // getAndRemoveDouble
 
-        double getDouble(int pos = 0) //!< BEWARE OF PRECISION
-        {
-            for (int i = 0; i < 8; i++)
-                d_as_i.i[i] = m_string[pos+i];
-            return d_as_i.d;
-        }
-        float getFloat(int pos = 0) //!< BEWARE OF PRECISION
-        {
-            for (int i = 0; i < 4; i++)
-                f_as_i.i[i] = m_string[pos+i];
-            return f_as_i.f;
-        }
+    // ------------------------------------------------------------------------
+    /** Get and remove a 4 byte floating point value. */
+    float getAndRemoveFloat(int pos = 0) //!< BEWARE OF PRECISION
+    {
+        for (int i = 0; i < 4; i++)
+            f_as_i.i[i] = m_string[pos + i];
+        return f_as_i.f;
+        remove(pos, 4);
+    }   // getAndRemoveFloat
 
-        //! Functions to get while removing
-        template<typename T, size_t n>
-        T getAndRemove(int pos)
-        {
-            int a = n;
-            T result = 0;
-            while(a--)
-            {
-                result <<= 8; // offset one byte
-                result += ((uint8_t)(m_string[pos+n-1-a]) & 0xff); // add the data
-            }
-            remove(pos,n);
-            return result;
-        }
+    // ------------------------------------------------------------------------
+    /** Removes a 8 bit unsigned int. */
+    inline NetworkString& gui8(uint8_t* dst)
+    {
+        *dst = getAndRemoveUInt8(0);
+        return *this; 
+    }   // gui8
 
-        // Another function for n == 1 to surpress warnings in clang
-        template<typename T>
-        T getAndRemove(int pos)
-        {
-            T result = m_string[pos];
-            remove(pos, 1);
-            return result;
-        }
+    // ------------------------------------------------------------------------
+    /** Returns a 16 bit integer. */
+    inline NetworkString& gui16(uint16_t* dst)
+    {
+        *dst = getAndRemoveUInt16(0);
+        return *this; 
+    }   // gui16
 
-        inline int          getAndRemoveInt(int pos = 0)     { return getAndRemove<int,4>(pos);             }
-        inline uint32_t     getAndRemoveUInt(int pos = 0)    { return getAndRemove<uint32_t,4>(pos);        }
-        inline uint32_t     getAndRemoveUInt32(int pos = 0)  { return getAndRemove<uint32_t,4>(pos);        }
-        inline uint16_t     getAndRemoveUInt16(int pos = 0)  { return getAndRemove<uint16_t,2>(pos);        }
-        inline uint8_t      getAndRemoveUInt8(int pos = 0)   { return getAndRemove<uint8_t>(pos);         }
-        inline char         getAndRemoveChar(int pos = 0)    { return getAndRemove<char>(pos);            }
-        inline unsigned char getAndRemoveUChar(int pos = 0)  { return getAndRemove<unsigned char>(pos);   }
-        double getAndRemoveDouble(int pos = 0) //!< BEWARE OF PRECISION
-        {
-            for (int i = 0; i < 8; i++)
-                d_as_i.i[i] = m_string[pos+i];
-            return d_as_i.d;
-            remove(pos, 8);
-        }
-        float getAndRemoveFloat(int pos = 0) //!< BEWARE OF PRECISION
-        {
-            for (int i = 0; i < 4; i++)
-                f_as_i.i[i] = m_string[pos+i];
-            return f_as_i.f;
-            remove(pos, 4);
-        }
+    // ------------------------------------------------------------------------
+    /** Returns a 32 bit integer. */
+    inline NetworkString& gui32(uint32_t* dst)
+    {
+        *dst = getAndRemoveUInt32(0);
+        return *this; 
+    }   // gui32
 
-        inline NetworkString& gui8(uint8_t* dst)   { *dst = getAndRemoveUInt8(0);  return *this; }
-        inline NetworkString& gui16(uint16_t* dst) { *dst = getAndRemoveUInt16(0); return *this; }
-        inline NetworkString& gui32(uint32_t* dst) { *dst = getAndRemoveUInt32(0); return *this; }
-        inline NetworkString& gui(uint32_t* dst)   { *dst = getAndRemoveUInt32(0); return *this; }
-        inline NetworkString& gi(int* dst)         { *dst = getAndRemoveInt(0);    return *this; }
-        inline NetworkString& gc(char* dst)        { *dst = getAndRemoveChar(0);   return *this; }
-        inline NetworkString& guc(uchar* dst)      { *dst = getAndRemoveUChar(0);  return *this; }
-        inline NetworkString& gd(double* dst)      { *dst = getAndRemoveDouble(0); return *this; }
-        inline NetworkString& gf(float* dst)       { *dst = getAndRemoveFloat(0);  return *this; }
+    // ------------------------------------------------------------------------
+    /** Returns a 32 bit integer. */
+    inline NetworkString& gui(uint32_t* dst)
+    {
+        *dst = getAndRemoveUInt32(0);
+        return *this;
+    }   // gui
+    
+    // ------------------------------------------------------------------------
+    /** Returns 4 byte integer. */
+    inline NetworkString& gi(int* dst)
+    {
+        *dst = getAndRemoveInt(0);
+        return *this;
+    }    // gi
 
-    protected:
-        std::vector<uint8_t> m_string;
-};
+    // ------------------------------------------------------------------------
+    /** Returns a single character. */
+    inline NetworkString& gc(char* dst)
+    {
+        *dst = getAndRemoveChar(0);
+        return *this; 
+    }   // gc
+
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned character. */
+    inline NetworkString& guc(uchar* dst)
+    {
+        *dst = getAndRemoveUChar(0);
+        return *this; 
+    }   // guc
+
+};   // class NetworkString
 
 NetworkString operator+(NetworkString const& a, NetworkString const& b);
 

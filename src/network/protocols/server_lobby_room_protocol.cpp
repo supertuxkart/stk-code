@@ -422,7 +422,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
         return;
 
     uint8_t kart_name_size = data.gui8(5);
-    std::string kart_name = data.gs(6, kart_name_size);
+    std::string kart_name = data.getString(6, kart_name_size);
     if (kart_name.size() != kart_name_size)
     {
         Log::error("ServerLobbyRoomProtocol", "Kart names sizes differ: told:"
@@ -575,7 +575,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     if (!checkDataSizeAndToken(event, 8))
         return;
     int N = data[5];
-    std::string track_name = data.gs(5, N);
+    std::string track_name = data.getString(5, N);
     if (!isByteCorrect(event, N+6, 1))
         return;
     uint8_t player_id = peer->getPlayerProfile()->race_id;
