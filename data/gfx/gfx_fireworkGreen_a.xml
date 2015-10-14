@@ -3,24 +3,24 @@
 
     <spreading angle="180"         />
     
-    <velocity  x="0.003"
-               y="0.0003"
-               z="0.003"           />
+    <velocity  x="0.03"
+               y="0.003"
+               z="0.03"           />
     
-    <material  file="gfx_sparkFire_a.png"  />
+    <material  file="gfx_sparkGreen_a.png"  />
     
     <!-- Amount of particles emitted per second -->
     <rate      min="65"
                max="100" />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="1700"
-               max="1700"         />
+    <lifetime  min="2700"
+               max="2700"         />
     
     <!-- Size of the particles -->
-    <size      min="0.7"
-               max="1.1"
-               x-increase-factor="1.3"
+    <size      min="0.5"
+               max="0.8"
+               x-increase-factor="1.1"
                y-increase-factor="1.3"
                />
     
