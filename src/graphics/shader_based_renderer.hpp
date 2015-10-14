@@ -15,10 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_LIGHT_PREPASS_RENDERER_HPP
-#define HEADER_LIGHT_PREPASS_RENDERER_HPP
+#ifndef HEADER_SHADER_BASED_RENDERER_HPP
+#define HEADER_SHADER_BASED_RENDERER_HPP
 
 #include "graphics/abstract_renderer.hpp"
+#include "graphics/draw_calls.hpp"
 #include "graphics/geometry_passes.hpp"
 #include "graphics/lighting_passes.hpp"
 #include "graphics/shadow_matrices.hpp"
@@ -27,6 +28,9 @@
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
+    
+    //GLsync          m_sync; //TODO
+    DrawCalls       m_draw_calls;
     GeometryPasses  m_geometry_passes;
     LightingPasses  m_lighting_passes;
     ShadowMatrices  m_shadow_matrices;
@@ -45,6 +49,8 @@ private:
     
     void resetShadowCamNodes(){m_shadow_matrices.resetShadowCamNodes();}
     
+    void prepareDrawCalls(scene::ICameraSceneNode *camnode);
+
     void renderScene(irr::scene::ICameraSceneNode * const camnode,
                      std::vector<GlowData>& glows,
                      float dt, bool hasShadows, bool forceRTT);
@@ -61,4 +67,4 @@ public:
     void render(float dt);
 };
 
-#endif //HEADER_LIGHT_PREPASS_RENDERER_HPP
+#endif //HEADER_SHADER_BASED_RENDERER_HPP

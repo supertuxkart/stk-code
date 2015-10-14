@@ -159,7 +159,11 @@ void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *con
 }   // computeMatrixesAndCameras
 
 // ============================================================================
-void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
+void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
+                                      std::vector<GlowData>& glows,
+                                      float dt,
+                                      bool hasShadow,
+                                      bool forceRTT)
 {
     PostProcessing *post_processing = irr_driver->getPostProcessing();
     
@@ -168,7 +172,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, s
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
-    irr_driver->PrepareDrawCalls(m_shadow_matrices, camnode);
+    m_draw_calls.prepareDrawCalls(m_shadow_matrices, camnode);
     PROFILER_POP_CPU_MARKER();
     // Shadows
     {
@@ -351,7 +355,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode, s
         PROFILER_POP_CPU_MARKER();
     }
 
-    irr_driver->m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+    m_draw_calls.m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
     // Render particles
     {
@@ -469,10 +473,8 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 }
 
 
-ShaderBasedRenderer::ShaderBasedRenderer():AbstractRenderer(), m_shadow_matrices()
-{
-
-}
+ShaderBasedRenderer::ShaderBasedRenderer():
+AbstractRenderer(), m_shadow_matrices() {}
 
 void ShaderBasedRenderer::addSunLight(const core::vector3df &pos) {
     m_shadow_matrices.addLight(pos);

@@ -41,8 +41,8 @@ one for each solid pass, one for shadow pass, one for RSM pass, and you need to 
 You need to declare a new enum in MeshMaterial and to write the corresponding dispatch code in getMeshMaterialFromType
 and to create 2 new List* structures (one for standard and one for instanced version).
 
-Then you need to write the code in stkscenemanager.cpp that will add any mesh with the new material to their corresponding
-lists : in handleSTKCommon for the standard version and in the body of PrepareDrawCalls for instanced version.
+Then you need to write the code in shader_based_renderer.cpp that will add any mesh with the new material to their corresponding
+lists : in handleSTKCommon for the standard version and in the body of prepareDrawCalls for instanced version.
 
 \section vertex_layout Available Vertex Layout
 

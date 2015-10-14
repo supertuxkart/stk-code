@@ -191,12 +191,8 @@ enum TypeRTT
   * \ingroup graphics
   */
 class IrrDriver : public IEventReceiver, public NoCopy
-{
-public:
-    GLsync m_sync; //TODO: set public to fix compile error, find a clean fix
-    
+{    
 private:
-    //GLsync m_sync;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -326,7 +322,6 @@ public: //TODO: move into renderer class
     void renderSSAO();
     void renderShadowsDebug();
     void doScreenShot();    
-    void PrepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICameraSceneNode *camnode);
 public:
          IrrDriver();
         ~IrrDriver();

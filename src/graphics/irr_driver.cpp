@@ -499,7 +499,6 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
-    m_sync = 0;
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
 
