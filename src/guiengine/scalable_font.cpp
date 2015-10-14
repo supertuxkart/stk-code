@@ -534,15 +534,13 @@ bool ScalableFont::loadTTF()
     MaxHeight = (int)((current_maxheight + (m_type == T_DIGIT ? 40 : 5) +
                 (m_type == T_BOLD ? 20 : 0))*m_scale);
 
-    if (m_type == T_DIGIT)
+
+    for(wchar_t c='0'; c<='9'; c++)
     {
-        for(wchar_t c='0'; c<='9'; c++)
-        {
-            SFontArea a = getAreaFromCharacter(c, NULL);
-            m_max_digit_area.width     = a.width;
-            m_max_digit_area.offsety   = a.offsety;
-            m_max_digit_area.bearingx  = a.bearingx;
-        }
+        SFontArea a = getAreaFromCharacter(c, NULL);
+        m_max_digit_area.width     = a.width;
+        m_max_digit_area.offsety   = a.offsety;
+        m_max_digit_area.bearingx  = a.bearingx;
     }
 
     switch (m_type)
