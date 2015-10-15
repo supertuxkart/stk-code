@@ -63,7 +63,7 @@ void QuickJoinProtocol::asynchronousUpdate()
                 result->get("port", &res->m_port);
                 result->get("hostid", m_server_id);
                 Log::info("QuickJoinProtocol", "Quick joining %s (server#%d).",
-                          res->toString(), *m_server_id);
+                          res->toString().c_str(), *m_server_id);
             }
             else
             {
