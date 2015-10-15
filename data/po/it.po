@@ -2736,7 +2736,6 @@ msgstr "Il numero massimo di giocatori deve essere tra 2 e 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Alessandro Aragione https://launchpad.net/~layn\n  Andrea Panontin https://launchpad.net/~any-97\n  Andrea Pivetta https://launchpad.net/~vanpivix\n  Dawid Gan https://launchpad.net/~deveee\n  Diego Pierotto https://launchpad.net/~gringo\n  Gigu https://launchpad.net/~pvinci26\n  Guido Barbi https://launchpad.net/~gbar\n  Massimiliano Caniparoli https://launchpad.net/~massic80\n  Max Perkins https://launchpad.net/~maxperkinstoki\n  Oibaf https://launchpad.net/~oibaf\n  STK-team https://launchpad.net/~stk\n  grandefava https://launchpad.net/~grandefava\n  marco https://launchpad.net/~marco97pa\n  nicoelba https://launchpad.net/~nicoelba\n  t3ddy https://launchpad.net/~t3ddy1988"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3794,3 +3793,4 @@ msgstr "Raccogli bottiglie di nitro (le useremo dopo le curve)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oops! Quando sei nei guai, premi <%s> per essere salvato"
+msgstr "Launchpad Contributions:\nAlessandro Aragione https://launchpad.net/~layn\nAndrea Panontin https://launchpad.net/~any-97\nAndrea Pivetta https://launchpad.net/~vanpivix\nDavide Depau, 2015\nDawid Gan https://launchpad.net/~deveee\nDiego Pierotto https://launchpad.net/~gringo\nEnrico, 2015\nGigu https://launchpad.net/~pvinci26\nGiuseppe Pignataro, 2015\ngrandefava https://launchpad.net/~grandefava\nGuido Barbi https://launchpad.net/~gbar\nlorenzo mijorus, 2015\nmarco https://launchpad.net/~marco97pa\nMassimiliano Caniparoli https://launchpad.net/~massic80\nMax Perkins https://launchpad.net/~maxperkinstoki\nnicoelba https://launchpad.net/~nicoelba\nOibaf https://launchpad.net/~oibaf\nSTK-team https://launchpad.net/~stk\nt3ddy https://launchpad.net/~t3ddy1988"

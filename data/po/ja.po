@@ -2731,7 +2731,6 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Auria https://launchpad.net/~auria-mg\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  Yuki Shira https://launchpad.net/~shirayuking\n  lindwurm https://launchpad.net/~lindwurm\n  tkbd https://launchpad.net/~arolf\n  xapantu https://launchpad.net/~xapantu"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3788,3 +3787,4 @@ msgstr "ニトロを集めよう(集めたニトロはカーブの後で使う�
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "しまった! どうしようもなくなったときは、<%s>を押して助けてもらおう"
+msgstr "Launchpad Contributions:\nAuria https://launchpad.net/~auria-mg\nDawid Gan https://launchpad.net/~deveee\nHotaka Hitagi, 2015\nlindwurm https://launchpad.net/~lindwurm\nMasayuki Sugahara, 2015\nSTK-team https://launchpad.net/~stk\nTae-Wong SEO https://launchpad.net/~seotaewong40\ntkbd https://launchpad.net/~arolf\nxapantu https://launchpad.net/~xapantu\nYuki Shira https://launchpad.net/~shirayuking"

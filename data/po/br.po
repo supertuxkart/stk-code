@@ -2735,7 +2735,6 @@ msgstr "An niver uc'hek a c'hoarierion a rank bezañ etre 2 ha 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Alan https://launchpad.net/~alan-m.\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3793,3 +3792,4 @@ msgstr "Dastum boutailhadoù nitro (ganto e vo graet goude ar gammdro)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Hopala ! Mar teuy kudennoù ouzhit, pouez war  <%s> da vezañ sikouret"
+msgstr "Launchpad Contributions:\nAlan https://launchpad.net/~alan-m.\nAlan Monfort, 2015\nDawid Gan https://launchpad.net/~deveee\nGwenn M, 2015\nSTK-team https://launchpad.net/~stk"

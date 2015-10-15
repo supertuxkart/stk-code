@@ -2737,7 +2737,6 @@ msgstr "Максимальна кількість гравців має бути
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Helen Antonova https://launchpad.net/~vigonett\n  JOker https://launchpad.net/~spenser26\n  Maks Lyashuk aka Ma)(imuM https://launchpad.net/~probel\n  Pasha Sydoryshyn https://launchpad.net/~pandorrarv\n  Pavlo Bilyak https://launchpad.net/~pavlo1997\n  STK-team https://launchpad.net/~stk\n  Volodymyr Bodenchuk https://launchpad.net/~bodenchuk\n  Сергій Дубик https://launchpad.net/~dubyk-library"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3796,3 +3795,4 @@ msgstr "Збирайте балони з азотом (використаємо 
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Упс! Якщо у вас проблеми тисніть <%s> для порятунку"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nfedik, 2015\nHelen Antonova https://launchpad.net/~vigonett\nJOker https://launchpad.net/~spenser26\nMaks Lyashuk aka Ma)(imuM https://launchpad.net/~probel\nMax Lyashuk, 2015\nPasha Sydoryshyn https://launchpad.net/~pandorrarv\nPavlo Bilyak https://launchpad.net/~pavlo1997\nSTK-team https://launchpad.net/~stk\nVolodymyr Bodenchuk https://launchpad.net/~bodenchuk\nСергій Дубик https://launchpad.net/~dubyk-library"

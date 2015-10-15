@@ -2734,7 +2734,6 @@ msgstr "Het maximum aantal spelers moet tussen 2 en 12 liggen."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Amy Smile Kerkhof https://launchpad.net/~amy\n  Asciimonster https://launchpad.net/~asciimonster-myrealbox\n  Dawid Gan https://launchpad.net/~deveee\n  Foppe Benedictus https://launchpad.net/~foppe-benedictus\n  Guus https://launchpad.net/~guus-verbeek\n  Heimen Stoffels https://launchpad.net/~vistaus\n  Kaj-Ivar https://launchpad.net/~kaj-ivar\n  Koen_VL https://launchpad.net/~koenvl\n  STK-team https://launchpad.net/~stk\n  Ward Muylaert https://launchpad.net/~ward-muylaert\n  Willem Sonke https://launchpad.net/~willem-sonke\n  Wim Champagne https://launchpad.net/~fng-deactivatedaccount-deactivatedaccount\n  plutgamer https://launchpad.net/~plutgamer\n  toams https://launchpad.net/~toams"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3792,3 +3791,4 @@ msgstr "Verzamel flessen lachgas (we gebruiken ze na de bocht)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oeps! Bij problemen druk <%s>"
+msgstr "Launchpad Contributions:\nAmy Smile Kerkhof https://launchpad.net/~amy\nAsciimonster https://launchpad.net/~asciimonster-myrealbox\nDawid Gan https://launchpad.net/~deveee\nFoppe Benedictus https://launchpad.net/~foppe-benedictus\nFrans van Rijn, 2015\nGuus https://launchpad.net/~guus-verbeek\nHeimen Stoffels https://launchpad.net/~vistaus\nKaj-Ivar https://launchpad.net/~kaj-ivar\nKoen_VL https://launchpad.net/~koenvl\nplutgamer https://launchpad.net/~plutgamer\nSTK-team https://launchpad.net/~stk\ntoams https://launchpad.net/~toams\nWard Muylaert https://launchpad.net/~ward-muylaert\nWard Muylaert, 2015\nWillem Sonke https://launchpad.net/~willem-sonke\nWim Champagne https://launchpad.net/~fng-deactivatedaccount-deactivatedaccount"

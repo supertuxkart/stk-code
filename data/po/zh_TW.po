@@ -2735,7 +2735,6 @@ msgstr "最大玩家數必須在 2 至 12 個之間。"
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Bill https://launchpad.net/~cges30901\n  Carl X. Su https://launchpad.net/~bcbcarl\n  Jeff Huang https://launchpad.net/~s8321414\n  STK-team https://launchpad.net/~stk\n  WM https://launchpad.net/~wandererm\n  jyc https://launchpad.net/~alphabet14\n  minhsien https://launchpad.net/~minhsien0330\n  tryneeds https://launchpad.net/~tryneeds\n  Ｖ字龍(Vdragon) https://launchpad.net/~vdragon"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3792,3 +3791,4 @@ msgstr "收集氮氣罐（我們將在轉彎之後使用它們）"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "糟糕！當你有麻煩時，按 <%s> 被救援"
+msgstr "Launchpad Contributions:\nBen Au, 2015\nBen Au, 2015\nBill https://launchpad.net/~cges30901\nCarl X. Su https://launchpad.net/~bcbcarl\ncges30901, 2015\ncges30901, 2015\nJeff Huang https://launchpad.net/~s8321414\nJeff Huang, 2015\njyc https://launchpad.net/~alphabet14\nminhsien https://launchpad.net/~minhsien0330\nSTK-team https://launchpad.net/~stk\ntryneeds https://launchpad.net/~tryneeds\nWM https://launchpad.net/~wandererm\nＶ字龍(Vdragon) https://launchpad.net/~vdragon\nＶ字龍(Vdragon), 2015"

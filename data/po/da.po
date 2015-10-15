@@ -2735,7 +2735,6 @@ msgstr "Det maksimale antal spiller skal være imellem 2 og 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  1001sd https://launchpad.net/~siadyhr\n  Aputsiaĸ Niels Janussen https://launchpad.net/~aj\n  Auria https://launchpad.net/~auria-mg\n  J https://launchpad.net/~rumbukken\n  Marcus Møller https://launchpad.net/~marcusmoller\n  STK-team https://launchpad.net/~stk\n\nscootergrisen"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3793,3 +3792,4 @@ msgstr "Saml nitroflasker (vi bruger dem efter svinget)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Hovsa! Når du er i problemer, kan du trykke på <%s> for at blive reddet"
+msgstr "Launchpad Contributions:\n\n1001sd https://launchpad.net/~siadyhr\nAputsiaĸ Niels Janussen https://launchpad.net/~aj\nAuria https://launchpad.net/~auria-mg\nJ https://launchpad.net/~rumbukken\nJoe Hansen, 2009,2015\nMarcus Møller https://launchpad.net/~marcusmoller\nscootergrisen\nscootergrisen, 2015\nSTK-team https://launchpad.net/~stk\nSøren Dyhr, 2015"

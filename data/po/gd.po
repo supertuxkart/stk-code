@@ -2741,7 +2741,6 @@ msgstr "Feumaidh an àireamh as motha de chluicheadairean a bhith eadar 2 is 12.
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  GunChleoc https://launchpad.net/~gunchleoc\n  STK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3801,3 +3800,4 @@ msgstr "Tog botalan naidhtreo (cleachdaidh sinn taobh thall na lùib iad)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oich! Ma tha thu ann an staing, brùth air <%s> gus cobhair fhaighinn"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nGunChleoc https://launchpad.net/~gunchleoc\nGunChleoc, 2012-2015\nGunChleoc, 2015\nSTK-team https://launchpad.net/~stk"

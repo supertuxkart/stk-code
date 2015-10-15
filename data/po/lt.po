@@ -2739,7 +2739,6 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Algimantas Margevičius https://launchpad.net/~gymka\n  Mantas Kriaučiūnas https://launchpad.net/~mantas\n  STK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3798,3 +3797,4 @@ msgstr "Rinkite ypatingo „nitro“ kuro butelius (juos panaudosite už posūki
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oi! Jei atsidūrėte neišvažiuojamoje vietoje - spauskite <%s> ir būsite išgelbėtas"
+msgstr "Launchpad Contributions:\nAlgimantas Margevičius https://launchpad.net/~gymka\nAlgimantas Margevičius, 2011\nJonas Kriaučiūnas, 2015\nMantas Kriaučiūnas https://launchpad.net/~mantas\nMantas Kriaučiūnas, 2015\nSTK-team https://launchpad.net/~stk"
