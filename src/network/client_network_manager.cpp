@@ -101,7 +101,7 @@ void* waitInput(void* data)
         else if (NetworkManager::getInstance() && 
                  NetworkManager::getInstance()->getPeers().size() > 0)
         {
-            NetworkString msg;
+            NetworkString msg(1+str.size());
             msg.ai8(0);
             msg += str;
             NetworkManager::getInstance()->getPeers()[0]->sendPacket(msg);

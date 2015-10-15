@@ -157,7 +157,7 @@ void ProtocolManager::notifyEvent(Event* event)
 void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message,
                                   bool reliable)
 {
-    NetworkString newMessage;
+    NetworkString newMessage(1+message.size());
     newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
     newMessage += message;
     NetworkManager::getInstance()->sendPacket(newMessage, reliable);
@@ -167,7 +167,7 @@ void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message
 void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer,
                                   const NetworkString& message, bool reliable)
 {
-    NetworkString newMessage;
+    NetworkString newMessage(1+message.size());
     newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
     newMessage += message;
     NetworkManager::getInstance()->sendPacket(peer, newMessage, reliable);
@@ -178,7 +178,7 @@ void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer,
                                         const NetworkString& message,
                                         bool reliable)
 {
-    NetworkString newMessage;
+    NetworkString newMessage(1+message.size());
     newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
     newMessage += message;
     NetworkManager::getInstance()->sendPacketExcept(peer, newMessage, reliable);

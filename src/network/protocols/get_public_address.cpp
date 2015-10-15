@@ -86,7 +86,7 @@ void GetPublicAddress::createStunRequest()
     m_transaction_host->setupClient(1, 1, 0, 0);
 
     // Assemble the message for the stun server
-    NetworkString s;
+    NetworkString s(21);
 
     // bytes 0-1: the type of the message
     // bytes 2-3: message length added to header (attributes)

@@ -118,7 +118,7 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         {
             if (i == client_index) // don't send that message to the sender
                 continue;
-            NetworkString ns2;
+            NetworkString ns2(4+pure_message.size());
             ns2.ai32(m_controllers[i].second->getClientServerToken());
             ns2 += pure_message;
             m_listener->sendMessage(this, m_controllers[i].second, ns2, false);
@@ -157,7 +157,7 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     uint8_t serialized_2 = (uint8_t)(controls->m_accel*255.0);
     uint8_t serialized_3 = (uint8_t)(controls->m_steer*127.0);
 
-    NetworkString ns;
+    NetworkString ns(17);
     ns.ai32(m_controllers[m_self_controller_index].second->getClientServerToken());
     ns.af(World::getWorld()->getTime());
     ns.ai8(m_self_controller_index);

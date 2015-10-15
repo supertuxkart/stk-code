@@ -60,7 +60,10 @@ public:
 
     // ------------------------------------------------------------------------
     /** Constructor to store one byte. */
-    NetworkString(const uint8_t& value) { m_string.push_back(value); }
+    NetworkString(int len)
+    {
+        m_string.reserve(len);
+    }   // NetworkString(int)
 
     // ------------------------------------------------------------------------
     /** Copy constructor. */

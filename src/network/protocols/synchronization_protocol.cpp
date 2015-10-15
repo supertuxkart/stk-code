@@ -74,7 +74,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 
     if (request)
     {
-        NetworkString response;
+        NetworkString response(10);
         response.ai8(data.gui8(talk_id)).ai32(token).ai8(0).ai32(sequence);
         m_listener->sendMessage(this, peers[peer_id], response, false);
         Log::verbose("SynchronizationProtocol", "Answering sequence %u", sequence);
@@ -155,7 +155,7 @@ void SynchronizationProtocol::asynchronousUpdate()
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
-            NetworkString ns;
+            NetworkString ns(10);
             ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1).addUInt32(m_pings[i].size());
             // now add the countdown if necessary
             if (m_countdown_activated && m_listener->isServer())
