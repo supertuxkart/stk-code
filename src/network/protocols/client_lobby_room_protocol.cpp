@@ -56,7 +56,7 @@ void ClientLobbyRoomProtocol::requestKartSelection(std::string kart_name)
 {
     NetworkString request;
     // 0x02 : kart selection request, size_token (4), token, size kart name, kart name
-    request.ai8(0x02).ai8(4).ai32(m_server->getClientServerToken()).ai8(kart_name.size()).as(kart_name);
+    request.ai8(0x02).ai8(4).ai32(m_server->getClientServerToken()).add(kart_name);
     m_listener->sendMessage(this, request, true);
 }   // requestKartSelection
 
@@ -96,7 +96,7 @@ void ClientLobbyRoomProtocol::voteTrack(std::string track, uint8_t track_nb)
 {
     NetworkString request;
     // 0xc0 : major vote, size_token (4), token, size track, track, size #track, #track
-    request.ai8(0xc3).ai8(4).ai32(m_server->getClientServerToken()).ai8(track.size()).as(track).ai8(1).ai8(track_nb);
+    request.ai8(0xc3).ai8(4).ai32(m_server->getClientServerToken()).add(track).ai8(1).ai8(track_nb);
     m_listener->sendMessage(this, request, true);
 }   // voteTrack
 

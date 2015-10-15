@@ -74,6 +74,12 @@ public:
     }   // NetworkString
 
     // ------------------------------------------------------------------------
+    NetworkString& add(const std::string &s)
+    {
+        return addUInt8(uint8_t(s.size())).as(s);
+    }   // add
+
+    // ------------------------------------------------------------------------
     NetworkString& removeFront(int size)
     {
         m_string.erase(m_string.begin(), m_string.begin() + size);
