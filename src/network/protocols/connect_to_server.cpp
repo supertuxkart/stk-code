@@ -177,7 +177,7 @@ void ConnectToServer::asynchronousUpdate()
                     if (strcmp(data, (char*)(received_data)) == 0)
                     {
                         Log::info("ConnectToServer", "LAN Server found : %s", 
-                                  sender.toString());
+                                  sender.toString().c_str());
 #ifndef WIN32
                         // just check if the ip is ours : if so, then just use localhost (127.0.0.1)
                         struct ifaddrs *ifap, *ifa;
@@ -188,8 +188,8 @@ void ConnectToServer::asynchronousUpdate()
                             if (ifa->ifa_addr->sa_family==AF_INET)
                             {
                                 sa = (struct sockaddr_in *) ifa->ifa_addr;
-                                if (ntohl(sa->sin_addr.s_addr) == sender.ip) // this interface is ours
-                                    sender.ip = 0x7f000001; // 127.0.0.1
+                                if (ntohl(sa->sin_addr.s_addr) == sender.m_ip) // this interface is ours
+                                    sender.m_ip = 0x7f000001; // 127.0.0.1
                             }
                         }
                         freeifaddrs(ifap);
@@ -247,7 +247,7 @@ void ConnectToServer::asynchronousUpdate()
                     timer = StkTime::getRealTime();
                     NetworkManager::getInstance()->connect(m_server_address);
                     Log::info("ConnectToServer", "Trying to connect to %s", 
-                              m_server_address.toString());
+                              m_server_address.toString().c_str());
                 }
                 break;
             }
