@@ -2732,7 +2732,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Auria https://launchpad.net/~auria-mg\n  Dawid Gan https://launchpad.net/~deveee"
+msgstr "Launchpad Contributions:\nAuria https://launchpad.net/~auria-mg\nDawid Gan https://launchpad.net/~deveee"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"

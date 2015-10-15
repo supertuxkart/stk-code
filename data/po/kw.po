@@ -2740,7 +2740,7 @@ msgstr "Res yw dhe'n niver ughella a warioryon bos ynter 2 ha 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  STK-team https://launchpad.net/~stk\n  kernow https://launchpad.net/~kernow"
+msgstr "Launchpad Contributions:\nkernow https://launchpad.net/~kernow\nNicky Rowe, 2015\nSTK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"

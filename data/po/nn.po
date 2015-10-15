@@ -3791,3 +3791,7 @@ msgstr "Plukk opp nitroflasker (me skal bruka dei etter svingen)."
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oi sann! Når du får problem, kan du trykkja <%s> for å verta redda."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nKarl Ove Hufthammer, 2011,2015"

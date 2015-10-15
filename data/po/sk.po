@@ -2738,7 +2738,7 @@ msgstr "Maximálny počet hráčov musí byť v rozsahu od 2 do 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Miroslav Remák https://launchpad.net/~miroslavr256\n  Prescott_SK https://launchpad.net/~prescott66\n  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nDušan Kazik, 2015\nMiroslav Remák https://launchpad.net/~miroslavr256\nMiroslavR, 2015\nPrescott_SK https://launchpad.net/~prescott66\nSTK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"

@@ -2739,7 +2739,7 @@ msgstr "Največje število igralcev mora biti med 2 in 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Andrej Znidarsic https://launchpad.net/~andrej.znidarsic\n  Auria https://launchpad.net/~auria-mg\n  Denis_Ubuntu https://launchpad.net/~sirdrinksalot\n  Domen Knez https://launchpad.net/~dmen\n  Matic Gradišer https://launchpad.net/~0micky\n  STK-team https://launchpad.net/~stk\n  Sasa Batistic https://launchpad.net/~sasa-batistic"
+msgstr "Launchpad Contributions:\nAndrej Znidarsic https://launchpad.net/~andrej.znidarsic\nAndrej Znidarsic, 2015\nAuria https://launchpad.net/~auria-mg\nDenis_Ubuntu https://launchpad.net/~sirdrinksalot\nDomen Knez https://launchpad.net/~dmen\nMatic Gradišer https://launchpad.net/~0micky\nSasa Batistic https://launchpad.net/~sasa-batistic\nSTK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
