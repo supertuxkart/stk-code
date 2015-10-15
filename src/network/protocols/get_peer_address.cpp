@@ -61,12 +61,12 @@ void GetPeerAddress::asynchronousUpdate()
             if (rec_success == "yes")
             {
                 TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
-                result->get("ip", &addr->ip);
+                result->get("ip", &addr->m_ip);
 
-                if (addr->ip == NetworkManager::getInstance()->getPublicAddress().ip)
-                    result->get("private_port", &addr->port);
+                if (addr->m_ip == NetworkManager::getInstance()->getPublicAddress().m_ip)
+                    result->get("private_port", &addr->m_port);
                 else
-                    result->get("port", &addr->port);
+                    result->get("port", &addr->m_port);
 
                 Log::debug("GetPeerAddress", "Address gotten successfully.");
             }

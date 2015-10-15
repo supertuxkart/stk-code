@@ -208,13 +208,13 @@ void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
     memset(&to,0,to_len);
 
     to.sin_family = AF_INET;
-    to.sin_port = htons(dst.port);
-    to.sin_addr.s_addr = htonl(dst.ip);
+    to.sin_port = htons(dst.m_port);
+    to.sin_addr.s_addr = htonl(dst.m_ip);
 
     sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
-    Log::verbose("STKHost", "Raw packet sent to %i.%i.%i.%i:%u", ((dst.ip>>24)&0xff)
-    , ((dst.ip>>16)&0xff), ((dst.ip>>8)&0xff), ((dst.ip>>0)&0xff), dst.port);
-    STKHost::logPacket(NetworkString(std::string((char*)(data), length)), false);
+    Log::verbose("STKHost", "Raw packet sent to %s", dst.toString().c_str());
+    STKHost::logPacket(NetworkString(std::string((char*)(data), length)),
+                       false);
 }
 
 // ----------------------------------------------------------------------------
@@ -265,8 +265,8 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
         Log::error("STKHost", "Problem with the socket. Please contact the dev team.");
     }
     // we received the data
-    sender->ip = ntohl((uint32_t)(addr.sin_addr.s_addr));
-    sender->port = ntohs(addr.sin_port);
+    sender->m_ip = ntohl((uint32_t)(addr.sin_addr.s_addr));
+    sender->m_port = ntohs(addr.sin_port);
 
     if (addr.sin_family == AF_INET)
     {
@@ -294,7 +294,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
 
     int i = 0;
      // wait to receive the message because enet sockets are non-blocking
-    while(len < 0 || addr.sin_addr.s_addr == sender.ip)
+    while(len < 0 || addr.sin_addr.s_addr == sender.m_ip)
     {
         i++;
         if (len>=0)
@@ -339,8 +339,8 @@ bool STKHost::peerExists(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == ntohl(peer.ip) &&
-            m_host->peers[i].address.port == peer.port)
+        if (m_host->peers[i].address.host == ntohl(peer.m_ip) &&
+            m_host->peers[i].address.port == peer.m_port)
         {
             return true;
         }
@@ -354,8 +354,7 @@ bool STKHost::isConnectedTo(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == ntohl(peer.ip) &&
-            m_host->peers[i].address.port == peer.port &&
+        if (peer == m_host->peers[i].address &&
             m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
         {
             return true;

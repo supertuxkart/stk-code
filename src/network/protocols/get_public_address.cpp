@@ -156,8 +156,7 @@ std::string GetPublicAddress::parseStunResponse()
 
 
     // Those are the port and the address to be detected
-    uint16_t port;
-    uint32_t address;
+    TransportAddress address;
     int pos = 20;
     while (true)
     {
@@ -167,8 +166,8 @@ std::string GetPublicAddress::parseStunResponse()
         {
             assert(size == 8);
             assert(datas.getUInt8(pos+5) == 0x01); // Family IPv4 only
-            port = datas.getUInt16(pos + 6);
-            address = datas.getUInt32(pos + 8);
+            address.m_port = datas.getUInt16(pos + 6);
+            address.m_ip   = datas.getUInt32(pos + 8);
             break;
         }   // type = 0 or 1
         pos +=  4 + size;
@@ -180,11 +179,10 @@ std::string GetPublicAddress::parseStunResponse()
     }   // while true
 
     // finished parsing, we know our public transport address
-    Log::debug("GetPublicAddress", "The public address has been found: %i.%i.%i.%i:%i",
-                 address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
+    Log::debug("GetPublicAddress", "The public address has been found: %s",
+               address.toString().c_str());
     TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
-    addr->ip = address;
-    addr->port = port;
+    *addr = address;
 
     // The address and the port are known, so the connection can be closed
     m_state = EXITING;

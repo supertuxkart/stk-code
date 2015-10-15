@@ -125,8 +125,7 @@ void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
 void ClientLobbyRoomProtocol::leave()
 {
     m_server->disconnect();
-    m_server_address.ip = 0;
-    m_server_address.port = 0;
+    m_server_address.clear();
 }   // leave
 
 //-----------------------------------------------------------------------------

@@ -22,14 +22,14 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
+#include "utils/string_utils.hpp"
 #include "utils/types.hpp"
+
+#include "enet/enet.h"
 
 #include <string>
 
-/*! functions to write easily addresses in logs. */
-#define ADDRESS_FORMAT "%d.%d.%d.%d:%d"
-#define ADDRESS_ARGS(ip,port) ((ip>>24)&0xff),((ip>>16)&0xff),((ip>>8)&0xff),((ip>>0)&0xff),port
-
+// ============================================================================
 /*! \class CallbackObject
  *  \brief Class that must be inherited to pass objects to protocols.
  */
@@ -39,29 +39,67 @@ class CallbackObject
         CallbackObject() {}
         ~CallbackObject() {}
 
-};
+};   // CallbackObject
 
+// ============================================================================
 /*! \class TransportAddress
  *  \brief Describes a transport-layer address.
  *  For IP networks, a transport address is the couple ip:port.
  */
 class TransportAddress : public CallbackObject
 {
-    public:
-    TransportAddress(uint32_t p_ip = 0, uint16_t p_port = 0)
-    { ip = p_ip; port = p_port; }
+public:
+    uint32_t m_ip;    //!< The IPv4 address
+    uint16_t m_port;  //!< The port number
+
+    /** Constructor. */
+    TransportAddress(uint32_t ip = 0, uint16_t port = 0)
+    {
+        m_ip = ip;
+        m_port = port; 
+    }   // TransportAddress
+
+    // ------------------------------------------------------------------------
     ~TransportAddress() {}
-
+    // ------------------------------------------------------------------------
+    /** Resets ip and port to 0. */
+    void clear()
+    {
+        m_ip   = 0;
+        m_port = 0;
+    }   // clear
+    // ------------------------------------------------------------------------
+    /** Compares if ip address and port are identical. */
     bool operator==(const TransportAddress& other) const
-    { return other.ip == ip && other.port == port; }
+    {
+        return other.m_ip == m_ip && other.m_port == m_port; 
+    }   // operator==
 
+    // ------------------------------------------------------------------------
+    bool operator==(const ENetAddress& other)
+    {
+        return other.host == ntohl(m_ip) && other.port == m_port;
+    }
+    // ------------------------------------------------------------------------
+    /** Compares if ip address or port are different. */
     bool operator!=(const TransportAddress& other) const
-    { return other.ip != ip || other.port != port; }
+    {
+        return other.m_ip != m_ip || other.m_port != m_port;
+    }   // operator!=
+    // ------------------------------------------------------------------------
+    /** Returns a std::string representing the ip address and port in human
+     *  readable format. */
+    std::string toString() const
+    {
+        return
+        StringUtils::insertValues("%d.%d.%d.%d:%d",
+                                  ((m_ip >> 24) & 0xff), ((m_ip >> 16) & 0xff),
+                                  ((m_ip >>  8) & 0xff), ((m_ip >>  0) & 0xff),
+                                  m_port                                     );
+    }   // toString
+};   // TransportAddress
 
-    uint32_t ip;    //!< The IPv4 address
-    uint16_t port;  //!< The port number
-};
-
+// ============================================================================
 /*! \class PlayerLogin
  *  \brief Contains the information needed to authenticate a user.
  */
@@ -73,7 +111,7 @@ class PlayerLogin : public CallbackObject
 
     std::string username;   //!< Username of the player
     std::string password;   //!< Password of the player
-};
+};   // class PlayerLogin
 
 
 #endif // TYPES_HPP

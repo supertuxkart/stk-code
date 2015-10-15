@@ -82,10 +82,8 @@ void ConnectToServer::setup()
 {
     Log::info("ConnectToServer", "SETUPP");
     m_state = NONE;
-    m_public_address.ip = 0;
-    m_public_address.port = 0;
-    m_server_address.ip = 0;
-    m_server_address.port = 0;
+    m_public_address.clear();
+    m_server_address.clear();
     m_current_protocol_id = 0;
 }
 
@@ -139,7 +137,7 @@ void ConnectToServer::asynchronousUpdate()
             == PROTOCOL_STATE_TERMINATED) // we know the server address
             {
                 Log::info("ConnectToServer", "Server's address known");
-                if (m_server_address.ip == m_public_address.ip) // we're in the same lan (same public ip address) !!
+                if (m_server_address.m_ip == m_public_address.m_ip) // we're in the same lan (same public ip address) !!
                     Log::info("ConnectToServer", "Server appears to be in the same LAN.");
                 m_state = REQUESTING_CONNECTION;
                 m_current_protocol_id = m_listener->requestStart(new RequestConnection(m_server_id));
@@ -150,14 +148,15 @@ void ConnectToServer::asynchronousUpdate()
             == PROTOCOL_STATE_TERMINATED) // server knows we wanna connect
             {
                 Log::info("ConnectToServer", "Connection request made");
-                if (m_server_address.ip == 0 || m_server_address.port == 0)
+                if (m_server_address.m_ip == 0 || m_server_address.m_port == 0)
                 { // server data not correct, hide address and stop
                     m_state = HIDING_ADDRESS;
-                    Log::error("ConnectToServer", "Server address is " ADDRESS_FORMAT, ADDRESS_ARGS(m_server_address.ip, m_server_address.port));
+                    Log::error("ConnectToServer", "Server address is %s",
+                               m_server_address.toString().c_str());
                     m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
                     return;
                 }
-                if (m_server_address.ip == m_public_address.ip) // we're in the same lan (same public ip address) !!
+                if (m_server_address.m_ip == m_public_address.m_ip) // we're in the same lan (same public ip address) !!
                 {
                     // just send a broadcast packet, the client will know our ip address and will connect
                     STKHost* host = NetworkManager::getInstance()->getHost();
@@ -165,8 +164,8 @@ void ConnectToServer::asynchronousUpdate()
                     TransportAddress sender;
 
                         TransportAddress broadcast_address;
-                        broadcast_address.ip = -1; // 255.255.255.255
-                        broadcast_address.port = 7321; // 0b10101100000101101101111111111111; // for test
+                        broadcast_address.m_ip = -1; // 255.255.255.255
+                        broadcast_address.m_port = 7321; // 0b10101100000101101101111111111111; // for test
                         char data2[] = "aloha_stk\0";
                         host->sendRawPacket((uint8_t*)(data2), 10, broadcast_address);
 
@@ -177,7 +176,8 @@ void ConnectToServer::asynchronousUpdate()
                     const char data[] = "aloha_stk\0";
                     if (strcmp(data, (char*)(received_data)) == 0)
                     {
-                        Log::info("ConnectToServer", "LAN Server found : %u:%u", sender.ip, sender.port);
+                        Log::info("ConnectToServer", "LAN Server found : %s", 
+                                  sender.toString());
 #ifndef WIN32
                         // just check if the ip is ours : if so, then just use localhost (127.0.0.1)
                         struct ifaddrs *ifap, *ifa;
@@ -219,9 +219,9 @@ void ConnectToServer::asynchronousUpdate()
                         for(unsigned int i=0; i<table->dwNumEntries; i++)
                         {
                             unsigned int ip = ntohl(table->table[i].dwAddr);
-                            if(sender.ip == ip) // this interface is ours
+                            if(sender.m_ip == ip) // this interface is ours
                             {
-                                sender.ip = 0x7f000001; // 127.0.0.1
+                                sender.m_ip = 0x7f000001; // 127.0.0.1
                                 break;
                             }
                         }
@@ -246,7 +246,8 @@ void ConnectToServer::asynchronousUpdate()
                 {
                     timer = StkTime::getRealTime();
                     NetworkManager::getInstance()->connect(m_server_address);
-                    Log::info("ConnectToServer", "Trying to connect to %u:%u", m_server_address.ip, m_server_address.port);
+                    Log::info("ConnectToServer", "Trying to connect to %s", 
+                              m_server_address.toString());
                 }
                 break;
             }

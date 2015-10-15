@@ -53,8 +53,7 @@ void ServerLobbyRoomProtocol::setup()
     m_setup->getRaceConfig()->setPlayerCount(16); //FIXME : this has to be moved to when logging into the server
     m_next_id = 0;
     m_state = NONE;
-    m_public_address.ip = 0;
-    m_public_address.port = 0;
+    m_public_address.clear();
     m_selection_enabled = false;
     m_in_race = false;
     Log::info("ServerLobbyRoomProtocol", "Starting the protocol.");
@@ -185,8 +184,8 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
         Online::XMLRequest* request = new Online::XMLRequest();
         PlayerManager::setUserDetails(request, "poll-connection-requests", Online::API::SERVER_PATH);
 
-        request->addParameter("address", addr.ip);
-        request->addParameter("port", addr.port);
+        request->addParameter("address", addr.m_ip);
+        request->addParameter("port", addr.m_port);
 
         request->executeNow();
         assert(request->isDone());

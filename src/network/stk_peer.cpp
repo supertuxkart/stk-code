@@ -67,11 +67,11 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host,
 {
     ENetAddress  address;
     address.host =
-         ((host.ip & 0xff000000) >> 24)
-       + ((host.ip & 0x00ff0000) >> 8)
-       + ((host.ip & 0x0000ff00) << 8)
-       + ((host.ip & 0x000000ff) << 24); // because ENet wants little endian
-    address.port = host.port;
+         ((host.m_ip & 0xff000000) >> 24)
+       + ((host.m_ip & 0x00ff0000) >> 8)
+       + ((host.m_ip & 0x0000ff00) << 8)
+       + ((host.m_ip & 0x000000ff) << 24); // because ENet wants little endian
+    address.port = host.m_port;
 
     ENetPeer* peer = enet_host_connect(localhost->m_host, &address, 2, 0);
     if (peer == NULL)
@@ -79,10 +79,10 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host,
         Log::error("STKPeer", "Could not try to connect to server.\n");
         return false;
     }
-    Log::verbose("STKPeer", "Connecting to %i.%i.%i.%i:%i.\nENetPeer address "
-                "is %p", (peer->address.host>>0)&0xff,
-                (peer->address.host>>8)&0xff,(peer->address.host>>16)&0xff,
-                (peer->address.host>>24)&0xff,peer->address.port, peer);
+    TransportAddress a;
+    a.m_ip = peer->address.host;
+    a.m_port = peer->address.port;
+    Log::verbose("STKPeer", "Connecting to %s", a.toString().c_str());
     return true;
 }
 
@@ -97,10 +97,13 @@ void STKPeer::disconnect()
 
 void STKPeer::sendPacket(NetworkString const& data, bool reliable)
 {
-    Log::verbose("STKPeer", "sending packet of size %d to %i.%i.%i.%i:%i",
-                data.size(), (m_peer->address.host>>0)&0xff,
-                (m_peer->address.host>>8)&0xff,(m_peer->address.host>>16)&0xff,
-                (m_peer->address.host>>24)&0xff,m_peer->address.port);
+    TransportAddress a;
+    a.m_ip   = m_peer->address.host;
+    a.m_port = m_peer->address.port;
+
+    Log::verbose("STKPeer", "sending packet of size %d to %s",
+                 a.toString().c_str());
+         
     ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
                 (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
     /* to debug the packet output
