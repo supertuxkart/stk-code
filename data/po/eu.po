@@ -2736,6 +2736,7 @@ msgstr "Gehienezko jokalari kopuruak 2 eta 12 artean egon behar du."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
+msgstr "Launchpad Contributions:\n  Amy Smile Kerkhof https://launchpad.net/~amy\n  Ander Elortondo https://launchpad.net/~ander-elor\n  Asier Iturralde Sarasola https://launchpad.net/~asier-iturralde\n  Jan Mees https://launchpad.net/~jmees001\n  Mikel Iturbe Urretxa https://launchpad.net/~mik-iturbe\n  STK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3793,4 +3794,3 @@ msgstr "Bildu nitro botilak (kurbaren ondoren erabiliko ditugu)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oops! Arazotan zaudenean sakatu  <%s> erreskata zaitzaten"
-msgstr "Launchpad Contributions:\nAmy Smile Kerkhof https://launchpad.net/~amy\nAnder Elortondo https://launchpad.net/~ander-elor\nAsier Iturralde Sarasola https://launchpad.net/~asier-iturralde\nAsier Iturralde Sarasola, 2015\nJan Mees https://launchpad.net/~jmees001\nManex Agirrezabal, 2015\nMikel Iturbe Urretxa https://launchpad.net/~mik-iturbe\nMikel Olasagasti Uranga, 2015\nSTK-team https://launchpad.net/~stk"

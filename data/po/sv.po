@@ -2733,6 +2733,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
+msgstr "Launchpad Contributions:\n  Anders Carlsson https://launchpad.net/~kk7ntl9af-gk9\n  Arve Eriksson https://launchpad.net/~031299870-telia\n  Daniel Nylander https://launchpad.net/~yeager\n  Dawid Gan https://launchpad.net/~deveee\n  MDxm https://launchpad.net/~mdxm3000\n  Mathias Tillman https://launchpad.net/~master-homer\n  Mikael Mildén https://launchpad.net/~mikael-milden\n  Phoenix https://launchpad.net/~thephoenix\n  Rikard Edgren https://launchpad.net/~rikard-edgren\n  Rikard Johansson https://launchpad.net/~rikard-jo\n  STK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3790,4 +3791,3 @@ msgstr "Samla nitro flaskor (vi kommer att använda dem efter kurvan)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Hoppsan! När du är i trubbel, tryck på <%s> att räddas"
-msgstr "Launchpad Contributions:\nAnders Carlsson https://launchpad.net/~kk7ntl9af-gk9\nArve Eriksson https://launchpad.net/~031299870-telia\nDaniel Nylander https://launchpad.net/~yeager\nDawid Gan https://launchpad.net/~deveee\nFroppe123, 2015\nMathias Tillman https://launchpad.net/~master-homer\nMDxm https://launchpad.net/~mdxm3000\nMikael Mildén https://launchpad.net/~mikael-milden\nPhoenix https://launchpad.net/~thephoenix\nRikard Edgren https://launchpad.net/~rikard-edgren\nRikard Johansson https://launchpad.net/~rikard-jo\nSTK-team https://launchpad.net/~stk"

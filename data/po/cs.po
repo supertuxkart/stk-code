@@ -2739,6 +2739,7 @@ msgstr "Je třeba, aby hráči museli být nejméně 2 a nejvíce 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
+msgstr "Launchpad Contributions:\n  Ari Green https://launchpad.net/~ariyoyah\n  David Kolibáč https://launchpad.net/~david-kolibac\n  Dawid Gan https://launchpad.net/~deveee\n  František Zatloukal https://launchpad.net/~zatloukal-frantisek\n  H0ff1 https://launchpad.net/~stefhoff\n  Jakub Talich https://launchpad.net/~jakub.talich-deactivatedaccount\n  Jan Srb https://launchpad.net/~j-srb\n  Jirka Folta https://launchpad.net/~pholta-cz\n  Lukáš Machyán https://launchpad.net/~phobulos\n  Michal Kundrát https://launchpad.net/~dreit\n  MightyPork https://launchpad.net/~mighty-pork\n  Ondřej Holý https://launchpad.net/~ondrej-holy\n  Petr Wudi https://launchpad.net/~petr-wudi\n  STK-team https://launchpad.net/~stk\n  Tadeáš Pařík https://launchpad.net/~pariktadeas\n  Tomáš Velecký https://launchpad.net/~elektron112\n  donny https://launchpad.net/~michal-donat\n  dtfjgk https://launchpad.net/~dtfjgk-deactivatedaccount"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -3797,4 +3798,3 @@ msgstr "Sbírejte láhve s nitrem (budeme je potřebovat po zatáčce)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Jejda! Když jste v potížích, stiskněte <%s> pro záchranu"
-msgstr "Launchpad Contributions:\nAri Green https://launchpad.net/~ariyoyah\nDavid Kolibáč https://launchpad.net/~david-kolibac\nDawid Gan https://launchpad.net/~deveee\ndonny https://launchpad.net/~michal-donat\ndtfjgk https://launchpad.net/~dtfjgk-deactivatedaccount\nFrantišek Zatloukal https://launchpad.net/~zatloukal-frantisek\nH0ff1 https://launchpad.net/~stefhoff\nJakub Talich https://launchpad.net/~jakub.talich-deactivatedaccount\nJakub Vaněk, 2015\nJan Srb https://launchpad.net/~j-srb\nJirka Folta https://launchpad.net/~pholta-cz\nLukáš Machyán https://launchpad.net/~phobulos\nMichal Kundrát https://launchpad.net/~dreit\nMightyPork https://launchpad.net/~mighty-pork\nOndřej Holý https://launchpad.net/~ondrej-holy\nPavel Borecki, 2015\nPetr Wudi https://launchpad.net/~petr-wudi\nSTK-team https://launchpad.net/~stk\nTadeáš Pařík https://launchpad.net/~pariktadeas\nToMáš Marný, 2015\nToMáš Marný, 2015\nTomáš Velecký https://launchpad.net/~elektron112"
