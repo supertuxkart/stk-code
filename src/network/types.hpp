@@ -51,12 +51,13 @@ class TransportAddress : public CallbackObject
 private:
     uint32_t m_ip;    //!< The IPv4 address
     uint16_t m_port;  //!< The port number
+
 public:
     /** Constructor. */
     TransportAddress(uint32_t ip = 0, uint16_t port = 0)
     {
         m_ip = ip;
-        m_port = port; 
+        m_port = port;
     }   // TransportAddress
 
     // ------------------------------------------------------------------------
@@ -111,7 +112,7 @@ public:
     /** Compares if ip address and port are identical. */
     bool operator==(const TransportAddress& other) const
     {
-        return other.m_ip == m_ip && other.m_port == m_port; 
+        return other.m_ip == m_ip && other.m_port == m_port;
     }   // operator==
 
     // ------------------------------------------------------------------------
