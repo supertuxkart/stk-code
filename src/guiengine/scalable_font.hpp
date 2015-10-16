@@ -86,6 +86,8 @@ public:
 
 #ifdef ENABLE_FREETYPE
     TTFLoadingType m_type;
+    FontUse        m_font_use;
+    u32            m_dpi;
 #endif // ENABLE_FREETYPE
 
     ScalableFont* m_fallback_font;
@@ -181,6 +183,12 @@ public:
 #ifdef ENABLE_FREETYPE
     //! re-create fonts when language is changed
     void recreateFromLanguage();
+
+    //! lazy load new characters discovered in normal font
+    bool lazyLoadChar();
+
+    //! force create a new texture (glyph) page in a font
+    void forceNewPage();
 #endif // ENABLE_FREETYPE
 
 private:
@@ -221,6 +229,10 @@ private:
     u32             WrongCharacter;
     s32             MaxHeight;
     s32             GlobalKerningWidth, GlobalKerningHeight;
+#ifdef ENABLE_FREETYPE
+    s32                     GlyphMaxHeight;
+    video::ITexture*        LastNormalPage;
+#endif // ENABLE_FREETYPE
 
     core::stringw Invisible;
 };

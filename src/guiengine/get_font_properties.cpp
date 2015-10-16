@@ -70,29 +70,9 @@ void getFontProperties::findScale()
 
 void getFontProperties::loadChar(const core::stringc langname, FontUse& fu, float scale)
 {
-    //Determine which ttf file to load first
-    if (langname == "ar" || langname == "fa")
-        fu = F_AR;
+    fu = F_DEFAULT; //Default font file
 
-    else if (langname == "sq" || langname == "eu" || langname == "br" ||
-             langname == "da" || langname == "nl" || langname == "en" ||
-             langname == "gd" || langname == "gl" || langname == "de" ||
-             langname == "is" || langname == "id" || langname == "it" ||
-             langname == "nb" || langname == "nn" || langname == "pt" ||
-             langname == "es" || langname == "sv" || langname == "uz")
-        //They are sorted out by running fc-list :lang="name" |grep Layne
-        //But we may get rid of the above by using a font that suitable for most language
-        //Like FreeSans/FreeSerif
-        fu = F_LAYNE;
-
-    else if (langname == "zh" || langname == "ja" || langname == "ko")
-        fu = F_CJK;
-
-    else
-        fu = F_DEFAULT; //Default font file
-
-    usedchar = translations->getCurrentAllChar(); //Loading unique characters
-    for (int i = 32; i < 256; ++i)
+    for (int i = 32; i < 128; ++i)
         usedchar.insert((wchar_t)i); //Include basic Latin too
     usedchar.insert((wchar_t)160);   //Non-breaking space
     usedchar.insert((wchar_t)215);   //Used on resolution selection screen (X).

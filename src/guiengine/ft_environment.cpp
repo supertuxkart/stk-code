@@ -57,12 +57,8 @@ void FTEnvironment::loadFont()
                                  0, &(FTEnvironment::ft_face[F_CJK]));
 
     FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "amiri-bold.ttf",true)).c_str(),
+                                (FileManager::TTF, "NotoNaskhArabicUI-Bold.ttf",true)).c_str(),
                                  0, &(FTEnvironment::ft_face[F_AR]));
-
-    FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "Layne_Hansom.ttf",true)).c_str(),
-                                 0, &(FTEnvironment::ft_face[F_LAYNE])); //to be removed?
 
     FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "FreeSansBold.ttf",true)).c_str(),

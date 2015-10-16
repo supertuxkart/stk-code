@@ -23,7 +23,7 @@ namespace irr
 namespace gui
 {
 
-enum FontUse {F_DEFAULT, F_CJK, F_AR, F_LAYNE, F_BOLD, F_DIGIT};
+enum FontUse {F_DEFAULT, F_CJK, F_AR, F_BOLD, F_DIGIT};
 
 enum TTFLoadingType {T_NORMAL, T_DIGIT, T_BOLD};
 

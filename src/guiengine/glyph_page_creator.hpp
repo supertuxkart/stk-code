@@ -19,6 +19,7 @@
 #include <irrlicht.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <set>
 
 using namespace irr;
 
@@ -61,12 +62,21 @@ namespace GUIEngine
          */
         video::IImage*           getPage();
 
+        /** Used to get the string of new characters inside set newchar. (Mainly for debug)
+         *  \return string of wild-character.
+         */
+        core::stringw            getNewChar();
+
         /** Used to insert a single glyph bitmap into the glyph page
          *  \param bits The Glyph bitmap inputted.
          *  \param rect Give the rectangle of the glyph on the page.
          *  \return True if a glyph is loaded.
          */
         bool                     insertGlyph(FT_Bitmap bits, core::rect<s32>& rect);
+
+        /** A temporary holder stored new char to be inserted.
+         */
+        std::set<wchar_t>        newchar;
 
     private:
         /** A temporary storage for a single glyph.

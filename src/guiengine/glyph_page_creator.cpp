@@ -31,6 +31,7 @@ namespace GUIEngine
 GlyphPageCreator::GlyphPageCreator()
 {
     page = GUIEngine::getDriver()->createImage(video::ECF_A8R8G8B8, core::dimension2du(512, 512));
+    newchar.clear();
 }
 
 GlyphPageCreator::~GlyphPageCreator()
@@ -74,6 +75,15 @@ void GlyphPageCreator::createNewGlyphPage()
 video::IImage* GlyphPageCreator::getPage()
 {
     return page;
+}
+
+core::stringw GlyphPageCreator::getNewChar()
+{
+    core::stringw c;
+    for (std::set<wchar_t>::iterator it = newchar.begin(); it != newchar.end(); ++it)
+        c += *it;
+
+    return c;
 }
 
 bool GlyphPageCreator::insertGlyph(FT_Bitmap bits, core::rect<s32>& rect)

@@ -20,7 +20,7 @@
 #include <cmath>
 #include <cwctype>
 
-#define cur_face   GUIEngine::getFreetype()->ft_face[fu]
+#define cur_face   GUIEngine::getFreetype()->ft_face[m_font_use]
 #define gp_creator GUIEngine::getGlyphPageCreator()
 
 namespace irr
@@ -45,6 +45,8 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, TTFLoadingType type)
     m_is_hollow_copy         = false;
     m_black_border           = false;
     m_type                   = type;
+    m_font_use               = (FontUse)0;
+    m_dpi                    = 0;
     m_shadow                 = false;
     m_mono_space_digits      = false;
     m_rtl                    = translations->isRTLLanguage();
@@ -371,15 +373,15 @@ bool ScalableFont::loadTTF()
 
     //Determine which font(face) and size to load,
     //also get all used char base on current language settings
-    FontUse fu;
-    getFontProperties cur_prop(translations->getCurrentLanguageNameCode().c_str(), m_type, fu);
+    getFontProperties cur_prop(translations->getCurrentLanguageNameCode().c_str(), m_type, m_font_use);
+    m_dpi = cur_prop.size;
 
     std::vector <s32> offset;
     std::vector <s32> bx;
     std::vector <s32> advance;
     std::vector <s32> height;
 
-    err = FT_Set_Pixel_Sizes(cur_face, 0, cur_prop.size);
+    err = FT_Set_Pixel_Sizes(cur_face, 0, m_dpi);
     if (err)
         Log::error("ScalableFont::loadTTF", "Can't set font size.");
 
@@ -390,6 +392,7 @@ bool ScalableFont::loadTTF()
     s32 t;
     u32 texno = 0;
     SpriteBank->addTexture(NULL);
+    gp_creator->clearGlyphPage();
     gp_creator->createNewGlyphPage();
 
     it = cur_prop.usedchar.begin();
@@ -468,8 +471,13 @@ bool ScalableFont::loadTTF()
 #ifdef FONT_DEBUG
             gp_creator->dumpGlyphPage(((std::to_string(m_type)) + "_" + (std::to_string(texno))).c_str());
 #endif
-            SpriteBank->setTexture(texno, Driver->addTexture("Glyph_page", gp_creator->getPage()));
-            gp_creator->clearGlyphPage();
+            if (m_type == T_NORMAL)
+            {
+                LastNormalPage = Driver->addTexture("Glyph_page", gp_creator->getPage());
+                SpriteBank->setTexture(texno, LastNormalPage);
+            }
+            else
+                SpriteBank->setTexture(texno, Driver->addTexture("Glyph_page", gp_creator->getPage()));
         }
 
         if (*it == (wchar_t)32 && SpriteBank->getPositions().size() == 1)
@@ -529,11 +537,12 @@ bool ScalableFont::loadTTF()
 
     WrongCharacter = getAreaIDFromCharacter(L' ', NULL);
 
-    //Add 5 for ttf bitmap to display Chinese better, 40 for digit font to display separately
+    //Reserve 10 for normal font new characters added, 40 for digit font to display separately
     //Consider fallback font (bold) too
-    MaxHeight = (int)((current_maxheight + (m_type == T_DIGIT ? 40 : 5) +
+    MaxHeight = (int)((current_maxheight + (m_type == T_DIGIT ? 40 : 10) +
                 (m_type == T_BOLD ? 20 : 0))*m_scale);
 
+    GlyphMaxHeight = current_maxheight;
 
     for(wchar_t c='0'; c<='9'; c++)
     {
@@ -548,22 +557,142 @@ bool ScalableFont::loadTTF()
         case T_NORMAL:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
                        "supporting %d characters for normal font %s at %d dpi using %d glyph page(s)."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, cur_prop.size, texno + 1);
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, m_dpi, SpriteBank->getTextureCount());
         break;
         case T_DIGIT:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
                        "supporting %d characters for high-res digits font %s at %d dpi using %d glyph page(s)."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, cur_prop.size, texno + 1);
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, m_dpi, SpriteBank->getTextureCount());
         break;
         case T_BOLD:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
                        "supporting %d characters for bold title font %s at %d dpi using %d glyph page(s)."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, cur_prop.size, texno + 1);
+                      , Areas.size(), CharacterMap.size(), cur_face->family_name, m_dpi, SpriteBank->getTextureCount());
         break;
     }
 
     return true;
 }
+
+//! lazy load new characters discovered in normal font
+bool ScalableFont::lazyLoadChar()
+{
+    //Mainly copy from loadTTF(), so removing unnecessary comments
+    if (m_type != T_NORMAL) return false; //Make sure only insert char inside normal font
+
+    FT_GlyphSlot slot;
+    FT_Error     err;
+
+    s32 height;
+    s32 bX;
+    s32 offset_on_line;
+    s32 width;
+    u32 texno = SpriteBank->getTextureCount() - 1;
+    std::set<wchar_t>::iterator it;
+    it = gp_creator->newchar.begin();
+    while (it != gp_creator->newchar.end())
+    {
+        SGUISpriteFrame f;
+        SGUISprite s;
+        core::rect<s32> rectangle;
+
+        //Lite-Fontconfig for stk
+        int idx;
+        int count = 0;
+        while (count < FONTNUM - 2) //Exclude bold and digit font
+        {
+            m_font_use = (FontUse)count;
+            err = FT_Set_Pixel_Sizes(cur_face, 0, m_dpi);
+            if (err)
+                Log::error("ScalableFont::loadTTF", "Can't set font size.");
+
+            idx = FT_Get_Char_Index(cur_face, *it);
+            if (idx > 0) break;
+            count++;
+        }
+        slot = cur_face->glyph;
+
+        if (idx)
+        {
+            err = FT_Load_Glyph(cur_face, idx,
+                  FT_LOAD_DEFAULT | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL);
+            if (err)
+                Log::error("ScalableFont::loadTTF", "Can't load a single glyph.");
+
+            offset_on_line = (cur_face->glyph->metrics.height >> 6) - cur_face->glyph->bitmap_top;
+            height = cur_face->glyph->metrics.height >> 6;
+            bX = cur_face->glyph->bitmap_left;
+            width = cur_face->glyph->advance.x >> 6;
+            FT_Bitmap bits = slot->bitmap;
+            CharacterMap[*it] = SpriteBank->getSprites().size();
+
+            if (!gp_creator->checkEnoughSpace(bits))
+            {
+#ifdef FONT_DEBUG
+                gp_creator->dumpGlyphPage(((std::to_string(m_type)) + "_" + (std::to_string(texno))).c_str());
+#endif
+                SpriteBank->setTexture(texno, Driver->addTexture("Glyph_page", gp_creator->getPage()));
+                gp_creator->clearGlyphPage();
+                SpriteBank->addTexture(NULL);
+                gp_creator->createNewGlyphPage();
+                texno++;
+            }
+
+            if (gp_creator->insertGlyph(bits, rectangle))
+            {
+                f.rectNumber = SpriteBank->getPositions().size();
+                f.textureNumber = texno;
+                s.Frames.push_back(f);
+                s.frameTime = 0;
+                SpriteBank->getPositions().push_back(rectangle);
+                SpriteBank->getSprites().push_back(s);
+            }
+            else
+                return false;
+
+            SFontArea a;
+            a.spriteno   = SpriteBank->getSprites().size() - 1;
+            a.offsety    = GlyphMaxHeight - height + offset_on_line;
+            a.offsety_bt = -offset_on_line;
+            a.bearingx   = bX;
+            a.width      = width;
+            Areas.push_back(a);
+        }
+        else
+            CharacterMap[*it] = 2; //Set wrong character to !, preventing it from loading again
+        ++it;
+    }
+
+#ifdef FONT_DEBUG
+    gp_creator->dumpGlyphPage(((std::to_string(m_type)) + "_" + (std::to_string(texno))).c_str());
+#endif
+    gp_creator->newchar.clear(); //Clear the Newly characters in creator after they are loaded
+    Driver->removeTexture(LastNormalPage); //Remove old texture
+    LastNormalPage = Driver->addTexture("Glyph_page", gp_creator->getPage());
+    SpriteBank->setTexture(texno, LastNormalPage);
+
+    if (!m_is_hollow_copy)
+    {
+        GUIEngine::cleanHollowCopyFont();
+        GUIEngine::reloadHollowCopyFont(GUIEngine::getFont());
+    }
+
+    Log::debug("ScalableFont::lazyLoadChar", "New characters drawn by %s inserted, there are %d glyphs "
+              "supporting %d characters for normal font at %d dpi using %d glyph page(s) now."
+              , cur_face->family_name, Areas.size(), CharacterMap.size(), m_dpi, SpriteBank->getTextureCount());
+
+    return true;
+}
+
+//! force create a new texture (glyph) page in a font
+void ScalableFont::forceNewPage()
+{
+    SpriteBank->setTexture(SpriteBank->getTextureCount() - 1, Driver->addTexture("Glyph_page", gp_creator->getPage()));
+    gp_creator->clearGlyphPage();
+    SpriteBank->addTexture(NULL);
+    gp_creator->createNewGlyphPage();
+}
+
 #endif // ENABLE_FREETYPE
 
 void ScalableFont::setScale(const float scale)
@@ -715,6 +844,27 @@ void ScalableFont::setInvisibleCharacters( const wchar_t *s )
 //! returns the dimension of text
 core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 {
+#ifdef ENABLE_FREETYPE
+    if (m_type == T_NORMAL || T_BOLD) //lazy load char
+    {
+        for (const wchar_t* p = text; *p; ++p)
+        {
+            if (*p == L'\r' ||  *p == L'\n' || *p == L' ' || *p < 32) continue;
+            if (GUIEngine::getFont()->getSpriteNoFromChar(p) == WrongCharacter)
+                gp_creator->newchar.insert(*p);
+        }
+
+        if (gp_creator->newchar.size() > 0 && !m_is_hollow_copy && m_scale == 1)
+        {
+            Log::debug("ScalableFont::getDimension", "New character(s) %s discoverd, perform lazy loading",
+                         StringUtils::wide_to_utf8(gp_creator->getNewChar().c_str()).c_str());
+
+            if (!GUIEngine::getFont()->lazyLoadChar())
+                Log::error("ScalableFont::lazyLoadChar", "Can't insert new char into glyph pages.");
+        }
+    }
+#endif // ENABLE_FREETYPE
+
     assert(Areas.size() > 0);
 
     core::dimension2d<u32> dim(0, 0);
@@ -824,6 +974,37 @@ void ScalableFont::doDraw(const core::stringw& text,
     core::array<s32>               indices(text_size);
     core::array<core::position2di> offsets(text_size);
     std::vector<bool>              fallback(text_size);
+
+#ifdef ENABLE_FREETYPE
+    if (m_type == T_NORMAL || T_BOLD) //lazy load char, have to do this again
+    {                                 //because some text isn't drawn with getDimension
+        for (u32 i = 0; i<text_size; i++)
+        {
+            wchar_t c = text[i];
+            if (c == L'\r' ||  c == L'\n' || c == L' ' || c < 32) continue;
+            if (GUIEngine::getFont()->getSpriteNoFromChar(&c) == WrongCharacter)
+                gp_creator->newchar.insert(c);
+
+            if (charCollector != NULL && m_type == T_NORMAL && SpriteBank->getSprites()
+                [GUIEngine::getFont()->getSpriteNoFromChar(&c)].Frames[0].textureNumber
+                == SpriteBank->getTextureCount() - 1) //Prevent overwriting texture used by billboard text
+            {
+                 Log::debug("ScalableFont::doDraw", "Character used by billboard text is in the last glyph page of normal font."
+                              " Create a new glyph page for new characters inserted later to prevent it from being removed.");
+                 GUIEngine::getFont()->forceNewPage();
+            }
+        }
+
+        if (gp_creator->newchar.size() > 0 && !m_is_hollow_copy && m_scale == 1)
+        {
+            Log::debug("ScalableFont::doDraw", "New character(s) %s discoverd, perform lazy loading",
+                         StringUtils::wide_to_utf8(gp_creator->getNewChar().c_str()).c_str());
+
+            if (!GUIEngine::getFont()->lazyLoadChar())
+                Log::error("ScalableFont::lazyLoadChar", "Can't insert new char into glyph pages.");
+        }
+    }
+#endif // ENABLE_FREETYPE
 
     for (u32 i = 0; i<text_size; i++)
     {
