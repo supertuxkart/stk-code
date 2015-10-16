@@ -22,6 +22,7 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
+#include "utils/no_copy.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/types.hpp"
 
@@ -46,7 +47,7 @@ class CallbackObject
  *  \brief Describes a transport-layer address.
  *  For IP networks, a transport address is the couple ip:port.
  */
-class TransportAddress : public CallbackObject
+class TransportAddress : public CallbackObject, public NoCopy
 {
 private:
     uint32_t m_ip;    //!< The IPv4 address
@@ -70,6 +71,15 @@ public:
 
     // ------------------------------------------------------------------------
     ~TransportAddress() {}
+    // ------------------------------------------------------------------------
+    /** A copy function (to replace the copy constructor which is disabled
+     *  using NoCopy). */
+    void copy(const TransportAddress &other)
+    {
+        m_ip   = other.m_ip;
+        m_port = other.m_port;
+    }   // copy
+
     // ------------------------------------------------------------------------
     /** Resets ip and port to 0. */
     void clear()

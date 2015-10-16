@@ -180,7 +180,7 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
     if (StkTime::getRealTime() > last_poll_time+10.0)
     {
         last_poll_time = StkTime::getRealTime();
-        TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
+        const TransportAddress &addr = NetworkManager::getInstance()->getPublicAddress();
         Online::XMLRequest* request = new Online::XMLRequest();
         PlayerManager::setUserDetails(request, "poll-connection-requests", Online::API::SERVER_PATH);
 

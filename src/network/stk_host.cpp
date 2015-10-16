@@ -201,7 +201,7 @@ void STKHost::stopListening()
 
 // ----------------------------------------------------------------------------
 
-void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
+void STKHost::sendRawPacket(uint8_t* data, int length, const TransportAddress& dst)
 {
     struct sockaddr_in to;
     int to_len = sizeof(to);
@@ -278,7 +278,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
 
 // ----------------------------------------------------------------------------
 
-uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
+uint8_t* STKHost::receiveRawPacket(const TransportAddress& sender, int max_tries)
 {
     uint8_t* buffer; // max size needed normally (only used for stun)
     buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
@@ -333,7 +333,7 @@ void STKHost::broadcastPacket(const NetworkString& data, bool reliable)
 
 // ----------------------------------------------------------------------------
 
-bool STKHost::peerExists(TransportAddress peer)
+bool STKHost::peerExists(const TransportAddress& peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
@@ -348,7 +348,7 @@ bool STKHost::peerExists(TransportAddress peer)
 
 // ----------------------------------------------------------------------------
 
-bool STKHost::isConnectedTo(TransportAddress peer)
+bool STKHost::isConnectedTo(const TransportAddress& peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {

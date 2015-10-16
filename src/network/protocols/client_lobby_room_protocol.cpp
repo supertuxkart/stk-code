@@ -31,7 +31,7 @@
 ClientLobbyRoomProtocol::ClientLobbyRoomProtocol(const TransportAddress& server_address)
                        : LobbyRoomProtocol(NULL)
 {
-    m_server_address = server_address;
+    m_server_address.copy(server_address);
     m_server = NULL;
 }   // ClientLobbyRoomProtocol
 

@@ -40,7 +40,7 @@ void StartServer::asynchronousUpdate()
 {
     if (m_state == NONE)
     {
-        TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
+        const TransportAddress& addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
         PlayerManager::setUserDetails(m_request, "start", Online::API::SERVER_PATH);
 

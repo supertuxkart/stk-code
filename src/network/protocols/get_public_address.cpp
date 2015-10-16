@@ -182,7 +182,7 @@ std::string GetPublicAddress::parseStunResponse()
     Log::debug("GetPublicAddress", "The public address has been found: %s",
                address.toString().c_str());
     TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
-    *addr = address;
+    addr->copy(address);
 
     // The address and the port are known, so the connection can be closed
     m_state = EXITING;

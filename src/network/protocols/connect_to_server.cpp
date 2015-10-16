@@ -233,7 +233,7 @@ void ConnectToServer::asynchronousUpdate()
                         delete[] table;
 
 #endif
-                        m_server_address = sender;
+                        m_server_address.copy(sender);
                         m_state = CONNECTING;
                     }
                 }
