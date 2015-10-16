@@ -49,8 +49,8 @@ void StopServer::asynchronousUpdate()
         m_request = new Online::XMLRequest();
         PlayerManager::setUserDetails(m_request, "stop", Online::API::SERVER_PATH);
 
-        m_request->addParameter("address", addr.m_ip);
-        m_request->addParameter("port", addr.m_port);
+        m_request->addParameter("address", addr.getIP());
+        m_request->addParameter("port", addr.getPort());
 
         Log::info("StopServer", "address %s", addr.toString().c_str());
 

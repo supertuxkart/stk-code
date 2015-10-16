@@ -184,8 +184,8 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
         Online::XMLRequest* request = new Online::XMLRequest();
         PlayerManager::setUserDetails(request, "poll-connection-requests", Online::API::SERVER_PATH);
 
-        request->addParameter("address", addr.m_ip);
-        request->addParameter("port", addr.m_port);
+        request->addParameter("address", addr.getIP());
+        request->addParameter("port", addr.getPort());
 
         request->executeNow();
         assert(request->isDone());

@@ -137,7 +137,8 @@ void ConnectToServer::asynchronousUpdate()
             == PROTOCOL_STATE_TERMINATED) // we know the server address
             {
                 Log::info("ConnectToServer", "Server's address known");
-                if (m_server_address.m_ip == m_public_address.m_ip) // we're in the same lan (same public ip address) !!
+                // we're in the same lan (same public ip address) !!
+                if (m_server_address.getIP() == m_public_address.getIP()) 
                     Log::info("ConnectToServer", "Server appears to be in the same LAN.");
                 m_state = REQUESTING_CONNECTION;
                 m_current_protocol_id = m_listener->requestStart(new RequestConnection(m_server_id));
@@ -148,7 +149,8 @@ void ConnectToServer::asynchronousUpdate()
             == PROTOCOL_STATE_TERMINATED) // server knows we wanna connect
             {
                 Log::info("ConnectToServer", "Connection request made");
-                if (m_server_address.m_ip == 0 || m_server_address.m_port == 0)
+                if (m_server_address.getIP() == 0 ||
+                    m_server_address.getPort() == 0  )
                 { // server data not correct, hide address and stop
                     m_state = HIDING_ADDRESS;
                     Log::error("ConnectToServer", "Server address is %s",
@@ -156,7 +158,8 @@ void ConnectToServer::asynchronousUpdate()
                     m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
                     return;
                 }
-                if (m_server_address.m_ip == m_public_address.m_ip) // we're in the same lan (same public ip address) !!
+                // we're in the same lan (same public ip address) !!
+                if (m_server_address.getIP() == m_public_address.getIP())
                 {
                     // just send a broadcast packet, the client will know our ip address and will connect
                     STKHost* host = NetworkManager::getInstance()->getHost();
@@ -164,8 +167,8 @@ void ConnectToServer::asynchronousUpdate()
                     TransportAddress sender;
 
                         TransportAddress broadcast_address;
-                        broadcast_address.m_ip = -1; // 255.255.255.255
-                        broadcast_address.m_port = 7321; // 0b10101100000101101101111111111111; // for test
+                        broadcast_address.setIP(-1); // 255.255.255.255
+                        broadcast_address.setPort(7321); // 0b10101100000101101101111111111111; // for test
                         char data2[] = "aloha_stk\0";
                         host->sendRawPacket((uint8_t*)(data2), 10, broadcast_address);
 
@@ -219,9 +222,9 @@ void ConnectToServer::asynchronousUpdate()
                         for(unsigned int i=0; i<table->dwNumEntries; i++)
                         {
                             unsigned int ip = ntohl(table->table[i].dwAddr);
-                            if(sender.m_ip == ip) // this interface is ours
+                            if(sender.getIP() == ip) // this interface is ours
                             {
-                                sender.m_ip = 0x7f000001; // 127.0.0.1
+                                sender.setIP(0x7f000001); // 127.0.0.1
                                 break;
                             }
                         }

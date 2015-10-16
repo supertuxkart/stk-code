@@ -62,16 +62,10 @@ STKPeer::~STKPeer()
 
 //-----------------------------------------------------------------------------
 
-bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host,
+bool STKPeer::connectToHost(STKHost* localhost, const TransportAddress &host,
                 uint32_t channel_count, uint32_t data)
 {
-    ENetAddress  address;
-    address.host =
-         ((host.m_ip & 0xff000000) >> 24)
-       + ((host.m_ip & 0x00ff0000) >> 8)
-       + ((host.m_ip & 0x0000ff00) << 8)
-       + ((host.m_ip & 0x000000ff) << 24); // because ENet wants little endian
-    address.port = host.m_port;
+    const ENetAddress  address = host.toEnetAddress();
 
     ENetPeer* peer = enet_host_connect(localhost->m_host, &address, 2, 0);
     if (peer == NULL)
@@ -79,9 +73,7 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host,
         Log::error("STKPeer", "Could not try to connect to server.\n");
         return false;
     }
-    TransportAddress a;
-    a.m_ip = peer->address.host;
-    a.m_port = peer->address.port;
+    TransportAddress a(peer->address);
     Log::verbose("STKPeer", "Connecting to %s", a.toString().c_str());
     return true;
 }
@@ -97,10 +89,7 @@ void STKPeer::disconnect()
 
 void STKPeer::sendPacket(NetworkString const& data, bool reliable)
 {
-    TransportAddress a;
-    a.m_ip   = m_peer->address.host;
-    a.m_port = m_peer->address.port;
-
+    TransportAddress a(m_peer->address);
     Log::verbose("STKPeer", "sending packet of size %d to %s",
                  a.toString().c_str());
          

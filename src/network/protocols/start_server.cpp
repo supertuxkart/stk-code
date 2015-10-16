@@ -44,8 +44,8 @@ void StartServer::asynchronousUpdate()
         m_request = new Online::XMLRequest();
         PlayerManager::setUserDetails(m_request, "start", Online::API::SERVER_PATH);
 
-        m_request->addParameter("address", addr.m_ip);
-        m_request->addParameter("port", addr.m_port);
+        m_request->addParameter("address", addr.getIP());
+        m_request->addParameter("port", addr.getPort());
         m_request->addParameter("private_port", NetworkManager::getInstance()->getHost()->getPort());
         m_request->addParameter("max_players", UserConfigParams::m_server_max_players);
 

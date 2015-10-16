@@ -208,8 +208,8 @@ void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
     memset(&to,0,to_len);
 
     to.sin_family = AF_INET;
-    to.sin_port = htons(dst.m_port);
-    to.sin_addr.s_addr = htonl(dst.m_ip);
+    to.sin_port = htons(dst.getPort());
+    to.sin_addr.s_addr = htonl(dst.getIP());
 
     sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
     Log::verbose("STKHost", "Raw packet sent to %s", dst.toString().c_str());
@@ -265,14 +265,12 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
         Log::error("STKHost", "Problem with the socket. Please contact the dev team.");
     }
     // we received the data
-    sender->m_ip = ntohl((uint32_t)(addr.sin_addr.s_addr));
-    sender->m_port = ntohs(addr.sin_port);
+    sender->setIP( ntohl((uint32_t)(addr.sin_addr.s_addr)) );
+    sender->setPort( ntohs(addr.sin_port) ); 
 
     if (addr.sin_family == AF_INET)
     {
-        char s[20];
-        inet_ntop(AF_INET, &(addr.sin_addr), s, 20);
-        Log::info("STKHost", "IPv4 Address of the sender was %s", s);
+        Log::info("STKHost", "IPv4 Address of the sender was %s", sender->toString());
     }
     STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
     return buffer;
@@ -294,7 +292,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
 
     int i = 0;
      // wait to receive the message because enet sockets are non-blocking
-    while(len < 0 || addr.sin_addr.s_addr == sender.m_ip)
+    while(len < 0 || addr.sin_addr.s_addr == sender.getIP())
     {
         i++;
         if (len>=0)
@@ -339,8 +337,8 @@ bool STKHost::peerExists(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == ntohl(peer.m_ip) &&
-            m_host->peers[i].address.port == peer.m_port)
+        if (m_host->peers[i].address.host == ntohl(peer.getIP()) &&
+            m_host->peers[i].address.port == peer.getPort()        )
         {
             return true;
         }

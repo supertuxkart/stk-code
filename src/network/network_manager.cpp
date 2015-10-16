@@ -35,8 +35,7 @@
 
 NetworkManager::NetworkManager()
 {
-    m_public_address.m_ip = 0;
-    m_public_address.m_port = 0;
+    m_public_address.clear();
     m_localhost = NULL;
     m_game_setup = NULL;
 }

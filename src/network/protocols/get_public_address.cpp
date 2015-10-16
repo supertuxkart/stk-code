@@ -166,8 +166,8 @@ std::string GetPublicAddress::parseStunResponse()
         {
             assert(size == 8);
             assert(datas.getUInt8(pos+5) == 0x01); // Family IPv4 only
-            address.m_port = datas.getUInt16(pos + 6);
-            address.m_ip   = datas.getUInt32(pos + 8);
+            address.setPort(datas.getUInt16(pos + 6));
+            address.setIP(datas.getUInt32(pos + 8));
             break;
         }   // type = 0 or 1
         pos +=  4 + size;

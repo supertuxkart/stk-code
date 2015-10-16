@@ -48,16 +48,24 @@ class CallbackObject
  */
 class TransportAddress : public CallbackObject
 {
-public:
+private:
     uint32_t m_ip;    //!< The IPv4 address
     uint16_t m_port;  //!< The port number
-
+public:
     /** Constructor. */
     TransportAddress(uint32_t ip = 0, uint16_t port = 0)
     {
         m_ip = ip;
         m_port = port; 
     }   // TransportAddress
+
+    // ------------------------------------------------------------------------
+    /** Construct an transport address from an ENetAddress. */
+    TransportAddress(const ENetAddress &a)
+    {
+        m_ip   = a.host;
+        m_port = a.port;
+    }   // TransportAddress(EnetAddress)
 
     // ------------------------------------------------------------------------
     ~TransportAddress() {}
@@ -68,6 +76,37 @@ public:
         m_ip   = 0;
         m_port = 0;
     }   // clear
+
+    // ------------------------------------------------------------------------
+    /** Returns the ip address. */
+    uint32_t getIP() const { return m_ip; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the port number. */
+    uint16_t getPort() const { return m_port;  }
+
+    // ------------------------------------------------------------------------
+    /** Sets the ip address. */
+    void setIP(uint32_t ip) { m_ip = ip;  }
+
+    // ------------------------------------------------------------------------
+    /** Set the port. */
+    void setPort(uint16_t port) { m_port = port; }
+
+    // ------------------------------------------------------------------------
+    /** Converts the address to an enet address. */
+    ENetAddress toEnetAddress() const
+    {
+        ENetAddress a;
+        // because ENet wants little endian
+        a.host = ((m_ip & 0xff000000) >> 24)
+               + ((m_ip & 0x00ff0000) >> 8)
+               + ((m_ip & 0x0000ff00) << 8)
+               + ((m_ip & 0x000000ff) << 24);
+        a.port = m_port;
+        return a;
+    }   // toEnetAddress
+
     // ------------------------------------------------------------------------
     /** Compares if ip address and port are identical. */
     bool operator==(const TransportAddress& other) const
