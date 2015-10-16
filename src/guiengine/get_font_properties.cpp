@@ -124,7 +124,8 @@ void getFontProperties::loadBoldChar(float scale)
     while (it != usedchar.end())
     {
         //Only use all capital letter for bold char with latin (<640 of char code).
-        if ((iswlower((wchar_t)*it) || !iswalpha((wchar_t)*it)) && *it < 640)
+        //Remove all characters (>char code 8191) not used by the title
+        if (((iswlower((wchar_t)*it) || !iswalpha((wchar_t)*it)) && *it < 640) || *it > 8192)
             it = usedchar.erase(it);
         else
             ++it;
@@ -134,8 +135,11 @@ void getFontProperties::loadBoldChar(float scale)
     for (int i = 32; i < 65; ++i)
         usedchar.insert((wchar_t)i); //Include basic symbol (from space (char code 32) to @(char code 64))
     usedchar.insert((wchar_t)160);   //Non-breaking space
+
+    //Remove Ordinal indicator (char code 170 and 186)
     usedchar.erase((wchar_t)170);
-    usedchar.erase((wchar_t)186);    //Remove Ordinal indicator (char code 170 and 186)
+    usedchar.erase((wchar_t)186);
+
     usedchar.erase((wchar_t)304);    //Remove Capital I-dotted (char code 304) with using "I" altogether.
 }
 

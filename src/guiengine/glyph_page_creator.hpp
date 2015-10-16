@@ -40,13 +40,13 @@ namespace GUIEngine
          *  Mainly for debug use.
          *  \param fn The file name.
          */
-        static void              dumpGlyphPage(const core::stringc fn);
+        void                     dumpGlyphPage(const core::stringc fn);
 
         /** Check whether it is ok the fit the inputted glyph into the current glyph page.
          *  \param bits The Glyph bitmap inputted.
          *  \return True if there is enough space.
          */
-        static bool              checkEnoughSpace(FT_Bitmap bits);
+        bool                     checkEnoughSpace(FT_Bitmap bits);
 
         /** Reset position of glyph on the current glyph page.
          */
@@ -54,12 +54,12 @@ namespace GUIEngine
 
         /** Clear (fill it with transparent content) the current glyph page.
          */
-        static void              createNewGlyphPage();
+        void                     createNewGlyphPage();
 
         /** Used to get a glyph page which is loaded later for texture
          *  \return Glyph page image.
          */
-        static video::IImage*    getPage();
+        video::IImage*           getPage();
 
         /** Used to insert a single glyph bitmap into the glyph page
          *  \param bits The Glyph bitmap inputted.
@@ -75,7 +75,7 @@ namespace GUIEngine
 
         /** A full glyph page.
          */
-        static  video::IImage*   page;
+        video::IImage*           page;
 
         static  u32              temp_height;
         static  u32              used_width;

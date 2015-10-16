@@ -52,7 +52,8 @@ bool GlyphPageCreator::checkEnoughSpace(FT_Bitmap bits)
     texture_size = d.getOptimalSize(!(GUIEngine::getDriver()->queryFeature(video::EVDF_TEXTURE_NPOT)),
                                     !(GUIEngine::getDriver()->queryFeature(video::EVDF_TEXTURE_NSQUARE)), true, 0);
 
-    if (used_width + texture_size.Width > 512 && used_height + temp_height + texture_size.Height > 512)
+    if ((used_width + texture_size.Width > 512 && used_height + temp_height + texture_size.Height > 512)
+         || used_height + texture_size.Height > 512)
         return false;
     return true;
 }
@@ -142,7 +143,6 @@ bool GlyphPageCreator::insertGlyph(FT_Bitmap bits, core::rect<s32>& rect)
 u32 GlyphPageCreator::used_width            = 0;
 u32 GlyphPageCreator::used_height           = 0;
 u32 GlyphPageCreator::temp_height           = 0;
-video::IImage* GlyphPageCreator::page       = 0;
 
 }   // guiengine
 #endif // ENABLE_FREETYPE
