@@ -125,7 +125,7 @@ void getFontProperties::loadBoldChar(float scale)
     {
         //Only use all capital letter for bold char with latin (<640 of char code).
         //Remove all characters (>char code 8191) not used by the title
-        if (((iswlower((wchar_t)*it) || !iswalpha((wchar_t)*it)) && *it < 640) || *it > 8192)
+        if (((iswlower((wchar_t)*it) || !iswalpha((wchar_t)*it)) && *it < 640) || *it > 8191)
             it = usedchar.erase(it);
         else
             ++it;
