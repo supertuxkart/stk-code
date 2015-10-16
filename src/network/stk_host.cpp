@@ -266,11 +266,11 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
     }
     // we received the data
     sender->setIP( ntohl((uint32_t)(addr.sin_addr.s_addr)) );
-    sender->setPort( ntohs(addr.sin_port) ); 
+    sender->setPort( ntohs(addr.sin_port) );
 
     if (addr.sin_family == AF_INET)
     {
-        Log::info("STKHost", "IPv4 Address of the sender was %s", sender->toString());
+        Log::info("STKHost", "IPv4 Address of the sender was %s", sender->toString().c_str());
     }
     STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
     return buffer;

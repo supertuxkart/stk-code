@@ -138,7 +138,7 @@ void ConnectToServer::asynchronousUpdate()
             {
                 Log::info("ConnectToServer", "Server's address known");
                 // we're in the same lan (same public ip address) !!
-                if (m_server_address.getIP() == m_public_address.getIP()) 
+                if (m_server_address.getIP() == m_public_address.getIP())
                     Log::info("ConnectToServer", "Server appears to be in the same LAN.");
                 m_state = REQUESTING_CONNECTION;
                 m_current_protocol_id = m_listener->requestStart(new RequestConnection(m_server_id));
@@ -179,7 +179,7 @@ void ConnectToServer::asynchronousUpdate()
                     const char data[] = "aloha_stk\0";
                     if (strcmp(data, (char*)(received_data)) == 0)
                     {
-                        Log::info("ConnectToServer", "LAN Server found : %s", 
+                        Log::info("ConnectToServer", "LAN Server found : %s",
                                   sender.toString().c_str());
 #ifndef WIN32
                         // just check if the ip is ours : if so, then just use localhost (127.0.0.1)
@@ -191,8 +191,10 @@ void ConnectToServer::asynchronousUpdate()
                             if (ifa->ifa_addr->sa_family==AF_INET)
                             {
                                 sa = (struct sockaddr_in *) ifa->ifa_addr;
-                                if (ntohl(sa->sin_addr.s_addr) == sender.m_ip) // this interface is ours
-                                    sender.m_ip = 0x7f000001; // 127.0.0.1
+
+                                // This interface is ours
+                                if (ntohl(sa->sin_addr.s_addr) == sender.getIP())
+                                    sender.setIP(0x7f000001); // 127.0.0.1
                             }
                         }
                         freeifaddrs(ifap);
@@ -249,7 +251,7 @@ void ConnectToServer::asynchronousUpdate()
                 {
                     timer = StkTime::getRealTime();
                     NetworkManager::getInstance()->connect(m_server_address);
-                    Log::info("ConnectToServer", "Trying to connect to %s", 
+                    Log::info("ConnectToServer", "Trying to connect to %s",
                               m_server_address.toString().c_str());
                 }
                 break;
