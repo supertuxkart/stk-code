@@ -37,7 +37,6 @@ class ConnectToServer : public Protocol, public CallbackObject
 
     protected:
         TransportAddress m_server_address;
-        TransportAddress m_public_address;
         uint32_t m_server_id;
         uint32_t m_host_id;
         uint32_t m_current_protocol_id;

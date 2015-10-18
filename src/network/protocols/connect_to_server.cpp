@@ -82,7 +82,6 @@ void ConnectToServer::setup()
 {
     Log::info("ConnectToServer", "SETUPP");
     m_state = NONE;
-    m_public_address.clear();
     m_server_address.clear();
     m_current_protocol_id = 0;
 }
@@ -96,7 +95,7 @@ void ConnectToServer::asynchronousUpdate()
         case NONE:
         {
             Log::info("ConnectToServer", "Protocol starting");
-            m_current_protocol_id = m_listener->requestStart(new GetPublicAddress(&m_public_address));
+            m_current_protocol_id = m_listener->requestStart(new GetPublicAddress());
             m_state = GETTING_SELF_ADDRESS;
             break;
         }
@@ -105,7 +104,6 @@ void ConnectToServer::asynchronousUpdate()
             == PROTOCOL_STATE_TERMINATED) // now we know the public addr
             {
                 m_state = SHOWING_SELF_ADDRESS;
-                NetworkManager::getInstance()->setPublicAddress(m_public_address); // set our public address
                 m_current_protocol_id = m_listener->requestStart(new ShowPublicAddress());
                 Log::info("ConnectToServer", "Public address known");
                 /*
@@ -138,10 +136,13 @@ void ConnectToServer::asynchronousUpdate()
             {
                 Log::info("ConnectToServer", "Server's address known");
                 // we're in the same lan (same public ip address) !!
-                if (m_server_address.getIP() == m_public_address.getIP())
-                    Log::info("ConnectToServer", "Server appears to be in the same LAN.");
+                if (m_server_address.getIP() == 
+                    NetworkManager::getInstance()->getPublicAddress().getIP())
+                    Log::info("ConnectToServer", 
+                              "Server appears to be in the same LAN.");
                 m_state = REQUESTING_CONNECTION;
-                m_current_protocol_id = m_listener->requestStart(new RequestConnection(m_server_id));
+                m_current_protocol_id = 
+                    m_listener->requestStart(new RequestConnection(m_server_id));
             }
             break;
         case REQUESTING_CONNECTION:
@@ -159,7 +160,8 @@ void ConnectToServer::asynchronousUpdate()
                     return;
                 }
                 // we're in the same lan (same public ip address) !!
-                if (m_server_address.getIP() == m_public_address.getIP())
+                if (m_server_address.getIP() ==
+                    NetworkManager::getInstance()->getPublicAddress().getIP())
                 {
                     // just send a broadcast packet, the client will know our ip address and will connect
                     STKHost* host = NetworkManager::getInstance()->getHost();

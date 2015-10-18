@@ -45,8 +45,8 @@
 // make the linker happy
 const uint32_t GetPublicAddress::m_stun_magic_cookie = 0x2112A442;
 
-GetPublicAddress::GetPublicAddress(CallbackObject* callback_object)
-                : Protocol(callback_object, PROTOCOL_SILENT)
+GetPublicAddress::GetPublicAddress()
+                : Protocol(NULL, PROTOCOL_SILENT)
 {
     m_state = NOTHING_DONE;
 }   // GetPublicAddress
@@ -154,9 +154,8 @@ std::string GetPublicAddress::parseStunResponse()
     if (message_size < 4) // cannot even read the size
         return "STUN response is too short.";
 
-
     // Those are the port and the address to be detected
-    TransportAddress address;
+    
     int pos = 20;
     while (true)
     {
@@ -166,8 +165,13 @@ std::string GetPublicAddress::parseStunResponse()
         {
             assert(size == 8);
             assert(datas.getUInt8(pos+5) == 0x01); // Family IPv4 only
-            address.setPort(datas.getUInt16(pos + 6));
-            address.setIP(datas.getUInt32(pos + 8));
+            TransportAddress address(datas.getUInt32(pos + 8), 
+                                     datas.getUInt16(pos + 6));
+            // finished parsing, we know our public transport address
+            Log::debug("GetPublicAddress", 
+                       "The public address has been found: %s",
+                        address.toString().c_str());
+            NetworkManager::getInstance()->setPublicAddress(address);
             break;
         }   // type = 0 or 1
         pos +=  4 + size;
@@ -177,12 +181,6 @@ std::string GetPublicAddress::parseStunResponse()
         if (message_size < 4) // cannot even read the size
             return "STUN response is invalid.";
     }   // while true
-
-    // finished parsing, we know our public transport address
-    Log::debug("GetPublicAddress", "The public address has been found: %s",
-               address.toString().c_str());
-    TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
-    addr->copy(address);
 
     // The address and the port are known, so the connection can be closed
     m_state = EXITING;

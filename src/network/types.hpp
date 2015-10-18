@@ -72,8 +72,19 @@ public:
     // ------------------------------------------------------------------------
     ~TransportAddress() {}
     // ------------------------------------------------------------------------
+private:
+    friend class NetworkManager;
+    /** The copy constructor is private, so that the friend class
+     *  NetworkManager can access it to create a copy, but no other
+     *  class can. */
+    TransportAddress(const TransportAddress &other)
+    {
+        copy(other);
+    }   // TransportAddress(const TransportAddress&)
+public:
+    // ------------------------------------------------------------------------
     /** A copy function (to replace the copy constructor which is disabled
-     *  using NoCopy). */
+     *  using NoCopy): it copies the data from the argument into this object.*/
     void copy(const TransportAddress &other)
     {
         m_ip   = other.m_ip;

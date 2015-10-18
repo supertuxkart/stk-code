@@ -31,6 +31,7 @@
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "utils/singleton.hpp"
+#include "utils/synchronised.hpp"
 
 #include <vector>
 
@@ -98,12 +99,30 @@ class NetworkManager : public AbstractSingleton<NetworkManager>
         virtual bool isConnectedTo(const TransportAddress& peer);
 
         virtual bool isServer() = 0;
+        // --------------------------------------------------------------------
         inline bool isClient()              { return !isServer();         }
+        // --------------------------------------------------------------------
         bool isPlayingOnline()              { return m_playing_online;    }
+        // --------------------------------------------------------------------
         STKHost* getHost()                  { return m_localhost;         }
+        // --------------------------------------------------------------------
         std::vector<STKPeer*> getPeers()    { return m_peers;             }
+        // --------------------------------------------------------------------
         unsigned int getPeerCount()         { return (int)m_peers.size(); }
-        const TransportAddress& getPublicAddress() { return m_public_address; }
+        // --------------------------------------------------------------------
+        /** Returns the public IP address (thread safe). The network manager
+         *  is a friend of TransportAddress and so has access to the copy
+         *  constructor, which is otherwise declared private. */
+        const TransportAddress getPublicAddress()
+        {
+            m_public_address.lock();
+            TransportAddress a;
+            a.copy(m_public_address.getData());
+            m_public_address.unlock();
+            return a;
+        } // getPublicAddress
+
+        // --------------------------------------------------------------------
         GameSetup* getGameSetup()           { return m_game_setup;        }
 
     protected:
@@ -115,8 +134,9 @@ class NetworkManager : public AbstractSingleton<NetworkManager>
         STKHost* m_localhost;
         bool m_playing_online;
         GameSetup* m_game_setup;
-
-        TransportAddress m_public_address;
+        /** This computer's public IP address. With lock since it can
+         *  be updated from a separate thread. */
+        Synchronised<TransportAddress> m_public_address;
         PlayerLogin m_player_login;
 };
 

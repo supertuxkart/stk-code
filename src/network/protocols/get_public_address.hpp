@@ -26,7 +26,7 @@
 class GetPublicAddress : public Protocol
 {
     public:
-        GetPublicAddress(CallbackObject* callback_object);
+        GetPublicAddress();
         virtual ~GetPublicAddress() {}
 
         virtual bool notifyEvent(Event* event) { return true; }

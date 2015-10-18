@@ -53,7 +53,6 @@ void ServerLobbyRoomProtocol::setup()
     m_setup->getRaceConfig()->setPlayerCount(16); //FIXME : this has to be moved to when logging into the server
     m_next_id = 0;
     m_state = NONE;
-    m_public_address.clear();
     m_selection_enabled = false;
     m_in_race = false;
     Log::info("ServerLobbyRoomProtocol", "Starting the protocol.");
@@ -106,13 +105,12 @@ void ServerLobbyRoomProtocol::update()
     switch (m_state)
     {
     case NONE:
-        m_current_protocol_id = m_listener->requestStart(new GetPublicAddress(&m_public_address));
+        m_current_protocol_id = m_listener->requestStart(new GetPublicAddress());
         m_state = GETTING_PUBLIC_ADDRESS;
         break;
     case GETTING_PUBLIC_ADDRESS:
         if (m_listener->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
         {
-            NetworkManager::getInstance()->setPublicAddress(m_public_address);
             m_current_protocol_id = m_listener->requestStart(new StartServer());
             m_state = LAUNCHING_SERVER;
             Log::debug("ServerLobbyRoomProtocol", "Public address known.");

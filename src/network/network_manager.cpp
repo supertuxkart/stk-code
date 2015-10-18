@@ -35,10 +35,12 @@
 
 NetworkManager::NetworkManager()
 {
-    m_public_address.clear();
+    m_public_address.lock();
+    m_public_address.getData().clear();
+    m_public_address.unlock();
     m_localhost = NULL;
     m_game_setup = NULL;
-}
+}   // NetworkManager
 
 //-----------------------------------------------------------------------------
 
@@ -195,8 +197,11 @@ void NetworkManager::setLogin(std::string username, std::string password)
 
 void NetworkManager::setPublicAddress(const TransportAddress& addr)
 {
-    m_public_address.copy(addr);
-}
+    m_public_address.lock();
+    m_public_address.getData().copy(addr);
+    m_public_address.unlock();
+}   // setPublicAddress
+
 //-----------------------------------------------------------------------------
 
 void NetworkManager::removePeer(STKPeer* peer)
