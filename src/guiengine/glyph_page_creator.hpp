@@ -81,7 +81,7 @@ namespace GUIEngine
     private:
         /** A temporary storage for a single glyph.
          */
-        video::IImage*           image = 0;
+        video::IImage*           image;
 
         /** A full glyph page.
          */
