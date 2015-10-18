@@ -96,12 +96,12 @@ namespace
     
     
     template<typename T>
-    static void FillInstances_impl( DrawCalls::InstanceList instance_list,
-                                    T * InstanceBuffer,
-                                    DrawElementsIndirectCommand *CommandBuffer,
-                                    size_t &InstanceBufferOffset,
-                                    size_t &CommandBufferOffset,
-                                    size_t &PolyCount)
+    void FillInstances_impl(DrawCalls::InstanceList instance_list,
+                            T * InstanceBuffer,
+                            DrawElementsIndirectCommand *CommandBuffer,
+                            size_t &InstanceBufferOffset,
+                            size_t &CommandBufferOffset,
+                            size_t &PolyCount)
     {
         // Should never be empty
         GLMesh *mesh = instance_list.front().first;
@@ -126,13 +126,13 @@ namespace
     }
 
     template<typename T>
-    static void FillInstances(  const DrawCalls::MeshMap &GatheredGLMesh,
-                                std::vector<GLMesh *> &InstancedList,
-                                T *InstanceBuffer,
-                                DrawElementsIndirectCommand *CommandBuffer,
-                                size_t &InstanceBufferOffset,
-                                size_t &CommandBufferOffset,
-                                size_t &Polycount)
+    void FillInstances( const DrawCalls::MeshMap &GatheredGLMesh,
+                        std::vector<GLMesh *> &InstancedList,
+                        T *InstanceBuffer,
+                        DrawElementsIndirectCommand *CommandBuffer,
+                        size_t &InstanceBufferOffset,
+                        size_t &CommandBufferOffset,
+                        size_t &Polycount)
     {
         auto It = GatheredGLMesh.begin(), E = GatheredGLMesh.end();
         for (; It != E; ++It)
@@ -658,11 +658,40 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
                 CmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             }
 
-
+            
+            //TODO: replace duplicated code with a loop
+            /*
+            Material::ShaderType dual_tex_materials[5] = {Material::SHADERTYPE_SOLID,
+                                                         Material::SHADERTYPE_ALPHA_TEST,
+                                                         Material::SHADERTYPE_SOLID_UNLIT,
+                                                         Material::SHADERTYPE_SPHERE_MAP,
+                                                         Material::SHADERTYPE_VEGETATION};
+            
+            for(int i=0;i<1;i++)
+            {
+                SolidPassCmd::getInstance()->Offset[dual_tex_materials[i]] = current_cmd;
+                FillInstances(m_solid_pass_mesh[dual_tex_materials[i]],
+                            ListInstancedMatDefault::getInstance()->SolidPass, //we need to change this line to something more generic
+                            InstanceBufferDualTex,
+                            CmdBuffer,
+                            offset,
+                            current_cmd,
+                            SolidPoly);
+                SolidPassCmd::getInstance()->Size[dual_tex_materials[i]] = current_cmd - SolidPassCmd::getInstance()->Offset[dual_tex_materials[i]];                
+            }*/
+              
+            
             // Default Material
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID] = current_cmd;
-            FillInstances(m_solid_pass_mesh[Material::SHADERTYPE_SOLID], ListInstancedMatDefault::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
+            FillInstances(m_solid_pass_mesh[Material::SHADERTYPE_SOLID],
+                          ListInstancedMatDefault::getInstance()->SolidPass,
+                          InstanceBufferDualTex,
+                          CmdBuffer,
+                          offset,
+                          current_cmd,
+                          SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID];
+            
             // Alpha Ref
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_ALPHA_TEST] = current_cmd;
             FillInstances(m_solid_pass_mesh[Material::SHADERTYPE_ALPHA_TEST], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);

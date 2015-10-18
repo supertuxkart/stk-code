@@ -87,6 +87,16 @@ public:
     virtual bool isImmediateDraw() const { return false; }
 };   // STKMeshCommon
 
+/*
+// ----------------------------------------------------------------------------
+//TODO: template function in order to avoid duplicate code (clear method)
+template<typename T>
+clearMeshList()
+{
+    
+}
+*/
+
 // ----------------------------------------------------------------------------
 template<typename T, typename... Args>
 class MeshList : public Singleton<T>

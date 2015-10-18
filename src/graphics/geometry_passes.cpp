@@ -17,6 +17,7 @@
 
 #include "graphics/geometry_passes.hpp"
 #include "graphics/callbacks.hpp"
+#include "graphics/draw_tools.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
@@ -976,123 +977,7 @@ namespace RenderGeometry
 using namespace RenderGeometry;
 
 
-// ----------------------------------------------------------------------------
-template<typename T, typename...uniforms>
-void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh->PrimitiveType;
-    GLenum itype = mesh->IndexType;
-    size_t count = mesh->IndexCount;
 
-    Shader->setUniforms(Args...);
-    glDrawElementsBaseVertex(ptype, (int)count, itype,
-                             (GLvoid *)mesh->vaoOffset,
-                             (int)mesh->vaoBaseVertex);
-}   // draw
-
-// ----------------------------------------------------------------------------
-
-template<int...List>
-struct custom_unroll_args;
-
-template<>
-struct custom_unroll_args<>
-{
-    template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
-    {
-        draw<T>(Shader, STK::tuple_get<0>(t), args...);
-    }   // exec
-};   // custom_unroll_args
-
-// ----------------------------------------------------------------------------
-template<int N, int...List>
-struct custom_unroll_args<N, List...>
-{
-    template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
-    {
-        custom_unroll_args<List...>::template exec<T>(Shader, t, STK::tuple_get<N>(t), args...);
-    }   // exec
-};   // custom_unroll_args
-
-// ----------------------------------------------------------------------------
-template<typename T, int N>
-struct TexExpander_impl
-{
-    template<typename...TupleArgs, typename... Args>
-    static void ExpandTex(GLMesh &mesh, const STK::Tuple<TupleArgs...> &TexSwizzle,
-                          Args... args)
-    {
-        size_t idx = STK::tuple_get<sizeof...(TupleArgs) - N>(TexSwizzle);
-        TexExpander_impl<T, N - 1>::template
-            ExpandTex(mesh, TexSwizzle, 
-                      args..., getTextureGLuint(mesh.textures[idx]));
-    }   // ExpandTex
-};   // TexExpander_impl
-
-// ----------------------------------------------------------------------------
-template<typename T>
-struct TexExpander_impl<T, 0>
-{
-    template<typename...TupleArgs, typename... Args>
-    static void ExpandTex(GLMesh &mesh, const STK::Tuple<TupleArgs...> &TexSwizzle,
-                          Args... args)
-    {
-        T::getInstance()->setTextureUnits(args...);
-    }   // ExpandTex
-};   // TexExpander_impl
-
-// ----------------------------------------------------------------------------
-template<typename T>
-struct TexExpander
-{
-    template<typename...TupleArgs, typename... Args>
-    static void ExpandTex(GLMesh &mesh, const STK::Tuple<TupleArgs...> &TexSwizzle,
-                          Args... args)
-    {
-        TexExpander_impl<T, sizeof...(TupleArgs)>::ExpandTex(mesh, TexSwizzle,
-                                                             args...);
-    }   // ExpandTex
-};   // TexExpander
-
-// ----------------------------------------------------------------------------
-template<typename T, int N>
-struct HandleExpander_impl
-{
-    template<typename...TupleArgs, typename... Args>
-    static void Expand(uint64_t *TextureHandles, 
-                       const STK::Tuple<TupleArgs...> &TexSwizzle, Args... args)
-    {
-        size_t idx = STK::tuple_get<sizeof...(TupleArgs)-N>(TexSwizzle);
-        HandleExpander_impl<T, N - 1>::template 
-            Expand(TextureHandles, TexSwizzle, args..., TextureHandles[idx]);
-    }   // Expand
-};   // HandleExpander_impl
-
-// ----------------------------------------------------------------------------
-template<typename T>
-struct HandleExpander_impl<T, 0>
-{
-    template<typename...TupleArgs, typename... Args>
-    static void Expand(uint64_t *TextureHandles,
-                       const STK::Tuple<TupleArgs...> &TexSwizzle, Args... args)
-    {
-        T::getInstance()->setTextureHandles(args...);
-    }   // Expand
-};   // HandleExpander_impl
-
-// ----------------------------------------------------------------------------
-template<typename T>
-struct HandleExpander
-{
-    template<typename...TupleArgs, typename... Args>
-    static void Expand(uint64_t *TextureHandles, const STK::Tuple<TupleArgs...> &TexSwizzle, Args... args)
-    {
-        HandleExpander_impl<T, sizeof...(TupleArgs)>::Expand(TextureHandles, TexSwizzle, args...);
-    }   // Expand
-};   // HandleExpander
 
 // ----------------------------------------------------------------------------
 template<typename T, int ...List>
@@ -1121,7 +1006,7 @@ void renderMeshes1stPass()
             HandleExpander<typename T::FirstPassShader>::template Expand(mesh.TextureHandles, T::FirstPassTextures);
         else
             TexExpander<typename T::FirstPassShader>::template ExpandTex(mesh, T::FirstPassTextures);
-        custom_unroll_args<List...>::template exec(T::FirstPassShader::getInstance(), meshes.at(i));
+        CustomUnrollArgs<List...>::template drawMesh<typename T::FirstPassShader>(meshes.at(i));
     }
 }   // renderMeshes1stPass
 
@@ -1188,6 +1073,7 @@ void GeometryPasses::renderSolidFirstPass()
         for (unsigned i = 0; i < ImmediateDrawList::getInstance()->size(); i++)
             ImmediateDrawList::getInstance()->at(i)->render();
 
+        //TODO: is it useful if AZDO enabled?
         renderMeshes1stPass<DefaultMaterial, 2, 1>();
         renderMeshes1stPass<SplattingMat, 2, 1>();
         renderMeshes1stPass<UnlitMat, 3, 2, 1>();
@@ -1256,8 +1142,7 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
             TexExpander<typename T::SecondPassShader>::template 
                 ExpandTex(mesh, T::SecondPassTextures, Prefilled_Tex[0], 
                           Prefilled_Tex[1], Prefilled_Tex[2]);
-        custom_unroll_args<List...>::template 
-            exec(T::SecondPassShader::getInstance(), meshes.at(i));
+        CustomUnrollArgs<List...>::template drawMesh<typename T::SecondPassShader>(meshes.at(i));
     }
 }   // renderMeshes2ndPass
 
@@ -1356,6 +1241,7 @@ void GeometryPasses::renderSolidSecondPass( unsigned render_target_diffuse,
                                  render_target_specular,
                                  render_target_half_red);
 
+        //TODO: is it useful when AZDO enabled?
         renderMeshes2ndPass<DefaultMaterial, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<AlphaRef, 3, 1 >(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<UnlitMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
@@ -1510,7 +1396,7 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
             Shader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
         else
             Shader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]));
-        custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
+        CustomUnrollArgs<List...>::template drawMesh<Shader>(meshes->at(i));
     }
 }   // renderTransparenPass
 
@@ -1653,45 +1539,6 @@ void GeometryPasses::renderTransparent(unsigned render_target)
 }   // renderTransparent
 
 // ----------------------------------------------------------------------------
-template<typename T, typename...uniforms>
-void drawShadow(const T *Shader, unsigned cascade, const GLMesh *mesh, uniforms... Args)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh->PrimitiveType;
-    GLenum itype = mesh->IndexType;
-    size_t count = mesh->IndexCount;
-
-    Shader->setUniforms(cascade, Args...);
-    glDrawElementsBaseVertex(ptype, (int)count, itype,
-                             (GLvoid *)mesh->vaoOffset, (int)mesh->vaoBaseVertex);
-}   // drawShadow
-
-// ----------------------------------------------------------------------------
-template<int...List>
-struct shadow_custom_unroll_args;
-
-template<>
-struct shadow_custom_unroll_args<>
-{
-    template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, unsigned cascade, const STK::Tuple<TupleTypes...> &t, Args... args)
-    {
-        drawShadow<T>(Shader, cascade, STK::tuple_get<0>(t), args...);
-    }   // exec
-};   // shadow_custom_unroll_args
-
-// ----------------------------------------------------------------------------
-template<int N, int...List>
-struct shadow_custom_unroll_args<N, List...>
-{
-    template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, unsigned cascade, const STK::Tuple<TupleTypes...> &t, Args... args)
-    {
-        shadow_custom_unroll_args<List...>::template exec<T>(Shader, cascade, t, STK::tuple_get<N>(t), args...);
-    }   // exec
-};   // shadow_custom_unroll_args
-
-// ----------------------------------------------------------------------------
 template<typename T, int...List>
 void renderShadow(unsigned cascade)
 {
@@ -1708,7 +1555,7 @@ void renderShadow(unsigned cascade)
             HandleExpander<typename T::ShadowPassShader>::template Expand(mesh->TextureHandles, T::ShadowTextures);
         else
             TexExpander<typename T::ShadowPassShader>::template ExpandTex(*mesh, T::ShadowTextures);
-        shadow_custom_unroll_args<List...>::template exec<typename T::ShadowPassShader>(T::ShadowPassShader::getInstance(), cascade, t.at(i));
+        CustomUnrollArgs<List...>::template drawShadow<typename T::ShadowPassShader>(cascade, t.at(i));
     }   // for i
 }   // renderShadow
 
@@ -1839,34 +1686,6 @@ void GeometryPasses::renderShadows(const ShadowMatrices& shadow_matrices,
 
 
 // ----------------------------------------------------------------------------
-template<int...List>
-struct rsm_custom_unroll_args;
-
-template<>
-struct rsm_custom_unroll_args<>
-{
-    template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const core::matrix4 &rsm_matrix, 
-                      const STK::Tuple<TupleTypes...> &t, Args... args)
-    {
-        draw<T>(T::getInstance(), STK::tuple_get<0>(t), rsm_matrix, args...);
-    }
-};   // rsm_custom_unroll_args
-
-// ----------------------------------------------------------------------------
-template<int N, int...List>
-struct rsm_custom_unroll_args<N, List...>
-{
-    template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const core::matrix4 &rsm_matrix,
-                     const STK::Tuple<TupleTypes...> &t, Args... args)
-    {
-        rsm_custom_unroll_args<List...>::template 
-            exec<T>(rsm_matrix, t, STK::tuple_get<N>(t), args...);
-    }
-};   // rsm_custom_unroll_args
-
-// ----------------------------------------------------------------------------
 template<typename T, int... Selector>
 void drawRSM(const core::matrix4 & rsm_matrix)
 {
@@ -1884,7 +1703,7 @@ void drawRSM(const core::matrix4 & rsm_matrix)
             HandleExpander<typename T::RSMShader>::template Expand(mesh->TextureHandles, T::RSMTextures);
         else
             TexExpander<typename T::RSMShader>::template ExpandTex(*mesh, T::RSMTextures);
-        rsm_custom_unroll_args<Selector...>::template exec<typename T::RSMShader>(rsm_matrix, t.at(i));
+        CustomUnrollArgs<Selector...>::template drawReflectiveShadowMap<typename T::RSMShader>(rsm_matrix, t.at(i));
     }
 }   // drawRSM
 

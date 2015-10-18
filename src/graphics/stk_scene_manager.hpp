@@ -29,12 +29,16 @@
 #include "graphics/stk_mesh.hpp"
 #include "utils/singleton.hpp"
 
-template<typename T>
+template<typename T, int nb_cascades, int nb_materials>
 class CommandBuffer : public Singleton<T>
 {
 public:
     GLuint drawindirectcmd;
     DrawElementsIndirectCommand *Ptr;
+    
+    //size_t Offset[nb_cascades][nb_materials];
+    //size_t Size[nb_cascades][nb_materials];
+    
     CommandBuffer()
     {
         glGenBuffers(1, &drawindirectcmd);
@@ -49,6 +53,11 @@ public:
             glBufferData(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_STREAM_DRAW);
         }
     }
+    
+    void bind()
+    {
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
+    }
 };
 
 class ImmediateDrawList : public Singleton<ImmediateDrawList>, public std::vector<scene::ISceneNode *>
@@ -61,25 +70,25 @@ class ParticlesList : public Singleton<ParticlesList>, public std::vector<Partic
 {};
 
 
-class SolidPassCmd : public CommandBuffer<SolidPassCmd>
+class SolidPassCmd : public CommandBuffer<SolidPassCmd, 1, static_cast<int>(Material::SHADERTYPE_COUNT)>
 {
 public:
     size_t Offset[Material::SHADERTYPE_COUNT], Size[Material::SHADERTYPE_COUNT];
 };
 
-class ShadowPassCmd : public CommandBuffer<ShadowPassCmd>
+class ShadowPassCmd : public CommandBuffer<ShadowPassCmd, 4, static_cast<int>(Material::SHADERTYPE_COUNT)>
 {
 public:
     size_t Offset[4][Material::SHADERTYPE_COUNT], Size[4][Material::SHADERTYPE_COUNT];
 };
 
-class RSMPassCmd : public CommandBuffer<RSMPassCmd>
+class RSMPassCmd : public CommandBuffer<RSMPassCmd, 1, static_cast<int>(Material::SHADERTYPE_COUNT)>
 {
 public:
     size_t Offset[Material::SHADERTYPE_COUNT], Size[Material::SHADERTYPE_COUNT];
 };
 
-class GlowPassCmd : public CommandBuffer<GlowPassCmd>
+class GlowPassCmd : public CommandBuffer<GlowPassCmd, 1, 1>
 {
 public:
     size_t Offset, Size;
