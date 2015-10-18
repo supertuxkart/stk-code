@@ -19,6 +19,7 @@
 #include "utils/time.hpp"
 
 #include "graphics/irr_driver.hpp"
+#include "utils/translation.hpp"
 
 #include <ctime>
 
@@ -37,6 +38,21 @@ void StkTime::init()
     m_timer = irr_driver->getDevice()->getTimer();
     m_timer->grab();
 }   // init
+
+// ----------------------------------------------------------------------------
+
+/** Converts the time in this object to a human readable string. */
+std::string StkTime::toString(const TimeType &tt)
+{
+    const struct tm *t = gmtime(&tt);
+
+    core::stringw w_date_format = translations->w_gettext(N_("%d/%m/%Y"));
+    core::stringc c_date_format(w_date_format.c_str());
+
+    char s[64];
+    strftime(s, 64, c_date_format.c_str(), t);
+    return s;
+}   // toString
 
 // ----------------------------------------------------------------------------
 /** Returns a time based on an arbitrary 'epoch' (e.g. could be start
