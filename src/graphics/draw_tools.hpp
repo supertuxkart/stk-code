@@ -23,25 +23,6 @@
 #include "graphics/stk_mesh.hpp"
 
 
-
-
-// ----------------------------------------------------------------------------
-/** Draw a mesh using specified shader (require OpenGL 3.2)
-    *  \param mesh The mesh to draw
-    *  \param args The shader uniforms values
-    */
-template<typename S, typename...Uniforms>
-void draw(const GLMesh *mesh, Uniforms... args)
-{
-    irr_driver->IncreaseObjectCount(); //TODO: move somewhere else
-    S::getInstance()->setUniforms(args...);
-    glDrawElementsBaseVertex(mesh->PrimitiveType,
-                             (int)mesh->IndexCount,
-                             mesh->IndexType,
-                             (GLvoid *)mesh->vaoOffset,
-                             (int)mesh->vaoBaseVertex);
-}   // draw
-
 // ----------------------------------------------------------------------------
 /** Variadic template to draw a mesh (using OpenGL 3.2 function)
  * with per mesh custom uniforms.*/
@@ -53,9 +34,8 @@ template<int n, int...list>
 struct CustomUnrollArgs<n, list...>
 {
     /** Draw a mesh using specified shader (require OpenGL 3.2)
-        *  \param cascade The cascade shadow map index
-        *  \param t First tuple element is the mesh to draw, next elements are uniforms values
-        *  \param args The shader uniforms values
+        *  \param t First tuple element is the mesh to draw, next elements are per mesh uniforms values
+        *  \param args Shader other uniforms values
         */  
     template<typename S,
              typename ...TupleTypes,
@@ -66,36 +46,6 @@ struct CustomUnrollArgs<n, list...>
         CustomUnrollArgs<list...>::template drawMesh<S>(t, STK::tuple_get<n>(t), args...);
     }   // drawMesh
     
-    // ----------------------------------------------------------------------------
-    /** Draw shadow mesh using specified shader (require OpenGL 3.2)
-        *  \param t First tuple element is the mesh to draw, next elements are uniforms values
-        *  \param args The shader uniforms values
-        */  
-    template<typename S,
-             typename ...TupleTypes,
-             typename ...Args>
-    static void drawShadow(unsigned cascade,
-                           const STK::Tuple<TupleTypes...> &t,
-                           Args... args)
-    {
-        CustomUnrollArgs<list...>::template drawShadow<S>(cascade, t, STK::tuple_get<n>(t), args...);
-    }   // drawShadow
-    
-    // ----------------------------------------------------------------------------
-    /** Draw mesh reflective shadow map using specified shader (require OpenGL 3.2)
-        *  \param rsm_matrix The reflective shadow map matrix
-        *  \param t First tuple element is the mesh to draw, next elements are uniforms values
-        *  \param args The shader uniforms values
-        */  
-    template<typename S,
-             typename ...TupleTypes,
-             typename ...Args>
-    static void drawReflectiveShadowMap(const irr::core::matrix4 &rsm_matrix,
-                                        const STK::Tuple<TupleTypes...> &t,
-                                        Args... args)
-    {
-        CustomUnrollArgs<list...>::template drawReflectiveShadowMap<S>(rsm_matrix, t, STK::tuple_get<n>(t), args...);
-    }   // drawReflectiveShadowMap
 };   // CustomUnrollArgs
 
 // ----------------------------------------------------------------------------
@@ -109,30 +59,15 @@ struct CustomUnrollArgs<>
     static void drawMesh(const STK::Tuple<TupleTypes...> &t,
                          Args... args)
     {
-        draw<S>(STK::tuple_get<0>(t), args...);
+        irr_driver->IncreaseObjectCount(); //TODO: move somewhere else
+        GLMesh *mesh = STK::tuple_get<0>(t);
+        S::getInstance()->setUniforms(args...);
+        glDrawElementsBaseVertex(mesh->PrimitiveType,
+                                (int)mesh->IndexCount,
+                                mesh->IndexType,
+                                (GLvoid *)mesh->vaoOffset,
+                                (int)mesh->vaoBaseVertex);
     }   // drawMesh
-    
-    // ---------------------------------------------------------------------------- 
-    template<typename S,
-             typename ...TupleTypes,
-             typename ...Args>
-    static void drawShadow(unsigned cascade,
-                           const STK::Tuple<TupleTypes...> &t,
-                           Args... args)
-    {
-        draw<S>(STK::tuple_get<0>(t), cascade, args...);
-    }   // drawShadow
-    
-    // ---------------------------------------------------------------------------- 
-    template<typename S,
-             typename ...TupleTypes,
-             typename ...Args>
-    static void drawReflectiveShadowMap(const irr::core::matrix4 &rsm_matrix,
-                                        const STK::Tuple<TupleTypes...> &t,
-                                        Args... args)
-    {
-        draw<S>(STK::tuple_get<0>(t), rsm_matrix, args...);
-    }   // drawReflectiveShadowMap
 };   // CustomUnrollArgs
 
 

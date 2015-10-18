@@ -168,7 +168,7 @@ public:
 };   // InstancedObjectRefPass2Shader
 
 // ============================================================================
-class ShadowShader : public TextureShader<ShadowShader, 0, int, core::matrix4>
+class ShadowShader : public TextureShader<ShadowShader, 0, core::matrix4, int>
 {
 public:
     ShadowShader()
@@ -187,7 +187,7 @@ public:
                                 GL_GEOMETRY_SHADER, "shadow.geom",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
-        assignUniforms("layer", "ModelMatrix");
+        assignUniforms("ModelMatrix", "layer");
     }   // ShadowShader
 };   // ShadowShader
 
@@ -229,7 +229,7 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "rsm.vert",
                             GL_FRAGMENT_SHADER, "rsm.frag");
 
-        assignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
+        assignUniforms("ModelMatrix", "TextureMatrix", "RSMMatrix");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // CRSMShader
 };   // CRSMShader
@@ -245,7 +245,7 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "rsm.vert",
                             GL_FRAGMENT_SHADER, "splatting_rsm.frag");
 
-        assignUniforms("RSMMatrix", "ModelMatrix");
+        assignUniforms("ModelMatrix", "RSMMatrix");
         assignSamplerNames(0, "tex_layout", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "tex_detail0", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            2, "tex_detail1", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -417,7 +417,7 @@ public:
 
 // ============================================================================
 class RefShadowShader : public TextureShader<RefShadowShader, 1, 
-                                             int, core::matrix4>
+                                             core::matrix4, int>
 {
 public:
     RefShadowShader()
@@ -436,7 +436,7 @@ public:
                                 GL_GEOMETRY_SHADER, "shadow.geom",
                                 GL_FRAGMENT_SHADER, "shadowref.frag");
         }
-        assignUniforms("layer", "ModelMatrix");
+        assignUniforms("ModelMatrix", "layer");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // RefShadowShader
 };   // RefShadowShader
@@ -667,8 +667,8 @@ public:
 };   // InstancedGrassPass1Shader
 
 // ============================================================================
-class GrassShadowShader : public TextureShader<GrassShadowShader, 1, int, core::matrix4,
-                                        core::vector3df>
+class GrassShadowShader : public TextureShader<GrassShadowShader, 1, core::matrix4,
+                                        core::vector3df, int>
 {
 public:
     GrassShadowShader()
@@ -687,14 +687,14 @@ public:
                                 GL_GEOMETRY_SHADER, "shadow.geom",
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
-        assignUniforms("layer", "ModelMatrix", "windDir");
+        assignUniforms("ModelMatrix", "windDir", "layer"); //TODO: check if order is correct
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // GrassShadowShader
 };   // GrassShadowShader
 
 // ============================================================================
 class InstancedGrassShadowShader : public TextureShader<InstancedGrassShadowShader, 1, 
-                                                 int, core::vector3df>
+                                                 core::vector3df, int>
 {
 public:
     InstancedGrassShadowShader()
@@ -717,7 +717,7 @@ public:
         }
 
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-        assignUniforms("layer", "windDir");
+        assignUniforms("windDir", "layer");
     }   // InstancedGrassShadowShader
 };   // InstancedGrassShadowShader
 
@@ -1555,7 +1555,7 @@ void renderShadow(unsigned cascade)
             HandleExpander<typename T::ShadowPassShader>::template Expand(mesh->TextureHandles, T::ShadowTextures);
         else
             TexExpander<typename T::ShadowPassShader>::template ExpandTex(*mesh, T::ShadowTextures);
-        CustomUnrollArgs<List...>::template drawShadow<typename T::ShadowPassShader>(cascade, t.at(i));
+        CustomUnrollArgs<List...>::template drawMesh<typename T::ShadowPassShader>(t.at(i), cascade);
     }   // for i
 }   // renderShadow
 
@@ -1573,7 +1573,7 @@ void renderInstancedShadow(unsigned cascade, Args ...args)
 
         TexExpander<typename T::InstancedShadowPassShader>::template 
                                        ExpandTex(*mesh, T::ShadowTextures);
-        T::InstancedShadowPassShader::getInstance()->setUniforms(cascade, args...);
+        T::InstancedShadowPassShader::getInstance()->setUniforms(args..., cascade);
         size_t tmp = ShadowPassCmd::getInstance()->Offset[cascade][T::MaterialType] + i;
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
                                (const void*)((tmp) 
@@ -1591,7 +1591,7 @@ static void multidrawShadow(unsigned i, Args ...args)
                                                            InstanceTypeShadow));
     if (ShadowPassCmd::getInstance()->Size[i][T::MaterialType])
     {
-        T::InstancedShadowPassShader::getInstance()->setUniforms(i, args...);
+        T::InstancedShadowPassShader::getInstance()->setUniforms(args..., i);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
             (const void*)(ShadowPassCmd::getInstance()->Offset[i][T::MaterialType] 
             * sizeof(DrawElementsIndirectCommand)),
@@ -1703,7 +1703,7 @@ void drawRSM(const core::matrix4 & rsm_matrix)
             HandleExpander<typename T::RSMShader>::template Expand(mesh->TextureHandles, T::RSMTextures);
         else
             TexExpander<typename T::RSMShader>::template ExpandTex(*mesh, T::RSMTextures);
-        CustomUnrollArgs<Selector...>::template drawReflectiveShadowMap<typename T::RSMShader>(rsm_matrix, t.at(i));
+        CustomUnrollArgs<Selector...>::template drawMesh<typename T::RSMShader>(t.at(i), rsm_matrix);
     }
 }   // drawRSM
 
