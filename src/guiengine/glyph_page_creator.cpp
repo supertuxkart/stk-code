@@ -31,6 +31,7 @@ namespace GUIEngine
 GlyphPageCreator::GlyphPageCreator()
 {
     page = GUIEngine::getDriver()->createImage(video::ECF_A8R8G8B8, core::dimension2du(512, 512));
+    image = 0;
     newchar.clear();
 }
 
