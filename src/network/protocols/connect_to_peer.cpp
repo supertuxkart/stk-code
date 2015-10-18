@@ -59,12 +59,10 @@ bool ConnectToPeer::notifyEventAsynchronous(Event* event)
 
 void ConnectToPeer::setup()
 {
-    m_state = NONE;
-    m_public_address.ip = 0;
-    m_public_address.port = 0;
-    m_peer_address.ip = 0;
-    m_peer_address.port = 0;
-    m_current_protocol_id = 0;
+    m_state                 = NONE;
+    m_public_address.clear();
+    m_peer_address.clear();
+    m_current_protocol_id   = 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -83,22 +81,22 @@ void ConnectToPeer::asynchronousUpdate()
             if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // we know the peer address
             {
-                if (m_peer_address.ip != 0 && m_peer_address.port != 0)
+                if (m_peer_address.getIP() != 0 && m_peer_address.getPort() != 0)
                 {
                     // we're in the same lan (same public ip address) !!
-                    if (m_peer_address.ip == NetworkManager::getInstance()->getPublicAddress().ip)
+                    if (m_peer_address.getIP() == NetworkManager::getInstance()->getPublicAddress().getIP())
                     {
                         // just send a broadcast packet with the string aloha_stk inside, the client will know our ip address and will connect
                         STKHost* host = NetworkManager::getInstance()->getHost();
                         TransportAddress broadcast_address;
-                        broadcast_address.ip = -1; // 255.255.255.255
-                        broadcast_address.port = m_peer_address.port; // 0b10101100000101101101111111111111; // for test
+                        broadcast_address.setIP(-1); // 255.255.255.255
+                        broadcast_address.setPort(m_peer_address.getPort()); // 0b10101100000101101101111111111111; // for test
                         char data[] = "aloha_stk\0";
                         host->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
                         Log::info("ConnectToPeer", "Broadcast aloha sent.");
                         StkTime::sleep(1);
-                        broadcast_address.ip = 0x7f000001; // 127.0.0.1 (localhost)
-                        broadcast_address.port = m_peer_address.port;
+                        broadcast_address.setIP(0x7f000001); // 127.0.0.1 (localhost)
+                        broadcast_address.setPort(m_peer_address.getPort());
                         host->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
                         Log::info("ConnectToPeer", "Broadcast aloha to self.");
                     }

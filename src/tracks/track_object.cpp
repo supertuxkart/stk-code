@@ -218,7 +218,8 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                 core::matrix4 absTransform = node->getAbsoluteTransformation();
                 node->setParent(irr_driver->getSceneManager()->getRootSceneNode());
                 node->setPosition(absTransform.getTranslation());
-                node->setRotation(absTransform.getRotationDegrees());
+                // Doesn't seem necessary to set rotation here, TODO: not sure why
+                //node->setRotation(absTransform.getRotationDegrees());
                 node->setScale(absTransform.getScale());
                 is_movable = true;
             }

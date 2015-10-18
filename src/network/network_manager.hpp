@@ -64,7 +64,7 @@ class NetworkManager : public AbstractSingleton<NetworkManager>
          *  \param peer : The transport address which you want to connect to.
          *  \return True if we're successfully connected. False elseway.
          */
-        virtual bool connect(TransportAddress peer);
+        virtual bool connect(const TransportAddress& peer);
         /** \brief Changes the socket working mode.
          *  Sockets can be in two modes : The ENet mode and a mode we will call
          *  the 'Raw' mode. In the ENet mode, the socket will be read as
@@ -90,12 +90,12 @@ class NetworkManager : public AbstractSingleton<NetworkManager>
 
         // raw data management
         void setLogin(std::string username, std::string password);
-        void setPublicAddress(TransportAddress addr);
+        void setPublicAddress(const TransportAddress& addr);
         void removePeer(STKPeer* peer);
 
         // getters
-        virtual bool peerExists(TransportAddress peer);
-        virtual bool isConnectedTo(TransportAddress peer);
+        virtual bool peerExists(const TransportAddress& peer);
+        virtual bool isConnectedTo(const TransportAddress& peer);
 
         virtual bool isServer() = 0;
         inline bool isClient()              { return !isServer();         }
@@ -103,7 +103,7 @@ class NetworkManager : public AbstractSingleton<NetworkManager>
         STKHost* getHost()                  { return m_localhost;         }
         std::vector<STKPeer*> getPeers()    { return m_peers;             }
         unsigned int getPeerCount()         { return (int)m_peers.size(); }
-        TransportAddress getPublicAddress() { return m_public_address;    }
+        const TransportAddress& getPublicAddress() { return m_public_address; }
         GameSetup* getGameSetup()           { return m_game_setup;        }
 
     protected:

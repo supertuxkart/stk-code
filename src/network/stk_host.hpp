@@ -118,7 +118,7 @@ class STKHost
          *  \param dst : Destination of the packet.
          */
         void        sendRawPacket(uint8_t* data, int length,
-                                TransportAddress dst);
+                                  const TransportAddress& dst);
         /*! \brief Receives a packet directly from the network interface.
          *  Receive a packet whithout ENet processing it.
          *  \return A string containing the data of the received packet.
@@ -138,7 +138,7 @@ class STKHost
          *  \return A string containing the data of the received packet
          *  matching the sender's ip address.
          */
-        uint8_t*    receiveRawPacket(TransportAddress sender, int max_tries = -1);
+        uint8_t*    receiveRawPacket(const TransportAddress& sender, int max_tries = -1);
         /*! \brief Broadcasts a packet to all peers.
          *  \param data : Data to send.
          */
@@ -147,11 +147,11 @@ class STKHost
         /*! \brief Tells if a peer is known.
          *  \return True if the peer is known, false elseway.
          */
-        bool        peerExists(TransportAddress peer_address);
+        bool        peerExists(const TransportAddress& peer_address);
         /*! \brief Tells if a peer is known and connected.
          *  \return True if the peer is known and connected, false elseway.
          */
-        bool        isConnectedTo(TransportAddress peer_address);
+        bool        isConnectedTo(const TransportAddress& peer_address);
 
         /*! \brief Returns true when the thread should stop listening. */
         int         mustStopListening();

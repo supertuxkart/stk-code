@@ -201,20 +201,20 @@ void STKHost::stopListening()
 
 // ----------------------------------------------------------------------------
 
-void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
+void STKHost::sendRawPacket(uint8_t* data, int length, const TransportAddress& dst)
 {
     struct sockaddr_in to;
     int to_len = sizeof(to);
     memset(&to,0,to_len);
 
     to.sin_family = AF_INET;
-    to.sin_port = htons(dst.port);
-    to.sin_addr.s_addr = htonl(dst.ip);
+    to.sin_port = htons(dst.getPort());
+    to.sin_addr.s_addr = htonl(dst.getIP());
 
     sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
-    Log::verbose("STKHost", "Raw packet sent to %i.%i.%i.%i:%u", ((dst.ip>>24)&0xff)
-    , ((dst.ip>>16)&0xff), ((dst.ip>>8)&0xff), ((dst.ip>>0)&0xff), dst.port);
-    STKHost::logPacket(NetworkString(std::string((char*)(data), length)), false);
+    Log::verbose("STKHost", "Raw packet sent to %s", dst.toString().c_str());
+    STKHost::logPacket(NetworkString(std::string((char*)(data), length)),
+                       false);
 }
 
 // ----------------------------------------------------------------------------
@@ -265,14 +265,12 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
         Log::error("STKHost", "Problem with the socket. Please contact the dev team.");
     }
     // we received the data
-    sender->ip = ntohl((uint32_t)(addr.sin_addr.s_addr));
-    sender->port = ntohs(addr.sin_port);
+    sender->setIP( ntohl((uint32_t)(addr.sin_addr.s_addr)) );
+    sender->setPort( ntohs(addr.sin_port) );
 
     if (addr.sin_family == AF_INET)
     {
-        char s[20];
-        inet_ntop(AF_INET, &(addr.sin_addr), s, 20);
-        Log::info("STKHost", "IPv4 Address of the sender was %s", s);
+        Log::info("STKHost", "IPv4 Address of the sender was %s", sender->toString().c_str());
     }
     STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
     return buffer;
@@ -280,7 +278,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
 
 // ----------------------------------------------------------------------------
 
-uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
+uint8_t* STKHost::receiveRawPacket(const TransportAddress& sender, int max_tries)
 {
     uint8_t* buffer; // max size needed normally (only used for stun)
     buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
@@ -294,7 +292,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
 
     int i = 0;
      // wait to receive the message because enet sockets are non-blocking
-    while(len < 0 || addr.sin_addr.s_addr == sender.ip)
+    while(len < 0 || addr.sin_addr.s_addr == sender.getIP())
     {
         i++;
         if (len>=0)
@@ -335,12 +333,12 @@ void STKHost::broadcastPacket(const NetworkString& data, bool reliable)
 
 // ----------------------------------------------------------------------------
 
-bool STKHost::peerExists(TransportAddress peer)
+bool STKHost::peerExists(const TransportAddress& peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == ntohl(peer.ip) &&
-            m_host->peers[i].address.port == peer.port)
+        if (m_host->peers[i].address.host == ntohl(peer.getIP()) &&
+            m_host->peers[i].address.port == peer.getPort()        )
         {
             return true;
         }
@@ -350,12 +348,11 @@ bool STKHost::peerExists(TransportAddress peer)
 
 // ----------------------------------------------------------------------------
 
-bool STKHost::isConnectedTo(TransportAddress peer)
+bool STKHost::isConnectedTo(const TransportAddress& peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == ntohl(peer.ip) &&
-            m_host->peers[i].address.port == peer.port &&
+        if (peer == m_host->peers[i].address &&
             m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
         {
             return true;

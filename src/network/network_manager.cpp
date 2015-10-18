@@ -35,8 +35,7 @@
 
 NetworkManager::NetworkManager()
 {
-    m_public_address.ip = 0;
-    m_public_address.port = 0;
+    m_public_address.clear();
     m_localhost = NULL;
     m_game_setup = NULL;
 }
@@ -87,7 +86,7 @@ void NetworkManager::abort()
 
 //-----------------------------------------------------------------------------
 
-bool NetworkManager::connect(TransportAddress peer)
+bool NetworkManager::connect(const TransportAddress& peer)
 {
     if (peerExists(peer))
         return isConnectedTo(peer);
@@ -194,9 +193,9 @@ void NetworkManager::setLogin(std::string username, std::string password)
 
 //-----------------------------------------------------------------------------
 
-void NetworkManager::setPublicAddress(TransportAddress addr)
+void NetworkManager::setPublicAddress(const TransportAddress& addr)
 {
-    m_public_address = addr;
+    m_public_address.copy(addr);
 }
 //-----------------------------------------------------------------------------
 
@@ -234,14 +233,14 @@ void NetworkManager::removePeer(STKPeer* peer)
 
 //-----------------------------------------------------------------------------
 
-bool NetworkManager::peerExists(TransportAddress peer)
+bool NetworkManager::peerExists(const TransportAddress& peer)
 {
     return m_localhost->peerExists(peer);
 }
 
 //-----------------------------------------------------------------------------
 
-bool NetworkManager::isConnectedTo(TransportAddress peer)
+bool NetworkManager::isConnectedTo(const TransportAddress& peer)
 {
     return m_localhost->isConnectedTo(peer);
 }

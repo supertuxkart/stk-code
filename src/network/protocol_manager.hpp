@@ -26,7 +26,9 @@
 #include "network/event.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
+#include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
 #include <vector>
@@ -102,10 +104,11 @@ typedef struct EventProcessingInfo
  * frames per second. Then, the management of protocols is thread-safe: any
  * object can start/pause/stop protocols whithout problems.
  */
-class ProtocolManager : public AbstractSingleton<ProtocolManager>
+class ProtocolManager : public AbstractSingleton<ProtocolManager>,
+                        public NoCopy
 {
     friend class AbstractSingleton<ProtocolManager>;
-    friend void* protocolManagerAsynchronousUpdate(void* data);
+    static void* mainLoop(void *data);
     public:
         
         /*! \brief Stops the protocol manager. */
@@ -189,11 +192,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>
          */
         virtual void            asynchronousUpdate();
 
-        /*!
-         * \brief Get the number of protocols running.
-         * \return The number of protocols that are actually running.
-         */
-        virtual int             runningProtocolsCount();
         /*!
          * \brief Get the state of a protocol using its id.
          * \param id : The id of the protocol you seek the state.
@@ -287,19 +285,15 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>
         bool                    propagateEvent(EventProcessingInfo* event, bool synchronous);
 
         // protected members
-        /*!
-         * \brief Contains the running protocols.
-         * This stores the protocols that are either running or paused, their
-         * state and their unique id.
-         */
-        std::vector<ProtocolInfo>       m_protocols;
-        /*!
-         * \brief Contains the network events to pass to protocols.
-         */
-        std::vector<EventProcessingInfo>             m_events_to_process;
-        /*!
-         * \brief Contains the requests to start/stop etc... protocols.
-         */
+        /** Contains the running protocols.
+         *  This stores the protocols that are either running or paused, their
+         * state and their unique id. */
+        Synchronised<std::vector<ProtocolInfo> >m_protocols;
+
+        /** Contains the network events to pass to protocols. */
+        Synchronised<std::vector<EventProcessingInfo> > m_events_to_process;
+
+        /** Contains the requests to start/stop etc... protocols. */
         std::vector<ProtocolRequest>    m_requests;
         /*! \brief The next id to assign to a protocol.
          * This value is incremented by 1 each time a protocol is started.
@@ -309,10 +303,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>
         uint32_t                        m_next_protocol_id;
 
         // mutexes:
-        /*! Used to ensure that the event queue is used thread-safely.       */
-        pthread_mutex_t                 m_events_mutex;
-        /*! Used to ensure that the protocol vector is used thread-safely.   */
-        pthread_mutex_t                 m_protocols_mutex;
         /*! Used to ensure that the protocol vector is used thread-safely.   */
         pthread_mutex_t                 m_asynchronous_protocols_mutex;
         /*! Used to ensure that the request vector is used thread-safely.    */

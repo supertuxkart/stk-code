@@ -41,15 +41,15 @@ void ShowPublicAddress::asynchronousUpdate()
 {
     if (m_state == NONE)
     {
-        TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
+        const TransportAddress& addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
         PlayerManager::setUserDetails(m_request, "set", Online::API::SERVER_PATH);
 
-        m_request->addParameter("address", addr.ip);
-        m_request->addParameter("port", addr.port);
+        m_request->addParameter("address", addr.getIP());
+        m_request->addParameter("port", addr.getPort());
         m_request->addParameter("private_port", NetworkManager::getInstance()->getHost()->getPort());
 
-        Log::info("ShowPublicAddress", "Showing addr %u and port %d", addr.ip, addr.port);
+        Log::info("ShowPublicAddress", "Showing addr %s", addr.toString().c_str());
 
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;

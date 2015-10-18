@@ -40,8 +40,9 @@ DEFINE_SCREEN_SINGLETON( GrandPrixEditorScreen );
 
 
 // -----------------------------------------------------------------------------
-GrandPrixEditorScreen::GrandPrixEditorScreen()
-    : Screen("gpeditor.stkgui"), m_selection(NULL), m_gpgroup(GrandPrixData::GP_NONE)
+GrandPrixEditorScreen::GrandPrixEditorScreen() 
+                     : Screen("grand_prix_editor.stkgui"), m_selection(NULL),
+                       m_gpgroup(GrandPrixData::GP_NONE)
 {
 }
 

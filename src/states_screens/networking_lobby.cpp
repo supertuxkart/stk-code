@@ -45,7 +45,7 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 
 // ----------------------------------------------------------------------------
 
-NetworkingLobby::NetworkingLobby() : Screen("online/lobby.stkgui")
+NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
     m_server = NULL;
 }   // NetworkingLobby
@@ -107,7 +107,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name, con
 
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     if (ribbon == NULL) return;
-    std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    const std::string &selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
     if (selection == m_exit_widget->m_properties[PROP_ID])
     {

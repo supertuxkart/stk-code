@@ -78,7 +78,7 @@ void KartUpdateProtocol::update()
         time = current_time;
         if (m_listener->isServer())
         {
-            NetworkString ns;
+            NetworkString ns(4+m_karts.size()*32);
             ns.af( World::getWorld()->getTime());
             for (unsigned int i = 0; i < m_karts.size(); i++)
             {
@@ -97,7 +97,7 @@ void KartUpdateProtocol::update()
             AbstractKart* kart = m_karts[m_self_kart_index];
             Vec3 v = kart->getXYZ();
             btQuaternion quat = kart->getRotation();
-            NetworkString ns;
+            NetworkString ns(36);
             ns.af( World::getWorld()->getTime());
             ns.ai32( kart->getWorldKartId());
             ns.af(v[0]).af(v[1]).af(v[2]); // add position

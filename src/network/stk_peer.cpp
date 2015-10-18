@@ -62,16 +62,10 @@ STKPeer::~STKPeer()
 
 //-----------------------------------------------------------------------------
 
-bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host,
+bool STKPeer::connectToHost(STKHost* localhost, const TransportAddress &host,
                 uint32_t channel_count, uint32_t data)
 {
-    ENetAddress  address;
-    address.host =
-         ((host.ip & 0xff000000) >> 24)
-       + ((host.ip & 0x00ff0000) >> 8)
-       + ((host.ip & 0x0000ff00) << 8)
-       + ((host.ip & 0x000000ff) << 24); // because ENet wants little endian
-    address.port = host.port;
+    const ENetAddress  address = host.toEnetAddress();
 
     ENetPeer* peer = enet_host_connect(localhost->m_host, &address, 2, 0);
     if (peer == NULL)
@@ -79,10 +73,8 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host,
         Log::error("STKPeer", "Could not try to connect to server.\n");
         return false;
     }
-    Log::verbose("STKPeer", "Connecting to %i.%i.%i.%i:%i.\nENetPeer address "
-                "is %ld", (peer->address.host>>0)&0xff,
-                (peer->address.host>>8)&0xff,(peer->address.host>>16)&0xff,
-                (peer->address.host>>24)&0xff,peer->address.port, (long int)(peer));
+    TransportAddress a(peer->address);
+    Log::verbose("STKPeer", "Connecting to %s", a.toString().c_str());
     return true;
 }
 
@@ -97,10 +89,10 @@ void STKPeer::disconnect()
 
 void STKPeer::sendPacket(NetworkString const& data, bool reliable)
 {
-    Log::verbose("STKPeer", "sending packet of size %d to %i.%i.%i.%i:%i",
-                data.size(), (m_peer->address.host>>0)&0xff,
-                (m_peer->address.host>>8)&0xff,(m_peer->address.host>>16)&0xff,
-                (m_peer->address.host>>24)&0xff,m_peer->address.port);
+    TransportAddress a(m_peer->address);
+    Log::verbose("STKPeer", "sending packet of size %d to %s",
+                 a.toString().c_str());
+         
     ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
                 (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
     /* to debug the packet output
