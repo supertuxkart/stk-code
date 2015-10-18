@@ -25,7 +25,7 @@
 
 // ----------------------------------------------------------------------------
 /** Variadic template to draw a mesh (using OpenGL 3.2 function)
- * with per mesh custom uniforms.*/
+ * using specified shader with per mesh custom uniforms.*/
 template<int...list>
 struct CustomUnrollArgs;
 
@@ -34,6 +34,7 @@ template<int n, int...list>
 struct CustomUnrollArgs<n, list...>
 {
     /** Draw a mesh using specified shader (require OpenGL 3.2)
+        *  \tparam S The shader to use.
         *  \param t First tuple element is the mesh to draw, next elements are per mesh uniforms values
         *  \param args Shader other uniforms values
         */  
@@ -73,88 +74,100 @@ struct CustomUnrollArgs<>
 
 
 // ----------------------------------------------------------------------------
-/** Variadic template to apply textures parameters.*/
+/** Variadic template to bind textures.*/
 template<typename T, int N>
-struct TexExpander_impl
+struct TexExpanderImpl
 {
     template<typename...TupleArgs,
              typename... Args>
     static void ExpandTex(const GLMesh &mesh,
-                          const STK::Tuple<TupleArgs...> &TexSwizzle,
+                          const STK::Tuple<TupleArgs...> &tex_swizzle,
                           Args... args)
     {
-        size_t idx = STK::tuple_get<sizeof...(TupleArgs) - N>(TexSwizzle);
-        TexExpander_impl<T, N - 1>::template
-            ExpandTex(mesh, TexSwizzle, 
-                      args..., getTextureGLuint(mesh.textures[idx]));
+        size_t idx = STK::tuple_get<sizeof...(TupleArgs) - N>(tex_swizzle);
+        TexExpanderImpl<T, N - 1>::template ExpandTex(mesh,
+                                                       tex_swizzle, 
+                                                       args...,
+                                                       getTextureGLuint(mesh.textures[idx]));
     }   // ExpandTex
-};   // TexExpander_impl
+};   // TexExpanderImpl
 
 // ----------------------------------------------------------------------------
+/** Partial specialisation of TexExpanderImpl to end the recursion */
 template<typename T>
-struct TexExpander_impl<T, 0>
+struct TexExpanderImpl<T, 0>
 {
     template<typename...TupleArgs, typename... Args>
     static void ExpandTex(const GLMesh &mesh,
-                          const STK::Tuple<TupleArgs...> &TexSwizzle,
+                          const STK::Tuple<TupleArgs...> &tex_swizzle,
                           Args... args)
     {
         T::getInstance()->setTextureUnits(args...);
     }   // ExpandTex
-};   // TexExpander_impl
+};   // TexExpanderImpl
+
 
 // ----------------------------------------------------------------------------
 template<typename T>
 struct TexExpander
 {
-    template<typename...TupleArgs, typename... Args>
+    template<typename...TupleArgs,
+             typename... Args>
     static void ExpandTex(const GLMesh &mesh,
-                          const STK::Tuple<TupleArgs...> &TexSwizzle,
+                          const STK::Tuple<TupleArgs...> &tex_swizzle,
                           Args... args)
     {
-        TexExpander_impl<T, sizeof...(TupleArgs)>::ExpandTex(mesh, TexSwizzle,
-                                                             args...);
+        TexExpanderImpl<T, sizeof...(TupleArgs)>::ExpandTex(mesh,
+                                                            tex_swizzle,
+                                                            args...);
     }   // ExpandTex
 };   // TexExpander
 
 
 
-
-
 // ----------------------------------------------------------------------------
 template<typename T, int N>
-struct HandleExpander_impl
+struct HandleExpanderImpl
 {
     template<typename...TupleArgs, typename... Args>
     static void Expand(uint64_t *TextureHandles, 
-                       const STK::Tuple<TupleArgs...> &TexSwizzle, Args... args)
+                       const STK::Tuple<TupleArgs...> &tex_swizzle,
+                       Args... args)
     {
-        size_t idx = STK::tuple_get<sizeof...(TupleArgs)-N>(TexSwizzle);
-        HandleExpander_impl<T, N - 1>::template 
-            Expand(TextureHandles, TexSwizzle, args..., TextureHandles[idx]);
+        size_t idx = STK::tuple_get<sizeof...(TupleArgs)-N>(tex_swizzle);
+        HandleExpanderImpl<T, N - 1>::template Expand(TextureHandles,
+                                                       tex_swizzle,
+                                                       args...,
+                                                       TextureHandles[idx]);
     }   // Expand
-};   // HandleExpander_impl
+};   // HandleExpanderImpl
 
 // ----------------------------------------------------------------------------
 template<typename T>
-struct HandleExpander_impl<T, 0>
+struct HandleExpanderImpl<T, 0>
 {
     template<typename...TupleArgs, typename... Args>
     static void Expand(uint64_t *TextureHandles,
-                       const STK::Tuple<TupleArgs...> &TexSwizzle, Args... args)
+                       const STK::Tuple<TupleArgs...> &tex_swizzle,
+                       Args... args)
     {
         T::getInstance()->setTextureHandles(args...);
     }   // Expand
-};   // HandleExpander_impl
+};   // HandleExpanderImpl
 
 // ----------------------------------------------------------------------------
 template<typename T>
 struct HandleExpander
 {
-    template<typename...TupleArgs, typename... Args>
-    static void Expand(uint64_t *TextureHandles, const STK::Tuple<TupleArgs...> &TexSwizzle, Args... args)
+    template<typename...TupleArgs,
+             typename... Args>
+    static void Expand(uint64_t *TextureHandles,
+                       const STK::Tuple<TupleArgs...> &tex_swizzle,
+                       Args... args)
     {
-        HandleExpander_impl<T, sizeof...(TupleArgs)>::Expand(TextureHandles, TexSwizzle, args...);
+        HandleExpanderImpl<T, sizeof...(TupleArgs)>::Expand(TextureHandles,
+                                                            tex_swizzle,
+                                                            args...);
     }   // Expand
 };   // HandleExpander
 
