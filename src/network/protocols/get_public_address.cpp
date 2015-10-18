@@ -53,7 +53,8 @@ GetPublicAddress::GetPublicAddress()
 
 // ----------------------------------------------------------------------------
 /** Creates a STUN request and sends it to a random STUN server selected from
- *  the list stored in the config file. See https://tools.ietf.org/html/rfc5389#section-6
+ *  the list stored in the config file. See
+ *  https://tools.ietf.org/html/rfc5389#section-6
  *  for details on the message structure.
  *  The request is send through m_transaction_host, from which the answer
  *  will be retrieved by parseStunResponse()
@@ -76,10 +77,12 @@ void GetPublicAddress::createStunRequest()
     int status = getaddrinfo(server_name, NULL, &hints, &res);
     if (status != 0)
     {
-        Log::error("GetPublicAddress", "Error in getaddrinfo: %s", gai_strerror(status));
+        Log::error("GetPublicAddress", "Error in getaddrinfo: %s",
+                   gai_strerror(status));
         return;
     }
-    assert(res != NULL); // documentation says it points to "one or more addrinfo structures"
+    // documentation says it points to "one or more addrinfo structures"
+    assert(res != NULL);
     struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
     m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
     m_transaction_host = new STKHost();
@@ -104,7 +107,9 @@ void GetPublicAddress::createStunRequest()
     s.addChar(0);
 
 
-    m_transaction_host->sendRawPacket(s.getBytes(), 20, TransportAddress(m_stun_server_ip, m_stun_server_port));
+    m_transaction_host->sendRawPacket(s.getBytes(), 20,
+                                      TransportAddress(m_stun_server_ip,
+                                                       m_stun_server_port) );
     freeaddrinfo(res);
     m_state = STUN_REQUEST_SENT;
 }   // createStunRequest
@@ -117,20 +122,24 @@ void GetPublicAddress::createStunRequest()
 */
 std::string GetPublicAddress::parseStunResponse()
 {
-    uint8_t* s = m_transaction_host->receiveRawPacket(TransportAddress(m_stun_server_ip, m_stun_server_port), 2000);
+    uint8_t* s = m_transaction_host
+        ->receiveRawPacket(TransportAddress(m_stun_server_ip,
+                                            m_stun_server_port),  2000);
 
     if (!s)
         return "STUN response contains no data at all";
 
     // Convert to network string.
     // FIXME: the length is not known (atm 2048 bytes are allocated in 
-    // receiveRawPacket, and it looks like 32 are actually used in a normal stun reply
+    // receiveRawPacket, and it looks like 32 are actually used in a normal
+    // stun reply
     NetworkString datas(std::string((char*)s, 32));
 
     // The received data has been copied and can now be deleted
     delete s;
 
-    // check that the stun response is a response, contains the magic cookie and the transaction ID
+    // check that the stun response is a response, contains the magic cookie
+    // and the transaction ID
     if (datas.getUInt16(0) != 0x0101)
         return "STUN response doesn't contain the magic cookie";
 
@@ -145,7 +154,8 @@ std::string GetPublicAddress::parseStunResponse()
             return "STUN response doesn't contain the transaction ID";
     }
 
-    Log::debug("GetPublicAddress", "The STUN server responded with a valid answer");
+    Log::debug("GetPublicAddress",
+               "The STUN server responded with a valid answer");
     int message_size = datas.getUInt16(2);
 
     // The stun message is valid, so we parse it now:
