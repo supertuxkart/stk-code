@@ -381,12 +381,6 @@ bool ScalableFont::loadTTF()
     std::vector <s32> advance;
     std::vector <s32> height;
 
-    err = FT_Set_Pixel_Sizes(cur_face, 0, m_dpi);
-    if (err)
-        Log::error("ScalableFont::loadTTF", "Can't set font size.");
-
-    slot = cur_face->glyph;
-
     std::set<wchar_t>::iterator it;
     s32 current_maxheight = 0;
     s32 t;
@@ -402,8 +396,33 @@ bool ScalableFont::loadTTF()
         SGUISprite s;
         core::rect<s32> rectangle;
 
-        // Retrieve glyph index from character code, skip useless glyph.
-        int idx = FT_Get_Char_Index(cur_face, *it);
+        int idx;
+        if (m_type == T_BOLD) //Lite-Fontconfig for stk, this one is specifically for bold title
+        {
+            int count = F_BOLD;
+            while (count < irr::gui::F_COUNT)
+            {
+                m_font_use = (FontUse)count;
+                err = FT_Set_Pixel_Sizes(cur_face, 0, m_dpi);
+                if (err)
+                    Log::error("ScalableFont::loadTTF", "Can't set font size.");
+
+                idx = FT_Get_Char_Index(cur_face, *it);
+                if (idx > 0) break;
+                count++;
+            }
+        }
+        else
+        {
+            err = FT_Set_Pixel_Sizes(cur_face, 0, m_dpi);
+            if (err)
+                Log::error("ScalableFont::loadTTF", "Can't set font size.");
+
+            idx = FT_Get_Char_Index(cur_face, *it);
+        }
+
+        slot = cur_face->glyph;
+
         if (idx)
         {
             // Load glyph image into the slot (erase previous one)
@@ -599,7 +618,7 @@ bool ScalableFont::lazyLoadChar()
         //Lite-Fontconfig for stk
         int idx;
         int count = 0;
-        while (count < irr::gui::F_COUNT - 2) //Exclude bold and digit font
+        while (count < irr::gui::F_COUNT - 3) //Exclude bold with fallback and digit font
         {
             m_font_use = (FontUse)count;
             err = FT_Set_Pixel_Sizes(cur_face, 0, m_dpi);

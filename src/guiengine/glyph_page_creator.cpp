@@ -107,10 +107,10 @@ bool GlyphPageCreator::insertGlyph(FT_Bitmap bits, core::rect<s32>& rect)
             const u32 image_pitch = image->getPitch() / sizeof(u32);
             u32* image_data = (u32*)image->lock();
             u8* glyph_data = bits.buffer;
-            for (u32 y = 0; y < bits.rows; ++y)
+            for (u32 y = 0; y < (unsigned)bits.rows; ++y)
             {
                 u8* row = glyph_data;
-                for (u32 x = 0; x < bits.width; ++x)
+                for (u32 x = 0; x < (unsigned)bits.width; ++x)
                 {
                     image_data[y * image_pitch + x] |= static_cast<u32>(255.0f * (static_cast<float>(*row++) / gray_count)) << 24;
                     //data[y * image_pitch + x] |= ((u32)(*bitsdata++) << 24);
