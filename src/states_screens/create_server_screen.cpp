@@ -56,7 +56,7 @@ void CreateServerScreen::loadedFromFile()
 {
     m_name_widget = getWidget<TextBoxWidget>("name");
     assert(m_name_widget != NULL);
-    m_name_widget->setText(_("%s's server", PlayerManager::getCurrentOnlineUserName()));
+ 
     m_max_players_widget = getWidget<SpinnerWidget>("max_players");
     assert(m_max_players_widget != NULL);
     m_max_players_widget->setValue(8);
@@ -74,113 +74,27 @@ void CreateServerScreen::loadedFromFile()
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
-void CreateServerScreen::beforeAddingWidget()
-{
-
-} // beforeAddingWidget
-
-// ----------------------------------------------------------------------------
 void CreateServerScreen::init()
 {
     Screen::init();
-    setInitialFocus();
     DemoWorld::resetIdleTime();
     m_info_widget->setText("", false);
     LabelWidget *title = getWidget<LabelWidget>("title");
 
     title->setText(m_is_lan ? _("Create LAN Server")
                             : _("Create Server")    , false);
+
+    // I18n: Name of the server. %s is either the online or local user name
+    m_name_widget->setText(_("%s's server",
+                       m_is_lan ? PlayerManager::getCurrentPlayer()->getName()
+                                : PlayerManager::getCurrentOnlineUserName()
+                             )
+                          );
 }   // init
 
 // ----------------------------------------------------------------------------
-void CreateServerScreen::onUpdate(float delta)
-{
-    if(m_server_creation_request != NULL)
-    {
-        if(m_server_creation_request->isDone())
-        {
-            if(m_server_creation_request->isSuccess())
-            {
-                new ServerInfoDialog(m_server_creation_request->getCreatedServerID(),
-                                     true);
-            }
-            else
-            {
-                SFXManager::get()->quickSound( "anvil" );
-                m_info_widget->setErrorColor();
-                m_info_widget->setText(m_server_creation_request->getInfo(), false);
-            }
-            delete m_server_creation_request;
-            m_server_creation_request = NULL;
-            //m_options_widget->setActive(true);
-        }
-        else
-        {
-            m_info_widget->setDefaultColor();
-            m_info_widget->setText(StringUtils::loadingDots(_("Creating server")),
-                                   false);
-        }
-    }
-}   // onUpdate
-
-
-// ----------------------------------------------------------------------------
-void CreateServerScreen::serverCreationRequest()
-{
-    if (m_is_lan)
-    {
-        const irr::core::stringw name = m_name_widget->getText().trim();
-        const int max_players = m_max_players_widget->getValue();
-        Server *server = new Server(name, /*lan*/true, max_players,
-                                    /*current_player*/1);
-        ServersManager::get()->addServer(server);
-        return;
-    }
-
-    // Now must be WAN: forward request to the stk server
-    const irr::core::stringw name = m_name_widget->getText().trim();
-    const int max_players = m_max_players_widget->getValue();
-    m_info_widget->setErrorColor();
-    if (name.size() < 4 || name.size() > 30)
-    {
-        m_info_widget->setText(
-            _("Name has to be between 4 and 30 characters long!"), false);
-    }
-    else if (max_players < 2 || max_players > 12)
-    {
-        m_info_widget->setText(
-            _("The maxinum number of players has to be between 2 and 12."), false);
-    }
-    else
-    {
-        m_server_creation_request = new ServerCreationRequest();
-        PlayerManager::setUserDetails(m_server_creation_request, "create",
-                                      Online::API::SERVER_PATH);
-        m_server_creation_request->addParameter("name", name);
-        m_server_creation_request->addParameter("max_players", max_players);
-        m_server_creation_request->queue();
-
-        return;
-    }
-    SFXManager::get()->quickSound("anvil");
-}   // serverCreationRequest
-
-// ----------------------------------------------------------------------------
-/** Callbacks from the online create server request.
+/** Event callback which starts the server creation process.
  */
-void CreateServerScreen::ServerCreationRequest::callback()
-{
-    if (isSuccess())
-    {
-        // Must be a WAN server
-        Server *server = new Server(*getXMLData()->getNode("server"),
-                                    /*is lan*/false);
-        ServersManager::get()->addServer(server);
-        m_created_server_id = server->getServerId();
-    }   // isSuccess
-}   // callback
-
-// ----------------------------------------------------------------------------
 void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
                                        const int playerID)
 {
@@ -200,6 +114,102 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+/** Called once per framce to check if the server creation request has
+ *  finished. If so, if pushes the server creation sceen.
+ */
+void CreateServerScreen::onUpdate(float delta)
+{
+    if (!m_server_creation_request) return;
+
+    // If the request is not ready, wait till it is done.
+    if (!m_server_creation_request->isDone())
+    {
+        m_info_widget->setDefaultColor();
+        m_info_widget->setText(StringUtils::loadingDots(_("Creating server")),
+                               false);
+        return;
+    }
+
+    // Now the request has been executed.
+    // ----------------------------------
+    if (m_server_creation_request->isSuccess())
+    {
+        new ServerInfoDialog(m_server_creation_request->getCreatedServerID(),
+                             true);
+    }
+    else
+    {
+        SFXManager::get()->quickSound("anvil");
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(m_server_creation_request->getInfo(), false);
+    }
+    delete m_server_creation_request;
+    m_server_creation_request = NULL;
+
+}   // onUpdate
+
+// ----------------------------------------------------------------------------
+/** In case of WAN it adds the server to the list of servers. In case of LAN
+ *  networking, it registers this game server with the stk server.
+ */
+void CreateServerScreen::serverCreationRequest()
+{
+    const irr::core::stringw name = m_name_widget->getText().trim();
+    const int max_players = m_max_players_widget->getValue();
+    m_info_widget->setErrorColor();
+    if (name.size() < 4 || name.size() > 30)
+    {
+        m_info_widget->setText(
+            _("Name has to be between 4 and 30 characters long!"), false);
+        SFXManager::get()->quickSound("anvil");
+        return;
+    }
+    else if (max_players < 2 || max_players > 12)
+    {
+        m_info_widget->setText(
+            _("The maxinum number of players has to be between 2 and 12."),
+            false);
+        SFXManager::get()->quickSound("anvil");
+        return;
+    }
+
+    if (m_is_lan)
+    {
+        const irr::core::stringw name = m_name_widget->getText().trim();
+        const int max_players = m_max_players_widget->getValue();
+        Server *server = new Server(name, /*lan*/true, max_players,
+            /*current_player*/1);
+        ServersManager::get()->addServer(server);
+        new ServerInfoDialog(server->getServerId(), true);
+        return;
+    }
+
+    // Now must be WAN: forward request to the stk server
+    m_server_creation_request = new ServerCreationRequest();
+    PlayerManager::setUserDetails(m_server_creation_request, "create",
+                                  Online::API::SERVER_PATH);
+    m_server_creation_request->addParameter("name", name);
+    m_server_creation_request->addParameter("max_players", max_players);
+    m_server_creation_request->queue();
+
+}   // serverCreationRequest
+
+// ----------------------------------------------------------------------------
+/** Callbacks from the online create server request.
+ */
+void CreateServerScreen::ServerCreationRequest::callback()
+{
+    if (isSuccess())
+    {
+        // Must be a WAN server
+        Server *server = new Server(*getXMLData()->getNode("server"),
+                                    /*is lan*/false);
+        ServersManager::get()->addServer(server);
+        m_created_server_id = server->getServerId();
+    }   // isSuccess
+}   // callback
+
+// ----------------------------------------------------------------------------
 
 void CreateServerScreen::tearDown()
 {
@@ -207,19 +217,3 @@ void CreateServerScreen::tearDown()
     m_server_creation_request = NULL;
 }   // tearDown
 
-// ----------------------------------------------------------------------------
-void CreateServerScreen::onDisabledItemClicked(const std::string& item)
-{
-
-}   // onDisabledItemClicked
-
-// ----------------------------------------------------------------------------
-void CreateServerScreen::setInitialFocus()
-{
-}   // setInitialFocus
-
-// ----------------------------------------------------------------------------
-void CreateServerScreen::onDialogClose()
-{
-    setInitialFocus();
-}   // onDialogClose()
