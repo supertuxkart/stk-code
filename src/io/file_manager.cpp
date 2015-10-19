@@ -115,7 +115,6 @@ FileManager::FileManager()
 {
     m_subdir_name.resize(ASSET_COUNT);
     m_subdir_name[CHALLENGE  ] = "challenges";
-    m_subdir_name[FONT       ] = "fonts";
     m_subdir_name[GFX        ] = "gfx";
     m_subdir_name[GRANDPRIX  ] = "grandprix";
     m_subdir_name[GUI        ] = "gui";
