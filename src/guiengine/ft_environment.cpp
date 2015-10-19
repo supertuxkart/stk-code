@@ -69,6 +69,10 @@ void FTEnvironment::loadFont()
                                 0, &(FTEnvironment::ft_face[F_BOLD]));
 
     FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
+                                (FileManager::TTF, "FreeSansBold.ttf", true)).c_str(),
+                                0, &(FTEnvironment::ft_face[F_BOLD_FALLBACK]));
+
+    FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "Ubuntu-B.ttf",true)).c_str(),
                                  0, &(FTEnvironment::ft_face[F_DIGIT]));
 

@@ -33,8 +33,9 @@ enum FontUse
     F_CJK = 2, 
     F_AR = 3, 
     F_BOLD = 4, 
-    F_DIGIT = 5,
-    F_COUNT = 6
+    F_BOLD_FALLBACK = 5,
+    F_DIGIT = 6,
+    F_COUNT = 7
 };
 
 enum TTFLoadingType {T_NORMAL, T_DIGIT, T_BOLD};
