@@ -434,9 +434,6 @@ if(MINGW)
     endif()
 endif()
 
-# Optional tools
-add_subdirectory(tools/font_tool)
-
 
 # ==== Checking if data folder exists ====
 if(NOT IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)
