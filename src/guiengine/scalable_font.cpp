@@ -20,9 +20,6 @@
 #include <cmath>
 #include <cwctype>
 
-#define cur_face   GUIEngine::getFreetype()->ft_face[m_font_use]
-#define gp_creator GUIEngine::getGlyphPageCreator()
-
 namespace irr
 {
 namespace gui
@@ -367,6 +364,8 @@ bool ScalableFont::loadTTF()
         return false;
     }
 
+    GUIEngine::GlyphPageCreator* gp_creator = GUIEngine::getGlyphPageCreator();
+
     //Initialize glyph slot
     FT_GlyphSlot slot;
     FT_Error     err;
@@ -389,6 +388,8 @@ bool ScalableFont::loadTTF()
     gp_creator->clearGlyphPage();
     gp_creator->createNewGlyphPage();
 
+    GUIEngine::FTEnvironment* ft_env = GUIEngine::getFreetype();
+
     it = cur_prop.usedchar.begin();
     while (it != cur_prop.usedchar.end())
     {
@@ -403,50 +404,54 @@ bool ScalableFont::loadTTF()
             while (count < irr::gui::F_COUNT)
             {
                 m_font_use = (FontUse)count;
-                err = FT_Set_Pixel_Sizes(cur_face, 0, m_dpi);
+                FT_Face curr_face = ft_env->ft_face[m_font_use];
+
+                err = FT_Set_Pixel_Sizes(curr_face, 0, m_dpi);
                 if (err)
                     Log::error("ScalableFont::loadTTF", "Can't set font size.");
 
-                idx = FT_Get_Char_Index(cur_face, *it);
+                idx = FT_Get_Char_Index(curr_face, *it);
                 if (idx > 0) break;
                 count++;
             }
         }
         else
         {
-            err = FT_Set_Pixel_Sizes(cur_face, 0, m_dpi);
+            FT_Face curr_face = ft_env->ft_face[m_font_use];
+            err = FT_Set_Pixel_Sizes(curr_face, 0, m_dpi);
             if (err)
                 Log::error("ScalableFont::loadTTF", "Can't set font size.");
 
-            idx = FT_Get_Char_Index(cur_face, *it);
+            idx = FT_Get_Char_Index(curr_face, *it);
         }
 
-        slot = cur_face->glyph;
+        FT_Face curr_face = ft_env->ft_face[m_font_use];
+        slot = curr_face->glyph;
 
         if (idx)
         {
             // Load glyph image into the slot (erase previous one)
-            err = FT_Load_Glyph(cur_face, idx,
+            err = FT_Load_Glyph(curr_face, idx,
                   FT_LOAD_DEFAULT | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL);
             if (err)
                 Log::error("ScalableFont::loadTTF", "Can't load a single glyph.");
 
             // Store vertical offset on line.
-            s32 offset_on_line = (cur_face->glyph->metrics.height >> 6) - cur_face->glyph->bitmap_top;
+            s32 offset_on_line = (curr_face->glyph->metrics.height >> 6) - curr_face->glyph->bitmap_top;
             offset.push_back(offset_on_line);
 
             // This is to be used later.
-            t = cur_face->glyph->metrics.height >> 6;
+            t = curr_face->glyph->metrics.height >> 6;
             height.push_back(t);
             if (t > current_maxheight)
                 current_maxheight = t;
 
             // Store horizontal padding (bearingX).
-            s32 bX = cur_face->glyph->bitmap_left;
+            s32 bX = curr_face->glyph->bitmap_left;
             bx.push_back(bX);
 
             // Store total width on horizontal line.
-            s32 width = cur_face->glyph->advance.x >> 6;
+            s32 width = curr_face->glyph->advance.x >> 6;
             advance.push_back(width);
 
             // Convert to an anti-aliased bitmap
@@ -576,17 +581,17 @@ bool ScalableFont::loadTTF()
         case T_NORMAL:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
                        "supporting %d characters for normal font %s at %d dpi using %d glyph page(s)."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, m_dpi, SpriteBank->getTextureCount());
+                       , Areas.size(), CharacterMap.size(), GUIEngine::getFreetype()->ft_face[m_font_use]->family_name, m_dpi, SpriteBank->getTextureCount());
         break;
         case T_DIGIT:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
                        "supporting %d characters for high-res digits font %s at %d dpi using %d glyph page(s)."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, m_dpi, SpriteBank->getTextureCount());
+                       , Areas.size(), CharacterMap.size(), GUIEngine::getFreetype()->ft_face[m_font_use]->family_name, m_dpi, SpriteBank->getTextureCount());
         break;
         case T_BOLD:
             Log::info("ScalableFont::loadTTF", "Created %d glyphs "
                        "supporting %d characters for bold title font %s at %d dpi using %d glyph page(s)."
-                      , Areas.size(), CharacterMap.size(), cur_face->family_name, m_dpi, SpriteBank->getTextureCount());
+                       , Areas.size(), CharacterMap.size(), GUIEngine::getFreetype()->ft_face[m_font_use]->family_name, m_dpi, SpriteBank->getTextureCount());
         break;
     }
 
@@ -601,6 +606,9 @@ bool ScalableFont::lazyLoadChar()
 
     FT_GlyphSlot slot;
     FT_Error     err;
+
+    GUIEngine::FTEnvironment* ft_env = GUIEngine::getFreetype();
+    GUIEngine::GlyphPageCreator* gp_creator = GUIEngine::getGlyphPageCreator();
 
     s32 height;
     s32 bX;
@@ -617,31 +625,38 @@ bool ScalableFont::lazyLoadChar()
 
         //Lite-Fontconfig for stk
         int idx;
-        int count = 0;
-        while (count < irr::gui::F_COUNT - 3) //Exclude bold with fallback and digit font
+        int font = irr::gui::F_DEFAULT;
+        while (font <= irr::gui::F_LAST_REGULAR_FONT)
         {
-            m_font_use = (FontUse)count;
-            err = FT_Set_Pixel_Sizes(cur_face, 0, m_dpi);
+            m_font_use = (FontUse)font;
+
+            FT_Face face = ft_env->ft_face[font];
+
+            err = FT_Set_Pixel_Sizes(face, 0, m_dpi);
             if (err)
                 Log::error("ScalableFont::loadTTF", "Can't set font size.");
 
-            idx = FT_Get_Char_Index(cur_face, *it);
+            idx = FT_Get_Char_Index(face, *it);
             if (idx > 0) break;
-            count++;
+
+            font++;
         }
-        slot = cur_face->glyph;
+
+        FT_Face curr_face = ft_env->ft_face[m_font_use];
+
+        slot = curr_face->glyph;
 
         if (idx)
         {
-            err = FT_Load_Glyph(cur_face, idx,
+            err = FT_Load_Glyph(curr_face, idx,
                   FT_LOAD_DEFAULT | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL);
             if (err)
                 Log::error("ScalableFont::loadTTF", "Can't load a single glyph.");
 
-            offset_on_line = (cur_face->glyph->metrics.height >> 6) - cur_face->glyph->bitmap_top;
-            height = cur_face->glyph->metrics.height >> 6;
-            bX = cur_face->glyph->bitmap_left;
-            width = cur_face->glyph->advance.x >> 6;
+            offset_on_line = (curr_face->glyph->metrics.height >> 6) - curr_face->glyph->bitmap_top;
+            height = curr_face->glyph->metrics.height >> 6;
+            bX = curr_face->glyph->bitmap_left;
+            width = curr_face->glyph->advance.x >> 6;
             FT_Bitmap bits = slot->bitmap;
             CharacterMap[*it] = SpriteBank->getSprites().size();
 
@@ -698,7 +713,7 @@ bool ScalableFont::lazyLoadChar()
 
     Log::debug("ScalableFont::lazyLoadChar", "New characters drawn by %s inserted, there are %d glyphs "
               "supporting %d characters for normal font at %d dpi using %d glyph page(s) now."
-              , cur_face->family_name, Areas.size(), CharacterMap.size(), m_dpi, SpriteBank->getTextureCount());
+              , GUIEngine::getFreetype()->ft_face[m_font_use]->family_name, Areas.size(), CharacterMap.size(), m_dpi, SpriteBank->getTextureCount());
 
     return true;
 }
@@ -706,6 +721,8 @@ bool ScalableFont::lazyLoadChar()
 //! force create a new texture (glyph) page in a font
 void ScalableFont::forceNewPage()
 {
+    GUIEngine::GlyphPageCreator* gp_creator = GUIEngine::getGlyphPageCreator();
+
     SpriteBank->setTexture(SpriteBank->getTextureCount() - 1, Driver->addTexture("Glyph_page", gp_creator->getPage()));
     gp_creator->clearGlyphPage();
     SpriteBank->addTexture(NULL);
@@ -864,6 +881,8 @@ void ScalableFont::setInvisibleCharacters( const wchar_t *s )
 core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 {
 #ifdef ENABLE_FREETYPE
+    GUIEngine::GlyphPageCreator* gp_creator = GUIEngine::getGlyphPageCreator();
+
     if (m_type == T_NORMAL || T_BOLD) //lazy load char
     {
         for (const wchar_t* p = text; *p; ++p)
@@ -955,6 +974,8 @@ void ScalableFont::doDraw(const core::stringw& text,
                           FontCharCollector* charCollector)
 {
     if (!Driver) return;
+
+    GUIEngine::GlyphPageCreator* gp_creator = GUIEngine::getGlyphPageCreator();
 
     if (m_shadow)
     {

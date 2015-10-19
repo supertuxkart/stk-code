@@ -32,6 +32,8 @@ enum FontUse
     F_DEFAULT_FALLBACK = 1, 
     F_CJK = 2, 
     F_AR = 3, 
+    F_LAST_REGULAR_FONT = F_AR,
+
     F_BOLD = 4, 
     F_BOLD_FALLBACK = 5,
     F_DIGIT = 6,
