@@ -25,17 +25,20 @@
 
 StartServer::StartServer() : Protocol(NULL, PROTOCOL_SILENT)
 {
-}
+}   // StartServer
 
+// ----------------------------------------------------------------------------
 StartServer::~StartServer()
 {
-}
+}   // ~StartServer
 
+// ----------------------------------------------------------------------------
 void StartServer::setup()
 {
     m_state = NONE;
-}
+}   // setup
 
+// ----------------------------------------------------------------------------
 void StartServer::asynchronousUpdate()
 {
     if (m_state == NONE)
@@ -83,4 +86,6 @@ void StartServer::asynchronousUpdate()
         m_request = NULL;
         m_listener->requestTerminate(this);
     }
-}
+}   // asynchronousUpdate
+
+// ----------------------------------------------------------------------------

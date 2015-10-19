@@ -54,8 +54,6 @@ CreateServerScreen::CreateServerScreen() : Screen("online/create_server.stkgui")
 
 void CreateServerScreen::loadedFromFile()
 {
-
-
     m_name_widget = getWidget<TextBoxWidget>("name");
     assert(m_name_widget != NULL);
     m_name_widget->setText(_("%s's server", PlayerManager::getCurrentOnlineUserName()));
@@ -134,7 +132,7 @@ void CreateServerScreen::serverCreationRequest()
         const irr::core::stringw name = m_name_widget->getText().trim();
         const int max_players = m_max_players_widget->getValue();
         Server *server = new Server(name, /*lan*/true, max_players,
-            /*current_player*/1);
+                                    /*current_player*/1);
         ServersManager::get()->addServer(server);
         return;
     }
@@ -155,7 +153,6 @@ void CreateServerScreen::serverCreationRequest()
     }
     else
     {
-
         m_server_creation_request = new ServerCreationRequest();
         PlayerManager::setUserDetails(m_server_creation_request, "create",
                                       Online::API::SERVER_PATH);
