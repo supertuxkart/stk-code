@@ -78,10 +78,10 @@ void getFontProperties::loadChar(const core::stringc langname, FontUse& fu, floa
     usedchar.insert((wchar_t)215);   //Used on resolution selection screen (X).
 
     //There's specific handling for some language, we may need more after more translation are added or problems found out.
-    if (langname == "el" || langname == "fr" || langname == "gd")
+    //if (langname == "el" || langname == "fr" || langname == "gd")
         size = (int)(27*scale); //Lower scale for them as they're space-consuming.
-    else
-        size = (int)(29*scale); //Set to default size
+    //else
+    //    size = (int)(29*scale); //Set to default size
 }
 
 void getFontProperties::loadNumber(float scale)

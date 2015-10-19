@@ -599,7 +599,7 @@ bool ScalableFont::lazyLoadChar()
         //Lite-Fontconfig for stk
         int idx;
         int count = 0;
-        while (count < FONTNUM - 2) //Exclude bold and digit font
+        while (count < irr::gui::F_COUNT - 2) //Exclude bold and digit font
         {
             m_font_use = (FontUse)count;
             err = FT_Set_Pixel_Sizes(cur_face, 0, m_dpi);

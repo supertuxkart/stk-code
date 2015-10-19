@@ -35,7 +35,7 @@ FTEnvironment::FTEnvironment()
 
 FTEnvironment::~FTEnvironment()
 {
-    for (int i = 0; i < FONTNUM; ++i)
+    for (int i = 0; i < F_COUNT; ++i)
         FTEnvironment::ft_err += FT_Done_Face((FTEnvironment::ft_face[i]));
 
     FTEnvironment::ft_err += FT_Done_FreeType(FTEnvironment::ft_lib);
@@ -49,8 +49,12 @@ FTEnvironment::~FTEnvironment()
 void FTEnvironment::loadFont()
 {
     FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
+                                (FileManager::TTF, "Ubuntu-R.ttf", true)).c_str(),
+                                0, &(FTEnvironment::ft_face[F_DEFAULT]));
+
+    FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "FreeSans.ttf",true)).c_str(),
-                                 0, &(FTEnvironment::ft_face[F_DEFAULT]));
+                                0, &(FTEnvironment::ft_face[F_DEFAULT_FALLBACK]));
 
     FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "wqy-microhei.ttf",true)).c_str(),
@@ -61,15 +65,15 @@ void FTEnvironment::loadFont()
                                  0, &(FTEnvironment::ft_face[F_AR]));
 
     FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "FreeSansBold.ttf",true)).c_str(),
-                                 0, &(FTEnvironment::ft_face[F_BOLD]));
+                                (FileManager::TTF, "Ubuntu-B.ttf", true)).c_str(),
+                                0, &(FTEnvironment::ft_face[F_BOLD]));
 
     FTEnvironment::ft_err += FT_New_Face(FTEnvironment::ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "FreeMonoBold.ttf",true)).c_str(),
+                                (FileManager::TTF, "Ubuntu-B.ttf",true)).c_str(),
                                  0, &(FTEnvironment::ft_face[F_DIGIT]));
 
     //Set charmap
-    for (int h = 0; h < FONTNUM; ++h)
+    for (int h = 0; h < F_COUNT; ++h)
     {
         for (int i = 0; i < FTEnvironment::ft_face[h]->num_charmaps; ++i)
         {

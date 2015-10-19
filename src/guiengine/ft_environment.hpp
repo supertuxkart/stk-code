@@ -16,9 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <ft2build.h>
+#include "guiengine/get_font_properties.hpp"
 #include FT_FREETYPE_H
-
-#define FONTNUM 5
 
 /**
  * \ingroup guiengine
@@ -33,7 +32,7 @@ namespace GUIEngine
     public:
         FTEnvironment();
         ~FTEnvironment();
-        FT_Face           ft_face[FONTNUM];
+        FT_Face           ft_face[irr::gui::F_COUNT];
 
     private:
         /** Load font face into memory, but don't create glyph yet.

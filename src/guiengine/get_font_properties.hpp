@@ -15,6 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef HEADER_GET_FONT_PROPERTIES_HPP
+#define HEADER_GET_FONT_PROPERTIES_HPP
+
 #include <irrlicht.h>
 #include <set>
 
@@ -23,7 +26,16 @@ namespace irr
 namespace gui
 {
 
-enum FontUse {F_DEFAULT, F_CJK, F_AR, F_BOLD, F_DIGIT};
+enum FontUse 
+{
+    F_DEFAULT = 0, 
+    F_DEFAULT_FALLBACK = 1, 
+    F_CJK = 2, 
+    F_AR = 3, 
+    F_BOLD = 4, 
+    F_DIGIT = 5,
+    F_COUNT = 6
+};
 
 enum TTFLoadingType {T_NORMAL, T_DIGIT, T_BOLD};
 
@@ -57,3 +69,5 @@ private:
 
 } // end namespace gui
 } // end namespace irr
+
+#endif
