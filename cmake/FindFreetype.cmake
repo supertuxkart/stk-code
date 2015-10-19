@@ -9,7 +9,7 @@
 # FREETYPE_LIBRARIES
 #     Freetype library list
 
-if(MSVC)
+if(WIN32)
     find_path(FREETYPE_INCLUDE_DIRS NAMES freetype/freetype.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
     find_library(FREETPYE_LIBRARY NAMES freetype PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
     set(FREETYPE_FOUND 1)
