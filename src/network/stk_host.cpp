@@ -179,7 +179,7 @@ void* STKHost::mainLoop(void* self)
         while (enet_host_service(host, &event, 20) != 0)
         {
             Event* stk_event = new Event(&event);
-            if (stk_event->type == EVENT_TYPE_MESSAGE)
+            if (stk_event->getType() == EVENT_TYPE_MESSAGE)
                 logPacket(stk_event->data(), true);
             if (event.type != ENET_EVENT_TYPE_NONE)
                 NetworkManager::getInstance()->notifyEvent(stk_event);

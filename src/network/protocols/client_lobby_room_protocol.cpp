@@ -133,7 +133,7 @@ void ClientLobbyRoomProtocol::leave()
 bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    if (event->type == EVENT_TYPE_MESSAGE)
+    if (event->getType() == EVENT_TYPE_MESSAGE)
     {
         NetworkString data = event->data();
         assert(data.size()); // assert that data isn't empty
@@ -159,7 +159,7 @@ bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
 bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    if (event->type == EVENT_TYPE_MESSAGE)
+    if (event->getType() == EVENT_TYPE_MESSAGE)
     {
         NetworkString data = event->data();
         assert(data.size()); // assert that data isn't empty
@@ -199,18 +199,18 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 
         return true;
     } // message
-    else if (event->type == EVENT_TYPE_CONNECTED)
+    else if (event->getType() == EVENT_TYPE_CONNECTED)
     {
         return true;
     } // connection
-    else if (event->type == EVENT_TYPE_DISCONNECTED) // means we left essentially
+    else if (event->getType() == EVENT_TYPE_DISCONNECTED) // means we left essentially
     {
         NetworkManager::getInstance()->removePeer(m_server);
         m_server = NULL;
         NetworkManager::getInstance()->disconnected();
         m_listener->requestTerminate(this);
         NetworkManager::getInstance()->reset();
-        NetworkManager::getInstance()->removePeer(*event->peer); // prolly the same as m_server
+        NetworkManager::getInstance()->removePeer(*event->getPeer()); // prolly the same as m_server
         return true;
     } // disconnection
     return false;
@@ -364,7 +364,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         Log::error("ClientLobbyRoomProtocol", "A message notifying an accepted connection wasn't formated as expected.");
         return;
     }
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = *(event->getPeer());
 
     uint32_t global_id = data.gui32(8);
     if (global_id == PlayerManager::getCurrentOnlineId())
@@ -406,7 +406,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         }
 
         // add self
-        m_server = *(event->peer);
+        m_server = *(event->getPeer());
         m_state = CONNECTED;
     }
     else
@@ -604,7 +604,7 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
         return;
     }
     NetworkString data = event->data();
-    if ((*event->peer)->getClientServerToken() != data.gui32(1))
+    if ((*event->getPeer())->getClientServerToken() != data.gui32(1))
     {
         Log::error("ClientLobbyRoomProtocol", "Bad token");
         return;

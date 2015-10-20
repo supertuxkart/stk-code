@@ -63,7 +63,7 @@ void ServerLobbyRoomProtocol::setup()
 bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    if (event->type == EVENT_TYPE_MESSAGE)
+    if (event->getType() == EVENT_TYPE_MESSAGE)
     {
         NetworkString data = event->data();
         assert(data.size()); // message not empty
@@ -87,14 +87,14 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
             playerReversedVote(event);
         else if (message_type == 0xc5) // vote for laps
             playerLapsVote(event);
-    } // if (event->type == EVENT_TYPE_MESSAGE)
-    else if (event->type == EVENT_TYPE_CONNECTED)
+    } // if (event->getType() == EVENT_TYPE_MESSAGE)
+    else if (event->getType() == EVENT_TYPE_CONNECTED)
     {
-    } // if (event->type == EVENT_TYPE_CONNECTED)
-    else if (event->type == EVENT_TYPE_DISCONNECTED)
+    } // if (event->getType() == EVENT_TYPE_CONNECTED)
+    else if (event->getType() == EVENT_TYPE_DISCONNECTED)
     {
         kartDisconnected(event);
-    } // if (event->type == EVENT_TYPE_DISCONNECTED)
+    } // if (event->getType() == EVENT_TYPE_DISCONNECTED)
     return true;
 }
 
@@ -305,7 +305,7 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
 
 void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
 {
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = *(event->getPeer());
     if (peer->getPlayerProfile() != NULL) // others knew him
     {
         NetworkString msg(3);
@@ -334,7 +334,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
  */
 void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 {
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = *(event->getPeer());
     NetworkString data = event->data();
     if (data.size() != 5 || data[0] != 4)
     {
@@ -415,7 +415,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
 {
     NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = *(event->getPeer());
     if (!checkDataSizeAndToken(event, 6))
         return;
 
@@ -476,7 +476,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
 void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
 {
     NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = *(event->getPeer());
     if (!checkDataSizeAndToken(event, 7))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -507,7 +507,7 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
 void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
 {
     NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = *(event->getPeer)();
     if (!checkDataSizeAndToken(event, 7))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -538,7 +538,7 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
 void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
 {
     NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = *(event->getPeer());
     if (!checkDataSizeAndToken(event, 7))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -569,7 +569,7 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
 void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
 {
     NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = *(event->getPeer());
     if (!checkDataSizeAndToken(event, 8))
         return;
     int N = data[5];
@@ -602,7 +602,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
 void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
 {
     NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = *(event->getPeer());
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -635,7 +635,7 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
 void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
 {
     NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = *(event->getPeer());
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))

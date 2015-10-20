@@ -67,7 +67,7 @@ ConnectToServer::~ConnectToServer()
 
 bool ConnectToServer::notifyEventAsynchronous(Event* event)
 {
-    if (event->type == EVENT_TYPE_CONNECTED)
+    if (event->getType() == EVENT_TYPE_CONNECTED)
     {
         Log::info("ConnectToServer", "The Connect To Server protocol has "
                 "received an event notifying that he's connected to the peer.");

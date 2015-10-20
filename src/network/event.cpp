@@ -31,19 +31,19 @@ Event::Event(ENetEvent* event)
     switch (event->type)
     {
     case ENET_EVENT_TYPE_CONNECT:
-        type = EVENT_TYPE_CONNECTED;
+        m_type = EVENT_TYPE_CONNECTED;
         break;
     case ENET_EVENT_TYPE_DISCONNECT:
-        type = EVENT_TYPE_DISCONNECTED;
+        m_type = EVENT_TYPE_DISCONNECTED;
         break;
     case ENET_EVENT_TYPE_RECEIVE:
-        type = EVENT_TYPE_MESSAGE;
+        m_type = EVENT_TYPE_MESSAGE;
         break;
     case ENET_EVENT_TYPE_NONE:
         return;
         break;
     }
-    if (type == EVENT_TYPE_MESSAGE)
+    if (m_type == EVENT_TYPE_MESSAGE)
     {
         m_data = NetworkString(std::string((char*)(event->packet->data),
                                event->packet->dataLength-1));
@@ -59,23 +59,23 @@ Event::Event(ENetEvent* event)
     m_packet = NULL;
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
-    peer = new STKPeer*;
-    *peer = NULL;
+    m_peer = new STKPeer*;
+    *m_peer = NULL;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         if (peers[i]->m_peer == event->peer)
         {
-            *peer = peers[i];
+            *m_peer = peers[i];
             Log::verbose("Event", "The peer you sought has been found on %p",
-                         peer);
+                         m_peer);
             return;
         }
     }
-    if (*peer == NULL) // peer does not exist, create him
+    if (*m_peer == NULL) // peer does not exist, create him
     {
         STKPeer* new_peer = new STKPeer();
         new_peer->m_peer = event->peer;
-        *peer = new_peer;
+        *m_peer = new_peer;
         Log::debug("Event", 
                    "Creating a new peer, address are STKPeer:%p, Peer:%p",
                     new_peer, event->peer);
@@ -88,11 +88,10 @@ Event::Event(ENetEvent* event)
  */
 Event::Event(const Event& event)
 {
-    type = event.type;
+    m_type   = event.m_type;
     m_packet = NULL;
     m_data   = event.m_data;
-    // copy the peer
-    peer     = event.peer;
+    m_peer   = event.m_peer;
 }   // Event(Event)
 
 // ----------------------------------------------------------------------------
@@ -100,12 +99,15 @@ Event::Event(const Event& event)
  */
 Event::~Event()
 {
-    delete peer;
-    peer = NULL;
+    delete m_peer;
+    m_peer = NULL;
     m_packet = NULL;
 }   // ~Event
 
 // ----------------------------------------------------------------------------
+/** \brief Remove bytes at the beginning of data.
+ *  \param size : The number of bytes to remove.
+ */
 void Event::removeFront(int size)
 {
     m_data.removeFront(size);

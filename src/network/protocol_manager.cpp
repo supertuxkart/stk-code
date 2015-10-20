@@ -102,7 +102,7 @@ void ProtocolManager::notifyEvent(Event* event)
     // register protocols that will receive this event
     std::vector<unsigned int> protocols_ids;
     PROTOCOL_TYPE searched_protocol = PROTOCOL_NONE;
-    if (event2->type == EVENT_TYPE_MESSAGE)
+    if (event->getType() == EVENT_TYPE_MESSAGE)
     {
         if (event2->data().size() > 0)
         {
@@ -114,7 +114,7 @@ void ProtocolManager::notifyEvent(Event* event)
             Log::warn("ProtocolManager", "Not enough data.");
         }
     }
-    if (event2->type == EVENT_TYPE_CONNECTED)
+    if (event->getType() == EVENT_TYPE_CONNECTED)
     {
         searched_protocol = PROTOCOL_CONNECTION;
     }
@@ -125,7 +125,7 @@ void ProtocolManager::notifyEvent(Event* event)
     {
         // Pass data to protocols even when paused
         if (m_protocols.getData()[i].protocol->getProtocolType() == searched_protocol ||
-            event2->type == EVENT_TYPE_DISCONNECTED)
+            event->getType() == EVENT_TYPE_DISCONNECTED)
         {
             protocols_ids.push_back(m_protocols.getData()[i].id);
         }
@@ -377,7 +377,6 @@ bool ProtocolManager::propagateEvent(EventProcessingInfo* event, bool synchronou
         (StkTime::getTimeSinceEpoch()-event->arrival_time) >= TIME_TO_KEEP_EVENTS)
     {
         // because we made a copy of the event
-        delete event->event->peer; // no more need of that
         delete event->event;
         return true;
     }

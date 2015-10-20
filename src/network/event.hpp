@@ -58,24 +58,31 @@ private:
     /** A pointer on the ENetPacket to be deleted. */
     ENetPacket* m_packet;
 
-public:
-    Event(ENetEvent* event);
-    Event(const Event& event);
-    ~Event();
+    /**  Type of the event. */
+    EVENT_TYPE m_type;
 
-    /*! \brief Remove bytes at the beginning of data.
-     *  \param size : The number of bytes to remove.
-     */
+    /** Pointer to the peer that triggered that event. */
+    STKPeer** m_peer;
+
+public:
+         Event(ENetEvent* event);
+         Event(const Event& event);
+        ~Event();
     void removeFront(int size);
 
-    /*! \brief Get a copy of the data.
+    // ------------------------------------------------------------------------
+    /** Returns the type of this event. */
+    EVENT_TYPE getType() const { return m_type; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the peer of this event. */
+    STKPeer ** getPeer() const { return m_peer;  }
+    // ------------------------------------------------------------------------
+    /** \brief Get a copy of the data.
      *  \return A copy of the message data. This is empty for events like
-     *  connection or disconnections.
-     */
+     *  connection or disconnections. */
     NetworkString data() const { return m_data; }
 
-    EVENT_TYPE type;    //!< Type of the event.
-    STKPeer** peer;     //!< Pointer to the peer that triggered that event.
 
 };   // class Event
 

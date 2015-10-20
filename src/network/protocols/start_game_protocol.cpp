@@ -44,7 +44,7 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
     }
     uint32_t token = data.gui32();
     uint8_t ready = data.gui8(4);
-    STKPeer* peer = (*(event->peer));
+    STKPeer* peer = (*(event->getPeer()));
     if (peer->getClientServerToken() != token)
     {
         Log::error("StartGameProtocol", "Bad token received.");

@@ -33,7 +33,7 @@ SynchronizationProtocol::~SynchronizationProtocol()
 
 bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 {
-    if (event->type != EVENT_TYPE_MESSAGE)
+    if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
     NetworkString data = event->data();
     if (data.size() < 10)
@@ -61,7 +61,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
     uint8_t peer_id = 0;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        if (peers[i]->isSamePeer(*event->peer))
+        if (peers[i]->isSamePeer(*event->getPeer()))
         {
             peer_id = i;
         }

@@ -111,18 +111,18 @@ void NetworkManager::setManualSocketsMode(bool manual)
 void NetworkManager::notifyEvent(Event* event)
 {
     Log::verbose("NetworkManager", "EVENT received of type %d",
-                 (int)(event->type));
-    STKPeer* peer = *event->peer;
-    if (event->type == EVENT_TYPE_CONNECTED)
+                 (int)(event->getType()));
+    STKPeer* peer = *event->getPeer();
+    if (event->getType() == EVENT_TYPE_CONNECTED)
     {
         Log::info("NetworkManager", "A client has just connected. There are "
                   "now %lu peers.", m_peers.size() + 1);
         Log::debug("NetworkManager", "Addresses are : %lx, %lx, %lx",
-                   event->peer, *event->peer, peer);
+                   event->getPeer(), *event->getPeer(), peer);
         // create the new peer:
         m_peers.push_back(peer);
     }
-    if (event->type == EVENT_TYPE_MESSAGE)
+    if (event->getType() == EVENT_TYPE_MESSAGE)
     {
         uint32_t addr = peer->getAddress();
         Log::verbose("NetworkManager",

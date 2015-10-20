@@ -35,7 +35,13 @@
 class STKPeer
 {
     friend class Event;
-    public:
+protected:
+    ENetPeer* m_peer;
+    NetworkPlayerProfile** m_player_profile;
+    uint32_t *m_client_server_token;
+    bool *m_token_set;
+
+public:
         STKPeer();
         STKPeer(const STKPeer& peer);
         virtual ~STKPeer();
@@ -60,11 +66,6 @@ class STKPeer
 
         bool isSamePeer(const STKPeer* peer) const;
 
-    protected:
-        ENetPeer* m_peer;
-        NetworkPlayerProfile** m_player_profile;
-        uint32_t *m_client_server_token;
-        bool *m_token_set;
-};
+};   // STKPeer
 
 #endif // STK_PEER_HPP

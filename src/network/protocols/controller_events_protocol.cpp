@@ -72,7 +72,7 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
     uint32_t token = data.gui32();
     NetworkString pure_message = data;
     pure_message.removeFront(4);
-    if (token != (*event->peer)->getClientServerToken())
+    if (token != (*event->getPeer())->getClientServerToken())
     {
         Log::error("ControllerEventsProtocol", "Bad token from peer.");
         return true;

@@ -47,7 +47,7 @@ ConnectToPeer::~ConnectToPeer()
 
 bool ConnectToPeer::notifyEventAsynchronous(Event* event)
 {
-    if (event->type == EVENT_TYPE_CONNECTED)
+    if (event->getType() == EVENT_TYPE_CONNECTED)
     {
         Log::debug("ConnectToPeer", "Received event notifying peer connection.");
         m_state = CONNECTED; // we received a message, we are connected
