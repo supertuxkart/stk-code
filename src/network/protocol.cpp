@@ -64,7 +64,7 @@ bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
                   data.size(), data[0]);
         return false;
     }
-    STKPeer* peer = *(event->getPeer());
+    STKPeer* peer = event->getPeer();
     uint32_t token = data.gui32(1);
     if (token != peer->getClientServerToken())
     {

@@ -59,23 +59,22 @@ Event::Event(ENetEvent* event)
     m_packet = NULL;
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
-    m_peer = new STKPeer*;
-    *m_peer = NULL;
+    m_peer = NULL;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         if (peers[i]->m_peer == event->peer)
         {
-            *m_peer = peers[i];
+            m_peer = peers[i];
             Log::verbose("Event", "The peer you sought has been found on %p",
                          m_peer);
             return;
         }
     }
-    if (*m_peer == NULL) // peer does not exist, create him
+    if (m_peer == NULL) // peer does not exist, create him
     {
         STKPeer* new_peer = new STKPeer();
         new_peer->m_peer = event->peer;
-        *m_peer = new_peer;
+        m_peer = new_peer;
         Log::debug("Event", 
                    "Creating a new peer, address are STKPeer:%p, Peer:%p",
                     new_peer, event->peer);

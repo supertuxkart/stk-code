@@ -61,7 +61,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
     uint8_t peer_id = 0;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        if (peers[i]->isSamePeer(*event->getPeer()))
+        if (peers[i]->isSamePeer(event->getPeer()))
         {
             peer_id = i;
         }

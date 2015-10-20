@@ -27,7 +27,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         Log::warn("GameEventsProtocol", "Too short message.");
         return true;
     }
-    if ( (*event->getPeer())->getClientServerToken() != data.gui32())
+    if ( event->getPeer()->getClientServerToken() != data.gui32())
     {
         Log::warn("GameEventsProtocol", "Bad token.");
         return true;

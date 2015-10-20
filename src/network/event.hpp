@@ -62,7 +62,7 @@ private:
     EVENT_TYPE m_type;
 
     /** Pointer to the peer that triggered that event. */
-    STKPeer** m_peer;
+    STKPeer* m_peer;
 
 public:
          Event(ENetEvent* event);
@@ -76,7 +76,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the peer of this event. */
-    STKPeer ** getPeer() const { return m_peer;  }
+    STKPeer* getPeer() const { return m_peer;  }
     // ------------------------------------------------------------------------
     /** \brief Get a copy of the data.
      *  \return A copy of the message data. This is empty for events like

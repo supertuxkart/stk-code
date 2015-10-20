@@ -210,7 +210,8 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         NetworkManager::getInstance()->disconnected();
         m_listener->requestTerminate(this);
         NetworkManager::getInstance()->reset();
-        NetworkManager::getInstance()->removePeer(*event->getPeer()); // prolly the same as m_server
+        // probably the same as m_server
+        NetworkManager::getInstance()->removePeer(event->getPeer());
         return true;
     } // disconnection
     return false;
@@ -364,7 +365,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         Log::error("ClientLobbyRoomProtocol", "A message notifying an accepted connection wasn't formated as expected.");
         return;
     }
-    STKPeer* peer = *(event->getPeer());
+    STKPeer* peer = event->getPeer();
 
     uint32_t global_id = data.gui32(8);
     if (global_id == PlayerManager::getCurrentOnlineId())
@@ -406,7 +407,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         }
 
         // add self
-        m_server = *(event->getPeer());
+        m_server = event->getPeer();
         m_state = CONNECTED;
     }
     else
@@ -604,7 +605,7 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
         return;
     }
     NetworkString data = event->data();
-    if ((*event->getPeer())->getClientServerToken() != data.gui32(1))
+    if (event->getPeer()->getClientServerToken() != data.gui32(1))
     {
         Log::error("ClientLobbyRoomProtocol", "Bad token");
         return;

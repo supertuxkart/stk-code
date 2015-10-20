@@ -112,7 +112,7 @@ void NetworkManager::notifyEvent(Event* event)
 {
     Log::verbose("NetworkManager", "EVENT received of type %d",
                  (int)(event->getType()));
-    STKPeer* peer = *event->getPeer();
+    STKPeer* peer = event->getPeer();
     if (event->getType() == EVENT_TYPE_CONNECTED)
     {
         Log::info("NetworkManager", "A client has just connected. There are "
