@@ -108,7 +108,7 @@ void STKHost::logPacket(const NetworkString &ns, bool incoming)
     if (m_log_file.getData() == NULL) // read only access, no need to lock
         return;
 
-    char *arrow = incoming ? "<--" : "-->";
+    const char *arrow = incoming ? "<--" : "-->";
 
     m_log_file.lock();
     fprintf(m_log_file.getData(), "[%d\t]  %s  ",
