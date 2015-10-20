@@ -72,20 +72,19 @@ struct CustomUnrollArgs<>
 };   // CustomUnrollArgs
 
 
-
 // ----------------------------------------------------------------------------
-/** Variadic template to bind textures.*/
+/** Variadic template to implement TexExpander*/
 template<typename T, int N>
 struct TexExpanderImpl
 {
     template<typename...TupleArgs,
              typename... Args>
-    static void ExpandTex(const GLMesh &mesh,
+    static void expandTex(const GLMesh &mesh,
                           const STK::Tuple<TupleArgs...> &tex_swizzle,
                           Args... args)
     {
         size_t idx = STK::tuple_get<sizeof...(TupleArgs) - N>(tex_swizzle);
-        TexExpanderImpl<T, N - 1>::template ExpandTex(mesh,
+        TexExpanderImpl<T, N - 1>::template expandTex( mesh,
                                                        tex_swizzle, 
                                                        args...,
                                                        getTextureGLuint(mesh.textures[idx]));
@@ -98,7 +97,7 @@ template<typename T>
 struct TexExpanderImpl<T, 0>
 {
     template<typename...TupleArgs, typename... Args>
-    static void ExpandTex(const GLMesh &mesh,
+    static void expandTex(const GLMesh &mesh,
                           const STK::Tuple<TupleArgs...> &tex_swizzle,
                           Args... args)
     {
@@ -106,48 +105,53 @@ struct TexExpanderImpl<T, 0>
     }   // ExpandTex
 };   // TexExpanderImpl
 
-
 // ----------------------------------------------------------------------------
 template<typename T>
 struct TexExpander
 {
+    /** Bind textures.
+        *  \param mesh The mesh which owns the textures
+        *  \param tex_swizzle Indices of texture id in mesh texture array
+        *  \param args Other textures ids (each of them will be bound)
+        */  
     template<typename...TupleArgs,
              typename... Args>
-    static void ExpandTex(const GLMesh &mesh,
+    static void expandTex(const GLMesh &mesh,
                           const STK::Tuple<TupleArgs...> &tex_swizzle,
                           Args... args)
     {
-        TexExpanderImpl<T, sizeof...(TupleArgs)>::ExpandTex(mesh,
+        TexExpanderImpl<T, sizeof...(TupleArgs)>::expandTex(mesh,
                                                             tex_swizzle,
                                                             args...);
     }   // ExpandTex
 };   // TexExpander
 
 
-
 // ----------------------------------------------------------------------------
+/** Variadic template to implement HandleExpander*/
 template<typename T, int N>
 struct HandleExpanderImpl
 {
     template<typename...TupleArgs, typename... Args>
-    static void Expand(uint64_t *TextureHandles, 
+    static void expand(uint64_t *texture_handles, 
                        const STK::Tuple<TupleArgs...> &tex_swizzle,
                        Args... args)
     {
         size_t idx = STK::tuple_get<sizeof...(TupleArgs)-N>(tex_swizzle);
-        HandleExpanderImpl<T, N - 1>::template Expand(TextureHandles,
+        HandleExpanderImpl<T, N - 1>::template expand(texture_handles,
                                                        tex_swizzle,
                                                        args...,
-                                                       TextureHandles[idx]);
+                                                       texture_handles[idx]);
     }   // Expand
 };   // HandleExpanderImpl
 
 // ----------------------------------------------------------------------------
+/** Partial specialisation of TexExpanderImpl to end the recursion */
 template<typename T>
 struct HandleExpanderImpl<T, 0>
 {
     template<typename...TupleArgs, typename... Args>
-    static void Expand(uint64_t *TextureHandles,
+    static void expand(uint64_t *texture_handles,
                        const STK::Tuple<TupleArgs...> &tex_swizzle,
                        Args... args)
     {
@@ -159,20 +163,25 @@ struct HandleExpanderImpl<T, 0>
 template<typename T>
 struct HandleExpander
 {
+    /** Give acces to textures in shaders without first binding them
+     * (require GL_ARB_bindless_texture extension) in order to reduce
+     * driver overhead.
+        *  \param texture_handles Array of handles
+        *  \param tex_swizzle Indices of handles in textures_handles array
+        *  \param args Other textures handles
+        * (each of them will be accessible in shader)
+        */  
     template<typename...TupleArgs,
              typename... Args>
-    static void Expand(uint64_t *TextureHandles,
+    static void expand(uint64_t *texture_handles,
                        const STK::Tuple<TupleArgs...> &tex_swizzle,
                        Args... args)
     {
-        HandleExpanderImpl<T, sizeof...(TupleArgs)>::Expand(TextureHandles,
+        HandleExpanderImpl<T, sizeof...(TupleArgs)>::expand(texture_handles,
                                                             tex_swizzle,
                                                             args...);
     }   // Expand
 };   // HandleExpander
-
-
-
 
 
 #endif //HEADER_DRAW_TOOLS_HPP
