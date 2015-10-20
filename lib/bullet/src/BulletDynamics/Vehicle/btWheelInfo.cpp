@@ -4,8 +4,8 @@
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
  * provided that the above copyright notice appear in all copies.
- * Erwin Coumans makes no representations about the suitability 
- * of this software for any purpose.  
+ * Erwin Coumans makes no representations about the suitability
+ * of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
 */
 #include "btWheelInfo.h"
@@ -23,7 +23,7 @@ void	btWheelInfo::updateWheel(const btRigidBody& chassis,RaycastInfo& raycastInf
 {
 	(void)raycastInfo;
 
-	
+
 	if (m_raycastInfo.m_isInContact)
 
 	{
@@ -43,7 +43,7 @@ void	btWheelInfo::updateWheel(const btRigidBody& chassis,RaycastInfo& raycastInf
 			m_suspensionRelativeVelocity = projVel * inv;
 			m_clippedInvContactDotSuspension = inv;
 		}
-		
+
 	}
 
 	else	// Not in contact : position wheel in a nice (rest length) position

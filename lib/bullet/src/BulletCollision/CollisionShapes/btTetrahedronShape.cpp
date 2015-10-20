@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -112,15 +112,15 @@ int btBU_Simplex1to4::getNumEdges() const
 
 void btBU_Simplex1to4::getEdge(int i,btVector3& pa,btVector3& pb) const
 {
-	
+
     switch (m_numVertices)
 	{
 
-	case 2: 
+	case 2:
 		pa = m_vertices[0];
 		pb = m_vertices[1];
 		break;
-	case 3:  
+	case 3:
 		switch (i)
 		{
 		case 0:
@@ -138,7 +138,7 @@ void btBU_Simplex1to4::getEdge(int i,btVector3& pa,btVector3& pb) const
 
 		}
 		break;
-	case 4: 
+	case 4:
 		switch (i)
 		{
 		case 0:
@@ -203,7 +203,7 @@ int	btBU_Simplex1to4::getNumPlanes() const
 
 void btBU_Simplex1to4::getPlane(btVector3&, btVector3& ,int ) const
 {
-	
+
 }
 
 int btBU_Simplex1to4::getIndex(int ) const

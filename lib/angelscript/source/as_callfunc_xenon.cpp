@@ -48,27 +48,27 @@
 
 // XBox 360 calling convention
 // ===========================
-// I've yet to find an official document with the ABI for XBox 360, 
+// I've yet to find an official document with the ABI for XBox 360,
 // but I'll describe what I've gathered from the code and tests
 // performed by the AngelScript community.
 //
 // Arguments are passed in the following registers:
 // r3  - r10   : integer/pointer arguments (each register is 64bit)
 // fr1 - fr13  : float/double arguments    (each register is 64bit)
-// 
+//
 // Arguments that don't fit in the registers will be pushed on the stack.
-// 
+//
 // When a float or double is passed as argument, its value will be placed
 // in the next available float register, but it will also reserve general
-// purpose register. 
-// 
+// purpose register.
+//
 // Example: void foo(float a, int b). a will be passed in fr1 and b in r4.
 //
-// For each argument passed to a function an 8byte slot is reserved on the 
+// For each argument passed to a function an 8byte slot is reserved on the
 // stack, so that the function can offload the value there if needed. The
 // first slot is at r1+20, the next at r1+28, etc.
 //
-// If the function is a class method, the this pointer is passed as hidden 
+// If the function is a class method, the this pointer is passed as hidden
 // first argument. If the function returns an object in memory, the address
 // for that memory is passed as hidden first argument.
 //
@@ -160,8 +160,8 @@ _ppcFunc:
 		// r31 is our pointer into the stack where the arguments will be place
 		// The MSVC optimizer seems to rely on nobody copying the r1 register directly
 		// so we can't just do a simple 'addi r31, r1, 14h' as the optimizer may
-		// end up moving this instruction to before the update of r1 above. 
-		// Instead we'll read the previous stack pointer from the stack, and then 
+		// end up moving this instruction to before the update of r1 above.
+		// Instead we'll read the previous stack pointer from the stack, and then
 		// subtract to get the correct offset.
 		lwz		r31, 0(r1)
 		subi	r31, r31, 1ECh	// prev r1 - 512 + 20 = curr r1 + 20
@@ -339,9 +339,9 @@ ppcArgIsFloat:
 		ppcLoadFloatRegUpd:
 		stfs	fr0, 0(r31)			// push on the stack
 		addi	r31, r31, 8			// inc stack by 1 reg
-		
+
 		addi r22, r22, 1			// Increment used float register count
-		addi r23, r23, 1			// Increment used int register count - a float reg eats up a GPR		
+		addi r23, r23, 1			// Increment used int register count - a float reg eats up a GPR
 		addi r26, r26, 4			// Increment pArgs
 		b ppcNextArg				// Call next arg
 
@@ -426,8 +426,8 @@ ppcArgIsDouble:
 		ppcLoadDoubleRegUpd:
 		stfd	fr0, 0(r31)			// push on the stack
 		addi	r31, r31, 8			// inc stack by 1 reg
-		
-		addi r22, r22, 1			// Increment used float register count		
+
+		addi r22, r22, 1			// Increment used float register count
 		addi r23, r23, 1			// Increment used int register count
 		addi r26, r26, 8			// Increment pArgs
 		b ppcNextArg
@@ -462,7 +462,7 @@ ppcArgsEnd:
 
 asDWORD GetReturnedFloat()
 {
-	// This variable must be declared volatile so that the 
+	// This variable must be declared volatile so that the
 	// compiler optimizations do not remove its initialization
 	// with the fr1 register due to believing the fr1 register
 	// isn't initialized.
@@ -478,7 +478,7 @@ asDWORD GetReturnedFloat()
 
 asQWORD GetReturnedDouble()
 {
-	// This variable must be declared volatile so that the 
+	// This variable must be declared volatile so that the
 	// compiler optimizations do not remove its initialization
 	// with the fr1 register due to believing the fr1 register
 	// isn't initialized.
@@ -503,7 +503,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	// TODO: Xenon does not yet support THISCALL_OBJFIRST/LAST
 
 	asCScriptEngine            *engine    = context->m_engine;
-	asSSystemFunctionInterface *sysFunc   = descr->sysFuncIntf;	
+	asSSystemFunctionInterface *sysFunc   = descr->sysFuncIntf;
 	int                         callConv  = sysFunc->callConv;
 	asQWORD                     retQW     = 0;
 	void                       *func      = (void*)sysFunc->func;
@@ -532,7 +532,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		argsCnt++;
 	}
 
-	// If the function takes any objects by value, they must be copied 
+	// If the function takes any objects by value, they must be copied
 	// to the stack, shifting the other arguments as necessary. paramBuffer
 	// will then replace the args pointer that was received from the VM.
 	// TODO: Is this really how XBox 360 passes objects by value?
@@ -546,7 +546,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
 		{
 			// Parameter object by value
-			if( descr->parameterTypes[n].IsObject() && 
+			if( descr->parameterTypes[n].IsObject() &&
 				!descr->parameterTypes[n].IsObjectHandle() &&
 				!descr->parameterTypes[n].IsReference() )
 			{
@@ -602,7 +602,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	asBYTE * pCurStackArgValue	= (asBYTE*)args;
 
 	for( asUINT n = 0; n < paramCount; n++ )
-	{		
+	{
 		argsCnt++;
 
 		if (descr->parameterTypes[n].IsFloatType() && !descr->parameterTypes[n].IsReference())
@@ -625,7 +625,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		}
 		else
 		{
-			// TODO: How should int64 and uint64 be passed natively? 
+			// TODO: How should int64 and uint64 be passed natively?
 			//       Currently the code doesn't handle these types
 
 			// TODO: The code also ignore the fact that large objects
@@ -638,7 +638,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 			if( !descr->parameterTypes[n].IsReference() )
 			{
-				// If the arg is less that 4 bytes, then move the  
+				// If the arg is less that 4 bytes, then move the
 				// bytes to the higher bytes within the dword
 				asUINT numBytes = descr->parameterTypes[n].GetSizeInMemoryBytes();
 				if( numBytes == 1 )
@@ -659,7 +659,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			// if it is a variable argument, account for the typeId
 			// implicitly add another parameter (AFTER the parameter above) for the typeId
 			if( IsVariableArgument(descr->parameterTypes[n]) )
-			{			
+			{
 				argsCnt++;
 
 				*pCurArgType++ = ppcINTARG;

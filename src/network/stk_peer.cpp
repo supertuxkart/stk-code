@@ -92,7 +92,7 @@ void STKPeer::sendPacket(NetworkString const& data, bool reliable)
     TransportAddress a(m_peer->address);
     Log::verbose("STKPeer", "sending packet of size %d to %s",
                  a.toString().c_str());
-         
+
     ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
                 (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
     /* to debug the packet output

@@ -171,7 +171,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 				// though this is only done for first 4 arguments, the rest are placed on the stack
 				if( paramSize < 4 && dt.IsFloatType() )
 					floatArgBuffer[dpos] = args[spos];
-				
+
 				dpos++;
 				spos++;
 			}

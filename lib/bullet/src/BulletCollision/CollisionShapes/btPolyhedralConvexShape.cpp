@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -42,7 +42,7 @@ bool	btPolyhedralConvexShape::initializePolyhedralFeatures()
 
 	if (m_polyhedron)
 		btAlignedFree(m_polyhedron);
-	
+
 	void* mem = btAlignedAlloc(sizeof(btConvexPolyhedron),16);
 	m_polyhedron = new (mem) btConvexPolyhedron;
 
@@ -85,7 +85,7 @@ bool	btPolyhedralConvexShape::initializePolyhedralFeatures()
 	faceNormals.resize(numFaces);
 	btConvexHullComputer* convexUtil = &conv;
 
-	
+
 	btAlignedObjectArray<btFace>	tmpFaces;
 	tmpFaces.resize(numFaces);
 
@@ -113,7 +113,7 @@ bool	btPolyhedralConvexShape::initializePolyhedralFeatures()
 
 		do
 		{
-			
+
 			int src = edge->getSourceVertex();
 			tmpFaces[i].m_indices.push_back(src);
 			int targ = edge->getTargetVertex();
@@ -130,7 +130,7 @@ bool	btPolyhedralConvexShape::initializePolyhedralFeatures()
 
 		btScalar planeEq = 1e30f;
 
-		
+
 		if (numEdges==2)
 		{
 			faceNormals[i] = edges[0].cross(edges[1]);
@@ -203,7 +203,7 @@ bool	btPolyhedralConvexShape::initializePolyhedralFeatures()
 				btVector3 xyPlaneNormal(0,0,1);
 
 				btQuaternion rotationArc = shortestArcQuat(faceNormal,xyPlaneNormal);
-				
+
 				for (int f=0;f<face.m_indices.size();f++)
 				{
 					int orgIndex = face.m_indices[f];
@@ -249,7 +249,7 @@ bool	btPolyhedralConvexShape::initializePolyhedralFeatures()
 
 
 	}
-	
+
 	m_polyhedron->initialize();
 
 	return true;
@@ -290,7 +290,7 @@ btVector3	btPolyhedralConvexShape::localGetSupportingVertexWithoutMargin(const b
 		}
 	}
 
-	
+
 #endif //__SPU__
 	return supVec;
 }
@@ -312,7 +312,7 @@ void	btPolyhedralConvexShape::batchedUnitVectorGetSupportingVertexWithoutMargin(
 
 	for (int j=0;j<numVectors;j++)
 	{
-	
+
 		const btVector3& vec = vectors[j];
 
 		for (i=0;i<getNumVertices();i++)
@@ -381,7 +381,7 @@ void btPolyhedralConvexAabbCachingShape::getAabb(const btTransform& trans,btVect
 void	btPolyhedralConvexAabbCachingShape::recalcLocalAabb()
 {
 	m_isLocalAabbValid = true;
-	
+
 	#if 1
 	static const btVector3 _directions[] =
 	{
@@ -392,7 +392,7 @@ void	btPolyhedralConvexAabbCachingShape::recalcLocalAabb()
 		btVector3( 0., -1.,  0.),
 		btVector3( 0.,  0., -1.)
 	};
-	
+
 	btVector3 _supporting[] =
 	{
 		btVector3( 0., 0., 0.),
@@ -402,15 +402,15 @@ void	btPolyhedralConvexAabbCachingShape::recalcLocalAabb()
 		btVector3( 0., 0., 0.),
 		btVector3( 0., 0., 0.)
 	};
-	
+
 	batchedUnitVectorGetSupportingVertexWithoutMargin(_directions, _supporting, 6);
-	
+
 	for ( int i = 0; i < 3; ++i )
 	{
 		m_localAabbMax[i] = _supporting[i][i] + m_collisionMargin;
 		m_localAabbMin[i] = _supporting[i + 3][i] - m_collisionMargin;
 	}
-	
+
 	#else
 
 	for (int i=0;i<3;i++)

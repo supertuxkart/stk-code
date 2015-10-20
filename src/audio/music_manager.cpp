@@ -172,7 +172,7 @@ void MusicManager::startMusic()
 //-----------------------------------------------------------------------------
 /** Schedules the indicated music to be played next.
  *  \param mi Music information of the music to be played.
- *  \param start_right_now 
+ *  \param start_right_now
  */
 void MusicManager::startMusic(MusicInformation* mi, bool start_right_now)
 {
@@ -242,7 +242,7 @@ void MusicManager::switchToFastMusic()
 void MusicManager::setTemporaryVolume(float gain)
 {
     if (m_current_music)
-        SFXManager::get()->queue(SFXManager::SFX_MUSIC_SET_TMP_VOLUME, 
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_SET_TMP_VOLUME,
                                  m_current_music, gain);
 }   // setTemporaryVolume
 

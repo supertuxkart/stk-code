@@ -130,7 +130,7 @@ std::string GetPublicAddress::parseStunResponse()
         return "STUN response contains no data at all";
 
     // Convert to network string.
-    // FIXME: the length is not known (atm 2048 bytes are allocated in 
+    // FIXME: the length is not known (atm 2048 bytes are allocated in
     // receiveRawPacket, and it looks like 32 are actually used in a normal
     // stun reply
     NetworkString datas(std::string((char*)s, 32));
@@ -165,7 +165,7 @@ std::string GetPublicAddress::parseStunResponse()
         return "STUN response is too short.";
 
     // Those are the port and the address to be detected
-    
+
     int pos = 20;
     while (true)
     {
@@ -175,10 +175,10 @@ std::string GetPublicAddress::parseStunResponse()
         {
             assert(size == 8);
             assert(datas.getUInt8(pos+5) == 0x01); // Family IPv4 only
-            TransportAddress address(datas.getUInt32(pos + 8), 
+            TransportAddress address(datas.getUInt32(pos + 8),
                                      datas.getUInt16(pos + 6));
             // finished parsing, we know our public transport address
-            Log::debug("GetPublicAddress", 
+            Log::debug("GetPublicAddress",
                        "The public address has been found: %s",
                         address.toString().c_str());
             NetworkManager::getInstance()->setPublicAddress(address);

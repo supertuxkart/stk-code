@@ -44,7 +44,7 @@ class SoccerSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSing
     };
 
     AlignedArray<KartViewInfo>  m_kart_view_info;
-    
+
     bool m_schedule_continue;
 
 public:

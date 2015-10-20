@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -88,7 +88,7 @@ void	btConvexHullShape::batchedUnitVectorGetSupportingVertexWithoutMargin(const 
 		for (int j=0;j<numVectors;j++)
 		{
 			const btVector3& vec = vectors[j];
-			
+
 			newDot = vec.dot(vtx);
 			if (newDot > supportVerticesOut[j][3])
 			{
@@ -102,7 +102,7 @@ void	btConvexHullShape::batchedUnitVectorGetSupportingVertexWithoutMargin(const 
 
 
 }
-	
+
 
 
 btVector3	btConvexHullShape::localGetSupportingVertex(const btVector3& vec)const
@@ -115,7 +115,7 @@ btVector3	btConvexHullShape::localGetSupportingVertex(const btVector3& vec)const
 		if (vecnorm .length2() < (SIMD_EPSILON*SIMD_EPSILON))
 		{
 			vecnorm.setValue(btScalar(-1.),btScalar(-1.),btScalar(-1.));
-		} 
+		}
 		vecnorm.normalize();
 		supVertex+= getMargin() * vecnorm;
 	}
@@ -190,7 +190,7 @@ const char*	btConvexHullShape::serialize(void* dataBuffer, btSerializer* seriali
 	shapeData->m_unscaledPointsFloatPtr = numElem ? (btVector3Data*)serializer->getUniquePointer((void*)&m_unscaledPoints[0]):  0;
 	shapeData->m_unscaledPointsDoublePtr = 0;
 #endif
-	
+
 	if (numElem)
 	{
 		int sz = sizeof(btVector3Data);
@@ -204,7 +204,7 @@ const char*	btConvexHullShape::serialize(void* dataBuffer, btSerializer* seriali
 		}
 		serializer->finalizeChunk(chunk,btVector3DataName,BT_ARRAY_CODE,(void*)&m_unscaledPoints[0]);
 	}
-	
+
 	return "btConvexHullShapeData";
 }
 
@@ -222,12 +222,12 @@ void btConvexHullShape::project(const btTransform& trans, const btVector3& dir, 
 		btVector3 vtx = m_unscaledPoints[i] * m_localScaling;
 		btVector3 pt = trans * vtx;
 		float dp = pt.dot(dir);
-		if(dp < min)	
+		if(dp < min)
 		{
 			min = dp;
 			witnesPtMin = pt;
 		}
-		if(dp > max)	
+		if(dp > max)
 		{
 			max = dp;
 			witnesPtMax=pt;

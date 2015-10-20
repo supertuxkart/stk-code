@@ -603,7 +603,7 @@ PROFILER_PUSH_CPU_MARKER("- culling", 0xFF, 0xFF, 0x0);
 
     bool cam = false, rsmcam = false;
     bool shadowcam[4] = { false, false, false, false };
-    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, 
+    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode,
                       getShadowMatrices()->getShadowCamNodes(),
                       getShadowMatrices()->getSunCam(), cam,
                       shadowcam, rsmcam,

@@ -41,24 +41,24 @@ namespace GUIEngine
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getWidthNeededAroundLabel()  const { return 35; }
-        
+
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 4; }
-        
+
         /** widget coordinates */
         int m_bar_x, m_bar_y, m_bar_h, m_bar_w;
         int m_label_x, m_label_y, m_label_h, m_label_w;
 
         std::string m_label_name;
-        
+
         int m_player_id;
         bool m_display_text;
 
     public:
-        
+
         LEAK_CHECK()
-        
+
         LabelWidget* m_label;
         ProgressBarWidget* m_bar;
 
@@ -83,7 +83,7 @@ namespace GUIEngine
 
         /** Change the value of the widget, it must be a percent. */
         void setValue(const int value);
-        
+
         /** Get the current values of the widget. */
         int getValue() {return m_bar->getValue(); };
 

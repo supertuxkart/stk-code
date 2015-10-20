@@ -271,7 +271,7 @@ private:
     std::string m_card_name;
 
     /** Operators to test version numbers with. */
-    enum {VERSION_IGNORE, VERSION_EQUAL, VERSION_LESS, 
+    enum {VERSION_IGNORE, VERSION_EQUAL, VERSION_LESS,
           VERSION_LESS_EQUAL}  m_version_test;
 
     /** Driver version for which this rule applies. */
@@ -354,7 +354,7 @@ public:
         case CARD_IS:
             if(card!=m_card_name) return false;
             break;
-        case CARD_CONTAINS: 
+        case CARD_CONTAINS:
             if(card.find(m_card_name)==std::string::npos)
                 return false;
             break;
@@ -410,7 +410,7 @@ void unitTesting()
     assert(Version("10.3") <=  Version("10.3.2"));
     assert(!(Version("10.3.2") <  Version("10.3")));
     assert(!(Version("10.3.2") <= Version("10.3")));
-    assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1", 
+    assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1",
                    "NVIDIA GeForce GTX 680MX OpenGL Engine")
            == Version("310.90.10.5")                                    );
 
@@ -421,7 +421,7 @@ void unitTesting()
     assert(Version("3.1 (Core Profile) Mesa 10.3.0",
                   "Mesa DRI Mobile Intel\u00ae GM45 Express Chipset")
            == Version("10.3.0")                                         );
-    assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel", 
+    assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel",
                    "Gallium 0.4 on NVC1")
            == Version("10.5.0")                                         );
     assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel",
@@ -439,7 +439,7 @@ void unitTesting()
     assert(Version("4.0.10188 Core Profile Context",
                    "ATI Radeon HD 5400 Series")
         == Version("4.0.10188"));
-    assert(Version("4.1 ATI-1.24.38", "AMD Radeon HD 6970M OpenGL Engine") 
+    assert(Version("4.1 ATI-1.24.38", "AMD Radeon HD 6970M OpenGL Engine")
         == Version("1.24.38"));
 
 }   // unitTesting

@@ -77,7 +77,7 @@ private:
         STKHost();
         /*! \brief Destructor                                               */
         virtual ~STKHost();
-        
+
         static void logPacket(const NetworkString &ns, bool incoming);
         static void* mainLoop(void* self);
 
@@ -93,7 +93,7 @@ private:
         void        sendRawPacket(uint8_t* data, int length,
                                   const TransportAddress& dst);
         uint8_t*    receiveRawPacket(TransportAddress* sender);
-        uint8_t*    receiveRawPacket(const TransportAddress& sender, 
+        uint8_t*    receiveRawPacket(const TransportAddress& sender,
                                      int max_tries = -1);
         void        broadcastPacket(const NetworkString& data,
                                     bool reliable = true);

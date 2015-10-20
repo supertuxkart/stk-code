@@ -109,7 +109,7 @@ void ProjectileManager::updateServer(float dt)
         else
             p++;
     }   // while p!=m_active_projectiles.end()
-    
+
 }   // updateServer
 
 // -----------------------------------------------------------------------------

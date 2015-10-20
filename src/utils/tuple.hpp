@@ -81,13 +81,13 @@ namespace STK {
         typedef typename tuple_element<_Index, Tuple<_Types...>>::_Ttype _Ttype;
         return (((_Ttype&)_Tuple)._Elem);
     }
-    
+
     template<size_t Index, typename... T> inline
         Tuple<T...> make_tuple(T... values)
     {
         return Tuple<T...>(values...);
     }
-    
+
     template<typename... T> inline
         Tuple<T...> make_tuple(T... values)
     {

@@ -115,7 +115,7 @@ public:
     GamePadDevice*      getGamePadFromIrrID(const int i);
     void                clearGamepads();
     /** Returns the keyboard that has a binding for this button, or NULL if none */
-    bool                getConfigForGamepad(const int sdl_id, 
+    bool                getConfigForGamepad(const int sdl_id,
                                             const std::string& name,
                                             GamepadConfig **config);
 

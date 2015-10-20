@@ -2041,7 +2041,7 @@ int asCCompiler::CompileDefaultAndNamedArgs(asCScriptNode *node, asCArray<asSExp
 	// Make sure none of the variables used in the previous arguments are reused in the default arguments
 	bool anyErrors = false;
 	int prevReservedVars = reservedVariables.GetLength();
-	
+
 	int explicitArgs = (int)args.GetLength();
 
 	for( int p = 0; p < explicitArgs; p++ )
@@ -3213,7 +3213,7 @@ int asCCompiler::CompileInitListElement(asSListPatternNode *&patternNode, asCScr
 
 			if( r == 0 )
 				countElements++;
-			else 
+			else
 			{
 				asASSERT( r == 1 && engine->ep.disallowEmptyListElements );
 				if( valueNode )
@@ -3390,7 +3390,7 @@ int asCCompiler::CompileInitListElement(asSListPatternNode *&patternNode, asCScr
 
 			if( lctx.type.dataType.IsNullHandle() )
 			{
-				// Don't add any code to assign a null handle. RefCpy doesn't work without a known type. 
+				// Don't add any code to assign a null handle. RefCpy doesn't work without a known type.
 				// The buffer is already initialized to zero in asBC_AllocMem anyway.
 				asASSERT( rctx.bc.GetLastInstr() == asBC_PshNull );
 				asASSERT( reinterpret_cast<asSListPatternDataTypeNode*>(patternNode)->dataType.GetTokenType() == ttQuestion );
@@ -5411,7 +5411,7 @@ bool asCCompiler::CompileRefCast(asSExprContext *ctx, const asCDataType &to, boo
 		}
 	}
 
-	// If the script object didn't implement a matching opCast or opImplCast 
+	// If the script object didn't implement a matching opCast or opImplCast
 	// then check if the desired type is part of the hierarchy
 	if( !conversionDone && (ctx->type.dataType.GetObjectType()->flags & asOBJ_SCRIPT_OBJECT) )
 	{
@@ -7828,12 +7828,12 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asSExprContext *ctx)
 				//     that would have to be cleaned up after the reference
 				//  3. neither expression can be temporary
 				//
-				// If either expression is local, the resulting lvalue is not valid 
-				// for return since it is not allowed to return references to local 
+				// If either expression is local, the resulting lvalue is not valid
+				// for return since it is not allowed to return references to local
 				// variables.
 				//
 				// The reference to the local variable must be loaded into the register,
-				// the resulting expression must not be considered as a local variable 
+				// the resulting expression must not be considered as a local variable
 				// with a stack offset (i.e. it will not be allowed to use asBC_VAR)
 
 				if( le.type.isLValue && re.type.isLValue &&
@@ -7874,7 +7874,7 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asSExprContext *ctx)
 
 					ctx->bc.Label((short)afterLabel);
 
-					// In case the options were to objects, it is necessary to dereference the pointer on 
+					// In case the options were to objects, it is necessary to dereference the pointer on
 					// the stack so it will point to the actual object, instead of the variable
 					if( le.type.dataType.IsReference() && le.type.isVariable && le.type.dataType.IsObject() && !le.type.dataType.IsObjectHandle() )
 					{
@@ -7896,7 +7896,7 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asSExprContext *ctx)
 					ctx->type.isTemporary = false;
 
 					// Must remember if the reference was to a local variable, since it must not be allowed to be returned
-					ctx->type.isRefToLocal = le.type.isVariable || le.type.isRefToLocal || re.type.isVariable || re.type.isRefToLocal; 
+					ctx->type.isRefToLocal = le.type.isVariable || le.type.isRefToLocal || re.type.isVariable || re.type.isRefToLocal;
 				}
 				else
 				{
@@ -9302,7 +9302,7 @@ void asCCompiler::CompileConversion(asCScriptNode *node, asSExprContext *ctx)
 
 void asCCompiler::AfterFunctionCall(int funcID, asCArray<asSExprContext*> &args, asSExprContext *ctx, bool deferAll)
 {
-	// deferAll is set to true if for example the function returns a reference, since in 
+	// deferAll is set to true if for example the function returns a reference, since in
 	// this case the function might be returning a reference to one of the arguments.
 
 	asCScriptFunction *descr = builder->GetFunctionDescription(funcID);
@@ -9987,7 +9987,7 @@ int asCCompiler::CompileFunctionCall(asCScriptNode *node, asSExprContext *ctx, a
 					if( objectType && funcExpr.property_get <= 0 )
 					{
 						// Dereference the object pointer to access the member
-						Dereference(ctx, true); 
+						Dereference(ctx, true);
 					}
 
 					if( funcExpr.property_get > 0 )
@@ -10840,8 +10840,8 @@ int asCCompiler::ProcessPropertySetAccessor(asSExprContext *ctx, asSExprContext 
 
 int asCCompiler::ProcessPropertyGetSetAccessor(asSExprContext *ctx, asSExprContext *lctx, asSExprContext *rctx, eTokenType op, asCScriptNode *errNode)
 {
-	// TODO: Perhaps it might be interesting to allow the definition of compound setters for better 
-	//       performance, e.g. set_add_prop, set_mul_prop, etc. With these it would also be possible 
+	// TODO: Perhaps it might be interesting to allow the definition of compound setters for better
+	//       performance, e.g. set_add_prop, set_mul_prop, etc. With these it would also be possible
 	//       to support value types, since it would be a single call
 
 	// Compound assignment for indexed property accessors is not supported yet
@@ -10862,7 +10862,7 @@ int asCCompiler::ProcessPropertyGetSetAccessor(asSExprContext *ctx, asSExprConte
 		return -1;
 	}
 
-	// Property accessors on value types (or scoped references types) are not supported since 
+	// Property accessors on value types (or scoped references types) are not supported since
 	// it is not possible to guarantee that the object will stay alive between the two calls
 	asCScriptFunction *func = engine->scriptFunctions[lctx->property_set];
 	if( func->objectType && (func->objectType->flags & (asOBJ_VALUE | asOBJ_SCOPED)) )
@@ -10882,9 +10882,9 @@ int asCCompiler::ProcessPropertyGetSetAccessor(asSExprContext *ctx, asSExprConte
 	case ttDivAssign: op = ttSlash; break;
 	case ttModAssign: op = ttPercent; break;
 	case ttPowAssign: op = ttStarStar; break;
-	
+
 	case ttAndAssign: op = ttAmp; break;
-	case ttOrAssign:  op = ttBitOr; break; 
+	case ttOrAssign:  op = ttBitOr; break;
 	case ttXorAssign: op = ttBitXor; break;
 
 	case ttShiftLeftAssign:   op = ttBitShiftLeft; break;
@@ -10897,7 +10897,7 @@ int asCCompiler::ProcessPropertyGetSetAccessor(asSExprContext *ctx, asSExprConte
 	if( op == ttUnrecognizedToken )
 	{
 		// Shouldn't happen
-		asASSERT(false); 
+		asASSERT(false);
 
 		// Process the property to free the memory
 		ProcessPropertySetAccessor(lctx, rctx, errNode);
@@ -11024,7 +11024,7 @@ void asCCompiler::ProcessPropertyGetAccessor(asSExprContext *ctx, asCScriptNode 
 	if( isExplicitHandle )
 		ctx->type.isExplicitHandle = true;
 
-	// Clear the property get/set ids 
+	// Clear the property get/set ids
 	ctx->property_get = 0;
 	ctx->property_set = 0;
 	if( ctx->property_arg )
@@ -12035,7 +12035,7 @@ int asCCompiler::CompileOverloadedDualOperator2(asCScriptNode *node, const char 
 			asUINT oldReservedVars = reservedVariables.GetLength();
 			for( asUINT n = 0; n < rctx->deferredParams.GetLength(); n++ )
 			{
-				if( rctx->deferredParams[n].argType.isTemporary && 
+				if( rctx->deferredParams[n].argType.isTemporary &&
 					usedVars.Exists(rctx->deferredParams[n].argType.stackOffset) )
 				{
 					if( reservedVariables.GetLength() == oldReservedVars )
@@ -13333,7 +13333,7 @@ void asCCompiler::CompileComparisonOperator(asCScriptNode *node, asSExprContext 
 	}
 
 	bool isConstant = lctx->type.isConstant && rctx->type.isConstant;
-	
+
 	if( op == ttUnrecognizedToken )
 		op = node->tokenType;
 
@@ -13845,7 +13845,7 @@ void asCCompiler::CompileOperatorOnHandles(asCScriptNode *node, asSExprContext *
 
 	if( opToken == ttEqual || opToken == ttNotEqual || opToken == ttIs || opToken == ttNotIs )
 	{
-		// Make sure handles received as parameters by reference are copied to a local variable before the 
+		// Make sure handles received as parameters by reference are copied to a local variable before the
 		// asBC_CmpPtr, so we don't end up comparing the reference to the handle instead of the handle itself
 		if( lctx->type.isVariable && !lctx->type.isTemporary && lctx->type.stackOffset <= 0 )
 			lctx->type.isVariable = false;
@@ -13909,8 +13909,8 @@ void asCCompiler::PerformFunctionCall(int funcId, asSExprContext *ctx, bool isCo
 		msg.Format(TXT_PRIVATE_METHOD_CALL_s, descr->GetDeclarationStr().AddressOf());
 		Error(msg, ctx->exprNode);
 	}
-	else if( descr->isProtected && 
-		     !(descr->GetObjectType() == outFunc->GetObjectType() || 
+	else if( descr->isProtected &&
+		     !(descr->GetObjectType() == outFunc->GetObjectType() ||
 		       (outFunc->GetObjectType() && outFunc->GetObjectType()->DerivesFrom(descr->GetObjectType()))) )
 	{
 		asCString msg;
@@ -13932,10 +13932,10 @@ void asCCompiler::PerformFunctionCall(int funcId, asSExprContext *ctx, bool isCo
 		!(ctx->type.dataType.GetObjectType()->GetFlags() & asOBJ_SCOPED) &&
 		!(ctx->type.dataType.GetObjectType()->GetFlags() & asOBJ_ASHANDLE) )
 	{
-		// TODO: runtime optimize: Avoid this for global variables, by storing a reference to the global variable once in a 
+		// TODO: runtime optimize: Avoid this for global variables, by storing a reference to the global variable once in a
 		//                         local variable and then refer to the same for each call. An alias for the global variable
-		//                         should be stored in the variable scope so that the compiler can find it. For loops and 
-		//                         scopes that will always be executed, i.e. non-if scopes the alias should be stored in the 
+		//                         should be stored in the variable scope so that the compiler can find it. For loops and
+		//                         scopes that will always be executed, i.e. non-if scopes the alias should be stored in the
 		//                         higher scope to increase the probability of re-use.
 
 		// TODO: runtime optimize: This can be avoided for local variables (non-handles) as they have a well defined life time

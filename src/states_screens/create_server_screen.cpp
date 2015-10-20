@@ -56,7 +56,7 @@ void CreateServerScreen::loadedFromFile()
 {
     m_name_widget = getWidget<TextBoxWidget>("name");
     assert(m_name_widget != NULL);
- 
+
     m_max_players_widget = getWidget<SpinnerWidget>("max_players");
     assert(m_max_players_widget != NULL);
     m_max_players_widget->setValue(8);

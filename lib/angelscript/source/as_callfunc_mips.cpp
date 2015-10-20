@@ -248,9 +248,9 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	int intArgs = 0;
 	for( size_t a = 0; a < descr->parameterTypes.GetLength(); a++ )
 	{
-		if (descr->parameterTypes[a].IsFloatType()) 
+		if (descr->parameterTypes[a].IsFloatType())
 			hostFlags |= argBit;
-		else 
+		else
 			intArgs++;
 		argBit <<= 1;
 	}

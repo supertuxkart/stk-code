@@ -172,7 +172,7 @@ protected:
 
     /** Set when the world is online and counts network players. */
     bool m_is_network_world;
-    
+
     /** Used to show weather graphical effects. */
     Weather* m_weather;
 
@@ -325,7 +325,7 @@ public:
     Track          *getTrack() const { return m_track; }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the Scripting Engine. */
-    Scripting::ScriptEngine   *getScriptEngine() 
+    Scripting::ScriptEngine   *getScriptEngine()
                                const { return m_script_engine; }
     //-------------------------------------------------------------------------
     bool            isFogEnabled() const;
@@ -366,7 +366,7 @@ public:
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
 
     bool isNetworkWorld() const { return m_is_network_world; }
-    
+
     /** Returns a pointer to the weather. */
     Weather* getWeather() {return m_weather;}
 };   // World

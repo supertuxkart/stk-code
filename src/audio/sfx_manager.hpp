@@ -111,7 +111,7 @@ public:
 
 private:
 
-    /** Data structure for the queue, which stores a sfx and the command to 
+    /** Data structure for the queue, which stores a sfx and the command to
      *  execute for it. */
     class SFXCommand : public NoCopy
     {

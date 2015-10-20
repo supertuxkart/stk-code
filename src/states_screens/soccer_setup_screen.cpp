@@ -192,10 +192,10 @@ void SoccerSetupScreen::init()
     m_schedule_continue = false;
 
     Screen::init();
-    
+
     if (UserConfigParams::m_num_goals <= 0)
         UserConfigParams::m_num_goals = 3;
-        
+
     if (UserConfigParams::m_soccer_time_limit <= 0)
         UserConfigParams::m_soccer_time_limit = 3;
 
@@ -230,7 +230,7 @@ void SoccerSetupScreen::tearDown()
 
     // Reset the 'map fire to select' option of the device manager
     input_manager->getDeviceManager()->mapFireToSelect(false);
-    
+
     UserConfigParams::m_num_goals = getWidget<SpinnerWidget>("goalamount")->getValue();
     UserConfigParams::m_soccer_time_limit = getWidget<SpinnerWidget>("timeamount")->getValue();
 
@@ -350,14 +350,14 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
     default:
         break;
     }
-     
+
     if(team_switch != SOCCER_TEAM_NONE) // A player wants to change his team?
     {
         race_manager->setLocalKartSoccerTeam(playerId, team_switch);
         m_kart_view_info[playerId].team = team_switch;
         updateKartViewsLayout();
     }
-    
+
 
 
     return result;
@@ -367,7 +367,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
 void SoccerSetupScreen::onUpdate(float delta)
 {
     int nb_players = (int)m_kart_view_info.size();
-    
+
     if(m_schedule_continue)
     {
         for(int i=0 ; i < nb_players ; i++)

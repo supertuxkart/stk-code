@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -20,12 +20,12 @@ btConvexShape (), m_childConvexShape(convexChildShape)
 {
 	m_shapeType = CONVEX_2D_SHAPE_PROXYTYPE;
 }
-	
+
 btConvex2dShape::~btConvex2dShape()
 {
 }
 
-	
+
 
 btVector3	btConvex2dShape::localGetSupportingVertexWithoutMargin(const btVector3& vec)const
 {
@@ -62,7 +62,7 @@ void btConvex2dShape::getAabbSlow(const btTransform& t,btVector3& aabbMin,btVect
 	m_childConvexShape->getAabbSlow(t,aabbMin,aabbMax);
 }
 
-void	btConvex2dShape::setLocalScaling(const btVector3& scaling) 
+void	btConvex2dShape::setLocalScaling(const btVector3& scaling)
 {
 	m_childConvexShape->setLocalScaling(scaling);
 }
@@ -85,7 +85,7 @@ int		btConvex2dShape::getNumPreferredPenetrationDirections() const
 {
 	return m_childConvexShape->getNumPreferredPenetrationDirections();
 }
-	
+
 void	btConvex2dShape::getPreferredPenetrationDirection(int index, btVector3& penetrationVector) const
 {
 	m_childConvexShape->getPreferredPenetrationDirection(index,penetrationVector);

@@ -443,11 +443,11 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Global illumination: %s",
         UserConfigParams::m_gi ? enabled : disabled);
-    
+
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Use high definition textures: %s",
         (UserConfigParams::m_high_definition_textures & 0x1) == 0 ? disabled : enabled);
-    
+
     gfx->setTooltip(tooltip);
 }   // updateTooltip
 

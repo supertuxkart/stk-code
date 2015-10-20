@@ -124,7 +124,7 @@ void*   btAlignedAllocInternal  (size_t size, int alignment,int line,char* filen
  gTotalBytesAlignedAllocs += size;
  gNumAlignedAllocs++;
 
- 
+
  real = (char *)sAllocFunc(size + 2*sizeof(void *) + (alignment-1));
  if (real) {
    offset = (alignment - (unsigned long)(real + 2*sizeof(void *))) &

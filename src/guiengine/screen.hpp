@@ -228,7 +228,7 @@ namespace GUIEngine
           */
         virtual void init();
 
-        /** Displays this screen bu pushing it onto the stack of screen 
+        /** Displays this screen bu pushing it onto the stack of screen
          *  in the state manager. */
         void push();
 

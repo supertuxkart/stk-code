@@ -222,7 +222,7 @@ void Physics::update(float dt)
                 kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
                     kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
             }
-            else if(obj->isSoccerBall() && 
+            else if(obj->isSoccerBall() &&
                     race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
@@ -283,7 +283,7 @@ void Physics::update(float dt)
             }
             flyable->hit(NULL, obj);
 
-            if (obj->isSoccerBall() && 
+            if (obj->isSoccerBall() &&
                 race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();

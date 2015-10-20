@@ -444,7 +444,7 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
     clone->recalculateBoundingBox();
     if (calculate_tangents)
         recalculateTangents(clone, recalculate_normals, smooth, angle_weighted);
-    
+
     int mbcount = clone->getMeshBufferCount();
     for (int i = 0; i < mbcount; i++)
     {

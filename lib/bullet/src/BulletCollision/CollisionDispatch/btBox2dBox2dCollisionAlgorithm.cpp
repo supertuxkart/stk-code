@@ -4,8 +4,8 @@ Bullet Continuous Collision Detection and Physics Library
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -39,13 +39,13 @@ m_manifoldPtr(mf)
 
 btBox2dBox2dCollisionAlgorithm::~btBox2dBox2dCollisionAlgorithm()
 {
-	
+
 	if (m_ownManifold)
 	{
 		if (m_manifoldPtr)
 			m_dispatcher->releaseManifold(m_manifoldPtr);
 	}
-	
+
 }
 
 
@@ -372,8 +372,8 @@ void b2CollidePolygons(btManifoldResult* manifold,
 	btVector3 sideNormal = b2Mul(xf1.getBasis(), v12 - v11);
 	sideNormal.normalize();
 	btVector3 frontNormal = btCrossS(sideNormal, 1.0f);
-	
-	
+
+
 	v11 = b2Mul(xf1, v11);
 	v12 = b2Mul(xf1, v12);
 
@@ -417,7 +417,7 @@ void b2CollidePolygons(btManifoldResult* manifold,
 
 		if (separation <= 0.0f)
 		{
-			
+
 			//b2ManifoldPoint* cp = manifold->points + pointCount;
 			//btScalar separation = separation;
 			//cp->localPoint1 = b2MulT(xfA, clipPoints2[i].v);

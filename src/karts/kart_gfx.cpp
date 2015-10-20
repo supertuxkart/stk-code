@@ -63,12 +63,12 @@ KartGFX::KartGFX(const AbstractKart *kart)
 
     // Create skidding lights
     // For the first skidding level
-    m_skidding_light_1 = 
+    m_skidding_light_1 =
         irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f*length - 0.05f),
                              /* force */ 0.3f,  /* radius */ 3.0f,
                              1.0f, 0.6f, 0.0f, false, node);
     m_skidding_light_1->setVisible(false);
-    m_skidding_light_1->setName( ("skidding emitter 1 (" + m_kart->getIdent() 
+    m_skidding_light_1->setName( ("skidding emitter 1 (" + m_kart->getIdent()
                                                          + ")").c_str() );
 
     // For the second skidding level
@@ -77,7 +77,7 @@ KartGFX::KartGFX(const AbstractKart *kart)
                              /* force */0.4f, /*radius*/ 4.0f,
                              1.0f, 0.0f, 0.0f, false, node);
     m_skidding_light_2->setVisible(false);
-    m_skidding_light_2->setName( ("skidding emitter 2 (" + m_kart->getIdent() 
+    m_skidding_light_2->setName( ("skidding emitter 2 (" + m_kart->getIdent()
                                                          + ")").c_str() );
 
     // Create particle effects
@@ -121,7 +121,7 @@ KartGFX::~KartGFX()
         if(m_all_emitters[i])
             delete m_all_emitters[i];
     }   // for i < KGFX_COUNT
-    
+
     if (CVS->isGLSL())
     {
         m_nitro_light->drop();
@@ -205,7 +205,7 @@ void KartGFX::reset()
 
 // ----------------------------------------------------------------------------
 /** Selects the correct skidding particle type depending on skid bonus level.
- *  \param level Must be 1 (accumulated enough for level 1 bonus) or 2 
+ *  \param level Must be 1 (accumulated enough for level 1 bonus) or 2
  *         (accumulated enough for level 2 bonus).
  */
 void KartGFX::setSkidLevel(const unsigned int level)

@@ -47,7 +47,7 @@ void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const i
 {
     if (name == "category")
     {
-        
+
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         Screen *screen = NULL;

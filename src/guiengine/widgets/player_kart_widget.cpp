@@ -185,7 +185,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_kartInternalName = props->getIdent();
 
     const KartModel &kart_model = props->getMasterKartModel();
-    
+
     float scale = 35.0f;
     if (kart_model.getLength() > 1.45f)
     {

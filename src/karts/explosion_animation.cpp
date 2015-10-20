@@ -110,7 +110,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
               m_kart->getPlayerDifficulty()->getExplosionInvulnerabilityTime();
     m_kart->setInvulnerableTime(t);
     m_kart->showStarEffect(t);
-    
+
     m_kart->getAttachment()->clear();
 
  };   // ExplosionAnimation

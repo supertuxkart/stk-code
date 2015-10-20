@@ -22,7 +22,7 @@
 #include "graphics/shaders.hpp"
 
 
-#include <algorithm> 
+#include <algorithm>
 #include <cassert>
 
 using namespace irr;
@@ -56,7 +56,7 @@ public:
 };   // SkyboxShader
 
 
-class SpecularIBLGenerator : public TextureShader<SpecularIBLGenerator, 1, 
+class SpecularIBLGenerator : public TextureShader<SpecularIBLGenerator, 1,
                                                   core::matrix4, float >
 {
 public:
@@ -84,7 +84,7 @@ namespace {
         new_img[4 * (stride * new_i + new_j) + 2] = old_img[4 * (stride * old_i + old_j) + 2];
         new_img[4 * (stride * new_i + new_j) + 3] = old_img[4 * (stride * old_i + old_j) + 3];
     }   // swapPixels
-    
+
     // ----------------------------------------------------------------------------
     // From http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
     /** Returns the index-th pair from Hammersley set of pseudo random set.
@@ -97,7 +97,7 @@ namespace {
         float InvertedBinaryRepresentation = 0.;
         for (size_t i = 0; i < 32; i++)
         {
-            InvertedBinaryRepresentation += ((index >> i) & 0x1) 
+            InvertedBinaryRepresentation += ((index >> i) & 0x1)
                                           * powf(.5, (float) (i + 1.));
         }
         return std::make_pair(float(index) / float(samples),
@@ -108,7 +108,7 @@ namespace {
     // ----------------------------------------------------------------------------
     /** Returns a pseudo random (theta, phi) generated from a probability density
     *  function modeled after Phong function.
-    *  \param a pseudo random float pair from a uniform density function between 
+    *  \param a pseudo random float pair from a uniform density function between
     *         0 and 1.
     *   \param exponent from the Phong formula.
     */
@@ -120,8 +120,8 @@ namespace {
     }   // getImportanceSamplingPhong
 
     // ----------------------------------------------------------------------------
-    static core::matrix4 getPermutationMatrix(size_t indexX, float valX, 
-                                              size_t indexY, float valY, 
+    static core::matrix4 getPermutationMatrix(size_t indexX, float valX,
+                                              size_t indexY, float valY,
                                               size_t indexZ, float valZ)
     {
         core::matrix4 result_mat;
@@ -135,7 +135,7 @@ namespace {
         M[8 + indexZ] = valZ;
         return result_mat;
     }   // getPermutationMatrix
-    
+
 }  //namespace
 
 // ----------------------------------------------------------------------------
@@ -253,7 +253,7 @@ void Skybox::generateSpecularCubemap()
         float *tmp = new float[2048];
         for (unsigned i = 0; i < 1024; i++)
         {
-            std::pair<float, float> sample = 
+            std::pair<float, float> sample =
                 getImportanceSamplingPhong(getHammersleySequence(i, 1024),
                                         roughness);
             tmp[2 * i] = sample.first;
@@ -261,12 +261,12 @@ void Skybox::generateSpecularCubemap()
         }
 
         glBindVertexArray(0);
-        glActiveTexture(GL_TEXTURE0 + 
+        glActiveTexture(GL_TEXTURE0 +
                         SpecularIBLGenerator::getInstance()->m_tu_samples);
         GLuint sampleTex, sampleBuffer;
         glGenBuffers(1, &sampleBuffer);
         glBindBuffer(GL_TEXTURE_BUFFER, sampleBuffer);
-        glBufferData(GL_TEXTURE_BUFFER, 2048 * sizeof(float), tmp, 
+        glBufferData(GL_TEXTURE_BUFFER, 2048 * sizeof(float), tmp,
                      GL_STATIC_DRAW);
         glGenTextures(1, &sampleTex);
         glBindTexture(GL_TEXTURE_BUFFER, sampleTex);
@@ -276,7 +276,7 @@ void Skybox::generateSpecularCubemap()
         for (unsigned face = 0; face < 6; face++)
         {
 
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
                                    m_specular_probe, level);
             GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -316,7 +316,7 @@ Out of legacy the sequence of textures maps to:
 Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
 {
     m_skybox_textures = skybox_textures;
-    
+
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     if (!skybox_textures.empty())
@@ -329,7 +329,7 @@ Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
 Skybox::~Skybox()
 {
     glDeleteTextures(1, &m_cube_map);
-    glDeleteTextures(1, &m_specular_probe);    
+    glDeleteTextures(1, &m_specular_probe);
 }
 
 

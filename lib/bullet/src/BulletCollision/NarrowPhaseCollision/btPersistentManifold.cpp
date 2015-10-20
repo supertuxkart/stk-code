@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -75,22 +75,22 @@ void btPersistentManifold::clearUserCache(btManifoldPoint& pt)
 			(*gContactDestroyedCallback)(pt.m_userPersistentData);
 			pt.m_userPersistentData = 0;
 		}
-		
+
 #ifdef DEBUG_PERSISTENCY
 		DebugPersistency();
 #endif
 	}
 
-	
+
 }
 
 
-int btPersistentManifold::sortCachedPoints(const btManifoldPoint& pt) 
+int btPersistentManifold::sortCachedPoints(const btManifoldPoint& pt)
 {
 
 		//calculate 4 possible cases areas, and take biggest area
 		//also need to keep 'deepest'
-		
+
 		int maxPenetrationIndex = -1;
 #define KEEP_DEEPEST_POINT 1
 #ifdef KEEP_DEEPEST_POINT
@@ -104,7 +104,7 @@ int btPersistentManifold::sortCachedPoints(const btManifoldPoint& pt)
 			}
 		}
 #endif //KEEP_DEEPEST_POINT
-		
+
 		btScalar res0(btScalar(0.)),res1(btScalar(0.)),res2(btScalar(0.)),res3(btScalar(0.));
 		if (maxPenetrationIndex != 0)
 		{
@@ -177,12 +177,12 @@ int btPersistentManifold::addManifoldPoint(const btManifoldPoint& newPoint)
 		insertIndex = 0;
 #endif
 		clearUserCache(m_pointCache[insertIndex]);
-		
+
 	} else
 	{
 		m_cachedPoints++;
 
-		
+
 	}
 	if (insertIndex<0)
 		insertIndex=0;
@@ -221,12 +221,12 @@ void btPersistentManifold::refreshContactPoints(const btTransform& trA,const btT
 		manifoldPoint.m_lifeTime++;
 	}
 
-	/// then 
+	/// then
 	btScalar distance2d;
 	btVector3 projectedDifference,projectedPoint;
 	for (i=getNumContacts()-1;i>=0;i--)
 	{
-		
+
 		btManifoldPoint &manifoldPoint = m_pointCache[i];
 		//contact becomes invalid when signed distance exceeds margin (projected on contactnormal direction)
 		if (!validContactDistance(manifoldPoint))

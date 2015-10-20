@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -97,10 +97,10 @@ int	btTriangleMesh::findOrAddVertex(const btVector3& vertex, bool removeDuplicat
 		m_indexedMeshes[0].m_vertexBase = (unsigned char*)&m_4componentVertices[0];
 
 		return m_4componentVertices.size()-1;
-		
+
 	} else
 	{
-		
+
 		if (removeDuplicateVertices)
 		{
 			for (int i=0;i< m_3componentVertices.size();i+=3)
@@ -121,7 +121,7 @@ int	btTriangleMesh::findOrAddVertex(const btVector3& vertex, bool removeDuplicat
 	}
 
 }
-		
+
 void	btTriangleMesh::addTriangle(const btVector3& vertex0,const btVector3& vertex1,const btVector3& vertex2,bool removeDuplicateVertices)
 {
 	m_indexedMeshes[0].m_numTriangles++;

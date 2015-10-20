@@ -181,10 +181,10 @@ void update(float dt)
     GUIEngine::getSkin()->drawMessage(g_container, g_area,
                                       current->getRenderType());
     gui::ScalableFont *font = GUIEngine::getFont();
-    
+
     video::SColor color(255, 0, 0, 0);
     font->draw(current->getMessage(), g_area, color, true, true);
-    
+
 }   // update
 
 }   // namespace GUIEngine

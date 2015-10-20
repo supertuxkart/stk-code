@@ -225,7 +225,7 @@ namespace StringUtils
     }   // parseString
 
     // ------------------------------------------------------------------------
-    
+
     std::string wide_to_utf8(const wchar_t* input);
     irr::core::stringw utf8_to_wide(const char* input);
 

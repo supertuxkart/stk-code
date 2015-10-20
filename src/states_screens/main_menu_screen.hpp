@@ -20,7 +20,7 @@
 
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine { class Widget;       class ListWidget; 
+namespace GUIEngine { class Widget;       class ListWidget;
                       class ButtonWidget; class IconButtonWidget; }
 
 /**

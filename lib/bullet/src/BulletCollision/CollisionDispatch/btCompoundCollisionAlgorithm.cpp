@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -30,10 +30,10 @@ m_sharedManifold(ci.m_manifold)
 
 	btCollisionObject* colObj = m_isSwapped? body1 : body0;
 	btAssert (colObj->getCollisionShape()->isCompound());
-	
+
 	btCompoundShape* compoundShape = static_cast<btCompoundShape*>(colObj->getCollisionShape());
 	m_compoundShapeRevision = compoundShape->getUpdateRevision();
-	
+
 	preallocateChildAlgorithms(body0,body1);
 }
 
@@ -42,12 +42,12 @@ void	btCompoundCollisionAlgorithm::preallocateChildAlgorithms(btCollisionObject*
 	btCollisionObject* colObj = m_isSwapped? body1 : body0;
 	btCollisionObject* otherObj = m_isSwapped? body0 : body1;
 	btAssert (colObj->getCollisionShape()->isCompound());
-	
+
 	btCompoundShape* compoundShape = static_cast<btCompoundShape*>(colObj->getCollisionShape());
 
 	int numChildren = compoundShape->getNumChildShapes();
 	int i;
-	
+
 	m_childCollisionAlgorithms.resize(numChildren);
 	for (i=0;i<numChildren;i++)
 	{
@@ -159,7 +159,7 @@ public:
 				m_dispatchInfo.m_debugDraw->drawAabb(aabbMin0,aabbMax0,btVector3(1,1,1));
 				m_dispatchInfo.m_debugDraw->drawAabb(aabbMin1,aabbMax1,btVector3(1,1,1));
 			}
-			
+
 			//revert back transform
 			m_compoundColObj->internalSetTemporaryCollisionShape( tmpShape);
 			m_compoundColObj->setWorldTransform(  orgTrans );
@@ -194,7 +194,7 @@ void btCompoundCollisionAlgorithm::processCollision (btCollisionObject* body0,bt
 	btCollisionObject* colObj = m_isSwapped? body1 : body0;
 	btCollisionObject* otherObj = m_isSwapped? body0 : body1;
 
-	
+
 
 	btAssert (colObj->getCollisionShape()->isCompound());
 	btCompoundShape* compoundShape = static_cast<btCompoundShape*>(colObj->getCollisionShape());
@@ -205,7 +205,7 @@ void btCompoundCollisionAlgorithm::processCollision (btCollisionObject* body0,bt
 	{
 		///clear and update all
 		removeChildAlgorithms();
-		
+
 		preallocateChildAlgorithms(body0,body1);
 	}
 
@@ -271,8 +271,8 @@ void btCompoundCollisionAlgorithm::processCollision (btCollisionObject* body0,bt
         btTransform	orgTrans;
         btTransform	orgInterpolationTrans;
         btTransform	newChildWorldTrans;
-        btVector3 aabbMin0,aabbMax0,aabbMin1,aabbMax1;        
-        
+        btVector3 aabbMin0,aabbMax0,aabbMin1,aabbMax1;
+
 		for (i=0;i<numChildren;i++)
 		{
 			if (m_childCollisionAlgorithms[i])
@@ -306,7 +306,7 @@ btScalar	btCompoundCollisionAlgorithm::calculateTimeOfImpact(btCollisionObject* 
 	btCollisionObject* otherObj = m_isSwapped? body0 : body1;
 
 	btAssert (colObj->getCollisionShape()->isCompound());
-	
+
 	btCompoundShape* compoundShape = static_cast<btCompoundShape*>(colObj->getCollisionShape());
 
 	//We will use the OptimizedBVH, AABB tree to cull potential child-overlaps
@@ -329,7 +329,7 @@ btScalar	btCompoundCollisionAlgorithm::calculateTimeOfImpact(btCollisionObject* 
 
 		//backup
         orgTrans = colObj->getWorldTransform();
-	
+
 		const btTransform& childTrans = compoundShape->getChildTransform(i);
 		//btTransform	newChildWorldTrans = orgTrans*childTrans ;
 		colObj->setWorldTransform( orgTrans*childTrans );

@@ -79,7 +79,7 @@ protected:
     std::string                    m_type;
 
     bool                           m_soccer_ball;
-    
+
     /** True if a kart can drive on this object. This will */
     bool                           m_is_driveable;
 
@@ -88,7 +88,7 @@ protected:
     ThreeDAnimation*               m_animator;
 
     TrackObject*                   m_parent_library;
-    
+
     std::vector<TrackObject*>      m_movable_children;
     std::vector<TrackObject*>      m_children;
 
@@ -125,7 +125,7 @@ public:
     const core::vector3df  getAbsoluteCenterPosition() const;
     const core::vector3df& getRotation() const;
     const core::vector3df& getScale() const;
-    bool castRay(const btVector3 &from, 
+    bool castRay(const btVector3 &from,
                  const btVector3 &to, btVector3 *hit_point,
                  const Material **material, btVector3 *normal,
                  bool interpolate_normal) const;

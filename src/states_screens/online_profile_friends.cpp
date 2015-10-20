@@ -127,7 +127,7 @@ void OnlineProfileFriends::onColumnClicked(int column_id)
         m_sort_increasing = !m_sort_increasing;
     else
     {
-        m_sort_increasing = true;       
+        m_sort_increasing = true;
     }
     m_sort_column = column_id;
     displayResults();

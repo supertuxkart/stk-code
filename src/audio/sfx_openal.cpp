@@ -38,8 +38,8 @@
 #include <stdio.h>
 #include <string>
 
-SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float volume, 
-                     bool owns_buffer) 
+SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float volume,
+                     bool owns_buffer)
          : SFXBase()
 {
     m_sound_buffer = buffer;
@@ -80,7 +80,7 @@ SFXOpenAL::~SFXOpenAL()
 }   // ~SFXOpenAL
 
 //-----------------------------------------------------------------------------
-/** Initialises the sfx. 
+/** Initialises the sfx.
  */
 bool SFXOpenAL::init()
 {
@@ -227,10 +227,10 @@ void SFXOpenAL::setMasterVolume(float volume)
 void SFXOpenAL::reallySetMasterVolumeNow(float volume)
 {
     m_master_gain = volume;
-    
+
     if(m_status==SFX_UNKNOWN || m_status == SFX_NOT_INITIALISED) return;
 
-    alSourcef(m_sound_source, AL_GAIN, 
+    alSourcef(m_sound_source, AL_GAIN,
                (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
     SFXManager::checkError("setting volume");
 }   // reallySetMasterVolumeNow
@@ -454,7 +454,7 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
     }
     else
     {
-        alSourcef(m_sound_source, AL_GAIN, 
+        alSourcef(m_sound_source, AL_GAIN,
                   (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
     }
 

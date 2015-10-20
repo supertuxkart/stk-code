@@ -160,7 +160,7 @@ void MainLoop::run()
             #ifdef ENABLE_WIIUSE
                 wiimote_manager->update();
             #endif
-            
+
             GUIEngine::update(dt);
             PROFILER_POP_CPU_MARKER();
 

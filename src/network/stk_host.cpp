@@ -284,7 +284,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
 {
     const int LEN = 2048;
     // max size needed normally (only used for stun)
-    uint8_t* buffer = new uint8_t[LEN]; 
+    uint8_t* buffer = new uint8_t[LEN];
     memset(buffer, 0, LEN);
 
     socklen_t from_len;
@@ -359,7 +359,7 @@ uint8_t* STKHost::receiveRawPacket(const TransportAddress& sender,
             Log::info("STKHost", "Message received but the ip address didn't "
                                  "match the expected one.");
         }
-        len = recvfrom(m_host->socket, (char*)buffer, LEN, 0, 
+        len = recvfrom(m_host->socket, (char*)buffer, LEN, 0,
                        (struct sockaddr*)(&addr), &from_len);
         StkTime::sleep(1); // wait 1 millisecond between two checks
         if (count >= max_tries && max_tries != -1)

@@ -83,7 +83,7 @@ void FollowTheLeaderRace::reset()
             stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
     WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
                               m_leader_intervals[0]);
-                              
+
     m_is_over_delay = 2.0f;
 }   // reset
 

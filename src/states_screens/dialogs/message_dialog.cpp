@@ -97,7 +97,7 @@ void MessageDialog::doInit(bool from_queue)
 
 MessageDialog::~MessageDialog()
 {
-    if (m_own_listener) delete m_listener; 
+    if (m_own_listener) delete m_listener;
     m_listener = NULL;
 
     if (StateManager::get()->getGameState() == GUIEngine::GAME)

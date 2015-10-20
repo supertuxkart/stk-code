@@ -314,19 +314,19 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
         parent_x = parent->m_x;
         parent_y = parent->m_y;
     }
-    
+
     if (parent != NULL && parent->getType() == WTYPE_DIV && parent->m_show_bounding_box)
     {
         int padding = 15;
         if (parent->m_properties[PROP_DIV_PADDING].length() > 0)
             padding = atoi(parent->m_properties[PROP_DIV_PADDING].c_str());
-            
+
         parent_x += padding;
         parent_y += padding;
         parent_w -= padding*2;
         parent_h -= padding*2;
     }
-    
+
     if      (self->m_absolute_x > -1)         self->m_x = parent_x + self->m_absolute_x;
     else if (self->m_absolute_reverse_x > -1) self->m_x = parent_x + (parent_w - self->m_absolute_reverse_x);
     else if (self->m_relative_x > -1)         self->m_x = (int)(parent_x + parent_w*self->m_relative_x/100);
@@ -446,13 +446,13 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
             int padding = 15;
             if (parent->m_properties[PROP_DIV_PADDING].length() > 0)
                 padding = atoi(parent->m_properties[PROP_DIV_PADDING].c_str());
-            
+
             x += padding;
             y += padding;
             w -= padding*2;
             h -= padding*2;
         }
-    
+
         // find space left after placing all absolutely-sized widgets in a row
         // (the space left will be divided between remaining widgets later)
         int left_space = (horizontal ? w : h);

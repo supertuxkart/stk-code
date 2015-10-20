@@ -58,7 +58,7 @@ void TrackManager::addTrackSearchDir(const std::string &dir)
 }   // addTrackDir
 
 //-----------------------------------------------------------------------------
-/** Returns the number of racing tracks. Those are tracks that are not 
+/** Returns the number of racing tracks. Those are tracks that are not
  *  internal (like cut scenes), arenas, or soccer fields.
  */
 int TrackManager::getNumberOfRaceTracks() const

@@ -176,14 +176,14 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
     m_dictionary_manager.add_directory(
                         file_manager->getAsset(FileManager::TRANSLATION,""));
-                        
+
     if (g_language_list.size() == 0)
     {
-        std::set<Language> languages = m_dictionary_manager.get_languages();      
-        
+        std::set<Language> languages = m_dictionary_manager.get_languages();
+
         // English is always there but won't be found on file system
         g_language_list.push_back("en");
-    
+
         std::set<Language>::iterator it;
         for (it = languages.begin(); it != languages.end(); it++)
         {

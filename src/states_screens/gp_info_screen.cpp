@@ -83,7 +83,7 @@ void GPInfoScreen::loadedFromFile()
     m_num_tracks_spinner->setValue(1);
 
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
-    
+
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
     screenshot->setFocusable(false);
     screenshot->m_tab_stop = false;
@@ -135,7 +135,7 @@ void GPInfoScreen::beforeAddingWidget()
             StateManager::get()->getActivePlayerProfile(0)->getUniqueID(),
             m_gp.getId(),
             race_manager->getNumLocalPlayers());
-            
+
         int tracks = m_gp.getTrackNames().size();
         bool continue_visible = saved_gp && saved_gp->getNextTrack() > 0 &&
                                             saved_gp->getNextTrack() < tracks;
@@ -379,7 +379,7 @@ void GPInfoScreen::onUpdate(float dt)
     screenshot->m_properties[PROP_ICON] = file;
 }   // onUpdate
 
-/** Get number of available tracks for random GPs 
+/** Get number of available tracks for random GPs
  */
 int GPInfoScreen::getMaxNumTracks(std::string group)
 {
@@ -390,7 +390,7 @@ int GPInfoScreen::getMaxNumTracks(std::string group)
         for (unsigned int i = 0; i < track_manager->getNumberOfTracks(); i++)
         {
             std::string id = track_manager->getTrack(i)->getIdent();
-    
+
             if (!PlayerManager::getCurrentPlayer()->isLocked(id) &&
                 track_manager->getTrack(i)->isRaceTrack())
             {
@@ -401,18 +401,18 @@ int GPInfoScreen::getMaxNumTracks(std::string group)
     else
     {
         std::vector<int> tracks = track_manager->getTracksInGroup(group);
-        
+
         for (unsigned int i = 0; i < tracks.size(); i++)
         {
             std::string id = track_manager->getTrack(tracks[i])->getIdent();
-            
+
             if (!PlayerManager::getCurrentPlayer()->isLocked(id) &&
                 track_manager->getTrack(tracks[i])->isRaceTrack())
             {
                 max_num_tracks++;
-            }               
+            }
         }
     }
-    
+
     return max_num_tracks;
 }

@@ -76,7 +76,7 @@ void StkTime::getDate(int *day, int *month, int *year)
 {
     std::time_t t = std::time(0);   // get time now
     std::tm * now = std::localtime(&t);
- 
+
     if(day)   *day   = now->tm_mday;
     if(month) *month = now->tm_mon + 1;
     if(year)  *year  = now->tm_year + 1900;

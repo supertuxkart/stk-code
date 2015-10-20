@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -133,7 +133,7 @@ void btHeightfieldTerrainShape::getAabb(const btTransform& t,btVector3& aabbMin,
 	localOrigin[m_upAxis] = (m_minHeight + m_maxHeight) * btScalar(0.5);
 	localOrigin *= m_localScaling;
 
-	btMatrix3x3 abs_b = t.getBasis().absolute();  
+	btMatrix3x3 abs_b = t.getBasis().absolute();
 	btVector3 center = t.getOrigin();
 	btVector3 extent = btVector3(abs_b[0].dot(halfExtents),
 		   abs_b[1].dot(halfExtents),
@@ -269,7 +269,7 @@ void btHeightfieldTerrainShape::quantizeWithClamp(int* out, const btVector3& poi
 	out[0] = getQuantized(clampedPoint.getX());
 	out[1] = getQuantized(clampedPoint.getY());
 	out[2] = getQuantized(clampedPoint.getZ());
-		
+
 }
 
 
@@ -296,13 +296,13 @@ void	btHeightfieldTerrainShape::processAllTriangles(btTriangleCallback* callback
 	int	quantizedAabbMax[3];
 	quantizeWithClamp(quantizedAabbMin, localAabbMin,0);
 	quantizeWithClamp(quantizedAabbMax, localAabbMax,1);
-	
+
 	// expand the min/max quantized values
 	// this is to catch the case where the input aabb falls between grid points!
 	for (int i = 0; i < 3; ++i) {
 		quantizedAabbMin[i]--;
 		quantizedAabbMax[i]++;
-	}	
+	}
 
 	int startX=0;
 	int endX=m_heightStickWidth-1;
@@ -354,8 +354,8 @@ void	btHeightfieldTerrainShape::processAllTriangles(btTriangleCallback* callback
 		}
 	}
 
-	
-  
+
+
 
 	for(int j=startJ; j<endJ; j++)
 	{
@@ -373,7 +373,7 @@ void	btHeightfieldTerrainShape::processAllTriangles(btTriangleCallback* callback
         getVertex(x,j,vertices[0]);
         getVertex(x+1,j+1,vertices[1]);
         getVertex(x,j+1,vertices[2]);
-        callback->processTriangle(vertices,x,j);				
+        callback->processTriangle(vertices,x,j);
 			} else
 			{
         //first triangle
@@ -390,14 +390,14 @@ void	btHeightfieldTerrainShape::processAllTriangles(btTriangleCallback* callback
 		}
 	}
 
-	
+
 
 }
 
 void	btHeightfieldTerrainShape::calculateLocalInertia(btScalar ,btVector3& inertia) const
 {
 	//moving concave objects not supported
-	
+
 	inertia.setValue(btScalar(0.),btScalar(0.),btScalar(0.));
 }
 

@@ -196,7 +196,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     OutputDebugString(szBuff);
     OutputDebugString("\r\n");
 #endif
-    
+
 
     if(m_file_stdout)
     {

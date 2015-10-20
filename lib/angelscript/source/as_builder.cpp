@@ -279,11 +279,11 @@ int asCBuilder::Build()
 	Reset();
 
 	// The template callbacks must only be called after the subtypes have a known structure,
-	// otherwise the callback may think it is not possible to create the template instance, 
+	// otherwise the callback may think it is not possible to create the template instance,
 	// even though it is.
-	// TODO: This flag shouldn't be set globally in the engine, as it would mean that another 
-	//       thread requesting a template instance in parallel to the compilation wouldn't 
-	//       evaluate the template instance. 
+	// TODO: This flag shouldn't be set globally in the engine, as it would mean that another
+	//       thread requesting a template instance in parallel to the compilation wouldn't
+	//       evaluate the template instance.
 	engine->deferValidationOfTemplateTypes = true;
 	asUINT numTempl = (asUINT)engine->templateInstanceTypes.GetLength();
 
@@ -293,7 +293,7 @@ int asCBuilder::Build()
 	CompileInterfaces();
 	CompileClasses(numTempl);
 
-	// Evaluate the template instances one last time, this time with error messages, as we know 
+	// Evaluate the template instances one last time, this time with error messages, as we know
 	// all classes have been fully built and it is known which ones will need garbage collection.
 	EvaluateTemplateInstances(numTempl, false);
 	engine->deferValidationOfTemplateTypes = false;
@@ -526,7 +526,7 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 		}
 
 		module->globalFunctions.Put(func);
-		
+
 		module->AddScriptFunction(func);
 	}
 	else
@@ -1084,7 +1084,7 @@ asCGlobalProperty *asCBuilder::GetGlobalProperty(const char *prop, asSNameSpace 
 			if( isPureConstant ) *isPureConstant = globDesc->isPureConstant;
 			if( constantValue  ) *constantValue  = globDesc->constantValue;
 		}
-		else 
+		else
 #endif
 		if( isAppProp )
 		{
@@ -1205,7 +1205,7 @@ int asCBuilder::ParseFunctionDeclaration(asCObjectType *objType, const char *dec
 
 		// Move to next parameter
 		n = n->next->next;
-		if( n && n->nodeType == snIdentifier ) 
+		if( n && n->nodeType == snIdentifier )
 		{
 			func->parameterNames[index] = asCString(&source.code[n->tokenPos], n->tokenLength);
 			n = n->next;
@@ -1244,7 +1244,7 @@ int asCBuilder::ParseFunctionDeclaration(asCObjectType *objType, const char *dec
 	// If the caller expects a list pattern, check for the existence, else report an error if not
 	if( listPattern )
 	{
-		if( n == 0 || n->nodeType != snListPattern ) 
+		if( n == 0 || n->nodeType != snListPattern )
 			return asINVALID_DECLARATION;
 		else
 		{
@@ -1257,7 +1257,7 @@ int asCBuilder::ParseFunctionDeclaration(asCObjectType *objType, const char *dec
 		if( n )
 			return asINVALID_DECLARATION;
 	}
-	
+
 	// Make sure the default args are declared correctly
 	ValidateDefaultArgs(&source, node, func);
 
@@ -3038,7 +3038,7 @@ void asCBuilder::CompileClasses(asUINT numTempl)
 				asCDataType dt = prop->type;
 
 				// TODO: Add this check again, once solving the issues commented below
-				/* 
+				/*
 				if( dt.IsTemplate() )
 				{
 					// TODO: This must verify all sub types, not just the first one
@@ -3140,7 +3140,7 @@ void asCBuilder::CompileClasses(asUINT numTempl)
 	{
 		if( numReevaluations > typesToValidate.GetLength() )
 		{
-			// No types could be completely evaluated in the last iteration so 
+			// No types could be completely evaluated in the last iteration so
 			// we consider the remaining types in the array as garbage collected
 			break;
 		}
@@ -3165,7 +3165,7 @@ void asCBuilder::CompileClasses(asUINT numTempl)
 
 		// Evaluate template instances (silently) before verifying each of the classes, since it is possible that
 		// a class will be marked as non-garbage collected, which in turn will mark the template instance that uses
-		// it as non-garbage collected, which in turn means the class that contains the array also do not have to be 
+		// it as non-garbage collected, which in turn means the class that contains the array also do not have to be
 		// garbage collected
 		EvaluateTemplateInstances(numTempl, true);
 
@@ -3253,7 +3253,7 @@ void asCBuilder::CompileClasses(asUINT numTempl)
 					else if( prop->flags & asOBJ_GC )
 					{
 						// If a type is not a script object, adopt its GC flag
-						// TODO: runtime optimize: Just because an application registered class is garbage collected, doesn't mean it 
+						// TODO: runtime optimize: Just because an application registered class is garbage collected, doesn't mean it
 						//                         can form a circular reference with this script class. Perhaps need a flag to tell
 						//                         if the script classes that contains the type should be garbage collected or not.
 						gc = true;
@@ -3270,8 +3270,8 @@ void asCBuilder::CompileClasses(asUINT numTempl)
 			}
 		}
 
-		// If the class wasn't found to require garbage collection, but it 
-		// contains another type that has yet to be evaluated then it must be 
+		// If the class wasn't found to require garbage collection, but it
+		// contains another type that has yet to be evaluated then it must be
 		// re-evaluated.
 		if( !gc && mustReevaluate )
 		{
@@ -3317,11 +3317,11 @@ void asCBuilder::IncludeMethodsFromMixins(sClassDeclaration *decl)
 		sMixinClass *mixin = 0;
 		while( ns )
 		{
-			// Need to make sure the name is not an object type 
+			// Need to make sure the name is not an object type
 			asCObjectType *objType = GetObjectType(name.AddressOf(), ns);
 			if( objType == 0 )
 				mixin = GetMixinClass(name.AddressOf(), ns);
-			
+
 			if( objType || mixin )
 				break;
 
@@ -3391,11 +3391,11 @@ void asCBuilder::IncludePropertiesFromMixins(sClassDeclaration *decl)
 		sMixinClass *mixin = 0;
 		while( ns )
 		{
-			// Need to make sure the name is not an object type 
+			// Need to make sure the name is not an object type
 			asCObjectType *objType = GetObjectType(name.AddressOf(), ns);
 			if( objType == 0 )
 				mixin = GetMixinClass(name.AddressOf(), ns);
-			
+
 			if( objType || mixin )
 				break;
 
@@ -3822,7 +3822,7 @@ int asCBuilder::RegisterEnum(asCScriptNode *node, asCScriptCode *file, asSNameSp
 				gvar->ns                 = ns;
 				// No need to allocate space on the global memory stack since the values are stored in the asCObjectType
 				// Set the index to a negative to allow compiler to diferentiate from ordinary global var when compiling the initialization
-				gvar->index              = -1; 
+				gvar->index              = -1;
 				gvar->isCompiled         = false;
 				gvar->isPureConstant     = true;
 				gvar->isEnumValue        = true;
@@ -3959,10 +3959,10 @@ void asCBuilder::GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *fi
 		returnType = ModifyDataTypeFromNode(returnType, node->next, file, 0, 0);
 
 		if( engine->ep.disallowValueAssignForRefType &&
-			returnType.GetObjectType() && 
-			(returnType.GetObjectType()->flags & asOBJ_REF) && 
+			returnType.GetObjectType() &&
+			(returnType.GetObjectType()->flags & asOBJ_REF) &&
 			!(returnType.GetObjectType()->flags & asOBJ_SCOPED) &&
-			!returnType.IsReference() && 
+			!returnType.IsReference() &&
 			!returnType.IsObjectHandle() )
 		{
 			WriteError(TXT_REF_TYPE_CANT_BE_RETURNED_BY_VAL, file, node);
@@ -4023,10 +4023,10 @@ void asCBuilder::GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *fi
 		type = ModifyDataTypeFromNode(type, n->next, file, &inOutFlag, 0);
 
 		if( engine->ep.disallowValueAssignForRefType &&
-			type.GetObjectType() && 
-			(type.GetObjectType()->flags & asOBJ_REF) && 
+			type.GetObjectType() &&
+			(type.GetObjectType()->flags & asOBJ_REF) &&
 			!(type.GetObjectType()->flags & asOBJ_SCOPED) &&
-			!type.IsReference() && 
+			!type.IsReference() &&
 			!type.IsObjectHandle() )
 		{
 			WriteError(TXT_REF_TYPE_CANT_BE_PASSED_BY_VAL, file, node);
@@ -5004,7 +5004,7 @@ asCDataType asCBuilder::CreateDataTypeFromNode(asCScriptNode *node, asCScriptCod
 							{
 								n = n->next;
 
-								// When parsing function definitions for template registrations (currentType != 0) it is necessary 
+								// When parsing function definitions for template registrations (currentType != 0) it is necessary
 								// to pass in the current template type to the recursive call since it is this ones sub-template types
 								// that should be allowed.
 								asCDataType subType = CreateDataTypeFromNode(n, file, implicitNamespace, false, module ? 0 : (currentType ? currentType : ot));
@@ -5236,7 +5236,7 @@ asCDataType asCBuilder::ModifyDataTypeFromNode(const asCDataType &type, asCScrip
 	if( n && n->tokenType == ttPlus )
 	{
 		// Autohandles are not supported for types with NOCOUNT
-		// If the type is not a handle then there was an error with building the type, but 
+		// If the type is not a handle then there was an error with building the type, but
 		// this error would already have been reported so no need to report another error here
 		if( dt.IsObjectHandle() && (dt.GetObjectType()->flags & asOBJ_NOCOUNT) )
 			WriteError(TXT_AUTOHANDLE_CANNOT_BE_USED_FOR_NOCOUNT, file, node->firstChild);
@@ -5337,7 +5337,7 @@ asCObjectType *asCBuilder::GetObjectTypeFromTypesKnownByObject(const char *type,
 		if( func->returnType.GetObjectType() &&
 			func->returnType.GetObjectType()->name == type )
 			found = func->returnType.GetObjectType();
-		
+
 		for( asUINT f = 0; found == 0 && f < func->parameterTypes.GetLength(); f++ )
 			if( func->parameterTypes[f].GetObjectType() &&
 				func->parameterTypes[f].GetObjectType()->name == type )

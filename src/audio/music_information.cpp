@@ -245,11 +245,11 @@ void MusicInformation::update(float dt)
         break;
                        }
     case SOUND_NORMAL:
-        if ( m_normal_music ) 
+        if ( m_normal_music )
             m_normal_music->update();
         break;
     case SOUND_FAST:
-        if ( m_fast_music ) 
+        if ( m_fast_music )
             m_fast_music->update();
         break;
     }   // switch

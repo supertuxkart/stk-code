@@ -75,7 +75,7 @@ Material::Material(const XMLNode *node, bool deprecated)
 
     node->get("dont-load", &m_dont_load_texture);
     bool b = false;
-    
+
     node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.4 style
     node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.5 style
     b = false;

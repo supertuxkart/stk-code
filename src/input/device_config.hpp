@@ -42,12 +42,12 @@ class DeviceConfig : public NoCopy
 {
 
 private:
-    /** If set to false, this device will be ignored. 
+    /** If set to false, this device will be ignored.
      *  Currently for gamepads only. */
     bool m_enabled;
 
     /** How many devices connected to the system which uses this config? */
-    int m_plugged; 
+    int m_plugged;
 
     /** Name of this configuratiom. */
     std::string m_name;

@@ -53,7 +53,7 @@ private:
     /** True if a collision with this object should trigger
      *  "exploding" a kart. */
     bool                  m_explode_kart;
-    
+
     bool                  m_flatten_kart;
 
     /** True if animation is currently paused by scripts */

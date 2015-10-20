@@ -2,23 +2,23 @@
    AngelCode Scripting Library
    Copyright (c) 2003-2015 Andreas Jonsson
 
-   This software is provided 'as-is', without any express or implied 
-   warranty. In no event will the authors be held liable for any 
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any
    damages arising from the use of this software.
 
-   Permission is granted to anyone to use this software for any 
-   purpose, including commercial applications, and to alter it and 
+   Permission is granted to anyone to use this software for any
+   purpose, including commercial applications, and to alter it and
    redistribute it freely, subject to the following restrictions:
 
-   1. The origin of this software must not be misrepresented; you 
+   1. The origin of this software must not be misrepresented; you
       must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product 
+      this software in a product, an acknowledgment in the product
       documentation would be appreciated but is not required.
 
-   2. Altered source versions must be plainly marked as such, and 
+   2. Altered source versions must be plainly marked as such, and
       must not be misrepresented as being the original software.
 
-   3. This notice may not be removed or altered from any source 
+   3. This notice may not be removed or altered from any source
       distribution.
 
    The original version of this library can be located at:
@@ -66,10 +66,10 @@ BEGIN_AS_NAMESPACE
 // TODO: How to avoid global variables keeping code alive? For example a script object, or a funcdef?
 //       Can I do a quick check of the object types and functions to count number of outside references, and then do another
 //       check over the global variables to subtract the outside references coming from these? What if the outside reference
-//       is added by an application type in a global variable that the engine doesn't know about? Example, a global dictionary 
+//       is added by an application type in a global variable that the engine doesn't know about? Example, a global dictionary
 //       holding object instances. Should discarding a module immediately destroy the content of the global variables? What if
 //       a live object tries to access the global variable after it has been discarded? Throwing a script exception is acceptable?
-//       Perhaps I need to allow the user to provide a clean-up routine that will be executed before destroying the objects. 
+//       Perhaps I need to allow the user to provide a clean-up routine that will be executed before destroying the objects.
 //       Or I might just put that responsibility on the application.
 
 
@@ -93,7 +93,7 @@ asCModule::~asCModule()
 {
 	InternalReset();
 
-	// The builder is not removed by InternalReset because it holds the script 
+	// The builder is not removed by InternalReset because it holds the script
 	// sections that will be built, so we need to explictly remove it now if it exists
 	if( builder )
 	{
@@ -137,7 +137,7 @@ void asCModule::Discard()
 	asCScriptEngine *lEngine = engine;
 
 	// Instead of deleting the module immediately, move it to the discarded pile
-	// This will turn it invisible to the application, yet keep it alive until all 
+	// This will turn it invisible to the application, yet keep it alive until all
 	// external references to its entities have been released.
 	ACQUIREEXCLUSIVE(engine->engineRWLock);
 	if( lEngine->lastModule == this )
@@ -313,7 +313,7 @@ int asCModule::Build()
 #else
 	TimeIt("asCModule::Build");
 
-	// Don't allow the module to be rebuilt if there are still 
+	// Don't allow the module to be rebuilt if there are still
 	// external references that will need the previous code
 	// TODO: 2.30.0: interface: The asIScriptModule must have a method for querying if the module is used
 	if( HasExternalReferences(false) )
@@ -348,7 +348,7 @@ int asCModule::Build()
 	r = builder->Build();
 	asDELETE(builder,asCBuilder);
 	builder = 0;
-	
+
 	if( r < 0 )
 	{
 		// Reset module again
@@ -385,7 +385,7 @@ int asCModule::Build()
 // interface
 int asCModule::ResetGlobalVars(asIScriptContext *ctx)
 {
-	if( isGlobalVarInitialized ) 
+	if( isGlobalVarInitialized )
 		CallExit();
 
 	return CallInit(ctx);
@@ -400,7 +400,7 @@ asIScriptFunction *asCModule::GetFunctionByIndex(asUINT index) const
 // internal
 int asCModule::CallInit(asIScriptContext *myCtx)
 {
-	if( isGlobalVarInitialized ) 
+	if( isGlobalVarInitialized )
 		return asERROR;
 
 	// Each global variable needs to be cleared individually
@@ -440,19 +440,19 @@ int asCModule::CallInit(asIScriptContext *myCtx)
 					asCScriptFunction *func = desc->GetInitFunc();
 
 					engine->WriteMessage(func->scriptData->scriptSectionIdx >= 0 ? engine->scriptSectionNames[func->scriptData->scriptSectionIdx]->AddressOf() : "",
-										 func->GetLineNumber(0, 0) & 0xFFFFF, 
+										 func->GetLineNumber(0, 0) & 0xFFFFF,
 										 func->GetLineNumber(0, 0) >> 20,
 										 asMSGTYPE_ERROR,
 										 msg.AddressOf());
-										 
+
 					if( r == asEXECUTION_EXCEPTION )
 					{
 						const asIScriptFunction *function = ctx->GetExceptionFunction();
 
 						msg.Format(TXT_EXCEPTION_s_IN_s, ctx->GetExceptionString(), function->GetDeclaration());
 
-						engine->WriteMessage(function->GetScriptSectionName(), 
-											 ctx->GetExceptionLineNumber(), 
+						engine->WriteMessage(function->GetScriptSectionName(),
+											 ctx->GetExceptionLineNumber(),
 											 0,
 											 asMSGTYPE_INFORMATION,
 											 msg.AddressOf());
@@ -468,9 +468,9 @@ int asCModule::CallInit(asIScriptContext *myCtx)
 		ctx = 0;
 	}
 
-	// Even if the initialization failed we need to set the 
+	// Even if the initialization failed we need to set the
 	// flag that the variables have been initialized, otherwise
-	// the module won't free those variables that really were 
+	// the module won't free those variables that really were
 	// initialized.
 	isGlobalVarInitialized = true;
 
@@ -524,7 +524,7 @@ bool asCModule::HasExternalReferences(bool shuttingDown)
 {
 	// Check all entiteis in the module for any external references.
 	// If there are any external references the module cannot be deleted yet.
-	
+
 	for( asUINT n = 0; n < scriptFunctions.GetLength(); n++ )
 		if( scriptFunctions[n] && scriptFunctions[n]->externalRefCount.get() )
 		{
@@ -602,7 +602,7 @@ void asCModule::InternalReset()
 	// Remove all global functions
 	globalFunctions.Clear();
 
-	// Destroy the internals of the global properties here, but do not yet remove them from the 
+	// Destroy the internals of the global properties here, but do not yet remove them from the
 	// engine, because functions need the engine's varAddressMap to get to the property. If the
 	// property is removed already, it may leak as the refCount doesn't reach 0.
 	asCSymbolTableIterator<asCGlobalProperty> globIt = scriptGlobals.List();
@@ -816,7 +816,7 @@ int asCModule::GetImportedFunctionIndexByDecl(const char *decl) const
 	int id = -1;
 	for( asUINT n = 0; n < bindInformations.GetLength(); ++n )
 	{
-		if( func.name == bindInformations[n]->importedFunctionSignature->name && 
+		if( func.name == bindInformations[n]->importedFunctionSignature->name &&
 			func.returnType == bindInformations[n]->importedFunctionSignature->returnType &&
 			func.parameterTypes.GetLength() == bindInformations[n]->importedFunctionSignature->parameterTypes.GetLength() )
 		{
@@ -999,7 +999,7 @@ int asCModule::GetGlobalVarIndexByDecl(const char *decl) const
 void *asCModule::GetAddressOfGlobalVar(asUINT index)
 {
 	asCGlobalProperty *prop = scriptGlobals.Get(index);
-	if( !prop ) 
+	if( !prop )
 		return 0;
 
 	// For object variables it's necessary to dereference the pointer to get the address of the value
@@ -1050,10 +1050,10 @@ asUINT asCModule::GetObjectTypeCount() const
 	return (asUINT)classTypes.GetLength();
 }
 
-// interface 
+// interface
 asIObjectType *asCModule::GetObjectTypeByIndex(asUINT index) const
 {
-	if( index >= classTypes.GetLength() ) 
+	if( index >= classTypes.GetLength() )
 		return 0;
 
 	return classTypes[index];
@@ -1142,7 +1142,7 @@ int asCModule::GetEnumValueCount(int enumTypeId) const
 {
 	asCDataType dt = engine->GetDataTypeFromTypeId(enumTypeId);
 	asCObjectType *t = dt.GetObjectType();
-	if( t == 0 || !(t->GetFlags() & asOBJ_ENUM) ) 
+	if( t == 0 || !(t->GetFlags() & asOBJ_ENUM) )
 		return asINVALID_TYPE;
 
 	return (int)t->enumValues.GetLength();
@@ -1153,7 +1153,7 @@ const char *asCModule::GetEnumValueByIndex(int enumTypeId, asUINT index, int *ou
 {
 	asCDataType dt = engine->GetDataTypeFromTypeId(enumTypeId);
 	asCObjectType *t = dt.GetObjectType();
-	if( t == 0 || !(t->GetFlags() & asOBJ_ENUM) ) 
+	if( t == 0 || !(t->GetFlags() & asOBJ_ENUM) )
 		return 0;
 
 	if( index >= t->enumValues.GetLength() )
@@ -1178,7 +1178,7 @@ const char *asCModule::GetTypedefByIndex(asUINT index, int *typeId, const char *
 		return 0;
 
 	if( typeId )
-		*typeId = engine->GetTypeIdFromDataType(typeDefs[index]->templateSubTypes[0]); 
+		*typeId = engine->GetTypeIdFromDataType(typeDefs[index]->templateSubTypes[0]);
 
 	if( nameSpace )
 		*nameSpace = typeDefs[index]->nameSpace->name.AddressOf();
@@ -1266,7 +1266,7 @@ int asCModule::AddScriptFunction(int sectionIdx, int declaredAt, int id, const a
 	return 0;
 }
 
-// internal 
+// internal
 int asCModule::AddScriptFunction(asCScriptFunction *func)
 {
 	scriptFunctions.PushLast(func);
@@ -1345,7 +1345,7 @@ int asCModule::BindImportedFunction(asUINT index, asIScriptFunction *func)
 		return asINVALID_ARG;
 
 	asCScriptFunction *src = engine->GetScriptFunction(func->GetId());
-	if( src == 0 ) 
+	if( src == 0 )
 		return asNO_FUNCTION;
 
 	// Verify return type
@@ -1468,12 +1468,12 @@ asCObjectType *asCModule::GetObjectType(const char *type, asSNameSpace *ns)
 			return classTypes[n];
 
 	for( n = 0; n < enumTypes.GetLength(); n++ )
-		if( enumTypes[n]->name == type && 
+		if( enumTypes[n]->name == type &&
 			enumTypes[n]->nameSpace == ns )
 			return enumTypes[n];
 
 	for( n = 0; n < typeDefs.GetLength(); n++ )
-		if( typeDefs[n]->name == type && 
+		if( typeDefs[n]->name == type &&
 			typeDefs[n]->nameSpace == ns )
 			return typeDefs[n];
 
@@ -1540,7 +1540,7 @@ int asCModule::LoadByteCode(asIBinaryStream *in, bool *wasDebugInfoStripped)
 {
 	if( in == 0 ) return asINVALID_ARG;
 
-	// Don't allow the module to be rebuilt if there are still 
+	// Don't allow the module to be rebuilt if there are still
 	// external references that will need the previous code
 	if( HasExternalReferences(false) )
 	{
@@ -1612,12 +1612,12 @@ int asCModule::CompileGlobalVar(const char *sectionName, const char *code, int l
 	// Initialize the variable
 	if( r >= 0 && engine->ep.initGlobalVarsAfterBuild )
 	{
-		// Clear the memory 
+		// Clear the memory
 		asCGlobalProperty *prop = scriptGlobals.GetLast();
 		if( prop )
 		{
 			memset(prop->GetAddressOfValue(), 0, sizeof(asDWORD)*prop->type.GetSizeOnStackDWords());
-	
+
 			if( prop->GetInitFunc() )
 			{
 				// Call the init function for the global variable
@@ -1625,11 +1625,11 @@ int asCModule::CompileGlobalVar(const char *sectionName, const char *code, int l
 				int r = engine->CreateContext(&ctx, true);
 				if( r < 0 )
 					return r;
-	
+
 				r = ctx->Prepare(prop->GetInitFunc());
 				if( r >= 0 )
 					r = ctx->Execute();
-	
+
 				ctx->Release();
 			}
 		}
@@ -1642,7 +1642,7 @@ int asCModule::CompileGlobalVar(const char *sectionName, const char *code, int l
 // interface
 int asCModule::CompileFunction(const char *sectionName, const char *code, int lineOffset, asDWORD compileFlags, asIScriptFunction **outFunc)
 {
-	// Make sure the outFunc is null if the function fails, so the 
+	// Make sure the outFunc is null if the function fails, so the
 	// application doesn't attempt to release a non-existent function
 	if( outFunc )
 		*outFunc = 0;
@@ -1655,7 +1655,7 @@ int asCModule::CompileFunction(const char *sectionName, const char *code, int li
 	return asNOT_SUPPORTED;
 #else
 	// Validate arguments
-	if( code == 0 || 
+	if( code == 0 ||
 		(compileFlags != 0 && compileFlags != asCOMP_ADD_TO_MODULE) )
 		return asINVALID_ARG;
 
@@ -1701,7 +1701,7 @@ int asCModule::CompileFunction(const char *sectionName, const char *code, int li
 int asCModule::RemoveFunction(asIScriptFunction *func)
 {
 	// TODO: 2.30.0: redesign: Check if there are any references before removing the function
-	//                         if there are, just hide it from the visible but do not destroy or 
+	//                         if there are, just hide it from the visible but do not destroy or
 	//                         remove it from the module.
 	//
 	//                         Only if the function has no live references, nor internal references

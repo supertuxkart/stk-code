@@ -41,7 +41,7 @@
 // Useful references for the System V AMD64 ABI:
 // http://eli.thegreenplace.net/2011/09/06/stack-frame-layout-on-x86-64/
 // http://math-atlas.sourceforge.net/devel/assembly/abi_sysV_amd64.pdf
- 
+
 #include "as_config.h"
 
 #ifndef AS_MAX_PORTABILITY
@@ -61,10 +61,10 @@ typedef asQWORD ( *funcptr_t )( void );
 #define MAX_CALL_SSE_REGISTERS    8
 #define X64_CALLSTACK_SIZE        ( X64_MAX_ARGS + MAX_CALL_SSE_REGISTERS + 3 )
 
-// Note to self: Always remember to inform the used registers on the clobber line, 
+// Note to self: Always remember to inform the used registers on the clobber line,
 // so that the gcc optimizer doesn't try to use them for other things
 
-static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, int cnt, funcptr_t func, asQWORD &retQW2, bool returnFloat) 
+static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, int cnt, funcptr_t func, asQWORD &retQW2, bool returnFloat)
 {
 	// Need to flag the variable as volatile so the compiler doesn't optimize out the variable
 	volatile asQWORD retQW1 = 0;
@@ -82,7 +82,7 @@ static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, i
 	// Make sure the stack unwind logic knows we've backed up the stack pointer in register r15
 		" .cfi_def_cfa_register r15 \n"
 
-	// Skip the first 128 bytes on the stack frame, called "red zone",  
+	// Skip the first 128 bytes on the stack frame, called "red zone",
 	// that might be used by the compiler to store temporary values
 		"  sub $128, %%rsp \n"
 
@@ -150,9 +150,9 @@ static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, i
 		"endcall: \n"
 
 		: : "r" ((asQWORD)cnt), "r" (args), "r" (func), "m" (retQW1), "m" (retQW2), "m" (returnFloat)
-		: "%xmm0", "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5", "%xmm6", "%xmm7", 
+		: "%xmm0", "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5", "%xmm6", "%xmm7",
 		  "%rdi", "%rsi", "%rax", "%rdx", "%rcx", "%r8", "%r9", "%r10", "%r11", "%r15");
-		
+
 	return retQW1;
 }
 
@@ -176,7 +176,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	int                         argIndex           = 0;
 	funcptr_t                   func               = (funcptr_t)sysFunc->func;
 
-	if( sysFunc->hostReturnInMemory ) 
+	if( sysFunc->hostReturnInMemory )
 	{
 		// The return is made in memory
 		callConv++;
@@ -184,7 +184,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 #ifdef AS_NO_THISCALL_FUNCTOR_METHOD
 	// Determine the real function pointer in case of virtual method
-	if ( obj && ( callConv == ICC_VIRTUAL_THISCALL || callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM ) ) 
+	if ( obj && ( callConv == ICC_VIRTUAL_THISCALL || callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM ) )
 #else
 	if ( obj && ( callConv == ICC_VIRTUAL_THISCALL ||
 		callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM ||
@@ -198,14 +198,14 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		func = vftable[FuncPtrToUInt(asFUNCTION_t(func)) >> 3];
 	}
 
-	// Determine the type of the arguments, and prepare the input array for the X64_CallFunction 
+	// Determine the type of the arguments, and prepare the input array for the X64_CallFunction
 	asQWORD  paramBuffer[X64_CALLSTACK_SIZE] = { 0 };
 	asBYTE	 argsType[X64_CALLSTACK_SIZE] = { 0 };
 
-	switch ( callConv ) 
+	switch ( callConv )
 	{
 		case ICC_CDECL_RETURNINMEM:
-		case ICC_STDCALL_RETURNINMEM: 
+		case ICC_STDCALL_RETURNINMEM:
 		{
 			paramBuffer[0] = (asPWORD)retPointer;
 			argsType[0] = x64INTARG;
@@ -221,7 +221,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 #endif
 		case ICC_THISCALL:
 		case ICC_VIRTUAL_THISCALL:
-		case ICC_CDECL_OBJFIRST: 
+		case ICC_CDECL_OBJFIRST:
 		{
 			paramBuffer[0] = (asPWORD)obj;
 			argsType[0] = x64INTARG;
@@ -237,7 +237,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 #endif
 		case ICC_THISCALL_RETURNINMEM:
 		case ICC_VIRTUAL_THISCALL_RETURNINMEM:
-		case ICC_CDECL_OBJFIRST_RETURNINMEM: 
+		case ICC_CDECL_OBJFIRST_RETURNINMEM:
 		{
 			paramBuffer[0] = (asPWORD)retPointer;
 			paramBuffer[1] = (asPWORD)obj;
@@ -277,7 +277,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		case ICC_CDECL_OBJLAST:
 			param_post = 1;
 			break;
-		case ICC_CDECL_OBJLAST_RETURNINMEM: 
+		case ICC_CDECL_OBJLAST_RETURNINMEM:
 		{
 			paramBuffer[0] = (asPWORD)retPointer;
 			argsType[0] = x64INTARG;
@@ -290,24 +290,24 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	}
 
 	int argumentCount = ( int )descr->parameterTypes.GetLength();
-	for( int a = 0; a < argumentCount; ++a ) 
+	for( int a = 0; a < argumentCount; ++a )
 	{
 		const asCDataType &parmType = descr->parameterTypes[a];
-		if( parmType.IsFloatType() && !parmType.IsReference() ) 
+		if( parmType.IsFloatType() && !parmType.IsReference() )
 		{
 			argsType[argIndex] = x64FLOATARG;
 			memcpy(paramBuffer + argIndex, stack_pointer, sizeof(float));
 			argIndex++;
 			stack_pointer++;
 		}
-		else if( parmType.IsDoubleType() && !parmType.IsReference() ) 
+		else if( parmType.IsDoubleType() && !parmType.IsReference() )
 		{
 			argsType[argIndex] = x64FLOATARG;
 			memcpy(paramBuffer + argIndex, stack_pointer, sizeof(double));
 			argIndex++;
 			stack_pointer += 2;
 		}
-		else if( IsVariableArgument( parmType ) ) 
+		else if( IsVariableArgument( parmType ) )
 		{
 			// The variable args are really two, one pointer and one type id
 			argsType[argIndex] = x64INTARG;
@@ -318,7 +318,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			stack_pointer += 3;
 		}
 		else if( parmType.IsPrimitive() ||
-		         parmType.IsReference() || 
+		         parmType.IsReference() ||
 		         parmType.IsObjectHandle() )
 		{
 			argsType[argIndex] = x64INTARG;
@@ -428,9 +428,9 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	int     used_sse_regs   = 0;
 	int     used_stack_args = 0;
 	int     idx             = 0;
-	for ( n = 0; ( n < totalArgumentCount ) && ( used_int_regs < MAX_CALL_INT_REGISTERS ); n++ ) 
+	for ( n = 0; ( n < totalArgumentCount ) && ( used_int_regs < MAX_CALL_INT_REGISTERS ); n++ )
 	{
-		if ( argsType[n] == x64INTARG ) 
+		if ( argsType[n] == x64INTARG )
 		{
 			argsSet[n] = 1;
 			tempBuff[idx++] = paramBuffer[n];
@@ -438,9 +438,9 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		}
 	}
 	idx = MAX_CALL_INT_REGISTERS;
-	for ( n = 0; ( n < totalArgumentCount ) && ( used_sse_regs < MAX_CALL_SSE_REGISTERS ); n++ ) 
+	for ( n = 0; ( n < totalArgumentCount ) && ( used_sse_regs < MAX_CALL_SSE_REGISTERS ); n++ )
 	{
-		if ( argsType[n] == x64FLOATARG ) 
+		if ( argsType[n] == x64FLOATARG )
 		{
 			argsSet[n] = 1;
 			tempBuff[idx++] = paramBuffer[n];
@@ -448,9 +448,9 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		}
 	}
 	idx = MAX_CALL_INT_REGISTERS + MAX_CALL_SSE_REGISTERS;
-	for ( n = totalArgumentCount - 1; n >= 0; n-- ) 
+	for ( n = totalArgumentCount - 1; n >= 0; n-- )
 	{
-		if ( !argsSet[n] ) 
+		if ( !argsSet[n] )
 		{
 			tempBuff[idx++] = paramBuffer[n];
 			used_stack_args++;

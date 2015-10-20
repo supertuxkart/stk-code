@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Stan Melax http://www.melax.com/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -33,7 +33,7 @@ void Swap(T &a,T &b)
 
 //----------------------------------
 
-class int3  
+class int3
 {
 public:
 	int x,y,z;
@@ -71,7 +71,7 @@ btVector3  ThreePlaneIntersection(const btPlane &p0,const btPlane &p1, const btP
 	btScalar quotient = (N1.dot(n2n3));
 
 	btAssert(btFabs(quotient) > btScalar(0.000001));
-	
+
 	quotient = btScalar(-1.) / quotient;
 	n2n3 *= p0.dist;
 	n3n1 *= p1.dist;
@@ -125,14 +125,14 @@ btScalar DistanceBetweenLines(const btVector3 &ustart, const btVector3 &udir, co
 	btScalar distu = -btDot(cp,ustart);
 	btScalar distv = -btDot(cp,vstart);
 	btScalar dist = (btScalar)fabs(distu-distv);
-	if(upoint) 
+	if(upoint)
 		{
 		btPlane plane;
 		plane.normal = btCross(vdir,cp).normalized();
 		plane.dist = -btDot(plane.normal,vstart);
 		*upoint = PlaneLineIntersection(plane,ustart,ustart+udir);
 	}
-	if(vpoint) 
+	if(vpoint)
 		{
 		btPlane plane;
 		plane.normal = btCross(udir,cp).normalized();
@@ -192,7 +192,7 @@ public:
 	unsigned char undermap;
 	unsigned char overmap;
 };
-class EdgeFlag 
+class EdgeFlag
 {
 public:
 	unsigned char planetest;
@@ -225,7 +225,7 @@ int maxdirfiltered(const T *p,int count,const T &dir,btAlignedObjectArray<int> &
 {
 	btAssert(count);
 	int m=-1;
-	for(int i=0;i<count;i++) 
+	for(int i=0;i<count;i++)
 		if(allow[i])
 		{
 			if(m==-1 || btDot(p[i],dir)>btDot(p[m],dir))
@@ -233,7 +233,7 @@ int maxdirfiltered(const T *p,int count,const T &dir,btAlignedObjectArray<int> &
 		}
 	btAssert(m!=-1);
 	return m;
-} 
+}
 
 btVector3 orth(const btVector3 &v);
 btVector3 orth(const btVector3 &v)
@@ -293,15 +293,15 @@ int maxdirsterid(const T *p,int count,const T &dir,btAlignedObjectArray<int> &al
 	}
 	btAssert(0);
 	return m;
-} 
+}
 
 
 
 
 int operator ==(const int3 &a,const int3 &b);
-int operator ==(const int3 &a,const int3 &b) 
+int operator ==(const int3 &a,const int3 &b)
 {
-	for(int i=0;i<3;i++) 
+	for(int i=0;i<3;i++)
 	{
 		if(a[i]!=b[i]) return 0;
 	}
@@ -310,7 +310,7 @@ int operator ==(const int3 &a,const int3 &b)
 
 
 int above(btVector3* vertices,const int3& t, const btVector3 &p, btScalar epsilon);
-int above(btVector3* vertices,const int3& t, const btVector3 &p, btScalar epsilon) 
+int above(btVector3* vertices,const int3& t, const btVector3 &p, btScalar epsilon)
 {
 	btVector3 n=TriNormal(vertices[t[0]],vertices[t[1]],vertices[t[2]]);
 	return (btDot(n,p-vertices[t[0]]) > epsilon); // EPSILON???
@@ -369,7 +369,7 @@ int &btHullTriangle::neib(int a,int b)
 {
 	static int er=-1;
 	int i;
-	for(i=0;i<3;i++) 
+	for(i=0;i<3;i++)
 	{
 		int i1=(i+1)%3;
 		int i2=(i+2)%3;
@@ -382,7 +382,7 @@ int &btHullTriangle::neib(int a,int b)
 void HullLibrary::b2bfix(btHullTriangle* s,btHullTriangle*t)
 {
 	int i;
-	for(i=0;i<3;i++) 
+	for(i=0;i<3;i++)
 	{
 		int i1=(i+1)%3;
 		int i2=(i+2)%3;
@@ -489,11 +489,11 @@ btHullTriangle* HullLibrary::extrudable(btScalar epsilon)
 int4 HullLibrary::FindSimplex(btVector3 *verts,int verts_count,btAlignedObjectArray<int> &allow)
 {
 	btVector3 basis[3];
-	basis[0] = btVector3( btScalar(0.01), btScalar(0.02), btScalar(1.0) );      
-	int p0 = maxdirsterid(verts,verts_count, basis[0],allow);   
+	basis[0] = btVector3( btScalar(0.01), btScalar(0.02), btScalar(1.0) );
+	int p0 = maxdirsterid(verts,verts_count, basis[0],allow);
 	int	p1 = maxdirsterid(verts,verts_count,-basis[0],allow);
 	basis[0] = verts[p0]-verts[p1];
-	if(p0==p1 || basis[0]==btVector3(0,0,0)) 
+	if(p0==p1 || basis[0]==btVector3(0,0,0))
 		return int4(-1,-1,-1,-1);
 	basis[1] = btCross(btVector3(     btScalar(1),btScalar(0.02), btScalar(0)),basis[0]);
 	basis[2] = btCross(btVector3(btScalar(-0.02),     btScalar(1), btScalar(0)),basis[0]);
@@ -509,13 +509,13 @@ int4 HullLibrary::FindSimplex(btVector3 *verts,int verts_count,btAlignedObjectAr
 	{
 		p2 = maxdirsterid(verts,verts_count,-basis[1],allow);
 	}
-	if(p2 == p0 || p2 == p1) 
+	if(p2 == p0 || p2 == p1)
 		return int4(-1,-1,-1,-1);
 	basis[1] = verts[p2] - verts[p0];
 	basis[2] = btCross(basis[1],basis[0]).normalized();
 	int p3 = maxdirsterid(verts,verts_count,basis[2],allow);
 	if(p3==p0||p3==p1||p3==p2) p3 = maxdirsterid(verts,verts_count,-basis[2],allow);
-	if(p3==p0||p3==p1||p3==p2) 
+	if(p3==p0||p3==p1||p3==p2)
 		return int4(-1,-1,-1,-1);
 	btAssert(!(p0==p1||p0==p2||p0==p3||p1==p2||p1==p3||p2==p3));
 	if(btDot(verts[p3]-verts[p0],btCross(verts[p1]-verts[p0],verts[p2]-verts[p0])) <0) {Swap(p2,p3);}
@@ -533,7 +533,7 @@ int HullLibrary::calchullgen(btVector3 *verts,int verts_count, int vlimit)
 	btAlignedObjectArray<int> allow;
 	allow.reserve(verts_count);
 
-	for(j=0;j<verts_count;j++) 
+	for(j=0;j<verts_count;j++)
 	{
 		allow.push_back(1);
 		isextreme.push_back(0);
@@ -580,7 +580,7 @@ int HullLibrary::calchullgen(btVector3 *verts,int verts_count, int vlimit)
 		while(j--) {
 			if(!m_tris[j]) continue;
 			int3 t=*m_tris[j];
-			if(above(verts,t,verts[v],btScalar(0.01)*epsilon)) 
+			if(above(verts,t,verts[v],btScalar(0.01)*epsilon))
 			{
 				extrude(m_tris[j],v);
 			}
@@ -597,9 +597,9 @@ int HullLibrary::calchullgen(btVector3 *verts,int verts_count, int vlimit)
 				btHullTriangle *nb = m_tris[m_tris[j]->n[0]];
 				btAssert(nb);btAssert(!hasvert(*nb,v));btAssert(nb->id<j);
 				extrude(nb,v);
-				j=m_tris.size(); 
+				j=m_tris.size();
 			}
-		} 
+		}
 		j=m_tris.size();
 		while(j--)
 		{
@@ -608,7 +608,7 @@ int HullLibrary::calchullgen(btVector3 *verts,int verts_count, int vlimit)
 			if(t->vmax>=0) break;
 			btVector3 n=TriNormal(verts[(*t)[0]],verts[(*t)[1]],verts[(*t)[2]]);
 			t->vmax = maxdirsterid(verts,verts_count,n,allow);
-			if(isextreme[t->vmax]) 
+			if(isextreme[t->vmax])
 			{
 				t->vmax=-1; // already done that vertex - algorithm needs to be able to terminate.
 			}
@@ -622,7 +622,7 @@ int HullLibrary::calchullgen(btVector3 *verts,int verts_count, int vlimit)
 	return 1;
 }
 
-int HullLibrary::calchull(btVector3 *verts,int verts_count, TUIntArray& tris_out, int &tris_count,int vlimit) 
+int HullLibrary::calchull(btVector3 *verts,int verts_count, TUIntArray& tris_out, int &tris_count,int vlimit)
 {
 	int rc=calchullgen(verts,verts_count,  vlimit) ;
 	if(!rc) return 0;
@@ -640,7 +640,7 @@ int HullLibrary::calchull(btVector3 *verts,int verts_count, TUIntArray& tris_out
 	}
 	tris_count = ts.size()/3;
 	tris_out.resize(ts.size());
-	
+
 	for (i=0;i<ts.size();i++)
 	{
 		tris_out[i] = static_cast<unsigned int>(ts[i]);
@@ -656,7 +656,7 @@ int HullLibrary::calchull(btVector3 *verts,int verts_count, TUIntArray& tris_out
 
 bool HullLibrary::ComputeHull(unsigned int vcount,const btVector3 *vertices,PHullResult &result,unsigned int vlimit)
 {
-	
+
 	int    tris_count;
 	int ret = calchull( (btVector3 *) vertices, (int) vcount, result.m_Indices, tris_count, static_cast<int>(vlimit) );
 	if(!ret) return false;
@@ -1029,7 +1029,7 @@ bool  HullLibrary::CleanupVertices(unsigned int svcount,
 						v[0] = px;
 						v[1] = py;
 						v[2] = pz;
-						
+
 					}
 
 					break;
@@ -1166,9 +1166,9 @@ void HullLibrary::BringOutYourDead(const btVector3* verts,unsigned int vcount, b
 
 			usedIndices[static_cast<int>(v)] = ocount; // assign new index remapping
 
-		
+
 		}
 	}
 
-	
+
 }

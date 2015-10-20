@@ -20,20 +20,20 @@
 #include "graphics/sphericalHarmonics.hpp"
 #include "utils/log.hpp"
 
-#include <algorithm> 
+#include <algorithm>
 #include <cassert>
 #include <irrlicht.h>
 
 using namespace irr;
 
-namespace 
+namespace
 {
     /** Convert an unsigned char cubemap texture to a float texture
      *  \param sh_rgba The 6 faces of the cubemap texture
      *  \param sh_w Texture width
      *  \param sh_h Texture height
      *  \param[out] float_tex_cube The converted float cubemap texture
-     */    
+     */
     void convertToFloatTexture(unsigned char *sh_rgba[6], unsigned sh_w, unsigned sh_h, Color *float_tex_cube[6])
     {
         for (unsigned i = 0; i < 6; i++)
@@ -45,17 +45,17 @@ namespace
                 float_tex_cube[i][j].Green = powf(float(0xFF & sh_rgba[i][4 * j + 1]) / 255.f, 2.2f);
                 float_tex_cube[i][j].Red = powf(float(0xFF & sh_rgba[i][4 * j + 2]) / 255.f, 2.2f);
             }
-        }    
+        }
     } //convertToFloatTexture
 
     // ------------------------------------------------------------------------
     /** Print the nine first spherical harmonics coefficients
      *  \param SH_coeff The nine spherical harmonics coefficients
-     */  
+     */
     void displayCoeff(float *SH_coeff)
     {
         Log::debug("SphericalHarmonics", "L00:%f", SH_coeff[0]);
-        Log::debug("SphericalHarmonics", "L1-1:%f, L10:%f, L11:%f", 
+        Log::debug("SphericalHarmonics", "L1-1:%f, L10:%f, L11:%f",
                    SH_coeff[1], SH_coeff[2], SH_coeff[3]);
         Log::debug("SphericalHarmonics", "L2-2:%f, L2-1:%f, L20:%f, L21:%f, L22:%f",
                    SH_coeff[4], SH_coeff[5], SH_coeff[6], SH_coeff[7], SH_coeff[8]);
@@ -73,23 +73,23 @@ namespace
      */
     float getTexelValue(unsigned i, unsigned j, size_t width, size_t height,
                         float *Coeff, float *Y00, float *Y1minus1,
-                        float *Y10, float *Y11, float *Y2minus2, 
+                        float *Y10, float *Y11, float *Y2minus2,
                         float * Y2minus1, float * Y20, float *Y21,
                         float *Y22)
     {
         float solidangle = 1.;
         size_t idx = i * height + j;
         float reconstructedVal = Y00[idx] * Coeff[0];
-        reconstructedVal += Y1minus1[i * height + j] * Coeff[1] 
-                         +  Y10[i * height + j] * Coeff[2] 
+        reconstructedVal += Y1minus1[i * height + j] * Coeff[1]
+                         +  Y10[i * height + j] * Coeff[2]
                          +  Y11[i * height + j] * Coeff[3];
-        reconstructedVal += Y2minus2[idx] * Coeff[4] 
+        reconstructedVal += Y2minus2[idx] * Coeff[4]
                          + Y2minus1[idx] * Coeff[5] + Y20[idx] * Coeff[6]
                          + Y21[idx] * Coeff[7] + Y22[idx] * Coeff[8];
         reconstructedVal /= solidangle;
         return std::max(255.0f * reconstructedVal, 0.f);
     }   // getTexelValue
-    
+
     // ------------------------------------------------------------------------
     /** Return a normalized vector aiming at a texel on a cubemap
      *  \param face The face of the cubemap
@@ -98,7 +98,7 @@ namespace
      *  \param x The x vector component
      *  \param y The y vector component
      *  \param z The z vector component
-     */    
+     */
     void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
     {
         switch (face)
@@ -188,7 +188,7 @@ namespace
             }
         }
     }
-    
+
 } //namespace
 
 // ----------------------------------------------------------------------------
@@ -376,7 +376,7 @@ SphericalHarmonics::SphericalHarmonics(const video::SColor &ambient)
 void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spherical_harmonics_textures)
 {
     assert(spherical_harmonics_textures.size() == 6);
-    
+
     m_spherical_harmonics_textures = spherical_harmonics_textures;
 
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
@@ -391,7 +391,7 @@ void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spher
 
     for (unsigned i = 0; i < 6; i++)
         sh_rgba[i] = new unsigned char[sh_w * sh_h * 4];
-    
+
     for (unsigned i = 0; i < 6; i++)
     {
         unsigned idx = texture_permutation[i];
@@ -416,19 +416,19 @@ void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spher
     {
         delete[] sh_rgba[i];
         delete[] float_tex_cube[i];
-    }    
+    }
 } //setSphericalHarmonicsTextures
 
 /** Compute spherical harmonics coefficients from ambient light */
 void SphericalHarmonics::setAmbientLight(const video::SColor &ambient)
-{    
+{
     //do not recompute SH coefficients if we already use the same ambient light
     if((m_spherical_harmonics_textures.size() != 6) && (ambient == m_ambient))
         return;
-        
+
     m_spherical_harmonics_textures.clear();
     m_ambient = ambient;
-    
+
     unsigned char *sh_rgba[6];
     unsigned sh_w = 16;
     unsigned sh_h = 16;
@@ -444,7 +444,7 @@ void SphericalHarmonics::setAmbientLight(const video::SColor &ambient)
             sh_rgba[i][j + 2] = ambient.getRed();
             sh_rgba[i][j + 3] = 255;
         }
-    }    
+    }
 
     Color *float_tex_cube[6];
     convertToFloatTexture(sh_rgba, sh_w, sh_h, float_tex_cube);
@@ -462,7 +462,7 @@ void SphericalHarmonics::setAmbientLight(const video::SColor &ambient)
         m_blue_SH_coeff[i] *= 4;
         m_green_SH_coeff[i] *= 4;
         m_red_SH_coeff[i] *= 4;
-    }    
+    }
 } //setAmbientLight
 
 // ----------------------------------------------------------------------------
@@ -473,7 +473,7 @@ void SphericalHarmonics::printCoeff() {
     Log::debug("SphericalHarmonics", "Green_SH:");
     displayCoeff(m_green_SH_coeff);
     Log::debug("SphericalHarmonics", "Red_SH:");
-    displayCoeff(m_red_SH_coeff);  
+    displayCoeff(m_red_SH_coeff);
 } //printCoeff
 
 // ----------------------------------------------------------------------------
@@ -482,7 +482,7 @@ void SphericalHarmonics::printCoeff() {
 *  \param height The texture height
 *  \param Yml The sphericals harmonics functions values
 *  \param[out] output The environment map texels values
-*/    
+*/
 void SphericalHarmonics::unprojectSH(size_t width, size_t height,
                                      float *Y00[], float *Y1minus1[], float *Y10[],
                                      float *Y11[], float *Y2minus2[], float *Y2minus1[],
@@ -504,12 +504,12 @@ void SphericalHarmonics::unprojectSH(size_t width, size_t height,
                                 Y1minus1[face], Y10[face], Y11[face],
                                 Y2minus2[face], Y2minus1[face], Y20[face],
                                 Y21[face], Y22[face]);
-                output[face][4 * height * i + 4 * j + 1] = 
+                output[face][4 * height * i + 4 * j + 1] =
                     getTexelValue(i, j, width, height, m_green_SH_coeff, Y00[face],
                                 Y1minus1[face], Y10[face], Y11[face],
                                 Y2minus2[face], Y2minus1[face], Y20[face],
                                 Y21[face], Y22[face]);
-                output[face][4 * height * i + 4 * j] = 
+                output[face][4 * height * i + 4 * j] =
                     getTexelValue(i, j, width, height, m_blue_SH_coeff, Y00[face],
                                 Y1minus1[face], Y10[face], Y11[face],
                                 Y2minus2[face], Y2minus1[face], Y20[face],

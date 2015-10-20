@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -38,7 +38,7 @@ btTriangleMeshShape::btTriangleMeshShape(btStridingMeshInterface* meshInterface)
 
 btTriangleMeshShape::~btTriangleMeshShape()
 {
-		
+
 }
 
 
@@ -50,8 +50,8 @@ void btTriangleMeshShape::getAabb(const btTransform& trans,btVector3& aabbMin,bt
 	btVector3 localHalfExtents = btScalar(0.5)*(m_localAabbMax-m_localAabbMin);
 	localHalfExtents += btVector3(getMargin(),getMargin(),getMargin());
 	btVector3 localCenter = btScalar(0.5)*(m_localAabbMax+m_localAabbMin);
-	
-	btMatrix3x3 abs_b = trans.getBasis().absolute();  
+
+	btMatrix3x3 abs_b = trans.getBasis().absolute();
 
 	btVector3 center = trans(localCenter);
 
@@ -92,7 +92,7 @@ public:
 
 	SupportVertexCallback(const btVector3& supportVecWorld,const btTransform& trans)
 		: m_supportVertexLocal(btScalar(0.),btScalar(0.),btScalar(0.)), m_worldTrans(trans) ,m_maxDot(btScalar(-BT_LARGE_FLOAT))
-		
+
 	{
 		m_supportVecLocal = supportVecWorld * m_worldTrans.getBasis();
 	}
@@ -124,7 +124,7 @@ public:
 
 };
 
-	
+
 void btTriangleMeshShape::setLocalScaling(const btVector3& scaling)
 {
 	m_meshInterface->setScaling(scaling);
@@ -167,7 +167,7 @@ void	btTriangleMeshShape::processAllTriangles(btTriangleCallback* callback,const
 				//check aabb in triangle-space, before doing this
 				m_callback->processTriangle(triangle,partId,triangleIndex);
 			}
-			
+
 		}
 
 	};
@@ -200,9 +200,9 @@ btVector3 btTriangleMeshShape::localGetSupportingVertex(const btVector3& vec) co
 	SupportVertexCallback supportCallback(vec,ident);
 
 	btVector3 aabbMax(btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT));
-	
+
 	processAllTriangles(&supportCallback,-aabbMax,aabbMax);
-		
+
 	supportVertex = supportCallback.GetSupportVertexLocal();
 
 	return supportVertex;

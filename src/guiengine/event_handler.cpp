@@ -65,7 +65,7 @@ bool EventHandler::OnEvent (const SEvent &event)
 
     if(!Debug::onEvent(event))
         return false;
-    
+
     // TO DEBUG HATS (when you don't actually have a hat)
     /*
     if (event.EventType == EET_KEY_INPUT_EVENT)
@@ -185,7 +185,7 @@ bool EventHandler::OnEvent (const SEvent &event)
         {
             Log::verbose("keyboard", "char %d key %d ctrl %d down %d shift %d",
                 event.KeyInput.Char, event.KeyInput.Key,
-                event.KeyInput.Control, event.KeyInput.PressedDown, 
+                event.KeyInput.Control, event.KeyInput.PressedDown,
                 event.KeyInput.Shift);
         }
         // FIXME? it may be a bit unclean that all input events go trough
@@ -535,7 +535,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
     if (!w->isActivated()) return EVENT_BLOCK;
 
     Widget* parent = w->m_event_handler;
-    
+
     if (ModalDialog::isADialogActive() && (parent == NULL || parent->m_type != GUIEngine::WTYPE_RIBBON))
     {
         if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]) == EVENT_BLOCK)

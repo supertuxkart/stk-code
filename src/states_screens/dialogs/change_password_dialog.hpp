@@ -66,7 +66,7 @@ private:
     GUIEngine::RibbonWidget * m_options_widget;
     GUIEngine::IconButtonWidget * m_submit_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
-    
+
     void submit();
 };
 

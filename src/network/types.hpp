@@ -155,7 +155,7 @@ public:
      */
     std::string toString(bool show_port = true) const
     {
-        std::string s = 
+        std::string s =
             StringUtils::insertValues("%d.%d.%d.%d",
                                  ((m_ip >> 24) & 0xff), ((m_ip >> 16) & 0xff),
                                  ((m_ip >>  8) & 0xff), ((m_ip >>  0) & 0xff));

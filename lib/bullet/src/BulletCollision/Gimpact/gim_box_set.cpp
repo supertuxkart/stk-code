@@ -123,7 +123,7 @@ void GIM_BOX_TREE::_build_sub_tree(gim_array<GIM_AABB_DATA> & primitive_boxes, G
 	btAssert((endIndex-startIndex)>0);
 
 	if((endIndex-startIndex) == 1) //we got a leaf
-	{		
+	{
 		m_node_array[current_index].m_left = 0;
 		m_node_array[current_index].m_right = 0;
 		m_node_array[current_index].m_escapeIndex = 0;
@@ -138,7 +138,7 @@ void GIM_BOX_TREE::_build_sub_tree(gim_array<GIM_AABB_DATA> & primitive_boxes, G
 	GUINT splitIndex;
 
 	//calc this node bounding box
-	m_node_array[current_index].m_bound.invalidate();	
+	m_node_array[current_index].m_bound.invalidate();
 	for (splitIndex=startIndex;splitIndex<endIndex;splitIndex++)
 	{
 		m_node_array[current_index].m_bound.merge(primitive_boxes[splitIndex].m_bound);
@@ -175,7 +175,7 @@ void GIM_BOX_TREE::build_tree(
 	m_num_nodes = 0;
 	// allocate nodes
 	m_node_array.resize(primitive_boxes.size()*2);
-	
+
 	_build_sub_tree(primitive_boxes, 0, primitive_boxes.size());
 }
 

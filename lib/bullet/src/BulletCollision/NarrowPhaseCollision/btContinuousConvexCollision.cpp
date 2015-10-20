@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -51,7 +51,7 @@ void btContinuousConvexCollision::computeClosestPoints( const btTransform& trans
 	if (m_convexB1)
 	{
 		m_simplexSolver->reset();
-		btGjkPairDetector gjk(m_convexA,m_convexB1,m_convexA->getShapeType(),m_convexB1->getShapeType(),m_convexA->getMargin(),m_convexB1->getMargin(),m_simplexSolver,m_penetrationDepthSolver);		
+		btGjkPairDetector gjk(m_convexA,m_convexB1,m_convexA->getShapeType(),m_convexB1->getShapeType(),m_convexA->getMargin(),m_convexB1->getMargin(),m_simplexSolver,m_penetrationDepthSolver);
 		btGjkPairDetector::ClosestPointInput input;
 		input.m_transformA = transA;
 		input.m_transformB = transB;
@@ -61,17 +61,17 @@ void btContinuousConvexCollision::computeClosestPoints( const btTransform& trans
 		//convex versus plane
 		const btConvexShape* convexShape = m_convexA;
 		const btStaticPlaneShape* planeShape = m_planeShape;
-		
+
 		bool hasCollision = false;
 		const btVector3& planeNormal = planeShape->getPlaneNormal();
 		const btScalar& planeConstant = planeShape->getPlaneConstant();
-		
+
 		btTransform convexWorldTransform = transA;
 		btTransform convexInPlaneTrans;
 		convexInPlaneTrans= transB.inverse() * convexWorldTransform;
 		btTransform planeInConvex;
 		planeInConvex= convexWorldTransform.inverse() * transB;
-		
+
 		btVector3 vtx = convexShape->localGetSupportingVertex(planeInConvex.getBasis()*-planeNormal);
 
 		btVector3 vtxInPlane = convexInPlaneTrans(vtx);
@@ -110,7 +110,7 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 	btVector3 relLinVel = (linVelB-linVelA);
 
 	btScalar relLinVelocLength = (linVelB-linVelA).length();
-	
+
 	if ((relLinVelocLength+maxAngularProjectedVelocity) == 0.f)
 		return false;
 
@@ -139,7 +139,7 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 	btPointCollector	pointCollector1;
 
 	{
-	
+
 		computeClosestPoints(fromA,fromB,pointCollector1);
 
 		hasResult = pointCollector1.m_hasResult;
@@ -166,15 +166,15 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 
 			projectedLinearVelocity = relLinVel.dot(n);
 
-			
+
 			//don't report time of impact for motion away from the contact normal (or causes minor penetration)
 			if ((projectedLinearVelocity+ maxAngularProjectedVelocity)<=SIMD_EPSILON)
 				return false;
-			
+
 			dLambda = dist / (projectedLinearVelocity+ maxAngularProjectedVelocity);
 
-			
-			
+
+
 			lambda = lambda + dLambda;
 
 			if (lambda > btScalar(1.))
@@ -193,7 +193,7 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 			}
 			lastLambda = lambda;
 
-			
+
 
 			//interpolate to next lambda
 			btTransform interpolatedTransA,interpolatedTransB,relativeTrans;
@@ -215,7 +215,7 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 			if (pointCollector.m_hasResult)
 			{
 				dist = pointCollector.m_distance+result.m_allowedPenetration;
-				c = pointCollector.m_pointInWorld;		
+				c = pointCollector.m_pointInWorld;
 				n = pointCollector.m_normalOnBInWorld;
 			} else
 			{
@@ -230,7 +230,7 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 				return false;
 			}
 		}
-	
+
 		result.m_fraction = lambda;
 		result.m_normal = n;
 		result.m_hitPoint = c;

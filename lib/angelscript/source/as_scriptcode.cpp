@@ -2,23 +2,23 @@
    AngelCode Scripting Library
    Copyright (c) 2003-2013 Andreas Jonsson
 
-   This software is provided 'as-is', without any express or implied 
-   warranty. In no event will the authors be held liable for any 
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any
    damages arising from the use of this software.
 
-   Permission is granted to anyone to use this software for any 
-   purpose, including commercial applications, and to alter it and 
+   Permission is granted to anyone to use this software for any
+   purpose, including commercial applications, and to alter it and
    redistribute it freely, subject to the following restrictions:
 
-   1. The origin of this software must not be misrepresented; you 
+   1. The origin of this software must not be misrepresented; you
       must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product 
+      this software in a product, an acknowledgment in the product
       documentation would be appreciated but is not required.
 
-   2. Altered source versions must be plainly marked as such, and 
+   2. Altered source versions must be plainly marked as such, and
       must not be misrepresented as being the original software.
 
-   3. This notice may not be removed or altered from any source 
+   3. This notice may not be removed or altered from any source
       distribution.
 
    The original version of this library can be located at:
@@ -52,7 +52,7 @@ asCScriptCode::asCScriptCode()
 
 asCScriptCode::~asCScriptCode()
 {
-	if( !sharedCode && code ) 
+	if( !sharedCode && code )
 	{
 		asDELETEARRAY(code);
 	}
@@ -67,7 +67,7 @@ int asCScriptCode::SetCode(const char *name, const char *code, size_t length, bo
 {
 	if( !code ) return asINVALID_ARG;
 	this->name = name ? name : "";
-	if( !sharedCode && this->code ) 
+	if( !sharedCode && this->code )
 		asDELETEARRAY(this->code);
 
 	if( length == 0 )
@@ -99,7 +99,7 @@ int asCScriptCode::SetCode(const char *name, const char *code, size_t length, bo
 
 void asCScriptCode::ConvertPosToRowCol(size_t pos, int *row, int *col)
 {
-	if( linePositions.GetLength() == 0 ) 
+	if( linePositions.GetLength() == 0 )
 	{
 		if( row ) *row = lineOffset;
 		if( col ) *col = 1;

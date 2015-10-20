@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -46,8 +46,8 @@ btCollisionObject::~btCollisionObject()
 {
 }
 
-void btCollisionObject::setActivationState(int newState) 
-{ 
+void btCollisionObject::setActivationState(int newState)
+{
 	if ( (m_activationState1 != DISABLE_DEACTIVATION) && (m_activationState1 != DISABLE_SIMULATION))
 		m_activationState1 = newState;
 }
@@ -90,7 +90,7 @@ const char* btCollisionObject::serialize(void* dataBuffer, btSerializer* seriali
 	dataOut->m_friction = m_friction;
 	dataOut->m_restitution = m_restitution;
 	dataOut->m_internalType = m_internalType;
-	
+
 	char* name = (char*) serializer->findNameForPointer(this);
 	dataOut->m_name = (char*)serializer->getUniquePointer(name);
 	if (dataOut->m_name)

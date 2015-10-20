@@ -178,7 +178,7 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-right",  2);
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
-    
+
     m_nitro_emitter_position[0] = Vec3 (0,0.1f,0);
     m_nitro_emitter_position[1] = Vec3 (0,0.1f,0);
     m_has_nitro_emitter = false;
@@ -258,7 +258,7 @@ KartModel::~KartModel()
         if (m_is_master)
         {
             // If there is only one copy left, it's the copy in irrlicht's
-            // mesh cache, so it can be removed. 
+            // mesh cache, so it can be removed.
             if (m_mesh && m_mesh->getReferenceCount() == 1)
             {
                 irr_driver->dropAllTextures(m_mesh);
@@ -300,11 +300,11 @@ KartModel* KartModel::makeCopy()
     km->m_animated_node     = NULL;
     km->m_hat_offset        = m_hat_offset;
     km->m_hat_name          = m_hat_name;
-    
+
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
     km->m_has_nitro_emitter = m_has_nitro_emitter;
-    
+
     for(unsigned int i=0; i<4; i++)
     {
         km->m_wheel_model[i]             = m_wheel_model[i];
@@ -317,7 +317,7 @@ KartModel* KartModel::makeCopy()
         km->m_max_suspension[i]             = m_max_suspension[i];
         km->m_dampen_suspension_amplitude[i]= m_dampen_suspension_amplitude[i];
     }
-    
+
     km->m_speed_weighted_objects.resize(m_speed_weighted_objects.size());
     for(size_t i=0; i<m_speed_weighted_objects.size(); i++)
     {
@@ -459,7 +459,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             obj.m_node = NULL;
             if(obj.m_model)
             {
-                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
+                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model,
                                                          "speedweighted", node);
                 obj.m_node->grab();
 
@@ -613,7 +613,7 @@ void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, const 
     SpeedWeightedObject obj;
     obj.m_properties    = fallback_properties;
     obj.m_properties.loadFromXMLNode(speed_weighted_node);
-    
+
     speed_weighted_node->get("position", &obj.m_position);
     speed_weighted_node->get("model",    &obj.m_name);
 
@@ -776,7 +776,7 @@ void KartModel::setDefaultSuspension()
 
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension
- *  updates the speed-weighted objects' animations. 
+ *  updates the speed-weighted objects' animations.
  *
  *  \param dt time since last frame
  *  \param distance How far the wheels have rotated since last time.
@@ -793,7 +793,7 @@ void KartModel::update(float dt, float distance, float steer,  float speed)
     {
        if (!m_kart || !m_wheel_node[i]) continue;
 #ifdef DEBUG
-       if (UserConfigParams::m_physics_debug && 
+       if (UserConfigParams::m_physics_debug &&
            !dynamic_cast<GhostKart*>(m_kart)     )
        {
            const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);

@@ -122,7 +122,7 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
         Log::warn("GLWrap", "    Severity : LOW");
         break;
     }
-    
+
     if (msg)
         Log::warn("GLWrap", "    Message : %s", msg);
 }
@@ -193,7 +193,7 @@ FrameBuffer::FrameBuffer() {}
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
                          bool layered)
-           : fbolayer(0), RenderTargets(RTTs), DepthTexture(0), 
+           : fbolayer(0), RenderTargets(RTTs), DepthTexture(0),
              width(w), height(h)
 {
     glGenFramebuffers(1, &fbo);
@@ -213,8 +213,8 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
 }
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
-                         size_t h, bool layered) 
-           : fbolayer(0), RenderTargets(RTTs), DepthTexture(DS), width(w), 
+                         size_t h, bool layered)
+           : fbolayer(0), RenderTargets(RTTs), DepthTexture(DS), width(w),
              height(h)
 {
     glGenFramebuffers(1, &fbo);
@@ -307,7 +307,7 @@ void draw3DLine(const core::vector3df& start,
     glGetError();
 }
 
-bool hasGLExtension(const char* extension) 
+bool hasGLExtension(const char* extension)
 {
     if (glGetStringi != NULL)
     {

@@ -127,7 +127,7 @@ public:
     /** Adds 16 bit integer. */
     inline NetworkString& ai16(const uint16_t& value)
     {
-        return addUInt16(value); 
+        return addUInt16(value);
     }   // ai16
 
     // ------------------------------------------------------------------------
@@ -145,7 +145,7 @@ public:
     /** Adds 32 bit integer. */
     inline NetworkString& ai32(const uint32_t& value)
     {
-        return addUInt32(value); 
+        return addUInt32(value);
     }   // ai32
 
     // ------------------------------------------------------------------------
@@ -229,7 +229,7 @@ public:
     /** Adds the content of another network string. */
     NetworkString& operator+=(NetworkString const& value)
     {
-        m_string.insert(m_string.end(), value.m_string.begin(), 
+        m_string.insert(m_string.end(), value.m_string.begin(),
                                         value.m_string.end()   );
         return *this;
     }   // operator+=
@@ -299,17 +299,17 @@ public:
     /** Returns an unsigned character. */
     inline unsigned char getUChar(int pos = 0) const
     {
-        return get<unsigned char>(pos); 
+        return get<unsigned char>(pos);
     }   // getUChar
     // ------------------------------------------------------------------------
     /** Returns a part of the network string as a std::string.
      *  \param pos First position to be in the string.
      *  \param len Number of bytes to copy.
      */
-    std::string getString(int pos, int len) const 
+    std::string getString(int pos, int len) const
     {
         return std::string(m_string.begin() + pos,
-                           m_string.begin() + pos + len); 
+                           m_string.begin() + pos + len);
     }   // getString
 
     // ------------------------------------------------------------------------
@@ -334,7 +334,7 @@ public:
     /** Return an unsigned character. */
     inline unsigned char guc(int pos = 0) const
     {
-        return get<unsigned char>(pos); 
+        return get<unsigned char>(pos);
     }   // guc
 
     // ------------------------------------------------------------------------
@@ -387,30 +387,30 @@ public:
     // ------------------------------------------------------------------------
     inline uint32_t getAndRemoveUInt32(int pos = 0)
     {
-        return getAndRemove<uint32_t, 4>(pos); 
+        return getAndRemove<uint32_t, 4>(pos);
     }   // getAndRemoveUInt32
-    
+
     // ------------------------------------------------------------------------
     inline uint16_t getAndRemoveUInt16(int pos = 0)
     {
-        return getAndRemove<uint16_t, 2>(pos); 
+        return getAndRemove<uint16_t, 2>(pos);
     }   // getAndRemoveUInt16
 
     // ------------------------------------------------------------------------
     inline uint8_t getAndRemoveUInt8(int pos = 0)
     {
-        return getAndRemove<uint8_t>(pos); 
+        return getAndRemove<uint8_t>(pos);
     }   // getAndRemoveUInt8
     // ------------------------------------------------------------------------
     inline char getAndRemoveChar(int pos = 0)
     {
-        return getAndRemove<char>(pos); 
+        return getAndRemove<char>(pos);
     }   // getAndRemoveChar
 
     // ------------------------------------------------------------------------
     inline unsigned char getAndRemoveUChar(int pos = 0)
     {
-        return getAndRemove<unsigned char>(pos); 
+        return getAndRemove<unsigned char>(pos);
     }   // getAndRemoveUChar
 
     // ------------------------------------------------------------------------
@@ -437,7 +437,7 @@ public:
     inline NetworkString& gui8(uint8_t* dst)
     {
         *dst = getAndRemoveUInt8(0);
-        return *this; 
+        return *this;
     }   // gui8
 
     // ------------------------------------------------------------------------
@@ -445,7 +445,7 @@ public:
     inline NetworkString& gui16(uint16_t* dst)
     {
         *dst = getAndRemoveUInt16(0);
-        return *this; 
+        return *this;
     }   // gui16
 
     // ------------------------------------------------------------------------
@@ -453,7 +453,7 @@ public:
     inline NetworkString& gui32(uint32_t* dst)
     {
         *dst = getAndRemoveUInt32(0);
-        return *this; 
+        return *this;
     }   // gui32
 
     // ------------------------------------------------------------------------
@@ -463,7 +463,7 @@ public:
         *dst = getAndRemoveUInt32(0);
         return *this;
     }   // gui
-    
+
     // ------------------------------------------------------------------------
     /** Returns 4 byte integer. */
     inline NetworkString& gi(int* dst)
@@ -477,7 +477,7 @@ public:
     inline NetworkString& gc(char* dst)
     {
         *dst = getAndRemoveChar(0);
-        return *this; 
+        return *this;
     }   // gc
 
     // ------------------------------------------------------------------------
@@ -485,7 +485,7 @@ public:
     inline NetworkString& guc(uchar* dst)
     {
         *dst = getAndRemoveUChar(0);
-        return *this; 
+        return *this;
     }   // guc
 
 };   // class NetworkString

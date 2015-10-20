@@ -864,7 +864,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
     {
-        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);    
+        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
         if (mb->getVertexType() != video::EVT_STANDARD &&
             mb->getVertexType() != video::EVT_2TCOORDS &&
@@ -1763,7 +1763,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
     if (m_spherical_harmonics_textures.size() != 6)
         irr_driver->getSphericalHarmonics()->setAmbientLight(m_ambient_color);
-    
+
     // ---- Create sun (non-ambient directional light)
     if (m_sun_position.getLengthSQ() < 0.03f)
     {

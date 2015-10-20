@@ -56,7 +56,7 @@ static void createBillboardVAO()
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
                           (GLvoid*) (2 * sizeof(float)));
     glBindVertexArray(0);
 }   // createBillboardVAO
@@ -66,10 +66,10 @@ STKBillboard::STKBillboard(irr::scene::ISceneNode* parent,
                            irr::scene::ISceneManager* mgr, irr::s32 id,
                            const irr::core::vector3df& position,
                            const irr::core::dimension2d<irr::f32>& size,
-                           irr::video::SColor colorTop, 
+                           irr::video::SColor colorTop,
                            irr::video::SColor colorBottom)
             : IBillboardSceneNode(parent, mgr, id, position),
-              CBillboardSceneNode(parent, mgr, id, position, size, 
+              CBillboardSceneNode(parent, mgr, id, position, size,
                                   colorTop, colorBottom)
 {
     if (!billboardvao)
@@ -102,7 +102,7 @@ void STKBillboard::render()
     GLuint texid = getTextureGLuint(tex);
     BillboardShader::getInstance()->use();
     BillboardShader::getInstance()->setTextureUnits(texid);
-    BillboardShader::getInstance()->setUniforms(irr_driver->getViewMatrix(), 
+    BillboardShader::getInstance()->setUniforms(irr_driver->getViewMatrix(),
                                                 irr_driver->getProjMatrix(),
                                                 pos, Size);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

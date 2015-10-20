@@ -112,7 +112,7 @@ int                                Shaders::m_shaders[ES_COUNT];
 // Use macro FOREACH_SHADER from shaders.hpp to create an array
 // with all shader names.
 #define STR(a) #a,
-const char *Shaders::shader_names[] = { FOREACH_SHADER(STR) };  
+const char *Shaders::shader_names[] = { FOREACH_SHADER(STR) };
 #undef STR
 
 using namespace video;

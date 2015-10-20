@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -32,14 +32,14 @@ btMultiSphereShape::btMultiSphereShape (const btVector3* positions,const btScala
 	{
 		m_localPositionArray[i] = positions[i];
 		m_radiArray[i] = radi[i];
-		
+
 	}
 
 	recalcLocalAabb();
 
 }
 
- 
+
  btVector3	btMultiSphereShape::localGetSupportingVertexWithoutMargin(const btVector3& vec0)const
 {
 	int i;
@@ -147,7 +147,7 @@ const char*	btMultiSphereShape::serialize(void* dataBuffer, btSerializer* serial
 
 	int numElem = m_localPositionArray.size();
 	shapeData->m_localPositionArrayPtr = numElem ? (btPositionAndRadius*)serializer->getUniquePointer((void*)&m_localPositionArray[0]):  0;
-	
+
 	shapeData->m_localPositionArraySize = numElem;
 	if (numElem)
 	{
@@ -160,7 +160,7 @@ const char*	btMultiSphereShape::serialize(void* dataBuffer, btSerializer* serial
 		}
 		serializer->finalizeChunk(chunk,"btPositionAndRadius",BT_ARRAY_CODE,(void*)&m_localPositionArray[0]);
 	}
-	
+
 	return "btMultiSphereShapeData";
 }
 

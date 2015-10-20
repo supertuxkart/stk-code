@@ -49,7 +49,7 @@ TutorialMessageDialog::TutorialMessageDialog(irr::core::stringw msg, bool stopGa
 
     ButtonWidget* cancelbtn = getWidget<ButtonWidget>("continue");
     cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    
+
     World::getWorld()->getKart(0)->getControls().reset();
 }
 

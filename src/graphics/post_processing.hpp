@@ -80,7 +80,7 @@ public:
 
     void renderSSAO();
     void renderEnvMap(unsigned skycubemap);
-    void renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB, 
+    void renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB,
                        const core::matrix4 &rh_matrix,
                        const core::vector3df &rh_extend);
     void renderGI(const core::matrix4 &rh_matrix,

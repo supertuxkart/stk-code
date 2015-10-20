@@ -457,7 +457,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                 m_node = ParticleSystemProxy::addParticleNode(m_is_glsl, type->randomizeInitialY());
             else
                 m_node = irr_driver->addParticleNode();
-            
+
             if (m_is_glsl)
             {
                 bool additive = (type->getMaterial()->getShaderType() == Material::SHADERTYPE_ADDITIVE);
@@ -707,7 +707,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 
 void ParticleEmitter::addHeightMapAffector(Track* t)
 {
-    
+
     if (m_is_glsl)
     {
         const Vec3* aabb_min;

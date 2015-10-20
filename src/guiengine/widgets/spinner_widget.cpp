@@ -436,17 +436,17 @@ void SpinnerWidget::setCustomText(const core::stringw& text)
 
 void SpinnerWidget::onClick()
 {
-    if (m_children[1].m_deactivated || 
-        m_children[1].m_properties[PROP_ID] != "spinnerbody"  || 
-        !isGauge()) 
-    { 
-        return; 
+    if (m_children[1].m_deactivated ||
+        m_children[1].m_properties[PROP_ID] != "spinnerbody"  ||
+        !isGauge())
+    {
+        return;
     }
 
     const core::position2di mouse_position
         = irr_driver->getDevice()->getCursorControl()->getPosition();
 
-    core::recti body_rect 
+    core::recti body_rect
         = m_children[1].getIrrlichtElement()->getAbsolutePosition();
 
     if (body_rect.isPointInside(mouse_position))

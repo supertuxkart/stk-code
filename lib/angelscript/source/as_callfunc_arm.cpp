@@ -94,7 +94,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 	asDWORD paramBuffer[64+2];
 	// Android & Linux needs to align 64bit types on even registers, but this isn't done on iOS or Windows Phone
-	// TODO: optimize runtime: There should be a check for this in PrepareSystemFunction() so this 
+	// TODO: optimize runtime: There should be a check for this in PrepareSystemFunction() so this
 	//                         doesn't have to be done for functions that don't have any 64bit types
 #if !defined(AS_ANDROID) && !defined(AS_LINUX)
 	// In cases of thiscall methods, the callstack is configured as a standard thiscall
@@ -181,9 +181,9 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			{
 #if defined(AS_ANDROID) || defined(AS_LINUX)
 				// Should an alignment be performed?
-				if( !descr->parameterTypes[n].IsObjectHandle() && 
-					!descr->parameterTypes[n].IsReference() && 
-					descr->parameterTypes[n].GetSizeOnStackDWords() == 2 && 
+				if( !descr->parameterTypes[n].IsObjectHandle() &&
+					!descr->parameterTypes[n].IsReference() &&
+					descr->parameterTypes[n].GetSizeOnStackDWords() == 2 &&
 					((dpos & 1) == mask) )
 				{
 					// 64 bit value align
@@ -341,7 +341,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			  ( descr->returnType.GetObjectType()->flags & asOBJ_APP_CLASS_ALLFLOATS )	&&
 			    descr->returnType.GetSizeInMemoryBytes() <= 8 )
 			callConv--;
-		
+
 		// The return is made in memory
 		callConv++;
 	}
@@ -349,7 +349,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	bool isThisCallMethod = callConv >= ICC_THISCALL_OBJLAST;
 
 	// Linux needs to align 64bit types on even registers, but this isn't done on iOS or Windows Phone
-	// TODO: optimize runtime: There should be a check for this in PrepareSystemFunction() so this 
+	// TODO: optimize runtime: There should be a check for this in PrepareSystemFunction() so this
 	//                         doesn't have to be done for functions that don't have any 64bit types
 	{
 		// mask is used as a toggler to skip uneven registers.
@@ -452,7 +452,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 					// Delete the original memory
 					engine->CallFree(*(char**)(args+spos));
-					spos++;					
+					spos++;
 				}
 
 				continue;
@@ -511,7 +511,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 					paramBuffer[stackPos++] = args[spos++];
 					stackSize += 2;
 				}
-				
+
 				continue;
 			}
 			else
@@ -520,7 +520,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 				if (paramSize < 4)
 				{
 					// Should an alignment be performed?
-					if( (dpos & 1) == mask && descr->parameterTypes[n].GetSizeOnStackDWords() == 2 && 
+					if( (dpos & 1) == mask && descr->parameterTypes[n].GetSizeOnStackDWords() == 2 &&
 						!descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() &&
 						!descr->parameterTypes[n].IsAnyType() )
 					{
@@ -629,8 +629,8 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		context->SetInternalException(TXT_INVALID_CALLING_CONVENTION);
 	}
 
-	// On Linux with arm the float and double values are returns in the 
-	// floating point registers, s0 and s1. Objects that contain only 
+	// On Linux with arm the float and double values are returns in the
+	// floating point registers, s0 and s1. Objects that contain only
 	// float types and are not considered complex are also returned in the
 	// floating point registers.
 	if( sysFunc->hostReturnFloat )

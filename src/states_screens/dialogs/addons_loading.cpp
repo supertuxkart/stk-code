@@ -208,7 +208,7 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
     {
         const std::string& selection =
                 actions_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        
+
         if(selection == "back")
         {
             stopDownload();
@@ -331,8 +331,8 @@ void AddonsLoading::stopDownload()
     // (and not uninstalling an installed one):
     if(m_download_request)
     {
-        // In case of a cancel we can't free the memory, since the 
-        // request manager thread is potentially working on this request. So 
+        // In case of a cancel we can't free the memory, since the
+        // request manager thread is potentially working on this request. So
         // in order to avoid a memory leak, we let the request manager
         // free the data. This is thread safe since freeing the data is done
         // when the request manager handles the result queue - and this is

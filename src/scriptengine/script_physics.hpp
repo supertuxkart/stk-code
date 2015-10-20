@@ -24,20 +24,20 @@
 
 namespace Scripting
 {
-    
+
     namespace Physics
     {
-       
+
         //script engine functions
         void registerScriptFunctions(asIScriptEngine *engine);
-        asIScriptFunction* 
+        asIScriptFunction*
             registerScriptCallbacks(asIScriptEngine *engine);
     }
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 }
 #endif

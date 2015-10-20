@@ -236,7 +236,7 @@ void ListWidget::addItem(const std::string& internal_name,
 }
 
 // -----------------------------------------------------------------------------
-void ListWidget::renameCell(const int row_index, const int col_index, 
+void ListWidget::renameCell(const int row_index, const int col_index,
                             const irr::core::stringw &newName, const int icon)
 {
     // May only be called AFTER this widget has been add()ed
@@ -259,7 +259,7 @@ void ListWidget::renameItem(const int row_index,
 }
 
 // -----------------------------------------------------------------------------
-void ListWidget::renameItem(const std::string &internal_name, 
+void ListWidget::renameItem(const std::string &internal_name,
                             const irr::core::stringw &newName, const int icon)
 {
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();

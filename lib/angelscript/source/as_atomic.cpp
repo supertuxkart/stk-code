@@ -27,7 +27,7 @@
    Andreas Jonsson
    andreas@angelcode.com
 */
- 
+
 //
 // as_atomic.cpp
 //
@@ -131,15 +131,15 @@ int asAtomicDec(int &value)
 #elif defined(AS_LINUX) || defined(AS_BSD) || defined(AS_ILLUMOS) || defined(AS_ANDROID)
 
 //
-// atomic_inc_and_test() and atomic_dec_and_test() from asm/atomic.h is not meant 
-// to be used outside the Linux kernel. Instead we should use the GNUC provided 
+// atomic_inc_and_test() and atomic_dec_and_test() from asm/atomic.h is not meant
+// to be used outside the Linux kernel. Instead we should use the GNUC provided
 // __sync_add_and_fetch() and __sync_sub_and_fetch() functions.
 //
 // Reference: http://golubenco.org/blog/atomic-operations/
 //
-// These are only available in GCC 4.1 and above, so for older versions we 
+// These are only available in GCC 4.1 and above, so for older versions we
 // use the critical sections, though it is a lot slower.
-// 
+//
 
 int asAtomicInc(int &value)
 {
@@ -170,7 +170,7 @@ int asAtomicDec(int &value)
 #else
 
 // If we get here, then the configuration in as_config.h
-//  is wrong for the compiler/platform combination. 
+//  is wrong for the compiler/platform combination.
 int ERROR_PleaseFixTheConfig[-1];
 
 #endif

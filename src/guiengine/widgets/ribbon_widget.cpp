@@ -458,7 +458,7 @@ void RibbonWidget::select(std::string item, const int mousePlayerID)
 EventPropagation RibbonWidget::rightPressed(const int playerID)
 {
     EventPropagation result = m_ribbon_type != RIBBON_TOOLBAR ? EVENT_LET : EVENT_BLOCK;
-    
+
     if (m_deactivated) return result;
     // empty ribbon, or only one item (can't move right)
     if (m_active_children.size() < 2) return result;
@@ -498,7 +498,7 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
 EventPropagation RibbonWidget::leftPressed(const int playerID)
 {
     EventPropagation result = m_ribbon_type != RIBBON_TOOLBAR ? EVENT_LET : EVENT_BLOCK;
-    
+
     if (m_deactivated) return result;
     // empty ribbon, or only one item (can't move left)
     if (m_active_children.size() < 2) return result;

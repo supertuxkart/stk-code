@@ -306,7 +306,7 @@ void RaceManager::startNew(bool from_overworld)
                                          ->getUniqueID(),
                                          m_grand_prix.getId(),
                                          m_player_karts.size());
-    
+
             // Saved GP only in offline mode
             if (m_continue_saved_gp)
             {
@@ -388,7 +388,7 @@ void RaceManager::startNew(bool from_overworld)
             m_track_number = m_saved_gp->getNextTrack();
             m_saved_gp->loadKarts(m_kart_status);
         }
-        else 
+        else
         {
             while (m_saved_gp != NULL)
             {

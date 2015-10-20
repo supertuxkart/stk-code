@@ -76,7 +76,7 @@ private:
     // static create function must be used.
     MusicInformation (const XMLNode *root, const std::string &filename);
 
-    // Declare the following functions private, but allow the SFXManager 
+    // Declare the following functions private, but allow the SFXManager
     // to access them. This makes sure that only the sfx thread calls
     // openal/vorbis etc, and so makes it is all thread safe.
 private:

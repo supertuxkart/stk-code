@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -56,7 +56,7 @@ m_ownsBvh(false)
 	{
 		void* mem = btAlignedAlloc(sizeof(btOptimizedBvh),16);
 		m_bvh = new (mem) btOptimizedBvh();
-		
+
 		m_bvh->build(meshInterface,m_useQuantizedAabbCompression,bvhAabbMin,bvhAabbMax);
 		m_ownsBvh = true;
 	}
@@ -68,7 +68,7 @@ m_ownsBvh(false)
 void	btBvhTriangleMeshShape::partialRefitTree(const btVector3& aabbMin,const btVector3& aabbMax)
 {
 	m_bvh->refitPartial( m_meshInterface,aabbMin,aabbMax );
-	
+
 	m_localAabbMin.setMin(aabbMin);
 	m_localAabbMax.setMax(aabbMax);
 }
@@ -77,7 +77,7 @@ void	btBvhTriangleMeshShape::partialRefitTree(const btVector3& aabbMin,const btV
 void	btBvhTriangleMeshShape::refitTree(const btVector3& aabbMin,const btVector3& aabbMax)
 {
 	m_bvh->refit( m_meshInterface, aabbMin,aabbMax );
-	
+
 	recalcLocalAabb();
 }
 
@@ -102,7 +102,7 @@ void	btBvhTriangleMeshShape::performRaycast (btTriangleCallback* callback, const
 			m_callback(callback)
 		{
 		}
-				
+
 		virtual void processNode(int nodeSubPart, int nodeTriangleIndex)
 		{
 			btVector3 m_triangle[3];
@@ -128,23 +128,23 @@ void	btBvhTriangleMeshShape::performRaycast (btTriangleCallback* callback, const
 
 			unsigned int* gfxbase = (unsigned int*)(indexbase+nodeTriangleIndex*indexstride);
 			btAssert(indicestype==PHY_INTEGER||indicestype==PHY_SHORT);
-	
+
 			const btVector3& meshScaling = m_meshInterface->getScaling();
 			for (int j=2;j>=0;j--)
 			{
 				int graphicsindex = indicestype==PHY_SHORT?((unsigned short*)gfxbase)[j]:gfxbase[j];
-				
+
 				if (type == PHY_FLOAT)
 				{
 					float* graphicsbase = (float*)(vertexbase+graphicsindex*stride);
-					
-					m_triangle[j] = btVector3(graphicsbase[0]*meshScaling.getX(),graphicsbase[1]*meshScaling.getY(),graphicsbase[2]*meshScaling.getZ());		
+
+					m_triangle[j] = btVector3(graphicsbase[0]*meshScaling.getX(),graphicsbase[1]*meshScaling.getY(),graphicsbase[2]*meshScaling.getZ());
 				}
 				else
 				{
 					double* graphicsbase = (double*)(vertexbase+graphicsindex*stride);
-					
-					m_triangle[j] = btVector3(btScalar(graphicsbase[0])*meshScaling.getX(),btScalar(graphicsbase[1])*meshScaling.getY(),btScalar(graphicsbase[2])*meshScaling.getZ());		
+
+					m_triangle[j] = btVector3(btScalar(graphicsbase[0])*meshScaling.getX(),btScalar(graphicsbase[1])*meshScaling.getY(),btScalar(graphicsbase[2])*meshScaling.getZ());
 				}
 			}
 
@@ -171,7 +171,7 @@ void	btBvhTriangleMeshShape::performConvexcast (btTriangleCallback* callback, co
 			m_callback(callback)
 		{
 		}
-				
+
 		virtual void processNode(int nodeSubPart, int nodeTriangleIndex)
 		{
 			btVector3 m_triangle[3];
@@ -197,7 +197,7 @@ void	btBvhTriangleMeshShape::performConvexcast (btTriangleCallback* callback, co
 
 			unsigned int* gfxbase = (unsigned int*)(indexbase+nodeTriangleIndex*indexstride);
 			btAssert(indicestype==PHY_INTEGER||indicestype==PHY_SHORT);
-	
+
 			const btVector3& meshScaling = m_meshInterface->getScaling();
 			for (int j=2;j>=0;j--)
 			{
@@ -207,13 +207,13 @@ void	btBvhTriangleMeshShape::performConvexcast (btTriangleCallback* callback, co
 				{
 					float* graphicsbase = (float*)(vertexbase+graphicsindex*stride);
 
-					m_triangle[j] = btVector3(graphicsbase[0]*meshScaling.getX(),graphicsbase[1]*meshScaling.getY(),graphicsbase[2]*meshScaling.getZ());		
+					m_triangle[j] = btVector3(graphicsbase[0]*meshScaling.getX(),graphicsbase[1]*meshScaling.getY(),graphicsbase[2]*meshScaling.getZ());
 				}
 				else
 				{
 					double* graphicsbase = (double*)(vertexbase+graphicsindex*stride);
-					
-					m_triangle[j] = btVector3(btScalar(graphicsbase[0])*meshScaling.getX(),btScalar(graphicsbase[1])*meshScaling.getY(),btScalar(graphicsbase[2])*meshScaling.getZ());		
+
+					m_triangle[j] = btVector3(btScalar(graphicsbase[0])*meshScaling.getX(),btScalar(graphicsbase[1])*meshScaling.getY(),btScalar(graphicsbase[2])*meshScaling.getZ());
 				}
 			}
 
@@ -239,7 +239,7 @@ void	btBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callback,co
 
 	//first get all the nodes
 
-	
+
 	struct	MyNodeOverlapCallback : public btNodeOverlapCallback
 	{
 		btStridingMeshInterface*	m_meshInterface;
@@ -252,7 +252,7 @@ void	btBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callback,co
 			m_callback(callback)
 		{
 		}
-				
+
 		virtual void processNode(int nodeSubPart, int nodeTriangleIndex)
 		{
 			const unsigned char *vertexbase;
@@ -263,7 +263,7 @@ void	btBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callback,co
 			int indexstride;
 			int numfaces;
 			PHY_ScalarType indicestype;
-			
+
 
 			m_meshInterface->getLockedReadOnlyVertexIndexBase(
 				&vertexbase,
@@ -278,11 +278,11 @@ void	btBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callback,co
 
 			unsigned int* gfxbase = (unsigned int*)(indexbase+nodeTriangleIndex*indexstride);
 			btAssert(indicestype==PHY_INTEGER||indicestype==PHY_SHORT||indicestype==PHY_UCHAR);
-	
+
 			const btVector3& meshScaling = m_meshInterface->getScaling();
 			for (int j=2;j>=0;j--)
 			{
-				
+
 				int graphicsindex = indicestype==PHY_SHORT?((unsigned short*)gfxbase)[j]:indicestype==PHY_INTEGER?gfxbase[j]:((unsigned char*)gfxbase)[j];
 
 
@@ -292,7 +292,7 @@ void	btBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callback,co
 				if (type == PHY_FLOAT)
 				{
 					float* graphicsbase = (float*)(vertexbase+graphicsindex*stride);
-					
+
 					m_triangle[j] = btVector3(
 																		graphicsbase[0]*meshScaling.getX(),
 																		graphicsbase[1]*meshScaling.getY(),
@@ -379,7 +379,7 @@ const char*	btBvhTriangleMeshShape::serialize(void* dataBuffer, btSerializer* se
 
 	trimeshData->m_collisionMargin = float(m_collisionMargin);
 
-	
+
 
 	if (m_bvh && !(serializer->getSerializationFlags()&BT_SERIALIZE_NO_BVH))
 	{
@@ -403,7 +403,7 @@ const char*	btBvhTriangleMeshShape::serialize(void* dataBuffer, btSerializer* se
 			trimeshData->m_quantizedFloatBvh  = (btQuantizedBvhData*)serializer->getUniquePointer(m_bvh);
 			trimeshData->m_quantizedDoubleBvh= 0;
 #endif //BT_USE_DOUBLE_PRECISION
-	
+
 			int sz = m_bvh->calculateSerializeBufferSizeNew();
 			btChunk* chunk = serializer->allocate(sz,1);
 			const char* structType = m_bvh->serialize(chunk->m_oldPtr, serializer);
@@ -415,7 +415,7 @@ const char*	btBvhTriangleMeshShape::serialize(void* dataBuffer, btSerializer* se
 		trimeshData->m_quantizedDoubleBvh = 0;
 	}
 
-	
+
 
 	if (m_triangleInfoMap && !(serializer->getSerializationFlags()&BT_SERIALIZE_NO_TRIANGLEINFOMAP))
 	{

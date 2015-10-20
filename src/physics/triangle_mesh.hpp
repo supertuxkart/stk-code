@@ -73,7 +73,7 @@ public:
     void setBody(btRigidBody *body)
     {
         assert(!m_body);
-        // Mark that the body should not be deleted when this object is 
+        // Mark that the body should not be deleted when this object is
         // deleted, since the body is managed elsewhere.
         m_free_body = false;
         m_body = body;
@@ -107,7 +107,7 @@ public:
     /** Returns the normals of the triangle with the given index.
      *  \param indx Index of the triangle to get the three normals of.
      *  \result n1,n2,n3 The three normals. */
-    void getNormals(unsigned int indx, const btVector3 **n1, 
+    void getNormals(unsigned int indx, const btVector3 **n1,
                     const btVector3 **n2, const btVector3 **n3) const
     {
         assert(indx < m_triangleIndex2Material.size());
