@@ -149,14 +149,19 @@ public:
     }   // operator!=
     // ------------------------------------------------------------------------
     /** Returns a std::string representing the ip address and port in human
-     *  readable format. */
-    std::string toString() const
+     *  readable format.
+     *  \param show_port True if the port should be shown as well, otherwise
+     *         only the ip address will be returned.
+     */
+    std::string toString(bool show_port = true) const
     {
-        return
-        StringUtils::insertValues("%d.%d.%d.%d:%d",
-                                  ((m_ip >> 24) & 0xff), ((m_ip >> 16) & 0xff),
-                                  ((m_ip >>  8) & 0xff), ((m_ip >>  0) & 0xff),
-                                  m_port                                     );
+        std::string s = 
+            StringUtils::insertValues("%d.%d.%d.%d",
+                                 ((m_ip >> 24) & 0xff), ((m_ip >> 16) & 0xff),
+                                 ((m_ip >>  8) & 0xff), ((m_ip >>  0) & 0xff));
+        if (show_port)
+            s += StringUtils::insertValues(":%d", m_port);
+        return s;
     }   // toString
 };   // TransportAddress
 
