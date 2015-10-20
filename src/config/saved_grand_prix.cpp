@@ -181,5 +181,7 @@ void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
         }   // if m_local_player_id == -1
     }   // for i
 
-    std::sort(kart_list.begin(), kart_list.end(), cmp__l);
+    // The line below causes issues in follow the leader race. The leader
+    // is not at first place anymore.
+    // std::sort(kart_list.begin(), kart_list.end(), cmp__l);
 }   // loadKarts
