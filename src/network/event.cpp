@@ -23,6 +23,9 @@
 
 #include <string.h>
 
+/** \brief Constructor
+ *  \param event : The event that needs to be translated.
+ */
 Event::Event(ENetEvent* event)
 {
     switch (event->type)
@@ -42,15 +45,17 @@ Event::Event(ENetEvent* event)
     }
     if (type == EVENT_TYPE_MESSAGE)
     {
-        m_data = NetworkString(std::string((char*)(event->packet->data), event->packet->dataLength-1));
+        m_data = NetworkString(std::string((char*)(event->packet->data),
+                               event->packet->dataLength-1));
     }
 
     m_packet = NULL;
     if (event->packet)
+    {
         m_packet = event->packet;
-
-    if (m_packet)
-        enet_packet_destroy(m_packet); // we got all we need, just remove the data.
+        // we got all we need, just remove the data.
+        enet_packet_destroy(m_packet);
+    }
     m_packet = NULL;
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
@@ -61,7 +66,8 @@ Event::Event(ENetEvent* event)
         if (peers[i]->m_peer == event->peer)
         {
             *peer = peers[i];
-            Log::verbose("Event", "The peer you sought has been found on %p", peer);
+            Log::verbose("Event", "The peer you sought has been found on %p",
+                         peer);
             return;
         }
     }
@@ -70,28 +76,38 @@ Event::Event(ENetEvent* event)
         STKPeer* new_peer = new STKPeer();
         new_peer->m_peer = event->peer;
         *peer = new_peer;
-        Log::debug("Event", "Creating a new peer, address are STKPeer:%p, Peer:%p", new_peer, event->peer);
+        Log::debug("Event", 
+                   "Creating a new peer, address are STKPeer:%p, Peer:%p",
+                    new_peer, event->peer);
     }
-}
+}   // Event(ENetEvent)
 
+// ----------------------------------------------------------------------------
+/** \brief Constructor
+ *  \param event : The event to copy.
+ */
 Event::Event(const Event& event)
 {
-    m_packet = NULL;
-    m_data = event.m_data;
-    // copy the peer
-    peer = event.peer;
     type = event.type;
-}
+    m_packet = NULL;
+    m_data   = event.m_data;
+    // copy the peer
+    peer     = event.peer;
+}   // Event(Event)
 
+// ----------------------------------------------------------------------------
+/** \brief Destructor that frees the memory of the package.
+ */
 Event::~Event()
 {
     delete peer;
     peer = NULL;
     m_packet = NULL;
-}
+}   // ~Event
 
+// ----------------------------------------------------------------------------
 void Event::removeFront(int size)
 {
     m_data.removeFront(size);
-}
+}   // removeFront
 

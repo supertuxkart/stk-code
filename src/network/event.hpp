@@ -51,37 +51,32 @@ enum EVENT_TYPE
  */
 class Event
 {
-    public:
-        /*! \brief Constructor
-         *  \param event : The event that needs to be translated.
-         */
-        Event(ENetEvent* event);
-        /*! \brief Constructor
-         *  \param event : The event to copy.
-         */
-        Event(const Event& event);
-        /*! \brief Destructor
-         *  frees the memory of the ENetPacket.
-         */
-        ~Event();
+private:
+    /** Copy of the data passed by the event. */
+    NetworkString m_data;
 
-        /*! \brief Remove bytes at the beginning of data.
-         *  \param size : The number of bytes to remove.
-         */
-        void removeFront(int size);
+    /** A pointer on the ENetPacket to be deleted. */
+    ENetPacket* m_packet;
 
-        /*! \brief Get a copy of the data.
-         *  \return A copy of the message data. This is empty for events like
-         *  connection or disconnections.
-         */
-        NetworkString data() const { return m_data; }
+public:
+    Event(ENetEvent* event);
+    Event(const Event& event);
+    ~Event();
 
-        EVENT_TYPE type;    //!< Type of the event.
-        STKPeer** peer;     //!< Pointer to the peer that triggered that event.
+    /*! \brief Remove bytes at the beginning of data.
+     *  \param size : The number of bytes to remove.
+     */
+    void removeFront(int size);
 
-    private:
-        NetworkString m_data; //!< Copy of the data passed by the event.
-        ENetPacket* m_packet; //!< A pointer on the ENetPacket to be deleted.
-};
+    /*! \brief Get a copy of the data.
+     *  \return A copy of the message data. This is empty for events like
+     *  connection or disconnections.
+     */
+    NetworkString data() const { return m_data; }
+
+    EVENT_TYPE type;    //!< Type of the event.
+    STKPeer** peer;     //!< Pointer to the peer that triggered that event.
+
+};   // class Event
 
 #endif // EVENT_HPP
