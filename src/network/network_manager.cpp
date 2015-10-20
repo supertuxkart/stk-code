@@ -117,8 +117,8 @@ void NetworkManager::notifyEvent(Event* event)
     {
         Log::info("NetworkManager", "A client has just connected. There are "
                   "now %lu peers.", m_peers.size() + 1);
-        Log::debug("NetworkManager", "Addresses are : %lx, %lx, %lx",
-                   event->getPeer(), *event->getPeer(), peer);
+        Log::debug("NetworkManager", "Addresses are : %lx, %lx",
+                   event->getPeer(), peer);
         // create the new peer:
         m_peers.push_back(peer);
     }
