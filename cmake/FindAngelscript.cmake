@@ -14,11 +14,11 @@ FIND_PATH(Angelscript_INCLUDE_DIRS angelscript.h
     )
 
 FIND_LIBRARY(Angelscript_LIBRARY
-    NAMES angelscript
+    NAMES angelscript angelscript_s
     PATHS
     /usr/local
     /usr
-    PATH_SUFFIXES lib
+    PATH_SUFFIXES lib lib64 lib32
     )
 
 # handle the QUIETLY and REQUIRED arguments and set ANGELSCRIPT_FOUND to TRUE if
