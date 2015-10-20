@@ -4,8 +4,8 @@ Copyright (c) 2011 Advanced Micro Devices, Inc.  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -31,7 +31,7 @@ bool gUseInternalObject = true;
 // Clips a face to the back of a plane
 void btPolyhedralContactClipping::clipFace(const btVertexArray& pVtxIn, btVertexArray& ppVtxOut, const btVector3& planeNormalWS,btScalar planeEqWS)
 {
-	
+
 	int ve;
 	btScalar ds, de;
 	int numVerts = pVtxIn.size();
@@ -40,7 +40,7 @@ void btPolyhedralContactClipping::clipFace(const btVertexArray& pVtxIn, btVertex
 
 	btVector3 firstVertex=pVtxIn[pVtxIn.size()-1];
 	btVector3 endVertex = pVtxIn[0];
-	
+
 	ds = planeNormalWS.dot(firstVertex)+planeEqWS;
 
 	for (ve = 0; ve < numVerts; ve++)
@@ -297,7 +297,7 @@ void	btPolyhedralContactClipping::clipFaceAgainstHull(const btVector3& separatin
 		{
 			const btVector3 Normal(hullA.m_faces[face].m_plane[0], hullA.m_faces[face].m_plane[1], hullA.m_faces[face].m_plane[2]);
 			const btVector3 faceANormalWS = transA.getBasis() * Normal;
-		
+
 			btScalar d = faceANormalWS.dot(separatingNormal);
 			if (d < dmin)
 			{
@@ -325,7 +325,7 @@ void	btPolyhedralContactClipping::clipFaceAgainstHull(const btVector3& separatin
 		btVector3 planeNormalWS1 = -WorldEdge0.cross(worldPlaneAnormal1);//.cross(WorldEdge0);
 		btVector3 worldA1 = transA*a;
 		btScalar planeEqWS1 = -worldA1.dot(planeNormalWS1);
-		
+
 //int otherFace=0;
 #ifdef BLA1
 		int otherFace = polyA.m_connectedFaces[e0];
@@ -334,10 +334,10 @@ void	btPolyhedralContactClipping::clipFaceAgainstHull(const btVector3& separatin
 
 		btVector3 planeNormalWS = transA.getBasis()*localPlaneNormal;
 		btScalar planeEqWS=localPlaneEq-planeNormalWS.dot(transA.getOrigin());
-#else 
+#else
 		btVector3 planeNormalWS = planeNormalWS1;
 		btScalar planeEqWS=planeEqWS1;
-		
+
 #endif
 		//clip face
 
@@ -351,7 +351,7 @@ void	btPolyhedralContactClipping::clipFaceAgainstHull(const btVector3& separatin
 //#define ONLY_REPORT_DEEPEST_POINT
 
 	btVector3 point;
-	
+
 
 	// only keep points that are behind the witness face
 	{
@@ -361,7 +361,7 @@ void	btPolyhedralContactClipping::clipFaceAgainstHull(const btVector3& separatin
 		btScalar planeEqWS=localPlaneEq-planeNormalWS.dot(transA.getOrigin());
 		for (int i=0;i<pVtxIn->size();i++)
 		{
-			
+
 			btScalar depth = planeNormalWS.dot(pVtxIn->at(i))+planeEqWS;
 			if (depth <=minDist)
 			{
@@ -380,8 +380,8 @@ void	btPolyhedralContactClipping::clipFaceAgainstHull(const btVector3& separatin
 				{
 					printf("error in btPolyhedralContactClipping depth = %f\n", depth);
 					printf("likely wrong separatingNormal passed in\n");
-				} 
-#endif				
+				}
+#endif
 				resultOut.addContactPoint(separatingNormal,point,depth);
 #endif
 			}
@@ -433,7 +433,7 @@ void	btPolyhedralContactClipping::clipHullAgainstHull(const btVector3& separatin
 					}
 				}
 
-	
+
 	if (closestFaceB>=0)
 		clipFaceAgainstHull(separatingNormal, hullA, transA,worldVertsB1, minDist, maxDist,resultOut);
 

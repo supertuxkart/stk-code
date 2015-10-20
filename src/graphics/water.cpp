@@ -68,7 +68,7 @@ void WaterNode::render()
     if (SceneManager->getSceneNodeRenderPass() != scene::ESNRP_TRANSPARENT)
         return;
 
-    WaterShaderProvider * const cb = 
+    WaterShaderProvider * const cb =
         (WaterShaderProvider *) Shaders::getCallback(ES_WATER);
     cb->setSpeed(m_speed);
     cb->setHeight(m_height);

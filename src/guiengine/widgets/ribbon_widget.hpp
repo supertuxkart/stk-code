@@ -58,21 +58,21 @@ namespace GUIEngine
                                              const int playerID) = 0;
             virtual void onSelectionChange() = 0;
         };
-        
+
     private:
         friend class DynamicRibbonWidget;
         friend class EventHandler;
-        
+
         int m_selection[MAX_PLAYER_COUNT];
-        
+
         /** The type of this ribbon (toolbar, combo, tabs) */
         RibbonType m_ribbon_type;
-                
+
         /** Each item within the ribbon holds a flag saying whether it is
          *  selected or not. This method updates the flag in all of this
          *  ribbon's children. Called everytime selection changes.*/
         void updateSelection();
-        
+
         /** Callbacks */
         virtual EventPropagation rightPressed(const int playerID=0);
         virtual EventPropagation leftPressed(const int playerID=0);
@@ -83,31 +83,31 @@ namespace GUIEngine
                                                const int playerID=0);
         virtual EventPropagation focused(const int playerID);
         virtual void unfocused(const int playerID, Widget* new_focus);
-        
+
         PtrVector<irr::gui::IGUIStaticText, REF> m_labels;
-        
+
         IRibbonListener* m_listener;
         PtrVector<Widget> m_active_children;
-        
+
     public:
-        
+
         LEAK_CHECK()
-        
+
         /** Internal identifier of filler items that are added in a ribbon
          *  widget to filllines when the number of items cannot be divided
          *  by the number of rows in the grid (mostly used by dynamic ribbon
          *  widgets, but the base ribbon needs to know about filler items)
          */
         static const char NO_ITEM_ID[];
-        
+
         /** Contains which element within the ribbon is currently focused by
          *  player 0 (used by the skin to show mouse hovers over items that
          *  are not selected). Only used for COMBO and TAB ribbons. */
         Widget* m_mouse_focus;
-        
+
         RibbonWidget(const RibbonType type=RIBBON_COMBO);
         virtual ~RibbonWidget();
-        
+
         void add();
 
         /** Sets a listener that will be notified of changes on this ribbon.
@@ -139,10 +139,10 @@ namespace GUIEngine
         /** Sets the ID of the selected item within the ribbon */
         void setSelection(const int i, const int playerID)
                              { m_selection[playerID] = i; updateSelection(); }
-        
+
         /** Select an item in the ribbon by its internal name */
         void select(std::string item, const int playerID);
-        
+
         /**
           * \brief This method can be used to rename an item.
           * Has no effect for ribbons without individual labels.
@@ -151,12 +151,12 @@ namespace GUIEngine
           * \param id The index of the item to rename, in range [0 .. item count - 1]
           */
         void setLabel(const unsigned int id, irr::core::stringw new_name);
-        
+
         void setItemVisible(const unsigned int id, bool visible);
 
         /** Returns the ID of the item, or -1 if not found */
         int findItemNamed(const char* internalName);
-        
+
         /** Returns the the widget, or NULL if not found */
         GUIEngine::Widget * findWidgetNamed(const char* interalName);
 
@@ -167,8 +167,8 @@ namespace GUIEngine
           *       (e.g. tab bars)
           */
         void addTextChild(const wchar_t* text, const std::string &id);
-        
-        
+
+
         /** \brief Dynamically (at runtime) add an icon item to this ribbon.
          *  \pre this must be called before RibbonWidget::add, while the widget
          *       is not yet displayed
@@ -178,19 +178,19 @@ namespace GUIEngine
                           const int w, const int h, const std::string &icon,
                           const IconButtonWidget::IconPathType iconPathType=
                                     IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
-    
+
         /**
           * \brief clear all children of this ribbon (likely because new ones will be added soon after)
           * \pre this must be called before RibbonWidget::add, while the widget is not yet displayed
           */
         void clearAllChildren();
-        
+
         /**
          * \brief clear one child from this ribbon
          * \pre this must be called before RibbonWidget::add, while the widget is not yet displayed
          */
         void removeChildNamed(const char* name);
-        
+
         PtrVector<Widget>& getRibbonChildren() { return m_children; }
     };
 

@@ -1,11 +1,11 @@
 /*
 Bullet Continuous Collision Detection and Physics Library, http://bulletphysics.org
-Copyright (C) 2006, 2007 Sony Computer Entertainment Inc. 
+Copyright (C) 2006, 2007 Sony Computer Entertainment Inc.
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -37,7 +37,7 @@ btUniversalConstraint::btUniversalConstraint(btRigidBody& rbA, btRigidBody& rbB,
 	// 6DOF constraint uses Euler angles and to define limits
 	// it is assumed that rotational order is :
 	// Z - first, allowed limits are (-PI,PI);
-	// new position of Y - second (allowed limits are (-PI/2 + epsilon, PI/2 - epsilon), where epsilon is a small positive number 
+	// new position of Y - second (allowed limits are (-PI/2 + epsilon, PI/2 - epsilon), where epsilon is a small positive number
 	// used to prevent constraint from instability on poles;
 	// new position of X, allowed limits are (-PI,PI);
 	// So to simulate ODE Universal joint we should use parent axis as Z, child axis as Y and limit all other DOFs
@@ -47,7 +47,7 @@ btUniversalConstraint::btUniversalConstraint(btRigidBody& rbA, btRigidBody& rbB,
 	btVector3 xAxis = yAxis.cross(zAxis); // we want right coordinate system
 	btTransform frameInW;
 	frameInW.setIdentity();
-	frameInW.getBasis().setValue(	xAxis[0], yAxis[0], zAxis[0],	
+	frameInW.getBasis().setValue(	xAxis[0], yAxis[0], zAxis[0],
 									xAxis[1], yAxis[1], zAxis[1],
 									xAxis[2], yAxis[2], zAxis[2]);
 	frameInW.setOrigin(anchor);
@@ -72,7 +72,7 @@ void btUniversalConstraint::setAxis(const btVector3& axis1,const btVector3& axis
 
 	btTransform frameInW;
 	frameInW.setIdentity();
-	frameInW.getBasis().setValue(	xAxis[0], yAxis[0], zAxis[0],	
+	frameInW.getBasis().setValue(	xAxis[0], yAxis[0], zAxis[0],
                                 xAxis[1], yAxis[1], zAxis[1],
                                 xAxis[2], yAxis[2], zAxis[2]);
 	frameInW.setOrigin(m_anchor);

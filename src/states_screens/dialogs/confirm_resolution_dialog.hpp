@@ -32,7 +32,7 @@ class ConfirmResolutionDialog : public GUIEngine::ModalDialog
 private:
     /** number of seconds left before resolution is considered unplayable */
     float m_remaining_time;
-        
+
     /** updates countdown message */
     void updateMessage();
 public:
@@ -40,10 +40,10 @@ public:
     ConfirmResolutionDialog();
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
+
     virtual void onUpdate(float dt);
     virtual bool onEscapePressed() OVERRIDE;
 };
-  
+
 
 #endif

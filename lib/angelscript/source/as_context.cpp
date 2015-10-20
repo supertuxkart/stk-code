@@ -1648,7 +1648,7 @@ bool asCContext::ReserveStackSpace(asUINT size)
 			                  (m_currentFunction->DoesReturnOnStack() ? AS_PTR_SIZE : 0);
 
 #ifdef WIP_16BYTE_ALIGN
-		// Align the stack pointer 
+		// Align the stack pointer
 		(asPWORD&)m_regs.stackPointer &= ~(MAX_TYPE_ALIGNMENT-1);
 
 		asASSERT( isAligned(m_regs.stackPointer, MAX_TYPE_ALIGNMENT) );
@@ -1687,8 +1687,8 @@ void asCContext::PrepareScriptFunction()
 	// over the function arguments to the new block.
 	if( m_regs.stackPointer != oldStackPointer )
 	{
-		int numDwords = m_currentFunction->GetSpaceNeededForArguments() + 
-		                (m_currentFunction->objectType ? AS_PTR_SIZE : 0) + 
+		int numDwords = m_currentFunction->GetSpaceNeededForArguments() +
+		                (m_currentFunction->objectType ? AS_PTR_SIZE : 0) +
 		                (m_currentFunction->DoesReturnOnStack() ? AS_PTR_SIZE : 0);
 		memcpy(m_regs.stackPointer, oldStackPointer, sizeof(asDWORD)*numDwords);
 	}
@@ -4922,7 +4922,7 @@ asEContextState asCContext::GetState() const
 // interface
 int asCContext::SetLineCallback(asSFuncPtr callback, void *obj, int callConv)
 {
-	// First turn off the line callback to avoid a second thread 
+	// First turn off the line callback to avoid a second thread
 	// attempting to call it while the new one is still being set
 	m_lineCallback = false;
 
@@ -4944,11 +4944,11 @@ int asCContext::SetLineCallback(asSFuncPtr callback, void *obj, int callConv)
 	}
 
 	int r = DetectCallingConvention(isObj, callback, callConv, 0, &m_lineCallbackFunc);
-	
+
 	// Turn on the line callback after setting both the function pointer and object pointer
 	if( r >= 0 ) m_lineCallback = true;
 
-	// The BC_SUSPEND instruction should be processed if either line 
+	// The BC_SUSPEND instruction should be processed if either line
 	// callback is set or if the application has requested a suspension
 	m_regs.doProcessSuspend = m_doSuspend || m_lineCallback;
 
@@ -5068,14 +5068,14 @@ int asCContext::CallGeneric(asCScriptFunction *descr)
 					*addr = 0;
 				}
 			}
-			else 
+			else
 			{
 				asASSERT( clean->op == 1 || clean->op == 2 );
 				asASSERT( *addr );
 
 				if( clean->op == 2 )
 					m_engine->CallObjectMethod(*addr, clean->ot->beh.destruct);
-				
+
 				m_engine->CallFree(*addr);
 			}
 		}

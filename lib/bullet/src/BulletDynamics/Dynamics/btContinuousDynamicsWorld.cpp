@@ -4,8 +4,8 @@ Copyright (c) 2003-2007 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -42,12 +42,12 @@ btContinuousDynamicsWorld::~btContinuousDynamicsWorld()
 {
 }
 
-	
+
 void	btContinuousDynamicsWorld::internalSingleStepSimulation( btScalar timeStep)
 {
-	
+
 	startProfiling(timeStep);
-	
+
 	if(0 != m_internalPreTickCallback) {
 		(*m_internalPreTickCallback)(this, timeStep);
 	}
@@ -72,14 +72,14 @@ void	btContinuousDynamicsWorld::internalSingleStepSimulation( btScalar timeStep)
 
 	calculateSimulationIslands();
 
-	
+
 	getSolverInfo().m_timeStep = timeStep;
-	
+
 
 
 	///solve contact and other joint constraints
 	solveConstraints(getSolverInfo());
-	
+
 	///CallbackTriggers();
 	calculateTimeOfImpacts(timeStep);
 
@@ -97,7 +97,7 @@ void	btContinuousDynamicsWorld::internalSingleStepSimulation( btScalar timeStep)
 	updateActions(timeStep);
 
 	updateActivationState( timeStep );
-	
+
 	if(0 != m_internalTickCallback) {
 		(*m_internalTickCallback)(this, timeStep);
 	}
@@ -107,12 +107,12 @@ void	btContinuousDynamicsWorld::calculateTimeOfImpacts(btScalar timeStep)
 {
 		///these should be 'temporal' aabbs!
 		updateTemporalAabbs(timeStep);
-		
+
 		///'toi' is the global smallest time of impact. However, we just calculate the time of impact for each object individually.
 		///so we handle the case moving versus static properly, and we cheat for moving versus moving
 		btScalar toi = 1.f;
-		
-	
+
+
 		btDispatcherInfo& dispatchInfo = getDispatchInfo();
 		dispatchInfo.m_timeStep = timeStep;
 		dispatchInfo.m_timeOfImpact = 1.f;
@@ -140,7 +140,7 @@ void	btContinuousDynamicsWorld::updateTemporalAabbs(btScalar timeStep)
 	for ( int i=0;i<m_collisionObjects.size();i++)
 	{
 		btCollisionObject* colObj = m_collisionObjects[i];
-		
+
 		btRigidBody* body = btRigidBody::upcast(colObj);
 		if (body)
 		{
@@ -157,17 +157,17 @@ void	btContinuousDynamicsWorld::updateTemporalAabbs(btScalar timeStep)
 
 			// add linear motion
 			btVector3 linMotion = linvel*timeStep;
-		
+
 			if (linMotion.x() > 0.f)
-				temporalAabbMaxx += linMotion.x(); 
+				temporalAabbMaxx += linMotion.x();
 			else
 				temporalAabbMinx += linMotion.x();
 			if (linMotion.y() > 0.f)
-				temporalAabbMaxy += linMotion.y(); 
+				temporalAabbMaxy += linMotion.y();
 			else
 				temporalAabbMiny += linMotion.y();
 			if (linMotion.z() > 0.f)
-				temporalAabbMaxz += linMotion.z(); 
+				temporalAabbMaxz += linMotion.z();
 			else
 				temporalAabbMinz += linMotion.z();
 
@@ -187,7 +187,7 @@ void	btContinuousDynamicsWorld::updateTemporalAabbs(btScalar timeStep)
 	//update aabb (of all moved objects)
 
 	m_broadphasePairCache->calculateOverlappingPairs(m_dispatcher1);
-	
+
 
 
 }

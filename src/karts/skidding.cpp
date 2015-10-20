@@ -79,7 +79,7 @@ void Skidding::reset()
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
     m_kart->getKartGFX()->updateSkidLight(0);
     m_kart->getControls().m_skid = KartControl::SC_NONE;
-    
+
     btVector3 rot(0, 0, 0);
     // Only access the vehicle if the kart is not a ghost
     if (dynamic_cast<GhostKart*>(m_kart)==NULL)
@@ -146,7 +146,7 @@ void Skidding::updateSteering(float steer, float dt)
                 m_visual_rotation = m_skid_visual * m_real_steering;
             break;
         }
-        
+
 
     }   // switch m_skid_state
 
@@ -407,7 +407,7 @@ void Skidding::update(float dt, bool is_on_ground,
                                              bonus_speed, bonus_speed,
                                              bonus_force, bonus_time,
                                              /*fade-out-time*/ 1.0f);
-                    
+
                     StateManager::ActivePlayer *c = m_kart->getController()->getPlayer();
                     if (c && c->getConstProfile() == PlayerManager::getCurrentPlayer())
                     {

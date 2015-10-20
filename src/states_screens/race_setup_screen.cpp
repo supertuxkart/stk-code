@@ -138,7 +138,7 @@ void RaceSetupScreen::assignDifficulty()
     RibbonWidget* difficulty = getWidget<RibbonWidget>("difficulty");
     assert(difficulty != NULL);
     const std::string& difficultySelection = difficulty->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-    
+
     if (difficultySelection == "novice")
     {
         UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_EASY;

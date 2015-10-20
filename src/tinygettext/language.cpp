@@ -432,7 +432,7 @@ Language::from_env(const std::string& env)
 
   if (ln != std::string::npos && ln+1 < env.size()) // _
   {
-    country = env.substr(ln+1, (std::min(dt, at) == std::string::npos) 
+    country = env.substr(ln+1, (std::min(dt, at) == std::string::npos)
                             ? std::string::npos : std::min(dt, at) - (ln+1));
     country = StringUtils::toUpperCase(country);
   }

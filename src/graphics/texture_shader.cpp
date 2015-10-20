@@ -33,7 +33,7 @@ TextureShaderBase::BindFunction TextureShaderBase::m_all_bind_functions[] =
   /* ST_SEMI_TRILINEAR                 */ &TextureShaderBase::bindTextureSemiTrilinear
 };
 
-GLuint TextureShaderBase::m_all_texture_types[] = 
+GLuint TextureShaderBase::m_all_texture_types[] =
 { /* ST_NEAREST_FILTERED               */ GL_TEXTURE_2D,
   /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ GL_TEXTURE_2D,
   /* ST_TRILINEAR_CUBEMAP              */ GL_TEXTURE_CUBE_MAP,

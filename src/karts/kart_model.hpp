@@ -159,7 +159,7 @@ private:
 
     /** Radius of the graphical wheels.  */
     float         m_wheel_graphics_radius[4];
-    
+
     /** The position of the nitro emitters */
     Vec3          m_nitro_emitter_position[2];
 
@@ -168,7 +168,7 @@ private:
 
     /** The speed weighted objects. */
     SpeedWeightedObjectList     m_speed_weighted_objects;
-    
+
     /** Length of the physics suspension when the kart is at rest. */
     float m_default_physics_suspension[4];
 
@@ -212,7 +212,7 @@ private:
 
     void  loadWheelInfo(const XMLNode &node,
                         const std::string &wheel_name, int index);
-    
+
     void  loadNitroEmitterInfo(const XMLNode &node,
                         const std::string &emitter_name, int index);
 

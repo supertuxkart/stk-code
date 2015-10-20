@@ -38,14 +38,14 @@ Material::ShaderType getMeshMaterialFromType(video::E_MATERIAL_TYPE material_typ
                                               Material* material,
                                               Material* layer2_material)
 {
-    if (layer2_material != NULL && 
+    if (layer2_material != NULL &&
         layer2_material->getShaderType() == Material::SHADERTYPE_SPLATTING)
         return Material::SHADERTYPE_SPLATTING;
 
     switch (material->getShaderType())
     {
     default:
-        return material->getShaderType();   
+        return material->getShaderType();
     case Material::SHADERTYPE_SOLID:
         if (material_type == Shaders::getShader(ES_NORMAL_MAP))
             return Material::SHADERTYPE_NORMAL_MAP;
@@ -117,7 +117,7 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
                               getVertexPitchFromType(type), (GLvoid*)12);
         // Color
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, 
+        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE,
                               getVertexPitchFromType(type), (GLvoid*)24);
         // Texcoord
         glEnableVertexAttribArray(3);
@@ -125,7 +125,7 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
                               getVertexPitchFromType(type), (GLvoid*)28);
         // SecondTexcoord
         glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, 
+        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE,
                               getVertexPitchFromType(type), (GLvoid*)36);
         break;
     case video::EVT_TANGENTS:
@@ -288,7 +288,7 @@ core::matrix4 computeMVP(const core::matrix4 &model_matrix)
 core::vector3df getWindDir()
 {
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    GrassShaderProvider *gsp = 
+    GrassShaderProvider *gsp =
         (GrassShaderProvider *)Shaders::getCallback(ES_GRASS);
     return (gsp->getSpeed() * cos(time)) * vector3df(1., 0., 0.);
 }   // getWindDir
@@ -340,7 +340,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
         Log::error("STKMesh", "Missing texture %d for material %s", i,
                    mat_name.c_str());
         // use unicolor texture to replace missing texture
-        mesh.textures[i] = 
+        mesh.textures[i] =
                       getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
     compressTexture(mesh.textures[i], is_srgb);

@@ -210,7 +210,7 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
             case 3: return "Y";
                     // I18N: name of buttons on gamepads
             case 4: return _("Left bumper");
-                    // I18N: name of buttons on gamepads                
+                    // I18N: name of buttons on gamepads
             case 5: return _("Right bumper");
                     // I18N: name of buttons on gamepads
             case 6: return _("Back");
@@ -248,7 +248,7 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
                                                     // I18N: name of stick on gamepads
                                                     : _("Right thumb left");
                                                     // I18N: name of buttons on gamepads
-            case Input::HAT_H_ID: return (ad == Input::AD_POSITIVE) ? _("DPad up") 
+            case Input::HAT_H_ID: return (ad == Input::AD_POSITIVE) ? _("DPad up")
                                                     // I18N: name of buttons on gamepads
                                                                     : _("DPad down");
                                                     // I18N: name of buttons on gamepads

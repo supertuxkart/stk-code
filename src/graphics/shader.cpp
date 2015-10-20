@@ -62,7 +62,7 @@ const std::string& ShaderBase::getHeader()
 GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
 {
     GLuint id = glCreateShader(type);
-    
+
     std::ostringstream code;
     code << "#version " << CVS->getGLSLVersion()<<"\n";
     if (CVS->isAMDVertexShaderLayerUsable())
@@ -124,7 +124,7 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
 /** Loads a transform feedback buffer shader with a given number of varying
  *  parameters.
 */
-int ShaderBase::loadTFBProgram(const std::string &shader_name, 
+int ShaderBase::loadTFBProgram(const std::string &shader_name,
                                const char **varyings,
                                unsigned varying_count)
 {
@@ -170,7 +170,7 @@ void ShaderBase::bypassUBO() const
     glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 
     GLint Screen = glGetUniformLocation(m_program, "screen");
-    glUniform2f(Screen, irr_driver->getCurrentScreenSize().X, 
+    glUniform2f(Screen, irr_driver->getCurrentScreenSize().X,
                         irr_driver->getCurrentScreenSize().Y);
 
     GLint bLmn = glGetUniformLocation(m_program, "blueLmn[0]");

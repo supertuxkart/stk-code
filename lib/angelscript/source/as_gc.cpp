@@ -85,7 +85,7 @@ int asCGarbageCollector::AddScriptObjectToGC(void *obj, asCObjectType *objType)
 
 	// Invoke the garbage collector to destroy a little garbage as new comes in
 	// This will maintain the number of objects in the GC at a maintainable level without
-	// halting the application, and without burdening the application with manually invoking the 
+	// halting the application, and without burdening the application with manually invoking the
 	// garbage collector.
 	if( engine->ep.autoGarbageCollect && gcNewObjects.GetLength() )
 	{
@@ -97,7 +97,7 @@ int asCGarbageCollector::AddScriptObjectToGC(void *obj, asCObjectType *objType)
 			{
 				isProcessing = true;
 
-				// TODO: The number of iterations should be dynamic, and increase 
+				// TODO: The number of iterations should be dynamic, and increase
 				//       if the number of objects in the garbage collector grows high
 
 				// Run one step of DetectGarbage
@@ -159,7 +159,7 @@ int asCGarbageCollector::GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj, a
 // TODO: Should have a flag to tell the garbage collector to automatically determine how many iterations are needed
 //       It should then gather statistics such as how many objects has been created since last run, and how many objects
 //       are destroyed per iteration, and how many objects are detected as cyclic garbage per iteration.
-//       It should try to reach a stable number of objects, i.e. so that on average the number of objects added to 
+//       It should try to reach a stable number of objects, i.e. so that on average the number of objects added to
 //       the garbage collector is the same as the number of objects destroyed. And it should try to minimize the number
 //       of iterations of detections that must be executed per cycle while still identifying the cyclic garbage
 //       These variables should also be available for inspection through the gcstatistics.
@@ -169,8 +169,8 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags, asUINT iterations)
 	if( TRYENTERCRITICALSECTION(gcCollecting) )
 	{
 		// If the GC is already processing in this thread, then don't enter here again
-		if( isProcessing ) 
-		{	
+		if( isProcessing )
+		{
 			LEAVECRITICALSECTION(gcCollecting);
 			return 1;
 		}
@@ -244,7 +244,7 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags, asUINT iterations)
 		isProcessing = false;
 		LEAVECRITICALSECTION(gcCollecting);
 	}
-	
+
 	// Return 1 to indicate that the cycle wasn't finished
 	return 1;
 }
@@ -370,7 +370,7 @@ int asCGarbageCollector::DestroyNewGarbage()
 			if( gcNewObjects.GetLength() == 0 )
 				return 0;
 
-			// Update the seqAtSweepStart which is used to determine when 
+			// Update the seqAtSweepStart which is used to determine when
 			// to move an object from the new set to the old set
 			seqAtSweepStart[0] = seqAtSweepStart[1];
 			seqAtSweepStart[1] = seqAtSweepStart[2];
@@ -427,9 +427,9 @@ int asCGarbageCollector::DestroyNewGarbage()
 
 					destroyNewState = destroyGarbage_haveMore;
 				}
-				// Check if this object has been inspected 3 times already, and if so move it to the 
+				// Check if this object has been inspected 3 times already, and if so move it to the
 				// set of old objects that are less likely to become garbage in a short time
-				// TODO: Is 3 really a good value? Should the number of times be dynamic? 
+				// TODO: Is 3 really a good value? Should the number of times be dynamic?
 				else if( gcObj.seqNbr < seqAtSweepStart[0] )
 				{
 					// We've already verified this object multiple times. It is likely
@@ -453,7 +453,7 @@ int asCGarbageCollector::DestroyNewGarbage()
 					// Restart the cycle
 					destroyNewState = destroyGarbage_init;
 
-					// Return 0 to tell the application that there 
+					// Return 0 to tell the application that there
 					// is no more garbage to destroy at the moment
 					return 0;
 				}
@@ -549,10 +549,10 @@ int asCGarbageCollector::DestroyOldGarbage()
 
 				if( gcObj.type->beh.gcGetRefCount == 0 )
 				{
-					// If circular references are formed with registered types that hasn't 
+					// If circular references are formed with registered types that hasn't
 					// registered the GC behaviours, then the engine may be forced to free
 					// the object type before the actual object instance. In this case we
-					// will be forced to skip the destruction of the objects, so as not to 
+					// will be forced to skip the destruction of the objects, so as not to
 					// crash the application.
 					asCString msg;
 					msg.Format(TXT_d_GC_CANNOT_FREE_OBJ_OF_TYPE_s, gcObj.seqNbr, gcObj.type->name.AddressOf());
@@ -611,7 +611,7 @@ int asCGarbageCollector::DestroyOldGarbage()
 					// Restart the cycle
 					destroyOldState = destroyGarbage_init;
 
-					// Return 0 to tell the application that there 
+					// Return 0 to tell the application that there
 					// is no more garbage to destroy at the moment
 					return 0;
 				}
@@ -681,7 +681,7 @@ int asCGarbageCollector::IdentifyGarbageWithCyclicRefs()
 			{
 				// Add the gc count for this object
 				asSObjTypePair gcObj = GetOldObjectAtIdx(detectIdx);
-	
+
 				int refCount = 0;
 				if( gcObj.type->beh.gcGetRefCount )
 					refCount = engine->CallObjectMethodRetInt(gcObj.obj, gcObj.type->beh.gcGetRefCount);
@@ -700,7 +700,7 @@ int asCGarbageCollector::IdentifyGarbageWithCyclicRefs()
 					engine->CallObjectMethod(gcObj.obj, gcObj.type->beh.gcSetFlag);
 				}
 
-				detectIdx++; 
+				detectIdx++;
 
 				// Let the application work a little
 				return 1;
@@ -881,7 +881,7 @@ int asCGarbageCollector::IdentifyGarbageWithCyclicRefs()
 				{
 					// For script objects we must call the class destructor before
 					// releasing the references, otherwise the destructor may not
-					// be able to perform the necessary clean-up as the handles will 
+					// be able to perform the necessary clean-up as the handles will
 					// be null.
 					reinterpret_cast<asCScriptObject*>(gcObj)->CallDestructor();
 				}
@@ -935,7 +935,7 @@ asCGarbageCollector::asSMapNode_t *asCGarbageCollector::GetNode(void *obj, asSIn
 			return 0;
 		}
 	}
-	
+
 	node->Init(obj, it);
 	return node;
 }

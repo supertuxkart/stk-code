@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -44,7 +44,7 @@ void btStaticPlaneShape::getAabb(const btTransform& t,btVector3& aabbMin,btVecto
 	aabbMin = center + infvec*m_planeNormal;
 	aabbMax = aabbMin;
 	aabbMin.setMin(center - infvec*m_planeNormal);
-	aabbMax.setMax(center - infvec*m_planeNormal); 
+	aabbMax.setMax(center - infvec*m_planeNormal);
 	*/
 
 	aabbMin.setValue(btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT));
@@ -61,7 +61,7 @@ void	btStaticPlaneShape::processAllTriangles(btTriangleCallback* callback,const 
 	btVector3 halfExtents = (aabbMax - aabbMin) * btScalar(0.5);
 	btScalar radius = halfExtents.length();
 	btVector3 center = (aabbMax + aabbMin) * btScalar(0.5);
-	
+
 	//this is where the triangles are generated, given AABB and plane equation (normal/constant)
 
 	btVector3 tangentDir0,tangentDir1;
@@ -72,7 +72,7 @@ void	btStaticPlaneShape::processAllTriangles(btTriangleCallback* callback,const 
 	btVector3 supVertex0,supVertex1;
 
 	btVector3 projectedCenter = center - (m_planeNormal.dot(center) - m_planeConstant)*m_planeNormal;
-	
+
 	btVector3 triangle[3];
 	triangle[0] = projectedCenter + tangentDir0*radius + tangentDir1*radius;
 	triangle[1] = projectedCenter + tangentDir0*radius - tangentDir1*radius;
@@ -93,7 +93,7 @@ void	btStaticPlaneShape::calculateLocalInertia(btScalar mass,btVector3& inertia)
 	(void)mass;
 
 	//moving concave objects not supported
-	
+
 	inertia.setValue(btScalar(0.),btScalar(0.),btScalar(0.));
 }
 

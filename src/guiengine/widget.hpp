@@ -352,9 +352,9 @@ namespace GUIEngine
          * \{
          */
 
-        /** \brief Sets an widget to be either activated or deactivated 
+        /** \brief Sets an widget to be either activated or deactivated
          *  (i.e. greyed out)
-         *  \param active Active (true) or deactive (false). Defaults to 
+         *  \param active Active (true) or deactive (false). Defaults to
          *         true. */
         virtual void setActive(bool active=true);
 

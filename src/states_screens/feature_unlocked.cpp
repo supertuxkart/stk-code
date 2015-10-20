@@ -156,7 +156,7 @@ void FeatureUnlockedCutScene::onCutsceneEnd()
         irr_driver->removeNode(m_avoid_irrlicht_bug);
     m_avoid_irrlicht_bug = NULL;
 #endif
-    
+
     m_unlocked_stuff.clearAndDeleteAll();
     m_all_kart_models.clearAndDeleteAll();
 

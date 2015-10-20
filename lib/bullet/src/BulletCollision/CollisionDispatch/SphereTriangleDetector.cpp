@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -67,7 +67,7 @@ btScalar SegmentSqrDistance(const btVector3& from, const btVector3& to,const btV
 	btVector3 diff = p - from;
 	btVector3 v = to - from;
 	btScalar t = v.dot(diff);
-	
+
 	if (t > 0) {
 		btScalar dotVV = v.dot(v);
 		if (t < dotVV) {
@@ -81,13 +81,13 @@ btScalar SegmentSqrDistance(const btVector3& from, const btVector3& to,const btV
 		t = 0;
 
 	nearest = from + t*v;
-	return diff.dot(diff);	
+	return diff.dot(diff);
 }
 
 bool SphereTriangleDetector::facecontains(const btVector3 &p,const btVector3* vertices,btVector3& normal)  {
 	btVector3 lp(p);
 	btVector3 lnormal(normal);
-	
+
 	return pointInTriangle(vertices, lnormal, &lp);
 }
 
@@ -95,7 +95,7 @@ bool SphereTriangleDetector::collide(const btVector3& sphereCenter,btVector3 &po
 {
 
 	const btVector3* vertices = &m_triangle->getVertexPtr(0);
-	
+
 	btScalar radius = m_sphere->getRadius();
 	btScalar radiusWithThreshold = radius + contactBreakingThreshold;
 
@@ -112,7 +112,7 @@ bool SphereTriangleDetector::collide(const btVector3& sphereCenter,btVector3 &po
 	}
 
 	bool isInsideContactPlane = distanceFromPlane < radiusWithThreshold;
-	
+
 	// Check for contact / intersection
 	bool hasContact = false;
 	btVector3 contactPoint;
@@ -126,10 +126,10 @@ bool SphereTriangleDetector::collide(const btVector3& sphereCenter,btVector3 &po
 			btScalar contactCapsuleRadiusSqr = radiusWithThreshold*radiusWithThreshold;
 			btVector3 nearestOnEdge;
 			for (int i = 0; i < m_triangle->getNumEdges(); i++) {
-				
+
 				btVector3 pa;
 				btVector3 pb;
-				
+
 				m_triangle->getEdge(i,pa,pb);
 
 				btScalar distanceSqr = SegmentSqrDistance(pa,pb,sphereCenter, nearestOnEdge);
@@ -138,7 +138,7 @@ bool SphereTriangleDetector::collide(const btVector3& sphereCenter,btVector3 &po
 					hasContact = true;
 					contactPoint = nearestOnEdge;
 				}
-				
+
 			}
 		}
 	}
@@ -166,7 +166,7 @@ bool SphereTriangleDetector::collide(const btVector3& sphereCenter,btVector3 &po
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -188,7 +188,7 @@ bool SphereTriangleDetector::pointInTriangle(const btVector3 vertices[], const b
 	btVector3 edge1_normal( edge1.cross(normal));
 	btVector3 edge2_normal( edge2.cross(normal));
 	btVector3 edge3_normal( edge3.cross(normal));
-	
+
 	btScalar r1, r2, r3;
 	r1 = edge1_normal.dot( p1_to_p );
 	r2 = edge2_normal.dot( p2_to_p );

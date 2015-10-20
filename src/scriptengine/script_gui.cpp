@@ -77,7 +77,7 @@ namespace Scripting
             irr::core::stringw msg = StringUtils::utf8_to_wide(input->c_str());
             std::vector<core::stringw> parts =
                 StringUtils::split(msg, '\n', false);
-                        
+
             for (unsigned int n = 0; n < parts.size(); n++)
             {
                 World::getWorld()->getRaceGUI()

@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -21,7 +21,7 @@ subject to the following restrictions:
 
 
 btOptimizedBvh::btOptimizedBvh()
-{ 
+{
 }
 
 btOptimizedBvh::~btOptimizedBvh()
@@ -46,7 +46,7 @@ void btOptimizedBvh::build(btStridingMeshInterface* triangles, bool useQuantized
 			m_triangleNodes = other.m_triangleNodes;
 			return *this;
 		}
-		
+
 		NodeTriangleCallback(NodeArray&	triangleNodes)
 			:m_triangleNodes(triangleNodes)
 		{
@@ -57,7 +57,7 @@ void btOptimizedBvh::build(btStridingMeshInterface* triangles, bool useQuantized
 			btOptimizedBvhNode node;
 			btVector3	aabbMin,aabbMax;
 			aabbMin.setValue(btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT));
-			aabbMax.setValue(btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT)); 
+			aabbMax.setValue(btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT));
 			aabbMin.setMin(triangle[0]);
 			aabbMax.setMax(triangle[0]);
 			aabbMin.setMin(triangle[1]);
@@ -70,7 +70,7 @@ void btOptimizedBvh::build(btStridingMeshInterface* triangles, bool useQuantized
 			node.m_aabbMaxOrg = aabbMax;
 
 			node.m_escapeIndex = -1;
-	
+
 			//for child nodes
 			node.m_subPart = partId;
 			node.m_triangleIndex = triangleIndex;
@@ -105,7 +105,7 @@ void btOptimizedBvh::build(btStridingMeshInterface* triangles, bool useQuantized
 			btQuantizedBvhNode node;
 			btVector3	aabbMin,aabbMax;
 			aabbMin.setValue(btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT));
-			aabbMax.setValue(btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT)); 
+			aabbMax.setValue(btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT));
 			aabbMin.setMin(triangle[0]);
 			aabbMax.setMax(triangle[0]);
 			aabbMin.setMin(triangle[1]);
@@ -140,12 +140,12 @@ void btOptimizedBvh::build(btStridingMeshInterface* triangles, bool useQuantized
 			m_triangleNodes.push_back(node);
 		}
 	};
-	
+
 
 
 	int numLeafNodes = 0;
 
-	
+
 	if (m_useQuantization)
 	{
 
@@ -154,7 +154,7 @@ void btOptimizedBvh::build(btStridingMeshInterface* triangles, bool useQuantized
 
 		QuantizedNodeTriangleCallback	callback(m_quantizedLeafNodes,this);
 
-	
+
 		triangles->InternalProcessAllTriangles(&callback,m_bvhAabbMin,m_bvhAabbMax);
 
 		//now we have an array of leafnodes in m_leafNodes
@@ -245,7 +245,7 @@ void	btOptimizedBvh::refitPartial(btStridingMeshInterface* meshInterface,const b
 
 	///we should update all quantization values, using updateBvhNodes(meshInterface);
 	///but we only update chunks that overlap the given aabb
-	
+
 	unsigned short	quantizedQueryAabbMin[3];
 	unsigned short	quantizedQueryAabbMax[3];
 
@@ -266,7 +266,7 @@ void	btOptimizedBvh::refitPartial(btStridingMeshInterface* meshInterface,const b
 			subtree.setAabbFromQuantizeNode(m_quantizedContiguousNodes[subtree.m_rootNodeIndex]);
 		}
 	}
-	
+
 }
 
 void	btOptimizedBvh::updateBvhNodes(btStridingMeshInterface* meshInterface,int firstNode,int endNode,int index)
@@ -290,7 +290,7 @@ void	btOptimizedBvh::updateBvhNodes(btStridingMeshInterface* meshInterface,int f
 		btVector3	triangleVerts[3];
 		btVector3	aabbMin,aabbMax;
 		const btVector3& meshScaling = meshInterface->getScaling();
-		
+
 		int i;
 		for (i=endNode-1;i>=firstNode;i--)
 		{
@@ -314,11 +314,11 @@ void	btOptimizedBvh::updateBvhNodes(btStridingMeshInterface* meshInterface,int f
 				//triangles->getLockedReadOnlyVertexIndexBase(vertexBase,numVerts,
 
 				unsigned int* gfxbase = (unsigned int*)(indexbase+nodeTriangleIndex*indexstride);
-				
-				
+
+
 				for (int j=2;j>=0;j--)
 				{
-					
+
 					int graphicsindex = indicestype==PHY_SHORT?((unsigned short*)gfxbase)[j]:gfxbase[j];
 					if (type == PHY_FLOAT)
 					{
@@ -336,9 +336,9 @@ void	btOptimizedBvh::updateBvhNodes(btStridingMeshInterface* meshInterface,int f
 				}
 
 
-				
+
 				aabbMin.setValue(btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT));
-				aabbMax.setValue(btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT)); 
+				aabbMax.setValue(btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT));
 				aabbMin.setMin(triangleVerts[0]);
 				aabbMax.setMax(triangleVerts[0]);
 				aabbMin.setMin(triangleVerts[1]);
@@ -348,16 +348,16 @@ void	btOptimizedBvh::updateBvhNodes(btStridingMeshInterface* meshInterface,int f
 
 				quantize(&curNode.m_quantizedAabbMin[0],aabbMin,0);
 				quantize(&curNode.m_quantizedAabbMax[0],aabbMax,1);
-				
+
 			} else
 			{
 				//combine aabb from both children
 
 				btQuantizedBvhNode* leftChildNode = &m_quantizedContiguousNodes[i+1];
-				
+
 				btQuantizedBvhNode* rightChildNode = leftChildNode->isLeafNode() ? &m_quantizedContiguousNodes[i+2] :
 					&m_quantizedContiguousNodes[i+1+leftChildNode->getEscapeIndex()];
-				
+
 
 				{
 					for (int i=0;i<3;i++)
@@ -378,14 +378,14 @@ void	btOptimizedBvh::updateBvhNodes(btStridingMeshInterface* meshInterface,int f
 		if (curNodeSubPart >= 0)
 			meshInterface->unLockReadOnlyVertexBase(curNodeSubPart);
 
-		
+
 }
 
 ///deSerializeInPlace loads and initializes a BVH from a buffer in memory 'in place'
 btOptimizedBvh* btOptimizedBvh::deSerializeInPlace(void *i_alignedDataBuffer, unsigned int i_dataBufferSize, bool i_swapEndian)
 {
 	btQuantizedBvh* bvh = btQuantizedBvh::deSerializeInPlace(i_alignedDataBuffer,i_dataBufferSize,i_swapEndian);
-	
+
 	//we don't add additional data so just do a static upcast
 	return static_cast<btOptimizedBvh*>(bvh);
 }

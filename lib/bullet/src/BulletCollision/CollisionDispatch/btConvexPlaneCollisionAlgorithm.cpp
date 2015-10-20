@@ -61,7 +61,7 @@ void btConvexPlaneCollisionAlgorithm::collideSingleContact (const btQuaternion& 
     bool hasCollision = false;
 	const btVector3& planeNormal = planeShape->getPlaneNormal();
 	const btScalar& planeConstant = planeShape->getPlaneConstant();
-	
+
 	btTransform convexWorldTransform = convexObj->getWorldTransform();
 	btTransform convexInPlaneTrans;
 	convexInPlaneTrans= planeObj->getWorldTransform().inverse() * convexWorldTransform;
@@ -69,7 +69,7 @@ void btConvexPlaneCollisionAlgorithm::collideSingleContact (const btQuaternion& 
 	convexWorldTransform.getBasis()*=btMatrix3x3(perturbeRot);
 	btTransform planeInConvex;
 	planeInConvex= convexWorldTransform.inverse() * planeObj->getWorldTransform();
-	
+
 	btVector3 vtx = convexShape->localGetSupportingVertex(planeInConvex.getBasis()*-planeNormal);
 
 	btVector3 vtxInPlane = convexInPlaneTrans(vtx);
@@ -140,7 +140,7 @@ void btConvexPlaneCollisionAlgorithm::processCollision (btCollisionObject* body0
 		btScalar perturbeAngle;
 		btScalar radius = convexShape->getAngularMotionDisc();
 		perturbeAngle = gContactBreakingThreshold / radius;
-		if ( perturbeAngle > angleLimit ) 
+		if ( perturbeAngle > angleLimit )
 				perturbeAngle = angleLimit;
 
 		btQuaternion perturbeRot(v0,perturbeAngle);

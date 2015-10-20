@@ -473,7 +473,7 @@ void RubberBall::interpolate(Vec3 *next_xyz, float dt)
                          +4*m_control_points[2] -  m_control_points[3])*m_t*m_t
                       + (-  m_control_points[0] +  m_control_points[2])*m_t
                       +   2*m_control_points[1]                              );
-                      
+
     assert(!isnan((*next_xyz)[0]));
     assert(!isnan((*next_xyz)[1]));
     assert(!isnan((*next_xyz)[2]));

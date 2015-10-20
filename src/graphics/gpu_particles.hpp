@@ -40,12 +40,12 @@ protected:
     float m_color_to[3];
     bool m_first_execution;
     bool m_randomize_initial_y;
-    
+
     GLuint texture;
-    
+
     /** Previous frame particles emitter source matrix */
     core::matrix4 m_previous_frame_matrix;
-    
+
     /** Current count of particles. */
     unsigned m_count;
     /** Previous count - for error handling only. */

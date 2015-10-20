@@ -77,7 +77,7 @@ public:
     static void init();
     static void destroy();
     // ------------------------------------------------------------------------
-    /** Returns the material type of a shader. 
+    /** Returns the material type of a shader.
      *  \param num The shader type.
      */
     static video::E_MATERIAL_TYPE getShader(const ShaderType num)

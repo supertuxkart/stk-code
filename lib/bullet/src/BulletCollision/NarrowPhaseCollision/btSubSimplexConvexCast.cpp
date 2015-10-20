@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -57,7 +57,7 @@ bool	btSubsimplexConvexCast::calcTimeOfImpact(
 	///take relative motion
 	btVector3 r = (linVelA-linVelB);
 	btVector3 v;
-	
+
 	btVector3 supVertexA = fromA(m_convexA->localGetSupportingVertex(-r*fromA.getBasis()));
 	btVector3 supVertexB = fromB(m_convexB->localGetSupportingVertex(r*fromB.getBasis()));
 	v = supVertexA-supVertexB;
@@ -79,7 +79,7 @@ bool	btSubsimplexConvexCast::calcTimeOfImpact(
 #endif //BT_USE_DOUBLE_PRECISION
 	btVector3	w,p;
 	btScalar VdotR;
-	
+
 	while ( (dist2 > epsilon) && maxIter--)
 	{
 		supVertexA = interpolatedTransA(m_convexA->localGetSupportingVertex(-v*interpolatedTransA.getBasis()));
@@ -113,7 +113,7 @@ bool	btSubsimplexConvexCast::calcTimeOfImpact(
 				n = v;
 				hasResult = true;
 			}
-		} 
+		}
 		///Just like regular GJK only add the vertex if it isn't already (close) to current vertex, it would lead to divisions by zero and NaN etc.
 		if (!m_simplexSolver->inSimplex(w))
 			m_simplexSolver->addVertex( w, supVertexA , supVertexB);
@@ -130,14 +130,14 @@ bool	btSubsimplexConvexCast::calcTimeOfImpact(
 		} else
 		{
 			dist2 = btScalar(0.);
-		} 
+		}
 	}
 
 	//int numiter = MAX_ITERATIONS - maxIter;
 //	printf("number of iterations: %d", numiter);
-	
+
 	//don't report a time of impact when moving 'away' from the hitnormal
-	
+
 
 	result.m_fraction = lambda;
 	if (n.length2() >= (SIMD_EPSILON*SIMD_EPSILON))

@@ -68,7 +68,7 @@ namespace Scripting
         r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Destructor), asCALL_CDECL_OBJLAST); assert(r >= 0);
         r = engine->RegisterObjectMethod("Vec3", "Vec3 &opAssign(const Vec3 &in)", asMETHODPR(SimpleVec3, operator =, (const SimpleVec3&), SimpleVec3&), asCALL_THISCALL); assert(r >= 0);
         r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f(float, float, float)", asFUNCTION(ConstructVector3FromFloats), asCALL_CDECL_OBJLAST); assert(r >= 0);
-        r = engine->RegisterGlobalFunction("void printVec3(Vec3 a)", asFUNCTION(printVec3), asCALL_GENERIC); assert(r >= 0);   
+        r = engine->RegisterGlobalFunction("void printVec3(Vec3 a)", asFUNCTION(printVec3), asCALL_GENERIC); assert(r >= 0);
         r = engine->RegisterObjectMethod("Vec3", "float getX()", asFUNCTION(getX), asCALL_CDECL_OBJLAST); assert(r >= 0);
         r = engine->RegisterObjectMethod("Vec3", "float getY()", asFUNCTION(getY), asCALL_CDECL_OBJLAST); assert(r >= 0);
         r = engine->RegisterObjectMethod("Vec3", "float getZ()", asFUNCTION(getZ), asCALL_CDECL_OBJLAST); assert(r >= 0);

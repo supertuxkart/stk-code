@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -78,8 +78,8 @@ bool	btGjkConvexCast::calcTimeOfImpact(
 
 	btPointCollector	pointCollector;
 
-		
-	btGjkPairDetector gjk(m_convexA,m_convexB,m_simplexSolver,0);//m_penetrationDepthSolver);		
+
+	btGjkPairDetector gjk(m_convexA,m_convexB,m_simplexSolver,0);//m_penetrationDepthSolver);
 	btGjkPairDetector::ClosestPointInput input;
 
 	//we don't use margins during CCD
@@ -98,7 +98,7 @@ bool	btGjkConvexCast::calcTimeOfImpact(
 		dist = pointCollector.m_distance;
 		n = pointCollector.m_normalOnBInWorld;
 
-	
+
 
 		//not close enough
 		while (dist > radius)
@@ -111,7 +111,7 @@ bool	btGjkConvexCast::calcTimeOfImpact(
 			btScalar dLambda = btScalar(0.);
 
 			btScalar projectedLinearVelocity = r.dot(n);
-			
+
 			dLambda = dist / (projectedLinearVelocity);
 
 			lambda = lambda - dLambda;
@@ -135,7 +135,7 @@ bool	btGjkConvexCast::calcTimeOfImpact(
 			result.DebugDraw( lambda );
 			input.m_transformA.getOrigin().setInterpolate3(fromA.getOrigin(),toA.getOrigin(),lambda);
 			input.m_transformB.getOrigin().setInterpolate3(fromB.getOrigin(),toB.getOrigin(),lambda);
-			
+
 			gjk.getClosestPoints(input,pointCollector,0);
 			if (pointCollector.m_hasResult)
 			{
@@ -147,7 +147,7 @@ bool	btGjkConvexCast::calcTimeOfImpact(
 					result.m_hitPoint = pointCollector.m_pointInWorld;
 					return true;
 				}
-				c = pointCollector.m_pointInWorld;		
+				c = pointCollector.m_pointInWorld;
 				n = pointCollector.m_normalOnBInWorld;
 				dist = pointCollector.m_distance;
 			} else

@@ -608,7 +608,7 @@ asCScriptEngine::asCScriptEngine()
 
 void asCScriptEngine::DeleteDiscardedModules()
 {
-	// TODO: 2.30.0: redesign: Prevent more than one thread from entering this function at the same time. 
+	// TODO: 2.30.0: redesign: Prevent more than one thread from entering this function at the same time.
 	//                         If a thread is already doing the work for the clean-up the other thread should
 	//                         simply return, as the first thread will continue.
 
@@ -865,7 +865,7 @@ asCModule *asCScriptEngine::FindNewOwnerForSharedType(asCObjectType *type, asCMo
 			foundIdx = mod->typeDefs.IndexOf(type);
 		else
 			foundIdx = mod->classTypes.IndexOf(type);
-		
+
 		if( foundIdx >= 0 )
 		{
 			type->module = mod;
@@ -894,7 +894,7 @@ asCModule *asCScriptEngine::FindNewOwnerForSharedFunc(asCScriptFunction *func, a
 			foundIdx = mod->funcDefs.IndexOf(func);
 		else
 			foundIdx = mod->scriptFunctions.IndexOf(func);
-		
+
 		if( foundIdx >= 0 )
 		{
 			func->module = mod;
@@ -1865,7 +1865,7 @@ int asCScriptEngine::RegisterObjectType(const char *name, int byteSize, asDWORD 
 			type->nameSpace  = dt.GetObjectType()->nameSpace;
 			type->templateSubTypes.PushLast(dt.GetSubType());
 			for( asUINT s = 0; s < type->templateSubTypes.GetLength(); s++ )
-				if( type->templateSubTypes[s].GetObjectType() ) 
+				if( type->templateSubTypes[s].GetObjectType() )
 					type->templateSubTypes[s].GetObjectType()->AddRefInternal();
 			type->size       = byteSize;
 #ifdef WIP_16BYTE_ALIGN
@@ -2663,7 +2663,7 @@ int asCScriptEngine::GetGlobalPropertyIndexByName(const char *name) const
 	while( ns )
 	{
 		int id = registeredGlobalProps.GetFirstIndex(ns, name);
-		if( id >= 0 ) 
+		if( id >= 0 )
 			return id;
 
 		// Recursively search parent namespace
@@ -3715,7 +3715,7 @@ asCDataType asCScriptEngine::DetermineTypeForTemplate(const asCDataType &orig, a
 		// Find the matching replacements for the subtypes
 		for( asUINT n = 0; n < origType->templateSubTypes.GetLength(); n++ )
 		{
-			if( origType->templateSubTypes[n].GetObjectType() == 0 || 
+			if( origType->templateSubTypes[n].GetObjectType() == 0 ||
 				!(origType->templateSubTypes[n].GetObjectType()->flags & asOBJ_TEMPLATE_SUBTYPE) )
 			{
 				// The template is already an instance so we shouldn't attempt to create another instance
@@ -3812,7 +3812,7 @@ asCScriptFunction *asCScriptEngine::GenerateTemplateFactoryStub(asCObjectType *t
 		func->inOutFlags[p-1] = factory->inOutFlags[p];
 	}
 	func->scriptData->objVariablesOnHeap = 0;
-	
+
 	// Generate the bytecode for the factory stub
 	asUINT bcLength = asBCTypeSize[asBCInfo[asBC_OBJTYPE].type] +
 	                  asBCTypeSize[asBCInfo[asBC_CALLSYS].type] +
@@ -4699,8 +4699,8 @@ int asCScriptEngine::RefCastObject(void *obj, asIObjectType *fromType, asIObject
 			}
 			else
 			{
-				asASSERT( func->returnType.GetTokenType() == ttVoid && 
-						  func->parameterTypes.GetLength() == 1 && 
+				asASSERT( func->returnType.GetTokenType() == ttVoid &&
+						  func->parameterTypes.GetLength() == 1 &&
 						  func->parameterTypes[0].GetTokenType() == ttQuestion );
 				universalCastFunc = func;
 			}
@@ -4744,7 +4744,7 @@ int asCScriptEngine::RefCastObject(void *obj, asIObjectType *fromType, asIObject
 		// Down casts to derived class or from interface can only be done explicitly
 		if( !useOnlyImplicitCast )
 		{
-			if( toType->Implements(fromType) || 
+			if( toType->Implements(fromType) ||
 				toType->DerivesFrom(fromType) )
 			{
 				*newPtr = obj;
@@ -5128,7 +5128,7 @@ int asCScriptEngine::RemoveConfigGroup(const char *groupName)
 		{
 			asCConfigGroup *group = configGroups[n];
 
-			// Remove any unused generated template instances 
+			// Remove any unused generated template instances
 			// before verifying if the config group is still in use.
 			// RemoveTemplateInstanceType() checks if the instance is in use
 			for( asUINT g = generatedTemplateTypes.GetLength(); g-- > 0; )

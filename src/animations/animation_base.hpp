@@ -62,7 +62,7 @@ protected:
 
     /** True if the animation is currently playing. */
     bool  m_playing;
-    
+
 public:
                  AnimationBase(const XMLNode &node);
                  AnimationBase(Ipo *ipo);

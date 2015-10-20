@@ -2602,7 +2602,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         if(nitro_frac>1.0f) nitro_frac = 1.0f;
     }
     m_kart_gfx->updateNitroGraphics(nitro_frac);
-    
+
     // Handle leaning of karts
     // -----------------------
     // Note that we compare with maximum speed of the kart, not

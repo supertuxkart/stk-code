@@ -170,8 +170,8 @@ bool ProfileManager::isInCache(const uint32_t id)
  *  cache. It will search all currently cached profiles that have the
  *  'friends fetched' flag set, and reset that flag if the profile id is
  *  one of their friends. This fixes the problem that friend lists can
- *  get shortened if some of their friends are being pushed out of 
- *  cache. 
+ *  get shortened if some of their friends are being pushed out of
+ *  cache.
  */
 void ProfileManager::updateFriendFlagsInCache(const ProfilesMap &cache,
                                               uint32_t profile_id)

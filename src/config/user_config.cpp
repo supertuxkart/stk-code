@@ -282,7 +282,7 @@ void ListUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
         std::string str;
         child->get( StringUtils::toString(n), &str);
         StringUtils::fromString<T>(str, elt);
-        
+
         // check if the element is already there :
         bool there = false;
         for (unsigned int i = 0; i < m_elements.size(); i++)

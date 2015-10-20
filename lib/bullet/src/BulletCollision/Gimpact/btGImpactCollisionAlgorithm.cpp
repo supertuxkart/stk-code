@@ -231,7 +231,7 @@ void btGImpactCollisionAlgorithm::shape_vs_shape_collision(
 
 	btCollisionShape* tmpShape0 = body0->getCollisionShape();
 	btCollisionShape* tmpShape1 = body1->getCollisionShape();
-	
+
 	body0->internalSetTemporaryCollisionShape(shape0);
 	body1->internalSetTemporaryCollisionShape(shape1);
 
@@ -261,7 +261,7 @@ void btGImpactCollisionAlgorithm::convex_vs_convex_collision(
 
 	btCollisionShape* tmpShape0 = body0->getCollisionShape();
 	btCollisionShape* tmpShape1 = body1->getCollisionShape();
-	
+
 	body0->internalSetTemporaryCollisionShape(shape0);
 	body1->internalSetTemporaryCollisionShape(shape1);
 

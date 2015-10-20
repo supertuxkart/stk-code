@@ -152,7 +152,7 @@ void DeviceManager::clearKeyboard()
 // -----------------------------------------------------------------------------
 void DeviceManager::clearGamepads()
 {
-    m_gamepads.clearAndDeleteAll(); 
+    m_gamepads.clearAndDeleteAll();
 }   // clearGamepads
 
 // -----------------------------------------------------------------------------
@@ -303,7 +303,7 @@ bool DeviceManager::deleteConfig(DeviceConfig* config)
  *  \param[in]   button_id  Id of the key pressed.
  *  \param[in]   mode       Used to determine whether to determine menu actions
  *                          or game actions
- *  \param[out]  player     Which player this input belongs to (only set in 
+ *  \param[out]  player     Which player this input belongs to (only set in
  *                          ASSIGN mode).
  *  \param[out]  action     Which action is related to this input trigger.
  *  \return                 The device to which this input belongs

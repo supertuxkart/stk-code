@@ -469,7 +469,7 @@ void RaceResultGUI::determineTableLayout()
         ri->m_kart_icon          = icon;
 
         // FTL karts will get a time assigned, they are not shown as eliminated
-        if (kart->isEliminated() && 
+        if (kart->isEliminated() &&
             race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             ri->m_finish_time_string = core::stringw(_("Eliminated"));
@@ -850,7 +850,7 @@ void RaceResultGUI::determineGPLayout()
         ri->m_y_pos          = (float)(m_top+rank*m_distance_between_rows);
         int p                = race_manager->getKartPrevScore(kart_id);
         ri->m_current_displayed_points = (float)p;
-        if (kart->isEliminated() && 
+        if (kart->isEliminated() &&
             race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             ri->m_new_points = 0;

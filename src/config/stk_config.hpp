@@ -188,7 +188,7 @@ public:
      */
     const KartProperties& getKartProperties(std::string type)
     {
-        return *m_kart_properties.at(type); 
+        return *m_kart_properties.at(type);
     }   // getKartProperties
 
     // ------------------------------------------------------------------------

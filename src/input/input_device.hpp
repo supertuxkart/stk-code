@@ -69,7 +69,7 @@ public:
      *  \param type Type of input (e.g. IT_STICKMOTION, ...).
      *  \param id   ID of the key that was pressed or of the axis that was
      *              triggered (depending on the value of the 'type' parameter).
-     *  \param mode Used to determine whether to map menu actions or 
+     *  \param mode Used to determine whether to map menu actions or
      *              game actions
      * \param[out] action  The action associated to this input (only check
      *                     this value if method returned true)
@@ -84,7 +84,7 @@ public:
                                     ) = 0;
 
     // ------------------------------------------------------------------------
-    /** Sets which players uses this device; or pass NULL to say no player 
+    /** Sets which players uses this device; or pass NULL to say no player
      *  uses it. */
     void setPlayer(StateManager::ActivePlayer* owner) { m_player = owner; }
 

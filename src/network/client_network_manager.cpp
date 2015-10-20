@@ -96,9 +96,9 @@ void* waitInput(void* data)
             }
             std::cout << "\n";
         }
-        // If STK shuts down, but should receive an input after the network 
+        // If STK shuts down, but should receive an input after the network
         // manager was deleted, the getInstance call will return NULL.
-        else if (NetworkManager::getInstance() && 
+        else if (NetworkManager::getInstance() &&
                  NetworkManager::getInstance()->getPeers().size() > 0)
         {
             NetworkString msg(1+str.size());
@@ -141,7 +141,7 @@ void ClientNetworkManager::run()
     Log::info("ClientNetworkManager", "Host initialized.");
 
     m_thread_keyboard = NULL;
-    // This code can cause crashes atm (see #1529): if the 
+    // This code can cause crashes atm (see #1529): if the
     // client_network_manager receives input after the network manager
     // has been deleted, stk will crash. And this happens on windows
     // in release mode (since there is no console, so no stdin), and

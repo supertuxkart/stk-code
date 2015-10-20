@@ -185,7 +185,7 @@ namespace Online
             }
 
             // User still at main menu screen, push user screen. Note that
-            // this function is called from the main thread, so we can 
+            // this function is called from the main thread, so we can
             // push screens without synchronisations.
             UserScreen::getInstance()->push();
             UserScreen::getInstance()->loginError(getInfo());

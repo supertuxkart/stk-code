@@ -205,7 +205,7 @@ void World::init()
         ReplayPlay::get()->Load();
 
     powerup_manager->updateWeightsForRace(num_karts);
-    
+
     if (UserConfigParams::m_weather_effects)
     {
         m_weather = new Weather(m_track->getWeatherLightning(),
@@ -401,7 +401,7 @@ World::~World()
         // gui and this must be deleted.
         delete m_race_gui;
     }
-    
+
     if (m_weather != NULL)
         delete m_weather;
 

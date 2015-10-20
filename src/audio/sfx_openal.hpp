@@ -65,7 +65,7 @@ private:
      the sound source won't be created and we'll be left with no clue when enabling
      sounds later. */
     float m_gain;
-    
+
     /** The master gain set in user preferences */
     float m_master_gain;
 

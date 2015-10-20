@@ -94,7 +94,7 @@ int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, 
 		else
 			return asNOT_SUPPORTED;
 	}
-	
+
 	if( isMethod )
 	{
 #ifndef AS_NO_CLASS_METHODS
@@ -221,7 +221,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 	UNUSED_VAR(internal);
 	UNUSED_VAR(engine);
 
-	// This should never happen, as when AS_MAX_PORTABILITY is on, all functions 
+	// This should never happen, as when AS_MAX_PORTABILITY is on, all functions
 	// are asCALL_GENERIC, which are prepared by PrepareSystemFunctionGeneric
 	asASSERT(false);
 #else
@@ -236,7 +236,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 	else if( func->returnType.IsObject() )
 	{
 		asDWORD objType = func->returnType.GetObjectType()->flags;
-	
+
 		// Only value types can be returned by value
 		asASSERT( objType & asOBJ_VALUE );
 
@@ -328,7 +328,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 			// Ref: http://www.agner.org/optimize/calling_conventions.pdf
 			// If the application informs that the class should be treated as all integers, then we allow it
 			if( !internal->hostReturnInMemory &&
-			    !(func->returnType.GetObjectType()->flags & (asOBJ_APP_CLASS_ALLINTS | asOBJ_APP_CLASS_ALLFLOATS)) )	
+			    !(func->returnType.GetObjectType()->flags & (asOBJ_APP_CLASS_ALLINTS | asOBJ_APP_CLASS_ALLFLOATS)) )
 			{
 				engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, func->GetDeclarationStr().AddressOf());
 
@@ -407,7 +407,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 			if( !(func->parameterTypes[n].GetObjectType()->flags & (asOBJ_APP_CLASS | asOBJ_APP_PRIMITIVE | asOBJ_APP_FLOAT | asOBJ_APP_ARRAY)) )
 			{
 				engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, func->GetDeclarationStr().AddressOf());
-	
+
 				asCString str;
 				str.Format(TXT_CANNOT_PASS_TYPE_s_BY_VAL, func->parameterTypes[n].GetObjectType()->name.AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
@@ -420,9 +420,9 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 			// will be used depending on the memory layout of the object
 			// Ref: http://www.x86-64.org/documentation/abi.pdf
 			// Ref: http://www.agner.org/optimize/calling_conventions.pdf
-			if( 
+			if(
 #ifdef COMPLEX_OBJS_PASSED_BY_REF
-			    !(func->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK) &&	
+			    !(func->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK) &&
 #endif
 #ifdef LARGE_OBJS_PASS_BY_REF
 			    func->parameterTypes[n].GetSizeInMemoryDWords() < AS_LARGE_OBJ_MIN_SIZE &&
@@ -458,7 +458,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 #endif
 		if( needFree &&
 			dt.IsObject() &&
-			!dt.IsObjectHandle() && 
+			!dt.IsObjectHandle() &&
 			!dt.IsReference() )
 		{
 			asSSystemFunctionInterface::SClean clean;
@@ -532,7 +532,7 @@ int CallSystemFunction(int id, asCContext *context)
 //
 // Return value:
 //
-// The function should return the value that is returned in registers. 
+// The function should return the value that is returned in registers.
 asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &retQW2, void *secondObj);
 
 
@@ -664,7 +664,7 @@ int CallSystemFunction(int id, asCContext *context)
 		popSize += AS_PTR_SIZE;
 		args += AS_PTR_SIZE;
 
-		// When returning the value on the location allocated by the called 
+		// When returning the value on the location allocated by the called
 		// we shouldn't set the object type in the register
 		context->m_regs.objectType = 0;
 	}
@@ -679,10 +679,10 @@ int CallSystemFunction(int id, asCContext *context)
 #ifdef AS_NO_EXCEPTIONS
 	retQW = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW2, secondObj);
 #else
-	// This try/catch block is to catch potential exception that may 
+	// This try/catch block is to catch potential exception that may
 	// be thrown by the registered function. The implementation of the
 	// CallSystemFunctionNative() must make sure not to have any manual
-	// clean-up after the call to the real function, or that won't be 
+	// clean-up after the call to the real function, or that won't be
 	// executed in case of an exception.
 	try
 	{
@@ -692,7 +692,7 @@ int CallSystemFunction(int id, asCContext *context)
 	{
 		cppException = true;
 
-		// Convert the exception to a script exception so the VM can 
+		// Convert the exception to a script exception so the VM can
 		// properly report the error to the application and then clean up
 		context->SetException(TXT_EXCEPTION_CAUGHT);
 	}
@@ -751,8 +751,8 @@ int CallSystemFunction(int id, asCContext *context)
 
 			if( context->m_status == asEXECUTION_EXCEPTION && !cppException )
 			{
-				// If the function raised a script exception it really shouldn't have 
-				// initialized the object. However, as it is a soft exception there is 
+				// If the function raised a script exception it really shouldn't have
+				// initialized the object. However, as it is a soft exception there is
 				// no way for the application to not return a value, so instead we simply
 				// destroy it here, to pretend it was never created.
 				if( descr->returnType.GetObjectType()->beh.destruct )
@@ -837,14 +837,14 @@ int CallSystemFunction(int id, asCContext *context)
 					*addr = 0;
 				}
 			}
-			else 
+			else
 			{
 				asASSERT( clean->op == 1 || clean->op == 2 );
 				asASSERT( *addr );
 
 				if( clean->op == 2 )
 					engine->CallObjectMethod(*addr, clean->ot->beh.destruct);
-				
+
 				engine->CallFree(*addr);
 			}
 		}

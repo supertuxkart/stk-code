@@ -123,7 +123,7 @@ void asCTypeInfo::SetConstantD(const asCDataType &dt, double value)
 
 void asCTypeInfo::SetUndefinedFuncHandle(asCScriptEngine *engine)
 {
-	// This is used for when the expression evaluates to a 
+	// This is used for when the expression evaluates to a
 	// function, but it is not yet known exactly which. The
 	// owner expression will hold the name of the function
 	// to determine the exact function when the signature is

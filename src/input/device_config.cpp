@@ -49,7 +49,7 @@ DeviceConfig* DeviceConfig::create(const XMLNode *config)
     }
     else
     {
-        Log::error("DeviceConfig", "Incorrect type: '%s'.", 
+        Log::error("DeviceConfig", "Incorrect type: '%s'.",
                    config->getName().c_str());
         return NULL;
     }
@@ -171,7 +171,7 @@ irr::core::stringw DeviceConfig::toString ()
  *  \param type Input type (stick button, stick motion, ...).
  *  \param id An id for this binding.
  *  \param direction In which direction the stick is moved.
- *  \param 
+ *  \param
  */
 void DeviceConfig::setBinding ( const PlayerAction      action,
                                 const Input::InputType  type,
@@ -218,7 +218,7 @@ bool DeviceConfig::getMenuAction(Input::InputType    type,
 }   // getMenuAction
 
 //------------------------------------------------------------------------------
-/** internal helper method for DeviceConfig::getGameAction and 
+/** internal helper method for DeviceConfig::getGameAction and
  *  DeviceConfig::getMenuAction
  */
 bool DeviceConfig::doGetAction(Input::InputType    type,

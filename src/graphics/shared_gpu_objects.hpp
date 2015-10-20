@@ -51,61 +51,61 @@ public:
     static void init();
     static void reset();
     // ------------------------------------------------------------------------
-    static GLuint getBillboardVBO() 
+    static GLuint getBillboardVBO()
     {
         assert(m_has_been_initialised);
         return m_billboard_vbo;
     }   // getBillboardVBO
     // ------------------------------------------------------------------------
-    static GLuint getSkyTriVBO() 
+    static GLuint getSkyTriVBO()
     {
         assert(m_has_been_initialised);
         return m_sky_tri_vbo;
     }   // getSkyTriVBO
     // ------------------------------------------------------------------------
-    static GLuint getFrustrumVBO() 
+    static GLuint getFrustrumVBO()
     {
         assert(m_has_been_initialised);
         return m_frustrum_vbo;
     }   // getFrustrumVBO
     // ------------------------------------------------------------------------
-    static GLuint getFrustrumIndices() 
+    static GLuint getFrustrumIndices()
     {
         assert(m_has_been_initialised);
         return m_frustrum_indices;
     }   // getFrustrumIndices
     // ------------------------------------------------------------------------
-    static GLuint getParticleQuadVBO() 
+    static GLuint getParticleQuadVBO()
     {
         assert(m_has_been_initialised);
         return m_particle_quad_vbo;
     }   // getParticleQuadVBO
     // ------------------------------------------------------------------------
-    static GLuint getViewProjectionMatricesUBO() 
+    static GLuint getViewProjectionMatricesUBO()
     {
         assert(m_has_been_initialised);
         return m_View_projection_matrices_ubo;
     }   // getViewProjectionMatricesUBO
     // ------------------------------------------------------------------------
-    static GLuint getLightingDataUBO() 
+    static GLuint getLightingDataUBO()
     {
         assert(m_has_been_initialised);
         return m_lighting_data_ubo;
     }   // getLightingDataUBO
     // -------------- ----------------------------------------------------------
-    static GLuint getFullScreenQuadVAO() 
+    static GLuint getFullScreenQuadVAO()
     {
         assert(m_has_been_initialised);
         return m_full_screen_quad_vao;
     }   // getFullScreenQuadVAO
     // ------------------------------------------------------------------------
-    static GLuint getUI_VAO() 
+    static GLuint getUI_VAO()
     {
         assert(m_has_been_initialised);
         return m_ui_vao;
     }  // getUI_VAO
     // ------------------------------------------------------------------------
-    static GLuint getQuadBuffer() 
+    static GLuint getQuadBuffer()
     {
         assert(m_has_been_initialised);
         return m_quad_buffer;

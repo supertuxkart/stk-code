@@ -316,7 +316,7 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
 
         //FIXME: it's not ideal that both the track object and the presentation
         // know the initial coordinates of the object
-        TrackObjectPresentationSceneNode* presentation = 
+        TrackObjectPresentationSceneNode* presentation =
             new TrackObjectPresentationSceneNode(kart_pos, kart_rot, kart_scale,
                                                  kart_main_node);
         TrackObject* tobj = new TrackObject(kart_pos, kart_rot, kart_scale,

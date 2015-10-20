@@ -124,7 +124,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 
     m_soccer_ball = false;
     xml_node.get("soccer_ball", &m_soccer_ball);
-    
+
     std::string type;
     xml_node.get("type",    &type );
 
@@ -297,7 +297,7 @@ void TrackObject::onWorldReady()
 
         std::ostringstream fn_signature;
         std::vector<std::string> arguments;
-        if (m_visibility_condition.find("(") != std::string::npos && 
+        if (m_visibility_condition.find("(") != std::string::npos &&
             m_visibility_condition.find(")") != std::string::npos)
         {
             // There are arguments to pass to the function
@@ -327,7 +327,7 @@ void TrackObject::onWorldReady()
 
         TrackObject* self = this;
         script_engine->runFunction(true, fn_signature.str(),
-            [&](asIScriptContext* ctx) 
+            [&](asIScriptContext* ctx)
             {
                 for (unsigned int i = 0; i < arguments.size(); i++)
                 {
@@ -447,7 +447,7 @@ void TrackObject::update(float dt)
  *  \return True if a triangle was hit, false otherwise (and no output
  *          variable will be set.
  */
-bool TrackObject::castRay(const btVector3 &from, 
+bool TrackObject::castRay(const btVector3 &from,
                           const btVector3 &to, btVector3 *hit_point,
                           const Material **material, btVector3 *normal,
                           bool interpolate_normal) const

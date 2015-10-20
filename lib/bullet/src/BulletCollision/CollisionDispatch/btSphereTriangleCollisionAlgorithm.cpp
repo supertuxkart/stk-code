@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -53,11 +53,11 @@ void btSphereTriangleCollisionAlgorithm::processCollision (btCollisionObject* co
 
 	btSphereShape* sphere = (btSphereShape*)sphereObj->getCollisionShape();
 	btTriangleShape* triangle = (btTriangleShape*)triObj->getCollisionShape();
-	
+
 	/// report a contact. internally this will be kept persistent, and contact reduction is done
 	resultOut->setPersistentManifold(m_manifoldPtr);
 	SphereTriangleDetector detector(sphere,triangle, m_manifoldPtr->getContactBreakingThreshold());
-	
+
 	btDiscreteCollisionDetectorInterface::ClosestPointInput input;
 	input.m_maximumDistanceSquared = btScalar(BT_LARGE_FLOAT);///@todo: tighter bounds
 	input.m_transformA = sphereObj->getWorldTransform();
@@ -69,7 +69,7 @@ void btSphereTriangleCollisionAlgorithm::processCollision (btCollisionObject* co
 
 	if (m_ownManifold)
 		resultOut->refreshContactPoints();
-	
+
 }
 
 btScalar btSphereTriangleCollisionAlgorithm::calculateTimeOfImpact(btCollisionObject* col0,btCollisionObject* col1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut)

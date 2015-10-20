@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -32,7 +32,7 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 
 	(void)stackAlloc;
 	(void)v;
-	
+
 	bool check2d= convexA->isConvex2d() && convexB->isConvex2d();
 
 	struct btIntermediateResult : public btDiscreteCollisionDetectorInterface::Result
@@ -41,7 +41,7 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 		btIntermediateResult():m_hasResult(false)
 		{
 		}
-		
+
 		btVector3 m_normalOnBInWorld;
 		btVector3 m_pointInWorld;
 		btScalar m_depth;
@@ -149,7 +149,7 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 			pInA = supportVerticesABatch[i];
 			qInB = supportVerticesBBatch[i];
 
-			pWorld = transA(pInA);	
+			pWorld = transA(pInA);
 			qWorld = transB(qInB);
 			if (check2d)
 			{
@@ -168,7 +168,7 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 				minB = qWorld;
 			}
 		}
-	}	
+	}
 #else
 
 	int numSampleDirections = NUM_UNITSPHERE_POINTS;
@@ -212,7 +212,7 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 		seperatingAxisInB = norm* transB.getBasis();
 		pInA = convexA->localGetSupportVertexWithoutMarginNonVirtual(seperatingAxisInA);
 		qInB = convexB->localGetSupportVertexWithoutMarginNonVirtual(seperatingAxisInB);
-		pWorld = transA(pInA);	
+		pWorld = transA(pInA);
 		qWorld = transB(qInB);
 		w	= qWorld - pWorld;
 		btScalar delta = norm.dot(w);
@@ -256,17 +256,17 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 	}
 #endif //DEBUG_DRAW
 
-	
+
 
 	btGjkPairDetector gjkdet(convexA,convexB,&simplexSolver,0);
 
 	btScalar offsetDist = minProj;
 	btVector3 offset = minNorm * offsetDist;
-	
+
 
 
 	btGjkPairDetector::ClosestPointInput input;
-		
+
 	btVector3 newOrg = transA.getOrigin() + offset;
 
 	btTransform displacedTrans = transA;
@@ -275,7 +275,7 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 	input.m_transformA = displacedTrans;
 	input.m_transformB = transB;
 	input.m_maximumDistanceSquared = btScalar(BT_LARGE_FLOAT);//minProj;
-	
+
 	btIntermediateResult res;
 	gjkdet.setCachedSeperatingAxis(-minNorm);
 	gjkdet.getClosestPoints(input,res,debugDraw);
@@ -286,7 +286,7 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 	//the penetration depth is over-estimated, relax it
 	btScalar penetration_relaxation= btScalar(1.);
 	minNorm*=penetration_relaxation;
-	
+
 
 	if (res.m_hasResult)
 	{
@@ -294,7 +294,7 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 		pa = res.m_pointInWorld - minNorm * correctedMinNorm;
 		pb = res.m_pointInWorld;
 		v = minNorm;
-		
+
 #ifdef DEBUG_DRAW
 		if (debugDraw)
 		{
@@ -310,7 +310,7 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 
 btVector3*	btMinkowskiPenetrationDepthSolver::getPenetrationDirections()
 {
-	static btVector3	sPenetrationDirections[NUM_UNITSPHERE_POINTS+MAX_PREFERRED_PENETRATION_DIRECTIONS*2] = 
+	static btVector3	sPenetrationDirections[NUM_UNITSPHERE_POINTS+MAX_PREFERRED_PENETRATION_DIRECTIONS*2] =
 	{
 	btVector3(btScalar(0.000000) , btScalar(-0.000000),btScalar(-1.000000)),
 	btVector3(btScalar(0.723608) , btScalar(-0.525725),btScalar(-0.447219)),

@@ -64,8 +64,8 @@ private:
 
     /** Which kind of account to create: new online account, new account
      *  using an existing online account, offline account. */
-    enum { ACCOUNT_NEW_ONLINE, 
-           ACCOUNT_EXISTING_ONLINE, 
+    enum { ACCOUNT_NEW_ONLINE,
+           ACCOUNT_EXISTING_ONLINE,
            ACCOUNT_OFFLINE } m_account_mode;
 
     /** A pointer to the parent UserScreen, in order to allow this screen
@@ -79,7 +79,7 @@ public:
     virtual void onUpdate(float dt) OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
     virtual void onDialogClose() OVERRIDE;
-    virtual void onFocusChanged(GUIEngine::Widget *previous, 
+    virtual void onFocusChanged(GUIEngine::Widget *previous,
                                 GUIEngine::Widget *focus,
                                 int playerID);
     void setRename(PlayerProfile *player);

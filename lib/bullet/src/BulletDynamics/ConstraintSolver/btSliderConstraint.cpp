@@ -120,7 +120,7 @@ void btSliderConstraint::getInfo1(btConstraintInfo1* info)
 	else
 	{
 		info->m_numConstraintRows = 4; // Fixed 2 linear + 2 angular
-		info->nub = 2; 
+		info->nub = 2;
 		//prepare constraint
 		calculateTransforms(m_rbA.getCenterOfMassTransform(),m_rbB.getCenterOfMassTransform());
 		testAngLimits();
@@ -128,12 +128,12 @@ void btSliderConstraint::getInfo1(btConstraintInfo1* info)
 		if(getSolveLinLimit() || getPoweredLinMotor())
 		{
 			info->m_numConstraintRows++; // limit 3rd linear as well
-			info->nub--; 
+			info->nub--;
 		}
 		if(getSolveAngLimit() || getPoweredAngMotor())
 		{
 			info->m_numConstraintRows++; // limit 3rd angular as well
-			info->nub--; 
+			info->nub--;
 		}
 	}
 }
@@ -142,7 +142,7 @@ void btSliderConstraint::getInfo1NonVirtual(btConstraintInfo1* info)
 {
 
 	info->m_numConstraintRows = 6; // Fixed 2 linear + 2 angular + 1 limit (even if not used)
-	info->nub = 0; 
+	info->nub = 0;
 }
 
 void btSliderConstraint::getInfo2(btConstraintInfo2* info)
@@ -189,7 +189,7 @@ void btSliderConstraint::calculateTransforms(const btTransform& transA,const btT
 		m_depth[i] = m_delta.dot(normalWorld);
     }
 }
- 
+
 
 
 void btSliderConstraint::testLinLimits(void)
@@ -230,15 +230,15 @@ void btSliderConstraint::testAngLimits(void)
 		const btVector3 axisA0 = m_calculatedTransformA.getBasis().getColumn(1);
 		const btVector3 axisA1 = m_calculatedTransformA.getBasis().getColumn(2);
 		const btVector3 axisB0 = m_calculatedTransformB.getBasis().getColumn(1);
-//		btScalar rot = btAtan2Fast(axisB0.dot(axisA1), axisB0.dot(axisA0));  
-		btScalar rot = btAtan2(axisB0.dot(axisA1), axisB0.dot(axisA0));  
+//		btScalar rot = btAtan2Fast(axisB0.dot(axisA1), axisB0.dot(axisA0));
+		btScalar rot = btAtan2(axisB0.dot(axisA1), axisB0.dot(axisA0));
 		rot = btAdjustAngleToLimits(rot, m_lowerAngLimit, m_upperAngLimit);
 		m_angPos = rot;
 		if(rot < m_lowerAngLimit)
 		{
 			m_angDepth = rot - m_lowerAngLimit;
 			m_solveAngLim = true;
-		} 
+		}
 		else if(rot > m_upperAngLimit)
 		{
 			m_angDepth = rot - m_upperAngLimit;
@@ -269,12 +269,12 @@ void btSliderConstraint::getInfo2NonVirtual(btConstraintInfo2* info, const btTra
 {
 	const btTransform& trA = getCalculatedTransformA();
 	const btTransform& trB = getCalculatedTransformB();
-	
+
 	btAssert(!m_useSolveConstraintObsolete);
 	int i, s = info->rowskip;
-	
+
 	btScalar signFact = m_useLinearReferenceFrameA ? btScalar(1.0f) : btScalar(-1.0f);
-	
+
 	// difference between frames in WCS
 	btVector3 ofs = trB.getOrigin() - trA.getOrigin();
 	// now get weight factors depending on masses
@@ -287,7 +287,7 @@ void btSliderConstraint::getInfo2NonVirtual(btConstraintInfo2* info, const btTra
 	{
 		factA = miB / miS;
 	}
-	else 
+	else
 	{
 		factA = btScalar(0.5f);
 	}
@@ -366,7 +366,7 @@ void btSliderConstraint::getInfo2NonVirtual(btConstraintInfo2* info, const btTra
 	int limit;
 	int powered;
 
-	// next two rows. 
+	// next two rows.
 	// we want: velA + wA x relA == velB + wB x relB ... but this would
 	// result in three equations, so we project along two orthos to the slider axis
 
@@ -472,7 +472,7 @@ void btSliderConstraint::getInfo2NonVirtual(btConstraintInfo2* info, const btTra
 		powered = 1;
 	}
 	// if the slider has joint limits or motor, add in the extra row
-	if (limit || powered) 
+	if (limit || powered)
 	{
 		nrow++;
 		srow = nrow * info->rowskip;
@@ -543,17 +543,17 @@ void btSliderConstraint::getInfo2NonVirtual(btConstraintInfo2* info, const btTra
 			{
 				info->cfm[srow] = m_cfmLimLin;
 			}
-			if(lostop == histop) 
+			if(lostop == histop)
 			{	// limited low and high simultaneously
 				info->m_lowerLimit[srow] = -SIMD_INFINITY;
 				info->m_upperLimit[srow] = SIMD_INFINITY;
 			}
-			else if(limit == 1) 
+			else if(limit == 1)
 			{ // low limit
 				info->m_lowerLimit[srow] = -SIMD_INFINITY;
 				info->m_upperLimit[srow] = 0;
 			}
-			else 
+			else
 			{ // high limit
 				info->m_lowerLimit[srow] = 0;
 				info->m_upperLimit[srow] = SIMD_INFINITY;
@@ -583,7 +583,7 @@ void btSliderConstraint::getInfo2NonVirtual(btConstraintInfo2* info, const btTra
 					if(vel > 0)
 					{
 						btScalar newc = -bounce * vel;
-						if(newc < info->m_constraintError[srow]) 
+						if(newc < info->m_constraintError[srow])
 						{
 							info->m_constraintError[srow] = newc;
 						}
@@ -607,7 +607,7 @@ void btSliderConstraint::getInfo2NonVirtual(btConstraintInfo2* info, const btTra
 	{
 		powered = 1;
 	}
-	if(limit || powered) 
+	if(limit || powered)
 	{
 		nrow++;
 		srow = nrow * info->rowskip;
@@ -645,18 +645,18 @@ void btSliderConstraint::getInfo2NonVirtual(btConstraintInfo2* info, const btTra
 			{
 				info->cfm[srow] = m_cfmLimAng;
 			}
-			if(lostop == histop) 
+			if(lostop == histop)
 			{
 				// limited low and high simultaneously
 				info->m_lowerLimit[srow] = -SIMD_INFINITY;
 				info->m_upperLimit[srow] = SIMD_INFINITY;
 			}
-			else if(limit == 1) 
+			else if(limit == 1)
 			{ // low limit
 				info->m_lowerLimit[srow] = 0;
 				info->m_upperLimit[srow] = SIMD_INFINITY;
 			}
-			else 
+			else
 			{ // high limit
 				info->m_lowerLimit[srow] = -SIMD_INFINITY;
 				info->m_upperLimit[srow] = 0;
@@ -698,7 +698,7 @@ void btSliderConstraint::getInfo2NonVirtual(btConstraintInfo2* info, const btTra
 }
 
 
-///override the default global value of a parameter (such as ERP or CFM), optionally provide the axis (0..5). 
+///override the default global value of a parameter (such as ERP or CFM), optionally provide the axis (0..5).
 ///If no axis is provided, it uses the default axis for this constraint.
 void btSliderConstraint::setParam(int num, btScalar value, int axis)
 {
@@ -776,7 +776,7 @@ void btSliderConstraint::setParam(int num, btScalar value, int axis)
 }
 
 ///return the local value of parameter
-btScalar btSliderConstraint::getParam(int num, int axis) const 
+btScalar btSliderConstraint::getParam(int num, int axis) const
 {
 	btScalar retVal(SIMD_INFINITY);
 	switch(num)

@@ -148,7 +148,7 @@ void WorldStatus::update(const float dt)
         case SETUP_PHASE:
             m_auxiliary_timer = 0.0f;
             m_phase = TRACK_INTRO_PHASE;
-            
+
             if (m_play_racestart_sounds)
             {
                 m_track_intro_sound->play();
@@ -190,7 +190,7 @@ void WorldStatus::update(const float dt)
                 m_prestart_sound->play();
 
             m_phase = READY_PHASE;
-            
+
             for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
             {
                 World::getWorld()->getKart(i)->startEngineSFX();

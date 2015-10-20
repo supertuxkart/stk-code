@@ -2,23 +2,23 @@
    AngelCode Scripting Library
    Copyright (c) 2003-2013 Andreas Jonsson
 
-   This software is provided 'as-is', without any express or implied 
-   warranty. In no event will the authors be held liable for any 
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any
    damages arising from the use of this software.
 
-   Permission is granted to anyone to use this software for any 
-   purpose, including commercial applications, and to alter it and 
+   Permission is granted to anyone to use this software for any
+   purpose, including commercial applications, and to alter it and
    redistribute it freely, subject to the following restrictions:
 
-   1. The origin of this software must not be misrepresented; you 
+   1. The origin of this software must not be misrepresented; you
       must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product 
+      this software in a product, an acknowledgment in the product
       documentation would be appreciated but is not required.
 
-   2. Altered source versions must be plainly marked as such, and 
+   2. Altered source versions must be plainly marked as such, and
       must not be misrepresented as being the original software.
 
-   3. This notice may not be removed or altered from any source 
+   3. This notice may not be removed or altered from any source
       distribution.
 
    The original version of this library can be located at:
@@ -45,7 +45,7 @@ BEGIN_AS_NAMESPACE
 
 int asCompareStrings(const char *str1, size_t len1, const char *str2, size_t len2)
 {
-	if( len1 == 0 ) 
+	if( len1 == 0 )
 	{
 		if( str2 == 0 || len2 == 0 ) return 0; // Equal
 
@@ -54,7 +54,7 @@ int asCompareStrings(const char *str1, size_t len1, const char *str2, size_t len
 
 	if( str2 == 0 )
 	{
-		if( len1 == 0 ) 
+		if( len1 == 0 )
 			return 0; // Equal
 
 		return -1; // The other string is smaller than this
@@ -77,11 +77,11 @@ int asCompareStrings(const char *str1, size_t len1, const char *str2, size_t len
 double asStringScanDouble(const char *string, size_t *numScanned)
 {
 	// I decided to do my own implementation of strtod() because this function
-	// doesn't seem to be present on all systems. iOS 5 for example doesn't appear 
+	// doesn't seem to be present on all systems. iOS 5 for example doesn't appear
 	// to include the function in the standard lib.
-	
+
 	// Another reason is that the standard implementation of strtod() is dependent
-	// on the locale on some systems, i.e. it may use comma instead of dot for 
+	// on the locale on some systems, i.e. it may use comma instead of dot for
 	// the decimal indicator. This can be avoided by forcing the locale to "C" with
 	// setlocale(), but this is another thing that is highly platform dependent.
 
@@ -91,7 +91,7 @@ double asStringScanDouble(const char *string, size_t *numScanned)
 	bool negativeExponent = false;
 	int c = 0;
 
-	// The tokenizer separates the sign from the number in   
+	// The tokenizer separates the sign from the number in
 	// two tokens so we'll never have a sign to parse here
 
 	// Parse the integer value
@@ -99,7 +99,7 @@ double asStringScanDouble(const char *string, size_t *numScanned)
 	{
 		if( string[c] >= '0' && string[c] <= '9' )
 			value = value*10 + double(string[c] - '0');
-		else 
+		else
 			break;
 
 		c++;
@@ -218,7 +218,7 @@ asQWORD asStringScanUInt64(const char *string, int base, size_t *numScanned)
 
 //
 // The function will encode the unicode code point into the outEncodedBuffer, and then
-// return the length of the encoded value. If the input value is not a valid unicode code 
+// return the length of the encoded value. If the input value is not a valid unicode code
 // point, then the function will return -1.
 //
 // This function is taken from the AngelCode ToolBox.
@@ -271,7 +271,7 @@ int asStringEncodeUTF8(unsigned int value, char *outEncodedBuffer)
 int asStringDecodeUTF8(const char *encodedBuffer, unsigned int *outLength)
 {
 	const unsigned char *buf = (const unsigned char*)encodedBuffer;
-	
+
 	int value = 0;
 	int length = -1;
 	unsigned char byte = buf[0];
@@ -287,7 +287,7 @@ int asStringDecodeUTF8(const char *encodedBuffer, unsigned int *outLength)
 		value = int(byte & 0x1F);
 		length = 2;
 
-		// The value at this moment must not be less than 2, because 
+		// The value at this moment must not be less than 2, because
 		// that should have been encoded with one byte only.
 		if( value < 2 )
 			length = -1;
@@ -311,7 +311,7 @@ int asStringDecodeUTF8(const char *encodedBuffer, unsigned int *outLength)
 		byte = buf[n];
 		if( (byte & 0xC0) == 0x80 )
 			value = (value << 6) + int(byte & 0x3F);
-		else 
+		else
 			break;
 	}
 
@@ -327,7 +327,7 @@ int asStringDecodeUTF8(const char *encodedBuffer, unsigned int *outLength)
 
 //
 // The function will encode the unicode code point into the outEncodedBuffer, and then
-// return the length of the encoded value. If the input value is not a valid unicode code 
+// return the length of the encoded value. If the input value is not a valid unicode code
 // point, then the function will return -1.
 //
 // This function is taken from the AngelCode ToolBox.

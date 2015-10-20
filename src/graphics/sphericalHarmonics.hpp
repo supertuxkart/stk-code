@@ -35,38 +35,38 @@ class SphericalHarmonics
 private:
     /** The 6 spherical harmonics textures */
     std::vector<irr::video::ITexture *> m_spherical_harmonics_textures;
-    
+
     /** Ambient light is used for tracks without spherical harmonics textures */
     irr::video::SColor m_ambient;
-    
+
     /** The spherical harmonics coefficients */
     float m_blue_SH_coeff[9];
     float m_green_SH_coeff[9];
     float m_red_SH_coeff[9];
-    
+
 
     void projectSH(Color *cubemap_face[6], size_t edge_size, float *Y00[],
                       float *Y1minus1[], float *Y10[], float *Y11[],
                       float *Y2minus2[], float *Y2minus1[], float * Y20[],
                       float *Y21[], float *Y22[]);
-    
+
     void generateSphericalHarmonics(Color *cubemap_face[6], size_t edge_size);
-    
+
 public:
     SphericalHarmonics(const std::vector<irr::video::ITexture *> &spherical_harmonics_textures);
     SphericalHarmonics(const irr::video::SColor &ambient);
-    
-    void setTextures(const std::vector<irr::video::ITexture *> &spherical_harmonics_textures);    
+
+    void setTextures(const std::vector<irr::video::ITexture *> &spherical_harmonics_textures);
     void setAmbientLight(const irr::video::SColor &ambient);
-    
+
     inline const float* getBlueSHCoeff () const     {return m_blue_SH_coeff;  }
     inline const float* getGreenSHCoeff() const     {return m_green_SH_coeff; }
-    inline const float* getRedSHCoeff  () const     {return m_red_SH_coeff;   }    
-    
+    inline const float* getRedSHCoeff  () const     {return m_red_SH_coeff;   }
+
     inline bool has6Textures() const {return m_spherical_harmonics_textures.size()==6;}
-    
+
     void printCoeff();
-    
+
     void unprojectSH (size_t width, size_t height,
                       float *Y00[], float *Y1minus1[], float *Y10[],
                       float *Y11[], float *Y2minus2[], float *Y2minus1[],

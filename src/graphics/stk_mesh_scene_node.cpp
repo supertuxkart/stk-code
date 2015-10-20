@@ -36,7 +36,7 @@
 
 
 // ============================================================================
-class ColorizeShader : public Shader<ColorizeShader, core::matrix4, 
+class ColorizeShader : public Shader<ColorizeShader, core::matrix4,
                                      video::SColorf>
 {
 public:
@@ -307,8 +307,8 @@ void STKMeshSceneNode::render()
             {
                 if (!mesh.TextureHandles[0])
                 {
-                    mesh.TextureHandles[0] = 
-                        glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), 
+                    mesh.TextureHandles[0] =
+                        glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]),
                                                      Shaders::ObjectPass1Shader
                                                      ::getInstance()->m_sampler_ids[0]);
                 }
@@ -349,7 +349,7 @@ void STKMeshSceneNode::render()
             if (CVS->isAZDOEnabled())
             {
                 GLuint64 DiffuseHandle =
-                    glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), 
+                    glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE),
                                                  Shaders::ObjectPass2Shader
                                                     ::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(DiffuseHandle))
@@ -368,8 +368,8 @@ void STKMeshSceneNode::render()
                     glMakeTextureHandleResidentARB(SSAOHandle);
 
                 if (!mesh.TextureHandles[0])
-                    mesh.TextureHandles[0] = 
-                    glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), 
+                    mesh.TextureHandles[0] =
+                    glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]),
                                 Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);

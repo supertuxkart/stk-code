@@ -25,7 +25,7 @@
 
 namespace Scripting
 {
-    
+
     namespace Physics
     {
         //Creates an explosion animation at specified Vec3 location

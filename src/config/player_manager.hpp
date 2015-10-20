@@ -152,7 +152,7 @@ public:
      */
     static void increaseAchievement(unsigned int achievement_id,
                                     const std::string &key,
-                                    int increase = 1, 
+                                    int increase = 1,
                                     const std::string &goal_key="")
     {
         Achievement *a = getCurrentAchievementsStatus()

@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -127,13 +127,13 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 	{
 		btScalar squaredDistance = BT_LARGE_FLOAT;
 		btScalar delta = btScalar(0.);
-		
+
 		btScalar margin = marginA + marginB;
-		
-		
+
+
 
 		m_simplexSolver->reset();
-		
+
 		for ( ; ; )
 		//while (true)
 		{
@@ -166,7 +166,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 #endif
 
 
-			btVector3  pWorld = localTransA(pInA);	
+			btVector3  pWorld = localTransA(pInA);
 			btVector3  qWorld = localTransB(qInB);
 
 #ifdef DEBUG_SPU_COLLISION_DETECTION
@@ -183,7 +183,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 			delta = m_cachedSeparatingAxis.dot(w);
 
 			// potential exit, they don't overlap
-			if ((delta > btScalar(0.0)) && (delta * delta > squaredDistance * input.m_maximumDistanceSquared)) 
+			if ((delta > btScalar(0.0)) && (delta * delta > squaredDistance * input.m_maximumDistanceSquared))
 			{
 				m_degenerateSimplex = 10;
 				checkSimplex=true;
@@ -253,40 +253,40 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
                 break;
 			}
 #endif //
-			
+
 
 			//redundant m_simplexSolver->compute_points(pointOnA, pointOnB);
 
 			//are we getting any closer ?
-			if (previousSquaredDistance - squaredDistance <= SIMD_EPSILON * previousSquaredDistance) 
-			{ 
+			if (previousSquaredDistance - squaredDistance <= SIMD_EPSILON * previousSquaredDistance)
+			{
 //				m_simplexSolver->backup_closest(m_cachedSeparatingAxis);
 				checkSimplex = true;
 				m_degenerateSimplex = 12;
-				
+
 				break;
 			}
 
 			m_cachedSeparatingAxis = newCachedSeparatingAxis;
 
-			  //degeneracy, this is typically due to invalid/uninitialized worldtransforms for a btCollisionObject   
-              if (m_curIter++ > gGjkMaxIter)   
-              {   
+			  //degeneracy, this is typically due to invalid/uninitialized worldtransforms for a btCollisionObject
+              if (m_curIter++ > gGjkMaxIter)
+              {
                       #if defined(DEBUG) || defined (_DEBUG) || defined (DEBUG_SPU_COLLISION_DETECTION)
 
-                              printf("btGjkPairDetector maxIter exceeded:%i\n",m_curIter);   
-                              printf("sepAxis=(%f,%f,%f), squaredDistance = %f, shapeTypeA=%i,shapeTypeB=%i\n",   
-                              m_cachedSeparatingAxis.getX(),   
-                              m_cachedSeparatingAxis.getY(),   
-                              m_cachedSeparatingAxis.getZ(),   
-                              squaredDistance,   
-                              m_minkowskiA->getShapeType(),   
-                              m_minkowskiB->getShapeType());   
+                              printf("btGjkPairDetector maxIter exceeded:%i\n",m_curIter);
+                              printf("sepAxis=(%f,%f,%f), squaredDistance = %f, shapeTypeA=%i,shapeTypeB=%i\n",
+                              m_cachedSeparatingAxis.getX(),
+                              m_cachedSeparatingAxis.getY(),
+                              m_cachedSeparatingAxis.getZ(),
+                              squaredDistance,
+                              m_minkowskiA->getShapeType(),
+                              m_minkowskiB->getShapeType());
 
-                      #endif   
-                      break;   
+                      #endif
+                      break;
 
-              } 
+              }
 
 
 			bool check = (!m_simplexSolver->fullSimplex());
@@ -306,24 +306,24 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 			m_simplexSolver->compute_points(pointOnA, pointOnB);
 			normalInB = m_cachedSeparatingAxis;
 			btScalar lenSqr =m_cachedSeparatingAxis.length2();
-			
+
 			//valid normal
 			if (lenSqr < 0.0001)
 			{
 				m_degenerateSimplex = 5;
-			} 
+			}
 			if (lenSqr > SIMD_EPSILON*SIMD_EPSILON)
 			{
 				btScalar rlen = btScalar(1.) / btSqrt(lenSqr );
 				normalInB *= rlen; //normalize
 				btScalar s = btSqrt(squaredDistance);
-			
+
 				btAssert(s > btScalar(0.0));
 				pointOnA -= m_cachedSeparatingAxis * (marginA / s);
 				pointOnB += m_cachedSeparatingAxis * (marginB / s);
 				distance = ((btScalar(1.)/rlen) - margin);
 				isValid = true;
-				
+
 				m_lastUsedMethod = 1;
 			} else
 			{
@@ -331,7 +331,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 			}
 		}
 
-		bool catchDegeneratePenetrationCase = 
+		bool catchDegeneratePenetrationCase =
 			(m_catchDegeneracies && m_penetrationDepthSolver && m_degenerateSimplex && ((distance+margin) < 0.01));
 
 		//if (checkPenetration && !isValid)
@@ -344,12 +344,12 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 			{
 				// Penetration depth case.
 				btVector3 tmpPointOnA,tmpPointOnB;
-				
+
 				gNumDeepPenetrationChecks++;
 				m_cachedSeparatingAxis.setZero();
 
-				bool isValid2 = m_penetrationDepthSolver->calcPenDepth( 
-					*m_simplexSolver, 
+				bool isValid2 = m_penetrationDepthSolver->calcPenDepth(
+					*m_simplexSolver,
 					m_minkowskiA,m_minkowskiB,
 					localTransA,localTransB,
 					m_cachedSeparatingAxis, tmpPointOnA, tmpPointOnB,
@@ -397,7 +397,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 					///thanks to Jacob.Langford for the reproduction case
 					///http://code.google.com/p/bullet/issues/detail?id=250
 
-				
+
 					if (m_cachedSeparatingAxis.length2() > btScalar(0.))
 					{
 						btScalar distance2 = (tmpPointOnA-tmpPointOnB).length()-margin;
@@ -419,13 +419,13 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 						}
 					}
 				}
-				
+
 			}
 
 		}
 	}
 
-	
+
 
 	if (isValid && ((distance < 0) || (distance*distance < input.m_maximumDistanceSquared)))
 	{
@@ -436,7 +436,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 			printf("n = %2.3f,%2.3f,%2.3f. ",normalInB[0],normalInB[1],normalInB[2]);
 			printf("distance = %2.3f exit=%d deg=%d\n",distance,m_lastUsedMethod,m_degenerateSimplex);
 		}
-#endif 
+#endif
 
 		m_cachedSeparatingAxis = normalInB;
 		m_cachedSeparatingDistance = distance;

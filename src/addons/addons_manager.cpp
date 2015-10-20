@@ -111,7 +111,7 @@ void AddonsManager::init(const XMLNode *xml,
           force_refresh                                              ||
           !file_manager->fileExists(filename)                          )
        && UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED;
-    
+
     if (download)
     {
         Log::info("addons", "Downloading updated addons.xml.");
@@ -130,7 +130,7 @@ void AddonsManager::init(const XMLNode *xml,
     }
     else
         Log::info("addons", "Using cached addons.xml.");
-        
+
     const XMLNode *xml_addons = new XMLNode(filename);
     addons_manager->initAddons(xml_addons);   // will free xml_addons
     if(UserConfigParams::logAddons())

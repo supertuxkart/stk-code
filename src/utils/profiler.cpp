@@ -302,7 +302,7 @@ void Profiler::draw()
             else end = std::max(end, m.end);
         }
     }
-    
+
     const double duration = end - start;
     const double factor = profiler_width / duration;
 
@@ -360,7 +360,7 @@ void Profiler::draw()
             m_first_capture_sweep = false;
         }
     }
-    
+
     // GPU profiler
     QueryPerf hovered_gpu_marker = Q_LAST;
     long hovered_gpu_marker_elapsed = 0;
@@ -372,7 +372,7 @@ void Profiler::draw()
         gpu_timers[i] = irr_driver->getGPUTimer(i).elapsedTimeus();
         total += gpu_timers[i];
     }
-    
+
     static video::SColor colors[] = {
         video::SColor(255, 255, 0, 0),
         video::SColor(255, 0, 255, 0),

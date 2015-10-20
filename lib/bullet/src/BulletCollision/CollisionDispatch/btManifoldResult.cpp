@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -74,7 +74,7 @@ void btManifoldResult::addContactPoint(const btVector3& normalOnBInWorld,const b
 
 	btVector3 localA;
 	btVector3 localB;
-	
+
 	if (isSwapped)
 	{
 		localA = m_rootTransB.invXform(pointA );
@@ -88,7 +88,7 @@ void btManifoldResult::addContactPoint(const btVector3& normalOnBInWorld,const b
 	btManifoldPoint newPt(localA,localB,normalOnBInWorld,depth);
 	newPt.m_positionWorldOnA = pointA;
 	newPt.m_positionWorldOnB = pointInWorld;
-	
+
 	int insertIndex = m_manifoldPtr->getCacheEntry(newPt);
 
 	newPt.m_combinedFriction = calculateCombinedFriction(m_body0,m_body1);
@@ -118,7 +118,7 @@ void btManifoldResult::addContactPoint(const btVector3& normalOnBInWorld,const b
 	{
 		insertIndex = m_manifoldPtr->addManifoldPoint(newPt);
 	}
-	
+
 	//User can override friction and/or restitution
 	if (gContactAddedCallback &&
 		//and if either of the two bodies requires custom material

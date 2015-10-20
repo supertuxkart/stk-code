@@ -349,7 +349,7 @@ void OptionsScreenDevice::updateInputButtons()
 
         }   // if existing key
     }   // for action <= PA_LAST_MENU_ACTION;
-    
+
 
     GUIEngine::Widget* conflict_label =
         getWidget<GUIEngine::LabelWidget>("conflict");

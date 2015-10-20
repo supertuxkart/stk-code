@@ -156,7 +156,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
 {
     if (!m_configuration->isEnabled()) return false;
 
-    // A digital input value is 32767 or -32768 (which then triggers 
+    // A digital input value is 32767 or -32768 (which then triggers
     // time-full-steer to be used to adjust actual steering values.
     // To prevent this delay for analog gamesticks, make sure that
     // 32767/-32768 are never used.

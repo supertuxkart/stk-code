@@ -145,7 +145,7 @@ class ListInstancedMatNormalMap : public InstancedMeshList<ListInstancedMatNorma
 {};
 
 // ----------------------------------------------------------------------------
-class ListMatGrass : public MeshList<ListMatGrass, GLMesh *, core::matrix4, 
+class ListMatGrass : public MeshList<ListMatGrass, GLMesh *, core::matrix4,
                                      core::matrix4, core::vector3df>
 {};
 

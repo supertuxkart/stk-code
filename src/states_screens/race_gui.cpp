@@ -174,7 +174,7 @@ void RaceGUI::renderGlobal(float dt)
         //stop displaying timer as soon as race is over
         if (world->getPhase()<WorldStatus::DELAY_FINISH_PHASE)
            drawGlobalTimer();
-        
+
         if(world->getPhase() == WorldStatus::GO_PHASE ||
            world->getPhase() == WorldStatus::MUSIC_PHASE)
         {
@@ -202,7 +202,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     core::vector2df scaling = camera->getScaling();
     const AbstractKart *kart = camera->getKart();
     if(!kart) return;
-    
+
     drawPlungerInFace(camera, dt);
 
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
@@ -818,7 +818,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 {
     // Don't display laps or ranks if the kart has already finished the race.
     if (kart->hasFinishedRace()) return;
-        
+
     World *world = World::getWorld();
     if (!world->raceHasLaps()) return;
     const int lap = world->getKartLaps(kart->getWorldKartId());

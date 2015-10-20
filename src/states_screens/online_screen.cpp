@@ -114,7 +114,7 @@ bool OnlineScreen::hasStateChanged()
 // ----------------------------------------------------------------------------
 void OnlineScreen::beforeAddingWidget()
 {
-    // Set everything that could be set invisible or deactivated 
+    // Set everything that could be set invisible or deactivated
     // to active and visible
     m_bottom_menu_widget->setVisible(true);
     m_top_menu_widget->setVisible(true);

@@ -31,7 +31,7 @@ Weather::Weather(bool lightning, std::string sound)
     m_lightning = lightning;
     m_thunder_sound = NULL;
     m_weather_sound = NULL;
-    
+
     if (m_lightning)
     {
         m_thunder_sound = SFXManager::get()->createSoundSource("thunder");
@@ -52,7 +52,7 @@ Weather::~Weather()
 {
     if (m_thunder_sound != NULL)
         m_thunder_sound->deleteSFX();
-        
+
     if (m_weather_sound != NULL)
         m_weather_sound->deleteSFX();
 }   // ~Weather
@@ -64,7 +64,7 @@ void Weather::update(float dt)
     if (m_lightning)
     {
         m_next_lightning -= dt;
-    
+
         if (m_next_lightning < 0.0f)
         {
             RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
@@ -78,7 +78,7 @@ void Weather::update(float dt)
                     m_thunder_sound->play();
                 }
             }
-    
+
             RandomGenerator g;
             m_next_lightning = 35 + (float)g.get(35);
         }

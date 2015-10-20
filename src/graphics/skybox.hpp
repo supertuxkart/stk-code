@@ -30,21 +30,21 @@ class Skybox
 private:
     /** The 6 skybox textures */
     std::vector<irr::video::ITexture *> m_skybox_textures;
-    
+
     /** The skybox texture id */
     GLuint m_cube_map;
-    
+
     /** The specular probe texture id */
-    GLuint m_specular_probe;   
-    
+    GLuint m_specular_probe;
+
 
     void generateCubeMapFromTextures ();
     void generateSpecularCubemap ();
-    
+
 public:
     Skybox(const std::vector<irr::video::ITexture *> &skybox_textures);
     ~Skybox();
-    
+
     void render(const irr::scene::ICameraSceneNode *camera) const;
 
     inline GLuint getSpecularProbe()      const     {return m_specular_probe; }

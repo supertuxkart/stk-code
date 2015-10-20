@@ -566,8 +566,8 @@ void PhysicalObject::update(float dt)
  *  \return True if a triangle was hit, false otherwise (and no output
  *          variable will be set.
  */
-bool PhysicalObject::castRay(const btVector3 &from, const btVector3 &to, 
-                             btVector3 *hit_point, const Material **material, 
+bool PhysicalObject::castRay(const btVector3 &from, const btVector3 &to,
+                             btVector3 *hit_point, const Material **material,
                              btVector3 *normal, bool interpolate_normal) const
 {
     if(m_body_type!=MP_EXACT)
@@ -575,8 +575,8 @@ bool PhysicalObject::castRay(const btVector3 &from, const btVector3 &to,
         Log::warn("PhysicalObject", "Can only raycast against 'exact' meshes.");
         return false;
     }
-    bool result = m_triangle_mesh->castRay(from, to, hit_point, 
-                                           material, normal, 
+    bool result = m_triangle_mesh->castRay(from, to, hit_point,
+                                           material, normal,
                                            interpolate_normal);
     return result;
 }   // castRay

@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -35,7 +35,7 @@ void	btSimpleBroadphase::validate()
 			btAssert(&m_pHandles[i] != &m_pHandles[j]);
 		}
 	}
-	
+
 }
 
 btSimpleBroadphase::btSimpleBroadphase(int maxProxies, btOverlappingPairCache* overlappingPairCache)
@@ -58,7 +58,7 @@ btSimpleBroadphase::btSimpleBroadphase(int maxProxies, btOverlappingPairCache* o
 	m_numHandles = 0;
 	m_firstFreeHandle = 0;
 	m_LastHandleIndex = -1;
-	
+
 
 	{
 		for (int i = m_firstFreeHandle; i < maxProxies; i++)
@@ -67,7 +67,7 @@ btSimpleBroadphase::btSimpleBroadphase(int maxProxies, btOverlappingPairCache* o
 			m_pHandles[i].m_uniqueId = i+2;//any UID will do, we just avoid too trivial values (0,1) for debugging purposes
 		}
 		m_pHandles[maxProxies - 1].SetNextFree(0);
-	
+
 	}
 
 }
@@ -130,14 +130,14 @@ protected:
 
 void	btSimpleBroadphase::destroyProxy(btBroadphaseProxy* proxyOrg,btDispatcher* dispatcher)
 {
-		
+
 		btSimpleBroadphaseProxy* proxy0 = static_cast<btSimpleBroadphaseProxy*>(proxyOrg);
 		freeHandle(proxy0);
 
 		m_pairCache->removeOverlappingPairsContainingProxy(proxyOrg,dispatcher);
 
 		//validate();
-		
+
 }
 
 void	btSimpleBroadphase::getAabb(btBroadphaseProxy* proxy,btVector3& aabbMin, btVector3& aabbMax ) const
@@ -186,13 +186,13 @@ void	btSimpleBroadphase::aabbTest(const btVector3& aabbMin, const btVector3& aab
 
 
 
-	
+
 
 
 
 bool	btSimpleBroadphase::aabbOverlap(btSimpleBroadphaseProxy* proxy0,btSimpleBroadphaseProxy* proxy1)
 {
-	return proxy0->m_aabbMin[0] <= proxy1->m_aabbMax[0] && proxy1->m_aabbMin[0] <= proxy0->m_aabbMax[0] && 
+	return proxy0->m_aabbMin[0] <= proxy1->m_aabbMax[0] && proxy1->m_aabbMin[0] <= proxy0->m_aabbMax[0] &&
 		   proxy0->m_aabbMin[1] <= proxy1->m_aabbMax[1] && proxy1->m_aabbMin[1] <= proxy0->m_aabbMax[1] &&
 		   proxy0->m_aabbMin[2] <= proxy1->m_aabbMax[2] && proxy1->m_aabbMin[2] <= proxy0->m_aabbMax[2];
 
@@ -316,7 +316,7 @@ void	btSimpleBroadphase::calculateOverlappingPairs(btDispatcher* dispatcher)
 					pair.m_pProxy1 = 0;
 					m_invalidPair++;
 					gOverlappingPairs--;
-				} 
+				}
 
 			}
 

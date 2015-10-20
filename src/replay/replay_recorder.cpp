@@ -173,7 +173,7 @@ void ReplayRecorder::Save()
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
     fprintf(fd, "Laps: %d\n",       race_manager->getNumLaps());
 
-    unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time 
+    unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time
                                              / stk_config->m_replay_dt      );
     for(unsigned int k=0; k<num_karts; k++)
     {

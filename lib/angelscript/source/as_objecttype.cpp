@@ -2,23 +2,23 @@
    AngelCode Scripting Library
    Copyright (c) 2003-2015 Andreas Jonsson
 
-   This software is provided 'as-is', without any express or implied 
-   warranty. In no event will the authors be held liable for any 
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any
    damages arising from the use of this software.
 
-   Permission is granted to anyone to use this software for any 
-   purpose, including commercial applications, and to alter it and 
+   Permission is granted to anyone to use this software for any
+   purpose, including commercial applications, and to alter it and
    redistribute it freely, subject to the following restrictions:
 
-   1. The origin of this software must not be misrepresented; you 
+   1. The origin of this software must not be misrepresented; you
       must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product 
+      this software in a product, an acknowledgment in the product
       documentation would be appreciated but is not required.
 
-   2. Altered source versions must be plainly marked as such, and 
+   2. Altered source versions must be plainly marked as such, and
       must not be misrepresented as being the original software.
 
-   3. This notice may not be removed or altered from any source 
+   3. This notice may not be removed or altered from any source
       distribution.
 
    The original version of this library can be located at:
@@ -45,11 +45,11 @@
 
 BEGIN_AS_NAMESPACE
 
-asCObjectType::asCObjectType() 
+asCObjectType::asCObjectType()
 {
-	externalRefCount.set(0); 
+	externalRefCount.set(0);
 	internalRefCount.set(1); // start with one internal ref-count
-	engine      = 0; 
+	engine      = 0;
 	module      = 0;
 	derivedFrom = 0;
 	size        = 0;
@@ -67,11 +67,11 @@ asCObjectType::asCObjectType()
 #endif
 }
 
-asCObjectType::asCObjectType(asCScriptEngine *engine) 
+asCObjectType::asCObjectType(asCScriptEngine *engine)
 {
-	externalRefCount.set(0); 
+	externalRefCount.set(0);
 	internalRefCount.set(1); // start with one internal ref count
-	this->engine = engine; 
+	this->engine = engine;
 	module       = 0;
 	derivedFrom  = 0;
 
@@ -103,7 +103,7 @@ int asCObjectType::Release() const
 		// internal references then it is time to delete the object type
 		if( internalRefCount.get() == 0 )
 		{
-			// If the engine is no longer set, then it has already been 
+			// If the engine is no longer set, then it has already been
 			// released and we must take care of the deletion ourselves
 			asDELETE(const_cast<asCObjectType*>(this), asCObjectType);
 		}
@@ -127,7 +127,7 @@ int asCObjectType::ReleaseInternal()
 		// external references then it is time to delete the object type
 		if( externalRefCount.get() == 0 )
 		{
-			// If the engine is no longer set, then it has already been 
+			// If the engine is no longer set, then it has already been
 			// released and we must take care of the deletion ourselves
 			asDELETE(const_cast<asCObjectType*>(this), asCObjectType);
 		}
@@ -174,7 +174,7 @@ void *asCObjectType::SetUserData(void *data, asPWORD type)
 
 void *asCObjectType::GetUserData(asPWORD type) const
 {
-	// There may be multiple threads reading, but when  
+	// There may be multiple threads reading, but when
 	// setting the user data nobody must be reading.
 	ACQUIRESHARED(engine->engineRWLock);
 
@@ -463,8 +463,8 @@ asIScriptFunction *asCObjectType::GetMethodByDecl(const char *decl, bool getVirt
 
 	// Get the module from one of the methods, but it will only be
 	// used to allow the parsing of types not already known by the object.
-	// It is possible for object types to be orphaned, e.g. by discarding 
-	// the module that created it. In this case it is still possible to 
+	// It is possible for object types to be orphaned, e.g. by discarding
+	// the module that created it. In this case it is still possible to
 	// find the methods, but any type not known by the object will result in
 	// an invalid declaration.
 	asCModule *mod = engine->scriptFunctions[methods[0]]->module;
@@ -535,14 +535,14 @@ const char *asCObjectType::GetPropertyDeclaration(asUINT index, bool includeName
 
 asIObjectType *asCObjectType::GetBaseType() const
 {
-	return derivedFrom; 
+	return derivedFrom;
 }
 
 asUINT asCObjectType::GetBehaviourCount() const
 {
 	// Count the number of behaviours (except factory functions)
 	asUINT count = 0;
-	
+
 	if( beh.destruct )               count++;
 	if( beh.addref )                 count++;
 	if( beh.release )                count++;
@@ -550,7 +550,7 @@ asUINT asCObjectType::GetBehaviourCount() const
 	if( beh.gcSetFlag )              count++;
 	if( beh.gcGetFlag )              count++;
 	if( beh.gcEnumReferences )       count++;
-	if( beh.gcReleaseAllReferences ) count++; 
+	if( beh.gcReleaseAllReferences ) count++;
 	if( beh.templateCallback )       count++;
 	if( beh.listFactory )            count++;
 	if( beh.getWeakRefFlag )         count++;
@@ -568,7 +568,7 @@ asIScriptFunction *asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviour
 	asUINT count = 0;
 
 	if( beh.destruct && count++ == index ) // only increase count if the behaviour is registered
-	{ 
+	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_DESTRUCT;
 		return engine->scriptFunctions[beh.destruct];
 	}
@@ -623,7 +623,7 @@ asIScriptFunction *asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviour
 
 	if( beh.listFactory && count++ == index )
 	{
-		if( outBehaviour ) 
+		if( outBehaviour )
 		{
 			if( flags & asOBJ_VALUE )
 				*outBehaviour = asBEHAVE_LIST_CONSTRUCT;
@@ -647,7 +647,7 @@ asIScriptFunction *asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviour
 		if( outBehaviour ) *outBehaviour = asBEHAVE_CONSTRUCT;
 		return engine->scriptFunctions[beh.constructors[index - count]];
 	}
-	else 
+	else
 		count += (asUINT)beh.constructors.GetLength();
 
 	return 0;
@@ -746,7 +746,7 @@ void asCObjectType::ReleaseAllProperties()
 {
 	for( asUINT n = 0; n < properties.GetLength(); n++ )
 	{
-		if( properties[n] ) 
+		if( properties[n] )
 		{
 			if( flags & asOBJ_SCRIPT_OBJECT )
 			{
@@ -781,7 +781,7 @@ void asCObjectType::ReleaseAllFunctions()
 	beh.copyfactory = 0;
 	for( asUINT a = 0; a < beh.factories.GetLength(); a++ )
 	{
-		if( engine->scriptFunctions[beh.factories[a]] ) 
+		if( engine->scriptFunctions[beh.factories[a]] )
 			engine->scriptFunctions[beh.factories[a]]->ReleaseInternal();
 	}
 	beh.factories.SetLength(0);
@@ -790,7 +790,7 @@ void asCObjectType::ReleaseAllFunctions()
 	beh.copyconstruct = 0;
 	for( asUINT b = 0; b < beh.constructors.GetLength(); b++ )
 	{
-		if( engine->scriptFunctions[beh.constructors[b]] ) 
+		if( engine->scriptFunctions[beh.constructors[b]] )
 			engine->scriptFunctions[beh.constructors[b]]->ReleaseInternal();
 	}
 	beh.constructors.SetLength(0);
@@ -813,7 +813,7 @@ void asCObjectType::ReleaseAllFunctions()
 
 	for( asUINT c = 0; c < methods.GetLength(); c++ )
 	{
-		if( engine->scriptFunctions[methods[c]] ) 
+		if( engine->scriptFunctions[methods[c]] )
 			engine->scriptFunctions[methods[c]]->ReleaseInternal();
 	}
 	methods.SetLength(0);

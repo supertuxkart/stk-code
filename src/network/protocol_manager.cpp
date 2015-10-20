@@ -279,7 +279,7 @@ void ProtocolManager::startProtocol(ProtocolInfo protocol)
     m_protocols.lock();
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
     Log::info("ProtocolManager",
-        "A %s protocol with id=%u has been started. There are %ld protocols running.", 
+        "A %s protocol with id=%u has been started. There are %ld protocols running.",
               typeid(*protocol.protocol).name(), protocol.id,
               m_protocols.getData().size()+1);
     m_protocols.getData().push_back(protocol);
@@ -373,7 +373,7 @@ bool ProtocolManager::propagateEvent(EventProcessingInfo* event, bool synchronou
                 index++;
         }
     }
-    if (event->protocols_ids.size() == 0 || 
+    if (event->protocols_ids.size() == 0 ||
         (StkTime::getTimeSinceEpoch()-event->arrival_time) >= TIME_TO_KEEP_EVENTS)
     {
         // because we made a copy of the event

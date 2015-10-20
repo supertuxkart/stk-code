@@ -2,23 +2,23 @@
    AngelCode Scripting Library
    Copyright (c) 2003-2015 Andreas Jonsson
 
-   This software is provided 'as-is', without any express or implied 
-   warranty. In no event will the authors be held liable for any 
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any
    damages arising from the use of this software.
 
-   Permission is granted to anyone to use this software for any 
-   purpose, including commercial applications, and to alter it and 
+   Permission is granted to anyone to use this software for any
+   purpose, including commercial applications, and to alter it and
    redistribute it freely, subject to the following restrictions:
 
-   1. The origin of this software must not be misrepresented; you 
+   1. The origin of this software must not be misrepresented; you
       must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product 
+      this software in a product, an acknowledgment in the product
       documentation would be appreciated but is not required.
 
-   2. Altered source versions must be plainly marked as such, and 
+   2. Altered source versions must be plainly marked as such, and
       must not be misrepresented as being the original software.
 
-   3. This notice may not be removed or altered from any source 
+   3. This notice may not be removed or altered from any source
       distribution.
 
    The original version of this library can be located at:
@@ -169,7 +169,7 @@ asCString asCDataType::Format(asSNameSpace *currNs, bool includeNamespace) const
 	if( isReadOnly )
 		str = "const ";
 
-	// If the type is not declared in the current namespace, then the namespace 
+	// If the type is not declared in the current namespace, then the namespace
 	// must always be informed to guarantee that the correct type is informed
 	if( includeNamespace || (objectType && objectType->nameSpace != currNs) || (funcDef && funcDef->nameSpace != currNs) )
 	{
@@ -264,15 +264,15 @@ int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 		}
 		else if( !isObjectHandle )
 		{
-			// Only reference types are allowed to be handles, 
-			// but not nohandle reference types, and not scoped references 
+			// Only reference types are allowed to be handles,
+			// but not nohandle reference types, and not scoped references
 			// (except when returned from registered function)
 			// funcdefs are special reference types and support handles
 			// value types with asOBJ_ASHANDLE are treated as a handle
-			if( !funcDef && 
-				(!objectType || 
-				!((objectType->flags & asOBJ_REF) || (objectType->flags & asOBJ_TEMPLATE_SUBTYPE) || (objectType->flags & asOBJ_ASHANDLE)) || 
-				(objectType->flags & asOBJ_NOHANDLE) || 
+			if( !funcDef &&
+				(!objectType ||
+				!((objectType->flags & asOBJ_REF) || (objectType->flags & asOBJ_TEMPLATE_SUBTYPE) || (objectType->flags & asOBJ_ASHANDLE)) ||
+				(objectType->flags & asOBJ_NOHANDLE) ||
 				((objectType->flags & asOBJ_SCOPED) && !acceptHandleForScope)) )
 				return -1;
 
@@ -305,7 +305,7 @@ int asCDataType::MakeArray(asCScriptEngine *engine, asCModule *module)
 
 	isObjectHandle = false;
 	isConstHandle = false;
-	
+
 	objectType = at;
 	tokenType = ttIdentifier;
 
@@ -342,7 +342,7 @@ int asCDataType::MakeHandleToConst(bool b)
 bool asCDataType::SupportHandles() const
 {
 	if( objectType &&
-		(objectType->flags & (asOBJ_REF | asOBJ_ASHANDLE)) && 
+		(objectType->flags & (asOBJ_REF | asOBJ_ASHANDLE)) &&
 		!(objectType->flags & asOBJ_NOHANDLE) &&
 		!isObjectHandle )
 		return true;
@@ -356,7 +356,7 @@ bool asCDataType::CanBeInstantiated() const
 		return false;
 
 	if( !IsObject() ) // Primitives
-		return true; 
+		return true;
 
 	if( IsObjectHandle() && !(objectType->flags & asOBJ_NOHANDLE) ) // Handles
 		return true;
@@ -432,7 +432,7 @@ bool asCDataType::IsArrayType() const
 	// This is only true if the type used is the default array type, i.e. the one used for the [] syntax form
 	if( objectType && objectType->engine->defaultArrayObjectType )
 		return objectType->name == objectType->engine->defaultArrayObjectType->name;
-	
+
 	return false;
 }
 
@@ -584,7 +584,7 @@ bool asCDataType::IsObject() const
 		return false;
 
 	// Null handle doesn't have an object type but should still be considered an object
-	if( objectType == 0 ) 
+	if( objectType == 0 )
 		return IsNullHandle();
 
 	return true;
@@ -626,7 +626,7 @@ int asCDataType::GetSizeInMemoryDWords() const
 	int s = GetSizeInMemoryBytes();
 	if( s == 0 ) return 0;
 	if( s <= 4 ) return 1;
-	
+
 	// Pad the size to 4 bytes
 	if( s & 0x3 )
 		s += 4 - (s & 0x3);
@@ -659,8 +659,8 @@ int  asCDataType::GetAlignment() const
 #endif
 
 asSTypeBehaviour *asCDataType::GetBehaviour() const
-{ 
-	return objectType ? &objectType->beh : 0; 
+{
+	return objectType ? &objectType->beh : 0;
 }
 
 bool asCDataType::IsEnumType() const

@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -31,7 +31,7 @@ btShapeHull::btShapeHull (const btConvexShape* shape)
 
 btShapeHull::~btShapeHull ()
 {
-	m_indices.clear();	
+	m_indices.clear();
 	m_vertices.clear ();
 }
 
@@ -120,7 +120,7 @@ btShapeHull::numIndices () const
 
 btVector3* btShapeHull::getUnitSpherePoints()
 {
-	static btVector3 sUnitSpherePoints[NUM_UNITSPHERE_POINTS+MAX_PREFERRED_PENETRATION_DIRECTIONS*2] = 
+	static btVector3 sUnitSpherePoints[NUM_UNITSPHERE_POINTS+MAX_PREFERRED_PENETRATION_DIRECTIONS*2] =
 	{
 		btVector3(btScalar(0.000000) , btScalar(-0.000000),btScalar(-1.000000)),
 		btVector3(btScalar(0.723608) , btScalar(-0.525725),btScalar(-0.447219)),

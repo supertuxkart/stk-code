@@ -110,7 +110,7 @@ void InputManager::handleStaticAction(int key, int value)
     }
 
 
-    if (world != NULL && UserConfigParams::m_artist_debug_mode && 
+    if (world != NULL && UserConfigParams::m_artist_debug_mode &&
         control_is_pressed && value > 0)
     {
         if (Debug::handleStaticAction(key))
@@ -630,7 +630,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         else if (button == KEY_RIGHT)  action = PA_MENU_RIGHT;
         else if (button == KEY_SPACE)  action = PA_MENU_SELECT;
         else if (button == KEY_RETURN) action = PA_MENU_SELECT;
-        else if (button == KEY_TAB)    
+        else if (button == KEY_TAB)
         {
             if (shift_mask)
             {

@@ -151,7 +151,7 @@ irr::core::stringw Achievement::getProgressAsString() const
  *  \param key The key whose value is increased.
  *  \param increase Amount to add to the value of this key.
  */
-void Achievement::increase(const std::string & key, 
+void Achievement::increase(const std::string & key,
                            const std::string &goal_key, int increase)
 {
     std::map<std::string, int>::iterator it;

@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -54,7 +54,7 @@ public:
 void	btScaledBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callback,const btVector3& aabbMin,const btVector3& aabbMax) const
 {
 	btScaledTriangleCallback scaledCallback(callback,m_localScaling);
-	
+
 	btVector3 invLocalScaling(1.f/m_localScaling.getX(),1.f/m_localScaling.getY(),1.f/m_localScaling.getZ());
 	btVector3 scaledAabbMin,scaledAabbMax;
 
@@ -63,13 +63,13 @@ void	btScaledBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callb
 	scaledAabbMin[1] = m_localScaling.getY() >= 0. ? aabbMin[1] * invLocalScaling[1] : aabbMax[1] * invLocalScaling[1];
 	scaledAabbMin[2] = m_localScaling.getZ() >= 0. ? aabbMin[2] * invLocalScaling[2] : aabbMax[2] * invLocalScaling[2];
 	scaledAabbMin[3] = 0.f;
-	
+
 	scaledAabbMax[0] = m_localScaling.getX() <= 0. ? aabbMin[0] * invLocalScaling[0] : aabbMax[0] * invLocalScaling[0];
 	scaledAabbMax[1] = m_localScaling.getY() <= 0. ? aabbMin[1] * invLocalScaling[1] : aabbMax[1] * invLocalScaling[1];
 	scaledAabbMax[2] = m_localScaling.getZ() <= 0. ? aabbMin[2] * invLocalScaling[2] : aabbMax[2] * invLocalScaling[2];
 	scaledAabbMax[3] = 0.f;
-	
-	
+
+
 	m_bvhTriMeshShape->processAllTriangles(&scaledCallback,scaledAabbMin,scaledAabbMax);
 }
 
@@ -93,8 +93,8 @@ void	btScaledBvhTriangleMeshShape::getAabb(const btTransform& trans,btVector3& a
 	btScalar margin = m_bvhTriMeshShape->getMargin();
 	localHalfExtents += btVector3(margin,margin,margin);
 	btVector3 localCenter = btScalar(0.5)*(localAabbMax+localAabbMin);
-	
-	btMatrix3x3 abs_b = trans.getBasis().absolute();  
+
+	btMatrix3x3 abs_b = trans.getBasis().absolute();
 
 	btVector3 center = trans(localCenter);
 

@@ -6,8 +6,8 @@ EPA Copyright (c) Ricardo Padrela 2006
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -33,22 +33,22 @@ bool btGjkEpaPenetrationDepthSolver::calcPenDepth( btSimplexSolverInterface& sim
 	(void)simplexSolver;
 
 //	const btScalar				radialmargin(btScalar(0.));
-	
+
 	btVector3	guessVector(transformA.getOrigin()-transformB.getOrigin());
 	btGjkEpaSolver2::sResults	results;
-	
+
 
 	if(btGjkEpaSolver2::Penetration(pConvexA,transformA,
 								pConvexB,transformB,
 								guessVector,results))
-	
+
 		{
 	//	debugDraw->drawLine(results.witnesses[1],results.witnesses[1]+results.normal,btVector3(255,0,0));
 		//resultOut->addContactPoint(results.normal,results.witnesses[1],-results.depth);
 		wWitnessOnA = results.witnesses[0];
 		wWitnessOnB = results.witnesses[1];
 		v = results.normal;
-		return true;		
+		return true;
 		} else
 	{
 		if(btGjkEpaSolver2::Distance(pConvexA,transformA,pConvexB,transformB,guessVector,results))

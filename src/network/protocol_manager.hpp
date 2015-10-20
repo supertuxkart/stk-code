@@ -110,7 +110,7 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
     friend class AbstractSingleton<ProtocolManager>;
     static void* mainLoop(void *data);
     public:
-        
+
         /*! \brief Stops the protocol manager. */
         virtual void            abort();
         /*!

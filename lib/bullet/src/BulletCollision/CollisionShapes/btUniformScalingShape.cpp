@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -21,11 +21,11 @@ m_uniformScalingFactor(uniformScalingFactor)
 {
 	m_shapeType = UNIFORM_SCALING_SHAPE_PROXYTYPE;
 }
-	
+
 btUniformScalingShape::~btUniformScalingShape()
 {
 }
-	
+
 
 btVector3	btUniformScalingShape::localGetSupportingVertexWithoutMargin(const btVector3& vec)const
 {
@@ -82,7 +82,7 @@ void btUniformScalingShape::getAabbSlow(const btTransform& t,btVector3& aabbMin,
 		btVector3( 0., -1.,  0.),
 		btVector3( 0.,  0., -1.)
 	};
-	
+
 	btVector3 _supporting[] =
 	{
 		btVector3( 0., 0., 0.),
@@ -97,9 +97,9 @@ void btUniformScalingShape::getAabbSlow(const btTransform& t,btVector3& aabbMin,
 	{
 		_directions[i] = _directions[i]*t.getBasis();
 	}
-	
+
 	batchedUnitVectorGetSupportingVertexWithoutMargin(_directions, _supporting, 6);
-	
+
 	btVector3 aabbMin1(0,0,0),aabbMax1(0,0,0);
 
 	for ( int i = 0; i < 3; ++i )
@@ -110,7 +110,7 @@ void btUniformScalingShape::getAabbSlow(const btTransform& t,btVector3& aabbMin,
 	btVector3 marginVec(getMargin(),getMargin(),getMargin());
 	aabbMin = aabbMin1-marginVec;
 	aabbMax = aabbMax1+marginVec;
-	
+
 #else
 
 	btScalar margin = getMargin();
@@ -130,7 +130,7 @@ void btUniformScalingShape::getAabbSlow(const btTransform& t,btVector3& aabbMin,
 #endif
 }
 
-void	btUniformScalingShape::setLocalScaling(const btVector3& scaling) 
+void	btUniformScalingShape::setLocalScaling(const btVector3& scaling)
 {
 	m_childConvexShape->setLocalScaling(scaling);
 }
@@ -153,7 +153,7 @@ int		btUniformScalingShape::getNumPreferredPenetrationDirections() const
 {
 	return m_childConvexShape->getNumPreferredPenetrationDirections();
 }
-	
+
 void	btUniformScalingShape::getPreferredPenetrationDirection(int index, btVector3& penetrationVector) const
 {
 	m_childConvexShape->getPreferredPenetrationDirection(index,penetrationVector);

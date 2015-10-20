@@ -93,7 +93,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     #ifdef DEBUG
     m_magic_number = 0xABCD1234;
     #endif
-    
+
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------

@@ -58,8 +58,8 @@
 
 BEGIN_AS_NAMESPACE
 
-// This part was written and tested by Jeff Slutter 
-// from Reactor Zero, Abril, 2007, for PlayStation 3, which 
+// This part was written and tested by Jeff Slutter
+// from Reactor Zero, Abril, 2007, for PlayStation 3, which
 // is a PowerPC 64bit based architecture. Even though it is
 // 64bit it seems the pointer size is still 32bit.
 
@@ -131,7 +131,7 @@ asm(""
 	"sub %r0,%r0,%r0\n"      // zero out r0
 	"mr  %r23,%r0\n"         // zero out r23, which holds the number of used GPR registers
 	"mr  %r22,%r0\n"         // zero our r22, which holds the number of used float registers
-	
+
 	// load the global ppcArgsType which holds the types of arguments for each argument
 	"lis %r25, ppcArgsType@ha\n"       // load the upper 16 bits of the address to r25
 	"addi %r25, %r25, ppcArgsType@l\n" // load the lower 16 bits of the address to r25
@@ -507,7 +507,7 @@ static asQWORD CallThisCallFunction(const void *obj, const asDWORD* pArgs, const
 }
 
 // This function is identical to CallCDeclFunction, with the only difference that
-// the value in the last parameter is the object 
+// the value in the last parameter is the object
 // NOTE: on PPC the order for the args is reversed
 static asQWORD CallThisCallFunction_objLast(const void *obj, const asDWORD* pArgs, const asBYTE *pArgsType, int argSize, asDWORD func, void *retInMemory)
 {
@@ -712,7 +712,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		// Keep a free location at the beginning
 		args = &paramBuffer[1];
 	}
-	
+
 	// one last verification to make sure things are how we expect
 	switch( callConv )
 	{

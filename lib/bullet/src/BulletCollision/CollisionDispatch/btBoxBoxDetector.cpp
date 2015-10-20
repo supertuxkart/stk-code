@@ -7,8 +7,8 @@
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -73,7 +73,7 @@ static btScalar dDOT14 (const btScalar *a, const btScalar *b) { return dDOTpq(a,
   (A)[0] op dDOT((B),(C)); \
   (A)[1] op dDOT((B+4),(C)); \
   (A)[2] op dDOT((B+8),(C)); \
-} 
+}
 
 #define dMULTIPLY1_331(A,B,C) dMULTIPLYOP1_331(A,=,B,C)
 #define dMULTIPLY0_331(A,B,C) dMULTIPLYOP0_331(A,=,B,C)
@@ -426,13 +426,13 @@ int dBoxBox2 (const btVector3& p1, const dMatrix3 R1,
     for (i=0; i<3; i++) pb[i] += ub[i]*beta;
 
 	{
-		
+
 		//contact[0].pos[i] = btScalar(0.5)*(pa[i]+pb[i]);
 		//contact[0].depth = *depth;
 		btVector3 pointInWorld;
 
 #ifdef USE_CENTER_POINT
-	    for (i=0; i<3; i++) 
+	    for (i=0; i<3; i++)
 			pointInWorld[i] = (pa[i]+pb[i])*btScalar(0.5);
 		output.addContactPoint(-normal,pointInWorld,-*depth);
 #else
@@ -608,13 +608,13 @@ int dBoxBox2 (const btVector3& p1, const dMatrix3 R1,
 
   if (cnum <= maxc) {
 
-	  if (code<4) 
+	  if (code<4)
 	  {
     // we have less contacts than we need, so we use them all
-    for (j=0; j < cnum; j++) 
+    for (j=0; j < cnum; j++)
 	{
 		btVector3 pointInWorld;
-		for (i=0; i<3; i++) 
+		for (i=0; i<3; i++)
 			pointInWorld[i] = point[j*3+i] + pa[i];
 		output.addContactPoint(-normal,pointInWorld,-dep[j]);
 
@@ -622,10 +622,10 @@ int dBoxBox2 (const btVector3& p1, const dMatrix3 R1,
 	  } else
 	  {
 		  // we have less contacts than we need, so we use them all
-		for (j=0; j < cnum; j++) 
+		for (j=0; j < cnum; j++)
 		{
 			btVector3 pointInWorld;
-			for (i=0; i<3; i++) 
+			for (i=0; i<3; i++)
 				pointInWorld[i] = point[j*3+i] + pa[i]-normal[i]*dep[j];
 				//pointInWorld[i] = point[j*3+i] + pa[i];
 			output.addContactPoint(-normal,pointInWorld,-dep[j]);
@@ -653,9 +653,9 @@ int dBoxBox2 (const btVector3& p1, const dMatrix3 R1,
     //  con->depth = dep[iret[j]];
 
 		btVector3 posInWorld;
-		for (i=0; i<3; i++) 
+		for (i=0; i<3; i++)
 			posInWorld[i] = point[iret[j]*3+i] + pa[i];
-		if (code<4) 
+		if (code<4)
 	   {
 			output.addContactPoint(-normal,posInWorld,-dep[iret[j]]);
 		} else
@@ -672,10 +672,10 @@ int dBoxBox2 (const btVector3& p1, const dMatrix3 R1,
 
 void	btBoxBoxDetector::getClosestPoints(const ClosestPointInput& input,Result& output,class btIDebugDraw* /*debugDraw*/,bool /*swapResults*/)
 {
-	
+
 	const btTransform& transformA = input.m_transformA;
 	const btTransform& transformB = input.m_transformB;
-	
+
 	int skip = 0;
 	dContactGeom *contact = 0;
 
@@ -696,7 +696,7 @@ void	btBoxBoxDetector::getClosestPoints(const ClosestPointInput& input,Result& o
 
 	}
 
-	
+
 
 	btVector3 normal;
 	btScalar depth;
@@ -704,11 +704,11 @@ void	btBoxBoxDetector::getClosestPoints(const ClosestPointInput& input,Result& o
 	int maxc = 4;
 
 
-	dBoxBox2 (transformA.getOrigin(), 
+	dBoxBox2 (transformA.getOrigin(),
 	R1,
 	2.f*m_box1->getHalfExtentsWithMargin(),
 	transformB.getOrigin(),
-	R2, 
+	R2,
 	2.f*m_box2->getHalfExtentsWithMargin(),
 	normal, &depth, &return_code,
 	maxc, contact, skip,

@@ -39,7 +39,7 @@ namespace gjkepa2_impl
 
 	// Config
 
-	/* GJK	*/ 
+	/* GJK	*/
 #define GJK_MAX_ITERATIONS	128
 #define GJK_ACCURARY		((btScalar)0.0001)
 #define GJK_MIN_DISTANCE	((btScalar)0.0001)
@@ -48,7 +48,7 @@ namespace gjkepa2_impl
 #define GJK_SIMPLEX3_EPS	((btScalar)0.0)
 #define GJK_SIMPLEX4_EPS	((btScalar)0.0)
 
-	/* EPA	*/ 
+	/* EPA	*/
 #define EPA_MAX_VERTICES	64
 #define EPA_MAX_FACES		(EPA_MAX_VERTICES*2)
 #define EPA_MAX_ITERATIONS	255
@@ -73,7 +73,7 @@ namespace gjkepa2_impl
 #else
 		btVector3				(btConvexShape::*Ls)(const btVector3&) const;
 #endif//__SPU__
-		
+
 
 		MinkowskiDiff()
 		{
@@ -83,7 +83,7 @@ namespace gjkepa2_impl
 			void					EnableMargin(bool enable)
 		{
 			m_enableMargin = enable;
-		}	
+		}
 		inline btVector3		Support0(const btVector3& d) const
 		{
 			if (m_enableMargin)
@@ -111,7 +111,7 @@ namespace gjkepa2_impl
 				Ls=&btConvexShape::localGetSupportVertexNonVirtual;
 			else
 				Ls=&btConvexShape::localGetSupportVertexWithoutMarginNonVirtual;
-		}	
+		}
 		inline btVector3		Support0(const btVector3& d) const
 		{
 			return(((m_shapes[0])->*(Ls))(d));
@@ -141,7 +141,7 @@ namespace gjkepa2_impl
 	// GJK
 	struct	GJK
 	{
-		/* Types		*/ 
+		/* Types		*/
 		struct	sSV
 		{
 			btVector3	d,w;
@@ -156,7 +156,7 @@ namespace gjkepa2_impl
 			Valid,
 			Inside,
 			Failed		};};
-			/* Fields		*/ 
+			/* Fields		*/
 			tShape			m_shape;
 			btVector3		m_ray;
 			btScalar		m_distance;
@@ -167,7 +167,7 @@ namespace gjkepa2_impl
 			U				m_current;
 			sSimplex*		m_simplex;
 			eStatus::_		m_status;
-			/* Methods		*/ 
+			/* Methods		*/
 			GJK()
 			{
 				Initialize();
@@ -187,7 +187,7 @@ namespace gjkepa2_impl
 				btScalar	alpha=0;
 				btVector3	lastw[4];
 				U			clastw=0;
-				/* Initialize solver		*/ 
+				/* Initialize solver		*/
 				m_free[0]			=	&m_store[0];
 				m_free[1]			=	&m_store[1];
 				m_free[2]			=	&m_store[2];
@@ -197,31 +197,31 @@ namespace gjkepa2_impl
 				m_status			=	eStatus::Valid;
 				m_shape				=	shapearg;
 				m_distance			=	0;
-				/* Initialize simplex		*/ 
+				/* Initialize simplex		*/
 				m_simplices[0].rank	=	0;
 				m_ray				=	guess;
 				const btScalar	sqrl=	m_ray.length2();
 				appendvertice(m_simplices[0],sqrl>0?-m_ray:btVector3(1,0,0));
 				m_simplices[0].p[0]	=	1;
-				m_ray				=	m_simplices[0].c[0]->w;	
+				m_ray				=	m_simplices[0].c[0]->w;
 				sqdist				=	sqrl;
 				lastw[0]			=
 					lastw[1]			=
 					lastw[2]			=
 					lastw[3]			=	m_ray;
-				/* Loop						*/ 
+				/* Loop						*/
 				do	{
 					const U		next=1-m_current;
 					sSimplex&	cs=m_simplices[m_current];
 					sSimplex&	ns=m_simplices[next];
-					/* Check zero							*/ 
+					/* Check zero							*/
 					const btScalar	rl=m_ray.length();
 					if(rl<GJK_MIN_DISTANCE)
-					{/* Touching or inside				*/ 
+					{/* Touching or inside				*/
 						m_status=eStatus::Inside;
 						break;
 					}
-					/* Append new vertice in -'v' direction	*/ 
+					/* Append new vertice in -'v' direction	*/
 					appendvertice(cs,-m_ray);
 					const btVector3&	w=cs.c[cs.rank-1]->w;
 					bool				found=false;
@@ -231,23 +231,23 @@ namespace gjkepa2_impl
 						{ found=true;break; }
 					}
 					if(found)
-					{/* Return old simplex				*/ 
+					{/* Return old simplex				*/
 						removevertice(m_simplices[m_current]);
 						break;
 					}
 					else
-					{/* Update lastw					*/ 
+					{/* Update lastw					*/
 						lastw[clastw=(clastw+1)&3]=w;
 					}
-					/* Check for termination				*/ 
+					/* Check for termination				*/
 					const btScalar	omega=btDot(m_ray,w)/rl;
 					alpha=btMax(omega,alpha);
 					if(((rl-alpha)-(GJK_ACCURARY*rl))<=0)
-					{/* Return old simplex				*/ 
+					{/* Return old simplex				*/
 						removevertice(m_simplices[m_current]);
 						break;
-					}		
-					/* Reduce simplex						*/ 
+					}
+					/* Reduce simplex						*/
 					btScalar	weights[4];
 					U			mask=0;
 					switch(cs.rank)
@@ -266,7 +266,7 @@ namespace gjkepa2_impl
 									weights,mask);break;
 					}
 					if(sqdist>=0)
-					{/* Valid	*/ 
+					{/* Valid	*/
 						ns.rank		=	0;
 						m_ray		=	btVector3(0,0,0);
 						m_current	=	next;
@@ -286,7 +286,7 @@ namespace gjkepa2_impl
 						if(mask==15) m_status=eStatus::Inside;
 					}
 					else
-					{/* Return old simplex				*/ 
+					{/* Return old simplex				*/
 						removevertice(m_simplices[m_current]);
 						break;
 					}
@@ -300,7 +300,7 @@ namespace gjkepa2_impl
 				default:
 					{
 					}
-				}	
+				}
 				return(m_status);
 			}
 			bool					EncloseOrigin()
@@ -368,7 +368,7 @@ namespace gjkepa2_impl
 				}
 				return(false);
 			}
-			/* Internals	*/ 
+			/* Internals	*/
 			void				getsupport(const btVector3& d,sSV& sv) const
 			{
 				sv.d	=	d/d.length();
@@ -432,13 +432,13 @@ namespace gjkepa2_impl
 								m			=	static_cast<U>(((subm&1)?1<<i:0)+((subm&2)?1<<j:0));
 								w[i]		=	subw[0];
 								w[j]		=	subw[1];
-								w[imd3[j]]	=	0;				
+								w[imd3[j]]	=	0;
 							}
 						}
 					}
 					if(mindist<0)
 					{
-						const btScalar	d=btDot(a,n);	
+						const btScalar	d=btDot(a,n);
 						const btScalar	s=btSqrt(l);
 						const btVector3	p=n*(d/l);
 						mindist	=	p.length2();
@@ -505,7 +505,7 @@ namespace gjkepa2_impl
 	// EPA
 	struct	EPA
 	{
-		/* Types		*/ 
+		/* Types		*/
 		typedef	GJK::sSV	sSV;
 		struct	sFace
 		{
@@ -536,13 +536,13 @@ namespace gjkepa2_impl
 			Touching,
 			Degenerated,
 			NonConvex,
-			InvalidHull,		
+			InvalidHull,
 			OutOfFaces,
 			OutOfVertices,
 			AccuraryReached,
 			FallBack,
 			Failed		};};
-			/* Fields		*/ 
+			/* Fields		*/
 			eStatus::_		m_status;
 			GJK::sSimplex	m_result;
 			btVector3		m_normal;
@@ -552,10 +552,10 @@ namespace gjkepa2_impl
 			U				m_nextsv;
 			sList			m_hull;
 			sList			m_stock;
-			/* Methods		*/ 
+			/* Methods		*/
 			EPA()
 			{
-				Initialize();	
+				Initialize();
 			}
 
 
@@ -598,7 +598,7 @@ namespace gjkepa2_impl
 				if((simplex.rank>1)&&gjk.EncloseOrigin())
 				{
 
-					/* Clean up				*/ 
+					/* Clean up				*/
 					while(m_hull.root)
 					{
 						sFace*	f = m_hull.root;
@@ -607,7 +607,7 @@ namespace gjkepa2_impl
 					}
 					m_status	=	eStatus::Valid;
 					m_nextsv	=	0;
-					/* Orient simplex		*/ 
+					/* Orient simplex		*/
 					if(gjk.det(	simplex.c[0]->w-simplex.c[3]->w,
 						simplex.c[1]->w-simplex.c[3]->w,
 						simplex.c[2]->w-simplex.c[3]->w)<0)
@@ -615,7 +615,7 @@ namespace gjkepa2_impl
 						btSwap(simplex.c[0],simplex.c[1]);
 						btSwap(simplex.p[0],simplex.p[1]);
 					}
-					/* Build initial hull	*/ 
+					/* Build initial hull	*/
 					sFace*	tetra[]={newface(simplex.c[0],simplex.c[1],simplex.c[2],true),
 						newface(simplex.c[1],simplex.c[0],simplex.c[3],true),
 						newface(simplex.c[2],simplex.c[1],simplex.c[3],true),
@@ -636,10 +636,10 @@ namespace gjkepa2_impl
 						for(;iterations<EPA_MAX_ITERATIONS;++iterations)
 						{
 							if(m_nextsv<EPA_MAX_VERTICES)
-							{	
+							{
 								sHorizon		horizon;
 								sSV*			w=&m_sv_store[m_nextsv++];
-								bool			valid=true;					
+								bool			valid=true;
 								best->pass	=	(U1)(++pass);
 								gjk.getsupport(best->n,*w);
 								const btScalar	wdist=btDot(best->n,w->w)-best->d;
@@ -682,7 +682,7 @@ namespace gjkepa2_impl
 						return(m_status);
 					}
 				}
-				/* Fallback		*/ 
+				/* Fallback		*/
 				m_status	=	eStatus::FallBack;
 				m_normal	=	-guess;
 				const btScalar	nl=m_normal.length();
@@ -693,7 +693,7 @@ namespace gjkepa2_impl
 				m_depth	=	0;
 				m_result.rank=1;
 				m_result.c[0]=simplex.c[0];
-				m_result.p[0]=1;	
+				m_result.p[0]=1;
 				return(m_status);
 			}
 			sFace*				newface(sSV* a,sSV* b,sSV* c,bool forced)
@@ -793,11 +793,11 @@ namespace gjkepa2_impl
 		tShape& shape,
 		bool withmargins)
 	{
-		/* Results		*/ 
+		/* Results		*/
 		results.witnesses[0]	=
 			results.witnesses[1]	=	btVector3(0,0,0);
 		results.status			=	btGjkEpaSolver2::sResults::Separated;
-		/* Shape		*/ 
+		/* Shape		*/
 		shape.m_shapes[0]		=	shape0;
 		shape.m_shapes[1]		=	shape1;
 		shape.m_toshape1		=	wtrs1.getBasis().transposeTimes(wtrs0.getBasis());
@@ -868,7 +868,7 @@ bool	btGjkEpaSolver2::Penetration(	const btConvexShape*	shape0,
 {
 	tShape			shape;
 	Initialize(shape0,wtrs0,shape1,wtrs1,results,shape,usemargins);
-	GJK				gjk;	
+	GJK				gjk;
 	GJK::eStatus::_	gjk_status=gjk.Evaluate(shape,-guess);
 	switch(gjk_status)
 	{
@@ -914,7 +914,7 @@ btScalar	btGjkEpaSolver2::SignedDistance(const btVector3& position,
 	btSphereShape	shape1(margin);
 	btTransform		wtrs1(btQuaternion(0,0,0,1),position);
 	Initialize(shape0,wtrs0,&shape1,wtrs1,results,shape,false);
-	GJK				gjk;	
+	GJK				gjk;
 	GJK::eStatus::_	gjk_status=gjk.Evaluate(shape,btVector3(1,1,1));
 	if(gjk_status==GJK::eStatus::Valid)
 	{
@@ -932,7 +932,7 @@ btScalar	btGjkEpaSolver2::SignedDistance(const btVector3& position,
 			results.witnesses[0];
 		const btScalar	margin=	shape0->getMarginNonVirtual()+
 			shape1.getMarginNonVirtual();
-		const btScalar	length=	delta.length();	
+		const btScalar	length=	delta.length();
 		results.normal			=	delta/length;
 		results.witnesses[0]	+=	results.normal*margin;
 		return(length-margin);
@@ -947,10 +947,10 @@ btScalar	btGjkEpaSolver2::SignedDistance(const btVector3& position,
 					results.witnesses[1];
 				const btScalar	length=	delta.length();
 				if (length >= SIMD_EPSILON)
-					results.normal	=	delta/length;			
+					results.normal	=	delta/length;
 				return(-length);
 			}
-		}	
+		}
 	}
 	return(SIMD_INFINITY);
 }
@@ -970,7 +970,7 @@ bool	btGjkEpaSolver2::SignedDistance(const btConvexShape*	shape0,
 }
 #endif //__SPU__
 
-/* Symbols cleanup		*/ 
+/* Symbols cleanup		*/
 
 #undef GJK_MAX_ITERATIONS
 #undef GJK_ACCURARY

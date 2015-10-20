@@ -138,7 +138,7 @@ unsigned int WorldWithRank::getNumberOfRescuePositions() const
 /** Determines the rescue position for a kart. The rescue position is the
  *  start position which is has the biggest accumulated distance to all other
  *  karts, and which has no other kart very close. The latter avoids dropping
- *  a kart on top of another kart. This is the method used 
+ *  a kart on top of another kart. This is the method used
  *  \param kart The kart that is going to be rescued.
  *  \returns The index of the start position to which the rescued kart
  *           should be moved to.

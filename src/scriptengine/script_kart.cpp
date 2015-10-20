@@ -86,10 +86,10 @@ namespace Scripting
         //    float normalized_dy = dy / d;
         //    float g = 9.81f;
         //    float velocity = sqrtf(d * g);
-        //    
+        //
         //    kart->setVelocity(btVector3(velocity * normalized_dx, velocity, velocity * normalized_dy));
         //}
-        
+
         /** Returns the location of the corresponding kart. */
         SimpleVec3 getLocation(int idKart)
         {

@@ -2,23 +2,23 @@
    AngelCode Scripting Library
    Copyright (c) 2003-2014 Andreas Jonsson
 
-   This software is provided 'as-is', without any express or implied 
-   warranty. In no event will the authors be held liable for any 
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any
    damages arising from the use of this software.
 
-   Permission is granted to anyone to use this software for any 
-   purpose, including commercial applications, and to alter it and 
+   Permission is granted to anyone to use this software for any
+   purpose, including commercial applications, and to alter it and
    redistribute it freely, subject to the following restrictions:
 
-   1. The origin of this software must not be misrepresented; you 
+   1. The origin of this software must not be misrepresented; you
       must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product 
+      this software in a product, an acknowledgment in the product
       documentation would be appreciated but is not required.
 
-   2. Altered source versions must be plainly marked as such, and 
+   2. Altered source versions must be plainly marked as such, and
       must not be misrepresented as being the original software.
 
-   3. This notice may not be removed or altered from any source 
+   3. This notice may not be removed or altered from any source
       distribution.
 
    The original version of this library can be located at:
@@ -48,14 +48,14 @@ asIScriptObject *ScriptObjectFactory(const asCObjectType *objType, asCScriptEngi
 	ctx = asGetActiveContext();
 	if( ctx )
 	{
-		// It may not always be possible to reuse the current context, 
+		// It may not always be possible to reuse the current context,
 		// in which case we'll have to create a new one any way.
 		if( ctx->GetEngine() == objType->GetEngine() && ctx->PushState() == asSUCCESS )
 			isNested = true;
 		else
 			ctx = 0;
 	}
-	
+
 	if( ctx == 0 )
 	{
 		// Request a context from the engine
@@ -81,7 +81,7 @@ asIScriptObject *ScriptObjectFactory(const asCObjectType *objType, asCScriptEngi
 	{
 		r = ctx->Execute();
 
-		// We can't allow this execution to be suspended 
+		// We can't allow this execution to be suspended
 		// so resume the execution immediately
 		if( r != asEXECUTION_SUSPENDED )
 			break;
@@ -191,7 +191,7 @@ void RegisterScriptObject(asCScriptEngine *engine)
 
 	// Weakref behaviours
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_GET_WEAKREF_FLAG, "int &f()", asMETHOD(asCScriptObject,GetWeakRefFlag), asCALL_THISCALL, 0); asASSERT( r >= 0 );
-	
+
 	// Register GC behaviours
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_GETREFCOUNT, "int f()", asMETHOD(asCScriptObject,GetRefCount), asCALL_THISCALL, 0); asASSERT( r >= 0 );
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_SETGCFLAG, "void f()", asMETHOD(asCScriptObject,SetFlag), asCALL_THISCALL, 0); asASSERT( r >= 0 );
@@ -338,10 +338,10 @@ asCScriptObject::~asCScriptObject()
 	asCScriptEngine *engine = objType->engine;
 
 	// Destroy all properties
-	// In most cases the members are initialized in the order they have been declared, 
+	// In most cases the members are initialized in the order they have been declared,
 	// so it's safer to uninitialize them from last to first. The order may be different
 	// depending on the use of inheritance and or initialization in the declaration.
-	// TODO: Should the order of initialization be stored by the compiler so that the 
+	// TODO: Should the order of initialization be stored by the compiler so that the
 	//       reverse order can be guaranteed during the destruction?
 	for( int n = (int)objType->properties.GetLength()-1; n >= 0; n-- )
 	{
@@ -390,12 +390,12 @@ asILockableSharedBool *asCScriptObject::GetWeakRefFlag() const
 
 	// Lock globally so no other thread can attempt
 	// to create a shared bool at the same time.
-	// TODO: runtime optimize: Instead of locking globally, it would be possible to have 
-	//                         a critical section per object type. This would reduce the 
+	// TODO: runtime optimize: Instead of locking globally, it would be possible to have
+	//                         a critical section per object type. This would reduce the
 	//                         chances of two threads lock on the same critical section.
 	asAcquireExclusiveLock();
 
-	// Make sure another thread didn't create the 
+	// Make sure another thread didn't create the
 	// flag while we waited for the lock
 	if( !extra )
 		extra = asNEW(SExtra);
@@ -436,12 +436,12 @@ void *asCScriptObject::SetUserData(void *data, asPWORD type)
 {
 	// Lock globally so no other thread can attempt
 	// to manipulate the extra data at the same time.
-	// TODO: runtime optimize: Instead of locking globally, it would be possible to have 
-	//                         a critical section per object type. This would reduce the 
+	// TODO: runtime optimize: Instead of locking globally, it would be possible to have
+	//                         a critical section per object type. This would reduce the
 	//                         chances of two threads lock on the same critical section.
 	asAcquireExclusiveLock();
 
-	// Make sure another thread didn't create the 
+	// Make sure another thread didn't create the
 	// flag while we waited for the lock
 	if( !extra )
 		extra = asNEW(SExtra);
@@ -504,13 +504,13 @@ int asCScriptObject::Release() const
 	// If the weak ref flag exists it is because someone held a weak ref
 	// and that someone may add a reference to the object at any time. It
 	// is ok to check the existance of the weakRefFlag without locking here
-	// because if the refCount is 1 then no other thread is currently 
+	// because if the refCount is 1 then no other thread is currently
 	// creating the weakRefFlag.
 	if( refCount.get() == 1 && extra && extra->weakRefFlag )
 	{
 		// Set the flag to tell others that the object is no longer alive
 		// We must do this before decreasing the refCount to 0 so we don't
-		// end up with a race condition between this thread attempting to 
+		// end up with a race condition between this thread attempting to
 		// destroy the object and the other that temporary added a strong
 		// ref from the weak ref.
 		extra->weakRefFlag->Set(true);
@@ -554,7 +554,7 @@ void asCScriptObject::CallDestructor()
 	bool isNested = false;
 	bool doAbort = false;
 
-	// Make sure the destructor is called once only, even if the  
+	// Make sure the destructor is called once only, even if the
 	// reference count is increased and then decreased again
 	isDestructCalled = true;
 
@@ -765,7 +765,7 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 	{
 		if( !other.objType->DerivesFrom(objType) )
 		{
-			// We cannot allow a value assignment from a type that isn't the same or 
+			// We cannot allow a value assignment from a type that isn't the same or
 			// derives from this type as the member properties may not have the same layout
 			asIScriptContext *ctx = asGetActiveContext();
 			ctx->SetException(TXT_MISMATCH_IN_VALUE_ASSIGN);
@@ -850,7 +850,7 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 			{
 				r = ctx->Execute();
 
-				// We can't allow this execution to be suspended 
+				// We can't allow this execution to be suspended
 				// so resume the execution immediately
 				if( r != asEXECUTION_SUSPENDED )
 					break;
@@ -984,7 +984,7 @@ void asCScriptObject::CopyHandle(asPWORD *src, asPWORD *dst, asCObjectType *objT
 }
 
 // TODO: weak: Should move to its own file
-asCLockableSharedBool::asCLockableSharedBool() : value(false) 
+asCLockableSharedBool::asCLockableSharedBool() : value(false)
 {
 	refCount.set(1);
 }
@@ -1009,7 +1009,7 @@ bool asCLockableSharedBool::Get() const
 
 void asCLockableSharedBool::Set(bool v)
 {
-	// Make sure the value is not changed while another thread  
+	// Make sure the value is not changed while another thread
 	// is inspecting it and taking a decision on what to do.
 	Lock();
 	value = v;
@@ -1027,7 +1027,7 @@ void asCLockableSharedBool::Unlock() const
 }
 
 // Interface
-// Auxiliary function to allow applications to create shared 
+// Auxiliary function to allow applications to create shared
 // booleans without having to implement the logic for them
 AS_API asILockableSharedBool *asCreateLockableSharedBool()
 {

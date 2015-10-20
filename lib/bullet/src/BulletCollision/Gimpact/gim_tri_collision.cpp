@@ -41,7 +41,7 @@ email: projectileman@yahoo.com
 class GIM_TRIANGLE_CALCULATION_CACHE
 {
 public:
-	GREAL margin;	
+	GREAL margin;
 	btVector3 tu_vertices[3];
 	btVector3 tv_vertices[3];
 	btVector4 tu_plane;
@@ -55,11 +55,11 @@ public:
 	GREAL du0du2;
 	GREAL dv[4];
 	GREAL dv0dv1;
-	GREAL dv0dv2;	
+	GREAL dv0dv2;
 	btVector3 temp_points[MAX_TRI_CLIPPING];
 	btVector3 temp_points1[MAX_TRI_CLIPPING];
 	btVector3 contact_points[MAX_TRI_CLIPPING];
-	
+
 
 
 	//! if returns false, the faces are paralele
@@ -152,8 +152,8 @@ public:
 		GUINT clipped_count= PLANE_CLIP_TRIANGLE_GENERIC(
 			0,srcpoints[0],srcpoints[1],srcpoints[2],temp_points,
 			DISTANCE_EDGE(tripoints[0],tripoints[1],i0,i1));
-		
-		
+
+
 		if(clipped_count == 0) return 0;
 
 		// edge 1
@@ -466,19 +466,19 @@ public:
 
 		//clip face against other
 
-		
+
 		GUINT point_count;
 		//TODO
 		if(bl == 0) //clip U points against V
 		{
 			point_count = clip_triangle(tv_plane,tv_vertices,tu_vertices,contact_points);
-			if(point_count == 0) return false;						
-			contacts.merge_points(tv_plane,margin,contact_points,point_count);			
+			if(point_count == 0) return false;
+			contacts.merge_points(tv_plane,margin,contact_points,point_count);
 		}
 		else //clip V points against U
 		{
 			point_count = clip_triangle(tu_plane,tu_vertices,tv_vertices,contact_points);
-			if(point_count == 0) return false;			
+			if(point_count == 0) return false;
 			contacts.merge_points(tu_plane,margin,contact_points,point_count);
 			contacts.m_separating_normal *= -1.f;
 		}
@@ -558,7 +558,7 @@ public:
 
 		margin = margin_u + margin_v;
 
-		
+
 		tu_vertices[0] = u0;
 		tu_vertices[1] = u1;
 		tu_vertices[2] = u2;
@@ -627,7 +627,7 @@ bool GIM_TRIANGLE::collide_triangle_hard_test(
 		const GIM_TRIANGLE & other,
 		GIM_TRIANGLE_CONTACT_DATA & contact_data) const
 {
-	GIM_TRIANGLE_CALCULATION_CACHE calc_cache;	
+	GIM_TRIANGLE_CALCULATION_CACHE calc_cache;
 	return calc_cache.triangle_collision(
 					m_vertices[0],m_vertices[1],m_vertices[2],m_margin,
 					other.m_vertices[0],other.m_vertices[1],other.m_vertices[2],other.m_margin,

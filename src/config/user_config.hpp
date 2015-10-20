@@ -447,7 +447,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_texture_compression
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
         &m_video_group, "Enable Texture Compression"));
-    /** This is a bit flag: bit 0: enabled (1) or disabled(0). 
+    /** This is a bit flag: bit 0: enabled (1) or disabled(0).
      *  Bit 1: setting done by default(0), or by user choice (2). This allows
      *  to e.g. disable h.d. textures on hd3000 as default, but still allow the
      *  user to enable it. */
@@ -513,7 +513,7 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
     /** Special debug camera: 0: normal camera;   1: being high over the kart;
-                              2: on ground level; 3: free first person camera; 
+                              2: on ground level; 3: free first person camera;
                               4: straight behind kart */
     PARAM_PREFIX int m_camera_debug PARAM_DEFAULT( false );
 

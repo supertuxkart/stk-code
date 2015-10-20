@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -139,7 +139,7 @@ static SIMD_FORCE_INLINE btScalar capsuleCapsuleDistance(
 	// compute the closest points of the capsule line segments
 
 	btVector3 ptsVector;           // the vector between the closest points
-	
+
 	btVector3 offsetA, offsetB;    // offsets from segment centers to their closest points
 	btScalar tA, tB;              // parameters on line segment
 
@@ -187,8 +187,8 @@ btConvexConvexAlgorithm::CreateFunc::CreateFunc(btSimplexSolverInterface*			simp
 	m_pdSolver = pdSolver;
 }
 
-btConvexConvexAlgorithm::CreateFunc::~CreateFunc() 
-{ 
+btConvexConvexAlgorithm::CreateFunc::~CreateFunc()
+{
 }
 
 btConvexConvexAlgorithm::btConvexConvexAlgorithm(btPersistentManifold* mf,const btCollisionAlgorithmConstructionInfo& ci,btCollisionObject* body0,btCollisionObject* body1,btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver,int numPerturbationIterations, int minimumPointsPerturbationThreshold)
@@ -267,7 +267,7 @@ struct btPerturbedContactResult : public btManifoldResult
 			endPt = pointInWorld + normalOnBInWorld*orgDepth;
 			startPt = (m_unPerturbedTransform*m_transformB.inverse())(pointInWorld);
 			newDepth = (endPt -  startPt).dot(normalOnBInWorld);
-			
+
 		}
 
 //#define DEBUG_CONTACTS 1
@@ -277,7 +277,7 @@ struct btPerturbedContactResult : public btManifoldResult
 		m_debugDrawer->drawSphere(endPt,0.05,btVector3(0,0,1));
 #endif //DEBUG_CONTACTS
 
-		
+
 		m_originalManifoldResult->addContactPoint(normalOnBInWorld,startPt,newDepth);
 	}
 
@@ -302,7 +302,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 
 	//comment-out next line to test multi-contact generation
 	//resultOut->getPersistentManifold()->clearManifold();
-	
+
 
 	btConvexShape* min0 = static_cast<btConvexShape*>(body0->getCollisionShape());
 	btConvexShape* min1 = static_cast<btConvexShape*>(body1->getCollisionShape());
@@ -316,7 +316,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 		btCapsuleShape* capsuleB = (btCapsuleShape*) min1;
 		btVector3 localScalingA = capsuleA->getLocalScaling();
 		btVector3 localScalingB = capsuleB->getLocalScaling();
-		
+
 		btScalar threshold = m_manifoldPtr->getContactBreakingThreshold();
 
 		btScalar dist = capsuleCapsuleDistance(normalOnB,	pointOnBWorld,capsuleA->getHalfHeight(),capsuleA->getRadius(),
@@ -326,7 +326,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 		if (dist<threshold)
 		{
 			btAssert(normalOnB.length2()>=(SIMD_EPSILON*SIMD_EPSILON));
-			resultOut->addContactPoint(normalOnB,pointOnBWorld,dist);	
+			resultOut->addContactPoint(normalOnB,pointOnBWorld,dist);
 		}
 		resultOut->refreshContactPoints();
 		return;
@@ -347,7 +347,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 
 	{
 
-	
+
 	btGjkPairDetector::ClosestPointInput input;
 
 	btGjkPairDetector	gjkPairDetector(min0,min1,m_simplexSolver,m_pdSolver);
@@ -379,7 +379,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 
 
 
-	
+
 
 #ifdef USE_SEPDISTANCE_UTIL2
 	btScalar sepDist = 0.f;
@@ -390,7 +390,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 		{
 			sepDist += dispatchInfo.m_convexConservativeDistanceThreshold;
 			//now perturbe directions to get multiple contact points
-			
+
 		}
 	}
 #endif //USE_SEPDISTANCE_UTIL2
@@ -403,11 +403,11 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 		{
 			virtual void setShapeIdentifiersA(int partId0,int index0){}
 			virtual void setShapeIdentifiersB(int partId1,int index1){}
-			virtual void addContactPoint(const btVector3& normalOnBInWorld,const btVector3& pointInWorld,btScalar depth) 
+			virtual void addContactPoint(const btVector3& normalOnBInWorld,const btVector3& pointInWorld,btScalar depth)
 			{
 			}
 		};
-		
+
 		btDummyResult dummy;
 
 
@@ -417,7 +417,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 		{
 
 
-			
+
 
 			btScalar threshold = m_manifoldPtr->getContactBreakingThreshold();
 
@@ -429,7 +429,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 			{
 				foundSepAxis = btPolyhedralContactClipping::findSeparatingAxis(
 					*polyhedronA->getConvexPolyhedron(), *polyhedronB->getConvexPolyhedron(),
-					body0->getWorldTransform(), 
+					body0->getWorldTransform(),
 					body1->getWorldTransform(),
 					sepNormalWorldSpace);
 			} else
@@ -447,7 +447,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 					sepNormalWorldSpace = gjkPairDetector.getCachedSeparatingAxis()*(1.f/l2);
 					//minDist = -1e30f;//gjkPairDetector.getCachedSeparatingDistance();
 					minDist = gjkPairDetector.getCachedSeparatingDistance()-min0->getMargin()-min1->getMargin();
-	
+
 #ifdef ZERO_MARGIN
 					foundSepAxis = true;//gjkPairDetector.getCachedSeparatingDistance()<0.f;
 #else
@@ -460,9 +460,9 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 //				printf("sepNormalWorldSpace=%f,%f,%f\n",sepNormalWorldSpace.getX(),sepNormalWorldSpace.getY(),sepNormalWorldSpace.getZ());
 
 				btPolyhedralContactClipping::clipHullAgainstHull(sepNormalWorldSpace, *polyhedronA->getConvexPolyhedron(), *polyhedronB->getConvexPolyhedron(),
-					body0->getWorldTransform(), 
+					body0->getWorldTransform(),
 					body1->getWorldTransform(), minDist-threshold, threshold, *resultOut);
- 				
+
 			}
 			if (m_ownManifold)
 			{
@@ -481,7 +481,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 				vertices.push_back(	body1->getWorldTransform()*tri->m_vertices1[0]);
 				vertices.push_back(	body1->getWorldTransform()*tri->m_vertices1[1]);
 				vertices.push_back(	body1->getWorldTransform()*tri->m_vertices1[2]);
-				
+
 				//tri->initializePolyhedralFeatures();
 
 				btScalar threshold = m_manifoldPtr->getContactBreakingThreshold();
@@ -489,14 +489,14 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 				btVector3 sepNormalWorldSpace;
 				btScalar minDist =-1e30f;
 				btScalar maxDist = threshold;
-				
+
 				bool foundSepAxis = false;
 				if (0)
 				{
 					polyhedronB->initializePolyhedralFeatures();
 					 foundSepAxis = btPolyhedralContactClipping::findSeparatingAxis(
 					*polyhedronA->getConvexPolyhedron(), *polyhedronB->getConvexPolyhedron(),
-					body0->getWorldTransform(), 
+					body0->getWorldTransform(),
 					body1->getWorldTransform(),
 					sepNormalWorldSpace);
 				//	 printf("sepNormalWorldSpace=%f,%f,%f\n",sepNormalWorldSpace.getX(),sepNormalWorldSpace.getY(),sepNormalWorldSpace.getZ());
@@ -509,7 +509,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 #else
 					gjkPairDetector.getClosestPoints(input,dummy,dispatchInfo.m_debugDraw);
 #endif//ZERO_MARGIN
-					
+
 					btScalar l2 = gjkPairDetector.getCachedSeparatingAxis().length2();
 					if (l2>SIMD_EPSILON)
 					{
@@ -521,44 +521,44 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 					}
 				}
 
-				
+
 			if (foundSepAxis)
 			{
-				btPolyhedralContactClipping::clipFaceAgainstHull(sepNormalWorldSpace, *polyhedronA->getConvexPolyhedron(), 
+				btPolyhedralContactClipping::clipFaceAgainstHull(sepNormalWorldSpace, *polyhedronA->getConvexPolyhedron(),
 					body0->getWorldTransform(), vertices, minDist-threshold, maxDist, *resultOut);
 			}
-				
-				
+
+
 				if (m_ownManifold)
 				{
 					resultOut->refreshContactPoints();
 				}
-				
+
 				return;
 			}
-			
+
 		}
 
 
 	}
-	
+
 	gjkPairDetector.getClosestPoints(input,*resultOut,dispatchInfo.m_debugDraw);
 
 	//now perform 'm_numPerturbationIterations' collision queries with the perturbated collision objects
-	
+
 	//perform perturbation when more then 'm_minimumPointsPerturbationThreshold' points
 	if (m_numPerturbationIterations && resultOut->getPersistentManifold()->getNumContacts() < m_minimumPointsPerturbationThreshold)
 	{
-		
+
 		int i;
 		btVector3 v0,v1;
 		btVector3 sepNormalWorldSpace;
 		btScalar l2 = gjkPairDetector.getCachedSeparatingAxis().length2();
-	
+
 		if (l2>SIMD_EPSILON)
 		{
 			sepNormalWorldSpace = gjkPairDetector.getCachedSeparatingAxis()*(1.f/l2);
-			
+
 			btPlaneSpace1(sepNormalWorldSpace,v0,v1);
 
 
@@ -576,7 +576,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 				perturbeAngle = gContactBreakingThreshold / radiusB;
 				perturbeA = false;
 			}
-			if ( perturbeAngle > angleLimit ) 
+			if ( perturbeAngle > angleLimit )
 					perturbeAngle = angleLimit;
 
 			btTransform unPerturbedTransform;
@@ -587,7 +587,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 			{
 				unPerturbedTransform = input.m_transformB;
 			}
-			
+
 			for ( i=0;i<m_numPerturbationIterations;i++)
 			{
 				if (v0.length2()>SIMD_EPSILON)
@@ -595,8 +595,8 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 				btQuaternion perturbeRot(v0,perturbeAngle);
 				btScalar iterationAngle = i*(SIMD_2_PI/btScalar(m_numPerturbationIterations));
 				btQuaternion rotq(sepNormalWorldSpace,iterationAngle);
-				
-				
+
+
 				if (perturbeA)
 				{
 					input.m_transformA.setBasis(  btMatrix3x3(rotq.inverse()*perturbeRot*rotq)*body0->getWorldTransform().getBasis());
@@ -612,7 +612,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 					dispatchInfo.m_debugDraw->drawTransform(input.m_transformB,10.0);
 	#endif
 				}
-				
+
 				btPerturbedContactResult perturbedResultOut(resultOut,input.m_transformA,input.m_transformB,unPerturbedTransform,perturbeA,dispatchInfo.m_debugDraw);
 				gjkPairDetector.getClosestPoints(input,perturbedResultOut,dispatchInfo.m_debugDraw);
 				}
@@ -620,7 +620,7 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 		}
 	}
 
-	
+
 
 #ifdef USE_SEPDISTANCE_UTIL2
 	if (dispatchInfo.m_useConvexConservativeDistanceUtil && (sepDist>SIMD_EPSILON))
@@ -647,7 +647,7 @@ btScalar	btConvexConvexAlgorithm::calculateTimeOfImpact(btCollisionObject* col0,
 	(void)resultOut;
 	(void)dispatchInfo;
 	///Rather then checking ALL pairs, only calculate TOI when motion exceeds threshold
-    
+
 	///Linear motion for one of objects needs to exceed m_ccdSquareMotionThreshold
 	///col0->m_worldTransform,
 	btScalar resultFraction = btScalar(1.);
@@ -655,7 +655,7 @@ btScalar	btConvexConvexAlgorithm::calculateTimeOfImpact(btCollisionObject* col0,
 
 	btScalar squareMot0 = (col0->getInterpolationWorldTransform().getOrigin() - col0->getWorldTransform().getOrigin()).length2();
 	btScalar squareMot1 = (col1->getInterpolationWorldTransform().getOrigin() - col1->getWorldTransform().getOrigin()).length2();
-    
+
 	if (squareMot0 < col0->getCcdSquareMotionThreshold() &&
 		squareMot1 < col1->getCcdSquareMotionThreshold())
 		return resultFraction;
@@ -670,7 +670,7 @@ btScalar	btConvexConvexAlgorithm::calculateTimeOfImpact(btCollisionObject* col0,
 	//For proper CCD, better accuracy and handling of 'allowed' penetration should be added
 	//also the mainloop of the physics should have a kind of toi queue (something like Brian Mirtich's application of Timewarp for Rigidbodies)
 
-		
+
 	/// Convex0 against sphere for Convex1
 	{
 		btConvexShape* convex0 = static_cast<btConvexShape*>(col0->getCollisionShape());
@@ -685,9 +685,9 @@ btScalar	btConvexConvexAlgorithm::calculateTimeOfImpact(btCollisionObject* col0,
 		if (ccd1.calcTimeOfImpact(col0->getWorldTransform(),col0->getInterpolationWorldTransform(),
 			col1->getWorldTransform(),col1->getInterpolationWorldTransform(),result))
 		{
-		
+
 			//store result.m_fraction in both bodies
-		
+
 			if (col0->getHitFraction()> result.m_fraction)
 				col0->setHitFraction( result.m_fraction );
 
@@ -698,8 +698,8 @@ btScalar	btConvexConvexAlgorithm::calculateTimeOfImpact(btCollisionObject* col0,
 				resultFraction = result.m_fraction;
 
 		}
-		
-		
+
+
 
 
 	}
@@ -718,9 +718,9 @@ btScalar	btConvexConvexAlgorithm::calculateTimeOfImpact(btCollisionObject* col0,
 		if (ccd1.calcTimeOfImpact(col0->getWorldTransform(),col0->getInterpolationWorldTransform(),
 			col1->getWorldTransform(),col1->getInterpolationWorldTransform(),result))
 		{
-		
+
 			//store result.m_fraction in both bodies
-		
+
 			if (col0->getHitFraction()	> result.m_fraction)
 				col0->setHitFraction( result.m_fraction);
 
@@ -732,7 +732,7 @@ btScalar	btConvexConvexAlgorithm::calculateTimeOfImpact(btCollisionObject* col0,
 
 		}
 	}
-	
+
 	return resultFraction;
 
 }

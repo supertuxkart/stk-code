@@ -196,7 +196,7 @@ void TracksScreen::init()
         }
         assert(screenshots.size() > 0);
 
-        if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()) && 
+        if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()) &&
             race_manager->getNumLocalPlayers() == 1)
         {
             gps_widget->addAnimatedItem(_("Locked!"), "locked",

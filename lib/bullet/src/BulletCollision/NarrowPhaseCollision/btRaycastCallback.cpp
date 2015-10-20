@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -46,7 +46,7 @@ void btTriangleRaycastCallback::processTriangle(btVector3* triangle,int partId, 
 	btVector3 v20; v20 = vert2 - vert0 ;
 
 	btVector3 triangleNormal; triangleNormal = v10.cross( v20 );
-	
+
 	const btScalar dist = vert0.dot(triangleNormal);
 	btScalar dist_a = triangleNormal.dot(m_from) ;
 	dist_a-= dist;
@@ -63,19 +63,19 @@ void btTriangleRaycastCallback::processTriangle(btVector3* triangle,int partId, 
       // Backface, skip check
       return;
    }
-	
+
 	const btScalar proj_length=dist_a-dist_b;
 	const btScalar distance = (dist_a)/(proj_length);
 	// Now we have the intersection point on the plane, we'll see if it's inside the triangle
 	// Add an epsilon as a tolerance for the raycast,
 	// in case the ray hits exacly on the edge of the triangle.
 	// It must be scaled for the triangle size.
-	
+
 	if(distance < m_hitFraction)
 	{
-		
 
-		btScalar edge_tolerance =triangleNormal.length2();		
+
+		btScalar edge_tolerance =triangleNormal.length2();
 		edge_tolerance *= btScalar(-0.0001);
 		btVector3 point; point.setInterpolate3( m_from, m_to, distance);
 		{
@@ -83,19 +83,19 @@ void btTriangleRaycastCallback::processTriangle(btVector3* triangle,int partId, 
 			btVector3 v1p; v1p = vert1 - point;
 			btVector3 cp0; cp0 = v0p.cross( v1p );
 
-			if ( (btScalar)(cp0.dot(triangleNormal)) >=edge_tolerance) 
+			if ( (btScalar)(cp0.dot(triangleNormal)) >=edge_tolerance)
 			{
-						
+
 
 				btVector3 v2p; v2p = vert2 -  point;
 				btVector3 cp1;
 				cp1 = v1p.cross( v2p);
-				if ( (btScalar)(cp1.dot(triangleNormal)) >=edge_tolerance) 
+				if ( (btScalar)(cp1.dot(triangleNormal)) >=edge_tolerance)
 				{
 					btVector3 cp2;
 					cp2 = v2p.cross(v0p);
-					
-					if ( (btScalar)(cp2.dot(triangleNormal)) >=edge_tolerance) 
+
+					if ( (btScalar)(cp2.dot(triangleNormal)) >=edge_tolerance)
 					{
                   //@BP Mod
                   // Triangle normal isn't normalized
@@ -146,7 +146,7 @@ btTriangleConvexcastCallback::processTriangle (btVector3* triangle, int partId, 
 	//btGjkConvexCast	convexCaster(m_convexShape,&triangleShape,&simplexSolver);
 	btContinuousConvexCollision convexCaster(m_convexShape,&triangleShape,&simplexSolver,&gjkEpaPenetrationSolver);
 #endif //#USE_SUBSIMPLEX_CONVEX_CAST
-	
+
 	btConvexCast::CastResult castResult;
 	castResult.m_fraction = btScalar(1.);
 	castResult.m_allowedPenetration = m_allowedPenetration;
@@ -154,7 +154,7 @@ btTriangleConvexcastCallback::processTriangle (btVector3* triangle, int partId, 
 	{
 		//add hit
 		if (castResult.m_normal.length2() > btScalar(0.0001))
-		{					
+		{
 			if (castResult.m_fraction < m_hitFraction)
 			{
 /* btContinuousConvexCast's normal is already in world space */

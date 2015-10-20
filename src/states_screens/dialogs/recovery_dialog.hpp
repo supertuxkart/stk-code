@@ -45,7 +45,7 @@ public:
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
+
     virtual void onUpdate(float dt);
     virtual bool onEscapePressed();
 

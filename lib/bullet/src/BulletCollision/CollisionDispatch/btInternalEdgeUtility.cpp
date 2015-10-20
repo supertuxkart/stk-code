@@ -151,7 +151,7 @@ struct btConnectivityProcessor : public btTriangleCallback
 				int sumvertsA = sharedVertsA[0]+sharedVertsA[1];
 				int otherIndexA = 3-sumvertsA;
 
-				
+
 				btVector3 edge(m_triangleVerticesA[sharedVertsA[1]]-m_triangleVerticesA[sharedVertsA[0]]);
 
 				btTriangleShape tA(m_triangleVerticesA[0],m_triangleVerticesA[1],m_triangleVerticesA[2]);
@@ -219,11 +219,11 @@ struct btConnectivityProcessor : public btTriangleCallback
 
 				}
 
-				
 
-				
-							
-				//alternatively use 
+
+
+
+				//alternatively use
 				//btVector3 calculatedNormalB2 = quatRotate(orn,normalA);
 
 
@@ -273,7 +273,7 @@ struct btConnectivityProcessor : public btTriangleCallback
 						info->m_edgeV2V0Angle = -correctedAngle;
 						if (isConvex)
 							info->m_flags |= TRI_INFO_V2V0_CONVEX;
-						break;	
+						break;
 					}
 				case 3:
 					{
@@ -362,7 +362,7 @@ void btGenerateInternalEdgeInfo (btBvhTriangleMeshShape*trimeshShape, btTriangle
 				}
 			}
 			aabbMin.setValue(btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT));
-			aabbMax.setValue(btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT)); 
+			aabbMax.setValue(btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT),btScalar(-BT_LARGE_FLOAT));
 			aabbMin.setMin(triangleVerts[0]);
 			aabbMax.setMax(triangleVerts[0]);
 			aabbMin.setMin(triangleVerts[1]);
@@ -457,12 +457,12 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 		return;
 
 	btBvhTriangleMeshShape* trimesh = 0;
-	
+
 	if( colObj0->getRootCollisionShape()->getShapeType() == SCALED_TRIANGLE_MESH_SHAPE_PROXYTYPE )
 	   trimesh = ((btScaledBvhTriangleMeshShape*)colObj0->getRootCollisionShape())->getChildShape();
-   else	   
+   else
 	   trimesh = (btBvhTriangleMeshShape*)colObj0->getRootCollisionShape();
-	   
+
    	btTriangleInfoMap* triangleInfoMapPtr = (btTriangleInfoMap*) trimesh->getTriangleInfoMap();
 	if (!triangleInfoMapPtr)
 		return;
@@ -475,7 +475,7 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 		return;
 
 	btScalar frontFacing = (normalAdjustFlags & BT_TRIANGLE_CONVEX_BACKFACE_MODE)==0? 1.f : -1.f;
-	
+
 	const btTriangleShape* tri_shape = static_cast<const btTriangleShape*>(colObj0->getCollisionShape());
 	btVector3 v0,v1,v2;
 	tri_shape->getVertex(0,v0);
@@ -507,14 +507,14 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 
 	btVector3 localContactNormalOnB = colObj0->getWorldTransform().getBasis().transpose() * cp.m_normalWorldOnB;
 	localContactNormalOnB.normalize();//is this necessary?
-	
+
 	// Get closest edge
 	int      bestedge=-1;
 	float    disttobestedge=BT_LARGE_FLOAT;
 	//
 	// Edge 0 -> 1
 	if (btFabs(info->m_edgeV0V1Angle)< triangleInfoMapPtr->m_maxEdgeAngleThreshold)
-	{	
+	{
 	   btVector3 nearest;
 	   btNearestPointInLineSegment( cp.m_localPointB, v0, v1, nearest );
 	   float     len=(contact-nearest).length();
@@ -523,11 +523,11 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 	   {
 	      bestedge=0;
 	      disttobestedge=len;
-      }	      
-   }	   
+      }
+   }
 	// Edge 1 -> 2
 	if (btFabs(info->m_edgeV1V2Angle)< triangleInfoMapPtr->m_maxEdgeAngleThreshold)
-	{	
+	{
 	   btVector3 nearest;
 	   btNearestPointInLineSegment( cp.m_localPointB, v1, v2, nearest );
 	   float     len=(contact-nearest).length();
@@ -536,11 +536,11 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 	   {
 	      bestedge=1;
 	      disttobestedge=len;
-      }	      
-   }	   
+      }
+   }
 	// Edge 2 -> 0
 	if (btFabs(info->m_edgeV2V0Angle)< triangleInfoMapPtr->m_maxEdgeAngleThreshold)
-	{	
+	{
 	   btVector3 nearest;
 	   btNearestPointInLineSegment( cp.m_localPointB, v2, v0, nearest );
 	   float     len=(contact-nearest).length();
@@ -549,13 +549,13 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 	   {
 	      bestedge=2;
 	      disttobestedge=len;
-      }	      
-   }   	      	
-	
+      }
+   }
+
 #ifdef BT_INTERNAL_EDGE_DEBUG_DRAW
    btVector3 upfix=tri_normal * btVector3(0.1f,0.1f,0.1f);
    btDebugDrawLine(tr * v0 + upfix, tr * v1 + upfix, red );
-#endif   
+#endif
 	if (btFabs(info->m_edgeV0V1Angle)< triangleInfoMapPtr->m_maxEdgeAngleThreshold)
 	{
 #ifdef BT_INTERNAL_EDGE_DEBUG_DRAW
@@ -594,7 +594,7 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 
 #ifdef DEBUG_INTERNAL_EDGE
 				{
-					
+
 					btDebugDrawLine(cp.getPositionWorldOnB(),cp.getPositionWorldOnB()+tr.getBasis()*(nB*20),red);
 				}
 #endif //DEBUG_INTERNAL_EDGE
@@ -619,7 +619,7 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 							// Reproject collision point along normal. (what about cp.m_distance1?)
 							cp.m_positionWorldOnB = cp.m_positionWorldOnA - cp.m_normalWorldOnB * cp.m_distance1;
 							cp.m_localPointB = colObj0->getWorldTransform().invXform(cp.m_positionWorldOnB);
-							
+
 						}
 					}
 				}
@@ -634,7 +634,7 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 
 #ifdef BT_INTERNAL_EDGE_DEBUG_DRAW
    btDebugDrawLine(tr * v1 + upfix, tr * v2 + upfix , green );
-#endif   
+#endif
 
 	if (btFabs(info->m_edgeV1V2Angle)< triangleInfoMapPtr->m_maxEdgeAngleThreshold)
 	{
@@ -669,7 +669,7 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 	#endif //BT_INTERNAL_EDGE_DEBUG_DRAW
 
 				btVector3 nA = swapFactor * tri_normal;
-				
+
 				btQuaternion orn(edge,info->m_edgeV1V2Angle);
 				btVector3 computedNormalB = quatRotate(orn,tri_normal);
 				if (info->m_flags & TRI_INFO_V1V2_SWAP_NORMALB)
@@ -720,7 +720,7 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 #endif //BT_INTERNAL_EDGE_DEBUG_DRAW
 #ifdef BT_INTERNAL_EDGE_DEBUG_DRAW
    btDebugDrawLine(tr * v2 + upfix, tr * v0 + upfix , blue );
-#endif   
+#endif
 
 	if (btFabs(info->m_edgeV2V0Angle)< triangleInfoMapPtr->m_maxEdgeAngleThreshold)
 	{
@@ -794,9 +794,9 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 							cp.m_localPointB = colObj0->getWorldTransform().invXform(cp.m_positionWorldOnB);
 						}
 					}
-				} 
+				}
 			}
-			
+
 
 		}
 	}
@@ -833,7 +833,7 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObject* 
 				//modify the normal to be the triangle normal (or backfacing normal)
 				cp.m_normalWorldOnB = colObj0->getWorldTransform().getBasis() *newNormal;
 			}
-						
+
 			// Reproject collision point along normal.
 			cp.m_positionWorldOnB = cp.m_positionWorldOnA - cp.m_normalWorldOnB * cp.m_distance1;
 			cp.m_localPointB = colObj0->getWorldTransform().invXform(cp.m_positionWorldOnB);

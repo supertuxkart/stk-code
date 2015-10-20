@@ -29,11 +29,11 @@ class SelectChallengeDialog : public GUIEngine::ModalDialog
 {
     std::string m_challenge_id;
 public:
-    
+
     SelectChallengeDialog(const float percentWidth, const float percentHeight,
                           std::string challenge_id);
     virtual ~SelectChallengeDialog();
-    
+
     virtual GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };
 

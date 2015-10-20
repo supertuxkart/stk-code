@@ -55,7 +55,7 @@ private:
     float m_max_handicap_accel; //The allowed maximum speed, in percentage,
                                 //from 0.0 to 1.0. Used only when
                                 //m_wait_for_players == true.
-    
+
     /*General purpose variables*/
     //The crash percentage is how much of the time the AI has been crashing,
     //if the AI has been crashing for some time, use the rescue.

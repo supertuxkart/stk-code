@@ -88,14 +88,14 @@ SFXBuffer::SFXBuffer(const std::string& file,
 
 //----------------------------------------------------------------------------
 /** \brief load the buffer from file into OpenAL.
- *  \note If this buffer is already loaded, this call does nothing and 
+ *  \note If this buffer is already loaded, this call does nothing and
   *       returns false.
  *  \return Whether loading was successful.
  */
 bool SFXBuffer::load()
 {
     if (UserConfigParams::m_sfx == false) return false;
-    
+
 #if HAVE_OGGVORBIS
     if (m_loaded) return false;
 
@@ -221,7 +221,7 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
         alGetBufferi(buffer, AL_FREQUENCY, &frequency      );
         alGetBufferi(buffer, AL_CHANNELS,  &channels       );
         alGetBufferi(buffer, AL_BITS,      &bits_per_sample);
-        m_duration = float(buffer_size) 
+        m_duration = float(buffer_size)
                    / (frequency*channels*(bits_per_sample / 8));
     }
     return success;

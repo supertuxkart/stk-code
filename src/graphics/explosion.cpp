@@ -74,16 +74,16 @@ bool Explosion::updateAndDelete(float dt)
     if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
     {
         scene::ISceneNode* node = m_emitter->getNode();
-        
+
         const int intensity = (int)(255-(m_remaining_time/-explosion_time)*255);
         node->getMaterial(0).AmbientColor.setGreen(intensity);
         node->getMaterial(0).DiffuseColor.setGreen(intensity);
         node->getMaterial(0).EmissiveColor.setGreen(intensity);
-        
+
         node->getMaterial(0).AmbientColor.setBlue(intensity);
         node->getMaterial(0).DiffuseColor.setBlue(intensity);
         node->getMaterial(0).EmissiveColor.setBlue(intensity);
-        
+
         node->getMaterial(0).AmbientColor.setRed(intensity);
         node->getMaterial(0).DiffuseColor.setRed(intensity);
         node->getMaterial(0).EmissiveColor.setRed(intensity);

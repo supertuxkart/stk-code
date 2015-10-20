@@ -31,7 +31,7 @@ namespace GUIEngine
  */
 class RacePausedDialog : public GUIEngine::ModalDialog
 {
-    
+
 protected:
     virtual void loadedFromFile();
 
@@ -41,10 +41,10 @@ public:
      */
     RacePausedDialog(const float percentWidth, const float percentHeight);
     virtual ~RacePausedDialog();
-    
+
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
+
 };
 
 #endif

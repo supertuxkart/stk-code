@@ -136,12 +136,12 @@ void ConnectToServer::asynchronousUpdate()
             {
                 Log::info("ConnectToServer", "Server's address known");
                 // we're in the same lan (same public ip address) !!
-                if (m_server_address.getIP() == 
+                if (m_server_address.getIP() ==
                     NetworkManager::getInstance()->getPublicAddress().getIP())
-                    Log::info("ConnectToServer", 
+                    Log::info("ConnectToServer",
                               "Server appears to be in the same LAN.");
                 m_state = REQUESTING_CONNECTION;
-                m_current_protocol_id = 
+                m_current_protocol_id =
                     m_listener->requestStart(new RequestConnection(m_server_id));
             }
             break;

@@ -96,7 +96,7 @@ public:
     /** Returns a copy of the initial position. Note this function does not
      *  return a const reference, since some classes overwrite it this way. */
     virtual const core::vector3df getAbsolutePosition() const
-    { 
+    {
         return m_init_xyz;
     }   // getAbsolutePosition
     // ------------------------------------------------------------------------
@@ -240,9 +240,9 @@ public:
 
     TrackObjectPresentationMesh(const std::string& model_file,
                                 const core::vector3df& xyz,
-                                const core::vector3df& hpr, 
+                                const core::vector3df& hpr,
                                 const core::vector3df& scale);
-    TrackObjectPresentationMesh(scene::IAnimatedMesh* mesh, 
+    TrackObjectPresentationMesh(scene::IAnimatedMesh* mesh,
                                 const core::vector3df& xyz,
                                 const core::vector3df& hpr,
                                 const core::vector3df& scale);

@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -73,7 +73,7 @@ void	btConvexPointCloudShape::batchedUnitVectorGetSupportingVertexWithoutMargin(
 		for (int j=0;j<numVectors;j++)
 		{
 			const btVector3& vec = vectors[j];
-			
+
 			newDot = vec.dot(vtx);
 			if (newDot > supportVerticesOut[j][3])
 			{
@@ -87,7 +87,7 @@ void	btConvexPointCloudShape::batchedUnitVectorGetSupportingVertexWithoutMargin(
 
 
 }
-	
+
 
 
 btVector3	btConvexPointCloudShape::localGetSupportingVertex(const btVector3& vec)const
@@ -100,7 +100,7 @@ btVector3	btConvexPointCloudShape::localGetSupportingVertex(const btVector3& vec
 		if (vecnorm .length2() < (SIMD_EPSILON*SIMD_EPSILON))
 		{
 			vecnorm.setValue(btScalar(-1.),btScalar(-1.),btScalar(-1.));
-		} 
+		}
 		vecnorm.normalize();
 		supVertex+= getMargin() * vecnorm;
 	}

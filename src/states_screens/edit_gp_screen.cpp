@@ -172,9 +172,9 @@ void EditGPScreen::init()
 
         if (edit->getResult())
         {
-            bool reverse = edit->getTrack()->reverseAvailable() ? 
+            bool reverse = edit->getTrack()->reverseAvailable() ?
                            edit->getReverse() : false;
-            
+
             if (m_action == "add")
             {
                 m_gp->addTrack(edit->getTrack(), edit->getLaps(), reverse,
