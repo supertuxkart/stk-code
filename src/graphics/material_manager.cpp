@@ -24,6 +24,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/material.hpp"
+#include "graphics/shaders.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
@@ -40,7 +41,6 @@ MaterialManager::MaterialManager()
 {
     /* Create list - and default material zero */
 
-    m_default_material = NULL;
     m_materials.reserve(256);
     // We can't call init/loadMaterial here, since the global variable
     // material_manager has not yet been initialised, and
@@ -67,7 +67,7 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
                                           scene::IMeshBuffer *mb)
 {
     if (t == NULL)
-        return m_default_material;
+        return getDefaultMaterial(mb->getMaterial().MaterialType);
 
     core::stringc img_path = core::stringc(t->getName());
     const std::string image = StringUtils::getBasename(img_path.c_str());
@@ -92,7 +92,8 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
             }
         }   // for i
     }
-    return m_default_material;
+
+    return getDefaultMaterial(mb->getMaterial().MaterialType);
 }
 
 //-----------------------------------------------------------------------------
@@ -111,50 +112,38 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
         return;
     }
 
-    if (m_default_material == NULL)
-        m_default_material = new Material("", false, false, false);
-    m_default_material->setMaterialProperties(&(mb->getMaterial()), mb);
-
-    /*
-    // This material does not appear in materials.xml. Set some common flags...
-    if (UserConfigParams::m_anisotropic > 0)
-    {
-        for (u32 i=0; i<video::MATERIAL_MAX_TEXTURES; ++i)
-        {
-            mb->getMaterial().TextureLayer[i].AnisotropicFilter =
-                                        UserConfigParams::m_anisotropic;
-        }
-    }
-    else if (UserConfigParams::m_trilinear)
-    {
-        mb->getMaterial().setFlag(video::EMF_TRILINEAR_FILTER, true);
-    }
-
-    mb->getMaterial().ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
-
-    if (World::getWorld() != NULL)
-    {
-        mb->getMaterial().FogEnable = World::getWorld()->isFogEnabled();
-    }
-
-
-    // Modify lightmap materials so that vertex colors are taken into account.
-    // But disable lighting because we assume all lighting is already part
-    // of the lightmap
-    if (mb->getMaterial().MaterialType == video::EMT_LIGHTMAP)
-    {
-        mb->getMaterial().MaterialType = video::EMT_LIGHTMAP_LIGHTING;
-        mb->getMaterial().AmbientColor  = video::SColor(255, 255, 255, 255);
-        mb->getMaterial().DiffuseColor  = video::SColor(255, 255, 255, 255);
-        mb->getMaterial().EmissiveColor = video::SColor(255, 255, 255, 255);
-        mb->getMaterial().SpecularColor = video::SColor(255, 255, 255, 255);
-    }
-
-
-    //if (UserConfigParams::m_fullscreen_antialiasing)
-    //    mb->getMaterial().AntiAliasing = video::EAAM_LINE_SMOOTH;
-    */
+    Material* default_material = getDefaultMaterial(mb->getMaterial().MaterialType);
+    default_material->setMaterialProperties(&(mb->getMaterial()), mb);
 }   // setAllMaterialFlags
+
+//-----------------------------------------------------------------------------
+
+Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type)
+{
+    auto it = m_default_materials.find(shader_type);
+    if (it == m_default_materials.end())
+    {
+        Material* default_material = new Material("", false, false, false);
+
+        // TODO: workaround, should not hardcode these material types here?
+        // Try to find a cleaner way
+        if (shader_type == Shaders::getShader(ShaderType::ES_OBJECT_UNLIT))
+            default_material->setShaderType(Material::SHADERTYPE_SOLID_UNLIT);
+        else if (shader_type == Shaders::getShader(ShaderType::ES_OBJECTPASS_REF))
+            default_material->setShaderType(Material::SHADERTYPE_ALPHA_TEST);
+        //else if (shader_type == Shaders::getShader(ShaderType::ES_OBJECTPASS))
+        //    default_material->setShaderType(Material::SHADERTYPE_ALPHA_BLEND);
+        else
+            default_material->setShaderType(Material::SHADERTYPE_SOLID);
+
+        m_default_materials[shader_type] = default_material;
+        return default_material;
+    }
+    else
+    {
+        return it->second;
+    }
+}
 
 //-----------------------------------------------------------------------------
 
@@ -191,9 +180,8 @@ void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb)
         material.MaterialType = irr::video::EMT_SOLID;
     }
 
-    if (m_default_material == NULL)
-        m_default_material = new Material("", false, false, false);
-    m_default_material->setMaterialProperties(&(mb->getMaterial()), mb);
+    Material* default_material = getDefaultMaterial(mb->getMaterial().MaterialType);
+    default_material->setMaterialProperties(&(mb->getMaterial()), mb);
 }
 //-----------------------------------------------------------------------------
 int MaterialManager::addEntity(Material *m)

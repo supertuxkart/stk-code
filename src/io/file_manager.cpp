@@ -115,7 +115,6 @@ FileManager::FileManager()
 {
     m_subdir_name.resize(ASSET_COUNT);
     m_subdir_name[CHALLENGE  ] = "challenges";
-    m_subdir_name[FONT       ] = "fonts";
     m_subdir_name[GFX        ] = "gfx";
     m_subdir_name[GRANDPRIX  ] = "grandprix";
     m_subdir_name[GUI        ] = "gui";
@@ -127,6 +126,7 @@ FileManager::FileManager()
     m_subdir_name[SKIN       ] = "skins";
     m_subdir_name[SHADER     ] = "shaders";
     m_subdir_name[TEXTURE    ] = "textures";
+    m_subdir_name[TTF        ] = "ttf";
     m_subdir_name[TRANSLATION] = "po";
 #ifdef __APPLE__
     // irrLicht's createDevice method has a nasty habit of messing the CWD.
