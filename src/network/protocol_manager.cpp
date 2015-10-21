@@ -99,58 +99,67 @@ void ProtocolManager::abort()
 void ProtocolManager::propagateEvent(Event* event)
 {
     m_events_to_process.lock();
-    Event* event2 = new Event(*event);
+
     // register protocols that will receive this event
-    std::vector<unsigned int> protocols_ids;
     PROTOCOL_TYPE searched_protocol = PROTOCOL_NONE;
     if (event->getType() == EVENT_TYPE_MESSAGE)
     {
-        if (event2->data().size() > 0)
+        if (event->data().size() > 0)
         {
-            searched_protocol = (PROTOCOL_TYPE)(event2->data()[0]);
-            event2->removeFront(1);
+            searched_protocol = (PROTOCOL_TYPE)(event->data()[0]);
+            event->removeFront(1);
         }
         else
         {
             Log::warn("ProtocolManager", "Not enough data.");
         }
     }
-    if (event->getType() == EVENT_TYPE_CONNECTED)
+    else if (event->getType() == EVENT_TYPE_CONNECTED)
     {
         searched_protocol = PROTOCOL_CONNECTION;
     }
     Log::verbose("ProtocolManager", "Received event for protocols of type %d",
                   searched_protocol);
+
+    std::vector<unsigned int> protocols_ids;
     m_protocols.lock();
     for (unsigned int i = 0; i < m_protocols.getData().size() ; i++)
     {
+        const ProtocolInfo &pi = m_protocols.getData()[i];
         // Pass data to protocols even when paused
-        if (m_protocols.getData()[i].protocol->getProtocolType() == searched_protocol ||
+        if (pi.protocol->getProtocolType() == searched_protocol ||
             event->getType() == EVENT_TYPE_DISCONNECTED)
         {
-            protocols_ids.push_back(m_protocols.getData()[i].id);
+            protocols_ids.push_back(pi.id);
         }
-    }
+    }    // for i in m_protocols
     m_protocols.unlock();
+
     // no protocol was aimed, show the msg to debug
     if (searched_protocol == PROTOCOL_NONE)
     {
         Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"",
-                    event2->data().std_string().c_str());
+                    event->data().std_string().c_str());
     }
 
     if (protocols_ids.size() != 0)
     {
         EventProcessingInfo epi;
         epi.arrival_time = (double)StkTime::getTimeSinceEpoch();
-        epi.event = event2;
+        epi.event = event;
         epi.protocols_ids = protocols_ids;
-        m_events_to_process.getData().push_back(epi); // add the event to the queue
+        // Add the event to the queue. After the event is handled
+        // its memory will be freed.
+        m_events_to_process.getData().push_back(epi); 
     }
     else
+    {
         Log::warn("ProtocolManager",
                   "Received an event for %d that has no destination protocol.",
                   searched_protocol);
+        // Free the memory for the vent
+        delete event;
+    }
     m_events_to_process.unlock();
 }   // propagateEvent
 
@@ -354,8 +363,11 @@ void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
 }   // protocolTerminated
 
 // ----------------------------------------------------------------------------
-bool ProtocolManager::propagateEvent(EventProcessingInfo* event, bool synchronous)
+/** Sends the event to the corresponding protocol.
+ */
+bool ProtocolManager::sendEvent(EventProcessingInfo* event, bool synchronous)
 {
+    m_protocols.lock();
     int index = 0;
     for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
@@ -374,26 +386,27 @@ bool ProtocolManager::propagateEvent(EventProcessingInfo* event, bool synchronou
                 index++;
         }
     }
+    m_protocols.unlock();
+
     if (event->protocols_ids.size() == 0 || 
         (StkTime::getTimeSinceEpoch()-event->arrival_time) >= TIME_TO_KEEP_EVENTS)
     {
-        // because we made a copy of the event
         delete event->event;
         return true;
     }
     return false;
-}   // propagateEvent
+}   // sendEvent
 
 // ----------------------------------------------------------------------------
 void ProtocolManager::update()
 {
-    // before updating, notice protocols that they have received events
+    // before updating, notify protocols that they have received events
     m_events_to_process.lock();
     int size = (int)m_events_to_process.getData().size();
     int offset = 0;
     for (int i = 0; i < size; i++)
     {
-        bool result = propagateEvent(&m_events_to_process.getData()[i+offset], true);
+        bool result = sendEvent(&m_events_to_process.getData()[i+offset], true);
         if (result)
         {
             m_events_to_process.getData()
@@ -422,7 +435,7 @@ void ProtocolManager::asynchronousUpdate()
     int offset = 0;
     for (int i = 0; i < size; i++)
     {
-        bool result = propagateEvent(&m_events_to_process.getData()[i+offset], false);
+        bool result = sendEvent(&m_events_to_process.getData()[i+offset], false);
         if (result)
         {
             m_events_to_process.getData()

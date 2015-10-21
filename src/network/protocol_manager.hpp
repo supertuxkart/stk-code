@@ -284,7 +284,7 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
          */
         virtual void            protocolTerminated(ProtocolInfo protocol);
 
-        bool                    propagateEvent(EventProcessingInfo* event, bool synchronous);
+        bool sendEvent(EventProcessingInfo* event, bool synchronous);
 
         // protected members
         /** Contains the running protocols.

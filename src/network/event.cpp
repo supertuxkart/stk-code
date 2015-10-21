@@ -82,18 +82,6 @@ Event::Event(ENetEvent* event)
 }   // Event(ENetEvent)
 
 // ----------------------------------------------------------------------------
-/** \brief Constructor
- *  \param event : The event to copy.
- */
-Event::Event(const Event& event)
-{
-    m_type   = event.m_type;
-    m_packet = NULL;
-    m_data   = event.m_data;
-    m_peer   = event.m_peer;
-}   // Event(Event)
-
-// ----------------------------------------------------------------------------
 /** \brief Destructor that frees the memory of the package.
  */
 Event::~Event()

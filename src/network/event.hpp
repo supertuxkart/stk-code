@@ -26,6 +26,7 @@
 
 #include "network/stk_peer.hpp"
 #include "network/network_string.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/types.hpp"
 
 /*!
@@ -52,6 +53,7 @@ enum EVENT_TYPE
 class Event
 {
 private:
+    LEAK_CHECK()
     /** Copy of the data passed by the event. */
     NetworkString m_data;
 
@@ -66,7 +68,6 @@ private:
 
 public:
          Event(ENetEvent* event);
-         Event(const Event& event);
         ~Event();
     void removeFront(int size);
 
