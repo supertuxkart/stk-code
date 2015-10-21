@@ -20,6 +20,7 @@
 
 #include "config/player_manager.hpp"
 #include "modes/world_with_rank.hpp"
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"

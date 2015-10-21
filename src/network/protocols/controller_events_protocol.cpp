@@ -3,6 +3,7 @@
 #include "modes/world.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
 #include "network/network_world.hpp"
 #include "utils/log.hpp"

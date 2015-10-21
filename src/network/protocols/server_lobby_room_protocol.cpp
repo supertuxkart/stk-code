@@ -21,6 +21,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
+#include "network/event.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/show_public_address.hpp"

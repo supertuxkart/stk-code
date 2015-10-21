@@ -1,5 +1,6 @@
 #include "network/protocols/synchronization_protocol.hpp"
 
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
 #include "network/protocols/kart_update_protocol.hpp"
 #include "network/protocols/controller_events_protocol.hpp"

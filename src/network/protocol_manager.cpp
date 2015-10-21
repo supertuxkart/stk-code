@@ -18,6 +18,7 @@
 
 #include "network/protocol_manager.hpp"
 
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
 #include "network/protocol.hpp"
 #include "utils/log.hpp"

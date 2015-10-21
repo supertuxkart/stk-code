@@ -19,6 +19,7 @@
 #include "network/protocols/connect_to_server.hpp"
 
 #include "network/client_network_manager.hpp"
+#include "network/event.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/show_public_address.hpp"

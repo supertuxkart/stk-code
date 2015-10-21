@@ -23,7 +23,6 @@
 #ifndef PROTOCOL_MANAGER_HPP
 #define PROTOCOL_MANAGER_HPP
 
-#include "network/event.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol.hpp"
 #include "utils/no_copy.hpp"
@@ -32,6 +31,9 @@
 #include "utils/types.hpp"
 
 #include <vector>
+
+class Event;
+class STKPeer;
 
 #define TIME_TO_KEEP_EVENTS 1.0
 
