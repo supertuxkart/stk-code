@@ -305,6 +305,7 @@ void RaceManager::startNew(bool from_overworld)
                                          ->getActivePlayerProfile(0)
                                          ->getUniqueID(),
                                          m_grand_prix.getId(),
+                                         m_minor_mode,
                                          m_player_karts.size());
     
             // Saved GP only in offline mode
@@ -398,6 +399,7 @@ void RaceManager::startNew(bool from_overworld)
                                              ->getActivePlayerProfile(0)
                                              ->getUniqueID(),
                                              m_grand_prix.getId(),
+                                             m_minor_mode,
                                              m_player_karts.size());
             }
         }
@@ -551,6 +553,7 @@ void RaceManager::saveGP()
         m_saved_gp = new SavedGrandPrix(
             StateManager::get()->getActivePlayerProfile(0)->getUniqueID(),
             m_grand_prix.getId(),
+            m_minor_mode,
             m_difficulty,
             (int)m_player_karts.size(),
             m_track_number,
