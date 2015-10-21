@@ -95,7 +95,7 @@ void ProtocolManager::abort()
 }   // abort
 
 // ----------------------------------------------------------------------------
-void ProtocolManager::notifyEvent(Event* event)
+void ProtocolManager::propagateEvent(Event* event)
 {
     m_events_to_process.lock();
     Event* event2 = new Event(*event);
@@ -150,8 +150,8 @@ void ProtocolManager::notifyEvent(Event* event)
         Log::warn("ProtocolManager",
                   "Received an event for %d that has no destination protocol.",
                   searched_protocol);
-    m_events_to_process.lock();
-}   // notifyEvent
+    m_events_to_process.unlock();
+}   // propagateEvent
 
 // ----------------------------------------------------------------------------
 void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message,

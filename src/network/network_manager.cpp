@@ -108,7 +108,13 @@ void NetworkManager::setManualSocketsMode(bool manual)
 }   // setManualSocketsMode
 
 //-----------------------------------------------------------------------------
-void NetworkManager::notifyEvent(Event* event)
+/** Is called from STKHost when an event (i.e. a package) is received. If the
+ *  event indicates a new connection, the peer is added to the list of peers.
+ *  It logs the package, and propagates the event to the ProtocollManager,
+ *  which in turn will notify individual protocols.
+ *  \param event Pointer to the event to propagate.
+ */
+void NetworkManager::propagateEvent(Event* event)
 {
     Log::verbose("NetworkManager", "EVENT received of type %d",
                  (int)(event->getType()));
@@ -135,8 +141,8 @@ void NetworkManager::notifyEvent(Event* event)
     }
 
     // notify for the event now.
-    ProtocolManager::getInstance()->notifyEvent(event);
-}   // notifyEvent
+    ProtocolManager::getInstance()->propagateEvent(event);
+}   // propagateEvent
 
 //-----------------------------------------------------------------------------
 

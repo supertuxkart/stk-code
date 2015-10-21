@@ -182,7 +182,7 @@ void* STKHost::mainLoop(void* self)
             if (stk_event->getType() == EVENT_TYPE_MESSAGE)
                 logPacket(stk_event->data(), true);
             if (event.type != ENET_EVENT_TYPE_NONE)
-                NetworkManager::getInstance()->notifyEvent(stk_event);
+                NetworkManager::getInstance()->propagateEvent(stk_event);
             delete stk_event;
         }   // while enet_host_service
     }   // while !mustStopListening

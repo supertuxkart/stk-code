@@ -75,7 +75,7 @@ class NetworkManager : public AbstractSingleton<NetworkManager>
         virtual void setManualSocketsMode(bool manual);
 
         // message/packets related functions
-        virtual void notifyEvent(Event* event);
+        virtual void propagateEvent(Event* event);
         virtual void sendPacket(const NetworkString& data,
                                 bool reliable = true) = 0;
         virtual void sendPacket(STKPeer* peer,

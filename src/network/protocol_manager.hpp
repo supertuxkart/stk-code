@@ -118,7 +118,7 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
          * This function is called by the network manager each time there is an
          * incoming packet.
          */
-        virtual void            notifyEvent(Event* event);
+        virtual void            propagateEvent(Event* event);
         /*!
          * \brief WILL BE COMMENTED LATER
          */
