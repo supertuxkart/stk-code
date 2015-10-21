@@ -28,12 +28,13 @@
 
 #include "network/protocol_manager.hpp"
 #include "network/types.hpp"
-#include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "utils/singleton.hpp"
 #include "utils/synchronised.hpp"
 
 #include <vector>
+
+class Event;
 
 /** \class NetworkManager
  *  \brief Gives the general functions to use network communication.

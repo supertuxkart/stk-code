@@ -18,14 +18,8 @@
 
 #include "network/network_manager.hpp"
 
-#include "network/protocols/hide_public_address.hpp"
-#include "network/protocols/show_public_address.hpp"
-#include "network/protocols/get_public_address.hpp"
-
+#include "network/event.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/client_network_manager.hpp"
-#include "network/server_network_manager.hpp"
-
 #include "utils/log.hpp"
 
 #include <pthread.h>

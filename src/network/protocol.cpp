@@ -18,8 +18,9 @@
 
 #include "network/protocol.hpp"
 
-#include "network/protocol_manager.hpp"
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
+#include "network/protocol_manager.hpp"
 
 Protocol::Protocol(CallbackObject* callback_object, PROTOCOL_TYPE type)
 {

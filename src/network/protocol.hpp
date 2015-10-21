@@ -23,10 +23,11 @@
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
-#include "network/event.hpp"
+#include "network/network_string.hpp"
 #include "network/types.hpp"
 #include "utils/types.hpp"
 
+class Event;
 class ProtocolManager;
 
 /** \enum PROTOCOL_TYPE
