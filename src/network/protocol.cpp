@@ -22,7 +22,7 @@
 #include "network/network_manager.hpp"
 #include "network/protocol_manager.hpp"
 
-Protocol::Protocol(CallbackObject* callback_object, PROTOCOL_TYPE type)
+Protocol::Protocol(CallbackObject* callback_object, ProtocolType type)
 {
     m_callback_object = callback_object;
     m_type = type;
@@ -50,7 +50,7 @@ void Protocol::setListener(ProtocolManager* listener)
     m_listener = listener;
 }
 
-PROTOCOL_TYPE Protocol::getProtocolType()
+ProtocolType Protocol::getProtocolType()
 {
     return m_type;
 }
