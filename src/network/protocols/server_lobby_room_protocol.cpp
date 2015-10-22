@@ -66,7 +66,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
     assert(m_setup); // assert that the setup exists
     if (event->getType() == EVENT_TYPE_MESSAGE)
     {
-        NetworkString data = event->data();
+        const NetworkString &data = event->data();
         assert(data.size()); // message not empty
         uint8_t message_type;
         message_type = data[0];
@@ -336,7 +336,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
 void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 {
     STKPeer* peer = event->getPeer();
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() != 5 || data[0] != 4)
     {
         Log::warn("ServerLobbyRoomProtocol", "Receiving badly formated message. Size is %d and first byte %d", data.size(), data[0]);
@@ -415,7 +415,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
  */
 void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 6))
         return;
@@ -476,7 +476,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
  */
 void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
 {
-    NetworkString data = event->data();
+    NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 7))
         return;
@@ -507,7 +507,7 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
  */
 void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
 {
-    NetworkString data = event->data();
+    NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 7))
         return;
@@ -538,7 +538,7 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
  */
 void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
 {
-    NetworkString data = event->data();
+    NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 7))
         return;
@@ -569,7 +569,7 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
  */
 void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
 {
-    NetworkString data = event->data();
+    NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 8))
         return;
@@ -602,7 +602,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
  */
 void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
 {
-    NetworkString data = event->data();
+    NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 9))
         return;
@@ -635,7 +635,7 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
  */
 void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
 {
-    NetworkString data = event->data();
+    NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 9))
         return;

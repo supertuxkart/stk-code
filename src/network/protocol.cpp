@@ -57,7 +57,7 @@ ProtocolType Protocol::getProtocolType()
 
 bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < minimum_size || data[0] != 4)
     {
         Log::warn("Protocol", "Receiving a badly "
@@ -78,7 +78,7 @@ bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
 
 bool Protocol::isByteCorrect(Event* event, int byte_nb, int value)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data[byte_nb] != value)
     {
         Log::info("Protocol", "Bad byte at pos %d. %d "

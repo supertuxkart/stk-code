@@ -24,7 +24,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NetworkString data = event->data();
+    NetworkString &data = event->data();
     if (data.size() < 5) // for token and type
     {
         Log::warn("GameEventsProtocol", "Too short message.");

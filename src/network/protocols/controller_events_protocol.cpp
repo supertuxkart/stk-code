@@ -66,7 +66,7 @@ void ControllerEventsProtocol::setup()
 
 bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 17)
     {
         Log::error("ControllerEventsProtocol", "The data supplied was not complete. Size was %d.", data.size());

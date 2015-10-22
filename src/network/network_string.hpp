@@ -39,10 +39,11 @@ typedef unsigned char uchar;
 class NetworkString
 {
 private:
-    union {
+    union FloatAsInt 
+    {
         float f;
         uint8_t i[4];
-    } f_as_i; // float as integer
+    }; // float as integer
 
     // ------------------------------------------------------------------------
     union {
@@ -165,6 +166,7 @@ public:
     NetworkString& addFloat(const float& value) //!< BEWARE OF PRECISION
     {
         assert(sizeof(float) == 4);
+        FloatAsInt f_as_i;
         f_as_i.f = value;
         m_string.push_back(f_as_i.i[0]);
         m_string.push_back(f_as_i.i[1]);
@@ -339,8 +341,9 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns a 4-byte floating point value. */
-    float getFloat(int pos = 0) //!< BEWARE OF PRECISION
+    float getFloat(int pos = 0) const //!< BEWARE OF PRECISION
     {
+        FloatAsInt f_as_i;
         for (int i = 0; i < 4; i++)
             f_as_i.i[i] = m_string[pos + i];
         return f_as_i.f;
@@ -426,6 +429,7 @@ public:
     /** Get and remove a 4 byte floating point value. */
     float getAndRemoveFloat(int pos = 0) //!< BEWARE OF PRECISION
     {
+        FloatAsInt f_as_i;
         for (int i = 0; i < 4; i++)
             f_as_i.i[i] = m_string[pos + i];
         return f_as_i.f;

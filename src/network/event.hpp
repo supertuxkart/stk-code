@@ -82,11 +82,16 @@ public:
     /** Returns the peer of this event. */
     STKPeer* getPeer() const { return m_peer;  }
     // ------------------------------------------------------------------------
-    /** \brief Get a copy of the data.
-     *  \return A copy of the message data. This is empty for events like
+    /** \brief Get a const reference to the received data.
+     *  This is empty for events like connection or disconnections. 
+     */
+    const NetworkString& data() const { return m_data; }
+    // ------------------------------------------------------------------------
+    /** \brief Get a non-const reference to the received data.
+     *  A copy of the message data. This is empty for events like
      *  connection or disconnections. */
-    NetworkString data() const { return m_data; }
-
+    NetworkString& data() { return m_data; }
+    // ------------------------------------------------------------------------
 
 };   // class Event
 

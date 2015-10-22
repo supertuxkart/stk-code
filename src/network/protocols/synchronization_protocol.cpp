@@ -36,7 +36,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 10)
     {
         Log::warn("SynchronizationProtocol", "Received a message too short.");

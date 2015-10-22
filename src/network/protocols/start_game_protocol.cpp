@@ -37,7 +37,7 @@ StartGameProtocol::~StartGameProtocol()
 
 bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 5)
     {
         Log::error("StartGameProtocol", "Too short message.");

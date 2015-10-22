@@ -34,7 +34,7 @@ bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NetworkString ns = event->data();
+    NetworkString &ns = event->data();
     if (ns.size() < 36)
     {
         Log::info("KartUpdateProtocol", "Message too short.");
