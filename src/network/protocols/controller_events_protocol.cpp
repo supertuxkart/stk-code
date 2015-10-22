@@ -4,6 +4,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "network/event.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_manager.hpp"
 #include "network/network_world.hpp"
 #include "utils/log.hpp"

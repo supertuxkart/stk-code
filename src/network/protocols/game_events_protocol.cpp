@@ -7,6 +7,7 @@
 #include "items/powerup.hpp"
 #include "modes/world.hpp"
 #include "network/event.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_manager.hpp"
 
 #include <stdint.h>

@@ -96,12 +96,12 @@ void NetworkManager::abort()
  *  \param peer : The transport address which you want to connect to.
  *  \return True if we're successfully connected. False elseway.
  */
-bool NetworkManager::connect(const TransportAddress& peer)
+bool NetworkManager::connect(const TransportAddress& address)
 {
-    if (peerExists(peer))
-        return isConnectedTo(peer);
+    if (peerExists(address))
+        return isConnectedTo(address);
 
-    return STKPeer::connectToHost(m_localhost, peer, 2, 0);
+    return STKPeer::connectToHost(m_localhost, address, 2, 0);
 }   // connect
 
 //-----------------------------------------------------------------------------
