@@ -24,10 +24,13 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
-#include "network/stk_peer.hpp"
 #include "network/network_string.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/types.hpp"
+
+#include "enet/enet.h"
+
+class STKPeer;
 
 /*!
  * \enum EVENT_TYPE

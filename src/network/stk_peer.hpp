@@ -23,6 +23,7 @@
 #ifndef STK_PEER_HPP
 #define STK_PEER_HPP
 
+#include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
 #include <enet/enet.h>
@@ -36,7 +37,7 @@ class TransportAddress;
  *  \brief Represents a peer.
  *  This class is used to interface the ENetPeer structure.
  */
-class STKPeer
+class STKPeer : public NoCopy
 {
     friend class Event;
 protected:
@@ -53,7 +54,6 @@ protected:
 
 public:
              STKPeer();
-             STKPeer(const STKPeer& peer);
     virtual ~STKPeer();
 
     virtual void sendPacket(const NetworkString& data, bool reliable = true);

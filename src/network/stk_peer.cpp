@@ -35,17 +35,6 @@ STKPeer::STKPeer()
 }   // STKPeer
 
 //-----------------------------------------------------------------------------
-/** Copy constructor.
- */
-STKPeer::STKPeer(const STKPeer& peer)
-{
-    m_enet_peer           = peer.m_enet_peer;
-    m_player_profile      = peer.m_player_profile;
-    m_client_server_token = peer.m_client_server_token;
-    m_token_set           = peer.m_token_set;
-}   // STKPeer
-
-//-----------------------------------------------------------------------------
 /** Destructor.
  */
 STKPeer::~STKPeer()
