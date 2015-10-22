@@ -1059,7 +1059,7 @@ GeometryPasses::GeometryPasses()
 }
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderSolidFirstPass()
+void GeometryPasses::renderSolidFirstPass(const DrawCalls& draw_calls)
 {
     m_wind_dir = getWindDir(); //TODO: why this function instead of Wind::getWind()?
 
@@ -1070,8 +1070,7 @@ void GeometryPasses::renderSolidFirstPass()
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
         irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
 
-        for (unsigned i = 0; i < ImmediateDrawList::getInstance()->size(); i++)
-            ImmediateDrawList::getInstance()->at(i)->render();
+        draw_calls.renderImmediateDrawList();
 
         //TODO: is it useful if AZDO enabled?
         renderMeshes1stPass<DefaultMaterial, 2, 1>();
@@ -1191,7 +1190,8 @@ void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
 
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderSolidSecondPass( unsigned render_target_diffuse,
+void GeometryPasses::renderSolidSecondPass( const DrawCalls& draw_calls,
+                                            unsigned render_target_diffuse,
                                             unsigned render_target_specular,
                                             unsigned render_target_half_red)
             {
@@ -1233,8 +1233,7 @@ void GeometryPasses::renderSolidSecondPass( unsigned render_target_diffuse,
 
         irr_driver->setPhase(SOLID_LIT_PASS);
 
-        for (unsigned i = 0; i < ImmediateDrawList::getInstance()->size(); i++)
-            ImmediateDrawList::getInstance()->at(i)->render();
+        draw_calls.renderImmediateDrawList();
 
         std::vector<GLuint> DiffSpecSSAOTex = 
             createVector<GLuint>(render_target_diffuse, 
@@ -1401,7 +1400,7 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
 }   // renderTransparenPass
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderTransparent(unsigned render_target)
+void GeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsigned render_target)
 {
 
     glEnable(GL_DEPTH_TEST);
@@ -1412,8 +1411,7 @@ void GeometryPasses::renderTransparent(unsigned render_target)
 
     irr_driver->setPhase(TRANSPARENT_PASS);
 
-    for (unsigned i = 0; i < ImmediateDrawList::getInstance()->size(); i++)
-        ImmediateDrawList::getInstance()->at(i)->render();
+    draw_calls.renderImmediateDrawList();
 
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
@@ -1444,8 +1442,7 @@ void GeometryPasses::renderTransparent(unsigned render_target)
                                       ListAdditiveTransparent::getInstance());
     }
 
-    for (unsigned i = 0; i < BillBoardList::getInstance()->size(); i++)
-        BillBoardList::getInstance()->at(i)->render();
+    draw_calls.renderBillboardList();
 
     if (!CVS->isDefferedEnabled())
         return;

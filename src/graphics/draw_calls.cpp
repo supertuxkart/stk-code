@@ -167,9 +167,9 @@ void DrawCalls::clearLists()
     ListMatGrass::getInstance()->clear();
     ListMatSplatting::getInstance()->clear();
 
-    ImmediateDrawList::getInstance()->clear();
-    BillBoardList::getInstance()->clear();
-    ParticlesList::getInstance()->clear();
+    m_immediate_draw_list.clear();
+    m_billboard_list.clear();
+    m_particles_list.clear();
     ListInstancedGlow::getInstance()->clear();    
 }
 
@@ -491,11 +491,15 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
 }
 
 
-//TODO: outside DrawCalls class?
- void
-DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List, std::vector<scene::ISceneNode *> *ImmediateDraw,
-    const scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadow_cam[4], const scene::ICameraSceneNode *rsmcam,
-    bool culledforcam, bool culledforshadowcam[4], bool culledforrsm, bool drawRSM)
+void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
+                                  std::vector<scene::ISceneNode *> *ImmediateDraw,
+                                  const scene::ICameraSceneNode* cam,
+                                  scene::ICameraSceneNode *shadow_cam[4],
+                                  const scene::ICameraSceneNode *rsmcam,
+                                  bool culledforcam,
+                                  bool culledforshadowcam[4],
+                                  bool culledforrsm,
+                                  bool drawRSM)
 {
     core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
     for (; I != E; ++I)
@@ -509,14 +513,14 @@ DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List, std::vector<s
         if (ParticleSystemProxy *node = dynamic_cast<ParticleSystemProxy *>(*I))
         {
             if (!isCulledPrecise(cam, *I))
-                ParticlesList::getInstance()->push_back(node);
+                m_particles_list.push_back(node);
             continue;
         }
 
         if (STKBillboard *node = dynamic_cast<STKBillboard *>(*I))
         {
             if (!isCulledPrecise(cam, *I))
-                BillBoardList::getInstance()->push_back(node);
+                m_billboard_list.push_back(node);
             continue;
         }
 
@@ -557,7 +561,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
     bool cam = false, rsmcam = false;
     bool shadowcam[4] = { false, false, false, false };
     parseSceneManager(List,
-                      ImmediateDrawList::getInstance(),
+                      &m_immediate_draw_list,
                       camnode, 
                       shadow_matrices.getShadowCamNodes(),
                       shadow_matrices.getSunCam(),
@@ -851,4 +855,22 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
     
     if (CVS->supportsAsyncInstanceUpload())
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
+}
+
+void DrawCalls::renderImmediateDrawList() const
+{
+    for(auto node: m_immediate_draw_list)
+        node->render();
+}
+
+void DrawCalls::renderBillboardList() const
+{
+    for(auto billboard: m_billboard_list)
+        billboard->render();
+}
+
+void DrawCalls::renderParticlesList() const
+{
+    for(auto particles: m_particles_list)
+        particles->render();
 }

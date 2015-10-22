@@ -18,6 +18,7 @@
 #ifndef HEADER_GEOMETRY_PASSES_HPP
 #define HEADER_GEOMETRY_PASSES_HPP
 
+#include "graphics/draw_calls.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include <ITexture.h>
@@ -33,12 +34,14 @@ private:
 public:
     GeometryPasses();
     
-    void renderSolidFirstPass();
-    void renderSolidSecondPass( unsigned render_target_diffuse,
+    void renderSolidFirstPass(const DrawCalls& draw_calls);
+    void renderSolidSecondPass( const DrawCalls& draw_calls,
+                                unsigned render_target_diffuse,
                                 unsigned render_target_specular,
                                 unsigned render_target_half_red);
     void renderNormalsVisualisation();
-    void renderTransparent(unsigned render_target);
+    void renderTransparent(const DrawCalls& draw_calls, 
+                           unsigned render_target);
     void renderShadows(const ShadowMatrices& shadow_matrices,
                        const FrameBuffer& shadow_framebuffer);
     void renderReflectiveShadowMap(const ShadowMatrices& shadow_matrices,

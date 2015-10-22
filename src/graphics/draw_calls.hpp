@@ -18,7 +18,9 @@
 #ifndef HEADER_DRAW_CALLS_HPP
 #define HEADER_DRAW_CALLS_HPP
 
+#include "graphics/gpu_particles.hpp"
 #include "graphics/shadow_matrices.hpp"
+#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh.hpp"
 #include <irrlicht.h>
 #include <unordered_map>
@@ -35,8 +37,11 @@ public:
     
 private:
     
+    std::vector<irr::scene::ISceneNode *> m_immediate_draw_list;
+    std::vector<STKBillboard *>           m_billboard_list;
+    std::vector<ParticleSystemProxy *>    m_particles_list;
+    
     irr::core::vector3df windDir; //TODO: same member in geometry_passes
-
     
     MeshMap m_solid_pass_mesh           [Material::SHADERTYPE_COUNT]    ;
     MeshMap m_shadow_pass_mesh          [Material::SHADERTYPE_COUNT][4] ;
@@ -66,14 +71,22 @@ private:
                                 bool &culledforrsm,
                                 bool drawRSM);
     
-     void
-parseSceneManager(core::list<scene::ISceneNode*> &List, std::vector<scene::ISceneNode *> *ImmediateDraw,
-    const scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadow_cam[4], const scene::ICameraSceneNode *rsmcam,
-    bool culledforcam, bool culledforshadowcam[4], bool culledforrsm, bool drawRSM);
+     void parseSceneManager(core::list<scene::ISceneNode*> &List,
+                            std::vector<scene::ISceneNode *> *ImmediateDraw,
+                            const scene::ICameraSceneNode* cam,
+                            scene::ICameraSceneNode *shadow_cam[4],const scene::ICameraSceneNode *rsmcam,
+                            bool culledforcam,
+                            bool culledforshadowcam[4],
+                            bool culledforrsm,
+                            bool drawRSM);
 
     
 public:
     void prepareDrawCalls(ShadowMatrices& shadow_matrices, irr::scene::ICameraSceneNode *camnode);
+
+    void renderImmediateDrawList() const;
+    void renderBillboardList()      const;
+    void renderParticlesList()     const;
 
     
 };

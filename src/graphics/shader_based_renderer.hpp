@@ -23,6 +23,7 @@
 #include "graphics/geometry_passes.hpp"
 #include "graphics/lighting_passes.hpp"
 #include "graphics/shadow_matrices.hpp"
+#include "graphics/solid_first_pass.hpp"
 
 
 class ShaderBasedRenderer: public AbstractRenderer
@@ -35,6 +36,8 @@ private:
     LightingPasses  m_lighting_passes;
     ShadowMatrices  m_shadow_matrices;
 
+    irr::core::vector3df m_wind_dir;
+    SolidFirstPass *m_solid_first_pass;
     
     void compressPowerUpTextures();
     void setOverrideMaterial();
@@ -54,6 +57,9 @@ private:
     void renderScene(irr::scene::ICameraSceneNode * const camnode,
                      std::vector<GlowData>& glows,
                      float dt, bool hasShadows, bool forceRTT);
+                     
+    void renderParticles();
+
     void renderBoundingBoxes();
     void debugPhysics();
     void renderPostProcessing(Camera * const camera);
@@ -61,6 +67,7 @@ private:
 
 public:
     ShaderBasedRenderer();
+    ~ShaderBasedRenderer();
 
     void addSunLight(const irr::core::vector3df &pos) override;
     

@@ -166,6 +166,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                                       bool forceRTT)
 {
     PostProcessing *post_processing = irr_driver->getPostProcessing();
+    m_wind_dir = getWindDir(); //TODO
     
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
     glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
@@ -214,7 +215,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         glClearColor(0., 0., 0., 0.);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        m_geometry_passes.renderSolidFirstPass();
+        m_geometry_passes.renderSolidFirstPass(m_draw_calls);
+        //m_solid_first_pass->render(m_wind_dir);
     }
     else
     {
@@ -278,7 +280,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glClear(GL_COLOR_BUFFER_BIT);
         glDepthMask(GL_FALSE);
     }
-    m_geometry_passes.renderSolidSecondPass(rtts->getRenderTarget(RTT_DIFFUSE),
+    m_geometry_passes.renderSolidSecondPass( m_draw_calls,
+                                             rtts->getRenderTarget(RTT_DIFFUSE),
                                              rtts->getRenderTarget(RTT_SPECULAR),
                                              rtts->getRenderTarget(RTT_HALF1_R));
     PROFILER_POP_CPU_MARKER();
@@ -351,7 +354,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TRANSPARENT));
-        m_geometry_passes.renderTransparent(irr_driver->getRTT()->getRenderTarget(RTT_DISPLACE));
+        m_geometry_passes.renderTransparent(m_draw_calls,
+                                            irr_driver->getRTT()->getRenderTarget(RTT_DISPLACE));
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -361,7 +365,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_PARTICLES));
-        irr_driver->renderParticles();
+        renderParticles();
         PROFILER_POP_CPU_MARKER();
     }
     if (!CVS->isDefferedEnabled() && !forceRTT)
@@ -376,6 +380,18 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     irr_driver->setPhase(PASS_COUNT);
 }
 
+// ----------------------------------------------------------------------------
+
+void ShaderBasedRenderer::renderParticles()
+{
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    m_draw_calls.renderBillboardList();
+
+//    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
+}
 
 
 void ShaderBasedRenderer::renderBoundingBoxes()
@@ -473,8 +489,20 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 }
 
 
-ShaderBasedRenderer::ShaderBasedRenderer():
-AbstractRenderer(), m_shadow_matrices() {}
+ShaderBasedRenderer::ShaderBasedRenderer()
+{
+    if (CVS->isAZDOEnabled())
+        m_solid_first_pass = new AZDOSolidFirstPass();
+    else if (CVS->supportsIndirectInstancingRendering())    
+        m_solid_first_pass = new IndirectInstancedSolidFirstPass();
+    else
+        m_solid_first_pass = new GL3SolidFirstPass();       
+}
+
+ShaderBasedRenderer::~ShaderBasedRenderer()
+{
+    delete m_solid_first_pass;
+}
 
 void ShaderBasedRenderer::addSunLight(const core::vector3df &pos) {
     m_shadow_matrices.addLight(pos);

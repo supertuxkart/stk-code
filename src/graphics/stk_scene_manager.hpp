@@ -60,15 +60,6 @@ public:
     }
 };
 
-class ImmediateDrawList : public Singleton<ImmediateDrawList>, public std::vector<scene::ISceneNode *>
-{};
-
-class BillBoardList : public Singleton<BillBoardList>, public std::vector<STKBillboard *>
-{};
-
-class ParticlesList : public Singleton<ParticlesList>, public std::vector<ParticleSystemProxy *>
-{};
-
 
 class SolidPassCmd : public CommandBuffer<SolidPassCmd, 1, static_cast<int>(Material::SHADERTYPE_COUNT)>
 {

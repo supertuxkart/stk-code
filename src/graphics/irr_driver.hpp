@@ -47,6 +47,8 @@
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
 
+
+
 namespace irr
 {
     namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;
@@ -317,7 +319,6 @@ private:
 #endif
 
 public: //TODO: move into renderer class
-    void renderParticles();
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
     void renderShadowsDebug();

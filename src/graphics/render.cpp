@@ -68,18 +68,7 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
     }
 }   // renderSkybox
 
-// ----------------------------------------------------------------------------
 
-void IrrDriver::renderParticles()
-{
-    glDepthMask(GL_FALSE);
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    for (unsigned i = 0; i < ParticlesList::getInstance()->size(); ++i)
-        ParticlesList::getInstance()->at(i)->render();
-//    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
-}
 
 // ----------------------------------------------------------------------------
 
