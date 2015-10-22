@@ -64,6 +64,7 @@ namespace irr {
 
 
 std::vector<std::string> FileManager::m_root_dirs;
+std::string              FileManager::m_stdout_filename = "stdout.log";
 
 #ifdef __APPLE__
 // dynamic data path detection onmac
@@ -1045,6 +1046,15 @@ std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
 #endif
 
 //-----------------------------------------------------------------------------
+/** Sets the name for the stdout log file.
+ *  \param filename Filename to use (relative to the user config dir).
+ */
+void FileManager::setStdoutName(const std::string& filename)
+{
+    m_stdout_filename = filename;
+}   // setStdoutName
+
+//-----------------------------------------------------------------------------
 /** Redirects output to go into files in the user's config directory
  *  instead of to the console. It keeps backup copies of previous stdout files
  *  (3 atm), which can help to diagnose problems caused by a previous crash.
@@ -1053,7 +1063,7 @@ void FileManager::redirectOutput()
 {
     // Do a simple log rotate: stdout.log.2 becomes stdout.log.3 etc
     const int NUM_BACKUPS=3;
-    std::string logoutfile = getUserConfigFile("stdout.log");
+    std::string logoutfile = getUserConfigFile(m_stdout_filename);
     for(int i=NUM_BACKUPS; i>1; i--)
     {
         std::ostringstream out_old;
