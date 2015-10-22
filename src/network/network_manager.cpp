@@ -105,21 +105,6 @@ bool NetworkManager::connect(const TransportAddress& address)
 }   // connect
 
 //-----------------------------------------------------------------------------
-/** \brief Changes the socket working mode.
- *  Sockets can be in two modes : The ENet mode and a mode we will call
- *  the 'Raw' mode. In the ENet mode, the socket will be read as
- *  \param peer : The transport address which you want to connect to.
- *  \return True if we're successfully connected. False elseway.
- */
-void NetworkManager::setManualSocketsMode(bool manual)
-{
-    if (manual)
-        m_localhost->stopListening();
-    else
-        m_localhost->startListening();
-}   // setManualSocketsMode
-
-//-----------------------------------------------------------------------------
 /** Is called from STKHost when an event (i.e. a package) is received. If the
  *  event indicates a new connection, the peer is added to the list of peers.
  *  It logs the package, and propagates the event to the ProtocollManager,
@@ -212,15 +197,6 @@ void NetworkManager::disconnected()
 }   // disconnected
 
 //-----------------------------------------------------------------------------
-
-void NetworkManager::setLogin(std::string username, std::string password)
-{
-    m_player_login.username = username;
-    m_player_login.password = password;
-}   // setLogin
-
-//-----------------------------------------------------------------------------
-
 void NetworkManager::setPublicAddress(const TransportAddress& addr)
 {
     m_public_address.lock();

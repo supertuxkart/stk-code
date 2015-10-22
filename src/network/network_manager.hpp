@@ -74,7 +74,6 @@ public:
     virtual void reset();
     virtual void abort();
     virtual bool connect(const TransportAddress& peer);
-    virtual void setManualSocketsMode(bool manual);
     virtual void propagateEvent(Event* event);
     virtual void sendPacket(const NetworkString& data,
                             bool reliable = true) = 0;
@@ -91,7 +90,6 @@ public:
     virtual bool isServer() = 0;
 
     // raw data management
-    void setLogin(std::string username, std::string password);
     void setPublicAddress(const TransportAddress& addr);
     void removePeer(STKPeer* peer);
 
