@@ -22,39 +22,30 @@
 #include "network/network_manager.hpp"
 #include "network/protocol_manager.hpp"
 
+/** \brief Constructor
+ *  Sets the basic protocol parameters, as the callback object and the
+ *  protocol type.
+ *  \param callback_object The callback object that will be used by the
+ *          protocol. Protocols that do not use callback objects must set
+ *          it to NULL.
+ *  \param type The type of the protocol.
+ */
 Protocol::Protocol(CallbackObject* callback_object, ProtocolType type)
 {
     m_callback_object = callback_object;
-    m_type = type;
-}
+    m_type            = type;
+    m_state           = PROTOCOL_STATE_INITIALISING;
+    m_id              = 0;
+}   // Protocol
 
+// ----------------------------------------------------------------------------
+/** \brief Destructor.
+ */
 Protocol::~Protocol()
 {
-}
+}   // ~Protocol
 
-void Protocol::pause()
-{
-    m_listener->requestPause(this);
-}
-void Protocol::unpause()
-{
-    m_listener->requestUnpause(this);
-}
-
-void Protocol::kill()
-{
-}
-
-void Protocol::setListener(ProtocolManager* listener)
-{
-    m_listener = listener;
-}
-
-ProtocolType Protocol::getProtocolType()
-{
-    return m_type;
-}
-
+// ----------------------------------------------------------------------------
 bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
 {
     const NetworkString &data = event->data();
@@ -74,8 +65,9 @@ bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
         return false;
     }
     return true;
-}
+}   // checkDataSizeAndToken
 
+// ----------------------------------------------------------------------------
 bool Protocol::isByteCorrect(Event* event, int byte_nb, int value)
 {
     const NetworkString &data = event->data();
@@ -86,15 +78,46 @@ bool Protocol::isByteCorrect(Event* event, int byte_nb, int value)
         return false;
     }
     return true;
-}
+}   // isByteCorrect
 
-void Protocol::sendMessageToPeersChangingToken(NetworkString prefix, NetworkString message)
+// ----------------------------------------------------------------------------
+/** Starts a request in the protocol manager to start this protocol. 
+ */
+void Protocol::requestStart()
+{
+    ProtocolManager::getInstance()->requestStart(this);
+}   // requestStart
+
+// ----------------------------------------------------------------------------
+/** Submits a request to the ProtocolManager to terminate this protocol.
+ */
+void Protocol::requestTerminate()
+{
+    ProtocolManager::getInstance()->requestTerminate(this);
+}   // requestTerminate
+
+// ----------------------------------------------------------------------------
+void Protocol::sendMessageToPeersChangingToken(NetworkString prefix,
+                                               NetworkString message)
 {
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         prefix.ai8(4).ai32(peers[i]->getClientServerToken());
         prefix += message;
-        m_listener->sendMessage(this, peers[i], prefix);
+        ProtocolManager::getInstance()->sendMessage(this, peers[i], prefix);
     }
-}
+}   // sendMessageToPeersChangingToken
+
+// ----------------------------------------------------------------------------
+void Protocol::sendMessage(const NetworkString& message, bool reliable)
+{
+    ProtocolManager::getInstance()->sendMessage(this, message, reliable);
+}   // sendMessage
+
+// ----------------------------------------------------------------------------
+void Protocol::sendMessage(STKPeer* peer, const NetworkString& message,
+                           bool reliable)
+{
+    ProtocolManager::getInstance()->sendMessage(this, peer, message, reliable);
+}   // sendMessage

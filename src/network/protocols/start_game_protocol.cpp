@@ -51,7 +51,7 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
         Log::error("StartGameProtocol", "Bad token received.");
         return true;
     }
-    if (m_listener->isServer() && ready) // on server, player is ready
+    if (ProtocolManager::getInstance()->isServer() && ready) // on server, player is ready
     {
         Log::info("StartGameProtocol", "One of the players is ready.");
         m_player_states[peer->getPlayerProfile()] = READY;
@@ -59,7 +59,10 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
         if (m_ready_count == m_game_setup->getPlayerCount())
         {
             // everybody ready, synchronize
-            SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
+            Protocol *p = ProtocolManager::getInstance()
+                        ->getProtocol(PROTOCOL_SYNCHRONIZATION);
+            SynchronizationProtocol* protocol = 
+                                static_cast<SynchronizationProtocol*>(p);
             if (protocol)
             {
                 protocol->startCountdown(5000); // 5 seconds countdown
@@ -94,7 +97,8 @@ void StartGameProtocol::update()
     if (m_state == NONE)
     {
         // if no synchronization protocol exists, create one
-        m_listener->requestStart(new SynchronizationProtocol());
+        Protocol *p = new SynchronizationProtocol();
+        p->requestStart();
         Log::info("StartGameProtocol", "SynchronizationProtocol started.");
         // race startup sequence
         NetworkWorld::getInstance<NetworkWorld>()->start(); // builds it and starts
@@ -145,9 +149,13 @@ void StartGameProtocol::update()
             rki.setDifficulty(profile->difficulty);
             rki.setGlobalPlayerId(profile->race_id);
             // on the server, the race id must be the local one.
-            rki.setLocalPlayerId(m_listener->isServer()?profile->race_id:(is_me?0:1));
+            rki.setLocalPlayerId(ProtocolManager::getInstance()->isServer() 
+                                 ? profile->race_id
+                                 : (is_me ? 0 : 1)                         );
             rki.setHostId(profile->race_id);
-            Log::info("StartGameProtocol", "Creating kart %s for Player#%d with race_id %d", profile->kart_name.c_str(), i, profile->race_id);
+            Log::info("StartGameProtocol",
+                      "Creating kart %s for Player#%d with race_id %d",
+                      profile->kart_name.c_str(), i, profile->race_id);
 
             if (!is_me)
             {
@@ -167,8 +175,9 @@ void StartGameProtocol::update()
     }
     else if (m_state == SYNCHRONIZATION_WAIT)
     {
-        SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>
-            (m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
+        Protocol *p = ProtocolManager::getInstance()
+                                     ->getProtocol(PROTOCOL_SYNCHRONIZATION);
+        SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(p);
         if (protocol)
         {
             // now the synchronization protocol exists.
@@ -190,19 +199,19 @@ void StartGameProtocol::update()
         // set karts into the network game setup
         NetworkManager::getInstance()->getGameSetup()->bindKartsToProfiles();
         m_state = EXITING;
-        m_listener->requestTerminate(this);
+        requestTerminate();
     }
 }
 
 void StartGameProtocol::ready() // on clients, means the loading is finished
 {
-    if (!m_listener->isServer()) // if we're a client
+    if (!ProtocolManager::getInstance()->isServer()) // if we're a client
     {
         assert(NetworkManager::getInstance()->getPeerCount() == 1);
         NetworkString ns(5);
         ns.ai32(NetworkManager::getInstance()->getPeers()[0]->getClientServerToken()).ai8(1);
         Log::info("StartGameProtocol", "Player ready, notifying server.");
-        m_listener->sendMessage(this, ns, true);
+        sendMessage(ns, true);
         m_state = READY;
         m_ready = true;
         return;

@@ -30,7 +30,9 @@ private:
     TransportAddress m_server_address;
     uint32_t m_server_id;
     uint32_t m_host_id;
-    uint32_t m_current_protocol_id;
+
+    /** Protocol currently being monitored. */
+    Protocol *m_current_protocol;
     bool m_quick_join;
 
     enum State

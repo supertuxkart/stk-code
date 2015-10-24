@@ -92,7 +92,7 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
             powerup = (((int)(kart->getPowerup()->getType()) << 4)&0xf0) + (kart->getPowerup()->getNum()&0x0f);
 
         ns.ai8(0x01).ai32(item->getItemId()).ai8(powerup).ai8(player_profile->race_id); // send item,
-        m_listener->sendMessage(this, peers[i], ns, true); // reliable
+        ProtocolManager::getInstance()->sendMessage(this, peers[i], ns, true); // reliable
         Log::info("GameEventsProtocol", "Notified a peer that a kart collected item %d.", (int)(kart->getPowerup()->getType()));
     }
 }

@@ -23,7 +23,7 @@
 
 #include <string>
 
-class STKHost;
+class Network;
 
 class GetPublicAddress : public Protocol
 {
@@ -54,7 +54,7 @@ class GetPublicAddress : public Protocol
         STATE m_state;
         uint8_t m_stun_tansaction_id[12];
         uint32_t m_stun_server_ip;
-        STKHost* m_transaction_host;
+        Network* m_transaction_host;
 };
 
 #endif // GET_PUBLIC_ADDRESS_HPP

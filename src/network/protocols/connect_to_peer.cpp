@@ -31,18 +31,18 @@
 
 // ----------------------------------------------------------------------------
 
-ConnectToPeer::ConnectToPeer(uint32_t peer_id) :
-    Protocol(NULL, PROTOCOL_CONNECTION)
+ConnectToPeer::ConnectToPeer(uint32_t peer_id) 
+             : Protocol(NULL, PROTOCOL_CONNECTION)
 {
     m_peer_id = peer_id;
     m_state = NONE;
-}
+}   // ConnectToPeer
 
 // ----------------------------------------------------------------------------
 
 ConnectToPeer::~ConnectToPeer()
 {
-}
+}   // ~ConnectToPeer
 
 // ----------------------------------------------------------------------------
 
@@ -54,17 +54,17 @@ bool ConnectToPeer::notifyEventAsynchronous(Event* event)
         m_state = CONNECTED; // we received a message, we are connected
     }
     return true;
-}
+}   // notifyEventAsynchronous
 
 // ----------------------------------------------------------------------------
 
 void ConnectToPeer::setup()
 {
-    m_state                 = NONE;
     m_public_address.clear();
     m_peer_address.clear();
-    m_current_protocol_id   = 0;
-}
+    m_current_protocol = NULL;
+    m_state            = NONE;
+}   // setup
 
 // ----------------------------------------------------------------------------
 
@@ -74,13 +74,14 @@ void ConnectToPeer::asynchronousUpdate()
     {
         case NONE:
         {
-            m_current_protocol_id = m_listener->requestStart(new GetPeerAddress(m_peer_id, &m_peer_address));
+            m_current_protocol = new GetPeerAddress(m_peer_id, &m_peer_address); 
+            ProtocolManager::getInstance()->requestStart(m_current_protocol);
             m_state = WAITING_PEER_ADDRESS;
             break;
         }
         case WAITING_PEER_ADDRESS:
-            if (m_listener->getProtocolState(m_current_protocol_id)
-            == PROTOCOL_STATE_TERMINATED) // we know the peer address
+            // Wait till we know the peer address
+            if (m_current_protocol->getState()== PROTOCOL_STATE_TERMINATED)
             {
                 if (m_peer_address.getIP() != 0 && m_peer_address.getPort() != 0)
                 {
@@ -88,22 +89,22 @@ void ConnectToPeer::asynchronousUpdate()
                     if (m_peer_address.getIP() == NetworkManager::getInstance()->getPublicAddress().getIP())
                     {
                         // just send a broadcast packet with the string aloha_stk inside, the client will know our ip address and will connect
-                        STKHost* host = NetworkManager::getInstance()->getHost();
                         TransportAddress broadcast_address;
                         broadcast_address.setIP(-1); // 255.255.255.255
                         broadcast_address.setPort(m_peer_address.getPort()); // 0b10101100000101101101111111111111; // for test
                         char data[] = "aloha_stk\0";
-                        host->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
+                        STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
                         Log::info("ConnectToPeer", "Broadcast aloha sent.");
                         StkTime::sleep(1);
                         broadcast_address.setIP(0x7f000001); // 127.0.0.1 (localhost)
                         broadcast_address.setPort(m_peer_address.getPort());
-                        host->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
+                        STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
                         Log::info("ConnectToPeer", "Broadcast aloha to self.");
                     }
                     else
                     {
-                        m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_peer_address, 2.0));
+                        m_current_protocol = new PingProtocol(m_peer_address, 2.0);
+                        ProtocolManager::getInstance()->requestStart(m_current_protocol);
                     }
                     m_state = CONNECTING;
                 }
@@ -120,18 +121,22 @@ void ConnectToPeer::asynchronousUpdate()
         {
             // the ping protocol is there for NAT traversal (disabled when connecting to LAN peer)
             if (m_peer_address != NetworkManager::getInstance()->getPublicAddress())
-                m_listener->requestTerminate( m_listener->getProtocol(m_current_protocol_id)); // kill the ping protocol because we're connected
+            {
+                // Kill the ping protocol because we're connected
+                ProtocolManager::getInstance()
+                               ->requestTerminate(m_current_protocol);
+            }
             m_state = DONE;
             break;
         }
         case DONE:
             m_state = EXITING;
-            m_listener->requestTerminate(this);
+            ProtocolManager::getInstance()->requestTerminate(this);
             break;
         case EXITING:
             break;
     }
-}
+}   // asynchronousUpdate
 
 // ----------------------------------------------------------------------------
 

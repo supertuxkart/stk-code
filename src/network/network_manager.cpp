@@ -33,7 +33,6 @@ NetworkManager::NetworkManager()
     m_public_address.lock();
     m_public_address.getData().clear();
     m_public_address.unlock();
-    m_localhost = NULL;
     m_game_setup = NULL;
 }   // NetworkManager
 
@@ -43,8 +42,7 @@ NetworkManager::~NetworkManager()
 {
     ProtocolManager::kill();
 
-    if (m_localhost)
-        delete m_localhost;
+    STKHost::destroy();
     while(!m_peers.empty())
     {
         delete m_peers.back();
@@ -57,8 +55,6 @@ NetworkManager::~NetworkManager()
  */
 void NetworkManager::run()
 {
-    // create the protocol manager
-    ProtocolManager::getInstance<ProtocolManager>();
 }   // run
 
 //-----------------------------------------------------------------------------
@@ -67,9 +63,7 @@ void NetworkManager::run()
  */
 void NetworkManager::reset()
 {
-    if (m_localhost)
-        delete m_localhost;
-    m_localhost = NULL;
+    STKHost::destroy();
     while(!m_peers.empty())
     {
         delete m_peers.back();
@@ -84,7 +78,7 @@ void NetworkManager::reset()
  */
 void NetworkManager::abort()
 {
-    m_localhost->stopListening();
+    STKHost::get()->stopListening();
     // FIXME: Why a reset here? This creates a new stk_host, which will open
     // a new packet_log file (and therefore delete the previous file)???
     // reset();
@@ -101,7 +95,7 @@ bool NetworkManager::connect(const TransportAddress& address)
     if (peerExists(address))
         return isConnectedTo(address);
 
-    return STKPeer::connectToHost(m_localhost, address, 2, 0);
+    return STKPeer::connectToHost(STKHost::get(), address, 2, 0);
 }   // connect
 
 //-----------------------------------------------------------------------------

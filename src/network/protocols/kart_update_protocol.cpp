@@ -77,7 +77,7 @@ void KartUpdateProtocol::update()
     if (current_time > time + 0.1) // 10 updates per second
     {
         time = current_time;
-        if (m_listener->isServer())
+        if (ProtocolManager::getInstance()->isServer())
         {
             NetworkString ns(4+m_karts.size()*32);
             ns.af( World::getWorld()->getTime());
@@ -89,9 +89,11 @@ void KartUpdateProtocol::update()
                 ns.ai32( kart->getWorldKartId());
                 ns.af(v[0]).af(v[1]).af(v[2]); // add position
                 ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
-                Log::verbose("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
+                Log::verbose("KartUpdateProtocol",
+                             "Sending %d's positions %f %f %f",
+                             kart->getWorldKartId(), v[0], v[1], v[2]);
             }
-            m_listener->sendMessage(this, ns, false);
+            sendMessage(ns, false);
         }
         else
         {
@@ -103,8 +105,10 @@ void KartUpdateProtocol::update()
             ns.ai32( kart->getWorldKartId());
             ns.af(v[0]).af(v[1]).af(v[2]); // add position
             ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
-            Log::verbose("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
-            m_listener->sendMessage(this, ns, false);
+            Log::verbose("KartUpdateProtocol",
+                         "Sending %d's positions %f %f %f",
+                         kart->getWorldKartId(), v[0], v[1], v[2]);
+            sendMessage(ns, false);
         }
     }
     switch(pthread_mutex_trylock(&m_positions_updates_mutex))
@@ -113,7 +117,8 @@ void KartUpdateProtocol::update()
             while (!m_next_positions.empty())
             {
                 uint32_t id = m_karts_ids.back();
-                if (id != m_self_kart_index || m_listener->isServer()) // server takes all updates
+                if (id != m_self_kart_index || 
+                    ProtocolManager::getInstance()->isServer()) // server takes all updates
                 {
                     Vec3 pos = m_next_positions.back();
                     btTransform transform = m_karts[id]->getBody()->getInterpolationWorldTransform();

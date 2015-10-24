@@ -22,6 +22,7 @@
 #ifndef STK_HOST_HPP
 #define STK_HOST_HPP
 
+#include "network/network.hpp"
 #include "network/network_string.hpp"
 #include "network/types.hpp"
 #include "utils/synchronised.hpp"
@@ -46,64 +47,125 @@
  */
 class STKHost
 {
+public:
+    /** \brief Defines three host types for the server.
+    *  These values tells the host where he will accept connections from.
+    */
+    enum
+    {
+        HOST_ANY = 0,             //!< Any host.
+        HOST_BROADCAST = 0xFFFFFFFF,    //!< Defines the broadcast address.
+        PORT_ANY = 0              //!< Any port.
+    };
+
+
     friend class STKPeer; // allow direct enet modifications in implementations
 
 private:
+    /** Singleton pointer to the instance. */
+    static STKHost* m_stk_host;
+
+    /** True if this host is a server, false otherwise. */
+    static bool m_is_server;
+
     /** ENet host interfacing sockets. */
-    ENetHost*       m_host;
+    Network* m_network;
 
     /** Id of thread listening to enet events. */
-    pthread_t*      m_listening_thread;
+    pthread_t*  m_listening_thread;
 
     /** Mutex used to stop this thread. */
     pthread_mutex_t m_exit_mutex;
 
-    //** Where to log packets. If NULL for FILE* logging is disabled. */
-    static Synchronised<FILE*> m_log_file;
+    /** Maximum number of players on the server. */
+    static int m_max_players;
 
-   public:
-        /*! \enum HOST_TYPE
-         *  \brief Defines three host types for the server.
-         *  These values tells the host where he will accept connections from.
-         */
-        enum HOST_TYPE
-        {
-            HOST_ANY       = 0,             //!< Any host.
-            HOST_BROADCAST = 0xFFFFFFFF,    //!< Defines the broadcast address.
-            PORT_ANY       = 0              //!< Any port.
-        };
+             STKHost();
+    virtual ~STKHost();
 
-        /*! \brief Constructor                                              */
-        STKHost();
-        /*! \brief Destructor                                               */
-        virtual ~STKHost();
-        
-        static void logPacket(const NetworkString &ns, bool incoming);
-        static void* mainLoop(void* self);
+public:
 
-        void        setupServer(uint32_t address, uint16_t port,
-                                int peer_count, int channel_limit,
-                                uint32_t max_incoming_bandwidth,
-                                uint32_t max_outgoing_bandwidth);
-        void        setupClient(int peer_count, int channel_limit,
-                                uint32_t max_incoming_bandwidth,
-                                uint32_t max_outgoing_bandwidth);
-        void        startListening();
-        void        stopListening();
-        void        sendRawPacket(uint8_t* data, int length,
-                                  const TransportAddress& dst);
-        uint8_t*    receiveRawPacket(TransportAddress* sender);
-        uint8_t*    receiveRawPacket(const TransportAddress& sender, 
-                                     int max_tries = -1);
-        void        broadcastPacket(const NetworkString& data,
-                                    bool reliable = true);
-        bool        peerExists(const TransportAddress& peer_address);
-        bool        isConnectedTo(const TransportAddress& peer_address);
-        int         mustStopListening();
-        uint16_t    getPort() const;
-        // --------------------------------------------------------------------
-        uint32_t    getAddress() const { return m_host->address.host; }
+    /** Creates the singleton. */
+    static void create(bool is_server)
+    {
+        m_is_server = is_server;
+        assert(m_stk_host == NULL);
+        m_stk_host  = new STKHost();
+    }   // create
+    // ------------------------------------------------------------------------
+    /** Returns the instance of STKHost. */
+    static STKHost *get()
+    {
+        assert(m_stk_host != NULL);
+        return m_stk_host;
+    }   // get
+    // ------------------------------------------------------------------------
+    static void destroy()
+    {
+        assert(m_stk_host != NULL);
+        delete m_stk_host;
+        m_stk_host = NULL;
+    }
+    // ------------------------------------------------------------------------
 
-};
+    static void* mainLoop(void* self);
+
+    void        setupServer(uint32_t address, uint16_t port,
+                            int peer_count, int channel_limit,
+                            uint32_t max_incoming_bandwidth,
+                            uint32_t max_outgoing_bandwidth);
+    void        setupClient(int peer_count, int channel_limit,
+                            uint32_t max_incoming_bandwidth,
+                            uint32_t max_outgoing_bandwidth);
+    void        startListening();
+    void        stopListening();
+    uint8_t*    receiveRawPacket(const TransportAddress& sender,
+                                 int max_tries = -1);
+    bool        peerExists(const TransportAddress& peer_address);
+    bool        isConnectedTo(const TransportAddress& peer_address);
+    int         mustStopListening();
+    uint16_t    getPort() const;
+
+    // --------------------------------------------------------------------
+    ENetPeer* connectTo(const TransportAddress &address)
+    {
+        return m_network->connectTo(address);
+    }   // connectTo
+
+    // --------------------------------------------------------------------
+    uint8_t* receiveRawPacket(TransportAddress* sender)
+    {
+        return m_network->receiveRawPacket(sender);
+    }   // receiveRawPacket
+
+    // --------------------------------------------------------------------
+    void broadcastPacket(const NetworkString& data,
+                         bool reliable = true)
+    {
+        m_network->broadcastPacket(data, reliable);
+    }   // broadcastPacket
+
+    // --------------------------------------------------------------------
+    void sendRawPacket(uint8_t* data, int length,
+                       const TransportAddress& dst)
+    {
+        m_network->sendRawPacket(data, length, dst);
+    }  // sendRawPacket
+
+    // --------------------------------------------------------------------
+    /** Returns the IP address of this host. */
+    uint32_t  getAddress() const
+    {
+        return m_network->getENetHost()->address.host;
+    }   // getAddress
+
+    // --------------------------------------------------------------------
+    /** Sets the maximum number of players for this server. */
+    static void setMaxPlayers(int n) { m_max_players = n; }
+    // --------------------------------------------------------------------
+    /** Returns the maximum number of players for this server. */
+    static int getMaxPlayers() { return m_max_players; }
+
+};   // class STKHost
 
 #endif // STK_HOST_HPP

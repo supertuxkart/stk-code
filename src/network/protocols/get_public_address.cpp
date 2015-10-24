@@ -85,8 +85,7 @@ void GetPublicAddress::createStunRequest()
     assert(res != NULL);
     struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
     m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
-    m_transaction_host = new STKHost();
-    m_transaction_host->setupClient(1, 1, 0, 0);
+    m_transaction_host = new Network(1, 1, 0, 0);
 
     // Assemble the message for the stun server
     NetworkString s(21);
@@ -194,7 +193,7 @@ std::string GetPublicAddress::parseStunResponse()
 
     // The address and the port are known, so the connection can be closed
     m_state = EXITING;
-    m_listener->requestTerminate(this);
+    requestTerminate();
 
     return "";
 }   // parseStunResponse

@@ -49,7 +49,7 @@ void StartServer::asynchronousUpdate()
 
         m_request->addParameter("address", addr.getIP());
         m_request->addParameter("port", addr.getPort());
-        m_request->addParameter("private_port", NetworkManager::getInstance()->getHost()->getPort());
+        m_request->addParameter("private_port", STKHost::get()->getPort());
         m_request->addParameter("max_players", UserConfigParams::m_server_max_players);
 
         Log::info("ShowPublicAddress", "Showing addr %s", addr.toString().c_str());
@@ -84,7 +84,7 @@ void StartServer::asynchronousUpdate()
         m_state = EXITING;
         delete m_request;
         m_request = NULL;
-        m_listener->requestTerminate(this);
+        requestTerminate();
     }
 }   // asynchronousUpdate
 

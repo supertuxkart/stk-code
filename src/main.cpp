@@ -179,7 +179,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/client_network_manager.hpp"
-#include "network/server_network_manager.hpp"
+#include "network/server_console.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "online/profile_manager.hpp"
@@ -782,9 +782,16 @@ int handleCmdLine()
     // Networking command lines
     if(CommandLine::has("--server") )
     {
-        NetworkManager::getInstance<ServerNetworkManager>();
-        Log::info("main", "Creating a server network manager.");
-    }   // -server
+        STKHost::create(/*is_Server*/true);
+        Log::info("main", "Creating a server.");
+    }   
+    else
+    {
+        STKHost::create(/*is_server*/false);
+        Log::info("main", "Creating a client.");
+    }
+    NetworkManager::getInstance<ClientNetworkManager>();
+    NetworkManager::getInstance()->run();
 
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
@@ -801,8 +808,8 @@ int handleCmdLine()
     // Race parameters
     if(CommandLine::has("--kartsize-debug"))
     {
-        for(unsigned int i=0;
-            i<kart_properties_manager->getNumberOfKarts(); i++)
+        for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts();
+           i++)
         {
             const KartProperties *km =
                 kart_properties_manager->getKartById(i);
@@ -1343,17 +1350,13 @@ int main(int argc, char *argv[] )
         if(!handleCmdLine()) exit(0);
 
         // load the network manager
-        // If the server has been created (--server option), this will do nothing (just a warning):
-        NetworkManager::getInstance<ClientNetworkManager>();
         if (NetworkManager::getInstance()->isServer())
         {
-            ServerNetworkManager::getInstance()->setMaxPlayers(
-                    UserConfigParams::m_server_max_players);
+            STKHost::setMaxPlayers(UserConfigParams::m_server_max_players);
+            (new ServerLobbyRoomProtocol())->requestStart();
         }
-        NetworkManager::getInstance()->run();
-        if (NetworkManager::getInstance()->isServer())
+        else   // is client
         {
-            ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
         }
 
         addons_manager->checkInstalledAddons();

@@ -50,12 +50,11 @@ STKPeer::~STKPeer()
 //-----------------------------------------------------------------------------
 /** Connect to the specified host.
  */
-bool STKPeer::connectToHost(STKHost* localhost, const TransportAddress &host,
+bool STKPeer::connectToHost(STKHost* localhost, const TransportAddress &address,
                             uint32_t channel_count, uint32_t data)
 {
-    const ENetAddress address = host.toEnetAddress();
+    ENetPeer* peer = localhost->connectTo(address);
 
-    ENetPeer* peer = enet_host_connect(localhost->m_host, &address, 2, 0);
     if (peer == NULL)
     {
         Log::error("STKPeer", "Could not try to connect to server.\n");

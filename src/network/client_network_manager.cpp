@@ -134,9 +134,8 @@ void ClientNetworkManager::run()
         Log::error("ClientNetworkManager", "Could not initialize enet.\n");
         return;
     }
-    m_localhost = new STKHost();
-    m_localhost->setupClient(1, 2, 0, 0);
-    m_localhost->startListening();
+    STKHost::get()->setupClient(1, 2, 0, 0);
+    STKHost::get()->startListening();
 
     Log::info("ClientNetworkManager", "Host initialized.");
 
@@ -170,9 +169,9 @@ void ClientNetworkManager::reset()
     NetworkManager::reset();
 
     m_connected = false;
-    m_localhost = new STKHost();
-    m_localhost->setupClient(1, 2, 0, 0);
-    m_localhost->startListening();
+    STKHost::create(/*is_server*/false);
+    STKHost::get()->setupClient(1, 2, 0, 0);
+    STKHost::get()->startListening();
 
 }
 

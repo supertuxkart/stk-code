@@ -74,6 +74,6 @@ void HidePublicAddress::asynchronousUpdate()
         m_state = EXITING;
         delete m_request;
         m_request = NULL;
-        m_listener->requestTerminate(this);
+        requestTerminate();
     }
 }

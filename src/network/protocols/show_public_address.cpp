@@ -47,7 +47,7 @@ void ShowPublicAddress::asynchronousUpdate()
 
         m_request->addParameter("address", addr.getIP());
         m_request->addParameter("port", addr.getPort());
-        m_request->addParameter("private_port", NetworkManager::getInstance()->getHost()->getPort());
+        m_request->addParameter("private_port", STKHost::get()->getPort());
 
         Log::info("ShowPublicAddress", "Showing addr %s", addr.toString().c_str());
 
@@ -81,6 +81,6 @@ void ShowPublicAddress::asynchronousUpdate()
         m_state = EXITING;
         delete m_request;
         m_request = NULL;
-        m_listener->requestTerminate(this);
+        requestTerminate();
     }
-}
+}   // asynchronousUpdate

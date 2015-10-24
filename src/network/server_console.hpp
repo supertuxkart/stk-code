@@ -16,34 +16,43 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network/protocols/ping_protocol.hpp"
+#ifndef SERVER_CONSOLE_HPP
+#define SERVER_CONSOLE_HPP
 
-#include "network/network_manager.hpp"
-#include "utils/time.hpp"
+#include "utils/types.hpp"
 
-PingProtocol::PingProtocol(const TransportAddress& ping_dst, double delay_between_pings) 
-            : Protocol(NULL, PROTOCOL_SILENT)
+#include "pthread.h"
+
+class NetworkString;
+class STKHost;
+
+class ServerConsole
 {
-    m_ping_dst.copy(ping_dst);
-    m_delay_between_pings = delay_between_pings;
-}
+protected:
 
-PingProtocol::~PingProtocol()
-{
-}
+    STKHost *m_localhost;
 
-void PingProtocol::setup()
-{
-    m_last_ping_time = 0;
-}
+    pthread_t* m_thread_keyboard;
 
-void PingProtocol::asynchronousUpdate()
-{
-    if (StkTime::getRealTime() > m_last_ping_time+m_delay_between_pings)
-    {
-        m_last_ping_time = StkTime::getRealTime();
-        uint8_t data = 0;
-        STKHost::get()->sendRawPacket(&data, 1, m_ping_dst);
-        Log::info("PingProtocol", "Ping message sent");
-    }
-}
+    uint8_t m_max_players;
+
+    static void* mainLoop(void* data);
+
+public:
+             ServerConsole();
+    virtual ~ServerConsole();
+
+    virtual void run();
+
+    void setMaxPlayers(uint8_t count) { m_max_players = count; }
+    uint8_t getMaxPlayers() { return m_max_players; }
+
+    void kickAllPlayers();
+
+    virtual void sendPacket(const NetworkString& data, bool reliable = true);
+
+    virtual bool isServer() { return true; }
+
+};   // class ServerConsole
+
+#endif // SERVER_CONSOLE_HPP

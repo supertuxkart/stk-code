@@ -37,7 +37,7 @@ void ControllerEventsProtocol::setup()
             m_self_controller_index = i;
         }
         STKPeer* peer = NULL;
-        if (m_listener->isServer())
+        if (ProtocolManager::getInstance()->isServer())
         {
             for (unsigned int j = 0; j < peers.size(); j++)
             {
@@ -114,7 +114,7 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         Log::warn("ControllerEventProtocol", "Couldn't have a client id.");
         return true;
     }
-    if (m_listener->isServer())
+    if (ProtocolManager::getInstance()->isServer())
     {
         // notify everybody of the event :
         for (unsigned int i = 0; i < m_controllers.size(); i++)
@@ -124,12 +124,13 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
             NetworkString ns2(4+pure_message.size());
             ns2.ai32(m_controllers[i].second->getClientServerToken());
             ns2 += pure_message;
-            m_listener->sendMessage(this, m_controllers[i].second, ns2, false);
+            ProtocolManager::getInstance()
+                           ->sendMessage(this, m_controllers[i].second, ns2, false);
             //Log::info("ControllerEventsProtocol", "Sizes are %d and %d", ns2.size(), pure_message.size());
         }
     }
     return true;
-}
+}   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
 
@@ -140,9 +141,9 @@ void ControllerEventsProtocol::update()
 //-----------------------------------------------------------------------------
 
 void ControllerEventsProtocol::controllerAction(Controller* controller,
-        PlayerAction action, int value)
+                                                PlayerAction action, int value)
 {
-    assert(!m_listener->isServer());
+    assert(!ProtocolManager::getInstance()->isServer());
 
     KartControl* controls = controller->getControls();
     uint8_t serialized_1 = 0;
@@ -168,7 +169,7 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     ns.ai8((uint8_t)(action)).ai32(value);
 
     Log::info("ControllerEventsProtocol", "Action %d value %d", action, value);
-    m_listener->sendMessage(this, ns, false); // send message to server
+    sendMessage(ns, false); // send message to server
 }
 
 

@@ -51,10 +51,6 @@ protected:
              NetworkManager();
     virtual ~NetworkManager();
 
-    /** Pointer to the one stk host instance, which is used to do all
-     *  network communication. */
-    STKHost* m_localhost;
-
     /** The list of peers connected to this instance. */
     std::vector<STKPeer*> m_peers;
 
@@ -99,18 +95,16 @@ public:
      *  already exists. */
     virtual bool peerExists(const TransportAddress& peer)
     {
-        return m_localhost->peerExists(peer);
+        return STKHost::get()->peerExists(peer);
     }   // peerExists
     // --------------------------------------------------------------------
     virtual bool isConnectedTo(const TransportAddress& peer)
     {
-        return m_localhost->isConnectedTo(peer);
+        return STKHost::get()->isConnectedTo(peer);
     }   // isConnectedTo
 
     // --------------------------------------------------------------------
     inline bool isClient() { return !isServer(); }
-    // --------------------------------------------------------------------
-    STKHost* getHost() { return m_localhost; }
     // --------------------------------------------------------------------
     std::vector<STKPeer*> getPeers() { return m_peers; }
     // --------------------------------------------------------------------

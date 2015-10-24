@@ -38,7 +38,9 @@ class ConnectToPeer : public Protocol, public CallbackObject
         TransportAddress m_peer_address;
         TransportAddress m_public_address;
         uint32_t m_peer_id;
-        uint32_t m_current_protocol_id;
+
+        /** Pointer to the protocol which is monitored for state changes. */
+        Protocol *m_current_protocol;
 
         enum STATE
         {

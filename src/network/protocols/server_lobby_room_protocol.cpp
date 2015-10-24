@@ -22,13 +22,14 @@
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "network/event.hpp"
+#include "network/network_manager.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/show_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/start_server.hpp"
 #include "network/protocols/start_game_protocol.hpp"
-#include "network/server_network_manager.hpp"
+#include "network/server_console.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
 #include "utils/log.hpp"
@@ -106,19 +107,21 @@ void ServerLobbyRoomProtocol::update()
     switch (m_state)
     {
     case NONE:
-        m_current_protocol_id = m_listener->requestStart(new GetPublicAddress());
+        m_current_protocol = new GetPublicAddress();
+        m_current_protocol->requestStart();
         m_state = GETTING_PUBLIC_ADDRESS;
         break;
     case GETTING_PUBLIC_ADDRESS:
-        if (m_listener->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
+        if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
         {
-            m_current_protocol_id = m_listener->requestStart(new StartServer());
+            m_current_protocol = new StartServer();
+            m_current_protocol->requestStart();
             m_state = LAUNCHING_SERVER;
             Log::debug("ServerLobbyRoomProtocol", "Public address known.");
         }
         break;
     case LAUNCHING_SERVER:
-        if (m_listener->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
+        if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
         {
             m_state = WORKING;
             Log::info("ServerLobbyRoomProtocol", "Server setup");
@@ -127,14 +130,17 @@ void ServerLobbyRoomProtocol::update()
     case WORKING:
     {
         checkIncomingConnectionRequests();
-        if (m_in_race && World::getWorld() && NetworkWorld::getInstance<NetworkWorld>()->isRunning())
+        if (m_in_race && World::getWorld() &&
+            NetworkWorld::getInstance<NetworkWorld>()->isRunning())
+        {
             checkRaceFinished();
+        }
 
         break;
     }
     case DONE:
         m_state = EXITING;
-        m_listener->requestTerminate(this);
+        requestTerminate();
         break;
     case EXITING:
         break;
@@ -150,11 +156,12 @@ void ServerLobbyRoomProtocol::startGame()
     {
         NetworkString ns(6);
         ns.ai8(0x04).ai8(4).ai32(peers[i]->getClientServerToken()); // start game
-        m_listener->sendMessage(this, peers[i], ns, true); // reliably
+        sendMessage(peers[i], ns, true); // reliably
     }
-    m_listener->requestStart(new StartGameProtocol(m_setup));
+    Protocol *p = new StartGameProtocol(m_setup);
+    p->requestStart();
     m_in_race = true;
-}
+}   // startGame
 
 //-----------------------------------------------------------------------------
 
@@ -165,10 +172,10 @@ void ServerLobbyRoomProtocol::startSelection()
     {
         NetworkString ns(6);
         ns.ai8(0x05).ai8(4).ai32(peers[i]->getClientServerToken()); // start selection
-        m_listener->sendMessage(this, peers[i], ns, true); // reliably
+        sendMessage(peers[i], ns, true); // reliably
     }
     m_selection_enabled = true;
-}
+}   // startSelection
 
 //-----------------------------------------------------------------------------
 
@@ -220,10 +227,11 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
     // now
     for (unsigned int i = 0; i < m_incoming_peers_ids.size(); i++)
     {
-        m_listener->requestStart(new ConnectToPeer(m_incoming_peers_ids[i]));
+        Protocol *p = new ConnectToPeer(m_incoming_peers_ids[i]);
+        p->requestStart();
     }
     m_incoming_peers_ids.clear();
-}
+}   // checkIncomingConnectionRequests
 
 //-----------------------------------------------------------------------------
 
@@ -265,28 +273,28 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
             NetworkString ns(6);
             ns.ai8(0x06).ai8(4).ai32(peers[i]->getClientServerToken());
             NetworkString total = ns + queue;
-            m_listener->sendMessage(this, peers[i], total, true);
+            sendMessage(peers[i], total, true);
         }
         Log::info("ServerLobbyRoomProtocol", "End of game message sent");
         m_in_race = false;
 
         // stop race protocols
         Protocol* protocol = NULL;
-        protocol = m_listener->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
+        protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
         if (protocol)
-            m_listener->requestTerminate(protocol);
+            protocol->requestTerminate();
         else
             Log::error("ClientLobbyRoomProtocol", "No controller events protocol registered.");
 
-        protocol = m_listener->getProtocol(PROTOCOL_KART_UPDATE);
+        protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_KART_UPDATE);
         if (protocol)
-            m_listener->requestTerminate(protocol);
+            protocol->requestTerminate();
         else
             Log::error("ClientLobbyRoomProtocol", "No kart update protocol registered.");
 
-        protocol = m_listener->getProtocol(PROTOCOL_GAME_EVENTS);
+        protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS);
         if (protocol)
-            m_listener->requestTerminate(protocol);
+            protocol->requestTerminate();
         else
             Log::error("ClientLobbyRoomProtocol", "No game events protocol registered.");
 
@@ -300,7 +308,7 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
     {
         //Log::info("ServerLobbyRoomProtocol", "Phase is %d", World::getWorld()->getPhase());
     }
-}
+}   // checkRaceFinished
 
 //-----------------------------------------------------------------------------
 
@@ -311,7 +319,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
     {
         NetworkString msg(3);
         msg.ai8(0x02).ai8(1).ai8(peer->getPlayerProfile()->race_id);
-        m_listener->sendMessage(this, msg);
+        sendMessage(msg);
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                   peer->getPlayerProfile()->race_id);
         m_setup->removePlayer(peer->getPlayerProfile()->race_id);
@@ -345,8 +353,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     uint32_t player_id = 0;
     player_id = data.getUInt32(1);
     // can we add the player ?
-    if (m_setup->getPlayerCount() <
-        ServerNetworkManager::getInstance()->getMaxPlayers()) //accept
+    if (m_setup->getPlayerCount() < STKHost::getMaxPlayers()) //accept
     {
         // add the player to the game setup
         m_next_id = m_setup->getPlayerCount();
@@ -354,7 +361,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         NetworkString message(8);
         // new player (1) -- size of id -- id -- size of local id -- local id;
         message.ai8(1).ai8(4).ai32(player_id).ai8(1).ai8(m_next_id);
-        m_listener->sendMessageExcept(this, peer, message);
+        ProtocolManager::getInstance()->sendMessageExcept(this, peer, message);
 
         /// now answer to the peer that just connected
         RandomGenerator token_generator;
@@ -377,7 +384,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
             if (players[i]->race_id != m_next_id && players[i]->user_profile->getID() != player_id)
                 message_ack.ai8(1).ai8(players[i]->race_id).ai8(4).ai32(players[i]->user_profile->getID());
         }
-        m_listener->sendMessage(this, peer, message_ack);
+        sendMessage(peer, message_ack);
 
         peer->setClientServerToken(token);
 
@@ -396,7 +403,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         message.ai8(1);               // 1 bytes for the error code
         message.ai8(0);               // 0 = too much players
         // send only to the peer that made the request
-        m_listener->sendMessage(this, peer, message);
+        sendMessage(peer, message);
         Log::verbose("ServerLobbyRoomProtocol", "Player refused");
     }
 }
@@ -433,7 +440,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     {
         NetworkString answer(3);
         answer.ai8(0x82).ai8(1).ai8(2); // selection still not started
-        m_listener->sendMessage(this, peer, answer);
+        sendMessage(peer, answer);
         return;
     }
     // check if somebody picked that kart
@@ -441,7 +448,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     {
         NetworkString answer(3);
         answer.ai8(0x82).ai8(1).ai8(0); // kart is already taken
-        m_listener->sendMessage(this, peer, answer);
+        sendMessage(peer, answer);
         return;
     }
     // check if this kart is authorized
@@ -449,7 +456,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     {
         NetworkString answer(3);
         answer.ai8(0x82).ai8(1).ai8(1); // kart is not authorized
-        m_listener->sendMessage(this, peer, answer);
+        sendMessage(peer, answer);
         return;
     }
     // send a kart update to everyone
@@ -458,7 +465,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     answer.ai8(0x03).ai8(1).ai8(peer->getPlayerProfile()->race_id);
     //  kart name size, kart name
     answer.add(kart_name);
-    m_listener->sendMessage(this, answer);
+    sendMessage(answer);
     m_setup->setPlayerKart(peer->getPlayerProfile()->race_id, kart_name);
 }
 

@@ -16,27 +16,67 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network/server_network_manager.hpp"
+#include "network/server_console.hpp"
 
 #include "main_loop.hpp"
-#include "network/protocols/connect_to_server.hpp"
-#include "network/protocols/get_peer_address.hpp"
-#include "network/protocols/get_public_address.hpp"
-#include "network/protocols/hide_public_address.hpp"
+#include "network/network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/stk_host.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
-#include "network/protocols/show_public_address.hpp"
 #include "network/protocols/stop_server.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
+#include <iostream>
+
+#ifdef XX
+#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/get_peer_address.hpp"
+#include "network/protocols/get_public_address.hpp"
+#include "network/protocols/hide_public_address.hpp"
+#include "network/protocols/show_public_address.hpp"
+
 #include <enet/enet.h>
 #include <pthread.h>
-#include <iostream>
 #include <string>
 #include <stdlib.h>
+#endif
 
-void* waitInput2(void* data)
+ServerConsole::ServerConsole()
 {
+    m_localhost = NULL;
+    m_thread_keyboard = NULL;
+}
+
+// ----------------------------------------------------------------------------
+ServerConsole::~ServerConsole()
+{
+    if (m_thread_keyboard)
+        pthread_cancel(*m_thread_keyboard);//, SIGKILL);
+}
+
+// ----------------------------------------------------------------------------
+void ServerConsole::run()
+{
+    if (enet_initialize() != 0)
+    {
+        Log::error("ServerConsole", "Could not initialize enet.");
+        return;
+    }
+
+    Log::info("ServerConsole", "Host initialized.");
+
+    // listen keyboard console input
+    m_thread_keyboard = new pthread_t;
+    pthread_create(m_thread_keyboard, NULL, mainLoop, this);
+
+    Log::info("ServerConsole", "Ready.");
+}   // run
+
+// ----------------------------------------------------------------------------
+void* ServerConsole::mainLoop(void* data)
+{
+    ServerConsole *me = static_cast<ServerConsole*>(data);
     std::string str = "";
     bool stop = false;
     while(!stop)
@@ -48,7 +88,7 @@ void* waitInput2(void* data)
         }
         else if (str == "kickall")
         {
-            ServerNetworkManager::getInstance()->kickAllPlayers();
+            me->kickAllPlayers();
         }
         else if (str == "start")
         {
@@ -83,50 +123,20 @@ void* waitInput2(void* data)
     main_loop->abort();
 
     return NULL;
-}
+}   // mainLoop
 
-ServerNetworkManager::ServerNetworkManager()
+// ----------------------------------------------------------------------------
+void ServerConsole::kickAllPlayers()
 {
-    m_localhost = NULL;
-    m_thread_keyboard = NULL;
-}
-
-ServerNetworkManager::~ServerNetworkManager()
-{
-    if (m_thread_keyboard)
-        pthread_cancel(*m_thread_keyboard);//, SIGKILL);
-}
-
-void ServerNetworkManager::run()
-{
-    if (enet_initialize() != 0)
+    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    for (unsigned int i = 0; i < peers.size(); i++)
     {
-        Log::error("ServerNetworkManager", "Could not initialize enet.");
-        return;
+        peers[i]->disconnect();
     }
-    m_localhost = new STKHost();
-    m_localhost->setupServer(STKHost::HOST_ANY, 7321, 16, 2, 0, 0);
-    m_localhost->startListening();
+}   // kickAllPlayers
 
-    Log::info("ServerNetworkManager", "Host initialized.");
-
-    // listen keyboard console input
-    m_thread_keyboard = new pthread_t;
-    pthread_create(m_thread_keyboard, NULL, waitInput2, NULL);
-
-    NetworkManager::run();
-    Log::info("ServerNetworkManager", "Ready.");
-}
-
-void ServerNetworkManager::kickAllPlayers()
-{
-    for (unsigned int i = 0; i < m_peers.size(); i++)
-    {
-        m_peers[i]->disconnect();
-    }
-}
-
-void ServerNetworkManager::sendPacket(const NetworkString& data, bool reliable)
+// ----------------------------------------------------------------------------
+void ServerConsole::sendPacket(const NetworkString& data, bool reliable)
 {
     m_localhost->broadcastPacket(data, reliable);
-}
+}   // sendPacket

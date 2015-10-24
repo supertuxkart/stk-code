@@ -58,7 +58,7 @@ void ClientLobbyRoomProtocol::requestKartSelection(std::string kart_name)
     NetworkString request(6+1+kart_name.size());
     // 0x02 : kart selection request, size_token (4), token, size kart name, kart name
     request.ai8(0x02).ai8(4).ai32(m_server->getClientServerToken()).add(kart_name);
-    m_listener->sendMessage(this, request, true);
+    sendMessage(request, true);
 }   // requestKartSelection
 
 //-----------------------------------------------------------------------------
@@ -68,7 +68,7 @@ void ClientLobbyRoomProtocol::voteMajor(uint8_t major)
     NetworkString request(8);
     // 0xc0 : major vote, size_token (4), token, size major(1),major
     request.ai8(0xc0).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(major);
-    m_listener->sendMessage(this, request, true);
+    sendMessage(request, true);
 }   // voteMajor
 
 //-----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
     NetworkString request(8);
     // 0xc0 : race count vote, size_token (4), token, size race count(1), count
     request.ai8(0xc1).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(count);
-    m_listener->sendMessage(this, request, true);
+    sendMessage(request, true);
 }   // voteRaceCount
 
 //-----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ void ClientLobbyRoomProtocol::voteMinor(uint8_t minor)
     NetworkString request(8);
     // 0xc0 : minor vote, size_token (4), token, size minor(1),minor
     request.ai8(0xc2).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(minor);
-    m_listener->sendMessage(this, request, true);
+    sendMessage(request, true);
 }   // voteMinor
 
 //-----------------------------------------------------------------------------
@@ -98,7 +98,7 @@ void ClientLobbyRoomProtocol::voteTrack(std::string track, uint8_t track_nb)
     NetworkString request(8+1+track.size());
     // 0xc0 : major vote, size_token (4), token, size track, track, size #track, #track
     request.ai8(0xc3).ai8(4).ai32(m_server->getClientServerToken()).add(track).ai8(1).ai8(track_nb);
-    m_listener->sendMessage(this, request, true);
+    sendMessage(request, true);
 }   // voteTrack
 
 //-----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
     NetworkString request(9);
     // 0xc0 : major vote, size_token (4), token, size reversed(1),reversed, size #track, #track
     request.ai8(0xc4).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(reversed).ai8(1).ai8(track_nb);
-    m_listener->sendMessage(this, request, true);
+    sendMessage(request, true);
 }   // voteReversed
 
 //-----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
     NetworkString request(10);
     // 0xc0 : major vote, size_token (4), token, size laps(1),laps, size #track, #track
     request.ai8(0xc5).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(laps).ai8(1).ai8(track_nb);
-    m_listener->sendMessage(this, request, true);
+    sendMessage(request, true);
 }   // voteLaps
 
 //-----------------------------------------------------------------------------
@@ -209,7 +209,7 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         NetworkManager::getInstance()->removePeer(m_server);
         m_server = NULL;
         NetworkManager::getInstance()->disconnected();
-        m_listener->requestTerminate(this);
+        ProtocolManager::getInstance()->requestTerminate(this);
         NetworkManager::getInstance()->reset();
         // probably the same as m_server
         NetworkManager::getInstance()->removePeer(event->getPeer());
@@ -235,7 +235,7 @@ void ClientLobbyRoomProtocol::update()
         NetworkString ns(6);
         // 1 (connection request), 4 (size of id), global id
         ns.ai8(1).ai8(4).ai32(PlayerManager::getCurrentOnlineId());
-        m_listener->sendMessage(this, ns);
+        sendMessage(ns);
         m_state = REQUESTING_CONNECTION;
     }
     break;
@@ -265,7 +265,7 @@ void ClientLobbyRoomProtocol::update()
         break;
     case DONE:
         m_state = EXITING;
-        m_listener->requestTerminate(this);
+        ProtocolManager::getInstance()->requestTerminate(this);
         break;
     case EXITING:
         break;
@@ -546,7 +546,7 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
     if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
     {
         m_state = PLAYING;
-        m_listener->requestStart(new StartGameProtocol(m_setup));
+        ProtocolManager::getInstance()->requestStart(new StartGameProtocol(m_setup));
         Log::error("ClientLobbyRoomProtocol", "Starting new game");
     }
     else
@@ -616,21 +616,21 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
 
     // stop race protocols
     Protocol* protocol = NULL;
-    protocol = m_listener->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
+    protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
     if (protocol)
-        m_listener->requestTerminate(protocol);
+        ProtocolManager::getInstance()->requestTerminate(protocol);
     else
         Log::error("ClientLobbyRoomProtocol", "No controller events protocol registered.");
 
-    protocol = m_listener->getProtocol(PROTOCOL_KART_UPDATE);
+    protocol = ProtocolManager::getInstance() ->getProtocol(PROTOCOL_KART_UPDATE);
     if (protocol)
-        m_listener->requestTerminate(protocol);
+        ProtocolManager::getInstance()->requestTerminate(protocol);
     else
         Log::error("ClientLobbyRoomProtocol", "No kart update protocol registered.");
 
-    protocol = m_listener->getProtocol(PROTOCOL_GAME_EVENTS);
+    protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS);
     if (protocol)
-        m_listener->requestTerminate(protocol);
+        ProtocolManager::getInstance()->requestTerminate(protocol);
     else
         Log::error("ClientLobbyRoomProtocol", "No game events protocol registered.");
 

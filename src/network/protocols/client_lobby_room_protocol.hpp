@@ -19,7 +19,6 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         void voteTrack(std::string track, uint8_t track_nb = 0);
         void voteReversed(bool reversed, uint8_t track_nb = 0);
         void voteLaps(uint8_t laps, uint8_t track_nb = 0);
-        void sendMessage(std::string message);
         void leave();
 
         virtual bool notifyEvent(Event* event);
