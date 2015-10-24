@@ -46,7 +46,7 @@ ClientLobbyRoomProtocol::~ClientLobbyRoomProtocol()
 
 void ClientLobbyRoomProtocol::setup()
 {
-    m_setup = NetworkManager::getInstance()->setupNewGame(); // create a new setup
+    m_setup = STKHost::get()->setupNewGame(); // create a new setup
     m_setup->getRaceConfig()->setPlayerCount(16); //FIXME : this has to be changed when logging into the server
     m_state = NONE;
 }   // setup

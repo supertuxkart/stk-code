@@ -30,7 +30,6 @@
 
 NetworkManager::NetworkManager()
 {
-    m_game_setup = NULL;
 }   // NetworkManager
 
 //-----------------------------------------------------------------------------
@@ -156,27 +155,12 @@ void NetworkManager::sendPacketExcept(STKPeer* peer, const NetworkString& data,
     }
 }   // sendPacketExcept
 
-//-----------------------------------------------------------------------------
-/** A previous GameSetup is deletea and a new one is created.
- *  \return Newly create GameSetup object.
- */
-GameSetup* NetworkManager::setupNewGame()
-{
-    if (m_game_setup)
-        delete m_game_setup;
-    m_game_setup = new GameSetup();
-    return m_game_setup;
-}   // setupNewGame
 
 //-----------------------------------------------------------------------------
 /** Called when you leave a server.
  */
 void NetworkManager::disconnected()
 {
-    // delete the game setup
-    if (m_game_setup)
-        delete m_game_setup;
-    m_game_setup = NULL;
 
     // remove all peers
     for (unsigned int i = 0; i < m_peers.size(); i++)

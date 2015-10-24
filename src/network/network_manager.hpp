@@ -55,7 +55,6 @@ protected:
     std::vector<STKPeer*> m_peers;
 
 private:
-    GameSetup* m_game_setup;
 
     PlayerLogin m_player_login;
 
@@ -77,7 +76,6 @@ public:
                                   bool reliable = true);
 
     // Game related functions
-    virtual GameSetup* setupNewGame();
     virtual void disconnected();
     virtual bool isServer() = 0;
 
@@ -105,9 +103,6 @@ public:
     // --------------------------------------------------------------------
     unsigned int getPeerCount() { return (int)m_peers.size(); }
 
-    // --------------------------------------------------------------------
-    /** Returns the current game setup. */
-    GameSetup* getGameSetup() { return m_game_setup; }
 
 };   // class NetworkManager
 

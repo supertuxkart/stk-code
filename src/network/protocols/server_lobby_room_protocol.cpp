@@ -51,7 +51,7 @@ ServerLobbyRoomProtocol::~ServerLobbyRoomProtocol()
 
 void ServerLobbyRoomProtocol::setup()
 {
-    m_setup = NetworkManager::getInstance()->setupNewGame(); // create a new setup
+    m_setup = STKHost::get()->setupNewGame(); // create a new setup
     m_setup->getRaceConfig()->setPlayerCount(16); //FIXME : this has to be moved to when logging into the server
     m_next_id = 0;
     m_state = NONE;

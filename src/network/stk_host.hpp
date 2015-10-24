@@ -35,6 +35,8 @@
 
 #include <pthread.h>
 
+class GameSetup;
+
 /*! \class STKHost
  *  \brief Represents the local host.
  *  This host is either a server host or a client host. A client host is in
@@ -75,6 +77,8 @@ private:
      *  be updated from a separate thread. */
     Synchronised<TransportAddress> m_public_address;
 
+    GameSetup* m_game_setup;
+
     /** Id of thread listening to enet events. */
     pthread_t*  m_listening_thread;
 
@@ -114,6 +118,7 @@ public:
 
     static void* mainLoop(void* self);
 
+    virtual GameSetup* setupNewGame();
     void setPublicAddress(const TransportAddress& addr);
 
     void        setupServer(uint32_t address, uint16_t port,
@@ -138,6 +143,9 @@ public:
         return m_network->connectTo(address);
     }   // connectTo
 
+    // --------------------------------------------------------------------
+    /** Returns the current game setup. */
+    GameSetup* getGameSetup() { return m_game_setup; }
     // --------------------------------------------------------------------
     uint8_t* receiveRawPacket(TransportAddress* sender)
     {

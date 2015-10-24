@@ -51,7 +51,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             uint8_t kart_race_id = data.gui8(5);
             // now set the kart powerup
             AbstractKart* kart = World::getWorld()->getKart(
-                NetworkManager::getInstance()->getGameSetup()->getProfile(kart_race_id)->world_kart_id);
+                STKHost::get()->getGameSetup()->getProfile(kart_race_id)->world_kart_id);
             ItemManager::get()->collectedItem(
                 ItemManager::get()->getItem(item_id),
                 kart,
@@ -75,7 +75,7 @@ void GameEventsProtocol::update()
 
 void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
 {
-    GameSetup* setup = NetworkManager::getInstance()->getGameSetup();
+    GameSetup* setup = STKHost::get()->getGameSetup();
     assert(setup);
     const NetworkPlayerProfile* player_profile = setup->getProfile(kart->getIdent()); // use kart name
 

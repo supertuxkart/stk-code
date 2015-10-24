@@ -51,6 +51,7 @@ STKHost::STKHost()
 {
     m_network          = NULL;
     m_listening_thread = NULL;
+    m_game_setup       = NULL;
 
     m_public_address.lock();
     m_public_address.getData().clear();
@@ -77,6 +78,11 @@ STKHost::STKHost()
  */
 STKHost::~STKHost()
 {
+    // delete the game setup
+    if (m_game_setup)
+        delete m_game_setup;
+    m_game_setup = NULL;
+
     Network::closeLog();
     stopListening();
     delete m_network;
@@ -89,6 +95,18 @@ void STKHost::setPublicAddress(const TransportAddress& addr)
     m_public_address.getData().copy(addr);
     m_public_address.unlock();
 }   // setPublicAddress
+
+//-----------------------------------------------------------------------------
+/** A previous GameSetup is deletea and a new one is created.
+ *  \return Newly create GameSetup object.
+ */
+GameSetup* STKHost::setupNewGame()
+{
+    if (m_game_setup)
+        delete m_game_setup;
+    m_game_setup = new GameSetup();
+    return m_game_setup;
+}   // setupNewGame
 
 // ----------------------------------------------------------------------------
 /** \brief Starts the listening of events from ENet.

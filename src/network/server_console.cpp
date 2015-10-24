@@ -104,12 +104,12 @@ void* ServerConsole::mainLoop(void* data)
         }
         else if (str == "compute_race")
         {
-            GameSetup* setup = NetworkManager::getInstance()->getGameSetup();
+            GameSetup* setup = STKHost::get()->getGameSetup();
             setup->getRaceConfig()->computeRaceMode();
         }
         else if (str == "compute_track")
         {
-            GameSetup* setup = NetworkManager::getInstance()->getGameSetup();
+            GameSetup* setup = STKHost::get()->getGameSetup();
             setup->getRaceConfig()->computeNextTrack();
         }
     }

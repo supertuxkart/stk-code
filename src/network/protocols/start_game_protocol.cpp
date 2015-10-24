@@ -197,7 +197,7 @@ void StartGameProtocol::update()
     else if (m_state == READY)
     {
         // set karts into the network game setup
-        NetworkManager::getInstance()->getGameSetup()->bindKartsToProfiles();
+        STKHost::get()->getGameSetup()->bindKartsToProfiles();
         m_state = EXITING;
         requestTerminate();
     }

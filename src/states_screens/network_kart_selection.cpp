@@ -64,7 +64,7 @@ void NetworkKartSelectionScreen::init()
     m_multiplayer = false;
 
     // add a widget for each player except self (already exists):
-    GameSetup* setup = NetworkManager::getInstance()->getGameSetup();
+    GameSetup* setup = STKHost::get()->getGameSetup();
     if (!setup)
     {
         Log::error("NetworkKartSelectionScreen", "No network game setup registered.");
