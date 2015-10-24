@@ -73,7 +73,7 @@ public:
     ~TransportAddress() {}
     // ------------------------------------------------------------------------
 private:
-    friend class NetworkManager;
+    friend class STKHost;
     /** The copy constructor is private, so that the friend class
      *  NetworkManager can access it to create a copy, but no other
      *  class can. */

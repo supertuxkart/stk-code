@@ -66,8 +66,8 @@ void GetPeerAddress::asynchronousUpdate()
                 addr->setIP(ip);
 
                 uint16_t port;
-                if (addr->getIP() == 
-                    NetworkManager::getInstance()->getPublicAddress().getIP())
+                if (addr->getIP() ==
+                    STKHost::get()->getPublicAddress().getIP())
                     result->get("private_port", &port);
                 else
                     result->get("port", &port);

@@ -57,10 +57,6 @@ protected:
 private:
     GameSetup* m_game_setup;
 
-    /** This computer's public IP address. With lock since it can
-     *  be updated from a separate thread. */
-    Synchronised<TransportAddress> m_public_address;
-
     PlayerLogin m_player_login;
 
 
@@ -86,7 +82,6 @@ public:
     virtual bool isServer() = 0;
 
     // raw data management
-    void setPublicAddress(const TransportAddress& addr);
     void removePeer(STKPeer* peer);
 
     // getters
@@ -109,18 +104,6 @@ public:
     std::vector<STKPeer*> getPeers() { return m_peers; }
     // --------------------------------------------------------------------
     unsigned int getPeerCount() { return (int)m_peers.size(); }
-    // --------------------------------------------------------------------
-    /** Returns the public IP address (thread safe). The network manager
-     *  is a friend of TransportAddress and so has access to the copy
-     *  constructor, which is otherwise declared private. */
-    const TransportAddress getPublicAddress()
-    {
-        m_public_address.lock();
-        TransportAddress a;
-        a.copy(m_public_address.getData());
-        m_public_address.unlock();
-        return a;
-    } // getPublicAddress
 
     // --------------------------------------------------------------------
     /** Returns the current game setup. */

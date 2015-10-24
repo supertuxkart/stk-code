@@ -180,7 +180,7 @@ std::string GetPublicAddress::parseStunResponse()
             Log::debug("GetPublicAddress", 
                        "The public address has been found: %s",
                         address.toString().c_str());
-            NetworkManager::getInstance()->setPublicAddress(address);
+            STKHost::get()->setPublicAddress(address);
             break;
         }   // type = 0 or 1
         pos +=  4 + size;

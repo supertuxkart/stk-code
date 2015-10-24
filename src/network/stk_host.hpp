@@ -71,6 +71,10 @@ private:
     /** ENet host interfacing sockets. */
     Network* m_network;
 
+    /** This computer's public IP address. With lock since it can
+     *  be updated from a separate thread. */
+    Synchronised<TransportAddress> m_public_address;
+
     /** Id of thread listening to enet events. */
     pthread_t*  m_listening_thread;
 
@@ -109,6 +113,8 @@ public:
     // ------------------------------------------------------------------------
 
     static void* mainLoop(void* self);
+
+    void setPublicAddress(const TransportAddress& addr);
 
     void        setupServer(uint32_t address, uint16_t port,
                             int peer_count, int channel_limit,
@@ -160,8 +166,22 @@ public:
     }   // getAddress
 
     // --------------------------------------------------------------------
+    /** Returns the public IP address (thread safe). The network manager
+     *  is a friend of TransportAddress and so has access to the copy
+     *  constructor, which is otherwise declared private. */
+    const TransportAddress getPublicAddress()
+    {
+        m_public_address.lock();
+        TransportAddress a;
+        a.copy(m_public_address.getData());
+        m_public_address.unlock();
+        return a;
+    }   // getPublicAddress
+
+    // --------------------------------------------------------------------
     /** Sets the maximum number of players for this server. */
     static void setMaxPlayers(int n) { m_max_players = n; }
+
     // --------------------------------------------------------------------
     /** Returns the maximum number of players for this server. */
     static int getMaxPlayers() { return m_max_players; }

@@ -30,9 +30,6 @@
 
 NetworkManager::NetworkManager()
 {
-    m_public_address.lock();
-    m_public_address.getData().clear();
-    m_public_address.unlock();
     m_game_setup = NULL;
 }   // NetworkManager
 
@@ -189,14 +186,6 @@ void NetworkManager::disconnected()
     }
     m_peers.clear();
 }   // disconnected
-
-//-----------------------------------------------------------------------------
-void NetworkManager::setPublicAddress(const TransportAddress& addr)
-{
-    m_public_address.lock();
-    m_public_address.getData().copy(addr);
-    m_public_address.unlock();
-}   // setPublicAddress
 
 //-----------------------------------------------------------------------------
 

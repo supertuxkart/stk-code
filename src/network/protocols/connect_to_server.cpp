@@ -100,7 +100,7 @@ void ConnectToServer::asynchronousUpdate()
         {
             Log::info("ConnectToServer", "Protocol starting");
             m_current_protocol = new GetPublicAddress();
-            ProtocolManager::getInstance()->requestStart(m_current_protocol);
+            m_current_protocol->requestStart();
             m_state = GETTING_SELF_ADDRESS;
             break;
         }
@@ -110,7 +110,7 @@ void ConnectToServer::asynchronousUpdate()
             {
                 m_state = SHOWING_SELF_ADDRESS;
                 m_current_protocol = new ShowPublicAddress();
-                ProtocolManager::getInstance()->requestStart(m_current_protocol);
+                m_current_protocol->requestStart();
                 Log::info("ConnectToServer", "Public address known");
             }
             break;
@@ -123,14 +123,14 @@ void ConnectToServer::asynchronousUpdate()
                 {
                     m_current_protocol = new QuickJoinProtocol(&m_server_address,
                                                                &m_server_id);
-                    ProtocolManager::getInstance()->requestStart(m_current_protocol);
+                    m_current_protocol->requestStart();
                     m_state = REQUESTING_CONNECTION;
                 }
                 else
                 {
                     m_current_protocol = new GetPeerAddress(m_host_id,
                                                             &m_server_address);
-                    ProtocolManager::getInstance()->requestStart(m_current_protocol);
+                    m_current_protocol->requestStart();
                     m_state = GETTING_SERVER_ADDRESS;
                 }
             }
@@ -142,14 +142,14 @@ void ConnectToServer::asynchronousUpdate()
                 Log::info("ConnectToServer", "Server's address known");
                 // we're in the same lan (same public ip address) !!
                 if (m_server_address.getIP() ==
-                    NetworkManager::getInstance()->getPublicAddress().getIP())
+                    STKHost::get()->getPublicAddress().getIP())
                 {
                     Log::info("ConnectToServer",
                               "Server appears to be in the same LAN.");
                 }
                 m_state = REQUESTING_CONNECTION;
                 m_current_protocol = new RequestConnection(m_server_id);
-                ProtocolManager::getInstance()->requestStart(m_current_protocol);
+                m_current_protocol->requestStart();
             }
             break;
         case REQUESTING_CONNECTION:
@@ -165,11 +165,11 @@ void ConnectToServer::asynchronousUpdate()
                     Log::error("ConnectToServer", "Server address is %s",
                                m_server_address.toString().c_str());
                     m_current_protocol = new HidePublicAddress();
-                    ProtocolManager::getInstance()->requestStart(m_current_protocol);
+                    m_current_protocol->requestStart();
                     return;
                 }
-                if (m_server_address.getIP() == NetworkManager::getInstance()
-                                                ->getPublicAddress().getIP())
+                if (m_server_address.getIP() 
+                      == STKHost::get()->getPublicAddress().getIP())
                 {
                     // we're in the same lan (same public ip address) !!
                     handleSameLAN();
@@ -178,7 +178,7 @@ void ConnectToServer::asynchronousUpdate()
                 {
                     m_state = CONNECTING;
                     m_current_protocol = new PingProtocol(m_server_address, 2.0);
-                    ProtocolManager::getInstance()->requestStart(m_current_protocol);
+                    m_current_protocol->requestStart();
                 }
             }
             break;
@@ -198,9 +198,10 @@ void ConnectToServer::asynchronousUpdate()
         {
             Log::info("ConnectToServer", "Connected");
             // Kill the ping protocol because we're connected
-            ProtocolManager::getInstance()->requestTerminate(m_current_protocol);
+            m_current_protocol->requestTerminate();
+
             m_current_protocol = new HidePublicAddress();
-            ProtocolManager::getInstance()->requestStart(m_current_protocol);
+            m_current_protocol->requestStart();
             ClientNetworkManager::getInstance()->setConnected(true);
             m_state = HIDING_ADDRESS;
             break;
@@ -214,13 +215,13 @@ void ConnectToServer::asynchronousUpdate()
                 // lobby room protocol if we're connected only
                 if (ClientNetworkManager::getInstance()->isConnected())
                 {
-                    ProtocolManager::getInstance()->requestStart(
-                                new ClientLobbyRoomProtocol(m_server_address));
+                    Protocol *p = new ClientLobbyRoomProtocol(m_server_address);
+                    p->requestStart();
                 }
             }
             break;
         case DONE:
-            ProtocolManager::getInstance()->requestTerminate(this);
+            requestTerminate();
             m_state = EXITING;
             break;
         case EXITING:

@@ -51,6 +51,11 @@ STKHost::STKHost()
 {
     m_network          = NULL;
     m_listening_thread = NULL;
+
+    m_public_address.lock();
+    m_public_address.getData().clear();
+    m_public_address.unlock();
+
     pthread_mutex_init(&m_exit_mutex, NULL);
 
     Network::openLog();
@@ -76,6 +81,14 @@ STKHost::~STKHost()
     stopListening();
     delete m_network;
 }   // ~STKHost
+
+//-----------------------------------------------------------------------------
+void STKHost::setPublicAddress(const TransportAddress& addr)
+{
+    m_public_address.lock();
+    m_public_address.getData().copy(addr);
+    m_public_address.unlock();
+}   // setPublicAddress
 
 // ----------------------------------------------------------------------------
 /** \brief Starts the listening of events from ENet.

@@ -41,7 +41,7 @@ void ShowPublicAddress::asynchronousUpdate()
 {
     if (m_state == NONE)
     {
-        const TransportAddress& addr = NetworkManager::getInstance()->getPublicAddress();
+        const TransportAddress& addr = STKHost::get()->getPublicAddress();
         m_request = new Online::XMLRequest();
         PlayerManager::setUserDetails(m_request, "set", Online::API::SERVER_PATH);
 

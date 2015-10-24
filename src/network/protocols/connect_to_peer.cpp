@@ -86,7 +86,7 @@ void ConnectToPeer::asynchronousUpdate()
                 if (m_peer_address.getIP() != 0 && m_peer_address.getPort() != 0)
                 {
                     // we're in the same lan (same public ip address) !!
-                    if (m_peer_address.getIP() == NetworkManager::getInstance()->getPublicAddress().getIP())
+                    if (m_peer_address.getIP() == STKHost::get()->getPublicAddress().getIP())
                     {
                         // just send a broadcast packet with the string aloha_stk inside, the client will know our ip address and will connect
                         TransportAddress broadcast_address;
@@ -120,7 +120,7 @@ void ConnectToPeer::asynchronousUpdate()
         case CONNECTED:
         {
             // the ping protocol is there for NAT traversal (disabled when connecting to LAN peer)
-            if (m_peer_address != NetworkManager::getInstance()->getPublicAddress())
+            if (m_peer_address != STKHost::get()->getPublicAddress())
             {
                 // Kill the ping protocol because we're connected
                 ProtocolManager::getInstance()
