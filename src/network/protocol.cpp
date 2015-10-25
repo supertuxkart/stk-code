@@ -100,7 +100,7 @@ void Protocol::requestTerminate()
 void Protocol::sendMessageToPeersChangingToken(NetworkString prefix,
                                                NetworkString message)
 {
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         prefix.ai8(4).ai32(peers[i]->getClientServerToken());

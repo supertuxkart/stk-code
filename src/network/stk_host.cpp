@@ -83,12 +83,21 @@ STKHost::~STKHost()
         delete m_game_setup;
     m_game_setup = NULL;
 
+    // Delete all connected peers
+    while (!m_peers.empty())
+    {
+        delete m_peers.back();
+        m_peers.pop_back();
+    }
+
     Network::closeLog();
     stopListening();
     delete m_network;
 }   // ~STKHost
 
 //-----------------------------------------------------------------------------
+/** Stores the public address of this host.
+ */
 void STKHost::setPublicAddress(const TransportAddress& addr)
 {
     m_public_address.lock();
@@ -107,6 +116,44 @@ GameSetup* STKHost::setupNewGame()
     m_game_setup = new GameSetup();
     return m_game_setup;
 }   // setupNewGame
+
+//-----------------------------------------------------------------------------
+/** \brief Function to reset the host - called in case that a client
+ *  is disconnected from a server. 
+ *  This function resets the peers and the listening host.
+ */
+void STKHost::reset()
+{
+    deleteAllPeers();
+    destroy();
+}   // reset
+
+//-----------------------------------------------------------------------------
+/** Called when you leave a server.
+*/
+void STKHost::deleteAllPeers()
+{
+    // remove all peers
+    for (unsigned int i = 0; i < m_peers.size(); i++)
+    {
+        delete m_peers[i];
+        m_peers[i] = NULL;
+    }
+    m_peers.clear();
+}   // deleteAllPeers
+
+// ----------------------------------------------------------------------------
+/** Called when STK exits. It stops the listening thread and the
+ *  ProtocolManager.
+ */
+void STKHost::abort()
+{
+    stopListening();
+    // FIXME: Why a reset here? This creates a new stk_host, which will open
+    // a new packet_log file (and therefore delete the previous file)???
+    // reset();
+    ProtocolManager::getInstance()->abort();
+}   // abort
 
 // ----------------------------------------------------------------------------
 /** \brief Starts the listening of events from ENet.
@@ -172,10 +219,30 @@ void* STKHost::mainLoop(void* self)
             if (stk_event->getType() == EVENT_TYPE_MESSAGE)
                 Network::logPacket(stk_event->data(), true);
 
-            // The event is forwarded to the NetworkManger and from there
-            // there to the ProtocolManager. The ProtocolManager is
-            // responsible for freeing the memory.
-            NetworkManager::getInstance()->propagateEvent(stk_event);
+            Log::verbose("STKHost", "Event of type %d received",
+                         (int)(stk_event->getType()));
+            STKPeer* peer = stk_event->getPeer();
+            if (stk_event->getType() == EVENT_TYPE_CONNECTED)
+            {
+                // Add the new peer:
+                myself->m_peers.push_back(peer);
+                Log::info("STKHost", "A client has just connected. There are "
+                          "now %lu peers.", myself->m_peers.size());
+                Log::debug("STKHost", "Addresses are : %lx, %lx",
+                           stk_event->getPeer(), peer);
+            }   // EVENT_TYPE_CONNECTED
+            else if (stk_event->getType() == EVENT_TYPE_MESSAGE)
+            {
+                TransportAddress stk_addr(peer->getAddress());
+                Log::verbose("NetworkManager",
+                             "Message, Sender : %s, message = \"%s\"",
+                             stk_addr.toString(/*show port*/false).c_str(),
+                             stk_event->data().std_string().c_str());
+
+            }   // if message event
+
+            // notify for the event now.
+            ProtocolManager::getInstance()->propagateEvent(stk_event);
             
         }   // while enet_host_service
     }   // while !mustStopListening
@@ -273,7 +340,46 @@ bool STKHost::isConnectedTo(const TransportAddress& peer)
     return false;
 }   // isConnectedTo
 
+
 // ----------------------------------------------------------------------------
+void STKHost::removePeer(const STKPeer* peer)
+{
+    if (!peer || !peer->exists()) // peer does not exist (already removed)
+        return;
+
+    TransportAddress addr(peer->getAddress());
+    Log::debug("STKHost", "Disconnected host: %s", addr.toString().c_str());
+            
+    // remove the peer:
+    bool removed = false;
+    for (unsigned int i = 0; i < m_peers.size(); i++)
+    {
+        if (m_peers[i]->isSamePeer(peer) && !removed) // remove only one
+        {
+            delete m_peers[i];
+            m_peers.erase(m_peers.begin() + i, m_peers.begin() + i + 1);
+            Log::verbose("NetworkManager",
+                "The peer has been removed from the Network Manager.");
+            removed = true;
+        }
+        else if (m_peers[i]->isSamePeer(peer))
+        {
+            Log::fatal("NetworkManager",
+                       "Multiple peers match the disconnected one.");
+        }
+    }   // for i < m_peers.size()
+
+    if (!removed)
+        Log::warn("NetworkManager", "The peer that has been disconnected was "
+                                    "not registered by the Network Manager.");
+
+    Log::info("NetworkManager",
+              "Somebody is now disconnected. There are now %lu peers.",
+              m_peers.size());
+}   // removePeer
+
+//-----------------------------------------------------------------------------
+
 uint16_t STKHost::getPort() const
 {
     struct sockaddr_in sin;
@@ -284,4 +390,24 @@ uint16_t STKHost::getPort() const
     else
         return ntohs(sin.sin_port);
     return 0;
-}
+}   // getPort
+
+//-----------------------------------------------------------------------------
+/** Sends data to all peers except the specified one.
+ *  \param peer Peer which will not receive the message.
+ *  \param data Data to sent.
+ *  \param reliable If the data should be sent reliable or now.
+ */
+void STKHost::sendPacketExcept(STKPeer* peer, const NetworkString& data,
+                               bool reliable)
+{
+    for (unsigned int i = 0; i < m_peers.size(); i++)
+    {
+        STKPeer* p = m_peers[i];
+        if (!p->isSamePeer(peer))
+        {
+            p->sendPacket(data, reliable);
+        }
+    }
+}   // sendPacketExcept
+

@@ -51,8 +51,6 @@ protected:
              NetworkManager();
     virtual ~NetworkManager();
 
-    /** The list of peers connected to this instance. */
-    std::vector<STKPeer*> m_peers;
 
 private:
 
@@ -62,25 +60,17 @@ private:
     friend class AbstractSingleton<NetworkManager>;
 public:
     virtual void run();
-    virtual void reset();
-    virtual void abort();
     virtual bool connect(const TransportAddress& peer);
-    virtual void propagateEvent(Event* event);
     virtual void sendPacket(const NetworkString& data,
                             bool reliable = true) = 0;
     virtual void sendPacket(STKPeer* peer,
                             const NetworkString& data,
                             bool reliable = true);
-    virtual void sendPacketExcept(STKPeer* peer,
-                                  const NetworkString& data,
-                                  bool reliable = true);
 
     // Game related functions
-    virtual void disconnected();
     virtual bool isServer() = 0;
 
     // raw data management
-    void removePeer(STKPeer* peer);
 
     // getters
     // --------------------------------------------------------------------
@@ -91,10 +81,6 @@ public:
 
     // --------------------------------------------------------------------
     inline bool isClient() { return !isServer(); }
-    // --------------------------------------------------------------------
-    std::vector<STKPeer*> getPeers() { return m_peers; }
-    // --------------------------------------------------------------------
-    unsigned int getPeerCount() { return (int)m_peers.size(); }
 
 
 };   // class NetworkManager

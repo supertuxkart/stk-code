@@ -11,7 +11,7 @@
 
 SynchronizationProtocol::SynchronizationProtocol() : Protocol(NULL, PROTOCOL_SYNCHRONIZATION)
 {
-    unsigned int size = NetworkManager::getInstance()->getPeerCount();
+    unsigned int size = STKHost::get()->getPeerCount();
     m_pings.resize(size, std::map<uint32_t,double>());
     m_pings_count.resize(size);
     for (unsigned int i = 0; i < size; i++)
@@ -47,7 +47,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
     uint32_t request = data.gui8(5);
     uint32_t sequence = data.gui32(6);
 
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     assert(peers.size() > 0);
 
     if (ProtocolManager::getInstance()->isServer())
@@ -155,7 +155,7 @@ void SynchronizationProtocol::asynchronousUpdate()
     }
     if (current_time > timer+0.1)
     {
-        std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+        const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString ns(10);

@@ -207,9 +207,9 @@ void StartGameProtocol::ready() // on clients, means the loading is finished
 {
     if (!ProtocolManager::getInstance()->isServer()) // if we're a client
     {
-        assert(NetworkManager::getInstance()->getPeerCount() == 1);
+        assert(STKHost::get()->getPeerCount() == 1);
         NetworkString ns(5);
-        ns.ai32(NetworkManager::getInstance()->getPeers()[0]->getClientServerToken()).ai8(1);
+        ns.ai32(STKHost::get()->getPeers()[0]->getClientServerToken()).ai8(1);
         Log::info("StartGameProtocol", "Player ready, notifying server.");
         sendMessage(ns, true);
         m_state = READY;

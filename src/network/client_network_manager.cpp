@@ -99,12 +99,12 @@ void* waitInput(void* data)
         // If STK shuts down, but should receive an input after the network 
         // manager was deleted, the getInstance call will return NULL.
         else if (NetworkManager::getInstance() && 
-                 NetworkManager::getInstance()->getPeers().size() > 0)
+                 STKHost::get()->getPeerCount() > 0)
         {
             NetworkString msg(1+str.size());
             msg.ai8(0);
             msg += str;
-            NetworkManager::getInstance()->getPeers()[0]->sendPacket(msg);
+            STKHost::get()->getPeers()[0]->sendPacket(msg);
         }
     }
 
@@ -166,7 +166,7 @@ void ClientNetworkManager::run()
 
 void ClientNetworkManager::reset()
 {
-    NetworkManager::reset();
+    STKHost::get()->reset();
 
     m_connected = false;
     STKHost::create(/*is_server*/false);
@@ -177,12 +177,12 @@ void ClientNetworkManager::reset()
 
 void ClientNetworkManager::sendPacket(const NetworkString& data, bool reliable)
 {
-    if (m_peers.size() > 1)
+    if (STKHost::get()->getPeerCount() > 1)
         Log::warn("ClientNetworkManager", "Ambiguous send of data.\n");
-    m_peers[0]->sendPacket(data, reliable);
+    STKHost::get()->getPeers()[0]->sendPacket(data, reliable);
 }
 
 STKPeer* ClientNetworkManager::getPeer()
 {
-    return m_peers[0];
+    return STKHost::get()->getPeers()[0];
 }

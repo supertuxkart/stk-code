@@ -128,7 +128,7 @@ void* ServerConsole::mainLoop(void* data)
 // ----------------------------------------------------------------------------
 void ServerConsole::kickAllPlayers()
 {
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         peers[i]->disconnect();

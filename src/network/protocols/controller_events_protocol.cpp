@@ -28,7 +28,7 @@ void ControllerEventsProtocol::setup()
 {
     m_self_controller_index = 0;
     std::vector<AbstractKart*> karts = World::getWorld()->getKarts();
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < karts.size(); i++)
     {
         if (karts[i]->getIdent() == NetworkWorld::getInstance()->m_self_kart)

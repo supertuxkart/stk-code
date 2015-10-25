@@ -58,7 +58,7 @@ Event::Event(ENetEvent* event)
     }
     m_packet = NULL;
 
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     m_peer = NULL;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
@@ -70,6 +70,7 @@ Event::Event(ENetEvent* event)
             return;
         }
     }
+
     if (m_peer == NULL) // peer does not exist, create him
     {
         STKPeer* new_peer = new STKPeer();

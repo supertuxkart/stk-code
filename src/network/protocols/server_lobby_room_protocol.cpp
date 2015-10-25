@@ -151,7 +151,7 @@ void ServerLobbyRoomProtocol::update()
 
 void ServerLobbyRoomProtocol::startGame()
 {
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         NetworkString ns(6);
@@ -167,7 +167,7 @@ void ServerLobbyRoomProtocol::startGame()
 
 void ServerLobbyRoomProtocol::startSelection()
 {
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         NetworkString ns(6);
@@ -260,7 +260,7 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
             }
         }
 
-        std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+        const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
 
         NetworkString queue(karts_results.size()*2);
         for (unsigned int i = 0; i < karts_results.size(); i++)
@@ -323,7 +323,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                   peer->getPlayerProfile()->race_id);
         m_setup->removePlayer(peer->getPlayerProfile()->race_id);
-        NetworkManager::getInstance()->removePeer(peer);
+        STKHost::get()->removePeer(peer);
     }
     else
         Log::info("ServerLobbyRoomProtocol", "The DC peer wasn't registered.");

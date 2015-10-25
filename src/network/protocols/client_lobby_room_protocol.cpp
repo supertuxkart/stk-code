@@ -206,13 +206,13 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
     } // connection
     else if (event->getType() == EVENT_TYPE_DISCONNECTED) // means we left essentially
     {
-        NetworkManager::getInstance()->removePeer(m_server);
+        STKHost::get()->removePeer(m_server);
         m_server = NULL;
-        NetworkManager::getInstance()->disconnected();
+        STKHost::get()->deleteAllPeers();
         ProtocolManager::getInstance()->requestTerminate(this);
-        NetworkManager::getInstance()->reset();
+        STKHost::get()->reset();
         // probably the same as m_server
-        NetworkManager::getInstance()->removePeer(event->getPeer());
+        STKHost::get()->removePeer(event->getPeer());
         return true;
     } // disconnection
     return false;
@@ -543,7 +543,7 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
         return;
     }
     uint8_t token = data.gui32(1);
-    if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
+    if (token == STKHost::get()->getPeers()[0]->getClientServerToken())
     {
         m_state = PLAYING;
         ProtocolManager::getInstance()->requestStart(new StartGameProtocol(m_setup));
@@ -576,7 +576,7 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
         return;
     }
     uint8_t token = data.gui32(1);
-    if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
+    if (token == STKHost::get()->getPeers()[0]->getClientServerToken())
     {
         m_state = KART_SELECTION;
         Log::info("ClientLobbyRoomProtocol", "Kart selection starts now");

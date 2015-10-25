@@ -194,10 +194,10 @@ void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer,
                                         const NetworkString& message,
                                         bool reliable)
 {
-    NetworkString newMessage(1+message.size());
-    newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
-    newMessage += message;
-    NetworkManager::getInstance()->sendPacketExcept(peer, newMessage, reliable);
+    NetworkString new_message(1+message.size());
+    new_message.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    new_message += message;
+    STKHost::get()->sendPacketExcept(peer, new_message, reliable);
 }   // sendMessageExcept
 
 // ----------------------------------------------------------------------------

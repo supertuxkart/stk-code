@@ -73,10 +73,14 @@ private:
     /** ENet host interfacing sockets. */
     Network* m_network;
 
+    /** The list of peers connected to this instance. */
+    std::vector<STKPeer*> m_peers;
+
     /** This computer's public IP address. With lock since it can
      *  be updated from a separate thread. */
     Synchronised<TransportAddress> m_public_address;
 
+    /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
 
     /** Id of thread listening to enet events. */
@@ -120,7 +124,12 @@ public:
 
     virtual GameSetup* setupNewGame();
     void setPublicAddress(const TransportAddress& addr);
-
+    void abort();
+    void deleteAllPeers ();
+    void reset();
+    void sendPacketExcept(STKPeer* peer,
+                          const NetworkString& data,
+                          bool reliable = true);
     void        setupServer(uint32_t address, uint16_t port,
                             int peer_count, int channel_limit,
                             uint32_t max_incoming_bandwidth,
@@ -133,6 +142,7 @@ public:
     uint8_t*    receiveRawPacket(const TransportAddress& sender,
                                  int max_tries = -1);
     bool        peerExists(const TransportAddress& peer_address);
+    void        removePeer(const STKPeer* peer);
     bool        isConnectedTo(const TransportAddress& peer_address);
     int         mustStopListening();
     uint16_t    getPort() const;
@@ -193,6 +203,14 @@ public:
     // --------------------------------------------------------------------
     /** Returns the maximum number of players for this server. */
     static int getMaxPlayers() { return m_max_players; }
+
+    // --------------------------------------------------------------------
+    /** Returns a const reference to the list of peers. */
+    const std::vector<STKPeer*> &getPeers() { return m_peers; }
+
+    // --------------------------------------------------------------------
+    /** Returns the number of currently connected peers. */
+    unsigned int getPeerCount() { return (int)m_peers.size(); }
 
 };   // class STKHost
 

@@ -79,7 +79,7 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
     assert(setup);
     const NetworkPlayerProfile* player_profile = setup->getProfile(kart->getIdent()); // use kart name
 
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         NetworkString ns(11);

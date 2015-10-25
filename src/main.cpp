@@ -1526,7 +1526,7 @@ int main(int argc, char *argv[] )
     // so we don't crash later when StateManager tries to access input devices.
     StateManager::get()->resetActivePlayers();
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
-    NetworkManager::getInstance()->abort();
+    STKHost::get()->abort();
 
     cleanSuperTuxKart();
 
