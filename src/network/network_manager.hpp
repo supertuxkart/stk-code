@@ -83,13 +83,6 @@ public:
     void removePeer(STKPeer* peer);
 
     // getters
-    // ------------------------------------------------------------------------
-    /** Returns if a peer from the specified IP:port address
-     *  already exists. */
-    virtual bool peerExists(const TransportAddress& peer)
-    {
-        return STKHost::get()->peerExists(peer);
-    }   // peerExists
     // --------------------------------------------------------------------
     virtual bool isConnectedTo(const TransportAddress& peer)
     {

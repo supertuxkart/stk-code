@@ -88,7 +88,7 @@ void NetworkManager::abort()
  */
 bool NetworkManager::connect(const TransportAddress& address)
 {
-    if (peerExists(address))
+    if (STKHost::get()->peerExists(address))
         return isConnectedTo(address);
 
     return STKPeer::connectToHost(STKHost::get(), address, 2, 0);
