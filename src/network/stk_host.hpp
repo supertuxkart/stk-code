@@ -36,6 +36,7 @@
 #include <pthread.h>
 
 class GameSetup;
+class STKPeer;
 
 /*! \class STKHost
  *  \brief Represents the local host.
