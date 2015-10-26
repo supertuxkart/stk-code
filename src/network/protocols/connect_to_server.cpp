@@ -188,7 +188,7 @@ void ConnectToServer::asynchronousUpdate()
                 if (StkTime::getRealTime() > timer+5.0) // every 5 seconds
                 {
                     timer = StkTime::getRealTime();
-                    NetworkManager::getInstance()->connect(m_server_address);
+                    STKHost::get()->connect(m_server_address);
                     Log::info("ConnectToServer", "Trying to connect to %s",
                               m_server_address.toString().c_str());
                 }

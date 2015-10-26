@@ -125,8 +125,10 @@ public:
     virtual GameSetup* setupNewGame();
     void setPublicAddress(const TransportAddress& addr);
     void abort();
-    void deleteAllPeers ();
+    void deleteAllPeers();
     void reset();
+    bool connect(const TransportAddress& peer);
+
     void sendPacketExcept(STKPeer* peer,
                           const NetworkString& data,
                           bool reliable = true);

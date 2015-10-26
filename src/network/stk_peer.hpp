@@ -57,8 +57,6 @@ public:
     virtual ~STKPeer();
 
     virtual void sendPacket(const NetworkString& data, bool reliable = true);
-    static bool connectToHost(STKHost* localhost, const TransportAddress& host,
-                              uint32_t channel_count, uint32_t data);
     void disconnect();
     bool isConnected() const;
     bool exists() const;

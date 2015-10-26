@@ -39,15 +39,3 @@ void NetworkManager::run()
 {
 }   // run
 
-//-----------------------------------------------------------------------------
-/** \brief Try to establish a connection to a given transport address.
- *  \param peer : The transport address which you want to connect to.
- *  \return True if we're successfully connected. False elseway.
- */
-bool NetworkManager::connect(const TransportAddress& address)
-{
-    if (STKHost::get()->peerExists(address))
-        return isConnectedTo(address);
-
-    return STKPeer::connectToHost(STKHost::get(), address, 2, 0);
-}   // connect

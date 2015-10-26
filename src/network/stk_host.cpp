@@ -157,6 +157,28 @@ void STKHost::abort()
     ProtocolManager::getInstance()->abort();
 }   // abort
 
+//-----------------------------------------------------------------------------
+/** \brief Try to establish a connection to a given transport address.
+ *  \param peer : The transport address which you want to connect to.
+ *  \return True if we're successfully connected. False elseway.
+ */
+bool STKHost::connect(const TransportAddress& address)
+{
+    if (peerExists(address))
+        return isConnectedTo(address);
+
+    ENetPeer* peer = connectTo(address);
+
+    if (peer == NULL)
+    {
+        Log::error("STKHost", "Could not try to connect to server.");
+        return false;
+    }
+    TransportAddress a(peer->address);
+    Log::verbose("STKPeer", "Connecting to %s", a.toString().c_str());
+    return true;
+}   // connect
+
 // ----------------------------------------------------------------------------
 /** \brief Starts the listening of events from ENet.
  *  Starts a thread for receiveData that updates it as often as possible.

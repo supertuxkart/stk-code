@@ -48,24 +48,6 @@ STKPeer::~STKPeer()
 }   // ~STKPeer
 
 //-----------------------------------------------------------------------------
-/** Connect to the specified host.
- */
-bool STKPeer::connectToHost(STKHost* localhost, const TransportAddress &address,
-                            uint32_t channel_count, uint32_t data)
-{
-    ENetPeer* peer = localhost->connectTo(address);
-
-    if (peer == NULL)
-    {
-        Log::error("STKPeer", "Could not try to connect to server.\n");
-        return false;
-    }
-    TransportAddress a(peer->address);
-    Log::verbose("STKPeer", "Connecting to %s", a.toString().c_str());
-    return true;
-}   // connectToHost
-
-//-----------------------------------------------------------------------------
 /** Disconnect from the server.
  */
 void STKPeer::disconnect()
