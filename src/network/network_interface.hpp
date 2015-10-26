@@ -24,7 +24,6 @@
 #define NETWORK_INTERFACE_H
 
 #include "network/types.hpp"
-#include "network/network_manager.hpp"
 #include "utils/singleton.hpp"
 
 #include <pthread.h>

@@ -28,7 +28,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
-#include "network/network_manager.hpp"
+#include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 
 static const char ID_LOCKED[] = "locked/";

@@ -19,8 +19,9 @@
 #include "network/protocol.hpp"
 
 #include "network/event.hpp"
-#include "network/network_manager.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 
 /** \brief Constructor
  *  Sets the basic protocol parameters, as the callback object and the

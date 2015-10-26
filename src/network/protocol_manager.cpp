@@ -19,8 +19,9 @@
 #include "network/protocol_manager.hpp"
 
 #include "network/event.hpp"
-#include "network/network_manager.hpp"
 #include "network/protocol.hpp"
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 

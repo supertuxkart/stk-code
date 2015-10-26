@@ -55,7 +55,7 @@
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_world.hpp"
-#include "network/network_manager.hpp"
+#include "network/stk_host.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/physics.hpp"

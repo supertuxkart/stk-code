@@ -174,12 +174,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
-#include "network/network_manager.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
-#include "network/server_console.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "network/stk_host.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
 #include "online/servers_manager.hpp"
@@ -1623,7 +1618,6 @@ static void cleanSuperTuxKart()
     // moved further up?
     Online::ServersManager::deallocate();
     STKHost::destroy();
-    NetworkManager::kill();
 
     cleanUserConfig();
 

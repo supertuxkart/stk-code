@@ -29,7 +29,6 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track_manager.hpp"

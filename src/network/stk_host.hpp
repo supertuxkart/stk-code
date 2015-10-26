@@ -38,7 +38,7 @@
 class GameSetup;
 class STKPeer;
 
-/*! \class STKHost
+/** \class STKHost
  *  \brief Represents the local host.
  *  This host is either a server host or a client host. A client host is in
  *  charge of connecting to a server. A server opens a socket for incoming

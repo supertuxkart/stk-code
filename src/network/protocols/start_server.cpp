@@ -20,7 +20,7 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "network/network_manager.hpp"
+#include "network/stk_host.hpp"
 #include "online/request_manager.hpp"
 
 StartServer::StartServer() : Protocol(NULL, PROTOCOL_SILENT)

@@ -18,7 +18,7 @@
 
 #include "network/protocols/ping_protocol.hpp"
 
-#include "network/network_manager.hpp"
+#include "network/stk_host.hpp"
 #include "utils/time.hpp"
 
 PingProtocol::PingProtocol(const TransportAddress& ping_dst, double delay_between_pings) 

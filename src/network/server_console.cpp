@@ -19,12 +19,12 @@
 #include "network/server_console.hpp"
 
 #include "main_loop.hpp"
-#include "network/network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/protocols/stop_server.hpp"
+#include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
@@ -170,10 +170,10 @@ void* ServerConsole::mainLoop(void* data)
             }
             std::cout << "\n";
         }
+        // FIXME
         // If STK shuts down, but should receive an input after the network 
         // manager was deleted, the getInstance call will return NULL.
-        else if (NetworkManager::getInstance() && STKHost::isclient() &&
-            STKHost::get()->getPeerCount() > 0)
+        else if (STKHost::isclient() && STKHost::get()->getPeerCount() > 0)
         {
             NetworkString msg(1 + str.size());
             msg.ai8(0);

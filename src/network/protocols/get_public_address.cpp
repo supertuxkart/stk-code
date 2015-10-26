@@ -19,10 +19,10 @@
 #include "network/protocols/get_public_address.hpp"
 
 #include "config/user_config.hpp"
-#include "network/client_network_manager.hpp"
+#include "network/network.hpp"
 #include "network/network_interface.hpp"
-#include "network/network_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"
+#include "network/stk_host.hpp"
 #include "utils/log.hpp"
 
 #include <assert.h>
