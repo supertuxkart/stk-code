@@ -315,7 +315,7 @@ void ProtocolManager::startProtocol(Protocol *protocol)
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
     Log::info("ProtocolManager",
         "A %s protocol with id=%u has been started. There are %ld protocols running.", 
-              typeid(protocol).name(), protocol->getId(),
+              typeid(*protocol).name(), protocol->getId(),
               m_protocols.getData().size()+1);
     m_protocols.getData().push_back(protocol);
     // setup the protocol and notify it that it's started
