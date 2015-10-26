@@ -31,11 +31,3 @@
 NetworkManager::NetworkManager()
 {
 }   // NetworkManager
-
-//----------------------------------------------------------------------------
-/** \brief Function to start the Network Manager (start threads).
- */
-void NetworkManager::run()
-{
-}   // run
-

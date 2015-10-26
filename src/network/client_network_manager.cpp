@@ -159,7 +159,6 @@ void ClientNetworkManager::run()
     pthread_create(m_thread_keyboard, NULL, waitInput, NULL);
 #endif
 #endif
-    NetworkManager::run();
 
     Log::info("ClientNetworkManager", "Ready !");
 }

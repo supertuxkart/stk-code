@@ -791,7 +791,6 @@ int handleCmdLine()
         Log::info("main", "Creating a client.");
     }
     NetworkManager::getInstance<ClientNetworkManager>();
-    NetworkManager::getInstance()->run();
 
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;

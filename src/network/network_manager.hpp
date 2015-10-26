@@ -59,7 +59,6 @@ private:
 
     friend class AbstractSingleton<NetworkManager>;
 public:
-    virtual void run();
     // Game related functions
     virtual bool isServer() = 0;
 
