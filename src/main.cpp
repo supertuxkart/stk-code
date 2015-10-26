@@ -1635,6 +1635,7 @@ static void cleanSuperTuxKart()
     // FIXME: do we need to wait for threads there, can they be
     // moved further up?
     Online::ServersManager::deallocate();
+    STKHost::destroy();
     NetworkManager::kill();
 
     cleanUserConfig();

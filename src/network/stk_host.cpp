@@ -92,6 +92,8 @@ STKHost::~STKHost()
 
     Network::closeLog();
     stopListening();
+    ProtocolManager::kill();
+
     delete m_network;
 }   // ~STKHost
 
