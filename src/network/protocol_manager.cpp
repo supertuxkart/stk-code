@@ -176,7 +176,7 @@ void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message
     NetworkString new_message(1+message.size());
     new_message.ai8(sender->getProtocolType()); // add one byte to add protocol type
     new_message += message;
-    NetworkManager::getInstance()->sendPacket(new_message, reliable);
+    STKHost::get()->sendMessage(new_message, reliable);
 }   // sendMessage
 
 // ----------------------------------------------------------------------------

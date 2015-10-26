@@ -129,6 +129,7 @@ public:
     void reset();
     bool connect(const TransportAddress& peer);
 
+    void sendMessage(const NetworkString& data, bool reliable = true);
     void sendPacketExcept(STKPeer* peer,
                           const NetworkString& data,
                           bool reliable = true);

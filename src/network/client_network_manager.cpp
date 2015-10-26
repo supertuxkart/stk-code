@@ -175,13 +175,6 @@ void ClientNetworkManager::reset()
 
 }
 
-void ClientNetworkManager::sendPacket(const NetworkString& data, bool reliable)
-{
-    if (STKHost::get()->getPeerCount() > 1)
-        Log::warn("ClientNetworkManager", "Ambiguous send of data.\n");
-    STKHost::get()->getPeers()[0]->sendPacket(data, reliable);
-}
-
 STKPeer* ClientNetworkManager::getPeer()
 {
     return STKHost::get()->getPeers()[0];

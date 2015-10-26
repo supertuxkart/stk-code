@@ -60,8 +60,6 @@ private:
     friend class AbstractSingleton<NetworkManager>;
 public:
     virtual void run();
-    virtual void sendPacket(const NetworkString& data,
-                            bool reliable = true) = 0;
     // Game related functions
     virtual bool isServer() = 0;
 
