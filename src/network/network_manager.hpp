@@ -67,12 +67,6 @@ public:
 
     // getters
     // --------------------------------------------------------------------
-    virtual bool isConnectedTo(const TransportAddress& peer)
-    {
-        return STKHost::get()->isConnectedTo(peer);
-    }   // isConnectedTo
-
-    // --------------------------------------------------------------------
     inline bool isClient() { return !isServer(); }
 
 

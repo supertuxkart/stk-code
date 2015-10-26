@@ -225,7 +225,7 @@ void ClientLobbyRoomProtocol::update()
     switch (m_state)
     {
     case NONE:
-        if (NetworkManager::getInstance()->isConnectedTo(m_server_address))
+        if (STKHost::get()->isConnectedTo(m_server_address))
         {
             m_state = LINKED;
         }
