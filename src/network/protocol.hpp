@@ -25,6 +25,7 @@
 
 #include "network/network_string.hpp"
 #include "network/types.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
@@ -73,6 +74,7 @@ enum ProtocolState
  */
 class Protocol : public NoCopy
 {
+    LEAK_CHECK()
 protected:
     /** The type of the protocol. */
     ProtocolType m_type;
