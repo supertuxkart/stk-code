@@ -26,6 +26,8 @@
 #include "network/protocols/hide_public_address.hpp"
 #include "network/protocols/request_connection.hpp"
 #include "network/protocols/ping_protocol.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/stk_host.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 

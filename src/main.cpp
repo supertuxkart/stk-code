@@ -174,11 +174,9 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
-#include "network/client_network_manager.hpp"
 #include "network/network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
-#include "network/client_network_manager.hpp"
 #include "network/server_console.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
@@ -782,6 +780,7 @@ int handleCmdLine()
     // Networking command lines
     if(CommandLine::has("--server") )
     {
+        STKHost::setMaxPlayers(UserConfigParams::m_server_max_players);
         STKHost::create(/*is_Server*/true);
         Log::info("main", "Creating a server.");
     }   
@@ -790,7 +789,6 @@ int handleCmdLine()
         STKHost::create(/*is_server*/false);
         Log::info("main", "Creating a client.");
     }
-    NetworkManager::getInstance<ClientNetworkManager>();
 
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
@@ -1347,16 +1345,6 @@ int main(int argc, char *argv[] )
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine()) exit(0);
-
-        // load the network manager
-        if (STKHost::isServer())
-        {
-            STKHost::setMaxPlayers(UserConfigParams::m_server_max_players);
-            (new ServerLobbyRoomProtocol())->requestStart();
-        }
-        else   // is client
-        {
-        }
 
         addons_manager->checkInstalledAddons();
 

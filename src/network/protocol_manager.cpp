@@ -388,7 +388,7 @@ void ProtocolManager::protocolTerminated(Protocol *protocol)
     {
         if (m_protocols.getData()[i-offset] == protocol)
         {
-            delete protocol;
+// FIXME check for memory leak            delete protocol;
             m_protocols.getData().erase(m_protocols.getData().begin()+(i-offset),
                                         m_protocols.getData().begin()+(i-offset)+1);
             offset++;

@@ -28,6 +28,8 @@
 #include "network/protocols/ping_protocol.hpp"
 #include "network/protocols/quick_join_protocol.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 
@@ -202,7 +204,8 @@ void ConnectToServer::asynchronousUpdate()
 
             m_current_protocol = new HidePublicAddress();
             m_current_protocol->requestStart();
-            ClientNetworkManager::getInstance()->setConnected(true);
+            // FIXME - is that necessary?  ClientNetworkManager::getInstance()->setConnected(true);
+            // FIXME We can test if the peer is connected, which is handled by ENet
             m_state = HIDING_ADDRESS;
             break;
         }
@@ -213,7 +216,7 @@ void ConnectToServer::asynchronousUpdate()
                 Log::info("ConnectToServer", "Address hidden");
                 m_state = DONE;
                 // lobby room protocol if we're connected only
-                if (ClientNetworkManager::getInstance()->isConnected())
+                if(STKHost::get()->getPeers()[0]->isConnected())
                 {
                     Protocol *p = new ClientLobbyRoomProtocol(m_server_address);
                     p->requestStart();

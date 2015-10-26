@@ -23,24 +23,16 @@
 #ifndef CLIENT_NETWORK_MANAGER_HPP
 #define CLIENT_NETWORK_MANAGER_HPP
 
-#include "network/network_manager.hpp"
+#include "pthread.h"
+
+class STKPeer;
 
 /*! \class ClientNetworkManager
  *  \ingroup network
  */
-class ClientNetworkManager : public NetworkManager
+class ClientNetworkManager 
 {
-    friend class AbstractSingleton<NetworkManager>;
     public:
-        /*! \brief Get the instance.
-         *  This is a utility function to avoid passing templates parameters
-         *  to the getInstance singleton method.
-         */
-        static ClientNetworkManager* getInstance()
-        {
-            return AbstractSingleton<NetworkManager>::getInstance<ClientNetworkManager>();
-        }
-
         /*! \brief Initializes network.
          *  This starts the threads and initializes network libraries.
          */

@@ -25,6 +25,7 @@
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
+#include "network/stk_host.hpp"
 
 #include "utils/log.hpp"
 
@@ -43,68 +44,6 @@ void* waitInput(void* data)
         if (str == "quit")
         {
             stop = true;
-        }
-        else if (str == "select")
-        {
-            std::string str2;
-            getline(std::cin, str2);
-            Protocol* protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM);
-            ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
-            clrp->requestKartSelection(str2);
-        }
-        else if (str == "vote")
-        {
-            std::cout << "Vote for ? (track/laps/reversed/major/minor/race#) :";
-            std::string str2;
-            getline(std::cin, str2);
-            Protocol* protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM);
-            ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
-            if (str2 == "track")
-            {
-                std::cin >> str2;
-                clrp->voteTrack(str2);
-            }
-            else if (str2 == "laps")
-            {
-                int cnt;
-                std::cin >> cnt;
-                clrp->voteLaps(cnt);
-            }
-            else if (str2 == "reversed")
-            {
-                bool cnt;
-                std::cin >> cnt;
-                clrp->voteReversed(cnt);
-            }
-            else if (str2 == "major")
-            {
-                int cnt;
-                std::cin >> cnt;
-                clrp->voteMajor(cnt);
-            }
-            else if (str2 == "minor")
-            {
-                int cnt;
-                std::cin >> cnt;
-                clrp->voteMinor(cnt);
-            }
-            else if (str2 == "race#")
-            {
-                int cnt;
-                std::cin >> cnt;
-                clrp->voteRaceCount(cnt);
-            }
-            std::cout << "\n";
-        }
-        // If STK shuts down, but should receive an input after the network 
-        // manager was deleted, the getInstance call will return NULL.
-        else if (NetworkManager::getInstance() && 
-                 STKHost::get()->getPeerCount() > 0)
-        {
-            NetworkString msg(1+str.size());
-            msg.ai8(0);
-            msg += str;
-            STKHost::get()->getPeers()[0]->sendPacket(msg);
         }
     }
 
@@ -172,9 +111,4 @@ void ClientNetworkManager::reset()
     STKHost::get()->setupClient(1, 2, 0, 0);
     STKHost::get()->startListening();
 
-}
-
-STKPeer* ClientNetworkManager::getPeer()
-{
-    return STKHost::get()->getPeers()[0];
 }
