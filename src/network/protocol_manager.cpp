@@ -173,20 +173,20 @@ void ProtocolManager::propagateEvent(Event* event)
 void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message,
                                   bool reliable)
 {
-    NetworkString newMessage(1+message.size());
-    newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
-    newMessage += message;
-    NetworkManager::getInstance()->sendPacket(newMessage, reliable);
+    NetworkString new_message(1+message.size());
+    new_message.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    new_message += message;
+    NetworkManager::getInstance()->sendPacket(new_message, reliable);
 }   // sendMessage
 
 // ----------------------------------------------------------------------------
 void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer,
                                   const NetworkString& message, bool reliable)
 {
-    NetworkString newMessage(1+message.size());
-    newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
-    newMessage += message;
-    NetworkManager::getInstance()->sendPacket(peer, newMessage, reliable);
+    NetworkString new_message(1+message.size());
+    new_message.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    new_message += message;
+    peer->sendPacket(new_message, reliable);
 }   // sendMessage
 
 // ----------------------------------------------------------------------------

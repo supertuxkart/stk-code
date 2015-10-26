@@ -32,15 +32,6 @@ NetworkManager::NetworkManager()
 {
 }   // NetworkManager
 
-//-----------------------------------------------------------------------------
-
-NetworkManager::~NetworkManager()
-{
-    ProtocolManager::kill();
-
-    STKHost::destroy();
-}   // ~Networkmanager
-
 //----------------------------------------------------------------------------
 /** \brief Function to start the Network Manager (start threads).
  */
@@ -60,16 +51,3 @@ bool NetworkManager::connect(const TransportAddress& address)
 
     return STKPeer::connectToHost(STKHost::get(), address, 2, 0);
 }   // connect
-
-//-----------------------------------------------------------------------------
-
-void NetworkManager::sendPacket(STKPeer* peer, const NetworkString& data,
-                                bool reliable)
-{
-    if (peer)
-        peer->sendPacket(data, reliable);
-}   // sendPacket
-
-
-
-//-----------------------------------------------------------------------------

@@ -49,7 +49,7 @@ class NetworkManager : public AbstractSingleton<NetworkManager>
 {
 protected:
              NetworkManager();
-    virtual ~NetworkManager();
+    virtual ~NetworkManager() {};
 
 
 private:
@@ -63,10 +63,6 @@ public:
     virtual bool connect(const TransportAddress& peer);
     virtual void sendPacket(const NetworkString& data,
                             bool reliable = true) = 0;
-    virtual void sendPacket(STKPeer* peer,
-                            const NetworkString& data,
-                            bool reliable = true);
-
     // Game related functions
     virtual bool isServer() = 0;
 
