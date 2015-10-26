@@ -50,7 +50,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     assert(peers.size() > 0);
 
-    if (ProtocolManager::getInstance()->isServer())
+    if (STKHost::isServer())
     {
         if (talk_id > peers.size())
         {
@@ -81,7 +81,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         Log::verbose("SynchronizationProtocol", "Answering sequence %u", sequence);
 
         // countdown time in the message
-        if (data.size() == 14 && !ProtocolManager::getInstance()->isServer())
+        if (data.size() == 14 && !STKHost::isServer())
         {
             uint32_t time_to_start = data.gui32(10);
             Log::debug("SynchronizationProtocol", "Request to start game in %d.", time_to_start);
@@ -161,8 +161,7 @@ void SynchronizationProtocol::asynchronousUpdate()
             NetworkString ns(10);
             ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1).addUInt32(m_pings[i].size());
             // now add the countdown if necessary
-            if (m_countdown_activated && 
-                ProtocolManager::getInstance()->isServer())
+            if (m_countdown_activated && STKHost::isServer())
             {
                 ns.addUInt32((int)(m_countdown*1000.0));
                 Log::debug("SynchronizationProtocol", "CNTActivated: Countdown value : %f", m_countdown);

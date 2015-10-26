@@ -1349,7 +1349,7 @@ int main(int argc, char *argv[] )
         if(!handleCmdLine()) exit(0);
 
         // load the network manager
-        if (NetworkManager::getInstance()->isServer())
+        if (STKHost::isServer())
         {
             STKHost::setMaxPlayers(UserConfigParams::m_server_max_players);
             (new ServerLobbyRoomProtocol())->requestStart();

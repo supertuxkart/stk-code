@@ -37,7 +37,7 @@ void ControllerEventsProtocol::setup()
             m_self_controller_index = i;
         }
         STKPeer* peer = NULL;
-        if (ProtocolManager::getInstance()->isServer())
+        if (STKHost::isServer())
         {
             for (unsigned int j = 0; j < peers.size(); j++)
             {
@@ -114,7 +114,7 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         Log::warn("ControllerEventProtocol", "Couldn't have a client id.");
         return true;
     }
-    if (ProtocolManager::getInstance()->isServer())
+    if (STKHost::isServer())
     {
         // notify everybody of the event :
         for (unsigned int i = 0; i < m_controllers.size(); i++)
@@ -143,7 +143,7 @@ void ControllerEventsProtocol::update()
 void ControllerEventsProtocol::controllerAction(Controller* controller,
                                                 PlayerAction action, int value)
 {
-    assert(!ProtocolManager::getInstance()->isServer());
+    assert(!STKHost::isServer());
 
     KartControl* controls = controller->getControls();
     uint8_t serialized_1 = 0;

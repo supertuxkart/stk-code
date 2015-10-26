@@ -62,7 +62,7 @@ bool NetworkWorld::isRaceOver()
 
 void NetworkWorld::collectedItem(Item *item, AbstractKart *kart)
 {
-    assert(NetworkManager::getInstance()->isServer()); // this is only called in the server
+    assert(STKHost::isServer()); // this is only called in the server
     GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
         ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
     protocol->collectedItem(item,kart);

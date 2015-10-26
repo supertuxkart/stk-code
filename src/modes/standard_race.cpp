@@ -124,6 +124,6 @@ void StandardRace::endRaceEarly()
     } // Finish the active players
     endSetKartPositions();
     setPhase(RESULT_DISPLAY_PHASE);
-    if (!isNetworkWorld() || NetworkManager::getInstance()->isServer())
+    if (!isNetworkWorld() || STKHost::isServer())
         terminateRace();
 } // endRaceEarly

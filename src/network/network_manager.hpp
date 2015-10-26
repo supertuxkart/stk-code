@@ -59,14 +59,6 @@ private:
 
     friend class AbstractSingleton<NetworkManager>;
 public:
-    // Game related functions
-    virtual bool isServer() = 0;
-
-    // raw data management
-
-    // getters
-    // --------------------------------------------------------------------
-    inline bool isClient() { return !isServer(); }
 
 
 };   // class NetworkManager

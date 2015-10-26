@@ -52,10 +52,6 @@ class ClientNetworkManager : public NetworkManager
          *  \return The peer with whom we're connected (if it exists). NULL elseway.
          */
         STKPeer* getPeer();
-        /*! \brief Function to know if we're a server.
-         *  \return Returns true if we're on a server. False if we're a client.
-         */
-        virtual bool isServer()         { return false; }
         /*! \brief Function used to notice the manager that we're connected to a server.
          *  \param value : True if we're connected, false elseway.
          */

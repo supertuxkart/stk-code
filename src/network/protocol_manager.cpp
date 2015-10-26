@@ -636,15 +636,6 @@ Protocol* ProtocolManager::getProtocol(ProtocolType type)
 }   // getProtocol
 
 // ----------------------------------------------------------------------------
-/** \brief Know whether the app is a server.
- *  \return True if this application is in server mode, false elseway.
- */
-bool ProtocolManager::isServer()
-{
-    return NetworkManager::getInstance()->isServer();
-}   // isServer
-
-// ----------------------------------------------------------------------------
 /*! \brief Tells if we need to stop the update thread.
  */
 int ProtocolManager::exit()

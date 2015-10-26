@@ -51,7 +51,7 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
         Log::error("StartGameProtocol", "Bad token received.");
         return true;
     }
-    if (ProtocolManager::getInstance()->isServer() && ready) // on server, player is ready
+    if (STKHost::isServer() && ready) // on server, player is ready
     {
         Log::info("StartGameProtocol", "One of the players is ready.");
         m_player_states[peer->getPlayerProfile()] = READY;
@@ -149,7 +149,7 @@ void StartGameProtocol::update()
             rki.setDifficulty(profile->difficulty);
             rki.setGlobalPlayerId(profile->race_id);
             // on the server, the race id must be the local one.
-            rki.setLocalPlayerId(ProtocolManager::getInstance()->isServer() 
+            rki.setLocalPlayerId(STKHost::isServer() 
                                  ? profile->race_id
                                  : (is_me ? 0 : 1)                         );
             rki.setHostId(profile->race_id);
@@ -205,7 +205,7 @@ void StartGameProtocol::update()
 
 void StartGameProtocol::ready() // on clients, means the loading is finished
 {
-    if (!ProtocolManager::getInstance()->isServer()) // if we're a client
+    if (!STKHost::isServer()) // if we're a client
     {
         assert(STKHost::get()->getPeerCount() == 1);
         NetworkString ns(5);

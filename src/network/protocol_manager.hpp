@@ -132,7 +132,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         virtual uint32_t  getProtocolID(Protocol* protocol);
         virtual Protocol* getProtocol(uint32_t id);
         virtual Protocol* getProtocol(ProtocolType type);
-        bool isServer();
         int exit();
 
     protected:

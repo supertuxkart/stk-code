@@ -1312,7 +1312,7 @@ void Kart::update(float dt)
 
     // Check if any item was hit.
     // check it if we're not in a network world, or if we're on the server (when network mode is on)
-    if (!NetworkWorld::getInstance()->isRunning() || NetworkManager::getInstance()->isServer())
+    if (!NetworkWorld::getInstance()->isRunning() || STKHost::isServer())
         ItemManager::get()->checkItemHit(this);
 
     static video::SColor pink(255, 255, 133, 253);

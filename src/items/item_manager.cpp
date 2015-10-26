@@ -320,7 +320,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
             // if we're not playing online, pick the item.
             if (!NetworkWorld::getInstance()->isRunning())
                 collectedItem(*i, kart);
-            else if (NetworkManager::getInstance()->isServer())
+            else if (STKHost::isServer())
             {
                 collectedItem(*i, kart);
                 NetworkWorld::getInstance()->collectedItem(*i, kart);

@@ -214,6 +214,12 @@ public:
     // --------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
     unsigned int getPeerCount() { return (int)m_peers.size(); }
+    // --------------------------------------------------------------------
+    /** Returns if this instance is a server. */
+    static bool isServer() { return m_is_server;  }
+    // --------------------------------------------------------------------
+    /** Returns if this instance is a client. */
+    static bool isclient() { return !m_is_server; }
 
 };   // class STKHost
 
