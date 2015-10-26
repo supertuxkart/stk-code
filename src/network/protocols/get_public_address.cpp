@@ -20,7 +20,6 @@
 
 #include "config/user_config.hpp"
 #include "network/network.hpp"
-#include "network/network_interface.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/stk_host.hpp"
 #include "utils/log.hpp"
