@@ -1252,6 +1252,8 @@ void Kart::update(float dt)
     {
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
     }
+
+    PROFILER_PUSH_CPU_MARKER("Kart::Update (material)", 0x60, 0x34, 0x7F);
     handleMaterialGFX();
     const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
@@ -1309,6 +1311,7 @@ void Kart::update(float dt)
 #endif
         }
     }   // if there is material
+    PROFILER_POP_CPU_MARKER();
 
     // Check if any item was hit.
     // check it if we're not in a network world, or if we're on the server (when network mode is on)
