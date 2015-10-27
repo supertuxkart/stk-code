@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network/server_console.hpp"
+#include "network/network_console.hpp"
 
 #include "main_loop.hpp"
 #include "network/protocol_manager.hpp"
@@ -43,41 +43,41 @@
 #include <stdlib.h>
 #endif
 
-ServerConsole::ServerConsole()
+NetworkConsole::NetworkConsole()
 {
     m_localhost = NULL;
     m_thread_keyboard = NULL;
 }
 
 // ----------------------------------------------------------------------------
-ServerConsole::~ServerConsole()
+NetworkConsole::~NetworkConsole()
 {
     if (m_thread_keyboard)
         pthread_cancel(*m_thread_keyboard);//, SIGKILL);
 }
 
 // ----------------------------------------------------------------------------
-void ServerConsole::run()
+void NetworkConsole::run()
 {
     if (enet_initialize() != 0)
     {
-        Log::error("ServerConsole", "Could not initialize enet.");
+        Log::error("NetworkConsole", "Could not initialize enet.");
         return;
     }
 
-    Log::info("ServerConsole", "Host initialized.");
+    Log::info("NetworkConsole", "Host initialized.");
 
     // listen keyboard console input
     m_thread_keyboard = new pthread_t;
     pthread_create(m_thread_keyboard, NULL, mainLoop, this);
 
-    Log::info("ServerConsole", "Ready.");
+    Log::info("NetworkConsole", "Ready.");
 }   // run
 
 // ----------------------------------------------------------------------------
-void* ServerConsole::mainLoop(void* data)
+void* NetworkConsole::mainLoop(void* data)
 {
-    ServerConsole *me = static_cast<ServerConsole*>(data);
+    NetworkConsole *me = static_cast<NetworkConsole*>(data);
     std::string str = "";
     bool stop = false;
     while (!stop)
@@ -197,7 +197,7 @@ void* ServerConsole::mainLoop(void* data)
 }   // mainLoop
 
 // ----------------------------------------------------------------------------
-void ServerConsole::kickAllPlayers()
+void NetworkConsole::kickAllPlayers()
 {
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
@@ -207,7 +207,7 @@ void ServerConsole::kickAllPlayers()
 }   // kickAllPlayers
 
 // ----------------------------------------------------------------------------
-void ServerConsole::sendPacket(const NetworkString& data, bool reliable)
+void NetworkConsole::sendPacket(const NetworkString& data, bool reliable)
 {
     m_localhost->broadcastPacket(data, reliable);
 }   // sendPacket

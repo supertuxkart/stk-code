@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef SERVER_CONSOLE_HPP
-#define SERVER_CONSOLE_HPP
+#ifndef HEADER_NETWORK_CONSOLE_HPP
+#define HEADER_NETWORK_CONSOLE_HPP
 
 #include "utils/types.hpp"
 
@@ -26,7 +26,7 @@
 class NetworkString;
 class STKHost;
 
-class ServerConsole
+class NetworkConsole
 {
 protected:
 
@@ -39,8 +39,8 @@ protected:
     static void* mainLoop(void* data);
 
 public:
-             ServerConsole();
-    virtual ~ServerConsole();
+             NetworkConsole();
+    virtual ~NetworkConsole();
 
     virtual void run();
 
@@ -53,6 +53,6 @@ public:
 
     virtual bool isServer() { return true; }
 
-};   // class ServerConsole
+};   // class NetworkConsole
 
 #endif // SERVER_CONSOLE_HPP

@@ -23,7 +23,7 @@
 #include "network/event.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/server_console.hpp"
+#include "network/network_console.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -65,7 +65,7 @@ STKHost::STKHost()
 
     if (m_is_server)
     {
-        ServerConsole *sc = new ServerConsole();
+        NetworkConsole *sc = new NetworkConsole();
         sc->run();
         setupServer(STKHost::HOST_ANY, 7321, 16, 2, 0, 0);
         startListening();
