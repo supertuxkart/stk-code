@@ -25,27 +25,32 @@
 #include "online/request_manager.hpp"
 #include "utils/log.hpp"
 
-GetPeerAddress::GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT)
+GetPeerAddress::GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object)
+              : Protocol(callback_object, PROTOCOL_SILENT)
 {
     m_peer_id = peer_id;
-}
+}   // GetPeerAddress
 
+// ----------------------------------------------------------------------------
 GetPeerAddress::~GetPeerAddress()
 {
-}
+}   // ~GetPeerAddress
 
+// ----------------------------------------------------------------------------
 void GetPeerAddress::setup()
 {
     m_state = NONE;
     m_request = NULL;
-}
+}   // setup
 
+// ----------------------------------------------------------------------------
 void GetPeerAddress::asynchronousUpdate()
 {
     if (m_state == NONE)
     {
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "get", Online::API::SERVER_PATH);
+        PlayerManager::setUserDetails(m_request, "get",
+                                      Online::API::SERVER_PATH);
         m_request->addParameter("peer_id", m_peer_id);
 
         Online::RequestManager::get()->addRequest(m_request);
@@ -93,9 +98,10 @@ void GetPeerAddress::asynchronousUpdate()
         m_request = NULL;
         requestTerminate();
     }
-}
+}   // asynchronousUpdate
 
+// ----------------------------------------------------------------------------
 void GetPeerAddress::setPeerID(uint32_t peer_id)
 {
     m_peer_id = peer_id;
-}
+}   // setPeerID

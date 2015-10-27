@@ -25,29 +25,34 @@ namespace Online { class XMLRequest; }
 
 class GetPeerAddress : public Protocol
 {
-    public:
-        GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object);
-        virtual ~GetPeerAddress();
+private:
+    uint32_t m_peer_id;
+    Online::XMLRequest* m_request;
 
-        virtual bool notifyEvent(Event* event) { return true; }
-        virtual bool notifyEventAsynchronous(Event* event) { return true; }
-        virtual void setup();
-        virtual void update() {}
-        virtual void asynchronousUpdate();
+    enum STATE
+    {
+        NONE,
+        REQUEST_PENDING,
+        DONE,
+        EXITING
+    };
+    STATE m_state;
 
-        void setPeerID(uint32_t m_peer_id);
-    protected:
-        uint32_t m_peer_id;
-        Online::XMLRequest* m_request;
-        enum STATE
-        {
-            NONE,
-            REQUEST_PENDING,
-            DONE,
-            EXITING
-        };
-        STATE m_state;
+public:
+             GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object);
+    virtual ~GetPeerAddress();
 
-};
+    virtual void setup();
+    virtual void asynchronousUpdate();
+    void setPeerID(uint32_t m_peer_id);
+
+    // ------------------------------------------------------------------------
+    virtual void update() {}
+    // ------------------------------------------------------------------------
+    virtual bool notifyEvent(Event* event) { return true; }
+    // ------------------------------------------------------------------------
+    virtual bool notifyEventAsynchronous(Event* event) { return true; }
+
+};   // class GetPeerAddress
 
 #endif // GET_PEER_ADDRESS_HPP

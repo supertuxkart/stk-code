@@ -39,7 +39,7 @@
 
 /** This is the central game setup protocol running in the server.
  *  It starts with detecting the public ip address and port of this
- *  host (GetPublicIpAddress).
+ *  host (GetPublicAddress).
  */
 ServerLobbyRoomProtocol::ServerLobbyRoomProtocol() : LobbyRoomProtocol(NULL)
 {

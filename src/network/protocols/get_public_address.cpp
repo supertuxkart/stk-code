@@ -190,10 +190,6 @@ std::string GetPublicAddress::parseStunResponse()
             return "STUN response is invalid.";
     }   // while true
 
-    // The address and the port are known, so the connection can be closed
-    m_state = EXITING;
-    requestTerminate();
-
     return "";
 }   // parseStunResponse
 
@@ -212,7 +208,13 @@ void GetPublicAddress::asynchronousUpdate()
         if (message != "")
         {
             Log::warn("GetPublicAddress", "%s", message.c_str());
-            m_state = NOTHING_DONE;
+            m_state = NOTHING_DONE;  // try again
+        }
+        else
+        {
+            // The address and the port are known, so the connection can be closed
+            m_state = EXITING;
+            requestTerminate();
         }
     }
 }   // asynchronousUpdate
