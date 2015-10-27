@@ -204,12 +204,13 @@ RaceConfig::RaceConfig()
 }
 
 //-----------------------------------------------------------------------------
-
-void RaceConfig::setPlayerCount(uint8_t count)
+/** Sets the maximum number of players.
+ */
+void RaceConfig::setMaxPlayerCount(uint8_t count)
 {
     m_max_players = count;
     m_votes.resize(m_max_players);
-}
+}   // setMaxPlayerCount
 
 //-----------------------------------------------------------------------------
 

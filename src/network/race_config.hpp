@@ -86,7 +86,7 @@ class RaceConfig
     public:
     RaceConfig();
 
-    void setPlayerCount(uint8_t count);
+    void setMaxPlayerCount(uint8_t count);
     void setPlayerMajorVote(uint8_t player_id, uint8_t major);
     void setPlayerRaceCountVote(uint8_t player_id, uint8_t count);
     void setPlayerMinorVote(uint8_t player_id, uint8_t minor);

@@ -132,6 +132,7 @@ GameSetup* STKHost::setupNewGame()
     if (m_game_setup)
         delete m_game_setup;
     m_game_setup = new GameSetup();
+    m_game_setup->getRaceConfig()->setMaxPlayerCount(m_max_players);
     return m_game_setup;
 }   // setupNewGame
 
