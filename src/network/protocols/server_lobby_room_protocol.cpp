@@ -26,7 +26,6 @@
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/show_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
-#include "network/protocols/start_server.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
@@ -38,28 +37,33 @@
 #include "utils/time.hpp"
 
 
+/** This is the central game setup protocol running in the server.
+ *  It starts with detecting the public ip address and port of this
+ *  host (GetPublicIpAddress).
+ */
 ServerLobbyRoomProtocol::ServerLobbyRoomProtocol() : LobbyRoomProtocol(NULL)
 {
-}
+}   // ServerLobbyRoomProtocol
 
 //-----------------------------------------------------------------------------
-
+/** Destructor.
+ */
 ServerLobbyRoomProtocol::~ServerLobbyRoomProtocol()
 {
-}
+}   // ~ServerLobbyRoomProtocol
 
 //-----------------------------------------------------------------------------
 
 void ServerLobbyRoomProtocol::setup()
 {
-    m_setup = STKHost::get()->setupNewGame(); // create a new setup
-    m_setup->getRaceConfig()->setPlayerCount(16); //FIXME : this has to be moved to when logging into the server
-    m_next_id = 0;
-    m_state = NONE;
+    m_setup             = STKHost::get()->setupNewGame();
+    m_next_id           = 0;
+    m_state             = NONE;
     m_selection_enabled = false;
-    m_in_race = false;
+    m_in_race           = false;
+    m_current_protocol  = NULL;
     Log::info("ServerLobbyRoomProtocol", "Starting the protocol.");
-}
+}   // setup
 
 //-----------------------------------------------------------------------------
 
@@ -99,15 +103,19 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         kartDisconnected(event);
     } // if (event->getType() == EVENT_TYPE_DISCONNECTED)
     return true;
-}
+}   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
-
+/** Simple finite state machine. First get the public ip address. Once this
+ *  is known, register the server and its address with the stk server so that
+ *  client can find it.
+ */
 void ServerLobbyRoomProtocol::update()
 {
     switch (m_state)
     {
     case NONE:
+        // Start the protocol to find the public ip address.
         m_current_protocol = new GetPublicAddress();
         m_current_protocol->requestStart();
         m_state = GETTING_PUBLIC_ADDRESS;
@@ -115,17 +123,14 @@ void ServerLobbyRoomProtocol::update()
     case GETTING_PUBLIC_ADDRESS:
         if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
         {
-            m_current_protocol = new StartServer();
-            m_current_protocol->requestStart();
-            m_state = LAUNCHING_SERVER;
             Log::debug("ServerLobbyRoomProtocol", "Public address known.");
-        }
-        break;
-    case LAUNCHING_SERVER:
-        if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
-        {
-            m_state = WORKING;
-            Log::info("ServerLobbyRoomProtocol", "Server setup");
+            // Free GetPublicAddress protocol
+            delete m_current_protocol;
+
+            // Register this server with the STK server. The callback in the
+            // xml request will update the state to WORKING.
+            registerServer();
+            Log::info("ServerLobbyRoomProtocol", "Server registered.");
         }
         break;
     case WORKING:
@@ -146,7 +151,37 @@ void ServerLobbyRoomProtocol::update()
     case EXITING:
         break;
     }
-}
+}   // update
+
+//-----------------------------------------------------------------------------
+/** Register this server (i.e. its public address) with the STK server
+ *  so that clients can find it. It blocks till a responsce from the
+ *  stk server is received (this function is executed from the 
+ *  ProtocolManager thread).
+ */
+void ServerLobbyRoomProtocol::registerServer()
+{
+    Online::XMLRequest *request = new Online::XMLRequest();
+    const TransportAddress& addr = STKHost::get()->getPublicAddress();
+    PlayerManager::setUserDetails(request, "start", Online::API::SERVER_PATH);
+    request->addParameter("address", addr.getIP());
+    request->addParameter("port", addr.getPort());
+    request->addParameter("private_port", STKHost::get()->getPort());
+    request->addParameter("max_players", 
+                          UserConfigParams::m_server_max_players);
+    Log::info("RegisterServer", "Showing addr %s", addr.toString().c_str());
+    
+    request->executeNow();
+
+    const XMLNode * result = request->getXMLData();
+    std::string rec_success;
+
+    if (result->get("success", &rec_success) && rec_success == "yes")
+        Log::info("RegisterServer", "Server is now online.");
+    else
+        Log::error("RegisterServer", "Fail to start server.");
+
+}   // registerServer
 
 //-----------------------------------------------------------------------------
 

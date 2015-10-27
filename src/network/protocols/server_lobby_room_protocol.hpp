@@ -25,18 +25,18 @@ private:
     void playerTrackVote(Event* event);
     void playerReversedVote(Event* event);
     void playerLapsVote(Event* event);
-
+    void registerServer();
 
     enum STATE
     {
         NONE,
         GETTING_PUBLIC_ADDRESS,
-        LAUNCHING_SERVER,
         WORKING,
         DONE,
         EXITING
     };
-    STATE m_state;    public:
+    STATE m_state;
+public:
         ServerLobbyRoomProtocol();
         virtual ~ServerLobbyRoomProtocol();
 
