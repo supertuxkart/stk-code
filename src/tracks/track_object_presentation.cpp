@@ -25,6 +25,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/light.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
@@ -972,7 +973,16 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
 TrackObjectPresentationLight::~TrackObjectPresentationLight()
 {
 }   // ~TrackObjectPresentationLight
-
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLight::setEnergy(float energy)
+{
+    m_energy = energy;
+    LightNode* lnode = dynamic_cast<LightNode*>(m_node);
+    if (lnode != NULL)
+    {
+        lnode->setEnergy(energy);
+    }
+}
 // ----------------------------------------------------------------------------
 TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
                                                        const XMLNode& xml_node)

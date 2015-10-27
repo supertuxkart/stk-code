@@ -359,6 +359,7 @@ public:
     TrackObjectPresentationLight(const XMLNode& xml_node,
                                  scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationLight();
+    void setEnergy(float energy);
 };   // TrackObjectPresentationLight
 
 // ============================================================================

@@ -213,6 +213,25 @@ namespace Scripting
             /** @} */
         }
 
+        // ----------- Light Object methods -----------
+
+        namespace Light
+        {
+            /**
+            * @addtogroup Scripting_Light Light (script binding)
+            * Type returned by trackObject.getLight()
+            * @{
+            */
+
+            void setEnergy(float energy, /** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
+            {
+                ((TrackObjectPresentationLight*)memory)->setEnergy(energy);
+            }
+
+            /** @} */
+        }
+
+
         // ----------- Sound Object methods -----------
 
         namespace SoundEmitter
@@ -289,6 +308,7 @@ namespace Scripting
             r = engine->RegisterObjectType("ParticleEmitter", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectType("SoundEmitter", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectType("Animator", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
+            r = engine->RegisterObjectType("Light", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
 
             //r = engine->RegisterGlobalFunction("void disableTrackObject(const string &in)", asFUNCTION(disableTrackObject), asCALL_CDECL); assert(r >= 0);
             //r = engine->RegisterGlobalFunction("void enableTrackObject(const string &in)", asFUNCTION(enableTrackObject), asCALL_CDECL); assert(r >= 0);
@@ -305,6 +325,7 @@ namespace Scripting
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(::TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "SoundEmitter@ getSoundEmitter()", asMETHOD(::TrackObject, getSoundEmitter), asCALL_THISCALL); assert(r >= 0);
+            r = engine->RegisterObjectMethod("TrackObject", "Light@ getLight()", asMETHOD(::TrackObject, getLight), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "PhysicalObject@ getPhysics()", asMETHOD(::TrackObject, getPhysics), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Mesh@ getMesh()", asMETHOD(::TrackObject, getMesh), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "ParticleEmitter@ getParticleEmitter()", asMETHOD(::TrackObject, getParticleEmitter), asCALL_THISCALL); assert(r >= 0);
@@ -335,6 +356,8 @@ namespace Scripting
             r = engine->RegisterObjectMethod("SoundEmitter", "void playOnce()", asFUNCTION(SoundEmitter::playOnce), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("SoundEmitter", "void playLoop()", asFUNCTION(SoundEmitter::playLoop), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
+            // Light
+            r = engine->RegisterObjectMethod("Light", "void setEnergy(float)", asFUNCTION(Light::setEnergy), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
             // Curve based Animation
             //fails due to insufficient visibility to scripts TODO : Decide whether to fix visibility or introduce wrappers
