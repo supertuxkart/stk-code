@@ -1447,7 +1447,11 @@ void Kart::handleMaterialSFX(const Material *material)
     // In case that three sfx needed to be played (i.e. a previous is
     // playing, a current is playing, and a new terrain with sfx is
     // entered), the oldest (previous) sfx is stopped and deleted.
-    if(getLastMaterial()!=material)
+
+    // FIXME: if there are already two sfx playing, don't add another
+    // one. This should reduce the performance impact when driving 
+    // on the bridge in Cocoa.
+    if(getLastMaterial()!=material && !m_previous_terrain_sound)
     {
         // First stop any previously playing terrain sound
         // and remove it, so that m_previous_terrain_sound
