@@ -168,7 +168,7 @@ bool STKHost::connect(const TransportAddress& address)
     if (peerExists(address))
         return isConnectedTo(address);
 
-    ENetPeer* peer = connectTo(address);
+    ENetPeer* peer = m_network->connectTo(address);
 
     if (peer == NULL)
     {

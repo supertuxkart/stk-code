@@ -39,14 +39,14 @@ class GameSetup;
 class STKPeer;
 
 /** \class STKHost
- *  \brief Represents the local host.
+ *  \brief Represents the local host. It is the main managing point for 
+ *  networking. It is responsible for sending and receiving messages,
+ *  and keeping track of onnected peers. It also provides some low
+ *  level socket functions (i.e. to avoid that enet adds its headers
+ *  to messages, useful for broadcast in LAN and for stun).
  *  This host is either a server host or a client host. A client host is in
  *  charge of connecting to a server. A server opens a socket for incoming
- *  connections.
- *  By default, this host will use ENet to exchange packets. It also defines an
- *  interface for ENet use. Nevertheless, this class can be used to send and/or
- *  receive packets whithout ENet adding its headers.
- *  This class is used by the Network Manager to send packets.
+ *  connections. 
  */
 class STKHost
 {
@@ -150,12 +150,6 @@ public:
     bool        isConnectedTo(const TransportAddress& peer_address);
     int         mustStopListening();
     uint16_t    getPort() const;
-
-    // --------------------------------------------------------------------
-    ENetPeer* connectTo(const TransportAddress &address)
-    {
-        return m_network->connectTo(address);
-    }   // connectTo
 
     // --------------------------------------------------------------------
     /** Returns the current game setup. */
