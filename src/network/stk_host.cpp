@@ -60,13 +60,28 @@ STKHost::STKHost()
 
     pthread_mutex_init(&m_exit_mutex, NULL);
 
-    Network::openLog();
+    // Start with initialising ENet
+    // ============================
+    if (enet_initialize() != 0)
+    {
+        Log::error("NetworkConsole", "Could not initialize enet.");
+        return;
+    }
+
+    Log::info("NetworkConsole", "Host initialized.");
+    Network::openLog();  // Open packet log file
     ProtocolManager::getInstance<ProtocolManager>();
+
+    // Optional: start the network console
+    m_network_console = new NetworkConsole();
+    m_network_console->run();
 
     if (m_is_server)
     {
-        NetworkConsole *sc = new NetworkConsole();
-        sc->run();
+        // The server control flow starts with the ServerLobbyRoomProtocol.
+        // This will in turn spawn more protocols:
+        // GetPublicAddress: Use STUN to discover the public ip address
+        //           and port number for this host.
         setupServer(STKHost::HOST_ANY, 7321, 16, 2, 0, 0);
         startListening();
         ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());

@@ -59,14 +59,6 @@ NetworkConsole::~NetworkConsole()
 // ----------------------------------------------------------------------------
 void NetworkConsole::run()
 {
-    if (enet_initialize() != 0)
-    {
-        Log::error("NetworkConsole", "Could not initialize enet.");
-        return;
-    }
-
-    Log::info("NetworkConsole", "Host initialized.");
-
     // listen keyboard console input
     m_thread_keyboard = new pthread_t;
     pthread_create(m_thread_keyboard, NULL, mainLoop, this);

@@ -36,6 +36,7 @@
 #include <pthread.h>
 
 class GameSetup;
+class NetworkConsole;
 class STKPeer;
 
 /** \class STKHost
@@ -73,6 +74,9 @@ private:
 
     /** ENet host interfacing sockets. */
     Network* m_network;
+
+    /** Network console */
+    NetworkConsole *m_network_console;
 
     /** The list of peers connected to this instance. */
     std::vector<STKPeer*> m_peers;
