@@ -214,59 +214,51 @@ void ServerLobbyRoomProtocol::startSelection()
 }   // startSelection
 
 //-----------------------------------------------------------------------------
-
+/** Query the STK server for connection requests. For each connection request
+ *  start a ConnectToPeer protocol.
+ */
 void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
 {
-    // first poll every 5 seconds
+    // First poll every 5 seconds. Return if no polling needs to be done.
+    const float POLL_INTERVAL = 5.0f;
     static double last_poll_time = 0;
-    if (StkTime::getRealTime() > last_poll_time+10.0)
+    if (StkTime::getRealTime() < last_poll_time + POLL_INTERVAL)
+        return;
+
+    // Now poll the stk server
+    last_poll_time = StkTime::getRealTime();
+    const TransportAddress &addr = STKHost::get()->getPublicAddress();
+    Online::XMLRequest* request = new Online::XMLRequest();
+    PlayerManager::setUserDetails(request, "poll-connection-requests",
+                                  Online::API::SERVER_PATH);
+
+    request->addParameter("address", addr.getIP()  );
+    request->addParameter("port",    addr.getPort());
+
+    request->executeNow();
+    assert(request->isDone());
+
+    const XMLNode *result = request->getXMLData();
+    std::string success;
+
+    if (!result->get("success", &success) || success != "yes")
     {
-        last_poll_time = StkTime::getRealTime();
-        const TransportAddress &addr = STKHost::get()->getPublicAddress();
-        Online::XMLRequest* request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(request, "poll-connection-requests", Online::API::SERVER_PATH);
-
-        request->addParameter("address", addr.getIP());
-        request->addParameter("port", addr.getPort());
-
-        request->executeNow();
-        assert(request->isDone());
-
-        const XMLNode * result = request->getXMLData();
-        std::string rec_success;
-
-        if(result->get("success", &rec_success))
-        {
-            if(rec_success == "yes")
-            {
-                const XMLNode * users_xml = result->getNode("users");
-                uint32_t id = 0;
-                for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
-                {
-                    users_xml->getNode(i)->get("id", &id);
-                    Log::debug("ServerLobbyRoomProtocol", "User with id %d wants to connect.", id);
-                    m_incoming_peers_ids.push_back(id);
-                }
-            }
-            else
-            {
-                Log::error("ServerLobbyRoomProtocol", "Error while reading the list.");
-            }
-        }
-        else
-        {
-            Log::error("ServerLobbyRoomProtocol", "Cannot retrieve the list.");
-        }
-        delete request;
+        Log::error("ServerLobbyRoomProtocol", "Cannot retrieve the list.");
+        return;
     }
 
-    // now
-    for (unsigned int i = 0; i < m_incoming_peers_ids.size(); i++)
+    // Now start a ConnectToPeer protocol for each connection request
+    const XMLNode * users_xml = result->getNode("users");
+    uint32_t id = 0;
+    for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
     {
-        Protocol *p = new ConnectToPeer(m_incoming_peers_ids[i]);
+        users_xml->getNode(i)->get("id", &id);
+        Log::debug("ServerLobbyRoomProtocol",
+                   "User with id %d wants to connect.", id);
+        Protocol *p = new ConnectToPeer(id);
         p->requestStart();
-    }
-    m_incoming_peers_ids.clear();
+    }        
+    delete request;
 }   // checkIncomingConnectionRequests
 
 //-----------------------------------------------------------------------------

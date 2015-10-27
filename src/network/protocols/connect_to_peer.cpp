@@ -45,7 +45,15 @@ ConnectToPeer::~ConnectToPeer()
 {
 }   // ~ConnectToPeer
 
-// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+
+void ConnectToPeer::setup()
+{
+    m_peer_address.clear();
+    m_current_protocol = NULL;
+    m_state            = NONE;
+}   // setup
+    // ----------------------------------------------------------------------------
 
 bool ConnectToPeer::notifyEventAsynchronous(Event* event)
 {
@@ -58,17 +66,12 @@ bool ConnectToPeer::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 // ----------------------------------------------------------------------------
-
-void ConnectToPeer::setup()
-{
-    m_public_address.clear();
-    m_peer_address.clear();
-    m_current_protocol = NULL;
-    m_state            = NONE;
-}   // setup
-
-// ----------------------------------------------------------------------------
-
+/** Simple finite state machine: Start a GetPeerAddress protocol. Once the
+ *  result has been received, start a ping protocol (hoping to be able
+ *  to connect to the NAT peer using its public port). The ping protocol
+ *  should make sure that the peer's firewall still lets packages through
+ *  by the time the actual game starts.
+ */
 void ConnectToPeer::asynchronousUpdate()
 {
     switch(m_state)

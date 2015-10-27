@@ -7,7 +7,7 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
 {
 private:
     uint8_t m_next_id; //!< Next id to assign to a peer.
-    std::vector<uint32_t> m_incoming_peers_ids;
+
     Protocol *m_current_protocol;
     bool m_selection_enabled;
     bool m_in_race;

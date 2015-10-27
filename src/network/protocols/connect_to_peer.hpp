@@ -25,33 +25,34 @@
 
 class ConnectToPeer : public Protocol, public CallbackObject
 {
-    public:
-        ConnectToPeer(uint32_t peer_id);
-        virtual ~ConnectToPeer();
+protected:
 
-        virtual bool notifyEventAsynchronous(Event* event);
-        virtual void setup();
-        virtual void update() {}
-        virtual void asynchronousUpdate();
+    TransportAddress m_peer_address;
+    uint32_t m_peer_id;
 
-    protected:
-        TransportAddress m_peer_address;
-        TransportAddress m_public_address;
-        uint32_t m_peer_id;
+    /** Pointer to the protocol which is monitored for state changes. */
+    Protocol *m_current_protocol;
 
-        /** Pointer to the protocol which is monitored for state changes. */
-        Protocol *m_current_protocol;
+    enum STATE
+    {
+        NONE,
+        WAITING_PEER_ADDRESS,
+        CONNECTING,
+        CONNECTED,
+        DONE,
+        EXITING
+    };
+    STATE m_state;
 
-        enum STATE
-        {
-            NONE,
-            WAITING_PEER_ADDRESS,
-            CONNECTING,
-            CONNECTED,
-            DONE,
-            EXITING
-        };
-        STATE m_state;
+public:
+    ConnectToPeer(uint32_t peer_id);
+    virtual ~ConnectToPeer();
+
+    virtual bool notifyEventAsynchronous(Event* event);
+    virtual void setup();
+    virtual void update() {}
+    virtual void asynchronousUpdate();
+
 };
 
 #endif // CONNECT_TO_SERVER_HPP
