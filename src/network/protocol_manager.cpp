@@ -542,53 +542,6 @@ void ProtocolManager::asynchronousUpdate()
 }   // asynchronousUpdate
 
 // ----------------------------------------------------------------------------
-/** \brief Get the state of a protocol using its id.
- *  \param id : The id of the protocol you seek the state.
- *  \return The state of the protocol.
- */
-ProtocolState ProtocolManager::getProtocolState(uint32_t id)
-{
-    //FIXME that actually need a lock, but it also can be called from
-    // a locked section anyway
-    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
-    {
-        if (m_protocols.getData()[i]->getId() == id) // we know a protocol with that id
-            return m_protocols.getData()[i]->getState();
-    }
-    // the protocol isn't running right now
-    for (unsigned int i = 0; i < m_requests.size(); i++)
-    {
-        // the protocol is going to be started
-        if (m_requests[i].m_protocol->getId() == id)
-            return PROTOCOL_STATE_RUNNING; // we can say it's running
-    }
-    return PROTOCOL_STATE_TERMINATED; // else, it's already finished
-}   // getProtocolState
-
-// ----------------------------------------------------------------------------
-/** \brief Get the state of a protocol using a pointer on it.
- *  \param protocol : A pointer to the protocol you seek the state.
- *  \return The state of the protocol.
- */
-ProtocolState ProtocolManager::getProtocolState(Protocol* protocol)
-{
-    // FIXME Does this need to be locked?
-    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
-    {
-        if (m_protocols.getData()[i] == protocol) // the protocol is known
-            return  m_protocols.getData()[i]->getState();
-    }
-    for (unsigned int i = 0; i < m_requests.size(); i++)
-    {
-        // the protocol is going to be started
-        if (m_requests[i].m_protocol == protocol)
-            return PROTOCOL_STATE_RUNNING; // we can say it's running
-    }
-    // we don't know this protocol at all, it's finished
-    return PROTOCOL_STATE_TERMINATED;
-}   // getProtocolState
-
-// ----------------------------------------------------------------------------
 /** \brief Get the id of a protocol.
  *  \param protocol : A pointer to the protocol you seek the id.
  *  \return The id of the protocol pointed by the protocol parameter.

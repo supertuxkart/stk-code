@@ -177,11 +177,13 @@ void* NetworkConsole::mainLoop(void* data)
 
     }   // while !stop
 
-    uint32_t id = ProtocolManager::getInstance()->requestStart(new StopServer());
-    while(ProtocolManager::getInstance()->getProtocolState(id) != PROTOCOL_STATE_TERMINATED)
+    Protocol *p = new StopServer();
+    while(p->getState() != PROTOCOL_STATE_TERMINATED)
     {
         StkTime::sleep(1);
     }
+
+    delete p;
 
     main_loop->abort();
 

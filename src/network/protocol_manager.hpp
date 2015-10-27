@@ -127,8 +127,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         virtual void requestTerminate(Protocol* protocol);
         virtual void update();
         virtual void asynchronousUpdate();
-        virtual ProtocolState getProtocolState(uint32_t id);
-        virtual ProtocolState getProtocolState(Protocol* protocol);
         virtual uint32_t  getProtocolID(Protocol* protocol);
         virtual Protocol* getProtocol(uint32_t id);
         virtual Protocol* getProtocol(ProtocolType type);
