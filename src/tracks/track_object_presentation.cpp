@@ -967,6 +967,11 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
     {
         m_node = NULL; // lights require shaders to work
     }
+
+    m_energy_animation_from = 0.0f;
+    m_energy_animation_to = 0.0f;
+    m_energy_animation_total_duration = 0.0f;
+    m_energy_animation_remaining_duration = 0.0f;
 }   // TrackObjectPresentationLight
 
 // ----------------------------------------------------------------------------
@@ -981,6 +986,29 @@ void TrackObjectPresentationLight::setEnergy(float energy)
     if (lnode != NULL)
     {
         lnode->setEnergy(energy);
+    }
+}
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLight::setEnergy(float energy, float duration)
+{
+    m_energy_animation_from = m_energy;
+    m_energy_animation_to = energy;
+    m_energy_animation_total_duration = duration;
+    m_energy_animation_remaining_duration = duration;
+}
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLight::update(float dt)
+{
+    if (m_energy_animation_remaining_duration > 0.0f)
+    {
+        m_energy_animation_remaining_duration -= dt;
+        if (m_energy_animation_remaining_duration < 0.0f)
+            m_energy_animation_remaining_duration = 0.0f;
+
+        float ratio = m_energy_animation_remaining_duration / m_energy_animation_total_duration;
+
+        setEnergy(m_energy_animation_from + 
+            (m_energy_animation_to - m_energy_animation_from)*(1.0f - ratio));
     }
 }
 // ----------------------------------------------------------------------------

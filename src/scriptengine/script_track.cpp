@@ -228,6 +228,11 @@ namespace Scripting
                 ((TrackObjectPresentationLight*)memory)->setEnergy(energy);
             }
 
+            void animateEnergy(float energy, float duration, /** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
+            {
+                ((TrackObjectPresentationLight*)memory)->setEnergy(energy, duration);
+            }
+
             /** @} */
         }
 
@@ -358,6 +363,7 @@ namespace Scripting
 
             // Light
             r = engine->RegisterObjectMethod("Light", "void setEnergy(float)", asFUNCTION(Light::setEnergy), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Light", "void animateEnergy(float, float)", asFUNCTION(Light::animateEnergy), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
             // Curve based Animation
             //fails due to insufficient visibility to scripts TODO : Decide whether to fix visibility or introduce wrappers
