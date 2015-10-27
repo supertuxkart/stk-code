@@ -18,10 +18,11 @@
 
 #include "network/protocol.hpp"
 
-#include "network/protocol_manager.hpp"
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
+#include "network/protocol_manager.hpp"
 
-Protocol::Protocol(CallbackObject* callback_object, PROTOCOL_TYPE type)
+Protocol::Protocol(CallbackObject* callback_object, ProtocolType type)
 {
     m_callback_object = callback_object;
     m_type = type;
@@ -49,14 +50,14 @@ void Protocol::setListener(ProtocolManager* listener)
     m_listener = listener;
 }
 
-PROTOCOL_TYPE Protocol::getProtocolType()
+ProtocolType Protocol::getProtocolType()
 {
     return m_type;
 }
 
 bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < minimum_size || data[0] != 4)
     {
         Log::warn("Protocol", "Receiving a badly "
@@ -77,7 +78,7 @@ bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
 
 bool Protocol::isByteCorrect(Event* event, int byte_nb, int value)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data[byte_nb] != value)
     {
         Log::info("Protocol", "Bad byte at pos %d. %d "

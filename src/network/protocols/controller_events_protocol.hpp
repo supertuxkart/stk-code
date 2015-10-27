@@ -4,7 +4,9 @@
 #include "network/protocol.hpp"
 
 #include "input/input.hpp"
-#include "karts/controller/controller.hpp"
+
+class Controller;
+class STKPeer;
 
 class ControllerEventsProtocol : public Protocol
 {

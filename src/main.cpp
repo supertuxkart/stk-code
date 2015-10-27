@@ -1265,9 +1265,9 @@ int main(int argc, char *argv[] )
         handleCmdLineOutputModifier();
 
         if(CommandLine::has("--root", &s))
-        {
             FileManager::addRootDirs(s);
-        }
+        if (CommandLine::has("--stdout", &s))
+            FileManager::setStdoutName(s);
 
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must

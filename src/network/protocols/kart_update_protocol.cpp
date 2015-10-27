@@ -2,8 +2,9 @@
 
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/event.hpp"
 #include "network/network_world.hpp"
+#include "network/protocol_manager.hpp"
 #include "utils/time.hpp"
 
 KartUpdateProtocol::KartUpdateProtocol()
@@ -33,7 +34,7 @@ bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NetworkString ns = event->data();
+    NetworkString &ns = event->data();
     if (ns.size() < 36)
     {
         Log::info("KartUpdateProtocol", "Message too short.");

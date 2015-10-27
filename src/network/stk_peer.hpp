@@ -23,48 +23,75 @@
 #ifndef STK_PEER_HPP
 #define STK_PEER_HPP
 
-#include "network/stk_host.hpp"
-#include "network/network_string.hpp"
-#include "network/game_setup.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/types.hpp"
+
 #include <enet/enet.h>
+
+class NetworkPlayerProfile;
+class NetworkString;
+class STKHost;
+class TransportAddress;
 
 /*! \class STKPeer
  *  \brief Represents a peer.
  *  This class is used to interface the ENetPeer structure.
  */
-class STKPeer
+class STKPeer : public NoCopy
 {
     friend class Event;
 protected:
-    ENetPeer* m_peer;
-    NetworkPlayerProfile** m_player_profile;
-    uint32_t *m_client_server_token;
-    bool *m_token_set;
+    /** Pointer to the corresponding ENet peer data structure. */
+    ENetPeer* m_enet_peer;
+
+    NetworkPlayerProfile* m_player_profile;
+
+    /** The token of this client. */
+    uint32_t m_client_server_token;
+
+    /** True if the token for this peer has been set. */
+    bool m_token_set;
 
 public:
-        STKPeer();
-        STKPeer(const STKPeer& peer);
-        virtual ~STKPeer();
+             STKPeer();
+    virtual ~STKPeer();
 
-        virtual void sendPacket(const NetworkString& data, bool reliable = true);
-        static bool connectToHost(STKHost* localhost, const TransportAddress& host,
-                                  uint32_t channel_count, uint32_t data);
-        void disconnect();
+    virtual void sendPacket(const NetworkString& data, bool reliable = true);
+    static bool connectToHost(STKHost* localhost, const TransportAddress& host,
+                              uint32_t channel_count, uint32_t data);
+    void disconnect();
+    bool isConnected() const;
+    bool exists() const;
+    uint32_t getAddress() const;
+    uint16_t getPort() const;
+    bool isSamePeer(const STKPeer* peer) const;
 
-        void setClientServerToken(const uint32_t& token) { *m_client_server_token = token; *m_token_set = true; }
-        void unsetClientServerToken() { *m_token_set = false; }
-        void setPlayerProfile(NetworkPlayerProfile* profile) { *m_player_profile = profile; }
-        void setPlayerProfilePtr(NetworkPlayerProfile** profile) { m_player_profile = profile; }
-
-        bool isConnected() const;
-        bool exists() const;
-        uint32_t getAddress() const;
-        uint16_t getPort() const;
-        NetworkPlayerProfile* getPlayerProfile() { return (m_player_profile)?(*m_player_profile):NULL; }
-        uint32_t getClientServerToken() const   { return *m_client_server_token; }
-        bool     isClientServerTokenSet() const { return *m_token_set; }
-
-        bool isSamePeer(const STKPeer* peer) const;
+    // ------------------------------------------------------------------------
+    /** Sets the token for this client. */
+    void setClientServerToken(const uint32_t& token)
+    {
+        m_client_server_token = token; 
+        m_token_set = true; 
+    }   // setClientServerToken
+    // ------------------------------------------------------------------------
+    void unsetClientServerToken() { m_token_set = false; }
+    // ------------------------------------------------------------------------
+    void setPlayerProfile(NetworkPlayerProfile* profile)
+    {
+        m_player_profile = profile; 
+    }   // setPlayerProfile
+    // ------------------------------------------------------------------------
+    /** Returns the player profile of this peer. */
+    NetworkPlayerProfile* getPlayerProfile() 
+    {
+        return m_player_profile;
+    }   // getPlayerProfile
+    // ------------------------------------------------------------------------
+    /** Returns the token of this client. */
+    uint32_t getClientServerToken() const { return m_client_server_token; }
+    // ------------------------------------------------------------------------
+    /** Returns if the token for this client is known. */
+    bool isClientServerTokenSet() const { return m_token_set; }
 
 };   // STKPeer
 

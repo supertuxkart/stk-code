@@ -28,12 +28,13 @@
 
 #include "network/protocol_manager.hpp"
 #include "network/types.hpp"
-#include "network/event.hpp"
-#include "network/game_setup.hpp"
 #include "utils/singleton.hpp"
 #include "utils/synchronised.hpp"
 
 #include <vector>
+
+class Event;
+class GameSetup;
 
 /** \class NetworkManager
  *  \brief Gives the general functions to use network communication.
@@ -46,98 +47,93 @@
  */
 class NetworkManager : public AbstractSingleton<NetworkManager>
 {
+protected:
+             NetworkManager();
+    virtual ~NetworkManager();
+
+    /** Pointer to the one stk host instance, which is used to do all
+     *  network communication. */
+    STKHost* m_localhost;
+
+    /** The list of peers connected to this instance. */
+    std::vector<STKPeer*> m_peers;
+
+private:
+    GameSetup* m_game_setup;
+
+    /** This computer's public IP address. With lock since it can
+     *  be updated from a separate thread. */
+    Synchronised<TransportAddress> m_public_address;
+
+    PlayerLogin m_player_login;
+
+
     friend class AbstractSingleton<NetworkManager>;
-    public:
-        /** \brief Function to start the Network Manager (start threads) */
-        virtual void run();
-        /** \brief Function to reset the Network Manager.
-         *  This function resets the peers and the listening host.
-         */
-        virtual void reset();
-        /** \brief Function that aborts the NetworkManager.
-         *  This function will stop the listening, delete the host and stop
-         *  threads that are related to networking.
-         */
-        virtual void abort();
+public:
+    virtual void run();
+    virtual void reset();
+    virtual void abort();
+    virtual bool connect(const TransportAddress& peer);
+    virtual void setManualSocketsMode(bool manual);
+    virtual void propagateEvent(Event* event);
+    virtual void sendPacket(const NetworkString& data,
+                            bool reliable = true) = 0;
+    virtual void sendPacket(STKPeer* peer,
+                            const NetworkString& data,
+                            bool reliable = true);
+    virtual void sendPacketExcept(STKPeer* peer,
+                                  const NetworkString& data,
+                                  bool reliable = true);
 
-        // network management functions
-        /** \brief Try to establish a connection to a given transport address.
-         *  \param peer : The transport address which you want to connect to.
-         *  \return True if we're successfully connected. False elseway.
-         */
-        virtual bool connect(const TransportAddress& peer);
-        /** \brief Changes the socket working mode.
-         *  Sockets can be in two modes : The ENet mode and a mode we will call
-         *  the 'Raw' mode. In the ENet mode, the socket will be read as
-         *  \param peer : The transport address which you want to connect to.
-         *  \return True if we're successfully connected. False elseway.
-         */
-        virtual void setManualSocketsMode(bool manual);
+    // Game related functions
+    virtual GameSetup* setupNewGame();
+    virtual void disconnected();
+    virtual bool isServer() = 0;
 
-        // message/packets related functions
-        virtual void notifyEvent(Event* event);
-        virtual void sendPacket(const NetworkString& data,
-                                bool reliable = true) = 0;
-        virtual void sendPacket(STKPeer* peer,
-                                const NetworkString& data,
-                                bool reliable = true);
-        virtual void sendPacketExcept(STKPeer* peer,
-                                const NetworkString& data,
-                                bool reliable = true);
+    // raw data management
+    void setLogin(std::string username, std::string password);
+    void setPublicAddress(const TransportAddress& addr);
+    void removePeer(STKPeer* peer);
 
-        // Game related functions
-        virtual GameSetup* setupNewGame(); //!< Creates a new game setup and returns it
-        virtual void disconnected(); //!< Called when you leave a server
+    // getters
+    // ------------------------------------------------------------------------
+    /** Returns if a peer from the specified IP:port address
+     *  already exists. */
+    virtual bool peerExists(const TransportAddress& peer)
+    {
+        return m_localhost->peerExists(peer);
+    }   // peerExists
+    // --------------------------------------------------------------------
+    virtual bool isConnectedTo(const TransportAddress& peer)
+    {
+        return m_localhost->isConnectedTo(peer);
+    }   // isConnectedTo
 
-        // raw data management
-        void setLogin(std::string username, std::string password);
-        void setPublicAddress(const TransportAddress& addr);
-        void removePeer(STKPeer* peer);
+    // --------------------------------------------------------------------
+    inline bool isClient() { return !isServer(); }
+    // --------------------------------------------------------------------
+    STKHost* getHost() { return m_localhost; }
+    // --------------------------------------------------------------------
+    std::vector<STKPeer*> getPeers() { return m_peers; }
+    // --------------------------------------------------------------------
+    unsigned int getPeerCount() { return (int)m_peers.size(); }
+    // --------------------------------------------------------------------
+    /** Returns the public IP address (thread safe). The network manager
+     *  is a friend of TransportAddress and so has access to the copy
+     *  constructor, which is otherwise declared private. */
+    const TransportAddress getPublicAddress()
+    {
+        m_public_address.lock();
+        TransportAddress a;
+        a.copy(m_public_address.getData());
+        m_public_address.unlock();
+        return a;
+    } // getPublicAddress
 
-        // getters
-        virtual bool peerExists(const TransportAddress& peer);
-        virtual bool isConnectedTo(const TransportAddress& peer);
+    // --------------------------------------------------------------------
+    /** Returns the current game setup. */
+    GameSetup* getGameSetup() { return m_game_setup; }
 
-        virtual bool isServer() = 0;
-        // --------------------------------------------------------------------
-        inline bool isClient()              { return !isServer();         }
-        // --------------------------------------------------------------------
-        bool isPlayingOnline()              { return m_playing_online;    }
-        // --------------------------------------------------------------------
-        STKHost* getHost()                  { return m_localhost;         }
-        // --------------------------------------------------------------------
-        std::vector<STKPeer*> getPeers()    { return m_peers;             }
-        // --------------------------------------------------------------------
-        unsigned int getPeerCount()         { return (int)m_peers.size(); }
-        // --------------------------------------------------------------------
-        /** Returns the public IP address (thread safe). The network manager
-         *  is a friend of TransportAddress and so has access to the copy
-         *  constructor, which is otherwise declared private. */
-        const TransportAddress getPublicAddress()
-        {
-            m_public_address.lock();
-            TransportAddress a;
-            a.copy(m_public_address.getData());
-            m_public_address.unlock();
-            return a;
-        } // getPublicAddress
-
-        // --------------------------------------------------------------------
-        GameSetup* getGameSetup()           { return m_game_setup;        }
-
-    protected:
-        NetworkManager();
-        virtual ~NetworkManager();
-
-        // protected members
-        std::vector<STKPeer*> m_peers;
-        STKHost* m_localhost;
-        bool m_playing_online;
-        GameSetup* m_game_setup;
-        /** This computer's public IP address. With lock since it can
-         *  be updated from a separate thread. */
-        Synchronised<TransportAddress> m_public_address;
-        PlayerLogin m_player_login;
-};
+};   // class NetworkManager
 
 #endif // NETWORKMANAGER_HPP

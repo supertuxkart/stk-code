@@ -18,14 +18,9 @@
 
 #include "network/network_manager.hpp"
 
-#include "network/protocols/hide_public_address.hpp"
-#include "network/protocols/show_public_address.hpp"
-#include "network/protocols/get_public_address.hpp"
-
+#include "network/event.hpp"
+#include "network/game_setup.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/client_network_manager.hpp"
-#include "network/server_network_manager.hpp"
-
 #include "utils/log.hpp"
 
 #include <pthread.h>
@@ -58,6 +53,8 @@ NetworkManager::~NetworkManager()
 }   // ~Networkmanager
 
 //----------------------------------------------------------------------------
+/** \brief Function to start the Network Manager (start threads).
+ */
 void NetworkManager::run()
 {
     // create the protocol manager
@@ -65,6 +62,9 @@ void NetworkManager::run()
 }   // run
 
 //-----------------------------------------------------------------------------
+/** \brief Function to reset the Network Manager.
+ *  This function resets the peers and the listening host.
+ */
 void NetworkManager::reset()
 {
     if (m_localhost)
@@ -78,6 +78,10 @@ void NetworkManager::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** \brief Function that aborts the NetworkManager.
+ *  This function will stop the listening, delete the host and stop
+ *  threads that are related to networking.
+ */
 void NetworkManager::abort()
 {
     m_localhost->stopListening();
@@ -88,17 +92,25 @@ void NetworkManager::abort()
 }   // abort
 
 //-----------------------------------------------------------------------------
-
-bool NetworkManager::connect(const TransportAddress& peer)
+/** \brief Try to establish a connection to a given transport address.
+ *  \param peer : The transport address which you want to connect to.
+ *  \return True if we're successfully connected. False elseway.
+ */
+bool NetworkManager::connect(const TransportAddress& address)
 {
-    if (peerExists(peer))
-        return isConnectedTo(peer);
+    if (peerExists(address))
+        return isConnectedTo(address);
 
-    return STKPeer::connectToHost(m_localhost, peer, 2, 0);
+    return STKPeer::connectToHost(m_localhost, address, 2, 0);
 }   // connect
 
 //-----------------------------------------------------------------------------
-
+/** \brief Changes the socket working mode.
+ *  Sockets can be in two modes : The ENet mode and a mode we will call
+ *  the 'Raw' mode. In the ENet mode, the socket will be read as
+ *  \param peer : The transport address which you want to connect to.
+ *  \return True if we're successfully connected. False elseway.
+ */
 void NetworkManager::setManualSocketsMode(bool manual)
 {
     if (manual)
@@ -108,7 +120,13 @@ void NetworkManager::setManualSocketsMode(bool manual)
 }   // setManualSocketsMode
 
 //-----------------------------------------------------------------------------
-void NetworkManager::notifyEvent(Event* event)
+/** Is called from STKHost when an event (i.e. a package) is received. If the
+ *  event indicates a new connection, the peer is added to the list of peers.
+ *  It logs the package, and propagates the event to the ProtocollManager,
+ *  which in turn will notify individual protocols.
+ *  \param event Pointer to the event to propagate.
+ */
+void NetworkManager::propagateEvent(Event* event)
 {
     Log::verbose("NetworkManager", "EVENT received of type %d",
                  (int)(event->getType()));
@@ -135,8 +153,8 @@ void NetworkManager::notifyEvent(Event* event)
     }
 
     // notify for the event now.
-    ProtocolManager::getInstance()->notifyEvent(event);
-}   // notifyEvent
+    ProtocolManager::getInstance()->propagateEvent(event);
+}   // propagateEvent
 
 //-----------------------------------------------------------------------------
 
@@ -163,18 +181,20 @@ void NetworkManager::sendPacketExcept(STKPeer* peer, const NetworkString& data,
 }   // sendPacketExcept
 
 //-----------------------------------------------------------------------------
-
+/** A previous GameSetup is deletea and a new one is created.
+ *  \return Newly create GameSetup object.
+ */
 GameSetup* NetworkManager::setupNewGame()
 {
     if (m_game_setup)
         delete m_game_setup;
-    m_game_setup = NULL;
     m_game_setup = new GameSetup();
     return m_game_setup;
 }   // setupNewGame
 
 //-----------------------------------------------------------------------------
-
+/** Called when you leave a server.
+ */
 void NetworkManager::disconnected()
 {
     // delete the game setup
@@ -248,15 +268,3 @@ void NetworkManager::removePeer(STKPeer* peer)
 }   // removePeer
 
 //-----------------------------------------------------------------------------
-
-bool NetworkManager::peerExists(const TransportAddress& peer)
-{
-    return m_localhost->peerExists(peer);
-}   // peerExists
-
-//-----------------------------------------------------------------------------
-
-bool NetworkManager::isConnectedTo(const TransportAddress& peer)
-{
-    return m_localhost->isConnectedTo(peer);
-}   // isConnectedTo

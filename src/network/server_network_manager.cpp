@@ -111,7 +111,7 @@ void ServerNetworkManager::run()
     Log::info("ServerNetworkManager", "Host initialized.");
 
     // listen keyboard console input
-    m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
+    m_thread_keyboard = new pthread_t;
     pthread_create(m_thread_keyboard, NULL, waitInput2, NULL);
 
     NetworkManager::run();

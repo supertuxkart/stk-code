@@ -24,9 +24,13 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
-#include "network/stk_peer.hpp"
 #include "network/network_string.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/types.hpp"
+
+#include "enet/enet.h"
+
+class STKPeer;
 
 /*!
  * \enum EVENT_TYPE
@@ -52,6 +56,7 @@ enum EVENT_TYPE
 class Event
 {
 private:
+    LEAK_CHECK()
     /** Copy of the data passed by the event. */
     NetworkString m_data;
 
@@ -66,7 +71,6 @@ private:
 
 public:
          Event(ENetEvent* event);
-         Event(const Event& event);
         ~Event();
     void removeFront(int size);
 
@@ -78,11 +82,16 @@ public:
     /** Returns the peer of this event. */
     STKPeer* getPeer() const { return m_peer;  }
     // ------------------------------------------------------------------------
-    /** \brief Get a copy of the data.
-     *  \return A copy of the message data. This is empty for events like
+    /** \brief Get a const reference to the received data.
+     *  This is empty for events like connection or disconnections. 
+     */
+    const NetworkString& data() const { return m_data; }
+    // ------------------------------------------------------------------------
+    /** \brief Get a non-const reference to the received data.
+     *  A copy of the message data. This is empty for events like
      *  connection or disconnections. */
-    NetworkString data() const { return m_data; }
-
+    NetworkString& data() { return m_data; }
+    // ------------------------------------------------------------------------
 
 };   // class Event
 

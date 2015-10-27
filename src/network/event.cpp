@@ -62,7 +62,7 @@ Event::Event(ENetEvent* event)
     m_peer = NULL;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        if (peers[i]->m_peer == event->peer)
+        if (peers[i]->m_enet_peer == event->peer)
         {
             m_peer = peers[i];
             Log::verbose("Event", "The peer you sought has been found on %p",
@@ -73,25 +73,13 @@ Event::Event(ENetEvent* event)
     if (m_peer == NULL) // peer does not exist, create him
     {
         STKPeer* new_peer = new STKPeer();
-        new_peer->m_peer = event->peer;
+        new_peer->m_enet_peer = event->peer;
         m_peer = new_peer;
         Log::debug("Event", 
                    "Creating a new peer, address are STKPeer:%p, Peer:%p",
                     new_peer, event->peer);
     }
 }   // Event(ENetEvent)
-
-// ----------------------------------------------------------------------------
-/** \brief Constructor
- *  \param event : The event to copy.
- */
-Event::Event(const Event& event)
-{
-    m_type   = event.m_type;
-    m_packet = NULL;
-    m_data   = event.m_data;
-    m_peer   = event.m_peer;
-}   // Event(Event)
 
 // ----------------------------------------------------------------------------
 /** \brief Destructor that frees the memory of the package.

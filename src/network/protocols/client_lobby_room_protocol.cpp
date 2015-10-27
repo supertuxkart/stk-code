@@ -20,6 +20,7 @@
 
 #include "config/player_manager.hpp"
 #include "modes/world_with_rank.hpp"
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
@@ -135,7 +136,7 @@ bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
     assert(m_setup); // assert that the setup exists
     if (event->getType() == EVENT_TYPE_MESSAGE)
     {
-        NetworkString data = event->data();
+        const NetworkString &data = event->data();
         assert(data.size()); // assert that data isn't empty
         uint8_t message_type = data[0];
         if (message_type != 0x03 &&
@@ -161,7 +162,7 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
     assert(m_setup); // assert that the setup exists
     if (event->getType() == EVENT_TYPE_MESSAGE)
     {
-        NetworkString data = event->data();
+        const NetworkString &data = event->data();
         assert(data.size()); // assert that data isn't empty
         uint8_t message_type = data[0];
         if (message_type == 0x03 ||
@@ -285,7 +286,7 @@ void ClientLobbyRoomProtocol::update()
  */
 void ClientLobbyRoomProtocol::newPlayer(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() != 7 || data[0] != 4 || data[5] != 1) // 7 bytes remains now
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a new player wasn't formated as expected.");
@@ -328,7 +329,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
  */
 void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() != 2 || data[0] != 1)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a new player wasn't formated as expected.");
@@ -359,7 +360,7 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
  */
 void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 {
-    NetworkString data = event->data();
+    NetworkString &data = event->data();
     if (data.size() < 12 || data[0] != 1 || data[2] != 4 || data[7] != 4) // 12 bytes remains now
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying an accepted connection wasn't formated as expected.");
@@ -428,7 +429,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
  */
 void ClientLobbyRoomProtocol::connectionRefused(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() != 2 || data[0] != 1) // 2 bytes remains now
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a refused connection wasn't formated as expected.");
@@ -463,7 +464,7 @@ void ClientLobbyRoomProtocol::connectionRefused(Event* event)
  */
 void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() != 2 || data[0] != 1)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a refused kart selection wasn't formated as expected.");
@@ -498,7 +499,7 @@ void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
  */
 void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 3 || data[0] != 1)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a kart selection update wasn't formated as expected.");
@@ -534,7 +535,7 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
  */
 void ClientLobbyRoomProtocol::startGame(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 5 || data[0] != 4)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
@@ -567,7 +568,7 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
  */
 void ClientLobbyRoomProtocol::startSelection(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 5 || data[0] != 4)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
@@ -599,12 +600,12 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
  */
 void ClientLobbyRoomProtocol::raceFinished(Event* event)
 {
-    if (event->data().size() < 5)
+    NetworkString &data = event->data();
+    if (data.size() < 5)
     {
         Log::error("ClientLobbyRoomProtocol", "Not enough data provided.");
         return;
     }
-    NetworkString data = event->data();
     if (event->getPeer()->getClientServerToken() != data.gui32(1))
     {
         Log::error("ClientLobbyRoomProtocol", "Bad token");
@@ -675,7 +676,7 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
  */
 void ClientLobbyRoomProtocol::playerMajorVote(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -698,7 +699,7 @@ void ClientLobbyRoomProtocol::playerMajorVote(Event* event)
  */
 void ClientLobbyRoomProtocol::playerRaceCountVote(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -721,7 +722,7 @@ void ClientLobbyRoomProtocol::playerRaceCountVote(Event* event)
  */
 void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -745,7 +746,7 @@ void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
  */
 void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 10))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -771,7 +772,7 @@ void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
  */
 void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 11))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -797,7 +798,7 @@ void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
  */
 void ClientLobbyRoomProtocol::playerLapsVote(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))

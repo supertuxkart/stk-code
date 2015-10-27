@@ -69,6 +69,9 @@ private:
     /** The list of all root directories. */
     static std::vector<std::string> m_root_dirs;
 
+    /** Name of stdout file. */
+    static std::string m_stdout_filename;
+
     /** Directory to store screenshots in. */
     std::string       m_screenshot_dir;
 
@@ -109,6 +112,7 @@ public:
                      ~FileManager();
     void              init();
     static void       addRootDirs(const std::string &roots);
+    static void       setStdoutName(const std::string &name);
     io::IXMLReader   *createXMLReader(const std::string &filename);
     XMLNode          *createXMLTree(const std::string &filename);
     XMLNode          *createXMLTreeFromString(const std::string & content);

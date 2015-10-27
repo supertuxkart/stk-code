@@ -23,6 +23,8 @@
 
 #include <string>
 
+class STKHost;
+
 class GetPublicAddress : public Protocol
 {
     public:

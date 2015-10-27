@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -178,12 +179,19 @@ void* STKHost::mainLoop(void* self)
     {
         while (enet_host_service(host, &event, 20) != 0)
         {
+            if (event.type == ENET_EVENT_TYPE_NONE)
+                continue;
+
+            // Create an STKEvent with the event data
             Event* stk_event = new Event(&event);
             if (stk_event->getType() == EVENT_TYPE_MESSAGE)
                 logPacket(stk_event->data(), true);
-            if (event.type != ENET_EVENT_TYPE_NONE)
-                NetworkManager::getInstance()->notifyEvent(stk_event);
-            delete stk_event;
+
+            // The event is forwarded to the NetworkManger and from there
+            // there to the ProtocolManager. The ProtocolManager is
+            // responsible for freeing the memory.
+            NetworkManager::getInstance()->propagateEvent(stk_event);
+            
         }   // while enet_host_service
     }   // while !mustStopListening
 
@@ -372,7 +380,7 @@ uint8_t* STKHost::receiveRawPacket(const TransportAddress& sender,
     }
     if (addr.sin_family == AF_INET)
     {
-        TransportAddress a(addr.sin_addr.s_addr);
+        TransportAddress a(ntohl(addr.sin_addr.s_addr));
         Log::info("STKHost", "IPv4 Address of the sender was %s",
                   a.toString(false).c_str());
     }

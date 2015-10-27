@@ -6,10 +6,11 @@
 #include "input/input_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/event.hpp"
 #include "network/game_setup.hpp"
+#include "network/network_manager.hpp"
 #include "network/network_world.hpp"
+#include "network/protocol_manager.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
 #include "online/online_profile.hpp"
 #include "race/race_manager.hpp"
@@ -36,7 +37,7 @@ StartGameProtocol::~StartGameProtocol()
 
 bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 5)
     {
         Log::error("StartGameProtocol", "Too short message.");

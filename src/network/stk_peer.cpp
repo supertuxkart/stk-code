@@ -18,54 +18,42 @@
 
 #include "network/stk_peer.hpp"
 #include "network/network_manager.hpp"
+#include "network/game_setup.hpp"
+#include "network/network_string.hpp"
 #include "utils/log.hpp"
 
 #include <string.h>
 
+/** Constructor for an empty peer.
+ */
 STKPeer::STKPeer()
 {
-    m_peer = NULL;
-    m_player_profile = new NetworkPlayerProfile*;
-    *m_player_profile = NULL;
-    m_client_server_token = new uint32_t;
-    *m_client_server_token = 0;
-    m_token_set = new bool;
-    *m_token_set = false;
-}
+    m_enet_peer           = NULL;
+    m_player_profile      = NULL;
+    m_client_server_token = 0;
+    m_token_set           = false;
+}   // STKPeer
 
 //-----------------------------------------------------------------------------
-
-STKPeer::STKPeer(const STKPeer& peer)
-{
-    m_peer = peer.m_peer;
-    m_player_profile = peer.m_player_profile;
-    m_client_server_token = peer.m_client_server_token;
-    m_token_set = peer.m_token_set;
-}
-
-//-----------------------------------------------------------------------------
-
+/** Destructor.
+ */
 STKPeer::~STKPeer()
 {
-    if (m_peer)
-        m_peer = NULL;
+    if (m_enet_peer)
+        m_enet_peer = NULL;
     if (m_player_profile)
         delete m_player_profile;
     m_player_profile = NULL;
-    if (m_client_server_token)
-        delete m_client_server_token;
-    m_client_server_token = NULL;
-    if (m_token_set)
-        delete m_token_set;
-    m_token_set = NULL;
-}
+    m_client_server_token = 0;
+}   // ~STKPeer
 
 //-----------------------------------------------------------------------------
-
+/** Connect to the specified host.
+ */
 bool STKPeer::connectToHost(STKHost* localhost, const TransportAddress &host,
-                uint32_t channel_count, uint32_t data)
+                            uint32_t channel_count, uint32_t data)
 {
-    const ENetAddress  address = host.toEnetAddress();
+    const ENetAddress address = host.toEnetAddress();
 
     ENetPeer* peer = enet_host_connect(localhost->m_host, &address, 2, 0);
     if (peer == NULL)
@@ -76,70 +64,70 @@ bool STKPeer::connectToHost(STKHost* localhost, const TransportAddress &host,
     TransportAddress a(peer->address);
     Log::verbose("STKPeer", "Connecting to %s", a.toString().c_str());
     return true;
-}
+}   // connectToHost
 
 //-----------------------------------------------------------------------------
-
+/** Disconnect from the server.
+ */
 void STKPeer::disconnect()
 {
-    enet_peer_disconnect(m_peer, 0);
-}
+    enet_peer_disconnect(m_enet_peer, 0);
+}   // disconnect
 
 //-----------------------------------------------------------------------------
-
+/** Sends a packet to this host.
+ *  \param data The data to send.
+ *  \param reliable If the data is sent reliable or not.
+ */
 void STKPeer::sendPacket(NetworkString const& data, bool reliable)
 {
-    TransportAddress a(m_peer->address);
+    TransportAddress a(m_enet_peer->address);
     Log::verbose("STKPeer", "sending packet of size %d to %s",
                  a.toString().c_str());
          
     ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
-                (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
-    /* to debug the packet output
-    printf("STKPeer: ");
-    for (unsigned int i = 0; i < data.size(); i++)
-    {
-        printf("%d ", (uint8_t)(data[i]));
-    }
-    printf("\n");
-    */
-    enet_peer_send(m_peer, 0, packet);
-}
+                                    (reliable ? ENET_PACKET_FLAG_RELIABLE
+                                              : ENET_PACKET_FLAG_UNSEQUENCED));
+    enet_peer_send(m_enet_peer, 0, packet);
+}   // sendPacket
 
 //-----------------------------------------------------------------------------
-
+/** Returns the IP address (in host format) of this client.
+ */
 uint32_t STKPeer::getAddress() const
 {
-    return ntohl(m_peer->address.host);
-}
+    return ntohl(m_enet_peer->address.host);
+}   // getAddress
 
 //-----------------------------------------------------------------------------
-
+/** Returns the port of this peer.
+ */
 uint16_t STKPeer::getPort() const
 {
-    return m_peer->address.port;
+    return m_enet_peer->address.port;
 }
 
 //-----------------------------------------------------------------------------
-
+/** Returns if the peer is connected or not.
+ */
 bool STKPeer::isConnected() const
 {
-    Log::info("STKPeer", "The peer state is %i", m_peer->state);
-    return (m_peer->state == ENET_PEER_STATE_CONNECTED);
-}
+    Log::info("STKPeer", "The peer state is %i", m_enet_peer->state);
+    return (m_enet_peer->state == ENET_PEER_STATE_CONNECTED);
+}   // isConnected
 
 //-----------------------------------------------------------------------------
 
 bool STKPeer::exists() const
 {
-    return (m_peer != NULL); // assert that the peer exists
+    return (m_enet_peer != NULL); // assert that the peer exists
 }
 
 //-----------------------------------------------------------------------------
 
 bool STKPeer::isSamePeer(const STKPeer* peer) const
 {
-    return peer->m_peer==m_peer;
+    return peer->m_enet_peer==m_enet_peer;
 }
 
 //-----------------------------------------------------------------------------

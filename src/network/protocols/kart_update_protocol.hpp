@@ -4,7 +4,9 @@
 #include "network/protocol.hpp"
 #include "utils/vec3.hpp"
 #include "LinearMath/btQuaternion.h"
+
 #include <list>
+#include "pthread.h"
 
 class AbstractKart;
 

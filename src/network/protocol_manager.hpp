@@ -23,7 +23,6 @@
 #ifndef PROTOCOL_MANAGER_HPP
 #define PROTOCOL_MANAGER_HPP
 
-#include "network/event.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol.hpp"
 #include "utils/no_copy.hpp"
@@ -33,77 +32,84 @@
 
 #include <vector>
 
+class Event;
+class STKPeer;
+
 #define TIME_TO_KEEP_EVENTS 1.0
 
-/*!
- * \enum PROTOCOL_STATE
- * \brief Defines the three states that a protocol can have.
+/** \enum PROTOCOL_STATE
+ *  \brief Defines the three states that a protocol can have.
  */
-enum PROTOCOL_STATE
+enum ProtocolState
 {
-    PROTOCOL_STATE_RUNNING,     //!< The protocol is being updated everytime.
-    PROTOCOL_STATE_PAUSED,      //!< The protocol is paused.
-    PROTOCOL_STATE_TERMINATED   //!< The protocol is terminated/does not exist.
-};
+    PROTOCOL_STATE_INITIALISING, //!< The protocol is waiting to be started
+    PROTOCOL_STATE_RUNNING,      //!< The protocol is being updated everytime.
+    PROTOCOL_STATE_PAUSED,       //!< The protocol is paused.
+    PROTOCOL_STATE_TERMINATED    //!< The protocol is terminated/does not exist.
+};   // ProtocolState
 
-/*!
- * \enum PROTOCOL_REQUEST_TYPE
- * \brief Defines actions that can be done about protocols.
- * This enum is used essentially to keep the manager thread-safe and
- * to avoid protocols modifying directly their state.
+// ----------------------------------------------------------------------------
+/** \enum ProtocolRequestType
+ *  \brief Defines actions that can be done about protocols.
+ *  This enum is used essentially to keep the manager thread-safe and
+ *  to avoid protocols modifying directly their state.
  */
-enum PROTOCOL_REQUEST_TYPE
+enum ProtocolRequestType
 {
     PROTOCOL_REQUEST_START,     //!< Start a protocol
     PROTOCOL_REQUEST_STOP,      //!< Stop a protocol
     PROTOCOL_REQUEST_PAUSE,     //!< Pause a protocol
     PROTOCOL_REQUEST_UNPAUSE,   //!< Unpause a protocol
     PROTOCOL_REQUEST_TERMINATE  //!< Terminate a protocol
-};
+};   // ProtocolRequestType
 
-/*!
-* \struct ProtocolInfo
-* \brief Stores the information needed to manage protocols
-*/
+// ----------------------------------------------------------------------------
+/** \struct ProtocolInfo
+ *  \brief Stores the information needed to manage protocols
+ */
 typedef struct ProtocolInfo
 {
-    PROTOCOL_STATE  state;      //!< The state of the protocol
-    Protocol*       protocol;   //!< A pointer to the protocol
-    uint32_t        id;         //!< The unique id of the protocol
+    ProtocolState   m_state;      //!< The state of the protocol
+    Protocol*       m_protocol;   //!< A pointer to the protocol
+    uint32_t        m_id;         //!< The unique id of the protocol
 } ProtocolInfo;
 
-/*!
-* \struct ProtocolRequest
-* \brief Represents a request to do an action about a protocol.
-*/
+// ----------------------------------------------------------------------------
+/** \struct ProtocolRequest
+ *  \brief Represents a request to do an action about a protocol.
+ */
 typedef struct ProtocolRequest
 {
-    PROTOCOL_REQUEST_TYPE type; //!< The type of request
-    ProtocolInfo protocol_info; //!< The concerned protocol information
+    /** The type of request. */
+    ProtocolRequestType m_type;
+
+    /** The concerned protocol information. */
+    ProtocolInfo m_protocol_info; 
 } ProtocolRequest;
 
-/*! \struct ProtocolRequest
+// ----------------------------------------------------------------------------
+/** \struct ProtocolRequest
  *  \brief Used to pass the event to protocols that need it
  */
 typedef struct EventProcessingInfo
 {
-    Event* event;
-    double arrival_time;
-    std::vector<unsigned int> protocols_ids;
+    Event* m_event;
+    double m_arrival_time;
+    std::vector<unsigned int> m_protocols_ids;
 } EventProcessingInfo;
 
-/*!
- * \class ProtocolManager
- * \brief Manages the protocols at runtime.
+// ----------------------------------------------------------------------------
+/** \class ProtocolManager
+ *  \brief Manages the protocols at runtime.
  *
- * This class is in charge of storing and managing protocols.
- * It is a singleton as there can be only one protocol manager per game
- * instance. Any game object that wants to start a protocol must create a
- * protocol and give it to this singleton. The protocols are updated in a
- * special thread, to ensure that they are processed independently from the
- * frames per second. Then, the management of protocols is thread-safe: any
- * object can start/pause/stop protocols whithout problems.
- */
+ *  This class is in charge of storing and managing protocols.
+ *  It is a singleton as there can be only one protocol manager per game
+ *  instance. Any game object that wants to start a protocol must create a
+ *  protocol and give it to this singleton. The protocols are updated in a
+ *  special thread, to ensure that they are processed independently from the
+ *  frames per second. Then, the management of protocols is thread-safe: any
+ *  object can start/pause/stop protocols whithout problems.
+ */ 
 class ProtocolManager : public AbstractSingleton<ProtocolManager>,
                         public NoCopy
 {
@@ -111,126 +117,31 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
     static void* mainLoop(void *data);
     public:
         
-        /*! \brief Stops the protocol manager. */
-        virtual void            abort();
-        /*!
-         * \brief Function that processes incoming events.
-         * This function is called by the network manager each time there is an
-         * incoming packet.
-         */
-        virtual void            notifyEvent(Event* event);
-        /*!
-         * \brief WILL BE COMMENTED LATER
-         */
-        virtual void            sendMessage(Protocol* sender, const NetworkString& message, bool reliable = true);
-        /*!
-         * \brief WILL BE COMMENTED LATER
-         */
-        virtual void            sendMessage(Protocol* sender, STKPeer* peer, const NetworkString& message, bool reliable = true);
-        /*!
-         * \brief WILL BE COMMENTED LATER
-         */
-        virtual void            sendMessageExcept(Protocol* sender, STKPeer* peer, const NetworkString& message, bool reliable = true);
-
-        /*!
-         * \brief Asks the manager to start a protocol.
-         * This function will store the request, and process it at a time it is
-         * thread-safe.
-         * \param protocol : A pointer to the protocol to start
-         * \return The unique id of the protocol that is being started.
-         */
-        virtual uint32_t        requestStart(Protocol* protocol);
-        /*!
-         * \brief Asks the manager to stop a protocol.
-         * This function will store the request, and process it at a time it is
-         * thread-safe.
-         * \param protocol : A pointer to the protocol to stop
-         */
-        virtual void            requestStop(Protocol* protocol);
-        /*!
-         * \brief Asks the manager to pause a protocol.
-         * This function will store the request, and process it at a time it is
-         * thread-safe.
-         * \param protocol : A pointer to the protocol to pause
-         */
-        virtual void            requestPause(Protocol* protocol);
-        /*!
-         * \brief Asks the manager to unpause a protocol.
-         * This function will store the request, and process it at a time it is
-         * thread-safe.
-         * \param protocol : A pointer to the protocol to unpause
-         */
-        virtual void            requestUnpause(Protocol* protocol);
-        /*!
-         * \brief Notifies the manager that a protocol is terminated.
-         * This function will store the request, and process it at a time it is
-         * thread-safe.
-         * \param protocol : A pointer to the protocol that is finished
-         */
-        virtual void            requestTerminate(Protocol* protocol);
-
-        /*!
-         * \brief Updates the manager.
-         *
-         * This function processes the events queue, notifies the concerned
-         * protocols that they have events to process. Then ask all protocols
-         * to update themselves. Finally processes stored requests about
-         * starting, stoping, pausing etc... protocols.
-         * This function is called by the main loop.
-         * This function IS FPS-dependant.
-         */
-        virtual void            update();
-        /*!
-         * \brief Updates the manager.
-         *
-         * This function processes the events queue, notifies the concerned
-         * protocols that they have events to process. Then ask all protocols
-         * to update themselves. Finally processes stored requests about
-         * starting, stoping, pausing etc... protocols.
-         * This function is called in a thread.
-         * This function IS NOT FPS-dependant.
-         */
-        virtual void            asynchronousUpdate();
-
-        /*!
-         * \brief Get the state of a protocol using its id.
-         * \param id : The id of the protocol you seek the state.
-         * \return The state of the protocol.
-         */
-        virtual PROTOCOL_STATE  getProtocolState(uint32_t id);
-        /*!
-         * \brief Get the state of a protocol using a pointer on it.
-         * \param protocol : A pointer to the protocol you seek the state.
-         * \return The state of the protocol.
-         */
-        virtual PROTOCOL_STATE  getProtocolState(Protocol* protocol);
-        /*!
-         * \brief Get the id of a protocol.
-         * \param protocol : A pointer to the protocol you seek the id.
-         * \return The id of the protocol pointed by the protocol parameter.
-         */
-        virtual uint32_t        getProtocolID(Protocol* protocol);
-
-        /*!
-         * \brief Get a protocol using its id.
-         * \param id : Unique ID of the seek protocol.
-         * \return The protocol that has the ID id.
-         */
-        virtual Protocol*       getProtocol(uint32_t id);
-        /*!
-         * \brief Get a protocol using its type.
-         * \param type : The type of the protocol.
-         * \return The protocol that matches the given type.
-         */
-        virtual Protocol*       getProtocol(PROTOCOL_TYPE type);
-
-        /*! \brief Know whether the app is a server.
-         *  \return True if this application is in server mode, false elseway.
-         */
-        bool                    isServer();
-
-        /*! \brief Tells if we need to stop the update thread. */
-        int                     exit();
+        virtual void abort();    
+        virtual void propagateEvent(Event* event);
+        virtual void sendMessage(Protocol* sender,
+                                 const NetworkString& message,
+                                 bool reliable = true);
+        virtual void sendMessage(Protocol* sender, STKPeer* peer,
+                                 const NetworkString& message,
+                                 bool reliable = true);
+        virtual void sendMessageExcept(Protocol* sender, STKPeer* peer,
+                                       const NetworkString& message,
+                                       bool reliable = true);
+        virtual uint32_t requestStart(Protocol* protocol);
+        virtual void requestStop(Protocol* protocol);
+        virtual void requestPause(Protocol* protocol);
+        virtual void requestUnpause(Protocol* protocol);
+        virtual void requestTerminate(Protocol* protocol);
+        virtual void update();
+        virtual void asynchronousUpdate();
+        virtual ProtocolState getProtocolState(uint32_t id);
+        virtual ProtocolState getProtocolState(Protocol* protocol);
+        virtual uint32_t  getProtocolID(Protocol* protocol);
+        virtual Protocol* getProtocol(uint32_t id);
+        virtual Protocol* getProtocol(ProtocolType type);
+        bool isServer();
+        int exit();
 
     protected:
         // protected functions
@@ -251,12 +162,7 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
          */
         void                    assignProtocolId(ProtocolInfo* protocol_info);
 
-        /*!
-         * \brief Starts a protocol.
-         * Add the protocol info to the m_protocols vector.
-         * \param protocol : ProtocolInfo to start.
-         */
-        virtual void            startProtocol(ProtocolInfo protocol);
+        virtual void startProtocol(ProtocolInfo &protocol);
         /*!
          * \brief Stops a protocol.
          * Coes nothing. Noone can stop running protocols for now.
@@ -282,7 +188,7 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
          */
         virtual void            protocolTerminated(ProtocolInfo protocol);
 
-        bool                    propagateEvent(EventProcessingInfo* event, bool synchronous);
+        bool sendEvent(EventProcessingInfo* event, bool synchronous);
 
         // protected members
         /** Contains the running protocols.

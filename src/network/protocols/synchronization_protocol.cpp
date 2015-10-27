@@ -1,5 +1,6 @@
 #include "network/protocols/synchronization_protocol.hpp"
 
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
 #include "network/protocols/kart_update_protocol.hpp"
 #include "network/protocols/controller_events_protocol.hpp"
@@ -35,7 +36,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 10)
     {
         Log::warn("SynchronizationProtocol", "Received a message too short.");
