@@ -175,7 +175,7 @@ endif()
 
 if(UNIX OR MINGW)
 #    if(USE_CPP2011)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x -lwayland-client -lwayland-egl -lEGL -lxkbcommon")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
 #    endif()
 endif()
 
@@ -184,6 +184,9 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 if(UNIX AND NOT APPLE)
+    find_package(X11 REQUIRED)
+    include_directories(${X11_INCLUDE_DIR})
+
     if(USE_XRANDR)
         find_package(Xrandr REQUIRED)
         if(NOT XRANDR_FOUND)
@@ -321,6 +324,7 @@ target_link_libraries(supertuxkart
     )
 
 if(UNIX AND NOT APPLE)
+    target_link_libraries(supertuxkart ${X11_LIBRARIES})
     if(USE_XRANDR)
         target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
     else()
@@ -330,6 +334,7 @@ if(UNIX AND NOT APPLE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
         target_link_libraries(supertuxkart "-fsanitize=address")
     endif()
+    target_link_libraries(supertuxkart wayland-client wayland-egl EGL xkbcommon)
 endif()
 
 if(APPLE)
