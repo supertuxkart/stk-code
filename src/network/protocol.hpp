@@ -141,14 +141,14 @@ public:
     // ------------------------------------------------------------------------
     /** \brief Called when the protocol is paused (by an other entity or by
      *  itself). */
-    virtual void pause() { }
+    virtual void paused() { }
     // ------------------------------------------------------------------------
     /** \brief Called when the protocol is used.
      */
-    virtual void unpause() { }
+    virtual void unpaused() { }
     // ------------------------------------------------------------------------
     /** \brief Called when the protocol is to be killed. */
-    virtual void kill() {}
+    virtual void terminated() {}
     // ------------------------------------------------------------------------
     /** \brief Method to get a protocol's type.
      *  \return The protocol type. */

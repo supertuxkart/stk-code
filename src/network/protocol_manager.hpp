@@ -46,7 +46,6 @@ class STKPeer;
 enum ProtocolRequestType
 {
     PROTOCOL_REQUEST_START,     //!< Start a protocol
-    PROTOCOL_REQUEST_STOP,      //!< Stop a protocol
     PROTOCOL_REQUEST_PAUSE,     //!< Pause a protocol
     PROTOCOL_REQUEST_UNPAUSE,   //!< Unpause a protocol
     PROTOCOL_REQUEST_TERMINATE  //!< Terminate a protocol
@@ -100,7 +99,7 @@ typedef struct EventProcessingInfo
  *  protocol and give it to this singleton. The protocols are updated in a
  *  special thread, to ensure that they are processed independently from the
  *  frames per second. Then, the management of protocols is thread-safe: any
- *  object can start/pause/stop protocols whithout problems.
+ *  object can start/pause/... protocols whithout problems.
  */ 
 class ProtocolManager : public AbstractSingleton<ProtocolManager>,
                         public NoCopy
@@ -121,7 +120,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
                                        const NetworkString& message,
                                        bool reliable = true);
         virtual uint32_t requestStart(Protocol* protocol);
-        virtual void requestStop(Protocol* protocol);
         virtual void requestPause(Protocol* protocol);
         virtual void requestUnpause(Protocol* protocol);
         virtual void requestTerminate(Protocol* protocol);
@@ -145,30 +143,9 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         uint32_t getNextProtocolId();
 
         virtual void startProtocol(Protocol *protocol);
-        /*!
-         * \brief Stops a protocol.
-         * Coes nothing. Noone can stop running protocols for now.
-         * \param protocol : Protocol to stop.
-         */
-        virtual void            stopProtocol(Protocol *protocol);
-        /*!
-         * \brief Pauses a protocol.
-         * Pauses a protocol and tells it that it's being paused.
-         * \param protocol : Protocol to pause.
-         */
-        virtual void            pauseProtocol(Protocol *protocol);
-        /*!
-         * \brief Unpauses a protocol.
-         * Unpauses a protocol and notifies it.
-         * \param protocol : Protocol to unpause.
-         */
-        virtual void            unpauseProtocol(Protocol *protocol);
-        /*!
-         * \brief Notes that a protocol is terminated.
-         * Remove a protocol from the protocols vector.
-         * \param protocol : Protocol concerned.
-         */
-        virtual void            protocolTerminated(Protocol *protocol);
+        virtual void pauseProtocol(Protocol *protocol);
+        virtual void unpauseProtocol(Protocol *protocol);
+        virtual void terminateProtocol(Protocol *protocol);
 
         bool sendEvent(EventProcessingInfo* event, bool synchronous);
 
@@ -181,7 +158,7 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         /** Contains the network events to pass to protocols. */
         Synchronised<std::vector<EventProcessingInfo> > m_events_to_process;
 
-        /** Contains the requests to start/stop etc... protocols. */
+        /** Contains the requests to start/pause etc... protocols. */
         std::vector<ProtocolRequest>    m_requests;
         /*! \brief The next id to assign to a protocol.
          * This value is incremented by 1 each time a protocol is started.

@@ -223,24 +223,6 @@ uint32_t ProtocolManager::requestStart(Protocol* protocol)
 }   // requestStart
 
 // ----------------------------------------------------------------------------
-/** \brief Asks the manager to stop a protocol.
- *  This function will store the request, and process it at a time it is
- *  thread-safe.
- *  \param protocol : A pointer to the protocol to stop
- */
-void ProtocolManager::requestStop(Protocol* protocol)
-{
-    if (!protocol)
-        return;
-    // create the request
-    ProtocolRequest req(PROTOCOL_REQUEST_STOP, protocol);
-    // add it to the request stack
-    pthread_mutex_lock(&m_requests_mutex);
-    m_requests.push_back(req);
-    pthread_mutex_unlock(&m_requests_mutex);
-}   // requestStop
-
-// ----------------------------------------------------------------------------
 /** \brief Asks the manager to pause a protocol.
  *  This function will store the request, and process it at a time it is
  *  thread-safe.
@@ -327,58 +309,35 @@ void ProtocolManager::startProtocol(Protocol *protocol)
 }   // startProtocol
 
 // ----------------------------------------------------------------------------
-void ProtocolManager::stopProtocol(Protocol *protocol)
-{
-}   // stopProtocol
-
-// ----------------------------------------------------------------------------
+/** \brief Pauses a protocol.
+ *  Pauses a protocol and tells it that it's being paused.
+ *  \param protocol : Protocol to pause.
+ */
 void ProtocolManager::pauseProtocol(Protocol *protocol)
 {
     assert(protocol->getState() == PROTOCOL_STATE_RUNNING);
     protocol->setState(PROTOCOL_STATE_PAUSED);
-
-    return;
-
-    // FIXME ... why so complicated???
-#ifdef XX
-    // FIXME Does this need to be locked?
-    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
-    {
-        //ProtocolInfo *pi = m_protocols.getData()[i];
-        if (pi->m_protocol == protocol.m_protocol &&
-            pi->m_state == PROTOCOL_STATE_RUNNING)
-        {
-            pi->m_state = PROTOCOL_STATE_PAUSED;
-            pi->m_protocol->pause();
-        }
-    }
-#endif
+    protocol->paused();
 }   // pauseProtocol
 
 // ----------------------------------------------------------------------------
+/** \brief Unpauses a protocol.
+ *  Unpauses a protocol and notifies it.
+ *  \param protocol : Protocol to unpause.
+ */
 void ProtocolManager::unpauseProtocol(Protocol *protocol)
 {
+    assert(protocol->getState() == PROTOCOL_STATE_PAUSED);
     protocol->setState(PROTOCOL_STATE_RUNNING);
-    protocol->unpause();
-    //FIXME: why call protocol->unpause() (which would queue a new request and
-    // then calls this function again) ... and why so complicated??
-#ifdef XX
-    // FIXME Does this need to be locked??
-    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
-    {
-        ProtocolInfo *p = m_protocols.getData()[i];
-        if (p->m_protocol == protocol.m_protocol &&
-            p->m_state == PROTOCOL_STATE_PAUSED)
-        {
-            p->m_state = PROTOCOL_STATE_RUNNING;
-            p->m_protocol->unpause();
-        }
-    }
-#endif
+    protocol->unpaused();
 }   // unpauseProtocol
 
 // ----------------------------------------------------------------------------
-void ProtocolManager::protocolTerminated(Protocol *protocol)
+/** \brief Notes that a protocol is terminated.
+ *  Remove a protocol from the protocols vector.
+ *  \param protocol : Protocol concerned.
+ */
+void ProtocolManager::terminateProtocol(Protocol *protocol)
 {
     // Be sure that noone accesses the protocols vector while we erase a protocol
     m_protocols.lock();
@@ -400,7 +359,8 @@ void ProtocolManager::protocolTerminated(Protocol *protocol)
               protocol_type.c_str(), m_protocols.getData().size());
     pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
     m_protocols.unlock();
-}   // protocolTerminated
+    protocol->terminated();
+}   // terminateProtocol
 
 // ----------------------------------------------------------------------------
 /** Sends the event to the corresponding protocol.
@@ -523,9 +483,6 @@ void ProtocolManager::asynchronousUpdate()
             case PROTOCOL_REQUEST_START:
                 startProtocol(m_requests[i].getProtocol());
                 break;
-            case PROTOCOL_REQUEST_STOP:
-                stopProtocol(m_requests[i].getProtocol());
-                break;
             case PROTOCOL_REQUEST_PAUSE:
                 pauseProtocol(m_requests[i].getProtocol());
                 break;
@@ -533,7 +490,7 @@ void ProtocolManager::asynchronousUpdate()
                 unpauseProtocol(m_requests[i].getProtocol());
                 break;
             case PROTOCOL_REQUEST_TERMINATE:
-                protocolTerminated(m_requests[i].getProtocol());
+                terminateProtocol(m_requests[i].getProtocol());
                 break;
         }
     }
