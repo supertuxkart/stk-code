@@ -165,19 +165,4 @@ public:
     }   // toString
 };   // TransportAddress
 
-// ============================================================================
-/*! \class PlayerLogin
- *  \brief Contains the information needed to authenticate a user.
- */
-class PlayerLogin : public CallbackObject
-{
-    public:
-    PlayerLogin() {}
-    ~PlayerLogin() { username.clear(); password.clear(); }
-
-    std::string username;   //!< Username of the player
-    std::string password;   //!< Password of the player
-};   // class PlayerLogin
-
-
 #endif // TYPES_HPP
