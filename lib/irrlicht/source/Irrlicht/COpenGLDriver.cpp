@@ -697,7 +697,6 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 	#ifdef _DEBUG
 	setDebugName("COpenGLDriver");
 	#endif
-		genericDriverInit();
 }
 
 
