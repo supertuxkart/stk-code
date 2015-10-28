@@ -615,7 +615,19 @@ bool CIrrDeviceWayland::createWindow()
 {
 	surface = wl_compositor_create_surface(compositor);
 	shell_surface = wl_shell_get_shell_surface(shell, surface);
-	wl_shell_surface_set_toplevel(shell_surface);
+	
+	if (CreationParams.Fullscreen)
+	{
+		wl_shell_surface_set_fullscreen(shell_surface,
+										WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT,
+										0, output);
+	}
+	else
+	{   
+		wl_shell_surface_set_toplevel(shell_surface);
+	}
+
+	wl_display_flush(display);
 
 	initEGL();
 
