@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -43,16 +43,15 @@ private:
     GUIEngine::LabelWidget *                    m_update_status;
     GUIEngine::ListWidget *                     m_server_list_widget;
 
-
-    /** The currently selected index, used to re-select this item after
-     *  addons_loading is being displayed. */
-    int                                         m_selected_index;
-
     /** \brief To check (and set) if sort order is descending **/
     bool                                        m_sort_desc;
 
-    const Online::ServersManager::RefreshRequest *    m_refresh_request;
+    const Online::ServersManager::RefreshRequest *m_refresh_request;
     bool                                        m_fake_refresh;
+
+    /** True if only lan servers should be shown. */
+    bool m_is_lan;
+
     void refresh();
 
 public:
@@ -79,8 +78,6 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
 
-    void    setLastSelected();
-
-};
+};   // ServerSelection
 
 #endif

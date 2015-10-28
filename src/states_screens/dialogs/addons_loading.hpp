@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Lucas Baudin
+//  Copyright (C) 2010-2015 Lucas Baudin
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,7 +34,6 @@ namespace Online { class HTTPRequest; }
 class AddonsLoading : public GUIEngine::ModalDialog
 {
 private:
-    GUIEngine::LabelWidget       *m_state;
     GUIEngine::ProgressBarWidget *m_progress;
     GUIEngine::IconButtonWidget  *m_back_button;
     GUIEngine::IconButtonWidget  *m_install_button;

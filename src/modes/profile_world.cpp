@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -108,7 +108,7 @@ AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
                                        RaceManager::KartType type,
                                        const PlayerDifficulty *difficulty)
 {
-    btTransform init_pos   = m_track->getStartTransform(index);
+    btTransform init_pos   = getStartTransform(index);
 
     Kart *new_kart         = new KartWithStats(kart_ident,
                                                /*world kart id*/ index,

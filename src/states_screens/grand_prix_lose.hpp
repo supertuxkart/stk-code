@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -62,6 +62,7 @@ public:
     void onUpdate(float dt) OVERRIDE;
     /** \brief set which karts lost this GP */
     void setKarts(std::vector<std::string> ident);
+    MusicInformation* getInGameMenuMusic() const OVERRIDE;
 };
 
 #endif

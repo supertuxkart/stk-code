@@ -1,7 +1,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,9 +19,6 @@
 
 #include "items/item.hpp"
 
-#include <IMeshSceneNode.h>
-#include <ISceneManager.h>
-
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "karts/abstract_kart.hpp"
@@ -31,6 +28,9 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/vec3.hpp"
+
+#include <IMeshSceneNode.h>
+#include <ISceneManager.h>
 
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh)
@@ -48,12 +48,15 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     LODNode* lodnode    = new LODNode("item",
                                       irr_driver->getSceneManager()->getRootSceneNode(),
                                       irr_driver->getSceneManager());
-    scene::IMeshSceneNode* meshnode = irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
+    scene::IMeshSceneNode* meshnode = 
+        irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
 
     if (lowres_mesh != NULL)
     {
         lodnode->add(35, meshnode, true);
-        scene::IMeshSceneNode* meshnode = irr_driver->addMesh(lowres_mesh, StringUtils::insertValues("item_lo_%i", (int)type));
+        scene::IMeshSceneNode* meshnode = 
+            irr_driver->addMesh(lowres_mesh, 
+                                StringUtils::insertValues("item_lo_%i", (int)type));
         lodnode->add(100, meshnode, true);
     }
     else
@@ -371,7 +374,7 @@ void Item::collected(const AbstractKart *kart, float t)
 
     if (m_listener != NULL)
     {
-        m_listener->onTriggerItemApproached(this);
+        m_listener->onTriggerItemApproached();
     }
 
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)

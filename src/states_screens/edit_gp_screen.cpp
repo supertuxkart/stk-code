@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 #include "states_screens/edit_gp_screen.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -35,25 +35,25 @@ using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( EditGPScreen );
 
 // -----------------------------------------------------------------------------
-EditGPScreen::EditGPScreen()
-    : Screen("gpedit.stkgui"), m_gp(NULL), m_list(NULL), m_icon_bank(NULL),
-    m_selected(-1), m_modified(false)
+EditGPScreen::EditGPScreen() : Screen("edit_gp.stkgui"), m_gp(NULL),
+              m_list(NULL), m_icon_bank(NULL),
+              m_selected(-1), m_modified(false)
 {
 
-}
+}   // EditGPScreen
 
 // -----------------------------------------------------------------------------
 EditGPScreen::~EditGPScreen()
 {
     delete m_icon_bank;
-}
+}   // ~EditGPScreen
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::setSelectedGP(GrandPrixData* gp)
 {
     assert(gp != NULL);
     m_gp = gp;
-}
+}   // setSelectedGP
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::loadedFromFile()
@@ -66,11 +66,12 @@ void EditGPScreen::loadedFromFile()
     m_list->addColumn(_("Track"), 3);
     m_list->addColumn(_("Laps"), 1);
     m_list->addColumn(_("Reversed"), 1);
-}
+}   // loadedFromFile
 
 // -----------------------------------------------------------------------------
-void EditGPScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name,
-    const int playerID)
+void EditGPScreen::eventCallback(GUIEngine::Widget* widget,
+                                 const std::string& name,
+                                 const int playerID)
 {
     setSelected(m_list->getSelectionID());
 
@@ -146,7 +147,7 @@ void EditGPScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
             back();
         }
     }
-}
+}   // eventCallback
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::init()
@@ -155,11 +156,11 @@ void EditGPScreen::init()
     {
         LabelWidget* header = getWidget<LabelWidget>("title");
         assert(header != NULL);
-        header->setText(m_gp->getName(), true);
+        header->setText(translations->fribidize(m_gp->getName()), true);
 
         IconButtonWidget* button = getWidget<IconButtonWidget>("save");
         assert(button != NULL);
-        button->setDeactivated();
+        button->setActive(false);
 
         loadList(0);
         setModified(false);
@@ -171,16 +172,19 @@ void EditGPScreen::init()
 
         if (edit->getResult())
         {
+            bool reverse = edit->getTrack()->reverseAvailable() ? 
+                           edit->getReverse() : false;
+            
             if (m_action == "add")
             {
-                m_gp->addTrack(edit->getTrack(), edit->getLaps(), edit->getReverse(),
-                    m_selected);
+                m_gp->addTrack(edit->getTrack(), edit->getLaps(), reverse,
+                               m_selected);
                 setSelected(m_selected + 1);
             }
             else if (m_action == "edit")
             {
                 m_gp->editTrack(m_selected, edit->getTrack(), edit->getLaps(),
-                    edit->getReverse());
+                                reverse);
             }
             setModified(true);
         }
@@ -188,7 +192,7 @@ void EditGPScreen::init()
         m_action.clear();
     }
     enableButtons();
-}
+}   // init
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::onConfirm()
@@ -207,7 +211,7 @@ void EditGPScreen::onConfirm()
         save();
         back();
     }
-}
+}   // onConfirm
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::onCancel()
@@ -218,7 +222,7 @@ void EditGPScreen::onCancel()
         m_gp->reload(); // Discard changes
         back();
     }
-}
+}   // onCancel
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::loadList(const int selected)
@@ -265,7 +269,7 @@ void EditGPScreen::loadList(const int selected)
     {
         enableButtons();
     }
-}
+}   // loadList
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::setModified(const bool modified)
@@ -274,24 +278,22 @@ void EditGPScreen::setModified(const bool modified)
 
     IconButtonWidget* save_button = getWidget<IconButtonWidget>("save");
     assert(save_button != NULL);
-    if (modified)
-        save_button->setActivated();
-    else
-        save_button->setDeactivated();
+    save_button->setActive(modified);
 
     LabelWidget* header = getWidget<LabelWidget>("title");
     assert(header != NULL);
-    header->setText(m_gp->getName() + (modified ? L" (+)" : L""), true);
+    //I18N: Indicate that the grand prix is modified and not saved
+    header->setText(modified ? _(L"%s (+)", m_gp->getName()) : L"", true);
 
     enableButtons();
-}
+}   // setModified
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::setSelected(const int selected)
 {
     m_selected = selected;
     enableButtons();
-}
+}   // setSelected
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::edit()
@@ -307,7 +309,7 @@ void EditGPScreen::edit()
             m_gp->getReverse((unsigned int)m_selected));
         edit_screen->push();
     }
-}
+}   // edit
 
 // -----------------------------------------------------------------------------
 bool EditGPScreen::save()
@@ -324,7 +326,7 @@ bool EditGPScreen::save()
             MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
         return false;
     }
-}
+}   // save
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::back()
@@ -332,19 +334,19 @@ void EditGPScreen::back()
     m_action.clear();
     m_modified = false;
     StateManager::get()->popMenu();
-}
+}   // back
 
 // -----------------------------------------------------------------------------
 bool EditGPScreen::canMoveUp() const
 {
     return (0 < m_selected && m_selected < m_list->getItemCount());
-}
+}   // canMoveUp
 
 // -----------------------------------------------------------------------------
 bool EditGPScreen::canMoveDown() const
 {
     return (0 <= m_selected && m_selected < m_list->getItemCount() - 1);
-}
+}   // canMoveDown
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::enableButtons()
@@ -358,25 +360,10 @@ void EditGPScreen::enableButtons()
     assert(edit_button != NULL);
     assert(remove_button != NULL);
 
-    if (m_selected >= 0 && m_list->getItemCount() > 1)
-    {
-        up_button->setActivated();
-        down_button->setActivated();
-    }
-    else
-    {
-        up_button->setDeactivated();
-        down_button->setDeactivated();
-    }
+    bool b = m_selected >= 0 && m_list->getItemCount() > 1;
+    up_button->setActive(b);
+    down_button->setActive(b);
 
-    if (m_selected >= 0)
-    {
-        edit_button->setActivated();
-        remove_button->setActivated();
-    }
-    else
-    {
-        edit_button->setDeactivated();
-        remove_button->setDeactivated();
-    }
-}
+    edit_button->setActive(m_selected >= 0);
+    remove_button->setActive(m_selected >= 0);
+}   // enableButtons

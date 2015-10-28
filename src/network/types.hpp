@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,14 +22,15 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
+#include "utils/no_copy.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/types.hpp"
+
+#include "enet/enet.h"
 
 #include <string>
 
-/*! functions to write easily addresses in logs. */
-#define ADDRESS_FORMAT "%d.%d.%d.%d:%d"
-#define ADDRESS_ARGS(ip,port) ((ip>>24)&0xff),((ip>>16)&0xff),((ip>>8)&0xff),((ip>>0)&0xff),port
-
+// ============================================================================
 /*! \class CallbackObject
  *  \brief Class that must be inherited to pass objects to protocols.
  */
@@ -39,29 +40,132 @@ class CallbackObject
         CallbackObject() {}
         ~CallbackObject() {}
 
-};
+};   // CallbackObject
 
+// ============================================================================
 /*! \class TransportAddress
  *  \brief Describes a transport-layer address.
  *  For IP networks, a transport address is the couple ip:port.
  */
-class TransportAddress : public CallbackObject
+class TransportAddress : public CallbackObject, public NoCopy
 {
-    public:
-    TransportAddress(uint32_t p_ip = 0, uint16_t p_port = 0)
-    { ip = p_ip; port = p_port; }
+private:
+    uint32_t m_ip;    //!< The IPv4 address
+    uint16_t m_port;  //!< The port number
+
+public:
+    /** Constructor. */
+    TransportAddress(uint32_t ip = 0, uint16_t port = 0)
+    {
+        m_ip = ip;
+        m_port = port;
+    }   // TransportAddress
+
+    // ------------------------------------------------------------------------
+    /** Construct an transport address from an ENetAddress. */
+    TransportAddress(const ENetAddress &a)
+    {
+        m_ip   = a.host;
+        m_port = a.port;
+    }   // TransportAddress(EnetAddress)
+
+    // ------------------------------------------------------------------------
     ~TransportAddress() {}
+    // ------------------------------------------------------------------------
+private:
+    friend class NetworkManager;
+    /** The copy constructor is private, so that the friend class
+     *  NetworkManager can access it to create a copy, but no other
+     *  class can. */
+    TransportAddress(const TransportAddress &other)
+    {
+        copy(other);
+    }   // TransportAddress(const TransportAddress&)
+public:
+    // ------------------------------------------------------------------------
+    /** A copy function (to replace the copy constructor which is disabled
+     *  using NoCopy): it copies the data from the argument into this object.*/
+    void copy(const TransportAddress &other)
+    {
+        m_ip   = other.m_ip;
+        m_port = other.m_port;
+    }   // copy
 
+    // ------------------------------------------------------------------------
+    /** Resets ip and port to 0. */
+    void clear()
+    {
+        m_ip   = 0;
+        m_port = 0;
+    }   // clear
+
+    // ------------------------------------------------------------------------
+    /** Returns the ip address. */
+    uint32_t getIP() const { return m_ip; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the port number. */
+    uint16_t getPort() const { return m_port;  }
+
+    // ------------------------------------------------------------------------
+    /** Sets the ip address. */
+    void setIP(uint32_t ip) { m_ip = ip;  }
+
+    // ------------------------------------------------------------------------
+    /** Set the port. */
+    void setPort(uint16_t port) { m_port = port; }
+
+    // ------------------------------------------------------------------------
+    /** Converts the address to an enet address. */
+    ENetAddress toEnetAddress() const
+    {
+        ENetAddress a;
+        // because ENet wants little endian
+        a.host = ((m_ip & 0xff000000) >> 24)
+               + ((m_ip & 0x00ff0000) >> 8)
+               + ((m_ip & 0x0000ff00) << 8)
+               + ((m_ip & 0x000000ff) << 24);
+        a.port = m_port;
+        return a;
+    }   // toEnetAddress
+
+    // ------------------------------------------------------------------------
+    /** Compares if ip address and port are identical. */
     bool operator==(const TransportAddress& other) const
-    { return other.ip == ip && other.port == port; }
+    {
+        return other.m_ip == m_ip && other.m_port == m_port;
+    }   // operator==
 
+    // ------------------------------------------------------------------------
+    bool operator==(const ENetAddress& other)
+    {
+        return other.host == ntohl(m_ip) && other.port == m_port;
+    }
+    // ------------------------------------------------------------------------
+    /** Compares if ip address or port are different. */
     bool operator!=(const TransportAddress& other) const
-    { return other.ip != ip || other.port != port; }
+    {
+        return other.m_ip != m_ip || other.m_port != m_port;
+    }   // operator!=
+    // ------------------------------------------------------------------------
+    /** Returns a std::string representing the ip address and port in human
+     *  readable format.
+     *  \param show_port True if the port should be shown as well, otherwise
+     *         only the ip address will be returned.
+     */
+    std::string toString(bool show_port = true) const
+    {
+        std::string s = 
+            StringUtils::insertValues("%d.%d.%d.%d",
+                                 ((m_ip >> 24) & 0xff), ((m_ip >> 16) & 0xff),
+                                 ((m_ip >>  8) & 0xff), ((m_ip >>  0) & 0xff));
+        if (show_port)
+            s += StringUtils::insertValues(":%d", m_port);
+        return s;
+    }   // toString
+};   // TransportAddress
 
-    uint32_t ip;    //!< The IPv4 address
-    uint16_t port;  //!< The port number
-};
-
+// ============================================================================
 /*! \class PlayerLogin
  *  \brief Contains the information needed to authenticate a user.
  */
@@ -73,7 +177,7 @@ class PlayerLogin : public CallbackObject
 
     std::string username;   //!< Username of the player
     std::string password;   //!< Password of the player
-};
+};   // class PlayerLogin
 
 
 #endif // TYPES_HPP

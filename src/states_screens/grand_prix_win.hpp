@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -66,6 +66,7 @@ public:
     void loadedFromFile() OVERRIDE {};
     void onCutsceneEnd() OVERRIDE;
     void onUpdate(float dt) OVERRIDE;
+    MusicInformation* getInGameMenuMusic() const OVERRIDE;
 
     /** \pre must be called after pushing the screen, but before onUpdate had the chance to be invoked */
     void setKarts(const std::string idents[3]);

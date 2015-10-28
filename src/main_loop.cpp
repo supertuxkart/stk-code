@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Ingo Ruhnke <grumbel@gmx.de>
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -40,8 +40,7 @@
 MainLoop* main_loop = 0;
 
 MainLoop::MainLoop() :
-m_abort(false),
-m_frame_count(0)
+m_abort(false)
 {
     m_curr_time = 0;
     m_prev_time = 0;
@@ -68,6 +67,24 @@ float MainLoop::getLimitedDt()
     {
         m_curr_time = device->getTimer()->getRealTime();
         dt = (float)(m_curr_time - m_prev_time);
+        const World* const world = World::getWorld();
+        if (UserConfigParams::m_fps_debug && world)
+        {
+            const LinearWorld *lw = dynamic_cast<const LinearWorld*>(world);
+            if (lw)
+            {
+                Log::verbose("fps", "time %f distance %f dt %f fps %f",
+                             lw->getTime(),
+                             lw->getDistanceDownTrackForKart(0),
+                             dt*0.001f, 1000.0f / dt);
+            }
+            else
+            {
+                Log::verbose("fps", "time %f dt %f fps %f",
+                             world->getTime(), dt*0.001f, 1000.0f / dt);
+            }
+
+        }
 
         // don't allow the game to run slower than a certain amount.
         // when the computer can't keep it up, slow down the shown time instead
@@ -77,7 +94,7 @@ float MainLoop::getLimitedDt()
         // Throttle fps if more than maximum, which can reduce
         // the noise the fan on a graphics card makes.
         // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
-        const int max_fps = (StateManager::get()->throttleFPS() ? 35 : UserConfigParams::m_max_fps);
+        const int max_fps = (StateManager::get()->throttleFPS() ? 30 : UserConfigParams::m_max_fps);
         const int current_fps = (int)(1000.0f/dt);
         if (m_throttle_fps && current_fps > max_fps && !ProfileWorld::isProfileMode())
         {
@@ -155,7 +172,7 @@ void MainLoop::run()
             // can use as many threads as possible without interfering
             // with audia
             PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
-            SFXManager::get()->update(dt);
+            SFXManager::get()->update();
             PROFILER_POP_CPU_MARKER();
 
             PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);

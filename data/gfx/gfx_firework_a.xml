@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<!-- For sky particles, the size of the box is ignored -->
+<particles emitter="sphere" radius="0.1">
+
+    <spreading angle="5"           />
+    
+    <velocity  x="-0.000"
+               y="0.002"
+               z="-0.000"             />
+    
+    <material  file="gfx_sparkFire_a.png" clampu="Y" clampv="Y" />
+    
+    <!-- Amount of particles emitted per second -->
+    <rate      min="20"
+               max="50"           />
+    
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="400"
+               max="500"          />
+    
+    <!-- Size of the particles -->
+    <size      min="0.2"
+               max="0.3"          />
+    
+    <color     min="40 40 255"
+               max="255 255 255"   />
+    
+    <!-- How much time in milliseconds before the particle is fully faded out  -->
+    <fadeout   time="100"          />
+
+    <wind      speed="0.16"
+               flips="Y"           />
+
+</particles>

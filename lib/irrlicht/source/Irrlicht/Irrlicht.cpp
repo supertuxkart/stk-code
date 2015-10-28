@@ -4,7 +4,7 @@
 
 #include "IrrCompileConfig.h"
 
-static const char* const copyright = "Irrlicht Engine (c) 2002-2012 Nikolaus Gebhardt";
+//static const char* const copyright = "Irrlicht Engine (c) 2002-2012 Nikolaus Gebhardt";
 
 #ifdef _IRR_WINDOWS_
 	#include <windows.h>

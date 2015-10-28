@@ -5,11 +5,11 @@ uniform vec2 sunpos;
 
 const float decaystep = 0.88;
 
-in vec2 uv;
 out vec4 FragColor;
 
 void main()
 {
+	vec2 uv = 4. * gl_FragCoord.xy / screen;
 	vec2 texc = uv;
 	vec2 tosun = sunpos - texc;
 

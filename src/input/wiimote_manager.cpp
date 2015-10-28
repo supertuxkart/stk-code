@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 SuperTuxKart-Team
+//  Copyright (C) 2012-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -410,12 +410,8 @@ void WiimoteManager::WiimoteDialogListener::onConfirm()
     int nb_wiimotes = wiimote_manager->getNumberOfWiimotes();
     if(nb_wiimotes > 0)
     {
-        core::stringw msg = StringUtils::insertValues(
-            _("Found %d wiimote(s)"),
-            core::stringw(nb_wiimotes));
-
-        new MessageDialog( msg );
-
+        new MessageDialog(_P("Found %d wiimote", "Found %d wiimotes",
+                             nb_wiimotes));
     }
     else
     {

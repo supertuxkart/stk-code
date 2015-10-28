@@ -35,6 +35,10 @@ if(UNIX AND USE_XRANDR)
     add_definitions(-D_IRR_LINUX_X11_RANDR_)
 endif()
 
+if(CYGWIN)
+    add_definitions(-DNO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
+endif()
+
 set(IRRLICHT_SOURCES
 source/Irrlicht/CGUIListBox.cpp
 source/Irrlicht/CZBuffer.cpp
@@ -499,7 +503,7 @@ if(APPLE)
     set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES LANGUAGE C)
 endif()
 
-add_library(stkirrlicht ${IRRLICHT_SOURCES})
+add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
 target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
 
 

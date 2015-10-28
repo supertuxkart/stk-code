@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 #include "states_screens/options_screen_input.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -28,7 +28,7 @@
 #include "input/gamepad_device.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
-#include "states_screens/options_screen_input2.hpp"
+#include "states_screens/options_screen_device.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
@@ -133,7 +133,8 @@ void OptionsScreenInput::init()
 {
     Screen::init();
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
-    if (tabBar != NULL)  tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
+    assert(tabBar != NULL);
+    tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
 
     tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
@@ -156,14 +157,8 @@ void OptionsScreenInput::init()
     eventCallback(devices, name2, PLAYER_ID_GAME_MASTER);
      */
     // Disable adding keyboard configurations
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        getWidget<ButtonWidget>("add_device")->setDeactivated();
-    }
-    else
-    {
-        getWidget<ButtonWidget>("add_device")->setActivated();
-    }
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    getWidget<ButtonWidget>("add_device")->setActive(!in_game);
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -230,8 +225,8 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             read = sscanf( selection.c_str(), "gamepad%i", &i );
             if (read == 1 && i != -1)
             {
-                OptionsScreenInput2::getInstance()->setDevice( input_manager->getDeviceManager()->getGamepadConfig(i) );
-                StateManager::get()->replaceTopMostScreen(OptionsScreenInput2::getInstance());
+                OptionsScreenDevice::getInstance()->setDevice( input_manager->getDeviceManager()->getGamepadConfig(i) );
+                StateManager::get()->replaceTopMostScreen(OptionsScreenDevice::getInstance());
                 //updateInputButtons( input_manager->getDeviceList()->getGamepadConfig(i) );
             }
             else
@@ -247,8 +242,9 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             if (read == 1 && i != -1)
             {
                 // updateInputButtons( input_manager->getDeviceList()->getKeyboardConfig(i) );
-                OptionsScreenInput2::getInstance()->setDevice( input_manager->getDeviceManager()->getKeyboardConfig(i) );
-                StateManager::get()->replaceTopMostScreen(OptionsScreenInput2::getInstance());
+                OptionsScreenDevice::getInstance()
+                    ->setDevice( input_manager->getDeviceManager()->getKeyboardConfig(i) );
+                StateManager::get()->replaceTopMostScreen(OptionsScreenDevice::getInstance());
             }
             else
             {
@@ -278,7 +274,6 @@ void OptionsScreenInput::filterInput(Input::InputType type,
                                      int deviceID,
                                      int btnID,
                                      int axisDir,
-                                     int axisRange,
                                      int value)
 {
     if (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON)

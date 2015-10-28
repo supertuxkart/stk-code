@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -688,7 +688,12 @@ namespace GUIEngine
     {
         IGUIEnvironment* g_env;
         Skin* g_skin = NULL;
+#ifdef ENABLE_FREETYPE
+        FTEnvironment* g_ft_env = NULL;
+        GlyphPageCreator* g_gp_creator = NULL;
+#endif // ENABLE_FREETYPE
         ScalableFont *g_font;
+        ScalableFont *g_outline_font;
         ScalableFont *g_large_font;
         ScalableFont *g_title_font;
         ScalableFont *g_small_font;
@@ -951,6 +956,13 @@ namespace GUIEngine
         //if (g_skin != NULL) delete g_skin;
         g_skin = NULL;
 
+#ifdef ENABLE_FREETYPE
+        g_ft_env->~FTEnvironment();
+        g_ft_env = NULL;
+        g_gp_creator->~GlyphPageCreator();
+        g_gp_creator = NULL;
+#endif // ENABLE_FREETYPE
+
         for (unsigned int i=0; i<g_loaded_screens.size(); i++)
         {
             g_loaded_screens[i].unload();
@@ -974,10 +986,23 @@ namespace GUIEngine
         g_large_font = NULL;
         g_digit_font->drop();
         g_digit_font = NULL;
+        g_outline_font->drop();
+        g_outline_font = NULL;
 
         // nothing else to delete for now AFAIK, irrlicht will automatically
         // kill everything along the device
     }   // cleanUp
+
+    // -----------------------------------------------------------------------
+     void cleanHollowCopyFont()
+    {
+        g_small_font->drop();
+        g_small_font = NULL;
+        g_large_font->drop();
+        g_large_font = NULL;
+        g_outline_font->drop();
+        g_outline_font = NULL;
+    }   // cleanHollowCopyFont
 
     // -----------------------------------------------------------------------
 
@@ -1005,6 +1030,11 @@ namespace GUIEngine
         {
             g_focus_for_player[n] = NULL;
         }
+
+#ifdef ENABLE_FREETYPE
+        g_ft_env = new FTEnvironment();
+        g_gp_creator = new GlyphPageCreator();
+#endif // ENABLE_FREETYPE
 
         /*
          To make the g_font a little bit nicer, we load an external g_font
@@ -1039,6 +1069,51 @@ namespace GUIEngine
             }
         }
 
+#ifdef ENABLE_FREETYPE
+        float normal_text_scale = 1;
+        float title_text_scale = 1;
+
+        ScalableFont* digit_font =new ScalableFont(g_env,T_DIGIT);
+        digit_font->setMonospaceDigits(true);
+        g_digit_font = digit_font;
+
+        ScalableFont* sfont2 =new ScalableFont(g_env,T_BOLD);
+        sfont2->setKerningWidth(0);
+        // Because the fallback font is much smaller than the title font:
+        sfont2->m_fallback_font_scale = 2.0f;
+        sfont2->m_fallback_kerning_width = 5;
+
+        ScalableFont* sfont =new ScalableFont(g_env,T_NORMAL);
+        sfont->setKerningHeight(0);
+        sfont->setScale(normal_text_scale);
+        g_font = sfont;
+        Private::font_height = g_font->getDimension( L"X" ).Height;
+
+        ScalableFont* sfont_larger = sfont->getHollowCopy();
+        sfont_larger->setScale(normal_text_scale*1.4f);
+        sfont_larger->setKerningHeight(0);
+        g_large_font = sfont_larger;
+
+        g_outline_font = sfont->getHollowCopy();
+        g_outline_font->m_black_border = true;
+
+        Private::large_font_height = g_large_font->getDimension( L"X" ).Height;
+
+        ScalableFont* sfont_smaller = sfont->getHollowCopy();
+        sfont_smaller->setScale(normal_text_scale*0.8f);
+        sfont_smaller->setKerningHeight(0);
+        g_small_font = sfont_smaller;
+
+        Private::small_font_height =
+            g_small_font->getDimension( L"X" ).Height;
+
+        sfont2->m_fallback_font = sfont;
+        sfont2->setScale(title_text_scale);
+        sfont2->m_black_border = true;
+        g_title_font = sfont2;
+        Private::title_font_height =
+            g_title_font->getDimension( L"X" ).Height;
+#else
         // font size is resolution-dependent.
         // normal text will range from 0.8, in 640x* resolutions (won't scale
         // below that) to 1.0, in 1024x* resolutions, and linearly up
@@ -1080,6 +1155,9 @@ namespace GUIEngine
         sfont_larger->setKerningHeight(-5);
         g_large_font = sfont_larger;
 
+        g_outline_font = sfont->getHollowCopy();
+        g_outline_font->m_black_border = true;
+
         Private::large_font_height = g_large_font->getDimension( L"X" ).Height;
 
         ScalableFont* sfont_smaller = sfont->getHollowCopy();
@@ -1106,6 +1184,7 @@ namespace GUIEngine
         g_title_font = sfont2;
         Private::title_font_height =
             g_title_font->getDimension( L"X" ).Height;
+#endif // ENABLE_FREETYPE
 
 
         if (g_font != NULL) g_skin->setFont(g_font);
@@ -1118,6 +1197,34 @@ namespace GUIEngine
         renderLoading();
         g_device->getVideoDriver()->endScene();
     }   // init
+
+    // -----------------------------------------------------------------------
+    void reloadHollowCopyFont(irr::gui::ScalableFont* sfont)
+    {
+        //Base on the init function above
+        float normal_text_scale = 1;
+
+        sfont->setScale(normal_text_scale);
+        sfont->setKerningHeight(-5);
+        Private::font_height = sfont->getDimension( L"X" ).Height;
+
+        ScalableFont* sfont_larger = sfont->getHollowCopy();
+        sfont_larger->setScale(normal_text_scale*1.4f);
+        sfont_larger->setKerningHeight(-5);
+        g_large_font = sfont_larger;
+
+        g_outline_font = sfont->getHollowCopy();
+        g_outline_font->m_black_border = true;
+
+        Private::large_font_height = g_large_font->getDimension( L"X" ).Height;
+
+        ScalableFont* sfont_smaller = sfont->getHollowCopy();
+        sfont_smaller->setScale(normal_text_scale*0.8f);
+        sfont_smaller->setKerningHeight(-5);
+        g_small_font = sfont_smaller;
+
+        Private::small_font_height =  g_small_font->getDimension( L"X" ).Height;
+    }   // reloadHollowCopyFont
 
     // -----------------------------------------------------------------------
     void reloadSkin()
@@ -1186,8 +1293,6 @@ namespace GUIEngine
         // further render)
         g_env->drawAll();
 
-        MessageQueue::update(elapsed_time);
-
         // ---- some menus may need updating
         if (gamestate != GAME)
         {
@@ -1209,6 +1314,7 @@ namespace GUIEngine
             }
         }
 
+        MessageQueue::update(elapsed_time);
 
         if (gamestate == INGAME_MENU && dynamic_cast<CutsceneWorld*>(World::getWorld()) != NULL)
         {

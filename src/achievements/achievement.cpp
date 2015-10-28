@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2014 Glenn De Jonghe
-//                     2014 Joerg Henrichs
+//  Copyright (C) 2013-2015 Glenn De Jonghe
+//            (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
 
 
 #include "achievements/achievement.hpp"
-
+#include "achievements/achievements_manager.hpp"
 #include "achievements/achievement_info.hpp"
 #include "guiengine/message_queue.hpp"
 #include "io/utf_writer.hpp"
@@ -151,20 +151,21 @@ irr::core::stringw Achievement::getProgressAsString() const
  *  \param key The key whose value is increased.
  *  \param increase Amount to add to the value of this key.
  */
-void Achievement::increase(const std::string & key, int increase)
+void Achievement::increase(const std::string & key, 
+                           const std::string &goal_key, int increase)
 {
     std::map<std::string, int>::iterator it;
     it = m_progress_map.find(key);
     if (it != m_progress_map.end())
     {
         it->second += increase;
-        if (it->second > m_achievement_info->getGoalValue(key))
-            it->second = m_achievement_info->getGoalValue(key);
+        if (it->second > m_achievement_info->getGoalValue(goal_key))
+            it->second = m_achievement_info->getGoalValue(goal_key);
     }
     else
     {
-        if (increase>m_achievement_info->getGoalValue(key))
-            increase = m_achievement_info->getGoalValue(key);
+        if (increase>m_achievement_info->getGoalValue(goal_key))
+            increase = m_achievement_info->getGoalValue(goal_key);
         m_progress_map[key] = increase;
     }
     check();
@@ -199,8 +200,13 @@ void Achievement::check()
     if(m_achievement_info->checkCompletion(this))
     {
         //show achievement
-        core::stringw s = StringUtils::insertValues(_("Completed achievement \"%s\"."),
-                                                    m_achievement_info->getName());
+        // Note: the "name" variable is required, see issue #2068
+        // calling _("...", info->getName()) is invalid because getName also calls
+        // _() and thus the string it returns is mapped to a temporary buffer
+        // in theory, it should return a copy of the string, but clang tries to
+        // optimise away the copy
+        core::stringw name = m_achievement_info->getName();
+        core::stringw s = _("Completed achievement \"%s\".", name);
         MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, s);
 
         // Sends a confirmation to the server that an achievement has been

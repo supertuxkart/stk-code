@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -63,6 +63,8 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
     xml_node.get("reset",   &m_crash_reset );
     xml_node.get("explode", &m_knock_kart  );
     xml_node.get("flatten", &m_flatten_kart);
+    xml_node.get("on-kart-collision", &m_on_kart_collision);
+    xml_node.get("on-item-collision", &m_on_item_collision);
     m_reset_when_too_low =
         xml_node.get("reset-when-below", &m_reset_height) == 1;
 
@@ -127,7 +129,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
 
     m_object = object;
 
-    m_init_xyz   = object->getAbsolutePosition();
+    m_init_xyz = object->getAbsoluteCenterPosition();
     m_init_hpr   = object->getRotation();
     m_init_scale = object->getScale();
 
@@ -140,6 +142,9 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_flatten_kart       = settings.m_flatten_kart;
     m_reset_when_too_low = settings.m_reset_when_too_low;
     m_reset_height       = settings.m_reset_height;
+    m_on_kart_collision  = settings.m_on_kart_collision;
+    m_on_item_collision  = settings.m_on_item_collision;
+    m_body_added = false;
 
     m_init_pos.setIdentity();
     Vec3 radHpr(m_init_hpr);
@@ -246,6 +251,16 @@ void PhysicalObject::init()
     {
         Log::fatal("PhysicalObject", "Unknown node type");
     }
+
+    Vec3 parent_scale(1.0f, 1.0f, 1.0f);
+    if (m_object->getParentLibrary() != NULL)
+    {
+        parent_scale = m_object->getParentLibrary()->getScale();
+    }
+
+    max = max * (Vec3(m_init_scale) * parent_scale);
+    min = min * (Vec3(m_init_scale) * parent_scale);
+
     Vec3 extend = max-min;
     // Adjust the mesth of the graphical object so that its center is where it
     // is in bullet (usually at (0,0,0)). It can be changed in the case clause
@@ -309,7 +324,6 @@ void PhysicalObject::init()
     }
     case MP_EXACT:
     {
-        m_graphical_offset = Vec3(0,0,0);
         extend.setY(0);
         TriangleMesh* triangle_mesh = new TriangleMesh();
 
@@ -435,7 +449,8 @@ void PhysicalObject::init()
         triangle_mesh->createCollisionShape();
         m_shape = &triangle_mesh->getCollisionShape();
         m_triangle_mesh = triangle_mesh;
-
+        m_init_pos.setOrigin(m_init_pos.getOrigin() + m_graphical_offset);
+        // m_graphical_offset = Vec3(0,0,0);
         break;
     }
     case MP_NONE:
@@ -452,12 +467,40 @@ void PhysicalObject::init()
     // 2. Create the rigid object
     // --------------------------
     // m_init_pos is the point on the track - add the offset
-    m_init_pos.setOrigin(m_init_pos.getOrigin() +
-                         btVector3(0,extend.getY()*0.5f, 0));
+    if (m_is_dynamic)
+    {
+        m_init_pos.setOrigin(m_init_pos.getOrigin() +
+            btVector3(0, extend.getY()*0.5f, 0));
+    }
+
+
+    // If this object has a parent, apply the parent's rotation
+    if (m_object->getParentLibrary() != NULL)
+    {
+        core::vector3df parent_rot_hpr = m_object->getParentLibrary()->getInitRotation();
+        core::matrix4 parent_rot_matrix;
+        parent_rot_matrix.setRotationDegrees(parent_rot_hpr);
+
+        btQuaternion child_rot_quat = m_init_pos.getRotation();
+        core::matrix4 child_rot_matrix;
+        Vec3 axis = child_rot_quat.getAxis();
+        child_rot_matrix.setRotationAxisRadians(child_rot_quat.getAngle(), axis.toIrrVector());
+
+        irr::core::quaternion tempQuat(parent_rot_matrix * child_rot_matrix);
+        btQuaternion q(tempQuat.X, tempQuat.Y, tempQuat.Z, tempQuat.W);
+
+        m_init_pos.setRotation(q);
+    }
+
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia(1,1,1);
     if (m_body_type != MP_EXACT)
         m_shape->calculateLocalInertia(m_mass, inertia);
+    else
+    {
+        if (m_mass == 0)
+            inertia.setValue(0, 0, 0);
+    }
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
 
@@ -475,6 +518,7 @@ void PhysicalObject::init()
     }
 
     World::getWorld()->getPhysics()->addBody(m_body);
+    m_body_added = true;
     if(m_triangle_mesh)
         m_triangle_mesh->setBody(m_body);
 }   // init
@@ -503,10 +547,8 @@ void PhysicalObject::update(float dt)
     hpr.setHPR(t.getRotation());
     //m_node->setRotation(hpr.toIrrHPR());
 
-    core::vector3df scale(1,1,1);
     m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE,
-                   scale, false);
-    return;
+                   m_init_scale, false, true /* isAbsoluteCoord */);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -605,14 +647,22 @@ void PhysicalObject::setInteraction(std::string interaction){
 /** Remove body from physics dynamic world interaction type for object*/
 void PhysicalObject::removeBody()
 {
-    World::getWorld()->getPhysics()->removeBody(m_body);
+    if (m_body_added)
+    {
+        World::getWorld()->getPhysics()->removeBody(m_body);
+        m_body_added = false;
+    }
 }   // Remove body
 
 // ----------------------------------------------------------------------------
 /** Add body to physics dynamic world */
 void PhysicalObject::addBody()
 {
-    World::getWorld()->getPhysics()->addBody(m_body);
+    if (!m_body_added)
+    {
+        m_body_added = true;
+        World::getWorld()->getPhysics()->addBody(m_body);
+    }
 }   // Add body
 
 // ----------------------------------------------------------------------------

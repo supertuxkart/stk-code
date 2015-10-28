@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -80,13 +80,9 @@ void LabelWidget::add()
     {
         irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
                                                           false, word_wrap, m_parent, -1);
-#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
         irrwidget->setTextRestrainedInside(false);
-#endif
     }
-#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
-    irrwidget->setRightToLeft( m_is_text_rtl );
-#endif
+    irrwidget->setRightToLeft(translations->isRTLText(message));
 
     m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
@@ -109,21 +105,8 @@ void LabelWidget::add()
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
 
-    if (m_scroll_speed > 0)
-    {
-        IGUIFont* font = m_title_font ? GUIEngine::getTitleFont()
-                                      : GUIEngine::getFont();
-        core::dimension2du r = font->getDimension(getText().c_str());
-
-        //m_scroll_offset = (float)r.Width;
-
-        // start scrolled off
-        m_scroll_offset = -999;
-    }
-    else
-    {
+    if (m_scroll_speed <= 0)
         m_element->setNotClipped(true);
-    }
 }   // add
 
 // ----------------------------------------------------------------------------
@@ -143,18 +126,15 @@ void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
             rect.LowerRightCorner.X = rect.UpperLeftCorner.X + fwidth;
             m_element->setRelativePosition(rect);
             m_element->updateAbsolutePosition();
-
-            //((IGUIStaticText*)m_element)->setBackgroundColor( video::SColor(255,255,0,0) );
         }
     }
 
     if (m_scroll_speed > 0)
-    {
-        //m_scroll_offset = (float)m_element->getAbsolutePosition().getWidth();
         m_scroll_offset = (float)m_w;
-    }
 
     Widget::setText(text);
+    if (m_element)
+        getIrrlichtElement<IGUIStaticText>()->setRightToLeft(translations->isRTLText(getText()));
 }   // setText
 
 // ----------------------------------------------------------------------------
@@ -183,7 +163,6 @@ bool LabelWidget::scrolledOff() const
 
 void LabelWidget::setScrollSpeed(float speed)
 {
-    //m_scroll_offset = 0;
     m_scroll_speed  = speed;
 }   // setScrollSpeed
 

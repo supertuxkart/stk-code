@@ -72,8 +72,8 @@ namespace video
 		//! Destructor
 		~SMaterialLayer()
 		{
-			MatrixAllocator.destruct(TextureMatrix);
-			MatrixAllocator.deallocate(TextureMatrix); 
+			    MatrixAllocator.destruct(TextureMatrix);
+  			    MatrixAllocator.deallocate(TextureMatrix); 
 		}
 
 		//! Assignment operator
@@ -219,6 +219,7 @@ namespace video
 		//! Texture Matrix
 		/** Do not access this element directly as the internal
 		ressource management has to cope with Null pointers etc. */
+public:
 		core::matrix4* TextureMatrix;
 	};
 

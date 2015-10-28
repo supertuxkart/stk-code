@@ -87,7 +87,7 @@ void CAnimatedMeshSceneNode::buildFrameNr(u32 timeMs)
 		}
 	}
 
-	if ((StartFrame==EndFrame))
+	if (StartFrame == EndFrame)
 	{
 		CurrentFrameNr = (f32)StartFrame; //Support for non animated meshes
 	}

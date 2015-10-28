@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2014 Glenn De Jonghe
-//                     2014 Joerg Henrichs
+//  Copyright (C) 2013-2015 Glenn De Jonghe
+//            (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -65,7 +65,8 @@ public:
     virtual void load(const XMLNode *node);
     virtual void save(UTFWriter &out);
     virtual int getValue(const std::string & key);
-    void increase(const std::string & key, int increase = 1);
+    void increase(const std::string & key, const std::string &goal_key,
+                  int increase = 1);
 
     virtual void reset();
     virtual irr::core::stringw getProgressAsString() const;

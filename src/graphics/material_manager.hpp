@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2010-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2010-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,13 +24,15 @@
 
 namespace irr
 {
-    namespace video { class ITexture;    }
+    namespace video { class ITexture; }
     namespace scene { class IMeshBuffer; class ISceneNode; }
 }
 using namespace irr;
 
+#include <irrlicht.h>
 #include <string>
 #include <vector>
+#include <map>
 
 class Material;
 class XMLReader;
@@ -48,7 +50,8 @@ private:
 
     std::vector<Material*> m_materials;
 
-    Material* m_default_material;
+    std::map<video::E_MATERIAL_TYPE, Material*> m_default_materials;
+    Material* getDefaultMaterial(video::E_MATERIAL_TYPE material_type);
 
 public:
               MaterialManager();

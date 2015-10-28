@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007-2013 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -66,21 +66,26 @@ void TerrainInfo::update(const Vec3 &from)
                      ->castRay(from, to, &m_hit_point, &m_material,
                                &m_normal, /*interpolate*/false);
 }   // update
+
 //-----------------------------------------------------------------------------
 /** Update the terrain information based on the latest position.
- *  \param Position from which to start the rayast from.
+ *  \param tran The transform ov the kart
+ *  \param from World coordinates from which to start the raycast.
  */
-void TerrainInfo::update(const btTransform &trans, const Vec3 &offset)
+void TerrainInfo::update(const btMatrix3x3 &rotation, const Vec3 &from)
 {
     m_last_material = m_material;
-    btVector3 from = trans(offset);
+    // Save the origin for debug drawing
+    m_origin_ray    = from;
+
+    // Compute the 'to' vector by rotating a long 'down' vectory by the
+    // kart rotation, and adding the start point to it.
     btVector3 to(0, -10000.0f, 0);
-    to = trans(to);
+    to = from + rotation*to;
 
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
     tm.castRay(from, to, &m_hit_point, &m_material, &m_normal,
                /*interpolate*/true);
-
     // Now also raycast against all track objects (that are driveable). If
     // there should be a closer result (than the one against the main track 
     // mesh), its data will be returned.

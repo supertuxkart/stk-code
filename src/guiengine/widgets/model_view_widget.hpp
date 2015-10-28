@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -49,8 +49,6 @@ namespace GUIEngine
         AlignedArray<Vec3> m_model_location;
         AlignedArray<Vec3> m_model_scale;
         std::vector<int> m_model_frames;
-        
-        video::ITexture* m_texture;
         
         RTT* m_rtt_provider;
         

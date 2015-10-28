@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -107,7 +107,7 @@ void BaseOnlineProfileAchievements::init()
             const Achievement *a = it->second;
             if(a->getInfo()->isSecret() && !a->isAchieved())
                 continue;
-            ListWidget::ListCell title(a->getInfo()->getName(), -1, 2);
+            ListWidget::ListCell title(translations->fribidize(a->getInfo()->getName()), -1, 2);
             ListWidget::ListCell progress(a->getProgressAsString(), -1, 1);
             row.push_back(title);
             row.push_back(progress);

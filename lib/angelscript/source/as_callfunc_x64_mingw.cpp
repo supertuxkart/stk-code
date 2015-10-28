@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -30,6 +30,8 @@
 
 //
 // This code was adapted from as_callfunc_x64_msvc by _Vicious_ on August 20th, 2011.
+//
+// Added support for functor methods by Jordi Oliveras Rovira in April, 2014.
 //
 
 #include <stdio.h>
@@ -165,7 +167,7 @@ static asQWORD GetReturnedDouble()
 	return ret;
 }
 
-asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/)
+asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/, void *secondObject)
 {
 	asCScriptEngine *engine = context->m_engine;
 	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
@@ -189,10 +191,16 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		allArgBuffer[paramSize++] = (asQWORD)retPointer;
 	}
 
+#ifdef AS_NO_THISCALL_FUNCTOR_METHOD
 	if( callConv == ICC_THISCALL ||
 		callConv == ICC_THISCALL_RETURNINMEM ||
 		callConv == ICC_VIRTUAL_THISCALL ||
 		callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM )
+#else
+	// Optimization to avoid check 12 values (all ICC_ that contains THISCALL)
+	if( (callConv >= ICC_THISCALL && callConv <= ICC_VIRTUAL_THISCALL_RETURNINMEM) ||
+		(callConv >= ICC_THISCALL_OBJLAST && callConv <= ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM) )
+#endif
 	{
 		// Add the object pointer as the first parameter
 		allArgBuffer[paramSize++] = (asQWORD)obj;
@@ -204,8 +212,28 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		// Add the object pointer as the first parameter
 		allArgBuffer[paramSize++] = (asQWORD)obj;
 	}
+#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
+	else if( callConv == ICC_THISCALL_OBJFIRST ||
+		callConv == ICC_THISCALL_OBJFIRST_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJFIRST ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM )
+	{
+		// Add the object pointer as the first parameter
+		allArgBuffer[paramSize++] = (asQWORD)secondObject;
+	}
+#endif
+
+#ifdef AS_NO_THISCALL_FUNCTOR_METHOD
 	if( callConv == ICC_VIRTUAL_THISCALL ||
 		callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM )
+#else
+	if( callConv == ICC_VIRTUAL_THISCALL ||
+		callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJFIRST ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJLAST ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM )
+#endif
 	{
 		// Get the true function pointer from the virtual function table
 		vftable = *(void***)obj;
@@ -287,6 +315,16 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		// Add the object pointer as the last parameter
 		allArgBuffer[paramSize++] = (asQWORD)obj;
 	}
+#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
+	else if( callConv == ICC_THISCALL_OBJLAST ||
+		callConv == ICC_THISCALL_OBJLAST_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJLAST ||
+		callConv == ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM )
+	{
+		// Add the object pointer as the last parameter
+		allArgBuffer[paramSize++] = (asQWORD)secondObject;
+	}
+#endif
 
 	retQW = CallX64(allArgBuffer, floatArgBuffer, paramSize*8, (asPWORD)func);
 

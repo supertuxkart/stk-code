@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -185,8 +185,8 @@ public:
      *  used as a 2d vector. */
     // ------------------------------------------------------------------------
     /** Returns the length of the vector using only the x/z coordinates. */
-    float length_2d() const {return sqrt(  m_floats[0]*m_floats[0]
-                                         + m_floats[2]*m_floats[2]);}
+    float length_2d() const {return sqrtf(  m_floats[0]*m_floats[0]
+                                          + m_floats[2]*m_floats[2]);}
     // ------------------------------------------------------------------------
     /** Sets this = max(this, a) componentwise.
      *  \param Vector to compare with. */

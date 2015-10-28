@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,9 +21,10 @@
 #include "network/network_manager.hpp"
 #include "utils/time.hpp"
 
-PingProtocol::PingProtocol(const TransportAddress& ping_dst, double delay_between_pings) : Protocol(NULL, PROTOCOL_SILENT)
+PingProtocol::PingProtocol(const TransportAddress& ping_dst, double delay_between_pings) 
+            : Protocol(NULL, PROTOCOL_SILENT)
 {
-    m_ping_dst = ping_dst;
+    m_ping_dst.copy(ping_dst);
     m_delay_between_pings = delay_between_pings;
 }
 

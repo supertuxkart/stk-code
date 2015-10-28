@@ -1,9 +1,9 @@
-// Copyright (C) 2002-2012 Nikolaus Gebhardt
+// Copyright (C) 2002-2015 Nikolaus Gebhardt
 //               2013 Glenn De Jonghe
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
-#include "guiengine/widgets/CGUISTKListBox.h"
+#include "guiengine/widgets/CGUISTKListBox.hpp"
 
 #include "IGUISkin.h"
 #include "IGUIEnvironment.h"
@@ -26,7 +26,7 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
 : IGUIElement(EGUIET_LIST_BOX, environment, parent, id, rectangle), Selected(-1),
     ItemHeight(0),ItemHeightOverride(0),
     TotalItemHeight(0), ItemsIconWidth(0), Font(0), IconBank(0),
-    ScrollBar(0), selectTime(0), LastKeyTime(0), Selecting(false), DrawBack(drawBack),
+    ScrollBar(0), selectTime(0), Selecting(false), DrawBack(drawBack),
     MoveOverSelect(moveOverSelect), AutoScroll(true), HighlightWhenNotFocused(true)
 {
     #ifdef _DEBUG

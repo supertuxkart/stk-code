@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -63,9 +63,8 @@ public:
 	bool HasLiveObjects();
 	void RemoveConfiguration(asCScriptEngine *engine, bool notUsed = false);
 
-#ifdef AS_DEBUG
-	void ValidateNoUsage(asCScriptEngine *engine, asCObjectType *type);
-#endif
+	void AddReferencesForFunc(asCScriptEngine *engine, asCScriptFunction *func);
+	void AddReferencesForType(asCScriptEngine *engine, asCObjectType *type);
 
 	asCString groupName;
 	int refCount;
@@ -75,6 +74,10 @@ public:
 	asCArray<asCGlobalProperty*> globalProps;
 	asCArray<asCConfigGroup*>    referencedConfigGroups;
 	asCArray<asCScriptFunction*> funcDefs;
+
+	// This array holds the generated template instances that are used 
+	// by the config group as part of function signature or property
+	asCArray<asCObjectType*>     generatedTemplateInstances;
 };
 
 END_AS_NAMESPACE

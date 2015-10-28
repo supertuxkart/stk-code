@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -62,6 +62,10 @@ DEFINE_SCREEN_SINGLETON( RaceResultGUI );
 RaceResultGUI::RaceResultGUI() : Screen("race_result.stkgui",
                                         /*pause race*/ false)
 {
+    std::string path = file_manager->getAsset(FileManager::MUSIC,
+                                              "race_summary.music");
+    m_race_over_music = music_manager->getMusicInformation(path);
+
 }   // RaceResultGUI
 
 //-----------------------------------------------------------------------------
@@ -83,6 +87,13 @@ void RaceResultGUI::init()
 
     music_manager->stopMusic();
     m_finish_sound = SFXManager::get()->quickSound("race_finish");
+    if (!m_finish_sound)
+    {
+        // If there is no finish sound (because sfx are disabled), start
+        // the race over music here (since the race over music is only started
+        // when the finish sound has been played).
+        music_manager->startMusic(m_race_over_music);
+    }
 
     // Calculate how many track screenshots can fit into the "result-table" widget
     GUIEngine::Widget* result_table = getWidget("result-table");
@@ -441,7 +452,6 @@ void RaceResultGUI::determineTableLayout()
     m_width_kart_name     = 0;
     float max_finish_time = 0;
 
-
     for(unsigned int position=first_position;
         position<=race_manager->getNumberOfKarts(); position++)
     {
@@ -458,7 +468,9 @@ void RaceResultGUI::determineTableLayout()
             kart->getKartProperties()->getIconMaterial()->getTexture();
         ri->m_kart_icon          = icon;
 
-        if (kart->isEliminated())
+        // FTL karts will get a time assigned, they are not shown as eliminated
+        if (kart->isEliminated() && 
+            race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             ri->m_finish_time_string = core::stringw(_("Eliminated"));
         }
@@ -515,9 +527,7 @@ void RaceResultGUI::determineTableLayout()
     if(m_distance_between_rows * num_karts > height)
         m_distance_between_rows = height / num_karts;
 
-    m_width_icon = table_area->m_h<600
-                 ? 27
-                 : (int)(40*(table_area->m_w/800.0f));
+    m_width_icon = table_area->m_h / 18;
 
     m_width_column_space  = 10;
 
@@ -602,14 +612,14 @@ void RaceResultGUI::onUpdate(float dt)
 {
     renderGlobal(dt);
 
-    if (m_finish_sound != NULL &&
-        m_finish_sound->getStatus() != SFXBase::SFX_PLAYING)
+    // When the finish sound has been played, start the race over music.
+    if(m_finish_sound && m_finish_sound->getStatus() != SFXBase::SFX_PLAYING)
     {
         try
         {
-            std::string path = file_manager->getAsset(FileManager::MUSIC,
-                                                      "race_summary.music");
-            music_manager->startMusic(music_manager->getMusicInformation(path));
+            // This call is done once each frame, but startMusic() is cheap
+            // if the music is already playing.
+            music_manager->startMusic(m_race_over_music);
         }
         catch (std::exception& e)
         {
@@ -755,18 +765,27 @@ void RaceResultGUI::renderGlobal(float dt)
                  }
                  break;
             case RR_INCREASE_POINTS:
+            {
+                WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+                assert(wwr);
+                int most_points;
+                if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+                    most_points = wwr->getScoreForPosition(2);
+                else
+                    most_points = wwr->getScoreForPosition(1);
                 ri->m_current_displayed_points +=
-                    dt*race_manager->getPositionScore(1)/m_time_for_points;
-                if(ri->m_current_displayed_points>ri->m_new_overall_points)
+                    dt*most_points / m_time_for_points;
+                if (ri->m_current_displayed_points > ri->m_new_overall_points)
                 {
                     ri->m_current_displayed_points =
-                       (float)ri->m_new_overall_points;
+                        (float)ri->m_new_overall_points;
                 }
                 ri->m_new_points -=
-                    dt*race_manager->getPositionScore(1)/m_time_for_points;
-                if(ri->m_new_points<0)
+                    dt*most_points / m_time_for_points;
+                if (ri->m_new_points < 0)
                     ri->m_new_points = 0;
                 break;
+            }
             case RR_RESORT_TABLE:
                 x = ri->m_x_pos
                   - ri->m_radius*sin(m_timer/m_time_rotation*M_PI);
@@ -813,23 +832,36 @@ void RaceResultGUI::determineGPLayout()
         ri->m_player         = ri->m_is_player_kart
                              ? kart->getController()->getPlayer() : NULL;
 
-        if (!kart->isEliminated())
+        // In FTL karts do have a time, which is shown even when the kart
+        // is eliminated
+        if (kart->isEliminated() &&
+            race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            ri->m_finish_time_string = core::stringw(_("Eliminated"));
+        }
+        else
         {
             float time           = race_manager->getOverallTime(kart_id);
             ri->m_finish_time_string
                                  = StringUtils::timeToString(time).c_str();
-        }
-        else
-        {
-            ri->m_finish_time_string = core::stringw(_("Eliminated"));
         }
         ri->m_start_at       = m_time_between_rows * rank;
         ri->m_x_pos          = (float)UserConfigParams::m_width;
         ri->m_y_pos          = (float)(m_top+rank*m_distance_between_rows);
         int p                = race_manager->getKartPrevScore(kart_id);
         ri->m_current_displayed_points = (float)p;
-        ri->m_new_points     =
-            (float)race_manager->getPositionScore(kart->getPosition());
+        if (kart->isEliminated() && 
+            race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            ri->m_new_points = 0;
+        }
+        else
+        {
+            WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+            assert(wwr);
+            ri->m_new_points =
+                (float)wwr->getScoreForPosition(kart->getPosition());
+        }
     }
 
     // Now update the GP ranks, and determine the new position
@@ -889,15 +921,10 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     current_x += m_width_kart_name + m_width_column_space;
 
 
-    // Draw the time except in FTL mode
-    // --------------------------------
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
-    {
-        core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
-        m_font->draw(ri->m_finish_time_string, dest_rect, color, false, false,
-                     NULL, true /* ignoreRTL */);
-        current_x += m_width_finish_time + m_width_column_space;
-    }
+    core::recti dest_rect = core::recti(current_x, y, current_x + 100, y + 10);
+    m_font->draw(ri->m_finish_time_string, dest_rect, color, false, false,
+                 NULL, true /* ignoreRTL */);
+    current_x += m_width_finish_time + m_width_column_space;
 
     // Only display points in GP mode and when the GP results are displayed.
     // =====================================================================
@@ -1202,14 +1229,14 @@ void RaceResultGUI::addGPProgressWidget(GUIEngine::Widget* widget)
 // ----------------------------------------------------------------------------
 void RaceResultGUI::displayGPProgress()
 {
-    const wchar_t* msg = _("Grand Prix progress:");
+    core::stringw msg = _("Grand Prix progress:");
 
     GUIEngine::Widget* result_table = getWidget("result-table");
     assert(result_table != NULL);
 
     video::SColor color = video::SColor(255,255,0,0);
     core::recti dest_rect(
-        result_table->m_x + result_table->m_w - m_font->getDimension(msg).Width - 5,
+        result_table->m_x + result_table->m_w - m_font->getDimension(msg.c_str()).Width - 5,
         m_top, 0, 0);
 
     m_font->draw(msg, dest_rect, color, false, false, NULL, true);
@@ -1250,6 +1277,10 @@ void RaceResultGUI::displayHighScores()
 
         // prevent excessive long name
         unsigned int max_characters = 15;
+        unsigned int max_width = (UserConfigParams::m_width / 2 - 200) / 10;
+        if (max_width < 15)
+            max_characters = max_width;
+
         float time;
         for (int i = 0; i < scores->getNumberEntries(); i++)
         {
@@ -1267,7 +1298,7 @@ void RaceResultGUI::displayHighScores()
             }
 
             int current_x = x;
-            int current_y = y+(i+1)*50;
+            int current_y = y + (int) ((i + 1) * m_distance_between_rows * 1.5f);
 
             const KartProperties* prop = kart_properties_manager->getKart(kart_name);
             if (prop != NULL)
@@ -1298,7 +1329,7 @@ void RaceResultGUI::displayHighScores()
                 text_color,
                 false, false, NULL, true /* ignoreRTL */);
 
-            current_x += 180;
+            current_x = (int) (UserConfigParams::m_width * 0.85f);
 
             // Finally draw the time
             std::string time_string = StringUtils::timeToString(time);

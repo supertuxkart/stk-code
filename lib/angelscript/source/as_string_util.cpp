@@ -78,7 +78,7 @@ double asStringScanDouble(const char *string, size_t *numScanned)
 {
 	// I decided to do my own implementation of strtod() because this function
 	// doesn't seem to be present on all systems. iOS 5 for example doesn't appear 
-	// to include the function in the standard lib. 
+	// to include the function in the standard lib.
 	
 	// Another reason is that the standard implementation of strtod() is dependent
 	// on the locale on some systems, i.e. it may use comma instead of dot for 

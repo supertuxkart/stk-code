@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -64,12 +64,6 @@ private:
     /** The user name that is currently being logged out. Used to
      *  display more meaningful sign-out message. */
     irr::core::stringw m_sign_in_name;
-
-    /** Per player difficulty. */
-    GUIEngine::SpinnerWidget *m_difficulty;
-
-    /** Apply per player difficulty in singleplayer mode. */
-    GUIEngine::CheckBoxWidget *m_singleplayer_difficulty;
 
     /** Online check box. */
     GUIEngine::CheckBoxWidget *m_online_cb;

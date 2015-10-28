@@ -1,9 +1,9 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007-2013 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  Linear item-kart intersection function written by
-//  Copyright (C) 2009-2013 David Mikos
+//  Copyright (C) 2009-2015 David Mikos
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@
 
 #include "items/flyable.hpp"
 
-#include <math.h>
+#include <cmath>
 
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
@@ -231,7 +231,7 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
         Vec3 delta      = t.getOrigin()-trans_projectile.getOrigin();
         // the Y distance is added again because karts above or below should//
         // not be prioritized when aiming
-        float distance2 = delta.length2() + abs(t.getOrigin().getY()
+        float distance2 = delta.length2() + std::abs(t.getOrigin().getY()
                         - trans_projectile.getOrigin().getY())*2;
 
         if(inFrontOf != NULL)

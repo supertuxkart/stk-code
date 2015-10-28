@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -69,7 +69,7 @@ void CheckGoal::update(float dt)
             continue;
 
         const Vec3 &xyz = obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getPosition();
-        if(isTriggered(m_previous_position[ball_index], xyz, ball_index))
+        if(isTriggered(m_previous_position[ball_index], xyz, -1))
         {
             if(UserConfigParams::m_check_debug)
                 Log::info("CheckGoal", "Goal check structure %d triggered for object %s.",
@@ -101,7 +101,7 @@ void CheckGoal::trigger(unsigned int kart_index)
 
 // ----------------------------------------------------------------------------
 bool CheckGoal::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                            unsigned int indx)
+                            unsigned int kartIndex)
 {
     core::vector2df cross_point;
 

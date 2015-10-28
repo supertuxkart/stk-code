@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -44,9 +44,6 @@ private:
         /** Second handle, i.e. the one towards the next point. */
         Vec3 m_handle2;
     };   // BezierData
-
-    /** Overall duration. */
-    float m_time;
 
     /** Vector with all control points and handles. */
     AlignedArray<BezierData> m_all_data;

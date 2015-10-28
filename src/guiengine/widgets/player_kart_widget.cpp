@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,10 +16,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "guiengine/widgets/player_kart_widget.hpp"
+
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
-#include "guiengine/widgets/player_kart_widget.hpp"
 #include "guiengine/widgets/player_name_spinner.hpp"
 #include "input/input_device.hpp"
 #include "karts/kart_properties.hpp"
@@ -27,8 +29,6 @@
 #include "online/online_profile.hpp"
 #include "states_screens/kart_selection.hpp"
 #include <IGUIEnvironment.h>
-
-static const char RANDOM_KART_ID[] = "randomkart";
 
 using namespace GUIEngine;
 
@@ -344,6 +344,7 @@ void PlayerKartWidget::add()
         name = m_associated_player->getProfile()->getName();
     if (m_associated_user)
         name = m_associated_user->getUserName();
+    core::stringw label = translations->fribidize(name);
 
     if (m_parent_screen->m_multiplayer)
     {
@@ -355,22 +356,23 @@ void PlayerKartWidget::add()
             m_player_ident_spinner->addLabel(label);
             if (UserConfigParams::m_per_player_difficulty)
             {
-                // The second player is the same, but with handicap
-                label = _("%s (handicapped)", label);
+                // I18N: 'handicapped' indicates that per-player handicaps are
+                //       activated for this kart (i.e. it will drive slower)
+                label = _("%s (handicapped)", name);
                 m_player_ident_spinner->addLabel(label);
             }
         }
 
         // select the right player profile in the spinner
-        m_player_ident_spinner->setValue(name);
+        m_player_ident_spinner->setValue(label);
     }
     else
     {
-        m_player_ident_spinner->addLabel(name);
+        m_player_ident_spinner->addLabel(label);
         m_player_ident_spinner->setVisible(false);
     }
 
-    assert(m_player_ident_spinner->getStringValue() == name);
+    assert(m_player_ident_spinner->getStringValue() == label);
 }   // add
 
 // ------------------------------------------------------------------------
@@ -415,10 +417,8 @@ void PlayerKartWidget::markAsReady()
     // 'playerNameString' is already fribidize, so we need to use
     // 'insertValues' and not _("...", a) so it's not flipped again
     m_ready_text =
-        GUIEngine::getGUIEnv()->addStaticText(
-            StringUtils::insertValues(_("%s is ready"),
-                                      playerNameString).c_str(),
-            rect                    );
+        GUIEngine::getGUIEnv()->addStaticText(_("%s is ready", playerNameString),
+            rect);
     m_ready_text->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER );
 
     m_children.remove(m_player_ident_spinner);

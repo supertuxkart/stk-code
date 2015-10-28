@@ -501,11 +501,11 @@ public:
 	//! Gets an attribute as dimension2d
 	//! \param attributeName: Name of the attribute to get.
 	//! \return Returns value of the attribute previously set by setAttribute()
-	virtual core::dimension2d<u32> getAttributeAsDimension2d(const c8* attributeName) = 0;
+	virtual core::dimension2d<u32> getAttributeAsDimension2d(const c8* attributeName) const = 0;
 
 	//! Gets an attribute as dimension2d
 	//! \param index: Index value, must be between 0 and getAttributeCount()-1.
-	virtual core::dimension2d<u32> getAttributeAsDimension2d(s32 index) = 0;
+	virtual core::dimension2d<u32> getAttributeAsDimension2d(s32 index) const = 0;
 
 	//! Sets an attribute as dimension2d
 	virtual void setAttribute(s32 index, core::dimension2d<u32> v) = 0;

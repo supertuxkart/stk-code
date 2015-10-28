@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -38,6 +38,11 @@ namespace irr
 
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
+
+#ifdef ENABLE_FREETYPE
+#include "guiengine/ft_environment.hpp"
+#include "guiengine/glyph_page_creator.hpp"
+#endif // ENABLE_FREETYPE
 
 /**
  * \ingroup guiengine
@@ -81,8 +86,13 @@ namespace GUIEngine
     {
         extern irr::gui::IGUIEnvironment* g_env;
         extern Skin* g_skin;
+#ifdef ENABLE_FREETYPE
+        extern FTEnvironment*  g_ft_env;
+        extern GlyphPageCreator*  g_gp_creator;
+#endif // ENABLE_FREETYPE
         extern irr::gui::ScalableFont* g_small_font;
         extern irr::gui::ScalableFont* g_font;
+        extern irr::gui::ScalableFont* g_outline_font;
         extern irr::gui::ScalableFont* g_large_font;
         extern irr::gui::ScalableFont* g_title_font;
         extern irr::gui::ScalableFont* g_digit_font;
@@ -136,6 +146,8 @@ namespace GUIEngine
       */
     inline irr::gui::ScalableFont*    getFont()          { return Private::g_font;           }
 
+    inline irr::gui::ScalableFont*    getOutlineFont()   { return Private::g_outline_font;   }
+
     /**
       * \return the "large" font (useful for text)
       */
@@ -168,6 +180,20 @@ namespace GUIEngine
       * \return       the skin object used to render widgets
       */
     inline Skin*                      getSkin()          { return Private::g_skin;           }
+
+#ifdef ENABLE_FREETYPE
+    /**
+      * \pre GUIEngine::init must have been called first
+      * \return       the freetype and library with face
+      */
+    inline FTEnvironment*             getFreetype()      { return Private::g_ft_env;         }
+
+    /**
+      * \pre GUIEngine::init must have been called first
+      * \return       the glyph page creator, useful to create a glyph page from individual char
+      */
+    inline GlyphPageCreator*          getGlyphPageCreator() { return Private::g_gp_creator;  }
+#endif // ENABLE_FREETYPE
 
     Screen*                           getScreenNamed(const char* name);
 
@@ -244,6 +270,14 @@ namespace GUIEngine
       * \brief call when skin in user config was updated
       */
     void reloadSkin();
+
+#ifdef ENABLE_FREETYPE
+    /**
+      * \brief call when translation in user config was updated for freetype rendering STK
+      */
+    void cleanHollowCopyFont();
+    void reloadHollowCopyFont(irr::gui::ScalableFont*);
+#endif // ENABLE_FREETYPE
 }
 
 #endif

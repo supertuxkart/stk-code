@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -51,7 +51,7 @@ class GrandPrixEditorScreen :
     void onNewGPWithName(const irr::core::stringw& newName);
     void onConfirm();
 
-    static const wchar_t* getGroupName(enum GrandPrixData::GPGroupType group);
+    static const core::stringw getGroupName(enum GrandPrixData::GPGroupType group);
 
     GrandPrixData*                  m_selection;
     std::string                     m_action;

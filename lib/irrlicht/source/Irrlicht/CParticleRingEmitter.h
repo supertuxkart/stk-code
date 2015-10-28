@@ -136,7 +136,6 @@ private:
 	u32 MinLifeTime, MaxLifeTime;
 
 	u32 Time;
-	u32 Emitted;
 	s32 MaxAngleDegrees;
 };
 

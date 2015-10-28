@@ -1,9 +1,9 @@
 
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013  Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013  Eduardo Hernandez Munoz
-//  Copyright (C) 2010-2013  Joerg Henrichs
+//  Copyright (C) 2004-2015  Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015  Eduardo Hernandez Munoz
+//  Copyright (C) 2010-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,27 @@
 
 #ifndef HEADER_SKIDDING_AI_HPP
 #define HEADER_SKIDDING_AI_HPP
+
+// Some debugging features for the AI. For example you can visualise the
+// point the AI is aiming at, or visualise the curve the AI is predicting.
+// It works best with just 1 AI kart, so set the number of karts
+// to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
+// Or use --profile-laps=99 and run just one AI. Using the debug camera
+// (top view) is useful, too
+
+#ifdef DEBUG
+   // Enable AI graphical debugging
+#  undef AI_DEBUG
+   // Shows left and right lines when using new findNonCrashing function
+#  undef AI_DEBUG_NEW_FIND_NON_CRASHING
+   // Show the predicted turn circles
+#  undef AI_DEBUG_CIRCLES
+   // Show the heading of the kart
+#  undef AI_DEBUG_KART_HEADING
+   // Shows line from kart to its aim point
+#  undef AI_DEBUG_KART_AIM
+#endif
+
 
 #include "karts/controller/ai_base_controller.hpp"
 #include "race/race_manager.hpp"
@@ -199,7 +220,7 @@ private:
     enum {PSA_DEFAULT, PSA_FIXED, PSA_NEW}
           m_point_selection_algorithm;
 
-#ifdef DEBUG
+#ifdef AI_DEBUG
     /** For skidding debugging: shows the estimated turn shape. */
     ShowCurve **m_curve;
 

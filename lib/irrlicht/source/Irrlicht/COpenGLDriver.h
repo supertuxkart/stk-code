@@ -163,6 +163,8 @@ namespace video
 				SColor color,
 				bool useAlphaChannelOfTexture);
 
+		// Import draw2DImage method from base class
+		using CNullDriver::draw2DImage;
 		//! draws an 2d image, using a color (if color is other then Color(255,255,255,255)) and the alpha channel of the texture if wanted.
 		virtual void draw2DImage(const video::ITexture* texture, const core::position2d<s32>& destPos,
 			const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect = 0,

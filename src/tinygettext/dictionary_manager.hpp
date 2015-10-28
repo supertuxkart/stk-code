@@ -1,5 +1,5 @@
 //  tinygettext - A gettext replacement that works directly on .po files
-//  Copyright (C) 2006-2013 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -51,7 +51,7 @@ private:
 
   Dictionary  empty_dict;
 
-  std::auto_ptr<FileSystem> filesystem;
+  std::unique_ptr<FileSystem> filesystem;
 
   void clear_cache();
 
@@ -89,7 +89,7 @@ public:
   /** Return a set of the available languages in their country code */
   std::set<Language> get_languages();
 
-  //void set_filesystem(std::auto_ptr<FileSystem> filesystem);
+  void set_filesystem(std::unique_ptr<FileSystem> filesystem);
   std::string convertFilename2Language(const std::string &s_in) const;
 
 

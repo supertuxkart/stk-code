@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -59,7 +59,8 @@ void OptionsScreenAudio::init()
 {
     Screen::init();
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "tab_audio", PLAYER_ID_GAME_MASTER );
+    assert(ribbon != NULL);
+    ribbon->select( "tab_audio", PLAYER_ID_GAME_MASTER );
 
     ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
     ribbon->getRibbonChildren()[2].setTooltip( _("User Interface") );
@@ -156,7 +157,7 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         if(w->getState() == false)
             music_manager->stopMusic();
         else
-            music_manager->startMusic(music_manager->getCurrentMusic(), 0);
+            music_manager->startMusic();
     }
     else if(name == "sfx_enabled")
     {

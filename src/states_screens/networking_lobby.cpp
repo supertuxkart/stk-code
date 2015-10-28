@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -45,7 +45,7 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 
 // ----------------------------------------------------------------------------
 
-NetworkingLobby::NetworkingLobby() : Screen("online/lobby.stkgui")
+NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
     m_server = NULL;
 }   // NetworkingLobby
@@ -86,7 +86,8 @@ void NetworkingLobby::init()
     setInitialFocus();
     DemoWorld::resetIdleTime(); //FIXME : what's this?
     m_server = ServersManager::get()->getJoinedServer();
-    m_server_name_widget->setText(m_server->getName(),false);
+    if(m_server)
+        m_server_name_widget->setText(m_server->getName(), false);
 
 }   // init
 
@@ -107,7 +108,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name, con
 
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     if (ribbon == NULL) return;
-    std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    const std::string &selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
     if (selection == m_exit_widget->m_properties[PROP_ID])
     {

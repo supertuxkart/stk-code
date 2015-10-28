@@ -1,11 +1,12 @@
 uniform sampler2D tex;
 uniform vec3 col;
 
-in vec2 uv;
 out vec4 FragColor;
 
 void main()
 {
+	// Use quarter resolution
+	vec2 uv = 4. * gl_FragCoord.xy / screen;
 	vec4 res = texture(tex, uv);
 
 	// Keep the sun fully bright, but fade the sky

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -47,7 +47,7 @@ DEFINE_SCREEN_SINGLETON( RaceSetupScreen );
 
 // -----------------------------------------------------------------------------
 
-RaceSetupScreen::RaceSetupScreen() : Screen("racesetup.stkgui")
+RaceSetupScreen::RaceSetupScreen() : Screen("race_setup.stkgui")
 {
 }   // RaceSetupScreen
 
@@ -228,7 +228,7 @@ void RaceSetupScreen::init()
         irr::core::stringw name4 = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
         //FIXME: avoid duplicating descriptions from the help menu!
-        name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
+        name4 += _("Hit others with weapons until they lose all their lives (only in multiplayer games).");
         w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
     }
 
@@ -237,7 +237,7 @@ void RaceSetupScreen::init()
     {
         irr::core::stringw name5 = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
-        name5 += _("Push the ball to the opposite cage to score goals. (Only in multiplayer games)");
+        name5 += _("Push the ball to the opposite cage to score goals (only in multiplayer games).");
         w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
     }
 #endif
@@ -281,15 +281,23 @@ void RaceSetupScreen::init()
             break;
     }
 
-    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
         RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
         assert(w != NULL);
 
         int index = w->findItemNamed("best");
         Widget* hardestWidget = &w->getChildren()[index];
-        hardestWidget->setBadge(LOCKED_BADGE);
-        hardestWidget->setDeactivated();
+
+        if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+        {
+            hardestWidget->setBadge(LOCKED_BADGE);
+            hardestWidget->setActive(false);
+        }
+        else
+        {
+            hardestWidget->unsetBadge(LOCKED_BADGE);
+            hardestWidget->setActive(true);
+        }
     }
 }   // init
 

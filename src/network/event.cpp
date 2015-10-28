@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,75 +23,80 @@
 
 #include <string.h>
 
+/** \brief Constructor
+ *  \param event : The event that needs to be translated.
+ */
 Event::Event(ENetEvent* event)
 {
     switch (event->type)
     {
     case ENET_EVENT_TYPE_CONNECT:
-        type = EVENT_TYPE_CONNECTED;
+        m_type = EVENT_TYPE_CONNECTED;
         break;
     case ENET_EVENT_TYPE_DISCONNECT:
-        type = EVENT_TYPE_DISCONNECTED;
+        m_type = EVENT_TYPE_DISCONNECTED;
         break;
     case ENET_EVENT_TYPE_RECEIVE:
-        type = EVENT_TYPE_MESSAGE;
+        m_type = EVENT_TYPE_MESSAGE;
         break;
     case ENET_EVENT_TYPE_NONE:
         return;
         break;
     }
-    if (type == EVENT_TYPE_MESSAGE)
+    if (m_type == EVENT_TYPE_MESSAGE)
     {
-        m_data = NetworkString(std::string((char*)(event->packet->data), event->packet->dataLength-1));
+        m_data = NetworkString(std::string((char*)(event->packet->data),
+                               event->packet->dataLength-1));
     }
 
     m_packet = NULL;
     if (event->packet)
+    {
         m_packet = event->packet;
-
-    if (m_packet)
-        enet_packet_destroy(m_packet); // we got all we need, just remove the data.
+        // we got all we need, just remove the data.
+        enet_packet_destroy(m_packet);
+    }
     m_packet = NULL;
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
-    peer = new STKPeer*;
-    *peer = NULL;
+    m_peer = NULL;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        if (peers[i]->m_peer == event->peer)
+        if (peers[i]->m_enet_peer == event->peer)
         {
-            *peer = peers[i];
-            Log::verbose("Event", "The peer you sought has been found on %lx", (long int)(peer));
+            m_peer = peers[i];
+            Log::verbose("Event", "The peer you sought has been found on %p",
+                         m_peer);
             return;
         }
     }
-    if (*peer == NULL) // peer does not exist, create him
+    if (m_peer == NULL) // peer does not exist, create him
     {
         STKPeer* new_peer = new STKPeer();
-        new_peer->m_peer = event->peer;
-        *peer = new_peer;
-        Log::debug("Event", "Creating a new peer, address are STKPeer:%lx, Peer:%lx", (long int)(new_peer), (long int)(event->peer));
+        new_peer->m_enet_peer = event->peer;
+        m_peer = new_peer;
+        Log::debug("Event", 
+                   "Creating a new peer, address are STKPeer:%p, Peer:%p",
+                    new_peer, event->peer);
     }
-}
+}   // Event(ENetEvent)
 
-Event::Event(const Event& event)
-{
-    m_packet = NULL;
-    m_data = event.m_data;
-    // copy the peer
-    peer = event.peer;
-    type = event.type;
-}
-
+// ----------------------------------------------------------------------------
+/** \brief Destructor that frees the memory of the package.
+ */
 Event::~Event()
 {
-    delete peer;
-    peer = NULL;
+    delete m_peer;
+    m_peer = NULL;
     m_packet = NULL;
-}
+}   // ~Event
 
+// ----------------------------------------------------------------------------
+/** \brief Remove bytes at the beginning of data.
+ *  \param size : The number of bytes to remove.
+ */
 void Event::removeFront(int size)
 {
     m_data.removeFront(size);
-}
+}   // removeFront
 

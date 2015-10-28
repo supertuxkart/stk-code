@@ -1,7 +1,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2004-2006 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -67,13 +67,10 @@ private:
     * makes the mouse behave like an analog axis on a gamepad/joystick.
     */
     int m_mouse_val_x, m_mouse_val_y;
-    /** To detect mouse events that are not caused by the user but by resetting
-        the mouse position to the center of the screen.
-        If it's not 0, the movement is ignored and the value is decreased. */
-    int m_mouse_reset;
 
     void   dispatchInput(Input::InputType, int deviceID, int btnID,
-                         Input::AxisDirection direction, int value);
+                         Input::AxisDirection direction, int value,
+                         bool shift_mask = false);
     void   handleStaticAction(int id0, int value);
     void   inputSensing(Input::InputType type, int deviceID, int btnID,
                         Input::AxisDirection axisDirection,  int value);

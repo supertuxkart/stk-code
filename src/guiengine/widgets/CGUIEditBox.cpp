@@ -1,8 +1,8 @@
-// Copyright (C) 2002-2013 Nikolaus Gebhardt
+// Copyright (C) 2002-2015 Nikolaus Gebhardt
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
-#include "CGUIEditBox.h"
+#include "guiengine/widgets/CGUIEditBox.hpp"
 
 #include "IGUISkin.h"
 #include "IGUIEnvironment.h"
@@ -13,6 +13,7 @@
 #include "Keycodes.h"
 
 #include "graphics/2dutils.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
 
@@ -279,9 +280,9 @@ bool CGUIEditBox::processKey(const SEvent& event)
                 const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
                 const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
-                core::stringc s;
+                core::stringw s;
                 s = Text.subString(realmbgn, realmend - realmbgn).c_str();
-                Operator->copyToClipboard(s.c_str());
+                Operator->copyToClipboard(StringUtils::wide_to_utf8(s.c_str()).c_str());
             }
             break;
         case KEY_KEY_X:
@@ -292,9 +293,9 @@ bool CGUIEditBox::processKey(const SEvent& event)
                 const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
                 // copy
-                core::stringc sc;
+                core::stringw sc;
                 sc = Text.subString(realmbgn, realmend - realmbgn).c_str();
-                Operator->copyToClipboard(sc.c_str());
+                Operator->copyToClipboard(StringUtils::wide_to_utf8(sc.c_str()).c_str());
 
                 if (isEnabled())
                 {
@@ -330,13 +331,13 @@ bool CGUIEditBox::processKey(const SEvent& event)
                     {
                         // insert text
                         core::stringw s = Text.subString(0, CursorPos);
-                        s.append(p);
+                        s.append(StringUtils::utf8_to_wide(p));
                         s.append( Text.subString(CursorPos, Text.size()-CursorPos) );
 
                         if (!Max || s.size()<=Max) // thx to Fish FH for fix
                         {
                             Text = s;
-                            s = p;
+                            s = StringUtils::utf8_to_wide(p);
                             CursorPos += s.size();
                         }
                     }
@@ -345,13 +346,13 @@ bool CGUIEditBox::processKey(const SEvent& event)
                         // replace text
 
                         core::stringw s = Text.subString(0, realmbgn);
-                        s.append(p);
+                        s.append(StringUtils::utf8_to_wide(p));
                         s.append( Text.subString(realmend, Text.size()-realmend) );
 
                         if (!Max || s.size()<=Max)  // thx to Fish FH for fix
                         {
                             Text = s;
-                            s = p;
+                            s = StringUtils::utf8_to_wide(p);
                             CursorPos = realmbgn + s.size();
                         }
                     }

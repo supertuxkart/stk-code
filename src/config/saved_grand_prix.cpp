@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -65,6 +65,7 @@ SavedGrandPrix::SavedGPKart::SavedGPKart(GroupUserConfigParam * group,
 // ============================================================================
 SavedGrandPrix::SavedGrandPrix(unsigned int player_id,
                                const std::string &gp_id,
+                               RaceManager::MinorRaceModeType race_type,
                                RaceManager::Difficulty difficulty,
                                int player_karts,
                                int last_track,
@@ -74,6 +75,7 @@ SavedGrandPrix::SavedGrandPrix(unsigned int player_id,
                                 "Represents the saved state of a GP"),
                 m_player_id(player_id, "player_id", &m_savedgp_group),
                 m_gp_id(gp_id.c_str(), "gp_id", &m_savedgp_group),
+                m_race_type((int)race_type,"race_type", &m_savedgp_group),
                 m_difficulty((int)difficulty,"difficulty", &m_savedgp_group),
                 m_player_karts(player_karts,"player_karts", &m_savedgp_group),
                 m_next_track(last_track,"last_track", &m_savedgp_group),
@@ -98,6 +100,7 @@ SavedGrandPrix::SavedGrandPrix(const XMLNode* node)
                                 "Represents the saved state of a GP"),
                 m_player_id   (0, "player_id",   &m_savedgp_group),
                 m_gp_id     ("-", "gp_id",       &m_savedgp_group),
+                m_race_type  (0,"race_type",     &m_savedgp_group),
                 m_difficulty  (0,"difficulty",   &m_savedgp_group),
                 m_player_karts(0,"player_karts", &m_savedgp_group),
                 m_next_track  (0,"last_track",   &m_savedgp_group),
@@ -106,6 +109,7 @@ SavedGrandPrix::SavedGrandPrix(const XMLNode* node)
     //m_player_group.findYourDataInAChildOf(node);
     m_player_id.   findYourDataInAnAttributeOf(node);
     m_gp_id.       findYourDataInAnAttributeOf(node);
+    m_race_type.   findYourDataInAnAttributeOf(node);
     m_difficulty.  findYourDataInAnAttributeOf(node);
     m_player_karts.findYourDataInAnAttributeOf(node);
     m_next_track.  findYourDataInAnAttributeOf(node);
@@ -173,12 +177,15 @@ void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
             {
                 if(kart_list[x].m_local_player_id == m_karts[i].m_local_player_id)
                 {
+                    if(kp) kart_list[x].m_ident        = m_karts[i].m_ident;
                     kart_list[x].m_score        = m_karts[i].m_score;
                     kart_list[x].m_overall_time = m_karts[i].m_overall_time;
-                }   // if kart_list[x].m_local_player_id == m_karts[i].,_local
+                }   // if kart_list[x].m_local_player_id == m_karts[i].local
             }   // for x
         }   // if m_local_player_id == -1
     }   // for i
 
-    std::sort(kart_list.begin(), kart_list.end(), cmp__l);
+    // The line below causes issues in follow the leader race. The leader
+    // is not at first place anymore.
+    // std::sort(kart_list.begin(), kart_list.end(), cmp__l);
 }   // loadKarts

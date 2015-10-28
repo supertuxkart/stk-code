@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2015 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -38,7 +38,6 @@ DEFINE_SCREEN_SINGLETON( OnlineUserSearch );
 
 OnlineUserSearch::OnlineUserSearch() : Screen("online/user_search.stkgui")
 {
-    m_selected_index     = -1;
     m_search_request     = NULL;
     m_search_string      = "";
     m_last_search_string = "";
@@ -206,9 +205,9 @@ void OnlineUserSearch::search()
         m_user_list_widget->clear();
         m_user_list_widget->addItem("spacer", L"");
         m_user_list_widget->addItem("loading", StringUtils::loadingDots(_("Searching")));
-        m_back_widget->setDeactivated();
-        m_search_box_widget->setDeactivated();
-        m_search_button_widget->setDeactivated();
+        m_back_widget->setActive(false);
+        m_search_box_widget->setActive(false);
+        m_search_button_widget->setActive(false);
     }
 }   // search
 
@@ -226,8 +225,9 @@ void OnlineUserSearch::eventCallback(GUIEngine::Widget* widget,
     }
     else if (name == m_user_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        m_selected_index = m_user_list_widget->getSelectionID();
-        new UserInfoDialog(m_users[m_selected_index]);
+        int selected_index = m_user_list_widget->getSelectionID();
+        if (selected_index != -1)
+            new UserInfoDialog(m_users[selected_index]);
     }
     else if (name == m_search_button_widget->m_properties[GUIEngine::PROP_ID])
     {
@@ -237,22 +237,6 @@ void OnlineUserSearch::eventCallback(GUIEngine::Widget* widget,
     }
 
 }   // eventCallback
-
-// ----------------------------------------------------------------------------
-/** Selects the last selected item on the list (which is the item that
- *  is just being installed) again. This function is used from the
- *  addons_loading screen: when it is closed, it will reset the
- *  select item so that people can keep on installing from that
- *  point on.
-*/
-void OnlineUserSearch::setLastSelected() //FIXME actually use this here and in server selection
-{
-    if(m_selected_index>-1)
-    {
-        m_user_list_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        m_user_list_widget->setSelectionID(m_selected_index);
-    }
-}   // setLastSelected
 
 // ----------------------------------------------------------------------------
 /** Called every frame. It queries the search request for results and
@@ -277,9 +261,9 @@ void OnlineUserSearch::onUpdate(float dt)
 
             delete m_search_request;
             m_search_request = NULL;
-            m_back_widget->setActivated();
-            m_search_box_widget->setActivated();
-            m_search_button_widget->setActivated();
+            m_back_widget->setActive(true);
+            m_search_box_widget->setActive(true);
+            m_search_button_widget->setActive(true);
         }
         else
         {

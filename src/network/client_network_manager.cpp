@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -101,7 +101,7 @@ void* waitInput(void* data)
         else if (NetworkManager::getInstance() && 
                  NetworkManager::getInstance()->getPeers().size() > 0)
         {
-            NetworkString msg;
+            NetworkString msg(1+str.size());
             msg.ai8(0);
             msg += str;
             NetworkManager::getInstance()->getPeers()[0]->sendPacket(msg);

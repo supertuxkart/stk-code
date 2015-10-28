@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,17 +23,18 @@
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
-#include "network/event.hpp"
+#include "network/network_string.hpp"
 #include "network/types.hpp"
 #include "utils/types.hpp"
 
+class Event;
 class ProtocolManager;
 
-/** \enum PROTOCOL_TYPE
+/** \enum ProtocolType
   * \brief The types that protocols can have. This is used to select which protocol receives which event.
   * \ingroup network
   */
-enum PROTOCOL_TYPE
+enum ProtocolType
 {
     PROTOCOL_NONE = 0,          //!< No protocol type assigned.
     PROTOCOL_CONNECTION = 1,    //!< Protocol that deals with client-server connection.
@@ -64,7 +65,7 @@ class Protocol
          * \param callback_object The callback object that will be used by the protocol. Protocols that do not use callback objects must set it to NULL.
          * \param type The type of the protocol.
          */
-        Protocol(CallbackObject* callback_object, PROTOCOL_TYPE type);
+        Protocol(CallbackObject* callback_object, ProtocolType type);
         /*! \brief Destructor
          */
         virtual ~Protocol();
@@ -111,7 +112,7 @@ class Protocol
         /*! \brief Method to get a protocol's type.
          *  \return The protocol type.
          */
-        PROTOCOL_TYPE getProtocolType();
+        ProtocolType getProtocolType();
 
         /// functions to check incoming data easily
         bool checkDataSizeAndToken(Event* event, int minimum_size);
@@ -121,7 +122,7 @@ class Protocol
 
     protected:
         ProtocolManager* m_listener;        //!< The protocol listener
-        PROTOCOL_TYPE m_type;               //!< The type of the protocol
+        ProtocolType m_type;               //!< The type of the protocol
         CallbackObject* m_callback_object;   //!< The callback object, if needed
 };
 

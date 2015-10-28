@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -53,7 +53,7 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     // we are using auto_ptr to make sure the XML node is released when leaving
     // the scope
-    std::auto_ptr<XMLNode> root(new XMLNode( filename ));
+    std::unique_ptr<XMLNode> root(new XMLNode( filename ));
 
     if(root.get() == NULL || root->getName()!="challenge")
     {
@@ -243,11 +243,16 @@ ChallengeData::ChallengeData(const std::string& filename)
     }
 
     core::stringw description;
-    if (track_node != NULL)
+    if (track_node != NULL && m_minor!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
     {
         //I18N: number of laps to race in a challenge
         description += _("Laps : %i", m_num_laps);
         description += core::stringw(L"\n");
+    }
+    else if (track_node)
+    {
+        // Follow the leader mode:
+        description = _("Follow the leader");
     }
 
     m_challenge_description = description;
@@ -483,8 +488,7 @@ const irr::core::stringw
             // shouldn't happen but let's avoid crashes as much as possible...
             if (track == NULL) return irr::core::stringw( L"????" );
 
-            return _("New track '%s' now available",
-                     core::stringw(track->getName()));
+            return _("New track '%s' now available", track->getName());
             break;
         }
         case UNLOCK_MODE:
@@ -513,8 +517,7 @@ const irr::core::stringw
             // shouldn't happen but let's avoid crashes as much as possible...
             if (kp == NULL) return irr::core::stringw( L"????" );
 
-            return _("New kart '%s' now available",
-                      core::stringw(kp->getName()));
+            return _("New kart '%s' now available", kp->getName());
         }
         default:
             assert(false);

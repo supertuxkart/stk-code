@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -208,11 +208,6 @@ private:
      *  chassis. Useful for karts that don't have enough space for suspension
      *  compression. */
     float       m_graphical_y_offset;
-    /** A hard flag that moves the graphical chassis higher if it's insde
-      * the track. Might cause stuttering. */
-    bool        m_prevent_chassis_in_terrain;
-    /** If the kart is supposed to have random wheel rotation at start. */
-    bool        m_has_rand_wheels;
     /** Max. length of plunger rubber band. */
     float       m_rubber_band_max_length;
     /** Force of an attached rubber band. */
@@ -288,7 +283,6 @@ private:
     float m_max_suspension_force;
     float m_friction_slip;
     float m_roll_influence;
-    float m_wheel_radius;
 
     /** Parameters for the speed-weighted objects */
     SpeedWeightedObject::Properties   m_speed_weighted_object_properties;
@@ -324,7 +318,7 @@ private:
     bool  m_exp_spring_response;
 
     float m_suspension_rest;
-    float m_suspension_travel_cm;
+    float m_suspension_travel;
 
 public:
     /** STK can add an impulse to push karts away from the track in case
@@ -458,7 +452,7 @@ public:
       */
     core::stringw getName() const
     {
-        return core::stringw(translations->w_gettext(m_name.c_str()));
+        return _LTR(m_name.c_str());
     }
 
     // ------------------------------------------------------------------------
@@ -572,22 +566,6 @@ public:
     float getRollInfluence          () const {return m_roll_influence;        }
 
     // ------------------------------------------------------------------------
-    /** Returns wheel radius. */
-    float getWheelRadius            () const {return m_wheel_radius;          }
-
-    // ------------------------------------------------------------------------
-    /** Return the additional Y offset added to the y position of the graphical
-     *  chassis. Useful for karts that don't have enough space for suspension
-     *  compression. */
-    float getGraphicalYOffset() const {return m_graphical_y_offset; }
-    // ------------------------------------------------------------------------
-    /** A hard flag that moves the graphical chassis higher if it's insde
-      * the track. Might cause stuttering. */
-    bool getPreventChassisInTerrain() const
-    {
-        return m_prevent_chassis_in_terrain;
-    }   // getPreventChassisInTerrain
-    // ------------------------------------------------------------------------
     /** Returns parameters for the speed-weighted objects */
     const SpeedWeightedObject::Properties& getSpeedWeightedObjectProperties() const
     {
@@ -685,7 +663,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the amount the suspension can extend. */
-    float getSuspensionTravelCM     () const {return m_suspension_travel_cm;  }
+    float getSuspensionTravel     () const {return m_suspension_travel;  }
 
     // ------------------------------------------------------------------------
     /** Returns if the spring should be exponentially dampened. */
@@ -925,9 +903,6 @@ public:
     /** Return show long a jump must last in order to play the jump
      *  animation. */
     float getJumpAnimationTime() const { return m_jump_animation_time; }
-    // ------------------------------------------------------------------------
-    /** Returns true if wheels should have random rotation at start. */
-    bool hasRandomWheels() const { return m_has_rand_wheels; }
     // ------------------------------------------------------------------------
     /** Returns minimum time during which nitro is consumed when pressing nitro
      *  key, to prevent using nitro in very short bursts

@@ -7,7 +7,7 @@
         <spacer height="25" width="50"/>
 
         <box proportion="5" width="90%" align="center" layout="vertical-row" padding="8">
-            <list id="terms" x="0" y="0" width="100%" height="100%"/>
+            <label word_wrap="true" id="terms" x="0" y="0" width="100%" height="100%"/>
         </box>
 
         <div align="center" width="fit" height="fit" layout="horizontal-row" >

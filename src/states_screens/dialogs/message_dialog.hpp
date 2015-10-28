@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -83,7 +83,7 @@ public:
       */
     MessageDialog(const irr::core::stringw &msg, MessageDialogType type,
                   IConfirmDialogListener* listener, bool delete_listener,
-                  bool from_queue=false);
+                  bool from_queue = false, float width = 0.6f, float height = 0.6f);
     
     /**
       * Variant of MessageDialog where cancelling is not possible (i.e. just shows a message box with OK)

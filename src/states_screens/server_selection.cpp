@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2015 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -36,9 +36,7 @@ DEFINE_SCREEN_SINGLETON( ServerSelection );
 
 ServerSelection::ServerSelection() : Screen("online/server_selection.stkgui")
 {
-    m_selected_index = -1;
     m_refresh_request = NULL;
-
 }   // ServerSelection
 
 // ----------------------------------------------------------------------------
@@ -65,8 +63,8 @@ void ServerSelection::refresh()
     m_server_list_widget->addItem("spacer", L"");
     m_server_list_widget->addItem("loading",
                               StringUtils::loadingDots(_("Fetching servers")));
-    m_reload_widget->setDeactivated();
-}
+    m_reload_widget->setActive(false);
+}   // refresh
 
 
 // ----------------------------------------------------------------------------
@@ -90,7 +88,8 @@ void ServerSelection::beforeAddingWidget()
     m_server_list_widget->clearColumns();
     m_server_list_widget->addColumn( _("Name"), 3 );
     m_server_list_widget->addColumn( _("Players"), 1);
-}
+}   // beforeAddingWidget
+
 // ----------------------------------------------------------------------------
 
 void ServerSelection::init()
@@ -112,11 +111,11 @@ void ServerSelection::init()
 void ServerSelection::loadList()
 {
     m_server_list_widget->clear();
-    ServersManager * manager = ServersManager::get();
+    ServersManager *manager = ServersManager::get();
     manager->sort(m_sort_desc);
     for(int i=0; i <  manager->getNumServers(); i++)
     {
-        const Server * server = manager->getServerBySort(i);
+        const Server *server = manager->getServerBySort(i);
         core::stringw num_players;
         num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
         num_players.append("/");
@@ -159,29 +158,13 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
 
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        m_selected_index = m_server_list_widget->getSelectionID();
-        uint32_t server_id = ServersManager::get()->getServerBySort(m_selected_index)->getServerId();
-        uint32_t host_id = ServersManager::get()->getServerBySort(m_selected_index)->getHostId();
+        int selected_index = m_server_list_widget->getSelectionID();
+        uint32_t server_id = ServersManager::get()->getServerBySort(selected_index)->getServerId();
+        uint32_t host_id = ServersManager::get()->getServerBySort(selected_index)->getHostId();
         new ServerInfoDialog(server_id, host_id);
     }
 
 }   // eventCallback
-
-// ----------------------------------------------------------------------------
-/** Selects the last selected item on the list (which is the item that
- *  is just being installed) again. This function is used from the
- *  addons_loading screen: when it is closed, it will reset the
- *  select item so that people can keep on installing from that
- *  point on.
-*/
-void ServerSelection::setLastSelected()
-{
-    if(m_selected_index>-1)
-    {
-        m_server_list_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        m_server_list_widget->setSelectionID(m_selected_index);
-    }
-}   // setLastSelected
 
 // ----------------------------------------------------------------------------
 
@@ -202,7 +185,7 @@ void ServerSelection::onUpdate(float dt)
             }
             delete m_refresh_request;
             m_refresh_request = NULL;
-            m_reload_widget->setActivated();
+            m_reload_widget->setActive(true);
         }
         else
         {
@@ -214,6 +197,6 @@ void ServerSelection::onUpdate(float dt)
     {
         loadList();
         m_fake_refresh = false;
-        m_reload_widget->setActivated();
+        m_reload_widget->setActive(true);
     }
 }   // onUpdate

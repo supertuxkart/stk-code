@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Joerg Henrichs
+//  Copyright (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -45,7 +45,8 @@ DEFINE_SCREEN_SINGLETON( RegisterScreen );
 RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")
 {
     m_existing_player = NULL;
-    m_account_mode = ACCOUNT_OFFLINE;
+    m_account_mode    = ACCOUNT_OFFLINE;
+    m_parent_screen   = NULL;
 }   // RegisterScreen
 
 // -----------------------------------------------------------------------------
@@ -286,9 +287,9 @@ void RegisterScreen::doRegister()
     {
         m_info_widget->setText(_("Password has to be between 8 and 30 characters long!"), false);
     }
-    else if (email.size() < 4 || email.size() > 50)
+    else if (email.size() < 5 || email.size() > 254)
     {
-        m_info_widget->setText(_("Email has to be between 4 and 50 characters long!"), false);
+        m_info_widget->setText(_("Email has to be between 5 and 254 characters long!"), false);
     }
     else if (  email.find(L"@")== -1 || email.find(L".")== -1 ||
               (email.findLast(L'.') - email.findLast(L'@') <= 2 ) ||
@@ -325,7 +326,7 @@ void RegisterScreen::doRegister()
  */
 void RegisterScreen::acceptTerms()
 {
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
 
     core::stringw username = getWidget<TextBoxWidget>("username")->getText().trim();
     core::stringw password = m_password_widget->getText().trim();
@@ -373,7 +374,7 @@ void RegisterScreen::onUpdate(float dt)
             }
             delete m_signup_request;
             m_signup_request = NULL;
-            m_options_widget->setActivated();
+            m_options_widget->setActive(true);
         }
     }
     else if(m_info_message_shown && !ModalDialog::isADialogActive())

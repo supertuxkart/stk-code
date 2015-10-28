@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -37,10 +37,13 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id, bool from_server_creation)
-        : ModalDialog(0.8f,0.8f), m_server_id(server_id), m_host_id(host_id)
+ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,
+                                   bool from_server_creation)
+                : ModalDialog(0.8f,0.8f), m_server_id(server_id),
+                  m_host_id(host_id)
 {
-    Log::info("ServerInfoDialog", "Server id is %d, Host id is %d", server_id, host_id);
+    Log::info("ServerInfoDialog", "Server id is %d, Host id is %d",
+               server_id, host_id);
     m_self_destroy = false;
     m_enter_lobby = false;
     m_from_server_creation = from_server_creation;
@@ -67,6 +70,7 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id, bool fr
 }   // ServerInfoDialog
 
 // -----------------------------------------------------------------------------
+
 ServerInfoDialog::~ServerInfoDialog()
 {
     if (m_server_join_request)

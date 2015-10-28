@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2010-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2010-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -73,7 +73,7 @@ Material::Material(const XMLNode *node, bool deprecated)
         m_full_path = file_manager->getFileSystem()->getAbsolutePath(relativePath.c_str()).c_str();
     init();
 
-    node->get("lazy-load", &m_lazy_load);
+    node->get("dont-load", &m_dont_load_texture);
     bool b = false;
     
     node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.4 style
@@ -84,21 +84,19 @@ Material::Material(const XMLNode *node, bool deprecated)
 
 
     std::string s;
-    //node->get("adjust-image",     &s                   );
-    //if(s=="premultiply")
-    //    m_adjust_image = ADJ_PREMUL;
-    //else if (s=="divide")
-    //    m_adjust_image = ADJ_DIV;
-    //else if (s=="" || s=="none")
-    //    m_adjust_image = ADJ_NONE;
-    //else
-    //    Log::warn("material",
-    //              "Incorrect adjust-image specification: '%s' - ignored.",
-    //              s.c_str());
 
-    node->get("high-adhesion",    &m_high_tire_adhesion);
-    node->get("reset",            &m_drive_reset       );
-
+    node->get("high-adhesion",    &m_high_tire_adhesion      );
+    node->get("reset",            &m_drive_reset             );
+    s = "";
+    node->get("mirror-axis", &s);
+    if (s == "u")
+        s = "U";
+    else if (s == "v")
+        s = "V";
+    if (s != "U" && s != "V")
+        m_mirror_axis_when_reverse = ' ';
+    else
+        m_mirror_axis_when_reverse = s[0];
     // backwards compatibility
     bool crash_reset = false;
     node->get("crash-reset",      &crash_reset         );
@@ -422,7 +420,7 @@ Material::Material(const std::string& fname, bool is_full_path,
  */
 void Material::init()
 {
-    m_lazy_load                 = false;
+    m_dont_load_texture         = false;
     m_texture                   = NULL;
     m_clamp_tex                 = 0;
     m_shader_type               = SHADERTYPE_SOLID;
@@ -433,6 +431,7 @@ void Material::init()
     m_surface                   = false;
     m_ignore                    = false;
     m_drive_reset               = false;
+    m_mirror_axis_when_reverse  = ' ';
     m_collision_reaction        = NORMAL;
     m_disable_z_write           = false;
     m_water_shader_speed_1      = 6.6667f;
@@ -466,8 +465,8 @@ void Material::init()
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path, bool complain_if_not_found)
 {
-    // Don't load a texture that is lazily loaded.
-    if(m_lazy_load) return;
+    // Don't load a texture that are not supposed to be loaded automatically
+    if(m_dont_load_texture) return;
 
     const std::string &full_path = is_full_path
                                  ? m_texname
@@ -478,6 +477,7 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
         Log::error("material", "Cannot find texture '%s'.", m_texname.c_str());
         m_texture = NULL;
     }
+
     else
     {
         m_texture = irr_driver->getTexture(full_path,
@@ -723,7 +723,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         switch (m_shader_type)
         {
         case SHADERTYPE_SOLID_UNLIT:
-            m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+            m->MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
             m->setTexture(1, glossytex);
             return;
         case SHADERTYPE_ALPHA_TEST:
@@ -747,7 +747,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 video::EAS_VERTEX_COLOR);
             return;
         case SHADERTYPE_SPHERE_MAP:
-            m->MaterialType = irr_driver->getShader(ES_SPHERE_MAP);
+            m->MaterialType = Shaders::getShader(ES_SPHERE_MAP);
             m->setTexture(1, glossytex);
             return;
         case SHADERTYPE_SPLATTING:
@@ -774,7 +774,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(6, glossytex);
 
             // Material and shaders
-            m->MaterialType = irr_driver->getShader(ES_SPLATTING);
+            m->MaterialType = Shaders::getShader(ES_SPLATTING);
             return;
         case SHADERTYPE_WATER:
             m->setTexture(1, irr_driver->getTexture(FileManager::TEXTURE,
@@ -782,20 +782,22 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(2, irr_driver->getTexture(FileManager::TEXTURE,
                 "waternormals2.jpg"));
 
-            ((WaterShaderProvider *)irr_driver->getCallback(ES_WATER))->
+            ((WaterShaderProvider *)Shaders::getCallback(ES_WATER))->
                 setSpeed(m_water_shader_speed_1 / 100.0f, m_water_shader_speed_2 / 100.0f);
 
-            m->MaterialType = irr_driver->getShader(ES_WATER);
+            m->MaterialType = Shaders::getShader(ES_WATER);
             return;
         case SHADERTYPE_VEGETATION:
             // Only one grass speed & amplitude per map for now
-            ((GrassShaderProvider *)irr_driver->getCallback(ES_GRASS))->
+            ((GrassShaderProvider *)Shaders::getCallback(ES_GRASS))->
                 setSpeed(m_grass_speed);
-            ((GrassShaderProvider *)irr_driver->getCallback(ES_GRASS))->
+            ((GrassShaderProvider *)Shaders::getCallback(ES_GRASS))->
                 setAmplitude(m_grass_amplitude);
-            m->MaterialType = irr_driver->getShader(ES_GRASS_REF);
+            m->MaterialType = Shaders::getShader(ES_GRASS_REF);
             m->setTexture(1, glossytex);
             return;
+        default:
+            break;
         }
 
         if (!m->getTexture(0))
@@ -807,7 +809,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(2, tex);
 
             // Material and shaders
-            m->MaterialType = irr_driver->getShader(ES_NORMAL_MAP);
+            m->MaterialType = Shaders::getShader(ES_NORMAL_MAP);
             m->setTexture(1, glossytex);
             return;
         }

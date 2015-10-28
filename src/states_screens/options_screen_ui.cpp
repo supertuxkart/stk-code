@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,7 +18,6 @@
 #include "states_screens/options_screen_ui.hpp"
 
 #include "addons/news_manager.hpp"
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/hardware_stats.hpp"
@@ -90,7 +89,7 @@ void OptionsScreenUI::loadedFromFile()
     {
         Log::warn("OptionsScreenUI", "Could not find a single skin, make sure that "
                                      "the data files are correctly installed");
-        skinSelector->setDeactivated();
+        skinSelector->setActive(false);
         return;
     }
 
@@ -113,7 +112,8 @@ void OptionsScreenUI::init()
 {
     Screen::init();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
+    assert(ribbon != NULL);
+    ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
 
     ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
     ribbon->getRibbonChildren()[1].setTooltip( _("Audio") );
@@ -152,6 +152,7 @@ void OptionsScreenUI::init()
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
     difficulty->setState( UserConfigParams::m_per_player_difficulty );
+    difficulty->setTooltip(_("Players can select handicapped (more difficult) profiles on the kart selection screen"));
 
     CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
     assert( show_login!= NULL );
@@ -191,12 +192,13 @@ void OptionsScreenUI::init()
     // The names need to be sorted alphabetically. Store the 2-letter
     // language names in a mapping, to be able to get them from the
     // user visible full name.
-    std::vector<std::string> nice_lang_list;
-    std::map<std::string, std::string> nice_name_2_id;
+    std::vector<core::stringw> nice_lang_list;
+    std::map<core::stringw, std::string> nice_name_2_id;
     for (int n=0; n<amount; n++)
     {
         std::string code_name = (*lang_list)[n];
-        std::string nice_name = tinygettext::Language::from_name(code_name).get_name();
+        std::string s_name = tinygettext::Language::from_name(code_name).get_name();
+        core::stringw nice_name = StringUtils::utf8_to_wide(s_name.c_str());
         nice_lang_list.push_back(nice_name);
         nice_name_2_id[nice_name] = code_name;
     }
@@ -204,21 +206,14 @@ void OptionsScreenUI::init()
     for(unsigned int i=0; i<nice_lang_list.size(); i++)
     {
         list_widget->addItem(nice_name_2_id[nice_lang_list[i]],
-                              nice_lang_list[i].c_str());
+                              nice_lang_list[i]);
     }
 
     list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
 
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        list_widget->setDeactivated();
-    }
-    else
-    {
-        list_widget->setActivated();
-    }
+    list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
 
 }   // init
 
@@ -334,6 +329,15 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         }
 
         translations = new Translations();
+
+#ifdef ENABLE_FREETYPE
+        //Reload fonts for new translation when using freetype
+        GUIEngine::cleanHollowCopyFont();
+        GUIEngine::getTitleFont()->recreateFromLanguage();
+        GUIEngine::getFont()->recreateFromLanguage();
+        GUIEngine::reloadHollowCopyFont(GUIEngine::getFont());
+#endif // ENABLE_FREETYPE
+
         GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
 
         GUIEngine::getFont()->updateRTL();

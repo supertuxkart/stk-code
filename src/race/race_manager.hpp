@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -120,7 +120,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** True if the AI should have additional abbilities, e.g.
-     *  nolik will get special bubble gums in the final challenge. */
+     *  nolok will get special bubble gums in the final challenge. */
     enum AISuperPower
     {
         SUPERPOWER_NONE       = 0,
@@ -168,7 +168,7 @@ public:
     /** Returns a (translated) name of a minor race mode.
      *  \param mode Minor race mode.
      */
-    static const wchar_t* getNameOf(const MinorRaceModeType mode)
+    static const core::stringw getNameOf(const MinorRaceModeType mode)
     {
         switch (mode)
         {
@@ -184,7 +184,7 @@ public:
             case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
             //I18N: Game mode
             case MINOR_MODE_SOCCER:         return _("Soccer");
-            default: assert(false); return NULL;
+            default: assert(false); return L"";
         }
     }   // getNameOf
 
@@ -312,10 +312,6 @@ private:
 
     /** Whether a track should be reversed */
     std::vector<bool>                m_reverse_track;
-
-    /** The points given to a kart on a given position (index is
-     *  0 based, so using race-position - 1. */
-    std::vector<int>                 m_score_for_position;
 
     /** The list of default AI karts to use. This is from the command line. */
     std::vector<std::string>         m_default_ai_list;
@@ -591,8 +587,6 @@ public:
     int getCoinTarget() const { return m_coin_target; }
     // ------------------------------------------------------------------------
     float getTimeTarget() const { return m_time_target; }
-    // ------------------------------------------------------------------------
-    int getPositionScore(int p) const { return m_score_for_position[p-1]; }
     // ------------------------------------------------------------------------
     int getTrackNumber() const { return m_track_number; }
     // ------------------------------------------------------------------------

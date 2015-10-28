@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Erwin Coumans http://continuousphysics.com/Bullet/
+ * Copyright (C) 2005-2015 Erwin Coumans http://continuousphysics.com/Bullet/
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -23,6 +23,10 @@
 #include "BulletDynamics/ConstraintSolver/btContactConstraint.h"
 
 #include "karts/kart.hpp"
+#include "modes/world.hpp"
+#include "physics/triangle_mesh.hpp"
+#include "tracks/terrain_info.hpp"
+#include "tracks/track.hpp"
 
 #define ROLLING_INFLUENCE_FIX
 
@@ -80,7 +84,7 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     ci.m_wheelsDampingCompression = tuning.m_suspensionCompression;
     ci.m_wheelsDampingRelaxation  = tuning.m_suspensionDamping;
     ci.m_frictionSlip             = tuning.m_frictionSlip;
-    ci.m_maxSuspensionTravelCm    = tuning.m_maxSuspensionTravelCm;
+    ci.m_maxSuspensionTravel      = tuning.m_maxSuspensionTravel;
     ci.m_maxSuspensionForce       = tuning.m_maxSuspensionForce;
 
     m_wheelInfo.push_back( btWheelInfo(ci));
@@ -109,7 +113,6 @@ void btKart::reset()
     {
         btWheelInfo &wheel                     = m_wheelInfo[i];
         wheel.m_raycastInfo.m_suspensionLength = 0;
-        wheel.m_rotation                       = 0;
         updateWheelTransform(i, true);
     }
     m_visual_wheels_touch_ground = false;
@@ -156,16 +159,13 @@ void btKart::updateWheelTransform(int wheelIndex, bool interpolatedTransform)
     btQuaternion steeringOrn(up,steering);//wheel.m_steering);
     btMatrix3x3 steeringMat(steeringOrn);
 
-    btQuaternion rotatingOrn(right,-wheel.m_rotation);
-    btMatrix3x3 rotatingMat(rotatingOrn);
-
     btMatrix3x3 basis2(
         right[0],fwd[0],up[0],
         right[1],fwd[1],up[1],
         right[2],fwd[2],up[2]
     );
 
-    wheel.m_worldTransform.setBasis(steeringMat * rotatingMat * basis2);
+    wheel.m_worldTransform.setBasis(steeringMat * basis2);
     wheel.m_worldTransform.setOrigin(
                                      wheel.m_raycastInfo.m_hardPointWS
                                     + wheel.m_raycastInfo.m_wheelDirectionWS
@@ -232,8 +232,8 @@ btScalar btKart::rayCast(unsigned int index)
 
     updateWheelTransformsWS( wheel,false);
 
-    btScalar max_susp_len = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius
-                          + wheel.m_maxSuspensionTravelCm*0.01f;
+    btScalar max_susp_len = wheel.getSuspensionRestLength()
+                          + wheel.m_maxSuspensionTravel;
 
     // Do a slightly longer raycast to see if the kart might soon hit the 
     // ground and some 'cushioning' is needed to avoid that the chassis
@@ -260,15 +260,16 @@ btScalar btKart::rayCast(unsigned int index)
         wheel.m_raycastInfo.m_contactNormalWS.normalize();
         wheel.m_raycastInfo.m_isInContact = true;
         ///@todo for driving on dynamic/movable objects!;
+        wheel.m_raycastInfo.m_triangle_index = rayResults.m_triangle_index;;
         wheel.m_raycastInfo.m_groundObject = &getFixedBody();
 
-        wheel.m_raycastInfo.m_suspensionLength = depth - wheel.m_wheelsRadius;
+        wheel.m_raycastInfo.m_suspensionLength = depth;
 
         //clamp on max suspension travel
         btScalar minSuspensionLength = wheel.getSuspensionRestLength()
-                                - wheel.m_maxSuspensionTravelCm*btScalar(0.01);
+                                - wheel.m_maxSuspensionTravel;
         btScalar maxSuspensionLength = wheel.getSuspensionRestLength()
-                                + wheel.m_maxSuspensionTravelCm*btScalar(0.01);
+                                + wheel.m_maxSuspensionTravel;
         if (wheel.m_raycastInfo.m_suspensionLength < minSuspensionLength)
         {
             wheel.m_raycastInfo.m_suspensionLength = minSuspensionLength;
@@ -361,12 +362,19 @@ const btTransform& btKart::getChassisWorldTransform() const
 }   // getChassisWorldTransform
 
 // ----------------------------------------------------------------------------
-void btKart::updateVehicle( btScalar step )
+void btKart::updateAllWheelPositions()
 {
     for (int i=0;i<getNumWheels();i++)
     {
         updateWheelTransform(i,false);
     }
+
+}   // updateAllWheelPositions
+
+// ----------------------------------------------------------------------------
+void btKart::updateVehicle( btScalar step )
+{
+    updateAllWheelPositions();
 
     const btTransform& chassisTrans = getChassisWorldTransform();
 
@@ -438,7 +446,20 @@ void btKart::updateVehicle( btScalar step )
     {
         btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
         btVector3 terrain_up(0,1,0);
+        // Length of axis depends on the angle - i.e. the further awat
+        // the kart is from being upright, the larger the applied impulse
+        // will be, resulting in fast changes when the kart is on its
+        // side, but not overcompensating (and therefore shaking) when
+        // the kart is not much away from being upright.
         btVector3 axis = kart_up.cross(terrain_up);
+
+        // To avoid the kart going backwards/forwards (or rolling sideways),
+        // set the pitch/roll to 0 before applying the 'straightening' impulse.
+        // TODO: make this works if gravity is changed.
+        btVector3 av = m_chassisBody->getAngularVelocity();
+        av.setX(0);
+        av.setZ(0);
+        m_chassisBody->setAngularVelocity(av);
         // Give a nicely balanced feeling for rebalancing the kart
         m_chassisBody->applyTorqueImpulse(axis * m_kart->getKartProperties()->getSmoothFlyingImpulse());
     }
@@ -520,15 +541,8 @@ void btKart::updateVehicle( btScalar step )
 
             btScalar proj2 = fwd.dot(vel);
 
-            wheel.m_deltaRotation = (proj2 * step) / (wheel.m_wheelsRadius);
-            wheel.m_rotation += wheel.m_deltaRotation;
 
-        } else
-        {
-            wheel.m_rotation += wheel.m_deltaRotation;
-        }
-        //damping of rotation when not in contact
-        wheel.m_deltaRotation *= btScalar(0.99);
+        } 
 
     }
 
@@ -659,7 +673,13 @@ void btKart::updateSuspension(btScalar deltaTime)
         btScalar length_diff    = (susp_length - current_length);
         if(m_kart->getKartProperties()->getExpSpringResponse())
             length_diff *= fabsf(length_diff)/susp_length;
-
+        float f = (1.0f + fabsf(length_diff) / susp_length);
+        // Scale the length diff. This results that in uphill sections, when
+        // the suspension is more compressed (i.e. length is bigger), more
+        // force is used, which makes it much less likely for the kart to hit
+        // the terrain, while when driving on flat terrain (length small),
+        // there is hardly any difference
+        length_diff *= f*f;
         force = wheel_info.m_suspensionStiffness * length_diff
               * wheel_info.m_clippedInvContactDotSuspension;
 
@@ -972,11 +992,15 @@ void btKart::updateFriction(btScalar timeStep)
 // ----------------------------------------------------------------------------
 void btKart::debugDraw(btIDebugDraw* debugDrawer)
 {
+    const btVector3 &from = m_kart->getTerrainInfo()->getOrigin();
+    const btVector3 &to = m_kart->getTerrainInfo()->getHitPoint();
+    debugDrawer->drawLine(from, to, btVector3(0.5, 0.5, 0));
 
     for (int v=0;v<getNumWheels();v++)
     {
         btVector3 wheelColor(0,1,1);
-        if (getWheelInfo(v).m_raycastInfo.m_isInContact)
+        const btWheelInfo &w = getWheelInfo(v);
+        if (w.m_raycastInfo.m_isInContact)
         {
             wheelColor.setValue(0,0,1);
         } else
@@ -984,18 +1008,40 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
             wheelColor.setValue(1,0,1);
         }
 
-        btVector3 wheelPosWS = getWheelInfo(v).m_worldTransform.getOrigin();
+        btVector3 wheelPosWS = w.m_worldTransform.getOrigin();
 
         btVector3 axle = btVector3(
-            getWheelInfo(v).m_worldTransform.getBasis()[0][getRightAxis()],
-            getWheelInfo(v).m_worldTransform.getBasis()[1][getRightAxis()],
-            getWheelInfo(v).m_worldTransform.getBasis()[2][getRightAxis()]);
+                            w.m_worldTransform.getBasis()[0][getRightAxis()],
+                            w.m_worldTransform.getBasis()[1][getRightAxis()],
+                            w.m_worldTransform.getBasis()[2][getRightAxis()]);
 
         //debug wheels (cylinders)
         debugDrawer->drawLine(wheelPosWS,wheelPosWS+axle,wheelColor);
         debugDrawer->drawLine(wheelPosWS,
-                              getWheelInfo(v).m_raycastInfo.m_contactPointWS,
+                              w.m_raycastInfo.m_contactPointWS,
                               wheelColor);
+        // Draw the (interpolated) normal of the ground at the wheel position
+        btVector3 white(1.0f, 1.0f, 1.0f);
+        debugDrawer->drawLine(w.m_raycastInfo.m_contactPointWS,
+                              w.m_raycastInfo.m_contactPointWS+
+                                 w.m_raycastInfo.m_contactNormalWS,
+                              white);
+        int n = w.m_raycastInfo.m_triangle_index;
+        if (n > -1)
+        {
+            const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+            btVector3 *p1, *p2, *p3;
+            tm.getTriangle(n, &p1, &p2, &p3);
+            const btVector3 *n1, *n2, *n3;
+            tm.getNormals(n, &n1, &n2, &n3);
+            // Draw the normals at the vertices
+            debugDrawer->drawLine(*p1, *p1 + *n1, white);
+            debugDrawer->drawLine(*p2, *p2 + *n2, white);
+            debugDrawer->drawLine(*p3, *p3 + *n3, white);
+            // Also draw the triangle in white, it can make it easier
+            // to identify which triangle a wheel is on
+            debugDrawer->drawTriangle(*p1, *p2, *p3, white, 1.0f);
+        }
 
     }   // for i < getNumWheels
     btVector3 yellow(1.0f, 1.0f, 0.0f);
@@ -1066,6 +1112,7 @@ btScalar btKart::rayCast(btWheelInfo& wheel, const btVector3& ray)
         wheel.m_raycastInfo.m_contactPointWS   = rayResults.m_hitPointInWorld;
         wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
         wheel.m_raycastInfo.m_isInContact      = true;
+        wheel.m_raycastInfo.m_triangle_index   = rayResults.m_triangle_index;
     }
 
     return depth;

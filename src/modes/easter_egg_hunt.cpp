@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -199,9 +199,8 @@ void EasterEggHunt::getKartsDisplayInfo(
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         //I18n: number of collected eggs / overall number of eggs
-        rank_info.m_text = StringUtils::insertValues(_("Eggs: %d / %d"),
-                                                    m_eggs_collected[i],
-                                                    m_number_of_eggs);
+        rank_info.m_text = _("Eggs: %d / %d", m_eggs_collected[i],
+                                              m_number_of_eggs);
         rank_info.m_color = video::SColor(255, 255, 255, 255);
     }
 }   // getKartDisplayInfo

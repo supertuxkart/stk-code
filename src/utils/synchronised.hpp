@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -42,7 +42,7 @@ private:
 public:
     // ------------------------------------------------------------------------
     /** Initialise the data and the mutex with default constructors. */
-    Synchronised() : m_data(TYPE())
+    Synchronised() : m_data()
     {
         pthread_mutex_init(&m_mutex, NULL);
     }   // Synchronised()

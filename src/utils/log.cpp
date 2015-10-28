@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2013 Joerg Henrichs
+//  Copyright (C) 2013-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -154,7 +154,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     }
     __android_log_vprint(alp, "SuperTuxKart", format, args);
 #else
-    static const char *names[] = {"verbose", "debug  ", "info   ",
+    static const char *names[] = {"debug", "verbose  ", "info   ",
                                   "warn   ", "error  ", "fatal  "};
 
     // Using a va_list twice produces undefined results, ie crash.

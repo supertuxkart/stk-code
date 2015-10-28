@@ -1,8 +1,8 @@
-// Copyright (C) 2002-2013 Nikolaus Gebhardt, modified by Marianne Gagnon
+// Copyright (C) 2002-2015 Nikolaus Gebhardt, modified by Marianne Gagnon
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #ifdef _IRR_COMPILE_WITH_GUI_
 
 #include "IGUIEnvironment.h"
@@ -151,8 +151,8 @@ s32 STKModifiedSpriteBank::addTextureAsSprite(video::ITexture* texture)
 
     u32 rectangleIndex = Rectangles.size();
     Rectangles.push_back( core::rect<s32>(0,0,
-                                          texture->getOriginalSize().Width,
-                                          texture->getOriginalSize().Height) );
+                                          texture->getSize().Width,
+                                          texture->getSize().Height) );
 
     SGUISprite sprite;
     sprite.frameTime = 0;

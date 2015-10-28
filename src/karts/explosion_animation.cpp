@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -109,11 +109,8 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime() *
               m_kart->getPlayerDifficulty()->getExplosionInvulnerabilityTime();
     m_kart->setInvulnerableTime(t);
-    if ( UserConfigParams::m_graphical_effects )
-    {
-        m_kart->showStarEffect(t);
-    }
-
+    m_kart->showStarEffect(t);
+    
     m_kart->getAttachment()->clear();
 
  };   // ExplosionAnimation

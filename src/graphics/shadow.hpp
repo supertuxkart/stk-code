@@ -21,7 +21,7 @@
 
 #include "utils/no_copy.hpp"
 
-#include <string>
+class KartProperties;
 
 namespace irr
 {
@@ -41,19 +41,24 @@ class Shadow : public NoCopy
 private:
     /** The scene node for the shadow. */
     scene::ISceneNode  *m_node;
+
     /** The mesh of the shadow. */
     scene::IMesh       *m_mesh;
+
     /** The scene node of the kart to which this shadow belongs. */
     scene::ISceneNode  *m_parent_kart_node;
+
+    /** If a kart is flying, the shadow is disabled (since it is
+     *  stuck to the kart, i.e. the shadow would be flying, too). */
+    bool             m_shadow_enabled;
+
 public:
-         Shadow(video::ITexture *texture, scene::ISceneNode *node,
-                float scale, float x_offset, float y_offset,float z_offset);
+         Shadow(const KartProperties *kart_properties,
+                scene::ISceneNode *node, float y_offset);
         ~Shadow();
-    void enableShadow();
-    void disableShadow();
+    void update(bool enabled, float hot);
 };   // Shadow
 #endif
 
 /* EOF */
-
 

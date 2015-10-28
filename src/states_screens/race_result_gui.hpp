@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,14 +19,15 @@
 #ifndef HEADER_RACE_RESULT_GUI_HPP
 #define HEADER_RACE_RESULT_GUI_HPP
 
+
+#include "guiengine/screen.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "states_screens/state_manager.hpp"
 
 #include <assert.h>
 #include <vector>
 
-#include "guiengine/screen.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
-#include "states_screens/state_manager.hpp"
 
 namespace irr
 {
@@ -36,6 +37,7 @@ namespace irr
     }
 }
 
+class MusicInformation;
 class SFXBase;
 
 /**
@@ -162,13 +164,17 @@ private:
     /** The previous monospace state of the font. */
     bool                       m_was_monospace;
 
-    SFXBase*                   m_finish_sound;
+    /** Sound effect at end of race. */
+    SFXBase                   *m_finish_sound;
+
+    /** Music to be played after race ended. */
+    MusicInformation          *m_race_over_music;
 
     /** For highscores */
     std::string m_highscore_who;
 
     /** For highscores */
-    StateManager::ActivePlayer* m_highscore_player;
+    StateManager::ActivePlayer *m_highscore_player;
 
     /** For highscores */
     int m_highscore_rank;
@@ -227,7 +233,7 @@ public:
                   { assert(false); return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
-    virtual void renderPlayerView(const AbstractKart *kart) {}
+    virtual void renderPlayerView(const Camera *camera, float dt) {}
 
     virtual void onUpdate(float dt) OVERRIDE;
 
@@ -240,10 +246,8 @@ public:
                             float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
-                            bool important=true) { }
-
-    /** Should not be called anymore. */
-    virtual void clearAllMessages() {assert(false); }
+                            bool important=true,
+                            bool big_font=false) { }
 
     void nextPhase();
 

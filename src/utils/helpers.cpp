@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Lauri Kasanen
+//  Copyright (C) 2013-2015 Lauri Kasanen
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -51,8 +51,8 @@ u8 shash8(const u8 * const data, const u16 size) {
 
 /*
 
-Copyright (C) 2011 by Ashima Arts (Simplex noise)
-Copyright (C) 2011 by Lauri Kasanen (cpu port)
+Copyright (C) 2011 by-2015 Ashima Arts (Simplex noise)
+Copyright (C) 2011 by-2015 Lauri Kasanen (cpu port)
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

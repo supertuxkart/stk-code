@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,7 +19,6 @@
 
 #include "animations/animation_base.hpp"
 #include "animations/three_d_animation.hpp"
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -78,13 +77,8 @@ void CutsceneWorld::init()
 
     m_duration = -1.0f;
 
-    //const btTransform &s = getTrack()->getStartTransform(0);
-    //const Vec3 &v = s.getOrigin();
     Camera* stk_cam = Camera::createCamera(NULL);
     m_camera = stk_cam->getCameraSceneNode();
-    //m_camera = irr_driver->getSceneManager()
-    //         ->addCameraSceneNode(NULL, core::vector3df(0.0f, 0.0f, 0.0f),
-    //                              core::vector3df(0.0f, 0.0f, 0.0f));
     m_camera->setFOV(0.61f);
     m_camera->bindTargetAndRotation(true); // no "look-at"
 

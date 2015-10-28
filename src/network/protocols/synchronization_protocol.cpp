@@ -1,5 +1,6 @@
 #include "network/protocols/synchronization_protocol.hpp"
 
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
 #include "network/protocols/kart_update_protocol.hpp"
 #include "network/protocols/controller_events_protocol.hpp"
@@ -33,9 +34,9 @@ SynchronizationProtocol::~SynchronizationProtocol()
 
 bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 {
-    if (event->type != EVENT_TYPE_MESSAGE)
+    if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 10)
     {
         Log::warn("SynchronizationProtocol", "Received a message too short.");
@@ -47,6 +48,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
     uint32_t sequence = data.gui32(6);
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    assert(peers.size() > 0);
 
     if (m_listener->isServer())
     {
@@ -57,10 +59,10 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         }
     }
 
-    uint8_t peer_id;
+    uint8_t peer_id = 0;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        if (peers[i]->isSamePeer(*event->peer))
+        if (peers[i]->isSamePeer(event->getPeer()))
         {
             peer_id = i;
         }
@@ -73,7 +75,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 
     if (request)
     {
-        NetworkString response;
+        NetworkString response(10);
         response.ai8(data.gui8(talk_id)).ai32(token).ai8(0).ai32(sequence);
         m_listener->sendMessage(this, peers[peer_id], response, false);
         Log::verbose("SynchronizationProtocol", "Answering sequence %u", sequence);
@@ -154,7 +156,7 @@ void SynchronizationProtocol::asynchronousUpdate()
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
-            NetworkString ns;
+            NetworkString ns(10);
             ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1).addUInt32(m_pings[i].size());
             // now add the countdown if necessary
             if (m_countdown_activated && m_listener->isServer())

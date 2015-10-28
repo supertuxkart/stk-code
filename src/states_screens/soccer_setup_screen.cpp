@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2013 Lionel Fuentes
+//  Copyright (C) 2013-2015 Lionel Fuentes
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -111,16 +111,9 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
     else if(name == "time_enabled")
     {
         CheckBoxWidget* timeEnabled = dynamic_cast<CheckBoxWidget*>(widget);
-        if(timeEnabled->getState())
-        {
-            getWidget<SpinnerWidget>("goalamount")->setDeactivated();
-            getWidget<SpinnerWidget>("timeamount")->setActivated();
-        }
-        else
-        {
-            getWidget<SpinnerWidget>("timeamount")->setDeactivated();
-            getWidget<SpinnerWidget>("goalamount")->setActivated();
-        }
+        bool timed = timeEnabled->getState();
+        getWidget<SpinnerWidget>("goalamount")->setActive(!timed);
+        getWidget<SpinnerWidget>("timeamount")->setActive(timed);
     }
 }   // eventCallback
 
@@ -208,11 +201,11 @@ void SoccerSetupScreen::init()
 
     SpinnerWidget*  goalamount = getWidget<SpinnerWidget>("goalamount");
     goalamount->setValue(UserConfigParams::m_num_goals);
-    goalamount->setActivated();
+    goalamount->setActive(true);
 
     SpinnerWidget* timeAmount = getWidget<SpinnerWidget>("timeamount");
     timeAmount->setValue(UserConfigParams::m_soccer_time_limit);
-    timeAmount->setDeactivated();
+    timeAmount->setActive(false);
 
     CheckBoxWidget* timeEnabled = getWidget<CheckBoxWidget>("time_enabled");
     timeEnabled->setState(false);

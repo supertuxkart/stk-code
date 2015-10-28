@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,18 +17,17 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tracks/track_manager.hpp"
-#include "graphics/irr_driver.hpp"
 
-#include <stdio.h>
-#include <stdexcept>
-#include <algorithm>
-#include <sstream>
-#include <iostream>
-
-#include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
+
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <stdio.h>
 
 TrackManager* track_manager = 0;
 std::vector<std::string>  TrackManager::m_track_search_path;

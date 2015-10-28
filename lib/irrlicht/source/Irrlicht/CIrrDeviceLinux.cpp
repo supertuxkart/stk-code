@@ -11,6 +11,7 @@ extern bool GLContextDebugBit;
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/utsname.h>
 #include <time.h>
 #include "IEventReceiver.h"
@@ -497,7 +498,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 }
 #endif
 
-static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
+static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
 {
 	GLXContext Context;
 	irr::video::useCoreContext = true;
@@ -546,35 +547,33 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
 			None
 		};
-	int legacyctx[] =
-		{
-			GLX_CONTEXT_MAJOR_VERSION_ARB, 2,
-			GLX_CONTEXT_MINOR_VERSION_ARB, 1,
-			None
-		};
 	PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
   
-	// create core 4.3 context
-	os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
-	if (!XErrorSignaled)
-		return Context;
+    if(!force_legacy_context)
+    {
+        // create core 4.3 context
+        os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
+        if (!XErrorSignaled)
+            return Context;
+        
+        XErrorSignaled = false;
+        // create core 3.3 context
+        os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
+        if (!XErrorSignaled)
+            return Context;
 
-	XErrorSignaled = false;
-	// create core 3.3 context
-	os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
-	if (!XErrorSignaled)
-		return Context;
+        XErrorSignaled = false;
+        // create core 3.1 context (for older mesa)
+        os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
+        if (!XErrorSignaled)
+            return Context;
 
-	XErrorSignaled = false;
-	// create core 3.1 context (for older mesa)
-	os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
-	if (!XErrorSignaled)
-		return Context;
+    }   // if(force_legacy_context)
 
 	XErrorSignaled = false;
 	irr::video::useCoreContext = false;
@@ -913,31 +912,17 @@ bool CIrrDeviceLinux::createWindow()
 				// window is showed in wrong screen. It doesn't matter for vidmode
 				// which displays cloned image in all devices.
 				#ifdef _IRR_LINUX_X11_RANDR_
-				XResizeWindow(display, window, Width, Height);
-				XMoveWindow(display, window, crtc_x, crtc_y);
+				XMoveResizeWindow(display, window, crtc_x, crtc_y, Width, Height);
 				XRaiseWindow(display, window);
 				XFlush(display);
 				#endif
-
-				// Workaround for Gnome which sometimes creates window smaller than display
-				XSizeHints *hints = XAllocSizeHints();
-				hints->flags=PMinSize;
-				hints->min_width=Width;
-				hints->min_height=Height;
-				XSetWMNormalHints(display, window, hints);
-				XFree(hints);
 
 				// Set the fullscreen mode via the window manager. This allows alt-tabing, volume hot keys & others.
 				// Get the needed atom from there freedesktop names
 				Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
 				Atom WMFullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
-				// Set the fullscreen property
-				XChangeProperty(display, window, WMStateAtom, XA_ATOM, 32, PropModeReplace, 
-								reinterpret_cast<unsigned char*>(&WMFullscreenAtom), 1);
 
-				// Notify the root window
 				XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
-
 				xev.type = ClientMessage;
 				xev.xclient.window = window;
 				xev.xclient.message_type = WMStateAtom;
@@ -948,6 +933,47 @@ bool CIrrDeviceLinux::createWindow()
 							SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 
 				XFlush(display);
+				
+				// Wait until window state is already changed to fullscreen
+				bool fullscreen = false;
+				for (int i = 0; i < 500; i++)
+				{
+					Atom type;
+					int format;
+					unsigned long numItems, bytesAfter;
+					unsigned char* data = NULL;
+
+					int s = XGetWindowProperty(display, window, WMStateAtom,
+											0l, 1024, False, XA_ATOM, &type, 
+											&format,  &numItems, &bytesAfter, 
+											&data);
+
+					if (s == Success) 
+					{
+						Atom* atoms = (Atom*)data;
+						
+						for (unsigned int i = 0; i < numItems; ++i) 
+						{
+							if (atoms[i] == WMFullscreenAtom) 
+							{
+								fullscreen = true;
+								break;
+							}
+						}
+					}
+						
+					XFree(data);
+					
+					if (fullscreen == true)
+						break;
+					
+					usleep(1000);
+				}
+					
+				if (!fullscreen)
+				{
+					os::Printer::log("Warning! Got timeout while checking fullscreen sate", ELL_WARNING);
+				}        
 			}
 			else
 			{
@@ -998,7 +1024,7 @@ bool CIrrDeviceLinux::createWindow()
 		glxWin=glXCreateWindow(display,glxFBConfig,window,NULL);
 		if (glxWin)
 		{
-			Context = getMeAGLContext(display, glxFBConfig);
+			Context = getMeAGLContext(display, glxFBConfig, CreationParams.ForceLegacyDevice);
 			if (Context)
 			{
 				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))
@@ -2082,11 +2108,13 @@ void CIrrDeviceLinux::pollJoysticks()
 	for (u32 j= 0; j< ActiveJoysticks.size(); ++j)
 	{
 		JoystickInfo & info =  ActiveJoysticks[j];
+		bool event_received = false;
 
 #ifdef __FreeBSD__
 		struct joystick js;
 		if (read(info.fd, &js, sizeof(js)) == sizeof(js))
 		{
+			event_received = true;
 			info.persistentData.JoystickEvent.ButtonStates = js.b1 | (js.b2 << 1); /* should be a two-bit field */
 			info.persistentData.JoystickEvent.Axis[0] = js.x; /* X axis */
 			info.persistentData.JoystickEvent.Axis[1] = js.y; /* Y axis */
@@ -2099,14 +2127,23 @@ void CIrrDeviceLinux::pollJoysticks()
 			{
 			case JS_EVENT_BUTTON:
 				if (event.value)
-						info.persistentData.JoystickEvent.ButtonStates |= (1 << event.number);
+				{
+					event_received = true;
+					info.persistentData.JoystickEvent.ButtonStates |= (1 << event.number);
+				}
 				else
-						info.persistentData.JoystickEvent.ButtonStates &= ~(1 << event.number);
+				{
+					event_received = true;
+					info.persistentData.JoystickEvent.ButtonStates &= ~(1 << event.number);
+				}
 				break;
 
 			case JS_EVENT_AXIS:
 				if (event.number < SEvent::SJoystickEvent::NUMBER_OF_AXES)
+				{
+					event_received = true;
 					info.persistentData.JoystickEvent.Axis[event.number] = event.value;
+				}
 				break;
 
 			default:
@@ -2117,6 +2154,13 @@ void CIrrDeviceLinux::pollJoysticks()
 
 		// Send an irrlicht joystick event once per ::run() even if no new data were received.
 		(void)postEventFromUser(info.persistentData);
+		
+#ifdef _IRR_COMPILE_WITH_X11_
+		if (event_received)
+		{
+			XResetScreenSaver(display);
+		}
+#endif
 	}
 #endif // _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 }

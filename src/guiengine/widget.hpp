@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -155,9 +155,6 @@ namespace GUIEngine
         /** PROP_TEXT is a special case : since it can be translated it can't
          *  go in the map above, which uses narrow strings */
         irr::core::stringw m_text;
-
-        /** Whether the text in m_text is right-to-left */
-        bool m_is_text_rtl;
 
         /** When true, this widget shall use a bigger and more colourful font */
         bool m_title_font;
@@ -325,7 +322,7 @@ namespace GUIEngine
         /**
          * \brief Sets the widget (and its children, if any) visible or not.
          * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
-         * it visible implicitely calls setActivated(). If you mix visiblity and (de)activated calls,
+         * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
          * undefined behavior may ensue (like invisible but clickable buttons).
          */
         void setVisible(bool visible);
@@ -355,12 +352,11 @@ namespace GUIEngine
          * \{
          */
 
-        /** \brief undos setDeactivated() */
-        virtual void setActivated();
-
-        /** \brief greys out the widget, making it not clickable for the user */
-        virtual void setDeactivated();
-
+        /** \brief Sets an widget to be either activated or deactivated 
+         *  (i.e. greyed out)
+         *  \param active Active (true) or deactive (false). Defaults to 
+         *         true. */
+        virtual void setActive(bool active=true);
 
         /**
           * \}

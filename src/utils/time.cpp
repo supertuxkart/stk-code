@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013  SuperTuxKart-Team
+//  Copyright (C) 2013-2015  SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,16 +19,51 @@
 #include "utils/time.hpp"
 
 #include "graphics/irr_driver.hpp"
+#include "utils/translation.hpp"
 
 #include <ctime>
 
+irr::ITimer *StkTime::m_timer = NULL;
+
+/** Init function for the timer. It grabs a copy of the timer of the
+ *  current irrlicht device (which is the NULL device). This way the
+ *  irrlicht time routine can be used even if no device exists. This
+ *  situation can happen when the window resolution is changed - if the
+ *  sfx manager (in a separate thread) would access the timer while the
+ *  device does not exist, stk crashes.
+ */
+void StkTime::init()
+{
+    assert(!m_timer);
+    m_timer = irr_driver->getDevice()->getTimer();
+    m_timer->grab();
+}   // init
+
+// ----------------------------------------------------------------------------
+
+/** Converts the time in this object to a human readable string. */
+std::string StkTime::toString(const TimeType &tt)
+{
+    const struct tm *t = gmtime(&tt);
+
+    //I18N: Format for dates (%d = day, %m = month, %Y = year). See http://www.cplusplus.com/reference/ctime/strftime/ for more info about date formats.
+    core::stringw w_date_format = translations->w_gettext(N_("%d/%m/%Y"));
+    core::stringc c_date_format(w_date_format.c_str());
+
+    char s[64];
+    strftime(s, 64, c_date_format.c_str(), t);
+    return s;
+}   // toString
+
+// ----------------------------------------------------------------------------
 /** Returns a time based on an arbitrary 'epoch' (e.g. could be start
  *  time of the application, 1.1.1970, ...).
  *  The value is a double precision floating point value in seconds.
  */
 double StkTime::getRealTime(long startAt)
 {
-    return irr_driver->getRealTime()/1000.0;
+    assert(m_timer);
+    return m_timer->getRealTime()/1000.0;
 }   // getTimeSinceEpoch
 
 // ----------------------------------------------------------------------------

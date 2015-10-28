@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <string>
+#include "utils/ptr_vector.hpp"
 
 #include "irrlicht.h"
 class GrandPrixData;
@@ -35,7 +36,7 @@ class GrandPrixManager
 private:
     static const char* SUFFIX;
 
-    std::vector<GrandPrixData*> m_gp_data;
+    PtrVector<GrandPrixData> m_gp_data;
 
     /** Load all the grands prix from the 3 directories known */
     void loadFiles();
@@ -51,20 +52,23 @@ public:
                    GrandPrixManager();
                   ~GrandPrixManager();
     void           reload();
-    GrandPrixData* getGrandPrix(const std::string& s) const;
     bool existsName(const irr::core::stringw& name) const;
     void           checkConsistency();
 
     // Methods for the gp editor
-    GrandPrixData* editGrandPrix(const std::string& s) const;
+    GrandPrixData* editGrandPrix(const std::string& s);
     GrandPrixData* createNewGP(const irr::core::stringw& newName);
     GrandPrixData* copy(const std::string& id,
                         const irr::core::stringw& newName);
     void           remove(const std::string& id);
     // ------------------------------------------------------------------------
     /** Returns a pointer to the data for the specified GP.
+    *  \param i Index of the GP. */
+    const GrandPrixData* getGrandPrix(const std::string& s) const;
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the data for the specified GP.
      *  \param i Index of the GP. */
-    GrandPrixData* getGrandPrix(const int i) const { return m_gp_data[i];     }
+    const GrandPrixData* getGrandPrix(const int i) const { return m_gp_data.get(i);     }
     // ------------------------------------------------------------------------
     /** Returns the number of GPs. */
     unsigned int   getNumberOfGrandPrix()    const { return (int)m_gp_data.size(); }

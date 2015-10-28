@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -40,8 +40,9 @@ DEFINE_SCREEN_SINGLETON( GrandPrixEditorScreen );
 
 
 // -----------------------------------------------------------------------------
-GrandPrixEditorScreen::GrandPrixEditorScreen()
-    : Screen("gpeditor.stkgui"), m_selection(NULL), m_gpgroup(GrandPrixData::GP_NONE)
+GrandPrixEditorScreen::GrandPrixEditorScreen() 
+                     : Screen("grand_prix_editor.stkgui"), m_selection(NULL),
+                       m_gpgroup(GrandPrixData::GP_NONE)
 {
 }
 
@@ -54,8 +55,8 @@ void GrandPrixEditorScreen::beforeAddingWidget()
     tabs->clearAllChildren();
     for (int i = 0; i < GrandPrixData::GP_GROUP_COUNT; i++)
     {
-        tabs->addTextChild(getGroupName((enum GrandPrixData::GPGroupType)i),
-            StringUtils::toString(i));
+        core::stringw label = getGroupName((enum GrandPrixData::GPGroupType)i);
+        tabs->addTextChild(label.c_str(), StringUtils::toString(i));
     }
 }
 
@@ -161,14 +162,14 @@ void GrandPrixEditorScreen::setSelection (const GrandPrixData* gpdata)
     if (gpdata == NULL)
     {
         m_selection = NULL;
-        gpname_widget->setText (L"Please select a Grand Prix", true);
+        gpname_widget->setText (_("Please select a Grand Prix"), true);
         tracks_widget->clearItems();
         tracks_widget->updateItemDisplay();
     }
     else
     {
         m_selection = grand_prix_manager->editGrandPrix(gpdata->getId());
-        gpname_widget->setText (gpdata->getName(), true);
+        gpname_widget->setText(translations->fribidize(gpdata->getName()), true);
         gplist_widget->setSelection(m_selection->getId(), PLAYER_ID_GAME_MASTER, true);
         loadTrackList (gpdata->getId());
     }
@@ -271,23 +272,13 @@ void GrandPrixEditorScreen::enableButtons()
     assert(remove_button != NULL);
     assert(rename_button != NULL);
 
-    if (m_selection != NULL && m_selection->getNumberOfTracks() > 0)
-        copy_button->setActivated();
-    else
-        copy_button->setDeactivated();
+    bool b = m_selection && m_selection->getNumberOfTracks() > 0;
+    copy_button->setActive(b);
 
-    if (m_selection != NULL && m_selection->isEditable())
-    {
-        edit_button->setActivated();
-        remove_button->setActivated();
-        rename_button->setActivated();
-    }
-    else
-    {
-        edit_button->setDeactivated();
-        remove_button->setDeactivated();
-        rename_button->setDeactivated();
-    }
+    b = m_selection && m_selection->isEditable();
+    edit_button->setActive(b);
+    remove_button->setActive(b);
+    rename_button->setActive(b);
 }
 
 // -----------------------------------------------------------------------------
@@ -301,6 +292,7 @@ void GrandPrixEditorScreen::onNewGPWithName(const stringw& newName)
     {
         m_selection->setName(newName);
         m_selection->writeToFile();
+        setSelection(grand_prix_manager->getGrandPrix(m_selection->getId()));
     }
     else if (m_action == "new")
     {
@@ -326,7 +318,7 @@ void GrandPrixEditorScreen::onConfirm()
 }
 
 // ----------------------------------------------------------------------------
-const wchar_t* GrandPrixEditorScreen::getGroupName(enum GrandPrixData::GPGroupType group)
+const core::stringw GrandPrixEditorScreen::getGroupName(enum GrandPrixData::GPGroupType group)
 {
     switch (group)
     {

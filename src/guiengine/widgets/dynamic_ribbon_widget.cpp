@@ -1,5 +1,5 @@
 //  Supertuxkart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -56,7 +56,6 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
 
     m_item_count_hint = 0;
 
-    m_font = GUIEngine::getFont()->getHollowCopy();
     m_max_label_width = 0;
 }
 // -----------------------------------------------------------------------------
@@ -385,6 +384,8 @@ void DynamicRibbonWidget::buildInternalStructure()
         ribbon->m_properties[PROP_ID] = name.str();
         ribbon->m_event_handler = this;
 
+        m_font = GUIEngine::getFont()->getHollowCopy();
+
         // calculate font size
         if (m_col_amount > 0)
         {
@@ -518,6 +519,7 @@ void DynamicRibbonWidget::clearItems()
     m_scroll_offset = 0;
     m_max_label_width = 0;
 }
+
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::elementRemoved()
 {

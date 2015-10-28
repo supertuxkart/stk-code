@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -321,6 +321,24 @@ void PlayerController::update(float dt)
     if (!history->replayHistory())
         steer(dt, m_steer_val);
 
+
+    // look backward when the player requests or
+    // if automatic reverse camera is active
+    if (m_camera->getMode() != Camera::CM_FINAL)
+    {
+        if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold > 0 &&
+            m_kart->getSpeed() < -UserConfigParams::m_reverse_look_threshold))
+        {
+            m_camera->setMode(Camera::CM_REVERSE);
+        }
+        else
+        {
+            if (m_camera->getMode() == Camera::CM_REVERSE)
+                m_camera->setMode(Camera::CM_NORMAL);
+        }
+    }
+
+
     if (World::getWorld()->isStartPhase())
     {
         if (m_controls->m_accel || m_controls->m_brake ||
@@ -358,21 +376,7 @@ void PlayerController::update(float dt)
         return;
     }
 
-    // look backward when the player requests or
-    // if automatic reverse camera is active
-    if (m_camera->getMode() != Camera::CM_FINAL)
-    {
-        if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold>0 &&
-            m_kart->getSpeed()<-UserConfigParams::m_reverse_look_threshold))
-        {
-            m_camera->setMode(Camera::CM_REVERSE);
-        }
-        else
-        {
-            if (m_camera->getMode() == Camera::CM_REVERSE)
-                m_camera->setMode(Camera::CM_NORMAL);
-        }
-    }
+
 
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
     // MK), since e.g. in the City track it is possible for the kart to end

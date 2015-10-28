@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -123,6 +123,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
     m_weather            = NULL;
+    m_force_disable_fog  = false;
 
     m_stop_music_when_dialog_open = true;
 
@@ -162,6 +163,9 @@ void World::init()
             << "' not found.\n";
         throw std::runtime_error(msg.str());
     }
+
+    std::string script_path = World::getWorld()->getTrack()->getTrackFile("scripting.as");
+    m_script_engine->loadScript(script_path, true);
 
     // Create the physics
     m_physics = new Physics();
@@ -299,9 +303,9 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
                                 const PlayerDifficulty *difficulty)
 {
     int position           = index+1;
-    btTransform init_pos   = m_track->getStartTransform(index);
+    btTransform init_pos   = getStartTransform(index);
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-            difficulty);
+                                      difficulty);
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)
@@ -330,6 +334,14 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
 
     return new_kart;
 }   // createKart
+
+//-----------------------------------------------------------------------------
+/** Returns the start coordinates for a kart with a given index.
+ *  \param index Index of kart ranging from 0 to kart_num-1. */
+const btTransform &World::getStartTransform(int index)
+{
+    return m_track->getStartTransform(index);
+}   // getStartTransform
 
 //-----------------------------------------------------------------------------
 /** Creates an AI controller for the kart.
@@ -404,7 +416,6 @@ World::~World()
     if(m_physics)
         delete m_physics;
 
-    music_manager->stopMusic();
     m_world = NULL;
 
     irr_driver->getSceneManager()->clear();
@@ -736,6 +747,12 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     kart->setRotation(pos.getRotation());
 
     kart->getBody()->setCenterOfMassTransform(pos);
+    // The raycast to determine the terrain underneath the kart is done from
+    // the centre point of the 4 wheel positions. After a rescue, the wheel
+    // positions need to be updated (otherwise the raycast will be done from
+    // the previous position, which might be the position that triggered
+    // the rescue in the first place).
+    kart->getVehicle()->updateAllWheelPositions();
 
     // Project kart to surface of track
     // This will set the physics transform
@@ -929,6 +946,7 @@ void World::update(float dt)
     if(ReplayPlay::get()) ReplayPlay::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
+    if (m_script_engine) m_script_engine->update(dt);
     PROFILER_POP_CPU_MARKER();
 
     if (!history->dontDoPhysics())
@@ -936,7 +954,7 @@ void World::update(float dt)
         m_physics->update(dt);
     }
 
-    PROFILER_PUSH_CPU_MARKER("World::update (AI)", 0x40, 0x7F, 0x00);
+    PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
     const int kart_amount = (int)m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {
@@ -1146,7 +1164,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
                                        2.0f);
             else
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
-                                       core::stringw(kart->getName())),
+                                       kart->getName()),
                                        camera->getKart(),
                                        2.0f);
         }  // for i < number of cameras

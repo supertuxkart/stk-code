@@ -1,7 +1,5 @@
-
-
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -342,6 +340,10 @@ void ThreeStrikesBattle::update(float dt)
         TrackObjectPresentationMesh* tire_presentation =
             new TrackObjectPresentationMesh(tire, tire_xyz, tire_hpr, tire_scale);
 
+#ifdef DEBUG
+        tire_presentation->getNode()->setName("Tire on ground");
+#endif
+
         TrackObject* tire_obj = new TrackObject(tire_xyz, tire_hpr, tire_scale,
                                                 "movable", tire_presentation,
                                                 true /* is_dynamic */,
@@ -474,54 +476,4 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
         rank_info.m_text = oss.str().c_str();
     }
 }   // getKartsDisplayInfo
-
-//-----------------------------------------------------------------------------
-/** Determines the rescue position for a kart. The rescue position is the
- *  start position which is has the biggest accumulated distance to all other
- *  karts, and which has no other kart very close. The latter avoids dropping
- *  a kart on top of another kart.
- *  \param kart The kart that is going to be rescued.
- *  \returns The index of the start position to which the rescued kart
- *           should be moved to.
- */
-
-unsigned int ThreeStrikesBattle::getRescuePositionIndex(AbstractKart *kart)
-{
-    const int start_spots_amount = getTrack()->getNumberOfStartPositions();
-    assert(start_spots_amount > 0);
-
-    float largest_accumulated_distance_found = -1;
-    int   furthest_id_found                  = -1;
-
-    for(int n=0; n<start_spots_amount; n++)
-    {
-        const btTransform &s = getTrack()->getStartTransform(n);
-        const Vec3 &v=s.getOrigin();
-        float accumulated_distance = .0f;
-        bool spawn_point_clear = true;
-
-        for(unsigned int k=0; k<getCurrentNumKarts(); k++)
-        {
-            if(kart->getWorldKartId()==k) continue;
-            float abs_distance2 = (getKart(k)->getXYZ()-v).length2_2d();
-            const float CLEAR_SPAWN_RANGE2 = 5*5;
-            if( abs_distance2 < CLEAR_SPAWN_RANGE2)
-            {
-                spawn_point_clear = false;
-                break;
-            }
-            accumulated_distance += sqrt(abs_distance2);
-        }
-
-        if(accumulated_distance > largest_accumulated_distance_found &&
-            spawn_point_clear)
-        {
-            furthest_id_found = n;
-            largest_accumulated_distance_found = accumulated_distance;
-        }
-    }
-
-    assert(furthest_id_found != -1);
-    return furthest_id_found;
-}   // getRescuePositionIndex
 

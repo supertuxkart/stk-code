@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007-2013 Damien Morel <divdams@free.fr>
+//  Copyright (C) 2007-2015 Damien Morel <divdams@free.fr>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -45,7 +45,7 @@ MusicOggStream::MusicOggStream()
 MusicOggStream::~MusicOggStream()
 {
     if(stopMusic() == false)
-        Log::warn("MusicOgg", "problems while stopping music.\n");
+        Log::warn("MusicOgg", "problems while stopping music.");
 }   // ~MusicOggStream
 
 //-----------------------------------------------------------------------------
@@ -61,12 +61,14 @@ bool MusicOggStream::load(const std::string& filename)
 
     if(!m_oggFile)
     {
-        Log::error("MusicOgg", "Loading Music: %s failed (fopen returned NULL)\n", m_fileName.c_str());
+        Log::error("MusicOgg", "Loading Music: %s failed (fopen returned NULL)",
+                   m_fileName.c_str());
         return false;
     }
 
 #if defined( WIN32 ) || defined( WIN64 )
-    const int result = ov_open_callbacks((void *)m_oggFile, &m_oggStream, NULL, 0, OV_CALLBACKS_DEFAULT);
+    const int result = ov_open_callbacks((void *)m_oggFile, &m_oggStream, NULL,
+                                         0, OV_CALLBACKS_DEFAULT             );
 #else
     const int result = ov_open(m_oggFile, &m_oggStream, NULL, 0);
 #endif
@@ -98,7 +100,8 @@ bool MusicOggStream::load(const std::string& filename)
                 errorMessage = "Unknown Error";
         }
 
-        Log::error("MusicOgg", "Loading Music: %s failed : ov_open returned error code %i (%s)\n",
+        Log::error("MusicOgg", "Loading Music: %s failed : "
+                               "ov_open returned error code %i (%s)",
                m_fileName.c_str(), result, errorMessage);
         return false;
     }
@@ -186,7 +189,7 @@ bool MusicOggStream::playMusic()
     alSourcePlay(m_soundSource);
     m_pausedMusic = false;
     m_playing = true;
-
+    check("playMusic");
     return true;
 }   // playMusic
 
@@ -244,20 +247,15 @@ bool MusicOggStream::resumeMusic()
 }   // resumeMusic
 
 //-----------------------------------------------------------------------------
-void MusicOggStream::volumeMusic(float gain)
+void MusicOggStream::setVolume(float volume)
 {
-    if (gain > 1.0f) gain = 1.0f;
-    if (gain < 0.0f) gain = 0.0f;
+    volume *= music_manager->getMasterMusicVolume();
+    if (volume > 1.0f) volume = 1.0f;
+    if (volume < 0.0f) volume = 0.0f;
 
-    alSourcef(m_soundSource, AL_GAIN, gain);
-} // volumeMusic
-
-//-----------------------------------------------------------------------------
-void MusicOggStream::updateFading(float percent)
-{
-    alSourcef(m_soundSource,AL_GAIN,percent);
-    update();
-}   // updateFading
+    alSourcef(m_soundSource, AL_GAIN, volume);
+    check("volume music");   // clear errors
+}   // setVolume
 
 //-----------------------------------------------------------------------------
 void MusicOggStream::updateFaster(float percent, float max_pitch)
@@ -302,13 +300,19 @@ void MusicOggStream::update()
 
     if (active)
     {
+        // For debugging
+        SFXManager::checkError("before source state");
         // we have data, so we should be playing...
         ALenum state;
         alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
         if (state != AL_PLAYING)
         {
-            Log::warn("MusicOgg", "Music not playing when it should be. "
-                      "Source state: %d\n", state);
+            // Prevent flooding
+            static int count = 0;
+            count++;
+            if (count<10)
+                Log::warn("MusicOgg", "Music not playing when it should be. "
+                          "Source state: %d", state);
             alGetSourcei(m_soundSource, AL_BUFFERS_PROCESSED, &processed);
             alSourcePlay(m_soundSource);
         }
@@ -316,7 +320,7 @@ void MusicOggStream::update()
     else
     {
         Log::warn("MusicOgg", "Attempt to stream music into buffer failed "
-                              "twice in a row.\n");
+                              "twice in a row.");
     }
 }   // update
 
@@ -359,7 +363,8 @@ bool MusicOggStream::check(const char* what)
 
     if (error != AL_NO_ERROR)
     {
-        Log::error("MusicOgg", "[MusicOggStream] OpenAL error at %s : %s (%i)\n", what, SFXManager::getErrorString(error).c_str(), error);
+        Log::error("MusicOgg", "OpenAL error at %s : %s (%i)", what,
+                  SFXManager::getErrorString(error).c_str(), error);
         return false;
     }
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2002-2013 Nikolaus Gebhardt
+// Copyright (C) 2002-2015 Nikolaus Gebhardt
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
@@ -6,6 +6,10 @@
 #define __C_GUI_FONT_H_INCLUDED__
 
 #include "utils/leak_check.hpp"
+
+#ifdef ENABLE_FREETYPE
+#include "guiengine/get_font_properties.hpp"
+#endif // ENABLE_FREETYPE
 
 #include "IrrCompileConfig.h"
 #include "IGUIFontBitmap.h"
@@ -51,6 +55,7 @@ class ScalableFont : public IGUIFontBitmap
     bool m_mono_space_digits;
     irr::video::SColor m_shadow_color;
 
+#ifndef ENABLE_FREETYPE
     struct TextureInfo
     {
         irr::core::stringc m_file_name;
@@ -68,6 +73,7 @@ class ScalableFont : public IGUIFontBitmap
     std::map<int /* texture file ID */, TextureInfo> m_texture_files;
 
     void doReadXmlFile(io::IXMLReader* xml);
+#endif // ENABLE_FREETYPE
 
     bool m_is_hollow_copy;
     bool m_rtl;
@@ -78,12 +84,22 @@ public:
 
     bool m_black_border;
 
+#ifdef ENABLE_FREETYPE
+    TTFLoadingType m_type;
+    FontUse        m_font_use;
+    u32            m_dpi;
+#endif // ENABLE_FREETYPE
+
     ScalableFont* m_fallback_font;
     float         m_fallback_font_scale;
     int           m_fallback_kerning_width;
 
     //! constructor
+#ifdef ENABLE_FREETYPE
+    ScalableFont(IGUIEnvironment* env, TTFLoadingType type);
+#else
     ScalableFont(IGUIEnvironment* env, const std::string &filename);
+#endif // ENABLE_FREETYPE
 
     /** Creates a hollow copy of this font; i.e. the underlying font data is the *same* for
       * both fonts. The advantage of doing this is that you can change "view" parameters
@@ -104,10 +120,15 @@ public:
     //! destructor
     virtual ~ScalableFont();
 
+#ifdef ENABLE_FREETYPE
+    //! loads a font from a TTF file
+    bool loadTTF();
+#else
     //! loads a font from an XML file
     bool load(io::IXMLReader* xml);
 
     void lazyLoadTexture(int texID);
+#endif // ENABLE_FREETYPE
 
     //! draws an text and clips it to the specified rectangle if wanted
     virtual void draw(const core::stringw& text, const core::rect<s32>& position,
@@ -159,8 +180,30 @@ public:
 
     void updateRTL();
 
+#ifdef ENABLE_FREETYPE
+    //! re-create fonts when language is changed
+    void recreateFromLanguage();
+
+    //! lazy load new characters discovered in normal font
+    bool lazyLoadChar();
+
+    //! force create a new texture (glyph) page in a font
+    void forceNewPage();
+#endif // ENABLE_FREETYPE
+
 private:
 
+#ifdef ENABLE_FREETYPE
+    struct SFontArea
+    {
+        SFontArea() : width(0), spriteno(0), offsety(0), offsety_bt(0), bearingx(0) {}
+        s32             width;
+        u32             spriteno;
+        s32             offsety;
+        s32             offsety_bt;
+        s32             bearingx;
+    };
+#else
     struct SFontArea
     {
         SFontArea() : underhang(0), overhang(0), width(0), spriteno(0) {}
@@ -169,6 +212,7 @@ private:
         s32             width;
         u32             spriteno;
     };
+#endif // ENABLE_FREETYPE
 
     int getCharWidth(const SFontArea& area, const bool fallback) const;
     s32 getAreaIDFromCharacter(const wchar_t c, bool* fallback_font) const;
@@ -185,6 +229,10 @@ private:
     u32             WrongCharacter;
     s32             MaxHeight;
     s32             GlobalKerningWidth, GlobalKerningHeight;
+#ifdef ENABLE_FREETYPE
+    s32                     GlyphMaxHeight;
+    video::ITexture*        LastNormalPage;
+#endif // ENABLE_FREETYPE
 
     core::stringw Invisible;
 };

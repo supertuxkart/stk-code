@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,7 +17,6 @@
 
 #include "states_screens/options_screen_video.hpp"
 
-#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/user_config.hpp"
@@ -62,6 +61,8 @@ struct GFXPreset
     /** Depth of field */
     bool dof;
     bool global_illumination;
+    bool degraded_ibl;
+    int hd_textures;
 };
 
 static GFXPreset GFX_PRESETS[] =
@@ -70,39 +71,73 @@ static GFXPreset GFX_PRESETS[] =
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
         false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 0 /* hd_textures */
     },
 
     {
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 0 /* hd_textures */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, true /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 1 /* hd_textures */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */, true /* weather */,
         true /* animatedScenery */, 1 /* animatedCharacters */, 8 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */
+        false /* depth of field */, false /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
+    },
+
+    {
+        true /* light */, 512 /* shadow */, true /* bloom */, true /* motionblur */,
+        true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
+        true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
+        true /* depth of field */, false /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
     },
 
     {
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         true /* animatedScenery */, 2 /* animatedCharacters */, 16 /* anisotropy */,
-        true /* depth of field */, true /* global illumination */
+        true /* depth of field */, true /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
     }
 };
 
-static const int  GFX_LEVEL_AMOUNT = 5;
+static const int  GFX_LEVEL_AMOUNT = 6;
+
+struct Resolution
+{
+    int width, height;
+
+    Resolution()
+    {
+        width = 0;
+        height = 0;
+    }
+
+    Resolution(int w, int h)
+    {
+        width = w;
+        height = h;
+    }
+
+    bool operator< (Resolution r) const
+    {
+        return width < r.width || (width == r.width && height < r.height);
+    }
+
+    float getRatio() const
+    {
+        return (float) width / height;
+    }
+};
 
 // ----------------------------------------------------------------------------
 
@@ -131,7 +166,8 @@ void OptionsScreenVideo::init()
 {
     Screen::init();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
+    assert(ribbon != NULL);
+    ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
 
     ribbon->getRibbonChildren()[1].setTooltip( _("Audio") );
     ribbon->getRibbonChildren()[2].setTooltip( _("User Interface") );
@@ -164,9 +200,7 @@ void OptionsScreenVideo::init()
     CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
     rememberWinpos->setState(UserConfigParams::m_remember_window_location);
 
-    if (UserConfigParams::m_fullscreen) rememberWinpos->setDeactivated();
-    else rememberWinpos->setActivated();
-
+    rememberWinpos->setActive(!UserConfigParams::m_fullscreen);
 
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
@@ -177,54 +211,69 @@ void OptionsScreenVideo::init()
                                                 irr_driver->getVideoModes();
         const int amount = (int)modes.size();
 
+        std::vector<Resolution> resolutions;
+        Resolution r;
+
         bool found_config_res = false;
 
         // for some odd reason, irrlicht sometimes fails to report the good
         // old standard resolutions
         // those are always useful for windowed mode
-        // allow 800x600 only for debug mode
-#ifdef DEBUG
-        bool found_800_600 = false;
-#endif
-        bool found_1024_640 = false;
         bool found_1024_768 = false;
 
         for (int n=0; n<amount; n++)
         {
-            const int w = modes[n].getWidth();
-            const int h = modes[n].getHeight();
-            const float ratio = (float)w / h;
+            r.width  = modes[n].getWidth();
+            r.height = modes[n].getHeight();
+            resolutions.push_back(r);
 
-            if (w == UserConfigParams::m_width &&
-                h == UserConfigParams::m_height)
+            if (r.width  == UserConfigParams::m_width &&
+                r.height == UserConfigParams::m_height)
             {
                 found_config_res = true;
             }
 
-            if (w == 800 && h == 600)
-            {
-#ifdef DEBUG
-                found_800_600 = true;
-#else
-                continue;
-#endif
-            }
-            else if (w == 1024 && h == 640)
-            {
-                found_1024_640 = true;
-            }
-            else if (w == 1024 && h == 768)
+            if (r.width == 1024 && r.height == 768)
             {
                 found_1024_768 = true;
             }
+        }
 
+        if (!found_config_res)
+        {
+            r.width  = UserConfigParams::m_width;
+            r.height = UserConfigParams::m_height;
+            resolutions.push_back(r);
+
+            if (r.width == 1024 && r.height == 768)
+            {
+                found_1024_768 = true;
+            }
+        } // next found resolution
+
+        // Add default resolutions that were not found by irrlicht
+        if (!found_1024_768)
+        {
+            r.width  = 1024;
+            r.height = 768;
+            resolutions.push_back(r);
+        }
+
+        // Sort resolutions by size
+        std::sort(resolutions.begin(), resolutions.end());
+
+        // Add resolutions list
+        for(std::vector<Resolution>::iterator it = resolutions.begin();
+            it != resolutions.end(); it++)
+        {
+            const float ratio = it->getRatio();
             char name[32];
-            sprintf( name, "%ix%i", w, h );
+            sprintf(name, "%ix%i", it->width, it->height);
 
             core::stringw label;
-            label += w;
+            label += it->width;
             label += L"\u00D7";
-            label += h;
+            label += it->height;
 
 #define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
 
@@ -243,71 +292,7 @@ void OptionsScreenVideo::init()
             else
                 res->addItem(label, name, "/gui/screen_other.png");
 #undef ABOUT_EQUAL
-        } // next resolution
-
-        if (!found_config_res)
-        {
-            const int w = UserConfigParams::m_width;
-            const int h = UserConfigParams::m_height;
-            const float ratio = (float)w / h;
-
-            if (w == 800 && h == 600)
-            {
-#ifdef DEBUG
-                found_800_600 = true;
-#endif
-            }
-            else if (w == 1024 && h == 640)
-            {
-                found_1024_640 = true;
-            }
-            else if (w == 1024 && h == 768)
-            {
-                found_1024_768 = true;
-            }
-
-            char name[32];
-            sprintf( name, "%ix%i", w, h );
-
-            core::stringw label;
-            label += w;
-            label += L"\u00D7";
-            label += h;
-
-#define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
-
-            if      (ABOUT_EQUAL( ratio, (5.0f/4.0f)   ))
-                res->addItem(label, name, "/gui/screen54.png");
-            else if (ABOUT_EQUAL( ratio, (4.0f/3.0f)   ))
-                res->addItem(label, name, "/gui/screen43.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/10.0f) ))
-                res->addItem(label, name, "/gui/screen1610.png");
-            else if (ABOUT_EQUAL( ratio, (5.0f/3.0f)   ))
-                res->addItem(label, name, "/gui/screen53.png");
-            else if (ABOUT_EQUAL( ratio, (3.0f/2.0f)   ))
-                res->addItem(label, name, "/gui/screen32.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/9.0f)   ))
-                res->addItem(label, name, "/gui/screen169.png");
-            else
-                res->addItem(label, name, "/gui/screen_other.png");
-#undef ABOUT_EQUAL
-        }
-
-#ifdef DEBUG
-        if (!found_800_600)
-        {
-            res->addItem(L"800\u00D7600", "800x600", "/gui/screen43.png");
-        }
-#endif
-        if (!found_1024_640)
-        {
-            res->addItem(L"1024\u00D7640", "1024x640", "/gui/screen1610.png");
-        }
-        if (!found_1024_768)
-        {
-            res->addItem(L"1024\u00D7768", "1024x768", "/gui/screen43.png");
-        }
-
+        } // add next resolution
     } // end if not inited
 
     res->updateItemDisplay();
@@ -331,23 +316,13 @@ void OptionsScreenVideo::init()
     // ---- forbid changing resolution or animation settings from in-game
     // (we need to disable them last because some items can't be edited when
     // disabled)
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        res->setDeactivated();
-        full->setDeactivated();
-        applyBtn->setDeactivated();
-        gfx->setDeactivated();
-        getWidget<ButtonWidget>("custom")->setDeactivated();
-    }
-    else
-    {
-        // Enable back widgets if they were visited in-game previously
-        res->setActivated();
-        full->setActivated();
-        applyBtn->setActivated();
-        gfx->setActivated();
-        getWidget<ButtonWidget>("custom")->setActivated();
-    }
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+
+    res->setActive(!in_game);
+    full->setActive(!in_game);
+    applyBtn->setActive(!in_game);
+    gfx->setActive(!in_game);
+    getWidget<ButtonWidget>("custom")->setActive(!in_game);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -375,7 +350,9 @@ void OptionsScreenVideo::updateGfxSlider()
             GFX_PRESETS[l].ssao == UserConfigParams::m_ssao &&
             GFX_PRESETS[l].weather == UserConfigParams::m_weather_effects &&
             GFX_PRESETS[l].dof == UserConfigParams::m_dof &&
-            GFX_PRESETS[l].global_illumination == UserConfigParams::m_gi)
+            GFX_PRESETS[l].global_illumination == UserConfigParams::m_gi &&
+            GFX_PRESETS[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
+            GFX_PRESETS[l].hd_textures == (UserConfigParams::m_high_definition_textures & 0x01))
         {
             gfx->setValue(l + 1);
             found = true;
@@ -416,30 +393,30 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw none = _LTR("None");
 
     //I18N: in graphical options
-//    tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
+//    tooltip = tooltip + L"\n" + _("Pixel shaders: %s",
 //                                  UserConfigParams::m_pixel_shaders ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = _("Animated Scenery : %s",
+    tooltip = _("Animated Scenery: %s",
         UserConfigParams::m_graphical_effects ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Weather Effects : %s",
+    tooltip = tooltip + L"\n" + _("Weather Effects: %s",
         UserConfigParams::m_weather_effects ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Animated Characters : %s",
+    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
         UserConfigParams::m_show_steering_animations == 2
         ? all
         : (UserConfigParams::m_show_steering_animations == 1 ? me : none));
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Dynamic lights : %s",
+    tooltip = tooltip + L"\n" + _("Dynamic lights: %s",
         UserConfigParams::m_dynamic_lights ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Motion blur: %s",
         UserConfigParams::m_motionblur ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing : %s",
+    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
         UserConfigParams::m_mlaa ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Ambient occlusion : %s",
+    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
         UserConfigParams::m_ssao ? enabled : disabled);
     //I18N: in graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
@@ -448,25 +425,29 @@ void OptionsScreenVideo::updateTooltip()
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Bloom : %s",
+    tooltip = tooltip + L"\n" + _("Bloom: %s",
         UserConfigParams::m_bloom ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Glow (outlines) : %s",
+    tooltip = tooltip + L"\n" + _("Glow (outlines): %s",
         UserConfigParams::m_glow ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light shaft (God rays) : %s",
+    tooltip = tooltip + L"\n" + _("Light shaft (God rays): %s",
         UserConfigParams::m_light_shaft ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Depth of field : %s",
+    tooltip = tooltip + L"\n" + _("Depth of field: %s",
         UserConfigParams::m_dof ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Global illumination : %s",
+    tooltip = tooltip + L"\n" + _("Global illumination: %s",
         UserConfigParams::m_gi ? enabled : disabled);
-
+    
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Use high definition textures: %s",
+        (UserConfigParams::m_high_definition_textures & 0x1) == 0 ? disabled : enabled);
+    
     gfx->setTooltip(tooltip);
 }   // updateTooltip
 
@@ -547,6 +528,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_weather_effects = GFX_PRESETS[level].weather;
         UserConfigParams::m_dof = GFX_PRESETS[level].dof;
         UserConfigParams::m_gi = GFX_PRESETS[level].global_illumination;
+        UserConfigParams::m_degraded_IBL = GFX_PRESETS[level].degraded_ibl;
+        UserConfigParams::m_high_definition_textures = 0x02 | GFX_PRESETS[level].hd_textures;
 
         updateGfxSlider();
     }
@@ -567,8 +550,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         CheckBoxWidget* fullscreen = getWidget<CheckBoxWidget>("fullscreen");
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
-        if (fullscreen->getState()) rememberWinpos->setDeactivated();
-        else rememberWinpos->setActivated();
+        rememberWinpos->setActive(!fullscreen->getState());
     }
 }   // eventCallback
 

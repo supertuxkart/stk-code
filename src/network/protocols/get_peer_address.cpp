@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -61,12 +61,17 @@ void GetPeerAddress::asynchronousUpdate()
             if (rec_success == "yes")
             {
                 TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
-                result->get("ip", &addr->ip);
+                uint32_t ip;
+                result->get("ip", &ip);
+                addr->setIP(ip);
 
-                if (addr->ip == NetworkManager::getInstance()->getPublicAddress().ip)
-                    result->get("private_port", &addr->port);
+                uint16_t port;
+                if (addr->getIP() == 
+                    NetworkManager::getInstance()->getPublicAddress().getIP())
+                    result->get("private_port", &port);
                 else
-                    result->get("port", &addr->port);
+                    result->get("port", &port);
+                addr->setPort(port);
 
                 Log::debug("GetPeerAddress", "Address gotten successfully.");
             }

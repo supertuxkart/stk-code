@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2008-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2008-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -48,8 +48,8 @@ public:
      *  The last entry ASSET_COUNT specifies the number of entries. */
     enum AssetType {ASSET_MIN,
                     CHALLENGE=ASSET_MIN,
-                    FONT, GFX, GRANDPRIX, GUI, LIBRARY, MODEL, MUSIC,
-                    SCRIPT, SFX, SHADER, SKIN, TEXTURE, 
+                    GFX, GRANDPRIX, GUI, LIBRARY, MODEL, MUSIC,
+                    SCRIPT, SFX, SHADER, SKIN, TEXTURE, TTF,
                     TRANSLATION, ASSET_MAX = TRANSLATION,
                     ASSET_COUNT};
 private:
@@ -68,6 +68,9 @@ private:
 
     /** The list of all root directories. */
     static std::vector<std::string> m_root_dirs;
+
+    /** Name of stdout file. */
+    static std::string m_stdout_filename;
 
     /** Directory to store screenshots in. */
     std::string       m_screenshot_dir;
@@ -109,6 +112,7 @@ public:
                      ~FileManager();
     void              init();
     static void       addRootDirs(const std::string &roots);
+    static void       setStdoutName(const std::string &name);
     io::IXMLReader   *createXMLReader(const std::string &filename);
     XMLNode          *createXMLTree(const std::string &filename);
     XMLNode          *createXMLTreeFromString(const std::string & content);
@@ -134,6 +138,14 @@ public:
     std::string searchTexture(const std::string& fname) const;
     std::string getUserConfigFile(const std::string& fname) const;
     bool        fileExists(const std::string& path) const;
+    // ------------------------------------------------------------------------
+    /** Convenience function to save some typing in the 
+     *  file manager constructor. */
+    bool        fileExists(const char *prefix, const std::string& path) const
+    {
+        return fileExists(std::string(prefix) + path);
+    }
+    // ------------------------------------------------------------------------
     void        listFiles        (std::set<std::string>& result,
                                   const std::string& dir,
                                   bool make_full_path=false) const;
@@ -158,7 +170,16 @@ public:
     {
         m_music_search_path.push_back(path);
     }   // pushMusicSearchPath
+    // ------------------------------------------------------------------------
+    /** Returns the full path to a shader (this function could be modified 
+     *  later to allow track-specific shaders).
+     *  \param name Name of the shader.
+     */
+    std::string getShader(const std::string &name) const
+    {
+        return getAsset(SHADER, name);
 
+    }   // getShader
 };   // FileManager
 
 extern FileManager* file_manager;

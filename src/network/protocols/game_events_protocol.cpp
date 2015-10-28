@@ -6,7 +6,10 @@
 #include "items/item_manager.hpp"
 #include "items/powerup.hpp"
 #include "modes/world.hpp"
+#include "network/event.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_manager.hpp"
+
 #include <stdint.h>
 
 GameEventsProtocol::GameEventsProtocol() : Protocol(NULL, PROTOCOL_GAME_EVENTS)
@@ -19,15 +22,15 @@ GameEventsProtocol::~GameEventsProtocol()
 
 bool GameEventsProtocol::notifyEvent(Event* event)
 {
-    if (event->type != EVENT_TYPE_MESSAGE)
+    if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NetworkString data = event->data();
+    NetworkString &data = event->data();
     if (data.size() < 5) // for token and type
     {
         Log::warn("GameEventsProtocol", "Too short message.");
         return true;
     }
-    if ( (*event->peer)->getClientServerToken() != data.gui32())
+    if ( event->getPeer()->getClientServerToken() != data.gui32())
     {
         Log::warn("GameEventsProtocol", "Bad token.");
         return true;
@@ -79,7 +82,7 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        NetworkString ns;
+        NetworkString ns(11);
         ns.ai32(peers[i]->getClientServerToken());
         // 0x01 : item picked : send item id, powerup type and kart race id
         uint8_t powerup = 0;
