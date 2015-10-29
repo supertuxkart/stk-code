@@ -44,7 +44,8 @@
 // make the linker happy
 const uint32_t GetPublicAddress::m_stun_magic_cookie = 0x2112A442;
 
-GetPublicAddress::GetPublicAddress() : Protocol(PROTOCOL_SILENT)
+GetPublicAddress::GetPublicAddress(CallbackObject *callback)
+                : Protocol(PROTOCOL_SILENT, callback)
 {
     m_state = NOTHING_DONE;
 }   // GetPublicAddress
@@ -83,6 +84,8 @@ void GetPublicAddress::createStunRequest()
     assert(res != NULL);
     struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
     m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
+
+    // Create a new socket for the stun server.
     m_transaction_host = new Network(1, 1, 0, 0);
 
     // Assemble the message for the stun server
@@ -204,6 +207,7 @@ void GetPublicAddress::asynchronousUpdate()
     if (m_state == STUN_REQUEST_SENT)
     {
         std::string message = parseStunResponse();
+        delete m_transaction_host;
         if (message != "")
         {
             Log::warn("GetPublicAddress", "%s", message.c_str());

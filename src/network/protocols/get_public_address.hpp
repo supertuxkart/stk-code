@@ -28,7 +28,7 @@ class Network;
 class GetPublicAddress : public Protocol
 {
     public:
-        GetPublicAddress();
+        GetPublicAddress(CallbackObject *callback = NULL);
         virtual ~GetPublicAddress() {}
 
         virtual bool notifyEvent(Event* event) { return true; }
@@ -45,13 +45,13 @@ class GetPublicAddress : public Protocol
         static const uint32_t m_stun_magic_cookie;
         static const int m_stun_server_port = 3478;
 
-        enum STATE
+        enum State
         {
             NOTHING_DONE,
             STUN_REQUEST_SENT,
             EXITING
-        };
-        STATE m_state;
+        } m_state;
+
         uint8_t m_stun_tansaction_id[12];
         uint32_t m_stun_server_ip;
         Network* m_transaction_host;

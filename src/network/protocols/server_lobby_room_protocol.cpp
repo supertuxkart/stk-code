@@ -116,21 +116,24 @@ void ServerLobbyRoomProtocol::update()
     {
     case NONE:
         // Start the protocol to find the public ip address.
-        m_current_protocol = new GetPublicAddress();
+        m_current_protocol = new GetPublicAddress(this);
         m_current_protocol->requestStart();
         m_state = GETTING_PUBLIC_ADDRESS;
+        // The callback from GetPublicAddress will wake this protocl up
+        ProtocolManager::getInstance()->pauseProtocol(this);
         break;
     case GETTING_PUBLIC_ADDRESS:
-        if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
         {
             Log::debug("ServerLobbyRoomProtocol", "Public address known.");
             // Free GetPublicAddress protocol
             delete m_current_protocol;
 
-            // Register this server with the STK server. The callback in the
-            // xml request will update the state to WORKING.
+            // Register this server with the STK server. This will block
+            // this thread, but there is no need for the protocol manager
+            // to react to any requests before the server is registered.
             registerServer();
             Log::info("ServerLobbyRoomProtocol", "Server registered.");
+            m_state = WORKING;
         }
         break;
     case WORKING:
@@ -152,6 +155,15 @@ void ServerLobbyRoomProtocol::update()
         break;
     }
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Callback when the GetPublicAddress terminates. It will unpause this
+ * protocol, which triggers the next state of the finite state machine.
+ */
+void ServerLobbyRoomProtocol::callback(Protocol *protocol)
+{
+    ProtocolManager::getInstance()->unpauseProtocol(this);
+}   // callback
 
 //-----------------------------------------------------------------------------
 /** Register this server (i.e. its public address) with the STK server
