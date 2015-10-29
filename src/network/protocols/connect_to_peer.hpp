@@ -20,7 +20,7 @@
 #define CONNECT_TO_SERVER_HPP
 
 #include "network/protocol.hpp"
-#include "network/types.hpp"
+#include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
 #include <string>

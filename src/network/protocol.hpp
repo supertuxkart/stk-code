@@ -24,7 +24,6 @@
 #define PROTOCOL_HPP
 
 #include "network/network_string.hpp"
-#include "network/types.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"

@@ -19,8 +19,8 @@
 /*! \file types.hpp
  *  \brief Declares the general types that are used by the network.
  */
-#ifndef HEADER_NETWORK_TYPES_HPP
-#define HEADER_NETWORK_TYPES_HPP
+#ifndef HEADER_TRANSPORT_ADDRESS_HPP
+#define HEADER_TRANSPORT_ADDRESS_HPP
 
 #include "utils/no_copy.hpp"
 #include "utils/string_utils.hpp"

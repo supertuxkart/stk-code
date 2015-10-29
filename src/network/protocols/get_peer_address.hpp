@@ -20,6 +20,7 @@
 #define GET_PEER_ADDRESS_HPP
 
 #include "network/protocol.hpp"
+#include "network/transport_address.hpp"
 
 namespace Online { class XMLRequest; }
 

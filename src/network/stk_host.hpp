@@ -24,7 +24,7 @@
 
 #include "network/network.hpp"
 #include "network/network_string.hpp"
-#include "network/types.hpp"
+#include "network/transport_address.hpp"
 #include "utils/synchronised.hpp"
 
 // enet.h includes win32.h, which without lean_and_mean includes

@@ -2,7 +2,7 @@
 #define CLIENT_LOBBY_ROOM_PROTOCOL_HPP
 
 #include "network/protocols/lobby_room_protocol.hpp"
-#include "network/types.hpp"
+#include "network/transport_address.hpp"
 
 class STKPeer;
 

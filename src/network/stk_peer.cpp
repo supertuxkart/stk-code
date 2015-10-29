@@ -19,7 +19,7 @@
 #include "network/stk_peer.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_string.hpp"
-#include "network/types.hpp"
+#include "network/transport_address.hpp"
 #include "utils/log.hpp"
 
 #include <string.h>

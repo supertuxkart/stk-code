@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_string.hpp"
+#include "network/transport_address.hpp"
 #include "utils/time.hpp"
 
 #include <string.h>

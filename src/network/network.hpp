@@ -22,8 +22,8 @@
 #ifndef HEADER_NETWORK_HPP
 #define HEADER_NETWORK_HPP
 
-#include "network/types.hpp"
 #include "utils/synchronised.hpp"
+#include "utils/types.hpp"
 
 // enet.h includes win32.h, which without lean_and_mean includes
 // winspool.h, which defines MAX_PRIORITY as a macro, which then
@@ -31,7 +31,10 @@
 #define WIN32_LEAN_AND_MEAN
 #include <enet/enet.h>
 
+#include <stdio.h>
+
 class NetworkString;
+class TransportAddress;
 
 /** \class EnetHost
  *  A small wrapper around enet to allow sending and receiving

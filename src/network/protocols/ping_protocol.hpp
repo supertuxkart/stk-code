@@ -2,7 +2,7 @@
 #define PING_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
-
+#include "network/transport_address.hpp"
 
 class PingProtocol : public Protocol
 {
