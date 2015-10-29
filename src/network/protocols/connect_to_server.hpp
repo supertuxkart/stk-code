@@ -42,25 +42,29 @@ private:
         SHOWING_SELF_ADDRESS,
         GETTING_SERVER_ADDRESS,
         REQUESTING_CONNECTION,
+        QUICK_JOIN,
         CONNECTING,
         CONNECTED,
         HIDING_ADDRESS,
         DONE,
         EXITING
     };
+
     /** State for finite state machine. */
     State m_state;
 
+    void handleQuickConnect();
     void handleSameLAN();
 
 public:
-    ConnectToServer();
-    ConnectToServer(uint32_t server_id, uint32_t host_id);
+              ConnectToServer();
+             ConnectToServer(uint32_t server_id, uint32_t host_id);
     virtual ~ConnectToServer();
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate();
+    virtual void callback(Protocol *protocol);
     virtual void update() OVERRIDE {}
 
 };   // class ConnectToServer

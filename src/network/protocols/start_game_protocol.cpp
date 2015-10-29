@@ -21,7 +21,7 @@
 #include "utils/time.hpp"
 
 StartGameProtocol::StartGameProtocol(GameSetup* game_setup)
-                 : Protocol(NULL, PROTOCOL_START_GAME)
+                 : Protocol(PROTOCOL_START_GAME)
 {
     m_game_setup = game_setup;
     std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();

@@ -29,7 +29,7 @@ using namespace Online;
  *  \param server_id Id of the server.
  */
 RequestConnection::RequestConnection(uint32_t server_id)
-                 : Protocol(NULL, PROTOCOL_SILENT)
+                 : Protocol(PROTOCOL_SILENT)
 {
     m_server_id = server_id;
 }   // RequestConnection

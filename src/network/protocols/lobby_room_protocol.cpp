@@ -18,8 +18,8 @@
 
 #include "network/protocols/lobby_room_protocol.hpp"
 
-LobbyRoomProtocol::LobbyRoomProtocol(CallbackObject* callback_object) :
-    Protocol(callback_object, PROTOCOL_LOBBY_ROOM)
+LobbyRoomProtocol::LobbyRoomProtocol(CallbackObject* callback_object)
+                 : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
 {
     m_setup = NULL;
 }

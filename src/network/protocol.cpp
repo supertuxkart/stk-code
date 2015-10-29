@@ -31,7 +31,7 @@
  *          it to NULL.
  *  \param type The type of the protocol.
  */
-Protocol::Protocol(CallbackObject* callback_object, ProtocolType type)
+Protocol::Protocol(ProtocolType type, CallbackObject* callback_object)
 {
     m_callback_object = callback_object;
     m_type            = type;

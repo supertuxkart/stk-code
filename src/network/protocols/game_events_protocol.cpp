@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-GameEventsProtocol::GameEventsProtocol() : Protocol(NULL, PROTOCOL_GAME_EVENTS)
+GameEventsProtocol::GameEventsProtocol() : Protocol(PROTOCOL_GAME_EVENTS)
 {
 }
 

@@ -26,7 +26,7 @@
 #include "utils/log.hpp"
 
 GetPeerAddress::GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object)
-              : Protocol(callback_object, PROTOCOL_SILENT)
+              : Protocol(PROTOCOL_SILENT, callback_object)
 {
     m_peer_id = peer_id;
 }   // GetPeerAddress
@@ -39,8 +39,9 @@ GetPeerAddress::~GetPeerAddress()
 // ----------------------------------------------------------------------------
 void GetPeerAddress::setup()
 {
-    m_state = NONE;
+    m_state   = NONE;
     m_request = NULL;
+    m_address.clear();
 }   // setup
 
 // ----------------------------------------------------------------------------
@@ -65,18 +66,17 @@ void GetPeerAddress::asynchronousUpdate()
         {
             if (rec_success == "yes")
             {
-                TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
                 uint32_t ip;
                 result->get("ip", &ip);
-                addr->setIP(ip);
+                m_address.setIP(ip);
 
                 uint16_t port;
-                if (addr->getIP() ==
+                if (m_address.getIP() ==
                     STKHost::get()->getPublicAddress().getIP())
                     result->get("private_port", &port);
                 else
                     result->get("port", &port);
-                addr->setPort(port);
+                m_address.setPort(port);
 
                 Log::debug("GetPeerAddress", "Address gotten successfully.");
             }

@@ -21,8 +21,9 @@
 #include "network/stk_host.hpp"
 #include "utils/time.hpp"
 
-PingProtocol::PingProtocol(const TransportAddress& ping_dst, double delay_between_pings) 
-            : Protocol(NULL, PROTOCOL_SILENT)
+PingProtocol::PingProtocol(const TransportAddress& ping_dst,
+                           double delay_between_pings) 
+            : Protocol(PROTOCOL_SILENT)
 {
     m_ping_dst.copy(ping_dst);
     m_delay_between_pings = delay_between_pings;

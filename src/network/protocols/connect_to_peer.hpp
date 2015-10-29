@@ -21,6 +21,8 @@
 
 #include "network/protocol.hpp"
 #include "network/types.hpp"
+#include "utils/cpp2011.hpp"
+
 #include <string>
 
 class ConnectToPeer : public Protocol, public CallbackObject
@@ -36,7 +38,7 @@ protected:
     enum STATE
     {
         NONE,
-        WAITING_PEER_ADDRESS,
+        RECEIVED_PEER_ADDRESS,
         CONNECTING,
         CONNECTED,
         DONE,
@@ -52,7 +54,7 @@ public:
     virtual void setup();
     virtual void update() {}
     virtual void asynchronousUpdate();
-
-};
+    virtual void callback(Protocol *protocol) OVERRIDE;
+};   // class ConnectToPeer
 
 #endif // CONNECT_TO_SERVER_HPP

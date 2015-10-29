@@ -23,7 +23,7 @@
 #include "network/stk_host.hpp"
 #include "online/request_manager.hpp"
 
-StopServer::StopServer() : Protocol(NULL, PROTOCOL_SILENT)
+StopServer::StopServer() : Protocol(PROTOCOL_SILENT)
 {
 }
 

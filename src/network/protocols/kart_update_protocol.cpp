@@ -8,8 +8,7 @@
 #include "network/stk_host.hpp"
 #include "utils/time.hpp"
 
-KartUpdateProtocol::KartUpdateProtocol()
-    : Protocol(NULL, PROTOCOL_KART_UPDATE)
+KartUpdateProtocol::KartUpdateProtocol() : Protocol(PROTOCOL_KART_UPDATE)
 {
     m_karts = World::getWorld()->getKarts();
     for (unsigned int i = 0; i < m_karts.size(); i++)

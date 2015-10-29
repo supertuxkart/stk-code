@@ -24,7 +24,7 @@
 #include "online/request_manager.hpp"
 #include "utils/log.hpp"
 
-HidePublicAddress::HidePublicAddress() : Protocol(NULL, PROTOCOL_SILENT)
+HidePublicAddress::HidePublicAddress() : Protocol(PROTOCOL_SILENT)
 {
 }
 

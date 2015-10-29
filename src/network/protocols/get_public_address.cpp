@@ -44,8 +44,7 @@
 // make the linker happy
 const uint32_t GetPublicAddress::m_stun_magic_cookie = 0x2112A442;
 
-GetPublicAddress::GetPublicAddress()
-                : Protocol(NULL, PROTOCOL_SILENT)
+GetPublicAddress::GetPublicAddress() : Protocol(PROTOCOL_SILENT)
 {
     m_state = NOTHING_DONE;
 }   // GetPublicAddress

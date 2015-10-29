@@ -63,7 +63,22 @@ enum ProtocolState
     PROTOCOL_STATE_TERMINATED    //!< The protocol is terminated/does not exist.
 };   // ProtocolState
 
-// ----------------------------------------------------------------------------
+class Protocol;
+
+// ============================================================================*
+/** \class CallbackObject
+ *  \brief Class that must be inherited to pass objects to protocols.
+ */
+class CallbackObject
+{
+public:
+             CallbackObject() {}
+    virtual ~CallbackObject() {}
+
+    virtual void callback(Protocol *protocol) = 0;
+};   // CallbackObject
+
+// ============================================================================
 /** \class Protocol
  *  \brief Abstract class used to define the global protocol functions.
  *  A protocol is an entity that is started at a point, and that is updated
@@ -89,12 +104,13 @@ protected:
     uint32_t        m_id;
 
 public:
-
-             Protocol(CallbackObject* callback_object, ProtocolType type);
+             Protocol(ProtocolType type, CallbackObject* callback_object=NULL);
     virtual ~Protocol();
+
     /** \brief Called when the protocol is going to start. Must be re-defined
      *  by subclasses. */
     virtual void setup() = 0;
+    // ------------------------------------------------------------------------
 
     /** \brief Called by the protocol listener, synchronously with the main
      *  loop. Must be re-defined.*/
@@ -115,6 +131,23 @@ public:
                      bool reliable = true);
     void requestStart();
     void requestTerminate();
+
+    // ------------------------------------------------------------------------
+    /** \brief Called when the protocol is paused (by an other entity or by
+    *  itself). */
+    virtual void paused() { }
+    // ------------------------------------------------------------------------
+    /** \brief Called when the protocol is used.
+    */
+    virtual void unpaused() { }
+    // ------------------------------------------------------------------------
+    /** \brief Called when the protocol was just killed. It triggers the 
+     *  callback if defined. */
+    virtual void terminated()
+    {
+        if (m_callback_object)
+            m_callback_object->callback(this);
+    }   // terminated
     // ------------------------------------------------------------------------
     /** Returns the current protocol state. */
     ProtocolState getState() const { return m_state;  }
@@ -138,17 +171,6 @@ public:
      *  \param event : Pointer to the event.
      *  \return True if the event has been treated, false otherwise */
     virtual bool notifyEventAsynchronous(Event* event) { return false; }
-    // ------------------------------------------------------------------------
-    /** \brief Called when the protocol is paused (by an other entity or by
-     *  itself). */
-    virtual void paused() { }
-    // ------------------------------------------------------------------------
-    /** \brief Called when the protocol is used.
-     */
-    virtual void unpaused() { }
-    // ------------------------------------------------------------------------
-    /** \brief Called when the protocol is to be killed. */
-    virtual void terminated() {}
     // ------------------------------------------------------------------------
     /** \brief Method to get a protocol's type.
      *  \return The protocol type. */

@@ -13,8 +13,8 @@
 
 //-----------------------------------------------------------------------------
 
-ControllerEventsProtocol::ControllerEventsProtocol() :
-        Protocol(NULL, PROTOCOL_CONTROLLER_EVENTS)
+ControllerEventsProtocol::ControllerEventsProtocol()
+                        : Protocol( PROTOCOL_CONTROLLER_EVENTS)
 {
 }
 

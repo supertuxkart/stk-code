@@ -10,7 +10,8 @@
 
 //-----------------------------------------------------------------------------
 
-SynchronizationProtocol::SynchronizationProtocol() : Protocol(NULL, PROTOCOL_SYNCHRONIZATION)
+SynchronizationProtocol::SynchronizationProtocol() 
+                       : Protocol(PROTOCOL_SYNCHRONIZATION)
 {
     unsigned int size = STKHost::get()->getPeerCount();
     m_pings.resize(size, std::map<uint32_t,double>());

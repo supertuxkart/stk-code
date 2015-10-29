@@ -32,8 +32,7 @@
 
 // ----------------------------------------------------------------------------
 
-ConnectToPeer::ConnectToPeer(uint32_t peer_id) 
-             : Protocol(NULL, PROTOCOL_CONNECTION)
+ConnectToPeer::ConnectToPeer(uint32_t peer_id)  : Protocol(PROTOCOL_CONNECTION)
 {
     m_peer_id = peer_id;
     m_state = NONE;
@@ -78,47 +77,52 @@ void ConnectToPeer::asynchronousUpdate()
     {
         case NONE:
         {
-            m_current_protocol = new GetPeerAddress(m_peer_id, &m_peer_address); 
-            ProtocolManager::getInstance()->requestStart(m_current_protocol);
-            m_state = WAITING_PEER_ADDRESS;
+            m_current_protocol = new GetPeerAddress(m_peer_id, this); 
+            ProtocolManager::getInstance()->requestStart(m_current_protocol);;
+
+            // Pause this protocol till we receive an answer
+            // The GetPeerAddress protocol will change the state and
+            // unpause this protocol
+            ProtocolManager::getInstance()->pauseProtocol(this);
             break;
         }
-        case WAITING_PEER_ADDRESS:
-            // Wait till we know the peer address
-            if (m_current_protocol->getState()== PROTOCOL_STATE_TERMINATED)
+        case RECEIVED_PEER_ADDRESS:
+        {
+            if (m_peer_address.getIP() == 0 || m_peer_address.getPort() == 0)
             {
-                if (m_peer_address.getIP() != 0 && m_peer_address.getPort() != 0)
-                {
-                    // we're in the same lan (same public ip address) !!
-                    if (m_peer_address.getIP() == STKHost::get()->getPublicAddress().getIP())
-                    {
-                        // just send a broadcast packet with the string aloha_stk inside, the client will know our ip address and will connect
-                        TransportAddress broadcast_address;
-                        broadcast_address.setIP(-1); // 255.255.255.255
-                        broadcast_address.setPort(m_peer_address.getPort()); // 0b10101100000101101101111111111111; // for test
-                        char data[] = "aloha_stk\0";
-                        STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
-                        Log::info("ConnectToPeer", "Broadcast aloha sent.");
-                        StkTime::sleep(1);
-                        broadcast_address.setIP(0x7f000001); // 127.0.0.1 (localhost)
-                        broadcast_address.setPort(m_peer_address.getPort());
-                        STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
-                        Log::info("ConnectToPeer", "Broadcast aloha to self.");
-                    }
-                    else
-                    {
-                        m_current_protocol = new PingProtocol(m_peer_address, 2.0);
-                        ProtocolManager::getInstance()->requestStart(m_current_protocol);
-                    }
-                    m_state = CONNECTING;
-                }
-                else
-                {
-                    Log::error("ConnectToPeer", "The peer you want to connect to has hidden his address.");
-                    m_state = DONE;
-                }
+                Log::error("ConnectToPeer",
+                    "The peer you want to connect to has hidden his address.");
+                m_state = DONE;
+                break;
             }
+
+            // Now we know the peer address. If it's a non-local host, start
+            // the Ping protocol to keep the port available.
+            if (m_peer_address.getIP() != STKHost::get()->getPublicAddress().getIP())
+            {
+                m_current_protocol = new PingProtocol(m_peer_address, 2.0);
+                ProtocolManager::getInstance()->requestStart(m_current_protocol);
+                m_state = CONNECTING;
+                break;
+            }
+
+            // Otherwise we are in the same LAN  (same public ip address) !!
+            // just send a broadcast packet with the string aloha_stk inside,
+            // the client will know our ip address and will connect
+            TransportAddress broadcast_address;
+            broadcast_address.setIP(-1); // 255.255.255.255
+            broadcast_address.setPort(m_peer_address.getPort()); // 0b10101100000101101101111111111111; // for test
+            char data[] = "aloha_stk\0";
+            STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
+            Log::info("ConnectToPeer", "Broadcast aloha sent.");
+            StkTime::sleep(1);
+            broadcast_address.setIP(0x7f000001); // 127.0.0.1 (localhost)
+            broadcast_address.setPort(m_peer_address.getPort());
+            STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
+            Log::info("ConnectToPeer", "Broadcast aloha to self.");
+            m_state = CONNECTING;
             break;
+        }
         case CONNECTING: // waiting the peer to connect
             break;
         case CONNECTED:
@@ -143,4 +147,11 @@ void ConnectToPeer::asynchronousUpdate()
 }   // asynchronousUpdate
 
 // ----------------------------------------------------------------------------
-
+/** Callback from the GetPeerAddress protocol
+ */
+void ConnectToPeer::callback(Protocol *protocol)
+{
+    m_peer_address.copy( ((GetPeerAddress*)protocol)->getAddress() );
+    // Reactivate this protocol
+    ProtocolManager::getInstance()->unpauseProtocol(this);
+}   // callback

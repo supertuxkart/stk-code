@@ -38,6 +38,9 @@ private:
     };
     STATE m_state;
 
+    /** Stores the address found. Used in a callback from the parent protocol
+     *  to get the result. */
+    TransportAddress m_address;
 public:
              GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object);
     virtual ~GetPeerAddress();
@@ -46,6 +49,9 @@ public:
     virtual void asynchronousUpdate();
     void setPeerID(uint32_t m_peer_id);
 
+    // ------------------------------------------------------------------------
+    /** Returns the address found. */
+    const TransportAddress &getAddress() const { return m_address;  }
     // ------------------------------------------------------------------------
     virtual void update() {}
     // ------------------------------------------------------------------------

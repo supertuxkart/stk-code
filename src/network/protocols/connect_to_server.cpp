@@ -18,6 +18,7 @@
 
 #include "network/protocols/connect_to_server.hpp"
 
+#include "config/player_manager.hpp"
 #include "network/event.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/get_peer_address.hpp"
@@ -25,8 +26,8 @@
 #include "network/protocols/hide_public_address.hpp"
 #include "network/protocols/request_connection.hpp"
 #include "network/protocols/ping_protocol.hpp"
-#include "network/protocols/quick_join_protocol.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/time.hpp"
@@ -39,9 +40,10 @@
 #endif
 
 // ----------------------------------------------------------------------------
-/** Quick join/
+/** Connects to a server. This is the quick connect constructor, which 
+ *  will pick a server randomly.
  */
-ConnectToServer::ConnectToServer() : Protocol(NULL, PROTOCOL_CONNECTION)
+ConnectToServer::ConnectToServer() : Protocol(PROTOCOL_CONNECTION)
 {
     m_server_id  = 0;
     m_host_id    = 0;
@@ -55,7 +57,7 @@ ConnectToServer::ConnectToServer() : Protocol(NULL, PROTOCOL_CONNECTION)
  *  \param host_id Id of host.
  */
 ConnectToServer::ConnectToServer(uint32_t server_id, uint32_t host_id)
-               : Protocol(NULL, PROTOCOL_CONNECTION)
+               : Protocol(PROTOCOL_CONNECTION)
 {
     m_server_id  = server_id;
     m_host_id    = host_id;
@@ -84,6 +86,8 @@ bool ConnectToServer::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 // ----------------------------------------------------------------------------
+/** Initialise the protocol.
+ */
 void ConnectToServer::setup()
 {
     Log::info("ConnectToServer", "SETUP");
@@ -110,6 +114,7 @@ void ConnectToServer::asynchronousUpdate()
             if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
             {
                 m_state = SHOWING_SELF_ADDRESS;
+                delete m_current_protocol;
                 m_current_protocol = new ShowPublicAddress();
                 m_current_protocol->requestStart();
                 Log::info("ConnectToServer", "Public address known");
@@ -118,28 +123,30 @@ void ConnectToServer::asynchronousUpdate()
         case SHOWING_SELF_ADDRESS:
             if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
             {
+                delete m_current_protocol;
+
+                m_current_protocol = NULL;
                 // now our public address is in the database
                 Log::info("ConnectToServer", "Public address shown");
                 if (m_quick_join)
                 {
-                    m_current_protocol = new QuickJoinProtocol(&m_server_address,
-                                                               &m_server_id);
-                    m_current_protocol->requestStart();
-                    m_state = REQUESTING_CONNECTION;
+                    handleQuickConnect();
                 }
                 else
                 {
-                    m_current_protocol = new GetPeerAddress(m_host_id,
-                                                            &m_server_address);
+                    m_current_protocol = new GetPeerAddress(m_host_id, this);
                     m_current_protocol->requestStart();
                     m_state = GETTING_SERVER_ADDRESS;
+                    // Pause this protocol till GetPeerAddress finishes.
+                    // The callback then will unpause this protocol/
+                    ProtocolManager::getInstance()->pauseProtocol(this);
                 }
             }
             break;
         case GETTING_SERVER_ADDRESS:
-            // Wait till we know the server address
-            if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
             {
+               if(m_current_protocol)
+                   delete m_current_protocol;
                 Log::info("ConnectToServer", "Server's address known");
                 // we're in the same lan (same public ip address) !!
                 if (m_server_address.getIP() ==
@@ -229,7 +236,52 @@ void ConnectToServer::asynchronousUpdate()
         case EXITING:
             break;
     }
-}
+}   // asynchronousUpdate
+
+ // ----------------------------------------------------------------------------
+/** Called when the GetPeerAddress protocol terminates.
+*/
+void ConnectToServer::callback(Protocol *protocol)
+{
+    ProtocolManager::getInstance()->unpauseProtocol(this);
+}   // callback
+
+// ----------------------------------------------------------------------------
+/** Called to request a quick connect from the STK server.
+ */
+void ConnectToServer::handleQuickConnect()
+{
+    Online::XMLRequest *request = new Online::XMLRequest();
+    PlayerManager::setUserDetails(request, "quick-join",
+                                  Online::API::SERVER_PATH);
+    request->executeNow();
+
+    const XMLNode * result = request->getXMLData();
+    delete request;
+    std::string success;
+
+    if(result->get("success", &success) && success=="yes")
+    {
+        uint32_t ip;
+        result->get("ip", &ip);
+        m_server_address.setIP(ip);
+
+        uint16_t port;
+        // If we are using a LAN connection, we need the private (local) port
+        if (m_server_address.getIP() == STKHost::get()->getPublicAddress().getIP())
+            result->get("private_port", &port);
+        else
+            result->get("port", &port);
+
+        m_server_address.setPort(port);
+
+        Log::debug("GetPeerAddress", "Address gotten successfully.");
+    }
+    else
+    {
+        Log::error("GetPeerAddress", "Fail to get address.");
+    }
+}   // handleQuickConnect
 
 // ----------------------------------------------------------------------------
 /** Called when the server is on the same LAN. It uses broadcast to

@@ -31,23 +31,11 @@
 #include <string>
 
 // ============================================================================
-/*! \class CallbackObject
- *  \brief Class that must be inherited to pass objects to protocols.
- */
-class CallbackObject
-{
-    public:
-        CallbackObject() {}
-        ~CallbackObject() {}
-
-};   // CallbackObject
-
-// ============================================================================
 /*! \class TransportAddress
  *  \brief Describes a transport-layer address.
  *  For IP networks, a transport address is the couple ip:port.
  */
-class TransportAddress : public CallbackObject, public NoCopy
+class TransportAddress : public NoCopy
 {
 private:
     uint32_t m_ip;    //!< The IPv4 address

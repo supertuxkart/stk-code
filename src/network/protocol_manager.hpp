@@ -123,6 +123,10 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         virtual void requestPause(Protocol* protocol);
         virtual void requestUnpause(Protocol* protocol);
         virtual void requestTerminate(Protocol* protocol);
+        virtual void startProtocol(Protocol *protocol);
+        virtual void pauseProtocol(Protocol *protocol);
+        virtual void unpauseProtocol(Protocol *protocol);
+        virtual void terminateProtocol(Protocol *protocol);
         virtual void update();
         virtual void asynchronousUpdate();
         virtual uint32_t  getProtocolID(Protocol* protocol);
@@ -141,11 +145,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
          */
         virtual ~ProtocolManager();
         uint32_t getNextProtocolId();
-
-        virtual void startProtocol(Protocol *protocol);
-        virtual void pauseProtocol(Protocol *protocol);
-        virtual void unpauseProtocol(Protocol *protocol);
-        virtual void terminateProtocol(Protocol *protocol);
 
         bool sendEvent(EventProcessingInfo* event, bool synchronous);
 
