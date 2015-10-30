@@ -40,7 +40,6 @@ private:
     {
         NONE,
         GETTING_SELF_ADDRESS,
-        SHOWING_SELF_ADDRESS,
         GETTING_SERVER_ADDRESS,
         REQUESTING_CONNECTION,
         QUICK_JOIN,

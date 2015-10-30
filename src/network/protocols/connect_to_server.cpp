@@ -123,6 +123,8 @@ void ConnectToServer::asynchronousUpdate()
             if (m_quick_join)
             {
                 handleQuickConnect();
+                // Quick connect will give us the server details,
+                // so we can immediately try to connect to the server
                 m_state = REQUESTING_CONNECTION;
             }
             else
@@ -239,18 +241,23 @@ void ConnectToServer::asynchronousUpdate()
  */
 void ConnectToServer::callback(Protocol *protocol)
 {
-    // Callbacks are only expected when getting either its owb public address
-    // or the server address.
-    if(m_state == GETTING_SELF_ADDRESS ||
-       m_state == GETTING_SERVER_ADDRESS )
+    switch(m_state)
     {
-        ProtocolManager::getInstance()->unpauseProtocol(this);
-    }
-    else 
-    {
-        Log::error("ConnectToServer",
-                   "Received unexpected callback while in state %d.", m_state);
-    }
+        case GETTING_SELF_ADDRESS:
+            // The GetPublicAddress protocol stores our address in
+            // STKHost, so we only need to unpause this protocol
+            ProtocolManager::getInstance()->unpauseProtocol(this);
+            break;
+        case GETTING_SERVER_ADDRESS:
+            // Get the server address from the protocol.
+            m_server_address.copy(((GetPeerAddress*)protocol)->getAddress());
+            ProtocolManager::getInstance()->unpauseProtocol(this);
+            break;
+        default:
+            Log::error("ConnectToServer",
+                       "Received unexpected callback while in state %d.",
+                       m_state);
+    }   // case m_state
 }   // callback
 
 // ----------------------------------------------------------------------------
