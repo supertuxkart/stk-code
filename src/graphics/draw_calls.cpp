@@ -28,63 +28,6 @@ using namespace irr;
 
 namespace
 {
-    template<typename InstanceData>
-    void fillOriginOrientationScale(scene::ISceneNode *node, InstanceData &instance)
-    {
-        const core::matrix4 &mat = node->getAbsoluteTransformation();
-        const core::vector3df &Origin = mat.getTranslation();
-        const core::vector3df &Orientation = mat.getRotationDegrees();
-        const core::vector3df &Scale = mat.getScale();
-        instance.Origin.X = Origin.X;
-        instance.Origin.Y = Origin.Y;
-        instance.Origin.Z = Origin.Z;
-        instance.Orientation.X = Orientation.X;
-        instance.Orientation.Y = Orientation.Y;
-        instance.Orientation.Z = Orientation.Z;
-        instance.Scale.X = Scale.X;
-        instance.Scale.Y = Scale.Y;
-        instance.Scale.Z = Scale.Z;        
-    }
-
-    template<typename InstanceData>
-    struct InstanceFiller
-    {
-        static void add(GLMesh *, scene::ISceneNode *, InstanceData &);
-    };
-
-    template<>
-    void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataSingleTex &Instance)
-    {
-        fillOriginOrientationScale<InstanceDataSingleTex>(node, Instance);
-        Instance.Texture = mesh->TextureHandles[0];
-    }
-
-    template<>
-    void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataDualTex &Instance)
-    {
-        fillOriginOrientationScale<InstanceDataDualTex>(node, Instance);
-        Instance.Texture = mesh->TextureHandles[0];
-        Instance.SecondTexture = mesh->TextureHandles[1];
-    }
-
-    template<>
-    void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataThreeTex &Instance)
-    {
-        fillOriginOrientationScale<InstanceDataThreeTex>(node, Instance);
-        Instance.Texture = mesh->TextureHandles[0];
-        Instance.SecondTexture = mesh->TextureHandles[1];
-        Instance.ThirdTexture = mesh->TextureHandles[2];
-    }
-
-    template<>
-    void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, scene::ISceneNode *node, GlowInstanceData &Instance)
-    {
-        fillOriginOrientationScale<GlowInstanceData>(node, Instance);
-        STKMeshSceneNode *nd = dynamic_cast<STKMeshSceneNode*>(node);
-        Instance.Color = nd->getGlowColor().color;
-    }
-    
-    
     void FixBoundingBoxes(scene::ISceneNode* node)
     {
         for (scene::ISceneNode *child : node->getChildren())
@@ -94,58 +37,7 @@ namespace
         }
     }
     
-    
-    template<typename T>
-    void FillInstances_impl(DrawCalls::InstanceList instance_list,
-                            T * InstanceBuffer,
-                            DrawElementsIndirectCommand *CommandBuffer,
-                            size_t &InstanceBufferOffset,
-                            size_t &CommandBufferOffset,
-                            size_t &PolyCount)
-    {
-        // Should never be empty
-        GLMesh *mesh = instance_list.front().first;
-        size_t InitialOffset = InstanceBufferOffset;
 
-        for (unsigned i = 0; i < instance_list.size(); i++)
-        {
-            auto &Tp = instance_list[i];
-            scene::ISceneNode *node = Tp.second;
-            InstanceFiller<T>::add(mesh, node, InstanceBuffer[InstanceBufferOffset++]);
-            assert(InstanceBufferOffset * sizeof(T) < 10000 * sizeof(InstanceDataDualTex));
-        }
-
-        DrawElementsIndirectCommand &CurrentCommand = CommandBuffer[CommandBufferOffset++];
-        CurrentCommand.baseVertex = mesh->vaoBaseVertex;
-        CurrentCommand.count = mesh->IndexCount;
-        CurrentCommand.firstIndex = mesh->vaoOffset / 2;
-        CurrentCommand.baseInstance = InitialOffset;
-        CurrentCommand.instanceCount = InstanceBufferOffset - InitialOffset;
-
-        PolyCount += (InstanceBufferOffset - InitialOffset) * mesh->IndexCount / 3;
-    }
-
-    template<typename T>
-    void FillInstances( const DrawCalls::MeshMap &GatheredGLMesh,
-                        std::vector<GLMesh *> &InstancedList,
-                        T *InstanceBuffer,
-                        DrawElementsIndirectCommand *CommandBuffer,
-                        size_t &InstanceBufferOffset,
-                        size_t &CommandBufferOffset,
-                        size_t &Polycount)
-    {
-        auto It = GatheredGLMesh.begin(), E = GatheredGLMesh.end();
-        for (; It != E; ++It)
-        {
-            FillInstances_impl<T>(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, Polycount);
-            if (!CVS->isAZDOEnabled())
-                InstancedList.push_back(It->second.front().first);
-        }
-    }
-
-
-    
-    
 } //namespace
 
 
@@ -653,6 +545,21 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
     {
 #pragma omp section
         {
+            
+            //TODO
+            /*std::vector<GLMesh *> instanced_lists[Material::SHADERTYPE_COUNT];
+            instanced_lists[static_cast<int>(Material::SHADERTYPE_SOLID)] = ListInstancedMatDefault::getInstance()->SolidPass;
+            instanced_lists[static_cast<int>(Material::SHADERTYPE_ALPHA_TEST)] = ListInstancedMatAlphaRef::getInstance()->SolidPass;
+            instanced_lists[static_cast<int>(Material::SHADERTYPE_SOLID_UNLIT)] = ListInstancedMatUnlit::getInstance()->SolidPass;
+            instanced_lists[static_cast<int>(Material::SHADERTYPE_SPHERE_MAP)] = ListInstancedMatSphereMap::getInstance()->SolidPass;
+            instanced_lists[static_cast<int>(Material::SHADERTYPE_VEGETATION)] = ListInstancedMatGrass::getInstance()->SolidPass;
+            instanced_lists[static_cast<int>(Material::SHADERTYPE_DETAIL_MAP)] = ListInstancedMatDetails::getInstance()->SolidPass;
+            instanced_lists[static_cast<int>(Material::SHADERTYPE_NORMAL_MAP)] = ListInstancedMatNormalMap::getInstance()->SolidPass;
+           
+            m_solid_cmd_buffer.fill(m_solid_pass_mesh, instanced_lists);*/
+            
+            
+            
             size_t offset = 0, current_cmd = 0;
             if (!CVS->supportsAsyncInstanceUpload())
             {
@@ -661,28 +568,6 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
                 CmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             }
-
-            
-            //TODO: replace duplicated code with a loop
-            /*
-            Material::ShaderType dual_tex_materials[5] = {Material::SHADERTYPE_SOLID,
-                                                         Material::SHADERTYPE_ALPHA_TEST,
-                                                         Material::SHADERTYPE_SOLID_UNLIT,
-                                                         Material::SHADERTYPE_SPHERE_MAP,
-                                                         Material::SHADERTYPE_VEGETATION};
-            
-            for(int i=0;i<1;i++)
-            {
-                SolidPassCmd::getInstance()->Offset[dual_tex_materials[i]] = current_cmd;
-                FillInstances(m_solid_pass_mesh[dual_tex_materials[i]],
-                            ListInstancedMatDefault::getInstance()->SolidPass, //we need to change this line to something more generic
-                            InstanceBufferDualTex,
-                            CmdBuffer,
-                            offset,
-                            current_cmd,
-                            SolidPoly);
-                SolidPassCmd::getInstance()->Size[dual_tex_materials[i]] = current_cmd - SolidPassCmd::getInstance()->Offset[dual_tex_materials[i]];                
-            }*/
               
             
             // Default Material

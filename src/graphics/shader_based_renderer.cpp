@@ -491,17 +491,17 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
 ShaderBasedRenderer::ShaderBasedRenderer()
 {
-    if (CVS->isAZDOEnabled())
+    /*if (CVS->isAZDOEnabled())
         m_solid_first_pass = new AZDOSolidFirstPass();
     else if (CVS->supportsIndirectInstancingRendering())    
         m_solid_first_pass = new IndirectInstancedSolidFirstPass();
     else
-        m_solid_first_pass = new GL3SolidFirstPass();       
+        m_solid_first_pass = new GL3SolidFirstPass();*/  
 }
 
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
-    delete m_solid_first_pass;
+    //delete m_solid_first_pass;
 }
 
 void ShaderBasedRenderer::addSunLight(const core::vector3df &pos) {

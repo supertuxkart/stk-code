@@ -29,24 +29,24 @@ public:
 };
 
 /** This class only uses OpenGL3.x functions */
-class GL3SolidFirstPass: public SolidFirstPass
+/*class GL3SolidFirstPass: public SolidFirstPass
 {
     void render(const DrawCalls& draw_calls, irr::core::vector3df wind_dir);
-};
+};*/
 
 /** Require GL_ARB_base_instance and GL_ARB_draw_indirect extensions */
-class IndirectInstancedSolidFirstPass: public SolidFirstPass
+/*class IndirectInstancedSolidFirstPass: public SolidFirstPass
 {
     void render(const DrawCalls& draw_calls, irr::core::vector3df wind_dir);
-};
+};*/
 
 /** AZDO: Approaching Zero Driver Overhead 
  * Require GL_ARB_base_instance, GL_ARB_draw_indirect,
  * GL_ARB_bindless_texture and GL_ARB_multi_draw_indirect extensions */
-class AZDOSolidFirstPass: public SolidFirstPass
+/*class AZDOSolidFirstPass: public SolidFirstPass
 {
     void render(const DrawCalls& draw_calls, irr::core::vector3df wind_dir);    
-};
+};*/
 
 
 #endif //HEADER_SOLID_FIRST_PASS_HPP

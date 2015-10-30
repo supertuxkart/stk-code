@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+
+/*
 #include "graphics/solid_first_pass.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
@@ -55,6 +57,7 @@ void AZDOSolidFirstPass::render(const DrawCalls& draw_calls, irr::core::vector3d
 
     draw_calls.renderImmediateDrawList(); 
   
-        
+    
     
 }
+*/

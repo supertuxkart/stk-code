@@ -21,6 +21,7 @@
 #include "graphics/shader.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stk_mesh.hpp"
+#include "graphics/texture_manager.hpp"
 
 
 // ----------------------------------------------------------------------------

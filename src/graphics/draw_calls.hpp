@@ -18,18 +18,21 @@
 #ifndef HEADER_DRAW_CALLS_HPP
 #define HEADER_DRAW_CALLS_HPP
 
+#include "graphics/command_buffer.hpp"
+#include "graphics/draw_tools.hpp"
 #include "graphics/gpu_particles.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh.hpp"
 #include <irrlicht.h>
+
 #include <unordered_map>
+
 
 class DrawCalls
 {
 public:
-    typedef std::vector<std::pair<GLMesh *, irr::scene::ISceneNode*> > InstanceList;
-    typedef std::unordered_map <irr::scene::IMeshBuffer *, InstanceList > MeshMap;
+
 
     
     GLsync          m_sync = 0; //TODO: make it private. Should it be in shader_based_renderer?
@@ -40,6 +43,12 @@ private:
     std::vector<irr::scene::ISceneNode *> m_immediate_draw_list;
     std::vector<STKBillboard *>           m_billboard_list;
     std::vector<ParticleSystemProxy *>    m_particles_list;
+    
+    SolidCommandBuffer                    m_solid_cmd_buffer;
+    ShadowCommandBuffer                   m_shadow_cmd_buffer;
+    ReflectiveShadowMapCommandBuffer      m_reflective_shadow_map_cmd_buffer;
+    GlowCommandBuffer                     m_glow_cmd_buffer;
+    
     
     irr::core::vector3df windDir; //TODO: same member in geometry_passes
     
