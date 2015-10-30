@@ -24,7 +24,6 @@
 #include "network/event.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/get_public_address.hpp"
-#include "network/protocols/show_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 #include "network/protocol_manager.hpp"

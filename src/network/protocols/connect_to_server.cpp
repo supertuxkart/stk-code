@@ -22,7 +22,6 @@
 #include "network/event.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/get_peer_address.hpp"
-#include "network/protocols/show_public_address.hpp"
 #include "network/protocols/hide_public_address.hpp"
 #include "network/protocols/request_connection.hpp"
 #include "network/protocols/ping_protocol.hpp"
@@ -104,62 +103,59 @@ void ConnectToServer::asynchronousUpdate()
         case NONE:
         {
             Log::info("ConnectToServer", "Protocol starting");
-            m_current_protocol = new GetPublicAddress();
+            // This protocol will write the public address of this
+            // instance to STKHost.
+            m_current_protocol = new GetPublicAddress(this);
             m_current_protocol->requestStart();
+            // This protocol will be unpaused in the callback from 
+            // GetPublicAddress
+            ProtocolManager::getInstance()->pauseProtocol(this);
             m_state = GETTING_SELF_ADDRESS;
             break;
         }
         case GETTING_SELF_ADDRESS:
-            // Wait till we know the public address
-            if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
-            {
-                m_state = SHOWING_SELF_ADDRESS;
-                delete m_current_protocol;
-                m_current_protocol = new ShowPublicAddress();
-                m_current_protocol->requestStart();
-                Log::info("ConnectToServer", "Public address known");
-            }
-            break;
-        case SHOWING_SELF_ADDRESS:
-            if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
-            {
-                delete m_current_protocol;
+        {
+            delete m_current_protocol;
+            m_current_protocol = NULL;
 
-                m_current_protocol = NULL;
-                // now our public address is in the database
-                Log::info("ConnectToServer", "Public address shown");
-                if (m_quick_join)
-                {
-                    handleQuickConnect();
-                }
-                else
-                {
-                    m_current_protocol = new GetPeerAddress(m_host_id, this);
-                    m_current_protocol->requestStart();
-                    m_state = GETTING_SERVER_ADDRESS;
-                    // Pause this protocol till GetPeerAddress finishes.
-                    // The callback then will unpause this protocol/
-                    ProtocolManager::getInstance()->pauseProtocol(this);
-                }
-            }
-            break;
-        case GETTING_SERVER_ADDRESS:
+            registerWithSTKServer();
+
+            if (m_quick_join)
             {
-               if(m_current_protocol)
-                   delete m_current_protocol;
-                Log::info("ConnectToServer", "Server's address known");
-                // we're in the same lan (same public ip address) !!
-                if (m_server_address.getIP() ==
-                    STKHost::get()->getPublicAddress().getIP())
-                {
-                    Log::info("ConnectToServer",
-                              "Server appears to be in the same LAN.");
-                }
+                handleQuickConnect();
                 m_state = REQUESTING_CONNECTION;
-                m_current_protocol = new RequestConnection(m_server_id);
-                m_current_protocol->requestStart();
             }
+            else
+            {
+                // No quick connect, so we have a server to connect to.
+                // Find its address
+                m_current_protocol = new GetPeerAddress(m_host_id, this);
+                m_current_protocol->requestStart();
+                m_state = GETTING_SERVER_ADDRESS;
+                // Pause this protocol till GetPeerAddress finishes.
+                // The callback then will unpause this protocol/
+                ProtocolManager::getInstance()->pauseProtocol(this);
+            }
+        }
+        break;
+        case GETTING_SERVER_ADDRESS:
+        {
+            assert(!m_quick_join);
+            delete m_current_protocol;
+            m_current_protocol = NULL;
+            Log::info("ConnectToServer", "Server's address known");
+            // we're in the same lan (same public ip address) !!
+            if (m_server_address.getIP() ==
+                STKHost::get()->getPublicAddress().getIP())
+            {
+                Log::info("ConnectToServer",
+                    "Server appears to be in the same LAN.");
+            }
+            m_state = REQUESTING_CONNECTION;
+            m_current_protocol = new RequestConnection(m_server_id);
+            m_current_protocol->requestStart();
             break;
+        }
         case REQUESTING_CONNECTION:
             if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
             {
@@ -240,11 +236,60 @@ void ConnectToServer::asynchronousUpdate()
 
  // ----------------------------------------------------------------------------
 /** Called when the GetPeerAddress protocol terminates.
-*/
+ */
 void ConnectToServer::callback(Protocol *protocol)
 {
-    ProtocolManager::getInstance()->unpauseProtocol(this);
+    // Callbacks are only expected when getting either its owb public address
+    // or the server address.
+    if(m_state == GETTING_SELF_ADDRESS ||
+       m_state == GETTING_SERVER_ADDRESS )
+    {
+        ProtocolManager::getInstance()->unpauseProtocol(this);
+    }
+    else 
+    {
+        Log::error("ConnectToServer",
+                   "Received unexpected callback while in state %d.", m_state);
+    }
 }   // callback
+
+// ----------------------------------------------------------------------------
+/** Register this client with the STK server.
+ */
+void ConnectToServer::registerWithSTKServer()
+{
+    // Our public address is now known, register details with
+    // STK server.
+    const TransportAddress& addr = STKHost::get()->getPublicAddress();
+    Online::XMLRequest *request  = new Online::XMLRequest();
+    PlayerManager::setUserDetails(request, "set",
+                                  Online::API::SERVER_PATH);
+    request->addParameter("address", addr.getIP());
+    request->addParameter("port", addr.getPort());
+    request->addParameter("private_port", STKHost::get()->getPort());
+
+    Log::info("ConnectToServer", "Registering addr %s",
+              addr.toString().c_str());
+
+    // This can be done blocking: till we are registered with the
+    // stk server, there is no need to to react to any other 
+    // network requests
+    request->executeNow();
+
+    const XMLNode * result = request->getXMLData();
+    delete request;
+
+    std::string success;
+    if(result->get("success", &success) && success == "yes")
+    {
+        Log::debug("ConnectToServer", "Address registered successfully.");
+    }
+    else
+    {
+        Log::error("ConnectToServer", "Failed to register address.");
+    }
+
+}   // registerWithSTKServer
 
 // ----------------------------------------------------------------------------
 /** Called to request a quick connect from the STK server.
@@ -279,7 +324,7 @@ void ConnectToServer::handleQuickConnect()
     }
     else
     {
-        Log::error("GetPeerAddress", "Fail to get address.");
+        Log::error("GetPeerAddress", "Failed to get address.");
     }
 }   // handleQuickConnect
 

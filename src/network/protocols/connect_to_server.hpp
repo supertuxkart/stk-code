@@ -35,7 +35,8 @@ private:
     Protocol *m_current_protocol;
     bool m_quick_join;
 
-    enum State
+    /** State for finite state machine. */
+    enum
     {
         NONE,
         GETTING_SELF_ADDRESS,
@@ -48,11 +49,9 @@ private:
         HIDING_ADDRESS,
         DONE,
         EXITING
-    };
+    } m_state;
 
-    /** State for finite state machine. */
-    State m_state;
-
+    void registerWithSTKServer();
     void handleQuickConnect();
     void handleSameLAN();
 
