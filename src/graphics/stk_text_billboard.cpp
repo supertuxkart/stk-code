@@ -67,11 +67,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
     font->doDraw(text, core::rect<s32>(0, 0, size.Width, size.Height), video::SColor(255,255,255,255),
         false, false, NULL, this);
 
-#ifdef ENABLE_FREETYPE
-    const float scale = 0.03f; //Larger for ttf font as they are less bold
-#else
-    const float scale = 0.018f;
-#endif // ENABLE_FREETYPE
+    const float scale = 0.03f;
 
     //scene::SMesh* mesh = new scene::SMesh();
     std::map<video::ITexture*, scene::SMeshBuffer*> buffers;
