@@ -19,6 +19,8 @@
 #include "guiengine/get_font_properties.hpp"
 #include FT_FREETYPE_H
 
+#include "utils/leak_check.hpp"
+
 /**
  * \ingroup guiengine
  */
@@ -30,6 +32,9 @@ namespace GUIEngine
     class FTEnvironment
     {
     public:
+
+        LEAK_CHECK()
+
         FTEnvironment();
         ~FTEnvironment();
         FT_Face           ft_face[irr::gui::F_COUNT];

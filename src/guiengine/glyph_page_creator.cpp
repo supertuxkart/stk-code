@@ -21,7 +21,6 @@
 //
 //  http://irrlicht.suckerfreegames.com/
 
-#ifdef ENABLE_FREETYPE
 #include <irrlicht.h>
 #include "guiengine/engine.hpp"
 
@@ -151,9 +150,4 @@ bool GlyphPageCreator::insertGlyph(FT_Bitmap bits, core::rect<s32>& rect)
     return true;
 }
 
-u32 GlyphPageCreator::used_width            = 0;
-u32 GlyphPageCreator::used_height           = 0;
-u32 GlyphPageCreator::temp_height           = 0;
-
 }   // guiengine
-#endif // ENABLE_FREETYPE
