@@ -22,11 +22,13 @@
 
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -410,6 +412,17 @@ void RaceGUIBase::preRenderCallback(const Camera *camera)
 // ----------------------------------------------------------------------------
 void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 {
+    if (CVS->isGLSL())
+    {
+        if (m_lightning > 0.0f)
+        {
+            core::vector3df intensity = {0.7f * m_lightning, 
+                                         0.7f * m_lightning, 
+                                         0.7f * std::min(1.0f, m_lightning * 1.5f)};
+            irr_driver->getPostProcessing()->renderLightning(intensity);
+        }
+    }
+    
 #if 0
     const core::recti &viewport = camera->getViewport();
 
