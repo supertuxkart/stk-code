@@ -16,7 +16,6 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(USE_WIIUSE "Support for wiimote input devices" ON)
-option(USE_FREETYPE "Use Freetype to render text" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
@@ -166,14 +165,12 @@ else()
 endif()
 
 # Freetype
-if(USE_FREETYPE)
-    find_package(Freetype)
-    if(FREETYPE_FOUND)
-        include_directories(${FREETYPE_INCLUDE_DIRS})
-    else()
-        message(FATAL_ERROR "Freetype not found. "
-            "Either install freetype or disable freetype rendering support with -DUSE_FREETYPE=0 ")
-    endif()
+find_package(Freetype)
+if(FREETYPE_FOUND)
+    include_directories(${FREETYPE_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Freetype not found. "
+        "Freetype is required to display characters in SuperTuxKart. ")
 endif()
 
 # Fribidi
@@ -351,7 +348,7 @@ target_link_libraries(supertuxkart
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES}
-    ${FREETPYE_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
     )
 
 if(UNIX AND NOT APPLE)
@@ -379,11 +376,6 @@ endif()
 if(USE_FRIBIDI)
     target_link_libraries(supertuxkart ${FRIBIDI_LIBRARIES})
     add_definitions(-DENABLE_BIDI)
-endif()
-
-if(USE_FREETYPE)
-    target_link_libraries(supertuxkart ${FREETYPE_LIBRARIES})
-    add_definitions(-DENABLE_FREETYPE)
 endif()
 
 # Wiiuse

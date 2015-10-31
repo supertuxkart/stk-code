@@ -15,7 +15,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef ENABLE_FREETYPE
 #include "guiengine/ft_environment.hpp"
 #include "guiengine/get_font_properties.hpp"
 #include "io/file_manager.hpp"
@@ -98,4 +97,3 @@ FT_Library FTEnvironment::ft_lib = NULL;
 FT_Error FTEnvironment::ft_err   = 0;
 
 }   // guiengine
-#endif // ENABLE_FREETYPE

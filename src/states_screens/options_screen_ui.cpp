@@ -330,13 +330,11 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
         translations = new Translations();
 
-#ifdef ENABLE_FREETYPE
-        //Reload fonts for new translation when using freetype
+        //Reload fonts for new translation
         GUIEngine::cleanHollowCopyFont();
         GUIEngine::getTitleFont()->recreateFromLanguage();
         GUIEngine::getFont()->recreateFromLanguage();
         GUIEngine::reloadHollowCopyFont(GUIEngine::getFont());
-#endif // ENABLE_FREETYPE
 
         GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
 
