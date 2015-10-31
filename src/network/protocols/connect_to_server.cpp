@@ -115,10 +115,10 @@ void ConnectToServer::asynchronousUpdate()
         }
         case GETTING_SELF_ADDRESS:
         {
-            delete m_current_protocol;
+            delete m_current_protocol;   // delete GetPublicAddress
             m_current_protocol = NULL;
 
-            registerWithSTKServer();
+            registerWithSTKServer();  // Register us with STK server
 
             if (m_quick_join)
             {

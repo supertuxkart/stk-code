@@ -39,63 +39,45 @@ GetPeerAddress::~GetPeerAddress()
 // ----------------------------------------------------------------------------
 void GetPeerAddress::setup()
 {
-    m_state   = NONE;
-    m_request = NULL;
     m_address.clear();
+
+    m_request = new Online::XMLRequest();
+    PlayerManager::setUserDetails(m_request, "get",
+                                  Online::API::SERVER_PATH);
+    m_request->addParameter("peer_id", m_peer_id);
+
+    Online::RequestManager::get()->addRequest(m_request);
 }   // setup
 
 // ----------------------------------------------------------------------------
 void GetPeerAddress::asynchronousUpdate()
 {
-    if (m_state == NONE)
-    {
-        m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "get",
-                                      Online::API::SERVER_PATH);
-        m_request->addParameter("peer_id", m_peer_id);
-
-        Online::RequestManager::get()->addRequest(m_request);
-        m_state = REQUEST_PENDING;
-    }
-    else if (m_state == REQUEST_PENDING && m_request->isDone())
+    if (m_request->isDone())
     {
         const XMLNode * result = m_request->getXMLData();
-        std::string rec_success;
+        delete m_request;
+        m_request = NULL;
 
-        if(result->get("success", &rec_success))
+        std::string success;
+        if(result->get("success", &success) && success == "yes")
         {
-            if (rec_success == "yes")
-            {
-                uint32_t ip;
-                result->get("ip", &ip);
-                m_address.setIP(ip);
+            uint32_t ip;
+            result->get("ip", &ip);
+            m_address.setIP(ip);
 
-                uint16_t port;
-                if (m_address.getIP() ==
-                    STKHost::get()->getPublicAddress().getIP())
-                    result->get("private_port", &port);
-                else
-                    result->get("port", &port);
-                m_address.setPort(port);
-
-                Log::debug("GetPeerAddress", "Address gotten successfully.");
-            }
+            uint16_t port;
+            if (m_address.getIP() == STKHost::get()->getPublicAddress().getIP())
+                result->get("private_port", &port);
             else
-            {
-                Log::error("GetPeerAddress", "Fail to get address.");
-            }
+                result->get("port", &port);
+            m_address.setPort(port);
+
+            Log::debug("GetPeerAddress", "Peer address retrieved.");
         }
         else
         {
-            Log::error("GetPeerAddress", "Fail to get address.");
+            Log::error("GetPeerAddress", "Failed to get peer address.");
         }
-        m_state = DONE;
-    }
-    else if (m_state == DONE)
-    {
-        m_state = EXITING;
-        delete m_request;
-        m_request = NULL;
         requestTerminate();
     }
 }   // asynchronousUpdate

@@ -25,6 +25,9 @@
 
 #include <string>
 
+/** One instance of this is started for every peer who tries to
+ *  connect to this server.
+ */
 class ConnectToPeer : public Protocol, public CallbackObject
 {
 protected:

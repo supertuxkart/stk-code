@@ -30,15 +30,6 @@ private:
     uint32_t m_peer_id;
     Online::XMLRequest* m_request;
 
-    enum STATE
-    {
-        NONE,
-        REQUEST_PENDING,
-        DONE,
-        EXITING
-    };
-    STATE m_state;
-
     /** Stores the address found. Used in a callback from the parent protocol
      *  to get the result. */
     TransportAddress m_address;
