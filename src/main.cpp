@@ -779,7 +779,7 @@ int handleCmdLine()
         STKHost::create(/*is_Server*/true);
         Log::info("main", "Creating a server.");
     }   
-    else
+    else if(CommandLine::has("--client"))
     {
         STKHost::create(/*is_server*/false);
         Log::info("main", "Creating a client.");

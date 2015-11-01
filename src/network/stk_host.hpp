@@ -124,6 +124,10 @@ public:
         m_stk_host = NULL;
     }
     // ------------------------------------------------------------------------
+    /** Return if a network setting is happening. A network setting is active
+     *  if a host (server or client) exists. */
+    static bool isNetworking() { return m_stk_host!=NULL; }
+    // ------------------------------------------------------------------------
 
     static void* mainLoop(void* self);
 
