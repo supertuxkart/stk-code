@@ -1508,7 +1508,9 @@ int main(int argc, char *argv[] )
     // so we don't crash later when StateManager tries to access input devices.
     StateManager::get()->resetActivePlayers();
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
-    STKHost::get()->abort();
+
+    if(STKHost::isNetworking())
+        STKHost::get()->abort();
 
     cleanSuperTuxKart();
 
@@ -1617,7 +1619,8 @@ static void cleanSuperTuxKart()
     // FIXME: do we need to wait for threads there, can they be
     // moved further up?
     Online::ServersManager::deallocate();
-    STKHost::destroy();
+    if(STKHost::isNetworking())
+        STKHost::destroy();
 
     cleanUserConfig();
 

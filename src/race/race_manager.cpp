@@ -46,6 +46,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
+#include "network/stk_host.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
@@ -511,10 +512,13 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_time  = 0;
     }
 
-    StartGameProtocol* protocol = static_cast<StartGameProtocol*>(
+    if(STKHost::isNetworking())
+    {
+        StartGameProtocol* protocol = static_cast<StartGameProtocol*>(
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_START_GAME));
-    if (protocol)
-        protocol->ready();
+        if (protocol)
+            protocol->ready();
+    }
 }   // startNextRace
 
 //-----------------------------------------------------------------------------
