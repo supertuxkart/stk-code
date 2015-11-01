@@ -18,6 +18,7 @@
 
 #include "physics/physical_object.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -325,7 +326,6 @@ void PhysicalObject::init()
     case MP_EXACT:
     {
         extend.setY(0);
-        TriangleMesh* triangle_mesh = new TriangleMesh();
 
         // In case of readonly materials we have to get the material from
         // the mesh, otherwise from the node. This is esp. important for
@@ -361,6 +361,8 @@ void PhysicalObject::init()
                 return;
         }   // switch node->getType()
 
+        std::auto_ptr<TriangleMesh> triangle_mesh(new TriangleMesh());
+
         for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
         {
             scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
@@ -385,7 +387,6 @@ void PhysicalObject::init()
             video::ITexture* t=irrMaterial.getTexture(0);
 
             const Material* material=0;
-            TriangleMesh *tmesh = triangle_mesh;
             if(t)
             {
                 std::string image =
@@ -414,10 +415,10 @@ void PhysicalObject::init()
                         vertices[k]=v;
                         normals[k]=mbVertices[indx].Normal;
                     }   // for k
-                    if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
-                                                 vertices[2], normals[0],
-                                                 normals[1],  normals[2],
-                                                 material                 );
+                    triangle_mesh->addTriangle(vertices[0], vertices[1],
+                                               vertices[2], normals[0],
+                                               normals[1],  normals[2],
+                                               material                 );
                 }   // for j
             }
             else
@@ -436,10 +437,10 @@ void PhysicalObject::init()
                             vertices[k]=v;
                             normals[k]=mbVertices[indx].Normal;
                         }   // for k
-                        if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
-                                                     vertices[2], normals[0],
-                                                     normals[1],  normals[2],
-                                                     material                 );
+                        triangle_mesh->addTriangle(vertices[0], vertices[1],
+                                                   vertices[2], normals[0],
+                                                   normals[1],  normals[2],
+                                                   material                 );
                     }   // for j
 
                 }
@@ -448,7 +449,7 @@ void PhysicalObject::init()
         }   // for i<getMeshBufferCount
         triangle_mesh->createCollisionShape();
         m_shape = &triangle_mesh->getCollisionShape();
-        m_triangle_mesh = triangle_mesh;
+        m_triangle_mesh = triangle_mesh.release();
         m_init_pos.setOrigin(m_init_pos.getOrigin() + m_graphical_offset);
         // m_graphical_offset = Vec3(0,0,0);
         break;
