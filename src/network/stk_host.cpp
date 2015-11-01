@@ -52,6 +52,15 @@ STKHost::STKHost()
 {
     m_is_server = false;
     init();
+
+    m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
+                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0);
+    if (!m_network)
+    {
+        Log::fatal ("STKHost", "An error occurred while trying to create "
+                               "an ENet client host.");
+    }
+
 }   // STKHost
 
 // ----------------------------------------------------------------------------
@@ -77,8 +86,8 @@ STKHost::STKHost(const irr::core::stringw &server_name)
                            /*max_out_bandwidth*/ 0, &addr);
     if (!m_network)
     {
-        Log::fatal("STKHost", "An error occurred while trying to create an ENet"
-            " server host.");
+        Log::fatal("STKHost", "An error occurred while trying to create an "
+                              "ENet server host.");
     }
 
     startListening();
@@ -343,30 +352,6 @@ void* STKHost::mainLoop(void* self)
     Log::info("STKHost", "Listening has been stopped");
     return NULL;
 }   // mainLoop
-
-// ----------------------------------------------------------------------------
-/** \brief Setups the host as a client.
- *  In fact there is only one peer connected to this host.
- *  \param peer_count : The maximum number of peers.
- *  \param channel_limit : The maximum number of channels per peer.
- *  \param max_incoming_bandwidth : The maximum incoming bandwidth.
- *  \param max_outgoing_bandwidth : The maximum outgoing bandwidth.
- */
-
-void STKHost::setupClient(int peer_count, int channel_limit,
-                          uint32_t max_incoming_bandwidth,
-                          uint32_t max_outgoing_bandwidth)
-{
-    m_network = new Network(peer_count, channel_limit,
-                            max_incoming_bandwidth,
-                            max_outgoing_bandwidth, NULL);
-    if (!m_network)
-    {
-        Log::fatal ("STKHost", "An error occurred while trying to create "
-                    "an ENet client host.");
-    }
-}   // setupClient
-
 
 // ----------------------------------------------------------------------------
 /** \brief Tells if a peer is known.

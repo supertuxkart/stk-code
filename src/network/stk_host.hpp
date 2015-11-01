@@ -115,18 +115,30 @@ private:
 
 public:
 
-    /** Creates the singleton for a client. */
+    /** Creates the singleton for a client. In case of an error
+     *  m_stk_host is NULL (which can be tested using isNetworking(). */
     static void create()
     {
         assert(m_stk_host == NULL);
         m_stk_host = new STKHost();
-    }
+        if(!m_stk_host->m_network)
+        {
+            delete m_stk_host;
+            m_stk_host = NULL;
+        }
+    }   // create
     // ------------------------------------------------------------------------
-    /** Creates the singleton for a server. */
+    /** Creates the singleton for a server. In case of an error
+     *  m_stk_host is NULL (which can be tested using isNetworking(). */
     static void create(const irr::core::stringw &server_name)
     {
         assert(m_stk_host == NULL);
         m_stk_host  = new STKHost(server_name);
+        if(!m_stk_host->m_network)
+        {
+            delete m_stk_host;
+            m_stk_host = NULL;
+        }
     }   // create
     // ------------------------------------------------------------------------
     /** Returns the instance of STKHost. */
