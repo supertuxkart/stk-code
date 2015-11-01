@@ -90,6 +90,12 @@ namespace Online
     }   // refreshRequest
 
     // ------------------------------------------------------------------------
+    void ServersManager::RefreshRequest::callback()
+    {
+        ServersManager::get()->refresh(isSuccess(), getXMLData());
+    }   // callback
+
+    // ------------------------------------------------------------------------
     /** Callback from the refresh request.
      *  \param success If the refresh was successful.
      *  \param input The XML data describing the server.
@@ -110,12 +116,6 @@ namespace Online
         }
         m_last_load_time.setAtomic((float)StkTime::getRealTime());
     }   // refresh
-
-    // ------------------------------------------------------------------------
-    void ServersManager::RefreshRequest::callback()
-    {
-        ServersManager::get()->refresh(isSuccess(), getXMLData());
-    }   // callback
 
     // ------------------------------------------------------------------------
     const Server* ServersManager::getQuickPlay() const
