@@ -166,7 +166,7 @@ uint8_t* Network::receiveRawPacket(TransportAddress* sender)
  *          matching the sender's ip address.
  */
 uint8_t* Network::receiveRawPacket(const TransportAddress& sender,
-                                      int max_tries)
+                                   int max_tries)
 {
     const int LEN = 2048;
     uint8_t* buffer = new uint8_t[LEN];
@@ -197,6 +197,7 @@ uint8_t* Network::receiveRawPacket(const TransportAddress& sender,
             TransportAddress a(m_host->address);
             Log::verbose("STKHost", "No answer from the server on %s",
                          a.toString().c_str());
+            delete [] buffer;
             return NULL;
         }
     }
