@@ -63,7 +63,7 @@ private:
 
     ServerCreationRequest *m_server_creation_request;
 
-    void serverCreationRequest();
+    void createServer();
 
 public:
 

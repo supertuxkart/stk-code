@@ -108,7 +108,7 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else if (selection == m_create_widget->m_properties[PROP_ID])
         {
-            serverCreationRequest();
+            createServer();
         }   // is create_widget
     }
 }   // eventCallback
@@ -152,7 +152,7 @@ void CreateServerScreen::onUpdate(float delta)
 /** In case of WAN it adds the server to the list of servers. In case of LAN
  *  networking, it registers this game server with the stk server.
  */
-void CreateServerScreen::serverCreationRequest()
+void CreateServerScreen::createServer()
 {
     const irr::core::stringw name = m_name_widget->getText().trim();
     const int max_players = m_max_players_widget->getValue();
@@ -183,8 +183,7 @@ void CreateServerScreen::serverCreationRequest()
     }
 
     STKHost::setMaxPlayers(max_players);
-    STKHost::create(/*is_server*/true);
-    STKHost::get()->setServerName(name);
+    STKHost::create(name);
 
     // Now must be WAN: forward request to the stk server
     m_server_creation_request = new ServerCreationRequest();
@@ -194,7 +193,7 @@ void CreateServerScreen::serverCreationRequest()
     m_server_creation_request->addParameter("max_players", max_players);
     m_server_creation_request->queue();
 
-}   // serverCreationRequest
+}   // createServer
 
 // ----------------------------------------------------------------------------
 /** Callbacks from the online create server request.

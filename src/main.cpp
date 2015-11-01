@@ -531,7 +531,7 @@ void cmdLineHelp()
     // "       --history=n        Replay history file 'history.dat' using:\n"
     // "                            n=1: recorded positions\n"
     // "                            n=2: recorded key strokes\n"
-    "       --server           Start a server (not a playing client).\n"
+    "       --server=name      Start a server (not a playing client).\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
@@ -773,15 +773,15 @@ int handleCmdLine()
     }
 
     // Networking command lines
-    if(CommandLine::has("--server") )
+    if(CommandLine::has("--server", &s) )
     {
         STKHost::setMaxPlayers(UserConfigParams::m_server_max_players);
-        STKHost::create(/*is_Server*/true);
+        STKHost::create(core::stringw(s.c_str()));
         Log::info("main", "Creating a server.");
     }   
     else if(CommandLine::has("--client"))
     {
-        STKHost::create(/*is_server*/false);
+        STKHost::create();
         Log::info("main", "Creating a client.");
     }
 

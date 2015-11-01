@@ -46,10 +46,51 @@ bool                 STKHost::m_is_server    = false;
 STKHost::NetworkType STKHost::m_network_type = STKHost::NETWORK_NONE;
 
 // ============================================================================
-/** Constructor that just initialises this object (esp. opening the packet
- *  log file), but it does not start a listener thread.
+/** Constructor for a client
  */
 STKHost::STKHost()
+{
+    m_is_server = false;
+    init();
+}   // STKHost
+
+// ----------------------------------------------------------------------------
+/** The constructor for a server.
+ *  \param server_name Name of the server to be registered with the STK server.
+ */
+STKHost::STKHost(const irr::core::stringw &server_name)
+{
+    m_is_server = true;
+    init();
+
+    // The server control flow starts with the ServerLobbyRoomProtocol.
+    // This will in turn spawn more protocols:
+    // GetPublicAddress: Use STUN to discover the public ip address
+    //           and port number for this host.
+    ENetAddress addr;
+    addr.host = STKHost::HOST_ANY;
+    addr.port = 2758;
+
+    m_network= new Network(getMaxPlayers(),
+                           /*channel_limit*/2,
+                           /*max_in_bandwidth*/0,
+                           /*max_out_bandwidth*/ 0, &addr);
+    if (!m_network)
+    {
+        Log::fatal("STKHost", "An error occurred while trying to create an ENet"
+            " server host.");
+    }
+
+    startListening();
+    ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
+
+}   // STKHost(server_name)
+
+// ----------------------------------------------------------------------------
+/** Initialises the internal data structures and starts the protocol manager
+ *  and the debug console.
+ */
+void STKHost::init()
 {
     m_network          = NULL;
     m_listening_thread = NULL;
@@ -77,16 +118,6 @@ STKHost::STKHost()
     m_network_console = new NetworkConsole();
     m_network_console->run();
 
-    if (m_is_server)
-    {
-        // The server control flow starts with the ServerLobbyRoomProtocol.
-        // This will in turn spawn more protocols:
-        // GetPublicAddress: Use STUN to discover the public ip address
-        //           and port number for this host.
-        setupServer(STKHost::HOST_ANY, 7321, 16, 2, 0, 0);
-        startListening();
-        ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
-    }
 }   // STKHost
 
 // ----------------------------------------------------------------------------
@@ -312,33 +343,6 @@ void* STKHost::mainLoop(void* self)
     Log::info("STKHost", "Listening has been stopped");
     return NULL;
 }   // mainLoop
-
-// ----------------------------------------------------------------------------
-/** \brief Setup this host as a server.
- *  \param address : The IPv4 address of incoming connections.
- *  \param port : The port on which the server listens.
- *  \param peer_count : The maximum number of peers.
- *  \param channel_limit : The maximum number of channels per peer.
- *  \param max_incoming_bandwidth : The maximum incoming bandwidth.
- *  \param max_outgoing_bandwidth : The maximum outgoing bandwidth.
- */
-void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
-                            int channel_limit, uint32_t max_incoming_bandwidth,
-                            uint32_t max_outgoing_bandwidth)
-{
-    ENetAddress* addr = (ENetAddress*)(malloc(sizeof(ENetAddress)));
-    addr->host = address;
-    addr->port = port;
-
-    m_network= new Network(peer_count, channel_limit,
-                           max_incoming_bandwidth,
-                           max_outgoing_bandwidth, addr);
-    if (!m_network)
-    {
-        Log::fatal("STKHost", "An error occurred while trying to create an ENet"
-                          " server host.");
-    }
-}   // setupServer
 
 // ----------------------------------------------------------------------------
 /** \brief Setups the host as a client.

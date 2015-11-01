@@ -105,19 +105,28 @@ private:
     enum NetworkType
     { NETWORK_NONE, NETWORK_WAN, NETWORK_LAN };
 
+    /** Keeps the type of network connection: none (yet), LAN or WAN. */
     static NetworkType m_network_type;
 
              STKHost();
+             STKHost(const irr::core::stringw &server_name);
     virtual ~STKHost();
+    void init();
 
 public:
 
-    /** Creates the singleton. */
-    static void create(bool is_server)
+    /** Creates the singleton for a client. */
+    static void create()
     {
-        m_is_server = is_server;
         assert(m_stk_host == NULL);
-        m_stk_host  = new STKHost();
+        m_stk_host = new STKHost();
+    }
+    // ------------------------------------------------------------------------
+    /** Creates the singleton for a server. */
+    static void create(const irr::core::stringw &server_name)
+    {
+        assert(m_stk_host == NULL);
+        m_stk_host  = new STKHost(server_name);
     }   // create
     // ------------------------------------------------------------------------
     /** Returns the instance of STKHost. */
@@ -162,10 +171,6 @@ public:
     void sendPacketExcept(STKPeer* peer,
                           const NetworkString& data,
                           bool reliable = true);
-    void        setupServer(uint32_t address, uint16_t port,
-                            int peer_count, int channel_limit,
-                            uint32_t max_incoming_bandwidth,
-                            uint32_t max_outgoing_bandwidth);
     void        setupClient(int peer_count, int channel_limit,
                             uint32_t max_incoming_bandwidth,
                             uint32_t max_outgoing_bandwidth);
