@@ -174,10 +174,11 @@ void ServerLobbyRoomProtocol::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
     const TransportAddress& addr = STKHost::get()->getPublicAddress();
-    PlayerManager::setUserDetails(request, "start", Online::API::SERVER_PATH);
+    PlayerManager::setUserDetails(request, "register", Online::API::SERVER_PATH);
     request->addParameter("address", addr.getIP());
     request->addParameter("port", addr.getPort());
     request->addParameter("private_port", STKHost::get()->getPort());
+    request->addParameter("name", STKHost::get()->getServerName());
     request->addParameter("max_players", 
                           UserConfigParams::m_server_max_players);
     Log::info("RegisterServer", "Showing addr %s", addr.toString().c_str());

@@ -27,6 +27,8 @@
 #include "network/transport_address.hpp"
 #include "utils/synchronised.hpp"
 
+#include "irrString.h"
+
 // enet.h includes win32.h, which without lean_and_mean includes
 // winspool.h, which defines MAX_PRIORITY as a macro, which then
 // results in request_manager.hpp not being compilable.
@@ -96,6 +98,9 @@ private:
 
     /** Maximum number of players on the server. */
     static int m_max_players;
+
+    /** If this is a server, the server name. */
+    irr::core::stringw m_server_name;
 
     enum NetworkType
     { NETWORK_NONE, NETWORK_WAN, NETWORK_LAN };
@@ -238,6 +243,21 @@ public:
     // --------------------------------------------------------------------
     /** Returns if this instance is a client. */
     static bool isclient() { return !m_is_server; }
+    // --------------------------------------------------------------------
+    /** Sets the name of the server if this instance is a server. */
+    void setServerName(const irr::core::stringw &name)
+    {
+        assert(isServer());
+        m_server_name = name;
+    }
+    // --------------------------------------------------------------------
+    /** Returns the server name. */
+    const irr::core::stringw& getServerName() const
+    {
+        assert(isServer());
+        return m_server_name;
+    }
+    // --------------------------------------------------------------------
 
 };   // class STKHost
 

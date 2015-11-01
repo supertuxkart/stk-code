@@ -175,14 +175,16 @@ void CreateServerScreen::serverCreationRequest()
 
     if (STKHost::isLAN())
     {
-        const irr::core::stringw name = m_name_widget->getText().trim();
-        const int max_players = m_max_players_widget->getValue();
         Server *server = new Server(name, /*lan*/true, max_players,
-            /*current_player*/1);
+                                    /*current_player*/1);
         ServersManager::get()->addServer(server);
         new ServerInfoDialog(server->getServerId(), true);
         return;
     }
+
+    STKHost::setMaxPlayers(max_players);
+    STKHost::create(/*is_server*/true);
+    STKHost::get()->setServerName(name);
 
     // Now must be WAN: forward request to the stk server
     m_server_creation_request = new ServerCreationRequest();
