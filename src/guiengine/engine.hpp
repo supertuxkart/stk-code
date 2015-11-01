@@ -39,10 +39,8 @@ namespace irr
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
 
-#ifdef ENABLE_FREETYPE
 #include "guiengine/ft_environment.hpp"
 #include "guiengine/glyph_page_creator.hpp"
-#endif // ENABLE_FREETYPE
 
 /**
  * \ingroup guiengine
@@ -86,10 +84,8 @@ namespace GUIEngine
     {
         extern irr::gui::IGUIEnvironment* g_env;
         extern Skin* g_skin;
-#ifdef ENABLE_FREETYPE
         extern FTEnvironment*  g_ft_env;
         extern GlyphPageCreator*  g_gp_creator;
-#endif // ENABLE_FREETYPE
         extern irr::gui::ScalableFont* g_small_font;
         extern irr::gui::ScalableFont* g_font;
         extern irr::gui::ScalableFont* g_outline_font;
@@ -181,7 +177,6 @@ namespace GUIEngine
       */
     inline Skin*                      getSkin()          { return Private::g_skin;           }
 
-#ifdef ENABLE_FREETYPE
     /**
       * \pre GUIEngine::init must have been called first
       * \return       the freetype and library with face
@@ -193,7 +188,6 @@ namespace GUIEngine
       * \return       the glyph page creator, useful to create a glyph page from individual char
       */
     inline GlyphPageCreator*          getGlyphPageCreator() { return Private::g_gp_creator;  }
-#endif // ENABLE_FREETYPE
 
     Screen*                           getScreenNamed(const char* name);
 
@@ -271,13 +265,11 @@ namespace GUIEngine
       */
     void reloadSkin();
 
-#ifdef ENABLE_FREETYPE
     /**
       * \brief call when translation in user config was updated for freetype rendering STK
       */
     void cleanHollowCopyFont();
     void reloadHollowCopyFont(irr::gui::ScalableFont*);
-#endif // ENABLE_FREETYPE
 }
 
 #endif

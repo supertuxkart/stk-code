@@ -197,6 +197,10 @@ public:
       * On the script side, the returned object is of type : @ref Scripting_SoundEmitter
       */
     TrackObjectPresentationSound* getSoundEmitter(){ return getPresentation<TrackObjectPresentationSound>(); }
+    /** Should only be used on sound emitter track objects.
+    * On the script side, the returned object is of type : @ref Scripting_Light
+    */
+    TrackObjectPresentationLight* getLight() { return getPresentation<TrackObjectPresentationLight>(); }
     // For angelscript. Needs to be named something different than getAnimator since it's overloaded.
     /** Should only be used on TrackObjects that use curve-based animation.
       * On the script side, the returned object is of type : @ref Scripting_Animator

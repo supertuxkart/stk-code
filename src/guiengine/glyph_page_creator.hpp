@@ -21,6 +21,8 @@
 #include FT_FREETYPE_H
 #include <set>
 
+#include "utils/leak_check.hpp"
+
 using namespace irr;
 
 /**
@@ -34,6 +36,9 @@ namespace GUIEngine
     class GlyphPageCreator
     {
     public:
+
+        LEAK_CHECK()
+
         GlyphPageCreator();
         ~GlyphPageCreator();
 
@@ -51,7 +56,7 @@ namespace GUIEngine
 
         /** Reset position of glyph on the current glyph page.
          */
-        static void              clearGlyphPage();
+        void                     clearGlyphPage();
 
         /** Clear (fill it with transparent content) the current glyph page.
          */
@@ -87,9 +92,9 @@ namespace GUIEngine
          */
         video::IImage*           page;
 
-        static  u32              temp_height;
-        static  u32              used_width;
-        static  u32              used_height;
+        u32                      temp_height;
+        u32                      used_width;
+        u32                      used_height;
     };
 
 }   // guiengine
