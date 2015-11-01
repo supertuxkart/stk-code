@@ -52,18 +52,23 @@ void ServerSelection::tearDown()
     delete m_refresh_request;
 }   // tearDown
 
-
 // ----------------------------------------------------------------------------
-
+/** Requests the servers manager to update its list of servers, and disables
+ *  the 'refresh' button (till the refresh was finished).
+ */
 void ServerSelection::refresh()
 {
     m_refresh_request = ServersManager::get()->refreshRequest();
-    m_fake_refresh = (m_refresh_request == NULL ? true : false);
-    m_server_list_widget->clear();
-    m_server_list_widget->addItem("spacer", L"");
-    m_server_list_widget->addItem("loading",
+    // If the request was created (i.e. no error, and not re-requested within
+    // 5 seconds), clear the list and display the waiting message:
+    if(m_refresh_request)
+    {
+        m_server_list_widget->clear();
+        m_server_list_widget->addItem("spacer", L"");
+        m_server_list_widget->addItem("loading",
                               StringUtils::loadingDots(_("Fetching servers")));
-    m_reload_widget->setActive(false);
+        m_reload_widget->setActive(false);
+    }
 }   // refresh
 
 
@@ -97,9 +102,10 @@ void ServerSelection::init()
     Screen::init();
     m_sort_desc = true;
 
-
     // Set the default sort order
     Server::setSortOrder(Server::SO_NAME);
+
+    /** Triggers the loading of the server list in the servers manager. */
     refresh();
 }   // init
 
@@ -167,36 +173,31 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-
+/** If a refresh of the server list was requested, check if it is finished and
+ *  if so, update the list of servers.
+ */
 void ServerSelection::onUpdate(float dt)
 {
-    if(m_refresh_request != NULL)
+    if(!m_refresh_request) return;
+
+    if (m_refresh_request->isDone())
     {
-        if(m_refresh_request->isDone())
+        if (m_refresh_request->isSuccess())
         {
-            if(m_refresh_request->isSuccess())
-            {
-                loadList();
-            }
-            else
-            {
-                SFXManager::get()->quickSound( "anvil" );
-                new MessageDialog(m_refresh_request->getInfo());
-            }
-            delete m_refresh_request;
-            m_refresh_request = NULL;
-            m_reload_widget->setActive(true);
+            loadList();
         }
         else
         {
-            m_server_list_widget->renameItem("loading",
-                              StringUtils::loadingDots(_("Fetching servers")));
+            SFXManager::get()->quickSound("anvil");
+            new MessageDialog(m_refresh_request->getInfo());
         }
-    }
-    else if(m_fake_refresh)
-    {
-        loadList();
-        m_fake_refresh = false;
+        delete m_refresh_request;
+        m_refresh_request = NULL;
         m_reload_widget->setActive(true);
+    }
+    else
+    {
+        m_server_list_widget->renameItem("loading",
+                              StringUtils::loadingDots(_("Fetching servers")));
     }
 }   // onUpdate
