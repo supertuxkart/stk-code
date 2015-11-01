@@ -30,6 +30,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/request_connection.hpp"
+#include "network/stk_host.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request.hpp"
 #include "online/servers_manager.hpp"
@@ -247,12 +248,13 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == m_create_lan_server_widget->m_properties[PROP_ID])
     {
-        CreateServerScreen::getInstance()->setIsLan(true);
+        STKHost::setIsLAN();
         CreateServerScreen::getInstance()->push();
         // TODO: create lan server
     }
     else if (selection == m_find_lan_server_widget->m_properties[PROP_ID])
     {
+        STKHost::setIsLAN();
         ServerSelection::getInstance()->push();
         // TODO: find lan server;
     }
@@ -267,11 +269,12 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == m_find_wan_server_widget->m_properties[PROP_ID])
     {
+        STKHost::setIsWAN();
         ServerSelection::getInstance()->push();
     }
     else if (selection == m_create_wan_server_widget->m_properties[PROP_ID])
     {
-        CreateServerScreen::getInstance()->setIsLan(false);
+        STKHost::setIsWAN();
         CreateServerScreen::getInstance()->push();
     }
     else if (selection == m_quick_wan_play_widget->m_properties[PROP_ID])

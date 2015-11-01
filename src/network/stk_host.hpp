@@ -97,6 +97,11 @@ private:
     /** Maximum number of players on the server. */
     static int m_max_players;
 
+    enum NetworkType
+    { NETWORK_NONE, NETWORK_WAN, NETWORK_LAN };
+
+    static NetworkType m_network_type;
+
              STKHost();
     virtual ~STKHost();
 
@@ -127,6 +132,16 @@ public:
     /** Return if a network setting is happening. A network setting is active
      *  if a host (server or client) exists. */
     static bool isNetworking() { return m_stk_host!=NULL; }
+    // ------------------------------------------------------------------------
+    /** Return true if it's a networked game with a LAN server. */
+    static bool isLAN() { return m_network_type == NETWORK_LAN; }
+    // ------------------------------------------------------------------------
+    /** Return true if it's a networked game but with a WAN server. */
+    static bool isWAN() { return m_network_type == NETWORK_WAN; }
+    // ------------------------------------------------------------------------
+    static void setIsLAN() { m_network_type = NETWORK_LAN; }
+    // ------------------------------------------------------------------------
+    static void setIsWAN() { m_network_type = NETWORK_WAN; }
     // ------------------------------------------------------------------------
 
     static void* mainLoop(void* self);

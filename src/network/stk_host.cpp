@@ -40,9 +40,10 @@
 #include <pthread.h>
 #include <signal.h>
 
-STKHost  *STKHost::m_stk_host    = NULL;
-int       STKHost::m_max_players = 0;
-bool      STKHost::m_is_server   = false;
+STKHost             *STKHost::m_stk_host     = NULL;
+int                  STKHost::m_max_players  = 0;
+bool                 STKHost::m_is_server    = false;
+STKHost::NetworkType STKHost::m_network_type = STKHost::NETWORK_NONE;
 
 // ============================================================================
 /** Constructor that just initialises this object (esp. opening the packet

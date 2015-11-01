@@ -23,6 +23,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "modes/demo_world.hpp"
+#include "network/stk_host.hpp"
 #include "online/servers_manager.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
@@ -47,7 +48,6 @@ DEFINE_SCREEN_SINGLETON( CreateServerScreen );
 CreateServerScreen::CreateServerScreen() : Screen("online/create_server.stkgui")
 {
     m_server_creation_request = NULL;
-    m_is_lan                  = false;
 }   // CreateServerScreen
 
 // ----------------------------------------------------------------------------
@@ -81,13 +81,13 @@ void CreateServerScreen::init()
     m_info_widget->setText("", false);
     LabelWidget *title = getWidget<LabelWidget>("title");
 
-    title->setText(m_is_lan ? _("Create LAN Server")
-                            : _("Create Server")    , false);
+    title->setText(STKHost::isLAN() ? _("Create LAN Server")
+                                    : _("Create Server")    , false);
 
     // I18n: Name of the server. %s is either the online or local user name
     m_name_widget->setText(_("%s's server",
-                       m_is_lan ? PlayerManager::getCurrentPlayer()->getName()
-                                : PlayerManager::getCurrentOnlineUserName()
+                STKHost::isLAN() ? PlayerManager::getCurrentPlayer()->getName()
+                                 : PlayerManager::getCurrentOnlineUserName()
                              )
                           );
 }   // init
@@ -173,7 +173,7 @@ void CreateServerScreen::serverCreationRequest()
         return;
     }
 
-    if (m_is_lan)
+    if (STKHost::isLAN())
     {
         const irr::core::stringw name = m_name_widget->getText().trim();
         const int max_players = m_max_players_widget->getValue();
