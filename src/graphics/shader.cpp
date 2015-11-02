@@ -65,6 +65,11 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
     
     std::ostringstream code;
     code << "#version " << CVS->getGLSLVersion()<<"\n";
+    
+    //shader compilation fails with some drivers if there is no precision qualifier
+    if (type == GL_FRAGMENT_SHADER)
+        code << "precision mediump float;\n";
+        
     if (CVS->isAMDVertexShaderLayerUsable())
         code << "#extension GL_AMD_vertex_shader_layer : enable\n";
     if (CVS->isAZDOEnabled())
