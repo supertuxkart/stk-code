@@ -33,20 +33,23 @@ using namespace Online;
 DEFINE_SCREEN_SINGLETON( ServerSelection );
 
 // ----------------------------------------------------------------------------
-
+/** Constructor, which loads the stkgui file.
+ */
 ServerSelection::ServerSelection() : Screen("online/server_selection.stkgui")
 {
     m_refresh_request = NULL;
 }   // ServerSelection
 
 // ----------------------------------------------------------------------------
-
+/** Destructor.
+ */
 ServerSelection::~ServerSelection()
 {
 }   // ServerSelection
 
 // ----------------------------------------------------------------------------
-
+/** Clean up.
+ */
 void ServerSelection::tearDown()
 {
     delete m_refresh_request;
@@ -71,9 +74,9 @@ void ServerSelection::refresh()
     }
 }   // refresh
 
-
 // ----------------------------------------------------------------------------
-
+/** Set pointers to the various widgets.
+ */
 void ServerSelection::loadedFromFile()
 {
     m_back_widget = getWidget<GUIEngine::IconButtonWidget>("back");
@@ -85,9 +88,9 @@ void ServerSelection::loadedFromFile()
     m_server_list_widget->setColumnListener(this);
 }   // loadedFromFile
 
-
 // ----------------------------------------------------------------------------
-
+/** Clear the server list, which will be reloaded. 
+ */
 void ServerSelection::beforeAddingWidget()
 {
     m_server_list_widget->clearColumns();
@@ -96,7 +99,8 @@ void ServerSelection::beforeAddingWidget()
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
-
+/** Triggers a refresh of the server list.
+ */
 void ServerSelection::init()
 {
     Screen::init();
@@ -134,6 +138,9 @@ void ServerSelection::loadList()
 }   // loadList
 
 // ----------------------------------------------------------------------------
+/** Change the sort order if a column was clicked.
+ *  \param column_id ID of the column that was clicked.
+ */
 void ServerSelection::onColumnClicked(int column_id)
 {
     switch(column_id)
