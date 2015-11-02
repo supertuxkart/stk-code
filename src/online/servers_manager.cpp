@@ -17,7 +17,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "online/servers_manager.hpp"
-
 #include "config/user_config.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
@@ -74,26 +73,33 @@ namespace Online
     }   // cleanUpServers
 
     // ------------------------------------------------------------------------
-    ServersManager::RefreshRequest* ServersManager::refreshRequest(bool request_now) const
+    XMLRequest* ServersManager::refreshRequest(bool request_now) const
     {
-        RefreshRequest* request = NULL;
-        if(StkTime::getRealTime() - m_last_load_time.getAtomic() > SERVER_REFRESH_INTERVAL)
+        if (StkTime::getRealTime() - m_last_load_time.getAtomic()
+                                                    < SERVER_REFRESH_INTERVAL)
         {
-            request = new RefreshRequest();
-            request->setApiURL(API::SERVER_PATH, "get-all");
-
-            if (request_now)
-                RequestManager::get()->addRequest(request);
+            // Avoid too frequent refreshing
+            return NULL;
         }
+
+        // ====================================================================
+        class RefreshRequest : public XMLRequest
+        {
+            virtual void callback()
+            {
+                ServersManager::get()->refresh(isSuccess(), getXMLData());
+            }   // callback
+        };   // RefreshRequest
+
+        // ====================================================================
+        RefreshRequest* request = new RefreshRequest();
+        request->setApiURL(API::SERVER_PATH, "get-all");
+
+        if (request_now)
+            RequestManager::get()->addRequest(request);
 
         return request;
     }   // refreshRequest
-
-    // ------------------------------------------------------------------------
-    void ServersManager::RefreshRequest::callback()
-    {
-        ServersManager::get()->refresh(isSuccess(), getXMLData());
-    }   // callback
 
     // ------------------------------------------------------------------------
     /** Callback from the refresh request.

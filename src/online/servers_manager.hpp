@@ -34,16 +34,6 @@ namespace Online
       */
     class ServersManager
     {
-    public:
-        // ====================================================================
-        class RefreshRequest : public XMLRequest
-        {
-            virtual void callback ();
-        public:
-            RefreshRequest() : XMLRequest() {}
-        };   // RefreshRequest
-        // ====================================================================
-
     private:
         ServersManager();
         ~ServersManager();
@@ -66,7 +56,7 @@ namespace Online
         static ServersManager*   get();
         static void              deallocate();
 
-        RefreshRequest *         refreshRequest(bool request_now = true) const;
+        XMLRequest *             refreshRequest(bool request_now = true) const;
         void                     setJoinedServer(uint32_t server_id);
         void                     unsetJoinedServer();
         void                     addServer(Server * server);
