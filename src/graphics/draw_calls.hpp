@@ -97,7 +97,9 @@ public:
     void renderBillboardList()      const;
     void renderParticlesList()     const;
 
-    
+    inline void bindSolidCmd() const { m_solid_cmd_buffer.bind(); }
+    void drawIndirectSolidCmd(Material::ShaderType shader_type, int i) const;
+    void multidrawIndirectSolidCmd(Material::ShaderType shader_type) const;
 };
 
 #endif //HEADER_DRAW_CALLS_HPP

@@ -159,14 +159,21 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced
     //Three textures materials
     InstanceDataThreeTex *instance_buffer_three_tex;
 
-    if (!CVS->supportsAsyncInstanceUpload())
+
+
+    if (CVS->supportsAsyncInstanceUpload())
+    {
+        instance_buffer_three_tex =
+            (InstanceDataThreeTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeThreeTex);
+    }
+    else
     {
         glUnmapBuffer(GL_ARRAY_BUFFER);
         glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeThreeTex));
-        instance_buffer_three_tex = (InstanceDataThreeTex*)
-            glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                             10000 * sizeof(InstanceDataSingleTex),
-                             GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+        instance_buffer_three_tex =
+            (InstanceDataThreeTex*) glMapBufferRange(GL_ARRAY_BUFFER, 0,
+                                                     10000 * sizeof(InstanceDataSingleTex), //TODO: why single?
+                                                     GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     }
     
     Material::ShaderType three_tex_materials[2] =

@@ -547,7 +547,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
         {
             
             //TODO
-            /*std::vector<GLMesh *> instanced_lists[Material::SHADERTYPE_COUNT];
+            std::vector<GLMesh *> instanced_lists[Material::SHADERTYPE_COUNT];
             instanced_lists[static_cast<int>(Material::SHADERTYPE_SOLID)] = ListInstancedMatDefault::getInstance()->SolidPass;
             instanced_lists[static_cast<int>(Material::SHADERTYPE_ALPHA_TEST)] = ListInstancedMatAlphaRef::getInstance()->SolidPass;
             instanced_lists[static_cast<int>(Material::SHADERTYPE_SOLID_UNLIT)] = ListInstancedMatUnlit::getInstance()->SolidPass;
@@ -556,8 +556,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
             instanced_lists[static_cast<int>(Material::SHADERTYPE_DETAIL_MAP)] = ListInstancedMatDetails::getInstance()->SolidPass;
             instanced_lists[static_cast<int>(Material::SHADERTYPE_NORMAL_MAP)] = ListInstancedMatNormalMap::getInstance()->SolidPass;
            
-            m_solid_cmd_buffer.fill(m_solid_pass_mesh, instanced_lists);*/
-            
+            m_solid_cmd_buffer.fill(m_solid_pass_mesh, instanced_lists);
             
             
             size_t offset = 0, current_cmd = 0;
@@ -758,4 +757,22 @@ void DrawCalls::renderParticlesList() const
 {
     for(auto particles: m_particles_list)
         particles->render();
+}
+
+
+ /** Draw the i-th mesh with the specified material for the solid pass
+ * (require at least OpenGL 4.0
+ * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+ */ 
+void DrawCalls::drawIndirectSolidCmd(Material::ShaderType shader_type, int i) const
+{
+    m_solid_cmd_buffer.drawIndirect(static_cast<int>(shader_type), i);
+}
+
+/** Draw the meshes with the specified material
+ * (require at least OpenGL 4.3 or AZDO extensions)
+ */ 
+void DrawCalls::multidrawIndirectSolidCmd(Material::ShaderType shader_type) const
+{
+    m_solid_cmd_buffer.multidrawIndirect(static_cast<int>(shader_type));
 }

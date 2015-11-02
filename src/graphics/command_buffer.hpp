@@ -125,34 +125,33 @@ public:
     CommandBuffer();
     virtual ~CommandBuffer();
 
-    inline size_t getPolyCount() {return m_poly_count;}
+    inline size_t getPolyCount() const {return m_poly_count;}
 
-    inline void bind()
+    inline void bind() const
     {
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);        
     }
  
      /** Draw the i-th mesh with the specified material
-     * (require GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
-     *  \param shader_type Only render meshes with the specified material
+     * (require at least OpenGL 4.0
+     * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
      */ 
-    inline void drawIndirect(Material::ShaderType shader_type, int i)
+    inline void drawIndirect(int material_id, int i) const
     {
         glDrawElementsIndirect(GL_TRIANGLES,
                                GL_UNSIGNED_SHORT,
-                               (const void*)(m_offset[static_cast<int>(shader_type) + i] * sizeof(DrawElementsIndirectCommand)));
+                               (const void*)((m_offset[material_id] + i) * sizeof(DrawElementsIndirectCommand)));
     }
  
     /** Draw the meshes with the specified material
-     * (require AZDO extensions)
-     *  \param shader_type Only render meshes with the specified material
+     * (require at least OpenGL 4.3 or AZDO extensions)
      */ 
-    inline void multidrawIndirect(Material::ShaderType shader_type)
+    inline void multidrawIndirect(int material_id) const
     {
         glMultiDrawElementsIndirect(GL_TRIANGLES,
                                     GL_UNSIGNED_SHORT,
-                                    (const void*)(m_offset[static_cast<int>(shader_type)] * sizeof(DrawElementsIndirectCommand)),
-                                    (int) m_size[static_cast<int>(shader_type)],
+                                    (const void*)(m_offset[material_id] * sizeof(DrawElementsIndirectCommand)),
+                                    (int) m_size[material_id],
                                     sizeof(DrawElementsIndirectCommand));
     }
 };
