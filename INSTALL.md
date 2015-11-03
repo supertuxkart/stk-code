@@ -1,6 +1,6 @@
-#SuperTuxKart Installation Instructions
+# SuperTuxKart Installation Instructions
 
-Note : If you obtained this source code from github, you also need to download the game assets from sourceforge using SVN.
+Note: If you obtained this source code from Github, you also need to download the game assets from Sourceforge using SVN.
 
 `svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets stk-assets`
 
@@ -8,7 +8,7 @@ Place the `stk-assets` folder next to the source root `stk-code` folder.
 See <http://supertuxkart.sourceforge.net/Source_control> for more information
 
 
-##Building STK on Linux
+## Building STK on Linux
 
 First, make sure that you have the following packages installed:
 
@@ -50,14 +50,18 @@ make VERBOSE=1 -j2
 
 To create a debug version of STK, use:
 
-`cmake .. -DCMAKE_BUILD_TYPE=Debug`
+```
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+```
 
 To test the compilation, supertuxkart can be run from the build
 directory by ./bin/supertuxkart 
 
 To install the file, as root execute:
 
-`make install`
+```
+make install
+```
 
 The default install location is `/usr/local`, i.e. the data files will
 be written to `/usr/local/share/games/supertuxkart`, the executable
@@ -66,9 +70,9 @@ location, specify `CMAKE_INSTALL_PREFIX` when running cmake, e.g.:
 `cmake .. -DCMAKE_INSTALL_PREFIX=/opt/stk`
 
   
-##Building STK on OS X
+## Building STK on OS X
 See <http://supertuxkart.sourceforge.net/Building_and_packaging_on_OSX>
 
 
-##Building STK on Windows
+## Building STK on Windows
 See <http://supertuxkart.sourceforge.net/How_to_build_the_Windows_version>
