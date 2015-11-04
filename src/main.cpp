@@ -779,11 +779,6 @@ int handleCmdLine()
         STKHost::create(core::stringw(s.c_str()));
         Log::info("main", "Creating a server.");
     }   
-    else if(CommandLine::has("--client"))
-    {
-        STKHost::create();
-        Log::info("main", "Creating a client.");
-    }
 
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
