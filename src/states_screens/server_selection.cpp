@@ -79,8 +79,6 @@ void ServerSelection::refresh()
  */
 void ServerSelection::loadedFromFile()
 {
-    m_back_widget = getWidget<GUIEngine::IconButtonWidget>("back");
-    assert(m_back_widget != NULL);
     m_reload_widget = getWidget<GUIEngine::IconButtonWidget>("reload");
     assert(m_reload_widget != NULL);
     m_server_list_widget = getWidget<GUIEngine::ListWidget>("server_list");
@@ -172,10 +170,12 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         int selected_index = m_server_list_widget->getSelectionID();
-        uint32_t server_id = ServersManager::get()->getServerBySort(selected_index)->getServerId();
-        uint32_t host_id = ServersManager::get()->getServerBySort(selected_index)->getHostId();
+        const Server *server = 
+            ServersManager::get()->getServerBySort(selected_index);
+        uint32_t server_id = server->getServerId();
+        uint32_t host_id = server->getHostId();
         new ServerInfoDialog(server_id, host_id);
-    }
+    }   // click on server
 
 }   // eventCallback
 

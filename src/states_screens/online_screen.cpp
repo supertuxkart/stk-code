@@ -256,7 +256,6 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     {
         STKHost::setIsLAN();
         ServerSelection::getInstance()->push();
-        // TODO: find lan server;
     }
     else if (selection == m_manage_user->m_properties[PROP_ID])
     {

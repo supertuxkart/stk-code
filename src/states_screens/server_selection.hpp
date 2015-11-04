@@ -38,7 +38,6 @@ private:
     ServerSelection();
     ~ServerSelection();
 
-    GUIEngine::IconButtonWidget *               m_back_widget;
     GUIEngine::IconButtonWidget *               m_reload_widget;
     GUIEngine::LabelWidget *                    m_update_status;
     GUIEngine::ListWidget *                     m_server_list_widget;
