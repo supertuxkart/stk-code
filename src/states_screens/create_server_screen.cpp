@@ -173,6 +173,7 @@ void CreateServerScreen::createServer()
         return;
     }
 
+    // In case of a LAN game, we can create the new server object now
     if (STKHost::isLAN())
     {
         Server *server = new Server(name, /*lan*/true, max_players,
@@ -182,6 +183,9 @@ void CreateServerScreen::createServer()
         return;
     }
 
+    // In case of a WAN game, we register this server with the
+    // stk server, and will get the server's id when this 
+    // request is finished.
     STKHost::setMaxPlayers(max_players);
     STKHost::create(name);
 

@@ -60,7 +60,6 @@ private:
     };   // ServerCreationRequest
     // --------------------------------------------------------------------
 
-
     ServerCreationRequest *m_server_creation_request;
 
     void createServer();
