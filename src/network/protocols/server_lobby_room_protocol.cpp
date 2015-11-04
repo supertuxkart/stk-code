@@ -168,19 +168,24 @@ void ServerLobbyRoomProtocol::callback(Protocol *protocol)
 /** Register this server (i.e. its public address) with the STK server
  *  so that clients can find it. It blocks till a responsce from the
  *  stk server is received (this function is executed from the 
- *  ProtocolManager thread).
+ *  ProtocolManager thread). The information about this client is added
+ *  to the table 'server'.
  */
 void ServerLobbyRoomProtocol::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
     const TransportAddress& addr = STKHost::get()->getPublicAddress();
+#ifdef NEW_PROTOCOL
     PlayerManager::setUserDetails(request, "register", Online::API::SERVER_PATH);
-    request->addParameter("address", addr.getIP());
-    request->addParameter("port", addr.getPort());
-    request->addParameter("private_port", STKHost::get()->getPort());
-    request->addParameter("name", STKHost::get()->getServerName());
+#else
+    PlayerManager::setUserDetails(request, "start", Online::API::SERVER_PATH);
+#endif
+    request->addParameter("address",      addr.getIP()                    );
+    request->addParameter("port",         addr.getPort()                  );
+    request->addParameter("private_port", STKHost::get()->getPort()       );
+    request->addParameter("name",         STKHost::get()->getServerName() );
     request->addParameter("max_players", 
-                          UserConfigParams::m_server_max_players);
+                          UserConfigParams::m_server_max_players          );
     Log::info("RegisterServer", "Showing addr %s", addr.toString().c_str());
     
     request->executeNow();
@@ -239,11 +244,11 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
 
     // Now poll the stk server
     last_poll_time = StkTime::getRealTime();
-    const TransportAddress &addr = STKHost::get()->getPublicAddress();
     Online::XMLRequest* request = new Online::XMLRequest();
     PlayerManager::setUserDetails(request, "poll-connection-requests",
                                   Online::API::SERVER_PATH);
 
+    const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
 
