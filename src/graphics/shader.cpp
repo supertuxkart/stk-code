@@ -65,7 +65,7 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
     
     std::ostringstream code;
     code << "#version " << CVS->getGLSLVersion()<<"\n";
-    
+
     if (CVS->isAMDVertexShaderLayerUsable())
         code << "#extension GL_AMD_vertex_shader_layer : enable\n";
     if (CVS->isAZDOEnabled())
