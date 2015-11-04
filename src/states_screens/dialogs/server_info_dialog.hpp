@@ -23,8 +23,8 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
-#include "network/protocols/request_connection.hpp"
 #include "online/server.hpp"
+#include "online/xml_request.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
@@ -41,17 +41,23 @@ private:
     bool m_self_destroy;
     bool m_enter_lobby;
     bool m_from_server_creation;
-    const RequestConnection::ServerJoinRequest * m_server_join_request;
+
+    /** Pointer to the server join request. */
+    Online::XMLRequest *m_server_join_request;
 
     const uint32_t m_server_id;
     uint32_t m_host_id;
 
-    GUIEngine::LabelWidget * m_name_widget;
-    GUIEngine::LabelWidget * m_info_widget;
+    /** The gui element for messages. */
+    GUIEngine::LabelWidget *m_info_widget;
 
-    GUIEngine::RibbonWidget * m_options_widget;
-    GUIEngine::IconButtonWidget * m_join_widget;
-    GUIEngine::IconButtonWidget * m_cancel_widget;
+    GUIEngine::RibbonWidget *m_options_widget;
+
+    /** The joinb button. */
+    GUIEngine::IconButtonWidget *m_join_widget;
+
+    /** The cancel button. */
+    GUIEngine::IconButtonWidget *m_cancel_widget;
 
     void requestJoin();
 
@@ -64,6 +70,6 @@ public:
 
     virtual bool onEscapePressed();
     virtual void onUpdate(float dt);
-};
+};   // class ServerInfoDialog
 
 #endif

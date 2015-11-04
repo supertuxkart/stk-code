@@ -20,7 +20,8 @@
 #include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/request_connection.hpp"
+#include "network/stk_host.hpp"
 #include "online/servers_manager.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
@@ -36,11 +37,16 @@ using namespace irr::gui;
 using namespace Online;
 
 // -----------------------------------------------------------------------------
-
+/** Dialog constructor. 
+ *  \param server_id ID of the server of which to display the info.
+ *  \param host_id ID of the host.
+ *  \param from_server_creation: true if the dialog shows the data of this
+ *         server (i.e. while it is being created).
+ */
 ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,
                                    bool from_server_creation)
-                : ModalDialog(0.8f,0.8f), m_server_id(server_id),
-                  m_host_id(host_id)
+                : ModalDialog(0.8f,0.8f), m_server_id(server_id)
+                , m_host_id(host_id)
 {
     Log::info("ServerInfoDialog", "Server id is %d, Host id is %d",
                server_id, host_id);
@@ -51,10 +57,10 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,
 
     loadFromFile("online/server_info_dialog.stkgui");
 
-    m_name_widget = getWidget<LabelWidget>("name");
-    assert(m_name_widget != NULL);
+    GUIEngine::LabelWidget *name = getWidget<LabelWidget>("name");
+    assert(name);
     const Server * server = ServersManager::get()->getServerByID(m_server_id);
-    m_name_widget->setText(server->getName(),false);
+    name->setText(server->getName(),false);
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
     if (m_from_server_creation)
@@ -84,19 +90,21 @@ void ServerInfoDialog::requestJoin()
     // FIXME - without this next line, it appears that m_server_join is completely unused.
     //m_server_join_request = Online::CurrentUser::get()->requestServerJoin(m_server_id);
     Online::ServersManager::get()->setJoinedServer(m_server_id);
-    ProtocolManager::getInstance()->requestStart(new ConnectToServer(m_server_id, m_host_id));
+
+    STKHost::create(m_server_id, m_host_id);
     ModalDialog::dismiss();
     NetworkingLobby::getInstance()->push();
     //Online::CurrentUser::release();
 }   // requestJoin
 
 // -----------------------------------------------------------------------------
-GUIEngine::EventPropagation ServerInfoDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation
+                 ServerInfoDialog::processEvent(const std::string& eventSource)
 {
-
     if (eventSource == m_options_widget->m_properties[PROP_ID])
     {
-        const std::string& selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        const std::string& selection =
+                 m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
@@ -112,11 +120,12 @@ GUIEngine::EventPropagation ServerInfoDialog::processEvent(const std::string& ev
 }   // processEvent
 
 // -----------------------------------------------------------------------------
-
+/** When the player pressed enter, select 'join' as default.
+ */
 void ServerInfoDialog::onEnterPressedInternal()
 {
-
-    //If enter was pressed while none of the buttons was focused interpret as join event
+    // If enter was pressed while none of the buttons was focused interpret
+    // as join event
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
