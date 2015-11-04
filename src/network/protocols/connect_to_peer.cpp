@@ -83,6 +83,7 @@ void ConnectToPeer::asynchronousUpdate()
             // The GetPeerAddress protocol will change the state and
             // unpause this protocol
             ProtocolManager::getInstance()->pauseProtocol(this);
+            m_state = RECEIVED_PEER_ADDRESS;
             break;
         }
         case RECEIVED_PEER_ADDRESS:
@@ -99,7 +100,8 @@ void ConnectToPeer::asynchronousUpdate()
             // the Ping protocol to keep the port available.
             if (m_peer_address.getIP() != STKHost::get()->getPublicAddress().getIP())
             {
-                m_current_protocol = new PingProtocol(m_peer_address, 2.0);
+                m_current_protocol = new PingProtocol(m_peer_address,
+                                                      /*time-between-ping*/2.0);
                 ProtocolManager::getInstance()->requestStart(m_current_protocol);
                 m_state = CONNECTING;
                 break;

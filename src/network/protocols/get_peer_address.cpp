@@ -25,7 +25,8 @@
 #include "online/request_manager.hpp"
 #include "utils/log.hpp"
 
-GetPeerAddress::GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object)
+GetPeerAddress::GetPeerAddress(uint32_t peer_id,
+                              CallbackObject* callback_object)
               : Protocol(PROTOCOL_SILENT, callback_object)
 {
     m_peer_id = peer_id;
@@ -55,8 +56,6 @@ void GetPeerAddress::asynchronousUpdate()
     if (m_request->isDone())
     {
         const XMLNode * result = m_request->getXMLData();
-        delete m_request;
-        m_request = NULL;
 
         std::string success;
         if(result->get("success", &success) && success == "yes")
@@ -79,6 +78,9 @@ void GetPeerAddress::asynchronousUpdate()
             Log::error("GetPeerAddress", "Failed to get peer address.");
         }
         requestTerminate();
+
+        delete m_request;
+        m_request = NULL;
     }
 }   // asynchronousUpdate
 

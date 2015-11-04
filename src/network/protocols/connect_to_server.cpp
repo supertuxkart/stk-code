@@ -146,6 +146,7 @@ void ConnectToServer::asynchronousUpdate()
             delete m_current_protocol;
             m_current_protocol = NULL;
             Log::info("ConnectToServer", "Server's address known");
+
             // we're in the same lan (same public ip address) !!
             if (m_server_address.getIP() ==
                 STKHost::get()->getPublicAddress().getIP())
@@ -284,7 +285,6 @@ void ConnectToServer::registerWithSTKServer()
     request->executeNow();
 
     const XMLNode * result = request->getXMLData();
-    delete request;
 
     std::string success;
     if(result->get("success", &success) && success == "yes")
@@ -295,6 +295,7 @@ void ConnectToServer::registerWithSTKServer()
     {
         Log::error("ConnectToServer", "Failed to register address.");
     }
+    delete request;
 
 }   // registerWithSTKServer
 
