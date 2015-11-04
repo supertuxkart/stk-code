@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "network/event.hpp"
+#include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_console.hpp"
@@ -45,10 +46,87 @@ int                  STKHost::m_max_players  = 0;
 bool                 STKHost::m_is_server    = false;
 STKHost::NetworkType STKHost::m_network_type = STKHost::NETWORK_NONE;
 
+
+/** \class STKHost. This is the main class for online games. It can be
+ *  either instantiated as server, or as client. The online game works
+ *  closely together with the stk server: a (game) server first connects
+ *  to the stk server and registers itself, clients find the list of servers
+ *  from the stk server. They insert a connections request into the stk
+ *  server, which is regularly polled by the client. On detecting a new
+ *  connection request the server will try to send a message to the client.
+ *  This allows connections between server and client even if they are 
+ *  sitting behind a NAT translating firewall. The following tables on
+ *  the stk server are used:
+ *  client_sessions: It stores the list of all online users (so loging in
+ *         means to insert a row in this table), including their token
+ *         used for authentication. In case of a client or server, their
+ *         public ip address and port number and private port (for LAN)
+ *         are added to the entry.
+ *  servers: Registers all servers and gives them a unique id, together
+ *         with the user id (which is stored as host_id in this table).
+ *  server_conn: This table stores connection requests from clients to
+ *         servers. A 'request' bit is set to 1 if the request has not
+ *         been handled, and is reset to 0 the moment the server receives
+ *         the information about the client request.
+ *
+ *  The following outlines the protocol happening in order to connect a
+ *  client to a server in more details:
+ *
+ *  Server:
+ *    1) ServerLobbyRoomProtocol:
+ *       Spawns the following sub-protocols:
+ *       a) GetPublicAddress: Use STUN to discover the public ip address
+ *          and port number of this host.
+ *       b) Register this server with stk server (i.e. publish its public
+ *          ip address and port number) - 'start' request. This enters the
+ *          public information into the 'client_sessions' table, and then
+ *          the server into the 'servers' table. This server can now
+ *          be detected by other clients, so they can request a connection.
+ *       c) The server lobby now polls the stk server for client connection
+ *          requests using the 'poll-connection-requests', which queries the
+ *          servers table to get the server id (based on address and user id),
+ *          and then the server_conn table. The rows in this table are updated
+ *          by setting the 'request' bit to 0 (i.e. connection request was
+ *          send to server).
+ *      
+ *  Client: The GUI queries the stk server to get a list of available servers
+ *    ('get-all' request, submitted from ServersManager to query the 'servers'
+ *    table). The user picks one (or in case of quick play one is picked
+ *    randomly), and then instantiates STKHost with the id of this server.
+ *    STKHost then triggers:
+ *    1) ConnectToServer, which starts the following protocols:
+ *       a) GetPublicAccress: Use STUN to discover the public ip address
+ *          and port number of this host.
+ *       b) Register the client with the STK host ('set' command, into the
+ *          table 'client_sessions'). Its public ip address and port will
+ *          be registerd.
+ *       c) GetPeerAddress. Submits a 'get' request to the STK server to get
+ *          the ip address and port for the selected server from
+ *          'client_sessions'. 
+ *          If the ip address of the server is the same as this client, they
+ *          will connect using the LAN connection.
+ *       d) RequestConnection will do a 'request-connection' to the stk server.
+ *          The user id and server id are stored in server_conn. This is the
+ *          request that the server will detect using polling.
+ * Server:
+ *   1) ServerLobbyRoomProtocol
+ *      Will the detect the above client requests, and start a ConnectToPeer
+ *      protocol for each incoming client:
+ *      a) ConnectToPeer
+ *         This protocol uses:
+ *         A) GetPeerAddress to get the ip address and port of the client.
+ *            Once this is received, it will start the:
+ *         B) PingProtocol
+ *            This sends a raw packet (i.e. no enet header) to the
+ *            destination.
+ *            (unless if it is a LAN connection, then UDP broadcasts will
+ *            be used). 
+ */
+
 // ============================================================================
 /** Constructor for a client
  */
-STKHost::STKHost()
+STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 {
     m_is_server = false;
     init();
@@ -61,21 +139,19 @@ STKHost::STKHost()
                                "an ENet client host.");
     }
 
+    Protocol *connect = new ConnectToServer(server_id, host_id);
+    connect->requestStart();
 }   // STKHost
 
 // ----------------------------------------------------------------------------
 /** The constructor for a server.
- *  \param server_name Name of the server to be registered with the STK server.
+ *  The server control flow starts with the ServerLobbyRoomProtocol.
  */
 STKHost::STKHost(const irr::core::stringw &server_name)
 {
     m_is_server = true;
     init();
 
-    // The server control flow starts with the ServerLobbyRoomProtocol.
-    // This will in turn spawn more protocols:
-    // GetPublicAddress: Use STUN to discover the public ip address
-    //           and port number for this host.
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
     addr.port = 2758;

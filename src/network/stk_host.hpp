@@ -108,7 +108,7 @@ private:
     /** Keeps the type of network connection: none (yet), LAN or WAN. */
     static NetworkType m_network_type;
 
-             STKHost();
+             STKHost(uint32_t server_id, uint32_t host_id);
              STKHost(const irr::core::stringw &server_name);
     virtual ~STKHost();
     void init();
@@ -117,10 +117,10 @@ public:
 
     /** Creates the singleton for a client. In case of an error
      *  m_stk_host is NULL (which can be tested using isNetworking(). */
-    static void create()
+    static void create(uint32_t server_id, uint32_t host_id)
     {
         assert(m_stk_host == NULL);
-        m_stk_host = new STKHost();
+        m_stk_host = new STKHost(server_id, host_id);
         if(!m_stk_host->m_network)
         {
             delete m_stk_host;
