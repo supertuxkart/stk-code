@@ -21,23 +21,30 @@
 #include "network/stk_host.hpp"
 #include "utils/time.hpp"
 
+/** Constructor. Stores the destination address and how often to ping.
+ *  \param ping_dest: Destination of ping request.
+ *  \param delay_between_pings: How often to ping.
+ */
 PingProtocol::PingProtocol(const TransportAddress& ping_dst,
                            double delay_between_pings) 
             : Protocol(PROTOCOL_SILENT)
 {
     m_ping_dst.copy(ping_dst);
     m_delay_between_pings = delay_between_pings;
-}
+}   // PingProtocol
 
+// ----------------------------------------------------------------------------
 PingProtocol::~PingProtocol()
 {
-}
+}   // ~PingProtocol
 
+// ----------------------------------------------------------------------------
 void PingProtocol::setup()
 {
     m_last_ping_time = 0;
-}
+}   // setup
 
+// ----------------------------------------------------------------------------
 void PingProtocol::asynchronousUpdate()
 {
     if (StkTime::getRealTime() > m_last_ping_time+m_delay_between_pings)
@@ -47,4 +54,4 @@ void PingProtocol::asynchronousUpdate()
         STKHost::get()->sendRawPacket(&data, 1, m_ping_dst);
         Log::info("PingProtocol", "Ping message sent");
     }
-}
+}   // asynchronousUpdate
