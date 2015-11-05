@@ -101,7 +101,7 @@ STKHost::NetworkType STKHost::m_network_type = STKHost::NETWORK_NONE;
  *    randomly), and then instantiates STKHost with the id of this server.
  *    STKHost then triggers:
  *    1) ConnectToServer, which starts the following protocols:
- *       a) GetPublicAccress: Use STUN to discover the public ip address
+ *       a) GetPublicAccess: Use STUN to discover the public ip address
  *          and port number of this host.
  *       b) Register the client with the STK host ('set' command, into the
  *          table 'client_sessions'). Its public ip address and port will
