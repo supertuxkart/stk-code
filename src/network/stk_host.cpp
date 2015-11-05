@@ -46,9 +46,15 @@ int                  STKHost::m_max_players  = 0;
 bool                 STKHost::m_is_server    = false;
 STKHost::NetworkType STKHost::m_network_type = STKHost::NETWORK_NONE;
 
-
-/** \class STKHost. This is the main class for online games. It can be
- *  either instantiated as server, or as client. The online game works
+/** \class STKHost
+ *  \brief Represents the local host. It is the main managing point for 
+ *  networking. It is responsible for sending and receiving messages,
+ *  and keeping track of onnected peers. It also provides some low
+ *  level socket functions (i.e. to avoid that enet adds its headers
+ *  to messages, useful for broadcast in LAN and for stun). It can be
+ *  either instantiated as server, or as client. 
+ *  Additionally this object stores information from the various protocols,
+ *  which can be queried by the GUI. The online game works
  *  closely together with the stk server: a (game) server first connects
  *  to the stk server and registers itself, clients find the list of servers
  *  from the stk server. They insert a connections request into the stk
@@ -180,6 +186,8 @@ void STKHost::init()
     m_network          = NULL;
     m_listening_thread = NULL;
     m_game_setup       = NULL;
+    m_is_registered    = false;
+    m_error_message    = "";
 
     m_public_address.lock();
     m_public_address.getData().clear();
@@ -291,7 +299,24 @@ void STKHost::abort()
     ProtocolManager::getInstance()->abort();
 }   // abort
 
-//-----------------------------------------------------------------------------
+// --------------------------------------------------------------------
+/** Sets an error message for the gui.
+ */
+void STKHost::setErrorMessage(const irr::core::stringw &message)
+{
+    irr::core::stringc s(message.c_str());
+    Log::error("STKHost", "%s", s.c_str());
+    m_error_message = message;
+}   // setErrorMessage
+
+// --------------------------------------------------------------------
+/** Returns the last error (or "" if no error has happened). */
+const irr::core::stringw& STKHost::getErrorMessage() const
+{
+    return m_error_message; 
+}   // getErrorMessage
+
+// --------------------------------------------------------------------
 /** \brief Try to establish a connection to a given transport address.
  *  \param peer : The transport address which you want to connect to.
  *  \return True if we're successfully connected. False elseway.

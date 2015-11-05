@@ -41,16 +41,6 @@ class GameSetup;
 class NetworkConsole;
 class STKPeer;
 
-/** \class STKHost
- *  \brief Represents the local host. It is the main managing point for 
- *  networking. It is responsible for sending and receiving messages,
- *  and keeping track of onnected peers. It also provides some low
- *  level socket functions (i.e. to avoid that enet adds its headers
- *  to messages, useful for broadcast in LAN and for stun).
- *  This host is either a server host or a client host. A client host is in
- *  charge of connecting to a server. A server opens a socket for incoming
- *  connections. 
- */
 class STKHost
 {
 public:
@@ -99,8 +89,16 @@ private:
     /** Maximum number of players on the server. */
     static int m_max_players;
 
+    /** If this is a server, it indicates if this server is registered
+     *  with the stk server. */
+    bool m_is_registered;
+
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
+
+    /** An error message, which is set by a protocol to be displayed
+     *  in the GUI. */
+    irr::core::stringw m_error_message;
 
     enum NetworkType
     { NETWORK_NONE, NETWORK_WAN, NETWORK_LAN };
@@ -195,6 +193,9 @@ public:
     bool        isConnectedTo(const TransportAddress& peer_address);
     int         mustStopListening();
     uint16_t    getPort() const;
+    void        setErrorMessage(const irr::core::stringw &message);
+    const irr::core::stringw& 
+                getErrorMessage() const;
 
     // --------------------------------------------------------------------
     /** Returns the current game setup. */
@@ -261,13 +262,6 @@ public:
     /** Returns if this instance is a client. */
     static bool isclient() { return !m_is_server; }
     // --------------------------------------------------------------------
-    /** Sets the name of the server if this instance is a server. */
-    void setServerName(const irr::core::stringw &name)
-    {
-        assert(isServer());
-        m_server_name = name;
-    }
-    // --------------------------------------------------------------------
     /** Returns the server name. */
     const irr::core::stringw& getServerName() const
     {
@@ -275,6 +269,19 @@ public:
         return m_server_name;
     }
     // --------------------------------------------------------------------
+    /** Sets if this server is registered with the stk server. */
+    void setRegistered(bool registered)
+    {
+        assert(isServer());
+        m_is_registered = registered; 
+    }   // setRegistered
+    // --------------------------------------------------------------------
+    /** Returns if this server is registered with the stk server. */
+    bool isRegistered() const
+    {
+        assert(isServer());
+        return m_is_registered;
+    }   // isRegistered
 
 };   // class STKHost
 

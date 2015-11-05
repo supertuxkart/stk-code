@@ -194,9 +194,16 @@ void ServerLobbyRoomProtocol::registerServer()
     std::string rec_success;
 
     if (result->get("success", &rec_success) && rec_success == "yes")
+    {
         Log::info("RegisterServer", "Server is now online.");
+        STKHost::get()->setRegistered(true);
+    }
     else
-        Log::error("RegisterServer", "Fail to start server.");
+    {
+        irr::core::stringc error(request->getInfo().c_str());
+        Log::error("RegisterServer", "%s", error.c_str());
+        STKHost::get()->setErrorMessage(_("Failed to register server"));
+    }
 
 }   // registerServer
 

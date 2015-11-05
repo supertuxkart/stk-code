@@ -46,22 +46,6 @@ private:
     GUIEngine::IconButtonWidget * m_create_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
-    // --------------------------------------------------------------------
-    class ServerCreationRequest : public Online::XMLRequest
-    {
-        virtual void callback();
-        uint32_t m_created_server_id;
-    public:
-        const uint32_t getCreatedServerID() const
-        {
-            assert(isDone());
-            return m_created_server_id;
-        }   // getCreatedServerID
-    };   // ServerCreationRequest
-    // --------------------------------------------------------------------
-
-    ServerCreationRequest *m_server_creation_request;
-
     void createServer();
 
 public:

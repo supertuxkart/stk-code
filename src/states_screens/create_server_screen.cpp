@@ -47,7 +47,6 @@ DEFINE_SCREEN_SINGLETON( CreateServerScreen );
 
 CreateServerScreen::CreateServerScreen() : Screen("online/create_server.stkgui")
 {
-    m_server_creation_request = NULL;
 }   // CreateServerScreen
 
 // ----------------------------------------------------------------------------
@@ -119,10 +118,24 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
  */
 void CreateServerScreen::onUpdate(float delta)
 {
-    if (!m_server_creation_request) return;
+    // If no host has been created, keep on waiting.
+    if(!STKHost::isNetworking())
+        return;
 
-    // If the request is not ready, wait till it is done.
-    if (!m_server_creation_request->isDone())
+    // First check if an error happened while registering the server:
+    // --------------------------------------------------------------
+    const irr::core::stringw &error = STKHost::get()->getErrorMessage();
+    if(error!="")
+    {
+        SFXManager::get()->quickSound("anvil");
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(error, false);
+        return;
+    }
+
+    // Otherwise wait till we get an answer from the server:
+    // -----------------------------------------------------
+    if(!STKHost::get()->isRegistered())
     {
         m_info_widget->setDefaultColor();
         m_info_widget->setText(StringUtils::loadingDots(_("Creating server")),
@@ -130,21 +143,10 @@ void CreateServerScreen::onUpdate(float delta)
         return;
     }
 
-    // Now the request has been executed.
-    // ----------------------------------
-    if (m_server_creation_request->isSuccess())
-    {
-        new ServerInfoDialog(m_server_creation_request->getCreatedServerID(),
-                             true);
-    }
-    else
-    {
-        SFXManager::get()->quickSound("anvil");
-        m_info_widget->setErrorColor();
-        m_info_widget->setText(m_server_creation_request->getInfo(), false);
-    }
-    delete m_server_creation_request;
-    m_server_creation_request = NULL;
+
+    // Go to lobby screen now
+    // ----------------------
+
 
 }   // onUpdate
 
@@ -189,36 +191,11 @@ void CreateServerScreen::createServer()
     STKHost::setMaxPlayers(max_players);
     STKHost::create(name);
 
-    // Now must be WAN: forward request to the stk server
-    m_server_creation_request = new ServerCreationRequest();
-    PlayerManager::setUserDetails(m_server_creation_request, "create",
-                                  Online::API::SERVER_PATH);
-    m_server_creation_request->addParameter("name", name);
-    m_server_creation_request->addParameter("max_players", max_players);
-    m_server_creation_request->queue();
-
 }   // createServer
-
-// ----------------------------------------------------------------------------
-/** Callbacks from the online create server request.
- */
-void CreateServerScreen::ServerCreationRequest::callback()
-{
-    if (isSuccess())
-    {
-        // Must be a WAN server
-        Server *server = new Server(*getXMLData()->getNode("server"),
-                                    /*is lan*/false);
-        ServersManager::get()->addServer(server);
-        m_created_server_id = server->getServerId();
-    }   // isSuccess
-}   // callback
 
 // ----------------------------------------------------------------------------
 
 void CreateServerScreen::tearDown()
 {
-    delete m_server_creation_request;
-    m_server_creation_request = NULL;
 }   // tearDown
 
