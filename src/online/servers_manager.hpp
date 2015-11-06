@@ -28,47 +28,47 @@
 
 namespace Online
 {
-    /**
-      * \brief
-      * \ingroup online
-      */
-    class ServersManager
-    {
-    private:
-        ServersManager();
-        ~ServersManager();
+/**
+ * \brief
+ * \ingroup online
+ */
+class ServersManager
+{
+private:
+     ServersManager();
+    ~ServersManager();
 
-        /** Sorted vector of servers */
-        Synchronised<PtrVector<Server> >                m_sorted_servers;
+    /** Sorted vector of servers */
+    Synchronised<PtrVector<Server> >                m_sorted_servers;
 
-        /** Maps server id's to the same servers*/
-        Synchronised<std::map<uint32_t, Server*> >      m_mapped_servers;
+    /** Maps server id's to the same servers*/
+    Synchronised<std::map<uint32_t, Server*> >      m_mapped_servers;
 
-        /** This is a pointer to a copy of the server, the moment it got joined */
-        Synchronised<Server *>   m_joined_server;
+    /** This is a pointer to a copy of the server, the moment it got joined */
+    Synchronised<Server *>   m_joined_server;
 
-        Synchronised<float>      m_last_load_time;
-        void                     refresh(bool success, const XMLNode * input);
-        void                     cleanUpServers();
+    Synchronised<float>      m_last_load_time;
+    void                     refresh(bool success, const XMLNode * input);
+    void                     cleanUpServers();
 
-    public:
-        // Singleton
-        static ServersManager*   get();
-        static void              deallocate();
+public:
+    // Singleton
+    static ServersManager*   get();
+    static void              deallocate();
 
-        XMLRequest *             refreshRequest(bool request_now = true) const;
-        void                     setJoinedServer(uint32_t server_id);
-        void                     unsetJoinedServer();
-        void                     addServer(Server * server);
-        int                      getNumServers () const;
-        const Server *           getServerByID (uint32_t server_id) const;
-        const Server *           getServerBySort (int index) const;
-        void                     sort(bool sort_desc);
-        Server *                 getJoinedServer() const;
+    XMLRequest *             refreshRequest(bool request_now = true) const;
+    void                     setJoinedServer(uint32_t server_id);
+    void                     unsetJoinedServer();
+    void                     addServer(Server * server);
+    int                      getNumServers() const;
+    const Server *           getServerByID(uint32_t server_id) const;
+    const Server *           getServerBySort(int index) const;
+    void                     sort(bool sort_desc);
+    Server *                 getJoinedServer() const;
 
-        // Returns the best server to join
-        const Server *           getQuickPlay() const;
+    // Returns the best server to join
+    const Server *           getQuickPlay() const;
 
-    };   // class ServersManager
+};   // class ServersManager
 } // namespace Online
 #endif // HEADER_SERVERS_MANAGER_HPP

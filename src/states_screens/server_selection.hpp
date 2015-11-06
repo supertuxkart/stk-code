@@ -20,7 +20,8 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/servers_manager.hpp"
+
+namespace Online { class XMLRequest; }
 
 namespace GUIEngine { class Widget; }
 
