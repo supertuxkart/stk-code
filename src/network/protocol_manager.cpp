@@ -476,25 +476,31 @@ void ProtocolManager::asynchronousUpdate()
     // process queued events for protocols
     // these requests are asynchronous
     pthread_mutex_lock(&m_requests_mutex);
-    for (unsigned int i = 0; i < m_requests.size(); i++)
+    while(m_requests.size()>0)
     {
-        switch (m_requests[i].getType())
+        ProtocolRequest request = m_requests[0];
+        m_requests.erase(m_requests.begin());
+        pthread_mutex_unlock(&m_requests_mutex);
+        // Make sure new requests can be queued up while handling requests.
+        // This is often used that terminating a protocol unpauses another,
+        // so the m_requests queue must not be locked while executing requests.
+        switch (request.getType())
         {
             case PROTOCOL_REQUEST_START:
-                startProtocol(m_requests[i].getProtocol());
+                startProtocol(request.getProtocol());
                 break;
             case PROTOCOL_REQUEST_PAUSE:
-                pauseProtocol(m_requests[i].getProtocol());
+                pauseProtocol(request.getProtocol());
                 break;
             case PROTOCOL_REQUEST_UNPAUSE:
-                unpauseProtocol(m_requests[i].getProtocol());
+                unpauseProtocol(request.getProtocol());
                 break;
             case PROTOCOL_REQUEST_TERMINATE:
-                terminateProtocol(m_requests[i].getProtocol());
+                terminateProtocol(request.getProtocol());
                 break;
-        }
-    }
-    m_requests.clear();
+        }   // switch (type)
+        pthread_mutex_lock(&m_requests_mutex);
+    }   // while m_requests.size()>0
     pthread_mutex_unlock(&m_requests_mutex);
 }   // asynchronousUpdate
 
