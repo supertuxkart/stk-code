@@ -343,7 +343,7 @@ void ProtocolManager::terminateProtocol(Protocol *protocol)
     m_protocols.lock();
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
     int offset = 0;
-    std::string protocol_type = typeid(protocol).name();
+    std::string protocol_type = typeid(*protocol).name();
     for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
         if (m_protocols.getData()[i-offset] == protocol)
