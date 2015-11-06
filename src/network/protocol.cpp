@@ -94,7 +94,7 @@ void Protocol::requestStart()
  */
 void Protocol::requestPause()
 {
-    ProtocolManager::getInstance()->requestPaues(this);
+    ProtocolManager::getInstance()->requestPause(this);
 }   // requestPause
 
 // ----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ void Protocol::requestPause()
  */
 void Protocol::requestUnpause()
 {
-    ProtocolManager::getInstance()->requestUnpaues(this);
+    ProtocolManager::getInstance()->requestUnpause(this);
 }   // requestUnpause
 
 // ----------------------------------------------------------------------------
