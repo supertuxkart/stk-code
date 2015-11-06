@@ -143,11 +143,7 @@ void CreateServerScreen::onUpdate(float delta)
         return;
     }
 
-
-    // Go to lobby screen now
-    // ----------------------
-
-
+    //FIXME If we really want a gui, we need to decide what else to do here
 }   // onUpdate
 
 // ----------------------------------------------------------------------------

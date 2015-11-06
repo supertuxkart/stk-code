@@ -129,6 +129,8 @@ public:
     void sendMessage(STKPeer* peer, const NetworkString& message,
                      bool reliable = true);
     void requestStart();
+    void requestPause();
+    void requestUnpause();
     void requestTerminate();
 
     // ------------------------------------------------------------------------

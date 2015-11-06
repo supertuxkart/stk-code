@@ -77,12 +77,12 @@ void ConnectToPeer::asynchronousUpdate()
         case NONE:
         {
             m_current_protocol = new GetPeerAddress(m_peer_id, this); 
-            ProtocolManager::getInstance()->requestStart(m_current_protocol);;
+            m_current_protocol->requestStart();
 
             // Pause this protocol till we receive an answer
             // The GetPeerAddress protocol will change the state and
             // unpause this protocol
-            ProtocolManager::getInstance()->pauseProtocol(this);
+            requestPause();
             m_state = RECEIVED_PEER_ADDRESS;
             break;
         }
@@ -95,9 +95,13 @@ void ConnectToPeer::asynchronousUpdate()
                 m_state = DONE;
                 break;
             }
+            delete m_current_protocol;
+            m_current_protocol = 0;
 
             // Now we know the peer address. If it's a non-local host, start
-            // the Ping protocol to keep the port available.
+            // the Ping protocol to keep the port available. We can't rely on
+            // STKHost::isLAN(), since we might get a LAN connection even if
+            // the server itself accepts connections from anywhere.
             if (m_peer_address.getIP() != STKHost::get()->getPublicAddress().getIP())
             {
                 m_current_protocol = new PingProtocol(m_peer_address,
@@ -107,8 +111,8 @@ void ConnectToPeer::asynchronousUpdate()
                 break;
             }
 
-            // Otherwise we are in the same LAN  (same public ip address) !!
-            // just send a broadcast packet with the string aloha_stk inside,
+            // Otherwise we are in the same LAN  (same public ip address).
+            // Just send a broadcast packet with the string aloha_stk inside,
             // the client will know our ip address and will connect
             TransportAddress broadcast_address;
             broadcast_address.setIP(-1); // 255.255.255.255
@@ -117,6 +121,7 @@ void ConnectToPeer::asynchronousUpdate()
             STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
             Log::info("ConnectToPeer", "Broadcast aloha sent.");
             StkTime::sleep(1);
+
             broadcast_address.setIP(0x7f000001); // 127.0.0.1 (localhost)
             broadcast_address.setPort(m_peer_address.getPort());
             STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
@@ -128,19 +133,20 @@ void ConnectToPeer::asynchronousUpdate()
             break;
         case CONNECTED:
         {
-            // the ping protocol is there for NAT traversal (disabled when connecting to LAN peer)
-            if (m_peer_address != STKHost::get()->getPublicAddress())
+            // If the ping protocol is there for NAT traversal terminate it.
+            // Ping is not running when connecting to a LAN peer.
+            if (m_current_protocol)
             {
                 // Kill the ping protocol because we're connected
-                ProtocolManager::getInstance()
-                               ->requestTerminate(m_current_protocol);
+                m_current_protocol->requestTerminate();
+                m_current_protocol = NULL;
             }
             m_state = DONE;
             break;
         }
         case DONE:
             m_state = EXITING;
-            ProtocolManager::getInstance()->requestTerminate(this);
+            requestTerminate();
             break;
         case EXITING:
             break;
@@ -148,11 +154,14 @@ void ConnectToPeer::asynchronousUpdate()
 }   // asynchronousUpdate
 
 // ----------------------------------------------------------------------------
-/** Callback from the GetPeerAddress protocol
+/** Callback from the GetPeerAddress protocol. It copies the received peer
+ *  address so that it can be used in the next states of the connection
+ *  protocol.
  */
 void ConnectToPeer::callback(Protocol *protocol)
 {
+    assert(m_state==RECEIVED_PEER_ADDRESS);
     m_peer_address.copy( ((GetPeerAddress*)protocol)->getAddress() );
     // Reactivate this protocol
-    ProtocolManager::getInstance()->unpauseProtocol(this);
+    requestUnpause();
 }   // callback

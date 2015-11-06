@@ -132,7 +132,7 @@ bool NetworkingLobby::onEscapePressed()
     if (protocol)
         protocol->leave();
     return true; // close the screen
-}
+}   // onEscapePressed
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onDisabledItemClicked(const std::string& item)

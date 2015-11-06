@@ -90,6 +90,22 @@ void Protocol::requestStart()
 }   // requestStart
 
 // ----------------------------------------------------------------------------
+/** Submits a request to the ProtocolManager to pause this protocol.
+ */
+void Protocol::requestPause()
+{
+    ProtocolManager::getInstance()->requestPaues(this);
+}   // requestPause
+
+// ----------------------------------------------------------------------------
+/** Submits a request to the ProtocolManager to unpause this protocol.
+ */
+void Protocol::requestUnpause()
+{
+    ProtocolManager::getInstance()->requestUnpaues(this);
+}   // requestUnpause
+
+// ----------------------------------------------------------------------------
 /** Submits a request to the ProtocolManager to terminate this protocol.
  */
 void Protocol::requestTerminate()
