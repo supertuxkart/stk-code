@@ -37,7 +37,7 @@ private:
     ShadowMatrices  m_shadow_matrices;
 
     irr::core::vector3df m_wind_dir;
-    //SolidFirstPass *m_solid_first_pass;
+    SolidFirstPass *m_solid_first_pass;
     
     void compressPowerUpTextures();
     void setOverrideMaterial();

@@ -39,7 +39,7 @@ public:
                                 unsigned render_target_diffuse,
                                 unsigned render_target_specular,
                                 unsigned render_target_half_red);
-    void renderNormalsVisualisation();
+    void renderNormalsVisualisation(const DrawCalls& draw_calls);
     void renderTransparent(const DrawCalls& draw_calls, 
                            unsigned render_target);
     void renderShadows(const ShadowMatrices& shadow_matrices,

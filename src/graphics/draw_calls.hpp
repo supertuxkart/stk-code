@@ -98,6 +98,8 @@ public:
     void renderParticlesList()     const;
 
     inline void bindSolidCmd() const { m_solid_cmd_buffer.bind(); }
+    inline bool isSolidCmdEmpty(Material::ShaderType shader_type) const
+    { return m_solid_cmd_buffer.isEmpty(shader_type); }
     void drawIndirectSolidCmd(Material::ShaderType shader_type, int i) const;
     void multidrawIndirectSolidCmd(Material::ShaderType shader_type) const;
 };

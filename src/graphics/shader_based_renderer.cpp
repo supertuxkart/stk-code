@@ -289,7 +289,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     if (irr_driver->getNormals())
     {
         rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        m_geometry_passes.renderNormalsVisualisation();
+        m_geometry_passes.renderNormalsVisualisation(m_draw_calls);
         rtts->getFBO(FBO_COLORS).bind();
     }
 
@@ -388,7 +388,7 @@ void ShaderBasedRenderer::renderParticles()
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
-    m_draw_calls.renderBillboardList();
+    m_draw_calls.renderParticlesList();
 
 //    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 }
@@ -491,17 +491,17 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
 ShaderBasedRenderer::ShaderBasedRenderer()
 {
-    /*if (CVS->isAZDOEnabled())
+    if (CVS->isAZDOEnabled())
         m_solid_first_pass = new AZDOSolidFirstPass();
     else if (CVS->supportsIndirectInstancingRendering())    
         m_solid_first_pass = new IndirectInstancedSolidFirstPass();
     else
-        m_solid_first_pass = new GL3SolidFirstPass();*/  
+        m_solid_first_pass = new GL3SolidFirstPass(); 
 }
 
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
-    //delete m_solid_first_pass;
+    delete m_solid_first_pass;
 }
 
 void ShaderBasedRenderer::addSunLight(const core::vector3df &pos) {

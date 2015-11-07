@@ -88,7 +88,7 @@ void CommandBuffer::fillMaterial(int material_id,
                                  std::vector<GLMesh *> &instanced_list,
                                  T *instance_buffer)
 {
-    m_offset[material_id] = m_instance_buffer_offset;
+    m_offset[material_id] = m_command_buffer_offset;
     FillInstances<T>(mesh_map[material_id],
                      instanced_list,
                      instance_buffer,

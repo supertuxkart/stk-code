@@ -110,7 +110,7 @@ protected:
     GLuint m_draw_indirect_cmd_id;
     DrawElementsIndirectCommand *m_draw_indirect_cmd;
     size_t *m_offset;
-    size_t *m_size;
+    size_t *m_size;    
     size_t m_poly_count;
     size_t m_instance_buffer_offset;
     size_t m_command_buffer_offset;
@@ -126,6 +126,9 @@ public:
     virtual ~CommandBuffer();
 
     inline size_t getPolyCount() const {return m_poly_count;}
+
+    inline bool isEmpty(Material::ShaderType shader_type) const
+    { return m_size[static_cast<int>(shader_type)] == 0;}
 
     inline void bind() const
     {
