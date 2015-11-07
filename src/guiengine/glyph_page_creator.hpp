@@ -58,6 +58,10 @@ namespace GUIEngine
          */
         void                     clearGlyphPage();
 
+        /** Reset characters holder for lazy loading char.
+         */
+        void                     clearNewCharHolder();
+
         /** Clear (fill it with transparent content) the current glyph page.
          */
         void                     createNewGlyphPage();
@@ -67,10 +71,15 @@ namespace GUIEngine
          */
         video::IImage*           getPage();
 
-        /** Used to get the string of new characters inside set newchar. (Mainly for debug)
+        /** Used to get the string of new characters inside set m_new_char_holder for lazy char loading.
          *  \return string of wild-character.
          */
         core::stringw            getNewChar();
+
+        /** Used to insert a single new character into glyph page used for lazy char loading.
+         *  \param c A new character.
+         */
+        void                     insertChar(const wchar_t c);
 
         /** Used to insert a single glyph bitmap into the glyph page
          *  \param bits The Glyph bitmap inputted.
@@ -79,22 +88,22 @@ namespace GUIEngine
          */
         bool                     insertGlyph(FT_Bitmap bits, core::rect<s32>& rect);
 
-        /** A temporary holder stored new char to be inserted.
-         */
-        std::set<wchar_t>        newchar;
-
     private:
         /** A temporary storage for a single glyph.
          */
-        video::IImage*           image;
+        video::IImage*           m_image;
+
+        /** A temporary holder stored new char to be inserted.
+         */
+        std::set<wchar_t>        m_new_char_holder;
 
         /** A full glyph page.
          */
-        video::IImage*           page;
+        video::IImage*           m_page;
 
-        u32                      temp_height;
-        u32                      used_width;
-        u32                      used_height;
+        u32                      m_temp_height;
+        u32                      m_used_width;
+        u32                      m_used_height;
     };
 
 }   // guiengine

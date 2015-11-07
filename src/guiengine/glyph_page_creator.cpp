@@ -27,24 +27,32 @@
 namespace GUIEngine
 {
 
+// ----------------------------------------------------------------------------
+
 GlyphPageCreator::GlyphPageCreator()
 {
-    page = GUIEngine::getDriver()->createImage(video::ECF_A8R8G8B8, core::dimension2du(512, 512));
-    image = 0;
-    newchar.clear();
+    m_page = GUIEngine::getDriver()->createImage(video::ECF_A8R8G8B8, core::dimension2du(512, 512));
+    m_image = 0;
 }
+
+// ----------------------------------------------------------------------------
 
 GlyphPageCreator::~GlyphPageCreator()
 {
     clearGlyphPage();
-    page->drop();
-    page = 0;
+    clearNewCharHolder();
+    m_page->drop();
+    m_page = 0;
 }
+
+// ----------------------------------------------------------------------------
 
 void GlyphPageCreator::dumpGlyphPage(const core::stringc fn)
 {
-    GUIEngine::getDriver()->writeImageToFile(page, fn + ".png");
+    GUIEngine::getDriver()->writeImageToFile(m_page, fn + ".png");
 }
+
+// ----------------------------------------------------------------------------
 
 bool GlyphPageCreator::checkEnoughSpace(FT_Bitmap bits)
 {
@@ -53,38 +61,62 @@ bool GlyphPageCreator::checkEnoughSpace(FT_Bitmap bits)
     texture_size = d.getOptimalSize(!(GUIEngine::getDriver()->queryFeature(video::EVDF_TEXTURE_NPOT)),
                                     !(GUIEngine::getDriver()->queryFeature(video::EVDF_TEXTURE_NSQUARE)), true, 0);
 
-    if ((used_width + texture_size.Width > 512 && used_height + temp_height + texture_size.Height > 512)
-         || used_height + texture_size.Height > 512)
+    if ((m_used_width + texture_size.Width > 512 && m_used_height + m_temp_height + texture_size.Height > 512)
+         || m_used_height + texture_size.Height > 512)
         return false;
     return true;
 }
 
+// ----------------------------------------------------------------------------
+
+void GlyphPageCreator::clearNewCharHolder()
+{
+    m_new_char_holder.clear();
+}
+
+// ----------------------------------------------------------------------------
+
 void GlyphPageCreator::clearGlyphPage()
 {
-    used_width  = 0;
-    temp_height = 0;
-    used_height = 0;
+    m_used_width  = 0;
+    m_temp_height = 0;
+    m_used_height = 0;
 }
+
+// ----------------------------------------------------------------------------
 
 void GlyphPageCreator::createNewGlyphPage()
 {
     //Clean the current glyph page by filling it with transparent content
-    page->fill(video::SColor(0, 255, 255, 255));
+    m_page->fill(video::SColor(0, 255, 255, 255));
 }
+
+// ----------------------------------------------------------------------------
 
 video::IImage* GlyphPageCreator::getPage()
 {
-    return page;
+    return m_page;
 }
+
+// ----------------------------------------------------------------------------
 
 core::stringw GlyphPageCreator::getNewChar()
 {
     core::stringw c;
-    for (std::set<wchar_t>::iterator it = newchar.begin(); it != newchar.end(); ++it)
+    for (std::set<wchar_t>::iterator it = m_new_char_holder.begin(); it != m_new_char_holder.end(); ++it)
         c += *it;
 
     return c;
 }
+
+// ----------------------------------------------------------------------------
+
+void GlyphPageCreator::insertChar(const wchar_t c)
+{
+    m_new_char_holder.insert(c);
+}
+
+// ----------------------------------------------------------------------------
 
 bool GlyphPageCreator::insertGlyph(FT_Bitmap bits, core::rect<s32>& rect)
 {
@@ -98,13 +130,13 @@ bool GlyphPageCreator::insertGlyph(FT_Bitmap bits, core::rect<s32>& rect)
             // Create our blank image.
             texture_size = d.getOptimalSize(!(GUIEngine::getDriver()->queryFeature(video::EVDF_TEXTURE_NPOT)),
                                             !(GUIEngine::getDriver()->queryFeature(video::EVDF_TEXTURE_NSQUARE)), true, 0);
-            image = GUIEngine::getDriver()->createImage(video::ECF_A8R8G8B8, texture_size);
-            image->fill(video::SColor(0, 255, 255, 255));
+            m_image = GUIEngine::getDriver()->createImage(video::ECF_A8R8G8B8, texture_size);
+            m_image->fill(video::SColor(0, 255, 255, 255));
 
             // Load the grayscale data in.
             const float gray_count = static_cast<float>(bits.num_grays);
-            const u32 image_pitch = image->getPitch() / sizeof(u32);
-            u32* image_data = (u32*)image->lock();
+            const u32 image_pitch = m_image->getPitch() / sizeof(u32);
+            u32* image_data = (u32*)m_image->lock();
             u8* glyph_data = bits.buffer;
             for (u32 y = 0; y < (unsigned)bits.rows; ++y)
             {
@@ -116,37 +148,37 @@ bool GlyphPageCreator::insertGlyph(FT_Bitmap bits, core::rect<s32>& rect)
                 }
                 glyph_data += bits.pitch;
             }
-            image->unlock();
+            m_image->unlock();
             break;
         }
         default:
             return false;
     }
-    if (!image)
+    if (!m_image)
         return false;
 
     //Done creating a single glyph, now copy to the glyph page...
     //Determine the linebreak location
-    if (used_width + texture_size.Width > 512)
+    if (m_used_width + texture_size.Width > 512)
     {
-        used_width  = 0;
-        used_height += temp_height;
-        temp_height = 0;
+        m_used_width  = 0;
+        m_used_height += m_temp_height;
+        m_temp_height = 0;
     }
 
     //Copy now
-    image->copyTo(page, core::position2di(used_width, used_height));
+    m_image->copyTo(m_page, core::position2di(m_used_width, m_used_height));
 
     //Store the rectangle of current glyph
-    rect = core::rect<s32> (used_width, used_height, used_width + bits.width, used_height + bits.rows);
+    rect = core::rect<s32> (m_used_width, m_used_height, m_used_width + bits.width, m_used_height + bits.rows);
 
-    image->drop();
-    image = 0;
+    m_image->drop();
+    m_image = 0;
 
     //Store used area
-    used_width += texture_size.Width;
-    if (temp_height < texture_size.Height)
-        temp_height = texture_size.Height;
+    m_used_width += texture_size.Width;
+    if (m_temp_height < texture_size.Height)
+        m_temp_height = texture_size.Height;
     return true;
 }
 
