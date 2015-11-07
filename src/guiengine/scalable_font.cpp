@@ -26,9 +26,7 @@
 #include <IAttributes.h>
 #include <IGUIEnvironment.h>
 #include <IGUISpriteBank.h>
-#include <IReadFile.h>
 #include <IVideoDriver.h>
-#include <IXMLReader.h>
 
 #include <clocale>
 #include <cmath>
@@ -92,8 +90,10 @@ ScalableFont::~ScalableFont()
 {
     if (!m_is_hollow_copy)
     {
-        if (m_video_driver)     m_video_driver->drop();
-        if (m_spritebank) m_spritebank->drop();
+        if (m_video_driver)
+            m_video_driver->drop();
+        if (m_spritebank)
+            m_spritebank->drop();
     }
 }
 
@@ -306,7 +306,7 @@ bool ScalableFont::loadTTF()
     //Reserve 10 for normal font new characters added, 40 for digit font to display separately
     //Consider fallback font (bold) too
     m_max_height = (int)((curr_maxheight + (m_type == T_DIGIT ? 40 : 10) +
-                (m_type == T_BOLD ? 20 : 0))*m_scale);
+                   (m_type == T_BOLD ? 20 : 0))*m_scale);
 
     m_glyph_max_height = curr_maxheight;
 
@@ -634,8 +634,7 @@ const ScalableFont::SFontArea &ScalableFont::getAreaFromCharacter(const wchar_t 
 {
     const int area_id = getAreaIDFromCharacter(c, fallback_font);
 
-
-    if(m_mono_space_digits && ( (c>=L'0' && c<=L'9') || c==L' ' ) )
+    if (m_mono_space_digits && ((c>=L'0' && c<=L'9') || c==L' '))
     {
         const SFontArea &area = (fallback_font && *fallback_font)
                               ? m_fallback_font->m_areas[area_id]
@@ -656,7 +655,7 @@ const ScalableFont::SFontArea &ScalableFont::getAreaFromCharacter(const wchar_t 
     }
 
     // Note: fallback_font can be NULL
-    return ( use_fallback_font ? m_fallback_font->m_areas[area_id] : m_areas[area_id]);
+    return (use_fallback_font ? m_fallback_font->m_areas[area_id] : m_areas[area_id]);
 }   // getAreaFromCharacter
 
 // ----------------------------------------------------------------------------
