@@ -547,16 +547,16 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
         {
             
             //TODO
-            std::vector<GLMesh *> instanced_lists[Material::SHADERTYPE_COUNT];
+            /*std::vector<GLMesh *> instanced_lists[Material::SHADERTYPE_COUNT];
             instanced_lists[static_cast<int>(Material::SHADERTYPE_SOLID)] = ListInstancedMatDefault::getInstance()->SolidPass;
             instanced_lists[static_cast<int>(Material::SHADERTYPE_ALPHA_TEST)] = ListInstancedMatAlphaRef::getInstance()->SolidPass;
             instanced_lists[static_cast<int>(Material::SHADERTYPE_SOLID_UNLIT)] = ListInstancedMatUnlit::getInstance()->SolidPass;
             instanced_lists[static_cast<int>(Material::SHADERTYPE_SPHERE_MAP)] = ListInstancedMatSphereMap::getInstance()->SolidPass;
             instanced_lists[static_cast<int>(Material::SHADERTYPE_VEGETATION)] = ListInstancedMatGrass::getInstance()->SolidPass;
             instanced_lists[static_cast<int>(Material::SHADERTYPE_DETAIL_MAP)] = ListInstancedMatDetails::getInstance()->SolidPass;
-            instanced_lists[static_cast<int>(Material::SHADERTYPE_NORMAL_MAP)] = ListInstancedMatNormalMap::getInstance()->SolidPass;
+            instanced_lists[static_cast<int>(Material::SHADERTYPE_NORMAL_MAP)] = ListInstancedMatNormalMap::getInstance()->SolidPass;*/
            
-            m_solid_cmd_buffer.fill(m_solid_pass_mesh, instanced_lists);
+            m_solid_cmd_buffer.fill(m_solid_pass_mesh);
             
             
             size_t offset = 0, current_cmd = 0;

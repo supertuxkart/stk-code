@@ -76,6 +76,7 @@ m_offset(NULL), m_size(NULL), m_poly_count(0)
 
 CommandBuffer::~CommandBuffer()
 {
+    delete[] m_meshes;
     glDeleteBuffers(1, &m_draw_indirect_cmd_id);
     delete[] m_offset;
     delete[] m_size;
@@ -85,12 +86,11 @@ CommandBuffer::~CommandBuffer()
 template<typename T>
 void CommandBuffer::fillMaterial(int material_id,
                                  MeshMap *mesh_map,
-                                 std::vector<GLMesh *> &instanced_list,
                                  T *instance_buffer)
 {
     m_offset[material_id] = m_command_buffer_offset;
     FillInstances<T>(mesh_map[material_id],
-                     instanced_list,
+                     m_meshes[material_id],
                      instance_buffer,
                      m_draw_indirect_cmd,
                      m_instance_buffer_offset,
@@ -102,15 +102,23 @@ void CommandBuffer::fillMaterial(int material_id,
 
 SolidCommandBuffer::SolidCommandBuffer(): CommandBuffer()
 {
+    m_meshes = new std::vector<GLMesh *>[static_cast<int>(Material::SHADERTYPE_COUNT)];
     m_offset = new size_t[static_cast<int>(Material::SHADERTYPE_COUNT)];
     m_size = new size_t[static_cast<int>(Material::SHADERTYPE_COUNT)];
 }
    
-void SolidCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced_lists[])
+void SolidCommandBuffer::fill(MeshMap *mesh_map)
 {
     m_instance_buffer_offset = 0;
     m_command_buffer_offset = 0;
     m_poly_count = 0;    
+    
+    //clear meshes
+    for(int i=0;i<Material::SHADERTYPE_COUNT;i++)
+    {
+        m_meshes[i].clear();
+    }
+    
     
     //Dual textures materials
     InstanceDataDualTex *instance_buffer_dual_tex;
@@ -151,7 +159,6 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced
         material_id = static_cast<int>(dual_tex_materials[i]);
         fillMaterial( material_id,
                       mesh_map,
-                      instanced_lists[material_id],
                       instance_buffer_dual_tex);
     }
         
@@ -186,7 +193,6 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced
         material_id = static_cast<int>(three_tex_materials[i]);
         fillMaterial( material_id,
                       mesh_map,
-                      instanced_lists[material_id],
                       instance_buffer_three_tex);
     } 
     
@@ -199,11 +205,12 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced
 
 ShadowCommandBuffer::ShadowCommandBuffer(): CommandBuffer()
 {
+    m_meshes = new std::vector<GLMesh *>[4 * static_cast<int>(Material::SHADERTYPE_COUNT)];
     m_offset = new size_t[4 * static_cast<int>(Material::SHADERTYPE_COUNT)];
     m_size = new size_t[4 * static_cast<int>(Material::SHADERTYPE_COUNT)];
 }
 
-void ShadowCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced_lists[])
+void ShadowCommandBuffer::fill(MeshMap *mesh_map)
 {
     m_instance_buffer_offset = 0;
     m_command_buffer_offset = 0;
@@ -247,7 +254,6 @@ void ShadowCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instance
             material_id = cascade * 7 + static_cast<int>(materials[i]);
             fillMaterial( material_id,
                           mesh_map,
-                          instanced_lists[material_id],
                           shadow_instance_buffer);            
         }
     }
@@ -262,12 +268,13 @@ void ShadowCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instance
 
 ReflectiveShadowMapCommandBuffer::ReflectiveShadowMapCommandBuffer(): CommandBuffer()
 {
+    m_meshes = new std::vector<GLMesh *>[static_cast<int>(Material::SHADERTYPE_COUNT)];
     m_offset = new size_t[static_cast<int>(Material::SHADERTYPE_COUNT)];
     m_size = new size_t[static_cast<int>(Material::SHADERTYPE_COUNT)];
 }
 
 
-void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced_lists[])
+void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
 {
     m_instance_buffer_offset = 0;
     m_command_buffer_offset = 0;
@@ -308,7 +315,6 @@ void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMes
         material_id = static_cast<int>(materials[i]);
         fillMaterial( material_id,
                       mesh_map,
-                      instanced_lists[material_id],
                       rsm_instance_buffer);
     }
 
@@ -322,11 +328,12 @@ void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMes
 
 GlowCommandBuffer::GlowCommandBuffer()
 {
+    m_meshes = new std::vector<GLMesh *>[1];
     m_offset = new size_t[1];
     m_size = new size_t[1];    
 }
 
-void GlowCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced_lists[])
+void GlowCommandBuffer::fill(MeshMap *mesh_map)
 {
     m_instance_buffer_offset = 0;
     m_command_buffer_offset = 0;
@@ -354,7 +361,6 @@ void GlowCommandBuffer::fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced_
  
      fillMaterial( 0,
                   mesh_map,
-                  instanced_lists[0],
                   glow_instance_buffer);   
     
     if (!CVS->supportsAsyncInstanceUpload())

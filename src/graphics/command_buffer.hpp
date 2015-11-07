@@ -107,6 +107,7 @@ void FillInstances( const MeshMap &gathered_GL_mesh,
 class CommandBuffer
 {
 protected:
+    std::vector<GLMesh *> *m_meshes;
     GLuint m_draw_indirect_cmd_id;
     DrawElementsIndirectCommand *m_draw_indirect_cmd;
     size_t *m_offset;
@@ -118,7 +119,6 @@ protected:
     template<typename T>
     void fillMaterial(int material_id,
                       MeshMap *mesh_map,
-                      std::vector<GLMesh *> &instanced_list,
                       T *instance_buffer);
 
 public:
@@ -163,28 +163,28 @@ class SolidCommandBuffer: public CommandBuffer
 {
 public:
     SolidCommandBuffer();
-    void fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced_lists[]);
+    void fill(MeshMap *mesh_map);
 };
 
 class ShadowCommandBuffer: public CommandBuffer
 {
 public:
     ShadowCommandBuffer();
-    void fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced_lists[]);
+    void fill(MeshMap *mesh_map);
 };
 
 class ReflectiveShadowMapCommandBuffer: public CommandBuffer
 {
 public:
     ReflectiveShadowMapCommandBuffer();
-    void fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced_lists[]);
+    void fill(MeshMap *mesh_map);
 };
 
 class GlowCommandBuffer: public CommandBuffer
 {
 public:
     GlowCommandBuffer();
-    void fill(MeshMap *mesh_map, std::vector<GLMesh *> instanced_lists[]);
+    void fill(MeshMap *mesh_map);
 };
 
 #endif //HEADER_COMMAND_BUFFER_HPP

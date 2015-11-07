@@ -19,6 +19,7 @@
 #include "graphics/callbacks.hpp"
 #include "graphics/draw_tools.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/materials.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
@@ -514,125 +515,6 @@ public:
 };   // NormalVisualizer
 
 // ============================================================================
-struct DefaultMaterial
-{
-    typedef InstancedObjectPass1Shader InstancedFirstPassShader;
-    typedef InstancedObjectPass2Shader InstancedSecondPassShader;
-    typedef InstancedShadowShader InstancedShadowPassShader;
-    typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatDefault InstancedList;
-    typedef Shaders::ObjectPass1Shader FirstPassShader;
-    typedef Shaders::ObjectPass2Shader SecondPassShader;
-    typedef ShadowShader ShadowPassShader;
-    typedef CRSMShader RSMShader;
-    typedef ListMatDefault List;
-    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum Material::ShaderType MaterialType
-                                               = Material::SHADERTYPE_SOLID;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
-};   // struct DefaultMaterial
-
-const STK::Tuple<size_t> DefaultMaterial::FirstPassTextures
-    = STK::Tuple<size_t>(1);
-const STK::Tuple<size_t, size_t> DefaultMaterial::SecondPassTextures
-    = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<> DefaultMaterial::ShadowTextures;
-const STK::Tuple<size_t> DefaultMaterial::RSMTextures = STK::Tuple<size_t>(0);
-
-// ----------------------------------------------------------------------------
-struct AlphaRef
-{
-    typedef InstancedObjectRefPass1Shader InstancedFirstPassShader;
-    typedef InstancedObjectRefPass2Shader InstancedSecondPassShader;
-    typedef InstancedRefShadowShader InstancedShadowPassShader;
-    typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatAlphaRef InstancedList;
-    typedef ObjectRefPass1Shader FirstPassShader;
-    typedef ObjectRefPass2Shader SecondPassShader;
-    typedef RefShadowShader ShadowPassShader;
-    typedef CRSMShader RSMShader;
-    typedef ListMatAlphaRef List;
-    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_ALPHA_TEST;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<size_t> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
-};   // struct AlphaRef
-
-// ----------------------------------------------------------------------------
-const STK::Tuple<size_t, size_t> AlphaRef::FirstPassTextures
-    = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t, size_t> AlphaRef::SecondPassTextures 
-    = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t> AlphaRef::ShadowTextures = STK::Tuple<size_t>(0);
-const STK::Tuple<size_t> AlphaRef::RSMTextures = STK::Tuple<size_t>(0);
-
-// ----------------------------------------------------------------------------
-struct SphereMap
-{
-    typedef InstancedObjectPass1Shader InstancedFirstPassShader;
-    typedef InstancedSphereMapShader InstancedSecondPassShader;
-    typedef InstancedShadowShader InstancedShadowPassShader;
-    typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatSphereMap InstancedList;
-    typedef Shaders::ObjectPass1Shader FirstPassShader;
-    typedef SphereMapShader SecondPassShader;
-    typedef ShadowShader ShadowPassShader;
-    typedef CRSMShader RSMShader;
-    typedef ListMatSphereMap List;
-    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum Material::ShaderType MaterialType 
-                                          = Material::SHADERTYPE_SPHERE_MAP;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
-};   // struct SphereMap
-
-// ----------------------------------------------------------------------------
-const STK::Tuple<size_t> SphereMap::FirstPassTextures = STK::Tuple<size_t>(1);
-const STK::Tuple<size_t> SphereMap::SecondPassTextures = STK::Tuple<size_t>(0);
-const STK::Tuple<> SphereMap::ShadowTextures;
-const STK::Tuple<size_t> SphereMap::RSMTextures = STK::Tuple<size_t>(0);
-
-// ----------------------------------------------------------------------------
-struct UnlitMat
-{
-    typedef InstancedObjectRefPass1Shader InstancedFirstPassShader;
-    typedef InstancedObjectUnlitShader InstancedSecondPassShader;
-    typedef InstancedRefShadowShader InstancedShadowPassShader;
-    typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatUnlit InstancedList;
-    typedef ObjectRefPass1Shader FirstPassShader;
-    typedef ObjectUnlitShader SecondPassShader;
-    typedef RefShadowShader ShadowPassShader;
-    typedef CRSMShader RSMShader;
-    typedef ListMatUnlit List;
-    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum Material::ShaderType MaterialType =
-                                           Material::SHADERTYPE_SOLID_UNLIT;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t> SecondPassTextures;
-    static const STK::Tuple<size_t> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
-};   // struct UnlitMat
-
-// ----------------------------------------------------------------------------
-const STK::Tuple<size_t, size_t> UnlitMat::FirstPassTextures
-    = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t> UnlitMat::SecondPassTextures = STK::Tuple<size_t>(0);
-const STK::Tuple<size_t> UnlitMat::ShadowTextures = STK::Tuple<size_t>(0);
-const STK::Tuple<size_t> UnlitMat::RSMTextures = STK::Tuple<size_t>(0);
-
-// ============================================================================
 class GrassPass1Shader : public TextureShader<GrassPass1Shader, 2, core::matrix4,
                                        core::matrix4, core::vector3df>
 {
@@ -802,128 +684,8 @@ public:
     }   // InstancedDetailedObjectPass2Shader
 };   // InstancedDetailedObjectPass2Shader
 
-// ============================================================================
-
-// ----------------------------------------------------------------------------
-struct GrassMat
-{
-    typedef InstancedGrassPass1Shader InstancedFirstPassShader;
-    typedef InstancedGrassPass2Shader InstancedSecondPassShader;
-    typedef InstancedGrassShadowShader InstancedShadowPassShader;
-    typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatGrass InstancedList;
-    typedef GrassPass1Shader FirstPassShader;
-    typedef GrassPass2Shader SecondPassShader;
-    typedef GrassShadowShader ShadowPassShader;
-    typedef CRSMShader RSMShader;
-    typedef ListMatGrass List;
-    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum Material::ShaderType MaterialType 
-        = Material::SHADERTYPE_VEGETATION;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<size_t> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
-};   // GrassMat
-
-// ----------------------------------------------------------------------------
-const STK::Tuple<size_t, size_t> GrassMat::FirstPassTextures 
-    = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t, size_t> GrassMat::SecondPassTextures 
-    = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t> GrassMat::ShadowTextures = STK::Tuple<size_t>(0);
-const STK::Tuple<size_t> GrassMat::RSMTextures = STK::Tuple<size_t>(0);
-
-// ----------------------------------------------------------------------------
-struct NormalMat
-{
-    typedef InstancedNormalMapShader InstancedFirstPassShader;
-    typedef InstancedObjectPass2Shader InstancedSecondPassShader;
-    typedef InstancedShadowShader InstancedShadowPassShader;
-    typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatNormalMap InstancedList;
-    typedef NormalMapShader FirstPassShader;
-    typedef Shaders::ObjectPass2Shader SecondPassShader;
-    typedef ShadowShader ShadowPassShader;
-    typedef CRSMShader RSMShader;
-    typedef ListMatNormalMap List;
-    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
-    static const enum Material::ShaderType MaterialType
-                                          = Material::SHADERTYPE_NORMAL_MAP;
-    static const enum InstanceType Instance = InstanceTypeThreeTex;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
-};   // NormalMat
-
-// ----------------------------------------------------------------------------
-const STK::Tuple<size_t, size_t> NormalMat::FirstPassTextures
-    = STK::Tuple<size_t, size_t>(2, 1);
-const STK::Tuple<size_t, size_t> NormalMat::SecondPassTextures 
-    = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<> NormalMat::ShadowTextures;
-const STK::Tuple<size_t> NormalMat::RSMTextures = STK::Tuple<size_t>(0);
-
-// ----------------------------------------------------------------------------
-struct DetailMat
-{
-    typedef InstancedObjectPass1Shader InstancedFirstPassShader;
-    typedef InstancedDetailedObjectPass2Shader InstancedSecondPassShader;
-    typedef InstancedShadowShader InstancedShadowPassShader;
-    typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatDetails InstancedList;
-    typedef Shaders::ObjectPass1Shader FirstPassShader;
-    typedef DetailedObjectPass2Shader SecondPassShader;
-    typedef ShadowShader ShadowPassShader;
-    typedef CRSMShader RSMShader;
-    typedef ListMatDetails List;
-    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
-    static const enum Material::ShaderType MaterialType
-                                          = Material::SHADERTYPE_DETAIL_MAP;
-    static const enum InstanceType Instance = InstanceTypeThreeTex;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
-};   // DetailMat
-
-// ----------------------------------------------------------------------------
-const STK::Tuple<size_t> DetailMat::FirstPassTextures = STK::Tuple<size_t>(1);
-const STK::Tuple<size_t, size_t, size_t> DetailMat::SecondPassTextures
-    = STK::Tuple<size_t, size_t, size_t>(0, 2, 1);
-const STK::Tuple<> DetailMat::ShadowTextures;
-const STK::Tuple<size_t> DetailMat::RSMTextures = STK::Tuple<size_t>(0);
-
-// ----------------------------------------------------------------------------
-struct SplattingMat
-{
-    typedef Shaders::ObjectPass1Shader FirstPassShader;
-    typedef SplattingShader SecondPassShader;
-    typedef ShadowShader ShadowPassShader;
-    typedef SplattingRSMShader RSMShader;
-    typedef ListMatSplatting List;
-    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t, size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t, size_t, size_t, size_t, size_t> RSMTextures;
-};   // SplattingMat
-
-// ----------------------------------------------------------------------------
-
-const STK::Tuple<size_t> SplattingMat::FirstPassTextures = STK::Tuple<size_t>(6);
-const STK::Tuple<size_t, size_t, size_t, size_t, size_t> 
-          SplattingMat::SecondPassTextures 
-              = STK::Tuple<size_t, size_t, size_t, size_t, size_t>(1, 2, 3, 4, 5);
-const STK::Tuple<> SplattingMat::ShadowTextures;
-const STK::Tuple<size_t, size_t, size_t, size_t, size_t> SplattingMat::RSMTextures
-    = STK::Tuple<size_t, size_t, size_t, size_t, size_t>(1, 2, 3, 4, 5);
 
 // ============================================================================
-
-
 namespace RenderGeometry
 {
     struct TexUnit
@@ -1014,6 +776,9 @@ void renderInstancedMeshes1stPass(const DrawCalls& draw_calls, Args...args)
 {
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
     T::InstancedFirstPassShader::getInstance()->use();
+    T::InstancedFirstPassShader::getInstance()->setUniforms(args...);
+
+    
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
@@ -1028,7 +793,6 @@ void renderInstancedMeshes1stPass(const DrawCalls& draw_calls, Args...args)
 #endif
         TexExpander<typename T::InstancedFirstPassShader>::template expandTex(*mesh, T::FirstPassTextures);
 
-        T::InstancedFirstPassShader::getInstance()->setUniforms(args...);
         draw_calls.drawIndirectSolidCmd(T::MaterialType, i);
     }
 }   // renderInstancedMeshes1stPass
