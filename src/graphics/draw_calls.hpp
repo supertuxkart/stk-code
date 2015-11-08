@@ -102,6 +102,10 @@ public:
     { return m_solid_cmd_buffer.isEmpty(shader_type); }
     void drawIndirectSolidCmd(Material::ShaderType shader_type, int i) const;
     void multidrawIndirectSolidCmd(Material::ShaderType shader_type) const;
+    
+    void drawIndirectSolidFirstPass() const;
+    //void multidrawIndirectSolidCmd() const; //TODO
+    void drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled_tex) const;
 };
 
 #endif //HEADER_DRAW_CALLS_HPP

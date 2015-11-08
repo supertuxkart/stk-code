@@ -23,7 +23,6 @@
 #include "graphics/geometry_passes.hpp"
 #include "graphics/lighting_passes.hpp"
 #include "graphics/shadow_matrices.hpp"
-#include "graphics/solid_first_pass.hpp"
 
 
 class ShaderBasedRenderer: public AbstractRenderer
@@ -37,7 +36,6 @@ private:
     ShadowMatrices  m_shadow_matrices;
 
     irr::core::vector3df m_wind_dir;
-    SolidFirstPass *m_solid_first_pass;
     
     void compressPowerUpTextures();
     void setOverrideMaterial();

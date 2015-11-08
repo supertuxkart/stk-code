@@ -17,6 +17,7 @@
 
 #include "graphics/draw_calls.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/materials.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_scene_manager.hpp"
 #include "graphics/vao_manager.hpp"
@@ -500,12 +501,9 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
     if (!CVS->supportsIndirectInstancingRendering())
         return;
 
-    InstanceDataDualTex *InstanceBufferDualTex;
-    InstanceDataThreeTex *InstanceBufferThreeTex;
     InstanceDataSingleTex *ShadowInstanceBuffer;
     InstanceDataSingleTex *RSMInstanceBuffer;
     GlowInstanceData *GlowInstanceBuffer;
-    DrawElementsIndirectCommand *CmdBuffer;
     DrawElementsIndirectCommand *ShadowCmdBuffer;
     DrawElementsIndirectCommand *RSMCmdBuffer;
     DrawElementsIndirectCommand *GlowCmdBuffer;
@@ -514,12 +512,9 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
     
     if (CVS->supportsAsyncInstanceUpload())
     {
-        InstanceBufferDualTex = (InstanceDataDualTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeDualTex);
-        InstanceBufferThreeTex = (InstanceDataThreeTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeThreeTex);
         ShadowInstanceBuffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeShadow);
         RSMInstanceBuffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeRSM);
         GlowInstanceBuffer = (GlowInstanceData*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeGlow);
-        CmdBuffer = SolidPassCmd::getInstance()->Ptr;
         ShadowCmdBuffer = ShadowPassCmd::getInstance()->Ptr;
         GlowCmdBuffer = GlowPassCmd::getInstance()->Ptr;
         RSMCmdBuffer = RSMPassCmd::getInstance()->Ptr;
@@ -545,81 +540,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
     {
 #pragma omp section
         {
-            
-            //TODO
-            /*std::vector<GLMesh *> instanced_lists[Material::SHADERTYPE_COUNT];
-            instanced_lists[static_cast<int>(Material::SHADERTYPE_SOLID)] = ListInstancedMatDefault::getInstance()->SolidPass;
-            instanced_lists[static_cast<int>(Material::SHADERTYPE_ALPHA_TEST)] = ListInstancedMatAlphaRef::getInstance()->SolidPass;
-            instanced_lists[static_cast<int>(Material::SHADERTYPE_SOLID_UNLIT)] = ListInstancedMatUnlit::getInstance()->SolidPass;
-            instanced_lists[static_cast<int>(Material::SHADERTYPE_SPHERE_MAP)] = ListInstancedMatSphereMap::getInstance()->SolidPass;
-            instanced_lists[static_cast<int>(Material::SHADERTYPE_VEGETATION)] = ListInstancedMatGrass::getInstance()->SolidPass;
-            instanced_lists[static_cast<int>(Material::SHADERTYPE_DETAIL_MAP)] = ListInstancedMatDetails::getInstance()->SolidPass;
-            instanced_lists[static_cast<int>(Material::SHADERTYPE_NORMAL_MAP)] = ListInstancedMatNormalMap::getInstance()->SolidPass;*/
-           
             m_solid_cmd_buffer.fill(m_solid_pass_mesh);
-            
-            
-            size_t offset = 0, current_cmd = 0;
-            if (!CVS->supportsAsyncInstanceUpload())
-            {
-                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeDualTex));
-                InstanceBufferDualTex = (InstanceDataDualTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-                glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
-                CmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-            }
-              
-            
-            // Default Material
-            SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID] = current_cmd;
-            FillInstances(m_solid_pass_mesh[Material::SHADERTYPE_SOLID],
-                          ListInstancedMatDefault::getInstance()->SolidPass,
-                          InstanceBufferDualTex,
-                          CmdBuffer,
-                          offset,
-                          current_cmd,
-                          SolidPoly);
-            SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID];
-            
-            // Alpha Ref
-            SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_ALPHA_TEST] = current_cmd;
-            FillInstances(m_solid_pass_mesh[Material::SHADERTYPE_ALPHA_TEST], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
-            SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_ALPHA_TEST] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_ALPHA_TEST];
-            // Unlit
-            SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_UNLIT] = current_cmd;
-            FillInstances(m_solid_pass_mesh[Material::SHADERTYPE_SOLID_UNLIT], ListInstancedMatUnlit::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
-            SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID_UNLIT] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_UNLIT];
-            // Spheremap
-            SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SPHERE_MAP] = current_cmd;
-            FillInstances(m_solid_pass_mesh[Material::SHADERTYPE_SPHERE_MAP], ListInstancedMatSphereMap::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
-            SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_SPHERE_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SPHERE_MAP];
-            // Grass
-            SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_VEGETATION] = current_cmd;
-            FillInstances(m_solid_pass_mesh[Material::SHADERTYPE_VEGETATION], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
-            SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_VEGETATION] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_VEGETATION];
-
-            if (!CVS->supportsAsyncInstanceUpload())
-            {
-                glUnmapBuffer(GL_ARRAY_BUFFER);
-                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeThreeTex));
-                InstanceBufferThreeTex = (InstanceDataThreeTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataSingleTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
-            }
-
-            // Detail
-            SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_DETAIL_MAP] = current_cmd;
-            FillInstances(m_solid_pass_mesh[Material::SHADERTYPE_DETAIL_MAP], ListInstancedMatDetails::getInstance()->SolidPass, InstanceBufferThreeTex, CmdBuffer, offset, current_cmd, SolidPoly);
-            SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_DETAIL_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_DETAIL_MAP];
-            // Normal Map
-            SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP] = current_cmd;
-            FillInstances(m_solid_pass_mesh[Material::SHADERTYPE_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->SolidPass, InstanceBufferThreeTex, CmdBuffer, offset, current_cmd, SolidPoly);
-            SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_NORMAL_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP];
-
-
-            if (!CVS->supportsAsyncInstanceUpload())
-            {
-                glUnmapBuffer(GL_ARRAY_BUFFER);
-                glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-            }
         }
 #pragma omp section
         {
@@ -776,3 +697,29 @@ void DrawCalls::multidrawIndirectSolidCmd(Material::ShaderType shader_type) cons
 {
     m_solid_cmd_buffer.multidrawIndirect(static_cast<int>(shader_type));
 }
+
+void DrawCalls::drawIndirectSolidFirstPass() const
+{
+    m_solid_cmd_buffer.drawIndirect<DefaultMaterial>();
+    m_solid_cmd_buffer.drawIndirect<AlphaRef>();
+    m_solid_cmd_buffer.drawIndirect<UnlitMat>();
+    m_solid_cmd_buffer.drawIndirect<SphereMap>();
+    m_solid_cmd_buffer.drawIndirect<GrassMat>(windDir);
+    m_solid_cmd_buffer.drawIndirect<DetailMat>();
+    m_solid_cmd_buffer.drawIndirect<NormalMat>();  
+}
+
+
+void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled_tex) const
+{
+
+    m_solid_cmd_buffer.drawIndirect2ndPass<DefaultMaterial>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirect2ndPass<AlphaRef>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirect2ndPass<UnlitMat>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirect2ndPass<SphereMap>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirect2ndPass<GrassMat>(prefilled_tex, windDir, irr_driver->getSunDirection());
+    m_solid_cmd_buffer.drawIndirect2ndPass<DetailMat>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirect2ndPass<NormalMat>(prefilled_tex);
+}
+
+

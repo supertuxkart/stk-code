@@ -61,12 +61,6 @@ public:
 };
 
 
-class SolidPassCmd : public CommandBufferOld<SolidPassCmd, 1, static_cast<int>(Material::SHADERTYPE_COUNT)>
-{
-public:
-    size_t Offset[Material::SHADERTYPE_COUNT], Size[Material::SHADERTYPE_COUNT];
-};
-
 class ShadowPassCmd : public CommandBufferOld<ShadowPassCmd, 4, static_cast<int>(Material::SHADERTYPE_COUNT)>
 {
 public:

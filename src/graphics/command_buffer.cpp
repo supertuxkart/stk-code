@@ -18,6 +18,7 @@
 #include "graphics/command_buffer.hpp"
 #include "graphics/central_settings.hpp"
 
+
     template<>
     void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataSingleTex &instance)
     {
@@ -49,6 +50,35 @@
         STKMeshSceneNode *nd = dynamic_cast<STKMeshSceneNode*>(node);
         instance.Color = nd->getGlowColor().color;
     }
+    
+    template<>
+    void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
+                                       const std::vector<GLuint> &prefilled_tex)
+    {
+        TexExpander<typename GrassMat::InstancedSecondPassShader>::template
+            expandTex(mesh, GrassMat::SecondPassTextures, prefilled_tex[0],
+                      prefilled_tex[1], prefilled_tex[2], prefilled_tex[3]);
+    }
+
+
+
+
+template<typename T>
+void CommandBuffer::fillMaterial(int material_id,
+                                 MeshMap *mesh_map,
+                                 T *instance_buffer)
+{
+    m_offset[material_id] = m_command_buffer_offset;
+    FillInstances<T>(mesh_map[material_id],
+                     m_meshes[material_id],
+                     instance_buffer,
+                     m_draw_indirect_cmd,
+                     m_instance_buffer_offset,
+                     m_command_buffer_offset,
+                     m_poly_count);
+            
+    m_size[material_id] = m_command_buffer_offset - m_instance_buffer_offset;        
+}
 
 
 CommandBuffer::CommandBuffer():
@@ -82,23 +112,6 @@ CommandBuffer::~CommandBuffer()
     delete[] m_size;
 }
 
-
-template<typename T>
-void CommandBuffer::fillMaterial(int material_id,
-                                 MeshMap *mesh_map,
-                                 T *instance_buffer)
-{
-    m_offset[material_id] = m_command_buffer_offset;
-    FillInstances<T>(mesh_map[material_id],
-                     m_meshes[material_id],
-                     instance_buffer,
-                     m_draw_indirect_cmd,
-                     m_instance_buffer_offset,
-                     m_command_buffer_offset,
-                     m_poly_count);
-            
-    m_size[material_id] = m_command_buffer_offset - m_instance_buffer_offset;        
-}
 
 SolidCommandBuffer::SolidCommandBuffer(): CommandBuffer()
 {

@@ -18,8 +18,11 @@
 #ifndef HEADER_COMMAND_BUFFER_HPP
 #define HEADER_COMMAND_BUFFER_HPP
 
+#include "graphics/draw_tools.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/material.hpp"
+#include "graphics/materials.hpp"
+
 
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/vao_manager.hpp"
@@ -103,6 +106,19 @@ void FillInstances( const MeshMap &gathered_GL_mesh,
     }
 }
 
+template<typename T>
+void expandTexSecondPass(const GLMesh &mesh,
+                         const std::vector<GLuint> &prefilled_tex)
+{
+    TexExpander<typename T::InstancedSecondPassShader>::template
+        expandTex(mesh, T::SecondPassTextures, prefilled_tex[0],
+                  prefilled_tex[1], prefilled_tex[2]);
+}
+
+template<>
+void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
+                                   const std::vector<GLuint> &prefilled_tex);
+
 
 class CommandBuffer
 {
@@ -120,7 +136,8 @@ protected:
     void fillMaterial(int material_id,
                       MeshMap *mesh_map,
                       T *instance_buffer);
-
+                      
+    
 public:
     CommandBuffer();
     virtual ~CommandBuffer();
@@ -134,6 +151,60 @@ public:
     {
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);        
     }
+ 
+ 
+    template<typename T, typename...Uniforms>
+    void drawIndirect(Uniforms...uniforms) const
+    {
+        T::InstancedFirstPassShader::getInstance()->use();
+        T::InstancedFirstPassShader::getInstance()->setUniforms(uniforms...);
+        
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
+        for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
+        {
+            GLMesh *mesh = m_meshes[T::MaterialType][i];
+    #ifdef DEBUG
+            if (mesh->VAOType != T::VertexType)
+            {
+                Log::error("RenderGeometry", "Wrong instanced vertex format (hint : %s)", 
+                    mesh->textures[0]->getName().getPath().c_str());
+                continue;
+            }
+    #endif
+            TexExpander<typename T::InstancedFirstPassShader>::template expandTex(*mesh, T::FirstPassTextures);
+
+            glDrawElementsIndirect(GL_TRIANGLES,
+                                   GL_UNSIGNED_SHORT,
+                                   (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
+        }        
+        
+    }
+
+    
+    // ----------------------------------------------------------------------------
+    template<typename T, typename...Uniforms>
+    void drawIndirect2ndPass(const std::vector<GLuint> &prefilled_tex,
+                             Uniforms...uniforms                       ) const
+    {
+        T::InstancedSecondPassShader::getInstance()->use();
+        T::InstancedSecondPassShader::getInstance()->setUniforms(uniforms...);
+
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                    T::Instance));
+        for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
+        {
+            GLMesh *mesh = m_meshes[T::MaterialType][i];
+            expandTexSecondPass<T>(*mesh, prefilled_tex);
+            glDrawElementsIndirect(GL_TRIANGLES,
+                                   GL_UNSIGNED_SHORT,
+                                   (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
+        }
+    } 
+    
+
+
+
+
  
      /** Draw the i-th mesh with the specified material
      * (require at least OpenGL 4.0
@@ -158,6 +229,8 @@ public:
                                     sizeof(DrawElementsIndirectCommand));
     }
 };
+
+
 
 class SolidCommandBuffer: public CommandBuffer
 {

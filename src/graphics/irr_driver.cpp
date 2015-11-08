@@ -814,7 +814,6 @@ void IrrDriver::applyResolutionSettings()
     // (we're sure to update main.cpp at some point and forget this one...)
     ShaderBase::updateShaders();
     VAOManager::getInstance()->kill();
-    SolidPassCmd::getInstance()->kill();
     ShadowPassCmd::getInstance()->kill();
     RSMPassCmd::getInstance()->kill();
     GlowPassCmd::getInstance()->kill();

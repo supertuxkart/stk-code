@@ -216,7 +216,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glClearColor(0., 0., 0., 0.);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         m_geometry_passes.renderSolidFirstPass(m_draw_calls);
-        //m_solid_first_pass->render(m_wind_dir);
     }
     else
     {
@@ -491,17 +490,10 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
 ShaderBasedRenderer::ShaderBasedRenderer()
 {
-    if (CVS->isAZDOEnabled())
-        m_solid_first_pass = new AZDOSolidFirstPass();
-    else if (CVS->supportsIndirectInstancingRendering())    
-        m_solid_first_pass = new IndirectInstancedSolidFirstPass();
-    else
-        m_solid_first_pass = new GL3SolidFirstPass(); 
 }
 
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
-    delete m_solid_first_pass;
 }
 
 void ShaderBasedRenderer::addSunLight(const core::vector3df &pos) {
