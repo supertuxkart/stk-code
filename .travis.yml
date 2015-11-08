@@ -24,6 +24,8 @@ before_install:
 
 before_script:
   - export THREADS=`nproc`
+  # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
+  - exort THREADS=4
   - echo "THREADS = $THREADS"
 
 script:
