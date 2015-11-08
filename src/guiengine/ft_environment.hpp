@@ -20,6 +20,7 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <irrlicht.h>
 
 #include "utils/leak_check.hpp"
 
@@ -62,6 +63,12 @@ enum TTFLoadingType {T_NORMAL, T_DIGIT, T_BOLD};
         FT_Face           getFace(const FontUse font);
 
     private:
+        /** Check for any error discovered in a freetype function that will return a FT_Error value.
+         *  \param err The Freetype function.
+         *  \param desc The description of what is the function doing.
+         */
+        void              checkError(FT_Error err, const irr::core::stringc desc);
+
         /** Load font face into memory, but don't create glyph yet.
          */
         void              loadFont();

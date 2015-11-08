@@ -31,7 +31,7 @@ namespace GUIEngine
 
 FTEnvironment::FTEnvironment()
 {
-    m_ft_err += FT_Init_FreeType(&(m_ft_lib));
+    checkError(FT_Init_FreeType(&m_ft_lib), "loading freetype library");
 
     loadFont();
 }
@@ -41,12 +41,15 @@ FTEnvironment::FTEnvironment()
 FTEnvironment::~FTEnvironment()
 {
     for (int i = 0; i < F_COUNT; ++i)
-        m_ft_err += FT_Done_Face(m_ft_face[i]);
+        checkError(FT_Done_Face(m_ft_face[i]), "removing freetype face");
 
-    m_ft_err += FT_Done_FreeType(m_ft_lib);
+    checkError(FT_Done_FreeType(m_ft_lib), "removing freetype library");
 
     if (m_ft_err > 0)
+    {
         Log::error("Freetype Environment", "Can't destroy all fonts.");
+        m_ft_err = 0;
+    }
     else
         Log::info("Freetype Environment", "Successfully destroy all fonts.");
 }
@@ -60,35 +63,46 @@ FT_Face FTEnvironment::getFace(const FontUse font)
 
 // ----------------------------------------------------------------------------
 
+void FTEnvironment::checkError(FT_Error err, const irr::core::stringc desc)
+{
+    if (err)
+    {
+        Log::error("Freetype Environment", "Something wrong when %s!", desc);
+        m_ft_err++;
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 void FTEnvironment::loadFont()
 {
-    m_ft_err += FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
+    checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "Ubuntu-R.ttf", true)).c_str(),
-                                0, &m_ft_face[F_DEFAULT]);
+                                0, &m_ft_face[F_DEFAULT]), "loading F_DEFAULT");
 
-    m_ft_err += FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
+    checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "FreeSans.ttf",true)).c_str(),
-                                0, &m_ft_face[F_DEFAULT_FALLBACK]);
+                                0, &m_ft_face[F_DEFAULT_FALLBACK]), "loading F_DEFAULT_FALLBACK");
 
-    m_ft_err += FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
+    checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "wqy-microhei.ttf",true)).c_str(),
-                                 0, &m_ft_face[F_CJK]);
+                                 0, &m_ft_face[F_CJK]), "loading F_CJK");
 
-    m_ft_err += FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
+    checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "NotoNaskhArabicUI-Bold.ttf",true)).c_str(),
-                                 0, &m_ft_face[F_AR]);
+                                 0, &m_ft_face[F_AR]), "loading F_AR");
 
-    m_ft_err += FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
+    checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "Ubuntu-B.ttf", true)).c_str(),
-                                0, &m_ft_face[F_BOLD]);
+                                0, &m_ft_face[F_BOLD]), "loading F_BOLD");
 
-    m_ft_err += FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
+    checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "FreeSansBold.ttf", true)).c_str(),
-                                0, &m_ft_face[F_BOLD_FALLBACK]);
+                                0, &m_ft_face[F_BOLD_FALLBACK]), "loading F_BOLD_FALLBACK");
 
-    m_ft_err += FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
+    checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
                                 (FileManager::TTF, "SigmarOne.otf",true)).c_str(),
-                                 0, &m_ft_face[F_DIGIT]);
+                                 0, &m_ft_face[F_DIGIT]), "loading F_DIGIT");
 
     //Set charmap
     for (int h = 0; h < F_COUNT; ++h)
@@ -98,7 +112,7 @@ void FTEnvironment::loadFont()
             FT_UShort pid = m_ft_face[h]->charmaps[i]->platform_id;
             FT_UShort eid = m_ft_face[h]->charmaps[i]->encoding_id;
             if (((pid == 0) && (eid == 3)) || ((pid == 3) && (eid == 1)))
-                m_ft_err += FT_Set_Charmap(m_ft_face[h], m_ft_face[h]->charmaps[i]);
+                checkError(FT_Set_Charmap(m_ft_face[h], m_ft_face[h]->charmaps[i]), "setting charmaps");
         }
     }
 
@@ -124,16 +138,19 @@ void FTEnvironment::loadFont()
     Log::info("Freetype Environment", "DPI for Title Font is %d.", title_dpi);
     Log::info("Freetype Environment", "DPI for Digit Font is %d.", digit_dpi);
 
-    m_ft_err += FT_Set_Pixel_Sizes(m_ft_face[F_DEFAULT], 0, normal_dpi);
-    m_ft_err += FT_Set_Pixel_Sizes(m_ft_face[F_DEFAULT_FALLBACK], 0, normal_dpi);
-    m_ft_err += FT_Set_Pixel_Sizes(m_ft_face[F_CJK], 0, normal_dpi);
-    m_ft_err += FT_Set_Pixel_Sizes(m_ft_face[F_AR], 0, normal_dpi);
-    m_ft_err += FT_Set_Pixel_Sizes(m_ft_face[F_BOLD], 0, title_dpi);
-    m_ft_err += FT_Set_Pixel_Sizes(m_ft_face[F_BOLD_FALLBACK], 0, title_dpi);
-    m_ft_err += FT_Set_Pixel_Sizes(m_ft_face[F_DIGIT], 0, digit_dpi);
+    checkError(FT_Set_Pixel_Sizes(m_ft_face[F_DEFAULT], 0, normal_dpi), "setting F_DEFAULT size");
+    checkError(FT_Set_Pixel_Sizes(m_ft_face[F_DEFAULT_FALLBACK], 0, normal_dpi), "setting F_DEFAULT_FALLBACK size");
+    checkError(FT_Set_Pixel_Sizes(m_ft_face[F_CJK], 0, normal_dpi), "setting F_CJK size");
+    checkError(FT_Set_Pixel_Sizes(m_ft_face[F_AR], 0, normal_dpi), "setting F_AR size");
+    checkError(FT_Set_Pixel_Sizes(m_ft_face[F_BOLD], 0, title_dpi), "setting F_BOLD size");
+    checkError(FT_Set_Pixel_Sizes(m_ft_face[F_BOLD_FALLBACK], 0, title_dpi), "setting F_BOLD_FALLBACK size");
+    checkError(FT_Set_Pixel_Sizes(m_ft_face[F_DIGIT], 0, digit_dpi), "setting F_DIGIT size");
 
     if (m_ft_err > 0)
+    {
         Log::error("Freetype Environment", "Can't load all fonts.");
+        m_ft_err = 0;
+    }
     else
         Log::info("Freetype Environment", "Successfully loaded all fonts.");
 }
