@@ -26,14 +26,14 @@ script:
   - mkdir build-debug
   - cd build-debug
   - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCHECK_ASSETS=off
-  - make VERBOSE=1 -j 4 
+  - make VERBOSE=1 -j 32
 
   # Then a release build: 
   - cd ..
   - mkdir build-release
   - cd build-release
   - cmake .. -DCMAKE_BUILD_TYPE=Release -DCHECK_ASSETS=off
-  - make VERBOSE=1 -j 4 
+  - make VERBOSE=1 -j 32
 
 notifications:
   irc:
