@@ -61,7 +61,7 @@ void FTEnvironment::checkError(FT_Error err, const irr::core::stringc desc)
 {
     if (err)
     {
-        Log::error("Freetype Environment", "Something wrong when %s!", desc);
+        Log::error("Freetype Environment", "Something wrong when %s!", desc.c_str());
     }
 }
 
