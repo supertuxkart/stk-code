@@ -15,8 +15,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef HEADER_FT_ENVIRONMENT_HPP
+#define HEADER_FT_ENVIRONMENT_HPP
+
 #include <ft2build.h>
-#include "guiengine/get_font_properties.hpp"
 #include FT_FREETYPE_H
 
 #include "utils/leak_check.hpp"
@@ -26,6 +28,23 @@
  */
 namespace GUIEngine
 {
+
+enum FontUse
+{
+    F_DEFAULT = 0,
+    F_DEFAULT_FALLBACK = 1,
+    F_CJK = 2,
+    F_AR = 3,
+    F_LAST_REGULAR_FONT = F_AR,
+
+    F_BOLD = 4,
+    F_BOLD_FALLBACK = 5,
+    F_DIGIT = 6,
+    F_COUNT = 7
+};
+
+enum TTFLoadingType {T_NORMAL, T_DIGIT, T_BOLD};
+
     /**
      * \brief Initialize a freetype environment with a single freetype library.
      */
@@ -37,15 +56,20 @@ namespace GUIEngine
 
         FTEnvironment();
         ~FTEnvironment();
-        FT_Face           ft_face[irr::gui::F_COUNT];
+
+        /** Get a face with a suitable font type.
+         */
+        FT_Face           getFace(const FontUse font);
 
     private:
         /** Load font face into memory, but don't create glyph yet.
          */
         void              loadFont();
 
-        static FT_Library ft_lib;
-        static FT_Error   ft_err;
+        FT_Face           m_ft_face[F_COUNT];
+        static FT_Library m_ft_lib;
+        static FT_Error   m_ft_err;
     };
 
 }   // guiengine
+#endif // HEADER_FT_ENVIRONMENT_HPP
