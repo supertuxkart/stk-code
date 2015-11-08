@@ -31,6 +31,8 @@ namespace GUIEngine
 
 FTEnvironment::FTEnvironment()
 {
+    Log::info("Freetype Environment", "Loading fonts...");
+
     checkError(FT_Init_FreeType(&m_ft_lib), "loading freetype library");
 
     loadFont();
@@ -44,14 +46,6 @@ FTEnvironment::~FTEnvironment()
         checkError(FT_Done_Face(m_ft_face[i]), "removing freetype face");
 
     checkError(FT_Done_FreeType(m_ft_lib), "removing freetype library");
-
-    if (m_ft_err > 0)
-    {
-        Log::error("Freetype Environment", "Can't destroy all fonts.");
-        m_ft_err = 0;
-    }
-    else
-        Log::info("Freetype Environment", "Successfully destroy all fonts.");
 }
 
 // ----------------------------------------------------------------------------
@@ -68,7 +62,6 @@ void FTEnvironment::checkError(FT_Error err, const irr::core::stringc desc)
     if (err)
     {
         Log::error("Freetype Environment", "Something wrong when %s!", desc);
-        m_ft_err++;
     }
 }
 
@@ -146,16 +139,8 @@ void FTEnvironment::loadFont()
     checkError(FT_Set_Pixel_Sizes(m_ft_face[F_BOLD_FALLBACK], 0, title_dpi), "setting F_BOLD_FALLBACK size");
     checkError(FT_Set_Pixel_Sizes(m_ft_face[F_DIGIT], 0, digit_dpi), "setting F_DIGIT size");
 
-    if (m_ft_err > 0)
-    {
-        Log::error("Freetype Environment", "Can't load all fonts.");
-        m_ft_err = 0;
-    }
-    else
-        Log::info("Freetype Environment", "Successfully loaded all fonts.");
 }
 
 FT_Library FTEnvironment::m_ft_lib = NULL;
-FT_Error FTEnvironment::m_ft_err   = 0;
 
 }   // guiengine

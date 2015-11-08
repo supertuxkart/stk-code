@@ -75,7 +75,6 @@ enum TTFLoadingType {T_NORMAL, T_DIGIT, T_BOLD};
 
         FT_Face           m_ft_face[F_COUNT];
         static FT_Library m_ft_lib;
-        static FT_Error   m_ft_err;
     };
 
 }   // guiengine
