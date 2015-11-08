@@ -315,7 +315,8 @@ void Track::cleanup()
     m_object_physics_only_nodes.clear();
 
     irr_driver->removeNode(m_sun);
-    m_sun->drop();
+    if (CVS->isGLSL())
+        m_sun->drop();
     delete m_track_mesh;
     m_track_mesh = NULL;
 

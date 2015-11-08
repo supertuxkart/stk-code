@@ -25,6 +25,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/light.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
@@ -966,13 +967,50 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
     {
         m_node = NULL; // lights require shaders to work
     }
+
+    m_energy_animation_from = 0.0f;
+    m_energy_animation_to = 0.0f;
+    m_energy_animation_total_duration = 0.0f;
+    m_energy_animation_remaining_duration = 0.0f;
 }   // TrackObjectPresentationLight
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLight::~TrackObjectPresentationLight()
 {
 }   // ~TrackObjectPresentationLight
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLight::setEnergy(float energy)
+{
+    m_energy = energy;
+    LightNode* lnode = dynamic_cast<LightNode*>(m_node);
+    if (lnode != NULL)
+    {
+        lnode->setEnergy(energy);
+    }
+}
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLight::setEnergy(float energy, float duration)
+{
+    m_energy_animation_from = m_energy;
+    m_energy_animation_to = energy;
+    m_energy_animation_total_duration = duration;
+    m_energy_animation_remaining_duration = duration;
+}
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLight::update(float dt)
+{
+    if (m_energy_animation_remaining_duration > 0.0f)
+    {
+        m_energy_animation_remaining_duration -= dt;
+        if (m_energy_animation_remaining_duration < 0.0f)
+            m_energy_animation_remaining_duration = 0.0f;
 
+        float ratio = m_energy_animation_remaining_duration / m_energy_animation_total_duration;
+
+        setEnergy(m_energy_animation_from + 
+            (m_energy_animation_to - m_energy_animation_from)*(1.0f - ratio));
+    }
+}
 // ----------------------------------------------------------------------------
 TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
                                                        const XMLNode& xml_node)

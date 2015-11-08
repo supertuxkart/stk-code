@@ -15,11 +15,15 @@ class StartServer : public Protocol
         StartServer();
         virtual ~StartServer();
 
-        virtual bool notifyEvent(Event* event) { return true; }
-        virtual bool notifyEventAsynchronous(Event* event) { return true; }
         virtual void setup();
-        virtual void update() {}
         virtual void asynchronousUpdate();
+        // --------------------------------------------------------------------
+        virtual bool notifyEvent(Event* event) { return true; }
+        // --------------------------------------------------------------------
+        virtual bool notifyEventAsynchronous(Event* event) { return true; }
+        // --------------------------------------------------------------------
+        virtual void update() {}
+        // --------------------------------------------------------------------
 
     protected:
         Online::XMLRequest* m_request;
@@ -31,6 +35,6 @@ class StartServer : public Protocol
             EXITING
         };
         STATE m_state;
-};
+};   // class StartServer
 
 #endif // START_SERVER_HPP

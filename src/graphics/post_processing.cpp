@@ -819,6 +819,24 @@ public:
 };   // SunLightShader
 
 // ============================================================================
+class LightningShader : public TextureShader<LightningShader, 1, 
+                                             core::vector3df>
+{
+public:
+    LightningShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "lightning.frag");
+        assignUniforms("intensity");
+    }   // LightningShader
+    // ------------------------------------------------------------------------
+    void render(core::vector3df intensity)
+    {
+        drawFullScreenEffect(intensity);
+    }   // render
+};   // LightningShader
+
+// ============================================================================
 
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
@@ -1407,6 +1425,18 @@ void PostProcessing::applyMLAA()
     // Done.
     glDisable(GL_STENCIL_TEST);
 }   // applyMLAA
+
+// ----------------------------------------------------------------------------
+void PostProcessing::renderLightning(core::vector3df intensity)
+{
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBlendEquation(GL_FUNC_ADD);
+       
+    LightningShader::getInstance()->render(intensity);
+    
+    glDisable(GL_BLEND);
+}
 
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */

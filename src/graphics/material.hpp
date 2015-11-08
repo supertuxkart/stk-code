@@ -377,6 +377,7 @@ public:
     float getZipperMinSpeed() const { return m_zipper_min_speed; }
     // ------------------------------------------------------------------------
     ShaderType getShaderType() const { return m_shader_type; }
+    void setShaderType(ShaderType st) { m_shader_type = st; }
     // ------------------------------------------------------------------------
     /** True if this texture should have the U coordinates mirrored. */
     char getMirrorAxisInReverse() const { return m_mirror_axis_when_reverse; }

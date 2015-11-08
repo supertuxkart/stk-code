@@ -72,20 +72,18 @@ if __name__ == "__main__":
     all_authors = old_authors + new_authors;
     all_authors = sorted(all_authors, key=lambda x: x.lower())
     all_authors_string = reduce(lambda x,y: x+"\\n"+y, all_authors, "")
-    
+
+    credits_line = "msgstr \"Launchpad Contributions:%s\"\n"%all_authors_string
     # If no old authors exists, write a new entry:
     if contributions==-1:
         lines.append("\n")
         lines.append("#: src/states_screens/credits.cpp:209\n")
         lines.append("msgid \"translator-credits\"\n")
-
+        lines.append(credits_line)
     else:
-        # Otherwise just delete the old contribution string
-        # so that the new one can be appended below.
-        del lines[contributions]
+        # Otherwise just replace the old contribution string
+        lines[contributions] = credits_line
 
-    # Append new author list
-    lines.append("msgstr \"Launchpad Contributions:%s\"\n"%all_authors_string)
 
     # Overwrite old file
     f = open(sys.argv[1], "w")

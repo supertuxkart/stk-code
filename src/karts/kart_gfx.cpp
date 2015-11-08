@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
@@ -120,9 +121,13 @@ KartGFX::~KartGFX()
         if(m_all_emitters[i])
             delete m_all_emitters[i];
     }   // for i < KGFX_COUNT
-    m_nitro_light->drop();
-    m_skidding_light_1->drop();
-    m_skidding_light_2->drop();
+    
+    if (CVS->isGLSL())
+    {
+        m_nitro_light->drop();
+        m_skidding_light_1->drop();
+        m_skidding_light_2->drop();
+    }
 
 }   // ~KartGFX
 

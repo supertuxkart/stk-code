@@ -298,6 +298,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             }
 
             m_current_language_name = l.get_name();
+            m_current_language_name_code = l.get_language();
 
             if (!l)
             {
@@ -312,11 +313,13 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 Log::warn("Translation", "Unsupported langage '%s'", language.c_str());
                 UserConfigParams::m_language = "system";
                 m_current_language_name = "Default language";
+                m_current_language_name_code = "en";
                 m_dictionary = m_dictionary_manager.get_dictionary();
             }
             else
             {
                 m_current_language_name = tgtLang.get_name();
+                m_current_language_name_code = tgtLang.get_language();
                 Log::verbose("translation", "Language '%s'.", m_current_language_name.c_str());
                 m_dictionary = m_dictionary_manager.get_dictionary(tgtLang);
             }
@@ -325,6 +328,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     else
     {
         m_current_language_name = "Default language";
+        m_current_language_name_code = "en";
         m_dictionary = m_dictionary_manager.get_dictionary();
     }
 
@@ -424,8 +428,7 @@ bool Translations::isRTLText(const wchar_t *in_ptr)
         // Declare as RTL if one character is RTL
         for (std::size_t i = 0; i < length; i++)
         {
-            if (types[i] == FRIBIDI_TYPE_RTL ||
-                types[i] == FRIBIDI_TYPE_RLO)
+            if (types[i] & FRIBIDI_MASK_RTL)
             {
                 delete[] types;
                 return true;
@@ -539,10 +542,20 @@ bool Translations::isRTLLanguage() const
     return m_rtl;
 }
 
+std::set<wchar_t> Translations::getCurrentAllChar()
+{
+    return m_dictionary.get_all_used_chars();
+}
+
 std::string Translations::getCurrentLanguageName()
 {
     return m_current_language_name;
     //return m_dictionary_manager.get_language().get_name();
+}
+
+std::string Translations::getCurrentLanguageNameCode()
+{
+    return m_current_language_name_code;
 }
 
 core::stringw Translations::fribidizeLine(const core::stringw &str)

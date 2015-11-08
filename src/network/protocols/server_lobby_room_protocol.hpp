@@ -34,10 +34,8 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
         void playerLapsVote(Event* event);
 
         uint8_t m_next_id; //!< Next id to assign to a peer.
-        std::vector<TransportAddress> m_peers;
         std::vector<uint32_t> m_incoming_peers_ids;
         uint32_t m_current_protocol_id;
-        TransportAddress m_public_address;
         bool m_selection_enabled;
         bool m_in_race;
 

@@ -554,6 +554,10 @@ public:
         m_boundingboxesviz = false;
     }
     // ------------------------------------------------------------------------
+    void toggleWireframe() { m_renderer->toggleWireframe(); }
+    // ------------------------------------------------------------------------
+    void toggleMipVisualization() { m_renderer->toggleMipVisualization(); }
+    // ------------------------------------------------------------------------
     void toggleNormals() { m_normals = !m_normals; }
     // ------------------------------------------------------------------------
     bool getNormals() { return m_normals; }

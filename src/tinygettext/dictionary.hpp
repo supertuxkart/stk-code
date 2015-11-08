@@ -21,6 +21,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <set>
 #include "plural_forms.hpp"
 
 namespace tinygettext {
@@ -90,6 +91,10 @@ public:
       dictionary */
   void add_translation(const std::string& msgid, const std::string& msgstr);
   void add_translation(const std::string& msgctxt, const std::string& msgid, const std::string& msgstr);
+
+  /** Write all unique character from current dictionary using in a c++ set which is useful for
+      specific character loading. */
+  std::set<wchar_t> get_all_used_chars();
 
   /** Iterate over all messages, Func is of type:
       void func(const std::string& msgid, const std::vector<std::string>& msgstrs) */

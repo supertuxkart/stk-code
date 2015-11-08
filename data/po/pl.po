@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-09-26 00:20+1000\n"
-"PO-Revision-Date: 2015-09-26 13:43+0000\n"
+"PO-Revision-Date: 2015-10-07 17:13+0000\n"
 "Last-Translator: Dawid Gan <deveee@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/supertuxkart/supertuxkart/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +65,7 @@ msgstr "Złoty Kierowca"
 
 #. I18N: ./data/achievements.xml
 msgid "Win against at least 3 opponents in all single player modes."
-msgstr "Wygraj z co najmniej 3 ptrzeciwnikami w każdym jednoosobowym trybie gry."
+msgstr "Wygraj z co najmniej 3 przeciwnikami w każdym jednoosobowym trybie gry."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"

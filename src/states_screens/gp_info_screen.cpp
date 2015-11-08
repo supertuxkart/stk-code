@@ -134,6 +134,7 @@ void GPInfoScreen::beforeAddingWidget()
         SavedGrandPrix* saved_gp = SavedGrandPrix::getSavedGP(
             StateManager::get()->getActivePlayerProfile(0)->getUniqueID(),
             m_gp.getId(),
+            race_manager->getMinorMode(),
             race_manager->getNumLocalPlayers());
             
         int tracks = m_gp.getTrackNames().size();

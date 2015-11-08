@@ -164,6 +164,15 @@ else()
     include_directories(${OGGVORBIS_INCLUDE_DIRS})
 endif()
 
+# Freetype
+find_package(Freetype)
+if(FREETYPE_FOUND)
+    include_directories(${FREETYPE_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Freetype not found. "
+        "Freetype is required to display characters in SuperTuxKart. ")
+endif()
+
 # Fribidi
 if(USE_FRIBIDI)
     find_package(Fribidi)
@@ -339,6 +348,7 @@ target_link_libraries(supertuxkart
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
     )
 
 if(UNIX AND NOT APPLE)
@@ -398,7 +408,7 @@ if(MSVC OR MINGW)
 endif()
 
 if(MINGW)
-    find_library(LIBGCC NAMES "libgcc_s_dw2-1.dll" "libgcc_s_sjlj-1.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
+    find_library(LIBGCC NAMES "libgcc_s_dw2-1.dll" "libgcc_s_sjlj-1.dll" "libgcc_s_seh-1.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
     if(LIBGCC)
         file(COPY ${LIBGCC} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     endif()
@@ -415,9 +425,6 @@ if(MINGW)
         file(COPY ${LIBPTHREAD} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     endif()
 endif()
-
-# Optional tools
-add_subdirectory(tools/font_tool)
 
 
 # ==== Checking if data folder exists ====

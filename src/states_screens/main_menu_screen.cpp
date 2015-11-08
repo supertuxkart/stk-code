@@ -72,7 +72,7 @@ bool MainMenuScreen::m_enable_online = false;
 
 // ----------------------------------------------------------------------------
 
-MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
+MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 {
 }   // MainMenuScreen
 

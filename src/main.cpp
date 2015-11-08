@@ -1013,7 +1013,7 @@ int handleCmdLine()
     // Demo mode
     if(CommandLine::has("--demo-mode", &s))
     {
-        float t;
+        float t = 0;
         StringUtils::fromString(s, t);
         DemoWorld::enableDemoMode(t);
         // The default number of laps is taken from ProfileWorld and
@@ -1265,9 +1265,9 @@ int main(int argc, char *argv[] )
         handleCmdLineOutputModifier();
 
         if(CommandLine::has("--root", &s))
-        {
             FileManager::addRootDirs(s);
-        }
+        if (CommandLine::has("--stdout", &s))
+            FileManager::setStdoutName(s);
 
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
@@ -1288,14 +1288,6 @@ int main(int argc, char *argv[] )
         input_manager->setMode(InputManager::MENU);
         main_loop = new MainLoop();
         material_manager->loadMaterial();
-
-        // Load the font textures - they are all lazily loaded
-        // so no need to push a texture search path. They will actually
-        // be loaded from ScalableFont.
-        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::FONT, ""));
-        material_manager->addSharedMaterial(
-                   file_manager->getAsset(FileManager::FONT,"materials.xml"));
-        file_manager->popTextureSearchPath();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));

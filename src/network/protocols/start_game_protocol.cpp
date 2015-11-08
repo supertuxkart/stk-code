@@ -6,10 +6,11 @@
 #include "input/input_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/event.hpp"
 #include "network/game_setup.hpp"
+#include "network/network_manager.hpp"
 #include "network/network_world.hpp"
+#include "network/protocol_manager.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
 #include "online/online_profile.hpp"
 #include "race/race_manager.hpp"
@@ -36,7 +37,7 @@ StartGameProtocol::~StartGameProtocol()
 
 bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 5)
     {
         Log::error("StartGameProtocol", "Too short message.");
@@ -44,7 +45,7 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
     }
     uint32_t token = data.gui32();
     uint8_t ready = data.gui8(4);
-    STKPeer* peer = (*(event->peer));
+    STKPeer* peer = event->getPeer();
     if (peer->getClientServerToken() != token)
     {
         Log::error("StartGameProtocol", "Bad token received.");
@@ -198,7 +199,7 @@ void StartGameProtocol::ready() // on clients, means the loading is finished
     if (!m_listener->isServer()) // if we're a client
     {
         assert(NetworkManager::getInstance()->getPeerCount() == 1);
-        NetworkString ns;
+        NetworkString ns(5);
         ns.ai32(NetworkManager::getInstance()->getPeers()[0]->getClientServerToken()).ai8(1);
         Log::info("StartGameProtocol", "Player ready, notifying server.");
         m_listener->sendMessage(this, ns, true);

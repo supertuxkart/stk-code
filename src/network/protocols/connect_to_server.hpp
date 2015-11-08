@@ -21,42 +21,46 @@
 
 #include "network/protocol.hpp"
 #include "network/types.hpp"
+#include "utils/cpp2011.hpp"
 #include <string>
 
 class ConnectToServer : public Protocol, public CallbackObject
 {
-    public:
-        ConnectToServer(); //!< Quick join
-        ConnectToServer(uint32_t server_id, uint32_t host_id); //!< Specify server id
-        virtual ~ConnectToServer();
+private:
+    TransportAddress m_server_address;
+    uint32_t m_server_id;
+    uint32_t m_host_id;
+    uint32_t m_current_protocol_id;
+    bool m_quick_join;
 
-        virtual bool notifyEventAsynchronous(Event* event);
-        virtual void setup();
-        virtual void update() {}
-        virtual void asynchronousUpdate();
+    enum State
+    {
+        NONE,
+        GETTING_SELF_ADDRESS,
+        SHOWING_SELF_ADDRESS,
+        GETTING_SERVER_ADDRESS,
+        REQUESTING_CONNECTION,
+        CONNECTING,
+        CONNECTED,
+        HIDING_ADDRESS,
+        DONE,
+        EXITING
+    };
+    /** State for finite state machine. */
+    State m_state;
 
-    protected:
-        TransportAddress m_server_address;
-        TransportAddress m_public_address;
-        uint32_t m_server_id;
-        uint32_t m_host_id;
-        uint32_t m_current_protocol_id;
-        bool m_quick_join;
+    void handleSameLAN();
 
-        enum STATE
-        {
-            NONE,
-            GETTING_SELF_ADDRESS,
-            SHOWING_SELF_ADDRESS,
-            GETTING_SERVER_ADDRESS,
-            REQUESTING_CONNECTION,
-            CONNECTING,
-            CONNECTED,
-            HIDING_ADDRESS,
-            DONE,
-            EXITING
-        };
-        STATE m_state;
-};
+public:
+    ConnectToServer();
+    ConnectToServer(uint32_t server_id, uint32_t host_id);
+    virtual ~ConnectToServer();
+
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual void setup() OVERRIDE;
+    virtual void asynchronousUpdate();
+    virtual void update() OVERRIDE {}
+
+};   // class ConnectToServer
 
 #endif // CONNECT_TO_SERVER_HPP

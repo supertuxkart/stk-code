@@ -56,7 +56,6 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
 
     m_item_count_hint = 0;
 
-    m_font = GUIEngine::getFont()->getHollowCopy();
     m_max_label_width = 0;
 }
 // -----------------------------------------------------------------------------
@@ -384,6 +383,8 @@ void DynamicRibbonWidget::buildInternalStructure()
         name << this->m_properties[PROP_ID] << "_row" << n;
         ribbon->m_properties[PROP_ID] = name.str();
         ribbon->m_event_handler = this;
+
+        m_font = GUIEngine::getFont()->getHollowCopy();
 
         // calculate font size
         if (m_col_amount > 0)

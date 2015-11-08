@@ -98,6 +98,7 @@ GPUTimer          m_perf_query[Q_LAST];
 
 const int MIN_SUPPORTED_HEIGHT = 768;
 const int MIN_SUPPORTED_WIDTH  = 1024;
+const bool ALLOW_1280_X_720    = true;
 
 // ----------------------------------------------------------------------------
 /** The constructor creates the irrlicht device. It first creates a NULL
@@ -319,8 +320,9 @@ void IrrDriver::createListOfVideoModes()
         {
             const int w = modes->getVideoModeResolution(i).Width;
             const int h = modes->getVideoModeResolution(i).Height;
-            if ( (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) &&
-                ( ! (h==600 && w==800 && UserConfigParams::m_artist_debug_mode) ) )
+            if ((h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) &&
+                (!(h==600 && w==800 && UserConfigParams::m_artist_debug_mode) &&
+                (!(h==720 && w==1280 && ALLOW_1280_X_720 == true))))
                 continue;
 
             VideoMode mode(w, h);
@@ -1383,7 +1385,11 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
 {
     assert(texture.size() == 6);
 
-    m_skybox = new Skybox(texture);
+    if (CVS->isGLSL())
+    {
+        m_skybox = new Skybox(texture);
+    }
+
     if(spherical_harmonics_textures.size() == 6)
     {
         m_spherical_harmonics->setTextures(spherical_harmonics_textures);

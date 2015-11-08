@@ -1252,6 +1252,8 @@ void Kart::update(float dt)
     {
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
     }
+
+    PROFILER_PUSH_CPU_MARKER("Kart::Update (material)", 0x60, 0x34, 0x7F);
     handleMaterialGFX();
     const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
@@ -1309,6 +1311,7 @@ void Kart::update(float dt)
 #endif
         }
     }   // if there is material
+    PROFILER_POP_CPU_MARKER();
 
     // Check if any item was hit.
     // check it if we're not in a network world, or if we're on the server (when network mode is on)
@@ -1447,7 +1450,11 @@ void Kart::handleMaterialSFX(const Material *material)
     // In case that three sfx needed to be played (i.e. a previous is
     // playing, a current is playing, and a new terrain with sfx is
     // entered), the oldest (previous) sfx is stopped and deleted.
-    if(getLastMaterial()!=material)
+
+    // FIXME: if there are already two sfx playing, don't add another
+    // one. This should reduce the performance impact when driving 
+    // on the bridge in Cocoa.
+    if(getLastMaterial()!=material && !m_previous_terrain_sound)
     {
         // First stop any previously playing terrain sound
         // and remove it, so that m_previous_terrain_sound

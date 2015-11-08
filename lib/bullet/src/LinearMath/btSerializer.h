@@ -213,7 +213,11 @@ protected:
 
 			int *intPtr=0;
 			short *shtPtr=0;
+#ifdef __MINGW64__
+			char *cp = 0;int dataLen =0;intptr_t nr=0;
+#else
 			char *cp = 0;int dataLen =0;long nr=0;
+#endif
 			intPtr = (int*)m_dna;
 
 			/*
@@ -247,7 +251,11 @@ protected:
 				cp++;
 			}
 			{
+#ifdef __MINGW64__
+				nr= (intptr_t)cp;
+#else
 				nr= (long)cp;
+#endif
 			//	long mask=3;
 				nr= ((nr+3)&~3)-nr;
 				while (nr--)
@@ -282,7 +290,11 @@ protected:
 			}
 
 		{
+#ifdef __MINGW64__
+				nr= (intptr_t)cp;
+#else
 				nr= (long)cp;
+#endif
 			//	long mask=3;
 				nr= ((nr+3)&~3)-nr;
 				while (nr--)

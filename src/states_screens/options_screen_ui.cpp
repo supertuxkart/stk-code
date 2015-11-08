@@ -192,12 +192,13 @@ void OptionsScreenUI::init()
     // The names need to be sorted alphabetically. Store the 2-letter
     // language names in a mapping, to be able to get them from the
     // user visible full name.
-    std::vector<std::string> nice_lang_list;
-    std::map<std::string, std::string> nice_name_2_id;
+    std::vector<core::stringw> nice_lang_list;
+    std::map<core::stringw, std::string> nice_name_2_id;
     for (int n=0; n<amount; n++)
     {
         std::string code_name = (*lang_list)[n];
-        std::string nice_name = tinygettext::Language::from_name(code_name).get_name();
+        std::string s_name = tinygettext::Language::from_name(code_name).get_name();
+        core::stringw nice_name = StringUtils::utf8_to_wide(s_name.c_str());
         nice_lang_list.push_back(nice_name);
         nice_name_2_id[nice_name] = code_name;
     }
@@ -205,7 +206,7 @@ void OptionsScreenUI::init()
     for(unsigned int i=0; i<nice_lang_list.size(); i++)
     {
         list_widget->addItem(nice_name_2_id[nice_lang_list[i]],
-                              nice_lang_list[i].c_str());
+                              nice_lang_list[i]);
     }
 
     list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
@@ -328,6 +329,13 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         }
 
         translations = new Translations();
+
+        //Reload fonts for new translation
+        GUIEngine::cleanHollowCopyFont();
+        GUIEngine::getTitleFont()->recreateFromLanguage();
+        GUIEngine::getFont()->recreateFromLanguage();
+        GUIEngine::reloadHollowCopyFont(GUIEngine::getFont());
+
         GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
 
         GUIEngine::getFont()->updateRTL();

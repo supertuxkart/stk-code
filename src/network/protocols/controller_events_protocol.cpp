@@ -2,6 +2,9 @@
 
 #include "modes/world.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
+#include "network/event.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_manager.hpp"
 #include "network/network_world.hpp"
 #include "utils/log.hpp"
@@ -63,7 +66,7 @@ void ControllerEventsProtocol::setup()
 
 bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
 {
-    NetworkString data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 17)
     {
         Log::error("ControllerEventsProtocol", "The data supplied was not complete. Size was %d.", data.size());
@@ -72,7 +75,7 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
     uint32_t token = data.gui32();
     NetworkString pure_message = data;
     pure_message.removeFront(4);
-    if (token != (*event->peer)->getClientServerToken())
+    if (token != event->getPeer()->getClientServerToken())
     {
         Log::error("ControllerEventsProtocol", "Bad token from peer.");
         return true;
@@ -118,7 +121,7 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         {
             if (i == client_index) // don't send that message to the sender
                 continue;
-            NetworkString ns2;
+            NetworkString ns2(4+pure_message.size());
             ns2.ai32(m_controllers[i].second->getClientServerToken());
             ns2 += pure_message;
             m_listener->sendMessage(this, m_controllers[i].second, ns2, false);
@@ -157,7 +160,7 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     uint8_t serialized_2 = (uint8_t)(controls->m_accel*255.0);
     uint8_t serialized_3 = (uint8_t)(controls->m_steer*127.0);
 
-    NetworkString ns;
+    NetworkString ns(17);
     ns.ai32(m_controllers[m_self_controller_index].second->getClientServerToken());
     ns.af(World::getWorld()->getTime());
     ns.ai8(m_self_controller_index);

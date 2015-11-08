@@ -67,7 +67,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
     font->doDraw(text, core::rect<s32>(0, 0, size.Width, size.Height), video::SColor(255,255,255,255),
         false, false, NULL, this);
 
-    const float scale = 0.018f;
+    const float scale = 0.03f;
 
     //scene::SMesh* mesh = new scene::SMesh();
     std::map<video::ITexture*, scene::SMeshBuffer*> buffers;

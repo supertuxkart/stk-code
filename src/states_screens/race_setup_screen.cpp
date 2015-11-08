@@ -47,7 +47,7 @@ DEFINE_SCREEN_SINGLETON( RaceSetupScreen );
 
 // -----------------------------------------------------------------------------
 
-RaceSetupScreen::RaceSetupScreen() : Screen("racesetup.stkgui")
+RaceSetupScreen::RaceSetupScreen() : Screen("race_setup.stkgui")
 {
 }   // RaceSetupScreen
 

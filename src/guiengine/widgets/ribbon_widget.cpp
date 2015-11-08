@@ -690,7 +690,8 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w,
     // bring focus back to enclosing ribbon widget
     this->setFocusForPlayer( playerID );
 
-    if (m_selection[playerID] != -1)
+    if (m_selection[playerID] > -1 && 
+        m_selection[playerID] < (int)(m_active_children.size()))
     {
         if (m_active_children[m_selection[playerID]].m_deactivated)
         {
