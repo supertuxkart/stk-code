@@ -205,7 +205,7 @@ XMLRequest* ServersManager::getRefreshRequest(bool request_now)
         RequestManager::get()->addRequest(request);
 
     return request;
-}   // refreshRequest
+}   // getRefreshRequest
 
 // ------------------------------------------------------------------------
 /** Callback from the refresh request.
