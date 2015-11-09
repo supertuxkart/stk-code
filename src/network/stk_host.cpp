@@ -433,7 +433,7 @@ void* STKHost::mainLoop(void* self)
             if(len>0 && std::string(buffer, len)=="stk-server")
             {
                 Log::verbose("STKHost", "Received LAN server query");
-                std::string &name = StringUtils::wide_to_utf8(
+                std::string name = StringUtils::wide_to_utf8(
                                       myself->get()->getServerName().c_str());
                 if(name.size()>2)
                     name = name.substr(0, 255);
