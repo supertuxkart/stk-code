@@ -63,8 +63,20 @@ ServersManager::~ServersManager()
 }   // ~ServersManager
 
 // ------------------------------------------------------------------------
+/** Removes all stored server information. After this call the list of
+ *  servers can be refreshed.
+ */
 void ServersManager::cleanUpServers()
 {
+    if(m_joined_server.getAtomic()!=NULL)
+    {
+        // m_joinsed_server is a pointer into the m_server structure,
+        // we can not modify this data structure while this pointer exists.
+        Log::warn("ServersManager", "Server cleanUp while being already "
+                                    "connected to a server.");
+        return;
+    }
+
     m_sorted_servers.lock();
     m_sorted_servers.getData().clearAndDeleteAll();
     m_sorted_servers.unlock();
@@ -73,7 +85,7 @@ void ServersManager::cleanUpServers()
     m_mapped_servers.unlock();
 }   // cleanUpServers
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Returns a WAN update-list-of-servers request. It queries the
  *  STK server for an up-to-date list of servers.
  */
@@ -102,7 +114,7 @@ XMLRequest* ServersManager::getWANRefreshRequest() const
     return request;
 }   // getWANRefreshRequest
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Returns a LAN update-list-of-servers request. It uses UDP broadcasts
  *  to find LAN servers, and waits for a certain amount of time fr 
  *  answers.
@@ -167,7 +179,8 @@ XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint8_t players     = s.getUInt8(1+name.size()+1);
                     ServersManager::get()
                           ->addServer(new Server(name_w, /*lan*/true,
-                                                 max_players, players));
+                                                 max_players, players, 
+                                                 sender)               );
                     m_success = true;
                 }   // if received_data
             }    // while still waiting
@@ -184,7 +197,7 @@ XMLRequest* ServersManager::getLANRefreshRequest() const
 
 }   // getLANRefreshRequest
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Factory function to create either a LAN or a WAN update-of-server
  *  requests. The current list of servers is also cleared/
  */
@@ -194,6 +207,15 @@ XMLRequest* ServersManager::getRefreshRequest(bool request_now)
         < SERVER_REFRESH_INTERVAL)
     {
         // Avoid too frequent refreshing
+        return NULL;
+    }
+
+    if(m_joined_server.getAtomic()!=NULL)
+    {
+        // m_joinsed_server is a pointer into the m_server structure,
+        // we can not modify this data structure while this pointer exists.
+        Log::warn("ServersManager", "Server refresh while being already "
+                                    "connected to a server.");
         return NULL;
     }
 
@@ -207,7 +229,7 @@ XMLRequest* ServersManager::getRefreshRequest(bool request_now)
     return request;
 }   // getRefreshRequest
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Callback from the refresh request.
  *  \param success If the refresh was successful.
  *  \param input The XML data describing the server.
@@ -228,7 +250,7 @@ void ServersManager::refresh(bool success, const XMLNode *input)
     m_last_load_time.setAtomic((float)StkTime::getRealTime());
 }   // refresh
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 const Server* ServersManager::getQuickPlay() const
 {
     if (m_sorted_servers.getData().size() > 0)
@@ -237,17 +259,27 @@ const Server* ServersManager::getQuickPlay() const
     return NULL;
 }   // getQuickPlay
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** Sets a pointer to the server to which this client is connected. From now
+ *  on the list of servers must not be modified (else this pointer might
+ *  become invalid).
+ */
 void ServersManager::setJoinedServer(uint32_t id)
 {
-    MutexLocker(m_joined_server);
-    delete m_joined_server.getData();
+    {
+        MutexLocker(m_joined_server);
+        delete m_joined_server.getData();
+    }
 
-    // It's a copy!
-    m_joined_server.getData() = new Server(*getServerByID(id));
+    {
+        MutexLocker(m_mapped_servers);
+        m_joined_server.getData() = m_mapped_servers.getData().at(id);
+    }
 }   // setJoinedServer
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** Unsets the server to which this client is connected.
+ */
 void ServersManager::unsetJoinedServer()
 {
     MutexLocker(m_joined_server);
@@ -255,7 +287,7 @@ void ServersManager::unsetJoinedServer()
     m_joined_server.getData() = NULL;
 }   // unsetJoinedServer
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void ServersManager::addServer(Server *server)
 {
     m_sorted_servers.lock();
@@ -267,14 +299,14 @@ void ServersManager::addServer(Server *server)
     m_mapped_servers.unlock();
 }   // addServer
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 int ServersManager::getNumServers() const
 {
     MutexLocker(m_sorted_servers);
     return m_sorted_servers.getData().size();
 }   // getNumServers
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 const Server* ServersManager::getServerBySort(int index) const
 {
     MutexLocker(m_sorted_servers);
@@ -288,13 +320,13 @@ const Server* ServersManager::getServerByID(uint32_t id) const
     return m_mapped_servers.getData().at(id);
 }   // getServerByID
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 Server* ServersManager::getJoinedServer() const
 {
     return m_joined_server.getAtomic();
 }   // getJoinedServer
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void ServersManager::sort(bool sort_desc)
 {
     MutexLocker(m_sorted_servers);

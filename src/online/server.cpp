@@ -57,21 +57,25 @@ Server::Server(const XMLNode & xml, bool is_lan)
 
 // ----------------------------------------------------------------------------
 /** Manual server creation, based on data received from a LAN server discovery
- *  (see ServersManager::getLANRefresh).
+ *  (see ServersManager::getLANRefresh). This constructor is only used for
+ *  LAN servers.
  *  \param name Name of the server.
  *  \param is_lan If this is a lan-only server.
  *  \param max_players Maximum number of players allowed on this server.
  *  \param current_players The currently connected number of players.
  */
 Server::Server(const core::stringw &name, bool is_lan, int max_players,
-               int current_players)
+               int current_players, const TransportAddress &address)
 {
-    m_name = name;
+    m_name               = name;
     m_satisfaction_score = 0;
-    m_server_id = 0;
-    m_current_players = current_players;
-    m_max_players = max_players;
-    m_is_lan = is_lan;
+    m_server_id          = 0;
+    m_current_players    = current_players;
+    m_max_players        = max_players;
+    m_is_lan             = is_lan;
+    m_address.copy(address);
+    // In case of LAN server, public and private port are the same.
+    m_private_port       = m_address.getPort();
 }   // server(name, ...)
 
 // ----------------------------------------------------------------------------

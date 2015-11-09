@@ -178,8 +178,9 @@ void CreateServerScreen::createServer()
     if (STKHost::isLAN())
     {
         // FIXME Is this actually necessary?? Only in case of WAN, or LAN and WAN?
+        TransportAddress address(0x7f000001,0);  // 127.0.0.1
         Server *server = new Server(name, /*lan*/true, max_players,
-                                    /*current_player*/1);
+                                    /*current_player*/1, address);
         ServersManager::get()->addServer(server);
     }
 

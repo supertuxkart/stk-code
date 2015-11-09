@@ -24,6 +24,7 @@
   * Represents a server that is joinable
   */
 
+#include "network/transport_address.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
@@ -71,6 +72,14 @@ protected:
     /** True if this server is on the LAN, false otherwise. */
     bool m_is_lan;
 
+    /** The public ip address and port of this server. */
+    TransportAddress m_address;
+
+    /** This is the private port of the server. This is used if a WAN game
+     *  is started, but one client is discovered on the same LAN, so a direct
+     *  connection using the private port is possible. */
+    uint16_t m_private_port;
+
     /** The sort order to be used in the comparison. */
     static SortOrder m_sort_order;
 
@@ -79,7 +88,7 @@ public:
          /** Initialises the object from an XML node. */
          Server(const XMLNode &xml, bool is_lan);
          Server(const irr::core::stringw &name, bool is_lan, int max_players,
-                int current_players);
+                int current_players, const TransportAddress &address);
     bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
    /** Sets the sort order used in the comparison function. It is static, so
