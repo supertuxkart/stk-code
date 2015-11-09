@@ -144,6 +144,9 @@ void CreateServerScreen::onUpdate(float delta)
     }
 
     //FIXME If we really want a gui, we need to decide what else to do here
+    // For now start the (wrong i.e. client) lobby, to prevent to create
+    // a server more than once.
+    NetworkingLobby::getInstance()->push();
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -174,11 +177,10 @@ void CreateServerScreen::createServer()
     // In case of a LAN game, we can create the new server object now
     if (STKHost::isLAN())
     {
+        // FIXME Is this actually necessary?? Only in case of WAN, or LAN and WAN?
         Server *server = new Server(name, /*lan*/true, max_players,
                                     /*current_player*/1);
         ServersManager::get()->addServer(server);
-        new ServerInfoDialog(server->getServerId(), true);
-        return;
     }
 
     // In case of a WAN game, we register this server with the

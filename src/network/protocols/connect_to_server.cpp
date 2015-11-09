@@ -357,11 +357,13 @@ void ConnectToServer::handleSameLAN()
 
     TransportAddress sender;
     // get the sender
-    const uint8_t* received_data = host->receiveRawPacket(&sender);
+    const int LEN=256;
+    char buffer[LEN];
+    int len = host->receiveRawPacket(buffer, LEN, &sender, 2000);
 
     host->startListening(); // start listening again
     const char data[] = "aloha_stk\0";
-    if (strcmp(data, (char*)(received_data)) == 0)
+    if (strcmp(data, buffer) == 0)
     {
         Log::info("ConnectToServer", "LAN Server found : %s",
                    sender.toString().c_str());

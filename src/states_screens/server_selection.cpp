@@ -62,7 +62,7 @@ void ServerSelection::tearDown()
  */
 void ServerSelection::refresh()
 {
-    m_refresh_request = ServersManager::get()->refreshRequest();
+    m_refresh_request = ServersManager::get()->getRefreshRequest();
     // If the request was created (i.e. no error, and not re-requested within
     // 5 seconds), clear the list and display the waiting message:
     if(m_refresh_request)

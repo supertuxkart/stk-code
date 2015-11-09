@@ -473,7 +473,7 @@ void ProtocolManager::asynchronousUpdate()
     }
     pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
 
-    // process queued events for protocols
+    // Process queued events for protocols
     // these requests are asynchronous
     pthread_mutex_lock(&m_requests_mutex);
     while(m_requests.size()>0)

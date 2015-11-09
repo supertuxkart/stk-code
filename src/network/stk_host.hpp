@@ -186,8 +186,6 @@ public:
                             uint32_t max_outgoing_bandwidth);
     void        startListening();
     void        stopListening();
-    uint8_t*    receiveRawPacket(const TransportAddress& sender,
-                                 int max_tries = -1);
     bool        peerExists(const TransportAddress& peer_address);
     void        removePeer(const STKPeer* peer);
     bool        isConnectedTo(const TransportAddress& peer_address);
@@ -201,9 +199,11 @@ public:
     /** Returns the current game setup. */
     GameSetup* getGameSetup() { return m_game_setup; }
     // --------------------------------------------------------------------
-    uint8_t* receiveRawPacket(TransportAddress* sender)
+    int receiveRawPacket(char *buffer, int buffer_len, 
+                         TransportAddress* sender, int max_tries = -1)
     {
-        return m_network->receiveRawPacket(sender);
+        return m_network->receiveRawPacket(buffer, buffer_len, sender,
+                                           max_tries);
     }   // receiveRawPacket
 
     // --------------------------------------------------------------------

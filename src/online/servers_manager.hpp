@@ -50,13 +50,15 @@ private:
     Synchronised<float>      m_last_load_time;
     void                     refresh(bool success, const XMLNode * input);
     void                     cleanUpServers();
+    XMLRequest *             getWANRefreshRequest() const;
+    XMLRequest *             getLANRefreshRequest() const;
 
 public:
     // Singleton
     static ServersManager*   get();
     static void              deallocate();
 
-    XMLRequest *             refreshRequest(bool request_now = true) const;
+    XMLRequest *             getRefreshRequest(bool request_now = true);
     void                     setJoinedServer(uint32_t server_id);
     void                     unsetJoinedServer();
     void                     addServer(Server * server);

@@ -78,6 +78,12 @@ public:
     }   // NetworkString
 
     // ------------------------------------------------------------------------
+    NetworkString(const char *p, int len)
+    {
+        m_string.resize(len);
+        memcpy(m_string.data(), p, len);
+    }   // NetworkString(char*, int)
+    // ------------------------------------------------------------------------
     NetworkString& add(const std::string &s)
     {
         return addUInt8(uint8_t(s.size())).as(s);

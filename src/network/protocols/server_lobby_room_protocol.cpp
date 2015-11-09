@@ -57,7 +57,10 @@ void ServerLobbyRoomProtocol::setup()
 {
     m_setup             = STKHost::get()->setupNewGame();
     m_next_id           = 0;
-    m_state             = NONE;
+
+    // In case of LAN we don't need our public address or register with the STK
+    // server, so we can directly go to the working state.
+    m_state             = STKHost::isLAN() ? WORKING : NONE;
     m_selection_enabled = false;
     m_in_race           = false;
     m_current_protocol  = NULL;

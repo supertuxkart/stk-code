@@ -18,6 +18,7 @@
 
 #include "online/servers_manager.hpp"
 #include "config/user_config.hpp"
+#include "network/stk_host.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
 
@@ -73,7 +74,121 @@ void ServersManager::cleanUpServers()
 }   // cleanUpServers
 
 // ------------------------------------------------------------------------
-XMLRequest* ServersManager::refreshRequest(bool request_now) const
+/** Returns a WAN update-list-of-servers request. It queries the
+ *  STK server for an up-to-date list of servers.
+ */
+XMLRequest* ServersManager::getWANRefreshRequest() const
+{
+    // ========================================================================
+    /** A small local class that triggers an update of the ServersManager
+     *  when the request is finished. */
+    class WANRefreshRequest : public XMLRequest
+    {
+    public:
+        WANRefreshRequest() : XMLRequest(/*manage_memory*/false,
+                                         /*priority*/100) {}
+        // --------------------------------------------------------------------
+        virtual void callback()
+        {
+            ServersManager::get()->refresh(isSuccess(), getXMLData());
+        }   // callback
+        // --------------------------------------------------------------------
+    };   // RefreshRequest
+    // ========================================================================
+
+    XMLRequest* request = new WANRefreshRequest();
+    request->setApiURL(API::SERVER_PATH, "get-all");
+
+    return request;
+}   // getWANRefreshRequest
+
+// ------------------------------------------------------------------------
+/** Returns a LAN update-list-of-servers request. It uses UDP broadcasts
+ *  to find LAN servers, and waits for a certain amount of time fr 
+ *  answers.
+ */
+XMLRequest* ServersManager::getLANRefreshRequest() const
+{
+    /** A simple class that uses LAN broadcasts to find local servers.
+     *  It is based on XML request, but actually does not use any of the
+     *  XML/HTTP based infrastructure, but implements the same interface.
+     *  This way the already existing request thread can be used.
+     */
+    class LANRefreshRequest : public XMLRequest
+    {
+    public:
+
+        /** High priority for this request. */
+        LANRefreshRequest() : XMLRequest(false, 100) {m_success = false;}
+        // --------------------------------------------------------------------
+        virtual ~LANRefreshRequest() {}
+        // --------------------------------------------------------------------
+        /** Get the downloaded XML tree.
+         *  \pre request has to be executed.
+         *  \return get the complete result from the request reply. */
+        virtual const XMLNode * getXMLData() const
+        {
+            assert(hasBeenExecuted());
+            return NULL;
+        }   // getXMLData
+        // --------------------------------------------------------------------
+        virtual void prepareOperation() OVERRIDE
+        {
+        }   // prepareOperation
+        // --------------------------------------------------------------------
+        virtual void operation()
+        {
+            Network *broadcast = new Network(1, 1, 0, 0);
+
+            NetworkString s(std::string("stk-server"));
+            TransportAddress broadcast_address(-1, 2757);
+            broadcast->sendRawPacket(s.getBytes(), s.size(), broadcast_address);
+
+            Log::info("ServersManager", "Sent broadcast message.");
+
+            const int LEN=2048;
+            char buffer[LEN];
+            // Wait for up to 0.5 seconds to receive an answer from 
+            // any local servers.
+            double start_time = StkTime::getRealTime();
+            const double DURATION = 1.0;
+            while(StkTime::getRealTime() - start_time < DURATION)
+            {
+                TransportAddress sender;
+                int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
+                if(len>0)
+                {
+                    NetworkString s(buffer, len);
+                    uint8_t name_len = s.getUInt8(0);
+                    std::string name = s.getString(1, name_len);
+                    irr::core::stringw name_w =
+                                       StringUtils::utf8_to_wide(name.c_str());
+                    uint8_t max_players = s.getUInt8(1+name_len  );
+                    uint8_t players     = s.getUInt8(1+name.size()+1);
+                    ServersManager::get()
+                          ->addServer(new Server(name_w, /*lan*/true,
+                                                 max_players, players));
+                    m_success = true;
+                }   // if received_data
+            }    // while still waiting
+        }   // operation
+        // --------------------------------------------------------------------
+        /** This function is necessary, otherwise the XML- and HTTP-Request
+         *  functions are called, which will cause a crash. */
+        virtual void afterOperation() OVERRIDE {}
+        // --------------------------------------------------------------------
+    };   // LANRefreshRequest
+    // ========================================================================
+
+    return new LANRefreshRequest();
+
+}   // getLANRefreshRequest
+
+// ------------------------------------------------------------------------
+/** Factory function to create either a LAN or a WAN update-of-server
+ *  requests. The current list of servers is also cleared/
+ */
+XMLRequest* ServersManager::getRefreshRequest(bool request_now)
 {
     if (StkTime::getRealTime() - m_last_load_time.getAtomic()
         < SERVER_REFRESH_INTERVAL)
@@ -82,18 +197,9 @@ XMLRequest* ServersManager::refreshRequest(bool request_now) const
         return NULL;
     }
 
-    // ====================================================================
-    class RefreshRequest : public XMLRequest
-    {
-        virtual void callback()
-        {
-            ServersManager::get()->refresh(isSuccess(), getXMLData());
-        }   // callback
-    };   // RefreshRequest
-
-    // ====================================================================
-    RefreshRequest* request = new RefreshRequest();
-    request->setApiURL(API::SERVER_PATH, "get-all");
+    cleanUpServers();
+    XMLRequest *request = STKHost::isWAN() ? getWANRefreshRequest()
+                                           : getLANRefreshRequest();
 
     if (request_now)
         RequestManager::get()->addRequest(request);
@@ -115,7 +221,6 @@ void ServersManager::refresh(bool success, const XMLNode *input)
     }
 
     const XMLNode *servers_xml = input->getNode("servers");
-    cleanUpServers();
     for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
     {
         addServer(new Server(*servers_xml->getNode(i), /*is_lan*/false));

@@ -21,10 +21,11 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "network/event.hpp"
+#include "network/network_console.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/network_console.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -101,7 +102,7 @@ STKHost::NetworkType STKHost::m_network_type = STKHost::NETWORK_NONE;
  *    randomly), and then instantiates STKHost with the id of this server.
  *    STKHost then triggers:
  *    1) ConnectToServer, which starts the following protocols:
- *       a) GetPublicAccess: Use STUN to discover the public ip address
+ *       a) GetPublicAddress: Use STUN to discover the public ip address
  *          and port number of this host.
  *       b) Register the client with the STK host ('set' command, into the
  *          table 'client_sessions'). Its public ip address and port will
@@ -157,6 +158,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
 {
     m_is_server = true;
     init();
+    m_server_name = server_name;
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
@@ -408,8 +410,42 @@ void* STKHost::mainLoop(void* self)
     ENetEvent event;
     STKHost* myself = (STKHost*)(self);
     ENetHost* host = myself->m_network->getENetHost();
+
+    // Separate network/socket connection in case of LAN server
+    // listening to broadcast.
+    Network *discovery_host = NULL;
+
+    if(myself->isServer() && STKHost::isLAN())
+    {
+        TransportAddress address(0, 2757);
+        ENetAddress eaddr = address.toEnetAddress();
+        discovery_host = new Network(1, 1, 0, 0, &eaddr);
+    }
+
+    const int LEN=2048;
+    char buffer[LEN];
     while (!myself->mustStopListening())
     {
+        if(discovery_host)
+        {
+            TransportAddress sender;
+            int len= discovery_host->receiveRawPacket(buffer, LEN, &sender, 1);
+            if(len>0 && std::string(buffer, len)=="stk-server")
+            {
+                Log::verbose("STKHost", "Received LAN server query");
+                std::string &name = StringUtils::wide_to_utf8(
+                                      myself->get()->getServerName().c_str());
+                if(name.size()>2)
+                    name = name.substr(0, 255);
+                NetworkString s;
+                s.addUInt8((uint8_t)name.size());
+                s.addString(name.c_str());
+                s.addUInt8(getMaxPlayers());
+                s.addUInt8(1);   // FIXME: current number of connected players
+                discovery_host->sendRawPacket(s.getBytes(), s.size(), sender);
+            }   // if message is server-requested
+        }   // if discovery host
+
         while (enet_host_service(host, &event, 20) != 0)
         {
             if (event.type == ENET_EVENT_TYPE_NONE)

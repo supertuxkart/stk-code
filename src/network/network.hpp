@@ -62,9 +62,8 @@ public:
     ENetPeer *connectTo(const TransportAddress &address);
     void     sendRawPacket(uint8_t* data, int length,
                            const TransportAddress& dst);
-    uint8_t* receiveRawPacket(TransportAddress* sender);
-    uint8_t* receiveRawPacket(const TransportAddress& sender,
-                              int max_tries = -1);
+    int receiveRawPacket(char *buffer, int buf_len,
+                         TransportAddress* sender, int max_tries = -1);
     void     broadcastPacket(const NetworkString& data,
                              bool reliable = true);
     // ------------------------------------------------------------------------

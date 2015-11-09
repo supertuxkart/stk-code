@@ -104,112 +104,58 @@ void Network::sendRawPacket(uint8_t* data, int length,
 }   // sendRawPacket
 
 // ----------------------------------------------------------------------------
-/** \brief Receives a packet directly from the network interface.
- *  Receive a packet whithout ENet processing it and returns the
- *  sender's ip address and port in the TransportAddress structure.
- *  \param sender : Stores the transport address of the sender of the
- *                  received packet.
- *  \return A string containing the data of the received packet.
- */
-uint8_t* Network::receiveRawPacket(TransportAddress* sender)
-{
-    const int LEN = 2048;
-    // max size needed normally (only used for stun)
-    uint8_t* buffer = new uint8_t[LEN]; 
-    memset(buffer, 0, LEN);
-
-    socklen_t from_len;
-    struct sockaddr_in addr;
-
-    from_len = sizeof(addr);
-    int len = recvfrom(m_host->socket, (char*)buffer, LEN, 0,
-                       (struct sockaddr*)(&addr), &from_len   );
-
-    int i = 0;
-     // wait to receive the message because enet sockets are non-blocking
-    while(len == -1) // nothing received
-    {
-        StkTime::sleep(1); // wait 1 millisecond between two checks
-        i++;
-        len = recvfrom(m_host->socket, (char*)buffer, LEN, 0,
-                       (struct sockaddr*)(&addr), &from_len   );
-    }
-    if (len == SOCKET_ERROR)
-    {
-        Log::error("STKHost",
-                   "Problem with the socket. Please contact the dev team.");
-    }
-    // we received the data
-    sender->setIP( ntohl((uint32_t)(addr.sin_addr.s_addr)) );
-    sender->setPort( ntohs(addr.sin_port) );
-
-    if (addr.sin_family == AF_INET)
-    {
-        Log::info("STKHost", "IPv4 Address of the sender was %s",
-                  sender->toString().c_str());
-    }
-    return buffer;
-}   // receiveRawPacket(TransportAddress* sender)
-
-// ----------------------------------------------------------------------------
 /** \brief Receives a packet directly from the network interface and
  *  filter its address.
  *  Receive a packet whithout ENet processing it. Checks that the
  *  sender of the packet is the one that corresponds to the sender
  *  parameter. Does not check the port right now.
- *  \param sender : Transport address of the original sender of the
- *                  wanted packet.
+ *  \param buffer A buffer to receive the data in.
+ *  \param buf_len  Length of the buffer.
+ *  \param[out] sender : Transport address of the original sender of the
+ *                  wanted packet. If the ip address is 0, do not check
+ *                  the sender's ip address, otherwise wait till a message
+ *                  from the specified sender arrives. All other messages
+ *                  are discarded.
  *  \param max_tries : Number of times we try to read data from the
  *                  socket. This is aproximately the time we wait in
  *                  milliseconds. -1 means eternal tries.
- *  \return A string containing the data of the received packet
- *          matching the sender's ip address.
+ *  \return Length of the received data, or -1 if no data was received.
  */
-uint8_t* Network::receiveRawPacket(const TransportAddress& sender,
-                                   int max_tries)
+int Network::receiveRawPacket(char *buffer, int buf_len, 
+                              TransportAddress *sender, int max_tries)
 {
-    const int LEN = 2048;
-    uint8_t* buffer = new uint8_t[LEN];
-    memset(buffer, 0, LEN);
+    memset(buffer, 0, buf_len);
 
-    socklen_t from_len;
     struct sockaddr_in addr;
+    socklen_t from_len = sizeof(addr);
 
-    from_len = sizeof(addr);
-    int len = recvfrom(m_host->socket, (char*)buffer, LEN, 0,
+    int len = recvfrom(m_host->socket, buffer, buf_len, 0,
                        (struct sockaddr*)(&addr), &from_len    );
 
     int count = 0;
-     // wait to receive the message because enet sockets are non-blocking
-    while(len < 0 || addr.sin_addr.s_addr == sender.getIP())
+    // wait to receive the message because enet sockets are non-blocking
+    while(len < 0 && (count<max_tries || max_tries==-1) )
     {
         count++;
-        if (len>=0)
-        {
-            Log::info("STKHost", "Message received but the ip address didn't "
-                                 "match the expected one.");
-        }
-        len = recvfrom(m_host->socket, (char*)buffer, LEN, 0, 
-                       (struct sockaddr*)(&addr), &from_len);
         StkTime::sleep(1); // wait 1 millisecond between two checks
-        if (count >= max_tries && max_tries != -1)
-        {
-            TransportAddress a(m_host->address);
-            Log::verbose("STKHost", "No answer from the server on %s",
-                         a.toString().c_str());
-            delete [] buffer;
-            return NULL;
-        }
+        len = recvfrom(m_host->socket, buffer, buf_len, 0, 
+                       (struct sockaddr*)(&addr), &from_len);
     }
+
+    // No message received
+    if(len<0)
+        return -1;
+
+    Network::logPacket(NetworkString(std::string(buffer, len)), true);
+    sender->setIP(ntohl((uint32_t)(addr.sin_addr.s_addr)) );
+    sender->setPort( ntohs(addr.sin_port) );
     if (addr.sin_family == AF_INET)
     {
-        TransportAddress a(ntohl(addr.sin_addr.s_addr));
-        Log::info("STKHost", "IPv4 Address of the sender was %s",
-                  a.toString(false).c_str());
+        Log::info("Network", "IPv4 Address of the sender was %s",
+                  sender->toString().c_str());
     }
-    Network::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
-    return buffer;
-}   // receiveRawPacket(const TransportAddress& sender, int max_tries)
+    return len;
+}   // receiveRawPacket
 
 // ----------------------------------------------------------------------------
 /** \brief Broadcasts a packet to all peers.

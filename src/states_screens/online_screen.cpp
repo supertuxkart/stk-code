@@ -183,7 +183,7 @@ void OnlineScreen::onUpdate(float delta)
 void OnlineScreen::doQuickPlay()
 {
     // Refresh server list.
-    HTTPRequest* refresh_request = ServersManager::get()->refreshRequest(false);
+    HTTPRequest* refresh_request = ServersManager::get()->getRefreshRequest(false);
     if (refresh_request != NULL) // consider request done
     {
         refresh_request->executeNow();

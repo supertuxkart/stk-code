@@ -129,7 +129,7 @@ void ConnectToPeer::asynchronousUpdate()
             m_state = CONNECTING;
             break;
         }
-        case CONNECTING: // waiting the peer to connect
+        case CONNECTING: // waiting for the peer to connect
             break;
         case CONNECTED:
         {
