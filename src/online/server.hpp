@@ -24,10 +24,11 @@
   * Represents a server that is joinable
   */
 
-#include <string>
-#include <irrString.h>
-#include "io/xml_node.hpp"
 #include "utils/types.hpp"
+
+#include <irrString.h>
+
+#include <string>
 
 class XMLNode;
 
@@ -77,7 +78,7 @@ public:
 
          /** Initialises the object from an XML node. */
          Server(const XMLNode &xml, bool is_lan);
-         Server(const core::stringw &name, bool is_lan, int max_players,
+         Server(const irr::core::stringw &name, bool is_lan, int max_players,
                 int current_players);
     bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
