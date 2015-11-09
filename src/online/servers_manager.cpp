@@ -288,6 +288,9 @@ void ServersManager::unsetJoinedServer()
 }   // unsetJoinedServer
 
 // ----------------------------------------------------------------------------
+/** Adds a server to the list of known servers.
+ *  \param server The server to add.
+ */
 void ServersManager::addServer(Server *server)
 {
     m_sorted_servers.lock();
