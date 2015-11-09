@@ -25,10 +25,11 @@
 
 #include "utils/types.hpp"
 
-#include <string>
-#include <vector>
-#include <stdarg.h>
 #include <assert.h>
+#include <stdarg.h>
+#include <string>
+#include <string.h>
+#include <vector>
 
 typedef unsigned char uchar;
 
