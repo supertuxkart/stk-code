@@ -58,7 +58,8 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float volume,
     // will not be used anyway.
     if (SFXManager::get()->sfxAllowed())
     {
-        init();
+        SFXManager::get()->queue(SFXManager::SFX_CREATE_SOURCE, this);
+        //init();
     }
 }   // SFXOpenAL
 
