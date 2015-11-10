@@ -186,6 +186,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
 void STKHost::init()
 {
     m_network          = NULL;
+    m_lan_network      = NULL;
     m_listening_thread = NULL;
     m_game_setup       = NULL;
     m_is_registered    = false;
@@ -411,39 +412,18 @@ void* STKHost::mainLoop(void* self)
     STKHost* myself = (STKHost*)(self);
     ENetHost* host = myself->m_network->getENetHost();
 
-    // Separate network/socket connection in case of LAN server
-    // listening to broadcast.
-    Network *discovery_host = NULL;
-
     if(myself->isServer() && STKHost::isLAN())
     {
         TransportAddress address(0, 2757);
         ENetAddress eaddr = address.toEnetAddress();
-        discovery_host = new Network(1, 1, 0, 0, &eaddr);
+        myself->m_lan_network = new Network(1, 1, 0, 0, &eaddr);
     }
 
-    const int LEN=2048;
-    char buffer[LEN];
     while (!myself->mustStopListening())
     {
-        if(discovery_host)
+        if(myself->m_lan_network)
         {
-            TransportAddress sender;
-            int len= discovery_host->receiveRawPacket(buffer, LEN, &sender, 1);
-            if(len>0 && std::string(buffer, len)=="stk-server")
-            {
-                Log::verbose("STKHost", "Received LAN server query");
-                std::string name = StringUtils::wide_to_utf8(
-                                      myself->get()->getServerName().c_str());
-                if(name.size()>2)
-                    name = name.substr(0, 255);
-                NetworkString s;
-                s.addUInt8((uint8_t)name.size());
-                s.addString(name.c_str());
-                s.addUInt8(getMaxPlayers());
-                s.addUInt8(1);   // FIXME: current number of connected players
-                discovery_host->sendRawPacket(s.getBytes(), s.size(), sender);
-            }   // if message is server-requested
+            myself->handleLANRequests();
         }   // if discovery host
 
         while (enet_host_service(host, &event, 20) != 0)
@@ -489,6 +469,39 @@ void* STKHost::mainLoop(void* self)
     Log::info("STKHost", "Listening has been stopped");
     return NULL;
 }   // mainLoop
+
+// ----------------------------------------------------------------------------
+void STKHost::handleLANRequests()
+{
+    const int LEN=2048;
+    char buffer[LEN];
+
+    TransportAddress sender;
+    int len = m_lan_network->receiveRawPacket(buffer, LEN, &sender, 1);
+    if(len<=0) return;
+
+    if (std::string(buffer, len) == "stk-server")
+    {
+        Log::verbose("STKHost", "Received LAN server query");
+        std::string name = StringUtils::wide_to_utf8(getServerName().c_str());
+        // Avoid buffer overflows
+        if (name.size() > 255)
+            name = name.substr(0, 255);
+
+        // Send the answer, consisting of server name, max players, 
+        // current players, and the client's ip address and port
+        // number (which solves the problem which network interface
+        // might be the right one if there is more than one).
+        NetworkString s;
+        s.addUInt8((uint8_t)name.size());
+        s.addString(name.c_str());
+        s.addUInt8(getMaxPlayers());
+        s.addUInt8(0);   // FIXME: current number of connected players
+        s.addUInt32(sender.getIP());
+        s.addUInt16(sender.getPort());
+        m_lan_network->sendRawPacket(s.getBytes(), s.size(), sender);
+    }   // if message is server-requested
+}   // handleLANRequests
 
 // ----------------------------------------------------------------------------
 /** \brief Tells if a peer is known.

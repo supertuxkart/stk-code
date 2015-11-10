@@ -177,6 +177,8 @@ XMLRequest* ServersManager::getLANRefreshRequest() const
                                        StringUtils::utf8_to_wide(name.c_str());
                     uint8_t max_players = s.getUInt8(1+name_len  );
                     uint8_t players     = s.getUInt8(1+name.size()+1);
+                    uint32_t my_ip      = s.getUInt32(1+name.size()+2);
+                    uint32_t my_port    = s.getUInt16(1+name.size()+6);
                     ServersManager::get()
                           ->addServer(new Server(name_w, /*lan*/true,
                                                  max_players, players, 

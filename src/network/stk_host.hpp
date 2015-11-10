@@ -67,6 +67,9 @@ private:
     /** ENet host interfacing sockets. */
     Network* m_network;
 
+    /** A separate network connection (socket) to handle LAN requests. */
+    Network *m_lan_network;
+
     /** Network console */
     NetworkConsole *m_network_console;
 
@@ -110,6 +113,7 @@ private:
              STKHost(const irr::core::stringw &server_name);
     virtual ~STKHost();
     void init();
+    void handleLANRequests();
 
 public:
 
