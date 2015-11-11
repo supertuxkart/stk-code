@@ -378,6 +378,13 @@ void SFXOpenAL::reallyPlayNow()
 
     alSourcePlay(m_sound_source);
     SFXManager::checkError("playing");
+    // Esp. with terrain sounds it can (very likely) happen that the status
+    // got overwritten: a sound is created and an init event is queued. Then
+    // a play event is queued, and the status is immediately changed to
+    // playing. But when now the init event is executed, the status is set
+    // to stopped again. So for this case we have to set the status to
+    // playing again.
+    m_status = SFX_PLAYING;
 }   // reallyPlayNow
 
 //-----------------------------------------------------------------------------
