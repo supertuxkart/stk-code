@@ -141,7 +141,9 @@ void ServerLobbyRoomProtocol::update()
         break;
     case WORKING:
     {
-        checkIncomingConnectionRequests();
+        // Only poll the STK server if this is a WAN server.
+        if(NetworkConfig::get()->isWAN())
+            checkIncomingConnectionRequests();
         if (m_in_race && World::getWorld() &&
             NetworkWorld::getInstance<NetworkWorld>()->isRunning())
         {
