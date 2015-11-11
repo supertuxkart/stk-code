@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2015 SuperTuxKart-Team
+//  Copyright (C) 2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 #include "network/network_console.hpp"
 
 #include "main_loop.hpp"
+#include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
@@ -67,11 +68,11 @@ void* NetworkConsole::mainLoop(void* data)
         {
             stop = true;
         }
-        else if (str == "kickall" && STKHost::isServer())
+        else if (str == "kickall" && NetworkConfig::get()->isServer())
         {
             me->kickAllPlayers();
         }
-        else if (str == "start" && STKHost::isServer())
+        else if (str == "start" && NetworkConfig::get()->isServer())
         {
             ServerLobbyRoomProtocol* protocol =
                 static_cast<ServerLobbyRoomProtocol*>
@@ -79,7 +80,7 @@ void* NetworkConsole::mainLoop(void* data)
             assert(protocol);
             protocol->startGame();
         }
-        else if (str == "selection" && STKHost::isServer())
+        else if (str == "selection" && NetworkConfig::get()->isServer())
         {
             ServerLobbyRoomProtocol* protocol =
                 static_cast<ServerLobbyRoomProtocol*>
@@ -87,17 +88,17 @@ void* NetworkConsole::mainLoop(void* data)
             assert(protocol);
             protocol->startSelection();
         }
-        else if (str == "compute_race"&& STKHost::isServer())
+        else if (str == "compute_race"&& NetworkConfig::get()->isServer())
         {
             GameSetup* setup = STKHost::get()->getGameSetup();
             setup->getRaceConfig()->computeRaceMode();
         }
-        else if (str == "compute_track" && STKHost::isServer())
+        else if (str == "compute_track" && NetworkConfig::get()->isServer())
         {
             GameSetup* setup = STKHost::get()->getGameSetup();
             setup->getRaceConfig()->computeNextTrack();
         }
-        else if (str == "select" && STKHost::isclient())
+        else if (str == "select" && NetworkConfig::get()->isclient())
         {
             std::string str2;
             getline(std::cin, str2);
@@ -106,7 +107,7 @@ void* NetworkConsole::mainLoop(void* data)
             ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
             clrp->requestKartSelection(str2);
         }
-        else if (str == "vote" && STKHost::isclient())
+        else if (str == "vote" && NetworkConfig::get()->isclient())
         {
             std::cout << "Vote for ? (track/laps/reversed/major/minor/race#) :";
             std::string str2;
@@ -153,7 +154,8 @@ void* NetworkConsole::mainLoop(void* data)
         // FIXME
         // If STK shuts down, but should receive an input after the network 
         // manager was deleted, the getInstance call will return NULL.
-        else if (STKHost::isclient() && STKHost::get()->getPeerCount() > 0)
+        else if (NetworkConfig::get()->isclient() && 
+                 STKHost::get()->getPeerCount() > 0)
         {
             NetworkString msg(1 + str.size());
             msg.ai8(0);

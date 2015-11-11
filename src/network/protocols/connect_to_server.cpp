@@ -20,6 +20,7 @@
 
 #include "config/player_manager.hpp"
 #include "network/event.hpp"
+#include "network/network_config.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/hide_public_address.hpp"
@@ -29,6 +30,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "online/servers_manager.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 
@@ -47,7 +49,7 @@ ConnectToServer::ConnectToServer() : Protocol(PROTOCOL_CONNECTION)
     m_server_id  = 0;
     m_host_id    = 0;
     m_quick_join = true;
-    m_state      = NONE;
+    m_server_address.clear();
 }   // ConnectToServer()
 
 // ----------------------------------------------------------------------------
@@ -61,7 +63,10 @@ ConnectToServer::ConnectToServer(uint32_t server_id, uint32_t host_id)
     m_server_id  = server_id;
     m_host_id    = host_id;
     m_quick_join = false;
-    m_state      = NONE;
+    const Online::Server *server = 
+        Online::ServersManager::get()->getServerByID(server_id);
+    m_server_address.copy(server->getAddress());
+
 }   // ConnectToServer(server, host)
 
 // ----------------------------------------------------------------------------
@@ -72,28 +77,26 @@ ConnectToServer::~ConnectToServer()
 }   // ~ConnectToServer
 
 // ----------------------------------------------------------------------------
-
-bool ConnectToServer::notifyEventAsynchronous(Event* event)
-{
-    if (event->getType() == EVENT_TYPE_CONNECTED)
-    {
-        Log::info("ConnectToServer", "The Connect To Server protocol has "
-                "received an event notifying that he's connected to the peer.");
-        m_state = CONNECTED; // we received a message, we are connected
-    }
-    return true;
-}   // notifyEventAsynchronous
-
-// ----------------------------------------------------------------------------
 /** Initialise the protocol.
  */
 void ConnectToServer::setup()
 {
     Log::info("ConnectToServer", "SETUP");
-    m_server_address.clear();
-    m_state            = NONE;
     m_current_protocol = NULL;
+    // In case of LAN we already have the server's and our ip address,
+    // so we can immediately start requesting a connection.
+    m_state = NetworkConfig::get()->isLAN() ? GETTING_SERVER_ADDRESS : NONE;
 }   // setup
+
+// ----------------------------------------------------------------------------
+/** Sets the server transport address. This is used in case of LAN networking,
+ *  when we do not query the stk server and instead have the address from the
+ *  LAN server directly.
+ *  \param address Address of server to connect to.
+ */
+void ConnectToServer::setServerAddress(const TransportAddress &address)
+{
+}   // setServerAddress
 
 // ----------------------------------------------------------------------------
 void ConnectToServer::asynchronousUpdate()
@@ -149,7 +152,7 @@ void ConnectToServer::asynchronousUpdate()
 
             // we're in the same lan (same public ip address) !!
             if (m_server_address.getIP() ==
-                STKHost::get()->getPublicAddress().getIP())
+                NetworkConfig::get()->getMyAddress().getIP())
             {
                 Log::info("ConnectToServer",
                     "Server appears to be in the same LAN.");
@@ -160,7 +163,9 @@ void ConnectToServer::asynchronousUpdate()
             break;
         }
         case REQUESTING_CONNECTION:
-            if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
+            // In case of a LAN server, m_crrent_protocol is NULL
+            if (NetworkConfig::get()->isLAN() ||
+                m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
             {
                 // Server knows we want to connect
                 Log::info("ConnectToServer", "Connection request made");
@@ -176,7 +181,7 @@ void ConnectToServer::asynchronousUpdate()
                     return;
                 }
                 if (m_server_address.getIP() 
-                      == STKHost::get()->getPublicAddress().getIP())
+                      == NetworkConfig::get()->getMyAddress().getIP())
                 {
                     // we're in the same lan (same public ip address) !!
                     handleSameLAN();
@@ -268,13 +273,14 @@ void ConnectToServer::registerWithSTKServer()
 {
     // Our public address is now known, register details with
     // STK server.
-    const TransportAddress& addr = STKHost::get()->getPublicAddress();
+    const TransportAddress& addr = NetworkConfig::get()->getMyAddress();
     Online::XMLRequest *request  = new Online::XMLRequest();
     PlayerManager::setUserDetails(request, "set",
                                   Online::API::SERVER_PATH);
     request->addParameter("address", addr.getIP());
     request->addParameter("port", addr.getPort());
-    request->addParameter("private_port", STKHost::get()->getPort());
+    request->addParameter("private_port",
+                          NetworkConfig::get()->getPrivatePort());
 
     Log::info("ConnectToServer", "Registering addr %s",
               addr.toString().c_str());
@@ -321,8 +327,11 @@ void ConnectToServer::handleQuickConnect()
 
         uint16_t port;
         // If we are using a LAN connection, we need the private (local) port
-        if (m_server_address.getIP() == STKHost::get()->getPublicAddress().getIP())
+        if (m_server_address.getIP() == 
+            NetworkConfig::get()->getMyAddress().getIP())
+        {
             result->get("private_port", &port);
+        }
         else
             result->get("port", &port);
 
@@ -424,3 +433,17 @@ void ConnectToServer::handleSameLAN()
         m_state = CONNECTING;
     }
 }  // handleSameLAN
+
+// ----------------------------------------------------------------------------
+
+bool ConnectToServer::notifyEventAsynchronous(Event* event)
+{
+    if (event->getType() == EVENT_TYPE_CONNECTED)
+    {
+        Log::info("ConnectToServer", "The Connect To Server protocol has "
+            "received an event notifying that he's connected to the peer.");
+        m_state = CONNECTED; // we received a message, we are connected
+    }
+    return true;
+}   // notifyEventAsynchronous
+

@@ -91,7 +91,10 @@ public:
                 int current_players, const TransportAddress &address);
     bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
-   /** Sets the sort order used in the comparison function. It is static, so
+    /** Returns ip address and port of this server. */
+    const TransportAddress& getAddress() const { return m_address; }
+    // ------------------------------------------------------------------------
+    /** Sets the sort order used in the comparison function. It is static, so
     *  that each instance can access the sort order. */
     static void setSortOrder(SortOrder so) { m_sort_order = so; }
 

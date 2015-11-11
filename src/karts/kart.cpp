@@ -54,8 +54,8 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
+#include "network/network_config.hpp"
 #include "network/network_world.hpp"
-#include "network/stk_host.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/physics.hpp"
@@ -1314,8 +1314,10 @@ void Kart::update(float dt)
     PROFILER_POP_CPU_MARKER();
 
     // Check if any item was hit.
-    // check it if we're not in a network world, or if we're on the server (when network mode is on)
-    if (!NetworkWorld::getInstance()->isRunning() || STKHost::isServer())
+    // check it if we're not in a network world, or if we're on the server
+    // (when network mode is on)
+    if (!NetworkWorld::getInstance()->isRunning() ||
+        NetworkConfig::get()->isServer())
         ItemManager::get()->checkItemHit(this);
 
     static video::SColor pink(255, 255, 133, 253);

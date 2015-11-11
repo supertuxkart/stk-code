@@ -20,8 +20,8 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/stk_host.hpp"
 #include "online/request_manager.hpp"
 #include "utils/log.hpp"
 
@@ -65,7 +65,8 @@ void GetPeerAddress::asynchronousUpdate()
             m_address.setIP(ip);
 
             uint16_t port;
-            if (m_address.getIP() == STKHost::get()->getPublicAddress().getIP())
+            uint32_t my_ip = NetworkConfig::get()->getMyAddress().getIP();
+            if (m_address.getIP() == my_ip)
                 result->get("private_port", &port);
             else
                 result->get("port", &port);

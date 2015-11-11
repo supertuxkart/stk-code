@@ -19,6 +19,7 @@
 #include "network/protocols/connect_to_peer.hpp"
 
 #include "network/event.hpp"
+#include "network/network_config.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/hide_public_address.hpp"
@@ -102,7 +103,8 @@ void ConnectToPeer::asynchronousUpdate()
             // the Ping protocol to keep the port available. We can't rely on
             // STKHost::isLAN(), since we might get a LAN connection even if
             // the server itself accepts connections from anywhere.
-            if (m_peer_address.getIP() != STKHost::get()->getPublicAddress().getIP())
+            if (m_peer_address.getIP() != NetworkConfig::get()
+                                          ->getMyAddress().getIP())
             {
                 m_current_protocol = new PingProtocol(m_peer_address,
                                                       /*time-between-ping*/2.0);

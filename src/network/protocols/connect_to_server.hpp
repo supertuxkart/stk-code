@@ -55,7 +55,7 @@ private:
     void handleSameLAN();
 
 public:
-              ConnectToServer();
+             ConnectToServer();
              ConnectToServer(uint32_t server_id, uint32_t host_id);
     virtual ~ConnectToServer();
 
@@ -64,7 +64,7 @@ public:
     virtual void asynchronousUpdate();
     virtual void callback(Protocol *protocol);
     virtual void update() OVERRIDE {}
-
+    void setServerAddress(const TransportAddress &address);
 };   // class ConnectToServer
 
 #endif // CONNECT_TO_SERVER_HPP

@@ -8,6 +8,7 @@
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
+#include "network/network_config.hpp"
 #include "network/network_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
@@ -52,7 +53,7 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
         Log::error("StartGameProtocol", "Bad token received.");
         return true;
     }
-    if (STKHost::isServer() && ready) // on server, player is ready
+    if (NetworkConfig::get()->isServer() && ready) // on server, player is ready
     {
         Log::info("StartGameProtocol", "One of the players is ready.");
         m_player_states[peer->getPlayerProfile()] = READY;
@@ -150,7 +151,7 @@ void StartGameProtocol::update()
             rki.setDifficulty(profile->difficulty);
             rki.setGlobalPlayerId(profile->race_id);
             // on the server, the race id must be the local one.
-            rki.setLocalPlayerId(STKHost::isServer() 
+            rki.setLocalPlayerId(NetworkConfig::get()->isServer() 
                                  ? profile->race_id
                                  : (is_me ? 0 : 1)                         );
             rki.setHostId(profile->race_id);
@@ -206,7 +207,7 @@ void StartGameProtocol::update()
 
 void StartGameProtocol::ready() // on clients, means the loading is finished
 {
-    if (!STKHost::isServer()) // if we're a client
+    if (!NetworkConfig::get()->isServer()) // if we're a client
     {
         assert(STKHost::get()->getPeerCount() == 1);
         NetworkString ns(5);

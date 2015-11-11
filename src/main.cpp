@@ -174,6 +174,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
+#include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
@@ -775,9 +776,11 @@ int handleCmdLine()
     // Networking command lines
     if(CommandLine::has("--server", &s) )
     {
-        STKHost::setMaxPlayers(UserConfigParams::m_server_max_players);
-        STKHost::create(core::stringw(s.c_str()));
-        Log::info("main", "Creating a server.");
+        NetworkConfig::get()->
+            setMaxPlayers(UserConfigParams::m_server_max_players);
+        NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
+        STKHost::create();
+        Log::info("main", "Creating a server '%s'.", s.c_str());
     }   
 
     if(CommandLine::has("--max-players", &n))
@@ -1504,7 +1507,7 @@ int main(int argc, char *argv[] )
     StateManager::get()->resetActivePlayers();
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
 
-    if(STKHost::isNetworking())
+    if(NetworkConfig::get()->isNetworking())
         STKHost::get()->abort();
 
     cleanSuperTuxKart();
@@ -1614,7 +1617,7 @@ static void cleanSuperTuxKart()
     // FIXME: do we need to wait for threads there, can they be
     // moved further up?
     Online::ServersManager::deallocate();
-    if(STKHost::isNetworking())
+    if(NetworkConfig::get()->isNetworking())
         STKHost::destroy();
 
     cleanUserConfig();

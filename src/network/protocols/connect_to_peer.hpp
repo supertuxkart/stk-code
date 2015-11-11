@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef CONNECT_TO_SERVER_HPP
-#define CONNECT_TO_SERVER_HPP
+#ifndef CONNECT_TO_PEER_HPP
+#define CONNECT_TO_PEER_HPP
 
 #include "network/protocol.hpp"
 #include "network/transport_address.hpp"

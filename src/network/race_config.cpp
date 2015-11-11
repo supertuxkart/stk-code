@@ -17,6 +17,7 @@
 
 #include "network/race_config.hpp"
 
+#include "network/network_config.hpp"
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
 
@@ -200,7 +201,7 @@ uint8_t RaceVote::getLapsVote(uint8_t track_number) const
 
 RaceConfig::RaceConfig()
 {
-    m_max_players = 0;
+    m_max_players = NetworkConfig::get()->getMaxPlayers();
 }
 
 //-----------------------------------------------------------------------------

@@ -4,7 +4,9 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "network/event.hpp"
+#include "network/network_config.hpp"
 #include "network/game_setup.hpp"
+#include "network/network_config.hpp"
 #include "network/network_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
@@ -39,7 +41,7 @@ void ControllerEventsProtocol::setup()
             m_self_controller_index = i;
         }
         STKPeer* peer = NULL;
-        if (STKHost::isServer())
+        if (NetworkConfig::get()->isServer())
         {
             for (unsigned int j = 0; j < peers.size(); j++)
             {
@@ -116,7 +118,7 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         Log::warn("ControllerEventProtocol", "Couldn't have a client id.");
         return true;
     }
-    if (STKHost::isServer())
+    if (NetworkConfig::get()->isServer())
     {
         // notify everybody of the event :
         for (unsigned int i = 0; i < m_controllers.size(); i++)
@@ -145,7 +147,7 @@ void ControllerEventsProtocol::update()
 void ControllerEventsProtocol::controllerAction(Controller* controller,
                                                 PlayerAction action, int value)
 {
-    assert(!STKHost::isServer());
+    assert(!NetworkConfig::get()->isServer());
 
     KartControl* controls = controller->getControls();
     uint8_t serialized_1 = 0;

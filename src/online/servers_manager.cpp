@@ -18,7 +18,9 @@
 
 #include "online/servers_manager.hpp"
 #include "config/user_config.hpp"
-#include "network/stk_host.hpp"
+#include "network/network.hpp"
+#include "network/network_config.hpp"
+#include "network/network_string.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
 
@@ -183,6 +185,8 @@ XMLRequest* ServersManager::getLANRefreshRequest() const
                           ->addServer(new Server(name_w, /*lan*/true,
                                                  max_players, players, 
                                                  sender)               );
+                    TransportAddress me(my_ip, my_port);
+                    NetworkConfig::get()->setMyAddress(me);
                     m_success = true;
                 }   // if received_data
             }    // while still waiting
@@ -222,8 +226,8 @@ XMLRequest* ServersManager::getRefreshRequest(bool request_now)
     }
 
     cleanUpServers();
-    XMLRequest *request = STKHost::isWAN() ? getWANRefreshRequest()
-                                           : getLANRefreshRequest();
+    XMLRequest *request = NetworkConfig::get()->isWAN() ? getWANRefreshRequest()
+                                                        : getLANRefreshRequest();
 
     if (request_now)
         RequestManager::get()->addRequest(request);

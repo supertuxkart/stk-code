@@ -21,12 +21,15 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "network/event.hpp"
+#include "network/network_config.hpp"
 #include "network/network_console.hpp"
 #include "network/network_string.hpp"
+#include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_peer.hpp"
+#include "online/servers_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
@@ -42,11 +45,27 @@
 #include <pthread.h>
 #include <signal.h>
 
-STKHost             *STKHost::m_stk_host     = NULL;
-int                  STKHost::m_max_players  = 0;
-bool                 STKHost::m_is_server    = false;
-STKHost::NetworkType STKHost::m_network_type = STKHost::NETWORK_NONE;
+STKHost *STKHost::m_stk_host = NULL;
 
+void STKHost::create()
+{
+    assert(m_stk_host == NULL);
+    if(NetworkConfig::get()->isServer())
+        m_stk_host = new STKHost(NetworkConfig::get()->getServerName());
+    else
+    {
+        Online::Server *server = 
+            Online::ServersManager::get()->getJoinedServer();
+        m_stk_host = new STKHost(server->getServerId(), 0);
+    }
+   if(!m_stk_host->m_network)
+    {
+        delete m_stk_host;
+        m_stk_host = NULL;
+    }
+}   // create
+
+// ============================================================================
 /** \class STKHost
  *  \brief Represents the local host. It is the main managing point for 
  *  networking. It is responsible for sending and receiving messages,
@@ -135,7 +154,6 @@ STKHost::NetworkType STKHost::m_network_type = STKHost::NETWORK_NONE;
  */
 STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 {
-    m_is_server = false;
     init();
 
     m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
@@ -156,15 +174,13 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
  */
 STKHost::STKHost(const irr::core::stringw &server_name)
 {
-    m_is_server = true;
     init();
-    m_server_name = server_name;
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
     addr.port = 2758;
 
-    m_network= new Network(getMaxPlayers(),
+    m_network= new Network(NetworkConfig::get()->getMaxPlayers(),
                            /*channel_limit*/2,
                            /*max_in_bandwidth*/0,
                            /*max_out_bandwidth*/ 0, &addr);
@@ -191,10 +207,6 @@ void STKHost::init()
     m_game_setup       = NULL;
     m_is_registered    = false;
     m_error_message    = "";
-
-    m_public_address.lock();
-    m_public_address.getData().clear();
-    m_public_address.unlock();
 
     pthread_mutex_init(&m_exit_mutex, NULL);
 
@@ -242,16 +254,6 @@ STKHost::~STKHost()
 }   // ~STKHost
 
 //-----------------------------------------------------------------------------
-/** Stores the public address of this host.
- */
-void STKHost::setPublicAddress(const TransportAddress& addr)
-{
-    m_public_address.lock();
-    m_public_address.getData().copy(addr);
-    m_public_address.unlock();
-}   // setPublicAddress
-
-//-----------------------------------------------------------------------------
 /** A previous GameSetup is deletea and a new one is created.
  *  \return Newly create GameSetup object.
  */
@@ -260,7 +262,6 @@ GameSetup* STKHost::setupNewGame()
     if (m_game_setup)
         delete m_game_setup;
     m_game_setup = new GameSetup();
-    m_game_setup->getRaceConfig()->setMaxPlayerCount(m_max_players);
     return m_game_setup;
 }   // setupNewGame
 
@@ -349,7 +350,7 @@ bool STKHost::connect(const TransportAddress& address)
  */
 void STKHost::sendMessage(const NetworkString& data, bool reliable)
 {
-    if (m_is_server)
+    if (NetworkConfig::get()->isServer())
         broadcastPacket(data, reliable);
     else
     {
@@ -412,7 +413,8 @@ void* STKHost::mainLoop(void* self)
     STKHost* myself = (STKHost*)(self);
     ENetHost* host = myself->m_network->getENetHost();
 
-    if(myself->isServer() && STKHost::isLAN())
+    if(NetworkConfig::get()->isServer() && 
+        NetworkConfig::get()->isLAN()      )
     {
         TransportAddress address(0, 2757);
         ENetAddress eaddr = address.toEnetAddress();
@@ -483,7 +485,9 @@ void STKHost::handleLANRequests()
     if (std::string(buffer, len) == "stk-server")
     {
         Log::verbose("STKHost", "Received LAN server query");
-        std::string name = StringUtils::wide_to_utf8(getServerName().c_str());
+        std::string name = 
+            StringUtils::wide_to_utf8(NetworkConfig::get()
+                                      ->getServerName().c_str());
         // Avoid buffer overflows
         if (name.size() > 255)
             name = name.substr(0, 255);
@@ -495,12 +499,18 @@ void STKHost::handleLANRequests()
         NetworkString s;
         s.addUInt8((uint8_t)name.size());
         s.addString(name.c_str());
-        s.addUInt8(getMaxPlayers());
+        s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8(0);   // FIXME: current number of connected players
         s.addUInt32(sender.getIP());
         s.addUInt16(sender.getPort());
         m_lan_network->sendRawPacket(s.getBytes(), s.size(), sender);
     }   // if message is server-requested
+    else if (std::string(buffer, len) == "connection-request")
+    {
+        Protocol *c = new ConnectToPeer(0);
+        c->requestStart();
+    }
+
 }   // handleLANRequests
 
 // ----------------------------------------------------------------------------

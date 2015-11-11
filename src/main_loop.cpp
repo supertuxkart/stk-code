@@ -30,6 +30,7 @@
 #include "input/wiimote_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_world.hpp"
 #include "network/stk_host.hpp"
@@ -177,7 +178,7 @@ void MainLoop::run()
             PROFILER_POP_CPU_MARKER();
 
             PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
-            if (STKHost::isNetworking())
+            if (STKHost::existHost())
                 ProtocolManager::getInstance()->update();
             PROFILER_POP_CPU_MARKER();
 
@@ -188,7 +189,7 @@ void MainLoop::run()
         else if (!m_abort && ProfileWorld::isNoGraphics())
         {
             PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
-            if(STKHost::isNetworking())
+            if(NetworkConfig::get()->isNetworking())
                 ProtocolManager::getInstance()->update();
             PROFILER_POP_CPU_MARKER();
 

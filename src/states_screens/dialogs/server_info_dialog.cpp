@@ -91,7 +91,7 @@ void ServerInfoDialog::requestJoin()
     //m_server_join_request = Online::CurrentUser::get()->requestServerJoin(m_server_id);
     Online::ServersManager::get()->setJoinedServer(m_server_id);
 
-    STKHost::create(m_server_id, m_host_id);
+    STKHost::create();
     ModalDialog::dismiss();
     NetworkingLobby::getInstance()->push();
     //Online::CurrentUser::release();

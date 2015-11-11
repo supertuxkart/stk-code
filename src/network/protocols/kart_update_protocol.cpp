@@ -3,9 +3,9 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/event.hpp"
+#include "network/network_config.hpp"
 #include "network/network_world.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/stk_host.hpp"
 #include "utils/time.hpp"
 
 KartUpdateProtocol::KartUpdateProtocol() : Protocol(PROTOCOL_KART_UPDATE)
@@ -77,7 +77,7 @@ void KartUpdateProtocol::update()
     if (current_time > time + 0.1) // 10 updates per second
     {
         time = current_time;
-        if (STKHost::isServer())
+        if (NetworkConfig::get()->isServer())
         {
             NetworkString ns(4+m_karts.size()*32);
             ns.af( World::getWorld()->getTime());
@@ -118,7 +118,7 @@ void KartUpdateProtocol::update()
             {
                 uint32_t id = m_karts_ids.back();
                 // server takes all updates
-                if (id != m_self_kart_index || STKHost::isServer())
+                if (id != m_self_kart_index || NetworkConfig::get()->isServer())
                 {
                     Vec3 pos = m_next_positions.back();
                     btTransform transform = m_karts[id]->getBody()->getInterpolationWorldTransform();

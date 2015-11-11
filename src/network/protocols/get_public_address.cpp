@@ -20,8 +20,8 @@
 
 #include "config/user_config.hpp"
 #include "network/network.hpp"
+#include "network/network_config.hpp"
 #include "network/protocols/connect_to_server.hpp"
-#include "network/stk_host.hpp"
 #include "utils/log.hpp"
 
 #include <assert.h>
@@ -184,7 +184,7 @@ std::string GetPublicAddress::parseStunResponse()
             Log::debug("GetPublicAddress", 
                        "The public address has been found: %s",
                         address.toString().c_str());
-            STKHost::get()->setPublicAddress(address);
+            NetworkConfig::get()->setMyAddress(address);
             break;
         }   // type = 0 or 1
         pos +=  4 + size;

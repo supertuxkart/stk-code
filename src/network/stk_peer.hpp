@@ -30,7 +30,6 @@
 
 class NetworkPlayerProfile;
 class NetworkString;
-class STKHost;
 class TransportAddress;
 
 /*! \class STKPeer

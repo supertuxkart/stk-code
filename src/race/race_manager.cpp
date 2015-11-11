@@ -44,9 +44,9 @@
 #include "modes/three_strikes_battle.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/network_config.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
-#include "network/stk_host.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
@@ -512,7 +512,7 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_time  = 0;
     }
 
-    if(STKHost::isNetworking())
+    if(NetworkConfig::get()->isNetworking())
     {
         StartGameProtocol* protocol = static_cast<StartGameProtocol*>(
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_START_GAME));

@@ -23,6 +23,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "modes/demo_world.hpp"
+#include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "online/servers_manager.hpp"
 #include "states_screens/online_screen.hpp"
@@ -80,13 +81,15 @@ void CreateServerScreen::init()
     m_info_widget->setText("", false);
     LabelWidget *title = getWidget<LabelWidget>("title");
 
-    title->setText(STKHost::isLAN() ? _("Create LAN Server")
-                                    : _("Create Server")    , false);
+    title->setText(NetworkConfig::get()->isLAN() ? _("Create LAN Server")
+                                                 : _("Create Server")    ,
+                   false);
 
     // I18n: Name of the server. %s is either the online or local user name
     m_name_widget->setText(_("%s's server",
-                STKHost::isLAN() ? PlayerManager::getCurrentPlayer()->getName()
-                                 : PlayerManager::getCurrentOnlineUserName()
+                             NetworkConfig::get()->isLAN() 
+                             ? PlayerManager::getCurrentPlayer()->getName()
+                             : PlayerManager::getCurrentOnlineUserName()
                              )
                           );
 }   // init
@@ -119,7 +122,7 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
 void CreateServerScreen::onUpdate(float delta)
 {
     // If no host has been created, keep on waiting.
-    if(!STKHost::isNetworking())
+    if(!STKHost::existHost())
         return;
 
     // First check if an error happened while registering the server:
@@ -175,7 +178,7 @@ void CreateServerScreen::createServer()
     }
 
     // In case of a LAN game, we can create the new server object now
-    if (STKHost::isLAN())
+    if (NetworkConfig::get()->isLAN())
     {
         // FIXME Is this actually necessary?? Only in case of WAN, or LAN and WAN?
         TransportAddress address(0x7f000001,0);  // 127.0.0.1
@@ -187,8 +190,9 @@ void CreateServerScreen::createServer()
     // In case of a WAN game, we register this server with the
     // stk server, and will get the server's id when this 
     // request is finished.
-    STKHost::setMaxPlayers(max_players);
-    STKHost::create(name);
+    NetworkConfig::get()->setMaxPlayers(max_players);
+    NetworkConfig::get()->setServerName(name);
+    STKHost::create();
 
 }   // createServer
 

@@ -61,10 +61,10 @@ public:
     ~TransportAddress() {}
     // ------------------------------------------------------------------------
 private:
-    friend class STKHost;
+    friend class NetworkConfig;
     /** The copy constructor is private, so that the friend class
-     *  NetworkManager can access it to create a copy, but no other
-     *  class can. */
+     *  NetworkConfig can access it to create a copy (getMyAddress), but
+     *  no other class can. */
     TransportAddress(const TransportAddress &other)
     {
         copy(other);

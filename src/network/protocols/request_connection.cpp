@@ -20,6 +20,8 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "network/network.hpp"
+#include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "online/servers_manager.hpp"
 
@@ -71,12 +73,26 @@ void RequestConnection::asynchronousUpdate()
     {
         case NONE:
         {
-            m_request = new ServerJoinRequest();
-            PlayerManager::setUserDetails(m_request, "request-connection", Online::API::SERVER_PATH);
+            if(NetworkConfig::get()->isLAN())
+            {
+                Network *broadcast = new Network(1, 1, 0, 0);
 
-            m_request->addParameter("server_id", m_server_id);
-            m_request->queue();
-            m_state = REQUEST_PENDING;
+                NetworkString s(std::string("connection-request"));
+                const Online::Server *server = 
+                    ServersManager::get()->getServerByID(m_server_id);
+                broadcast->sendRawPacket(s.getBytes(), s.size(),
+                                         server->getAddress());
+                m_state = EXITING;
+            }
+            else
+            {
+                m_request = new ServerJoinRequest();
+                PlayerManager::setUserDetails(m_request, "request-connection", Online::API::SERVER_PATH);
+
+                m_request->addParameter("server_id", m_server_id);
+                m_request->queue();
+                m_state = REQUEST_PENDING;
+            }
             break;
         }
         case REQUEST_PENDING:

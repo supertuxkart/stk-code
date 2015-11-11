@@ -27,10 +27,10 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "modes/demo_world.hpp"
+#include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/request_connection.hpp"
-#include "network/stk_host.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request.hpp"
 #include "online/servers_manager.hpp"
@@ -248,13 +248,15 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == m_create_lan_server_widget->m_properties[PROP_ID])
     {
-        STKHost::setIsLAN();
+        NetworkConfig::get()->setIsLAN();
+        NetworkConfig::get()->setIsServer(true);
         CreateServerScreen::getInstance()->push();
         // TODO: create lan server
     }
     else if (selection == m_find_lan_server_widget->m_properties[PROP_ID])
     {
-        STKHost::setIsLAN();
+        NetworkConfig::get()->setIsLAN();
+        NetworkConfig::get()->setIsServer(false);
         ServerSelection::getInstance()->push();
     }
     else if (selection == m_manage_user->m_properties[PROP_ID])
@@ -268,12 +270,14 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == m_find_wan_server_widget->m_properties[PROP_ID])
     {
-        STKHost::setIsWAN();
+        NetworkConfig::get()->setIsWAN();
+        NetworkConfig::get()->setIsServer(false);
         ServerSelection::getInstance()->push();
     }
     else if (selection == m_create_wan_server_widget->m_properties[PROP_ID])
     {
-        STKHost::setIsWAN();
+        NetworkConfig::get()->setIsWAN();
+        NetworkConfig::get()->setIsServer(true);
         CreateServerScreen::getInstance()->push();
     }
     else if (selection == m_quick_wan_play_widget->m_properties[PROP_ID])

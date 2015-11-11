@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "network/event.hpp"
+#include "network/network_config.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
@@ -60,7 +61,7 @@ void ServerLobbyRoomProtocol::setup()
 
     // In case of LAN we don't need our public address or register with the STK
     // server, so we can directly go to the working state.
-    m_state             = STKHost::isLAN() ? WORKING : NONE;
+    m_state             = NetworkConfig::get()->isLAN() ? WORKING : NONE;
     m_selection_enabled = false;
     m_in_race           = false;
     m_current_protocol  = NULL;
@@ -177,7 +178,7 @@ void ServerLobbyRoomProtocol::callback(Protocol *protocol)
 void ServerLobbyRoomProtocol::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
-    const TransportAddress& addr = STKHost::get()->getPublicAddress();
+    const TransportAddress& addr = NetworkConfig::get()->getMyAddress();
 #ifdef NEW_PROTOCOL
     PlayerManager::setUserDetails(request, "register", Online::API::SERVER_PATH);
 #else
@@ -185,8 +186,9 @@ void ServerLobbyRoomProtocol::registerServer()
 #endif
     request->addParameter("address",      addr.getIP()                    );
     request->addParameter("port",         addr.getPort()                  );
-    request->addParameter("private_port", STKHost::get()->getPort()       );
-    request->addParameter("name",         STKHost::get()->getServerName() );
+    request->addParameter("private_port",
+                                    NetworkConfig::get()->getPrivatePort());
+    request->addParameter("name",   NetworkConfig::get()->getServerName() );
     request->addParameter("max_players", 
                           UserConfigParams::m_server_max_players          );
     Log::info("RegisterServer", "Showing addr %s", addr.toString().c_str());
@@ -258,7 +260,7 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
     PlayerManager::setUserDetails(request, "poll-connection-requests",
                                   Online::API::SERVER_PATH);
 
-    const TransportAddress &addr = STKHost::get()->getPublicAddress();
+    const TransportAddress &addr = NetworkConfig::get()->getMyAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
 
@@ -408,7 +410,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     uint32_t player_id = 0;
     player_id = data.getUInt32(1);
     // can we add the player ?
-    if (m_setup->getPlayerCount() < STKHost::getMaxPlayers()) //accept
+    if (m_setup->getPlayerCount() < NetworkConfig::get()->getMaxPlayers()) //accept
     {
         // add the player to the game setup
         m_next_id = m_setup->getPlayerCount();

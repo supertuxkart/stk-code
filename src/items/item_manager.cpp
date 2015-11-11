@@ -29,8 +29,8 @@
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
+#include "network/network_config.hpp"
 #include "network/network_world.hpp"
-#include "network/stk_host.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
@@ -320,7 +320,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
             // if we're not playing online, pick the item.
             if (!NetworkWorld::getInstance()->isRunning())
                 collectedItem(*i, kart);
-            else if (STKHost::isServer())
+            else if (NetworkConfig::get()->isServer())
             {
                 collectedItem(*i, kart);
                 NetworkWorld::getInstance()->collectedItem(*i, kart);

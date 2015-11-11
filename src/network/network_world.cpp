@@ -1,10 +1,10 @@
 #include "network/network_world.hpp"
 
+#include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
 #include "network/protocols/controller_events_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
-#include "network/stk_host.hpp"
 #include "modes/world.hpp"
 
 #include "karts/controller/controller.hpp"
@@ -62,7 +62,7 @@ bool NetworkWorld::isRaceOver()
 
 void NetworkWorld::collectedItem(Item *item, AbstractKart *kart)
 {
-    assert(STKHost::isServer()); // this is only called in the server
+    assert(NetworkConfig::get()->isServer()); // this is only called in the server
     GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
         ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
     protocol->collectedItem(item,kart);
