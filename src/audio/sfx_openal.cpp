@@ -59,7 +59,6 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float volume,
     if (SFXManager::get()->sfxAllowed())
     {
         SFXManager::get()->queue(SFXManager::SFX_CREATE_SOURCE, this);
-        //init();
     }
 }   // SFXOpenAL
 
@@ -158,6 +157,8 @@ void SFXOpenAL::setSpeed(float factor)
  */
 void SFXOpenAL::reallySetSpeed(float factor)
 {
+    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+
     if(m_status==SFX_NOT_INITIALISED)
     {
         init();
@@ -315,7 +316,8 @@ void SFXOpenAL::reallyPauseNow()
  */
 void SFXOpenAL::resume()
 {
-    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+    //if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+    if (!SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_RESUME, this);
 }   // resume
 
@@ -347,7 +349,7 @@ void SFXOpenAL::play()
 {
     if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
 
-    if(m_status==SFX_STOPPED)
+    if(m_status==SFX_STOPPED || m_status==SFX_NOT_INITIALISED)
         m_play_time = 0.0f;
 
     // Technically the sfx is only playing after the sfx thread starts it,
@@ -386,7 +388,7 @@ void SFXOpenAL::play(const Vec3 &position)
 {
     if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
 
-    if(m_status==SFX_STOPPED)
+    if(m_status==SFX_STOPPED || m_status==SFX_NOT_INITIALISED)
         m_play_time = 0.0f;
 
     // Technically the sfx is only playing after the sfx thread starts it,
@@ -466,7 +468,8 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
 /** Shortcut that plays at a specified position. */
 void SFXOpenAL::setSpeedPosition(float factor, const Vec3 &position)
 {
-    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+    //if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+    if (!SFXManager::get()->sfxAllowed()) return;
 
     SFXManager::get()->queue(SFXManager::SFX_SPEED_POSITION, this,
                              factor, position);
@@ -478,6 +481,7 @@ void SFXOpenAL::setSpeedPosition(float factor, const Vec3 &position)
  */
 void SFXOpenAL::reallySetSpeedPosition(float f, const Vec3 &position)
 {
+    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
     reallySetSpeed(f);
     reallySetPosition(position);
 }   // reallySetSpeedPosition
