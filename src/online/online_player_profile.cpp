@@ -25,7 +25,6 @@
 #include "guiengine/screen.hpp"
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
-#include "online/servers_manager.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online_profile_friends.hpp"
 #include "states_screens/user_screen.hpp"
