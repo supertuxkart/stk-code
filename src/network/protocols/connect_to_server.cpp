@@ -28,9 +28,9 @@
 #include "network/protocols/ping_protocol.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
-#include "online/servers_manager.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 
@@ -63,8 +63,7 @@ ConnectToServer::ConnectToServer(uint32_t server_id, uint32_t host_id)
     m_server_id  = server_id;
     m_host_id    = host_id;
     m_quick_join = false;
-    const Online::Server *server = 
-        Online::ServersManager::get()->getServerByID(server_id);
+    const Server *server = ServersManager::get()->getServerByID(server_id);
     m_server_address.copy(server->getAddress());
 
 }   // ConnectToServer(server, host)

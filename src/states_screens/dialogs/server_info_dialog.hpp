@@ -23,11 +23,12 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
-#include "online/server.hpp"
-#include "online/xml_request.hpp"
+#include "network/server.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
+
+namespace Online { class XMLRequest; }
 
 /**
  * \brief Dialog that allows a user to sign in

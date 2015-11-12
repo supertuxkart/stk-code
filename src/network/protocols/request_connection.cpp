@@ -23,7 +23,7 @@
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
-#include "online/servers_manager.hpp"
+#include "network/servers_manager.hpp"
 
 using namespace Online;
 
@@ -78,7 +78,7 @@ void RequestConnection::asynchronousUpdate()
                 Network *broadcast = new Network(1, 1, 0, 0);
 
                 NetworkString s(std::string("connection-request"));
-                const Online::Server *server = 
+                const Server *server = 
                     ServersManager::get()->getServerByID(m_server_id);
                 broadcast->sendRawPacket(s.getBytes(), s.size(),
                                          server->getAddress());

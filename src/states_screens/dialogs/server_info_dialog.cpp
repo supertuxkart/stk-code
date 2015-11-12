@@ -21,8 +21,8 @@
 #include "guiengine/engine.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/request_connection.hpp"
+#include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
-#include "online/servers_manager.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
@@ -89,7 +89,7 @@ void ServerInfoDialog::requestJoin()
 {
     // FIXME - without this next line, it appears that m_server_join is completely unused.
     //m_server_join_request = Online::CurrentUser::get()->requestServerJoin(m_server_id);
-    Online::ServersManager::get()->setJoinedServer(m_server_id);
+    ServersManager::get()->setJoinedServer(m_server_id);
 
     STKHost::create();
     ModalDialog::dismiss();

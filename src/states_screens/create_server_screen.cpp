@@ -24,8 +24,8 @@
 #include "config/player_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "network/network_config.hpp"
+#include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
-#include "online/servers_manager.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -40,7 +40,6 @@
 
 
 using namespace GUIEngine;
-using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( CreateServerScreen );
 

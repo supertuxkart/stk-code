@@ -16,11 +16,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "online/servers_manager.hpp"
+#include "network/servers_manager.hpp"
+
 #include "config/user_config.hpp"
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "online/xml_request.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
 
@@ -30,8 +32,6 @@
 
 #define SERVER_REFRESH_INTERVAL 5.0f
 
-namespace Online
-{
 static ServersManager* manager_singleton(NULL);
 
 ServersManager* ServersManager::get()
@@ -91,16 +91,16 @@ void ServersManager::cleanUpServers()
 /** Returns a WAN update-list-of-servers request. It queries the
  *  STK server for an up-to-date list of servers.
  */
-XMLRequest* ServersManager::getWANRefreshRequest() const
+Online::XMLRequest* ServersManager::getWANRefreshRequest() const
 {
     // ========================================================================
     /** A small local class that triggers an update of the ServersManager
      *  when the request is finished. */
-    class WANRefreshRequest : public XMLRequest
+    class WANRefreshRequest : public Online::XMLRequest
     {
     public:
-        WANRefreshRequest() : XMLRequest(/*manage_memory*/false,
-                                         /*priority*/100) {}
+        WANRefreshRequest() : Online::XMLRequest(/*manage_memory*/false,
+                                                 /*priority*/100) {}
         // --------------------------------------------------------------------
         virtual void callback()
         {
@@ -110,8 +110,8 @@ XMLRequest* ServersManager::getWANRefreshRequest() const
     };   // RefreshRequest
     // ========================================================================
 
-    XMLRequest* request = new WANRefreshRequest();
-    request->setApiURL(API::SERVER_PATH, "get-all");
+    Online::XMLRequest *request = new WANRefreshRequest();
+    request->setApiURL(Online::API::SERVER_PATH, "get-all");
 
     return request;
 }   // getWANRefreshRequest
@@ -121,14 +121,14 @@ XMLRequest* ServersManager::getWANRefreshRequest() const
  *  to find LAN servers, and waits for a certain amount of time fr 
  *  answers.
  */
-XMLRequest* ServersManager::getLANRefreshRequest() const
+Online::XMLRequest* ServersManager::getLANRefreshRequest() const
 {
     /** A simple class that uses LAN broadcasts to find local servers.
      *  It is based on XML request, but actually does not use any of the
      *  XML/HTTP based infrastructure, but implements the same interface.
      *  This way the already existing request thread can be used.
      */
-    class LANRefreshRequest : public XMLRequest
+    class LANRefreshRequest : public Online::XMLRequest
     {
     public:
 
@@ -207,7 +207,7 @@ XMLRequest* ServersManager::getLANRefreshRequest() const
 /** Factory function to create either a LAN or a WAN update-of-server
  *  requests. The current list of servers is also cleared/
  */
-XMLRequest* ServersManager::getRefreshRequest(bool request_now)
+Online::XMLRequest* ServersManager::getRefreshRequest(bool request_now)
 {
     if (StkTime::getRealTime() - m_last_load_time.getAtomic()
         < SERVER_REFRESH_INTERVAL)
@@ -226,11 +226,12 @@ XMLRequest* ServersManager::getRefreshRequest(bool request_now)
     }
 
     cleanUpServers();
-    XMLRequest *request = NetworkConfig::get()->isWAN() ? getWANRefreshRequest()
-                                                        : getLANRefreshRequest();
+    Online::XMLRequest *request = 
+        NetworkConfig::get()->isWAN() ? getWANRefreshRequest()
+                                      : getLANRefreshRequest();
 
     if (request_now)
-        RequestManager::get()->addRequest(request);
+        Online::RequestManager::get()->addRequest(request);
 
     return request;
 }   // getRefreshRequest
@@ -342,4 +343,3 @@ void ServersManager::sort(bool sort_desc)
     m_sorted_servers.getData().insertionSort(0, sort_desc);
 }   // sort
 
-} // namespace Online

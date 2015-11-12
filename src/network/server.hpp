@@ -33,8 +33,6 @@
 
 class XMLNode;
 
-namespace Online
-{
 /**
  * \ingroup online
  */
@@ -137,5 +135,4 @@ public:
     }   // operator<
 
 };   // Server
-} // namespace Online
 #endif // HEADER_SERVER_HPP

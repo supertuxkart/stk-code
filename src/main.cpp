@@ -175,10 +175,10 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
+#include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
-#include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -1616,7 +1616,7 @@ static void cleanSuperTuxKart()
 
     // FIXME: do we need to wait for threads there, can they be
     // moved further up?
-    Online::ServersManager::deallocate();
+    ServersManager::deallocate();
     if(NetworkConfig::get()->isNetworking())
         STKHost::destroy();
 

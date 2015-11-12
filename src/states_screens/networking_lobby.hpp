@@ -22,7 +22,8 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
-#include "online/server.hpp"
+
+class Server;
 
 namespace GUIEngine { class Widget; class ListWidget; }
 
@@ -36,7 +37,7 @@ class NetworkingLobby :     public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<NetworkingLobby>;
 
-    Online::Server * m_server;
+    Server * m_server;
 
     NetworkingLobby();
 

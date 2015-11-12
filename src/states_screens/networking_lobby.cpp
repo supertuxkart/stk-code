@@ -29,14 +29,14 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "main_loop.hpp"
+#include "modes/demo_world.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/servers_manager.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/client_lobby_room_protocol.hpp"
-#include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
-#include "online/servers_manager.hpp"
 
 using namespace Online;
 using namespace GUIEngine;

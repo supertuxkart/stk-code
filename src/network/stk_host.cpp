@@ -28,8 +28,8 @@
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/servers_manager.hpp"
 #include "network/stk_peer.hpp"
-#include "online/servers_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
@@ -54,8 +54,7 @@ void STKHost::create()
         m_stk_host = new STKHost(NetworkConfig::get()->getServerName());
     else
     {
-        Online::Server *server = 
-            Online::ServersManager::get()->getJoinedServer();
+        Server *server = ServersManager::get()->getJoinedServer();
         m_stk_host = new STKHost(server->getServerId(), 0);
     }
    if(!m_stk_host->m_network)

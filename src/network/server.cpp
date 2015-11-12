@@ -14,18 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-/**
-  \page online Online
-  */
 
-#include "online/server.hpp"
+#include "network/server.hpp"
 
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
-namespace Online
-{
 Server::SortOrder Server::m_sort_order = Server::SO_NAME;
 
 /** Constructor based on XML data received from the stk server.
@@ -102,4 +97,3 @@ bool Server::filterByWords(const core::stringw words) const
 
     return false;
 } // filterByWords
-} // namespace Online

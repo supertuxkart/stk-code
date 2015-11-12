@@ -20,14 +20,13 @@
 #define HEADER_SERVERS_MANAGER_HPP
 
 #include "online/request_manager.hpp"
-#include "online/server.hpp"
-#include "online/xml_request.hpp"
+#include "network/server.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
-namespace Online
-{
+namespace Online { class XMLRequest; }
+
 /**
  * \brief
  * \ingroup online
@@ -50,15 +49,15 @@ private:
     Synchronised<float>      m_last_load_time;
     void                     refresh(bool success, const XMLNode * input);
     void                     cleanUpServers();
-    XMLRequest *             getWANRefreshRequest() const;
-    XMLRequest *             getLANRefreshRequest() const;
+    Online::XMLRequest *     getWANRefreshRequest() const;
+    Online::XMLRequest *     getLANRefreshRequest() const;
 
 public:
     // Singleton
     static ServersManager*   get();
     static void              deallocate();
 
-    XMLRequest *             getRefreshRequest(bool request_now = true);
+    Online::XMLRequest *     getRefreshRequest(bool request_now = true);
     void                     setJoinedServer(uint32_t server_id);
     void                     unsetJoinedServer();
     void                     addServer(Server * server);
@@ -72,5 +71,4 @@ public:
     const Server *           getQuickPlay() const;
 
 };   // class ServersManager
-} // namespace Online
 #endif // HEADER_SERVERS_MANAGER_HPP

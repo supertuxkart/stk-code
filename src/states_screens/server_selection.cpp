@@ -19,7 +19,8 @@
 
 #include "audio/sfx_manager.hpp"
 #include "guiengine/modaldialog.hpp"
-#include "online/servers_manager.hpp"
+#include "network/servers_manager.hpp"
+#include "online/xml_request.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
